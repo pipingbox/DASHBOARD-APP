@@ -1,0 +1,50 @@
+Improve certificate and document viewing in Company Candidate Detail.
+
+Current issue:
+Recruiters can only download certificates/documents. This forces them to download many files unnecessarily.
+
+Goal:
+Allow recruiters to preview certificates and documents directly inside the app before deciding to download.
+
+Requirements:
+
+1. In Candidate Detail, replace or complement the download-only button with:
+   - "Ver"
+   - "Descargar"
+
+2. When clicking "Ver", open a modal preview.
+
+3. Preview behavior:
+   - If file is PDF: show embedded PDF viewer using iframe/object.
+   - If file is image: show image preview.
+   - If file type is unknown: show message "Vista previa no disponible" and offer download.
+
+4. Modal content:
+   - Title: certificate/document name
+   - Issuer/type
+   - Expiry date if available
+   - Large preview area
+   - Download button
+   - Close button
+
+5. Do not automatically download when clicking "Ver".
+
+6. Use existing file URLs:
+   Certifications:
+   - certificate_file_url
+   - fallback file_url
+
+   Documents:
+   - file_url
+
+7. Keep existing download button for users who want the file.
+
+8. Add same preview behavior in:
+   - Profile / CV worker view
+   - Company Candidate Detail view
+
+9. Support public Supabase Storage URLs.
+
+10. Keep current dark industrial PipingBox design.
+11. Do not change database schema.
+12. Do not change upload logic.

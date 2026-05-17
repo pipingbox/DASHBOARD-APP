@@ -1,0 +1,96 @@
+Implement ultra-fast onboarding + fix mobile horizontal overflow.
+
+PART 1 — ULTRA FAST ONBOARDING
+
+Create a fast onboarding wizard after signup/login.
+
+Goal:
+User can complete minimum useful profile in under 2 minutes.
+
+Flow:
+1. Account type
+- Profesional Industrial
+- Empresa
+
+2. Main role/trade
+Options:
+- Piping Supervisor
+- Pipefitter
+- Welder
+- Mechanical Supervisor
+- QA/QC
+- HSE
+- Rigger
+- Scaffolder
+- Engineer
+- Other
+
+3. Main specialty
+Options as selectable chips:
+- Piping
+- Mechanical
+- Welding
+- Rigging
+- Scaffolding
+- QA/QC
+- HSE
+- Shutdowns
+- Oil & Gas
+- Energy
+- Construction
+
+4. Current country/location
+Simple field with country + city.
+
+5. Availability
+Options:
+- Available now
+- Available in 2 weeks
+- Available in 1 month
+- Currently working
+- Not available
+
+6. Travel/relocation
+Toggles:
+- Willing to travel
+- Willing to relocate
+
+7. Optional profile photo
+Allow skip.
+
+Rules:
+- Save each step instantly.
+- Do not force CV/certificates/experience during initial onboarding.
+- After completion redirect to dashboard.
+- Calculate profile_completion percentage.
+- Minimum onboarding completed should mark user as PROFILE_STARTED.
+- Marketplace visibility should only happen when minimum required profile data is completed.
+
+Add progress bar:
+“Perfil completado X%”
+
+Add encouraging copy:
+“Completa lo esencial ahora. Podrás añadir CV, certificados y experiencia después.”
+
+PART 2 — MOBILE LAYOUT BUG
+
+Fix mobile horizontal overflow.
+
+Current issue:
+On mobile, user can scroll sideways and a white blank area appears on the right side.
+
+Fix requirements:
+- Remove horizontal scrolling on all app pages.
+- Body, html, root and app containers must have max-width: 100vw and overflow-x: hidden.
+- Ensure sidebar/drawer does not create extra width.
+- Header must fit mobile width.
+- Search bar on mobile should be smaller or collapsible.
+- Language selector, notification icon and avatar must not push layout wider than viewport.
+- On mobile, search input can become icon-only or max-width 140px.
+- Ensure no element uses fixed desktop width that exceeds viewport.
+- Test dashboard, profile, admin, login and register pages at 360px width.
+
+Expected result:
+No white area on the right.
+No horizontal scrollbar.
+Mobile header clean and compact.

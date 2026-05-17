@@ -1,0 +1,56 @@
+URGENT BUGFIX — Restore admin access and prevent role lockout.
+
+Current issue:
+The app now shows "Access Restricted" and detects the current user as WORKER, even though the primary admin account must be admin.
+
+PRIMARY ADMIN EMAIL:
+[gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com)
+
+IMPORTANT:
+Do not redesign anything.
+Do not remove existing role system.
+Do not break Admin Center, Company Dashboard, Jobs, Applications, or Content Drafts.
+
+TASKS:
+
+1. Restore admin access immediately for:
+   [gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com)
+
+2. Ensure this email always resolves as:
+   role = admin
+
+3. Update the profiles table if needed:
+   role = admin
+   where email = '[gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com)'
+
+4. If the app cannot read profile role, add fallback logic:
+   if authenticated user email equals [gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com), treat as admin.
+
+5. Fix route protection:
+
+* /dashboard must never be blocked for authenticated users.
+* /admin is only for admin.
+* /company-dashboard is for company role and admin preview mode.
+* normal worker should still access /dashboard.
+
+6. Restore Admin View switcher:
+   Admin must be able to preview:
+
+* Admin View
+* Worker View
+* Company View
+* Community Moderator View
+* Jobs Moderator View
+
+7. Preview mode must NOT overwrite the real stored role in Supabase.
+
+8. Add safe fallback:
+   If role is missing or invalid, default user to worker, but never override the primary admin email.
+
+Expected result:
+
+* Gaspar can access dashboard again.
+* Gaspar sees ADMIN in sidebar.
+* Admin Center appears.
+* Preview mode works.
+* No endless Access Restricted loop.

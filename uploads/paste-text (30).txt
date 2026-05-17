@@ -1,0 +1,62 @@
+BUGFIX — Post Job still fails with:
+
+permission denied for table users
+
+The frontend no longer queries users, but the error still appears.
+
+This means the insert into app_14da0f1941_jobs is probably triggering a database trigger, function, relationship, or validation that reads from the users table.
+
+IMPORTANT:
+Do not redesign anything.
+Do not disable RLS globally.
+Do not expose users table publicly.
+
+TASKS:
+
+1. Inspect app_14da0f1941_jobs for:
+
+* triggers
+* functions
+* foreign key relationships
+* validations
+* generated fields
+* policies
+  that reference the users table.
+
+2. Remove or replace any dependency on the users table.
+
+3. The jobs table should use only:
+
+* auth.uid()
+* company_user_id
+* profiles table if needed
+
+4. If there is a trigger that reads users:
+   replace it so it reads profiles instead, or remove it if not required.
+
+5. Ensure publish job works with this payload only:
+   company_user_id: user.id
+   posted_by: user.id if column exists
+   company_name
+   title
+   location
+   country
+   discipline
+   contract_type
+   salary_range
+   rotation
+   description
+   requirements
+   status: 'open'
+   applications_count: 0
+
+6. If a NOT NULL column requires company_name, use the form company_name or fallback to the profile/company name.
+
+7. Add detailed console logging for:
+
+* insert payload
+* Supabase insert error
+* failing table/function if available
+
+EXPECTED RESULT:
+Publishing a job must succeed without any dependency on the users table.

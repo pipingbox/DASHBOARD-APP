@@ -1,0 +1,50 @@
+Extend the Profile / CV module with professional certification and identity features.
+
+1. Profile picture:
+- Add upload profile image
+- Store in Supabase Storage
+- Show in dashboard, community and profile
+
+2. Certifications system:
+Create a new section “Certifications”
+
+Allow users to:
+- Add certification
+- Upload PDF file
+- Add verification URL
+- Add QR code
+- Add credential ID
+- Add issue and expiry dates
+
+Create Supabase table:
+certifications with user_id relation
+
+3. Certification display:
+- Show list of certifications
+- Display:
+  - Name
+  - Issuer
+  - Validity
+  - Verified badge
+- Add “View certificate” and “Verify” buttons
+
+4. Verification logic:
+- If verification_url exists → mark as “verifiable”
+- Future-ready for admin verification system
+
+5. CV Builder:
+Replace “CV URL” with:
+- “Generate CV” button
+
+Generate PDF including:
+- Profile data
+- Skills
+- Experience
+- Certifications (with QR if available)
+
+Design:
+Keep Dark Industrial Minimalism
+Professional, recruiter-focused UI
+
+Important:
+This module should position PipingBox as a professional verified identity platform for industrial workers.

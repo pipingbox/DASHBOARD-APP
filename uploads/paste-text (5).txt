@@ -1,0 +1,58 @@
+Implement a multilingual interface system for the PipingBox React app.
+
+Objective:
+The platform must support multiple UI languages because not all users speak English. English must remain the default language.
+
+Languages to support in the first version:
+- English
+- Spanish
+- Dutch
+- French
+- German
+- Portuguese
+
+Important rule:
+The brand name “PipingBox” must never be translated in any language.
+
+UI requirements:
+1. Add a language selector in the top bar, next to the user avatar/profile icon.
+2. The selector should show a small country/language flag and current language code.
+3. When clicked, open a clean dropdown with:
+   - 🇬🇧 English
+   - 🇪🇸 Español
+   - 🇳🇱 Nederlands
+   - 🇫🇷 Français
+   - 🇩🇪 Deutsch
+   - 🇵🇹 Português
+4. Default language must be English.
+5. Store the selected language in localStorage so the user preference remains after refresh/login.
+6. If possible, detect browser language on first visit, but only apply it if it matches one of the supported languages. Otherwise use English.
+7. All visible interface texts must use translation keys, not hardcoded strings.
+8. Do not translate technical brand/module names unless explicitly required:
+   - PipingBox
+   - Academy
+   - Tools
+   - Community
+   - Jobs
+   - Companies
+   - Profile / CV
+9. Translate descriptions, buttons, helper text, labels, empty states and error messages.
+10. Ensure the sidebar, dashboard cards, community page, channel descriptions and top search placeholder are ready for translation.
+11. Add a scalable translation file structure, for example:
+   /src/i18n/locales/en.json
+   /src/i18n/locales/es.json
+   /src/i18n/locales/nl.json
+   /src/i18n/locales/fr.json
+   /src/i18n/locales/de.json
+   /src/i18n/locales/pt.json
+
+Recommended implementation:
+Use i18next or a lightweight custom translation provider if the app is simple.
+
+Acceptance test:
+- App opens in English by default.
+- User can change language from the top-right selector.
+- Selected language persists after refresh.
+- PipingBox always remains “PipingBox”.
+- No page breaks when switching language.
+- Missing translations must fallback to English.

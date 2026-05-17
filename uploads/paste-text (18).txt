@@ -1,0 +1,140 @@
+ACT AS A SENIOR SAAS AUTHORIZATION ENGINEER.
+
+We need to fix the current admin role visibility and add an admin-only role preview switcher.
+
+IMPORTANT:
+Do not redesign the platform.
+Do not break existing role-based navigation.
+Only fix admin role detection and add admin preview mode.
+
+==================================================
+PRIMARY ADMIN ACCOUNT
+=====================
+
+The PRIMARY PLATFORM ADMIN is:
+
+[gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com)
+
+This account must always have:
+
+* role = admin
+* full admin navigation
+* access to Admin Center
+* access to moderation systems
+* access to content systems
+* access to analytics and role preview tools
+
+==================================================
+STEP 1 — FORCE CURRENT USER AS ADMIN
+====================================
+
+Find the authenticated user profile linked to:
+
+[gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com)
+
+Update the profile role to:
+
+admin
+
+Persist this role in Supabase so it survives refresh, logout, and future sessions.
+
+==================================================
+STEP 2 — SIDEBAR ROLE BADGE
+===========================
+
+Update the sidebar footer role badge.
+
+If current user role is admin:
+show:
+ADMIN
+
+If worker:
+WORKER
+
+If company:
+COMPANY
+
+If community_moderator:
+COMMUNITY MODERATOR
+
+If jobs_moderator:
+JOBS MODERATOR
+
+==================================================
+STEP 3 — ADMIN CENTER VISIBILITY
+================================
+
+Ensure Admin Center menu item appears ONLY when real user role = admin.
+
+Admin must see:
+
+* Admin Center
+* Content Drafts
+* Jobs
+* Companies
+* Community
+* My Applications
+* Tools
+* Academy
+* Profile / CV
+
+==================================================
+STEP 4 — ADMIN ROLE PREVIEW SWITCHER
+====================================
+
+Add an admin-only "View As" switcher near the sidebar footer, close to the role badge.
+
+Visible only to real admin users.
+
+Options:
+
+* Admin View
+* Worker View
+* Company View
+* Community Moderator View
+* Jobs Moderator View
+
+This switcher must only affect UI preview/navigation visibility.
+It must NOT change the real stored user role in Supabase.
+
+==================================================
+STEP 5 — PREVIEW MODE BEHAVIOR
+==============================
+
+When admin selects "Worker View":
+show worker navigation and permissions preview.
+
+When admin selects "Company View":
+show company navigation preview.
+
+When admin selects "Community Moderator View":
+show community moderation interface.
+
+When admin selects "Jobs Moderator View":
+show recruitment moderation interface.
+
+When admin selects "Admin View":
+restore full admin interface.
+
+==================================================
+STEP 6 — SECURITY
+=================
+
+The preview switcher is ONLY for admin testing.
+
+Do NOT weaken route protection.
+Do NOT expose admin routes to non-admin users.
+Do NOT overwrite real roles during preview mode.
+
+==================================================
+FINAL RESULT
+============
+
+The account:
+[gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com)
+
+must permanently behave as:
+ADMIN
+
+Admin Center must appear automatically.
+The admin can instantly preview Worker, Company, Community Moderator, and Jobs Moderator views without logging out.

@@ -1,0 +1,73 @@
+Verify and implement full referral tracking system.
+
+Current situation:
+
+* WhatsApp sharing works.
+* Copy link and generic share buttons are not fully working.
+* Need backend persistence and referral attribution.
+
+IMPLEMENT REQUIRED FLOW:
+
+1. Each user must have:
+
+* unique referral_code
+* unique referral URL
+
+Example:
+https://pipingbox.com/register?ref=PB-060D99L9X
+
+2. When a visitor enters through referral link:
+
+* store referral code in localStorage/session/cookie.
+
+Example:
+localStorage.setItem("referralCode", code)
+
+3. During registration:
+
+* send referralCode to backend.
+
+4. Backend must:
+
+* validate referral code,
+* identify referring user,
+* create referral relationship.
+
+DATABASE STRUCTURE:
+
+users:
+
+* id
+* referral_code
+* referred_by_user_id
+
+referrals:
+
+* id
+* referrer_user_id
+* referred_user_id
+* status
+* created_at
+* verified_at
+
+Referral statuses:
+
+* pending
+* verified
+* rejected
+
+A referral only becomes VERIFIED if:
+
+* email verified
+* onboarding completed
+* minimum activity detected
+
+FRONTEND FIXES:
+
+* Fix "Copy Link" button using navigator.clipboard.writeText()
+* Fix generic Share button using navigator.share() with fallback support
+
+IMPORTANT:
+Ensure referral attribution survives page refresh and delayed registration.
+
+Track referrals securely and prevent abuse/fake accounts.

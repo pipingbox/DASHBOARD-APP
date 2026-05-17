@@ -1,0 +1,99 @@
+BUGFIX — Post Job still fails with:
+
+permission denied for table users
+
+IMPORTANT:
+Do not redesign anything.
+Do not weaken security.
+Do not disable RLS.
+Do not expose the users table publicly.
+
+==================================================
+ISSUE
+=====
+
+The Post Job flow is trying to read from a table called users.
+
+This causes:
+permission denied for table users
+
+The jobs table permissions are already fixed.
+
+==================================================
+GOAL
+====
+
+Remove dependency on the users table from the Post Job flow.
+
+Use:
+
+* supabase.auth.getUser()
+* profiles table if profile/company data is needed
+
+==================================================
+TASKS
+=====
+
+1. Inspect the Post Job publish function.
+
+2. Find any query using:
+   .from('users')
+   or joining/querying the users table.
+
+3. Remove that users table query.
+
+4. Get current authenticated user with:
+   const { data: { user } } = await supabase.auth.getUser()
+
+5. Use:
+   user.id
+   user.email
+
+6. If company/profile info is needed, read from:
+   profiles
+
+using:
+.eq('id', user.id)
+
+or the correct profile user_id field already used in the app.
+
+7. Insert job into:
+   app_14da0f1941_jobs
+
+Payload must include:
+company_user_id: user.id
+company_name
+title
+location
+country
+discipline
+contract_type
+salary_range
+rotation
+description
+requirements
+status: 'open'
+applications_count: 0
+
+8. Do not query all users.
+   Do not query public users table.
+
+9. Add console error logging showing the exact Supabase error if publish fails.
+
+10. After successful insert:
+
+* show success toast
+* redirect to /company/jobs
+* refresh Jobs Management list
+
+==================================================
+EXPECTED RESULT
+===============
+
+Publishing a job must work without accessing the users table.
+
+The flow should be:
+auth user → optional profiles lookup → insert job
+
+No more:
+permission denied for table users

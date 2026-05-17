@@ -1,0 +1,118 @@
+Next development task: build the notifications system.
+
+Goal:
+Create a real notification layer that increases retention, supports referrals, onboarding, jobs, messages, and admin activity.
+
+PART 1 — Notification Center
+
+Add a notifications bell dropdown in the header.
+
+Show:
+- unread count badge
+- recent notifications
+- mark as read
+- mark all as read
+- link to related page/action
+
+Notification types:
+- PROFILE_INCOMPLETE
+- PROFILE_READY
+- REFERRAL_JOINED
+- REFERRAL_VERIFIED
+- JOB_INVITATION
+- NEW_MESSAGE
+- DOCUMENT_REQUEST
+- CERTIFICATE_EXPIRING
+- ADMIN_ALERT
+
+PART 2 — Database
+
+Create a notifications table if it does not exist.
+
+Fields:
+- id
+- user_id
+- type
+- title
+- message
+- related_entity_type
+- related_entity_id
+- action_url
+- read_at
+- created_at
+
+Enable RLS:
+- users can read their own notifications
+- users can update their own read_at
+- admins can view all notifications
+
+PART 3 — Automatic Notifications
+
+Trigger notifications when:
+
+1. Profile incomplete after signup:
+“Completa tu perfil para aparecer ante empresas.”
+
+2. Profile reaches marketplace ready:
+“Tu perfil ya puede ser descubierto por empresas.”
+
+3. New referral joins:
+“Tu referido se ha registrado en PipingBox.”
+
+4. Referral becomes verified:
+“Tu referido ha completado su perfil mínimo.”
+
+5. Company sends job invitation:
+“Has recibido una invitación de trabajo.”
+
+6. New message received:
+“Tienes un nuevo mensaje.”
+
+7. Certificate expiring soon:
+“Uno de tus certificados está próximo a vencer.”
+
+8. Admin orphan account detected:
+“Usuario registrado sin perfil detectado.”
+
+PART 4 — Admin Notifications
+
+In Admin → Activity or Admin → Notifications, show:
+- new registrations
+- orphan users
+- company signups
+- referral activity
+- failed profile creation
+- job invitations sent
+
+PART 5 — UX
+
+Keep industrial dark PipingBox style.
+
+Notifications must be:
+- short
+- actionable
+- mobile-friendly
+- not intrusive
+
+Example notification cards:
+- title
+- short message
+- time ago
+- icon
+- action button
+
+PART 6 — Important
+
+Do not break:
+- Google Auth
+- email login
+- referrals
+- profile completion
+- admin registros
+- marketplace visibility
+
+After implementation:
+- test by creating a notification manually
+- confirm bell unread count works
+- confirm read/unread state works
+- confirm mobile header still fits

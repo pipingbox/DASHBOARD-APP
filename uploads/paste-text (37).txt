@@ -1,0 +1,98 @@
+BUGFIX — Candidate profile still shows Access Denied.
+
+IMPORTANT:
+Do not redesign anything.
+Do not touch unrelated pages.
+
+CURRENT ISSUE:
+Company Candidates displays applicants correctly.
+But clicking "View Profile" still opens Access Denied.
+
+This likely means:
+
+* the View Profile button is not passing the correct application.user_id
+* the candidate route is receiving an undefined/wrong userId
+* or the access check is too strict and fails before loading the profile
+
+==================================================
+GOAL
+====
+
+Make View Profile work from /company/candidates.
+
+==================================================
+TASKS
+=====
+
+1. In /company/candidates, inspect each candidate card data.
+
+2. Ensure every card has:
+   application.id
+   application.user_id
+   application.job_id
+   application.company_user_id
+
+3. Update the View Profile button to navigate using:
+   application.user_id
+
+Route:
+`/candidate/${application.user_id}`
+
+Do NOT use candidate.id unless candidate.id is the profile/user id.
+Do NOT use application.id as candidate route id.
+
+4. In /candidate/:userId route:
+   Read route param as candidateUserId.
+
+5. Before showing Access Denied, log:
+
+* candidateUserId
+* current auth user id
+* current role
+* preview role
+* matching application found or not
+
+6. In admin preview mode:
+   If real user is admin and preview role is company, allow access for testing.
+
+7. For now, allow primary admin email to open any candidate profile:
+   [gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com)
+
+8. Candidate profile data fetch:
+   Fetch from:
+   app_14da0f1941_profiles
+
+Try both safely:
+
+* id = candidateUserId
+* user_id = candidateUserId if user_id column exists
+
+Use whichever returns data.
+
+9. If profile data does not exist:
+   Do NOT show Access Denied.
+   Show a fallback candidate profile using data from:
+   app_14da0f1941_job_applications
+
+Fallback fields:
+
+* worker name: "Worker"
+* job title
+* location
+* application status
+* applied date
+
+10. Only show Access Denied if:
+
+* viewer is not admin
+* not jobs_moderator
+* not authorized company
+* not owner of profile
+
+==================================================
+EXPECTED RESULT
+===============
+
+Clicking View Profile from Company Candidates opens candidate profile page.
+
+Even if profile row is incomplete, show fallback candidate/application data instead of Access Denied for admin/company preview.

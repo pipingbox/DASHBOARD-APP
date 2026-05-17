@@ -1,0 +1,166 @@
+FEATURE — Recruitment Messaging System (Company ↔ Worker)
+
+IMPORTANT:
+Do not redesign the platform.
+Keep the same dark industrial UI style.
+
+GOAL:
+Add a professional recruitment messaging system between companies and workers.
+
+This is NOT a public social chat.
+This is a recruitment communication system.
+
+==================================================
+PHASE 1 SCOPE
+=============
+
+Allow messaging only between:
+
+* company users
+* workers
+
+ONLY when:
+
+* worker applied to company job
+  OR
+* company explicitly contacted/saved worker
+
+==================================================
+NEW FEATURE
+===========
+
+Add:
+
+* Inbox / Messages page
+* Conversation view
+* Unread notifications
+* Message counter badge
+
+==================================================
+DATABASE
+========
+
+Create table:
+app_14da0f1941_messages
+
+Fields:
+
+* id
+* conversation_id
+* sender_user_id
+* receiver_user_id
+* application_id
+* job_id
+* company_user_id
+* worker_user_id
+* message
+* read
+* created_at
+
+Create table:
+app_14da0f1941_conversations
+
+Fields:
+
+* id
+* company_user_id
+* worker_user_id
+* application_id
+* job_id
+* last_message
+* last_message_at
+* unread_company
+* unread_worker
+* created_at
+
+==================================================
+RULES
+=====
+
+Workers can:
+
+* read own conversations
+* send messages in own conversations
+
+Companies can:
+
+* read conversations linked to their jobs/applications
+* send messages to candidates
+
+Admins/jobs_moderators:
+
+* full access
+
+No public access.
+
+==================================================
+UI
+==
+
+Add sidebar item:
+Messages
+
+Conversation list:
+
+* worker/company avatar
+* name
+* last message
+* unread badge
+* timestamp
+
+Chat window:
+
+* message bubbles
+* send box
+* auto-scroll
+* timestamps
+
+==================================================
+COMPANY FEATURES
+================
+
+From candidate card:
+Add button:
+"Message Candidate"
+
+This opens or creates conversation.
+
+==================================================
+WORKER FEATURES
+===============
+
+Worker sees messages in:
+My Messages
+
+==================================================
+NOTIFICATIONS
+=============
+
+Add:
+
+* unread count in sidebar
+* unread badge in topbar
+
+==================================================
+OPTIONAL QUICK ACTIONS
+======================
+
+Inside conversation:
+
+* Invite to Interview
+* Request Documents
+* Request Availability
+
+==================================================
+IMPORTANT
+=========
+
+Keep architecture scalable for:
+
+* future real-time chat
+* file attachments
+* interview scheduling
+* hiring pipeline
+
+Do not add external chat providers.
+Use Supabase only.

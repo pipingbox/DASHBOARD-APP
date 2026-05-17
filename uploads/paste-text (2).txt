@@ -1,0 +1,109 @@
+Refactor the Daily Pipe Log into a cleaner “Work Day Salary Log”.
+
+Main objective:
+This widget should focus only on daily work hours, gross salary, location and optional travel allowance. Do not mix ISO numbers, welders or welding production data in this form.
+
+Rename the feature from “Daily Pipe Log” to:
+“Work Day Log” or “Salary Log”
+
+Dashboard changes:
+- Add a monthly calendar widget.
+- Days with saved work entries should be highlighted in green.
+- Clicking a day opens the saved entry or allows creating a new one.
+- Show monthly totals:
+  - Total normal hours
+  - Total extra hours
+  - Total gross salary
+  - Total kilometers
+  - Total travel allowance if enabled
+
+Form fields:
+Required:
+- Date
+- Work location / site name
+- Normal hours
+- Extra hours
+- Normal hourly gross rate
+- Extra hourly gross rate
+
+Optional:
+- Notes
+- Kilometers driven
+- Kilometer rate
+- Travel allowance total
+
+Salary calculation:
+- Normal salary = normal hours × normal hourly gross rate
+- Extra salary = extra hours × extra hourly gross rate
+- Total gross salary = normal salary + extra salary
+
+Travel calculation:
+- Travel allowance = kilometers driven × kilometer rate
+- Final day total = total gross salary + travel allowance
+
+Rate presets:
+Create a rate preset system so the user does not need to type rates every day.
+
+Add a small selector:
+- Select saved rate preset
+- Create new preset
+- Edit preset
+
+Preset fields:
+- Preset name, for example “Fluxys Loenhout”, “ATPC Antwerp”, “Weekend rate”
+- Work location
+- Normal hourly gross rate
+- Extra hourly gross rate
+- Kilometer rate optional
+- Currency, EUR by default
+
+When a preset is selected:
+- Auto-fill location
+- Auto-fill normal rate
+- Auto-fill extra rate
+- Auto-fill kilometer rate if available
+
+Database:
+Update Supabase schema.
+
+Create a new table:
+salary_rate_presets:
+- id
+- user_id
+- name
+- location
+- normal_rate
+- extra_rate
+- kilometer_rate
+- currency
+- created_at
+
+Update daily_logs or create a new table work_day_logs with:
+- id
+- user_id
+- date
+- location
+- normal_hours
+- extra_hours
+- normal_rate
+- extra_rate
+- normal_salary
+- extra_salary
+- total_salary
+- kilometers
+- kilometer_rate
+- travel_allowance
+- final_total
+- currency
+- notes
+- preset_id
+- created_at
+
+Important:
+- Keep this feature focused on money and workday tracking only.
+- Remove ISO number and welders count from this form.
+- Keep future piping production tracking separate.
+- Use Dark Industrial Minimalism.
+- Use real Supabase data.
+- No mock data.
+- Keep RLS policies secure so users only access their own logs and presets.

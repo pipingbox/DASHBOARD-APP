@@ -1,0 +1,72 @@
+BUGFIX — Company Candidates shows 0 candidates while Worker My Applications shows applications.
+
+IMPORTANT:
+Do not redesign anything.
+Only fix data linking and candidate fetching.
+
+CURRENT ISSUE:
+
+* Worker My Applications correctly shows applications.
+* Company Dashboard shows 1 active job.
+* Company Candidates shows 0 candidates.
+* Some applications may not have company_user_id or job_id correctly linked.
+
+GOAL:
+Company Candidates must show applications for company jobs.
+
+TASKS:
+
+1. Inspect app_14da0f1941_job_applications records.
+
+2. Ensure every application created from a real job includes:
+
+* job_id
+* company_user_id
+* user_id
+* job_title
+* company_name
+* location
+* contract_type
+* status
+
+3. Update Apply Now flow:
+   When applying to a job from app_14da0f1941_jobs, copy:
+   job.id → job_id
+   job.company_user_id → company_user_id
+
+4. Backfill existing applications where possible:
+   If application has job_title and company_name matching a job in app_14da0f1941_jobs, update:
+   job_id
+   company_user_id
+
+5. Update /company/candidates fetch logic:
+   For real company users:
+   fetch applications where company_user_id = auth.uid()
+
+For Admin Preview Company View:
+show applications linked to company jobs OR show all applications with clear "Admin Preview" visibility.
+
+6. Do not rely only on auth.uid() during admin preview mode.
+
+7. Candidate cards must show:
+
+* worker name
+* job title
+* company/job location
+* application status
+* applied date
+* View Profile button
+
+8. Add console logs:
+
+* current auth user id
+* preview mode role
+* fetch filter used
+* number of applications returned
+
+EXPECTED RESULT:
+
+* Worker applications remain visible in My Applications.
+* Company Candidates shows applicants for the company job.
+* Admin Preview Company View can see candidate applications for testing.
+* Future real company users see only their own candidates.

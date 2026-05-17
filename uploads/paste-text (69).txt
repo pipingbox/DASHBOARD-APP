@@ -1,0 +1,76 @@
+Backend is now correct.
+
+I verified directly in Supabase:
+Gaspar profile has:
+- profile_completion = 100
+- onboarding_status = MARKETPLACE_READY
+- marketplace_ready = true
+
+So the database and centralized backend logic are already working correctly.
+
+The remaining issue is FRONTEND STATE / CACHE / LEGACY COMPONENTS.
+
+Current issue:
+- Profile page correctly shows 100%
+- Dashboard still shows 0% or disappears
+- Admin Registros still shows 75%
+
+This means some frontend components are:
+- using stale cached state
+- using old local calculations
+- not reading database values correctly
+- not refreshing after profile load
+
+CRITICAL FRONTEND FIX REQUIRED
+
+1. Dashboard:
+Remove all local completion calculations and stale state.
+Read ONLY:
+profile.profile_completion
+
+directly from Supabase query/store.
+
+2. Admin Registros:
+Stop using derived/local percentage logic.
+Read ONLY:
+profile_completion
+from database.
+
+3. Remove ALL fallback percentages:
+- 75%
+- 0%
+- hardcoded defaults
+- partial calculations
+
+4. Search entire frontend for:
+- profile_completion ||
+- ?? 75
+- ?? 0
+- fake completion arrays
+- completion derived from field counts
+- useMemo completion
+- local completion state
+
+5. Force fresh refetch after:
+- profile save
+- onboarding completion
+- login
+- dashboard load
+
+6. Clear stale React state/query cache.
+
+7. Ensure:
+Dashboard = 100
+Profile = 100
+Admin = 100
+
+for the same user.
+
+8. Add temporary console logs:
+COMPONENT NAME
+VALUE RECEIVED FROM DB
+FINAL DISPLAYED VALUE
+
+9. Database is now the single source of truth.
+Frontend must DISPLAY ONLY.
+NO local recalculations anymore.

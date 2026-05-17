@@ -1,0 +1,111 @@
+Implement a professional referral and rewards system with progressive visibility and gamified unlocks.
+
+OBJECTIVE:
+Create a viral but elegant growth system focused on organic word-of-mouth inside professional/industrial environments.
+
+CORE STRATEGY:
+
+* Do NOT aggressively show referrals on the landing page or registration.
+* Referral features should only become visible AFTER the user experiences product value.
+* Trigger visibility after:
+
+  * profile completion,
+  * first AI tool usage,
+  * first CV generation,
+  * or meaningful engagement.
+
+REFERRAL LOGIC:
+
+* Each user receives:
+
+  * unique referral link,
+  * referral code,
+  * optional QR code.
+
+VALID REFERRALS:
+A referral only counts if:
+
+* email is verified,
+* account is active,
+* and user completed minimum onboarding usage.
+
+REWARD STRUCTURE:
+
+LEVEL 1:
+3 successful referrals:
+
+* unlock Profile Premium permanently,
+* unlock CV tools,
+* unlock advanced profile features.
+
+LEVEL 2:
+10 referrals:
+
+* unlock advanced AI features,
+* ambassador badge,
+* early access tools.
+
+LEVEL 3:
+25+ referrals:
+
+* elite badge,
+* exclusive features,
+* future premium perks.
+
+UX REQUIREMENTS:
+Add a referral widget inside dashboard/profile:
+
+Components:
+
+* progress bar,
+* referrals counter,
+* unlocked rewards,
+* share button,
+* WhatsApp share shortcut,
+* copy link button.
+
+EXAMPLE:
+"Invite 3 professionals and unlock Premium Profile tools"
+
+PROGRESS UI:
+Visual progress bar:
+0/3
+1/3
+2/3
+3/3 unlocked
+
+IMPORTANT:
+The system must feel:
+
+* professional,
+* premium,
+* non-spammy,
+* not MLM-like.
+
+Avoid words like:
+
+* referral program,
+* earn money,
+* rewards system.
+
+Prefer:
+
+* Professional Network,
+* Unlock Features,
+* Team Access,
+* Pro Access.
+
+DESIGN STYLE:
+Minimal.
+Clean.
+Industrial/professional aesthetic.
+High trust.
+No flashy marketing feeling.
+
+EXTRA:
+Make the referral system scalable for future:
+
+* team/company groups,
+* rankings,
+* ambassador leaderboard,
+* company communities.

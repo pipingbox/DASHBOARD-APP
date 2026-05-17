@@ -1,0 +1,62 @@
+We are now very close, but the profile completion system is STILL not fully unified.
+
+Current state:
+- Dashboard now shows 70%
+- Admin → Registros shows 75%
+- Profile page still shows 100%
+
+This proves:
+- the database migration now exists
+- some modules already read profile_completion from database
+- BUT some components still use old frontend/local calculations
+
+We must now COMPLETE the migration to a single source of truth.
+
+CRITICAL TASK:
+
+1. Search entire frontend for:
+- "100%"
+- completion calculations
+- calculateProfileCompletion
+- profile completion UI
+- local completion logic
+- hardcoded percentages
+- derived completion arrays
+
+2. REMOVE all local/frontend completion calculations.
+
+3. The Profile page MUST stop calculating its own completion percentage.
+
+4. ALL modules must ONLY read:
+profile.profile_completion
+
+from database.
+
+NO EXCEPTIONS.
+
+5. Dashboard, Profile page and Admin must all display EXACTLY the same value.
+
+6. Create temporary debug logs:
+MODULE NAME
+DATABASE VALUE
+LOCAL VALUE (if still exists)
+
+to detect remaining old logic.
+
+7. IMPORTANT:
+The Profile page is still showing stale/local completion logic.
+Replace it completely with DB-driven value.
+
+8. Verify final result:
+Gaspar profile completion must be IDENTICAL everywhere:
+- Dashboard
+- Profile page
+- Admin Registros
+- Candidate profile
+- Any onboarding widgets
+
+9. Remove ALL hardcoded completion percentages.
+
+10. Final architecture:
+Database = single source of truth.
+Frontend = display only.

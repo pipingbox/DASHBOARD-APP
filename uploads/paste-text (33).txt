@@ -1,0 +1,88 @@
+BUGFIX — Candidate status and profile view are not connected correctly.
+
+IMPORTANT:
+Do not redesign anything.
+Do not break Jobs, Applications, Company Dashboard, Admin Center, or role system.
+
+CURRENT STATUS:
+
+* Workers can apply to jobs.
+* Company Candidates page now shows real applicants.
+* Company can change candidate status in the dropdown.
+* But the worker does not see the updated status in My Applications.
+* View Profile button does not open the real worker profile.
+
+GOAL:
+Complete the candidate pipeline connection.
+
+TASKS:
+
+1. Ensure /company/candidates status dropdown updates:
+   app_14da0f1941_job_applications.status
+
+Allowed statuses:
+
+* applied
+* reviewed
+* interview
+* shortlisted
+* rejected
+* hired
+
+2. Ensure My Applications page reads the same status field from:
+   app_14da0f1941_job_applications
+
+The worker should immediately see:
+
+* Applied
+* Reviewed
+* Interview
+* Shortlisted
+* Rejected
+* Hired
+
+3. Add visual status badges in My Applications matching company status.
+
+4. When company changes status, save to Supabase and show success toast.
+
+5. Add refresh/realtime behavior so status updates appear after refresh at minimum.
+
+6. Fix View Profile button in /company/candidates.
+
+When clicking View Profile:
+
+* open candidate profile route:
+  /profile/:userId
+  or create route:
+  /candidate/:userId
+
+7. Candidate profile must load data from profiles table using:
+   candidate user_id from app_14da0f1941_job_applications.user_id
+
+8. Candidate profile should show:
+
+* name
+* role/title
+* location
+* skills
+* experience
+* bio
+* certifications if available
+* applications context if available
+
+9. Add route protection:
+   Only admin, jobs_moderator, and the company linked to the application can view candidate profiles.
+
+10. If permissions block reading candidate profile, add safe RLS:
+
+* user can read own profile
+* company can read profile of users who applied to its jobs
+* admin can read all
+
+Do not expose all profiles publicly.
+
+EXPECTED RESULT:
+
+* Company updates application status.
+* Worker sees updated status in My Applications.
+* Company can open real candidate profile from Candidates page.

@@ -1,0 +1,176 @@
+ACT AS A SENIOR ENTERPRISE SAAS B2B DASHBOARD ENGINEER.
+
+We are starting PRIO 2 for PipingBox:
+REAL COMPANY DASHBOARD SYSTEM.
+
+IMPORTANT:
+Do not redesign the platform.
+Do not break:
+
+* Admin Center
+* Jobs
+* Applications
+* Community
+* Content Drafts
+* Worker Dashboard
+* Profile/CV
+* Existing role system
+* Existing navigation
+
+Only add a real Company Dashboard experience.
+
+==================================================
+GOAL
+====
+
+Create a professional Company Dashboard where companies can:
+
+* manage jobs
+* manage workforce requests
+* monitor candidates
+* see recruitment activity
+* access company-specific tools
+
+This dashboard must only be visible for:
+role = company
+
+==================================================
+STEP 1 — COMPANY ROLE NAVIGATION
+================================
+
+When user role = company:
+
+Replace worker navigation with company navigation.
+
+Company navigation should include:
+
+* Company Dashboard
+* Jobs Management
+* Candidates
+* Workforce Requests
+* Community
+* Company Profile
+* Analytics
+
+Hide:
+
+* My Applications
+* Worker salary/workday sections
+* Worker-specific dashboard widgets
+
+==================================================
+STEP 2 — COMPANY DASHBOARD HOME
+===============================
+
+Create route:
+/company-dashboard
+
+Professional B2B recruitment dashboard.
+
+==================================================
+STEP 3 — OVERVIEW CARDS
+=======================
+
+Show company metrics:
+
+* Active Jobs
+* Total Applications
+* Workforce Requests
+* Saved Candidates
+* Interviews Pending
+* Hires This Month
+
+Use live data where possible.
+
+If tables are empty:
+show 0 safely.
+
+==================================================
+STEP 4 — RECENT ACTIVITY
+========================
+
+Create activity feed showing:
+
+* New candidate applied
+* Workforce request updates
+* Job published
+* Candidate saved
+* Candidate withdrawn
+
+==================================================
+STEP 5 — COMPANY QUICK ACTIONS
+==============================
+
+Add buttons:
+
+* Post New Job
+* Request Workforce
+* Search Workers
+* View Candidates
+
+==================================================
+STEP 6 — COMPANY PROFILE SUMMARY
+================================
+
+Show compact company card:
+
+* company logo placeholder
+* company name
+* industry
+* country
+* verification badge
+* active projects count
+
+==================================================
+STEP 7 — COMPANY JOB WIDGET
+===========================
+
+Show latest jobs posted by company.
+
+Each card:
+
+* title
+* location
+* applications count
+* status
+* created date
+
+==================================================
+STEP 8 — RESPONSIVE B2B DESIGN
+==============================
+
+Use premium industrial SaaS style:
+
+* black backgrounds
+* orange accents
+* enterprise cards
+* clean KPI layout
+* smooth hover effects
+* professional recruiting software feeling
+
+==================================================
+STEP 9 — ACCESS PROTECTION
+==========================
+
+Only users with:
+role = company
+
+can access company routes.
+
+If worker tries:
+redirect to dashboard.
+
+==================================================
+STEP 10 — ADMIN PREVIEW SUPPORT
+===============================
+
+Admin View Switcher must support:
+Company View
+
+Admin should be able to preview the full company dashboard without changing real role.
+
+==================================================
+FINAL RESULT
+============
+
+PipingBox should now have a true B2B company-side experience where industrial companies can manage recruitment operations professionally inside the platform.

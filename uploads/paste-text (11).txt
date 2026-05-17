@@ -1,0 +1,130 @@
+ACT AS A SENIOR SAAS PRODUCT DESIGNER AND RECRUITMENT PLATFORM EXPERT.
+
+We need to transform the Jobs section into a realistic and active industrial recruitment platform.
+
+IMPORTANT:
+DO NOT BREAK CURRENT DESIGN SYSTEM.
+DO NOT REMOVE EXISTING FEATURES.
+
+ONLY IMPROVE REALISM, TRUST, AND PLATFORM ACTIVITY.
+
+==================================================
+STEP 1 — POPULATE JOB FEED
+==========================
+
+Create realistic industrial job listings.
+
+Include:
+
+* Pipefitters
+* TIG Welders
+* QA/QC Inspectors
+* Mechanical Supervisors
+* Work Preparators
+* Riggers
+* Planners
+* Offshore Technicians
+
+Use realistic countries:
+
+* Belgium
+* Netherlands
+* Germany
+* Norway
+* UAE
+* UK
+
+Each job card should include:
+
+* company name
+* location
+* rotation if offshore
+* contract type
+* salary range
+* urgent badge if needed
+* posted time
+* verification badge
+
+==================================================
+STEP 2 — LIVE ACTIVITY FEED
+===========================
+
+Add a small section:
+
+"Recent Applications"
+
+Examples:
+
+* 3 new candidates applied to Siemens Energy
+* QA/QC role filled in Rotterdam
+* Offshore welder position closed in Norway
+
+==================================================
+STEP 3 — JOB FILTERS
+====================
+
+Add filters:
+
+* country
+* discipline
+* offshore/onshore
+* contract type
+* urgent only
+
+==================================================
+STEP 4 — FEATURED JOBS
+======================
+
+Add a top featured jobs carousel or highlighted section.
+
+Use premium/high-paying jobs.
+
+==================================================
+STEP 5 — EMPTY STATE REMOVAL
+============================
+
+Never show:
+"No jobs match your search"
+
+Instead:
+show recommended jobs.
+
+==================================================
+STEP 6 — TRUST ELEMENTS
+=======================
+
+Add:
+
+* active jobs counter
+* verified companies counter
+* candidate applications count
+
+==================================================
+STEP 7 — MICRO UX
+=================
+
+Add:
+
+* hover animations
+* subtle transitions
+* loading skeletons
+* premium SaaS feel
+
+Inspired by:
+LinkedIn Jobs
+Indeed
+Linear
+Modern recruitment SaaS
+
+==================================================
+FINAL GOAL
+==========
+
+The Jobs section must feel:
+
+* active
+* alive
+* trusted
+* premium
+* industrial
+* already used by real companies and workers

@@ -1,0 +1,148 @@
+ACT AS A SENIOR SAAS PRODUCT ENGINEER AND UX DESIGNER.
+
+We are building the real business core of PipingBox.
+
+IMPORTANT:
+DO NOT CREATE A NEW APP.
+DO NOT BREAK EXISTING DASHBOARD.
+DO NOT REMOVE CURRENT FEATURES.
+
+WORK INSIDE THE CURRENT PROJECT.
+
+GOAL:
+Create the first monetization-ready system for companies that need industrial workers.
+
+==================================================
+STEP 1 — CREATE NEW PAGE
+========================
+
+Create a new page inside the existing "Companies" section:
+
+Route:
+"/companies/request-workers"
+
+Menu title:
+"Request Workforce"
+
+Use the existing PipingBox dark industrial design system:
+
+* black background
+* orange accent
+* clean SaaS layout
+* responsive
+* premium industrial feeling
+
+==================================================
+STEP 2 — CREATE COMPANY LEAD FORM
+=================================
+
+Build a professional form card with these fields:
+
+* Company Name
+* Contact Person
+* Email
+* Country
+* Type of workers needed
+* Estimated start date
+* Number of workers
+* Project duration
+* Message
+
+Add:
+
+* proper spacing
+* icons
+* validation
+* loading state
+* success message
+
+Main CTA button:
+"Request Workforce"
+
+==================================================
+STEP 3 — SUPABASE DATABASE
+==========================
+
+Create a Supabase table:
+
+company_leads
+
+Columns:
+
+id uuid primary key
+created_at timestamp
+company_name text
+contact_person text
+email text
+country text
+workers_needed text
+start_date text
+number_of_workers text
+project_duration text
+message text
+status text default 'new'
+
+==================================================
+STEP 4 — SAVE FORM DATA
+=======================
+
+When user submits:
+
+* save all form data to Supabase
+* show success confirmation
+* reset form
+
+==================================================
+STEP 5 — ADMIN VISIBILITY
+=========================
+
+Create a simple admin table/card inside dashboard visible only for admin users.
+
+Title:
+"Company Leads"
+
+Show:
+
+* company
+* country
+* workers needed
+* date
+* status
+
+Newest first.
+
+==================================================
+STEP 6 — UI QUALITY
+===================
+
+This must feel like:
+LinkedIn + industrial SaaS + modern recruitment platform.
+
+High-end professional look.
+Not generic.
+
+==================================================
+STEP 7 — SAFETY
+===============
+
+DO NOT MODIFY:
+
+* existing workday logs
+* existing profile system
+* jobs system
+* community system
+* authentication
+* current dashboard widgets
+
+ONLY EXTEND THE CURRENT APP CLEANLY.
+
+==================================================
+FINAL RESULT
+============
+
+After implementation:
+
+* Companies can request workers
+* Leads are stored in Supabase
+* Admin can see incoming leads
+* PipingBox becomes monetization-ready

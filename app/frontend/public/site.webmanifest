@@ -1,0 +1,26 @@
+{
+  "name": "PipingBox - Industrial Workforce Platform",
+  "short_name": "PipingBox",
+  "description": "Formación, herramientas, empleo, certificaciones y comunidad para profesionales y empresas del sector industrial.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0d0d",
+  "theme_color": "#f59e0b",
+  "icons": [
+    {
+      "src": "/assets/logos/logo-icon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/logos/logo-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/logos/logo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

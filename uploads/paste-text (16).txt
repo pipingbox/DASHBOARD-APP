@@ -1,0 +1,198 @@
+ACT AS A SENIOR SAAS AUTHORIZATION ARCHITECT AND PRODUCT ENGINEER.
+
+We need to implement scalable role-based navigation and access control in PipingBox.
+
+IMPORTANT:
+Do not redesign the platform.
+Do not break existing features.
+Only add role-based visibility and protected access.
+
+==================================================
+GOAL
+====
+
+Different user types must see different menus, dashboards, tools, and routes.
+
+The platform must support operational separation between:
+
+* administrators
+* community management
+* recruitment management
+* workers
+* companies
+
+==================================================
+USER ROLES
+==========
+
+Support these roles:
+
+* admin
+* community_moderator
+* jobs_moderator
+* worker
+* company
+
+==================================================
+ROLE PURPOSES
+=============
+
+ADMIN:
+Full platform access.
+
+COMMUNITY MODERATOR:
+Manages:
+
+* Community
+* Content Drafts
+* Platform Updates
+* Ideas & Suggestions
+* Community moderation
+
+Should NOT access sensitive recruitment administration.
+
+JOBS MODERATOR:
+Manages:
+
+* Jobs
+* Applicants
+* Candidate database
+* Workforce requests
+* Recruitment workflows
+* Company recruiting activity
+
+Should NOT access full admin settings or platform configuration.
+
+WORKER:
+Standard user experience:
+
+* Dashboard
+* Jobs
+* My Applications
+* Community
+* Tools
+* Academy
+* Profile / CV
+
+COMPANY:
+Company-focused interface:
+
+* Company Dashboard
+* Request Workforce
+* Post Job
+* Applicants
+* Company Profile
+* Recruitment tools
+
+==================================================
+STEP 1 — USER ROLE STORAGE
+==========================
+
+Check if profiles table already has role column.
+
+If not:
+add:
+role text default 'worker'
+
+Use authenticated profile role everywhere.
+
+==================================================
+STEP 2 — ROLE-BASED SIDEBAR
+===========================
+
+Show menu items dynamically.
+
+ADMIN sees:
+
+* all menus
+
+COMMUNITY MODERATOR sees:
+
+* Dashboard
+* Community
+* Content Drafts
+* Platform Updates
+* Ideas & Suggestions
+* Profile / CV
+
+JOBS MODERATOR sees:
+
+* Dashboard
+* Jobs
+* Workforce Requests
+* Applicants
+* Candidate Database
+* Companies
+* Profile / CV
+
+WORKER sees:
+
+* Dashboard
+* Jobs
+* My Applications
+* Community
+* Tools
+* Academy
+* Profile / CV
+
+COMPANY sees:
+
+* Company Dashboard
+* Request Workforce
+* Post Job
+* Applicants
+* Company Profile
+
+==================================================
+STEP 3 — ROUTE PROTECTION
+=========================
+
+Protect all restricted routes.
+
+Unauthorized users must:
+
+* be redirected to dashboard
+* see professional permission message
+
+==================================================
+STEP 4 — CONTENT DRAFTS ACCESS
+==============================
+
+Content Drafts must ONLY be visible to:
+
+* admin
+* community_moderator
+
+==================================================
+STEP 5 — RECRUITMENT ACCESS
+===========================
+
+Applicant databases and recruitment management must ONLY be visible to:
+
+* admin
+* jobs_moderator
+* company
+
+==================================================
+STEP 6 — ADMIN FALLBACK
+=======================
+
+Ensure current user Gaspar remains admin.
+
+==================================================
+STEP 7 — FUTURE READY STRUCTURE
+===============================
+
+Structure roles so future expansion is easy:
+
+* academy instructor
+* verified recruiter
+* regional moderator
+* premium company
+* support staff
+
+==================================================
+FINAL RESULT
+============
+
+PipingBox must behave like a real scalable SaaS platform with separated operational departments and role-based experiences.

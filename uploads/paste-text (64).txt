@@ -1,0 +1,88 @@
+Unify ALL profile completion calculations across the entire platform.
+
+Current issue:
+The profile page shows 100% completion, but Admin → Registros shows 75%.
+Different modules are using different completion logic.
+
+Goal:
+There must be ONE single source of truth for profile completion.
+
+IMPLEMENTATION REQUIREMENTS
+
+1. Create centralized completion engine
+Create one reusable function/service:
+calculateProfileCompletion(profile)
+
+This function must be used everywhere:
+- Profile page
+- Dashboard
+- Admin → Registros
+- Marketplace readiness
+- Worker search eligibility
+- Referral verification
+- Analytics
+
+2. Standardize completion weights
+
+CORE PROFILE (required for marketplace readiness)
+- full_name
+- role/title
+- company OR current status
+- location
+- years_experience
+- specialties/skills
+- bio/about
+- profile_visibility
+- availability
+- travel/relocation
+- profile photo
+
+ADVANCED PROFILE
+- CV uploaded
+- certifications
+- work history
+- supporting documents
+- languages
+
+3. Define exact thresholds
+
+0–30%
+AUTH_ONLY
+
+31–69%
+PROFILE_STARTED
+
+70%+
+MARKETPLACE_READY
+
+90–100%
+PROFESSIONAL_COMPLETE
+
+4. IMPORTANT:
+If profile page says 100%,
+Admin page MUST also display 100%.
+
+No duplicate logic allowed.
+
+5. Add debug visibility in Admin
+Optional small tooltip or expandable debug info:
+Show which fields are missing and how percentage is calculated.
+
+6. Ensure recalculation happens:
+- after saving profile
+- after uploading CV
+- after adding certifications
+- after onboarding
+- after changing visibility
+
+7. Database sync
+Store computed completion consistently:
+profile_completion
+onboarding_status
+marketplace_ready
+
+8. Fix current inconsistency for Gaspar profile
+Recalculate existing profiles automatically.
+
+Expected result:
+All screens show identical completion percentage and onboarding state.

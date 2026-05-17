@@ -1,0 +1,55 @@
+Worker Search is connected but returns "No workers found" even though profiles exist.
+
+Debug and fix the worker query logic.
+
+Requirements:
+
+1. Temporarily disable ALL filters on initial load.
+2. On page load, fetch and display ALL available worker profiles from:
+public.app_14da0f1941_profiles
+
+3. Do not require:
+- certifications
+- documents
+- experiences
+- availability
+- skills
+
+for a worker to appear.
+
+4. Minimum requirement to show a worker:
+- role = 'worker'
+OR
+- title is not null
+OR
+- full_name is not null
+
+5. Add console logs:
+- profiles fetched count
+- raw query result
+- filtered result count
+- why profiles are excluded
+
+6. If filters are empty, do NOT apply filtering.
+
+7. Keyword search should only apply after typing/search.
+
+8. Ensure Worker Cards render even if:
+- no certifications
+- no documents
+- no availability fields
+
+Use graceful fallbacks:
+- "No certifications"
+- "Availability not specified"
+
+9. Verify route:
+Worker Search should fetch from:
+public.app_14da0f1941_profiles
+
+10. Ensure RLS is not blocking SELECT.
+
+11. Add a temporary debug mode:
+show first 10 raw profiles in console.
+
+12. Keep existing UI design unchanged.

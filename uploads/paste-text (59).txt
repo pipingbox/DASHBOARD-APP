@@ -1,0 +1,81 @@
+Necesito crear un sistema interno de trazabilidad de usuarios en PipingBox Admin.
+
+Objetivo:
+Quiero poder ver TODOS los usuarios registrados aunque no hayan completado el onboarding o no aparezcan todavía en el marketplace público de candidatos.
+
+IMPORTANTE:
+- Los usuarios incompletos NO deben aparecer en el listado público de candidatos.
+- Pero sí deben aparecer en un panel interno de administración.
+
+Crear un nuevo módulo:
+
+ADMIN → REGISTROS
+
+Estructura requerida:
+
+1. Tabla de usuarios registrados
+Mostrar:
+- nombre
+- email
+- fecha de registro
+- método de login (email/google)
+- rol seleccionado (worker/company)
+- onboarding_status
+- profile_completion %
+- referral_code usado
+- último login
+
+2. Estados visuales con badges
+- 🟢 COMPLETO
+- 🟡 REGISTRO PARCIAL
+- 🔴 SOLO AUTH
+- 🔵 EMPRESA PENDIENTE
+
+3. Separar:
+- usuarios profesionales
+- empresas
+- early access leads
+
+4. Integrar usuarios de:
+- Supabase auth.users
+- profiles
+- early.pipingbox.com / Mailchimp
+
+5. Reglas importantes
+- Un usuario registrado debe aparecer aunque NO tenga perfil completo.
+- NO mostrar usuarios vacíos en marketplace público.
+- Marketplace solo muestra onboarding_status = COMPLETE.
+
+6. Detectar usuarios huérfanos
+Mostrar si existe:
+- auth.user sin profile
+- profile sin onboarding
+- onboarding incompleto
+
+7. Añadir filtros:
+- todos
+- completos
+- incompletos
+- empresas
+- referrals
+- early access
+
+8. Añadir contador visual:
+- total registros
+- onboarding completados
+- empresas registradas
+- usuarios Google OAuth
+- referrals activos
+
+9. Crear lógica onboarding_status automática:
+- AUTH_ONLY
+- PROFILE_STARTED
+- PROFILE_COMPLETED
+- MARKETPLACE_READY
+
+10. Muy importante:
+Fernando debe aparecer ya en Admin → Registros aunque todavía no tenga perfil público.
+
+NO modificar el marketplace público actual.
+NO mostrar perfiles vacíos a empresas.
+Solo crear trazabilidad interna de administración.

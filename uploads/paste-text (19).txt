@@ -1,0 +1,141 @@
+ACT AS A SENIOR SAAS ADMIN PANEL ARCHITECT AND PRODUCT ENGINEER.
+
+We need to build the first real version of the PipingBox Admin Center.
+
+IMPORTANT:
+Do not redesign the full platform.
+Do not break existing routes, roles, dashboard, jobs, companies, applications, profile, community, or content drafts.
+
+Only improve the admin-only internal management area.
+
+==================================================
+GOAL
+====
+
+Create a real Admin Center where the platform owner can see users, roles, platform metrics, and basic activity.
+
+Route:
+/admin
+
+Visible only to:
+role = admin
+
+==================================================
+STEP 1 — ADMIN OVERVIEW CARDS
+=============================
+
+Create overview cards using live Supabase data where possible:
+
+* Total Users
+* Workers
+* Companies
+* Community Moderators
+* Jobs Moderators
+* Total Job Applications
+* Total Workforce Requests
+* Total Content Drafts
+
+Use existing tables:
+
+* profiles
+* app_14da0f1941_job_applications
+* app_14da0f1941_company_leads
+* app_14da0f1941_ai_content_drafts
+
+If a table is unavailable, show 0 safely and do not break the page.
+
+==================================================
+STEP 2 — USER MANAGEMENT TABLE
+==============================
+
+Create a professional admin table:
+
+Columns:
+
+* Full Name
+* Email
+* Current Role
+* Created Date
+* Status
+* Actions
+
+Role badges:
+
+* admin
+* community_moderator
+* jobs_moderator
+* worker
+* company
+
+Add search:
+
+* by name
+* by email
+* by role
+
+==================================================
+STEP 3 — ROLE MANAGEMENT
+========================
+
+Allow admin to change a user role from a dropdown.
+
+Supported roles:
+
+* admin
+* community_moderator
+* jobs_moderator
+* worker
+* company
+
+After change:
+
+* update profiles.role
+* refresh table
+* show success toast
+
+Do not allow the current admin to accidentally remove their own admin role without confirmation.
+
+==================================================
+STEP 4 — ACCESS PROTECTION
+==========================
+
+If non-admin tries to open /admin:
+redirect to dashboard and show:
+"You do not have permission to access Admin Center."
+
+==================================================
+STEP 5 — ADMIN UX
+=================
+
+Use current PipingBox dark industrial style:
+
+* black background
+* orange accent
+* premium tables
+* clean cards
+* search bar
+* role badges
+* responsive layout
+
+==================================================
+STEP 6 — ERROR HANDLING
+=======================
+
+Add:
+
+* loading skeletons
+* empty states
+* console logs for Supabase fetch errors
+* safe fallback if data is missing
+
+==================================================
+FINAL RESULT
+============
+
+Admin Center must allow Gaspar to:
+
+* see total platform users
+* see user roles
+* change user roles
+* see key platform counters
+* manage the platform internally like a real SaaS admin.

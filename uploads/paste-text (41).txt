@@ -1,0 +1,236 @@
+FEATURE — Worker Profile Intelligence Foundation
+
+IMPORTANT:
+Do not redesign the platform.
+Do not break existing Profile/CV, Jobs, Applications, Company Candidates, Messages, Admin Center, or role system.
+
+GOAL:
+Upgrade the Worker Profile / CV system into a modular professional profile where users can manage CV, work experience, certifications, documents, and visibility.
+
+This profile must become the professional identity system of PipingBox.
+
+==================================================
+PHASE 1 — PROFILE MODULES
+=========================
+
+Add modular sections inside Profile / CV:
+
+1. Basic Professional Info
+
+* full name
+* title/role
+* current company
+* location
+* years of experience
+* bio
+* skills
+
+2. CV Upload
+
+* upload PDF CV
+* show uploaded file name
+* replace CV
+* remove CV
+* privacy toggle:
+  visible to companies: yes/no
+
+3. Work Experience
+   Allow user to add multiple experiences:
+
+* job title
+* company
+* project/site
+* country/location
+* start date
+* end date
+* current job toggle
+* description
+* responsibilities
+* visibility toggle
+
+4. Certifications
+   Allow user to add multiple certifications:
+
+* certificate name
+* issuing body
+* certificate number
+* issue date
+* expiry date
+* file upload
+* verification status: pending / verified / rejected
+* visibility toggle
+
+5. Documents
+   Allow additional document uploads:
+
+* document type
+* file
+* notes
+* visibility toggle
+
+==================================================
+PHASE 2 — DATABASE
+==================
+
+Use existing tables if available.
+If missing, create:
+
+app_14da0f1941_worker_experiences
+
+* id
+* user_id
+* job_title
+* company
+* project_site
+* location
+* country
+* start_date
+* end_date
+* is_current
+* description
+* responsibilities
+* is_visible
+* created_at
+
+app_14da0f1941_worker_certifications
+
+* id
+* user_id
+* certificate_name
+* issuing_body
+* certificate_number
+* issue_date
+* expiry_date
+* file_url
+* verification_status
+* is_visible
+* created_at
+
+app_14da0f1941_worker_documents
+
+* id
+* user_id
+* document_type
+* file_name
+* file_url
+* notes
+* is_visible
+* created_at
+
+If profiles table needs CV fields, add:
+
+* cv_file_url
+* cv_file_name
+* cv_visible boolean default true
+
+==================================================
+PHASE 3 — PRIVACY
+=================
+
+Every section must have visibility control.
+
+Worker can decide what companies see.
+
+Company candidate profile should show only:
+
+* visible experiences
+* visible certifications
+* visible CV
+* visible documents
+
+Admin can see everything.
+
+Worker sees everything in own profile.
+
+==================================================
+PHASE 4 — CERTIFICATION SYSTEM
+==============================
+
+Certification upload must work correctly.
+
+Each certification must:
+
+* be independent
+* support file upload
+* show expiry date
+* show verification status badge
+* allow edit/delete
+* allow hide/show from companies
+
+Verification statuses:
+
+* pending
+* verified
+* rejected
+* expired
+
+==================================================
+PHASE 5 — CV PARSING READY
+==========================
+
+Add a section called:
+
+AI CV Extraction
+
+For now create the UI and workflow placeholder:
+
+* Upload CV PDF
+* Button: Extract Profile Data
+* Show extraction preview before applying
+* User must confirm before data is saved
+
+Do not overwrite existing profile automatically.
+
+Extraction preview should be prepared for:
+
+* basic profile info
+* work experience
+* certifications
+* skills
+* languages
+* education
+
+If AI extraction is not available yet, show:
+"AI CV extraction will be connected in the next phase."
+
+==================================================
+PHASE 6 — RLS SECURITY
+======================
+
+RLS rules:
+
+Worker:
+
+* can read/write own profile modules
+
+Company:
+
+* can read visible worker profile data only when worker applied to company job
+
+Admin:
+
+* full access
+
+No public access to private documents.
+
+==================================================
+PHASE 7 — COMPANY CANDIDATE VIEW
+================================
+
+Update candidate profile view so companies can see:
+
+* basic visible profile
+* visible work experience
+* visible certifications
+* visible CV download if allowed
+* visible documents if allowed
+
+If hidden:
+show:
+"Hidden by worker privacy settings."
+
+==================================================
+EXPECTED RESULT
+===============
+
+PipingBox worker profiles become modular, document-based, privacy-controlled, and ready for future AI CV extraction.

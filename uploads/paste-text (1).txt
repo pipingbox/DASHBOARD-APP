@@ -1,0 +1,119 @@
+Build a production-ready SaaS application called PipingBox using:
+
+- Next.js App Router
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Supabase Auth
+- Supabase PostgreSQL
+- Supabase Storage
+- Stripe integration-ready architecture
+
+The app must run under app.pipingbox.com and act as the central platform for the PipingBox ecosystem.
+
+Main modules:
+
+1. Dashboard
+2. Academy
+3. Tools
+4. Jobs
+5. Community
+6. Companies
+7. User Profile / CV
+8. Admin Panel
+
+Design style:
+Dark Industrial Minimalism.
+
+Colors:
+Background: #0A0A0A
+Cards: #1C1C1C
+Borders: #2A2A2A
+Accent: #E8611A
+Accent hover: #FF7A33
+Text primary: #FFFFFF
+Text secondary: #A0A0A0
+
+Create the following routes:
+
+/dashboard
+/academy
+/tools
+/jobs
+/community
+/companies
+/profile
+/admin
+/login
+/register
+/settings
+
+Authentication:
+Use Supabase Auth with server-side session handling.
+Protected routes must redirect unauthenticated users to /login.
+User roles:
+- worker
+- supervisor
+- recruiter
+- company_admin
+- admin
+
+Dashboard requirements:
+Show a modular overview with cards for:
+
+- Profile completion
+- Academy progress
+- Recommended tools
+- Job matches
+- Community activity
+- Company interactions
+- Notifications
+- Daily Pipe Log
+- AI Assistant panel
+
+Database:
+Create SQL schema for:
+
+users/profiles
+companies
+courses
+lessons
+course_progress
+tools
+tool_usage
+jobs
+job_applications
+posts
+comments
+notifications
+daily_logs
+subscriptions
+
+Use Row Level Security policies for user-owned data.
+
+Architecture:
+Use reusable components:
+- AppLayout
+- Sidebar
+- TopNav
+- DashboardCard
+- ModuleCard
+- StatCard
+- JobCard
+- CourseCard
+- ToolCard
+- NotificationCenter
+- AIAssistantPanel
+
+The UI must be responsive, scalable and production-oriented.
+Avoid dummy-looking design.
+Make it feel like a real industrial SaaS platform for piping, welding, QA/QC, supervisors, workers and companies.
+
+Output:
+1. Project structure
+2. Component structure
+3. Supabase schema
+4. Main dashboard UI
+5. Auth flow
+6. Deployment steps for Vercel

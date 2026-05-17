@@ -1,0 +1,59 @@
+Necesito reparar definitivamente el problema de usuarios registrados que existen en Supabase Auth pero no aparecen en Admin.
+
+Caso real:
+- Javier aparece porque tiene profile.
+- Fernando confirmó email y entró en la app, pero no aparece porque no se creó su row en profiles.
+- Ambos deberían aparecer en Admin → Registros.
+- Solo perfiles completos deben aparecer en marketplace público.
+
+Implementar:
+
+1. Botón "Reparar Huérfanos"
+Debe buscar usuarios en auth.users sin row en app_14da0f1941_profiles y crear profile mínimo.
+
+Profile mínimo:
+- user_id = auth.users.id
+- full_name = auth.users.raw_user_meta_data.full_name OR email prefix
+- role = 'user'
+- account_type = 'worker'
+- cv_visible = false
+- availability_status = 'not_specified'
+- referral_code = generar código único si falta
+
+2. Admin → Registros debe mostrar:
+- auth.users + profiles combinados
+- usuarios solo auth con badge "SOLO AUTH"
+- usuarios con profile con badge "PROFILE STARTED"
+- usuarios listos con badge "MARKETPLACE READY"
+
+3. Añadir acción admin:
+"Asignar referido"
+
+Debe permitir seleccionar:
+- usuario referido
+- usuario referrer
+
+Ejemplo:
+Fernando referido por Gaspar.
+
+Al guardar:
+- actualizar referred_by_user_id del usuario referido
+- guardar referral_code_used si existe columna
+- actualizar contador de referidos si existe sistema de stats
+- mostrarlo en Admin → Registros → Referrals
+
+4. Importante:
+NO mostrar usuarios incompletos en Worker Search.
+Worker Search solo debe mostrar perfiles con onboarding mínimo completado.
+
+5. Crear fallback automático:
+Cada vez que un usuario inicia sesión:
+- comprobar si tiene profile
+- si no tiene, crearlo automáticamente
+- no dejar nunca más usuarios huérfanos.
+
+6. Añadir logs:
+- ORPHAN USER FOUND
+- PROFILE CREATED
+- REFERRAL MANUALLY ASSIGNED
+- PROFILE ALREADY EXISTS

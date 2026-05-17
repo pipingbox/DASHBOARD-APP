@@ -1,0 +1,129 @@
+Add a Worker Availability & Mobility section to Profile / CV.
+
+Goal:
+Companies need to know whether a worker is available now, currently employed, available soon, unemployed, or open to opportunities, and whether the worker can travel or relocate.
+
+Add a new section in Profile / CV called:
+Spanish: Disponibilidad y movilidad
+English: Availability & Mobility
+
+Fields:
+
+1. Employment status
+Spanish label: Situación laboral actual
+Options:
+- Trabajando actualmente
+- Desempleado
+- Buscando activamente
+- Abierto a ofertas
+- No disponible
+
+English:
+- Currently employed
+- Unemployed
+- Actively looking
+- Open to offers
+- Not available
+
+2. Availability status
+Spanish label: Disponibilidad
+Options:
+- Disponible inmediatamente
+- Disponible próximamente
+- Disponible desde fecha concreta
+- No disponible actualmente
+
+English:
+- Available immediately
+- Available soon
+- Available from specific date
+- Not currently available
+
+3. Available from date
+Only show if availability status = available from specific date.
+
+4. Current location
+Use existing profile location if available, but allow editing.
+
+5. Willing to travel
+Boolean toggle:
+Spanish: Disponible para viajar
+English: Willing to travel
+
+6. Willing to relocate
+Boolean toggle:
+Spanish: Disponible para reubicación
+English: Willing to relocate
+
+7. Preferred countries / regions
+Multi-select or comma-separated text:
+Example: Belgium, Netherlands, Germany, Spain
+
+8. Work rotation preference
+Options:
+- Local only
+- Daily commute
+- Weekly rotation
+- 2/1 rotation
+- 3/1 rotation
+- 4/2 rotation
+- Flexible
+
+9. Notice period
+Spanish: Preaviso necesario
+English: Notice period
+Options:
+- Immediate
+- 1 week
+- 2 weeks
+- 1 month
+- More than 1 month
+
+Database:
+Use public.app_14da0f1941_profiles if possible. Add columns if missing:
+- employment_status text
+- availability_status text
+- available_from date
+- willing_to_travel boolean default true
+- willing_to_relocate boolean default false
+- preferred_regions text
+- rotation_preference text
+- notice_period text
+
+Company / Candidate view:
+1. Show a compact badge near the top of Candidate Detail:
+- Available now
+- Available soon
+- Currently employed
+- Open to offers
+- Not available
+
+2. Show current location and mobility:
+- Location
+- Willing to travel
+- Willing to relocate
+- Preferred regions
+- Notice period
+
+Candidate search / Worker Search:
+Add filters:
+- Availability
+- Employment status
+- Country / location
+- Willing to travel
+- Willing to relocate
+- Preferred regions
+
+Design:
+Keep current dark industrial PipingBox style.
+Use amber/green badges:
+- Green: available immediately
+- Amber: available soon / open to offers
+- Grey: employed / not available
+
+Do not remove or break:
+- CV
+- certifications
+- documents
+- work experience
+- profile completeness

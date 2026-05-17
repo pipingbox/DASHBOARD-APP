@@ -1,0 +1,119 @@
+El módulo Admin → Registros existe visualmente pero NO está conectado correctamente a Supabase.
+
+Problemas detectados:
+
+1. auth.users contiene 3 usuarios:
+- Gaspar
+- Javier
+- Fernando
+
+Pero Admin → Registros muestra 0.
+
+2. Fernando existe en auth.users pero NO tiene fila en:
+public.app_14da0f1941_profiles
+
+3. El referral de Fernando NO se guardó aunque entró con enlace referido.
+
+Necesito arreglar TODO el flujo.
+
+OBJETIVOS:
+
+====================================================
+A. CONECTAR ADMIN REGISTROS A DATOS REALES
+====================================================
+
+El panel Registros debe leer:
+- auth.users
+- app_14da0f1941_profiles
+
+y combinar ambos datasets.
+
+Debe mostrar:
+- usuarios completos
+- usuarios huérfanos
+- solo auth
+- onboarding incompleto
+
+Aunque no tengan profile.
+
+====================================================
+B. REPARAR FERNANDO
+====================================================
+
+Crear automáticamente profile para Fernando usando:
+- auth.users.raw_user_meta_data
+- email
+- display name
+
+Asignar:
+- role = worker
+- onboarding_status = AUTH_ONLY
+- account_type = professional
+
+====================================================
+C. ARREGLAR SISTEMA DE REFERRALS
+====================================================
+
+Cuando un usuario entra desde:
+
+?ref=PB-XXXX
+
+guardar:
+- referred_by_user_id
+- referral_code usado
+
+durante signup.
+
+Persistir referral:
+- localStorage
+- cookies
+- signup metadata
+
+para que NO se pierda al registrarse.
+
+====================================================
+D. REPARAR REFERRAL DE FERNANDO
+====================================================
+
+Fernando se registró con referral de Gaspar.
+
+Necesito:
+- enlazar manualmente referred_by_user_id
+- incrementar contador referrals de Gaspar
+- mostrar Fernando en Admin → Registros → Referrals
+
+====================================================
+E. REPARAR FUTUROS SIGNUPS
+====================================================
+
+Si signup crea auth.user pero falla profile insert:
+- retry automático
+- fallback profile creation
+- nunca dejar huérfanos
+
+====================================================
+F. DATOS VISUALES
+====================================================
+
+Admin → Registros debe mostrar:
+
+- total registros = 3
+- onboarding
+- referrals
+- huérfanos
+- google oauth
+- companies
+
+y badges:
+
+🟢 COMPLETE
+🟡 PARTIAL
+🔴 SOLO AUTH
+
+====================================================
+G. IMPORTANTE
+====================================================
+
+NO modificar marketplace público.
+NO mostrar perfiles incompletos a empresas.
+Solo arreglar trazabilidad interna y referrals.

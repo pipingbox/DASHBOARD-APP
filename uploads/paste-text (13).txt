@@ -1,0 +1,114 @@
+ACT AS A SENIOR SAAS PRODUCT DESIGNER AND RECRUITMENT PLATFORM ENGINEER.
+
+We now need to build a professional "My Applications" system connected to the existing Jobs workflow.
+
+IMPORTANT:
+Do not redesign the platform.
+Do not break existing functionality.
+
+Use the current dark industrial PipingBox design system.
+
+==================================================
+GOAL
+====
+
+Create a full "My Applications" experience similar to LinkedIn Jobs or Indeed.
+
+==================================================
+STEP 1 — CREATE PAGE
+====================
+
+Create new route:
+
+/applications
+
+Add menu item:
+"My Applications"
+
+==================================================
+STEP 2 — FETCH REAL APPLICATIONS
+================================
+
+Fetch data from:
+
+app_14da0f1941_job_applications
+
+Only show applications for:
+auth.uid()
+
+==================================================
+STEP 3 — APPLICATION CARDS
+==========================
+
+Each application card should show:
+
+* Job title
+* Company name
+* Location
+* Contract type
+* Applied date
+* Current status
+* Salary range (if available)
+* Verified company badge
+
+==================================================
+STEP 4 — APPLICATION STATUS
+===========================
+
+Add professional status badges:
+
+* Applied
+* Under Review
+* Interview
+* Accepted
+* Rejected
+
+Use clean SaaS colors and badges.
+
+==================================================
+STEP 5 — EMPTY STATE
+====================
+
+If user has no applications:
+show professional empty state with CTA:
+"Browse Jobs"
+
+==================================================
+STEP 6 — QUICK ACTIONS
+======================
+
+Allow:
+
+* View Job
+* Withdraw Application
+* Save Notes (optional)
+
+==================================================
+STEP 7 — DASHBOARD INTEGRATION
+==============================
+
+The dashboard "My Applications" counter must stay synced automatically.
+
+==================================================
+STEP 8 — UX QUALITY
+===================
+
+Add:
+
+* loading skeletons
+* hover effects
+* smooth transitions
+* responsive layout
+
+The page must feel:
+
+* premium
+* modern
+* alive
+* professional
+
+==================================================
+FINAL GOAL
+==========
+
+Users should feel they are using a real industrial recruitment platform with persistent application history and recruitment tracking.

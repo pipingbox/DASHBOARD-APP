@@ -1,0 +1,119 @@
+ACT AS A SENIOR SAAS BACKEND ENGINEER.
+
+We now need to transform the workforce request system into a real operational recruitment pipeline.
+
+IMPORTANT:
+DO NOT CHANGE UI DESIGN.
+DO NOT BREAK EXISTING FEATURES.
+
+ONLY ADD REAL BUSINESS FUNCTIONALITY.
+
+==================================================
+STEP 1 — EMAIL NOTIFICATIONS
+============================
+
+When a company submits a workforce request:
+
+Send notification email to:
+[jobs@pipingbox.com](mailto:jobs@pipingbox.com)
+
+Email subject:
+"New Workforce Request - [Company Name]"
+
+Include:
+
+* company
+* country
+* workers needed
+* duration
+* contact info
+* message
+
+==================================================
+STEP 2 — COMPANY CONFIRMATION EMAIL
+===================================
+
+Automatically send a confirmation email to the company.
+
+Subject:
+"PipingBox Workforce Request Received"
+
+Professional industrial email template.
+
+==================================================
+STEP 3 — LEAD STATUS PIPELINE
+=============================
+
+Expand lead status system:
+
+Possible statuses:
+
+* new
+* contacted
+* sourcing
+* candidates_sent
+* closed
+
+Add colored status badges.
+
+==================================================
+STEP 4 — ADMIN LEAD DETAILS
+===========================
+
+Allow admin to:
+
+* open lead details
+* edit status
+* add internal notes
+
+==================================================
+STEP 5 — QUICK ACTIONS
+======================
+
+Add admin quick actions:
+
+* Copy email
+* Contact company
+* Mark contacted
+* Archive lead
+
+==================================================
+STEP 6 — LEAD PRIORITY
+======================
+
+Add automatic lead priority:
+
+Urgent:
+
+* 10+ workers
+* urgent start date
+
+Normal:
+
+* standard requests
+
+Show colored indicators.
+
+==================================================
+STEP 7 — PROFESSIONAL FEEL
+==========================
+
+The entire workflow should feel like:
+a real industrial recruitment CRM.
+
+Minimal.
+Fast.
+Professional.
+Scalable.
+
+==================================================
+FINAL GOAL
+==========
+
+PipingBox should now be capable of:
+
+* receiving real company requests
+* storing leads
+* notifying admin
+* tracking recruitment process
+* operating as an actual staffing platform

@@ -1,0 +1,78 @@
+Quiero actualizar la pantalla de registro/onboarding de PipingBox con estos cambios exactos:
+
+1. Añadir selector visual de tipo de cuenta encima del formulario de registro.
+
+Debe haber 2 opciones tipo cards/buttons:
+
+👷 Profesional Industrial
+Texto:
+“Accede a empleo, herramientas, formación y comunidad.”
+
+🏢 Empresa
+Texto:
+“Publica vacantes, encuentra trabajadores y gestiona contratación.”
+
+Al seleccionar una opción:
+
+* guardar account_type correctamente
+* worker/professional por defecto para usuarios normales
+* company para empresas
+* mantener compatibilidad con Supabase auth y perfiles actuales
+
+2. Cambiar el headline principal de la parte derecha.
+
+REEMPLAZAR:
+“Tu carrera, en un entorno de grado industrial.”
+
+POR:
+“Trabajo, formación y herramientas para el sector industrial.”
+
+3. Añadir login/registro con Google usando Supabase Auth.
+
+Requisitos:
+
+* botón visual premium
+* compatible con dark mode actual
+* mantener redirect correcto
+* crear perfil automáticamente si no existe
+* guardar account_type seleccionado también en login Google
+
+4. Cambiar el texto inferior del panel derecho.
+
+REEMPLAZAR:
+“HECHO PARA INGENIEROS”
+
+POR:
+“Piping • Mechanical • Construction • Shutdowns • Oil & Gas • Energy”
+
+5. Mantener:
+
+* diseño industrial oscuro actual
+* grid background
+* branding PipingBox
+* responsive mobile
+* soporte multiidioma existente
+
+6. IMPORTANTE:
+   No romper:
+
+* signup flow actual
+* Supabase auth
+* creación de perfiles
+* sistema de roles
+* sistema de referrals
+* trazabilidad de usuarios
+
+7. Añadir microanimaciones suaves:
+
+* hover en cards
+* transición al seleccionar tipo de cuenta
+* hover en botón Google
+
+8. El resultado debe sentirse:
+
+* premium
+* industrial
+* SaaS europeo
+* limpio
+* listo para feria/evento profesional

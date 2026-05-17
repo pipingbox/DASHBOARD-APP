@@ -1,0 +1,63 @@
+Fix full PipingBox browser and link preview branding.
+
+Current issues:
+1. Browser tab still uses a very small favicon.
+2. Shared links on WhatsApp show:
+- "shadcnui"
+- "Atoms Generated Project"
+- old copy about engineers of piping
+
+This must be fully replaced with PipingBox branding.
+
+Update all metadata in index.html / app head / SEO config:
+
+Title:
+"PipingBox - Industrial Workforce Platform"
+
+Short title:
+"PipingBox"
+
+Meta description:
+"Formación, herramientas, empleo, certificaciones y comunidad para profesionales y empresas del sector industrial."
+
+OpenGraph title:
+"PipingBox"
+
+OpenGraph description:
+"Formación, herramientas, empleo, certificaciones y comunidad para profesionales y empresas del sector industrial."
+
+Twitter/X title:
+"PipingBox"
+
+Twitter/X description:
+"Formación, herramientas, empleo, certificaciones y comunidad para profesionales y empresas del sector industrial."
+
+Remove completely:
+- shadcnui
+- Atoms Generated Project
+- engineers of piping
+- red profesional para ingenieros de piping
+
+Favicon:
+- Use the PipingBox icon/logo.
+- Create proper favicon sizes:
+  16x16
+  32x32
+  48x48
+  180x180 apple-touch-icon
+  512x512 web app icon if manifest exists.
+- Make sure the favicon is readable at small tab size.
+
+Also update:
+- site.webmanifest if present
+- theme color to PipingBox orange/black
+- apple-mobile-web-app-title to PipingBox
+- application-name to PipingBox
+
+Important:
+WhatsApp link preview must show:
+Title: PipingBox
+Description: Formación, herramientas, empleo, certificaciones y comunidad para profesionales y empresas del sector industrial.
+Domain: app.pipingbox.com
+
+Keep the current visual design unchanged.
