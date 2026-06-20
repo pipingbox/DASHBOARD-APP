@@ -29,7 +29,8 @@ export function CVUploadSection() {
 
   const handleUpload = async (file: File) => {
     if (!user) return;
-    if (file.type !== 'application/pdf') {
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    if (!isPdf) {
       toast.error(t('workerProfile.cv.pdfOnly'));
       return;
     }

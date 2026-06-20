@@ -172,14 +172,15 @@ export function DocumentsSection() {
       return;
     }
 
-    // Validate file type
+    // Validate file type (with extension fallback for mobile browsers)
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!allowedTypes.some((t) => file.type.startsWith(t.split('/')[0]) || file.type === t)) {
-      // Allow any image/* or the specific doc types
-      if (!file.type.startsWith('image/') && !allowedTypes.includes(file.type)) {
-        toast.error(t('workerProfile.documents.invalidType', { defaultValue: 'Unsupported file type. Please upload PDF or image files.' }));
-        return;
-      }
+    const docExt = file.name.split('.').pop()?.toLowerCase() || '';
+    const allowedExts = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'doc', 'docx', 'heic', 'heif'];
+    const typeOk = allowedTypes.includes(file.type) || file.type.startsWith('image/');
+    const extOk = allowedExts.includes(docExt);
+    if (!typeOk && !extOk) {
+      toast.error(t('workerProfile.documents.invalidType', { defaultValue: 'Unsupported file type. Please upload PDF or image files.' }));
+      return;
     }
 
     setUploading(true);
