@@ -41,6 +41,7 @@ import {
 import type { WorkerDocument } from '@/lib/workerProfile';
 import { normalizeDocument } from '@/lib/workerProfile';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
+import { uploadWithTimeout } from '@/lib/uploadHelpers';
 
 const DOCUMENT_TYPES = [
   'passport',
@@ -196,9 +197,7 @@ export function DocumentsSection() {
         fileName: file.name,
       });
 
-      const { error } = await supabase.storage
-        .from(bucketName)
-        .upload(path, file, { upsert: false, cacheControl: '3600' });
+      const { error } = await uploadWithTimeout(bucketName, path, file, { upsert: false, cacheControl: '3600' });
       if (error) {
         console.error('[DocumentsSection] Upload error:', { bucket: bucketName, path, error });
         toast.error(t('workerProfile.documents.uploadFailed', { defaultValue: 'Upload failed: ' }) + error.message);

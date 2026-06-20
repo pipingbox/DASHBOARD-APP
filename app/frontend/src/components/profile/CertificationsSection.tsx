@@ -41,6 +41,7 @@ import type { WorkerCertification } from '@/lib/workerProfile';
 import { normalizeCertification } from '@/lib/workerProfile';
 import { syncCertificationReminders, deleteCertificationReminders } from '@/lib/certificationReminders';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
+import { uploadWithTimeout } from '@/lib/uploadHelpers';
 
 export function CertificationsSection() {
   const { t } = useTranslation();
@@ -233,9 +234,7 @@ export function CertificationsSection() {
         fileName: file.name,
       });
 
-      const { error } = await supabase.storage
-        .from(bucketName)
-        .upload(path, file, { upsert: false, cacheControl: '3600' });
+      const { error } = await uploadWithTimeout(bucketName, path, file, { upsert: false, cacheControl: '3600' });
 
       if (error) {
         console.error('[CertificationsSection] Upload error:', { bucket: bucketName, path, error });

@@ -11,6 +11,7 @@ import { supabase, TABLES, STORAGE_BUCKETS } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
+import { uploadWithTimeout } from '@/lib/uploadHelpers';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -49,9 +50,7 @@ export function CVUploadSection() {
       fileName: file.name,
     });
 
-    const { error } = await supabase.storage
-      .from(bucketName)
-      .upload(path, file, { upsert: false, cacheControl: '3600' });
+    const { error } = await uploadWithTimeout(bucketName, path, file, { upsert: false, cacheControl: '3600' });
     if (error) {
       console.error('[CVUploadSection] Upload error:', { bucket: bucketName, path, error });
       setUploading(false);
