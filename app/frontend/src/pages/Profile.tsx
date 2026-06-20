@@ -19,7 +19,6 @@ import { DocumentsSection } from '@/components/profile/DocumentsSection';
 import { AvailabilityMobilitySection } from '@/components/profile/AvailabilityMobilitySection';
 import { AICVExtraction } from '@/components/profile/AICVExtraction';
 import { ProfileCompleteness } from '@/components/profile/ProfileCompleteness';
-import { generateCV } from '@/lib/generateCV';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import type { Certification } from '@/lib/certifications';
 
@@ -92,6 +91,7 @@ export default function Profile() {
         .eq('user_id', user.id)
         .order('issue_date', { ascending: false, nullsFirst: false });
       if (error) throw error;
+      const { generateCV } = await import('@/lib/generateCV');
       await generateCV({
         profile: {
           ...profile,
