@@ -23,6 +23,7 @@ export default function Register() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [accountType, setAccountType] = useState<AccountType>('worker');
   const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState('');
 
   // Capture referral code from URL and persist it
   useEffect(() => {
@@ -53,6 +54,7 @@ export default function Register() {
     const { error } = await signUp(email, password, fullName, accountType);
     setLoading(false);
     if (error) {
+      setErrorMsg(error);
       toast.error(error);
       return;
     }
@@ -69,6 +71,7 @@ export default function Register() {
     const { error } = await signInWithGoogle(accountType);
     setGoogleLoading(false);
     if (error) {
+      setErrorMsg(error);
       toast.error(error);
     }
   };
@@ -115,12 +118,14 @@ export default function Register() {
 
           {/* Account Type Selector */}
           <div className="space-y-3">
-            <p className="text-xs uppercase tracking-wider text-zinc-400 font-medium">
+            <p className="text-xs uppercase tracking-wider text-zinc-400 font-medium" id="account-type-label">
               {t('auth.selectAccountType')}
             </p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-labelledby="account-type-label">
               <button
                 type="button"
+                role="radio"
+                aria-checked={accountType === 'worker'}
                 onClick={() => setAccountType('worker')}
                 className={`relative p-4 rounded-lg border text-left transition-all duration-200 ease-out hover:scale-[1.02] hover:shadow-lg hover:shadow-amber-500/5 ${
                   accountType === 'worker'
@@ -128,7 +133,7 @@ export default function Register() {
                     : 'border-zinc-800 bg-zinc-950/50 hover:border-zinc-700'
                 }`}
               >
-                <div className="text-2xl mb-2">👷</div>
+                <div className="text-2xl mb-2" aria-hidden="true">👷</div>
                 <p className="text-sm font-semibold text-zinc-100">
                   {t('auth.accountTypeWorker')}
                 </p>
@@ -136,12 +141,14 @@ export default function Register() {
                   {t('auth.accountTypeWorkerDesc')}
                 </p>
                 {accountType === 'worker' && (
-                  <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#f59e0b] animate-pulse" />
+                  <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#f59e0b] animate-pulse" aria-hidden="true" />
                 )}
               </button>
 
               <button
                 type="button"
+                role="radio"
+                aria-checked={accountType === 'company'}
                 onClick={() => setAccountType('company')}
                 className={`relative p-4 rounded-lg border text-left transition-all duration-200 ease-out hover:scale-[1.02] hover:shadow-lg hover:shadow-amber-500/5 ${
                   accountType === 'company'
@@ -149,7 +156,7 @@ export default function Register() {
                     : 'border-zinc-800 bg-zinc-950/50 hover:border-zinc-700'
                 }`}
               >
-                <div className="text-2xl mb-2">🏢</div>
+                <div className="text-2xl mb-2" aria-hidden="true">🏢</div>
                 <p className="text-sm font-semibold text-zinc-100">
                   {t('auth.accountTypeCompany')}
                 </p>
@@ -157,7 +164,7 @@ export default function Register() {
                   {t('auth.accountTypeCompanyDesc')}
                 </p>
                 {accountType === 'company' && (
-                  <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#f59e0b] animate-pulse" />
+                  <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#f59e0b] animate-pulse" aria-hidden="true" />
                 )}
               </button>
             </div>
@@ -168,9 +175,10 @@ export default function Register() {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
+            aria-label={t('auth.continueWithGoogle')}
             className="w-full h-11 bg-zinc-900 border border-zinc-700 text-zinc-100 hover:bg-zinc-800 hover:border-zinc-600 hover:shadow-md transition-all duration-200 font-medium tracking-wide flex items-center justify-center gap-3"
           >
-            <svg className="h-5 w-5" viewBox="0 0 24 24">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                 fill="#4285F4"
@@ -266,6 +274,11 @@ export default function Register() {
               </Link>
               .
             </p>
+
+            {/* Accessible error announcement */}
+            <div aria-live="assertive" aria-atomic="true" className="sr-only">
+              {errorMsg}
+            </div>
 
             <Button
               type="submit"

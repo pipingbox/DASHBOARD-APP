@@ -16,13 +16,16 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setErrorMsg('');
     setLoading(true);
     const { error } = await signIn(email, password);
     setLoading(false);
     if (error) {
+      setErrorMsg(error);
       toast.error(error);
       return;
     }
@@ -31,10 +34,12 @@ export default function Login() {
   };
 
   const handleGoogleSignIn = async () => {
+    setErrorMsg('');
     setGoogleLoading(true);
     const { error } = await signInWithGoogle();
     setGoogleLoading(false);
     if (error) {
+      setErrorMsg(error);
       toast.error(error);
     }
   };
@@ -140,9 +145,10 @@ export default function Login() {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
+            aria-label={t('auth.continueWithGoogle')}
             className="w-full h-11 bg-zinc-900 border border-zinc-700 text-zinc-100 hover:bg-zinc-800 hover:border-zinc-600 hover:shadow-md transition-all duration-200 font-medium tracking-wide flex items-center justify-center gap-3"
           >
-            <svg className="h-5 w-5" viewBox="0 0 24 24">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                 fill="#4285F4"
@@ -217,6 +223,11 @@ export default function Login() {
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Accessible error announcement */}
+          <div aria-live="assertive" aria-atomic="true" className="sr-only">
+            {errorMsg}
           </div>
 
           <Button
