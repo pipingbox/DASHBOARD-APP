@@ -337,6 +337,8 @@
     "notFound": "Die angeforderte Ressource wurde nicht gefunden.",
     "pageNotFound": "Seite nicht gefunden",
     "pageNotFoundDesc": "Die Seite, die Sie suchen, existiert nicht oder wurde verschoben.",
-    "backToDashboard": "Zurück zum Dashboard"
+    "backToDashboard": "Zurück zum Dashboard",
+    "boundaryTitle": "Etwas ist schiefgelaufen",
+    "boundaryDesc": "Ein unerwarteter Fehler ist aufgetreten. Versuchen Sie, diesen Bereich neu zu laden."
   }
 }

@@ -337,6 +337,8 @@
     "notFound": "La ressource demandée est introuvable.",
     "pageNotFound": "Page introuvable",
     "pageNotFoundDesc": "La page que vous recherchez n'existe pas ou a été déplacée.",
-    "backToDashboard": "Retour au tableau de bord"
+    "backToDashboard": "Retour au tableau de bord",
+    "boundaryTitle": "Une erreur est survenue",
+    "boundaryDesc": "Une erreur inattendue s'est produite. Essayez de recharger cette section."
   }
 }

@@ -10,6 +10,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { useReferralCapture } from '@/hooks/useReferralCapture';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { OnboardingGate } from '@/components/OnboardingGate';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Eagerly loaded — critical auth path
 import Index from './pages/Index';
@@ -61,14 +62,18 @@ const PageLoader = () => (
 const withShell = (node: React.ReactNode) => (
   <ProtectedRoute>
     <OnboardingGate>
-      <AppShell>{node}</AppShell>
+      <AppShell>
+        <ErrorBoundary>{node}</ErrorBoundary>
+      </AppShell>
     </OnboardingGate>
   </ProtectedRoute>
 );
 
 const withShellRoles = (node: React.ReactNode, allowedRoles: string[]) => (
   <ProtectedRoute allowedRoles={allowedRoles}>
-    <AppShell>{node}</AppShell>
+    <AppShell>
+      <ErrorBoundary>{node}</ErrorBoundary>
+    </AppShell>
   </ProtectedRoute>
 );
 
@@ -216,7 +221,9 @@ const App = () => (
         <TooltipProvider>
           <Toaster theme="dark" />
           <BrowserRouter>
-            <AppRoutes />
+            <ErrorBoundary>
+              <AppRoutes />
+            </ErrorBoundary>
           </BrowserRouter>
         </TooltipProvider>
       </AdminPreviewProvider>

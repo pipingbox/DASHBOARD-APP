@@ -337,6 +337,8 @@
     "notFound": "De gevraagde bron is niet gevonden.",
     "pageNotFound": "Pagina niet gevonden",
     "pageNotFoundDesc": "De pagina die je zoekt bestaat niet of is verplaatst.",
-    "backToDashboard": "Terug naar dashboard"
+    "backToDashboard": "Terug naar dashboard",
+    "boundaryTitle": "Er ging iets mis",
+    "boundaryDesc": "Er is een onverwachte fout opgetreden. Probeer deze sectie opnieuw te laden."
   }
 }

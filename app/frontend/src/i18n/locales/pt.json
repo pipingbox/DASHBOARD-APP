@@ -337,6 +337,8 @@
     "notFound": "O recurso pedido não foi encontrado.",
     "pageNotFound": "Página não encontrada",
     "pageNotFoundDesc": "A página que procura não existe ou foi movida.",
-    "backToDashboard": "Voltar ao painel"
+    "backToDashboard": "Voltar ao painel",
+    "boundaryTitle": "Algo correu mal",
+    "boundaryDesc": "Ocorreu um erro inesperado. Tente recarregar esta secção."
   }
 }

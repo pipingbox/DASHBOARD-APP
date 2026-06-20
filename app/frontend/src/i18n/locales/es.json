@@ -382,7 +382,9 @@
     "notFound": "No se ha encontrado el recurso solicitado.",
     "pageNotFound": "Página no encontrada",
     "pageNotFoundDesc": "La página que buscas no existe o ha sido movida.",
-    "backToDashboard": "Volver al panel"
+    "backToDashboard": "Volver al panel",
+    "boundaryTitle": "Algo salió mal",
+    "boundaryDesc": "Ocurrió un error inesperado. Intenta recargar esta sección."
   },
   "certAlerts": {
     "sectionLabel": "Alertas",
