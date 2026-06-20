@@ -2,44 +2,43 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function AuthErrorPage() {
   const [searchParams] = useSearchParams();
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(5);
+  const { t } = useTranslation();
   const errorMessage =
     searchParams.get('msg') ||
-    'Sorry, your authentication information is invalid or has expired';
+    t('auth.errorGeneric', 'Sorry, your authentication information is invalid or has expired');
 
   useEffect(() => {
-    // Countdown logic
     const timer = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          // Redirect to home page
-          window.location.href = '/';
+          window.location.href = '/login';
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    // Clean up timer
     return () => clearInterval(timer);
   }, []);
 
-  const handleReturnHome = () => {
-    window.location.href = '/';
+  const handleReturnLogin = () => {
+    window.location.href = '/login';
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 p-6 text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] p-6 text-center">
       <div className="space-y-6 max-w-md">
         <div className="space-y-4">
           {/* Error icon */}
           <div className="flex justify-center">
             <div className="relative">
-              <div className="absolute inset-0 bg-red-500/20 blur-xl rounded-full"></div>
+              <div className="absolute inset-0 bg-red-500/20 blur-xl rounded-full" />
               <AlertCircle
                 className="relative h-12 w-12 text-red-500"
                 strokeWidth={1.5}
@@ -48,35 +47,38 @@ export default function AuthErrorPage() {
           </div>
 
           {/* Error title */}
-          <h1 className="text-2xl font-bold text-gray-800">
-            Authentication Error
+          <h1 className="text-2xl font-bold text-zinc-100">
+            {t('auth.errorTitle', 'Authentication Error')}
           </h1>
 
           {/* Error description */}
-          <p className="text-base text-muted-foreground">{errorMessage}</p>
+          <p className="text-base text-zinc-400">{errorMessage}</p>
 
           {/* Countdown message */}
           <div className="pt-2">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-zinc-500">
               {countdown > 0 ? (
                 <>
-                  Will automatically return to the home page in{' '}
-                  <span className="text-blue-600 font-semibold text-base">
+                  {t('auth.errorRedirectCountdown', 'Redirecting to login in')}{' '}
+                  <span className="text-[#f59e0b] font-semibold text-base">
                     {countdown}
                   </span>{' '}
-                  seconds
+                  {t('auth.errorSeconds', 'seconds')}
                 </>
               ) : (
-                'Redirecting...'
+                t('auth.redirecting', 'Redirecting...')
               )}
             </p>
           </div>
         </div>
 
-        {/* Return to home button */}
+        {/* Return to login button */}
         <div className="flex justify-center pt-2">
-          <Button onClick={handleReturnHome} className="px-6">
-            Return to Home
+          <Button
+            onClick={handleReturnLogin}
+            className="px-6 bg-[#f59e0b] hover:bg-[#d97706] text-black font-medium"
+          >
+            {t('auth.backToLogin', 'Return to Login')}
           </Button>
         </div>
       </div>

@@ -86,12 +86,23 @@ export default function Register() {
       <div className="flex items-center justify-center p-6 lg:p-12 order-2 lg:order-1">
         <div className="w-full max-w-md space-y-6">
           <div className="space-y-3">
-            <div className="lg:hidden mb-4">
+            {/* Mobile branding — compact version of the desktop sidebar */}
+            <div className="lg:hidden mb-6 space-y-4">
               <img
                 src="/assets/logos/logo-horizontal.png"
                 alt="PipingBox"
                 className="w-[200px] h-auto"
               />
+              <h1 className="text-lg font-bold leading-snug">
+                {t('auth.heroHeadline')}
+              </h1>
+              <div className="flex flex-wrap gap-2">
+                {features.map((f) => (
+                  <span key={f} className="text-[10px] px-2.5 py-1 rounded-full border border-zinc-800 text-zinc-400 uppercase tracking-wider">
+                    {f}
+                  </span>
+                ))}
+              </div>
             </div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#f59e0b]">
               {t('auth.joinPipingBox')}
@@ -243,6 +254,19 @@ export default function Register() {
               />
             </div>
 
+            {/* Legal consent notice */}
+            <p className="text-xs text-zinc-500 leading-relaxed">
+              {t('auth.legalConsentPrefix')}{' '}
+              <Link to="/terms" className="text-[#f59e0b] hover:underline">
+                {t('auth.termsOfService')}
+              </Link>{' '}
+              {t('auth.legalConsentAnd')}{' '}
+              <Link to="/privacy" className="text-[#f59e0b] hover:underline">
+                {t('auth.privacyPolicy')}
+              </Link>
+              .
+            </p>
+
             <Button
               type="submit"
               disabled={loading}
@@ -256,6 +280,17 @@ export default function Register() {
             {t('auth.alreadyHaveAccount')}{' '}
             <Link to="/login" className="text-[#f59e0b] hover:underline font-medium">
               {t('common.signIn')}
+            </Link>
+          </p>
+
+          {/* Legal footer links */}
+          <p className="text-center text-[11px] text-zinc-600 pt-2">
+            <Link to="/terms" className="hover:text-zinc-400 transition">
+              {t('auth.termsOfService')}
+            </Link>
+            <span className="mx-2">·</span>
+            <Link to="/privacy" className="hover:text-zinc-400 transition">
+              {t('auth.privacyPolicy')}
             </Link>
           </p>
         </div>

@@ -57,7 +57,7 @@ const WORKER_TYPES = [
   'Other',
 ];
 
-export default function RequestWorkers() {
+export default function RequestWorkers({ isPublic = false }: { isPublic?: boolean }) {
   const [form, setForm] = useState<FormData>(INITIAL);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -150,12 +150,21 @@ export default function RequestWorkers() {
             >
               Submit Another Request
             </Button>
-            <Link
-              to="/companies"
-              className="text-sm text-zinc-500 hover:text-zinc-300 transition"
-            >
-              ← Back to Companies
-            </Link>
+            {isPublic ? (
+              <Link
+                to="/register?type=company"
+                className="text-sm text-[#f59e0b] hover:underline transition text-center"
+              >
+                Create an account to track your requests →
+              </Link>
+            ) : (
+              <Link
+                to="/companies"
+                className="text-sm text-zinc-500 hover:text-zinc-300 transition"
+              >
+                ← Back to Companies
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -167,11 +176,11 @@ export default function RequestWorkers() {
       {/* Header */}
       <div className="space-y-4">
         <Link
-          to="/companies"
+          to={isPublic ? '/' : '/companies'}
           className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-300 transition"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Companies
+          {isPublic ? 'Home' : 'Back to Companies'}
         </Link>
 
         <div className="space-y-2">
@@ -201,7 +210,7 @@ export default function RequestWorkers() {
               <Input
                 value={form.company_name}
                 onChange={(e) => update('company_name', e.target.value)}
-                placeholder="e.g. Neptune Energy"
+                placeholder="e.g. Your Company Name"
                 className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:border-[#f59e0b] focus:ring-[#f59e0b]/20"
               />
               {errors.company_name && (

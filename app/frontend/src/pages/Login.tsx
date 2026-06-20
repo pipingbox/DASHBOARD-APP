@@ -103,12 +103,28 @@ export default function Login() {
       <div className="flex items-center justify-center p-6 lg:p-12">
         <form onSubmit={onSubmit} className="w-full max-w-md space-y-6">
           <div className="space-y-3">
-            <div className="lg:hidden mb-4">
+            {/* Mobile branding — compact version of the desktop sidebar */}
+            <div className="lg:hidden mb-6 space-y-4">
               <img
                 src="/assets/logos/logo-horizontal.png"
                 alt="PipingBox"
                 className="w-[200px] h-auto"
               />
+              <h1 className="text-lg font-bold leading-snug">
+                {t('auth.heroHeadline')}
+              </h1>
+              <div className="flex items-center gap-4 text-xs">
+                {[
+                  { label: 'Academy', value: '120+' },
+                  { label: 'Tools', value: '30+' },
+                  { label: 'Jobs', value: 'Live' },
+                ].map((s) => (
+                  <div key={s.label} className="flex items-center gap-1.5">
+                    <span className="text-[#f59e0b] font-bold">{s.value}</span>
+                    <span className="text-zinc-500 uppercase tracking-wider text-[9px]">{s.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#f59e0b]">
               {t('auth.secureAccess')}
@@ -192,6 +208,14 @@ export default function Login() {
                 className="h-11 bg-zinc-950 border-zinc-800 focus-visible:ring-[#f59e0b] focus-visible:border-[#f59e0b]"
                 placeholder="••••••••"
               />
+              <div className="flex justify-end">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-zinc-500 hover:text-[#f59e0b] transition-colors"
+                >
+                  {t('auth.forgotPassword', 'Forgot password?')}
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -210,6 +234,17 @@ export default function Login() {
               className="text-[#f59e0b] hover:underline font-medium"
             >
               {t('auth.createOne')}
+            </Link>
+          </p>
+
+          {/* Legal footer links */}
+          <p className="text-center text-[11px] text-zinc-600 pt-2">
+            <Link to="/terms" className="hover:text-zinc-400 transition">
+              {t('auth.termsOfService')}
+            </Link>
+            <span className="mx-2">·</span>
+            <Link to="/privacy" className="hover:text-zinc-400 transition">
+              {t('auth.privacyPolicy')}
             </Link>
           </p>
         </form>

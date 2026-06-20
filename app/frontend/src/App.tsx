@@ -1,7 +1,8 @@
+import { lazy, Suspense } from 'react';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/hooks/useAuth';
 import { AdminPreviewProvider } from '@/contexts/AdminPreviewContext';
 import { ProtectedRoute, GuestRoute } from '@/components/ProtectedRoute';
@@ -10,36 +11,52 @@ import { useReferralCapture } from '@/hooks/useReferralCapture';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { OnboardingGate } from '@/components/OnboardingGate';
 
+// Eagerly loaded — critical auth path
 import Index from './pages/Index';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import CompanyDashboard from './pages/CompanyDashboard';
-import Academy from './pages/Academy';
-import Tools from './pages/Tools';
-import Jobs from './pages/Jobs';
-import Community from './pages/Community';
-import CommunityChannel from './pages/CommunityChannel';
-import CommunityPost from './pages/CommunityPost';
-import Companies from './pages/Companies';
-import RequestWorkers from './pages/RequestWorkers';
-import Profile from './pages/Profile';
-import Admin from './pages/Admin';
-import Applications from './pages/Applications';
-import Messages from './pages/Messages';
-import ContentDrafts from './pages/ContentDrafts';
-import {
-  CompanyJobs,
-  CompanyPostJob,
-  CompanyCandidates,
-  CandidateProfile,
-  CompanyWorkersSearch,
-  CompanyWorkforceRequests,
-  CompanyProfile,
-  CompanyAnalytics,
-} from './pages/company';
+import AuthCallback from './pages/AuthCallback';
+import AuthErrorPage from './pages/AuthError';
+import ForgotPassword from './pages/ForgotPassword';
+
+// Lazy loaded — post-auth and secondary pages
+const PublicRequestWorkers = lazy(() => import('./pages/PublicRequestWorkers'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const TermsOfService = lazy(() => import('./pages/legal/TermsOfService'));
+const PrivacyPolicy = lazy(() => import('./pages/legal/PrivacyPolicy'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const CompanyDashboard = lazy(() => import('./pages/CompanyDashboard'));
+const Academy = lazy(() => import('./pages/Academy'));
+const Tools = lazy(() => import('./pages/Tools'));
+const Jobs = lazy(() => import('./pages/Jobs'));
+const Community = lazy(() => import('./pages/Community'));
+const CommunityChannel = lazy(() => import('./pages/CommunityChannel'));
+const CommunityPost = lazy(() => import('./pages/CommunityPost'));
+const Companies = lazy(() => import('./pages/Companies'));
+const RequestWorkers = lazy(() => import('./pages/RequestWorkers'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Admin = lazy(() => import('./pages/Admin'));
+const Applications = lazy(() => import('./pages/Applications'));
+const Messages = lazy(() => import('./pages/Messages'));
+const ContentDrafts = lazy(() => import('./pages/ContentDrafts'));
+
+// Company sub-pages
+const CompanyJobs = lazy(() => import('./pages/company/CompanyJobs'));
+const CompanyPostJob = lazy(() => import('./pages/company/CompanyPostJob'));
+const CompanyCandidates = lazy(() => import('./pages/company/CompanyCandidates'));
+const CandidateProfile = lazy(() => import('./pages/company/CandidateProfile'));
+const CompanyWorkersSearch = lazy(() => import('./pages/company/CompanyWorkersSearch'));
+const CompanyWorkforceRequests = lazy(() => import('./pages/company/CompanyWorkforceRequests'));
+const CompanyProfile = lazy(() => import('./pages/company/CompanyProfile'));
+const CompanyAnalytics = lazy(() => import('./pages/company/CompanyAnalytics'));
 
 const queryClient = new QueryClient();
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+    <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#f59e0b] border-t-transparent" />
+  </div>
+);
 
 const withShell = (node: React.ReactNode) => (
   <ProtectedRoute>
@@ -62,6 +79,7 @@ const AppRoutes = () => {
   useDocumentTitle();
 
   return (
+  <Suspense fallback={<PageLoader />}>
   <Routes>
     <Route path="/" element={<Index />} />
     <Route
@@ -80,6 +98,19 @@ const AppRoutes = () => {
         </GuestRoute>
       }
     />
+    <Route path="/auth/callback" element={<AuthCallback />} />
+    <Route path="/auth/error" element={<AuthErrorPage />} />
+    <Route
+      path="/forgot-password"
+      element={
+        <GuestRoute>
+          <ForgotPassword />
+        </GuestRoute>
+      }
+    />
+    <Route path="/request-workers" element={<PublicRequestWorkers />} />
+    <Route path="/terms" element={<TermsOfService />} />
+    <Route path="/privacy" element={<PrivacyPolicy />} />
     <Route path="/dashboard" element={withShell(<Dashboard />)} />
     <Route
       path="/company-dashboard"
@@ -172,8 +203,9 @@ const AppRoutes = () => {
         </ProtectedRoute>
       }
     />
-    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    <Route path="*" element={<NotFound />} />
   </Routes>
+  </Suspense>
   );
 };
 

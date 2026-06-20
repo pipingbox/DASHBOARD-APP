@@ -76,10 +76,11 @@ function useCounter(target: number, duration = 1600) {
 }
 
 /* ─── Static Job Data (realistic industrial listings) ─── */
+// TODO: Replace with real job data from Supabase when employer partnerships are confirmed
 const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   {
     title: 'Senior Pipefitter',
-    company: 'Siemens Energy',
+    company: 'Nordvest Energy',
     location: 'Antwerp, Belgium',
     job_type: 'contract',
     category: 'Pipefitting',
@@ -92,7 +93,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'TIG Welder — 6GR Certified',
-    company: 'Subsea 7',
+    company: 'Deepwater Marine Solutions',
     location: 'Stavanger, Norway',
     job_type: 'contract',
     category: 'Welding',
@@ -105,7 +106,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'QA/QC Inspector — Piping',
-    company: 'Fluor Corporation',
+    company: 'Horizon EPC International',
     location: 'Rotterdam, Netherlands',
     job_type: 'contract',
     category: 'QA/QC',
@@ -118,7 +119,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Mechanical Supervisor',
-    company: 'TechnipFMC',
+    company: 'Oceanic Technical Services',
     location: 'Aberdeen, United Kingdom',
     job_type: 'full-time',
     category: 'Supervision',
@@ -131,12 +132,12 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Work Preparator — Piping',
-    company: 'Bilfinger',
+    company: 'Rhine Industrial Services',
     location: 'Ludwigshafen, Germany',
     job_type: 'full-time',
     category: 'Planning',
     description:
-      'Prepare work packages for piping maintenance at BASF site. SAP PM experience preferred.',
+      'Prepare work packages for piping maintenance at chemical site. SAP PM experience preferred.',
     salary_min: 48000,
     salary_max: 62000,
     currency: '€',
@@ -144,7 +145,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Rigger / Banksman',
-    company: 'Saipem',
+    company: 'Mediterranean Offshore Group',
     location: 'Abu Dhabi, UAE',
     job_type: 'contract',
     category: 'Rigging',
@@ -157,7 +158,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Project Planner — Oil & Gas',
-    company: 'Wood Group',
+    company: 'Caspian Engineering Consultants',
     location: 'The Hague, Netherlands',
     job_type: 'full-time',
     category: 'Planning',
@@ -170,7 +171,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Offshore Instrument Technician',
-    company: 'Petrofac',
+    company: 'Fjord Technical Services',
     location: 'Bergen, Norway',
     job_type: 'contract',
     category: 'Instrumentation',
@@ -183,7 +184,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Piping Stress Engineer — CAESAR II',
-    company: 'Neptune Energy',
+    company: 'Trident Upstream Energy',
     location: 'Houston, TX',
     job_type: 'full-time',
     category: 'Stress',
@@ -208,7 +209,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Scaffolder — Advanced',
-    company: 'Brand Energy',
+    company: 'Summit Access Solutions',
     location: 'Ghent, Belgium',
     job_type: 'contract',
     category: 'Scaffolding',
@@ -221,7 +222,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'NDT Technician Level II',
-    company: 'Applus+',
+    company: 'Vanguard Inspection Group',
     location: 'Düsseldorf, Germany',
     job_type: 'full-time',
     category: 'QA/QC',
@@ -246,7 +247,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Welding Engineer',
-    company: 'Boskalis',
+    company: 'Delta Marine Engineering',
     location: 'Papendrecht, Netherlands',
     job_type: 'full-time',
     category: 'Welding',
@@ -259,7 +260,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Construction Manager — Piping',
-    company: 'McDermott',
+    company: 'Titan Fabrication International',
     location: 'Jebel Ali, UAE',
     job_type: 'contract',
     category: 'Supervision',
@@ -272,7 +273,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Pipe Stress Analyst',
-    company: 'Worley',
+    company: 'Pacific Engineering Consultants',
     location: 'London, United Kingdom',
     job_type: 'full-time',
     category: 'Stress',
@@ -346,8 +347,9 @@ function isOffshore(idx: number): boolean {
 }
 
 /* ─── Activity Feed Data ─── */
+// TODO: Replace with real activity data from Supabase
 const ACTIVITY_FEED = [
-  { text: '3 new candidates applied to Siemens Energy — Pipefitter role', time: '5 min ago', type: 'application' as const },
+  { text: '3 new candidates applied to Senior Pipefitter — Antwerp', time: '5 min ago', type: 'application' as const },
   { text: 'QA/QC Inspector role filled in Rotterdam', time: '18 min ago', type: 'filled' as const },
   { text: 'Offshore TIG Welder position closed in Norway', time: '42 min ago', type: 'closed' as const },
   { text: '7 applications received for Mechanical Supervisor — Aberdeen', time: '1h ago', type: 'application' as const },

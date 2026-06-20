@@ -57,9 +57,10 @@ const METRICS = [
 ];
 
 /* ─── Activity Feed ─── */
+// TODO: Replace with real data from Supabase when company partnerships are confirmed
 const ACTIVITY = [
   {
-    company: 'Siemens Energy',
+    company: 'Nordvest Energy',
     action: 'requested',
     count: 12,
     role: 'Pipefitters',
@@ -68,7 +69,7 @@ const ACTIVITY = [
     time: '2 hours ago',
   },
   {
-    company: 'Subsea 7',
+    company: 'Deepwater Marine Solutions',
     action: 'requested',
     count: 6,
     role: 'TIG Welders',
@@ -77,7 +78,7 @@ const ACTIVITY = [
     time: '4 hours ago',
   },
   {
-    company: 'Fluor Corporation',
+    company: 'Horizon EPC International',
     action: 'requested',
     count: 8,
     role: 'QA/QC Inspectors',
@@ -86,7 +87,7 @@ const ACTIVITY = [
     time: '6 hours ago',
   },
   {
-    company: 'TechnipFMC',
+    company: 'Oceanic Technical Services',
     action: 'requested',
     count: 15,
     role: 'Scaffolders',
@@ -95,7 +96,7 @@ const ACTIVITY = [
     time: '8 hours ago',
   },
   {
-    company: 'Saipem',
+    company: 'Mediterranean Offshore Group',
     action: 'requested',
     count: 4,
     role: 'Instrument Technicians',
@@ -106,9 +107,10 @@ const ACTIVITY = [
 ];
 
 /* ─── Companies Data ─── */
+// TODO: Replace with real company data from Supabase when partnerships are confirmed
 const COMPANIES = [
   {
-    name: 'Neptune Energy',
+    name: 'Trident Upstream Energy',
     sector: 'Oil & Gas',
     hq: 'Houston, TX',
     size: '5,000+',
