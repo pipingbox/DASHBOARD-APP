@@ -1,3 +1,5 @@
+import { supabase, TABLES } from './supabase';
+
 /**
  * Centralized Profile Completion Engine
  *
@@ -256,4 +258,72 @@ export function calculateOnboardingCompletion(input: OnboardingCompletionInput):
   if (input.hasAvatar) score += COMPLETION_WEIGHTS.photo; // 10%
 
   return Math.min(score, 100);
+}
+
+/**
+ * Fetch profile data + related record counts, recalculate profile_completion,
+ * and persist the new value to the database.
+ *
+ * Designed to be called after ANY profile-related mutation:
+ * save profile, upload CV, add certification, add experience, add document.
+ *
+ * Returns the new percentage or null on failure.
+ */
+export async function recalculateAndSaveProfileCompletion(
+  userId: string,
+): Promise<number | null> {
+  try {
+    const [profileRes, expRes, certRes, docRes] = await Promise.all([
+      supabase
+        .from(TABLES.profiles)
+        .select('avatar_url, full_name, title, company, location, years_experience, skills, bio, cv_file_url, cv_url')
+        .eq('user_id', userId)
+        .single(),
+      supabase
+        .from(TABLES.workerExperiences)
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId),
+      supabase
+        .from(TABLES.workerCertifications)
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId),
+      supabase
+        .from(TABLES.workerDocuments)
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId),
+    ]);
+
+    if (profileRes.error || !profileRes.data) return null;
+
+    const p = profileRes.data as Record<string, unknown>;
+    const input: ProfileCompletionInput = {
+      avatar_url: p.avatar_url as string | null,
+      full_name: p.full_name as string | null,
+      title: p.title as string | null,
+      company: p.company as string | null,
+      location: p.location as string | null,
+      years_experience: p.years_experience as number | null,
+      skills: p.skills as string[] | null,
+      bio: p.bio as string | null,
+      cv_file_url: p.cv_file_url as string | null,
+      cv_url: p.cv_url as string | null,
+      experience_count: expRes.count ?? 0,
+      certification_count: certRes.count ?? 0,
+      document_count: docRes.count ?? 0,
+    };
+
+    const { percentage } = calculateProfileCompletion(input);
+
+    await supabase
+      .from(TABLES.profiles)
+      .update({
+        profile_completion: percentage,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId);
+
+    return percentage;
+  } catch {
+    return null;
+  }
 }

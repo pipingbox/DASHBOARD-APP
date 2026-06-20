@@ -20,6 +20,7 @@ import { AvailabilityMobilitySection } from '@/components/profile/AvailabilityMo
 import { AICVExtraction } from '@/components/profile/AICVExtraction';
 import { ProfileCompleteness } from '@/components/profile/ProfileCompleteness';
 import { generateCV } from '@/lib/generateCV';
+import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import type { Certification } from '@/lib/certifications';
 
 export default function Profile() {
@@ -75,6 +76,8 @@ export default function Profile() {
       toast.error(error.message);
       return;
     }
+    // Recalculate profile_completion based on actual data
+    await recalculateAndSaveProfileCompletion(user.id);
     toast.success(t('profile.profileUpdated'));
     await refreshProfile();
   };

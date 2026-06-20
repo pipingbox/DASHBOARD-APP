@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase, TABLES } from '@/lib/supabase';
+import { supabase, TABLES, STORAGE_BUCKETS } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -124,13 +124,13 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       let avatarUrl: string | null = null;
       if (avatarFile) {
         const ext = avatarFile.name.split('.').pop() || 'jpg';
-        const path = `avatars/${user.id}/profile.${ext}`;
+        const path = `${user.id}/avatar-${Date.now()}.${ext}`;
         const { error: uploadErr } = await supabase.storage
-          .from('profile_pictures')
+          .from(STORAGE_BUCKETS.avatars)
           .upload(path, avatarFile, { upsert: true });
         if (!uploadErr) {
           const { data: urlData } = supabase.storage
-            .from('profile_pictures')
+            .from(STORAGE_BUCKETS.avatars)
             .getPublicUrl(path);
           avatarUrl = urlData.publicUrl;
         }
@@ -245,7 +245,11 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     if (!user) return;
     await supabase
       .from(TABLES.profiles)
-      .update({ onboarding_completed: true })
+      .update({
+        onboarding_completed: true,
+        profile_visibility: 'public',
+        cv_visible: true,
+      })
       .eq('user_id', user.id);
     await refreshProfile();
     onComplete();

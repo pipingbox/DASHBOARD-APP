@@ -3,6 +3,8 @@ import { Camera, Eye, EyeOff, Loader2, Trash2, User } from 'lucide-react';
 import { supabase, STORAGE_BUCKETS, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { compressImage, isAcceptedImage, uploadWithTimeout } from '@/lib/uploadHelpers';
+import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
 interface AvatarUploadProps {
   avatarUrl: string | null;
@@ -34,39 +36,45 @@ export function AvatarUpload({
 
   const handleUpload = async (file: File) => {
     if (!user) return;
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be under 5MB');
+    if (!isAcceptedImage(file)) {
+      toast.error('Please select an image file (JPG, PNG, WebP, or HEIC)');
       return;
     }
     setUploading(true);
-    const ext = file.name.split('.').pop() || 'jpg';
-    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-    const { error } = await supabase.storage
-      .from(STORAGE_BUCKETS.avatars)
-      .upload(path, file, { upsert: true, cacheControl: '3600' });
-    if (error) {
+    try {
+      // Compress image before upload (critical for mobile cameras: 5-15MB → ~200KB)
+      const compressed = await compressImage(file, 800, 800, 0.8);
+      const path = `${user.id}/avatar-${Date.now()}.jpg`;
+      const { error } = await uploadWithTimeout(
+        STORAGE_BUCKETS.avatars,
+        path,
+        compressed,
+        { upsert: true, cacheControl: '3600' },
+        30_000,
+      );
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      const { data } = supabase.storage.from(STORAGE_BUCKETS.avatars).getPublicUrl(path);
+      const publicUrl = data.publicUrl;
+      const { error: updateErr } = await supabase
+        .from(TABLES.profiles)
+        .update({ avatar_url: publicUrl, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id);
+      if (updateErr) {
+        toast.error(updateErr.message);
+        return;
+      }
+      onChange(publicUrl);
+      await recalculateAndSaveProfileCompletion(user.id);
+      await refreshProfile();
+      toast.success('Profile picture updated');
+    } catch {
+      toast.error('Upload failed. Please try again.');
+    } finally {
       setUploading(false);
-      toast.error(error.message);
-      return;
     }
-    const { data } = supabase.storage.from(STORAGE_BUCKETS.avatars).getPublicUrl(path);
-    const publicUrl = data.publicUrl;
-    const { error: updateErr } = await supabase
-      .from(TABLES.profiles)
-      .update({ avatar_url: publicUrl, updated_at: new Date().toISOString() })
-      .eq('user_id', user.id);
-    setUploading(false);
-    if (updateErr) {
-      toast.error(updateErr.message);
-      return;
-    }
-    onChange(publicUrl);
-    await refreshProfile();
-    toast.success('Profile picture updated');
   };
 
   const handleRemove = async () => {
@@ -175,13 +183,13 @@ export function AvatarUpload({
         </div>
 
         <p className="text-[11px] text-zinc-500">
-          JPG or PNG, max 5MB. Photo upload is optional — you can hide it at any time.
+          JPG, PNG, WebP, or HEIC. Images are compressed automatically. Photo upload is optional.
         </p>
 
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];

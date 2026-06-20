@@ -40,6 +40,7 @@ import {
 import type { WorkerCertification } from '@/lib/workerProfile';
 import { normalizeCertification } from '@/lib/workerProfile';
 import { syncCertificationReminders, deleteCertificationReminders } from '@/lib/certificationReminders';
+import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
 export function CertificationsSection() {
   const { t } = useTranslation();
@@ -205,8 +206,11 @@ export function CertificationsSection() {
 
   const handleFileUpload = async (file: File) => {
     if (!user) return;
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/heic', 'image/heif'];
+    // Fallback: also check extension for mobile browsers that don't set MIME type
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    const allowedExts = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'heic', 'heif'];
+    if (!allowedTypes.includes(file.type) && !allowedExts.includes(ext)) {
       toast.error(t('workerProfile.certifications.invalidFileType'));
       return;
     }
@@ -300,6 +304,7 @@ export function CertificationsSection() {
           prev.map((i) => (i.id === editing.id ? { ...i, ...payload } : i))
         );
         toast.success(t('workerProfile.certifications.updated'));
+        await recalculateAndSaveProfileCompletion(user.id);
 
         // Sync reminders when expiration_date changes
         try {
@@ -380,6 +385,7 @@ export function CertificationsSection() {
           await load();
         }
         toast.success(t('workerProfile.certifications.added'));
+        await recalculateAndSaveProfileCompletion(user.id);
       }
       setDialogOpen(false);
     } catch (err) {
@@ -408,6 +414,7 @@ export function CertificationsSection() {
         setItems(previousItems);
       } else {
         toast.success(t('workerProfile.certifications.deleted'));
+        await recalculateAndSaveProfileCompletion(user!.id);
       }
     } catch {
       toast.error(t('common.unexpectedError'));

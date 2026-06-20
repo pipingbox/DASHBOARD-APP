@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import type { WorkExperience, TranslationLanguage } from '@/lib/workerProfile';
 import { normalizeExperience, TRANSLATION_FIELDS, LANGUAGE_NAMES } from '@/lib/workerProfile';
+import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
 /**
  * Placeholder for AI-powered translation generation.
@@ -305,6 +306,7 @@ export function WorkExperienceSection() {
           )
         );
         toast.success(t('workerProfile.experience.updated'));
+        await recalculateAndSaveProfileCompletion(user.id);
       } else {
         const { data, error } = await supabase
           .from(TABLES.workerExperiences)
@@ -321,6 +323,7 @@ export function WorkExperienceSection() {
           await load();
         }
         toast.success(t('workerProfile.experience.added'));
+        await recalculateAndSaveProfileCompletion(user.id);
       }
       setDialogOpen(false);
     } catch {
@@ -345,6 +348,7 @@ export function WorkExperienceSection() {
         setItems(previousItems);
       } else {
         toast.success(t('workerProfile.experience.deleted'));
+        await recalculateAndSaveProfileCompletion(user!.id);
       }
     } catch {
       toast.error(t('common.unexpectedError'));

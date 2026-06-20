@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import type { WorkerDocument } from '@/lib/workerProfile';
 import { normalizeDocument } from '@/lib/workerProfile';
+import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
 const DOCUMENT_TYPES = [
   'passport',
@@ -269,6 +270,7 @@ export function DocumentsSection() {
         return;
       }
       toast.success(t('workerProfile.documents.added', { defaultValue: 'Document added successfully' }));
+      await recalculateAndSaveProfileCompletion(user.id);
       setDialogOpen(false);
       load();
     } catch (err) {
@@ -288,6 +290,7 @@ export function DocumentsSection() {
       toast.error(error.message);
     } else {
       toast.success(t('workerProfile.documents.deleted', { defaultValue: 'Document deleted' }));
+      if (user) await recalculateAndSaveProfileCompletion(user.id);
       load();
     }
     setDeleteTarget(null);

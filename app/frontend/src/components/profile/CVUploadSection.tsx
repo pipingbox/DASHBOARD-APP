@@ -10,6 +10,7 @@ import {
 import { supabase, TABLES, STORAGE_BUCKETS } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -81,6 +82,7 @@ export function CVUploadSection() {
       return;
     }
     toast.success(t('workerProfile.cv.uploaded'));
+    await recalculateAndSaveProfileCompletion(user.id);
     await refreshProfile();
   };
 
@@ -101,6 +103,7 @@ export function CVUploadSection() {
       return;
     }
     toast.success(t('workerProfile.cv.removed'));
+    await recalculateAndSaveProfileCompletion(user.id);
     await refreshProfile();
   };
 
