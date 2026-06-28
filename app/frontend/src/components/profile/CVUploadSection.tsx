@@ -39,51 +39,56 @@ export function CVUploadSection() {
       return;
     }
     setUploading(true);
-    const path = `${user.id}/cv-${Date.now()}.pdf`;
-    const bucketName = STORAGE_BUCKETS.certificates;
+    try {
+      const path = `${user.id}/cv-${Date.now()}.pdf`;
+      const bucketName = STORAGE_BUCKETS.certificates;
 
-    // Logging: bucket, file type, file size
-    console.log('[CVUploadSection] File upload starting:', {
-      bucket: bucketName,
-      path,
-      fileType: file.type,
-      fileSize: file.size,
-      fileName: file.name,
-    });
+      // Logging: bucket, file type, file size
+      console.log('[CVUploadSection] File upload starting:', {
+        bucket: bucketName,
+        path,
+        fileType: file.type,
+        fileSize: file.size,
+        fileName: file.name,
+      });
 
-    const { error } = await uploadWithTimeout(bucketName, path, file, { upsert: false, cacheControl: '3600' });
-    if (error) {
-      console.error('[CVUploadSection] Upload error:', { bucket: bucketName, path, error });
+      const { error } = await uploadWithTimeout(bucketName, path, file, { upsert: false, cacheControl: '3600' });
+      if (error) {
+        console.error('[CVUploadSection] Upload error:', { bucket: bucketName, path, error });
+        toast.error(error.message);
+        return;
+      }
+
+      console.log('[CVUploadSection] Upload success:', { bucket: bucketName, path });
+
+      const { data } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(path);
+
+      console.log('[CVUploadSection] Public URL:', data.publicUrl);
+
+      const { error: updateError } = await supabase
+        .from(TABLES.profiles)
+        .update({
+          cv_file_url: data.publicUrl,
+          cv_file_name: file.name,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
+
+      if (updateError) {
+        toast.error(updateError.message);
+        return;
+      }
+      toast.success(t('workerProfile.cv.uploaded'));
+      await recalculateAndSaveProfileCompletion(user.id);
+      await refreshProfile();
+    } catch (err) {
+      console.error('[CVUploadSection] Unexpected upload error:', err);
+      toast.error(t('workerProfile.cv.uploadError', 'Upload failed'));
+    } finally {
       setUploading(false);
-      toast.error(error.message);
-      return;
     }
-
-    console.log('[CVUploadSection] Upload success:', { bucket: bucketName, path });
-
-    const { data } = supabase.storage
-      .from(bucketName)
-      .getPublicUrl(path);
-
-    console.log('[CVUploadSection] Public URL:', data.publicUrl);
-
-    const { error: updateError } = await supabase
-      .from(TABLES.profiles)
-      .update({
-        cv_file_url: data.publicUrl,
-        cv_file_name: file.name,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', user.id);
-
-    setUploading(false);
-    if (updateError) {
-      toast.error(updateError.message);
-      return;
-    }
-    toast.success(t('workerProfile.cv.uploaded'));
-    await recalculateAndSaveProfileCompletion(user.id);
-    await refreshProfile();
   };
 
   const handleRemove = async () => {

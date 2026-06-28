@@ -45,7 +45,10 @@ export function ProNetworkWidget() {
   const [copied, setCopied] = useState(false);
 
   const loadData = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const show = await shouldShowReferralWidget(user.id);

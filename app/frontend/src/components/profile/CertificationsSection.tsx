@@ -42,6 +42,7 @@ import { normalizeCertification } from '@/lib/workerProfile';
 import { syncCertificationReminders, deleteCertificationReminders } from '@/lib/certificationReminders';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { uploadWithTimeout } from '@/lib/uploadHelpers';
+import { withQueryTimeout } from '@/lib/queryTimeout';
 
 export function CertificationsSection() {
   const { t } = useTranslation();
@@ -73,15 +74,20 @@ export function CertificationsSection() {
   const [isVisible, setIsVisible] = useState(true);
 
   const load = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     console.log('[CertificationsSection] load - current user id:', user.id);
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('app_worker_certifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      const { data, error } = await withQueryTimeout(
+        supabase
+          .from('app_worker_certifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+      );
       console.log('[CertificationsSection] certifications response data:', data);
       console.log('[CertificationsSection] certifications response error:', error);
       if (error) {

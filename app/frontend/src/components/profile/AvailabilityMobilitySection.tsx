@@ -7,7 +7,8 @@ import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
-import { Loader2, MapPin, Plane, Globe, RotateCcw, Clock, Briefcase } from 'lucide-react';
+import { Loader2, MapPin, Plane, Globe, RotateCcw, Clock, Briefcase, AlertCircle, RefreshCw } from 'lucide-react';
+import { withQueryTimeout } from '@/lib/queryTimeout';
 
 const EMPLOYMENT_STATUS_OPTIONS = [
   'currently_employed',
@@ -47,6 +48,7 @@ export function AvailabilityMobilitySection() {
   const { user, profile } = useAuth();
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const [employmentStatus, setEmploymentStatus] = useState<string>('');
   const [availabilityStatus, setAvailabilityStatus] = useState<string>('');
@@ -58,21 +60,31 @@ export function AvailabilityMobilitySection() {
   const [noticePeriod, setNoticePeriod] = useState<string>('');
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadData = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
+    setError(false);
     try {
-      const { data } = await supabase
-        .from(TABLES.profiles)
-        .select(
-          'employment_status, availability_status, available_from, willing_to_travel, willing_to_relocate, preferred_regions, rotation_preference, notice_period, location'
-        )
-        .eq('user_id', user.id)
-        .maybeSingle();
+      const { data } = await withQueryTimeout(
+        supabase
+          .from(TABLES.profiles)
+          .select(
+            'employment_status, availability_status, available_from, willing_to_travel, willing_to_relocate, preferred_regions, rotation_preference, notice_period, location'
+          )
+          .eq('user_id', user.id)
+          .maybeSingle()
+      );
 
       if (data) {
         setEmploymentStatus(data.employment_status || '');
@@ -86,6 +98,7 @@ export function AvailabilityMobilitySection() {
       }
     } catch (err) {
       console.error('[AvailabilityMobility] load error:', err);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -120,12 +133,35 @@ export function AvailabilityMobilitySection() {
     }
   };
 
+  if (loading && !user) return null;
+
   if (loading) {
     return (
       <div className="border border-zinc-800/80 bg-[#0d0d0d] p-6">
         <div className="flex items-center gap-2 text-zinc-400">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span>{t('common.loading')}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="border border-zinc-800/80 bg-[#0d0d0d] p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-zinc-500">
+            <AlertCircle className="h-4 w-4" />
+            <span className="text-sm">{t('common.loadError', 'Could not load data')}</span>
+          </div>
+          <button
+            type="button"
+            onClick={loadData}
+            className="flex items-center gap-1.5 text-xs text-[#f59e0b] hover:underline"
+          >
+            <RefreshCw className="h-3 w-3" />
+            {t('common.retry', 'Retry')}
+          </button>
         </div>
       </div>
     );

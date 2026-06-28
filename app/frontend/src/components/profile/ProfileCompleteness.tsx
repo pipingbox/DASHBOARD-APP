@@ -14,6 +14,8 @@ import {
   FolderOpen,
   CheckCircle2,
   Circle,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,6 +23,7 @@ import {
   getCompletionStatus,
   type CompletionStatusLevel,
 } from '@/lib/profileCompletion';
+import { withQueryTimeout } from '@/lib/queryTimeout';
 
 interface CompletenessItem {
   key: string;
@@ -37,18 +40,27 @@ export function ProfileCompleteness() {
   const { user, profile } = useAuth();
   const [items, setItems] = useState<CompletenessItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   // Read directly from DB-stored value — no local calculation
   const percentage = (profile as Record<string, unknown>)?.profile_completion as number ?? 0;
 
   useEffect(() => {
-    if (!user || !profile) return;
+    if (!user || !profile) {
+      setLoading(false);
+      return;
+    }
     buildChecklist();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, profile]);
 
   const buildChecklist = async () => {
-    if (!user || !profile) return;
+    if (!user || !profile) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
+    setError(false);
 
     // Fetch counts only for the checklist display (not for percentage calculation)
     let experienceCount = 0;
@@ -56,26 +68,28 @@ export function ProfileCompleteness() {
     let documentCount = 0;
 
     try {
-      const [expRes, certRes, docRes] = await Promise.all([
-        supabase
-          .from(TABLES.workerExperiences)
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id),
-        supabase
-          .from(TABLES.workerCertifications)
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id),
-        supabase
-          .from(TABLES.workerDocuments)
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id),
-      ]);
+      const [expRes, certRes, docRes] = await withQueryTimeout(
+        Promise.all([
+          supabase
+            .from(TABLES.workerExperiences)
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', user.id),
+          supabase
+            .from(TABLES.workerCertifications)
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', user.id),
+          supabase
+            .from(TABLES.workerDocuments)
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', user.id),
+        ])
+      );
 
       experienceCount = expRes.count ?? 0;
       certificationCount = certRes.count ?? 0;
       documentCount = docRes.error ? 0 : (docRes.count ?? 0);
     } catch {
-      // Continue with zeros
+      setError(true);
     }
 
     const iconMap: Record<string, React.ReactNode> = {
@@ -117,6 +131,8 @@ export function ProfileCompleteness() {
   const statusLevel = getStatusLevel(percentage);
   const missingItems = items.filter((item) => !item.completed);
 
+  if (loading && (!user || !profile)) return null;
+
   if (loading) {
     return (
       <div className="border border-zinc-800/80 bg-[#0d0d0d] p-6 animate-pulse">
@@ -126,6 +142,27 @@ export function ProfileCompleteness() {
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-3 w-48 bg-zinc-800 rounded" />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="border border-zinc-800/80 bg-[#0d0d0d] p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-zinc-500">
+            <AlertCircle className="h-4 w-4" />
+            <span className="text-sm">{t('common.loadError', 'Could not load data')}</span>
+          </div>
+          <button
+            type="button"
+            onClick={buildChecklist}
+            className="flex items-center gap-1.5 text-xs text-[#f59e0b] hover:underline"
+          >
+            <RefreshCw className="h-3 w-3" />
+            {t('common.retry', 'Retry')}
+          </button>
         </div>
       </div>
     );

@@ -41,6 +41,7 @@ import {
 import type { WorkExperience, TranslationLanguage } from '@/lib/workerProfile';
 import { normalizeExperience, TRANSLATION_FIELDS, LANGUAGE_NAMES } from '@/lib/workerProfile';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
+import { withQueryTimeout } from '@/lib/queryTimeout';
 
 /**
  * Placeholder for AI-powered translation generation.
@@ -95,14 +96,19 @@ export function WorkExperienceSection() {
   const [showTranslations, setShowTranslations] = useState(false);
 
   const load = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from(TABLES.workerExperiences)
-        .select('*')
-        .eq('user_id', user.id)
-        .order('start_date', { ascending: false, nullsFirst: false });
+      const { data, error } = await withQueryTimeout(
+        supabase
+          .from(TABLES.workerExperiences)
+          .select('*')
+          .eq('user_id', user.id)
+          .order('start_date', { ascending: false, nullsFirst: false })
+      );
       if (error) {
         toast.error(error.message);
       } else {

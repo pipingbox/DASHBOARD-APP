@@ -42,6 +42,7 @@ import type { WorkerDocument } from '@/lib/workerProfile';
 import { normalizeDocument } from '@/lib/workerProfile';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { uploadWithTimeout } from '@/lib/uploadHelpers';
+import { withQueryTimeout } from '@/lib/queryTimeout';
 
 const DOCUMENT_TYPES = [
   'passport',
@@ -109,14 +110,19 @@ export function DocumentsSection() {
   const [isVisible, setIsVisible] = useState(true);
 
   const load = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from(TABLES.workerDocuments)
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      const { data, error } = await withQueryTimeout(
+        supabase
+          .from(TABLES.workerDocuments)
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+      );
       if (error) {
         toast.error(t('workerProfile.documents.loadError', { defaultValue: 'Failed to load documents' }));
         console.error('Documents load error:', error.message);
@@ -126,8 +132,9 @@ export function DocumentsSection() {
     } catch (err) {
       console.error('Documents load exception:', err);
       toast.error(t('workerProfile.documents.loadError', { defaultValue: 'Failed to load documents' }));
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
