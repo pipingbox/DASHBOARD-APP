@@ -1,28 +1,59 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
 import {
   Building2,
   Globe,
   MapPin,
   FileText,
-  CheckCircle2,
   Save,
   Shield,
+  ShieldAlert,
 } from 'lucide-react';
 
 export default function CompanyProfile() {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
 
   const [form, setForm] = useState({
     company_name: profile?.full_name || '',
-    industry: 'Oil & Gas / Industrial Services',
-    country: '',
+    industry: 'Oil & Gas / Industrial Service',
+    country: profile?.location || '',
     website: '',
-    description: '',
+    description: profile?.bio || '',
   });
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Load existing company data from the profile.
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from(TABLES.profiles)
+          .select('full_name, location, bio, title')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (data) {
+          const p = data as { full_name: string | null; location: string | null; bio: string | null; title: string | null };
+          setForm((prev) => ({
+            ...prev,
+            company_name: p.full_name || prev.company_name,
+            country: p.location || prev.country,
+            description: p.bio || prev.description,
+            industry: p.title || prev.industry,
+          }));
+        }
+      } catch {
+        // ignore — form keeps defaults
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,11 +61,44 @@ export default function CompanyProfile() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast.error('You must be logged in to save your profile.');
+      return;
+    }
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    toast.success('Company profile saved.');
-    setSaving(false);
+    try {
+      // TD-05: real DB save (previously was a fake setTimeout).
+      // Map form fields to existing profile columns.
+      const updates = {
+        full_name: form.company_name.trim(),
+        location: form.country.trim() || null,
+        bio: form.description.trim() || null,
+        title: form.industry || null,
+      };
+
+      const { error } = await supabase
+        .from(TABLES.profiles)
+        .update(updates)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast.success('Company profile saved.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to save profile.';
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#f59e0b] border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -45,12 +109,12 @@ export default function CompanyProfile() {
       />
 
       <form onSubmit={handleSave} className="max-w-2xl space-y-6">
-        {/* Verification Status */}
-        <div className="border border-emerald-500/20 bg-emerald-500/5 rounded-sm p-4 flex items-center gap-3">
-          <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
+        {/* Verification Status — TD-34: no fake "Verified" badge. Show pending status honestly. */}
+        <div className="border border-zinc-800/80 bg-zinc-900/30 rounded-sm p-4 flex items-center gap-3">
+          <ShieldAlert className="h-5 w-5 text-zinc-500 shrink-0" />
           <div>
-            <p className="text-sm font-medium text-emerald-300">Verified Company</p>
-            <p className="text-[11px] text-emerald-400/70">Your company identity has been verified by PipingBox.</p>
+            <p className="text-sm font-medium text-zinc-300">Verification Pending</p>
+            <p className="text-[11px] text-zinc-500">Submit verification documents to get your company verified.</p>
           </div>
         </div>
 
@@ -79,7 +143,7 @@ export default function CompanyProfile() {
                 onChange={handleChange}
                 className="w-full rounded-sm border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[#f59e0b]/50 transition"
               >
-                <option>Oil & Gas / Industrial Services</option>
+                <option>Oil & Gas / Industrial Service</option>
                 <option>Construction</option>
                 <option>Marine & Offshore</option>
                 <option>Mining</option>
@@ -100,7 +164,7 @@ export default function CompanyProfile() {
                 name="country"
                 value={form.country}
                 onChange={handleChange}
-                placeholder="e.g. United Arab Emirates"
+                placeholder="e.g. Belgium"
                 className="w-full rounded-sm border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-[#f59e0b]/50 transition"
               />
             </div>
@@ -143,7 +207,7 @@ export default function CompanyProfile() {
           </div>
           <div className="space-y-2 text-xs text-zinc-400">
             <p>• Email verified: <span className="text-emerald-400">Yes</span></p>
-            <p>• Company documents: <span className="text-emerald-400">Approved</span></p>
+            <p>• Company documents: <span className="text-zinc-500">Not submitted</span></p>
             <p>• Account status: <span className="text-emerald-400">Active</span></p>
           </div>
         </div>

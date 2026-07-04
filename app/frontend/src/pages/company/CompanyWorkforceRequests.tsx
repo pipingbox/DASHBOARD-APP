@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { supabase, TABLES } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
+import { isPrimaryAdmin } from '@/lib/admin';
 import {
   HardHat,
   Plus,
@@ -25,20 +27,37 @@ interface WorkforceRequest {
 }
 
 export default function CompanyWorkforceRequests() {
+  const { user } = useAuth();
   const [requests, setRequests] = useState<WorkforceRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
-      const { data } = await supabase
+      // TD-06: scope to the current company's leads only.
+      // The primary admin sees all leads (no filter).
+      // Company users see only leads matching their email (the contact email
+      // used when submitting the workforce request via RequestWorkers.tsx).
+      // NOTE: the proper fix (DEC-37 follow-up) is to add a `posted_by` column
+      // referencing auth.users.id and filter by it. Until that migration lands,
+      // email-based scoping closes the data-leakage gap.
+      let query = supabase
         .from(TABLES.companyLeads)
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*');
+
+      if (!isPrimaryAdmin(user.email)) {
+        query = query.eq('email', user.email);
+      }
+
+      const { data } = await query.order('created_at', { ascending: false });
       setRequests((data || []) as WorkforceRequest[]);
       setLoading(false);
     })();
-  }, []);
+  }, [user]);
 
   return (
     <div className="space-y-6">

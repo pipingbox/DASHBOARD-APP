@@ -39,8 +39,9 @@ import type { WorkExperience, WorkerCertification, WorkerDocument } from '@/lib/
 import { normalizeExperience, normalizeCertification, normalizeDocument, getExperienceDescriptionByLanguage, LANGUAGE_NAMES } from '@/lib/workerProfile';
 import { useTranslation } from 'react-i18next';
 import { InviteToJobModal } from '@/components/InviteToJobModal';
+import { isPrimaryAdmin } from '@/lib/admin';
 
-const PRIMARY_ADMIN_EMAIL = 'gaspardelhierromata@gmail.com';
+// TD-02: moved to lib/admin.ts (reads VITE_PRIMARY_ADMIN_EMAIL env var).
 
 const STATUS_OPTIONS = [
   'applied',
@@ -138,7 +139,7 @@ export default function CandidateProfile() {
     const viewerRole = effectiveRole;
 
     // --- ACCESS CHECK ---
-    if (viewerEmail === PRIMARY_ADMIN_EMAIL) {
+    if (isPrimaryAdmin(viewerEmail)) {
       await fetchCandidateData(candidateUserId);
       return;
     }

@@ -3,10 +3,12 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminPreview } from '@/contexts/AdminPreviewContext';
 import { hasRouteAccess, getDefaultRoute, getRoleLabel } from '@/lib/roles';
+import { isPrimaryAdmin as checkPrimaryAdmin } from '@/lib/admin';
 import { ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const PRIMARY_ADMIN_EMAIL = 'gaspardelhierromata@gmail.com';
+// TD-02: moved to lib/admin.ts (reads VITE_PRIMARY_ADMIN_EMAIL env var).
+const isPrimaryAdminEmail = (email?: string | null) => checkPrimaryAdmin(email);
 
 interface Props {
   children: ReactNode;
@@ -47,7 +49,7 @@ export function ProtectedRoute({ children, adminOnly = false, allowedRoles }: Pr
   }
 
   // CRITICAL FALLBACK: Primary admin email always gets admin access regardless of profile state
-  const isPrimaryAdmin = user.email === PRIMARY_ADMIN_EMAIL;
+  const isPrimaryAdmin = isPrimaryAdminEmail(user.email);
   if (isPrimaryAdmin) {
     isRealAdmin = true;
     effectiveRole = effectiveRole || 'admin';

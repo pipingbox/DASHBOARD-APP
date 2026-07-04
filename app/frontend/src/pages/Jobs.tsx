@@ -356,13 +356,69 @@ const ACTIVITY_FEED = [
   { text: 'Construction Manager position updated — salary increased', time: '4h ago', type: 'new' as const },
 ];
 
-/* ─── Trust Metrics ─── */
-const TRUST_METRICS = [
-  { label: 'Active Jobs', value: 126, icon: Briefcase },
-  { label: 'Verified Companies', value: 48, icon: BadgeCheck },
-  { label: 'Applications This Week', value: 847, icon: TrendingUp },
-  { label: 'Countries', value: 17, icon: Globe },
-];
+/* ─── Trust Metrics (TD-03 / DEC-33: real data, never fabricated) ─── */
+// Previously this was a hardcoded array with fake numbers (126 jobs, 48 companies,
+// 847 applications, 17 countries). Per DEC-33, fabricated metrics destroy trust
+// when discovered. These are now queried from Supabase. If the count is 0, we
+// show 0 — no fake padding.
+interface TrustMetric {
+  label: string;
+  value: number;
+  icon: typeof Briefcase;
+}
+
+function useTrustMetrics(): { metrics: TrustMetric[]; loading: boolean } {
+  const [metrics, setMetrics] = useState<TrustMetric[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        // Query real counts in parallel. head:true returns count without rows.
+        const [jobsRes, companiesRes, appsRes] = await Promise.all([
+          supabase.from(TABLES.jobs).select('*', { count: 'exact', head: true }),
+          // Company profiles: role = 'company'
+          supabase.from(TABLES.profiles).select('*', { count: 'exact', head: true }).eq('role', 'company'),
+          supabase.from(TABLES.jobApplications).select('*', { count: 'exact', head: true }),
+        ]);
+
+        const activeJobs = jobsRes.count ?? 0;
+        const verifiedCompanies = companiesRes.count ?? 0;
+        const applications = appsRes.count ?? 0;
+
+        setMetrics([
+          { label: 'Active Jobs', value: activeJobs, icon: Briefcase },
+          { label: 'Companies', value: verifiedCompanies, icon: BadgeCheck },
+          { label: 'Applications', value: applications, icon: TrendingUp },
+          { label: 'Countries', value: 0, icon: Globe }, // TODO: derive from jobs.location distinct count when data exists
+        ]);
+      } catch {
+        // On error, show zeros rather than fake numbers (DEC-33).
+        setMetrics([
+          { label: 'Active Jobs', value: 0, icon: Briefcase },
+          { label: 'Companies', value: 0, icon: BadgeCheck },
+          { label: 'Applications', value: 0, icon: TrendingUp },
+          { label: 'Countries', value: 0, icon: Globe },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  return { metrics, loading };
+}
+
+function TrustMetricsSection() {
+  const { metrics } = useTrustMetrics();
+  return (
+    <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+      {metrics.map((m) => (
+        <MetricCard key={m.label} metric={m} />
+      ))}
+    </div>
+  );
+}
 
 /* ─── Filter Options ─── */
 const COUNTRIES = ['Belgium', 'Netherlands', 'Germany', 'Norway', 'UAE', 'United Kingdom'];
@@ -427,7 +483,7 @@ function JobSkeleton() {
 }
 
 /* ─── Metric Card ─── */
-function MetricCard({ metric }: { metric: (typeof TRUST_METRICS)[0] }) {
+function MetricCard({ metric }: { metric: TrustMetric }) {
   const { count, ref } = useCounter(metric.value);
   const Icon = metric.icon;
   return (
@@ -886,12 +942,8 @@ export default function Jobs() {
         }
       />
 
-      {/* ─── Trust Metrics ─── */}
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-        {TRUST_METRICS.map((m) => (
-          <MetricCard key={m.label} metric={m} />
-        ))}
-      </div>
+      {/* ─── Trust Metrics (TD-03: real data from Supabase, no fake numbers) ─── */}
+      <TrustMetricsSection />
 
       {/* ─── Featured Jobs Carousel ─── */}
       <div className="space-y-3">

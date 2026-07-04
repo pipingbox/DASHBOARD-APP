@@ -1,8 +1,9 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+﻿import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase, TABLES } from '@/lib/supabase';
 import { getStoredReferralCode, clearStoredReferralCode, validateReferralCode } from '@/lib/referrals';
 import { getAppBaseUrl, getAuthRedirectUrl } from '@/lib/constants';
+import { isPrimaryAdmin } from '@/lib/admin';
 
 export interface Profile {
   id: string;
@@ -48,7 +49,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const PRIMARY_ADMIN_EMAIL = 'gaspardelhierromata@gmail.com';
+// TD-02: primary admin email now comes from lib/admin.ts (VITE_PRIMARY_ADMIN_EMAIL env var).
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -79,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('PROFILE FETCH ERROR:', fetchError.message);
         // CRITICAL FALLBACK: If we can't read the profile but this is the primary admin,
         // create a synthetic profile so the app doesn't lock them out
-        if (authUser.email === PRIMARY_ADMIN_EMAIL) {
+        if (isPrimaryAdmin(authUser.email)) {
           setProfile({
             id: authUser.id,
             user_id: authUser.id,
@@ -114,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('PROFILE EXISTS', existing.user_id);
         const profileData = existing as Profile;
         // Force admin role for primary admin account
-        if (authUser.email === PRIMARY_ADMIN_EMAIL && profileData.role !== 'admin') {
+        if (isPrimaryAdmin(authUser.email) && profileData.role !== 'admin') {
           supabase
             .from(TABLES.profiles)
             .update({ role: 'admin' })
@@ -131,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const storedAccountType = localStorage.getItem('pipingbox_account_type') as 'worker' | 'company' | null;
       const metaAccountType = authUser.user_metadata?.account_type as 'worker' | 'company' | undefined;
       const resolvedAccountType = storedAccountType || metaAccountType || 'worker';
-      const assignedRole = authUser.email === PRIMARY_ADMIN_EMAIL ? 'admin' : (resolvedAccountType === 'company' ? 'company' : 'worker');
+      const assignedRole = isPrimaryAdmin(authUser.email) ? 'admin' : (resolvedAccountType === 'company' ? 'company' : 'worker');
       const fullName = fallbackName || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Engineer';
 
       // Check for referral code from URL/localStorage/sessionStorage
@@ -266,7 +267,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Ultimate fallback after all retries exhausted
       console.error('[ensureProfile] All retries exhausted, using synthetic profile');
-      if (authUser.email === PRIMARY_ADMIN_EMAIL) {
+      if (isPrimaryAdmin(authUser.email)) {
         setProfile({
           id: authUser.id,
           user_id: authUser.id,
