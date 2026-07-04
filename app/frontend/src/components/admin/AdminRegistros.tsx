@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { supabase, TABLES } from '@/lib/supabase';
+import { supabase, TABLES, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase';
 import { COMPLETION_THRESHOLDS } from '@/lib/profileCompletion';
 import {
   Users2,
@@ -21,9 +21,6 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 /* ─── Constants ─── */
-const SUPABASE_URL = 'https://mwdauubztjxkbrefirbg.supabase.co';
-const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13ZGF1dWJ6dGp4a2JyZWZpcmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDY4NTAsImV4cCI6MjA5MzQ4Mjg1MH0.vtFpaUlevj5H65m1xUS84VHLq3B1YEXhX8G6BSP0wos';
 const BACKFILL_URL = `${SUPABASE_URL}/functions/v1/backfill-profiles`;
 
 /* ─── Types ─── */

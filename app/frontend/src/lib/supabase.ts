@@ -1,8 +1,20 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://mwdauubztjxkbrefirbg.supabase.co';
-const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13ZGF1dWJ6dGp4a2JyZWZpcmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDY4NTAsImV4cCI6MjA5MzQ4Mjg1MH0.vtFpaUlevj5H65m1xUS84VHLq3B1YEXhX8G6BSP0wos';
+// TD-01 (DEC-36): Supabase credentials are read from environment variables,
+// NOT hardcoded. The anon key is public by design (protected by RLS, DEC-07).
+// See .env.example for required variables and brain/03-ENGINEERING/DEPLOYMENT.md.
+export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error(
+    'Missing Supabase environment variables. Copy .env.example to .env.local and fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY. (TD-01 / DEC-36)'
+  );
+}
+
+// Helper to build Edge Function URLs without duplicating the project URL.
+export const edgeFunctionUrl = (name: string) =>
+  `${SUPABASE_URL}/functions/v1/${name}`;
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { PageHeader } from '@/components/PageHeader';
-import { supabase, TABLES } from '@/lib/supabase';
+import { supabase, TABLES, edgeFunctionUrl } from '@/lib/supabase';
 import {
   ShieldCheck,
   Users2,
@@ -435,9 +435,7 @@ function OverviewTab({ counts, loading, onRefresh }: { counts: OverviewCounts; l
     setBackfilling(true);
     setBackfillResult(null);
     try {
-      const res = await fetch(
-        'https://mwdauubztjxkbrefirbg.supabase.co/functions/v1/backfill-profiles',
-        {
+      const res = await fetch(edgeFunctionUrl('backfill-profiles'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
         }

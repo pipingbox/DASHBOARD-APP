@@ -1,2 +1,10 @@
 node_modules/
 dist/
+
+# Environment variables — never commit secrets
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.*.local

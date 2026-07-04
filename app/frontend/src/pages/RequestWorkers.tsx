@@ -14,7 +14,7 @@ import {
   Loader2,
   ArrowLeft,
 } from 'lucide-react';
-import { supabase, TABLES } from '@/lib/supabase';
+import { supabase, TABLES, edgeFunctionUrl } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -109,7 +109,7 @@ export default function RequestWorkers() {
     // Trigger email notifications via edge function (fire-and-forget)
     try {
       await fetch(
-        'https://mwdauubztjxkbrefirbg.supabase.co/functions/v1/app_14da0f1941_send_lead_notification',
+        edgeFunctionUrl('app_14da0f1941_send_lead_notification'),
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
