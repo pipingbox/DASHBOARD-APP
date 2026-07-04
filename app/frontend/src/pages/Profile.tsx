@@ -91,6 +91,14 @@ export default function Profile() {
         .eq('user_id', user.id)
         .order('issue_date', { ascending: false, nullsFirst: false });
       if (error) throw error;
+      // TD-09: normalize unified table columns to Certification interface
+      const normalizedCerts = ((data as Record<string, unknown>[]) ?? []).map((row) => ({
+        ...row,
+        name: row.certification_name ?? row.name ?? '',
+        issuer: row.issuing_organization ?? row.issuer ?? '',
+        file_url: row.certificate_file_url ?? row.file_url ?? null,
+        expiry_date: row.expiration_date ?? row.expiry_date ?? null,
+      })) as Certification[];
       await generateCV({
         profile: {
           ...profile,
@@ -105,7 +113,7 @@ export default function Profile() {
             .filter(Boolean),
           bio: bio || profile.bio,
         },
-        certifications: (data as Certification[]) ?? [],
+        certifications: normalizedCerts,
       });
       toast.success(t('profile.cvGenerated'));
     } catch (err) {

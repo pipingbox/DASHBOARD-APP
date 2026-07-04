@@ -39,7 +39,7 @@ export const TABLES = {
   communityPostLikes: 'app_14da0f1941_community_post_likes',
   communitySavedPosts: 'app_14da0f1941_community_saved_posts',
   communityModerators: 'app_14da0f1941_community_moderators',
-  certifications: 'app_14da0f1941_certifications',
+  certifications: 'app_worker_certifications', // TD-09: unified into worker_certifications
   certificationAlerts: 'app_14da0f1941_certification_alerts',
   jobAlerts: 'app_14da0f1941_job_alerts',
   notifications: 'app_14da0f1941_notifications',

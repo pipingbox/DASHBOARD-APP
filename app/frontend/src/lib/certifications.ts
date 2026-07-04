@@ -1,16 +1,25 @@
 export interface Certification {
   id: string;
   user_id: string;
+  // TD-09: unified table uses certification_name/issuing_organization
+  // but we keep name/issuer as aliases for backwards compatibility
   name: string;
   issuer: string;
+  certification_name?: string;
+  issuing_organization?: string;
   credential_id: string | null;
   verification_url: string | null;
   qr_code_url: string | null;
   file_url: string | null;
+  certificate_file_url?: string | null;
   issue_date: string | null;
   expiry_date: string | null;
+  expiration_date?: string | null;
   is_verified: boolean;
   verified_at: string | null;
+  is_visible?: boolean;
+  visible_to_companies?: boolean;
+  notes?: string | null;
   visibility?: 'public' | 'private';
   created_at: string;
   updated_at: string;

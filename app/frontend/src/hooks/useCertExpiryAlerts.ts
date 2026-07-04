@@ -64,7 +64,7 @@ export function useCertExpiryAlerts() {
         .from(TABLES.certifications)
         .select('*')
         .eq('user_id', user.id)
-        .not('expiry_date', 'is', null);
+        .or('expiry_date.not.is.null,expiration_date.not.is.null');
 
       if (!data || data.length === 0) {
         setExpiringCerts([]);
@@ -75,7 +75,15 @@ export function useCertExpiryAlerts() {
       const threshold = alertPrefs.days_before_expiry;
       const expiring: ExpiringCert[] = [];
 
-      for (const cert of data as Certification[]) {
+      // TD-09: normalize — use expiration_date or expiry_date
+      const normalized = (data as Record<string, unknown>[]).map((row) => ({
+        ...row,
+        name: row.certification_name ?? row.name ?? '',
+        issuer: row.issuing_organization ?? row.issuer ?? '',
+        expiry_date: row.expiration_date ?? row.expiry_date ?? null,
+      })) as Certification[];
+
+      for (const cert of normalized) {
         if (!cert.expiry_date) continue;
         const expiryDate = new Date(cert.expiry_date);
         const diffMs = expiryDate.getTime() - now.getTime();

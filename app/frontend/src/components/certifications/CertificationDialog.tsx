@@ -143,14 +143,16 @@ export function CertificationDialog({
     }
 
     const payload = {
-      name: name.trim(),
-      issuer: issuer.trim(),
+      certification_name: name.trim(),
+      issuing_organization: issuer.trim(),
       credential_id: credentialId.trim() || null,
       verification_url: verificationUrl.trim() || null,
       qr_code_url: qrDataUrl,
       file_url: fileUrl || null,
+      certificate_file_url: fileUrl || null,
       issue_date: issueDate || null,
       expiry_date: expiryDate || null,
+      expiration_date: expiryDate || null,
       updated_at: new Date().toISOString(),
     };
 

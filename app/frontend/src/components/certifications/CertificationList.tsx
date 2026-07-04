@@ -80,7 +80,15 @@ export function CertificationList() {
     if (error) {
       toast.error(error.message);
     } else {
-      setItems((data as Certification[]) ?? []);
+      // TD-09: normalize unified table columns to Certification interface
+      const normalized = ((data as Record<string, unknown>[]) ?? []).map((row) => ({
+        ...row,
+        name: row.certification_name ?? row.name ?? '',
+        issuer: row.issuing_organization ?? row.issuer ?? '',
+        file_url: row.certificate_file_url ?? row.file_url ?? null,
+        expiry_date: row.expiration_date ?? row.expiry_date ?? null,
+      })) as Certification[];
+      setItems(normalized);
     }
     setLoading(false);
   };
