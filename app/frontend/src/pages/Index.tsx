@@ -13,6 +13,8 @@ import {
   FileCheck,
   ArrowRight,
   ChevronDown,
+  Globe,
+  Lock,
 } from 'lucide-react';
 
 // BUG-001: Landing page. Replaces the old redirect-only Index.
@@ -252,6 +254,30 @@ export default function Index() {
         </div>
       </section>
 
+      {/* VIS-002: Trust badges */}
+      <section className="border-t border-zinc-800/60 py-8">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-center">
+            <div className="flex items-center gap-2 text-xs text-zinc-500">
+              <ShieldCheck className="h-4 w-4 text-[#f59e0b]" />
+              <span>GDPR compliant</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-zinc-500">
+              <FileCheck className="h-4 w-4 text-[#f59e0b]" />
+              <span>ASME · EN · ISO standards</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-zinc-500">
+              <Globe className="h-4 w-4 text-[#f59e0b]" />
+              <span>Made in Europe</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-zinc-500">
+              <Lock className="h-4 w-4 text-[#f59e0b]" />
+              <span>Encrypted data</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* For Workers */}
       <section className="border-t border-zinc-800/60 py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -387,6 +413,9 @@ export default function Index() {
             </Link>
             <Link to="/blog" className="transition hover:text-zinc-300">
               {t('landing.blog', { defaultValue: 'Blog' })}
+            </Link>
+            <Link to="/pricing" className="transition hover:text-zinc-300">
+              {t('landing.pricing', { defaultValue: 'Pricing' })}
             </Link>
             <Link to="/register" className="transition hover:text-zinc-300">
               {t('landing.signUpFree', { defaultValue: 'Sign up free' })}

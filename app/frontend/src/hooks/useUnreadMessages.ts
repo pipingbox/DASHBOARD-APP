@@ -49,6 +49,9 @@ export function useUnreadMessages() {
     // Subscribe to conversation changes to update unread count in real-time
     if (!user) return;
 
+    // TD-12: Subscribe to conversation changes scoped to the current user only.
+    // Previously subscribed to ALL conversation changes (performance waste).
+    const col = isCompany ? 'company_user_id' : 'worker_user_id';
     const channel = supabase
       .channel('unread-messages')
       .on(
@@ -57,6 +60,7 @@ export function useUnreadMessages() {
           event: '*',
           schema: 'public',
           table: TABLES.conversations,
+          filter: `${col}=eq.${user.id}`,
         },
         () => {
           fetchUnread();

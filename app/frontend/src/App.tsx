@@ -40,6 +40,7 @@ import {
   CompanyProfile,
   CompanyAnalytics,
 } from './pages/company';
+import PricingPage from './pages/PricingPage';
 
 // BUG-002: Blog connected to router. Lazy-loaded for better bundle splitting.
 // Public routes (no auth) for SEO. Prerendered at build time via vite-prerender.
@@ -89,6 +90,9 @@ const AppRoutes = () => {
         </Suspense>
       }
     />
+
+    {/* ENT-002: Pricing page (public) */}
+    <Route path="/pricing" element={<PricingPage />} />
 
     <Route
       path="/login"

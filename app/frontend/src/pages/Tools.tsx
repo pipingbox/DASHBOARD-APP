@@ -10,6 +10,7 @@ import {
   Table2,
   GitBranch,
   Scissors,
+  Boxes,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
@@ -26,6 +27,7 @@ import ReynoldsCalculator from '@/tools/reynolds/ReynoldsCalculator';
 import ThermalExpansion from '@/tools/thermal-expansion/ThermalExpansion';
 import FlangeRating from '@/tools/flange-rating/FlangeRating';
 import FittingTakeOff from '@/tools/fitting-takeoff/FittingTakeOff';
+import BranchLayout from '@/tools/branch-layout/BranchLayout';
 
 interface ToolDef {
   key: string;
@@ -42,8 +44,9 @@ const TOOLS: ToolDef[] = [
   { key: 'reynolds', nameKey: 'tools.reynolds', icon: Beaker, categoryKey: 'tools.categoryHydraulics' },
   { key: 'thermal-expansion', nameKey: 'tools.thermalExpansion', icon: Thermometer, categoryKey: 'tools.categoryStress' },
   { key: 'flange-rating', nameKey: 'tools.flangeRating', icon: CircuitBoard, categoryKey: 'tools.categoryReference' },
-  { key: 'fitting-takeoff', nameKey: 'tools.fittingTakeOff', icon: GitBranch, categoryKey: 'tools.categoryReference' },
+  { key: 'fitting-takeoff', nameKey: 'tools.fittingTakeOff', icon: Boxes, categoryKey: 'tools.categoryReference' },
   { key: 'elbow-cut', nameKey: 'tools.elbowCut', icon: Scissors, categoryKey: 'tools.categoryDesign' },
+  { key: 'branch-layout', nameKey: 'tools.branchLayout', icon: GitBranch, categoryKey: 'tools.categoryDesign' },
 ];
 
 export default function Tools() {
@@ -251,6 +254,8 @@ export default function Tools() {
             <FlangeRating user={user} />
           ) : active === 'fitting-takeoff' ? (
             <FittingTakeOff user={user} />
+          ) : active === 'branch-layout' ? (
+            <BranchLayout user={user} />
           ) : (
             <div className="flex min-h-[280px] flex-col items-center justify-center text-center">
               <Wrench className="h-8 w-8 text-zinc-600" />

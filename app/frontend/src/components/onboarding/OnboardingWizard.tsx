@@ -46,7 +46,7 @@ const AVAILABILITY_OPTIONS = [
   { value: 'not_available', label: 'No disponible' },
 ];
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 9; // UX-001: added step 0 (welcome)
 
 interface OnboardingWizardProps {
   onComplete: () => void;
@@ -55,7 +55,7 @@ interface OnboardingWizardProps {
 export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0); // UX-001: start at welcome step
   const [saving, setSaving] = useState(false);
 
   // Form state
@@ -286,6 +286,37 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         {/* Step content */}
         <div className="rounded-lg border border-zinc-800 bg-zinc-950/80 p-5 sm:p-6 min-h-[300px] flex flex-col">
           <div className="flex-1">
+            {/* UX-001: Step 0 — Welcome */}
+            {step === 0 && (
+              <div className="space-y-6 text-center py-6">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#f59e0b]/10 border border-[#f59e0b]/20">
+                  <span className="text-3xl">🔧</span>
+                </div>
+                <div className="space-y-3">
+                  <h2 className="text-xl font-bold text-zinc-100">Welcome to PipingBox</h2>
+                  <p className="text-sm text-zinc-400 max-w-md mx-auto">
+                    Complete your profile so companies can find you. A complete profile
+                    gets 3× more offers and becomes your professional CV automatically.
+                  </p>
+                </div>
+                <div className="grid gap-2 text-left max-w-sm mx-auto">
+                  <div className="flex items-center gap-2 text-xs text-zinc-400">
+                    <Check className="h-3.5 w-3.5 text-[#f59e0b]" />
+                    <span>Be found by industrial companies across Europe</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-zinc-400">
+                    <Check className="h-3.5 w-3.5 text-[#f59e0b]" />
+                    <span>Access free engineering tools and certification prep</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-zinc-400">
+                    <Check className="h-3.5 w-3.5 text-[#f59e0b]" />
+                    <span>Auto-generate a professional CV from your profile</span>
+                  </div>
+                </div>
+                <p className="text-[10px] text-zinc-600">Takes ~2 minutes · You can skip any step</p>
+              </div>
+            )}
+
             {/* Step 1: Account Type */}
             {step === 1 && (
               <div className="space-y-4">
