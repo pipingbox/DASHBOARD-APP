@@ -16,6 +16,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CompanyDashboard from './pages/CompanyDashboard';
+import EnterpriseDashboard from './pages/EnterpriseDashboard';
 import Academy from './pages/Academy';
 import Tools from './pages/Tools';
 import ToolsPage from './pages/ToolsPage';
@@ -118,6 +119,10 @@ const AppRoutes = () => {
     <Route
       path="/company-dashboard"
       element={withShellRoles(<CompanyDashboard />, ['admin', 'company'])}
+    />
+    <Route
+      path="/enterprise-dashboard"
+      element={withShellRoles(<EnterpriseDashboard />, ['admin', 'company'])}
     />
     <Route
       path="/company/jobs"
