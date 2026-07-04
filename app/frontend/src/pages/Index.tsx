@@ -62,31 +62,36 @@ function useRealMetrics() {
   useEffect(() => {
     (async () => {
       try {
+        // Count workers: account_type = 'worker' OR (role = 'worker' AND account_type is null)
+        // Count companies: account_type = 'company' OR role = 'company'
+        // Use OR conditions to cover both legacy and current profiles.
         const [workersRes, companiesRes] = await Promise.all([
           supabase
             .from(TABLES.profiles)
             .select('*', { count: 'exact', head: true })
-            .in('role', ['worker', 'company']),
+            .or('account_type.eq.worker,and(account_type.is.null,role.eq.worker)'),
           supabase
             .from(TABLES.profiles)
             .select('*', { count: 'exact', head: true })
-            .eq('role', 'company'),
+            .or('account_type.eq.company,role.eq.company'),
         ]);
 
-        const total = workersRes.count ?? 0;
+        const workers = workersRes.count ?? 0;
         const companies = companiesRes.count ?? 0;
-        const workers = Math.max(0, total - companies);
+
+        // Tools count: read from registry (single source of truth)
+        const toolsCount = await import('@/tools/registry').then((m) => m.TOOL_REGISTRY.length).catch(() => 11);
 
         setMetrics([
           { label: 'Professionals registered', value: workers },
           { label: 'Companies', value: companies },
-          { label: 'Free engineering tools', value: 2 },
+          { label: 'Free engineering tools', value: toolsCount },
         ]);
       } catch {
         setMetrics([
           { label: 'Professionals registered', value: 0 },
           { label: 'Companies', value: 0 },
-          { label: 'Free engineering tools', value: 2 },
+          { label: 'Free engineering tools', value: 11 },
         ]);
       } finally {
         setLoading(false);
