@@ -28,6 +28,7 @@ import ThermalExpansion from '@/tools/thermal-expansion/ThermalExpansion';
 import FlangeRating from '@/tools/flange-rating/FlangeRating';
 import FittingTakeOff from '@/tools/fitting-takeoff/FittingTakeOff';
 import BranchLayout from '@/tools/branch-layout/BranchLayout';
+import ElbowCut from '@/tools/elbow-cut/ElbowCut';
 
 interface ToolDef {
   key: string;
@@ -270,6 +271,8 @@ export default function Tools() {
             <FittingTakeOff user={user} />
           ) : active === 'branch-layout' ? (
             <BranchLayout user={user} />
+          ) : active === 'elbow-cut' ? (
+            <ElbowCut user={user} />
           ) : (
             <div className="flex min-h-[280px] flex-col items-center justify-center text-center">
               <Wrench className="h-8 w-8 text-zinc-600" />
