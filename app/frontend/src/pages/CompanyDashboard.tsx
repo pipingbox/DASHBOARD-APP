@@ -23,6 +23,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { JobInvitationsStatusWidget } from '@/components/JobInvitationsStatusWidget';
+import { ProNetworkWidget } from '@/components/profile/ProNetworkWidget';
 
 /* ─── Types ─── */
 interface CompanyMetrics {
@@ -225,6 +226,9 @@ export default function CompanyDashboard() {
 
           {/* Job Invitations Status */}
           <JobInvitationsStatusWidget />
+
+          {/* Referral / Pro Network Widget (companies can also refer) */}
+          <ProNetworkWidget />
 
           {/* Latest Jobs Widget */}
           <JobsWidget jobs={jobs} loading={loading} />

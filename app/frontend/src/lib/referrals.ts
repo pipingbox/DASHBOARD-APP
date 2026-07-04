@@ -1,4 +1,5 @@
 import { supabase, TABLES } from '@/lib/supabase';
+import { getAppBaseUrl } from '@/lib/constants';
 
 export interface Referral {
   id: string;
@@ -146,23 +147,37 @@ export function clearStoredReferralCode(): void {
 /**
  * Check if the referral widget should be visible based on user engagement.
  * Progressive visibility: only show after meaningful engagement.
+ * Works for both workers and companies (different engagement signals).
  */
 export async function shouldShowReferralWidget(userId: string): Promise<boolean> {
   try {
-    // Check profile completeness (has full_name, title, skills)
     const { data: profile } = await supabase
       .from(TABLES.profiles)
-      .select('full_name, title, skills, cv_url, cv_file_url')
+      .select('full_name, title, skills, cv_url, cv_file_url, account_type, role, company, bio')
       .eq('user_id', userId)
       .single();
 
     if (!profile) return false;
 
+    const accountType = (profile as Record<string, unknown>).account_type as string | undefined;
+    const role = (profile as Record<string, unknown>).role as string | undefined;
+    const isCompany = accountType === 'company' || role === 'company';
+
     const hasProfile = !!(profile.full_name && profile.title);
+
+    if (isCompany) {
+      // Company engagement: has profile + (company name OR bio OR has posted jobs)
+      const hasCompanyInfo = !!(profile.company || profile.bio);
+      // Check if company has posted jobs (engagement signal).
+      // posted_by stores email, not user_id — fetch profile email via auth or skip.
+      // Simpler: use company name presence as engagement signal for companies.
+      return hasProfile && hasCompanyInfo;
+    }
+
+    // Worker engagement signals
     const hasCV = !!(profile.cv_url || profile.cv_file_url);
     const hasSkills = !!(profile.skills && (profile.skills as string[]).length > 0);
 
-    // Check tool usage
     const { count: toolCount } = await supabase
       .from(TABLES.toolUsage)
       .select('*', { count: 'exact', head: true })
@@ -170,7 +185,6 @@ export async function shouldShowReferralWidget(userId: string): Promise<boolean>
 
     const hasToolUsage = (toolCount ?? 0) >= 1;
 
-    // Check certifications
     const { count: certCount } = await supabase
       .from(TABLES.certifications)
       .select('*', { count: 'exact', head: true })
@@ -178,7 +192,6 @@ export async function shouldShowReferralWidget(userId: string): Promise<boolean>
 
     const hasCerts = (certCount ?? 0) >= 1;
 
-    // Show widget if user has completed profile basics OR has meaningful engagement
     return hasProfile && (hasCV || hasSkills || hasToolUsage || hasCerts);
   } catch {
     return false;
@@ -236,11 +249,23 @@ export async function validateReferralCode(code: string): Promise<string | null>
 
 /**
  * Get referral statistics for a user.
- * Primary source: profiles.referred_by_user_id (set by admin manual assignment or signup flow).
- * Fallback: also checks the referrals table for legacy entries.
+ * Sources (in priority order):
+ *   1. profiles.referral_count (set/incremented by admin manual assignment)
+ *   2. profiles.referred_by_user_id (set by signup flow or admin)
+ *   3. referrals table (legacy, verified entries)
+ * Uses the MAX across all sources to ensure no referral is missed.
  */
 export async function getReferralStats(userId: string): Promise<ReferralStats> {
-  // Primary: count profiles where referred_by_user_id = current user
+  // Fetch the referrer's own profile to get referral_count
+  const { data: ownProfile } = await supabase
+    .from(TABLES.profiles)
+    .select('referral_count')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  const manualCount = (ownProfile?.referral_count as number) || 0;
+
+  // Count profiles where referred_by_user_id = current user (organic + admin-assigned)
   const { count: profileReferralCount } = await supabase
     .from(TABLES.profiles)
     .select('*', { count: 'exact', head: true })
@@ -253,20 +278,19 @@ export async function getReferralStats(userId: string): Promise<ReferralStats> {
     .eq('referrer_id', userId)
     .eq('status', 'verified');
 
-  // Use the higher count between profiles-based and legacy table
-  // This ensures both admin-assigned and organic referrals are counted
+  // Use the maximum across all sources so nothing is missed
   const profileCount = profileReferralCount ?? 0;
   const legacyCount = legacyVerifiedCount ?? 0;
-  const verified = Math.max(profileCount, legacyCount);
+  const verified = Math.max(manualCount, profileCount, legacyCount);
 
-  // Total includes pending from legacy table + profile-based count
+  // Total includes pending from legacy table too
   const { count: legacyTotalCount } = await supabase
     .from(TABLES.referrals)
     .select('*', { count: 'exact', head: true })
     .eq('referrer_id', userId);
 
   const totalFromLegacy = legacyTotalCount ?? 0;
-  const total = Math.max(profileCount, totalFromLegacy);
+  const total = Math.max(verified, totalFromLegacy);
 
   // Determine current level and rewards
   let currentLevel = 0;
@@ -339,6 +363,19 @@ export async function processStoredReferral(userId: string, userEmail?: string):
       .update({ referred_by_user_id: referrerId })
       .eq('user_id', userId);
 
+    // Increment referrer's referral_count so the widget reflects it immediately
+    const { data: referrerProfile } = await supabase
+      .from(TABLES.profiles)
+      .select('referral_count')
+      .eq('user_id', referrerId)
+      .maybeSingle();
+
+    const currentCount = (referrerProfile?.referral_count as number) || 0;
+    await supabase
+      .from(TABLES.profiles)
+      .update({ referral_count: currentCount + 1 })
+      .eq('user_id', referrerId);
+
   } catch {
     // Silently fail - referral tracking shouldn't break the app
     console.warn('[Referrals] Failed to process referral');
@@ -406,8 +443,7 @@ export async function verifyReferralIfEligible(userId: string): Promise<void> {
  * Get the referral link for sharing.
  */
 export function getReferralLink(code: string): string {
-  const baseUrl = window.location.origin;
-  return `${baseUrl}/register?ref=${code}`;
+  return `${getAppBaseUrl()}/register?ref=${code}`;
 }
 
 /**
