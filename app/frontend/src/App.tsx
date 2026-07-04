@@ -2,6 +2,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import { AuthProvider } from '@/hooks/useAuth';
 import { AdminPreviewProvider } from '@/contexts/AdminPreviewContext';
 import { ProtectedRoute, GuestRoute } from '@/components/ProtectedRoute';
@@ -17,6 +18,7 @@ import Dashboard from './pages/Dashboard';
 import CompanyDashboard from './pages/CompanyDashboard';
 import Academy from './pages/Academy';
 import Tools from './pages/Tools';
+import ToolsPage from './pages/ToolsPage';
 import Jobs from './pages/Jobs';
 import Community from './pages/Community';
 import CommunityChannel from './pages/CommunityChannel';
@@ -38,6 +40,11 @@ import {
   CompanyProfile,
   CompanyAnalytics,
 } from './pages/company';
+
+// BUG-002: Blog connected to router. Lazy-loaded for better bundle splitting.
+// Public routes (no auth) for SEO. Prerendered at build time via vite-prerender.
+const BlogIndexPage = lazy(() => import('./pages/blog/BlogIndexPage'));
+const BlogPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
 
 const queryClient = new QueryClient();
 
@@ -64,6 +71,25 @@ const AppRoutes = () => {
   return (
   <Routes>
     <Route path="/" element={<Index />} />
+
+    {/* BUG-002: Blog — public routes for SEO, lazy-loaded, prerendered */}
+    <Route
+      path="/blog"
+      element={
+        <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a]" />}>
+          <BlogIndexPage />
+        </Suspense>
+      }
+    />
+    <Route
+      path="/blog/:slug"
+      element={
+        <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a]" />}>
+          <BlogPostPage />
+        </Suspense>
+      }
+    />
+
     <Route
       path="/login"
       element={
@@ -123,7 +149,7 @@ const AppRoutes = () => {
     />
     <Route
       path="/tools"
-      element={withShellRoles(<Tools />, ['admin', 'worker'])}
+      element={<ToolsPage />}
     />
     <Route
       path="/jobs"

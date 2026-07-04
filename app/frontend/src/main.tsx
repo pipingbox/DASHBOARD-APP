@@ -4,6 +4,17 @@ import './index.css';
 import './i18n';
 import { loadRuntimeConfig } from './lib/config.ts';
 
+// TD-13 (CODE_STANDARDS §13 #4): Silence verbose console methods in production.
+// In production builds, console.log/debug/info become no-ops to prevent
+// bundle bloat and PII leakage (DEC-35). console.warn/error are kept
+// because they are critical for diagnosing issues. New code should use
+// the logger module (src/lib/logger.ts) for structured, dev-only logging.
+if (import.meta.env.PROD) {
+  console.log = () => {};
+  console.debug = () => {};
+  console.info = () => {};
+}
+
 // Load runtime configuration before rendering the app
 async function initializeApp() {
   // Prerendered blog pages are served as pure static HTML for SEO.

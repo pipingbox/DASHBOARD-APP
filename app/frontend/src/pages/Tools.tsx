@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
+import UnitConverter from '@/tools/unit-converter/UnitConverter';
 
 interface ToolDef {
   key: string;
@@ -198,6 +199,8 @@ export default function Tools() {
                 </div>
               )}
             </div>
+          ) : active === 'unit-converter' ? (
+            <UnitConverter user={user} />
           ) : (
             <div className="flex min-h-[280px] flex-col items-center justify-center text-center">
               <Wrench className="h-8 w-8 text-zinc-600" />
