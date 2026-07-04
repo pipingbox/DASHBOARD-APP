@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+﻿import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import {
   Briefcase,
   MapPin,
@@ -79,7 +79,7 @@ function useCounter(target: number, duration = 1600) {
 const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   {
     title: 'Senior Pipefitter',
-    company: 'Siemens Energy',
+    company: 'Atlas Industrial Solutions',
     location: 'Antwerp, Belgium',
     job_type: 'contract',
     category: 'Pipefitting',
@@ -92,7 +92,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'TIG Welder — 6GR Certified',
-    company: 'Subsea 7',
+    company: 'Helix Marine Engineering',
     location: 'Stavanger, Norway',
     job_type: 'contract',
     category: 'Welding',
@@ -105,7 +105,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'QA/QC Inspector — Piping',
-    company: 'Fluor Corporation',
+    company: 'Meridian Industrial Group',
     location: 'Rotterdam, Netherlands',
     job_type: 'contract',
     category: 'QA/QC',
@@ -118,7 +118,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Mechanical Supervisor',
-    company: 'TechnipFMC',
+    company: 'Polaris Energy Services',
     location: 'Aberdeen, United Kingdom',
     job_type: 'full-time',
     category: 'Supervision',
@@ -144,7 +144,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Rigger / Banksman',
-    company: 'Saipem',
+    company: 'Vanguard Offshore Operations',
     location: 'Abu Dhabi, UAE',
     job_type: 'contract',
     category: 'Rigging',
@@ -157,7 +157,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Project Planner — Oil & Gas',
-    company: 'Wood Group',
+    company: 'Apex Technical Services',
     location: 'The Hague, Netherlands',
     job_type: 'full-time',
     category: 'Planning',
@@ -183,7 +183,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Piping Stress Engineer — CAESAR II',
-    company: 'Neptune Energy',
+    company: 'Trident Upstream Energy',
     location: 'Houston, TX',
     job_type: 'full-time',
     category: 'Stress',
@@ -246,7 +246,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Welding Engineer',
-    company: 'Boskalis',
+    company: 'Cascade Dredging Marine',
     location: 'Papendrecht, Netherlands',
     job_type: 'full-time',
     category: 'Welding',
@@ -272,7 +272,7 @@ const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
   },
   {
     title: 'Pipe Stress Analyst',
-    company: 'Worley',
+    company: 'Orion Engineering Partners',
     location: 'London, United Kingdom',
     job_type: 'full-time',
     category: 'Stress',
@@ -347,7 +347,7 @@ function isOffshore(idx: number): boolean {
 
 /* ─── Activity Feed Data ─── */
 const ACTIVITY_FEED = [
-  { text: '3 new candidates applied to Siemens Energy — Pipefitter role', time: '5 min ago', type: 'application' as const },
+  { text: '3 new candidates applied to Atlas Industrial Solutions — Pipefitter role', time: '5 min ago', type: 'application' as const },
   { text: 'QA/QC Inspector role filled in Rotterdam', time: '18 min ago', type: 'filled' as const },
   { text: 'Offshore TIG Welder position closed in Norway', time: '42 min ago', type: 'closed' as const },
   { text: '7 applications received for Mechanical Supervisor — Aberdeen', time: '1h ago', type: 'application' as const },

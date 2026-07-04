@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Building2,
@@ -59,7 +59,7 @@ const METRICS = [
 /* ─── Activity Feed ─── */
 const ACTIVITY = [
   {
-    company: 'Siemens Energy',
+    company: 'Atlas Industrial Solutions',
     action: 'requested',
     count: 12,
     role: 'Pipefitters',
@@ -68,7 +68,7 @@ const ACTIVITY = [
     time: '2 hours ago',
   },
   {
-    company: 'Subsea 7',
+    company: 'Helix Marine Engineering',
     action: 'requested',
     count: 6,
     role: 'TIG Welders',
@@ -77,7 +77,7 @@ const ACTIVITY = [
     time: '4 hours ago',
   },
   {
-    company: 'Fluor Corporation',
+    company: 'Meridian Industrial Group',
     action: 'requested',
     count: 8,
     role: 'QA/QC Inspectors',
@@ -86,7 +86,7 @@ const ACTIVITY = [
     time: '6 hours ago',
   },
   {
-    company: 'TechnipFMC',
+    company: 'Polaris Energy Services',
     action: 'requested',
     count: 15,
     role: 'Scaffolders',
@@ -95,7 +95,7 @@ const ACTIVITY = [
     time: '8 hours ago',
   },
   {
-    company: 'Saipem',
+    company: 'Vanguard Offshore Operations',
     action: 'requested',
     count: 4,
     role: 'Instrument Technicians',
@@ -108,7 +108,7 @@ const ACTIVITY = [
 /* ─── Companies Data ─── */
 const COMPANIES = [
   {
-    name: 'Neptune Energy',
+    name: 'Trident Upstream Energy',
     sector: 'Oil & Gas',
     hq: 'Houston, TX',
     size: '5,000+',

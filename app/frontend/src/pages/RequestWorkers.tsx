@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Building2,
@@ -201,7 +201,7 @@ export default function RequestWorkers() {
               <Input
                 value={form.company_name}
                 onChange={(e) => update('company_name', e.target.value)}
-                placeholder="e.g. Neptune Energy"
+                placeholder="e.g. Trident Upstream Energy"
                 className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:border-[#f59e0b] focus:ring-[#f59e0b]/20"
               />
               {errors.company_name && (

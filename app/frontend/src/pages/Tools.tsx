@@ -7,6 +7,9 @@ import {
   Thermometer,
   Beaker,
   CircuitBoard,
+  Table2,
+  GitBranch,
+  Scissors,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
@@ -17,6 +20,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
 import UnitConverter from '@/tools/unit-converter/UnitConverter';
+import PipeDataTables from '@/tools/pipe-data-tables/PipeDataTables';
+import PressureDrop from '@/tools/pressure-drop/PressureDrop';
+import ReynoldsCalculator from '@/tools/reynolds/ReynoldsCalculator';
+import ThermalExpansion from '@/tools/thermal-expansion/ThermalExpansion';
+import FlangeRating from '@/tools/flange-rating/FlangeRating';
+import FittingTakeOff from '@/tools/fitting-takeoff/FittingTakeOff';
 
 interface ToolDef {
   key: string;
@@ -27,11 +36,14 @@ interface ToolDef {
 
 const TOOLS: ToolDef[] = [
   { key: 'wall-thickness', nameKey: 'tools.wallThickness', icon: Ruler, categoryKey: 'tools.categoryDesign' },
-  { key: 'pressure-drop', nameKey: 'tools.pressureDrop', icon: Gauge, categoryKey: 'tools.categoryHydraulics' },
   { key: 'unit-converter', nameKey: 'tools.unitConverter', icon: Calculator, categoryKey: 'tools.categoryUtility' },
-  { key: 'thermal-expansion', nameKey: 'tools.thermalExpansion', icon: Thermometer, categoryKey: 'tools.categoryStress' },
+  { key: 'pipe-dimensions', nameKey: 'tools.pipeDataTables', icon: Table2, categoryKey: 'tools.categoryReference' },
+  { key: 'pressure-drop', nameKey: 'tools.pressureDrop', icon: Gauge, categoryKey: 'tools.categoryHydraulics' },
   { key: 'reynolds', nameKey: 'tools.reynolds', icon: Beaker, categoryKey: 'tools.categoryHydraulics' },
+  { key: 'thermal-expansion', nameKey: 'tools.thermalExpansion', icon: Thermometer, categoryKey: 'tools.categoryStress' },
   { key: 'flange-rating', nameKey: 'tools.flangeRating', icon: CircuitBoard, categoryKey: 'tools.categoryReference' },
+  { key: 'fitting-takeoff', nameKey: 'tools.fittingTakeOff', icon: GitBranch, categoryKey: 'tools.categoryReference' },
+  { key: 'elbow-cut', nameKey: 'tools.elbowCut', icon: Scissors, categoryKey: 'tools.categoryDesign' },
 ];
 
 export default function Tools() {
@@ -82,33 +94,59 @@ export default function Tools() {
       />
 
       <div className="grid gap-6 lg:grid-cols-[280px,1fr]">
+        {/* VIS-001: Mobile = horizontal scroll tabs, Desktop = vertical sidebar */}
         <aside className="space-y-1">
-          <p className="px-3 pb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500">
-            {t('tools.catalog')}
-          </p>
-          {TOOLS.map((tool) => {
-            const Icon = tool.icon;
-            const selected = active === tool.key;
-            return (
-              <button
-                key={tool.key}
-                onClick={() => setActive(tool.key)}
-                className={`group flex w-full items-center gap-3 border px-3 py-2.5 text-left text-sm transition ${
-                  selected
-                    ? 'border-[#f59e0b] bg-[#f59e0b]/10 text-[#f59e0b]'
-                    : 'border-zinc-800/80 bg-[#0d0d0d] text-zinc-300 hover:border-zinc-700'
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                <div className="flex-1">
-                  <div>{t(tool.nameKey)}</div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-                    {t(tool.categoryKey)}
+          {/* Mobile: horizontal scrollable tool selector */}
+          <div className="flex gap-2 overflow-x-auto pb-2 lg:hidden">
+            {TOOLS.map((tool) => {
+              const Icon = tool.icon;
+              const selected = active === tool.key;
+              return (
+                <button
+                  key={tool.key}
+                  onClick={() => setActive(tool.key)}
+                  className={`flex shrink-0 items-center gap-2 border px-3 py-2 text-xs transition ${
+                    selected
+                      ? 'border-[#f59e0b] bg-[#f59e0b]/10 text-[#f59e0b]'
+                      : 'border-zinc-800/80 bg-[#0d0d0d] text-zinc-300'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="whitespace-nowrap">{t(tool.nameKey)}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Desktop: vertical sidebar */}
+          <div className="hidden lg:block space-y-1">
+            <p className="px-3 pb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500">
+              {t('tools.catalog')}
+            </p>
+            {TOOLS.map((tool) => {
+              const Icon = tool.icon;
+              const selected = active === tool.key;
+              return (
+                <button
+                  key={tool.key}
+                  onClick={() => setActive(tool.key)}
+                  className={`group flex w-full items-center gap-3 border px-3 py-2.5 text-left text-sm transition ${
+                    selected
+                      ? 'border-[#f59e0b] bg-[#f59e0b]/10 text-[#f59e0b]'
+                      : 'border-zinc-800/80 bg-[#0d0d0d] text-zinc-300 hover:border-zinc-700'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <div className="flex-1">
+                    <div>{t(tool.nameKey)}</div>
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+                      {t(tool.categoryKey)}
+                    </div>
                   </div>
-                </div>
-              </button>
-            );
-          })}
+                </button>
+              );
+            })}
+          </div>
         </aside>
 
         <div className="border border-zinc-800/80 bg-[#0d0d0d] p-6">
@@ -201,6 +239,18 @@ export default function Tools() {
             </div>
           ) : active === 'unit-converter' ? (
             <UnitConverter user={user} />
+          ) : active === 'pipe-dimensions' ? (
+            <PipeDataTables user={user} />
+          ) : active === 'pressure-drop' ? (
+            <PressureDrop user={user} />
+          ) : active === 'reynolds' ? (
+            <ReynoldsCalculator user={user} />
+          ) : active === 'thermal-expansion' ? (
+            <ThermalExpansion user={user} />
+          ) : active === 'flange-rating' ? (
+            <FlangeRating user={user} />
+          ) : active === 'fitting-takeoff' ? (
+            <FittingTakeOff user={user} />
           ) : (
             <div className="flex min-h-[280px] flex-col items-center justify-center text-center">
               <Wrench className="h-8 w-8 text-zinc-600" />
