@@ -17,11 +17,11 @@ function escapeHtmlAttr(str: string): string {
     .replace(/'/g, '&#39;');
 }
 
-process.env.VITE_APP_TITLE ??= process.env.OVERVIEW_TITLE ?? 'PipingBox - Industrial Workforce Platform';
-process.env.VITE_APP_DESCRIPTION ??= process.env.OVERVIEW_DESCRIPTION ?? 'Formación, herramientas, empleo, certificaciones y comunidad para profesionales y empresas del sector industrial.';
+process.env.VITE_APP_TITLE ??= 'PipingBox - Industrial Workforce Platform';
+process.env.VITE_APP_DESCRIPTION ??= 'Formación, herramientas, empleo, certificaciones y comunidad para profesionales y empresas del sector industrial.';
 process.env.VITE_APP_TITLE = escapeHtmlAttr(process.env.VITE_APP_TITLE);
 process.env.VITE_APP_DESCRIPTION = escapeHtmlAttr(process.env.VITE_APP_DESCRIPTION);
-process.env.VITE_APP_LOGO_URL ??= process.env.OVERVIEW_LOGO_URL ?? '/assets/logos/logo-icon.png';
+process.env.VITE_APP_LOGO_URL ??= '/assets/logos/logo-icon.png';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -35,7 +35,7 @@ export default defineConfig(({ command }) => {
       react(),
       atoms(),
       Sitemap({
-        hostname: 'https://atoms.template.com',
+        hostname: 'https://pipingbox.com',
         lastmod: getSitemapLastmod(),
         readable: true,
         generateRobotsTxt: true,
