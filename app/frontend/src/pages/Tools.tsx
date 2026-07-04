@@ -49,6 +49,10 @@ const TOOLS: ToolDef[] = [
   { key: 'branch-layout', nameKey: 'tools.branchLayout', icon: GitBranch, categoryKey: 'tools.categoryDesign' },
 ];
 
+// MON-002: Free tier includes the first 5 tools. Pro tier unlocks all + future tools.
+// First 5 tools are free (index 0-4). The rest are Pro (badge only, no paywall yet).
+const FREE_TOOL_COUNT = 5;
+
 export default function Tools() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -101,9 +105,10 @@ export default function Tools() {
         <aside className="space-y-1">
           {/* Mobile: horizontal scrollable tool selector */}
           <div className="flex gap-2 overflow-x-auto pb-2 lg:hidden">
-            {TOOLS.map((tool) => {
+            {TOOLS.map((tool, idx) => {
               const Icon = tool.icon;
               const selected = active === tool.key;
+              const isPro = idx >= FREE_TOOL_COUNT;
               return (
                 <button
                   key={tool.key}
@@ -116,6 +121,9 @@ export default function Tools() {
                 >
                   <Icon className="h-4 w-4" />
                   <span className="whitespace-nowrap">{t(tool.nameKey)}</span>
+                  {isPro && (
+                    <span className="rounded-sm bg-[#f59e0b]/20 px-1 text-[8px] font-bold uppercase text-[#f59e0b]">PRO</span>
+                  )}
                 </button>
               );
             })}
@@ -126,9 +134,10 @@ export default function Tools() {
             <p className="px-3 pb-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500">
               {t('tools.catalog')}
             </p>
-            {TOOLS.map((tool) => {
+            {TOOLS.map((tool, idx) => {
               const Icon = tool.icon;
               const selected = active === tool.key;
+              const isPro = idx >= FREE_TOOL_COUNT;
               return (
                 <button
                   key={tool.key}
@@ -141,7 +150,12 @@ export default function Tools() {
                 >
                   <Icon className="h-4 w-4" />
                   <div className="flex-1">
-                    <div>{t(tool.nameKey)}</div>
+                    <div className="flex items-center gap-1.5">
+                      {t(tool.nameKey)}
+                      {isPro && (
+                        <span className="rounded-sm bg-[#f59e0b]/20 px-1 text-[8px] font-bold uppercase text-[#f59e0b]">PRO</span>
+                      )}
+                    </div>
                     <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
                       {t(tool.categoryKey)}
                     </div>
