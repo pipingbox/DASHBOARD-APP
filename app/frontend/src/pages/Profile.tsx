@@ -20,11 +20,13 @@ import { AvailabilityMobilitySection } from '@/components/profile/AvailabilityMo
 import { AICVExtraction } from '@/components/profile/AICVExtraction';
 import { ProfileCompleteness } from '@/components/profile/ProfileCompleteness';
 import { generateCV } from '@/lib/generateCV';
+import { useAutoCV } from '@/hooks/useAutoCV';
 import type { Certification } from '@/lib/certifications';
 
 export default function Profile() {
   const { t } = useTranslation();
   const { profile, user, refreshProfile } = useAuth();
+  const { isStale } = useAutoCV(); // AUTO-003: CV staleness detection
   const [fullName, setFullName] = useState('');
   const [title, setTitle] = useState('');
   const [company, setCompany] = useState('');

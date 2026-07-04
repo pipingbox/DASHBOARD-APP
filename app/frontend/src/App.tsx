@@ -26,6 +26,7 @@ import CommunityPost from './pages/CommunityPost';
 import Companies from './pages/Companies';
 import RequestWorkers from './pages/RequestWorkers';
 import Profile from './pages/Profile';
+import PublicWorkerProfile from './pages/PublicWorkerProfile';
 import Admin from './pages/Admin';
 import Applications from './pages/Applications';
 import Messages from './pages/Messages';
@@ -93,6 +94,9 @@ const AppRoutes = () => {
 
     {/* ENT-002: Pricing page (public) */}
     <Route path="/pricing" element={<PricingPage />} />
+
+    {/* UX-003: Public worker profile (SEO + shareable) */}
+    <Route path="/worker/:id" element={<PublicWorkerProfile />} />
 
     <Route
       path="/login"
