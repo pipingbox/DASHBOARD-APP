@@ -8,14 +8,16 @@ import nl from './locales/nl.json';
 import fr from './locales/fr.json';
 import de from './locales/de.json';
 import pt from './locales/pt.json';
+import it from './locales/it.json';
 
 export const SUPPORTED_LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇬🇧' },
   { code: 'es', label: 'Español', flag: '🇪🇸' },
+  { code: 'pt', label: 'Português', flag: '🇵🇹' },
   { code: 'nl', label: 'Nederlands', flag: '🇳🇱' },
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
   { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
-  { code: 'pt', label: 'Português', flag: '🇵🇹' },
+  { code: 'it', label: 'Italiano', flag: '🇮🇹' },
 ] as const;
 
 export type SupportedLanguageCode = (typeof SUPPORTED_LANGUAGES)[number]['code'];
@@ -59,6 +61,7 @@ void i18n
       fr: { translation: fr },
       de: { translation: de },
       pt: { translation: pt },
+      it: { translation: it },
     },
     lng: resolveInitialLanguage(),
     fallbackLng: DEFAULT_LANGUAGE,
