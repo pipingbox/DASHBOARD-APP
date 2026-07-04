@@ -388,7 +388,7 @@ export default function CompanyWorkersSearch() {
             value={filters.certification}
             onChange={handleChange}
             icon={Shield}
-            options={['', 'ASME IX', 'AWS D1.1', '6G', 'CISRS', 'LEEA', 'CompEx', 'NEBOSH', 'IOSH']}
+            options={['', 'ASME IX', 'AWS D1.1', '6G', 'CISRS', 'LEEA', 'CompEx', 'NEBOSH', 'IOSH', 'OSHA 30', 'NCCER', 'API 570']}
           />
           <FilterSelect
             label="Experience Level"

@@ -49,11 +49,34 @@ function useTrustMetrics(): { metrics: TrustMetric[]; loading: boolean } {
         const verifiedCompanies = companiesRes.count ?? 0;
         const applications = appsRes.count ?? 0;
 
+        // Count distinct countries from profiles location
+        const { data: locData } = await supabase
+          .from(TABLES.profiles)
+          .select('location')
+          .not('location', 'is', null);
+        const countries = new Set<string>();
+        (locData || []).forEach((p: { location: string | null }) => {
+          const loc = p.location || '';
+          if (loc.includes('Belgium')) countries.add('Belgium');
+          if (loc.includes('Netherlands')) countries.add('Netherlands');
+          if (loc.includes('Germany')) countries.add('Germany');
+          if (loc.includes('Norway')) countries.add('Norway');
+          if (loc.includes('Spain') || loc.includes('España')) countries.add('Spain');
+          if (loc.includes('France')) countries.add('France');
+          if (loc.includes('UAE') || loc.includes('Emirates')) countries.add('UAE');
+          if (loc.includes('United Kingdom') || loc.includes('UK')) countries.add('UK');
+          if (loc.includes('TX') || loc.includes('USA') || loc.includes('Houston')) countries.add('USA');
+          if (loc.includes('Poland')) countries.add('Poland');
+          if (loc.includes('Portugal')) countries.add('Portugal');
+          if (loc.includes('Italy')) countries.add('Italy');
+        });
+        const countryCount = countries.size;
+
         setMetrics([
           { label: 'Active Jobs', value: activeJobs, icon: Briefcase },
           { label: 'Companies', value: verifiedCompanies, icon: BadgeCheck },
           { label: 'Applications', value: applications, icon: TrendingUp },
-          { label: 'Countries', value: 0, icon: Globe },
+          { label: 'Countries', value: countryCount, icon: Globe },
         ]);
       } catch {
         setMetrics([

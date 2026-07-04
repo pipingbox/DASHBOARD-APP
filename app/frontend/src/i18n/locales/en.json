@@ -253,10 +253,10 @@
     "skillsPlaceholder": "Stress analysis, CAESAR II, ASME B31.3…",
     "saveProfile": "Save profile",
     "profileUpdated": "Profile updated",
-    "generateCV": "Generate CV (PDF)",
+    "generateCV": "Generate Resume (PDF)",
     "generatingCV": "Generating…",
-    "cvGenerated": "CV generated",
-    "cvFailed": "Failed to generate CV",
+    "cvGenerated": "Resume generated",
+    "cvFailed": "Failed to generate resume",
     "preview": "Preview",
     "yourName": "Your name",
     "yourRole": "Your role",
@@ -494,17 +494,17 @@
       }
     },
     "cv": {
-      "label": "CV / Resume",
-      "title": "CV Upload",
-      "description": "Upload your CV as a PDF. Control who can see it.",
-      "uploadPdf": "Upload CV (PDF)",
+      "label": "Resume",
+      "title": "Resume Upload",
+      "description": "Upload your resume as a PDF. Control who can see it.",
+      "uploadPdf": "Upload Resume (PDF)",
       "pdfOnly": "Only PDF files are accepted",
       "fileTooBig": "File must be under 10MB",
-      "uploaded": "CV uploaded successfully",
-      "removed": "CV removed",
+      "uploaded": "Resume uploaded successfully",
+      "removed": "Resume removed",
       "view": "View",
       "replace": "Replace",
-      "visibleToCompanies": "CV visible to companies"
+      "visibleToCompanies": "Resume visible to companies"
     },
     "aiExtraction": {
       "label": "AI Intelligence",
@@ -588,7 +588,7 @@
       "yearsExperience": "Add years of experience",
       "skills": "Add professional skills",
       "bio": "Write a professional bio",
-      "cv": "Upload your CV",
+      "cv": "Upload your resume",
       "experience": "Add at least one work experience",
       "certification": "Add at least one certification",
       "documents": "Upload a supporting document"

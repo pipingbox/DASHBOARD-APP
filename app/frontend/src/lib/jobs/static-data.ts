@@ -209,10 +209,76 @@ export const STATIC_JOBS: Omit<Job, 'id' | 'created_at' | 'posted_by'>[] = [
     currency: '£',
     is_remote: false,
   },
+  // US Gulf Coast market (MARKET_USA.md entry strategy)
+  {
+    title: 'Pipefitter — Turnaround',
+    company: 'Vanguard Industrial Services',
+    location: 'Beaumont, TX',
+    job_type: 'contract',
+    category: 'Pipefitting',
+    description:
+      'Petrochemical turnaround. NCCER Pipefitting Level 2+ required. OSHA 30 preferred. Per diem available.',
+    salary_min: 38,
+    salary_max: 52,
+    currency: '$',
+    is_remote: false,
+  },
+  {
+    title: 'TIG Welder — 6G Pipe',
+    company: 'Gulf Coast Fabrication',
+    location: 'Houston, TX',
+    job_type: 'contract',
+    category: 'Welding',
+    description:
+      'TIG welding on high-pressure piping for LNG facility. AWS certified. 6G position. ASME Section IX qualified.',
+    salary_min: 45,
+    salary_max: 65,
+    currency: '$',
+    is_remote: false,
+  },
+  {
+    title: 'QA/QC Inspector — Piping',
+    company: 'Apex Inspection Group',
+    location: 'Lake Charles, LA',
+    job_type: 'contract',
+    category: 'QA/QC',
+    description:
+      'Inspection of piping fabrication per ASME B31.3. API 570 certification preferred. NDT Level II (UT, MT, PT).',
+    salary_min: 42,
+    salary_max: 58,
+    currency: '$',
+    is_remote: false,
+  },
+  {
+    title: 'Piping Superintendent',
+    company: 'Corpus Christi Constructors',
+    location: 'Corpus Christi, TX',
+    job_type: 'full-time',
+    category: 'Supervision',
+    description:
+      'Supervise piping construction crews on refinery expansion. 10+ years experience. OSHA 30 required. NCCER preferred.',
+    salary_min: 95000,
+    salary_max: 130000,
+    currency: '$',
+    is_remote: false,
+  },
+  {
+    title: 'Pipe Stress Engineer — CAESAR II',
+    company: 'Lone Star Engineering',
+    location: 'Remote, USA',
+    job_type: 'full-time',
+    category: 'Stress',
+    description:
+      'Lead stress analysis for petrochemical projects. CAESAR II and ASME B31.3 expertise. Remote-friendly.',
+    salary_min: 110000,
+    salary_max: 145000,
+    currency: '$',
+    is_remote: true,
+  },
 ];
 
 /* ─── Featured Jobs (premium / high-paying) ─── */
-export const FEATURED_INDICES = [1, 3, 8, 14];
+export const FEATURED_INDICES = [1, 3, 8, 14, 20];
 
 /* ─── Activity Feed Data ─── */
 export const ACTIVITY_FEED: ActivityItem[] = [
@@ -226,7 +292,7 @@ export const ACTIVITY_FEED: ActivityItem[] = [
 ];
 
 /* ─── Filter Options ─── */
-export const COUNTRIES = ['Belgium', 'Netherlands', 'Germany', 'Norway', 'UAE', 'United Kingdom'];
+export const COUNTRIES = ['Belgium', 'Netherlands', 'Germany', 'Norway', 'UAE', 'United Kingdom', 'USA'];
 export const DISCIPLINES = ['Pipefitter', 'TIG Welder', 'QA/QC', 'Supervisor', 'Planner', 'Rigger', 'Offshore Technician'];
 export const WORK_TYPES = ['Offshore', 'Onshore', 'Shutdown', 'Long-term', 'Rotation'];
 export const CONTRACT_TYPES_OPTIONS = ['Freelance', 'Employee', 'Contract', 'Full-time'];

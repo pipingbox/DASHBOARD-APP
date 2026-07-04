@@ -39,6 +39,15 @@ export default defineConfig(({ command }) => {
         lastmod: getSitemapLastmod(),
         readable: true,
         generateRobotsTxt: true,
+        // Explicit public routes for SEO (I18N-05 fix)
+        routes: [
+          '/',
+          '/tools',
+          '/jobs',
+          '/pricing',
+          '/companies',
+          '/blog',
+        ],
       }),
       ...(blogPrerenderRoutes.length > 0
         ? vitePrerenderPlugin({
