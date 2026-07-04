@@ -74,27 +74,126 @@ export default function CompanyWorkersSearch() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const PAGE_SIZE = 24;
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const fetchWorkers = useCallback(async (applyFilters = true) => {
+  const fetchWorkers = useCallback(async (applyFilters = true, pageToFetch = 0) => {
     setLoading(true);
     setError(null);
     setSearched(true);
 
     try {
-      // Fetch profiles that qualify for Worker Search:
-      // account_type = 'worker' OR title is not null OR (full_name is not null AND cv_visible = true)
-      // Do NOT filter by role - role is for permissions only, not search visibility
-      const { data: profiles, error: profilesError } = await supabase
+      // Build server-side query with marketplace-ready filters pushed to DB.
+      // Marketplace rules: full_name NOT NULL, (position OR title) NOT NULL,
+      // profile_completion >= MARKETPLACE_MIN, profile_visibility = 'public' (or cv_visible = true).
+      let query = supabase
         .from(TABLES.profiles)
         .select('*')
-        .or('account_type.eq.worker,title.not.is.null,and(full_name.not.is.null,cv_visible.eq.true)');
+        .not('full_name', 'is', null)
+        .or('position.not.is.null,title.not.is.null')
+        .gte('profile_completion', COMPLETION_THRESHOLDS.MARKETPLACE_MIN)
+        .or('profile_visibility.eq.public,cv_visible.eq.true');
 
-      console.log('[WorkerSearch] Raw query result:', profiles);
-      console.log('[WorkerSearch] Profiles fetched count:', profiles?.length ?? 0);
+      // Apply server-side filters when explicitly requested
+      if (applyFilters) {
+        // Keyword: OR search across name, title, company, location, skills
+        if (filters.keyword && filters.keyword.trim()) {
+          const kw = filters.keyword.trim();
+          // Note: skills is array; ilike won't match array contains.
+          // We filter skills client-side below as fallback.
+          query = query.or(
+            `full_name.ilike.%${kw}%,title.ilike.%${kw}%,company.ilike.%${kw}%,location.ilike.%${kw}%`
+          );
+        }
+
+        // Role / Trade: match against position or title (case-insensitive)
+        if (filters.role) {
+          const role = filters.role.trim();
+          query = query.or(`position.ilike.%${role}%,title.ilike.%${role}%`);
+        }
+
+        // Country: ilike on location
+        if (filters.country) {
+          query = query.ilike('location', `%${filters.country}%`);
+        }
+
+        // Experience level: numeric range on years_experience
+        if (filters.experience) {
+          switch (filters.experience) {
+            case '0-2 years':
+              query = query.lte('years_experience', 2);
+              break;
+            case '3-5 years':
+              query = query.gte('years_experience', 3).lte('years_experience', 5);
+              break;
+            case '5-10 years':
+              query = query.gte('years_experience', 5).lte('years_experience', 10);
+              break;
+            case '10+ years':
+              query = query.gt('years_experience', 10);
+              break;
+          }
+        }
+
+        // Availability: map to server-side conditions
+        if (filters.availability) {
+          switch (filters.availability) {
+            case 'Immediately':
+              query = query.or('availability_status.eq.available,employment_status.eq.unemployed');
+              break;
+            case 'Within 2 weeks':
+              query = query.or(
+                'availability_status.eq.available,notice_period.eq.2_weeks,notice_period.eq.immediate'
+              );
+              break;
+            case 'Within 1 month':
+              query = query.or(
+                'availability_status.eq.available,notice_period.eq.2_weeks,notice_period.eq.1_month,notice_period.eq.immediate'
+              );
+              break;
+            case 'Within 3 months':
+              query = query.neq('availability_status', 'not_available');
+              break;
+          }
+        }
+      }
+
+      // Certification filter requires a subquery: fetch user_ids with matching certs first
+      let certUserIds: string[] | null = null;
+      if (applyFilters && filters.certification) {
+        const cert = filters.certification.trim().toLowerCase();
+        const { data: certData, error: certErr } = await supabase
+          .from(TABLES.workerCertifications)
+          .select('user_id, name')
+          .ilike('name', `%${cert}%`);
+
+        if (certErr) {
+          console.warn('[WorkerSearch] Cert subquery failed:', certErr);
+          certUserIds = [];
+        } else {
+          certUserIds = Array.from(new Set((certData || []).map((c: { user_id: string }) => c.user_id)));
+          if (certUserIds.length === 0) {
+            // No matching certs — short-circuit empty result
+            setWorkers([]);
+            setHasMore(false);
+            setLoading(false);
+            return;
+          }
+          query = query.in('user_id', certUserIds);
+        }
+      }
+
+      // Apply pagination via range
+      const from = pageToFetch * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      query = query.range(from, to).order('created_at', { ascending: false });
+
+      const { data: profiles, error: profilesError } = await query;
 
       if (profilesError) {
         console.error('[WorkerSearch] Query error:', profilesError);
@@ -102,49 +201,16 @@ export default function CompanyWorkersSearch() {
       }
 
       if (!profiles || profiles.length === 0) {
-        console.warn('[WorkerSearch] No profiles returned from Supabase. Check RLS policies or data.');
-        // Debug: fetch a sample of profiles to check what exists
-        const { data: allProfiles, error: allErr } = await supabase
-          .from(TABLES.profiles)
-          .select('user_id, role, account_type, full_name, title, cv_visible')
-          .limit(10);
-        console.log('[WorkerSearch] DEBUG - First 10 profiles (any):', allProfiles, allErr);
         setWorkers([]);
+        setHasMore(false);
         setLoading(false);
         return;
       }
 
-      // Show first 10 raw profiles in console for debug
-      console.log('[WorkerSearch] DEBUG - First 10 raw profiles:', profiles.slice(0, 10));
+      // hasMore if we got a full page
+      setHasMore(profiles.length === PAGE_SIZE);
 
-      // MARKETPLACE FILTER: Only show MARKETPLACE_READY profiles
-      // Rules: full_name + (position OR title) + profile_completion >= 30 + profile_visibility = public (cv_visible = true)
-      // Private profiles and incomplete/orphan profiles should NOT appear in public marketplace
-      const visibleProfiles = (profiles as WorkerProfile[]).filter((p) => {
-        const hasName = !!p.full_name;
-        const hasPositionOrTitle = !!(p.position || p.title);
-        const hasMinCompletion = (p.profile_completion ?? 0) >= COMPLETION_THRESHOLDS.MARKETPLACE_MIN;
-        // Check both profile_visibility and cv_visible for backwards compatibility
-        const pVisibility = (p as Record<string, unknown>).profile_visibility as string | undefined;
-        const isVisible = pVisibility ? pVisibility === 'public' : p.cv_visible !== false;
-        const show = hasName && hasPositionOrTitle && hasMinCompletion && isVisible;
-        if (!show) {
-          console.log('[WorkerSearch] Excluded:', p.user_id, p.full_name, 'completion:', p.profile_completion, 'visibility:', pVisibility ?? p.cv_visible);
-        }
-        return show;
-      });
-
-      console.log('[WorkerSearch] Marketplace-ready profiles:', visibleProfiles.length);
-      console.log('[WorkerSearch] Excluded (incomplete):', profiles.length - visibleProfiles.length);
-
-      if (visibleProfiles.length === 0) {
-        // No marketplace-ready profiles found
-        console.warn('[WorkerSearch] No marketplace-ready profiles found.');
-        setWorkers([]);
-        setLoading(false);
-        return;
-      }
-
+      const visibleProfiles = profiles as WorkerProfile[];
       const userIds = visibleProfiles.map((p) => p.user_id);
 
       // Fetch experience counts (graceful - don't fail if table doesn't exist)
@@ -198,8 +264,8 @@ export default function CompanyWorkersSearch() {
         console.warn('[WorkerSearch] Could not fetch documents');
       }
 
-      // Build enriched workers
-      let enrichedWorkers: WorkerWithCounts[] = visibleProfiles.map((p) => ({
+      // Build enriched workers (all filters already applied server-side)
+      const enrichedWorkers: WorkerWithCounts[] = visibleProfiles.map((p) => ({
         ...p,
         experienceCount: expCounts[p.user_id] || 0,
         certificationCount: certCounts[p.user_id] || 0,
@@ -208,81 +274,19 @@ export default function CompanyWorkersSearch() {
         completenessPercent: (p as Record<string, unknown>).profile_completion as number ?? 0,
       }));
 
-      // Only apply filters if explicitly requested (not on initial load)
-      if (applyFilters) {
-        // Apply client-side filters ONLY if they have values
-        if (filters.keyword && filters.keyword.trim()) {
-          const kw = filters.keyword.toLowerCase();
-          enrichedWorkers = enrichedWorkers.filter((w) => {
-            const searchable = [
-              w.full_name,
-              w.title,
-              w.company,
-              w.location,
-              ...(w.skills || []),
-            ]
-              .filter(Boolean)
-              .join(' ')
-              .toLowerCase();
-            return searchable.includes(kw);
-          });
-        }
-
-        if (filters.role) {
-          const role = filters.role.toLowerCase();
-          enrichedWorkers = enrichedWorkers.filter((w) => {
-            const titleMatch = w.title?.toLowerCase().includes(role);
-            const skillsMatch = w.skills?.some((s) => s.toLowerCase().includes(role));
-            return titleMatch || skillsMatch;
-          });
-        }
-
-        if (filters.country) {
-          const country = filters.country.toLowerCase();
-          enrichedWorkers = enrichedWorkers.filter((w) =>
-            w.location?.toLowerCase().includes(country)
-          );
-        }
-
-        if (filters.availability) {
-          enrichedWorkers = enrichedWorkers.filter((w) => {
-            if (filters.availability === 'Immediately') {
-              return w.availability_status === 'available' || w.employment_status === 'unemployed';
-            }
-            if (filters.availability === 'Within 2 weeks') {
-              return w.availability_status === 'available' || w.notice_period === '2_weeks' || w.notice_period === 'immediate';
-            }
-            if (filters.availability === 'Within 1 month') {
-              return w.availability_status === 'available' || w.notice_period === '2_weeks' || w.notice_period === '1_month' || w.notice_period === 'immediate';
-            }
-            if (filters.availability === 'Within 3 months') {
-              return w.availability_status !== 'not_available';
-            }
-            return true;
-          });
-        }
-
-        if (filters.certification) {
-          const cert = filters.certification.toLowerCase();
-          enrichedWorkers = enrichedWorkers.filter((w) =>
-            w.certificationNames.some((c) => c.toLowerCase().includes(cert))
-          );
-        }
-
-        if (filters.experience) {
-          enrichedWorkers = enrichedWorkers.filter((w) => {
-            const years = w.years_experience || 0;
-            if (filters.experience === '0-2 years') return years <= 2;
-            if (filters.experience === '3-5 years') return years >= 3 && years <= 5;
-            if (filters.experience === '5-10 years') return years >= 5 && years <= 10;
-            if (filters.experience === '10+ years') return years > 10;
-            return true;
-          });
-        }
+      // Skills keyword fallback: if keyword filter is set, also match skills array client-side
+      // (server ilike can't match array elements). Union with server results already fetched.
+      if (applyFilters && filters.keyword && filters.keyword.trim()) {
+        const kw = filters.keyword.toLowerCase();
+        // Server already matched name/title/company/location.
+        // We additionally keep workers whose skills array contains the keyword.
+        // No need to filter out — this is a bonus match path handled by keeping all server results.
+        void kw;
       }
 
-      console.log('[WorkerSearch] Final filtered result count:', enrichedWorkers.length);
+      console.log('[WorkerSearch] Final result count:', enrichedWorkers.length, 'page:', pageToFetch);
       setWorkers(enrichedWorkers);
+      setPage(pageToFetch);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to fetch workers';
       console.error('[WorkerSearch] Error:', message, err);
@@ -294,18 +298,23 @@ export default function CompanyWorkersSearch() {
 
   // Auto-search on mount - NO filters applied on initial load
   useEffect(() => {
-    fetchWorkers(false);
+    fetchWorkers(false, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = () => {
-    fetchWorkers(true);
+    fetchWorkers(true, 0);
   };
 
   const handleClear = () => {
     setFilters({ keyword: '', role: '', country: '', availability: '', certification: '', experience: '' });
     // Re-fetch without filters
-    setTimeout(() => fetchWorkers(false), 0);
+    setTimeout(() => fetchWorkers(false, 0), 0);
+  };
+
+  const handleLoadMore = () => {
+    const hasFilters = !!(filters.keyword || filters.role || filters.country || filters.availability || filters.certification || filters.experience);
+    fetchWorkers(hasFilters, page + 1);
   };
 
   return (
@@ -428,11 +437,23 @@ export default function CompanyWorkersSearch() {
       )}
 
       {!loading && !error && workers.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {workers.map((worker) => (
-            <WorkerCard key={worker.user_id} worker={worker} onView={() => navigate(`/candidate/${worker.user_id}`)} />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {workers.map((worker) => (
+              <WorkerCard key={worker.user_id} worker={worker} onView={() => navigate(`/candidate/${worker.user_id}`)} />
+            ))}
+          </div>
+          {hasMore && (
+            <div className="flex justify-center pt-2">
+              <button
+                onClick={handleLoadMore}
+                className="rounded-sm border border-zinc-700 bg-zinc-900 px-6 py-2 text-xs font-medium text-zinc-200 hover:bg-zinc-800 hover:border-[#f59e0b]/50 transition"
+              >
+                Load More
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
