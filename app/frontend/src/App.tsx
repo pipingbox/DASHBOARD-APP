@@ -165,11 +165,20 @@ const AppRoutes = () => {
     />
     <Route
       path="/academy/vca-course"
-      element={withShellRoles(<VCAExamBookingPage />, ['admin', 'worker', 'company'])}
+      element={<VCAExamBookingPage />}
     />
     <Route
       path="/academy/vca-booking"
-      element={withShellRoles(<VCAExamBookingPage />, ['admin', 'worker', 'company'])}
+      element={<VCAExamBookingPage />}
+    />
+    {/* Public certification landing pages (DEC-51, BRAIN-VCA-002) */}
+    <Route
+      path="/certifications"
+      element={<VCAExamBookingPage />}
+    />
+    <Route
+      path="/certifications/vca"
+      element={<VCAExamBookingPage />}
     />
     <Route
       path="/academy/course/:slug"

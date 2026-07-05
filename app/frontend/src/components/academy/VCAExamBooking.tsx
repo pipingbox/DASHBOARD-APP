@@ -2,17 +2,8 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   MapPin,
-  Phone,
-  Mail,
-  Globe,
-  CheckCircle2,
-  Clock,
-  Languages,
   AlertCircle,
   Loader2,
-  Search,
-  Calendar,
-  User,
   ArrowRight,
   ShieldCheck,
 } from 'lucide-react';
@@ -23,39 +14,58 @@ import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
-/* ─── VCA Exam Booking (Fase 1 MVP) ───
- * Per ticket: VCA Exam Booking + Official Material Strategy
+/* ─── VCA Exam Booking (Fase 2 — generic certification engine, DEC-51) ───
+ * Source: 02-PRODUCT/CERTIFICATION_PLATFORM_STRATEGY.md
+ *
+ * Reads from app_certifications + app_certification_exam_centers (generic).
+ * Writes to app_certification_bookings (generic).
  *
  * Flow:
  * 1. User enters postal code + exam type (B-VCA / VOL-VCA) + language + date
- * 2. System shows nearby official VCA exam centers
+ * 2. System shows nearby official VCA exam centers (filtered by certification_id)
  * 3. User selects booking mode: exam only OR course + exam
  * 4. User selects fee type: standard (€10) OR urgent (€15)
  * 5. User submits booking request
  * 6. PipingBox manages the reservation manually (WhatsApp/email)
  * 7. User receives confirmation
  *
+ * Pricing is TRANSPARENT: official exam fee (paid to center) and PipingBox
+ * management fee are shown as separate line items.
+ *
  * LEGAL: PipingBox does NOT issue VCA certificates.
  * "PipingBox prepara al alumno y gestiona la reserva del examen oficial
  *  en centros reconocidos."
  */
 
+interface Certification {
+  id: string;
+  country_code: string;
+  code: string;
+  variant: string;
+  name: string;
+  type: 'exam_based' | 'training_based';
+  issuing_body: string;
+  languages: string[];
+  syllabus_version: string | null;
+  official_url: string | null;
+}
+
 interface ExamCenter {
   id: string;
-  name: string;
+  certification_id: string;
+  center_name: string;
   city: string;
-  address: string | null;
   postal_code: string | null;
+  address: string | null;
   website: string | null;
   phone: string | null;
   email: string | null;
-  languages: string[];
-  bvca_available: boolean;
-  volvca_available: boolean;
-  classroom_course_available: boolean;
-  online_exam_available: boolean;
-  exam_price_eur: number;
-  course_plus_exam_price_eur: number;
+  languages_offered: string[];
+  variants_offered: string[];
+  exam_price_cents: number;
+  course_plus_exam_price_cents: number;
+  online_available: boolean;
+  onsite_available: boolean;
 }
 
 const EXAM_LANGUAGES = ['NL', 'FR', 'EN', 'ES', 'PT', 'DE'];
@@ -63,12 +73,12 @@ const EXAM_LANGUAGES = ['NL', 'FR', 'EN', 'ES', 'PT', 'DE'];
 export function VCAExamBooking() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [certs, setCerts] = useState<Certification[]>([]);
   const [centers, setCenters] = useState<ExamCenter[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   // Form state
-  const [postalCode, setPostalCode] = useState('');
   const [examType, setExamType] = useState<'B-VCA' | 'VOL-VCA'>('B-VCA');
   const [examLanguage, setExamLanguage] = useState('EN');
   const [preferredDate, setPreferredDate] = useState('');
@@ -76,33 +86,62 @@ export function VCAExamBooking() {
   const [feeType, setFeeType] = useState<'standard' | 'urgent'>('standard');
   const [userName, setUserName] = useState('');
   const [userPhone, setUserPhone] = useState('');
+  const [postalCode, setPostalCode] = useState('');
   const [selectedCenter, setSelectedCenter] = useState<ExamCenter | null>(null);
 
+  // Resolve the active certification id (BE B-VCA / BE VOL-VCA)
+  const activeCertId =
+    certs.find((c) => c.country_code === 'BE' && c.code === 'VCA' && c.variant === examType)?.id ??
+    certs.find((c) => c.code === 'VCA' && c.variant === examType)?.id ??
+    null;
+
   useEffect(() => {
-    fetchCenters();
+    fetchCertifications();
     if (user) {
       setUserName(user.email ?? '');
     }
   }, [user]);
 
-  const fetchCenters = async () => {
+  useEffect(() => {
+    if (activeCertId) {
+      fetchCenters(activeCertId);
+    } else {
+      setCenters([]);
+    }
+  }, [activeCertId]);
+
+  const fetchCertifications = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from(TABLES.vcaExamCenters)
-      .select('*')
+      .from(TABLES.certifications)
+      .select('id, country_code, code, variant, name, type, issuing_body, languages, syllabus_version, official_url')
+      .eq('code', 'VCA')
+      .eq('is_active', true)
+      .order('country_code', { ascending: true });
+    if (error) {
+      console.error('[Cert Booking] Error fetching certifications:', error);
+    }
+    setCerts((data as Certification[]) ?? []);
+    setLoading(false);
+  };
+
+  const fetchCenters = async (certId: string) => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from(TABLES.certificationExamCenters)
+      .select('id, certification_id, center_name, city, postal_code, address, website, phone, email, languages_offered, variants_offered, exam_price_cents, course_plus_exam_price_cents, online_available, onsite_available')
+      .eq('certification_id', certId)
       .eq('is_active', true)
       .order('city', { ascending: true });
     if (error) {
-      console.error('[VCA Booking] Error fetching centers:', error);
+      console.error('[Cert Booking] Error fetching centers:', error);
     }
     setCenters((data as ExamCenter[]) ?? []);
     setLoading(false);
   };
 
   const filteredCenters = centers.filter((c) => {
-    if (examType === 'B-VCA' && !c.bvca_available) return false;
-    if (examType === 'VOL-VCA' && !c.volvca_available) return false;
-    if (bookingMode === 'course_plus_exam' && !c.classroom_course_available) return false;
+    if (bookingMode === 'course_plus_exam' && c.course_plus_exam_price_cents === 0) return false;
     if (postalCode && c.postal_code && !c.postal_code.startsWith(postalCode.slice(0, 2))) {
       // Fase 1: simple prefix match on first 2 digits (postal region)
       // Fase 2: proper geolocation distance ranking
@@ -111,6 +150,9 @@ export function VCAExamBooking() {
   });
 
   const feeAmount = feeType === 'standard' ? 10 : 15;
+  const feeAmountCents = feeType === 'standard' ? 1000 : 1500;
+  const examPriceEur = selectedCenter ? selectedCenter.exam_price_cents / 100 : null;
+  const totalEur = (examPriceEur ?? 0) + feeAmount;
 
   const handleSubmit = async () => {
     if (!user) {
@@ -121,23 +163,29 @@ export function VCAExamBooking() {
       toast.error('Please fill in your name and postal code');
       return;
     }
+    if (!activeCertId) {
+      toast.error('Certification not available. Please try again later.');
+      return;
+    }
 
     setSubmitting(true);
-    const { error } = await supabase.from(TABLES.vcaBookings).insert({
+    const { error } = await supabase.from(TABLES.certificationBookings).insert({
       user_id: user.id,
+      certification_id: activeCertId,
+      exam_center_id: selectedCenter?.id ?? null,
       user_email: user.email ?? '',
       user_name: userName,
       user_phone: userPhone || null,
       postal_code: postalCode,
-      exam_type: examType,
-      exam_language: examLanguage,
-      preferred_date: preferredDate || null,
-      booking_mode: bookingMode,
-      fee_type: feeType,
-      fee_amount_eur: feeAmount,
-      fee_paid: false, // Fase 1: manual payment confirmation
+      requested_variant: examType,
+      requested_language: examLanguage,
+      requested_date: preferredDate || null,
+      booking_type: feeType === 'urgent' ? 'urgent' : bookingMode,
+      exam_price_cents: selectedCenter?.exam_price_cents ?? 0,
+      management_fee_cents: feeAmountCents,
+      total_cents: (selectedCenter?.exam_price_cents ?? 0) + feeAmountCents,
       status: 'pending',
-      assigned_center_id: selectedCenter?.id ?? null,
+      notes: null,
     });
 
     setSubmitting(false);
@@ -148,11 +196,12 @@ export function VCAExamBooking() {
     }
 
     toast.success('Booking request submitted! PipingBox will contact you within 24h to confirm your exam reservation.');
-    // Reset form
     setPostalCode('');
     setPreferredDate('');
     setSelectedCenter(null);
   };
+
+  const activeCert = certs.find((c) => c.id === activeCertId);
 
   return (
     <div className="space-y-8">
@@ -178,6 +227,16 @@ export function VCAExamBooking() {
             with the course and <strong className="text-zinc-300">manages the reservation</strong> of the official exam
             at recognized VCA exam centers. The VCA certificate is issued by SSVV/BESACC through the exam center.
           </p>
+          {activeCert?.official_url && (
+            <a
+              href={activeCert.official_url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-block text-[10px] text-[#f59e0b] underline underline-offset-2 mt-1"
+            >
+              Official authority: {activeCert.issuing_body}
+            </a>
+          )}
         </div>
       </div>
 
@@ -306,28 +365,28 @@ export function VCAExamBooking() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1 space-y-1">
-                        <p className="text-xs font-semibold text-zinc-200">{center.name}</p>
+                        <p className="text-xs font-semibold text-zinc-200">{center.center_name}</p>
                         <p className="text-[10px] text-zinc-500 flex items-center gap-1">
                           <MapPin className="h-3 w-3" />
                           {center.city} {center.postal_code && `(${center.postal_code})`}
                         </p>
                         <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                          {center.languages.map((lang) => (
+                          {center.languages_offered.map((lang) => (
                             <span key={lang} className="px-1.5 py-0.5 text-[9px] bg-zinc-800/60 text-zinc-400 rounded-sm">{lang}</span>
                           ))}
-                          {center.online_exam_available && (
+                          {center.online_available && (
                             <span className="px-1.5 py-0.5 text-[9px] bg-blue-500/10 text-blue-400 rounded-sm">Online</span>
                           )}
-                          {center.classroom_course_available && (
+                          {center.course_plus_exam_price_cents > 0 && (
                             <span className="px-1.5 py-0.5 text-[9px] bg-green-500/10 text-green-400 rounded-sm">Course</span>
                           )}
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-xs font-medium text-[#f59e0b]">€{center.exam_price_eur}</p>
+                        <p className="text-xs font-medium text-[#f59e0b]">€{(center.exam_price_cents / 100).toFixed(2)}</p>
                         <p className="text-[9px] text-zinc-600">exam fee</p>
-                        {center.course_plus_exam_price_eur > 0 && (
-                          <p className="text-[10px] text-zinc-500 mt-1">€{center.course_plus_exam_price_eur} course+exam</p>
+                        {center.course_plus_exam_price_cents > 0 && (
+                          <p className="text-[10px] text-zinc-500 mt-1">€{(center.course_plus_exam_price_cents / 100).toFixed(2)} course+exam</p>
                         )}
                       </div>
                     </div>
@@ -383,14 +442,19 @@ export function VCAExamBooking() {
               />
             </div>
 
+            {/* Transparent pricing — official fee + PipingBox fee separated (legal requirement) */}
             <div className="border-t border-zinc-800 pt-3 space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500">Exam fee (paid to center)</span>
-                <span className="text-zinc-300">€{selectedCenter?.exam_price_eur ?? '—'}</span>
+                <span className="text-zinc-500">Official exam fee <span className="text-zinc-600">(paid to center)</span></span>
+                <span className="text-zinc-300">{examPriceEur !== null ? `€${examPriceEur.toFixed(2)}` : '€—'}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-zinc-500">PipingBox management fee</span>
-                <span className="text-[#f59e0b] font-medium">€{feeAmount}</span>
+                <span className="text-[#f59e0b] font-medium">€{feeAmount.toFixed(2)}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs pt-1 border-t border-zinc-800/60">
+                <span className="text-zinc-400 font-medium">Total</span>
+                <span className="text-zinc-200 font-semibold">€{totalEur.toFixed(2)}</span>
               </div>
               <div className="flex items-center gap-2 pt-1">
                 <button

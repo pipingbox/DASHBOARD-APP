@@ -57,8 +57,15 @@ export const TABLES = {
   referrals: 'app_14da0f1941_referrals',
   savedFilters: 'app_14da0f1941_saved_filters',
   jobInvitations: 'app_14da0f1941_job_invitations',
-  vcaExamCenters: 'app_vca_exam_centers',
-  vcaBookings: 'app_vca_bookings',
+  vcaExamCenters: 'app_vca_exam_centers', // DEPRECATED — use certificationExamCenters (DEC-51)
+  vcaBookings: 'app_vca_bookings',        // DEPRECATED — use certificationBookings (DEC-51)
+  // Generic certification platform (DEC-51, BRAIN-VCA-002)
+  certifications: 'app_certifications',
+  certificationModules: 'app_certification_modules',
+  certificationLessons: 'app_certification_lessons',
+  certificationExamCenters: 'app_certification_exam_centers',
+  certificationBookings: 'app_certification_bookings',
+  certificationProgress: 'app_certification_progress',
   academyCourses: 'app_academy_courses',
   academyLessons: 'app_academy_lessons',
   academyProgress: 'app_academy_progress',
