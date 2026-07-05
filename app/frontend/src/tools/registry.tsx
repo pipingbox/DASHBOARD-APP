@@ -36,6 +36,7 @@ const ThermalExpansion = lazy(() => import('@/tools/thermal-expansion/ThermalExp
 const FlangeRating = lazy(() => import('@/tools/flange-rating/FlangeRating'));
 const FittingTakeOff = lazy(() => import('@/tools/fitting-takeoff/FittingTakeOff'));
 const FlangeLibrary = lazy(() => import('@/tools/flange-library/FlangeLibrary').then((m) => ({ default: m.FlangeLibrary })));
+const BranchTemplate = lazy(() => import('@/tools/branch-template/BranchTemplate').then((m) => ({ default: m.BranchTemplate })));
 
 export const TOOL_REGISTRY: ToolDefinition[] = [
   // 🏭 Fabrication
@@ -52,6 +53,14 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
     icon: GitBranch,
     block: 'fabrication',
     component: FittingTakeOff,
+    isNew: true,
+  },
+  {
+    key: 'branch-template',
+    nameKey: 'tools.branchTemplate',
+    icon: Scissors,
+    block: 'fabrication',
+    component: BranchTemplate,
     isNew: true,
   },
   // 📐 Design & Calculation

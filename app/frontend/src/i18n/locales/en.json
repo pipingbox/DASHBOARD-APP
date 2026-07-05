@@ -341,6 +341,7 @@
     "fittingTakeOff": "Fitting Take-Off",
     "elbowCut": "Elbow Cut Calculator",
     "branchLayout": "Branch Layout",
+    "branchTemplate": "Branch Template (Injerto)",
     "flangeLibrary": "Flange Library (ASME B16.5)"
   },
   "jobs": {

@@ -33,6 +33,7 @@ import FittingTakeOff from '@/tools/fitting-takeoff/FittingTakeOff';
 import BranchLayout from '@/tools/branch-layout/BranchLayout';
 import ElbowCut from '@/tools/elbow-cut/ElbowCut';
 import { FlangeLibrary } from '@/tools/flange-library/FlangeLibrary';
+import { BranchTemplate } from '@/tools/branch-template/BranchTemplate';
 
 /**
  * TICKET-001 Fase 1: Centro Técnico — 5 blocks organization.
@@ -73,6 +74,7 @@ const TOOLS: ToolDef[] = [
   // 🏭 Fabrication
   { key: 'elbow-cut', nameKey: 'tools.elbowCut', icon: Scissors, block: 'fabrication' },
   { key: 'branch-layout', nameKey: 'tools.branchLayout', icon: GitBranch, block: 'fabrication' },
+  { key: 'branch-template', nameKey: 'tools.branchTemplate', icon: Scissors, block: 'fabrication' },
   { key: 'fitting-takeoff', nameKey: 'tools.fittingTakeOff', icon: Boxes, block: 'fabrication' },
 
   // 📐 Design & Calculation
@@ -327,6 +329,8 @@ export default function Tools() {
             <FittingTakeOff user={user} />
           ) : active === 'branch-layout' ? (
             <BranchLayout user={user} />
+          ) : active === 'branch-template' ? (
+            <BranchTemplate user={user} />
           ) : active === 'elbow-cut' ? (
             <ElbowCut user={user} />
           ) : (

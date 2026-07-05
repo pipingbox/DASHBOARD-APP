@@ -11,6 +11,8 @@ import {
   Download,
   ShieldCheck,
   BookOpen,
+  Wrench,
+  AlertTriangle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -22,6 +24,7 @@ import {
   type FlangeType,
   type PressureClass,
 } from './flange-data';
+import { getGasketForFlange, getStudBoltForFlange, type GasketSpec, type StudBoltSpec } from './gasket-bolt-data';
 
 /**
  * TICKET-001 Fase 2: Flange Library — the killer differentiator.
@@ -402,22 +405,79 @@ function FlangeDetailModal({ spec, onClose }: { spec: FlangeSpec; onClose: () =>
             </div>
           </div>
 
-          {/* Gasket cross-link (Fase 3 foundation) */}
-          <div className="border border-[#f59e0b]/20 bg-[#f59e0b]/5 rounded-sm p-4 space-y-3">
-            <h4 className="flex items-center gap-2 text-[10px] uppercase tracking-[0.15em] text-[#f59e0b] font-semibold">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              Compatible Gasket
-            </h4>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <DimBox label="Gasket Type" value={spec.gasketType} />
-              <DimBox label="Gasket OD" value={`${spec.gasketOD} mm`} />
-              <DimBox label="Gasket ID" value={`${spec.gasketID} mm`} />
-            </div>
-            <p className="text-[10px] text-zinc-500 leading-relaxed">
-              Gasket dimensions are approximate for Raised Face (RF) flanges with spiral wound CG/CGI gaskets.
-              Always verify against the gasket manufacturer's specification for your service conditions.
-            </p>
-          </div>
+          {/* Gasket cross-link (Fase 3) */}
+          {(() => {
+            const gasket = getGasketForFlange(spec.nps, spec.pressureClass);
+            if (!gasket) return null;
+            return (
+              <div className="border border-[#f59e0b]/20 bg-[#f59e0b]/5 rounded-sm p-4 space-y-3">
+                <h4 className="flex items-center gap-2 text-[10px] uppercase tracking-[0.15em] text-[#f59e0b] font-semibold">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  Compatible Gasket
+                </h4>
+                <div className="grid gap-3 sm:grid-cols-4">
+                  <DimBox label="Type" value={gasket.type} />
+                  <DimBox label="Material" value={gasket.material} />
+                  <DimBox label="Inner Ø" value={`${gasket.innerDiameter} mm`} />
+                  <DimBox label="Outer Ø" value={`${gasket.outerDiameter} mm`} />
+                  <DimBox label="Thickness" value={`${gasket.thickness} mm`} />
+                  <DimBox label="Seal Type" value={gasket.sealType} />
+                </div>
+                <p className="text-[10px] text-zinc-500 leading-relaxed">
+                  Gasket dimensions per ASME B16.20 (spiral wound) / ASME B16.21 (non-metallic).
+                  For {spec.pressureClass === '900#' || spec.pressureClass === '1500#' ? 'high-pressure service, RTJ ring joint recommended' : 'RF flanges, spiral wound CGI is standard'}.
+                  Always verify against the gasket manufacturer's specification.
+                </p>
+              </div>
+            );
+          })()}
+
+          {/* Stud bolt + torque cross-link (Fase 3) */}
+          {(() => {
+            const stud = getStudBoltForFlange(spec.boltSize, spec.numBolts, spec.studLength, spec.nps, spec.pressureClass);
+            if (!stud) return null;
+            return (
+              <div className="border border-blue-500/20 bg-blue-500/5 rounded-sm p-4 space-y-3">
+                <h4 className="flex items-center gap-2 text-[10px] uppercase tracking-[0.15em] text-blue-400 font-semibold">
+                  <Bolt className="h-3.5 w-3.5" />
+                  Stud Bolts & Torque (ASME PCC-1)
+                </h4>
+                <div className="grid gap-3 sm:grid-cols-4">
+                  <DimBox label="Quantity" value={String(stud.quantity)} />
+                  <DimBox label="Stud Size" value={stud.studDiameter} />
+                  <DimBox label="Stud Ø (mm)" value={`${stud.studDiameterMm} mm`} />
+                  <DimBox label="Stud Length" value={`${stud.studLength} mm`} />
+                  <DimBox label="Nut Size" value={stud.nutSize} />
+                  <DimBox label="Torque (min)" value={`${stud.torqueMin} Nm`} />
+                  <DimBox label="Torque (target)" value={`${stud.torqueLubricated} Nm`} highlight />
+                  <DimBox label="Torque (max)" value={`${stud.torqueMax} Nm`} />
+                </div>
+
+                {/* Torque pattern */}
+                <div className="border-t border-blue-500/10 pt-3 space-y-2">
+                  <p className="text-[10px] uppercase tracking-wider text-blue-400 font-medium">Tightening Pattern</p>
+                  <p className="text-[11px] text-zinc-400 leading-relaxed">
+                    Use a <strong className="text-zinc-300">crisscross (star) pattern</strong> in minimum 3 passes:
+                  </p>
+                  <ol className="space-y-1 text-[11px] text-zinc-400">
+                    <li><span className="text-blue-400 font-bold">1.</span> Pass 1: 30% of target torque — tighten in star pattern</li>
+                    <li><span className="text-blue-400 font-bold">2.</span> Pass 2: 70% of target torque — tighten in star pattern</li>
+                    <li><span className="text-blue-400 font-bold">3.</span> Pass 3: 100% of target torque — tighten in star pattern</li>
+                    <li><span className="text-blue-400 font-bold">4.</span> Final pass: 100% clockwise — verify all bolts</li>
+                  </ol>
+                </div>
+
+                <div className="flex items-start gap-2 border-t border-blue-500/10 pt-3">
+                  <AlertTriangle className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
+                  <p className="text-[10px] text-zinc-500 leading-relaxed">
+                    Torque values are guidelines for lubricated studs (anti-seize or copper grease) at ambient temperature.
+                    For elevated temperature, exotic materials, or critical service, consult ASME PCC-1 and your company procedure.
+                    Dry torque requires ~30% more force (not recommended).
+                  </p>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Full dimension table */}
           <div className="space-y-2">
@@ -490,11 +550,13 @@ function DimRow({ label, value, icon: Icon }: { label: string; value: string; ic
   );
 }
 
-function DimBox({ label, value }: { label: string; value: string }) {
+function DimBox({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="border border-zinc-800/60 bg-zinc-950/50 rounded-sm p-2.5 space-y-1">
+    <div className={`border rounded-sm p-2.5 space-y-1 ${
+      highlight ? 'border-[#f59e0b]/40 bg-[#f59e0b]/5' : 'border-zinc-800/60 bg-zinc-950/50'
+    }`}>
       <p className="text-[9px] uppercase tracking-wider text-zinc-600">{label}</p>
-      <p className="text-sm font-semibold text-zinc-200">{value}</p>
+      <p className={`text-sm font-semibold ${highlight ? 'text-[#f59e0b]' : 'text-zinc-200'}`}>{value}</p>
     </div>
   );
 }
