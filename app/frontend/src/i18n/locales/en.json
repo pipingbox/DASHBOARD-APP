@@ -340,7 +340,8 @@
     "pipeDataTables": "Pipe Data Tables",
     "fittingTakeOff": "Fitting Take-Off",
     "elbowCut": "Elbow Cut Calculator",
-    "branchLayout": "Branch Layout"
+    "branchLayout": "Branch Layout",
+    "flangeLibrary": "Flange Library (ASME B16.5)"
   },
   "jobs": {
     "eyebrow": "Jobs",

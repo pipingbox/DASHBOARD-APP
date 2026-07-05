@@ -8,6 +8,7 @@ import {
   Table2,
   GitBranch,
   Scissors,
+  BookOpen,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -34,6 +35,7 @@ const PressureDrop = lazy(() => import('@/tools/pressure-drop/PressureDrop'));
 const ThermalExpansion = lazy(() => import('@/tools/thermal-expansion/ThermalExpansion'));
 const FlangeRating = lazy(() => import('@/tools/flange-rating/FlangeRating'));
 const FittingTakeOff = lazy(() => import('@/tools/fitting-takeoff/FittingTakeOff'));
+const FlangeLibrary = lazy(() => import('@/tools/flange-library/FlangeLibrary').then((m) => ({ default: m.FlangeLibrary })));
 
 export const TOOL_REGISTRY: ToolDefinition[] = [
   // 🏭 Fabrication
@@ -83,6 +85,14 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
     icon: Table2,
     block: 'library',
     component: PipeDataTables,
+    isNew: true,
+  },
+  {
+    key: 'flange-library',
+    nameKey: 'tools.flangeLibrary',
+    icon: BookOpen,
+    block: 'library',
+    component: FlangeLibrary,
     isNew: true,
   },
   // 🔍 Inspection & Codes

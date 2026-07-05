@@ -32,6 +32,7 @@ import FlangeRating from '@/tools/flange-rating/FlangeRating';
 import FittingTakeOff from '@/tools/fitting-takeoff/FittingTakeOff';
 import BranchLayout from '@/tools/branch-layout/BranchLayout';
 import ElbowCut from '@/tools/elbow-cut/ElbowCut';
+import { FlangeLibrary } from '@/tools/flange-library/FlangeLibrary';
 
 /**
  * TICKET-001 Fase 1: Centro Técnico — 5 blocks organization.
@@ -81,6 +82,7 @@ const TOOLS: ToolDef[] = [
 
   // 📚 Technical Library
   { key: 'pipe-dimensions', nameKey: 'tools.pipeDataTables', icon: Table2, block: 'library' },
+  { key: 'flange-library', nameKey: 'tools.flangeLibrary', icon: BookOpen, block: 'library' },
 
   // 🔍 Inspection & Codes
   { key: 'flange-rating', nameKey: 'tools.flangeRating', icon: CircuitBoard, block: 'inspection' },
@@ -313,6 +315,8 @@ export default function Tools() {
             <UnitConverter user={user} />
           ) : active === 'pipe-dimensions' ? (
             <PipeDataTables user={user} />
+          ) : active === 'flange-library' ? (
+            <FlangeLibrary user={user} />
           ) : active === 'pressure-drop' ? (
             <PressureDrop user={user} />
           ) : active === 'thermal-expansion' ? (
