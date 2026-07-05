@@ -20,7 +20,7 @@
  * LLM can be added later for truly ambiguous queries (Fase 5b).
  */
 
-import { FLANGE_SPECS, type FlangeType, type PressureClass } from './flange-data';
+import { FLANGE_SPECS, type FlangeType, type PressureClass } from '../flange-library/flange-data';
 
 export type ComponentCategory = 'flange' | 'fitting' | 'pipe' | 'tool';
 
