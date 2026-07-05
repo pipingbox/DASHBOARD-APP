@@ -18,6 +18,7 @@ import Dashboard from './pages/Dashboard';
 import CompanyDashboard from './pages/CompanyDashboard';
 import EnterpriseDashboard from './pages/EnterpriseDashboard';
 import Academy from './pages/Academy';
+import VCAExamBookingPage from './pages/VCAExamBookingPage';
 import Tools from './pages/Tools';
 import ToolsPage from './pages/ToolsPage';
 import Jobs from './pages/Jobs';
@@ -159,6 +160,14 @@ const AppRoutes = () => {
     <Route
       path="/academy"
       element={withShellRoles(<Academy />, ['admin', 'worker'])}
+    />
+    <Route
+      path="/academy/vca-course"
+      element={withShellRoles(<VCAExamBookingPage />, ['admin', 'worker', 'company'])}
+    />
+    <Route
+      path="/academy/vca-booking"
+      element={withShellRoles(<VCAExamBookingPage />, ['admin', 'worker', 'company'])}
     />
     <Route
       path="/tools"

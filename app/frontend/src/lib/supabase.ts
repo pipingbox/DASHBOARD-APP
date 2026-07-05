@@ -57,6 +57,8 @@ export const TABLES = {
   referrals: 'app_14da0f1941_referrals',
   savedFilters: 'app_14da0f1941_saved_filters',
   jobInvitations: 'app_14da0f1941_job_invitations',
+  vcaExamCenters: 'app_vca_exam_centers',
+  vcaBookings: 'app_vca_bookings',
 } as const;
 
 export const STORAGE_BUCKETS = {
