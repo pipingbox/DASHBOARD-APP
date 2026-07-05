@@ -25,6 +25,7 @@ import { AdminAnalytics } from '@/components/admin/AdminAnalytics';
 import { AdminAuditLog, logAuditEvent } from '@/components/admin/AdminAuditLog';
 import { AdminRegistros } from '@/components/admin/AdminRegistros';
 import { AdminNotifications } from '@/components/admin/AdminNotifications';
+import { AdminVCABookings } from '@/components/admin/AdminVCABookings';
 import { ALL_ROLES, getRoleLabel } from '@/lib/roles';
 import { toast } from 'sonner';
 
@@ -87,7 +88,7 @@ function getActivityIcon(type: ActivityItem['type']) {
 }
 
 /* ─── Tabs ─── */
-type AdminTab = 'overview' | 'users' | 'registros' | 'activity' | 'leads' | 'analytics' | 'audit' | 'notifications';
+type AdminTab = 'overview' | 'users' | 'registros' | 'activity' | 'leads' | 'analytics' | 'audit' | 'notifications' | 'vca-bookings';
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
@@ -316,6 +317,7 @@ export default function Admin() {
     { id: 'leads', label: 'Lead Pipeline', icon: <Building2 className="h-3.5 w-3.5" /> },
     { id: 'audit', label: 'Audit Log', icon: <Shield className="h-3.5 w-3.5" /> },
     { id: 'notifications', label: 'Notifications', icon: <Bell className="h-3.5 w-3.5" /> },
+    { id: 'vca-bookings', label: 'VCA Bookings', icon: <Calendar className="h-3.5 w-3.5" /> },
   ];
 
   return (
@@ -414,6 +416,7 @@ export default function Admin() {
       {activeTab === 'analytics' && <AdminAnalytics />}
       {activeTab === 'audit' && <AdminAuditLog />}
       {activeTab === 'notifications' && <AdminNotifications />}
+      {activeTab === 'vca-bookings' && <AdminVCABookings />}
     </div>
   );
 }
