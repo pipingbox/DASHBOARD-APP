@@ -59,6 +59,10 @@ export const TABLES = {
   jobInvitations: 'app_14da0f1941_job_invitations',
   vcaExamCenters: 'app_vca_exam_centers',
   vcaBookings: 'app_vca_bookings',
+  academyCourses: 'app_academy_courses',
+  academyLessons: 'app_academy_lessons',
+  academyProgress: 'app_academy_progress',
+  academyCertificates: 'app_academy_certificates',
 } as const;
 
 export const STORAGE_BUCKETS = {
