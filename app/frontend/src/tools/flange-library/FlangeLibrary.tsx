@@ -13,6 +13,7 @@ import {
   BookOpen,
   Wrench,
   AlertTriangle,
+  Crown,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -25,6 +26,8 @@ import {
   type PressureClass,
 } from './flange-data';
 import { getGasketForFlange, getStudBoltForFlange, type GasketSpec, type StudBoltSpec } from './gasket-bolt-data';
+import { usePremium } from '@/hooks/usePremium';
+import { PremiumGate, usePremiumGate } from '@/components/premium/PremiumGate';
 
 /**
  * TICKET-001 Fase 2: Flange Library — the killer differentiator.
@@ -41,11 +44,25 @@ import { getGasketForFlange, getStudBoltForFlange, type GasketSpec, type StudBol
 
 export function FlangeLibrary({ user }: { user?: { id: string } | null }) {
   const { t } = useTranslation();
+  const { status: premiumStatus } = usePremium();
+  const { isGateOpen, gateFeature, openGate, closeGate } = usePremiumGate();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<FlangeType | 'all'>('all');
   const [classFilter, setClassFilter] = useState<PressureClass | 'all'>('all');
   const [npsFilter, setNpsFilter] = useState<string>('all');
   const [selectedSpec, setSelectedSpec] = useState<FlangeSpec | null>(null);
+
+  const handleExport = () => {
+    if (premiumStatus.isPremium) {
+      // TODO: Generate actual PDF with jsPDF when premium
+      toast('Generating PDF... (premium feature active)');
+    } else {
+      openGate(
+        'PDF Export — Flange Dimension Sheet',
+        'Export this flange specification as a professional PDF with all dimensions, bolt data, gasket info, and torque values. Perfect for documentation, QA/QC records, and field reference.',
+      );
+    }
+  };
 
   const filteredSpecs = useMemo(() => {
     return FLANGE_SPECS.filter((spec) => {
@@ -167,8 +184,17 @@ export function FlangeLibrary({ user }: { user?: { id: string } | null }) {
 
       {/* Detail modal */}
       {selectedSpec && (
-        <FlangeDetailModal spec={selectedSpec} onClose={() => setSelectedSpec(null)} />
+        <FlangeDetailModal spec={selectedSpec} onClose={() => setSelectedSpec(null)} onExport={handleExport} isPremium={premiumStatus.isPremium} />
       )}
+
+      {/* Premium gate */}
+      <PremiumGate
+        open={isGateOpen}
+        onClose={closeGate}
+        feature={gateFeature.name}
+        featureDescription={gateFeature.description}
+        status={premiumStatus}
+      />
     </div>
   );
 }
@@ -333,7 +359,7 @@ function FlangeSVG({ type, compact = false }: { type: FlangeType; compact?: bool
 }
 
 /* ─── Detail Modal ─── */
-function FlangeDetailModal({ spec, onClose }: { spec: FlangeSpec; onClose: () => void }) {
+function FlangeDetailModal({ spec, onClose, onExport, isPremium }: { spec: FlangeSpec; onClose: () => void; onExport: () => void; isPremium: boolean }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
@@ -526,10 +552,13 @@ function FlangeDetailModal({ spec, onClose }: { spec: FlangeSpec; onClose: () =>
           </span>
           <button
             className="flex items-center gap-1.5 text-xs text-[#f59e0b] hover:underline"
-            onClick={() => toast('PDF export coming with Premium tier (Fase 6)')}
+            onClick={onExport}
           >
-            <Download className="h-3.5 w-3.5" />
-            Export PDF
+            {isPremium ? (
+              <><Download className="h-3.5 w-3.5" /> Export PDF</>
+            ) : (
+              <><Crown className="h-3.5 w-3.5" /> Export PDF <span className="text-[9px] uppercase tracking-wider bg-[#f59e0b]/10 px-1 rounded-sm">PRO</span></>
+            )}
           </button>
         </div>
       </div>

@@ -5,7 +5,10 @@ import {
   Ruler,
   Info,
   Printer,
+  Crown,
 } from 'lucide-react';
+import { usePremium } from '@/hooks/usePremium';
+import { PremiumGate, usePremiumGate } from '@/components/premium/PremiumGate';
 
 /**
  * TICKET-001 Fase 4: Branch Template (Plantilla de Rama / Injerto)
@@ -46,6 +49,8 @@ const COMMON_PIPES: { nps: string; od: number }[] = [
 const NUM_SEGMENTS = 16; // standard for template method
 
 export function BranchTemplate({ user }: { user?: { id: string } | null }) {
+  const { status: premiumStatus } = usePremium();
+  const { isGateOpen, gateFeature, openGate, closeGate } = usePremiumGate();
   const [runOD, setRunOD] = useState(168.3); // 6" default
   const [branchOD, setBranchOD] = useState(88.9); // 3" default
   const [angle, setAngle] = useState(90); // 90° = perpendicular
@@ -100,7 +105,14 @@ export function BranchTemplate({ user }: { user?: { id: string } | null }) {
   }, [runOD, branchOD, angle]);
 
   const handlePrint = () => {
-    window.print();
+    if (premiumStatus.isPremium) {
+      window.print();
+    } else {
+      openGate(
+        'Printable Template (1:1 Scale)',
+        'Print this branch template at true 1:1 scale. Free users can view the template on screen, but printing at exact scale requires Premium. Essential for accurate field marking.',
+      );
+    }
   };
 
   return (
@@ -197,10 +209,17 @@ export function BranchTemplate({ user }: { user?: { id: string } | null }) {
           <h3 className="text-sm font-semibold text-zinc-200">Cut Template (Unwrapped)</h3>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm border border-zinc-700 text-xs text-zinc-300 hover:border-[#f59e0b]/50 hover:text-[#f59e0b] transition"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs transition ${
+              premiumStatus.isPremium
+                ? 'border-zinc-700 text-zinc-300 hover:border-[#f59e0b]/50 hover:text-[#f59e0b]'
+                : 'border-[#f59e0b]/30 text-[#f59e0b] hover:bg-[#f59e0b]/10'
+            }`}
           >
-            <Printer className="h-3.5 w-3.5" />
-            Print (1:1 scale)
+            {premiumStatus.isPremium ? (
+              <><Printer className="h-3.5 w-3.5" /> Print (1:1 scale)</>
+            ) : (
+              <><Crown className="h-3.5 w-3.5" /> Print (1:1) <span className="text-[9px] uppercase tracking-wider bg-[#f59e0b]/10 px-1 rounded-sm">PRO</span></>
+            )}
           </button>
         </div>
 
@@ -373,6 +392,15 @@ export function BranchTemplate({ user }: { user?: { id: string } | null }) {
           Branch on run pipe should be reinforced per ASME B31.3 if the branch ratio exceeds code limits.
         </p>
       </div>
+
+      {/* Premium gate */}
+      <PremiumGate
+        open={isGateOpen}
+        onClose={closeGate}
+        feature={gateFeature.name}
+        featureDescription={gateFeature.description}
+        status={premiumStatus}
+      />
     </div>
   );
 }
