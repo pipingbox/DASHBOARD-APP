@@ -19,6 +19,7 @@ import CompanyDashboard from './pages/CompanyDashboard';
 import EnterpriseDashboard from './pages/EnterpriseDashboard';
 import Academy from './pages/Academy';
 import VCAExamBookingPage from './pages/VCAExamBookingPage';
+import SCCCoursePage from './pages/SCCCoursePage';
 import CourseDetail from './pages/academy/CourseDetail';
 import LessonView from './pages/academy/LessonView';
 import Tools from './pages/Tools';
@@ -179,6 +180,15 @@ const AppRoutes = () => {
     <Route
       path="/certifications/vca"
       element={<VCAExamBookingPage />}
+    />
+    {/* SCC (Germany / Austria) — Fase 3, DEC-51 */}
+    <Route
+      path="/certifications/scc"
+      element={<SCCCoursePage />}
+    />
+    <Route
+      path="/academy/scc-course"
+      element={<SCCCoursePage />}
     />
     <Route
       path="/academy/course/:slug"
