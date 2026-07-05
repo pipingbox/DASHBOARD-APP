@@ -34,6 +34,8 @@ import BranchLayout from '@/tools/branch-layout/BranchLayout';
 import ElbowCut from '@/tools/elbow-cut/ElbowCut';
 import { FlangeLibrary } from '@/tools/flange-library/FlangeLibrary';
 import { BranchTemplate } from '@/tools/branch-template/BranchTemplate';
+import { TechnicalSearch } from '@/tools/search/TechnicalSearch';
+import type { SearchResult } from '@/tools/search/search-parser';
 
 /**
  * TICKET-001 Fase 1: Centro Técnico — 5 blocks organization.
@@ -133,6 +135,13 @@ export default function Tools() {
 
   const activeTool = TOOLS.find((tool) => tool.key === active);
 
+  // Fase 5: Handle search selection — navigate to the right tool
+  const handleSearchSelect = (result: SearchResult) => {
+    if (result.toolKey) {
+      setActive(result.toolKey);
+    }
+  };
+
   // Filter tools by search
   const filteredTools = search
     ? TOOLS.filter((tool) => t(tool.nameKey).toLowerCase().includes(search.toLowerCase()))
@@ -151,6 +160,9 @@ export default function Tools() {
         title={t('tools.title')}
         description={t('tools.description')}
       />
+
+      {/* Fase 5: Technical Search — "The Google of Piping" */}
+      <TechnicalSearch onSelectResult={handleSearchSelect} />
 
       <div className="grid gap-6 lg:grid-cols-[300px,1fr]">
         {/* Sidebar — blocks with tools */}
