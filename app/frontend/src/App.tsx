@@ -20,6 +20,7 @@ import EnterpriseDashboard from './pages/EnterpriseDashboard';
 import Academy from './pages/Academy';
 import VCAExamBookingPage from './pages/VCAExamBookingPage';
 import SCCCoursePage from './pages/SCCCoursePage';
+import PRLCoursePage from './pages/PRLCoursePage';
 import CourseDetail from './pages/academy/CourseDetail';
 import LessonView from './pages/academy/LessonView';
 import Tools from './pages/Tools';
@@ -189,6 +190,19 @@ const AppRoutes = () => {
     <Route
       path="/academy/scc-course"
       element={<SCCCoursePage />}
+    />
+    {/* PRL (Spain) — Fase 4, DEC-51 — training_based (no exam) */}
+    <Route
+      path="/certificaciones/prl"
+      element={<PRLCoursePage />}
+    />
+    <Route
+      path="/certifications/prl"
+      element={<PRLCoursePage />}
+    />
+    <Route
+      path="/academy/prl-course"
+      element={<PRLCoursePage />}
     />
     <Route
       path="/academy/course/:slug"
