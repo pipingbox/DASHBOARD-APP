@@ -18,14 +18,14 @@ const PAGE_TITLES: Record<string, string> = {
   '/company-dashboard': `${APP_TITLE} — Company Dashboard`,
   '/enterprise-dashboard': `${APP_TITLE} — Enterprise Dashboard`,
   '/academy': `${APP_TITLE} — Academy | VCA, SCC, PRL, OSHA Certification Prep`,
-  '/tools': `${APP_TITLE} — Free Engineering Tools | Pipe Calculators, ASME B31.3`,
+  '/tools': `${APP_TITLE} — Technical Hub | Piping Calculators, Fabrication Tools, Component Library`,
   '/companies': `${APP_TITLE} — Verified Industrial Employers`,
   '/pricing': `${BASE_TITLE} — Pricing | Academy, Enterprise, Job Posts`,
 };
 
 const PAGE_DESCRIPTIONS: Record<string, string> = {
   '/': 'Free engineering tools, industrial jobs, certification training (VCA, SCC, OSHA), and community for pipefitters, welders, and industrial professionals. ASME B31.3 calculators, pipe data tables, elbow cut calculator.',
-  '/tools': '11 free engineering calculators for piping work: pipe wall thickness (ASME B31.3), elbow cut, flange rating, pressure drop, thermal expansion, Reynolds number, unit converter, and more. No login required.',
+  '/tools': 'PipingBox Technical Hub: piping calculators, fabrication tools (elbow cut, branch layout, fitting take-off), pipe data tables, flange rating lookup, unit converter, and more. Free, no login required.',
   '/jobs': 'Industrial job board for pipefitters, welders, QA/QC inspectors, supervisors, and planners. Verified companies across Europe, USA, and Middle East. Apply in one click.',
   '/pricing': 'PipingBox pricing: Academy certification courses (VCA, SCC, OSHA), enterprise subscriptions, featured job posts. Transparent pricing, no hidden fees.',
   '/academy': 'Certification preparation courses: VCA (Belgium/Netherlands), SCC (Germany), PRL (Spain), OSHA 10/30 (USA). Up to 6x cheaper than classroom training.',

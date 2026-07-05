@@ -4,7 +4,6 @@ import {
   Calculator,
   Gauge,
   Thermometer,
-  Beaker,
   CircuitBoard,
   Table2,
   GitBranch,
@@ -20,7 +19,7 @@ export interface ToolDefinition {
   key: string;
   nameKey: string;
   icon: LucideIcon;
-  categoryKey: string;
+  block: 'fabrication' | 'design' | 'library' | 'inspection' | 'utility';
   component: ComponentType<{ user?: { id: string } | null }>;
   isPremium?: boolean;
   isNew?: boolean;
@@ -32,82 +31,77 @@ const WallThickness = lazy(() => import('@/pages/Tools').then((m) => ({ default:
 const UnitConverter = lazy(() => import('@/tools/unit-converter/UnitConverter'));
 const PipeDataTables = lazy(() => import('@/tools/pipe-data-tables/PipeDataTables'));
 const PressureDrop = lazy(() => import('@/tools/pressure-drop/PressureDrop'));
-const ReynoldsCalculator = lazy(() => import('@/tools/reynolds/ReynoldsCalculator'));
 const ThermalExpansion = lazy(() => import('@/tools/thermal-expansion/ThermalExpansion'));
 const FlangeRating = lazy(() => import('@/tools/flange-rating/FlangeRating'));
 const FittingTakeOff = lazy(() => import('@/tools/fitting-takeoff/FittingTakeOff'));
 
 export const TOOL_REGISTRY: ToolDefinition[] = [
+  // 🏭 Fabrication
+  {
+    key: 'elbow-cut',
+    nameKey: 'tools.elbowCut',
+    icon: Scissors,
+    block: 'fabrication',
+    component: () => null, // rendered directly in Tools.tsx (FEAT-001)
+  },
+  {
+    key: 'fitting-takeoff',
+    nameKey: 'tools.fittingTakeOff',
+    icon: GitBranch,
+    block: 'fabrication',
+    component: FittingTakeOff,
+    isNew: true,
+  },
+  // 📐 Design & Calculation
   {
     key: 'wall-thickness',
     nameKey: 'tools.wallThickness',
     icon: Ruler,
-    categoryKey: 'tools.categoryDesign',
+    block: 'design',
     component: WallThickness,
-  },
-  {
-    key: 'unit-converter',
-    nameKey: 'tools.unitConverter',
-    icon: Calculator,
-    categoryKey: 'tools.categoryUtility',
-    component: UnitConverter,
-    isNew: true,
-  },
-  {
-    key: 'pipe-dimensions',
-    nameKey: 'tools.pipeDataTables',
-    icon: Table2,
-    categoryKey: 'tools.categoryReference',
-    component: PipeDataTables,
-    isNew: true,
   },
   {
     key: 'pressure-drop',
     nameKey: 'tools.pressureDrop',
     icon: Gauge,
-    categoryKey: 'tools.categoryHydraulics',
+    block: 'design',
     component: PressureDrop,
-    isNew: true,
-  },
-  {
-    key: 'reynolds',
-    nameKey: 'tools.reynolds',
-    icon: Beaker,
-    categoryKey: 'tools.categoryHydraulics',
-    component: ReynoldsCalculator,
     isNew: true,
   },
   {
     key: 'thermal-expansion',
     nameKey: 'tools.thermalExpansion',
     icon: Thermometer,
-    categoryKey: 'tools.categoryStress',
+    block: 'design',
     component: ThermalExpansion,
     isNew: true,
   },
+  // 📚 Technical Library
+  {
+    key: 'pipe-dimensions',
+    nameKey: 'tools.pipeDataTables',
+    icon: Table2,
+    block: 'library',
+    component: PipeDataTables,
+    isNew: true,
+  },
+  // 🔍 Inspection & Codes
   {
     key: 'flange-rating',
     nameKey: 'tools.flangeRating',
     icon: CircuitBoard,
-    categoryKey: 'tools.categoryReference',
+    block: 'inspection',
     component: FlangeRating,
     isNew: true,
   },
+  // 🔧 Utilities
   {
-    key: 'fitting-takeoff',
-    nameKey: 'tools.fittingTakeOff',
-    icon: GitBranch,
-    categoryKey: 'tools.categoryReference',
-    component: FittingTakeOff,
+    key: 'unit-converter',
+    nameKey: 'tools.unitConverter',
+    icon: Calculator,
+    block: 'utility',
+    component: UnitConverter,
     isNew: true,
-  },
-  {
-    key: 'elbow-cut',
-    nameKey: 'tools.elbowCut',
-    icon: Scissors,
-    categoryKey: 'tools.categoryDesign',
-    // Placeholder until FEAT-001 is implemented
-    component: () => null,
   },
 ];
 
