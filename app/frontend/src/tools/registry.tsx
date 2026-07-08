@@ -9,6 +9,7 @@ import {
   GitBranch,
   Scissors,
   BookOpen,
+  Library,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -37,6 +38,7 @@ const FlangeRating = lazy(() => import('@/tools/flange-rating/FlangeRating'));
 const FittingTakeOff = lazy(() => import('@/tools/fitting-takeoff/FittingTakeOff'));
 const FlangeLibrary = lazy(() => import('@/tools/flange-library/FlangeLibrary').then((m) => ({ default: m.FlangeLibrary })));
 const BranchTemplate = lazy(() => import('@/tools/branch-template/BranchTemplate').then((m) => ({ default: m.BranchTemplate })));
+const AccessoriesLibrary = lazy(() => import('@/components/tools/AccessoriesLibrary'));
 
 export const TOOL_REGISTRY: ToolDefinition[] = [
   // 🏭 Fabrication
@@ -102,6 +104,14 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
     icon: BookOpen,
     block: 'library',
     component: FlangeLibrary,
+    isNew: true,
+  },
+  {
+    key: 'accessories-library',
+    nameKey: 'tools.accessoriesLibrary',
+    icon: Library,
+    block: 'library',
+    component: AccessoriesLibrary,
     isNew: true,
   },
   // 🔍 Inspection & Codes
