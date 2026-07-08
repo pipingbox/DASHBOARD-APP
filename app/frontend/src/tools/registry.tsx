@@ -10,6 +10,7 @@ import {
   Scissors,
   BookOpen,
   Library,
+  Wrench,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -39,6 +40,7 @@ const FittingTakeOff = lazy(() => import('@/tools/fitting-takeoff/FittingTakeOff
 const FlangeLibrary = lazy(() => import('@/tools/flange-library/FlangeLibrary').then((m) => ({ default: m.FlangeLibrary })));
 const BranchTemplate = lazy(() => import('@/tools/branch-template/BranchTemplate').then((m) => ({ default: m.BranchTemplate })));
 const AccessoriesLibrary = lazy(() => import('@/components/tools/AccessoriesLibrary'));
+const PrefabSuite = lazy(() => import('@/tools/prefab-suite/PrefabSuite'));
 
 export const TOOL_REGISTRY: ToolDefinition[] = [
   // 🏭 Fabrication
@@ -63,6 +65,14 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
     icon: Scissors,
     block: 'fabrication',
     component: BranchTemplate,
+    isNew: true,
+  },
+  {
+    key: 'prefab-suite',
+    nameKey: 'tools.prefabSuite',
+    icon: Wrench,
+    block: 'fabrication',
+    component: PrefabSuite,
     isNew: true,
   },
   // 📐 Design & Calculation

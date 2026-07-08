@@ -340,6 +340,7 @@
     "reynolds": "Número de Reynolds",
     "flangeRating": "Consulta de rating de bridas",
     "accessoriesLibrary": "Biblioteca de Accesorios",
+    "prefabSuite": "Suite de Prefabricación",
     "accessories": {
       "title": "Biblioteca de Accesorios",
       "subtitle": "Dimensiones de accesorios para prefabricación",

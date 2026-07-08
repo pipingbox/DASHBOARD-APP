@@ -344,6 +344,7 @@
     "branchTemplate": "Branch Template (Injerto)",
     "flangeLibrary": "Flange Library (ASME B16.5)",
     "accessoriesLibrary": "Accessories Library",
+    "prefabSuite": "Prefabrication Suite",
     "accessories": {
       "title": "Accessories Library",
       "subtitle": "Fitting dimensions for prefabrication",
