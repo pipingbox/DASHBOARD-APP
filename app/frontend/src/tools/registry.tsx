@@ -11,6 +11,8 @@ import {
   BookOpen,
   Library,
   Wrench,
+  Droplets,
+  Weight,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -41,6 +43,8 @@ const FlangeLibrary = lazy(() => import('@/tools/flange-library/FlangeLibrary').
 const BranchTemplate = lazy(() => import('@/tools/branch-template/BranchTemplate').then((m) => ({ default: m.BranchTemplate })));
 const AccessoriesLibrary = lazy(() => import('@/components/tools/AccessoriesLibrary'));
 const PrefabSuite = lazy(() => import('@/tools/prefab-suite/PrefabSuite'));
+const PipeVolume = lazy(() => import('@/tools/pipe-volume/PipeVolume'));
+const WeightCalculator = lazy(() => import('@/tools/weight-calc/WeightCalculator'));
 
 export const TOOL_REGISTRY: ToolDefinition[] = [
   // 🏭 Fabrication
@@ -89,6 +93,22 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
     icon: Gauge,
     block: 'design',
     component: PressureDrop,
+    isNew: true,
+  },
+  {
+    key: 'pipe-volume',
+    nameKey: 'tools.pipeVolume',
+    icon: Droplets,
+    block: 'design',
+    component: PipeVolume,
+    isNew: true,
+  },
+  {
+    key: 'weight-calc',
+    nameKey: 'tools.weightCalc',
+    icon: Weight,
+    block: 'design',
+    component: WeightCalculator,
     isNew: true,
   },
   {
