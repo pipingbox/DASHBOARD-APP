@@ -157,3 +157,127 @@ export function verifyOffset(
     tolerance: toleranceMm,
   };
 }
+
+// ─── PB-029: Segmented Elbows (Codos a Gajos) ───
+
+export interface SegmentedElbowResult {
+  /** Total bend angle (degrees) */
+  totalAngle: number;
+  /** Number of miter cuts */
+  cuts: number;
+  /** Total number of pipe segments */
+  segments: number;
+  /** Bend radius at centerline (mm) */
+  radius: number;
+  /** Pipe OD (mm) */
+  od: number;
+  /** Bevel angle at each cut — measured from perpendicular to pipe axis */
+  bevelAngle: number;
+  /** Advance from center — center-to-end dimension (mm) */
+  advance: number;
+  /** Length of each END segment at centerline (mm) */
+  endSegmentCL: number;
+  /** Length of each MIDDLE segment at centerline (mm) */
+  midSegmentCL: number;
+  /** Length of each END segment at intrados (mm) */
+  endSegmentInt: number;
+  /** Length of each END segment at extrados (mm) */
+  endSegmentExt: number;
+  /** Length of each MIDDLE segment at intrados (mm) */
+  midSegmentInt: number;
+  /** Length of each MIDDLE segment at extrados (mm) */
+  midSegmentExt: number;
+}
+
+// OD by NPS (same as elbow-cut)
+const NPS_OD: Record<string, number> = {
+  '1/2': 21.3, '3/4': 26.7, '1': 33.4, '1-1/4': 42.2, '1-1/2': 48.3,
+  '2': 60.3, '2-1/2': 73.0, '3': 88.9, '4': 114.3, '5': 141.3,
+  '6': 168.3, '8': 219.1, '10': 273.0, '12': 323.8, '14': 355.6,
+  '16': 406.4, '18': 457.0, '20': 508.0, '24': 609.6,
+};
+
+export function getOdByNps(nps: string): number {
+  return NPS_OD[nps] ?? 168.3;
+}
+
+/**
+ * Calculate segmented elbow (codo a gajos) dimensions.
+ *
+ * A segmented elbow is made from straight pipe sections cut at angles and welded
+ * together to form a bend. This is used when standard fittings are not available
+ * or for large-diameter piping.
+ *
+ * @param totalAngleDeg - Total bend angle (e.g. 90°)
+ * @param cuts - Number of miter cuts (e.g. 2 cuts = 3 segments)
+ * @param nps - Nominal pipe size
+ * @param radiusMultiplier - Bend radius as multiple of NPS (default 1.5 = LR equivalent)
+ */
+export function calculateSegmentedElbow(
+  totalAngleDeg: number,
+  cuts: number,
+  nps: string,
+  radiusMultiplier: number = 1.5,
+): SegmentedElbowResult {
+  const od = getOdByNps(nps);
+  const halfOd = od / 2;
+
+  // Parse NPS to numeric inches
+  let npsNum: number;
+  if (nps.includes('-')) {
+    const parts = nps.split('-');
+    npsNum = parseFloat(parts[0]) + parseFloat(parts[1].replace('/', '.'));
+    // Handle fractions properly
+    if (nps === '1-1/4') npsNum = 1.25;
+    else if (nps === '1-1/2') npsNum = 1.5;
+    else if (nps === '2-1/2') npsNum = 2.5;
+  } else if (nps.includes('/')) {
+    const [num, den] = nps.split('/').map(Number);
+    npsNum = num / den;
+  } else {
+    npsNum = parseFloat(nps);
+  }
+
+  const R = radiusMultiplier * npsNum * 25.4; // mm
+  const segments = cuts + 1;
+
+  // Angle at each miter cut = totalAngle / cuts
+  const anglePerCut = totalAngleDeg / cuts;
+  // Bevel angle = half of the angle at each cut
+  const bevelAngle = anglePerCut / 2;
+  const bevelRad = (bevelAngle * Math.PI) / 180;
+
+  // Advance from center = R × tan(totalAngle/2) — the center-to-end dimension
+  const totalRad = (totalAngleDeg * Math.PI) / 180;
+  const advance = R * Math.tan(totalRad / 2);
+
+  // End segments: one bevel cut, one square end
+  // Length at centerline = R × tan(bevelAngle)
+  const endSegmentCL = R * Math.tan(bevelRad);
+  // Length at intrados (shorter) = (R - OD/2) × tan(bevelAngle)
+  const endSegmentInt = (R - halfOd) * Math.tan(bevelRad);
+  // Length at extrados (longer) = (R + OD/2) × tan(bevelAngle)
+  const endSegmentExt = (R + halfOd) * Math.tan(bevelRad);
+
+  // Middle segments: two bevel cuts
+  // Length at centerline = 2 × R × tan(bevelAngle)
+  const midSegmentCL = 2 * R * Math.tan(bevelRad);
+  const midSegmentInt = 2 * (R - halfOd) * Math.tan(bevelRad);
+  const midSegmentExt = 2 * (R + halfOd) * Math.tan(bevelRad);
+
+  return {
+    totalAngle: totalAngleDeg,
+    cuts,
+    segments,
+    radius: R,
+    od,
+    bevelAngle,
+    advance,
+    endSegmentCL,
+    midSegmentCL,
+    endSegmentInt: Math.max(0, endSegmentInt),
+    endSegmentExt,
+    midSegmentInt: Math.max(0, midSegmentInt),
+    midSegmentExt,
+  };
+}

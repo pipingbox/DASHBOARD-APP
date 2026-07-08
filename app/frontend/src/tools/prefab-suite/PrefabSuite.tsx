@@ -9,10 +9,13 @@ import {
   calculateOffsetWithElbows,
   calculateOffsetWithoutElbows,
   verifyOffset,
+  calculateSegmentedElbow,
+  getOdByNps,
   type ElbowType,
   type OffsetWithElbowsResult,
   type OffsetWithoutElbowsResult,
   type OffsetVerifyResult,
+  type SegmentedElbowResult,
 } from './offsets';
 
 // PB-027: Suite de Prefabricación
@@ -432,6 +435,274 @@ function VerifyOffset({ t }: { t: (k: string, o?: Record<string, string>) => str
   );
 }
 
+// ─── PB-029: Segmented Elbows (Codos a Gajos) ───
+function SegmentedElbows({ t }: { t: (k: string, o?: Record<string, string>) => string }) {
+  const [totalAngle, setTotalAngle] = useState('90');
+  const [cuts, setCuts] = useState('2');
+  const [nps, setNps] = useState('6');
+  const [radiusMult, setRadiusMult] = useState('1.5');
+  const [unit, setUnit] = useState<'mm' | 'in'>('mm');
+
+  const angleDeg = parseFloat(totalAngle) || 90;
+  const numCuts = parseInt(cuts) || 2;
+  const mult = parseFloat(radiusMult) || 1.5;
+  const valid = angleDeg > 0 && angleDeg <= 180 && numCuts >= 1 && numCuts <= 6;
+
+  const result = useMemo(() => {
+    if (!valid) return null;
+    return calculateSegmentedElbow(angleDeg, numCuts, nps, mult);
+  }, [angleDeg, numCuts, nps, mult, valid]);
+
+  const toUnit = (v: number) => unit === 'in' ? v / 25.4 : v;
+  const fmtU = (v: number) => fmt(toUnit(v), unit === 'in' ? 2 : 1);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-end gap-2">
+        {(['mm', 'in'] as const).map((u) => (
+          <button key={u} onClick={() => setUnit(u)}
+            className={`rounded-sm border px-3 py-1 text-xs transition ${unit === u ? 'border-[#f59e0b] bg-[#f59e0b]/10 text-[#f59e0b]' : 'border-zinc-800 text-zinc-400'}`}>
+            {u}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Inputs */}
+        <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider text-zinc-400">
+                {t('prefab.totalAngle', { defaultValue: 'Total Angle' })} (°)
+              </Label>
+              <Select value={totalAngle} onValueChange={setTotalAngle}>
+                <SelectTrigger className="bg-zinc-950 border-zinc-800"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {[30, 45, 60, 90, 120, 135, 150, 180].map((a) => (
+                    <SelectItem key={a} value={String(a)}>{a}°</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider text-zinc-400">
+                {t('prefab.cuts', { defaultValue: 'Miter Cuts' })}
+              </Label>
+              <Select value={cuts} onValueChange={setCuts}>
+                <SelectTrigger className="bg-zinc-950 border-zinc-800"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6].map((c) => (
+                    <SelectItem key={c} value={String(c)}>{c} {t('prefab.cutsLabel', { defaultValue: c === 1 ? 'cut' : 'cuts' })} → {c + 1} {t('prefab.segments', { defaultValue: 'segments' })}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider text-zinc-400">NPS</Label>
+              <Select value={nps} onValueChange={setNps}>
+                <SelectTrigger className="bg-zinc-950 border-zinc-800"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {NPS_OPTIONS.map((n) => <SelectItem key={n} value={n}>{n}" (OD {getOdByNps(n)}mm)</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider text-zinc-400">
+                {t('prefab.bendRadius', { defaultValue: 'Bend Radius' })}
+              </Label>
+              <div className="flex gap-2">
+                {[{ v: '1.5', label: '1.5D (LR)' }, { v: '1.0', label: '1.0D (SR)' }, { v: '2.0', label: '2.0D' }].map((r) => (
+                  <button key={r.v} onClick={() => setRadiusMult(r.v)}
+                    className={`flex-1 rounded-sm border px-2 py-2 text-xs transition ${radiusMult === r.v ? 'border-[#f59e0b] bg-[#f59e0b]/10 text-[#f59e0b]' : 'border-zinc-800 bg-zinc-950 text-zinc-300'}`}>
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Results */}
+          {valid && result && (
+            <div className="space-y-3">
+              {/* Advance from center — KEY result for prefab */}
+              <div className="rounded-md border-2 border-[#f59e0b] bg-[#f59e0b]/10 p-4">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-[#f59e0b]">
+                  {t('prefab.advanceFromCenter', { defaultValue: 'Advance from Center (Avance)' })}
+                </p>
+                <p className="mt-1 text-2xl font-bold text-[#f59e0b]">{fmtU(result.advance)} <span className="text-sm font-normal">{unit}</span></p>
+                <p className="text-xs text-zinc-400">R × tan(θ/2) = {fmt(result.radius, 1)} × tan({fmt(angleDeg / 2, 1)}°)</p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <ResultCard label={t('prefab.bevelAngle', { defaultValue: 'Bevel Angle' })} value={fmt(result.bevelAngle, 2)} unit="°" accent="#22d3ee" />
+                <ResultCard label={t('prefab.bendRadius', { defaultValue: 'Bend Radius' })} value={fmtU(result.radius)} unit={unit} accent="#a78bfa" />
+              </div>
+
+              {/* Segment dimensions table */}
+              <div className="overflow-x-auto rounded-md border border-zinc-800">
+                <table className="w-full text-xs">
+                  <thead className="bg-zinc-900 text-[10px] uppercase tracking-wider text-zinc-400">
+                    <tr>
+                      <th className="px-3 py-2 text-left">{t('prefab.segment', { defaultValue: 'Segment' })}</th>
+                      <th className="px-3 py-2 text-right">{t('prefab.intrados', { defaultValue: 'Intradós' })} ({unit})</th>
+                      <th className="px-3 py-2 text-right">{t('prefab.centerline', { defaultValue: 'Centerline' })} ({unit})</th>
+                      <th className="px-3 py-2 text-right">{t('prefab.extrados', { defaultValue: 'Extradós' })} ({unit})</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* End segment */}
+                    <tr className="border-t border-zinc-800/60 bg-[#f59e0b]/5">
+                      <td className="px-3 py-2 font-semibold text-zinc-100">
+                        {t('prefab.endSegment', { defaultValue: 'End' })} (×2)
+                      </td>
+                      <td className="px-3 py-2 text-right font-mono text-[#f97316]">{fmtU(result.endSegmentInt)}</td>
+                      <td className="px-3 py-2 text-right font-mono text-zinc-200">{fmtU(result.endSegmentCL)}</td>
+                      <td className="px-3 py-2 text-right font-mono text-[#22d3ee]">{fmtU(result.endSegmentExt)}</td>
+                    </tr>
+                    {/* Middle segments (if any) */}
+                    {result.segments > 2 && (
+                      <tr className="border-t border-zinc-800/60">
+                        <td className="px-3 py-2 font-semibold text-zinc-100">
+                          {t('prefab.midSegment', { defaultValue: 'Middle' })} (×{result.segments - 2})
+                        </td>
+                        <td className="px-3 py-2 text-right font-mono text-[#f97316]">{fmtU(result.midSegmentInt)}</td>
+                        <td className="px-3 py-2 text-right font-mono text-zinc-200">{fmtU(result.midSegmentCL)}</td>
+                        <td className="px-3 py-2 text-right font-mono text-[#22d3ee]">{fmtU(result.midSegmentExt)}</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* SVG diagram */}
+        <div className="border border-zinc-800 bg-[#0d0d0d] p-4 rounded-sm">
+          {valid && result ? (
+            <svg viewBox="0 0 400 400" className="w-full" role="img" aria-label="Segmented elbow diagram">
+              {(() => {
+                const cx = 200, cy = 350;
+                const R = result.radius;
+                const maxR = R + result.od / 2;
+                const scale = Math.min(1, 160 / maxR);
+                const rExt = (R + result.od / 2) * scale;
+                const rNeu = R * scale;
+                const rInt = Math.max(0, (R - result.od / 2) * scale);
+                const totalRad = (result.totalAngle * Math.PI) / 180;
+
+                // Arc helper
+                const arcPath = (radius: number, startDeg: number, endDeg: number) => {
+                  const sR = (startDeg * Math.PI) / 180;
+                  const eR = (endDeg * Math.PI) / 180;
+                  const x1 = cx + radius * Math.cos(sR);
+                  const y1 = cy - radius * Math.sin(sR);
+                  const x2 = cx + radius * Math.cos(eR);
+                  const y2 = cy - radius * Math.sin(eR);
+                  const large = Math.abs(endDeg - startDeg) > 180 ? 1 : 0;
+                  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${radius.toFixed(2)} ${radius.toFixed(2)} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+                };
+
+                // Miter cut lines
+                const cutLines = [];
+                for (let i = 1; i <= result.cuts; i++) {
+                  const cutAngle = (i * result.totalAngle / result.cuts);
+                  const cutRad = (cutAngle * Math.PI) / 180;
+                  cutLines.push({
+                    x1: cx + rInt * Math.cos(cutRad),
+                    y1: cy - rInt * Math.sin(cutRad),
+                    x2: cx + rExt * Math.cos(cutRad),
+                    y2: cy - rExt * Math.sin(cutRad),
+                    angle: cutAngle,
+                  });
+                }
+
+                return (
+                  <>
+                    {/* Fill */}
+                    <path d={`${arcPath(rExt, 0, result.totalAngle)} L ${cx + rInt * Math.cos(totalRad)} ${cy - rInt * Math.sin(totalRad)} ${rInt > 0 ? `A ${rInt.toFixed(2)} ${rInt.toFixed(2)} 0 ${result.totalAngle > 180 ? 1 : 0} 0 ${(cx + rInt).toFixed(2)} ${cy.toFixed(2)}` : `L ${cx} ${cy}`} Z`}
+                      fill="#f59e0b" fillOpacity="0.05" />
+
+                    {/* Outer arc */}
+                    <path d={arcPath(rExt, 0, result.totalAngle)} fill="none" stroke="#22d3ee" strokeWidth="2" />
+                    {/* Center arc */}
+                    <path d={arcPath(rNeu, 0, result.totalAngle)} fill="none" stroke="#ffffff" strokeWidth="1.5" strokeDasharray="6 3" opacity="0.5" />
+                    {/* Inner arc */}
+                    {rInt > 0 && <path d={arcPath(rInt, 0, result.totalAngle)} fill="none" stroke="#f97316" strokeWidth="2" />}
+
+                    {/* End faces */}
+                    <line x1={cx + rInt} y1={cy} x2={cx + rExt} y2={cy} stroke="#71717a" strokeWidth="1.5" />
+                    <line
+                      x1={cx + rInt * Math.cos(totalRad)} y1={cy - rInt * Math.sin(totalRad)}
+                      x2={cx + rExt * Math.cos(totalRad)} y2={cy - rExt * Math.sin(totalRad)}
+                      stroke="#71717a" strokeWidth="1.5" />
+
+                    {/* Miter cuts */}
+                    {cutLines.map((cl, i) => (
+                      <g key={i}>
+                        <line x1={cl.x1} y1={cl.y1} x2={cl.x2} y2={cl.y2}
+                          stroke="#ef4444" strokeWidth="2" strokeDasharray="4 2" />
+                        <text
+                          x={cx + (rExt + 18) * Math.cos(cl.angle * Math.PI / 180)}
+                          y={cy - (rExt + 18) * Math.sin(cl.angle * Math.PI / 180)}
+                          fill="#ef4444" fontSize="9" textAnchor="middle">
+                          {fmt(cl.angle, 1)}°
+                        </text>
+                      </g>
+                    ))}
+
+                    {/* Center point */}
+                    <circle cx={cx} cy={cy} r="3" fill="#ffffff" />
+
+                    {/* Advance dimension */}
+                    <text x={cx + rExt + 8} y={cy - rExt / 2} fill="#f59e0b" fontSize="10" fontWeight="bold">
+                      A: {fmtU(result.advance)} {unit}
+                    </text>
+
+                    {/* Segments label */}
+                    <text x={200} y={25} fill="#71717a" fontSize="11" textAnchor="middle">
+                      {result.segments} {t('prefab.segments', { defaultValue: 'segments' })} · {result.cuts} {t('prefab.cuts', { defaultValue: 'cuts' })} · {fmt(result.bevelAngle, 1)}° bevel
+                    </text>
+
+                    {/* Axes */}
+                    <line x1={cx - 10} y1={cy} x2={cx + rExt + 40} y2={cy} stroke="#27272a" strokeWidth="0.5" />
+                    <line x1={cx} y1={cy + 10} x2={cx} y2={cy - rExt - 40} stroke="#27272a" strokeWidth="0.5" />
+                  </>
+                );
+              })()}
+            </svg>
+          ) : (
+            <div className="flex h-60 items-center justify-center text-sm text-zinc-600">
+              {t('prefab.enterValues', { defaultValue: 'Enter values to see the diagram' })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Reference notes */}
+      <div className="border border-zinc-800 bg-[#0d0d0d] p-5 rounded-sm space-y-3">
+        <h4 className="text-sm font-semibold text-zinc-200">{t('prefab.segmentedNotes', { defaultValue: 'Segmented Elbow Notes' })}</h4>
+        <div className="space-y-2 font-mono text-xs text-zinc-300">
+          <div className="border-l-2 border-[#f59e0b] pl-3">
+            <p className="text-[#f59e0b]">{t('prefab.advanceFromCenter', { defaultValue: 'Advance from Center' })}</p>
+            <p>advance = R × tan(θ/2)</p>
+          </div>
+          <div className="border-l-2 border-[#ef4444] pl-3">
+            <p className="text-[#ef4444]">Bevel Angle</p>
+            <p>bevel = θ / (2 × N)</p>
+            <p className="text-zinc-500">where N = number of cuts</p>
+          </div>
+          <div className="border-l-2 border-zinc-600 pl-3">
+            <p className="text-zinc-400">{t('prefab.segmentLengths', { defaultValue: 'Segment Lengths' })}</p>
+            <p>end = R × tan(bevel)</p>
+            <p>middle = 2 × R × tan(bevel)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Suite Component ───
 export default function PrefabSuite({ user: _user }: { user?: { id: string } | null }) {
   const { t } = useTranslation();
@@ -455,6 +726,9 @@ export default function PrefabSuite({ user: _user }: { user?: { id: string } | n
           <TabsTrigger value="offset-no-elbows">
             {t('prefab.tabOffsetNoElbows', { defaultValue: 'Offsets w/o Elbows' })}
           </TabsTrigger>
+          <TabsTrigger value="segmented">
+            {t('prefab.tabSegmented', { defaultValue: 'Segmented Elbows' })}
+          </TabsTrigger>
           <TabsTrigger value="verify">
             {t('prefab.tabVerify', { defaultValue: 'Verify' })}
           </TabsTrigger>
@@ -466,6 +740,10 @@ export default function PrefabSuite({ user: _user }: { user?: { id: string } | n
 
         <TabsContent value="offset-no-elbows" className="mt-6">
           <OffsetWithoutElbows t={t} />
+        </TabsContent>
+
+        <TabsContent value="segmented" className="mt-6">
+          <SegmentedElbows t={t} />
         </TabsContent>
 
         <TabsContent value="verify" className="mt-6">

@@ -45,6 +45,10 @@ function calculateCut(od: number, nps: string, radiusType: 'LR' | 'SR', angleDeg
   const arcExtradors = (R + od / 2) * rad;
   const arcIntradors = (R - od / 2) * rad;
 
+  // PB-029: Advance from center — the key dimension for prefabrication discounts
+  // center_to_end = R × tan(θ/2) — ASME standard formula
+  const advance = R * Math.tan(halfRad);
+
   return {
     R,
     cutIntradors: Math.max(0, cutIntradors),
@@ -52,6 +56,7 @@ function calculateCut(od: number, nps: string, radiusType: 'LR' | 'SR', angleDeg
     arcNeutral,
     arcExtradors,
     arcIntradors,
+    advance,
   };
 }
 
@@ -202,16 +207,26 @@ export default function ElbowCut({ user: _user }: { user?: { id: string } | null
 
               {/* Results */}
               {valid && result ? (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="border-l-2 border-[#f59e0b] bg-[#f59e0b]/5 p-4">
-                    <p className="text-[10px] uppercase tracking-[0.25em] text-[#f59e0b]">Cut — Intradós</p>
-                    <p className="mt-1 text-lg font-bold text-zinc-100">{fmt(result.cutIntradors)} mm</p>
-                    <p className="text-[10px] text-zinc-500">{fmt(result.cutIntradors / 25.4, 3)} in</p>
+                <div className="space-y-3">
+                  {/* PB-029: Advance from center — highlighted for prefabrication */}
+                  <div className="rounded-md border-2 border-[#f59e0b] bg-[#f59e0b]/10 p-4">
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-[#f59e0b]">
+                      {t('tools.elbowAdvanceFromCenter', { defaultValue: 'Advance from Center (Avance)' })}
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-[#f59e0b]">{fmt(result.advance)} mm</p>
+                    <p className="text-xs text-zinc-400">{fmt(result.advance / 25.4, 3)} in — R × tan(θ/2)</p>
                   </div>
-                  <div className="border-l-2 border-[#22d3ee] bg-[#22d3ee]/5 p-4">
-                    <p className="text-[10px] uppercase tracking-[0.25em] text-[#22d3ee]">Cut — Extradós</p>
-                    <p className="mt-1 text-lg font-bold text-zinc-100">{fmt(result.cutExtradors)} mm</p>
-                    <p className="text-[10px] text-zinc-500">{fmt(result.cutExtradors / 25.4, 3)} in</p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="border-l-2 border-[#f97316] bg-[#f97316]/5 p-4">
+                      <p className="text-[10px] uppercase tracking-[0.25em] text-[#f97316]">Cut — Intradós</p>
+                      <p className="mt-1 text-lg font-bold text-zinc-100">{fmt(result.cutIntradors)} mm</p>
+                      <p className="text-[10px] text-zinc-500">{fmt(result.cutIntradors / 25.4, 3)} in</p>
+                    </div>
+                    <div className="border-l-2 border-[#22d3ee] bg-[#22d3ee]/5 p-4">
+                      <p className="text-[10px] uppercase tracking-[0.25em] text-[#22d3ee]">Cut — Extradós</p>
+                      <p className="mt-1 text-lg font-bold text-zinc-100">{fmt(result.cutExtradors)} mm</p>
+                      <p className="text-[10px] text-zinc-500">{fmt(result.cutExtradors / 25.4, 3)} in</p>
+                    </div>
                   </div>
                 </div>
               ) : angleNum === 0 ? (
@@ -226,6 +241,7 @@ export default function ElbowCut({ user: _user }: { user?: { id: string } | null
                   <thead className="bg-zinc-900 text-[10px] uppercase tracking-wider text-zinc-400">
                     <tr>
                       <th className="px-3 py-2 text-left">Angle</th>
+                      <th className="px-3 py-2 text-right text-[#f59e0b]">Advance (mm)</th>
                       <th className="px-3 py-2 text-right">Cut Intradós (mm)</th>
                       <th className="px-3 py-2 text-right">Cut Extradós (mm)</th>
                       <th className="px-3 py-2 text-right">Arc Neutral (mm)</th>
@@ -238,6 +254,7 @@ export default function ElbowCut({ user: _user }: { user?: { id: string } | null
                         className={`border-t border-zinc-800/60 hover:bg-zinc-900/30 ${r.angle === angleNum ? 'bg-[#f59e0b]/5' : ''}`}
                       >
                         <td className="px-3 py-2 font-semibold text-zinc-100">{r.angle}°</td>
+                        <td className="px-3 py-2 text-right font-mono font-bold text-[#f59e0b]">{fmt(r.advance)}</td>
                         <td className="px-3 py-2 text-right font-mono text-zinc-300">{fmt(r.cutIntradors)}</td>
                         <td className="px-3 py-2 text-right font-mono text-zinc-300">{fmt(r.cutExtradors)}</td>
                         <td className="px-3 py-2 text-right font-mono text-zinc-400">{fmt(r.arcNeutral)}</td>
@@ -373,7 +390,12 @@ export default function ElbowCut({ user: _user }: { user?: { id: string } | null
             <h4 className="text-sm font-semibold text-zinc-200">Formulas</h4>
             <div className="space-y-3 font-mono text-xs text-zinc-300">
               <div className="border-l-2 border-[#f59e0b] pl-3">
-                <p className="text-[#f59e0b]">R (radius)</p>
+                <p className="text-[#f59e0b]">Advance from Center (Avance)</p>
+                <p>advance = R × tan(θ/2)</p>
+                <p className="text-zinc-500">Key dimension for prefabrication discounts</p>
+              </div>
+              <div className="border-l-2 border-zinc-500 pl-3">
+                <p className="text-zinc-300">R (radius)</p>
                 <p>LR: R = 1.5 × NPS × 25.4 mm</p>
                 <p>SR: R = 1.0 × NPS × 25.4 mm</p>
               </div>
