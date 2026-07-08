@@ -10,12 +10,14 @@ import {
   calculateOffsetWithoutElbows,
   verifyOffset,
   calculateSegmentedElbow,
+  calculatePipeComb,
   getOdByNps,
   type ElbowType,
   type OffsetWithElbowsResult,
   type OffsetWithoutElbowsResult,
   type OffsetVerifyResult,
   type SegmentedElbowResult,
+  type PipeCombResult,
 } from './offsets';
 
 // PB-027: Suite de Prefabricación
@@ -703,6 +705,246 @@ function SegmentedElbows({ t }: { t: (k: string, o?: Record<string, string>) => 
   );
 }
 
+// ─── PB-026: Pipe Combs (Peines de Tubería) ───
+function PipeCombs({ t }: { t: (k: string, o?: Record<string, string>) => string }) {
+  const [numLines, setNumLines] = useState('4');
+  const [initialSpacing, setInitialSpacing] = useState('200');
+  const [finalSpacing, setFinalSpacing] = useState('300');
+  const [angle, setAngle] = useState('45');
+  const [nps, setNps] = useState('6');
+  const [elbowType, setElbowType] = useState<ElbowType>('90LR');
+  const [unit, setUnit] = useState<'mm' | 'in'>('mm');
+
+  const lines = Math.min(20, Math.max(2, parseInt(numLines) || 2));
+  const initSp = parseFloat(initialSpacing) || 0;
+  const finSp = parseFloat(finalSpacing) || 0;
+  const angleDeg = parseFloat(angle) || 45;
+  const valid = lines >= 2 && initSp > 0 && finSp > 0 && initSp !== finSp && angleDeg > 0 && angleDeg < 90;
+
+  const result = useMemo(() => {
+    if (!valid) return null;
+    return calculatePipeComb(lines, initSp, finSp, angleDeg, nps, elbowType);
+  }, [lines, initSp, finSp, angleDeg, nps, elbowType, valid]);
+
+  const toUnit = (v: number) => unit === 'in' ? v / 25.4 : v;
+  const fmtU = (v: number) => fmt(toUnit(v), unit === 'in' ? 2 : 1);
+
+  // Colors for each line
+  const lineColors = ['#71717a', '#f59e0b', '#22d3ee', '#a78bfa', '#22c55e', '#f97316', '#ec4899', '#06b6d4', '#84cc16', '#e879f9',
+    '#fb923c', '#2dd4bf', '#c084fc', '#facc15', '#38bdf8', '#f472b6', '#4ade80', '#fbbf24', '#818cf8', '#34d399'];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-end gap-2">
+        {(['mm', 'in'] as const).map((u) => (
+          <button key={u} onClick={() => setUnit(u)}
+            className={`rounded-sm border px-3 py-1 text-xs transition ${unit === u ? 'border-[#f59e0b] bg-[#f59e0b]/10 text-[#f59e0b]' : 'border-zinc-800 text-zinc-400'}`}>
+            {u}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Inputs */}
+        <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider text-zinc-400">
+                {t('prefab.numLines', { defaultValue: 'Number of Lines' })}
+              </Label>
+              <Input type="number" min="2" max="20" value={numLines} onChange={(e) => setNumLines(e.target.value)}
+                className="bg-zinc-950 border-zinc-800 focus-visible:ring-[#f59e0b]" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider text-zinc-400">
+                {t('prefab.angle', { defaultValue: 'Angle' })} (°)
+              </Label>
+              <Select value={angle} onValueChange={setAngle}>
+                <SelectTrigger className="bg-zinc-950 border-zinc-800"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {[15, 22.5, 30, 45, 60].map((a) => <SelectItem key={a} value={String(a)}>{a}°</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider text-zinc-400">
+                {t('prefab.initialSpacing', { defaultValue: 'Initial Spacing' })} ({unit})
+              </Label>
+              <Input type="number" min="1" value={initialSpacing} onChange={(e) => setInitialSpacing(e.target.value)}
+                className="bg-zinc-950 border-zinc-800 focus-visible:ring-[#f59e0b]" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider text-zinc-400">
+                {t('prefab.finalSpacing', { defaultValue: 'Final Spacing' })} ({unit})
+              </Label>
+              <Input type="number" min="1" value={finalSpacing} onChange={(e) => setFinalSpacing(e.target.value)}
+                className="bg-zinc-950 border-zinc-800 focus-visible:ring-[#f59e0b]" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider text-zinc-400">NPS</Label>
+              <Select value={nps} onValueChange={setNps}>
+                <SelectTrigger className="bg-zinc-950 border-zinc-800"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {NPS_OPTIONS.map((n) => <SelectItem key={n} value={n}>{n}"</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider text-zinc-400">
+                {t('prefab.elbowType', { defaultValue: 'Elbow Type' })}
+              </Label>
+              <div className="flex gap-2">
+                {(['90LR', '90SR', '45LR'] as ElbowType[]).map((et) => (
+                  <button key={et} onClick={() => setElbowType(et)}
+                    className={`flex-1 rounded-sm border px-2 py-2 text-xs transition ${elbowType === et ? 'border-[#f59e0b] bg-[#f59e0b]/10 text-[#f59e0b]' : 'border-zinc-800 bg-zinc-950 text-zinc-300'}`}>
+                    {et === '90LR' ? '90° LR' : et === '90SR' ? '90° SR' : '45° LR'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Summary */}
+          {valid && result && (
+            <div className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <ResultCard label={t('prefab.spacingChange', { defaultValue: 'Spacing Change' })}
+                  value={`${fmtU(result.initialSpacing)} → ${fmtU(result.finalSpacing)}`} unit={unit}
+                  accent={result.expanding ? '#22c55e' : '#ef4444'} />
+                <ResultCard label={t('prefab.deltaPerLine', { defaultValue: 'Delta / Line' })}
+                  value={fmtU(Math.abs(result.finalSpacing - result.initialSpacing))} unit={unit} accent="#22d3ee" />
+                <ResultCard label={t('prefab.cutDelta', { defaultValue: 'Cut Delta' })}
+                  value={fmtU(result.cutLengthDelta)} unit={unit} accent="#a78bfa" />
+              </div>
+
+              {/* Per-line results table */}
+              <div className="overflow-x-auto rounded-md border border-zinc-800">
+                <table className="w-full text-xs">
+                  <thead className="bg-zinc-900 text-[10px] uppercase tracking-wider text-zinc-400">
+                    <tr>
+                      <th className="px-3 py-2 text-left">{t('prefab.line', { defaultValue: 'Line' })}</th>
+                      <th className="px-3 py-2 text-right">{t('prefab.offset', { defaultValue: 'Offset' })} ({unit})</th>
+                      <th className="px-3 py-2 text-right">Travel ({unit})</th>
+                      <th className="px-3 py-2 text-right">Run ({unit})</th>
+                      <th className="px-3 py-2 text-right text-[#22c55e]">{t('prefab.cutLength', { defaultValue: 'Cut' })} ({unit})</th>
+                      <th className="px-3 py-2 text-right">C-C ({unit})</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.lineResults.map((lr) => (
+                      <tr key={lr.lineIndex}
+                        className={`border-t border-zinc-800/60 hover:bg-zinc-900/30 ${lr.lineIndex === 0 ? 'bg-zinc-900/20' : ''}`}>
+                        <td className="px-3 py-2 font-semibold">
+                          <span className="inline-block w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: lineColors[lr.lineIndex % lineColors.length] }} />
+                          <span className="text-zinc-100">L{lr.lineIndex + 1}</span>
+                          {lr.lineIndex === 0 && <span className="ml-1 text-zinc-500 text-[10px]">(ref)</span>}
+                        </td>
+                        <td className="px-3 py-2 text-right font-mono text-zinc-300">{lr.offset === 0 ? '—' : fmtU(lr.offset)}</td>
+                        <td className="px-3 py-2 text-right font-mono text-zinc-300">{lr.travel === 0 ? '—' : fmtU(lr.travel)}</td>
+                        <td className="px-3 py-2 text-right font-mono text-zinc-300">{lr.run === 0 ? '—' : fmtU(lr.run)}</td>
+                        <td className="px-3 py-2 text-right font-mono font-bold text-[#22c55e]">{lr.cutLength === 0 ? '—' : fmtU(lr.cutLength)}</td>
+                        <td className="px-3 py-2 text-right font-mono text-zinc-400">{lr.centerToCenter === 0 ? '—' : fmtU(lr.centerToCenter)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* SVG Schematic */}
+        <div className="border border-zinc-800 bg-[#0d0d0d] p-4 rounded-sm">
+          {valid && result ? (
+            <svg viewBox="0 0 450 400" className="w-full" role="img" aria-label="Pipe comb schematic">
+              {(() => {
+                const margin = 30;
+                const w = 450 - margin * 2;
+                const h = 400 - margin * 2;
+                const n = result.lines;
+
+                // Find max dimension for scaling
+                const maxOffset = result.lineResults[n - 1]?.offset ?? 0;
+                const maxRun = result.lineResults[n - 1]?.run ?? 0;
+                const maxInitialPos = (n - 1) * result.initialSpacing;
+                const maxFinalPos = (n - 1) * result.finalSpacing;
+                const maxVertical = Math.max(maxInitialPos, maxFinalPos);
+
+                // Scale to fit
+                const runSection = 60; // fixed horizontal length for straight runs
+                const totalHoriz = runSection + maxRun + runSection;
+                const scaleX = w / Math.max(totalHoriz, 1);
+                const scaleY = h / Math.max(maxVertical, 1);
+                const scale = Math.min(scaleX, scaleY, 2);
+
+                const x0 = margin;
+                const y0 = margin + 20;
+
+                return result.lineResults.map((lr) => {
+                  const color = lineColors[lr.lineIndex % lineColors.length];
+                  const yInit = y0 + lr.initialPos * scale;
+                  const yFinal = y0 + lr.finalPos * scale;
+                  const xRunStart = x0;
+                  const xElbow1 = x0 + runSection * scale;
+                  const xElbow2 = xElbow1 + (lr.run || 0) * scale;
+                  const xEnd = xElbow2 + runSection * scale;
+
+                  if (lr.offset === 0) {
+                    // Reference line — straight
+                    return (
+                      <g key={lr.lineIndex}>
+                        <line x1={xRunStart} y1={yInit} x2={xEnd} y2={yInit}
+                          stroke={color} strokeWidth="2.5" />
+                        <text x={xRunStart - 5} y={yInit + 4} fill={color} fontSize="9" textAnchor="end" fontWeight="bold">
+                          L{lr.lineIndex + 1}
+                        </text>
+                      </g>
+                    );
+                  }
+
+                  return (
+                    <g key={lr.lineIndex}>
+                      {/* Initial run */}
+                      <line x1={xRunStart} y1={yInit} x2={xElbow1} y2={yInit}
+                        stroke={color} strokeWidth="2" />
+                      {/* Inclined (travel) */}
+                      <line x1={xElbow1} y1={yInit} x2={xElbow2} y2={yFinal}
+                        stroke={color} strokeWidth="2" />
+                      {/* Final run */}
+                      <line x1={xElbow2} y1={yFinal} x2={xEnd} y2={yFinal}
+                        stroke={color} strokeWidth="2" />
+                      {/* Elbow dots */}
+                      <circle cx={xElbow1} cy={yInit} r="3" fill={color} />
+                      <circle cx={xElbow2} cy={yFinal} r="3" fill={color} />
+                      {/* Label */}
+                      <text x={xRunStart - 5} y={yInit + 4} fill={color} fontSize="9" textAnchor="end" fontWeight="bold">
+                        L{lr.lineIndex + 1}
+                      </text>
+                      {/* Cut length label on inclined section */}
+                      {lr.lineIndex === n - 1 && (
+                        <text x={(xElbow1 + xElbow2) / 2 + 12} y={(yInit + yFinal) / 2}
+                          fill="#22c55e" fontSize="9" fontWeight="bold">
+                          {fmtU(lr.cutLength)} {unit}
+                        </text>
+                      )}
+                    </g>
+                  );
+                });
+              })()}
+            </svg>
+          ) : (
+            <div className="flex h-60 items-center justify-center text-sm text-zinc-600">
+              {initSp === finSp
+                ? t('prefab.spacingMustDiffer', { defaultValue: 'Initial and final spacing must be different' })
+                : t('prefab.enterValues', { defaultValue: 'Enter values to see the diagram' })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Suite Component ───
 export default function PrefabSuite({ user: _user }: { user?: { id: string } | null }) {
   const { t } = useTranslation();
@@ -719,7 +961,7 @@ export default function PrefabSuite({ user: _user }: { user?: { id: string } | n
       </div>
 
       <Tabs defaultValue="offset-elbows">
-        <TabsList className="bg-zinc-950 border border-zinc-800">
+        <TabsList className="bg-zinc-950 border border-zinc-800 flex-wrap">
           <TabsTrigger value="offset-elbows">
             {t('prefab.tabOffsetElbows', { defaultValue: 'Offsets w/ Elbows' })}
           </TabsTrigger>
@@ -728,6 +970,9 @@ export default function PrefabSuite({ user: _user }: { user?: { id: string } | n
           </TabsTrigger>
           <TabsTrigger value="segmented">
             {t('prefab.tabSegmented', { defaultValue: 'Segmented Elbows' })}
+          </TabsTrigger>
+          <TabsTrigger value="pipe-combs">
+            {t('prefab.tabPipeCombs', { defaultValue: 'Pipe Combs' })}
           </TabsTrigger>
           <TabsTrigger value="verify">
             {t('prefab.tabVerify', { defaultValue: 'Verify' })}
@@ -744,6 +989,10 @@ export default function PrefabSuite({ user: _user }: { user?: { id: string } | n
 
         <TabsContent value="segmented" className="mt-6">
           <SegmentedElbows t={t} />
+        </TabsContent>
+
+        <TabsContent value="pipe-combs" className="mt-6">
+          <PipeCombs t={t} />
         </TabsContent>
 
         <TabsContent value="verify" className="mt-6">

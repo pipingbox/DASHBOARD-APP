@@ -281,3 +281,128 @@ export function calculateSegmentedElbow(
     midSegmentExt,
   };
 }
+
+// ─── PB-026: Pipe Combs (Peines de Tubería) ───
+
+export interface PipeCombLineResult {
+  /** Line index (0 = reference, no offset) */
+  lineIndex: number;
+  /** Initial position from reference (mm) */
+  initialPos: number;
+  /** Final position from reference (mm) */
+  finalPos: number;
+  /** Offset for this line (mm) — difference between initial and final position */
+  offset: number;
+  /** Travel along the inclined pipe (mm) */
+  travel: number;
+  /** Run — horizontal projection (mm) */
+  run: number;
+  /** Elbow advance (mm) */
+  elbowAdvance: number;
+  /** Cut length of the inclined pipe (mm) */
+  cutLength: number;
+  /** Center-to-center between elbows (mm) */
+  centerToCenter: number;
+}
+
+export interface PipeCombResult {
+  /** Number of lines */
+  lines: number;
+  /** Initial spacing between adjacent lines (mm) */
+  initialSpacing: number;
+  /** Final spacing between adjacent lines (mm) */
+  finalSpacing: number;
+  /** Angle used (degrees) */
+  angle: number;
+  /** Whether spacing is increasing or decreasing */
+  expanding: boolean;
+  /** Results for each line */
+  lineResults: PipeCombLineResult[];
+  /** Difference in cut length between consecutive lines (mm) — constant for equal spacing */
+  cutLengthDelta: number;
+}
+
+/**
+ * Calculate pipe comb (peine de tubería) dimensions.
+ *
+ * A pipe comb is a set of N parallel pipes that change spacing from an initial
+ * distance to a final distance using elbows of the same angle. Line 0 is the
+ * reference (straight through, no offset). Each subsequent line has a progressively
+ * larger offset.
+ *
+ * @param numLines - Number of parallel lines (2–20)
+ * @param initialSpacing - Initial spacing between adjacent centerlines (mm)
+ * @param finalSpacing - Final spacing between adjacent centerlines (mm)
+ * @param angleDeg - Elbow angle for all offsets (degrees)
+ * @param nps - Nominal pipe size
+ * @param elbowType - Type of elbow
+ */
+export function calculatePipeComb(
+  numLines: number,
+  initialSpacing: number,
+  finalSpacing: number,
+  angleDeg: number,
+  nps: string,
+  elbowType: ElbowType,
+): PipeCombResult {
+  const rad = (angleDeg * Math.PI) / 180;
+  const sinA = Math.sin(rad);
+  const elbowAdv = getElbowAdvance(nps, elbowType);
+  const expanding = finalSpacing > initialSpacing;
+  const spacingDelta = Math.abs(finalSpacing - initialSpacing);
+
+  const lineResults: PipeCombLineResult[] = [];
+
+  for (let i = 0; i < numLines; i++) {
+    const initialPos = i * initialSpacing;
+    const finalPos = i * finalSpacing;
+    const offset = i * spacingDelta; // progressive offset
+
+    if (offset === 0) {
+      // Reference line — straight through
+      lineResults.push({
+        lineIndex: i,
+        initialPos,
+        finalPos,
+        offset: 0,
+        travel: 0,
+        run: 0,
+        elbowAdvance: 0,
+        cutLength: 0,
+        centerToCenter: 0,
+      });
+    } else {
+      const travel = offset / sinA;
+      const run = offset / Math.tan(rad);
+      const cutLength = Math.max(0, travel - 2 * elbowAdv);
+      const centerToCenter = travel;
+
+      lineResults.push({
+        lineIndex: i,
+        initialPos,
+        finalPos,
+        offset,
+        travel,
+        run,
+        elbowAdvance: elbowAdv,
+        cutLength,
+        centerToCenter,
+      });
+    }
+  }
+
+  // Delta between consecutive lines (constant for equal spacing)
+  const cutLengthDelta = numLines > 1
+    ? (lineResults[1]?.cutLength ?? 0)
+    : 0;
+
+  return {
+    lines: numLines,
+    initialSpacing,
+    finalSpacing,
+    angle: angleDeg,
+    expanding,
+    lineResults,
+    cutLengthDelta,
+  };
+}
