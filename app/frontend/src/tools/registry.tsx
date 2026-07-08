@@ -13,6 +13,7 @@ import {
   Wrench,
   Droplets,
   Weight,
+  Paintbrush,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -45,6 +46,7 @@ const AccessoriesLibrary = lazy(() => import('@/components/tools/AccessoriesLibr
 const PrefabSuite = lazy(() => import('@/tools/prefab-suite/PrefabSuite'));
 const PipeVolume = lazy(() => import('@/tools/pipe-volume/PipeVolume'));
 const WeightCalculator = lazy(() => import('@/tools/weight-calc/WeightCalculator'));
+const ColorLookup = lazy(() => import('@/tools/color-lookup/ColorLookup'));
 
 export const TOOL_REGISTRY: ToolDefinition[] = [
   // 🏭 Fabrication
@@ -160,6 +162,14 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
     icon: Calculator,
     block: 'utility',
     component: UnitConverter,
+    isNew: true,
+  },
+  {
+    key: 'color-lookup',
+    nameKey: 'tools.colorLookup',
+    icon: Paintbrush,
+    block: 'utility',
+    component: ColorLookup,
     isNew: true,
   },
 ];

@@ -347,6 +347,7 @@
     "prefabSuite": "Prefabrication Suite",
     "pipeVolume": "Pipe Volume Calculator",
     "weightCalc": "Weight Calculator",
+    "colorLookup": "Industrial Color Lookup (RAL)",
     "accessories": {
       "title": "Accessories Library",
       "subtitle": "Fitting dimensions for prefabrication",
