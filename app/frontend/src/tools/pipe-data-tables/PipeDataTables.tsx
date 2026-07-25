@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search } from 'lucide-react';
+import { Search, Database, HardDrive } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { useCatalog } from '@/hooks/useCatalog';
 
 // QW-002: Pipe Data Tables. Reference data that every piping professional
 // consults daily. Data from ASME B36.10M (pipe), B16.5 (flanges), PCC-1 (bolting).
+// PIDM integration: when pipe dimensions exist in Supabase, they override inline data.
 
 interface PipeDim {
   nps: string;
@@ -108,6 +110,8 @@ function mmToIn(mm: number): string {
 
 export default function PipeDataTables({ user: _user }: { user?: { id: string } | null }) {
   const { t } = useTranslation();
+  const { store, lastSync } = useCatalog();
+  const hasPidm = (store?.components.size || 0) > 0;
   const [search, setSearch] = useState('');
   const [unit, setUnit] = useState<'mm' | 'in'>('mm');
 

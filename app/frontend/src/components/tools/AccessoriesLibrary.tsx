@@ -1,47 +1,33 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Database, HardDrive } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   FITTING_CATEGORIES,
-  ELBOW_ENTRIES,
   ELBOW_COLUMNS,
-  TEE_ENTRIES,
   TEE_COLUMNS,
-  REDUCER_RAW,
-  VALVE_RAW,
   VALVE_TYPES,
   VALVE_CLASSES,
-  CAP_ENTRIES,
   CAP_COLUMNS,
-  FLANGE_ENTRIES,
   FLANGE_TYPES,
   FLANGE_CLASSES,
   FLANGE_COLUMNS_WN,
   FLANGE_COLUMNS_SO,
-  STUD_BOLT_ENTRIES,
   STUD_BOLT_CLASSES,
   STUD_BOLT_COLUMNS,
-  GASKET_ENTRIES,
   GASKET_CLASSES,
   GASKET_COLUMNS,
-  STUB_END_ENTRIES,
   STUB_END_COLUMNS,
-  OLET_ENTRIES,
   OLET_TYPES,
-  OLET_RAW,
-  SW_FITTING_ENTRIES,
   SW_FITTING_TYPES,
-  THREADED_FITTING_ENTRIES,
   THREADED_FITTING_TYPES,
-  SPECTACLE_BLIND_ENTRIES,
   SPECTACLE_BLIND_CLASSES,
   SPECTACLE_BLIND_COLUMNS,
-  Y_STRAINER_ENTRIES,
   Y_STRAINER_COLUMNS,
   mmToInch,
 } from '@/lib/fittingsData';
 import type { FittingCategory, FittingEntry } from '@/lib/fittingsData';
+import { useFittingsProvider } from '@/hooks/useFittingsProvider';
 
 type View = 'grid' | 'detail';
 
@@ -54,6 +40,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 export default function AccessoriesLibrary() {
   const { t } = useTranslation();
+  const fittings = useFittingsProvider();
   const [view, setView] = useState<View>('grid');
   const [activeCategory, setActiveCategory] = useState<FittingCategory | null>(null);
   const [unit, setUnit] = useState<'mm' | 'in'>('mm');
@@ -114,6 +101,23 @@ export default function AccessoriesLibrary() {
           </h3>
           {view === 'grid' && <p className="mt-1 text-sm text-zinc-400">{t('tools.accessories.desc')}</p>}
         </div>
+        {/* Data source indicator */}
+        <div className="ml-auto flex items-center gap-1.5 text-[10px]">
+          {fittings.source === 'pidm' ? (
+            <>
+              <Database className="h-3 w-3 text-emerald-500" />
+              <span className="text-emerald-500">PIDM</span>
+              <span className="text-zinc-600">({fittings.pidmComponentCount}C / {fittings.pidmDimensionCount}D)</span>
+            </>
+          ) : fittings.source === 'loading' ? (
+            <span className="text-zinc-600 animate-pulse">Syncing...</span>
+          ) : (
+            <>
+              <HardDrive className="h-3 w-3 text-zinc-600" />
+              <span className="text-zinc-600">Local</span>
+            </>
+          )}
+        </div>
       </div>
 
       {/* ─── GRID VIEW ─── */}
@@ -155,7 +159,7 @@ export default function AccessoriesLibrary() {
 
           {/* Table */}
           <div className="overflow-x-auto border border-zinc-800/60">
-            <CategoryTable category={activeCategory} subType={subType} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} t={t} />
+            <CategoryTable category={activeCategory} subType={subType} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} t={t} fittings={fittings} />
           </div>
           <p className="text-[10px] text-zinc-600">{t('tools.accessories.reference')}</p>
         </div>
@@ -186,38 +190,39 @@ interface CategoryTableProps {
   toUnit: (mm: number) => number;
   unitLabel: string;
   t: (key: string) => string;
+  fittings: ReturnType<typeof useFittingsProvider>;
 }
 
-function CategoryTable({ category, subType, classRating, filterNPS, toUnit, unitLabel, t }: CategoryTableProps) {
+function CategoryTable({ category, subType, classRating, filterNPS, toUnit, unitLabel, t, fittings }: CategoryTableProps) {
   switch (category) {
     case 'elbow-bw':
-      return <GenericTable entries={ELBOW_ENTRIES} columns={ELBOW_COLUMNS} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <GenericTable entries={fittings.getEntries('elbow-bw')} columns={ELBOW_COLUMNS} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'tee-bw':
-      return <GenericTable entries={TEE_ENTRIES} columns={TEE_COLUMNS} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <GenericTable entries={fittings.getEntries('tee-bw')} columns={TEE_COLUMNS} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'reducer-bw':
-      return <ReducerTable data={REDUCER_RAW} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} t={t} />;
+      return <ReducerTable data={fittings.reducerRaw} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} t={t} />;
     case 'cap-bw':
-      return <GenericTable entries={CAP_ENTRIES} columns={CAP_COLUMNS} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <GenericTable entries={fittings.getEntries('cap-bw')} columns={CAP_COLUMNS} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'valve':
-      return <ValveTable data={VALVE_RAW} type={subType} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <ValveTable data={fittings.valveRaw} type={subType} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'flange':
-      return <FlangeTable entries={FLANGE_ENTRIES} flangeType={subType} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <FlangeTable entries={fittings.getEntries('flange')} flangeType={subType} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'stud-bolt':
-      return <ClassFilteredTable entries={STUD_BOLT_ENTRIES} columns={STUD_BOLT_COLUMNS} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <ClassFilteredTable entries={fittings.getEntries('stud-bolt')} columns={STUD_BOLT_COLUMNS} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'gasket':
-      return <ClassFilteredTable entries={GASKET_ENTRIES} columns={GASKET_COLUMNS} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <ClassFilteredTable entries={fittings.getEntries('gasket')} columns={GASKET_COLUMNS} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'stub-end':
-      return <GenericTable entries={STUB_END_ENTRIES} columns={STUB_END_COLUMNS} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <GenericTable entries={fittings.getEntries('stub-end')} columns={STUB_END_COLUMNS} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'olet':
-      return <OletTable data={OLET_RAW} type={subType} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <OletTable data={fittings.oletRaw} type={subType} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'fitting-sw':
-      return <TypeFilteredTable entries={SW_FITTING_ENTRIES} type={subType} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <TypeFilteredTable entries={fittings.getEntries('fitting-sw')} type={subType} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'fitting-threaded':
-      return <TypeFilteredTable entries={THREADED_FITTING_ENTRIES} type={subType} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <TypeFilteredTable entries={fittings.getEntries('fitting-threaded')} type={subType} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'spectacle-blind':
-      return <ClassFilteredTable entries={SPECTACLE_BLIND_ENTRIES} columns={SPECTACLE_BLIND_COLUMNS} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <ClassFilteredTable entries={fittings.getEntries('spectacle-blind')} columns={SPECTACLE_BLIND_COLUMNS} classRating={classRating} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     case 'y-strainer':
-      return <GenericTable entries={Y_STRAINER_ENTRIES} columns={Y_STRAINER_COLUMNS} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
+      return <GenericTable entries={fittings.getEntries('y-strainer')} columns={Y_STRAINER_COLUMNS} filterNPS={filterNPS} toUnit={toUnit} unitLabel={unitLabel} />;
     default:
       return <p className="p-4 text-zinc-500">No data available.</p>;
   }

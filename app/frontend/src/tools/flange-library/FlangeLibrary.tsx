@@ -14,6 +14,8 @@ import {
   Wrench,
   AlertTriangle,
   Crown,
+  Database,
+  HardDrive,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -28,6 +30,7 @@ import {
 import { getGasketForFlange, getStudBoltForFlange, type GasketSpec, type StudBoltSpec } from './gasket-bolt-data';
 import { usePremium } from '@/hooks/usePremium';
 import { PremiumGate, usePremiumGate } from '@/components/premium/PremiumGate';
+import { useCatalogFlanges } from '@/hooks/useCatalog';
 
 /**
  * TICKET-001 Fase 2: Flange Library — the killer differentiator.
@@ -46,6 +49,9 @@ export function FlangeLibrary({ user }: { user?: { id: string } | null }) {
   const { t } = useTranslation();
   const { status: premiumStatus } = usePremium();
   const { isGateOpen, gateFeature, openGate, closeGate } = usePremiumGate();
+  const { specs: pidmSpecs, isLoading: pidmLoading } = useCatalogFlanges();
+  const allSpecs = pidmSpecs.length > 0 ? pidmSpecs as FlangeSpec[] : FLANGE_SPECS;
+  const dataSource = pidmSpecs.length > 0 ? 'pidm' : 'hardcoded';
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<FlangeType | 'all'>('all');
   const [classFilter, setClassFilter] = useState<PressureClass | 'all'>('all');
@@ -65,14 +71,14 @@ export function FlangeLibrary({ user }: { user?: { id: string } | null }) {
   };
 
   const filteredSpecs = useMemo(() => {
-    return FLANGE_SPECS.filter((spec) => {
+    return allSpecs.filter((spec) => {
       if (typeFilter !== 'all' && spec.type !== typeFilter) return false;
       if (classFilter !== 'all' && spec.pressureClass !== classFilter) return false;
       if (npsFilter !== 'all' && spec.nps !== npsFilter) return false;
       if (search && !spec.nps.includes(search) && !spec.typeLabel.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [search, typeFilter, classFilter, npsFilter]);
+  }, [search, typeFilter, classFilter, npsFilter, allSpecs]);
 
   return (
     <div className="space-y-6">
