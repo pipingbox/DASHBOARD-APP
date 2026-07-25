@@ -70,6 +70,11 @@ export const TABLES = {
   academyLessons: 'app_academy_lessons',
   academyProgress: 'app_academy_progress',
   academyCertificates: 'app_academy_certificates',
+  // PIDM Catalog (Phase C — PIDM-CATALOG-EXPANSION-001)
+  pidmStandards: 'pidm_standards',
+  pidmComponents: 'pidm_components',
+  pidmDimensionSets: 'pidm_dimension_sets',
+  pidmDimensions: 'pidm_dimensions',
 } as const;
 
 export const STORAGE_BUCKETS = {
