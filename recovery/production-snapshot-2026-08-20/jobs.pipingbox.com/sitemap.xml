@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Application not ready yet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
+
+  <link rel="shortcut icon" href="https://public-frontend-cos.metadl.com/mgx/img/favicon.ico" type="image/x-icon" />
+
+  <title>Atoms - App Not Ready</title>
+  <style>
+    :root {
+      --color-bg-primary: rgba(255, 255, 255, 1);
+      --color-text-primary: rgba(12, 12, 12, 0.95);
+      --color-text-secondary: rgba(12, 12, 12, 0.60);
+      --color-text-button: rgba(255, 255, 255, 0.95);
+      --color-bg-message: rgba(12, 12, 12, 0.04);
+      --color-bg-button: rgba(12, 12, 12, 1);
+      --color-bg-button-secondary: rgba(12, 12, 12, 0.06);
+      --spacing-xs: 8px;
+      --spacing-sm: 16px;
+      --spacing-md: 24px;
+      --spacing-lg: 32px;
+      --spacing-xl: 40px;
+      --spacing-2xl: 64px;
+      --border-radius-sm: 8px;
+      --border-radius-md: 12px;
+      --icon-size: 104px;
+      --icon-size-sm: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    body {
+      background: var(--color-bg-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .loading-icon {
+      width: var(--icon-size);
+      height: var(--icon-size);
+      margin: 0 auto;
+      border-radius: 50%;
+    }
+
+    .title {
+      color: var(--color-text-primary);
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 40px;
+      text-align: center;
+    }
+
+    .message-box {
+      border-radius: var(--border-radius-md);
+      background: var(--color-bg-message);
+      display: flex;
+      padding: var(--spacing-md) var(--spacing-lg);
+      justify-content: center;
+      align-items: center;
+      gap: var(--spacing-xs);
+      margin-bottom: var(--spacing-2xl);
+      margin-top: var(--spacing-xl);
+    }
+
+    .message {
+      color: var(--color-text-primary);
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .reload-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .reload-text {
+      color: var(--color-text-secondary);
+      text-align: center;
+      font-size: 14px;
+      line-height: 22px;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .reload-button {
+      display: flex;
+      width: 153px;
+      height: 40px;
+      justify-content: center;
+      align-items: center;
+      gap: var(--spacing-xs);
+      border-radius: var(--border-radius-sm);
+      background: var(--color-bg-button);
+      border: none;
+      color: var(--color-text-button);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 22px;
+      margin: 0 auto;
+      cursor: pointer;
+      transition: filter 0.2s ease;
+    }
+
+    .reload-button:hover {
+      filter: brightness(1.1);
+    }
+
+    .reload-button:focus-visible {
+      outline: 2px solid var(--color-text-primary);
+      outline-offset: 2px;
+    }
+
+    .reload-button:active {
+      filter: brightness(0.95);
+    }
+
+    .reload-button img {
+      width: var(--icon-size-sm);
+      height: var(--icon-size-sm);
+      flex-shrink: 0;
+    }
+
+    /* 响应式优化 */
+    @media (max-width: 640px) {
+      .title {
+        font-size: 22px;
+      }
+
+      .message-box {
+        padding: var(--spacing-sm) var(--spacing-md);
+      }
+
+      .message {
+        font-size: 14px;
+      }
+
+      .reload-text {
+        font-size: 14px;
+      }
+
+      .reload-button {
+        width: 100%;
+        max-width: 153px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container" role="main">
+    <div class="loading-icon" role="img" aria-label="Loading animation"></div>
+    <h1 class="title">Your app is not ready yet</h1>
+    <div class="message-box" role="alert" aria-live="polite">
+      <p class="message">Please confirm if the agent is done in this chat, or if there's a bug to fix.</p>
+    </div>
+    <div class="reload-section">
+      <p class="reload-text">Click reload when agent work finishes successfully</p>
+      <button class="reload-button" onclick="reloadPage()" type="button" aria-label="Reload page">
+        <img src="https://public-frontend-cos.metadl.com/commonfile/general-refresh.svg" alt="" aria-hidden="true" />
+        <span>Reload</span>
+      </button>
+    </div>
+  </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"
+  integrity="sha512-jEnuDt6jfecCjthQAJ+ed0MTVA++5ZKmlUcmDGBv2vUI/REn6FuIdixLNnQT+vKusE2hhTk2is3cFvv5wA+Sgg=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+  (function () {
+    'use strict';
+
+    // Constants
+    const LOTTIE_PATH = 'https://public-frontend-cos.metadl.com/commonfile/lottie-503-loading.json';
+
+    // Event handler
+    window.reloadPage = function () {
+      window.location.reload();
+    };
+
+    // Initialize Lottie animation
+    function initializeLottie() {
+      const container = document.querySelector('.loading-icon');
+
+      if (!container) {
+        console.error('Lottie container not found');
+        return;
+      }
+
+      if (typeof lottie === 'undefined') {
+        console.error('Lottie library not loaded');
+        return;
+      }
+
+      try {
+        lottie.loadAnimation({
+          container: container,
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          path: LOTTIE_PATH
+        });
+      } catch (error) {
+        console.error('Failed to load Lottie animation:', error);
+      }
+    }
+
+    // Notify parent window
+    function notifyParent() {
+      try {
+        window.parent.postMessage({ type: '404page', targetName: window.name }, '*');
+      } catch (error) {
+        console.error('Failed to notify parent:', error);
+      }
+    }
+
+    // Initialize on DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        initializeLottie();
+        notifyParent();
+      });
+    } else {
+      initializeLottie();
+      notifyParent();
+    }
+  })();
+</script>
+
+</html>
