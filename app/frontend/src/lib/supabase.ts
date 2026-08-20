@@ -70,6 +70,14 @@ export const TABLES = {
   academyLessons: 'app_academy_lessons',
   academyProgress: 'app_academy_progress',
   academyCertificates: 'app_academy_certificates',
+  certificationAccessGrants: 'app_certification_access_grants',
+  // Stripe / monetization (PB-STRIPE-001 Fase 2, DEC-30)
+  // Client access is read-only; all writes happen in Edge Functions via service_role.
+  stripePrices: 'app_stripe_prices',
+  orders: 'app_orders',
+  subscriptions: 'app_subscriptions',
+  stripeEvents: 'app_stripe_events',
+  invoices: 'app_invoices',
   // PIDM Catalog (Phase C — PIDM-CATALOG-EXPANSION-001)
   pidmStandards: 'pidm_standards',
   pidmComponents: 'pidm_components',

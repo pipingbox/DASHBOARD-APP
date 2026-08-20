@@ -1,28 +1,70 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Package, Plus } from 'lucide-react';
+import { Package, Plus, Loader2 } from 'lucide-react';
+import { fetchCatalogPrices, formatPrice, redirectToCheckout, type CatalogPrice } from '@/lib/stripe';
 
-// MON-001: Job Credits UI component.
-// Shows remaining job credits and a purchase CTA.
-// NOTE: This is UI-only. Stripe integration is NOT implemented yet.
-// When Stripe is connected, the "Buy credits" button will redirect to Stripe Checkout.
+// MON-001 / PB-STRIPE-001 Fase 5: Job Credits UI component.
+// Shows remaining job credits and a purchase CTA wired to Stripe Checkout.
+//
+// The credit packs are NOT hardcoded any more. They are read from
+// app_stripe_prices, so the price shown here is by construction the price
+// charged at checkout. The previous hardcoded list had drifted away from the
+// catalog (it advertised EUR 49 / 199 / 349 against a catalog of 29 / 129 / 399).
 
 interface JobCreditsWidgetProps {
   creditsRemaining: number;
   planType: 'starter' | 'professional' | 'enterprise' | 'custom';
 }
 
-const CREDIT_PACKS = [
-  { id: 'single', label: '1 Job Post', price: 49, pricePer: 49 },
-  { id: 'pack5', label: '5 Job Posts', price: 199, pricePer: 39.8, savings: '20%' },
-  { id: 'pack10', label: '10 Job Posts', price: 349, pricePer: 34.9, savings: '30%' },
-  { id: 'featured', label: 'Featured Post', price: 99, pricePer: 99, note: '30 days in carousel' },
-];
+/** job_credit_5 -> "5 Job Posts" */
+function packLabel(productKey: string): string {
+  const n = Number(productKey.replace('job_credit_', ''));
+  if (!Number.isFinite(n)) return productKey;
+  return n === 1 ? '1 Job Post' : `${n} Job Posts`;
+}
+
+function packQuantity(productKey: string): number {
+  const n = Number(productKey.replace('job_credit_', ''));
+  return Number.isFinite(n) && n > 0 ? n : 1;
+}
 
 export function JobCreditsWidget({ creditsRemaining, planType }: JobCreditsWidgetProps) {
-  const { t } = useTranslation();
+  const [packs, setPacks] = useState<CatalogPrice[] | null>(null);
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const planLabel = planType.charAt(0).toUpperCase() + planType.slice(1);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const rows = await fetchCatalogPrices('job_credit_');
+      if (!cancelled) setPacks(rows);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleBuy(productKey: string) {
+    setBusyKey(productKey);
+    setError(null);
+    const reason = await redirectToCheckout(productKey);
+    if (reason) {
+      setBusyKey(null);
+      setError(
+        reason === 'not_authenticated'
+          ? 'Sign in to purchase credits.'
+          : reason === 'not_available'
+            ? 'This pack is not available right now.'
+            : 'Could not start checkout. Please try again.',
+      );
+    }
+    // On success the browser navigates away, so no state reset is needed.
+  }
+
+  const basePricePerPost =
+    packs?.find((p) => packQuantity(p.product_key) === 1)?.amount_cents ?? null;
 
   return (
     <div className="border border-zinc-800/80 bg-[#0d0d0d] p-5 rounded-sm space-y-4">
@@ -49,29 +91,72 @@ export function JobCreditsWidget({ creditsRemaining, planType }: JobCreditsWidge
       {/* Credit packs */}
       <div className="space-y-2">
         <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Buy more credits</p>
-        {CREDIT_PACKS.map((pack) => (
-          <div
-            key={pack.id}
-            className="flex items-center justify-between border border-zinc-800/60 bg-zinc-950 p-3 rounded-sm"
-          >
-            <div>
-              <p className="text-sm text-zinc-200">{pack.label}</p>
-              <p className="text-[10px] text-zinc-500">
-                {pack.savings ? `Save ${pack.savings}` : pack.note || `€${pack.pricePer.toFixed(2)} per post`}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-zinc-100">€{pack.price}</span>
-              {/* MON-001 TODO: Wire to Stripe Checkout when Stripe is configured */}
-              <button
-                className="rounded-sm bg-[#f59e0b] px-3 py-1 text-xs font-semibold text-black transition hover:bg-[#d97706]"
-                onClick={() => alert('Stripe integration pending. Contact hello@pipingbox.com to purchase credits.')}
-              >
-                <Plus className="h-3 w-3 inline" /> Buy
-              </button>
-            </div>
+
+        {packs === null && (
+          <div className="flex items-center gap-2 p-3 text-xs text-zinc-500">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            Loading packs…
           </div>
-        ))}
+        )}
+
+        {packs !== null && packs.length === 0 && (
+          <div className="border border-zinc-800/60 bg-zinc-950 p-3 text-xs text-zinc-400">
+            Credit packs are not available yet.{' '}
+            <a
+              href="mailto:hello@pipingbox.com?subject=Job%20Credits"
+              className="text-[#f59e0b] hover:underline"
+            >
+              Contact us
+            </a>{' '}
+            to purchase.
+          </div>
+        )}
+
+        {packs?.map((pack) => {
+          const qty = packQuantity(pack.product_key);
+          const perPost = pack.amount_cents != null ? pack.amount_cents / qty : null;
+          const savings =
+            basePricePerPost && perPost && qty > 1
+              ? Math.round((1 - perPost / basePricePerPost) * 100)
+              : 0;
+
+          return (
+            <div
+              key={pack.product_key}
+              className="flex items-center justify-between border border-zinc-800/60 bg-zinc-950 p-3 rounded-sm"
+            >
+              <div>
+                <p className="text-sm text-zinc-200">{packLabel(pack.product_key)}</p>
+                <p className="text-[10px] text-zinc-500">
+                  {savings > 0
+                    ? `Save ${savings}%`
+                    : `€${formatPrice(perPost)} per post`}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-zinc-100">
+                  €{formatPrice(pack.amount_cents)}
+                </span>
+                <button
+                  disabled={busyKey !== null}
+                  className="rounded-sm bg-[#f59e0b] px-3 py-1 text-xs font-semibold text-black transition hover:bg-[#d97706] disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => handleBuy(pack.product_key)}
+                >
+                  {busyKey === pack.product_key ? (
+                    <Loader2 className="h-3 w-3 inline animate-spin" />
+                  ) : (
+                    <Plus className="h-3 w-3 inline" />
+                  )}{' '}
+                  Buy
+                </button>
+              </div>
+            </div>
+          );
+        })}
+
+        {error && (
+          <p className="text-[10px] text-red-400 pt-1">{error}</p>
+        )}
       </div>
 
       <Link

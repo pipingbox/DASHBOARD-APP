@@ -11,9 +11,11 @@ import {
   Users,
   GraduationCap,
   Lock,
+  Loader2,
 } from 'lucide-react';
 import type { PremiumStatus } from '@/lib/premium';
 import { PREMIUM_PRICE_MONTHLY, PREMIUM_PRICE_YEARLY, PREMIUM_FEATURES } from '@/lib/premium';
+import { redirectToCheckout } from '@/lib/stripe';
 
 /**
  * PremiumGate — paywall modal for premium features.
@@ -33,11 +35,33 @@ interface PremiumGateProps {
 }
 
 export function PremiumGate({ open, onClose, feature, featureDescription, status }: PremiumGateProps) {
+  const [plan, setPlan] = useState<'monthly' | 'annual'>('annual');
+  const [busy, setBusy] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
   if (!open) return null;
 
   const referralProgress = status.referralLevel ?? 0;
   const referralTarget = 3;
   const referralRemaining = Math.max(0, referralTarget - referralProgress);
+
+  async function handleUpgrade() {
+    setBusy(true);
+    setCheckoutError(null);
+    const reason = await redirectToCheckout(
+      plan === 'annual' ? 'premium_tools_annual' : 'premium_tools_monthly',
+    );
+    if (reason) {
+      setBusy(false);
+      setCheckoutError(
+        reason === 'not_authenticated'
+          ? 'Sign in to subscribe.'
+          : reason === 'not_available'
+            ? 'Subscriptions are not available yet. Email us and we will set it up manually.'
+            : 'Could not start checkout. Please try again.',
+      );
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -68,21 +92,37 @@ export function PremiumGate({ open, onClose, feature, featureDescription, status
 
         {/* Body */}
         <div className="p-6 space-y-5">
-          {/* Pricing */}
+          {/* Pricing — selectable */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="border border-zinc-800 bg-zinc-950/50 rounded-sm p-4 text-center space-y-1">
+            <button
+              type="button"
+              onClick={() => setPlan('monthly')}
+              className={`border rounded-sm p-4 text-center space-y-1 transition ${
+                plan === 'monthly'
+                  ? 'border-[#f59e0b] bg-[#f59e0b]/10'
+                  : 'border-zinc-800 bg-zinc-950/50 hover:border-zinc-700'
+              }`}
+            >
               <p className="text-[10px] uppercase tracking-wider text-zinc-500">Monthly</p>
               <p className="text-2xl font-bold text-zinc-100">€{PREMIUM_PRICE_MONTHLY}</p>
               <p className="text-[10px] text-zinc-600">per month</p>
-            </div>
-            <div className="border border-[#f59e0b]/30 bg-[#f59e0b]/5 rounded-sm p-4 text-center space-y-1 relative">
+            </button>
+            <button
+              type="button"
+              onClick={() => setPlan('annual')}
+              className={`border rounded-sm p-4 text-center space-y-1 relative transition ${
+                plan === 'annual'
+                  ? 'border-[#f59e0b] bg-[#f59e0b]/10'
+                  : 'border-zinc-800 bg-zinc-950/50 hover:border-zinc-700'
+              }`}
+            >
               <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 text-[9px] uppercase tracking-wider bg-[#f59e0b] text-black rounded-sm font-bold">
                 Save 35%
               </span>
               <p className="text-[10px] uppercase tracking-wider text-[#f59e0b]">Yearly</p>
               <p className="text-2xl font-bold text-[#f59e0b]">€{PREMIUM_PRICE_YEARLY}</p>
               <p className="text-[10px] text-zinc-500">€3.25/month</p>
-            </div>
+            </button>
           </div>
 
           {/* Features list */}
@@ -137,20 +177,31 @@ export function PremiumGate({ open, onClose, feature, featureDescription, status
 
           {/* CTA */}
           <div className="space-y-2 pt-2">
-            {/* Stripe CTA (when live) */}
             <button
-              className="w-full bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold py-2.5 rounded-sm text-sm transition flex items-center justify-center gap-2"
-              onClick={() => {
-                // TODO: When Stripe is live (DEC-30), redirect to checkout
-                // For now, show contact message
-                window.location.href = 'mailto:hello@pipingbox.com?subject=Premium Tools Subscription&body=I want to subscribe to PipingBox Premium Tools (€4.99/month or €39/year).';
-              }}
+              disabled={busy}
+              className="w-full bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold py-2.5 rounded-sm text-sm transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              onClick={handleUpgrade}
             >
-              <Crown className="h-4 w-4" />
-              Upgrade to Premium
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
+              {busy
+                ? 'Redirecting to checkout…'
+                : `Upgrade to Premium — €${plan === 'annual' ? PREMIUM_PRICE_YEARLY : PREMIUM_PRICE_MONTHLY}`}
             </button>
+
+            {checkoutError && (
+              <p className="text-[10px] text-red-400 text-center">{checkoutError}</p>
+            )}
+
+            {/* Manual fallback stays available: if the catalog is not mapped in
+                Stripe yet, checkout returns not_available and this is the way out. */}
             <p className="text-[10px] text-zinc-600 text-center">
-              Stripe activation pending. Email us to subscribe manually.
+              Trouble paying?{' '}
+              <a
+                href="mailto:hello@pipingbox.com?subject=Premium Tools Subscription"
+                className="text-zinc-500 hover:text-zinc-300 underline"
+              >
+                Email us
+              </a>
             </p>
           </div>
         </div>
