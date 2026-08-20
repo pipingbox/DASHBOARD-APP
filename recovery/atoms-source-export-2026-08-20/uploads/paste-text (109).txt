@@ -1,0 +1,244 @@
+Necesito crear las tablas de Supabase para Academy y el generador de certificados PDF en PipingBox.
+
+## Contexto del proyecto
+
+- Framework: React 18.3 + TypeScript + Vite + Tailwind 3.4
+- Supabase: src/lib/supabase.ts con TABLES ya definido
+- jspdf ya esta instalado (version ^4.2.1)
+- i18n: react-i18next
+- Tema: dark
+
+## Parte A: Migracion SQL
+
+Crear archivo supabase/migrations/academy_tables.sql con:
+
+-- Tabla de progreso por modulo
+CREATE TABLE IF NOT EXISTS app_14da0f1941_academy_progress (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  module_id INTEGER NOT NULL CHECK (module_id >= 1 AND module_id <= 22),
+  completed BOOLEAN DEFAULT false,
+  score DECIMAL(5,2) DEFAULT 0,
+  best_score DECIMAL(5,2) DEFAULT 0,
+  attempts INTEGER DEFAULT 0,
+  last_attempt_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(user_id, module_id)
+);
+
+-- Tabla de examenes simulacro
+CREATE TABLE IF NOT EXISTS app_14da0f1941_academy_mock_exams (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  exam_type TEXT NOT NULL CHECK (exam_type IN ('bvca', 'volvca')),
+  total_questions INTEGER NOT NULL,
+  correct_answers INTEGER NOT NULL,
+  passed BOOLEAN NOT NULL,
+  duration_seconds INTEGER NOT NULL,
+  completed_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Tabla de respuestas detalladas (opcional, para analiticas)
+CREATE TABLE IF NOT EXISTS app_14da0f1941_academy_exam_answers (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  mock_exam_id UUID REFERENCES app_14da0f1941_academy_mock_exams(id) ON DELETE CASCADE NOT NULL,
+  question_id INTEGER NOT NULL,
+  selected_answer CHAR(1) CHECK (selected_answer IN ('A', 'B', 'C')),
+  correct_answer CHAR(1) NOT NULL CHECK (correct_answer IN ('A', 'B', 'C')),
+  is_correct BOOLEAN NOT NULL
+);
+
+-- RLS Policies
+ALTER TABLE app_14da0f1941_academy_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE app_14da0f1941_academy_mock_exams ENABLE ROW LEVEL SECURITY;
+ALTER TABLE app_14da0f1941_academy_exam_answers ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read own progress" ON app_14da0f1941_academy_progress
+  FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own progress" ON app_14da0f1941_academy_progress
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own progress" ON app_14da0f1941_academy_progress
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can read own exams" ON app_14da0f1941_academy_mock_exams
+  FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own exams" ON app_14da0f1941_academy_mock_exams
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can read own exam answers" ON app_14da0f1941_academy_exam_answers
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM app_14da0f1941_academy_mock_exams
+      WHERE id = app_14da0f1941_academy_exam_answers.mock_exam_id
+      AND user_id = auth.uid()
+    )
+  );
+CREATE POLICY "Users can insert own exam answers" ON app_14da0f1941_academy_exam_answers
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM app_14da0f1941_academy_mock_exams
+      WHERE id = app_14da0f1941_academy_mock_exams.mock_exam_id
+      AND user_id = auth.uid()
+    )
+  );
+
+-- Indices
+CREATE INDEX IF NOT EXISTS idx_academy_progress_user ON app_14da0f1941_academy_progress(user_id);
+CREATE INDEX IF NOT EXISTS idx_academy_mock_exams_user ON app_14da0f1941_academy_mock_exams(user_id);
+CREATE INDEX IF NOT EXISTS idx_academy_exam_answers_exam ON app_14da0f1941_academy_exam_answers(mock_exam_id);
+
+## Parte B: Actualizar TABLES en supabase.ts
+
+Anadir a TABLES en src/lib/supabase.ts:
+
+academyProgress: 'app_14da0f1941_academy_progress',
+academyMockExams: 'app_14da0f1941_academy_mock_exams',
+academyExamAnswers: 'app_14da0f1941_academy_exam_answers',
+
+## Parte C: Generador de Certificado PDF
+
+Crear src/lib/certificate-generator.ts:
+
+import jsPDF from 'jspdf';
+
+interface CertificateData {
+  userName: string;
+  courseName: string;
+  completedModules: number;
+  totalModules: number;
+  averageScore: number;
+  completedAt: Date;
+  examType: 'bvca' | 'volvca' | 'full';
+}
+
+export function generateCertificate(data: CertificateData): jsPDF {
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4',
+  });
+
+  // Fondo
+  doc.setFillColor(10, 10, 10);
+  doc.rect(0, 0, 297, 210, 'F');
+
+  // Borde dorado
+  doc.setDrawColor(245, 158, 11);
+  doc.setLineWidth(1.5);
+  doc.rect(10, 10, 277, 190);
+
+  // Borde interno fino
+  doc.setLineWidth(0.3);
+  doc.rect(14, 14, 269, 182);
+
+  // Logo / Titulo PipingBox
+  doc.setTextColor(245, 158, 11);
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('PIPINGBOX ACADEMY', 148.5, 35, { align: 'center' });
+
+  // Linea decorativa
+  doc.setDrawColor(245, 158, 11);
+  doc.setLineWidth(0.5);
+  doc.line(100, 40, 197, 40);
+
+  // Titulo del certificado
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(32);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Certificate of Completion', 148.5, 60, { align: 'center' });
+
+  // Subtitulo
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(161, 161, 170);
+  doc.text('This certifies that', 148.5, 75, { align: 'center' });
+
+  // Nombre del usuario
+  doc.setFontSize(24);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(245, 158, 11);
+  doc.text(data.userName, 148.5, 90, { align: 'center' });
+
+  // Texto de completacion
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(255, 255, 255);
+  const courseLabel = data.examType === 'full'
+    ? 'has successfully completed the VCA Safety Certification Preparation Course'
+    : data.examType === 'bvca'
+    ? 'has successfully completed the B-VCA Safety Preparation Course'
+    : 'has successfully completed the VOL-VCA Safety Preparation Course';
+  doc.text(courseLabel, 148.5, 105, { align: 'center' });
+
+  doc.setFontSize(10);
+  doc.setTextColor(161, 161, 170);
+  doc.text(data.courseName, 148.5, 113, { align: 'center' });
+
+  // Stats
+  doc.setFontSize(11);
+  doc.setTextColor(255, 255, 255);
+  doc.text(`Modules Completed: ${data.completedModules}/${data.totalModules}`, 148.5, 130, { align: 'center' });
+  doc.text(`Average Score: ${data.averageScore}%`, 148.5, 138, { align: 'center' });
+
+  // Fecha
+  doc.setFontSize(10);
+  doc.setTextColor(161, 161, 170);
+  const dateStr = data.completedAt.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  doc.text(`Completed on ${dateStr}`, 148.5, 150, { align: 'center' });
+
+  // Disclaimer
+  doc.setFontSize(8);
+  doc.setTextColor(100, 100, 100);
+  doc.text(
+    'This certificate confirms completion of PipingBox preparation course and does not constitute official VCA certification.',
+    148.5, 165, { align: 'center' }
+  );
+  doc.text('Official VCA certification requires passing the exam at an accredited testing center.', 148.5, 170, { align: 'center' });
+
+  // ID del certificado
+  const certId = `PB-VCA-${data.completedAt.getTime().toString(36).toUpperCase()}`;
+  doc.setFontSize(8);
+  doc.setTextColor(80, 80, 80);
+  doc.text(`Certificate ID: ${certId}`, 148.5, 185, { align: 'center' });
+
+  return doc;
+}
+
+export function downloadCertificate(data: CertificateData) {
+  const doc = generateCertificate(data);
+  doc.save(`PipingBox-VCA-Certificate-${data.userName.replace(/\s/g, '-')}.pdf`);
+}
+
+## Parte D: Integrar certificado en Academy.tsx
+
+En el TAB "Mis certificados" de Academy.tsx, el boton "Download Certificate" debe:
+
+1. Verificar que todos los modulos esten completados (completed === true)
+2. Si no estan todos: mostrar toast "Complete all 22 modules to earn your certificate"
+3. Si estan todos:
+   - Calcular averageScore de todos los modulos
+   - Llamar a downloadCertificate con los datos del usuario
+   - El userName viene del perfil del usuario (useAuth o perfil cargado)
+
+## Resumen
+
+CREAR:
+- supabase/migrations/academy_tables.sql
+- src/lib/certificate-generator.ts
+
+MODIFICAR:
+- src/lib/supabase.ts (anadir 3 claves a TABLES)
+- src/pages/Academy.tsx (integrar boton de descarga de certificado en tab 3)
+
+NO TOCAR:
+- AcademyModule.tsx
+- AcademyExam.tsx
+- vca-questions.ts
+- vca-lessons.ts
+- Componentes ui/*

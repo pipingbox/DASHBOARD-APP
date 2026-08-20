@@ -1,0 +1,67 @@
+Audit and complete multilingual support across the entire dashboard app.
+
+Current issue:
+Several new Company View pages and menu items are still hardcoded in English or only partially translated. The language selector exists, but not all UI text changes correctly.
+
+Required languages:
+- English
+- Español
+- Nederlands
+- Français
+- Deutsch
+- Português
+
+Scope:
+1. Company View sidebar
+2. Worker View sidebar
+3. Company Dashboard
+4. Documentation page
+5. Company Profile
+6. Settings
+7. Billing / Plans
+8. Messages
+9. Candidates
+10. Worker Search
+11. Workforce Requests
+12. Buttons, tabs, filters, empty states, status badges and table headers
+
+Important:
+- Remove hardcoded visible UI strings.
+- Use the existing translation/i18n system.
+- Add missing translation keys.
+- Keep technical route names unchanged.
+- Do not redesign UI.
+- Do not break existing language selector.
+- Do not change database values unless needed.
+- Status labels should display translated text while preserving backend enum values.
+
+Examples:
+Company Dashboard:
+ES: Panel de empresa
+EN: Company Dashboard
+NL: Bedrijfspaneel
+FR: Tableau de bord entreprise
+DE: Unternehmensdashboard
+PT: Painel da empresa
+
+Documentation:
+ES: Documentación
+EN: Documentation
+NL: Documentatie
+FR: Documentation
+DE: Dokumentation
+PT: Documentação
+
+Billing / Plans:
+ES: Facturación / Planes
+EN: Billing / Plans
+NL: Facturatie / Plannen
+FR: Facturation / Plans
+DE: Abrechnung / Pläne
+PT: Faturação / Planos
+
+Acceptance criteria:
+- Switching language updates all visible dashboard text.
+- No mixed English/Spanish/Dutch text remains in the same selected language.
+- Company View and Worker View are both fully translated.
+- Build and lint pass.

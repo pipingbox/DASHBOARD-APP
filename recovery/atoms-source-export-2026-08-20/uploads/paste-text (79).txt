@@ -1,0 +1,55 @@
+Replace the current favicon and app icons with the new optimized PipingBox favicon assets I uploaded.
+
+Use the uploaded files:
+- favicon.ico
+- pipingbox-favicon-48.png
+- pipingbox-favicon-32.png
+- pipingbox-favicon-192.png
+- pipingbox-favicon-512.png
+
+Required:
+1. Replace the existing favicon completely.
+2. Use favicon.ico as the main browser favicon.
+3. Use 32x32 and 48x48 PNG versions for browser icons.
+4. Use 192x192 and 512x512 PNG versions for PWA/mobile icons.
+5. Update all relevant files:
+   - index.html
+   - manifest.json / site.webmanifest if present
+   - metadata config if present
+   - React/Next/Vite head config if present
+
+Expected tags:
+<link rel="icon" href="/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="/pipingbox-favicon-32.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="/pipingbox-favicon-48.png" />
+<link rel="apple-touch-icon" href="/pipingbox-favicon-192.png" />
+
+Manifest icons:
+[
+  {
+    "src": "/pipingbox-favicon-192.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  },
+  {
+    "src": "/pipingbox-favicon-512.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }
+]
+
+Important:
+- Remove old favicon references.
+- Remove old tiny logo/icon references.
+- Do not use the old small transparent-padded favicon.
+- Do not alter the uploaded logo files.
+- Do not change UI layout.
+- Do not redesign anything.
+- Only replace favicon/browser/PWA icons.
+
+Acceptance criteria:
+- Browser tab shows the new larger PipingBox icon clearly.
+- Favicon no longer appears tiny.
+- Manifest uses the new 192 and 512 icons.
+- No old favicon remains referenced.
+- Build/publish passes.

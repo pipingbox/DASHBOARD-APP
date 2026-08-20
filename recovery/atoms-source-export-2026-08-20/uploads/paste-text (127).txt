@@ -1,0 +1,105 @@
+Trabaja sobre la aplicación desplegada en app.pipingbox.com. No toques ninguna otra
+aplicación de pipingbox.com ni la base de datos de Supabase.
+
+CONTEXTO
+
+La aplicación muestra ofertas de empleo, actividad y empresas inventadas atribuidas a
+compañías reales (Siemens Energy, Subsea 7, Fluor Corporation, TechnipFMC, Bilfinger,
+Saipem, Wood Group, Petrofac, Neptune Energy, Brand Energy, Applus+, Boskalis, McDermott,
+Worley). Ninguna de esas empresas se ha dado de alta en la plataforma.
+
+Esto no es contenido de demostración inerte: 10 personas reales han enviado 27
+candidaturas a esas ofertas inexistentes entre el 11 de mayo y el 19 de junio de 2026.
+Cada una recibió un mensaje de éxito. Ninguna llegó a ninguna parte.
+
+OBJETIVO
+
+Eliminar del código fuente los tres bloques de datos fabricados y todo lo que dependa de
+ellos. No sustituir por otros nombres inventados. No ocultar tras una bandera de
+configuración. Eliminar.
+
+QUÉ HAY QUE ELIMINAR
+
+1) Array de ofertas de empleo estáticas — página de Jobs
+
+   Array de 16 objetos con la forma:
+     { title, company, location, job_type, category, description,
+       salary_min, salary_max, currency, is_remote }
+
+   Empieza por { title: "Senior Pipefitter", company: "Siemens Energy",
+   location: "Antwerp, Belgium", ... } y termina en
+   { title: "Pipe Stress Analyst", company: "Worley", location: "London, United Kingdom", ... }.
+
+   Empresas presentes: Siemens Energy, Subsea 7, Fluor Corporation, TechnipFMC, Bilfinger,
+   Saipem, Wood Group, Petrofac, Neptune Energy, Meridian EPC, Brand Energy, Applus+,
+   Aurora Process, Boskalis, McDermott, Worley.
+
+   Hay que eliminar TAMBIÉN:
+   - La fusión de ese array con las ofertas reales de Supabase. Hoy el código mapea cada
+     entrada a un id sintético `static-${indice}` y un created_at calculado
+     (`Date.now() - indice * 36e5 * 6`) para simular antigüedad, y las concatena con las
+     filas reales de la tabla de jobs deduplicando por `titulo|empresa`.
+     Tras el cambio, la lista debe mostrar única y exclusivamente lo que devuelve Supabase.
+   - El carrusel de ofertas destacadas, que indexa directamente ese mismo array.
+   - Los filtros que buscan la posición de una oferta dentro de ese array
+     (`findIndex(x => x.title === ... && x.company === ...)`) y los arrays auxiliares de
+     "urgente" y "hace 1w" indexados por esa misma posición.
+   - El camino de la función de candidatura que contempla ids que empiezan por `static-`.
+     Si el id sintético deja de existir, ese camino sobra: toda candidatura debe llevar
+     `job_id` y, cuando exista, `company_user_id`.
+
+   Estado esperado si no hay ofertas reales: lista vacía con su mensaje de estado vacío.
+   Es preferible una página honestamente vacía a una llena de ofertas que no existen.
+
+2) Feed de actividad — página de Companies
+
+   Array de 5 objetos { company, action, count, role, country, flag, time } que produce
+   frases del tipo "Siemens Energy requested 12 Pipefitters — Belgium — 2 hours ago".
+   Entradas: Siemens Energy, Subsea 7, Fluor Corporation, TechnipFMC, Saipem.
+
+   Eliminar el array y el bloque de interfaz que lo pinta.
+
+3) Directorio de empresas y contadores — página de Companies
+
+   a) Array de 6 objetos { name, sector, hq, size, description, verified, hiring,
+      projects, tags }. La primera entrada es "Neptune Energy", empresa real, marcada
+      `verified: true` y `hiring: true`. Las otras cinco (Meridian EPC, Aurora Process,
+      Helios Power, Orion Offshore, Vertex Piping) son inventadas pero también llevan
+      `verified: true`.
+
+      Eliminar el array completo. El distintivo "verificada" solo puede aparecer sobre una
+      empresa que exista en la base de datos y haya pasado verificación real.
+
+   b) Array de 4 contadores animados:
+        Active Companies 48 · Open Positions 126 · Available Workers 2340 · Countries Active 17
+
+      Ninguna de esas cifras sale de la base de datos: son constantes en el código.
+      Sustituir por consultas reales a Supabase (count sobre las tablas correspondientes)
+      o eliminar el bloque. Si el número real es 0, debe mostrarse 0.
+
+LÍMITES
+
+- No modifiques la base de datos de Supabase. Las 27 candidaturas afectadas se tratan
+  aparte y de forma deliberada.
+- No inventes datos sustitutos, ni con nombres ficticios ni con cifras "de ejemplo".
+- No dejes el contenido detrás de una variable de entorno, un modo demo o un comentario.
+  Debe desaparecer del bundle publicado.
+- No toques el resto de la aplicación: academia, herramientas, comunidad, perfiles,
+  certificaciones y el simulador VCA se quedan como están.
+
+VERIFICACIÓN QUE DEBES HACER ANTES DE DAR POR CERRADO
+
+Descarga el bundle publicado y comprueba que no aparece ninguna de estas cadenas:
+"Siemens Energy", "Subsea 7", "Fluor Corporation", "TechnipFMC", "Bilfinger", "Saipem",
+"Wood Group", "Petrofac", "Neptune Energy", "Brand Energy", "Applus+", "Boskalis",
+"McDermott", "Worley", "Meridian EPC", "Aurora Process", "Helios Power", "Orion Offshore",
+"Vertex Piping", "static-".
+
+INFORME QUE DEBES DEVOLVER
+
+- Ficheros modificados y qué se eliminó en cada uno.
+- Confirmación de las 20 cadenas ausentes del bundle nuevo, con el nombre del fichero
+  de bundle publicado.
+- Qué ve ahora un visitante en /jobs y en /companies cuando no hay datos reales.
+- Cualquier otro punto del código donde hayas encontrado datos fabricados que no esté
+  en esta lista. Repórtalo, no lo corrijas por tu cuenta.

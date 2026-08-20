@@ -1,0 +1,52 @@
+Tengo un error en Feedback Beta al enviar un reporte.
+
+Error visible:
+TypeError: Failed to fetch
+
+El comentario no se registra y no aparece en el panel admin.
+
+Necesito que revises y corrijas el flujo completo de envío a Supabase.
+
+Comprobar:
+
+1. Cliente Supabase
+- Verificar que SUPABASE_URL y SUPABASE_ANON_KEY están correctamente leídas.
+- Si faltan variables, mostrar error claro en consola.
+- No mostrar solo “Failed to fetch”.
+
+2. Tabla beta_feedback_reports
+- Confirmar que existe.
+- Si no existe, generar SQL para crearla.
+- Columnas:
+  id uuid primary key
+  created_at timestamp
+  user_id text nullable
+  user_email text nullable
+  category text
+  description text
+  screenshot_url text nullable
+  page_url text
+  user_agent text
+  screen_size text
+  status text default 'new'
+  priority text default 'unreviewed'
+
+3. Insert de reportes
+- Permitir enviar reportes aunque no haya imagen adjunta.
+- Insertar category, description, page_url, user_agent y screen_size correctamente.
+- Añadir console.error detallado con el error real de Supabase.
+
+4. RLS / permisos
+- Crear política para que cualquier usuario autenticado pueda insertar reportes.
+- Solo admins pueden leer todos los reportes.
+- Evitar que el usuario normal necesite permisos de lectura para enviar feedback.
+
+5. Manejo de errores
+- Si Supabase no responde, mostrar:
+“No se pudo enviar el reporte. Inténtalo de nuevo.”
+- Si se envía correctamente, mostrar animación de éxito.
+
+6. Importante
+- No romper el diseño actual.
+- No tocar otras partes de la app.
+- Mantener i18n.

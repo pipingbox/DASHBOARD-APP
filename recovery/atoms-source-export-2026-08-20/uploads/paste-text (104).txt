@@ -1,0 +1,223 @@
+Necesito implementar el Unit Converter en el proyecto PipingBox.
+
+## Contexto del proyecto
+
+- Framework: React 18.3 + TypeScript + Vite + Tailwind 3.4
+- Componentes UI: shadcn/ui (Button, Input, Label ya existen)
+- i18n: react-i18next con archivos en src/i18n/locales/en.json y es.json
+- Tema: dark (#0a0a0a bg, #0d0d0d cards, zinc-800/80 borders, #f59e0b amber accent)
+- Supabase: guardar uso en TABLES.toolUsage
+
+## Archivos a modificar
+
+### 1. Crear src/components/ui/select.tsx (shadcn/ui Select)
+
+Instalar el componente Select de shadcn/ui. La dependencia @radix-ui/react-select ya esta instalada.
+Crear el wrapper estandar de shadcn/ui con las primitivas:
+Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectLabel, SelectItem, SelectSeparator, SelectScrollUpButton, SelectScrollDownButton.
+Usar el estilo dark por defecto (bg-zinc-950, border-zinc-800, text-zinc-100).
+
+### 2. Crear src/tools/UnitConverter.tsx
+
+Componente funcional que recibe { userId?: string } como prop.
+
+Categorias de conversion con sus unidades y factores (TODOS relativos a la unidad base):
+
+LONGITUD (base: mm):
+- mm: 1
+- cm: 10
+- m: 1000
+- in: 25.4
+- ft: 304.8
+- yd: 914.4
+
+PRESION (base: Pa):
+- Pa: 1
+- kPa: 1000
+- MPa: 1000000
+- bar: 100000
+- psi: 6894.757
+- atm: 101325
+- kgf/cm2: 98066.5
+
+TEMPERATURA (formulas especiales, NO factores):
+- Celsius → Fahrenheit: F = C * 9/5 + 32
+- Celsius → Kelvin: K = C + 273.15
+- Fahrenheit → Celsius: C = (F - 32) * 5/9
+- Fahrenheit → Kelvin: K = (F - 32) * 5/9 + 273.15
+- Kelvin → Celsius: C = K - 273.15
+- Kelvin → Fahrenheit: F = (K - 273.15) * 9/5 + 32
+
+PESO/MASA (base: kg):
+- kg: 1
+- g: 0.001
+- lb: 0.453592
+- oz: 0.0283495
+- ton (metric): 1000
+- ton (short/US): 907.185
+- ton (long/UK): 1016.047
+
+VOLUMEN (base: litros):
+- l: 1
+- ml: 0.001
+- m3: 1000
+- gal (US): 3.78541
+- gal (UK): 4.54609
+- ft3: 28.3168
+- bbl (barrel): 158.987
+
+AREA (base: mm2):
+- mm2: 1
+- cm2: 100
+- m2: 1000000
+- in2: 645.16
+- ft2: 92903.04
+
+CAUDAL (base: m3/h):
+- m3/h: 1
+- l/min: 0.06
+- GPM (US): 0.227125
+- CFM: 1.69901
+
+DIAMETRO NPS-DN (tabla especial, NO formula):
+Tabla completa de conversion:
+NPS → DN (mm) → OD (mm):
+1/8" → DN6 → 10.3
+1/4" → DN8 → 13.7
+3/8" → DN10 → 17.1
+1/2" → DN15 → 21.3
+3/4" → DN20 → 26.7
+1" → DN25 → 33.4
+1-1/4" → DN32 → 42.2
+1-1/2" → DN40 → 48.3
+2" → DN50 → 60.3
+2-1/2" → DN65 → 73.0
+3" → DN80 → 88.9
+3-1/2" → DN90 → 101.6
+4" → DN100 → 114.3
+5" → DN125 → 141.3
+6" → DN150 → 168.3
+8" → DN200 → 219.1
+10" → DN250 → 273.0
+12" → DN300 → 323.8
+14" → DN350 → 355.6
+16" → DN400 → 406.4
+18" → DN450 → 457.2
+20" → DN500 → 508.0
+22" → DN550 → 558.8
+24" → DN600 → 609.6
+26" → DN650 → 660.4
+28" → DN700 → 711.2
+30" → DN750 → 762.0
+32" → DN800 → 812.8
+34" → DN850 → 863.6
+36" → DN900 → 914.4
+42" → DN1050 → 1066.8
+48" → DN1200 → 1219.2
+
+UI del componente:
+
+1. Dropdown (Select) para elegir categoria
+2. Input numerico para valor a convertir (onChange en tiempo real, sin boton calculate)
+3. Select unidad origen + Select unidad destino
+4. Boton swap (icono ArrowLeftRight de lucide-react) para intercambiar unidades
+5. Resultado grande debajo del input (se calcula en tiempo real mientras escribe)
+6. Tabla debajo mostrando el valor convertido a TODAS las unidades de esa categoria
+7. Si la categoria es "NPS-DN", mostrar la tabla completa con busqueda/filtro
+
+Estilos (SEGUIR EXACTAMENTE el patron de Tools.tsx):
+- Contenedor: className="space-y-6"
+- Titulo: text-[10px] uppercase tracking-[0.25em] text-[#f59e0b] + h3 text-xl font-semibold
+- Labels: className="text-xs uppercase tracking-wider text-zinc-400"
+- Inputs: className="bg-zinc-950 border-zinc-800 focus-visible:ring-[#f59e0b]"
+- Grid inputs: className="grid gap-4 sm:grid-cols-2" o sm:grid-cols-3
+- Resultado: border-l-2 border-[#f59e0b] bg-[#f59e0b]/5 p-4
+- Tabla: border border-zinc-800/80, header bg-zinc-900, celdas text-sm text-zinc-300, hover:bg-zinc-800/50
+
+Guardar uso en Supabase al convertir (si userId existe):
+await supabase.from('app_14da0f1941_tool_usage').insert({
+  user_id: userId,
+  tool_name: 'Unit Converter',
+  tool_category: 'Utility',
+  input_data: { value, fromUnit, toUnit, category },
+  output_data: { result },
+});
+Solo guardar una vez cada 5 segundos maximo (debounce) para no saturar con cada keystroke.
+
+### 3. Modificar src/pages/Tools.tsx
+
+Importar UnitConverter:
+import UnitConverter from '@/tools/UnitConverter';
+
+En el JSX, donde dice {active === 'wall-thickness' ? (...) : (... coming soon ...)}, cambiar la logica a:
+
+{active === 'wall-thickness' ? (
+  // ... codigo existente del wall thickness, NO TOCAR ...
+) : active === 'unit-converter' ? (
+  <UnitConverter userId={user?.id} />
+) : (
+  // ... coming soon existente ...
+)}
+
+NO modificar nada del Wall Thickness Calculator existente.
+
+### 4. Agregar claves i18n en en.json y es.json
+
+En la seccion "tools" de en.json agregar:
+"unitConverterSubtitle": "Convert between imperial and metric units",
+"selectCategory": "Category",
+"selectFromUnit": "From",
+"selectToUnit": "To",
+"enterValue": "Enter value",
+"conversionTable": "All conversions",
+"swap": "Swap units",
+"npsDnTitle": "NPS / DN Reference Table",
+"nps": "NPS (inches)",
+"dn": "DN (mm)",
+"od": "OD (mm)",
+"searchBySize": "Search by size...",
+"categoryLength": "Length",
+"categoryPressure": "Pressure",
+"categoryTemperature": "Temperature",
+"categoryWeight": "Weight / Mass",
+"categoryVolume": "Volume",
+"categoryArea": "Area",
+"categoryFlowRate": "Flow Rate",
+"categoryNpsDn": "NPS ↔ DN"
+
+En la seccion "tools" de es.json agregar:
+"unitConverterSubtitle": "Convierte entre unidades imperiales y métricas",
+"selectCategory": "Categoría",
+"selectFromUnit": "Desde",
+"selectToUnit": "Hasta",
+"enterValue": "Introduce un valor",
+"conversionTable": "Todas las conversiones",
+"swap": "Intercambiar unidades",
+"npsDnTitle": "Tabla de referencia NPS / DN",
+"nps": "NPS (pulgadas)",
+"dn": "DN (mm)",
+"od": "OD (mm)",
+"searchBySize": "Buscar por tamaño...",
+"categoryLength": "Longitud",
+"categoryPressure": "Presión",
+"categoryTemperature": "Temperatura",
+"categoryWeight": "Peso / Masa",
+"categoryVolume": "Volumen",
+"categoryArea": "Área",
+"categoryFlowRate": "Caudal",
+"categoryNpsDn": "NPS ↔ DN"
+
+## Resumen de archivos
+
+CREAR:
+- src/components/ui/select.tsx (shadcn/ui Select wrapper)
+- src/tools/UnitConverter.tsx
+
+MODIFICAR:
+- src/pages/Tools.tsx (agregar import y renderizado condicional)
+- src/i18n/locales/en.json (agregar claves)
+- src/i18n/locales/es.json (agregar claves)
+
+NO TOCAR:
+- El Wall Thickness Calculator existente en Tools.tsx
+- Ningun otro archivo

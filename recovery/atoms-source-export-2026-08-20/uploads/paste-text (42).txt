@@ -1,0 +1,87 @@
+BUGFIX — Certifications save permission + Spanish translations.
+
+IMPORTANT:
+Do not redesign the profile page.
+Do not break existing profile, jobs, applications, messages, admin, company, or worker flows.
+
+CURRENT ISSUES:
+
+1. Adding a certification fails with:
+   permission denied for table app_14da0f1941_certifications
+
+2. Certification modal texts are in English even when the app language is Spanish.
+
+==================================================
+PART 1 — FIX CERTIFICATIONS RLS
+===============================
+
+Table:
+app_14da0f1941_certifications
+
+Goal:
+Workers can manage their own certifications.
+Companies can only read visible certifications of candidates who applied to their jobs.
+Admin can read/update everything.
+
+Tasks:
+
+1. Enable RLS on app_14da0f1941_certifications.
+2. Ensure authenticated users have SELECT, INSERT, UPDATE, DELETE grants.
+3. Create safe policies:
+
+* Worker SELECT own certifications: user_id = auth.uid()
+* Worker INSERT own certifications: user_id = auth.uid()
+* Worker UPDATE own certifications: user_id = auth.uid()
+* Worker DELETE own certifications: user_id = auth.uid()
+* Primary admin email [gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com) can SELECT/UPDATE/DELETE all.
+
+4. Do not create recursive policies using profiles.
+5. Insert payload must include:
+   user_id: auth.uid()
+
+==================================================
+PART 2 — FIX CERTIFICATION MODAL LANGUAGE
+=========================================
+
+The certification modal must use the active app language.
+
+When language = Spanish, translate:
+
+* Add certification → Añadir certificación
+* Proof of your professional credentials — visible to recruiters. → Acredita tus credenciales profesionales — visible para reclutadores.
+* Certification name → Nombre de certificación
+* Issuer → Entidad emisora
+* Credential ID → Nº de certificado / credencial
+* Verification URL → URL de verificación
+* Issue date → Fecha de emisión
+* Expiry date → Fecha de caducidad
+* Certificate file (PDF or image) → Archivo del certificado (PDF o imagen)
+* Upload PDF or image → Subir PDF o imagen
+* A QR code will be auto-generated if you provide a verification URL. → Se generará un código QR automáticamente si introduces una URL de verificación.
+* Cancel → Cancelar
+* Add certification → Añadir certificación
+
+Also translate success/error toasts:
+
+* Certification added successfully → Certificación añadida correctamente
+* Failed to add certification → No se pudo añadir la certificación
+
+==================================================
+PART 3 — LANGUAGE SYSTEM
+========================
+
+Do not hardcode English labels.
+Use the same translation/i18n mechanism already used by the app language selector.
+
+If the translation dictionary is missing these keys, add them for:
+
+* Spanish
+* English
+
+==================================================
+EXPECTED RESULT
+===============
+
+User can add certifications successfully.
+Certification modal appears in Spanish when Spanish is selected.
+English still works when English is selected.

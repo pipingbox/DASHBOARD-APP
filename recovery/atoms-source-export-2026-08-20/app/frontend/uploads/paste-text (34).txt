@@ -1,0 +1,67 @@
+BUGFIX — My Applications now fails to load after candidate profile/status changes.
+
+IMPORTANT:
+Do not redesign anything.
+Do not break Company Candidates, Jobs, Admin Center, or role system.
+
+CURRENT ISSUE:
+In Worker View, /applications shows:
+"No Applications Yet"
+and toast:
+"Failed to load applications"
+
+But applications existed before and company candidates can see them.
+
+GOAL:
+Restore My Applications loading for the authenticated worker.
+
+TASKS:
+
+1. Inspect /applications fetch query.
+
+2. It must read from:
+   app_14da0f1941_job_applications
+
+3. It must filter by:
+   user_id = auth.uid()
+
+4. Do not require company_user_id for worker reading.
+
+5. Do not join restricted tables unless necessary.
+   If job/profile data is needed, use stored fields already inside job_applications:
+
+* job_title
+* company_name
+* location
+* contract_type
+* status
+* created_at
+
+6. If the page currently joins jobs/profiles and causes RLS failure, remove that join for My Applications.
+
+7. Add safe RLS for job_applications:
+   Workers can SELECT their own applications:
+   user_id = auth.uid()
+
+Companies can SELECT applications linked to their jobs:
+company_user_id = auth.uid()
+
+Primary admin can SELECT all:
+auth.jwt()->>'email' = '[gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com)'
+
+8. Add detailed console logging showing the exact Supabase error if loading fails.
+
+9. My Applications must display:
+
+* job title
+* company name
+* location
+* contract type
+* applied date
+* current status
+
+10. Status must come from:
+    app_14da0f1941_job_applications.status
+
+EXPECTED RESULT:
+Worker can see all own applications again and updated candidate status appears after refresh.

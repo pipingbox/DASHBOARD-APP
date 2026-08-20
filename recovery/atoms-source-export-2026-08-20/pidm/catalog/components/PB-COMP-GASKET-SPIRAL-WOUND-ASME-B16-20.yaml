@@ -1,0 +1,44 @@
+schema_version: "1.0.0"
+id: PB-COMP-GASKET-SPIRAL-WOUND-ASME-B16-20
+
+metadata:
+  slug: gasket-spiral-wound
+  display_name: "Spiral Wound Gasket (CGI)"
+  short_name: "SW Gasket"
+  description: "Spiral wound gasket with inner ring and centering ring per ASME B16.20. Type CGI with stainless steel inner ring and flexible graphite filler."
+  status: draft
+  version: "0.1"
+
+classification:
+  discipline: piping
+  category: gaskets
+  family: gasket
+  subfamily: spiral_wound
+  tags: [gasket, spiral-wound, CGI, sealing, ASME-B16-20]
+  type: spiral_wound
+
+technical:
+  geometry:
+    shape: ring
+  connection_types: [FLANGED_RF]
+  pressure_ratings: ["150", "300"]
+  materials: [stainless_steel_304, flexible_graphite]
+  temperature_range:
+    min_c: -196
+    max_c: 538
+  features:
+    - inner_ring: true
+    - centering_ring: true
+    - filler: flexible_graphite
+    - winding: stainless_steel_304
+
+standards:
+  - standard_id: PB-STD-ASME-B16-20
+    role: dimensions
+
+dimension_sets:
+  - PB-DIM-ASME-B16-20-GASKET-SPIRAL-WOUND
+
+lifecycle:
+  created_at: "2026-07-26"
+  updated_at: "2026-07-26"

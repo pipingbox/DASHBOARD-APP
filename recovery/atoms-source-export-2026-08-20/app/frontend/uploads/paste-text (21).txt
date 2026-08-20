@@ -1,0 +1,155 @@
+ACT AS A SENIOR SAAS CRM ENGINEER.
+
+We need to complete the PipingBox Admin Center Lead Pipeline.
+
+IMPORTANT:
+Do not redesign the platform.
+Do not break existing Admin Center tabs, users, activity feed, roles, jobs, companies, applications, profile, community, or content drafts.
+
+Only improve the existing Lead Pipeline tab inside Admin Center.
+
+==================================================
+GOAL
+====
+
+Create a functional CRM-style Lead Pipeline for workforce requests.
+
+Use table:
+app_14da0f1941_company_leads
+
+==================================================
+STEP 1 — LEAD PIPELINE TAB
+==========================
+
+Inside Admin Center, improve the existing tab:
+
+Lead Pipeline
+
+Show all workforce requests from:
+app_14da0f1941_company_leads
+
+Newest first.
+
+==================================================
+STEP 2 — LEAD TABLE / CARDS
+===========================
+
+Each lead should show:
+
+* Company name
+* Contact person
+* Email
+* Country
+* Workers needed
+* Number of workers
+* Project duration
+* Estimated start date
+* Status
+* Created date
+
+==================================================
+STEP 3 — CRM STATUS FLOW
+========================
+
+Add lead statuses:
+
+* new
+* contacted
+* sourcing
+* candidates_sent
+* closed
+* rejected
+
+Use colored badges.
+
+==================================================
+STEP 4 — STATUS UPDATE
+======================
+
+Allow admin to update lead status from dropdown.
+
+After update:
+
+* save to Supabase
+* refresh lead list
+* show success toast
+
+==================================================
+STEP 5 — QUICK ACTIONS
+======================
+
+Add quick actions:
+
+* Copy email
+* Open mailto link
+* Mark contacted
+* View details
+
+==================================================
+STEP 6 — SEARCH AND FILTERS
+===========================
+
+Add search by:
+
+* company
+* contact person
+* email
+* country
+* workers needed
+
+Add filters:
+
+* status
+* country
+* urgent/high priority if available
+
+==================================================
+STEP 7 — DETAILS PANEL
+======================
+
+When clicking "View details", open side panel/modal showing full lead data including:
+
+* message
+* all request fields
+* internal notes field
+
+Allow admin to save internal notes if column exists.
+If internal_notes column does not exist, create it:
+internal_notes text
+
+==================================================
+STEP 8 — SAFE FALLBACKS
+=======================
+
+If no leads exist:
+show professional empty state:
+"No workforce requests yet."
+
+If a field is missing:
+show "-"
+
+==================================================
+STEP 9 — UX QUALITY
+===================
+
+Use existing PipingBox dark industrial SaaS style:
+
+* black background
+* orange accent
+* professional CRM feel
+* clean table/cards
+* hover effects
+* responsive layout
+
+==================================================
+FINAL RESULT
+============
+
+Admin can manage workforce leads directly inside PipingBox:
+
+* see all company requests
+* update status
+* copy/contact email
+* view details
+* add internal notes
+* track recruitment pipeline.

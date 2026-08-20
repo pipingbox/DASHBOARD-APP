@@ -1,0 +1,275 @@
+schema_version: "1.0.0"
+id: PB-DIM-VALVE-GLOBE-CLASS300-600
+component_id: PB-COMP-VALVE-GLOBE
+standard_id: PB-STD-ASME-B16-10
+dataset_type: standard
+system: mixed
+
+selectors:
+  - key: nps
+    label: "Nominal Pipe Size"
+    unit: "in"
+    type: string
+  - key: dn
+    label: "Diametre Nominal"
+    unit: "mm"
+    type: integer
+  - key: class
+    label: "Pressure Class"
+    unit: ""
+    type: integer
+
+fields:
+  - key: face_to_face_in
+    label: "Face-to-Face"
+    unit: "in"
+    type: number
+  - key: face_to_face_mm
+    label: "Face-to-Face"
+    unit: "mm"
+    type: number
+  - key: end_connection
+    label: "End Connection"
+    unit: ""
+    type: string
+  - key: weight_approx_kg
+    label: "Approximate Weight"
+    unit: "kg"
+    type: number
+
+rows:
+  # ═══════════════════════════════════════════════════════════
+  # Globe Valve — API 600 (Bolted Bonnet, Standard Pattern)
+  # F2F per ASME B16.10 Table 2
+  # Globe F2F is generally longer than Gate for same NPS/Class
+  # ═══════════════════════════════════════════════════════════
+
+  # --- Class 300 ---
+  - nps: "2"
+    dn: 50
+    class: 300
+    face_to_face_in: 12.00
+    face_to_face_mm: 304.80
+    end_connection: RF
+    weight_approx_kg: 38
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 300
+    face_to_face_in: 13.00
+    face_to_face_mm: 330.20
+    end_connection: RF
+    weight_approx_kg: 52
+
+  - nps: "3"
+    dn: 80
+    class: 300
+    face_to_face_in: 14.00
+    face_to_face_mm: 355.60
+    end_connection: RF
+    weight_approx_kg: 65
+
+  - nps: "4"
+    dn: 100
+    class: 300
+    face_to_face_in: 16.00
+    face_to_face_mm: 406.40
+    end_connection: RF
+    weight_approx_kg: 100
+
+  - nps: "6"
+    dn: 150
+    class: 300
+    face_to_face_in: 20.00
+    face_to_face_mm: 508.00
+    end_connection: RF
+    weight_approx_kg: 200
+
+  - nps: "8"
+    dn: 200
+    class: 300
+    face_to_face_in: 24.00
+    face_to_face_mm: 609.60
+    end_connection: RF
+    weight_approx_kg: 370
+
+  - nps: "10"
+    dn: 250
+    class: 300
+    face_to_face_in: 28.00
+    face_to_face_mm: 711.20
+    end_connection: RF
+    weight_approx_kg: 570
+
+  - nps: "12"
+    dn: 300
+    class: 300
+    face_to_face_in: 32.00
+    face_to_face_mm: 812.80
+    end_connection: RF
+    weight_approx_kg: 790
+
+  - nps: "14"
+    dn: 350
+    class: 300
+    face_to_face_in: 35.00
+    face_to_face_mm: 889.00
+    end_connection: RF
+    weight_approx_kg: 1050
+
+  - nps: "16"
+    dn: 400
+    class: 300
+    face_to_face_in: 38.00
+    face_to_face_mm: 965.20
+    end_connection: RF
+    weight_approx_kg: 1400
+
+  - nps: "18"
+    dn: 450
+    class: 300
+    face_to_face_in: 41.00
+    face_to_face_mm: 1041.40
+    end_connection: RF
+    weight_approx_kg: 1800
+
+  - nps: "20"
+    dn: 500
+    class: 300
+    face_to_face_in: 44.00
+    face_to_face_mm: 1117.60
+    end_connection: RF
+    weight_approx_kg: 2300
+
+  - nps: "24"
+    dn: 600
+    class: 300
+    face_to_face_in: 50.00
+    face_to_face_mm: 1270.00
+    end_connection: RF
+    weight_approx_kg: 3300
+
+  # --- Class 600 ---
+  - nps: "2"
+    dn: 50
+    class: 600
+    face_to_face_in: 14.50
+    face_to_face_mm: 368.30
+    end_connection: RF
+    weight_approx_kg: 60
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 600
+    face_to_face_in: 16.50
+    face_to_face_mm: 419.10
+    end_connection: RF
+    weight_approx_kg: 82
+
+  - nps: "3"
+    dn: 80
+    class: 600
+    face_to_face_in: 17.00
+    face_to_face_mm: 431.80
+    end_connection: RF
+    weight_approx_kg: 105
+
+  - nps: "4"
+    dn: 100
+    class: 600
+    face_to_face_in: 19.50
+    face_to_face_mm: 495.30
+    end_connection: RF
+    weight_approx_kg: 170
+
+  - nps: "6"
+    dn: 150
+    class: 600
+    face_to_face_in: 25.00
+    face_to_face_mm: 635.00
+    end_connection: RF
+    weight_approx_kg: 370
+
+  - nps: "8"
+    dn: 200
+    class: 600
+    face_to_face_in: 30.50
+    face_to_face_mm: 774.70
+    end_connection: RF
+    weight_approx_kg: 670
+
+  - nps: "10"
+    dn: 250
+    class: 600
+    face_to_face_in: 36.00
+    face_to_face_mm: 914.40
+    end_connection: RF
+    weight_approx_kg: 1050
+
+  - nps: "12"
+    dn: 300
+    class: 600
+    face_to_face_in: 40.50
+    face_to_face_mm: 1028.70
+    end_connection: RF
+    weight_approx_kg: 1450
+
+  - nps: "14"
+    dn: 350
+    class: 600
+    face_to_face_in: 43.00
+    face_to_face_mm: 1092.20
+    end_connection: RF
+    weight_approx_kg: 1950
+
+  - nps: "16"
+    dn: 400
+    class: 600
+    face_to_face_in: 48.00
+    face_to_face_mm: 1219.20
+    end_connection: RF
+    weight_approx_kg: 2600
+
+  - nps: "18"
+    dn: 450
+    class: 600
+    face_to_face_in: 53.00
+    face_to_face_mm: 1346.20
+    end_connection: RF
+    weight_approx_kg: 3400
+
+  - nps: "20"
+    dn: 500
+    class: 600
+    face_to_face_in: 56.00
+    face_to_face_mm: 1422.40
+    end_connection: RF
+    weight_approx_kg: 4300
+
+  - nps: "24"
+    dn: 600
+    class: 600
+    face_to_face_in: 64.00
+    face_to_face_mm: 1625.60
+    end_connection: RF
+    weight_approx_kg: 6100
+
+notes:
+  - "Globe valve F2F per ASME B16.10 Table 2 (Standard Pattern)."
+  - "Globe F2F is longer than Gate for same NPS due to flow path geometry."
+  - "Class 600 F2F is longer than Class 300."
+  - "Weights are approximate for carbon steel bolted bonnet globe valves."
+  - "API 600 — Steel Gate Valves (also covers globe valves)."
+
+quality:
+  validation_status: draft
+  confidence: 0.70
+  sources:
+    - name: ASME B16.10-2017 & API 600
+      url: https://www.asme.org
+      access_date: "2026-07-26"
+      note: Face-to-face dimensions for flanged globe valves.
+
+lifecycle:
+  created_at: "2026-07-26"
+  updated_at: "2026-07-26"

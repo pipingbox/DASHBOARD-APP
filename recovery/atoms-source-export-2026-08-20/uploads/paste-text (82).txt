@@ -1,0 +1,53 @@
+Hay un bug en Feedback Beta.
+
+Al enviar o cargar reportes aparece el mensaje:
+“Error al cargar los reportes”.
+
+Necesito que revises y corrijas el flujo completo de feedback.
+
+Comprobar:
+
+1. Tabla backend
+- Verificar si existe la tabla beta_feedback_reports.
+- Si no existe, crearla correctamente.
+- Campos necesarios:
+  id
+  created_at
+  user_id
+  user_email
+  category
+  description
+  screenshot_url
+  page_url
+  user_agent
+  screen_size
+  status
+  priority
+
+2. Políticas / permisos
+- Revisar permisos de lectura y escritura.
+- Los usuarios normales deben poder crear reportes.
+- Solo administradores deben poder leer todos los reportes.
+- Evitar errores por Row Level Security.
+
+3. Envío de reportes
+- Confirmar que el formulario inserta correctamente los datos.
+- Si hay imagen, guardar o manejar correctamente el archivo.
+- Si no hay imagen, permitir enviar igualmente.
+
+4. Carga de reportes
+- El panel admin debe cargar reportes sin romper la app.
+- Si no hay reportes, mostrar:
+  “Todavía no hay reportes.”
+- Si hay error real, mostrar un mensaje más técnico en consola para debugging.
+
+5. Manejo de errores
+- No mostrar solo “Error al cargar los reportes”.
+- Añadir console.error con el error real.
+- Mostrar mensaje amigable al usuario.
+
+6. Importante
+- No romper el botón de Feedback Beta.
+- No romper el modal actual.
+- Mantener traducciones i18n.
+- Revisar que funcione en español, inglés, francés, alemán y portugués.

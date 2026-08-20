@@ -1,0 +1,83 @@
+## PROMPT 3: ARCH-004 — PWA (Progressive Web App)
+
+
+Contexto: DASHBOARD-APP/app/frontend usa Vite + React. Necesita convertirse en PWA.
+
+Tarea: Configurar PWA con vite-plugin-pwa.
+
+
+
+
+
+Instalar dependencia: npm install -D vite-plugin-pwa
+
+
+
+Actualizar vite.config.ts:
+
+
+
+
+
+Importar VitePWA de 'vite-plugin-pwa'
+
+
+
+Configurar con:
+
+
+
+
+
+registerType: 'autoUpdate'
+
+
+
+manifest: { name: 'PipingBox', short_name: 'PipingBox', description: 'Industrial piping tools & workforce platform', theme_color: '#0a0a0a', background_color: '#0a0a0a', display: 'standalone', icons: [{ src: '/icon-192.png', sizes: '192x192', type: 'image/png' }, { src: '/icon-512.png', sizes: '512x512', type: 'image/png' }] }
+
+
+
+workbox: { globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'], runtimeCaching: [ { urlPattern: /^https://.supabase./, handler: 'NetworkFirst', options: { cacheName: 'supabase-api', expiration: { maxEntries: 50, maxAgeSeconds: 300 } } } ] }
+
+
+
+Crear placeholder icons en public/:
+
+
+
+
+
+icon-192.png (placeholder SVG convertido a PNG con fondo #0a0a0a y logo amber)
+
+
+
+icon-512.png (misma cosa)
+
+
+
+Agregar meta tags en index.html:
+
+
+
+Crear src/components/PWAUpdatePrompt.tsx:
+
+
+
+
+
+Usar useRegisterSW de 'virtual:pwa-register/react'
+
+
+
+Mostrar toast cuando hay update disponible con boton "Update"
+
+
+
+Estilo: border-[#f59e0b] bg-[#0a0a0a]
+
+
+
+Importar PWAUpdatePrompt en App.tsx (dentro del Router, antes de Routes)
+
+Verificar con: npx tsc --noEmit --skipLibCheck && npm run build
+

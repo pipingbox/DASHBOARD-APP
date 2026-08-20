@@ -1,0 +1,77 @@
+Fix Companies lead form submission reliability and admin visibility.
+
+Current issue:
+The Companies landing form sometimes shows success confirmation even when the lead is not actually inserted into Supabase.
+
+Also, company leads are stored in Supabase but not visible inside the admin dashboard.
+
+REQUIRED FIXES:
+
+1. REAL submission validation
+- Do not show “Solicitud recibida” until Supabase insert succeeds.
+- Await the insert response properly.
+- If insert fails:
+  - show error state
+  - show retry button
+  - do not fake success
+  - log the error in console
+
+2. Add debug logging
+Console log:
+- payload being sent
+- Supabase response
+- insert errors
+
+3. Verify insert target
+Ensure the form inserts into:
+public.app_14da0f1941_company_leads
+
+4. Validate required fields
+Before submit:
+- company name
+- contact person
+- email
+- workers needed
+must be validated.
+
+5. Add loading state
+Disable submit button while saving.
+
+6. Add admin dashboard section
+Inside admin panel create:
+“Company Leads”
+
+Show:
+- company
+- contact person
+- email
+- workers needed
+- number of workers
+- start date
+- project duration
+- country
+- status
+- created_at
+
+Add:
+- search
+- filters
+- status badges
+- update status
+- archive lead
+
+7. Add lead notifications
+Create notification when a new company lead is inserted.
+
+8. Verify RLS policies
+Ensure authenticated insert is allowed for public form submissions safely.
+
+9. Do not redesign existing UI.
+10. Keep current Companies landing visuals.
+
+Acceptance criteria:
+- form only shows success after real insert
+- failed insert shows visible error
+- new leads appear instantly in admin dashboard
+- admin can manage company requests
+- build passes

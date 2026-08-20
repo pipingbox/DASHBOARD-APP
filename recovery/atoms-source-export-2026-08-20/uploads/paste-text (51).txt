@@ -1,0 +1,54 @@
+Fix certificate/document preview detection.
+
+Current issue:
+Some uploaded certificates show:
+"Vista previa no disponible"
+even though they are valid images or PDFs.
+
+Goal:
+Improve file type detection and preview rendering.
+
+Requirements:
+
+1. Preview detection must NOT rely only on file extension.
+2. Use this priority:
+   - mime_type from database if available
+   - storage metadata contentType
+   - fallback extension parsing
+
+3. Treat these as previewable images:
+   image/jpeg
+   image/jpg
+   image/png
+   image/webp
+
+4. Treat these as previewable PDFs:
+   application/pdf
+
+5. If mime type is missing or generic:
+   application/octet-stream
+
+then infer from filename extension:
+   .jpg
+   .jpeg
+   .png
+   .webp
+   .pdf
+
+6. For images:
+Render full image preview with object-fit contain.
+
+7. For PDFs:
+Render iframe/object embedded viewer.
+
+8. Add debug logging:
+console.log({
+  fileUrl,
+  mimeType,
+  detectedType,
+  extension
+})
+
+9. Keep fallback message ONLY if type truly unsupported.
+
+10. Keep current dark modal design unchanged.

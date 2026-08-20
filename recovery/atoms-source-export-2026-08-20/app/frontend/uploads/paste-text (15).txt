@@ -1,0 +1,210 @@
+ACT AS A SENIOR SAAS PRODUCT ENGINEER AND AI CONTENT PLATFORM ARCHITECT.
+
+We are building the first AI-assisted content engine for PipingBox Community.
+
+IMPORTANT:
+Do not redesign the existing platform.
+Do not break current Jobs, Dashboard, Companies, Applications, or Community features.
+
+Build only the first MVP layer for AI content drafts.
+
+==================================================
+GOAL
+====
+
+Create a "Content Drafts" system where PipingBox can store AI-generated community post drafts before manual approval.
+
+This is NOT automatic publishing yet.
+This is human-reviewed content workflow.
+
+==================================================
+CONTENT CHANNELS
+================
+
+The system must support these suggested community channels:
+
+1. Piping & Isometrics
+2. Welding & QA/QC
+3. Jobs & Projects
+4. Tools & Calculators
+5. Field Problems / Site Tips
+6. Platform Updates
+7. Ideas & Suggestions
+
+Special purpose:
+
+Platform Updates:
+Used to publish product improvements, new features, bug fixes, release notes, platform progress, and visible updates so users feel there is an active team improving PipingBox.
+
+Ideas & Suggestions:
+Used for user feedback, feature requests, community proposals, and posts where PipingBox can later respond that a user suggestion has been implemented.
+
+Example:
+"Thanks for your suggestion. This week we implemented the feature you requested."
+
+==================================================
+STEP 1 — CREATE SUPABASE TABLE
+==============================
+
+Create table:
+
+app_14da0f1941_ai_content_drafts
+
+Columns:
+id uuid primary key default gen_random_uuid()
+created_at timestamptz default now()
+title text
+content text
+source_url text
+source_type text
+suggested_channel text
+language text
+tags text
+status text default 'draft'
+created_by uuid
+
+==================================================
+STEP 2 — RLS POLICIES
+=====================
+
+Enable RLS.
+
+Authenticated users can:
+
+* insert drafts
+* read drafts
+* update drafts
+
+For now, allow authenticated admin/moderator users to manage drafts.
+
+If admin roles are not yet implemented, allow authenticated users temporarily, but structure it so admin-only can be added later.
+
+==================================================
+STEP 3 — CREATE PAGE
+====================
+
+Create new route:
+
+/content-drafts
+
+Add sidebar menu item:
+
+Content Drafts
+
+==================================================
+STEP 4 — UI
+===========
+
+Create a professional dark industrial SaaS interface.
+
+Page sections:
+
+1. Draft Overview Cards:
+
+* Total Drafts
+* Pending Review
+* Approved
+* Published
+
+2. Draft List:
+   Show:
+
+* title
+* suggested channel
+* language
+* status
+* created date
+* source type
+
+3. Draft Detail Panel:
+   When clicking a draft:
+
+* show full content
+* source URL
+* tags
+* approve button
+* reject button
+* mark as published button
+
+==================================================
+STEP 5 — MANUAL CREATE DRAFT FORM
+=================================
+
+Add button:
+
+"Create Draft"
+
+Form fields:
+
+* title
+* content
+* source URL
+* source type
+* suggested channel
+* language
+* tags
+
+The suggested_channel field should use a dropdown with the 7 supported channels.
+
+==================================================
+STEP 6 — STATUS FLOW
+====================
+
+Draft statuses:
+
+* draft
+* approved
+* published
+* rejected
+
+Add colored badges.
+
+==================================================
+STEP 7 — PLATFORM UPDATE DRAFT TYPE
+===================================
+
+Add an optional draft type:
+
+* Technical post
+* Job post
+* Platform update
+* User suggestion response
+* Community discussion
+* Site tip
+
+For Platform update drafts, make the UI support:
+
+* version/change title
+* what changed
+* why it matters
+* call to action
+
+For User suggestion response drafts, make the UI support:
+
+* original suggestion
+* implemented improvement
+* thank-you message
+* release note style response
+
+==================================================
+STEP 8 — UX QUALITY
+===================
+
+Use the existing PipingBox dark industrial style:
+
+* black background
+* orange accent
+* premium SaaS layout
+* responsive
+* clean cards
+* hover effects
+
+==================================================
+FINAL GOAL
+==========
+
+PipingBox should now have the first operational content workflow:
+
+Source idea → AI/manual draft → review → approve → publish later.
+
+The system should also help PipingBox communicate continuous platform improvements and encourage users to submit suggestions.

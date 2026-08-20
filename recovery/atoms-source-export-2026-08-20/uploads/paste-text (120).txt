@@ -1,0 +1,74 @@
+## ATOM-003 | Flanges Multi-Class (B16.5 — Class 300)
+
+**Estado:** PENDING
+**Prioridad:** P0
+**Output esperado:** 5 YAML actualizados (PB-DIM de cada tipo de brida con Class 300 rows)
+
+### Prompt para Atoms:
+
+```
+Necesito que generes las filas dimensionales de bridas ASME B16.5 Class 300 para 5 tipos de brida.
+
+## Contexto
+Ya tenemos bridas Class 150 en el catalogo. Ahora necesito añadir Class 300.
+Cada archivo PB-DIM tiene una seccion "rows:" con filas por NPS.
+
+## Datos requeridos
+
+Para CADA uno de estos 5 tipos de brida, genera las filas Class 300 con los NPS:
+1/2, 3/4, 1, 1-1/4, 1-1/2, 2, 2-1/2, 3, 3-1/2, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24
+
+### Tipos:
+1. Slip-On (SO) — RF
+2. Blind (BL) — RF  
+3. Socket Weld (SW) — RF
+4. Threaded (THD) — RF
+5. Lap Joint (LJ)
+
+### Formato de cada fila:
+  - nps: "4"
+    dn: 100
+    class: 300
+    od_flange_in: 10.75
+    od_flange_mm: 273.05
+    thickness_in: 1.50
+    thickness_mm: 38.10
+    bolt_circle_in: 8.50
+    bolt_circle_mm: 215.90
+    num_bolts: 8
+    bolt_dia_in: 0.875
+    bolt_dia_mm: 22.23
+    hub_length_in: 2.06
+    hub_length_mm: 52.32
+    bore_in: 4.03
+    bore_mm: 102.36
+    weight_approx_lb: 32
+    weight_approx_kg: 14.5
+
+### Campos por tipo:
+- **SO y THD**: od_flange, thickness, bolt_circle, num_bolts, bolt_dia, bore, hub_length (sin hub para BL)
+- **BL**: od_flange, thickness, bolt_circle, num_bolts, bolt_dia (SIN bore, SIN hub)
+- **SW**: igual que SO + socket_depth_in/mm
+- **LJ**: od_flange, thickness, bolt_circle, num_bolts, bolt_dia, bore, flange_od (diametro exterior del lap)
+
+### Fuente de datos
+ASME B16.5-2020, Table 7 (Class 300) para diametros y espesores.
+Los datos de pernos (bolt circle, num bolts, bolt diameter) estan en Table E-1.
+
+IMPORTANTE:
+- Usa valores reales de ASME B16.5 Class 300.
+- NO inventes dimensiones.
+- Si no estas seguro de un valor, pon null y añade un comentario.
+- Los DN son: 15, 20, 25, 32, 40, 50, 65, 80, 90, 100, 125, 150, 200, 250, 300, 350, 400, 450, 500, 600
+
+Devuelve 5 bloques de codigo YAML, uno por tipo de brida, con SOLO la seccion "rows:" (yo las inserto en los archivos existentes).
+```
+
+### Que controlar al revisar:
+- [ ] OD brida Class 300 es mayor que Class 150 para mismo NPS
+- [ ] Espesor Class 300 es mayor que Class 150
+- [ ] Num bolts y bolt dia corresponden a B16.5 Table E-1
+- [ ] BL no tiene bore ni hub
+- [ ] 20 filas por tipo x 5 tipos = 100 filas nuevas
+
+---

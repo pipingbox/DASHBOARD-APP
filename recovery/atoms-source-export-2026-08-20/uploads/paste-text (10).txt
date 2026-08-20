@@ -1,0 +1,50 @@
+The workforce request system is successfully saving records in Supabase.
+
+However, the admin dashboard is not displaying the saved leads.
+
+IMPORTANT:
+Do not redesign anything.
+Only fix the data fetching connection.
+
+==================================================
+ISSUE
+=====
+
+Records are correctly saved in Supabase table:
+
+app_14da0f1941_company_leads
+
+But the admin "Company Leads" section is either:
+
+* empty
+* not refreshing
+* or connected to the wrong table
+
+==================================================
+TASKS
+=====
+
+1. Verify admin dashboard fetch query.
+
+2. Ensure admin panel reads from:
+   app_14da0f1941_company_leads
+
+3. Ensure newest leads appear first.
+
+4. Add automatic refresh after insert.
+
+5. Add loading state.
+
+6. Add empty state only if table truly has no records.
+
+7. Add console debugging for fetch errors.
+
+==================================================
+EXPECTED RESULT
+===============
+
+After submitting a workforce request:
+
+* the lead appears automatically in admin dashboard
+* no manual refresh needed
+* newest records appear first

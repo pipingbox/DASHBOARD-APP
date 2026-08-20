@@ -1,0 +1,170 @@
+ACT AS A SENIOR SAAS ADMIN PANEL ARCHITECT AND PRODUCT ENGINEER.
+
+We need to create an internal Admin Center for PipingBox so the platform owner can see and manage the life of the platform.
+
+IMPORTANT:
+Do not redesign the existing platform.
+Do not break current Dashboard, Jobs, Companies, Applications, Community, Content Drafts, or role system.
+Only add an admin-only internal management area.
+
+==================================================
+GOAL
+====
+
+Create an admin-only section called:
+
+Admin Center
+
+Only users with role = admin can see and access it.
+
+==================================================
+STEP 1 — ROUTE AND MENU
+=======================
+
+Create route:
+
+/admin
+
+Add sidebar menu item:
+
+Admin Center
+
+Visible only to:
+admin
+
+If non-admin tries to access /admin:
+redirect to dashboard and show:
+"You do not have permission to access Admin Center."
+
+==================================================
+STEP 2 — ADMIN OVERVIEW DASHBOARD
+=================================
+
+Create overview cards:
+
+* Total Users
+* Workers
+* Companies
+* Community Moderators
+* Jobs Moderators
+* Total Job Applications
+* Total Workforce Requests
+* Total Content Drafts
+
+Use live data from Supabase where possible.
+
+==================================================
+STEP 3 — USER MANAGEMENT TABLE
+==============================
+
+Create a Users table.
+
+Show:
+
+* full name
+* email if available
+* current role
+* created date
+* last activity if available
+* status
+
+Add role badges:
+
+* admin
+* community_moderator
+* jobs_moderator
+* worker
+* company
+
+==================================================
+STEP 4 — ROLE MANAGEMENT
+========================
+
+Allow admin to update a user's role from a dropdown.
+
+Supported roles:
+
+* admin
+* community_moderator
+* jobs_moderator
+* worker
+* company
+
+After updating:
+
+* save role to Supabase profiles table
+* refresh user list
+* show success toast
+
+==================================================
+STEP 5 — PLATFORM ACTIVITY SECTION
+==================================
+
+Add a recent platform activity feed.
+
+Show latest:
+
+* job applications
+* workforce requests
+* content drafts
+* new users if available
+
+Use existing tables:
+
+* app_14da0f1941_job_applications
+* app_14da0f1941_company_leads
+* app_14da0f1941_ai_content_drafts
+* profiles
+
+==================================================
+STEP 6 — ACCESS SAFETY
+======================
+
+Admin Center must never be visible to:
+
+* worker
+* company
+* community_moderator
+* jobs_moderator
+
+Only admin.
+
+==================================================
+STEP 7 — RLS / SUPABASE
+=======================
+
+Ensure admin can read:
+
+* profiles
+* job applications
+* company leads
+* content drafts
+
+If RLS blocks admin reads, add safe policies for admin users based on profiles.role = 'admin'.
+
+Do not expose sensitive admin data to normal users.
+
+==================================================
+STEP 8 — UX QUALITY
+===================
+
+Use existing PipingBox dark industrial SaaS style:
+
+* black background
+* orange accent
+* clean admin tables
+* badges
+* filters
+* search by name/email
+* responsive layout
+
+==================================================
+FINAL GOAL
+==========
+
+PipingBox must now have an internal Admin Center where Gaspar can see:
+
+* who is registered
+* what role each user has
+* what is happening inside the platform
+* and manage roles safely.

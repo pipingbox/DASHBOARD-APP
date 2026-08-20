@@ -1,0 +1,51 @@
+Fix onboarding role selection for new users.
+
+Current issue:
+When a new user signs in with Google, the app automatically creates or routes them as a Worker profile. Company users cannot choose Company View unless an admin manually changes their role. This is wrong.
+
+Required behavior:
+After first login/signup, if the user does not have a completed account type / role, redirect them to an onboarding screen asking:
+
+"How will you use PipingBox?"
+
+Options:
+1. Worker / Professional
+   - For piping professionals, welders, supervisors, inspectors, engineers, shutdown workers, etc.
+   - Creates/uses worker profile.
+   - Routes to Worker Dashboard.
+
+2. Company / Recruiter
+   - For companies, recruiters, contractors, staffing agencies and industrial employers.
+   - Creates/uses company profile.
+   - Routes to Company Dashboard.
+
+Technical requirements:
+- Do not default all new users to worker.
+- Add a persistent field if needed, for example account_type or role:
+  values: 'worker', 'company', 'admin'
+- If a user already has an account_type/role, do not ask again.
+- If account_type is missing/null, show onboarding role selection.
+- Store selected account_type in Supabase.
+- After selection:
+  - worker → /dashboard or worker dashboard
+  - company → /company/dashboard
+- Keep admin role behavior intact.
+- Admin users must still be able to preview/switch views.
+- Do not break existing support@pipingbox.com or existing users.
+- Existing users with role already set should keep their current role.
+
+UI requirements:
+- Dark industrial PipingBox style.
+- Clear two-card selection screen.
+- Include PipingBox logo.
+- Mobile responsive.
+- Support translations using existing i18n system.
+
+Acceptance criteria:
+- New Google user sees role selection before dashboard.
+- New email/password user sees role selection before dashboard.
+- Selecting Worker creates/updates worker account and routes to Worker View.
+- Selecting Company creates/updates company account and routes to Company View.
+- User does not need admin intervention to become company.
+- Existing users are not forced through onboarding again unless role/account_type is missing.
+- Build and lint pass.

@@ -1,0 +1,176 @@
+FEATURE — Certification expiry alerts + edit/delete actions.
+
+IMPORTANT:
+Do not redesign the profile page.
+Do not break certifications, profile, jobs, applications, messages, admin, company, or worker flows.
+
+GOAL:
+Complete the certification management system.
+
+==================================================
+PART 1 — CERTIFICATION ACTION BUTTONS
+=====================================
+
+For each certification card, add:
+
+* Edit
+* Delete / Remove
+* Renew
+
+Edit:
+
+* opens the certification modal with current data loaded
+* allows updating fields
+* saves changes to Supabase
+
+Delete:
+
+* asks for confirmation before deleting
+* deletes only the selected certification
+* shows success toast
+
+Renew:
+
+* opens edit modal focused on:
+
+  * new issue date
+  * new expiry date
+  * updated file upload if needed
+
+==================================================
+PART 2 — EXPIRY STATUS
+======================
+
+Calculate certification status from expiry_date:
+
+* Valid: more than 90 days remaining
+* Expiring soon: 90 days or less
+* Critical: 30 days or less
+* Expired: expiry date passed
+
+Show clear badges:
+
+* Valid
+* Expiring soon
+* Critical
+* Expired
+
+Spanish translations:
+
+* Válido
+* Próximo a caducar
+* Crítico
+* Caducado
+
+==================================================
+PART 3 — IN-APP ALERTS
+======================
+
+Create in-app alerts for certifications:
+
+Alert schedule:
+
+* 90 days before expiry
+* 60 days before expiry
+* 30 days before expiry
+* on expiry date
+
+Alert text examples:
+
+* Your certificate will expire in 3 months.
+* Your certificate will expire in 2 months.
+* Your certificate will expire in 1 month.
+* Your certificate has expired.
+
+Spanish:
+
+* Tu certificado caducará en 3 meses.
+* Tu certificado caducará en 2 meses.
+* Tu certificado caducará en 1 mes.
+* Tu certificado ha caducado.
+
+Show alerts in:
+
+* notification bell
+* Profile / CV certification section
+* optional dashboard warning card
+
+==================================================
+PART 4 — EMAIL ALERT READY
+==========================
+
+Add email alert preparation but do not send real emails yet unless already supported.
+
+Create structure for future email delivery:
+
+* user_id
+* certification_id
+* alert_type
+* scheduled_for
+* sent_at
+* status
+
+If needed, create table:
+app_14da0f1941_certification_alerts
+
+Columns:
+
+* id
+* user_id
+* certification_id
+* alert_type
+* scheduled_for
+* sent_at
+* status
+* created_at
+
+Do not integrate external email provider yet.
+Just prepare the data and UI.
+
+==================================================
+PART 5 — PRIVACY
+================
+
+Companies can see expiry status only for certifications visible to companies.
+
+Private certifications remain hidden from companies.
+
+Admin can see all.
+
+==================================================
+PART 6 — TRANSLATIONS
+=====================
+
+Add Spanish and English translations for:
+
+* Edit
+* Delete
+* Remove
+* Renew
+* Expiring soon
+* Critical
+* Expired
+* Valid
+* Certificate expires in 3 months
+* Certificate expires in 2 months
+* Certificate expires in 1 month
+* Certificate expired
+* Confirm delete certification
+* Certification updated successfully
+* Certification deleted successfully
+
+==================================================
+EXPECTED RESULT
+===============
+
+Workers can fully manage certifications:
+
+* add
+* edit
+* delete
+* renew
+* see expiry status
+* receive in-app expiry alerts
+* prepare future email reminders
+
+This must work in Spanish and English.

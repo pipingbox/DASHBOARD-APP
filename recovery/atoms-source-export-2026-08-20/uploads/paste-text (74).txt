@@ -1,0 +1,73 @@
+Do a full i18n sweep for remaining hardcoded visible content.
+
+Problem:
+Many UI labels are now translated, but dynamic/mock content is still in English:
+- Academy course titles/descriptions
+- Jobs/application content
+- My Applications page
+- Calendar labels such as Monthly Overview, Today, weekdays/months
+- Status badges: Applied, Rejected, Reviewed, Interview, Hired, etc.
+- Buttons: View Jobs, Withdraw, Browse More Jobs
+- Community channel descriptions
+- Company dashboard activity text
+- Messages action buttons and template messages
+- Content Drafts labels and empty states
+
+Goal:
+When language is Spanish, ALL visible user-facing content must be Spanish, including mock/static data arrays.
+
+Instructions:
+1. Search the entire frontend for hardcoded English strings.
+2. Include strings inside arrays/objects, not only JSX.
+3. Replace mock/static content with translation keys.
+4. Add missing keys to EN and ES translation files.
+5. Do not change layout, design, data logic, or dashboard profile completion card.
+6. Fix these modules specifically:
+   - Academy
+   - Jobs
+   - My Applications
+   - Dashboard calendar/month overview
+   - Messages
+   - Community
+   - Content Drafts
+   - Company pages
+   - Admin pages
+
+Specific translations:
+- My Applications → Mis candidaturas
+- Browse More Jobs → Ver más empleos
+- Applied → Postulado
+- Reviewed → Revisado
+- Interview → Entrevista
+- Shortlisted → Preseleccionado
+- Rejected → Rechazado
+- Hired → Contratado
+- View Jobs → Ver vacante
+- Withdraw → Retirar candidatura
+- Search by job title or company... → Buscar por puesto o empresa...
+- Monthly Overview → Resumen mensual
+- Today → Hoy
+- Featured Positions → Vacantes destacadas
+- Recent Applications → Candidaturas recientes
+- All Open Positions → Todas las vacantes abiertas
+- Apply Now → Postularme
+- New post → Nueva publicación
+- Open channel → Abrir canal
+- Create Draft → Crear borrador
+- No drafts found → No se encontraron borradores
+- Request Documents → Solicitar documentos
+- Request Availability → Solicitar disponibilidad
+- Invite to Interview → Invitar a entrevista
+
+Academy:
+Translate course titles/descriptions too. Use translation keys like:
+academy.courses.piping_fundamentals.title
+academy.courses.piping_fundamentals.description
+
+Jobs:
+Translate job card UI and static sample job descriptions where they are mock data.
+
+Acceptance criteria:
+- Spanish selected: no visible English remains in Academy, Jobs, My Applications, Dashboard calendar, Messages, Community, Content Drafts, Company/Admin.
+- English selected: English still works.
+- Build and lint pass.

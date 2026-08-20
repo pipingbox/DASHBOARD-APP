@@ -1,0 +1,74 @@
+Necesito añadir en el panel de administración, en la lista de usuarios/trabajadores, un indicador y botón de visibilidad del perfil profesional.
+
+Problema:
+Hay trabajadores como Pedro Crespo con perfil 100% completado y CV subido, pero no aparecen en CompanyWorkersSearch porque probablemente tienen el perfil oculto/privado o marketplace_ready=false. Desde admin necesito verlo claramente y poder cambiarlo.
+
+Objetivo:
+En la tabla/listado de trabajadores del admin añadir una columna llamada “Visibilidad”.
+
+Debe mostrar uno de estos estados:
+
+1. Visible en marketplace
+   Condiciones:
+   - marketplace_ready = true
+   - profile_visibility != 'private'
+   - full_name no vacío
+
+2. Oculto
+   Condiciones:
+   - profile_visibility = 'private'
+   OR marketplace_ready = false
+
+3. Perfil incompleto
+   Condiciones:
+   - profile_completion < 60
+   OR full_name vacío
+   OR title/oficio vacío
+   OR sin CV
+
+Mostrarlo visualmente como badge:
+- Verde: Visible
+- Amarillo: Incompleto
+- Rojo/Gris: Oculto
+
+Añadir botón de acción rápida:
+
+Si está oculto:
+Botón: “Publicar perfil”
+Acción:
+- marketplace_ready = true
+- profile_visibility = 'public'
+- onboarding_status = 'MARKETPLACE_READY'
+
+Si está visible:
+Botón: “Ocultar perfil”
+Acción:
+- marketplace_ready = false
+- profile_visibility = 'private'
+- onboarding_status = 'PROFILE_STARTED'
+
+Si está incompleto:
+Botón deshabilitado:
+“Perfil incompleto”
+y mostrar tooltip/lista de campos que faltan:
+- CV
+- oficio
+- ubicación
+- experiencia
+- perfil mínimo 60%
+
+También añadir en el detalle del perfil de trabajador una sección “Estado marketplace” con:
+- marketplace_ready
+- profile_visibility
+- onboarding_status
+- profile_completion
+- cv_visible
+- cv_file_name
+- motivo por el que aparece o no aparece en CompanyWorkersSearch
+
+Importante:
+El admin debe poder entender inmediatamente por qué un trabajador no aparece en la búsqueda de empresas.
+
+No borrar datos.
+No cambiar candidaturas.
+Solo controlar visibilidad del perfil profesional.

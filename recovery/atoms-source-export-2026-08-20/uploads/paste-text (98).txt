@@ -1,0 +1,59 @@
+He encontrado el problema en workers-search.
+
+Ejemplo real:
+Pedro Crespo existe en app_14da0f1941_profiles pero tiene:
+
+- profile_completion = 100
+- cv_visible = true
+- marketplace_ready = false
+- profile_visibility = 'private'
+- onboarding_status = 'AUTH_ONLY'
+
+Por eso aparece cuando aplica a empleos pero NO aparece en /company/workers-search.
+
+Necesito revisar y corregir la lógica de publicación del marketplace.
+
+Objetivos:
+
+1. Revisar cómo se calcula marketplace_ready.
+2. Revisar cuándo profile_visibility pasa a public.
+3. Revisar qué significa onboarding_status = AUTH_ONLY.
+4. Revisar si el onboarding nunca se finaliza correctamente.
+5. Revisar si el botón o proceso de “completar perfil” no actualiza estos campos.
+
+Necesito localizar:
+- hooks
+- triggers
+- actions
+- mutations
+- edge functions
+- frontend submit handlers
+relacionados con:
+- marketplace_ready
+- profile_visibility
+- onboarding_status
+
+También revisar workers-search:
+qué filtros exactos usa actualmente.
+
+Probablemente hay algo como:
+marketplace_ready = true
+AND profile_visibility = 'public'
+
+Necesito decidir una de estas opciones:
+
+OPCIÓN A:
+Mostrar automáticamente trabajadores con:
+- profile_completion >= 60
+- CV subido
+
+aunque marketplace_ready siga false.
+
+OPCIÓN B:
+Corregir el flujo para que al completar perfil:
+- marketplace_ready pase a true
+- profile_visibility pase a public
+- onboarding_status pase a completed
+
+Resultado esperado:
+Pedro Crespo y otros trabajadores similares deben aparecer en workers-search sin necesidad de aplicar primero a una oferta.

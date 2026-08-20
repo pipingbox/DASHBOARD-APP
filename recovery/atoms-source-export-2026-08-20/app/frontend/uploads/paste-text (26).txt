@@ -1,0 +1,82 @@
+ACT AS A SENIOR SUPABASE SECURITY ENGINEER.
+
+We must fix RLS permissions for:
+
+app_14da0f1941_jobs
+
+IMPORTANT:
+Do not disable RLS.
+Do not use public access.
+Use proper ownership-based security.
+
+==================================================
+GOAL
+==================================================
+
+Authenticated company users must be able to:
+
+- create their own jobs
+- view their own jobs
+- update their own jobs
+- delete their own jobs
+
+using:
+
+company_user_id = auth.uid()
+
+==================================================
+STEP 1 — ENABLE RLS
+==================================================
+
+Enable RLS on:
+
+app_14da0f1941_jobs
+
+==================================================
+STEP 2 — CREATE POLICIES
+==================================================
+
+Create these policies for authenticated users:
+
+1. SELECT
+auth.uid() = company_user_id
+
+2. INSERT
+WITH CHECK (
+auth.uid() = company_user_id
+)
+
+3. UPDATE
+USING (
+auth.uid() = company_user_id
+)
+WITH CHECK (
+auth.uid() = company_user_id
+)
+
+4. DELETE
+USING (
+auth.uid() = company_user_id
+)
+
+==================================================
+STEP 3 — SAFE ADMIN ACCESS
+==================================================
+
+Allow admin preview mode to continue working safely.
+
+==================================================
+STEP 4 — VERIFY INSERT FLOW
+==================================================
+
+Ensure the Post Job form inserts:
+
+company_user_id: auth.uid()
+
+This is mandatory.
+
+==================================================
+FINAL RESULT
+==================================================
+
+Company users can publish and manage their own jobs securely without permission errors.

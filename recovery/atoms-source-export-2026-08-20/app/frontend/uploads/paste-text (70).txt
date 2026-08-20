@@ -1,0 +1,51 @@
+This is a blocking bug. Do not add features.
+
+Supabase value is correct:
+Gaspar profile_completion = 100.
+
+But UI shows:
+- Profile page: 100
+- Dashboard: missing / not shown
+- Admin Registros: 75
+
+Therefore Dashboard and Admin are NOT reading app_14da0f1941_profiles.profile_completion.
+
+Find the exact files/components causing this.
+
+Tasks:
+1. Search codebase for every occurrence of:
+- 75
+- profile completion
+- completionPercentage
+- calculateProfileCompletion
+- profile_completion
+- onboarding_status
+- marketplace_ready
+
+2. Identify Dashboard component and Admin Registros component.
+
+3. Replace their displayed percentage with ONLY:
+profile.profile_completion
+
+4. Remove any local calculation in Dashboard/Admin.
+
+5. Dashboard must query:
+app_14da0f1941_profiles
+select profile_completion,onboarding_status,marketplace_ready
+where user_id = currentUser.id
+
+6. Admin Registros must display:
+profile.profile_completion
+from profiles table.
+
+7. Add console logs:
+Dashboard profile_completion from DB:
+Admin profile_completion from DB:
+
+8. Do not hide the dashboard card if completion exists.
+9. Expected result:
+Dashboard = 100
+Profile = 100
+Admin = 100
+
+Do not answer completed unless you show which files were changed.

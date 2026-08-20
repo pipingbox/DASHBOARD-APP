@@ -19,6 +19,10 @@ build/
 supabase/.temp/
 supabase/.branches/
 
+# Zips crudos de Share -> Export de Atoms: se versiona el arbol extraido,
+# no el contenedor. Su SHA256 queda registrado en el MANIFEST de cada export.
+recovery/atoms-export/*.zip
+
 # Editor
 .vscode/*
 !.vscode/extensions.json

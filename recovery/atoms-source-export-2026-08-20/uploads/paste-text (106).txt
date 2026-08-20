@@ -1,0 +1,252 @@
+Necesito implementar la herramienta "Elbow Cut Calculator" en el proyecto PipingBox. Esta es la herramienta estrella: calcula donde cortar un codo estandar para obtener un angulo especifico, con visualizacion SVG interactiva.
+
+## Contexto del proyecto
+
+- Framework: React 18.3 + TypeScript + Vite + Tailwind 3.4
+- UI: shadcn/ui (Button, Input, Label, Select, Tabs ya existen)
+- i18n: react-i18next
+- Tema: dark (#0a0a0a bg, #0d0d0d cards, zinc-800/80 borders, #f59e0b amber accent)
+- Supabase: tabla 'app_14da0f1941_tool_usage'
+- @radix-ui/react-slider esta instalado pero el componente NO existe
+
+## Archivos a crear/modificar
+
+### 1. Crear src/components/ui/slider.tsx (shadcn/ui Slider)
+
+Wrapper de shadcn/ui para @radix-ui/react-slider (ya instalado).
+Exportar: Slider.
+Estilo: track bg-zinc-800, range bg-[#f59e0b], thumb bg-[#f59e0b] border-2 border-[#f59e0b] w-5 h-5.
+
+### 2. Crear src/tools/data/elbowData.ts
+
+Archivo de datos con las dimensiones estandar de codos segun ASME B16.9.
+
+export interface ElbowSpec {
+  nps: string;        // "1/2", "3/4", "1", etc.
+  dn: number;         // 15, 20, 25, etc.
+  od: number;          // mm
+  lrRadius: number;    // Long Radius center-to-end = 1.5 * NPS (en mm)
+  srRadius: number;    // Short Radius center-to-end = 1.0 * NPS (en mm)
+}
+
+Datos de codos 90° Long Radius (ASME B16.9):
+El radio del centro del codo (R) para LR = 1.5 * diametro nominal en mm.
+Para SR = 1.0 * diametro nominal en mm.
+
+export const ELBOW_DATA: ElbowSpec[] = [
+  { nps: '1/2"', dn: 15, od: 21.3, lrRadius: 38.1, srRadius: 25.4 },
+  { nps: '3/4"', dn: 20, od: 26.7, lrRadius: 38.1, srRadius: 25.4 },
+  { nps: '1"', dn: 25, od: 33.4, lrRadius: 38.1, srRadius: 25.4 },
+  { nps: '1-1/4"', dn: 32, od: 42.2, lrRadius: 47.6, srRadius: 31.8 },
+  { nps: '1-1/2"', dn: 40, od: 48.3, lrRadius: 57.2, srRadius: 38.1 },
+  { nps: '2"', dn: 50, od: 60.3, lrRadius: 76.2, srRadius: 50.8 },
+  { nps: '2-1/2"', dn: 65, od: 73.0, lrRadius: 95.3, srRadius: 63.5 },
+  { nps: '3"', dn: 80, od: 88.9, lrRadius: 114.3, srRadius: 76.2 },
+  { nps: '3-1/2"', dn: 90, od: 101.6, lrRadius: 133.4, srRadius: 88.9 },
+  { nps: '4"', dn: 100, od: 114.3, lrRadius: 152.4, srRadius: 101.6 },
+  { nps: '5"', dn: 125, od: 141.3, lrRadius: 190.5, srRadius: 127.0 },
+  { nps: '6"', dn: 150, od: 168.3, lrRadius: 228.6, srRadius: 152.4 },
+  { nps: '8"', dn: 200, od: 219.1, lrRadius: 304.8, srRadius: 203.2 },
+  { nps: '10"', dn: 250, od: 273.0, lrRadius: 381.0, srRadius: 254.0 },
+  { nps: '12"', dn: 300, od: 323.8, lrRadius: 457.2, srRadius: 304.8 },
+  { nps: '14"', dn: 350, od: 355.6, lrRadius: 533.4, srRadius: 355.6 },
+  { nps: '16"', dn: 400, od: 406.4, lrRadius: 609.6, srRadius: 406.4 },
+  { nps: '18"', dn: 450, od: 457.2, lrRadius: 685.8, srRadius: 457.2 },
+  { nps: '20"', dn: 500, od: 508.0, lrRadius: 762.0, srRadius: 508.0 },
+  { nps: '24"', dn: 600, od: 609.6, lrRadius: 914.4, srRadius: 609.6 },
+];
+
+Tabla de wall thickness por schedule (para los tamanos mas comunes):
+export const SCHEDULE_WT: Record<string, Record<string, number>> = {
+  // nps -> { schedule: wall_thickness_mm }
+  '1/2"': { '10': 2.11, '40': 2.77, '80': 3.73, '160': 4.78 },
+  '3/4"': { '10': 2.11, '40': 2.87, '80': 3.91, '160': 5.56 },
+  '1"': { '10': 2.77, '40': 3.38, '80': 4.55, '160': 6.35 },
+  '1-1/2"': { '10': 2.77, '40': 3.68, '80': 5.08, '160': 7.14 },
+  '2"': { '10': 2.77, '40': 3.91, '80': 5.54, '160': 8.74 },
+  '3"': { '10': 3.05, '40': 5.49, '80': 7.62, '160': 11.13 },
+  '4"': { '10': 3.05, '40': 6.02, '80': 8.56, '160': 13.49 },
+  '6"': { '10': 3.40, '40': 7.11, '80': 10.97, '160': 21.95 },
+  '8"': { '10': 3.76, '40': 8.18, '80': 12.70, '160': 23.01 },
+  '10"': { '10': 4.19, '40': 9.27, '80': 15.09, '160': 28.58 },
+  '12"': { '10': 4.57, '40': 10.31, '80': 17.48, '160': 33.32 },
+  '14"': { '10': 4.78, '40': 11.13, '80': 19.05, '160': 35.71 },
+  '16"': { '10': 4.78, '40': 12.70, '80': 21.44, '160': 40.49 },
+  '18"': { '10': 4.78, '40': 14.27, '80': 23.83, '160': 45.24 },
+  '20"': { '10': 5.54, '40': 15.09, '80': 26.19, '160': 50.01 },
+  '24"': { '10': 6.35, '40': 17.48, '80': 30.96, '160': 59.54 },
+};
+
+### 3. Crear src/tools/ElbowCutCalculator.tsx
+
+Componente principal. Recibe { userId?: string }.
+
+#### SECCION DE INPUTS (lado izquierdo en desktop, arriba en mobile):
+
+1. Select "Pipe Size (NPS)": dropdown con todos los tamanos del ELBOW_DATA
+2. Select "Elbow Type": Long Radius (LR) / Short Radius (SR)
+3. Select "Schedule": 10, 40/STD, 80/XS, 160 (filtra segun SCHEDULE_WT)
+4. Slider + Input numerico "Desired Angle": 1 a 90 grados (default 45)
+   - Slider de @radix-ui/react-slider con color amber
+   - Input numerico sincronizado con el slider
+   - Cambio en tiempo real (ambos actualizan el otro)
+
+#### SECCION DE RESULTADOS (debajo de inputs):
+
+Calcular y mostrar:
+
+FORMULAS:
+- R = radio del codo (lrRadius o srRadius del ELBOW_DATA seleccionado)
+- theta = angulo deseado en radianes = angulo * PI / 180
+- Arc Length (linea neutra) = R * theta
+- Cut distance at intrados = (R - OD/2) * tan(theta/2) 
+  Nota: para angulos pequenos esto se simplifica, pero usar la formula del arco:
+  Intrados arc = (R - OD/2) * theta
+- Cut distance at extrados = (R + OD/2) * theta
+  Extrados arc = (R + OD/2) * theta
+- Center arc = R * theta
+
+Mostrar en un panel con border-l-2 border-[#f59e0b]:
+- "Cut angle: XX°"
+- "Center arc (neutral line): XXX.X mm"
+- "Intrados arc (inside): XXX.X mm"  
+- "Extrados arc (outside): XXX.X mm"
+- "Elbow radius (R): XXX.X mm"
+- Cada valor con toggle mm / inches
+
+#### TABLA DE ANGULOS COMUNES (debajo de resultados):
+
+Tabla que muestra los valores para 5°, 10°, 15°, 22.5°, 30°, 45°, 60°, 75°, 90°:
+Columnas: Angle | Center Arc (mm) | Intrados Arc (mm) | Extrados Arc (mm)
+La fila correspondiente al angulo actual se resalta en bg-[#f59e0b]/10.
+
+#### VISUALIZACION SVG (lado derecho en desktop, debajo en mobile):
+
+SVG interactivo de 400x400 (responsive con viewBox).
+Fondo transparente.
+
+Dibujar el codo como un arco con espesor de pared:
+- El codo es un arco de 90° (siempre dibujar el codo completo)
+- Arco exterior (extrados): radio R + OD/2, color zinc-600, stroke-width 1
+- Arco interior (intrados): radio R - OD/2, color zinc-600, stroke-width 1
+- Conectar ambos arcos con lineas rectas en los extremos (el perfil del codo)
+- Rellenar el area del codo con zinc-800/50
+
+Linea de corte:
+- Dibujar una linea que cruza el codo en el angulo seleccionado
+- Color: #f59e0b (amber)
+- stroke-width: 2
+- stroke-dasharray: "6 3" (linea punteada)
+- La linea debe ir desde el intrados hasta el extrados del codo
+
+Parte cortada:
+- La parte del codo ANTES de la linea de corte: rellenar con #f59e0b/20 (semitransparente amber)
+- La parte DESPUES de la linea de corte: rellenar con zinc-800/50 (la parte que se descarta)
+
+Cotas:
+- Texto con el angulo "45°" en text-[#f59e0b] cerca del centro del arco
+- Arco de cota con flechas mostrando el angulo
+- Texto "R = XXX mm" cerca del centro de curvatura
+
+Animacion:
+- Cuando el slider cambia, la linea de corte se mueve suavemente (CSS transition o requestAnimationFrame)
+
+Orientacion del SVG:
+- El codo se dibuja en posicion vertical: una pata apuntando hacia arriba, otra hacia la derecha
+- El centro de curvatura esta en la esquina superior derecha del SVG
+- El arco va de 90° (pata vertical, abajo) a 0° (pata horizontal, derecha)
+
+Layout general del componente:
+Desktop (lg y superior): grid lg:grid-cols-2 con inputs+resultados a la izquierda y SVG a la derecha
+Mobile: todo apilado verticalmente (inputs -> SVG -> resultados -> tabla)
+
+Guardar uso al cambiar angulo (debounce 2 segundos):
+await supabase.from('app_14da0f1941_tool_usage').insert({
+  user_id: userId,
+  tool_name: 'Elbow Cut Calculator',
+  tool_category: 'Layout',
+  input_data: { nps, elbowType, schedule, angle },
+  output_data: { centerArc, intradosArc, extradosArc, radius },
+});
+
+### 4. Modificar src/pages/Tools.tsx
+
+Agregar al array TOOLS:
+{ key: 'elbow-cut', nameKey: 'tools.elbowCut', icon: Scissors, categoryKey: 'tools.categoryLayout' }
+
+Poner DESPUES de 'pipe-data' en el array.
+
+Importar Scissors de lucide-react.
+
+Importar ElbowCutCalculator:
+import ElbowCutCalculator from '@/tools/ElbowCutCalculator';
+
+Agregar renderizado condicional:
+) : active === 'elbow-cut' ? (
+  <ElbowCutCalculator userId={user?.id} />
+) : (
+
+NO modificar las herramientas anteriores.
+
+### 5. Agregar i18n keys
+
+En en.json seccion "tools":
+"elbowCut": "Elbow Cut Calculator",
+"elbowCutSubtitle": "Calculate where to cut a standard elbow to get any angle",
+"categoryLayout": "Layout",
+"pipeSize": "Pipe Size (NPS)",
+"elbowType": "Elbow Type",
+"longRadius": "Long Radius (LR)",
+"shortRadius": "Short Radius (SR)",
+"desiredAngle": "Desired Angle",
+"degrees": "degrees",
+"centerArc": "Center Arc (neutral line)",
+"intradosArc": "Intrados Arc (inside)",
+"extradosArc": "Extrados Arc (outside)",
+"elbowRadius": "Elbow Radius (R)",
+"commonAngles": "Common angles reference table",
+"angle": "Angle",
+"cutAngle": "Cut angle",
+"discardedPart": "Discarded section",
+"usablePart": "Usable section",
+"elbowNote": "Based on ASME B16.9. Verify dimensions against manufacturer data.",
+"toggleMmIn": "mm / in"
+
+En es.json seccion "tools":
+"elbowCut": "Calculadora de Corte de Codos",
+"elbowCutSubtitle": "Calcula dónde cortar un codo estándar para obtener cualquier ángulo",
+"categoryLayout": "Trazado",
+"pipeSize": "Tamaño de tubería (NPS)",
+"elbowType": "Tipo de codo",
+"longRadius": "Radio largo (LR)",
+"shortRadius": "Radio corto (SR)",
+"desiredAngle": "Ángulo deseado",
+"degrees": "grados",
+"centerArc": "Arco central (línea neutra)",
+"intradosArc": "Arco intradós (interior)",
+"extradosArc": "Arco extradós (exterior)",
+"elbowRadius": "Radio del codo (R)",
+"commonAngles": "Tabla de ángulos comunes",
+"angle": "Ángulo",
+"cutAngle": "Ángulo de corte",
+"discardedPart": "Sección descartada",
+"usablePart": "Sección utilizable",
+"elbowNote": "Basado en ASME B16.9. Verificar dimensiones con datos del fabricante.",
+"toggleMmIn": "mm / pulg"
+
+## Resumen de archivos
+
+CREAR:
+- src/components/ui/slider.tsx (shadcn/ui Slider wrapper)
+- src/tools/data/elbowData.ts (datos + types)
+- src/tools/ElbowCutCalculator.tsx (componente principal con SVG)
+
+MODIFICAR:
+- src/pages/Tools.tsx (agregar tool + import + renderizado)
+- src/i18n/locales/en.json
+- src/i18n/locales/es.json
+
+NO TOCAR:
+- Wall Thickness Calculator
+- UnitConverter.tsx
+- PipeDataTables.tsx

@@ -1,0 +1,57 @@
+## ATOM-004 | Valvulas Multi-Class (API 600 — Class 300 + 600)
+
+**Estado:** PENDING
+**Prioridad:** P1
+**Output esperado:** Filas dimensionales adicionales para gate, globe, ball, check
+
+### Prompt para Atoms:
+
+```
+Necesito filas dimensionales de valvulas industriales para Class 300 y Class 600.
+
+## Contexto
+Ya tenemos valvulas Class 150 (gate, globe, ball, check) en el catalogo PIDM.
+Las dimensiones principales son face-to-face (F2F) segun ASME B16.10.
+
+## Datos requeridos
+
+Para CADA tipo de valvula, genera filas Class 300 y Class 600.
+NPS a cubrir: 2, 2-1/2, 3, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24
+
+### Tipos:
+1. Gate Valve (API 600) — rising stem, OS&Y
+2. Globe Valve (API 600) — bolted bonnet
+3. Ball Valve (API 608) — floating ball, full port
+4. Check Valve (API 594) — swing type
+
+### Formato de cada fila:
+  - nps: "4"
+    dn: 100
+    class: 300
+    face_to_face_in: 11.50
+    face_to_face_mm: 292.10
+    end_connection: RF
+    weight_approx_kg: 85
+
+### Fuentes:
+- Face-to-face: ASME B16.10
+- Gate/Globe: API 600 (long pattern para gate, standard para globe)
+- Ball: API 608
+- Check: API 594 (swing check, standard length)
+
+IMPORTANTE:
+- Los F2F de Class 300 son generalmente iguales a Class 150 para valvulas de compuerta (same long pattern).
+- Los F2F de Class 600 pueden ser mayores.
+- NO inventes valores. Si no tienes el dato exacto, pon null.
+- Los DN son: 50, 65, 80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600
+
+Devuelve 4 bloques YAML (uno por tipo), cada uno con las filas Class 300 y Class 600 juntas.
+```
+
+### Que controlar al revisar:
+- [ ] F2F gate Class 300 = Class 150 (misma norma B16.10)
+- [ ] F2F globe generalmente diferente de gate
+- [ ] Pesos Class 300 > Class 150 para mismo NPS
+- [ ] 13 NPS x 2 clases x 4 tipos = ~104 filas nuevas
+
+---

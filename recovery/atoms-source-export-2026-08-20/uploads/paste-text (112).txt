@@ -1,0 +1,188 @@
+# PROMPT PARA ATOMS — Flange Library v2.0 (Rediseño visual profesional)
+
+## ⚠️ ANTES DE EMPEZAR
+1. `git clone https://github.com/pipingbox/DASHBOARD-APP.git` (NO hacer `git init`)
+2. Trabaja en la rama `main`
+3. NO toques `src/tools/elbow-cut/ElbowCut.tsx` — es el diseño de referencia y está perfecto
+4. NO toques `src/tools/flange-library/flange-data.ts` ni `gasket-bolt-data.ts` — los datos son correctos
+5. Solo modifica `src/tools/flange-library/FlangeLibrary.tsx`
+
+## OBJETIVO
+Rediseñar completamente la representación visual del Flange Library para que tenga:
+1. Dibujos técnicos SVG profesionales con cotas (dimension lines con flechas, extension lines, labels)
+2. Mejor representación visual del accesorio (no un esquema simplista, sino un drawing técnico real)
+3. Mantener toda la funcionalidad existente (filtros, cards, modal, cross-linking gasket+bolts+torque, premium gate)
+
+## DISEÑO DE REFERENCIA (NO MODIFICAR)
+El archivo `src/tools/elbow-cut/ElbowCut.tsx` es el diseño de referencia que el cliente ama.
+Cópiale el PATRÓN VISUAL, no el código:
+- Controles de visibilidad (checkboxes) para toggle de cotas/centro/cut line/fill
+- SVG grande con viewBox, paths coloreados, labels de dimensiones inline
+- Paleta: cyan #22d3ee (exterior), naranja #f97316 (interior), blanco punteado (centro), ámbar #f59e0b (acentos), rojo #ef4444 (cut lines)
+- Tabla de resultados con font-mono y colores por fila
+- Tabs (Calculator / Formulas & Notes) — para el modal: (Dimensions / Cross-Link / Notes)
+- Bordes rounded-sm, fondos #0d0d0d, bordes border-zinc-800
+
+## LO QUE HAY QUE MEJORAR (PROBLEMAS ACTUALES)
+
+### Problema 1: SVG demasiado simplista
+El SVG actual de cada tipo de flange (WN/SO/BL) es un esquema con 4-5 líneas y un rectángulo.
+Parece un placeholder, no un drawing técnico.
+
+Solución: Rediseñar los 3 SVGs (WN, SO, BL) como drawings técnicos profesionales con:
+- Vista lateral realista del flange con proporciones correctas (usar spec.od, spec.flangeThickness, spec.boltCircleDiameter, spec.hubLength, spec.pipeOD para escalar)
+- Hub taper real para WN (Weld Neck) — el cono de transición entre pipe y flange
+- Weld prep visible (bevel) en WN
+- Raised face visible (RF) — la cara elevada donde asienta la junta
+- Bolt holes representados correctamente (número real de spec.numBolts, distribución en círculo)
+- Hatching en blind flange (BL) para indicar sólido
+- Pipe stub a ambos lados con OD correcto
+
+### Problema 2: Faltan cotas (dimension lines)
+El SVG actual NO tiene dimension lines con flechas. Solo badges con números sueltos.
+
+Solución: Añadir sistema de cotas técnico profesional:
+- Dimension lines: líneas horizontales/verticales con flechas en los extremos
+- Extension lines: líneas cortas perpendiculares desde el objeto hasta la dimension line
+- Labels: el valor numérico encima de la dimension line (ej: "Ø 318 mm")
+- Cotas a mostrar en el SVG del modal:
+  - Ø Outside Diameter (OD) — horizontal sobre el flange
+  - Flange thickness — vertical a la derecha
+  - Bolt circle diameter (BCD) — horizontal con línea de centro punteada
+  - Hub length (solo WN) — vertical
+  - Pipe OD — horizontal sobre el pipe stub
+  - Raised face height — pequeña cota vertical
+  - Bolt hole Ø — cota en un agujero
+- Toggles de visibilidad (como ElbowCut):
+  - showDimensions — mostrar/ocultar todas las cotas
+  - showCenter — mostrar/ocultar línea de centro
+  - showBoltHoles — mostrar/ocultar agujeros perno
+  - showFill — mostrar/ocultar relleno
+
+### Problema 3: Modal de detalle mejorable
+El modal actual muestra datos en DimBox y DimRow pero el SVG es el mismo simplista de la card.
+
+Solución: El modal debe tener:
+- SVG GRANDE (400×300 mínimo) con TODAS las cotas visibles
+- Vista isométrica o lateral con proporciones reales escaladas
+- Sistema de cotas completo (dimension lines + extension lines + labels)
+- Toggles de visibilidad arriba del SVG
+- Layout en 2 columnas: SVG grande a la izquierda, tabla de dimensiones a la derecha
+- Sección de cross-linking (gasket + bolts + torque) debajo — MANTENER TAL CUAL, está bien
+- Tab de "Cross-Link" separado del tab "Dimensions" para no saturar
+
+### Problema 4: Cards de la grid demasiado simples
+La card actual tiene un SVG mini de 100×80 que no se entiende.
+
+Solución: Card más rica visualmente:
+- SVG mini (120×80) pero con proporciones correctas del flange
+- 3-4 dimensiones clave overlaid como labels pequeños (OD, BCD, thickness)
+- Badge de tipo (WN/SO/BL) más visible
+- Al hover, mostrar un preview de las cotas principales
+- Mantener peso, nº pernos, OD en la parte inferior
+
+## ESTRUCTURA DEL COMPONENTE (mantener)
+
+FlangeLibrary (export function)
+├── Header + filtros (Type/Class/NPS)  [MANTENER]
+├── Grid de FlangeCard                 [MEJORAR SVG + cotas]
+├── FlangeDetailModal                  [MEJORAR SVG grande + cotas + toggles]
+│   ├── Header (badges clase/norma)
+│   ├── Tabs
+│   │   ├── Tab "Dimensions"           [SVG grande con cotas + tabla]
+│   │   ├── Tab "Cross-Link"           [gasket + bolts + torque — MANTENER]
+│   │   └── Tab "Notes"                [disclaimer + ASME reference]
+│   └── Footer (Export PDF PRO)
+└── PremiumGate                         [MANTENER]
+
+## DATOS DISPONIBLES EN FlangeSpec (NO cambiar)
+
+interface FlangeSpec {
+  type: 'WN' | 'SO' | 'BL';
+  typeLabel: string;           // 'Weld Neck' | 'Slip-On' | 'Blind'
+  pressureClass: '150#'|'300#'|'600#'|'900#'|'1500#';
+  facing: 'RF' | 'RTJ';
+  nps: string;                 // '6"'
+  pipeOD: number;              // 168.3 mm
+  od: number;                  // 318 mm (Outside Diameter)
+  flangeThickness: number;     // 31.8 mm
+  boltCircleDiameter: number;  // 269.9 mm
+  numBolts: number;            // 12
+  boltHoleDiameter: number;    // 22.3 mm
+  boltSize: string;            // '3/4"'
+  studLength: number;          // 150 mm
+  hubDiameterEnd?: number;     // 200.3 mm (solo WN)
+  hubDiameterBase?: number;    // 241.4 mm (solo WN)
+  hubLength?: number;          // 33.4 mm (solo WN)
+  boreDiameter?: number;       // 168.3 mm (WN/SO, no BL)
+  weight: number;              // 13.5 kg
+  gasketOD: number;
+  gasketID: number;
+  gasketType: string;
+}
+
+## FUNCIONES AUXILIARES A CREAR
+
+// Dimension line con flechas en ambos extremos
+function DimensionLine({
+  x1, y1, x2, y2,           // puntos de la línea
+  label,                     // texto (ej: "Ø 318")
+  color = '#f59e0b',
+  orientation = 'horizontal' // | 'vertical' | 'diagonal'
+}): JSX.Element
+
+// Extension line (línea corta desde el objeto hasta la cota)
+function ExtensionLine({ x, y, length, direction }): JSX.Element
+
+// Cálculo de escala para que el flange quepa en el viewBox
+function calculateScale(spec: FlangeSpec, viewWidth: number, viewHeight: number): number
+
+## PALETA DE COLORES (igual que ElbowCut)
+- Flange body: #27272a (zinc-800) stroke, #18181b (zinc-900) fill
+- Cotas/dimension lines: #f59e0b (ámbar)
+- Labels de cotas: #f59e0b fill, font-size 9-10
+- Bolt holes: #f59e0b stroke
+- Center line: #52525b dashed
+- Pipe: #52525b stroke
+- Raised face: #22d3ee (cyan) highlight
+- Hub taper: #f97316 (naranja) highlight en WN
+- Cross-hatching (BL): #52525b lines
+
+## CRITERIOS DE ACEPTACIÓN
+
+✅ El SVG del modal se ve como un drawing técnico de manual de fabricación
+✅ Las cotas tienen flechas, extension lines y labels con unidades (mm)
+✅ Los toggles de visibilidad funcionan (cotas, centro, agujeros, relleno)
+✅ Las proporciones del flange son realistas (no esquemáticas)
+✅ WN muestra hub taper + weld prep + raised face
+✅ SO muestra pipe through + fillet welds
+✅ BL muestra hatching de sólido
+✅ Los nº de bolt holes coinciden con spec.numBolts
+✅ El modal mantiene el cross-linking (gasket + bolts + torque)
+✅ El modal mantiene el PremiumGate (Export PDF PRO)
+✅ Las cards de la grid se ven más profesionales
+✅ Build pasa sin errores TypeScript
+✅ npm run dev funciona y la página carga
+
+## COMMIT
+FEAT: Flange Library v2.0 — dibujos técnicos profesionales con cotas
+
+- Rediseño completo de SVG (WN/SO/BL) con proporciones reales
+- Sistema de cotas con dimension lines + extension lines + labels
+- Toggles de visibilidad (cotas/centro/agujeros/relleno)
+- Hub taper + weld prep + raised face en WN
+- Fillet welds en SO
+- Hatching de sólido en BL
+- Modal con SVG grande + tabs (Dimensions/Cross-Link/Notes)
+- Cards mejoradas con cotas overlaid
+- Mantiene cross-linking gasket+bolts+torque (Fase 3)
+- Mantiene PremiumGate (Fase 6)
+- Diseño alineado con ElbowCut.tsx (referencia visual)
+
+## AL ACABAR
+1. npm run build — debe pasar sin errores
+2. npm run dev — verificar que carga en http://localhost:5173/tools
+3. Click en "Flange Library" → abrir una card → verificar SVG con cotas
+4. git add . && git commit -m "..."
+5. git push origin main
+6. Reporta commit hash

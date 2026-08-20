@@ -1,0 +1,56 @@
+FEATURE — Messaging V2: unread badges and message status.
+
+IMPORTANT:
+Do not redesign the platform.
+Do not break existing messages, conversations, candidates, applications, jobs, roles, or RLS.
+
+GOAL:
+Improve the recruitment messaging system so it behaves like a real inbox.
+
+TASKS:
+
+1. Add unread message count to sidebar item:
+   Messages
+
+2. Show unread badge only when unread count > 0.
+
+3. Conversation list must show:
+
+* last message
+* last message time
+* unread badge
+* participant name
+* related job title if available
+
+4. When user opens a conversation:
+   mark messages received by current user as read.
+
+5. Messages table:
+   Use existing read field.
+   If missing, add:
+   read boolean default false
+
+6. Add message status in chat:
+
+* Sent
+* Read
+
+7. Sort conversations by:
+   last_message_at DESC
+
+8. When sending a message:
+
+* insert message
+* update conversation last_message
+* update last_message_at
+* increment unread count for receiver side:
+  unread_company or unread_worker
+
+9. When opening conversation:
+   reset unread count for current user side.
+
+10. Keep RLS secure:
+    Only participants and admin can read/update their conversations.
+
+EXPECTED RESULT:
+Messages sidebar shows unread count, conversations sort correctly, and opening a conversation marks messages as read.

@@ -1,0 +1,94 @@
+## ATOM-005 | Gaskets Expansion (Spiral Wound + Ring Joint)
+
+**Estado:** PENDING
+**Prioridad:** P1
+**Output esperado:** 2 PB-COMP + 2 PB-DIM nuevos
+
+### Prompt para Atoms:
+
+```
+Necesito datos dimensionales de juntas industriales para el catalogo PIDM de PIPINGBOX.
+
+## Juntas a cubrir:
+
+### 1. Spiral Wound Gasket (ASME B16.20)
+Tipo: CGI (con inner ring de acero inoxidable)
+Clases: 150, 300
+NPS: 1/2, 3/4, 1, 1-1/4, 1-1/2, 2, 2-1/2, 3, 3-1/2, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24
+
+Campos por fila:
+  - nps: "4"
+    dn: 100
+    class: 150
+    gasket_od_in: 5.88
+    gasket_od_mm: 149.35
+    gasket_id_in: 4.00
+    gasket_id_mm: 101.60
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 3.75
+    inner_ring_id_mm: 95.25
+    centering_ring_od_in: 6.19
+    centering_ring_od_mm: 157.23
+
+### 2. Ring Joint Gasket (ASME B16.20)
+Tipo: Oval/Octagonal
+Clases: 150, 300, 600
+NPS: 1/2, 3/4, 1, 1-1/4, 1-1/2, 2, 2-1/2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24
+
+Campos por fila:
+  - nps: "4"
+    dn: 100
+    class: 300
+    ring_number: "R-26"
+    pitch_diameter_in: 5.312
+    pitch_diameter_mm: 134.93
+    od_in: 5.545
+    od_mm: 140.84
+    id_in: 5.080
+    id_mm: 129.03
+    height_in: 0.437
+    height_mm: 11.10
+    width_in: 0.233
+    width_mm: 5.92
+
+Fuente: ASME B16.20 Tables.
+
+Genera 2 bloques YAML con la seccion "rows:" completa para cada tipo de junta.
+Genera tambien 2 bloques PB-COMP siguiendo esta estructura:
+
+schema_version: 1.0.0
+id: PB-COMP-GASKET-SPIRAL-WOUND-ASME-B16-20
+metadata:
+  slug: gasket-spiral-wound
+  display_name: Spiral Wound Gasket (CGI)
+  short_name: SW Gasket
+  description: Spiral wound gasket with inner ring per ASME B16.20.
+  status: draft
+  version: '0.1'
+classification:
+  discipline: piping
+  category: gaskets
+  family: gasket
+  subfamily: spiral_wound
+  tags: [gasket, spiral-wound, CGI, sealing]
+  type: spiral_wound
+technical:
+  geometry: {shape: ring}
+  connection_types: [FLANGED_RF]
+  pressure_ratings: ['150', '300']
+  materials: [stainless_steel_304, flexible_graphite]
+standards:
+  - standard_id: PB-STD-ASME-B16-20
+    role: dimensions
+dimension_sets:
+  - PB-DIM-ASME-B16-20-GASKET-SPIRAL-WOUND
+
+(Adapta para Ring Joint cambiando subfamily, type, tags, connection_types a FLANGED_RTJ)
+```
+
+### Que controlar al revisar:
+- [ ] Gasket OD es menor que flange RF raised face OD
+- [ ] Ring numbers (R-xx) son correctos segun ASME B16.20
+- [ ] Spiral wound tiene inner ring + centering ring
+- [ ] Ring joint tiene pitch diameter entre OD e ID

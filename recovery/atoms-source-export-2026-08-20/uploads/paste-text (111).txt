@@ -1,0 +1,98 @@
+Crea el módulo "Elbow Cut Calculator" en src/tools/elbow-cut/ElbowCut.tsx e intégralo en src/pages/Tools.tsx (reemplazando el placeholder "Coming Soon" del tool key "elbow-cut").
+
+CONTEXTO:
+- Sigue el patrón de las herramientas existentes (UnitConverter, PipeDataTables, PressureDrop, etc.): componente default export, prop { user?: { id: string } | null }, dark theme (#0a0a0a, accent #f59e0b), i18n con useTranslation + defaultValue.
+- Stack: React 18 + TypeScript + SVG inline + shadcn/ui Tabs (@/components/ui/tabs).
+- El icono Scissors ya está importado en Tools.tsx para esta herramienta.
+- En Tools.tsx, el render condicional ya tiene: active === 'elbow-cut' ? <ElbowCut user={user} /> : ...
+- Solo necesitas: 1) crear el archivo, 2) añadir el import en Tools.tsx.
+
+FUNCIONALIDAD:
+Un codo estándar de 90° se corta para obtener ángulos menores. El usuario necesita saber DÓNDE cortar.
+
+INPUTS:
+- NPS: dropdown (Select de shadcn/ui) con valores 1/2" a 24" (usar NPS_DN_TABLE del UnitConverter o crear la lista inline).
+- Schedule: dropdown (10, 40/STD, 80/XS, 160, XXS).
+- Radio del codo: toggle entre "Long Radius (1.5D)" y "Short Radius (1D)".
+- Ángulo deseado: slider (shadcn Slider si existe, o input range nativo) + Input numérico, rango 1 a 90 grados.
+- El OD se calcula automáticamente desde el NPS.
+
+FÓRMULAS:
+- R (radio centro): LR = 1.5 * NPS_numérico, SR = 1.0 * NPS_numérico. (NPS_numérico = valor en pulgadas, ej 2" = 2)
+- OD = valor de la tabla NPS→OD para ese NPS.
+- angulo_rad = angulo * PI / 180
+- Distancia corte intradós = (R - OD/2) * tan(angulo_rad / 2)
+- Distancia corte extradós = (R + OD/2) * tan(angulo_rad / 2)
+- Longitud arco neutro = R * angulo_rad
+- Arco extradós = (R + OD/2) * angulo_rad
+- Arco intradós = (R - OD/2) * angulo_rad
+
+OUTPUTS:
+- Distancia de corte desde el extremo (intradós y extradós) en mm y pulgadas.
+- Longitud de arco (neutro, extradós, intradós).
+- Tabla con cotas para ángulos fijos: 5°, 10°, 15°, 20°, 25°, 30°, 45°, 60°, 75°, 90°.
+
+VISUALIZACIÓN SVG PROFESIONAL (estilo manual de fabricación):
+El SVG es lo más importante. Debe verse como un diagrama técnico profesional, no un dibujo simplista.
+
+Elementos del SVG:
+1. 3 arcos diferenciados por color:
+   - Arco EXTERIOR (extradós): stroke cyan (#22d3ee), strokeWidth 2, fill none.
+   - Arco CENTRAL (neutro): stroke white (#ffffff), strokeWidth 1.5, strokeDasharray "6 3", fill none.
+   - Arco INTERIOR (intradós): stroke orange (#f97316), strokeWidth 2, fill none.
+2. Línea de corte: stroke red (#ef4444), strokeWidth 2, strokeDasharray "4 2". Se posiciona en el ángulo deseado y se mueve en tiempo real cuando el usuario mueve el slider. Etiqueta de ángulo (texto) junto a la línea.
+3. Cotas/dimensiones con flechas:
+   - OD (Outside Diameter): línea de cota vertical con flechas en ambos extremos, etiqueta "OD: XXmm".
+   - C-C (Center to Center): línea de cota horizontal.
+   - Longitudes de arco: etiquetas en cada arco.
+   - Centro del radio marcado con un punto + etiqueta "R: XXXmm".
+4. Marcadores numerados ①②③ en cada arco (extradós, neutro, intradós).
+5. Controles de visibilidad (checkboxes):
+   - ☑ Mostrar centro
+   - ☑ Mostrar líneas de corte
+   - ☑ Mostrar cotas
+   - ☑ Mostrar relleno (fill del codo con opacity baja)
+6. El SVG debe ser responsive (viewBox, width 100%, max-width 600px).
+7. Fondo transparente (hereda dark theme).
+
+LAYOUT EN 2 PESTAÑAS (Tabs de shadcn/ui):
+- Tab "Calculadora": Inputs + SVG grande + Tabla de resultados.
+- Tab "Fórmulas y Notas": Fórmulas matemáticas (formato legible) + Notas de referencia:
+  - LR = Long Radius (1.5D), SR = Short Radius (1.0D) per ASME B16.9.
+  - Tolerancias de corte: ±2mm recomendado.
+  - El ángulo de corte se mide desde el extremo del codo.
+  - Para ángulos < 30° usar plantilla física para mayor precisión.
+
+UI LAYOUT (Tab "Calculadora"):
+- Grid de 2 columnas en desktop (lg): izquierda = inputs + tabla, derecha = SVG sticky.
+- Mobile: una columna, SVG arriba después de los inputs.
+
+VALIDACIÓN:
+- Si el ángulo es 0, mostrar "Introduce un ángulo mayor que 0".
+- Si el ángulo es 90, mostrar "Codo completo, sin corte necesario".
+
+DATOS ASME B16.9:
+Usar dimensiones reales de codos. Tabla NPS→OD (mm):
+1/2"=21.3, 3/4"=26.7, 1"=33.4, 1-1/4"=42.2, 1-1/2"=48.3, 2"=60.3,
+2-1/2"=73.0, 3"=88.9, 4"=114.3, 5"=141.3, 6"=168.3, 8"=219.1,
+10"=273.0, 12"=323.8, 14"=355.6, 16"=406.4, 18"=457.0, 20"=508.0, 24"=609.6
+
+Wall thickness por Schedule (mm) — usar los mismos valores de PIPE_DIMENSIONS en PipeDataTables.tsx:
+Sch 10, Sch 40/STD, Sch 80/XS, Sch 160, XXS.
+
+i18n:
+- Todas las labels con t('tools.elbowCut.*', { defaultValue: '...' }).
+- Añadir claves a src/i18n/locales/en.json y src/i18n/locales/es.json.
+
+ACCESIBILIDAD:
+- El SVG debe tener role="img" y aria-label descriptivo ("Codo de 90 grados con línea de corte a X grados").
+- El slider debe tener aria-label.
+
+INTEGRACIÓN EN Tools.tsx:
+- Añadir import: import ElbowCut from '@/tools/elbow-cut/ElbowCut';
+- El render condicional ya existe: active === 'elbow-cut' ? <ElbowCut user={user} /> : ...
+- Solo falta el import.
+
+NO TOCAR:
+- registry.tsx (ya tiene la entrada elbow-cut).
+- El array TOOLS en Tools.tsx (ya tiene el entry con key 'elbow-cut').

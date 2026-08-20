@@ -1,0 +1,165 @@
+ACT AS A SENIOR ENTERPRISE SAAS ADMIN ANALYTICS ENGINEER.
+
+We are completing the first production-ready version of the PipingBox Admin Center.
+
+IMPORTANT:
+Do not redesign the platform.
+Do not break existing:
+
+* Admin Center
+* users table
+* activity feed
+* lead pipeline
+* roles
+* jobs
+* companies
+* applications
+* drafts
+* dashboard
+* community
+
+Only add enterprise-level analytics and audit visibility.
+
+==================================================
+GOAL
+====
+
+Upgrade the Admin Center into a real platform control center.
+
+==================================================
+STEP 1 — PLATFORM ANALYTICS SECTION
+===================================
+
+Create a new Admin tab:
+
+Analytics
+
+Show platform statistics using live data where possible.
+
+Cards:
+
+* Total Users
+* Active Workers
+* Companies
+* Job Applications
+* Workforce Requests
+* Content Drafts
+* Published Posts
+* Open Jobs
+* Platform Moderators
+
+==================================================
+STEP 2 — WEEKLY GROWTH
+======================
+
+Add growth metrics:
+
+* New users this week
+* New applications this week
+* New workforce requests this week
+
+Show:
+
+* percentage increase/decrease if possible
+* otherwise show total count
+
+==================================================
+STEP 3 — VISUAL CHARTS
+======================
+
+Add clean SaaS charts:
+
+1. User growth
+2. Applications over time
+3. Workforce requests over time
+4. Draft activity over time
+
+Use dark-theme compatible charts.
+
+==================================================
+STEP 4 — AUDIT LOG
+==================
+
+Create another admin tab:
+
+Audit Log
+
+Track important admin actions:
+
+* role changes
+* lead status changes
+* content approvals
+* content rejections
+* job applications withdrawn
+* workforce notes saved
+
+If audit table does not exist:
+create:
+app_14da0f1941_audit_logs
+
+Columns:
+
+* id
+* created_at
+* actor_email
+* action_type
+* target_type
+* target_id
+* details
+
+==================================================
+STEP 5 — ADMIN ACTION TRACKING
+==============================
+
+Automatically log actions when:
+
+* admin changes role
+* admin updates lead status
+* admin saves internal notes
+* content status changes
+
+==================================================
+STEP 6 — SYSTEM HEALTH
+======================
+
+Create small system cards:
+
+* Supabase connection
+* Total tables loaded
+* Last activity timestamp
+* Active admin sessions (optional)
+
+==================================================
+STEP 7 — UX QUALITY
+===================
+
+Maintain current PipingBox industrial SaaS style:
+
+* black backgrounds
+* orange accents
+* premium enterprise look
+* responsive layout
+* subtle hover effects
+* smooth transitions
+
+==================================================
+STEP 8 — PERFORMANCE
+====================
+
+Prevent dashboard overload:
+
+* paginate long logs
+* limit analytics queries
+* avoid excessive realtime subscriptions
+
+==================================================
+FINAL RESULT
+============
+
+The PipingBox Admin Center should now feel like a real enterprise operations console where Gaspar can:
+
+* monitor platform growth
+* audit admin actions
+* monitor recruitment flow
+* track users
+* manage the ecosystem professionally.

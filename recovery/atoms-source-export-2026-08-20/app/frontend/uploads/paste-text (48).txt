@@ -1,0 +1,67 @@
+Add a Profile Completeness indicator to the Profile / CV page.
+
+Goal:
+Motivate workers to complete their professional profile.
+
+Requirements:
+
+1. Add a visible profile completion card near the profile preview section, preferably on the right side or directly under the preview card.
+
+2. Show:
+   - Completion percentage
+   - Progress bar
+   - Short motivational message
+   - Missing items checklist
+
+3. Calculate profile completion based on:
+
+Profile photo uploaded: 10%
+Full name completed: 5%
+Current position completed: 5%
+Current company completed: 5%
+Location completed: 5%
+Years of experience completed: 5%
+Skills added: 10%
+Professional bio completed: 10%
+CV uploaded: 15%
+At least 1 work experience added: 15%
+At least 1 certification added: 10%
+At least 1 professional document uploaded: 5%
+
+Total: 100%
+
+4. Checklist examples:
+   - Add a profile photo
+   - Upload your CV
+   - Add your first work experience
+   - Add at least one certification
+   - Add professional skills
+   - Complete your professional bio
+   - Upload supporting documents
+
+5. Use the existing PipingBox dark industrial design:
+   - dark card
+   - amber/yellow accent
+   - subtle border
+   - compact progress bar
+
+6. Add status labels:
+   - 0–39%: "Profile incomplete"
+   - 40–69%: "Good start"
+   - 70–89%: "Almost ready"
+   - 90–100%: "Recruiter-ready profile"
+
+7. In the Company Candidate Detail page, optionally show the candidate profile completion percentage as a small badge, but do not show the private checklist.
+
+8. The calculation must use real existing data:
+   - profile fields
+   - uploaded CV fields
+   - app_worker_experiences count
+   - app_worker_certifications count
+   - documents count if available
+
+9. If documents table is not available, skip documents from the calculation or treat it as optional.
+
+10. Do not create new tables.
+11. Do not break existing Profile / CV, certifications, work experience, CV upload, or alert preferences.
+12. Keep Spanish and English translations.

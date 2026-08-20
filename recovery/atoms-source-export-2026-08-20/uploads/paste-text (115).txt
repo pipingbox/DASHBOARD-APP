@@ -1,0 +1,97 @@
+## PROMPT 2: BUG-003 — Refactor Jobs.tsx
+
+
+Contexto: DASHBOARD-APP/app/frontend/src/pages/Jobs.tsx tiene 1467 lineas con todo inline. Necesita refactor a modulos.
+
+Tarea: Extraer componentes sin cambiar funcionalidad.
+
+
+
+
+
+Crear src/components/jobs/JobCard.tsx:
+
+
+
+
+
+Extraer el componente de tarjeta de trabajo que se renderiza en el grid
+
+
+
+Props: job, onApply, onSave
+
+
+
+Mantener exactamente el mismo JSX y estilos
+
+
+
+Crear src/components/jobs/JobFilters.tsx:
+
+
+
+
+
+Extraer la barra de filtros (location, type, salary range, experience)
+
+
+
+Props: filters, onFilterChange
+
+
+
+Incluir el search input
+
+
+
+Crear src/components/jobs/JobDetail.tsx:
+
+
+
+
+
+Extraer el panel de detalle que aparece al hacer click en un job
+
+
+
+Props: job, onApply, onClose
+
+
+
+Crear src/components/jobs/SavedJobs.tsx:
+
+
+
+
+
+Extraer la seccion de trabajos guardados
+
+
+
+Usar el mismo patron de localStorage que ya existe
+
+
+
+Actualizar Jobs.tsx:
+
+
+
+
+
+Importar los 4 componentes nuevos
+
+
+
+El archivo debe quedar en <200 lineas
+
+
+
+No cambiar ninguna funcionalidad, solo mover codigo
+
+
+
+Actualizar src/pages/company/CompanyJobs.tsx si usa componentes similares
+
+Verificar con: npx tsc --noEmit --skipLibCheck Hacer git diff para confirmar que el resultado final renderiza lo mismo.
+

@@ -1,0 +1,958 @@
+schema_version: "1.0.0"
+id: PB-DIM-ASME-B16-20-GASKET-RING-JOINT
+component_id: PB-COMP-GASKET-RING-JOINT-ASME-B16-20
+standard_id: PB-STD-ASME-B16-20
+dataset_type: standard
+system: mixed
+
+selectors:
+  - key: nps
+    label: "Nominal Pipe Size"
+    unit: "in"
+    type: string
+  - key: dn
+    label: "Diametre Nominal"
+    unit: "mm"
+    type: integer
+  - key: class
+    label: "Pressure Class"
+    unit: ""
+    type: integer
+
+fields:
+  - key: ring_number
+    label: "Ring Number"
+    unit: ""
+    type: string
+  - key: pitch_diameter_in
+    label: "Pitch Diameter"
+    unit: "in"
+    type: number
+  - key: pitch_diameter_mm
+    label: "Pitch Diameter"
+    unit: "mm"
+    type: number
+  - key: od_in
+    label: "Ring OD"
+    unit: "in"
+    type: number
+  - key: od_mm
+    label: "Ring OD"
+    unit: "mm"
+    type: number
+  - key: id_in
+    label: "Ring ID"
+    unit: "in"
+    type: number
+  - key: id_mm
+    label: "Ring ID"
+    unit: "mm"
+    type: number
+  - key: height_in
+    label: "Height"
+    unit: "in"
+    type: number
+  - key: height_mm
+    label: "Height"
+    unit: "mm"
+    type: number
+  - key: width_in
+    label: "Width"
+    unit: "in"
+    type: number
+  - key: width_mm
+    label: "Width"
+    unit: "mm"
+    type: number
+
+rows:
+  # ═══════════════════════════════════════════════════════════
+  # Ring Joint Gasket — ASME B16.20 (Oval/Octagonal)
+  # Ring numbers per ASME B16.20 Table
+  # Class 150 — 19 NPS
+  # ═══════════════════════════════════════════════════════════
+
+  - nps: "1/2"
+    dn: 15
+    class: 150
+    ring_number: "R-11"
+    pitch_diameter_in: 1.437
+    pitch_diameter_mm: 36.50
+    od_in: 1.557
+    od_mm: 39.55
+    id_in: 1.317
+    id_mm: 33.45
+    height_in: 0.312
+    height_mm: 7.92
+    width_in: 0.120
+    width_mm: 3.05
+
+  - nps: "3/4"
+    dn: 20
+    class: 150
+    ring_number: "R-13"
+    pitch_diameter_in: 1.687
+    pitch_diameter_mm: 42.85
+    od_in: 1.807
+    od_mm: 45.90
+    id_in: 1.567
+    id_mm: 39.80
+    height_in: 0.312
+    height_mm: 7.92
+    width_in: 0.120
+    width_mm: 3.05
+
+  - nps: "1"
+    dn: 25
+    class: 150
+    ring_number: "R-16"
+    pitch_diameter_in: 2.000
+    pitch_diameter_mm: 50.80
+    od_in: 2.152
+    od_mm: 54.66
+    id_in: 1.848
+    id_mm: 46.94
+    height_in: 0.375
+    height_mm: 9.52
+    width_in: 0.152
+    width_mm: 3.86
+
+  - nps: "1-1/4"
+    dn: 32
+    class: 150
+    ring_number: "R-18"
+    pitch_diameter_in: 2.375
+    pitch_diameter_mm: 60.33
+    od_in: 2.527
+    od_mm: 64.19
+    id_in: 2.223
+    id_mm: 56.46
+    height_in: 0.375
+    height_mm: 9.52
+    width_in: 0.152
+    width_mm: 3.86
+
+  - nps: "1-1/2"
+    dn: 40
+    class: 150
+    ring_number: "R-20"
+    pitch_diameter_in: 2.750
+    pitch_diameter_mm: 69.85
+    od_in: 2.902
+    od_mm: 73.71
+    id_in: 2.598
+    id_mm: 65.99
+    height_in: 0.375
+    height_mm: 9.52
+    width_in: 0.152
+    width_mm: 3.86
+
+  - nps: "2"
+    dn: 50
+    class: 150
+    ring_number: "R-23"
+    pitch_diameter_in: 3.375
+    pitch_diameter_mm: 85.73
+    od_in: 3.559
+    od_mm: 90.40
+    id_in: 3.191
+    id_mm: 81.05
+    height_in: 0.437
+    height_mm: 11.10
+    width_in: 0.184
+    width_mm: 4.67
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 150
+    ring_number: "R-26"
+    pitch_diameter_in: 3.937
+    pitch_diameter_mm: 100.00
+    od_in: 4.121
+    od_mm: 104.67
+    id_in: 3.753
+    id_mm: 95.33
+    height_in: 0.437
+    height_mm: 11.10
+    width_in: 0.184
+    width_mm: 4.67
+
+  - nps: "3"
+    dn: 80
+    class: 150
+    ring_number: "R-31"
+    pitch_diameter_in: 4.625
+    pitch_diameter_mm: 117.48
+    od_in: 4.841
+    od_mm: 122.96
+    id_in: 4.409
+    id_mm: 111.99
+    height_in: 0.500
+    height_mm: 12.70
+    width_in: 0.216
+    width_mm: 5.49
+
+  - nps: "4"
+    dn: 100
+    class: 150
+    ring_number: "R-37"
+    pitch_diameter_in: 5.750
+    pitch_diameter_mm: 146.05
+    od_in: 5.966
+    od_mm: 151.54
+    id_in: 5.534
+    id_mm: 140.56
+    height_in: 0.500
+    height_mm: 12.70
+    width_in: 0.216
+    width_mm: 5.49
+
+  - nps: "5"
+    dn: 125
+    class: 150
+    ring_number: "R-41"
+    pitch_diameter_in: 7.000
+    pitch_diameter_mm: 177.80
+    od_in: 7.216
+    od_mm: 183.29
+    id_in: 6.784
+    id_mm: 172.31
+    height_in: 0.500
+    height_mm: 12.70
+    width_in: 0.216
+    width_mm: 5.49
+
+  - nps: "6"
+    dn: 150
+    class: 150
+    ring_number: "R-45"
+    pitch_diameter_in: 8.000
+    pitch_diameter_mm: 203.20
+    od_in: 8.248
+    od_mm: 209.50
+    id_in: 7.752
+    id_mm: 196.90
+    height_in: 0.562
+    height_mm: 14.27
+    width_in: 0.248
+    width_mm: 6.30
+
+  - nps: "8"
+    dn: 200
+    class: 150
+    ring_number: "R-49"
+    pitch_diameter_in: 10.000
+    pitch_diameter_mm: 254.00
+    od_in: 10.248
+    od_mm: 260.30
+    id_in: 9.752
+    id_mm: 247.70
+    height_in: 0.562
+    height_mm: 14.27
+    width_in: 0.248
+    width_mm: 6.30
+
+  - nps: "10"
+    dn: 250
+    class: 150
+    ring_number: "R-53"
+    pitch_diameter_in: 12.250
+    pitch_diameter_mm: 311.15
+    od_in: 12.498
+    od_mm: 317.45
+    id_in: 12.002
+    id_mm: 304.85
+    height_in: 0.562
+    height_mm: 14.27
+    width_in: 0.248
+    width_mm: 6.30
+
+  - nps: "12"
+    dn: 300
+    class: 150
+    ring_number: "R-57"
+    pitch_diameter_in: 14.500
+    pitch_diameter_mm: 368.30
+    od_in: 14.780
+    od_mm: 375.41
+    id_in: 14.220
+    id_mm: 361.19
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "14"
+    dn: 350
+    class: 150
+    ring_number: "R-61"
+    pitch_diameter_in: 15.500
+    pitch_diameter_mm: 393.70
+    od_in: 15.780
+    od_mm: 400.81
+    id_in: 15.220
+    id_mm: 386.59
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "16"
+    dn: 400
+    class: 150
+    ring_number: "R-65"
+    pitch_diameter_in: 17.750
+    pitch_diameter_mm: 450.85
+    od_in: 18.030
+    od_mm: 457.96
+    id_in: 17.470
+    id_mm: 443.74
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "18"
+    dn: 450
+    class: 150
+    ring_number: "R-69"
+    pitch_diameter_in: 19.750
+    pitch_diameter_mm: 501.65
+    od_in: 20.030
+    od_mm: 508.76
+    id_in: 19.470
+    id_mm: 494.54
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "20"
+    dn: 500
+    class: 150
+    ring_number: "R-73"
+    pitch_diameter_in: 22.000
+    pitch_diameter_mm: 558.80
+    od_in: 22.280
+    od_mm: 565.91
+    id_in: 21.720
+    id_mm: 551.69
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "24"
+    dn: 600
+    class: 150
+    ring_number: "R-77"
+    pitch_diameter_in: 26.125
+    pitch_diameter_mm: 663.58
+    od_in: 26.405
+    od_mm: 670.69
+    id_in: 25.845
+    id_mm: 656.46
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  # ═══════════════════════════════════════════════════════════
+  # Class 300 — 19 NPS
+  # ═══════════════════════════════════════════════════════════
+
+  - nps: "1/2"
+    dn: 15
+    class: 300
+    ring_number: "R-11"
+    pitch_diameter_in: 1.437
+    pitch_diameter_mm: 36.50
+    od_in: 1.557
+    od_mm: 39.55
+    id_in: 1.317
+    id_mm: 33.45
+    height_in: 0.312
+    height_mm: 7.92
+    width_in: 0.120
+    width_mm: 3.05
+
+  - nps: "3/4"
+    dn: 20
+    class: 300
+    ring_number: "R-13"
+    pitch_diameter_in: 1.687
+    pitch_diameter_mm: 42.85
+    od_in: 1.807
+    od_mm: 45.90
+    id_in: 1.567
+    id_mm: 39.80
+    height_in: 0.312
+    height_mm: 7.92
+    width_in: 0.120
+    width_mm: 3.05
+
+  - nps: "1"
+    dn: 25
+    class: 300
+    ring_number: "R-16"
+    pitch_diameter_in: 2.000
+    pitch_diameter_mm: 50.80
+    od_in: 2.152
+    od_mm: 54.66
+    id_in: 1.848
+    id_mm: 46.94
+    height_in: 0.375
+    height_mm: 9.52
+    width_in: 0.152
+    width_mm: 3.86
+
+  - nps: "1-1/4"
+    dn: 32
+    class: 300
+    ring_number: "R-18"
+    pitch_diameter_in: 2.375
+    pitch_diameter_mm: 60.33
+    od_in: 2.527
+    od_mm: 64.19
+    id_in: 2.223
+    id_mm: 56.46
+    height_in: 0.375
+    height_mm: 9.52
+    width_in: 0.152
+    width_mm: 3.86
+
+  - nps: "1-1/2"
+    dn: 40
+    class: 300
+    ring_number: "R-20"
+    pitch_diameter_in: 2.750
+    pitch_diameter_mm: 69.85
+    od_in: 2.902
+    od_mm: 73.71
+    id_in: 2.598
+    id_mm: 65.99
+    height_in: 0.375
+    height_mm: 9.52
+    width_in: 0.152
+    width_mm: 3.86
+
+  - nps: "2"
+    dn: 50
+    class: 300
+    ring_number: "R-24"
+    pitch_diameter_in: 3.500
+    pitch_diameter_mm: 88.90
+    od_in: 3.684
+    od_mm: 93.57
+    id_in: 3.316
+    id_mm: 84.23
+    height_in: 0.437
+    height_mm: 11.10
+    width_in: 0.184
+    width_mm: 4.67
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 300
+    ring_number: "R-27"
+    pitch_diameter_in: 4.125
+    pitch_diameter_mm: 104.78
+    od_in: 4.309
+    od_mm: 109.45
+    id_in: 3.941
+    id_mm: 100.10
+    height_in: 0.437
+    height_mm: 11.10
+    width_in: 0.184
+    width_mm: 4.67
+
+  - nps: "3"
+    dn: 80
+    class: 300
+    ring_number: "R-31"
+    pitch_diameter_in: 4.625
+    pitch_diameter_mm: 117.48
+    od_in: 4.841
+    od_mm: 122.96
+    id_in: 4.409
+    id_mm: 111.99
+    height_in: 0.500
+    height_mm: 12.70
+    width_in: 0.216
+    width_mm: 5.49
+
+  - nps: "4"
+    dn: 100
+    class: 300
+    ring_number: "R-37"
+    pitch_diameter_in: 5.750
+    pitch_diameter_mm: 146.05
+    od_in: 5.966
+    od_mm: 151.54
+    id_in: 5.534
+    id_mm: 140.56
+    height_in: 0.500
+    height_mm: 12.70
+    width_in: 0.216
+    width_mm: 5.49
+
+  - nps: "5"
+    dn: 125
+    class: 300
+    ring_number: "R-41"
+    pitch_diameter_in: 7.000
+    pitch_diameter_mm: 177.80
+    od_in: 7.216
+    od_mm: 183.29
+    id_in: 6.784
+    id_mm: 172.31
+    height_in: 0.500
+    height_mm: 12.70
+    width_in: 0.216
+    width_mm: 5.49
+
+  - nps: "6"
+    dn: 150
+    class: 300
+    ring_number: "R-45"
+    pitch_diameter_in: 8.000
+    pitch_diameter_mm: 203.20
+    od_in: 8.248
+    od_mm: 209.50
+    id_in: 7.752
+    id_mm: 196.90
+    height_in: 0.562
+    height_mm: 14.27
+    width_in: 0.248
+    width_mm: 6.30
+
+  - nps: "8"
+    dn: 200
+    class: 300
+    ring_number: "R-49"
+    pitch_diameter_in: 10.000
+    pitch_diameter_mm: 254.00
+    od_in: 10.248
+    od_mm: 260.30
+    id_in: 9.752
+    id_mm: 247.70
+    height_in: 0.562
+    height_mm: 14.27
+    width_in: 0.248
+    width_mm: 6.30
+
+  - nps: "10"
+    dn: 250
+    class: 300
+    ring_number: "R-53"
+    pitch_diameter_in: 12.250
+    pitch_diameter_mm: 311.15
+    od_in: 12.498
+    od_mm: 317.45
+    id_in: 12.002
+    id_mm: 304.85
+    height_in: 0.562
+    height_mm: 14.27
+    width_in: 0.248
+    width_mm: 6.30
+
+  - nps: "12"
+    dn: 300
+    class: 300
+    ring_number: "R-57"
+    pitch_diameter_in: 14.500
+    pitch_diameter_mm: 368.30
+    od_in: 14.780
+    od_mm: 375.41
+    id_in: 14.220
+    id_mm: 361.19
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "14"
+    dn: 350
+    class: 300
+    ring_number: "R-62"
+    pitch_diameter_in: 16.000
+    pitch_diameter_mm: 406.40
+    od_in: 16.280
+    od_mm: 413.51
+    id_in: 15.720
+    id_mm: 399.29
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "16"
+    dn: 400
+    class: 300
+    ring_number: "R-66"
+    pitch_diameter_in: 18.250
+    pitch_diameter_mm: 463.55
+    od_in: 18.530
+    od_mm: 470.66
+    id_in: 17.970
+    id_mm: 456.44
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "18"
+    dn: 450
+    class: 300
+    ring_number: "R-70"
+    pitch_diameter_in: 20.500
+    pitch_diameter_mm: 520.70
+    od_in: 20.780
+    od_mm: 527.81
+    id_in: 20.220
+    id_mm: 513.59
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "20"
+    dn: 500
+    class: 300
+    ring_number: "R-74"
+    pitch_diameter_in: 22.500
+    pitch_diameter_mm: 571.50
+    od_in: 22.780
+    od_mm: 578.61
+    id_in: 22.220
+    id_mm: 564.39
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "24"
+    dn: 600
+    class: 300
+    ring_number: "R-78"
+    pitch_diameter_in: 26.750
+    pitch_diameter_mm: 679.45
+    od_in: 27.030
+    od_mm: 686.56
+    id_in: 26.470
+    id_mm: 672.34
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  # ═══════════════════════════════════════════════════════════
+  # Class 600 — 19 NPS
+  # ═══════════════════════════════════════════════════════════
+
+  - nps: "1/2"
+    dn: 15
+    class: 600
+    ring_number: "R-11"
+    pitch_diameter_in: 1.437
+    pitch_diameter_mm: 36.50
+    od_in: 1.557
+    od_mm: 39.55
+    id_in: 1.317
+    id_mm: 33.45
+    height_in: 0.312
+    height_mm: 7.92
+    width_in: 0.120
+    width_mm: 3.05
+
+  - nps: "3/4"
+    dn: 20
+    class: 600
+    ring_number: "R-13"
+    pitch_diameter_in: 1.687
+    pitch_diameter_mm: 42.85
+    od_in: 1.807
+    od_mm: 45.90
+    id_in: 1.567
+    id_mm: 39.80
+    height_in: 0.312
+    height_mm: 7.92
+    width_in: 0.120
+    width_mm: 3.05
+
+  - nps: "1"
+    dn: 25
+    class: 600
+    ring_number: "R-16"
+    pitch_diameter_in: 2.000
+    pitch_diameter_mm: 50.80
+    od_in: 2.152
+    od_mm: 54.66
+    id_in: 1.848
+    id_mm: 46.94
+    height_in: 0.375
+    height_mm: 9.52
+    width_in: 0.152
+    width_mm: 3.86
+
+  - nps: "1-1/4"
+    dn: 32
+    class: 600
+    ring_number: "R-18"
+    pitch_diameter_in: 2.375
+    pitch_diameter_mm: 60.33
+    od_in: 2.527
+    od_mm: 64.19
+    id_in: 2.223
+    id_mm: 56.46
+    height_in: 0.375
+    height_mm: 9.52
+    width_in: 0.152
+    width_mm: 3.86
+
+  - nps: "1-1/2"
+    dn: 40
+    class: 600
+    ring_number: "R-20"
+    pitch_diameter_in: 2.750
+    pitch_diameter_mm: 69.85
+    od_in: 2.902
+    od_mm: 73.71
+    id_in: 2.598
+    id_mm: 65.99
+    height_in: 0.375
+    height_mm: 9.52
+    width_in: 0.152
+    width_mm: 3.86
+
+  - nps: "2"
+    dn: 50
+    class: 600
+    ring_number: "R-24"
+    pitch_diameter_in: 3.500
+    pitch_diameter_mm: 88.90
+    od_in: 3.684
+    od_mm: 93.57
+    id_in: 3.316
+    id_mm: 84.23
+    height_in: 0.437
+    height_mm: 11.10
+    width_in: 0.184
+    width_mm: 4.67
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 600
+    ring_number: "R-27"
+    pitch_diameter_in: 4.125
+    pitch_diameter_mm: 104.78
+    od_in: 4.309
+    od_mm: 109.45
+    id_in: 3.941
+    id_mm: 100.10
+    height_in: 0.437
+    height_mm: 11.10
+    width_in: 0.184
+    width_mm: 4.67
+
+  - nps: "3"
+    dn: 80
+    class: 600
+    ring_number: "R-32"
+    pitch_diameter_in: 4.875
+    pitch_diameter_mm: 123.83
+    od_in: 5.091
+    od_mm: 129.31
+    id_in: 4.659
+    id_mm: 118.34
+    height_in: 0.500
+    height_mm: 12.70
+    width_in: 0.216
+    width_mm: 5.49
+
+  - nps: "4"
+    dn: 100
+    class: 600
+    ring_number: "R-37"
+    pitch_diameter_in: 5.750
+    pitch_diameter_mm: 146.05
+    od_in: 5.966
+    od_mm: 151.54
+    id_in: 5.534
+    id_mm: 140.56
+    height_in: 0.500
+    height_mm: 12.70
+    width_in: 0.216
+    width_mm: 5.49
+
+  - nps: "5"
+    dn: 125
+    class: 600
+    ring_number: "R-41"
+    pitch_diameter_in: 7.000
+    pitch_diameter_mm: 177.80
+    od_in: 7.216
+    od_mm: 183.29
+    id_in: 6.784
+    id_mm: 172.31
+    height_in: 0.500
+    height_mm: 12.70
+    width_in: 0.216
+    width_mm: 5.49
+
+  - nps: "6"
+    dn: 150
+    class: 600
+    ring_number: "R-46"
+    pitch_diameter_in: 8.375
+    pitch_diameter_mm: 212.73
+    od_in: 8.623
+    od_mm: 219.02
+    id_in: 8.127
+    id_mm: 206.43
+    height_in: 0.562
+    height_mm: 14.27
+    width_in: 0.248
+    width_mm: 6.30
+
+  - nps: "8"
+    dn: 200
+    class: 600
+    ring_number: "R-50"
+    pitch_diameter_in: 10.500
+    pitch_diameter_mm: 266.70
+    od_in: 10.748
+    od_mm: 273.00
+    id_in: 10.252
+    id_mm: 260.40
+    height_in: 0.562
+    height_mm: 14.27
+    width_in: 0.248
+    width_mm: 6.30
+
+  - nps: "10"
+    dn: 250
+    class: 600
+    ring_number: "R-54"
+    pitch_diameter_in: 12.750
+    pitch_diameter_mm: 323.85
+    od_in: 12.998
+    od_mm: 330.15
+    id_in: 12.502
+    id_mm: 317.55
+    height_in: 0.562
+    height_mm: 14.27
+    width_in: 0.248
+    width_mm: 6.30
+
+  - nps: "12"
+    dn: 300
+    class: 600
+    ring_number: "R-58"
+    pitch_diameter_in: 15.000
+    pitch_diameter_mm: 381.00
+    od_in: 15.280
+    od_mm: 388.11
+    id_in: 14.720
+    id_mm: 373.89
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "14"
+    dn: 350
+    class: 600
+    ring_number: "R-62"
+    pitch_diameter_in: 16.000
+    pitch_diameter_mm: 406.40
+    od_in: 16.280
+    od_mm: 413.51
+    id_in: 15.720
+    id_mm: 399.29
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "16"
+    dn: 400
+    class: 600
+    ring_number: "R-66"
+    pitch_diameter_in: 18.250
+    pitch_diameter_mm: 463.55
+    od_in: 18.530
+    od_mm: 470.66
+    id_in: 17.970
+    id_mm: 456.44
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "18"
+    dn: 450
+    class: 600
+    ring_number: "R-70"
+    pitch_diameter_in: 20.500
+    pitch_diameter_mm: 520.70
+    od_in: 20.780
+    od_mm: 527.81
+    id_in: 20.220
+    id_mm: 513.59
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "20"
+    dn: 500
+    class: 600
+    ring_number: "R-74"
+    pitch_diameter_in: 22.500
+    pitch_diameter_mm: 571.50
+    od_in: 22.780
+    od_mm: 578.61
+    id_in: 22.220
+    id_mm: 564.39
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+  - nps: "24"
+    dn: 600
+    class: 600
+    ring_number: "R-78"
+    pitch_diameter_in: 26.750
+    pitch_diameter_mm: 679.45
+    od_in: 27.030
+    od_mm: 686.56
+    id_in: 26.470
+    id_mm: 672.34
+    height_in: 0.625
+    height_mm: 15.88
+    width_in: 0.280
+    width_mm: 7.11
+
+notes:
+  - "Ring joint gasket dimensions per ASME B16.20."
+  - "Ring numbers (R-xx) are standard designations per ASME B16.20 Table."
+  - "Pitch diameter is the nominal groove diameter on the flange face."
+  - "OD and ID are the outer and inner diameters of the ring cross-section."
+  - "Height and width define the oval/octagonal cross-section."
+  - "Same ring number may apply to multiple pressure classes (groove is same)."
+  - "Class 600 may use different ring numbers than Class 150/300 for larger NPS."
+
+quality:
+  validation_status: draft
+  confidence: 0.75
+  sources:
+    - name: ASME B16.20-2017
+      url: https://www.asme.org
+      access_date: "2026-07-26"
+      note: Ring joint gasket dimensions for RTJ flanges.
+
+lifecycle:
+  created_at: "2026-07-26"
+  updated_at: "2026-07-26"

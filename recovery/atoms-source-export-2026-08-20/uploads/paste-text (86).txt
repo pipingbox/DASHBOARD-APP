@@ -1,0 +1,57 @@
+El sistema Feedback Beta ya conecta correctamente con Supabase.
+
+Ahora el error exacto es:
+“No tienes permisos para realizar esta acción. Verifica que estás autenticado.”
+
+Eso significa que:
+- el frontend llega a Supabase,
+- la tabla existe,
+- pero la policy RLS de INSERT está bloqueando el envío.
+
+Necesito corregir únicamente la autenticación y políticas RLS del INSERT.
+
+Objetivo:
+Permitir que usuarios autenticados puedan enviar reportes correctamente.
+
+Comprobar:
+
+1. Frontend
+- Verificar que el usuario actual de Supabase está autenticado.
+- Obtener correctamente:
+  const { data: { user } } = await supabase.auth.getUser()
+- Enviar:
+  user_id = user.id
+  user_email = user.email
+
+2. INSERT actual
+- Verificar qué payload se envía realmente.
+- Añadir console.log temporal del payload antes del insert.
+- Confirmar que user_id no es undefined ni null.
+
+3. Policy RLS INSERT
+Corregir policy para permitir:
+
+authenticated users
+WITH CHECK (
+  auth.uid() = user_id
+)
+
+4. Si el sistema permite usuarios anónimos:
+- permitir user_id null opcionalmente
+- pero mantener seguridad
+
+5. Panel admin
+- Mantener SELECT solo admins.
+- No romper lectura admin.
+
+6. Debugging
+- Mostrar en consola:
+  auth.uid()
+  payload.user_id
+  resultado exacto de Supabase
+
+7. Importante
+- No recrear tabla.
+- No desactivar RLS globalmente.
+- No usar service_role en frontend.
+- Mantener diseño actual.

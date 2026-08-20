@@ -1,0 +1,71 @@
+Connect Worker Search to real Supabase data.
+
+Current issue:
+Worker Search UI exists but returns no workers. It looks disconnected from database.
+
+Goal:
+Companies should be able to search real worker profiles.
+
+Use these tables:
+- public.app_14da0f1941_profiles
+- public.app_worker_experiences
+- public.app_worker_certifications
+- public.app_worker_documents
+
+Requirements:
+
+1. Fetch workers from app_14da0f1941_profiles.
+
+2. Only show profiles that have enough public data:
+- full_name not null
+- title not null
+- cv_visible = true OR show_avatar = true OR profile is completed enough
+
+3. For each worker, also fetch:
+- work experience count from app_worker_experiences
+- certification count from app_worker_certifications
+- document count from app_worker_documents
+- latest/main certifications if visible_to_companies = true
+- availability fields from profile:
+  employment_status
+  availability_status
+  available_from
+  willing_to_travel
+  willing_to_relocate
+  preferred_regions
+  rotation_preference
+  notice_period
+
+4. Worker cards must show:
+- name
+- title
+- company
+- location
+- years_experience
+- skills
+- availability badge
+- willing to travel / relocate badges
+- certifications count
+- profile completeness %
+- button: View profile
+
+5. Filters must work:
+- keyword search over name, title, skills, company, location
+- role/trade
+- country/location
+- availability
+- certification
+- experience level
+
+6. Clicking View profile should open the existing Candidate Detail route:
+/candidate/:userId
+
+7. If no workers match, show:
+"No workers found. Try changing your filters."
+
+8. Add loading state and error state.
+
+9. Keep current dark industrial PipingBox design.
+
+10. Do not create new tables.
+11. Do not break Candidate Detail, Profile / CV, certifications, documents or experiences.

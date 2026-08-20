@@ -1,0 +1,524 @@
+schema_version: "1.0.0"
+id: PB-DIM-STUD-BOLTS-CLASS300-600
+component_id: PB-COMP-STUD-BOLT
+standard_id: PB-STD-ASME-B16-5
+dataset_type: standard
+system: mixed
+
+selectors:
+  - key: nps
+    label: "Nominal Pipe Size"
+    unit: "in"
+    type: string
+  - key: dn
+    label: "Diametre Nominal"
+    unit: "mm"
+    type: integer
+  - key: class
+    label: "Pressure Class"
+    unit: ""
+    type: integer
+
+fields:
+  - key: stud_dia_in
+    label: "Stud Diameter"
+    unit: "in"
+    type: number
+  - key: stud_dia_mm
+    label: "Stud Diameter"
+    unit: "mm"
+    type: number
+  - key: stud_length_in
+    label: "Stud Length"
+    unit: "in"
+    type: number
+  - key: stud_length_mm
+    label: "Stud Length"
+    unit: "mm"
+    type: number
+  - key: num_studs
+    label: "Number of Studs"
+    unit: ""
+    type: integer
+  - key: nut_size_in
+    label: "Nut Size (across flats)"
+    unit: "in"
+    type: number
+  - key: nut_size_mm
+    label: "Nut Size (across flats)"
+    unit: "mm"
+    type: number
+
+rows:
+  # ═══════════════════════════════════════════════════════════
+  # Stud Bolts for ASME B16.5 Flanges
+  # Source: ASME B16.5 Table E-1 (Bolting Data)
+  # Stud length ≈ 2×flange_thickness + 2×nut_height + thread_protrusion
+  # num_studs = num_bolts from flange table
+  # stud_dia = bolt_dia from flange table
+  # nut_size = stud_dia (heavy hex nut per ASME B18.2.2)
+  # ═══════════════════════════════════════════════════════════
+
+  # --- Class 300 (consistent with PB-DIM-FLANGE-SO-CLASS300) ---
+  - nps: "1/2"
+    dn: 15
+    class: 300
+    stud_dia_in: 0.625
+    stud_dia_mm: 15.88
+    stud_length_in: 3.25
+    stud_length_mm: 82.55
+    num_studs: 4
+    nut_size_in: 0.625
+    nut_size_mm: 15.88
+
+  - nps: "3/4"
+    dn: 20
+    class: 300
+    stud_dia_in: 0.750
+    stud_dia_mm: 19.05
+    stud_length_in: 3.50
+    stud_length_mm: 88.90
+    num_studs: 4
+    nut_size_in: 0.750
+    nut_size_mm: 19.05
+
+  - nps: "1"
+    dn: 25
+    class: 300
+    stud_dia_in: 0.750
+    stud_dia_mm: 19.05
+    stud_length_in: 3.75
+    stud_length_mm: 95.25
+    num_studs: 4
+    nut_size_in: 0.750
+    nut_size_mm: 19.05
+
+  - nps: "1-1/4"
+    dn: 32
+    class: 300
+    stud_dia_in: 0.750
+    stud_dia_mm: 19.05
+    stud_length_in: 4.00
+    stud_length_mm: 101.60
+    num_studs: 4
+    nut_size_in: 0.750
+    nut_size_mm: 19.05
+
+  - nps: "1-1/2"
+    dn: 40
+    class: 300
+    stud_dia_in: 0.875
+    stud_dia_mm: 22.23
+    stud_length_in: 4.25
+    stud_length_mm: 107.95
+    num_studs: 4
+    nut_size_in: 0.875
+    nut_size_mm: 22.23
+
+  - nps: "2"
+    dn: 50
+    class: 300
+    stud_dia_in: 0.625
+    stud_dia_mm: 15.88
+    stud_length_in: 4.25
+    stud_length_mm: 107.95
+    num_studs: 8
+    nut_size_in: 0.625
+    nut_size_mm: 15.88
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 300
+    stud_dia_in: 0.750
+    stud_dia_mm: 19.05
+    stud_length_in: 4.50
+    stud_length_mm: 114.30
+    num_studs: 8
+    nut_size_in: 0.750
+    nut_size_mm: 19.05
+
+  - nps: "3"
+    dn: 80
+    class: 300
+    stud_dia_in: 0.750
+    stud_dia_mm: 19.05
+    stud_length_in: 4.75
+    stud_length_mm: 120.65
+    num_studs: 8
+    nut_size_in: 0.750
+    nut_size_mm: 19.05
+
+  - nps: "3-1/2"
+    dn: 90
+    class: 300
+    stud_dia_in: 0.875
+    stud_dia_mm: 22.23
+    stud_length_in: 5.00
+    stud_length_mm: 127.00
+    num_studs: 8
+    nut_size_in: 0.875
+    nut_size_mm: 22.23
+
+  - nps: "4"
+    dn: 100
+    class: 300
+    stud_dia_in: 0.875
+    stud_dia_mm: 22.23
+    stud_length_in: 5.50
+    stud_length_mm: 139.70
+    num_studs: 8
+    nut_size_in: 0.875
+    nut_size_mm: 22.23
+
+  - nps: "5"
+    dn: 125
+    class: 300
+    stud_dia_in: 0.875
+    stud_dia_mm: 22.23
+    stud_length_in: 5.75
+    stud_length_mm: 146.05
+    num_studs: 8
+    nut_size_in: 0.875
+    nut_size_mm: 22.23
+
+  - nps: "6"
+    dn: 150
+    class: 300
+    stud_dia_in: 0.875
+    stud_dia_mm: 22.23
+    stud_length_in: 6.00
+    stud_length_mm: 152.40
+    num_studs: 12
+    nut_size_in: 0.875
+    nut_size_mm: 22.23
+
+  - nps: "8"
+    dn: 200
+    class: 300
+    stud_dia_in: 1.000
+    stud_dia_mm: 25.40
+    stud_length_in: 6.75
+    stud_length_mm: 171.45
+    num_studs: 12
+    nut_size_in: 1.000
+    nut_size_mm: 25.40
+
+  - nps: "10"
+    dn: 250
+    class: 300
+    stud_dia_in: 1.125
+    stud_dia_mm: 28.58
+    stud_length_in: 7.50
+    stud_length_mm: 190.50
+    num_studs: 16
+    nut_size_in: 1.125
+    nut_size_mm: 28.58
+
+  - nps: "12"
+    dn: 300
+    class: 300
+    stud_dia_in: 1.250
+    stud_dia_mm: 31.75
+    stud_length_in: 8.00
+    stud_length_mm: 203.20
+    num_studs: 16
+    nut_size_in: 1.250
+    nut_size_mm: 31.75
+
+  - nps: "14"
+    dn: 350
+    class: 300
+    stud_dia_in: 1.125
+    stud_dia_mm: 28.58
+    stud_length_in: 8.25
+    stud_length_mm: 209.55
+    num_studs: 20
+    nut_size_in: 1.125
+    nut_size_mm: 28.58
+
+  - nps: "16"
+    dn: 400
+    class: 300
+    stud_dia_in: 1.250
+    stud_dia_mm: 31.75
+    stud_length_in: 8.75
+    stud_length_mm: 222.25
+    num_studs: 20
+    nut_size_in: 1.250
+    nut_size_mm: 31.75
+
+  - nps: "18"
+    dn: 450
+    class: 300
+    stud_dia_in: 1.250
+    stud_dia_mm: 31.75
+    stud_length_in: 9.25
+    stud_length_mm: 234.95
+    num_studs: 24
+    nut_size_in: 1.250
+    nut_size_mm: 31.75
+
+  - nps: "20"
+    dn: 500
+    class: 300
+    stud_dia_in: 1.250
+    stud_dia_mm: 31.75
+    stud_length_in: 9.75
+    stud_length_mm: 247.65
+    num_studs: 24
+    nut_size_in: 1.250
+    nut_size_mm: 31.75
+
+  - nps: "24"
+    dn: 600
+    class: 300
+    stud_dia_in: 1.500
+    stud_dia_mm: 38.10
+    stud_length_in: 10.75
+    stud_length_mm: 273.05
+    num_studs: 24
+    nut_size_in: 1.500
+    nut_size_mm: 38.10
+
+  # --- Class 600 (heavier flanges, larger/more bolts per B16.5) ---
+  - nps: "1/2"
+    dn: 15
+    class: 600
+    stud_dia_in: 0.625
+    stud_dia_mm: 15.88
+    stud_length_in: 3.75
+    stud_length_mm: 95.25
+    num_studs: 4
+    nut_size_in: 0.625
+    nut_size_mm: 15.88
+
+  - nps: "3/4"
+    dn: 20
+    class: 600
+    stud_dia_in: 0.750
+    stud_dia_mm: 19.05
+    stud_length_in: 4.25
+    stud_length_mm: 107.95
+    num_studs: 4
+    nut_size_in: 0.750
+    nut_size_mm: 19.05
+
+  - nps: "1"
+    dn: 25
+    class: 600
+    stud_dia_in: 0.750
+    stud_dia_mm: 19.05
+    stud_length_in: 4.50
+    stud_length_mm: 114.30
+    num_studs: 4
+    nut_size_in: 0.750
+    nut_size_mm: 19.05
+
+  - nps: "1-1/4"
+    dn: 32
+    class: 600
+    stud_dia_in: 0.750
+    stud_dia_mm: 19.05
+    stud_length_in: 4.75
+    stud_length_mm: 120.65
+    num_studs: 4
+    nut_size_in: 0.750
+    nut_size_mm: 19.05
+
+  - nps: "1-1/2"
+    dn: 40
+    class: 600
+    stud_dia_in: 0.875
+    stud_dia_mm: 22.23
+    stud_length_in: 5.00
+    stud_length_mm: 127.00
+    num_studs: 4
+    nut_size_in: 0.875
+    nut_size_mm: 22.23
+
+  - nps: "2"
+    dn: 50
+    class: 600
+    stud_dia_in: 0.750
+    stud_dia_mm: 19.05
+    stud_length_in: 5.25
+    stud_length_mm: 133.35
+    num_studs: 8
+    nut_size_in: 0.750
+    nut_size_mm: 19.05
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 600
+    stud_dia_in: 0.875
+    stud_dia_mm: 22.23
+    stud_length_in: 5.50
+    stud_length_mm: 139.70
+    num_studs: 8
+    nut_size_in: 0.875
+    nut_size_mm: 22.23
+
+  - nps: "3"
+    dn: 80
+    class: 600
+    stud_dia_in: 0.875
+    stud_dia_mm: 22.23
+    stud_length_in: 5.75
+    stud_length_mm: 146.05
+    num_studs: 8
+    nut_size_in: 0.875
+    nut_size_mm: 22.23
+
+  - nps: "3-1/2"
+    dn: 90
+    class: 600
+    stud_dia_in: 1.000
+    stud_dia_mm: 25.40
+    stud_length_in: 6.25
+    stud_length_mm: 158.75
+    num_studs: 8
+    nut_size_in: 1.000
+    nut_size_mm: 25.40
+
+  - nps: "4"
+    dn: 100
+    class: 600
+    stud_dia_in: 1.000
+    stud_dia_mm: 25.40
+    stud_length_in: 6.50
+    stud_length_mm: 165.10
+    num_studs: 8
+    nut_size_in: 1.000
+    nut_size_mm: 25.40
+
+  - nps: "5"
+    dn: 125
+    class: 600
+    stud_dia_in: 1.000
+    stud_dia_mm: 25.40
+    stud_length_in: 7.00
+    stud_length_mm: 177.80
+    num_studs: 8
+    nut_size_in: 1.000
+    nut_size_mm: 25.40
+
+  - nps: "6"
+    dn: 150
+    class: 600
+    stud_dia_in: 1.125
+    stud_dia_mm: 28.58
+    stud_length_in: 7.50
+    stud_length_mm: 190.50
+    num_studs: 12
+    nut_size_in: 1.125
+    nut_size_mm: 28.58
+
+  - nps: "8"
+    dn: 200
+    class: 600
+    stud_dia_in: 1.250
+    stud_dia_mm: 31.75
+    stud_length_in: 8.50
+    stud_length_mm: 215.90
+    num_studs: 12
+    nut_size_in: 1.250
+    nut_size_mm: 31.75
+
+  - nps: "10"
+    dn: 250
+    class: 600
+    stud_dia_in: 1.375
+    stud_dia_mm: 34.93
+    stud_length_in: 9.50
+    stud_length_mm: 241.30
+    num_studs: 16
+    nut_size_in: 1.375
+    nut_size_mm: 34.93
+
+  - nps: "12"
+    dn: 300
+    class: 600
+    stud_dia_in: 1.375
+    stud_dia_mm: 34.93
+    stud_length_in: 10.25
+    stud_length_mm: 260.35
+    num_studs: 20
+    nut_size_in: 1.375
+    nut_size_mm: 34.93
+
+  - nps: "14"
+    dn: 350
+    class: 600
+    stud_dia_in: 1.500
+    stud_dia_mm: 38.10
+    stud_length_in: 10.75
+    stud_length_mm: 273.05
+    num_studs: 20
+    nut_size_in: 1.500
+    nut_size_mm: 38.10
+
+  - nps: "16"
+    dn: 400
+    class: 600
+    stud_dia_in: 1.625
+    stud_dia_mm: 41.28
+    stud_length_in: 11.50
+    stud_length_mm: 292.10
+    num_studs: 20
+    nut_size_in: 1.625
+    nut_size_mm: 41.28
+
+  - nps: "18"
+    dn: 450
+    class: 600
+    stud_dia_in: 1.625
+    stud_dia_mm: 41.28
+    stud_length_in: 12.25
+    stud_length_mm: 311.15
+    num_studs: 20
+    nut_size_in: 1.625
+    nut_size_mm: 41.28
+
+  - nps: "20"
+    dn: 500
+    class: 600
+    stud_dia_in: 1.625
+    stud_dia_mm: 41.28
+    stud_length_in: 13.00
+    stud_length_mm: 330.20
+    num_studs: 24
+    nut_size_in: 1.625
+    nut_size_mm: 41.28
+
+  - nps: "24"
+    dn: 600
+    class: 600
+    stud_dia_in: 1.875
+    stud_dia_mm: 47.63
+    stud_length_in: 14.50
+    stud_length_mm: 368.30
+    num_studs: 24
+    nut_size_in: 1.875
+    nut_size_mm: 47.63
+
+notes:
+  - "Stud bolt data per ASME B16.5 Table E-1."
+  - "Stud length = 2 × flange thickness + 2 × nut height + thread protrusion."
+  - "num_studs matches num_bolts from corresponding flange table."
+  - "stud_dia matches bolt_dia from corresponding flange table."
+  - "nut_size equals stud diameter (heavy hex nuts per ASME B18.2.2)."
+  - "Class 600 studs are larger diameter and longer than Class 300 for same NPS."
+  - "Material: ASTM A193 Gr. B7 studs with ASTM A194 Gr. 2H nuts (typical)."
+
+quality:
+  validation_status: draft
+  confidence: 0.75
+  sources:
+    - name: ASME B16.5-2020 Table E-1
+      url: https://www.asme.org
+      access_date: "2026-07-26"
+      note: Bolting data for flanged joints.
+
+lifecycle:
+  created_at: "2026-07-26"
+  updated_at: "2026-07-26"

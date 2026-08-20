@@ -1,0 +1,139 @@
+ACT AS A SENIOR SAAS ADMIN PANEL ENGINEER.
+
+We need to continue improving the PipingBox Admin Center.
+
+IMPORTANT:
+Do not redesign the platform.
+Do not break existing Admin Center, roles, users table, dashboard, jobs, companies, applications, profile, community, or content drafts.
+
+Only add a real platform activity feed inside Admin Center.
+
+==================================================
+GOAL
+====
+
+Add a "Platform Activity" section to /admin so the admin can see what is happening inside PipingBox.
+
+==================================================
+STEP 1 — ACTIVITY FEED
+======================
+
+Create a section:
+
+Platform Activity
+
+Show recent activity from existing tables:
+
+1. Job applications
+   Table:
+   app_14da0f1941_job_applications
+
+Show:
+
+* user applied to job
+* company
+* job title
+* created_at
+
+2. Workforce requests
+   Table:
+   app_14da0f1941_company_leads
+
+Show:
+
+* company requested workforce
+* country
+* workers needed
+* created_at
+
+3. Content drafts
+   Table:
+   app_14da0f1941_ai_content_drafts
+
+Show:
+
+* draft created
+* suggested channel
+* status
+* created_at
+
+4. New users
+   Table:
+   profiles
+
+Show:
+
+* new user registered
+* role
+* created_at if available
+
+==================================================
+STEP 2 — SORTING
+================
+
+Merge all activity items into one unified feed.
+
+Sort by newest first.
+
+Limit to latest 20 activities.
+
+==================================================
+STEP 3 — ACTIVITY DESIGN
+========================
+
+Use professional activity cards with:
+
+* icon
+* activity type
+* short description
+* timestamp
+* source label
+
+Activity types:
+
+* New Application
+* Workforce Request
+* Content Draft
+* New User
+
+==================================================
+STEP 4 — FILTERS
+================
+
+Add simple filters:
+
+* All
+* Applications
+* Workforce
+* Content
+* Users
+
+==================================================
+STEP 5 — SAFE FALLBACKS
+=======================
+
+If a table has no data:
+do not break the feed.
+
+If all tables are empty:
+show:
+"No platform activity yet."
+
+==================================================
+STEP 6 — UX QUALITY
+===================
+
+Use current PipingBox dark industrial SaaS style:
+
+* black background
+* orange accent
+* clean cards
+* subtle hover effects
+* loading skeletons
+* responsive layout
+
+==================================================
+FINAL RESULT
+============
+
+Admin Center should now show a real internal activity feed so Gaspar can monitor the life of the platform from one place.

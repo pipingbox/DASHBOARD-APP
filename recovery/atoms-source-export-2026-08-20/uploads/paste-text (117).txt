@@ -1,0 +1,97 @@
+## PROMPT 4: UX-001 — Onboarding Mejorado
+
+
+Contexto: DASHBOARD-APP/app/frontend tiene un OnboardingWizard basico. Necesita mejoras de UX.
+
+Tarea: Mejorar el flujo de onboarding post-registro.
+
+
+
+
+
+Leer src/components/onboarding/OnboardingWizard.tsx para entender el estado actual.
+
+
+
+Agregar paso de "Role Selection" como primer paso:
+
+
+
+
+
+Dos cards grandes: "I'm a Worker" (icono Wrench) y "I'm a Company" (icono Building2)
+
+
+
+Cada card con descripcion de 1 linea
+
+
+
+Al seleccionar, guarda en el perfil de Supabase (campo role)
+
+
+
+Design: border-zinc-800, hover:border-[#f59e0b], selected:bg-[#f59e0b]/10
+
+
+
+Agregar paso de "Skills & Interests" para workers:
+
+
+
+
+
+Grid de chips seleccionables: Pipe Fitting, Welding, Scaffolding, Rigging, QC/QA, NDE, Painting, Insulation, Electrical, Instrumentation
+
+
+
+Multi-select con toggle visual
+
+
+
+Guardar en profile.skills (jsonb array)
+
+
+
+Agregar paso de "Company Info" para companies:
+
+
+
+
+
+Campos: Company Name, Industry, Size (dropdown), Country
+
+
+
+Guardar en profile
+
+
+
+Agregar progress bar visual en la parte superior:
+
+
+
+
+
+Stepped: Role -> Profile -> Skills/Company -> Complete
+
+
+
+Amber accent para pasos completados
+
+
+
+Al completar, redirigir segun role:
+
+
+
+
+
+Worker -> /dashboard
+
+
+
+Company -> /company/dashboard
+
+Mantener los estilos del design system: bg-[#0a0a0a], accent #f59e0b, zinc scale. Verificar con: npx tsc --noEmit --skipLibCheck
+

@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Copias forenses: se conservan byte a byte. Sin normalizacion de EOL, para que
+# los SHA-256 del MANIFEST sigan siendo verificables tras un checkout.
+recovery/** -text
+

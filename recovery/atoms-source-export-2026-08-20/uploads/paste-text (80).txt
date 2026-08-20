@@ -1,0 +1,79 @@
+Quiero añadir a la app PipingBox una capa básica pero profesional de feedback para fase beta.
+
+Objetivo:
+Crear un sistema visible para que los usuarios puedan reportar errores, funciones incompletas o comportamientos extraños durante la fase beta.
+
+Implementa lo siguiente:
+
+1. Popup inicial de aviso beta
+- Debe mostrarse al usuario al entrar en la app.
+- Texto corto y elegante, no demasiado grande.
+- Mensaje:
+  “PipingBox está actualmente en fase beta. Algunas funciones pueden estar incompletas o comportarse de forma inesperada. Si encuentras un error, puedes ayudarnos enviando una captura o una breve descripción del problema.”
+- Incluir email de soporte: support@pipingbox.com
+- Botones:
+  “Continuar”
+  “Reportar problema”
+- El popup no debe mostrarse de nuevo si el usuario ya lo cerró. Guardar esa preferencia en localStorage.
+
+2. Botón flotante de feedback beta
+- Añadir un botón flotante discreto en la parte inferior derecha de la app.
+- Texto o icono: “Feedback Beta” o “Reportar problema”.
+- Debe estar siempre disponible dentro de la aplicación.
+
+3. Modal de reporte de problema
+Al pulsar el botón, abrir un modal con:
+- Campo de descripción del problema.
+- Selector de categoría:
+  - Error de IA
+  - Exportación
+  - Login / Cuenta
+  - Interfaz
+  - Rendimiento
+  - Otro
+- Campo opcional para adjuntar captura de pantalla.
+- Botón “Enviar reporte”.
+- Botón “Cancelar”.
+
+4. Datos técnicos que deben guardarse automáticamente
+Cuando el usuario envíe un reporte, recoger:
+- Fecha y hora
+- URL actual
+- Navegador / user agent
+- Tamaño de pantalla
+- Email o ID del usuario si está disponible
+- Categoría seleccionada
+- Descripción escrita
+- Imagen adjunta si existe
+- Estado beta_reported = true
+
+5. Backend / almacenamiento
+Si ya existe Supabase en el proyecto, crear o usar una tabla llamada beta_feedback_reports con estos campos:
+- id
+- created_at
+- user_id
+- user_email
+- category
+- description
+- screenshot_url
+- page_url
+- user_agent
+- screen_size
+- status default “new”
+- priority default “unreviewed”
+
+Si no existe Supabase configurado, crea una implementación provisional usando un endpoint interno o estructura preparada para conectar después.
+
+6. Confirmación visual
+Después de enviar:
+Mostrar mensaje:
+“Gracias. Tu reporte ha sido enviado y nos ayudará a mejorar PipingBox.”
+Cerrar el modal automáticamente.
+
+7. Importante
+- No romper funcionalidades existentes.
+- Mantener diseño limpio, moderno y coherente con la UI actual.
+- Usar componentes existentes del proyecto si los hay.
+- El código debe estar bien organizado y fácil de ampliar.
+- Priorizar que funcione antes que hacerlo demasiado complejo.
+- No implementar todavía chat IA de soporte. Solo dejar la estructura preparada para añadirlo más adelante.

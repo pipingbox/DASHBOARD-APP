@@ -1,0 +1,59 @@
+schema_version: "1.0.0"
+id: PB-COMP-PIPE-SEAMLESS-ASME-B36-10M
+metadata:
+  slug: pipe-seamless-asme-b36-10m
+  display_name: Seamless Steel Pipe
+  short_name: Pipe
+  description: Seamless wrought steel pipe per ASME B36.10M. Covers NPS 1/8 through 36 in schedules 5S through XXS.
+  status: draft
+  version: '0.1'
+classification:
+  discipline: piping
+  category: pipe
+  family: pipe
+  subfamily: seamless
+  tags: [pipe, seamless, steel, schedule]
+  type: seamless
+technical:
+  geometry:
+    shape: tube
+  connection_types: [BW, PLAIN_END]
+  pressure_ratings: []
+  materials: [carbon_steel, alloy_steel, stainless_steel]
+standards:
+  - standard_id: PB-STD-ASME-B36-10M
+    role: dimensions
+dimension_sets:
+  - PB-DIM-ASME-B36-10M-PIPE
+manufacturing:
+  prefabrication_fields: [od_mm, wt_mm, weight_kg_per_m]
+  fabrication_notes:
+    - Verify actual wall thickness against nominal.
+compatibility:
+  compatible_with:
+    - target: fittings
+      relation: joins_to
+      conditions:
+        connection: BW
+        nominal_size_match: true
+assets: {}
+localization:
+  default_language: en
+  translations:
+    en:
+      name: Seamless Steel Pipe
+      short_name: Pipe
+consumers:
+  modules: [tools]
+  tools: [pipe_data_tables, weight_calculator, volume_calculator]
+quality:
+  validation_status: draft
+  confidence: 0.70
+  sources:
+    - source_id: PB-STD-ASME-B36-10M
+      edition: "2018"
+      page_or_table: Table 1
+      note: Standard wall thickness per NPS.
+lifecycle:
+  created_at: '2026-07-26'
+  updated_at: '2026-07-26'

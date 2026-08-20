@@ -1,0 +1,47 @@
+Contexto: PipingBox es una app React + Supabase + Stripe. Stripe ya esta conectado al proyecto Supabase. El archivo principal es DASHBOARD-APP/app/frontend/.
+
+Tarea: Implementar sistema de job posts de pago con Stripe Checkout.
+
+1. Crear una Edge Function en Supabase `create-checkout-session` que:
+   - Reciba `{ price_id, job_id, user_id }` via POST
+   - Cree una Stripe Checkout Session con `mode: 'payment'`
+   - Use los precios: single_post ($49), pack_5 ($199), pack_10 ($349)
+   - Retorne `{ url: session.url }`
+   - Requiera JWT valido (verify_jwt: true)
+
+2. Crear una Edge Function `stripe-webhook` que:
+   - Escuche `checkout.session.completed`
+   - Verifique signature con STRIPE_WEBHOOK_SECRET
+   - Inserte creditos en tabla `job_credits` del user
+   - verify_jwt: false (webhook externo)
+
+3. Crear componente `src/components/jobs/PricingCards.tsx`:
+   - 3 cards: Single ($49), Pack 5 ($199), Pack 10 ($349)
+   - Design system: bg-[#0a0a0a], border-zinc-800, accent #f59e0b
+   - Boton que llama a la Edge Function y redirige a Stripe
+   - Usar useAuth() para obtener session.access_token
+
+4. Crear hook `src/hooks/useJobCredits.ts`:
+   - Query a tabla `job_credits` filtrando por user_id
+   - Retorne { credits, loading, refetch }
+   - Tabla: job_credits(id, user_id, credits_total, credits_used, purchased_at, stripe_session_id)
+
+5. Integrar en CompanyDashboard.tsx:
+   - Mostrar creditos restantes en el header
+   - Boton "Post Job" deshabilitado si credits = 0, muestra PricingCards
+
+6. Crear migracion SQL (para aplicar via mcp_supabase_apply_migration):
+   ```sql
+   CREATE TABLE IF NOT EXISTS public.job_credits (
+     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+     user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+     credits_total int NOT NULL DEFAULT 0,
+     credits_used int NOT NULL DEFAULT 0,
+     purchased_at timestamptz DEFAULT now(),
+     stripe_session_id text,
+     created_at timestamptz DEFAULT now()
+   );
+   ALTER TABLE public.job_credits ENABLE ROW LEVEL SECURITY;
+   CREATE POLICY "Users see own credits" ON public.job_credits FOR SELECT USING (auth.uid() = user_id);
+
+Verificar con: npx tsc --noEmit --skipLibCheck No modificar archivos fuera de src/components/jobs/, src/hooks/, y src/pages/CompanyDashboard.tsx.

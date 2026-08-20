@@ -1,0 +1,86 @@
+BUGFIX — Message Candidate fails to start conversation.
+
+IMPORTANT:
+Do not redesign anything.
+Do not create public/global chat.
+Keep messaging recruitment-focused and linked to applications/jobs.
+
+CURRENT ISSUE:
+Clicking "Message Candidate" from candidate profile shows:
+"Failed to start conversation"
+
+GOAL:
+Fix conversation creation and messaging permissions.
+
+TASKS:
+
+1. Inspect the Message Candidate button flow.
+
+2. It must create or find a conversation in:
+   app_14da0f1941_conversations
+
+using:
+
+* company_user_id
+* worker_user_id
+* application_id
+* job_id
+
+3. Use authenticated user:
+   const { data: { user } } = await supabase.auth.getUser()
+
+4. In Admin Preview Company View:
+   real auth user may be admin, so allow admin preview to create/test conversations safely.
+
+5. Ensure insert payload includes:
+   company_user_id
+   worker_user_id
+   application_id
+   job_id
+   last_message: null or ''
+   last_message_at: now()
+   unread_company: 0
+   unread_worker: 0
+
+6. Create or fix RLS policies for:
+   app_14da0f1941_conversations
+
+Rules:
+
+* company_user_id = auth.uid() can SELECT/INSERT/UPDATE conversations
+* worker_user_id = auth.uid() can SELECT/UPDATE conversations
+* primary admin email [gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com) can SELECT/INSERT/UPDATE all
+* jobs_moderator can SELECT/UPDATE all if role system supports it
+
+7. Create or fix RLS policies for:
+   app_14da0f1941_messages
+
+Rules:
+
+* sender_user_id = auth.uid() can INSERT message
+* receiver_user_id = auth.uid() can SELECT message
+* sender_user_id = auth.uid() can SELECT own sent messages
+* company_user_id = auth.uid() can SELECT/INSERT messages in company conversations
+* worker_user_id = auth.uid() can SELECT/INSERT messages in worker conversations
+* primary admin email can SELECT/INSERT/UPDATE all
+
+8. If there are recursive policies referencing profiles, remove them.
+   Do not create policies that query the same table recursively.
+
+9. Message Candidate should:
+
+* find existing conversation by application_id if exists
+* otherwise create conversation
+* navigate to /messages?conversation=<conversation_id>
+
+10. Add detailed console logs:
+
+* current user id
+* preview role
+* candidate worker_user_id
+* application_id
+* job_id
+* Supabase error details
+
+EXPECTED RESULT:
+Clicking "Message Candidate" creates or opens a recruitment conversation without permission errors.

@@ -1,0 +1,215 @@
+# PROMPT PARA ATOMS — UNIFICAR SISTEMA COMPLETO DE TRADUCCIONES (I18N)
+
+Necesito hacer una revisión GLOBAL del sistema de traducciones de PipingBox.
+
+OBJETIVO:
+Todo texto visible en la plataforma debe renderizarse automáticamente según el idioma seleccionado por el usuario.
+
+Actualmente hay módulos parcialmente traducidos y otros con strings hardcodeadas en inglés.
+
+QUIERO:
+
+## 1. AUDITORÍA COMPLETA
+
+Revisar TODOS los módulos y localizar:
+- textos hardcodeados
+- labels
+- botones
+- placeholders
+- títulos
+- subtítulos
+- badges
+- estados
+- mensajes vacíos
+- tablas
+- menús laterales
+- tooltips
+- modales
+- cards dinámicas
+- arrays mock
+- status labels
+
+Buscar especialmente strings directas tipo:
+- "Apply Now"
+- "Monthly Overview"
+- "Recent Applications"
+- "New Post"
+- "Request Documents"
+- "Request Availability"
+- "Create Draft"
+- etc.
+
+NO debe quedar ningún texto visible hardcodeado.
+
+---
+
+## 2. CENTRALIZAR I18N
+
+Usar un único sistema global:
+- useTranslation()
+- t('key')
+
+Crear estructura consistente:
+
+/locales
+  /es
+  /en
+  /fr
+  /nl
+  /de
+  /pt
+
+Cada idioma debe tener:
+- common.json
+- dashboard.json
+- jobs.json
+- academy.json
+- community.json
+- messages.json
+- company.json
+- admin.json
+- content.json
+
+---
+
+## 3. REEMPLAZAR STRINGS FIJAS
+
+Ejemplo:
+
+ANTES:
+<button>Apply Now</button>
+
+DESPUÉS:
+<button>{t('jobs.apply_now')}</button>
+
+---
+
+## 4. TRADUCIR MÓDULOS COMPLETOS
+
+Revisar y corregir:
+
+### Dashboard
+- Monthly Overview
+- Recent Applications
+- Last Workdays
+- Profile Completed
+- etc.
+
+### Academy
+- títulos
+- niveles
+- descripciones
+- botones
+- duración
+- lessons
+- cards
+
+### Jobs
+- Apply Now
+- Featured Positions
+- Active Jobs
+- Countries
+- Full-time
+- Contract
+- Rotation
+- Posted X ago
+- etc.
+
+### Community
+- New Post
+- Open Channel
+- Publications
+- descriptions
+- category names
+
+### Messages
+- Invite to Interview
+- Request Documents
+- Request Availability
+- placeholders
+- system messages
+
+### Content Drafts
+- Create Draft
+- Pending Review
+- Published
+- Rejected
+- Empty states
+
+### Company
+- Request Workforce
+- Active Companies
+- Available Workers
+- Partner Companies
+
+### Admin
+TODO el panel admin completo.
+
+---
+
+## 5. IDS Y DATOS DINÁMICOS
+
+Los datos mock también deben soportar traducciones.
+
+NO hardcodear descripciones de:
+- cursos
+- jobs
+- categorías
+- community channels
+
+Usar:
+t('academy.courses.piping_fundamentals.description')
+
+etc.
+
+---
+
+## 6. FALLBACKS
+
+Implementar:
+- fallback automático a inglés
+- detección de claves faltantes
+- consola warning en desarrollo
+
+---
+
+## 7. PERSISTENCIA
+
+El idioma seleccionado:
+- debe guardarse en localStorage
+- sincronizarse con el perfil del usuario
+- mantenerse tras refresh/login/logout
+
+---
+
+## 8. VALIDACIÓN FINAL
+
+Hacer revisión final completa navegando TODOS los módulos:
+- worker
+- company
+- admin
+
+Verificar:
+- 0 textos mezclados
+- 0 inglés residual si usuario usa español
+- 0 placeholders sin traducir
+
+---
+
+## 9. IMPORTANTE
+
+NO modificar:
+- layout
+- spacing
+- cards
+- diseño visual
+- animaciones
+
+Solo corregir internacionalización.
+
+---
+
+Cuando termine:
+- mostrar lista de archivos modificados
+- mostrar módulos corregidos
+- indicar si quedan textos pendientes.

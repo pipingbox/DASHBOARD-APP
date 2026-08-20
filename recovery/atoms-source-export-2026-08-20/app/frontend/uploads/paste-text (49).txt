@@ -1,0 +1,56 @@
+Certification creation is still failing even after RLS was disabled.
+
+This means the frontend insert payload is wrong or the app is using the wrong table.
+
+Debug and fix certification creation.
+
+Requirements:
+
+1. Use only this table:
+public.app_worker_certifications
+
+2. Before insert, log:
+- authenticated user
+- user.id
+- final insert payload
+- Supabase insert response data
+- Supabase insert error
+
+3. The insert payload must use only these fields:
+- user_id
+- certification_name
+- issuing_organization
+- credential_id
+- verification_url
+- issue_date
+- expiration_date
+- expiry_date
+- certificate_file_url
+- file_url
+- file_name
+- document_name
+- notes
+- is_visible
+- visible_to_companies
+
+4. Do not send legacy fields:
+- name
+- issuer
+- company
+- organization
+- expiration
+- file
+- visible
+
+5. If user is available, set:
+user_id: user.id
+
+6. If no file is uploaded, insert certificate_file_url and file_url as null.
+
+7. If a file is uploaded, upload to worker-documents bucket first, then save the file path/url.
+
+8. Do not block certificate creation if no file is uploaded.
+
+9. Show the actual Supabase error message in console.
+
+10. Keep the UI design unchanged.

@@ -1,0 +1,140 @@
+Implement ultra-fast onboarding wizard + profile completion engine.
+
+Goal:
+A user must be able to create a useful industrial profile in under 2 minutes.
+
+IMPORTANT:
+Do NOT add camera/selfie capture.
+For profile photo, keep normal file upload only and make it optional/skippable.
+
+PART 1 — FAST ONBOARDING WIZARD
+
+Create onboarding after signup/login if profile is incomplete.
+
+Steps:
+
+1. Account type
+- Profesional Industrial
+- Empresa
+
+2. Role / trade
+Options:
+- Piping Supervisor
+- Pipefitter
+- Welder
+- Mechanical Supervisor
+- QA/QC
+- HSE
+- Rigger
+- Scaffolder
+- Engineer
+- Other
+
+3. Specialty chips
+Allow multiple selection:
+- Piping
+- Mechanical
+- Welding
+- Rigging
+- Scaffolding
+- QA/QC
+- HSE
+- Shutdowns
+- Oil & Gas
+- Energy
+- Construction
+
+4. Location
+Fields:
+- country
+- city / region
+
+5. Availability
+Options:
+- Available now
+- Available in 2 weeks
+- Available in 1 month
+- Currently working
+- Not available
+
+6. Travel / relocation
+Toggles:
+- willing_to_travel
+- willing_to_relocate
+
+7. Profile visibility
+Add clear privacy choice:
+- Public profile: companies can view my profile in searches
+- Private profile: only I can view my profile; companies cannot discover me
+
+Store this as:
+profile_visibility = 'public' | 'private'
+or use cv_visible/profile_visible if existing schema already has a similar field.
+
+Default recommendation:
+Public, but user must clearly see and control it.
+
+8. Optional profile photo
+- Upload file only
+- Skip allowed
+- No camera/selfie capture
+
+PART 2 — PROFILE COMPLETION ENGINE
+
+Calculate profile_completion percentage automatically.
+
+Suggested weights:
+- full_name: 10%
+- account_type: 10%
+- role/title: 15%
+- specialty/skills: 15%
+- location: 15%
+- availability_status: 15%
+- travel/relocation: 10%
+- profile_visibility selected: 10%
+
+CV, certificates and work experience should improve profile later, but must NOT block initial onboarding.
+
+PART 3 — STATES
+
+Create onboarding status:
+- AUTH_ONLY
+- PROFILE_STARTED
+- MARKETPLACE_READY
+
+Rules:
+- AUTH_ONLY: only login/signup exists
+- PROFILE_STARTED: user completed some onboarding
+- MARKETPLACE_READY: minimum useful fields completed AND profile_visibility = public
+
+Marketplace / Worker Search:
+- show only MARKETPLACE_READY profiles
+- do not show private profiles
+- do not show incomplete profiles
+
+Admin → Registros:
+- show all users regardless of status
+- show profile_visibility
+- show completion percentage
+- show onboarding status badge
+
+PART 4 — UX
+
+Requirements:
+- one question per screen
+- mobile-first
+- progress bar
+- save each step instantly
+- allow skip where reasonable
+- after onboarding, redirect to dashboard
+- show profile completion card on dashboard
+
+Copy:
+“Completa lo esencial ahora. Podrás añadir CV, certificados y experiencia después.”
+
+Do not break:
+- Google login
+- email signup
+- referrals
+- existing profile page
+- admin traceability

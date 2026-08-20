@@ -1,0 +1,124 @@
+ACT AS A SENIOR SAAS UX DESIGNER AND JOB PLATFORM ENGINEER.
+
+We need to implement a real interactive filter system for the Jobs page.
+
+IMPORTANT:
+Do not redesign the entire Jobs page.
+Only add a functional premium filter experience.
+
+==================================================
+GOAL
+====
+
+When users click the filter button on the Jobs page,
+a professional filter panel should open.
+
+==================================================
+STEP 1 — FILTER PANEL
+=====================
+
+Create a slide-out filter sidebar.
+
+Desktop:
+
+* right sidebar
+
+Mobile:
+
+* bottom modal / sheet
+
+Smooth animations required.
+
+==================================================
+STEP 2 — FILTER OPTIONS
+=======================
+
+Add these functional filters:
+
+COUNTRY
+
+* Belgium
+* Netherlands
+* Germany
+* Norway
+* UAE
+* UK
+
+DISCIPLINE
+
+* Pipefitter
+* TIG Welder
+* QA/QC
+* Supervisor
+* Planner
+* Rigger
+* Offshore Technician
+
+WORK TYPE
+
+* Offshore
+* Onshore
+* Shutdown
+* Long-term
+* Rotation
+
+CONTRACT TYPE
+
+* Freelance
+* Employee
+* Contract
+* Full-time
+
+URGENT ONLY
+
+* toggle switch
+
+==================================================
+STEP 3 — ACTIVE FILTER TAGS
+===========================
+
+Show active filters above job listings.
+
+Example:
+Belgium ×
+Offshore ×
+Supervisor ×
+
+Users can remove filters individually.
+
+==================================================
+STEP 4 — FILTER FUNCTIONALITY
+=============================
+
+Filters must actually filter jobs in real-time.
+
+No fake UI.
+
+==================================================
+STEP 5 — EMPTY FILTER STATE
+===========================
+
+If no jobs match:
+show recommended jobs instead of empty screen.
+
+==================================================
+STEP 6 — PREMIUM UX
+===================
+
+Add:
+
+* smooth transitions
+* hover states
+* loading skeletons
+* modern SaaS interactions
+
+Inspired by:
+LinkedIn Jobs
+Airbnb filters
+Linear UI
+
+==================================================
+FINAL GOAL
+==========
+
+The Jobs page should feel like a modern real industrial recruitment platform with interactive filtering and premium UX.

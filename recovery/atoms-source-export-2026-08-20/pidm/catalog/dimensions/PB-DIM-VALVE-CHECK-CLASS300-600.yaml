@@ -1,0 +1,275 @@
+schema_version: "1.0.0"
+id: PB-DIM-VALVE-CHECK-CLASS300-600
+component_id: PB-COMP-VALVE-CHECK
+standard_id: PB-STD-ASME-B16-10
+dataset_type: standard
+system: mixed
+
+selectors:
+  - key: nps
+    label: "Nominal Pipe Size"
+    unit: "in"
+    type: string
+  - key: dn
+    label: "Diametre Nominal"
+    unit: "mm"
+    type: integer
+  - key: class
+    label: "Pressure Class"
+    unit: ""
+    type: integer
+
+fields:
+  - key: face_to_face_in
+    label: "Face-to-Face"
+    unit: "in"
+    type: number
+  - key: face_to_face_mm
+    label: "Face-to-Face"
+    unit: "mm"
+    type: number
+  - key: end_connection
+    label: "End Connection"
+    unit: ""
+    type: string
+  - key: weight_approx_kg
+    label: "Approximate Weight"
+    unit: "kg"
+    type: number
+
+rows:
+  # ═══════════════════════════════════════════════════════════
+  # Check Valve — API 594 (Swing Type, Standard Length)
+  # F2F per ASME B16.10 Table 3 (Swing Check)
+  # ═══════════════════════════════════════════════════════════
+
+  # --- Class 300 ---
+  - nps: "2"
+    dn: 50
+    class: 300
+    face_to_face_in: 10.50
+    face_to_face_mm: 266.70
+    end_connection: RF
+    weight_approx_kg: 22
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 300
+    face_to_face_in: 11.50
+    face_to_face_mm: 292.10
+    end_connection: RF
+    weight_approx_kg: 30
+
+  - nps: "3"
+    dn: 80
+    class: 300
+    face_to_face_in: 12.00
+    face_to_face_mm: 304.80
+    end_connection: RF
+    weight_approx_kg: 40
+
+  - nps: "4"
+    dn: 100
+    class: 300
+    face_to_face_in: 14.00
+    face_to_face_mm: 355.60
+    end_connection: RF
+    weight_approx_kg: 60
+
+  - nps: "6"
+    dn: 150
+    class: 300
+    face_to_face_in: 18.00
+    face_to_face_mm: 457.20
+    end_connection: RF
+    weight_approx_kg: 120
+
+  - nps: "8"
+    dn: 200
+    class: 300
+    face_to_face_in: 22.00
+    face_to_face_mm: 558.80
+    end_connection: RF
+    weight_approx_kg: 220
+
+  - nps: "10"
+    dn: 250
+    class: 300
+    face_to_face_in: 26.00
+    face_to_face_mm: 660.40
+    end_connection: RF
+    weight_approx_kg: 350
+
+  - nps: "12"
+    dn: 300
+    class: 300
+    face_to_face_in: 28.00
+    face_to_face_mm: 711.20
+    end_connection: RF
+    weight_approx_kg: 480
+
+  - nps: "14"
+    dn: 350
+    class: 300
+    face_to_face_in: 33.00
+    face_to_face_mm: 838.20
+    end_connection: RF
+    weight_approx_kg: 650
+
+  - nps: "16"
+    dn: 400
+    class: 300
+    face_to_face_in: 36.00
+    face_to_face_mm: 914.40
+    end_connection: RF
+    weight_approx_kg: 880
+
+  - nps: "18"
+    dn: 450
+    class: 300
+    face_to_face_in: 39.00
+    face_to_face_mm: 990.60
+    end_connection: RF
+    weight_approx_kg: 1150
+
+  - nps: "20"
+    dn: 500
+    class: 300
+    face_to_face_in: 42.00
+    face_to_face_mm: 1066.80
+    end_connection: RF
+    weight_approx_kg: 1450
+
+  - nps: "24"
+    dn: 600
+    class: 300
+    face_to_face_in: 48.00
+    face_to_face_mm: 1219.20
+    end_connection: RF
+    weight_approx_kg: 2100
+
+  # --- Class 600 ---
+  - nps: "2"
+    dn: 50
+    class: 600
+    face_to_face_in: 14.50
+    face_to_face_mm: 368.30
+    end_connection: RF
+    weight_approx_kg: 38
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 600
+    face_to_face_in: 16.50
+    face_to_face_mm: 419.10
+    end_connection: RF
+    weight_approx_kg: 50
+
+  - nps: "3"
+    dn: 80
+    class: 600
+    face_to_face_in: 17.00
+    face_to_face_mm: 431.80
+    end_connection: RF
+    weight_approx_kg: 65
+
+  - nps: "4"
+    dn: 100
+    class: 600
+    face_to_face_in: 19.00
+    face_to_face_mm: 482.60
+    end_connection: RF
+    weight_approx_kg: 105
+
+  - nps: "6"
+    dn: 150
+    class: 600
+    face_to_face_in: 24.00
+    face_to_face_mm: 609.60
+    end_connection: RF
+    weight_approx_kg: 230
+
+  - nps: "8"
+    dn: 200
+    class: 600
+    face_to_face_in: 29.50
+    face_to_face_mm: 749.30
+    end_connection: RF
+    weight_approx_kg: 420
+
+  - nps: "10"
+    dn: 250
+    class: 600
+    face_to_face_in: 35.50
+    face_to_face_mm: 901.70
+    end_connection: RF
+    weight_approx_kg: 660
+
+  - nps: "12"
+    dn: 300
+    class: 600
+    face_to_face_in: 39.50
+    face_to_face_mm: 1003.30
+    end_connection: RF
+    weight_approx_kg: 900
+
+  - nps: "14"
+    dn: 350
+    class: 600
+    face_to_face_in: 42.00
+    face_to_face_mm: 1066.80
+    end_connection: RF
+    weight_approx_kg: 1250
+
+  - nps: "16"
+    dn: 400
+    class: 600
+    face_to_face_in: 47.00
+    face_to_face_mm: 1193.80
+    end_connection: RF
+    weight_approx_kg: 1650
+
+  - nps: "18"
+    dn: 450
+    class: 600
+    face_to_face_in: 52.00
+    face_to_face_mm: 1320.80
+    end_connection: RF
+    weight_approx_kg: 2200
+
+  - nps: "20"
+    dn: 500
+    class: 600
+    face_to_face_in: 55.50
+    face_to_face_mm: 1409.70
+    end_connection: RF
+    weight_approx_kg: 2800
+
+  - nps: "24"
+    dn: 600
+    class: 600
+    face_to_face_in: 63.00
+    face_to_face_mm: 1600.20
+    end_connection: RF
+    weight_approx_kg: 3900
+
+notes:
+  - "Swing check valve F2F per ASME B16.10 Table 3."
+  - "API 594 — Check Valves: Flanged, Lug, Wafer, and Butt-Welding."
+  - "Class 300 F2F same as gate valve (long pattern per B16.10)."
+  - "Class 600 F2F longer than Class 300."
+  - "Weights are approximate for carbon steel swing check valves."
+  - "Check valves are lighter than gate valves for same NPS (no stem/handwheel)."
+
+quality:
+  validation_status: draft
+  confidence: 0.70
+  sources:
+    - name: ASME B16.10-2017 & API 594
+      url: https://www.asme.org
+      access_date: "2026-07-26"
+      note: Face-to-face dimensions for flanged swing check valves.
+
+lifecycle:
+  created_at: "2026-07-26"
+  updated_at: "2026-07-26"

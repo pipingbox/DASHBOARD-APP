@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/pipingbox-favicon-16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/pipingbox-favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/pipingbox-favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/pipingbox-favicon-192.png" />
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Theme & App Identity -->
+    <meta name="theme-color" content="#f59e0b" />
+    <meta name="apple-mobile-web-app-title" content="PipingBox" />
+    <meta name="application-name" content="PipingBox" />
+    <meta name="msapplication-TileColor" content="#0d0d0d" />
+
+    <!-- Primary Meta Tags -->
+    <title>%VITE_APP_TITLE%</title>
+    <meta name="title" content="%VITE_APP_TITLE%" />
+    <meta name="description" content="%VITE_APP_DESCRIPTION%" />
+    <meta name="author" content="PipingBox" />
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://app.pipingbox.com/" />
+    <meta property="og:title" content="PipingBox" />
+    <meta property="og:description" content="Formación, herramientas, empleo, certificaciones y comunidad para profesionales y empresas del sector industrial." />
+    <meta property="og:image" content="https://app.pipingbox.com/assets/logos/logo-horizontal.png" />
+    <meta property="og:site_name" content="PipingBox" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://app.pipingbox.com/" />
+    <meta name="twitter:title" content="PipingBox" />
+    <meta name="twitter:description" content="Formación, herramientas, empleo, certificaciones y comunidad para profesionales y empresas del sector industrial." />
+    <meta name="twitter:image" content="https://app.pipingbox.com/assets/logos/logo-horizontal.png" />
+
+    <!-- Google tag (gtag.js) - non-blocking -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V04RD9W0J4"></script>
+    <script>
+      try {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-V04RD9W0J4');
+      } catch(e) {}
+    </script>
+
+    <!-- Global error handler to catch iframe-specific issues -->
+    <script>
+      window.__APP_ERRORS = [];
+      window.addEventListener('error', function(e) {
+        window.__APP_ERRORS.push(e.message + ' at ' + (e.filename || '') + ':' + e.lineno);
+        var el = document.getElementById('__debug_errors');
+        if (el) el.textContent = JSON.stringify(window.__APP_ERRORS);
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        window.__APP_ERRORS.push('Promise: ' + (e.reason && e.reason.message ? e.reason.message : String(e.reason)));
+        var el = document.getElementById('__debug_errors');
+        if (el) el.textContent = JSON.stringify(window.__APP_ERRORS);
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <div id="__debug_errors" style="display:none;position:fixed;bottom:0;left:0;right:0;background:red;color:white;font-size:10px;z-index:99999;padding:4px;max-height:100px;overflow:auto;"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // If app hasn't rendered after 5 seconds, show debug info
+      setTimeout(function() {
+        var root = document.getElementById('root');
+        if (root && root.children.length === 0) {
+          var dbg = document.getElementById('__debug_errors');
+          if (dbg) {
+            dbg.style.display = 'block';
+            if (window.__APP_ERRORS.length === 0) {
+              dbg.textContent = 'App did not render. No JS errors caught. Possible module loading hang.';
+            }
+          }
+          // Also show a user-friendly message in root
+          root.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0d0d0d;color:#f59e0b;font-family:sans-serif;flex-direction:column;gap:16px;"><p style="font-size:18px;">Loading PipingBox...</p><p style="font-size:12px;color:#888;">If this persists, check console for errors.</p></div>';
+        }
+      }, 5000);
+    </script>
+  </body>
+</html>

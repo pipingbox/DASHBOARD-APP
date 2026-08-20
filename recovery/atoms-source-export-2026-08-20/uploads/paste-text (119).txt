@@ -1,0 +1,244 @@
+## ATOM-002 | Pipe Schedule Data (ASME B36.10M)
+
+**Estado:** PENDING
+**Prioridad:** P0 — Dato mas referenciado que falta en el catalogo
+**Output esperado:** 1 YAML (PB-COMP) + 1 YAML (PB-DIM) + 1 YAML (PB-STD)
+
+### Prompt para Atoms:
+
+```
+Necesito que generes 3 archivos YAML para el catalogo tecnico PIDM de PIPINGBOX.
+
+## Contexto
+El catalogo PIDM tiene 3 tipos de entidades:
+- PB-STD: normas tecnicas
+- PB-COMP: componentes maestros (metadata + clasificacion)
+- PB-DIM: datos dimensionales (filas por NPS/schedule)
+
+## Archivo 1: PB-STD-ASME-B36-10M.yaml
+
+Genera la norma ASME B36.10M (Welded and Seamless Wrought Steel Pipe) con esta estructura:
+
+schema_version: "1.0.0"
+id: PB-STD-ASME-B36-10M
+organization: ASME
+code: B36.10M
+designation: ASME B36.10M
+title: Welded and Seamless Wrought Steel Pipe
+edition: "2018"
+status: active
+scope: >
+  Covers the standardization of dimensions of welded and seamless
+  wrought steel pipe for high or low temperatures and pressures.
+roles:
+  - dimensions
+  - wall_thickness
+  - schedules
+applicable_families:
+  - pipe
+source:
+  url: https://www.asme.org/codes-standards/find-codes-standards/b36-10m
+  license_note: Dimensional data from public reference tables.
+  access_date: "2026-07-26"
+
+## Archivo 2: PB-COMP-PIPE-SEAMLESS-ASME-B36-10M.yaml
+
+Genera el componente con esta estructura exacta:
+
+schema_version: 1.0.0
+id: PB-COMP-PIPE-SEAMLESS-ASME-B36-10M
+metadata:
+  slug: pipe-seamless-asme-b36-10m
+  display_name: Seamless Steel Pipe
+  short_name: Pipe
+  description: Seamless wrought steel pipe per ASME B36.10M. Covers NPS 1/8 through 36 in schedules 5S through XXS.
+  status: draft
+  version: '0.1'
+classification:
+  discipline: piping
+  category: pipe
+  family: pipe
+  subfamily: seamless
+  tags: [pipe, seamless, steel, schedule]
+  type: seamless
+technical:
+  geometry:
+    shape: tube
+  connection_types: [BW, PLAIN_END]
+  pressure_ratings: []
+  materials: [carbon_steel, alloy_steel, stainless_steel]
+standards:
+  - standard_id: PB-STD-ASME-B36-10M
+    role: dimensions
+dimension_sets:
+  - PB-DIM-ASME-B36-10M-PIPE
+manufacturing:
+  prefabrication_fields: [od_mm, wt_mm, weight_kg_per_m]
+  fabrication_notes:
+    - Verify actual wall thickness against nominal.
+compatibility:
+  compatible_with:
+    - target: fittings
+      relation: joins_to
+      conditions:
+        connection: BW
+        nominal_size_match: true
+assets: {}
+localization:
+  default_language: en
+  translations:
+    en:
+      name: Seamless Steel Pipe
+      short_name: Pipe
+consumers:
+  modules: [tools]
+  tools: [pipe_data_tables, weight_calculator, volume_calculator]
+quality:
+  validation_status: draft
+  confidence: 0.70
+  sources:
+    - source_id: PB-STD-ASME-B36-10M
+      edition: "2018"
+      page_or_table: Table 1
+      note: Standard wall thickness per NPS.
+lifecycle:
+  created_at: '2026-07-26'
+  updated_at: '2026-07-26'
+
+## Archivo 3: PB-DIM-ASME-B36-10M-PIPE.yaml
+
+Este es el mas importante. Genera el conjunto dimensional con TODAS las filas.
+
+Estructura del header:
+
+schema_version: "1.0.0"
+id: PB-DIM-ASME-B36-10M-PIPE
+component_id: PB-COMP-PIPE-SEAMLESS-ASME-B36-10M
+standard_id: PB-STD-ASME-B36-10M
+dataset_type: standard
+system: mixed
+
+selectors:
+  - key: nps
+    label: "Nominal Pipe Size"
+    unit: "in"
+    type: string
+  - key: dn
+    label: "Diametre Nominal"
+    unit: "mm"
+    type: integer
+  - key: schedule
+    label: "Schedule"
+    unit: ""
+    type: string
+
+fields:
+  - key: od_in
+    label: "Outside Diameter"
+    unit: "in"
+    type: number
+    fabrication_priority: 1
+  - key: od_mm
+    label: "Outside Diameter"
+    unit: "mm"
+    type: number
+    fabrication_priority: 1
+  - key: wt_in
+    label: "Wall Thickness"
+    unit: "in"
+    type: number
+    fabrication_priority: 2
+  - key: wt_mm
+    label: "Wall Thickness"
+    unit: "mm"
+    type: number
+    fabrication_priority: 2
+  - key: id_in
+    label: "Inside Diameter"
+    unit: "in"
+    type: number
+  - key: id_mm
+    label: "Inside Diameter"
+    unit: "mm"
+    type: number
+  - key: weight_kg_per_m
+    label: "Weight per meter"
+    unit: "kg/m"
+    type: number
+    fabrication_priority: 3
+  - key: weight_lb_per_ft
+    label: "Weight per foot"
+    unit: "lb/ft"
+    type: number
+
+Luego la seccion rows: con UNA FILA POR COMBINACION NPS + SCHEDULE.
+
+Los NPS a cubrir: 1/8, 1/4, 3/8, 1/2, 3/4, 1, 1-1/4, 1-1/2, 2, 2-1/2, 3, 3-1/2, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24
+
+Los schedules a cubrir por cada NPS (los que apliquen):
+- STD (Standard)
+- XS (Extra Strong)  
+- SCH 10
+- SCH 20
+- SCH 40
+- SCH 60
+- SCH 80
+- SCH 100
+- SCH 120
+- SCH 140
+- SCH 160
+- XXS (Double Extra Strong)
+
+Formato de cada fila:
+  - nps: "4"
+    dn: 100
+    schedule: "STD"
+    od_in: 4.500
+    od_mm: 114.30
+    wt_in: 0.237
+    wt_mm: 6.02
+    id_in: 4.026
+    id_mm: 102.26
+    weight_kg_per_m: 16.07
+    weight_lb_per_ft: 10.79
+
+IMPORTANTE:
+- Usa los valores reales de ASME B36.10M Table 1.
+- STD = SCH 40 para NPS <= 10", STD = 3/8" WT para NPS >= 12".
+- XS = SCH 80 para NPS <= 8".
+- Calcula id = od - 2*wt.
+- Calcula weight_kg_per_m = 0.02466 * (od_mm - wt_mm) * wt_mm.
+- Calcula weight_lb_per_ft = weight_kg_per_m * 0.6720.
+- NO inventes valores. Si un schedule no existe para un NPS, NO lo incluyas.
+
+Al final agrega:
+
+notes:
+  - "STD = SCH 40 for NPS <= 10 in. For NPS 12+ STD wall = 3/8 in (9.53 mm)."
+  - "XS = SCH 80 for NPS <= 8 in. For NPS 10+ XS wall = 1/2 in (12.70 mm)."
+  - "ID calculated as OD - 2*WT."
+  - "Weight calculated per ASME formula: W = 0.02466*(OD-WT)*WT kg/m."
+
+quality:
+  validation_status: draft
+  confidence: 0.70
+  sources:
+    - name: ASME B36.10M-2018 Table 1
+      url: https://www.asme.org
+      access_date: "2026-07-26"
+      note: Wall thickness and OD from standard tables.
+
+lifecycle:
+  created_at: "2026-07-26"
+  updated_at: "2026-07-26"
+
+Devuelveme los 3 archivos completos en bloques de codigo YAML separados.
+```
+
+### Que controlar al revisar:
+- [ ] Los OD son correctos (ej: NPS 4" = 4.500" / 114.30 mm)
+- [ ] Los WT de STD coinciden con SCH 40 para NPS <= 10"
+- [ ] Los ID estan bien calculados (OD - 2*WT)
+- [ ] Los pesos son coherentes (NPS 4" STD ~ 16 kg/m)
+- [ ] No hay schedules inventados para NPS donde no existen
+- [ ] Minimo ~150 filas (23 NPS x ~6-8 schedules promedio)

@@ -1,0 +1,96 @@
+CT AS A SENIOR PRODUCT DESIGNER AND GROWTH UX SPECIALIST.
+
+We need to transform the Companies section from a static demo into a real active industrial recruitment platform.
+
+IMPORTANT:
+DO NOT BREAK CURRENT STRUCTURE.
+DO NOT REMOVE EXISTING FEATURES.
+
+ONLY IMPROVE TRUST, CONVERSION, AND REALISM.
+
+At the top of the Companies page add a professional industrial metrics section.
+
+Show animated statistics cards:
+
+Active Companies
+Open Positions
+Available Workers
+Countries Active
+
+Use realistic values:
+48 Companies
+126 Open Positions
+2,340 Workers
+17 Countries
+
+Dark industrial SaaS style.
+
+Create a live activity section.
+
+Title:
+"Recent Hiring Activity"
+
+Show realistic recent activity examples like:
+
+Siemens Energy requested 12 pipefitters in Belgium
+Offshore contractor requested 6 TIG welders in Norway
+EPC company requested QA/QC inspectors in Rotterdam
+
+Include:
+
+country flags
+timestamps
+worker types
+modern activity cards
+
+Improve the company cards.
+
+Add:
+
+"Verified" badge
+industry tags
+hiring status
+active projects label
+
+Make them feel like real industrial companies.
+
+If no real company leads exist yet:
+show demo data professionally.
+
+Never show empty sections.
+
+Add subtle:
+
+hover effects
+fade transitions
+premium motion
+loading skeletons
+
+Make it feel modern like:
+Linear
+Notion
+Stripe
+LinkedIn SaaS
+
+Add secondary CTA section:
+
+"Need urgent workforce support?"
+
+Text:
+PipingBox helps industrial companies connect with qualified professionals fast across Europe.
+
+Buttons:
+
+Request Workforce
+Contact Recruitment Team
+
+Optimize all sections for mobile responsiveness.
+
+The Companies section must feel:
+
+alive
+trusted
+active
+scalable
+premium
+already used by real industry

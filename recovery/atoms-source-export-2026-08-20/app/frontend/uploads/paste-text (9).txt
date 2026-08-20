@@ -1,0 +1,59 @@
+The workforce request form is NOT persisting data correctly.
+
+Please debug and fix the Supabase integration.
+
+IMPORTANT:
+Do not redesign anything.
+Only fix backend persistence and live updates.
+
+==================================================
+ISSUE
+=====
+
+When submitting the workforce request form:
+
+* the form closes
+* but no company lead appears in admin panel
+* data may not be saving to Supabase
+
+==================================================
+TASKS
+=====
+
+1. Verify the table:
+   company_leads
+
+2. Verify insert operation works correctly.
+
+3. Verify Supabase client connection.
+
+4. Check Row Level Security (RLS) policies.
+
+5. Ensure authenticated admin users can:
+
+* insert
+* read
+* update
+
+6. Add proper error handling:
+
+* show toast error if insert fails
+* show success confirmation if saved
+
+7. Ensure admin panel auto-refreshes after insert.
+
+8. Add console logging for debugging.
+
+9. If RLS blocks inserts:
+   create correct policies for company_leads.
+
+==================================================
+EXPECTED RESULT
+===============
+
+After submitting the form:
+
+* record is saved in Supabase
+* lead instantly appears in admin panel
+* no manual refresh needed
+* no silent failures

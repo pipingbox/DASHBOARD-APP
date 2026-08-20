@@ -1,0 +1,51 @@
+Create two new public pages for the PipingBox application:
+
+1. /privacy
+2. /terms
+
+STYLE:
+- Match current dark industrial theme
+- Responsive layout
+- Simple centered container
+- Orange accent color matching branding
+- Add PipingBox logo at top
+
+PAGE 1: PRIVACY POLICY
+
+Include sections for:
+- Introduction
+- Information We Collect
+- Authentication Data
+- Cookies and Analytics
+- Data Protection
+- Third-Party Services
+- User Rights
+- Contact Information
+
+Use support@pipingbox.com as contact email.
+
+PAGE 2: TERMS OF SERVICE
+
+Include sections for:
+- Acceptance of Terms
+- User Responsibilities
+- Professional Use
+- Account Security
+- Intellectual Property
+- Platform Availability
+- Limitation of Liability
+- Termination
+- Contact Information
+
+Use support@pipingbox.com as contact email.
+
+IMPORTANT:
+Add both links in the global footer of the app:
+- Privacy Policy
+- Terms of Service
+
+URLs:
+https://pipingbox.com/privacy
+https://pipingbox.com/terms
+
+Keep implementation lightweight and production ready.

@@ -1,0 +1,55 @@
+Fix the certification renewal reminders feature.
+
+Current issue:
+The app shows errors when trying to create 90-day, 60-day and 30-day certification expiry reminders.
+
+A new Supabase table now exists:
+public.app_worker_certification_reminders
+
+Fields:
+- id
+- user_id
+- certification_id
+- reminder_days
+- reminder_date
+- status
+- sent_at
+- created_at
+- updated_at
+
+Requirements:
+
+1. When a certification has an expiration_date, automatically calculate reminder dates:
+   - 90 days before expiration
+   - 60 days before expiration
+   - 30 days before expiration
+   - Optional: 15, 7 and 1 days before expiration
+
+2. Insert reminders into:
+   public.app_worker_certification_reminders
+
+3. Use upsert or conflict handling on:
+   certification_id + reminder_days
+   so duplicate reminders are not created.
+
+4. If expiration_date is null:
+   - do not create reminders
+   - show "No expiry date, reminders not required."
+
+5. If expiration_date is already expired:
+   - do not create future reminders
+   - show certification as expired.
+
+6. When a certification is edited and expiration_date changes:
+   - recalculate reminders
+   - update existing reminder_date values.
+
+7. Add try/catch/finally to avoid UI freezing.
+8. Show toast success/error messages.
+9. Do not break the existing certifications CRUD.
+10. Keep the existing visual design.
+
+Reminder date calculation example:
+expirationDate minus reminder_days.
+
+Use authenticated user's id as user_id.

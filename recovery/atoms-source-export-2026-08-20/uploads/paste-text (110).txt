@@ -1,0 +1,60 @@
+Crea una landing page profesional en src/pages/Index.tsx que reemplace el redirect actual a /login.
+
+CONTEXTO:
+- El archivo actual solo hace navigate(user ? '/dashboard' : '/login').
+- Debe convertirse en una landing page pública que convierta visitantes en registros.
+- Si el usuario ya está logueado, SÍ redirigir a /dashboard (mantener esa lógica).
+- Stack: React 18 + TypeScript + Tailwind + shadcn/ui. i18n con react-i18next.
+- NO usar datos fabricados (DEC-33). Los contadores animados deben hacer query real a Supabase (count de jobs, profiles con role=company) o mostrar 0 si no hay datos.
+- NO usar nombres de empresas reales (DEC-42). Usar nombres ficticios si hace falta.
+- Dark theme permanente: bg #0a0a0a, accent #f59e0b, borders zinc-800/80. Sin light mode (DEC-45).
+
+IMPORTS DISPONIBLES:
+- import { supabase, TABLES } from '@/lib/supabase';
+- import { useAuth } from '@/hooks/useAuth';
+- import { useTranslation } from 'react-i18next';
+- Componentes shadcn/ui: Button, Input, Accordion (de @/components/ui/accordion).
+- Iconos lucide-react.
+
+ESTRUCTURA (mobile-first, responsive):
+1. Header sticky con logo "PipingBox" (Piping en zinc-100, Box en #f59e0b), links "Sign in" y botón "Sign up free" (Link to /register).
+2. Hero section:
+   - Eyebrow: "La plataforma del sector industrial europeo"
+   - Headline: "PipingBox — el ecosistema para profesionales y empresas industriales"
+   - Subheadline: "Herramientas de ingeniería gratuitas, formación certificada (VCA/SCC/PRL), empleos verificados y comunidad técnica. Todo en un solo lugar."
+   - Dos CTAs: "Crear cuenta gratis" (Link to /register, bg #f59e0b) y "Explorar herramientas" (Link to /tools, outline).
+   - Sin imagen hero (placeholder de gradiente amber/zinc es suficiente).
+3. Sección "Para Trabajadores" — 4 cards con icono lucide:
+   - Perfil profesional verificable (icono UserCheck)
+   - Herramientas de cálculo gratuitas (icono Calculator)
+   - Formación VCA/SCC/PRL (icono GraduationCap)
+   - Empleos en proyectos industriales (icono Briefcase)
+4. Sección "Para Empresas" — 3 cards:
+   - Talento verificado por certificaciones (icono ShieldCheck)
+   - Reducción de tiempo de contratación (icono Clock)
+   - Compliance y auditoría de certificados (icono FileCheck)
+5. Sección "Métricas reales" — 3 contadores animados (usa el patrón de useCounter existente en Jobs.tsx):
+   - "Profesionales registrados" (count de profiles donde role=worker o null)
+   - "Empresas" (count de profiles donde role=company)
+   - "Herramientas gratuitas" (número fijo: 2 — Wall Thickness + Unit Converter)
+   Si los counts son 0, mostrar 0. NUNCA números fake.
+   Query: supabase.from(TABLES.profiles).select('*', { count: 'exact', head: true }).eq('role', 'company') y lo mismo para workers.
+6. Sección FAQ con Accordion (5 preguntas):
+   - "¿PipingBox es gratis para trabajadores?" → Sí, siempre (DEC-32).
+   - "¿PipingBox emite certificaciones oficiales?" → No, prepara para el examen (DEC-20).
+   - "¿Qué certificaciones puedo preparar?" → VCA (BE/NL), SCC (DE), PRL (ES).
+   - "¿Cuánto cuesta el curso VCA?" → 59.90 EUR (DEC-30).
+   - "¿Las herramientas funcionan sin registro?" → Sí, son públicas (DEC-16).
+7. Footer con links: /tools, /blog, /register, /login. Texto legal pequeño. "Made in Europe".
+
+i18n:
+- Todas las strings UI deben usar t('landing.heroTitle'), t('landing.forWorkers'), etc.
+- Añadir las claves a src/i18n/locales/en.json y src/i18n/locales/es.json.
+- Usar defaultValue en t() como fallback para no romper si faltan claves.
+
+ACCESIBILIDAD:
+- Contraste AA. Touch targets mínimo 44x44px. Jerarquía de headings (h1 único en hero, h2 en secciones).
+
+NO TOCAR:
+- App.tsx (la ruta / ya apunta a Index).
+- El redirect de usuarios logueados (mantener el useEffect con navigate).

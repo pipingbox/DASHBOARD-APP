@@ -1,0 +1,50 @@
+Cuando un admin cambia un reporte de Feedback Beta a estado “Resuelto”, quiero crear una notificación para el usuario que envió el reporte.
+
+Tabla existente:
+public.app_14da0f1941_notifications
+
+Campos disponibles:
+- user_id
+- type
+- title
+- message
+- related_entity_type
+- related_entity_id
+- action_url
+- actor_id
+- actor_name
+- is_read
+- read_at
+- created_at
+
+Implementar:
+
+1. Al cambiar un reporte beta_feedback_reports.status a "resolved" o "resuelto":
+- Crear una notificación para beta_feedback_reports.user_id.
+- Tipo: "feedback_resolved"
+- Título: "Problema resuelto"
+- Mensaje: "Hemos revisado y marcado como resuelto tu reporte. Gracias por ayudarnos a mejorar PipingBox."
+- related_entity_type: "beta_feedback_report"
+- related_entity_id: id del reporte
+- action_url: "/dashboard" o "/admin?tab=feedback-beta" si aplica.
+
+2. Evitar duplicados:
+- No crear varias notificaciones si el admin cambia varias veces el mismo reporte a resuelto.
+- Comprobar si ya existe una notificación feedback_resolved para ese related_entity_id.
+
+3. Campanita:
+- Revisar que el icono de notificaciones consulte app_14da0f1941_notifications filtrando por user_id = auth.uid().
+- Mostrar contador de no leídas.
+- Al hacer click, mostrar lista de notificaciones.
+- Permitir marcar como leída.
+
+4. RLS:
+- El usuario debe poder leer sus propias notificaciones.
+- El usuario debe poder marcar sus propias notificaciones como leídas.
+- El sistema/admin debe poder crear notificaciones.
+
+5. Importante:
+- No romper el sistema de Feedback Beta.
+- No crear otra tabla de notificaciones.
+- Usar la tabla existente app_14da0f1941_notifications.
+- Mantener i18n.

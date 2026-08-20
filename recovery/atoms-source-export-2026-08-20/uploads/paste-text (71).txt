@@ -1,0 +1,80 @@
+We need to permanently fix the profile completion inconsistency across PipingBox.
+
+Current problem:
+- Profile page shows 100%.
+- Admin Registros shows 75%.
+- Dashboard profile completion card disappeared or does not show the same value.
+- Supabase DB was missing profile_visibility, but I already added it via SQL.
+- The app currently mixes DB-stored profile_completion with dynamic calculations.
+
+Goal:
+Make profile completion use ONE single source of truth everywhere.
+
+Required implementation:
+
+1. Use app/frontend/src/lib/profileCompletion.ts as the only calculation engine.
+   Import calculateProfileCompletion() wherever profile percentage is shown.
+
+2. Dashboard:
+   - Restore ProfileCompletionCard on the worker dashboard if it disappeared.
+   - It must be visible even when completion is 100%.
+   - If profile is 100%, show it as completed instead of hiding it.
+   - Do NOT hide the card with `if (completion >= 90) return null`.
+   - Dashboard must calculate completion using calculateProfileCompletion(), not only profile.profile_completion.
+
+3. Profile page:
+   - Keep the right-side completion widget, but make sure it uses calculateProfileCompletion().
+   - It must show the exact same percentage as Dashboard and Admin.
+
+4. AdminRegistros:
+   - Stop trusting profile.profile_completion as the displayed percentage.
+   - For each user with profile, calculate completion using calculateProfileCompletion().
+   - Use the same fields: avatar_url, full_name, title, company, location, years_experience, skills, bio, cv_file_url, cv_url.
+   - If related counts are not available, temporarily use:
+     experience_count: user.experience_count ?? 0
+     certification_count: user.certification_count ?? 0
+     document_count: user.document_count ?? 0
+   - If those counts are not currently fetched, add queries or include them in the edge function response.
+
+5. Edge function backfill-profiles:
+   - Update defaults to match the current schema:
+     role: "worker" instead of "user"
+     account_type: "worker"
+     cv_visible: false
+     profile_visibility: "private"
+     availability_status: "not_specified"
+     profile_completion should not be used as final source of truth.
+   - Make sure list-all returns profile_visibility and any useful count fields if available.
+
+6. ProfileCompletionCard:
+   - Show:
+     “Perfil completado”
+     progress bar
+     percentage
+     pending items if not complete
+     success message if complete
+   - If completion >= 90, show:
+     “Perfil listo para reclutadores”
+   - If completion == 100, show:
+     “Perfil completo”
+   - Never disappear.
+
+7. Optional but recommended:
+   - After calculating the percentage, update profiles.profile_completion in Supabase only as a cached value.
+   - But UI must always prefer the live calculated value.
+
+8. Add console logs for debugging:
+   console.log("[PROFILE_COMPLETION]", {
+     source: "dashboard/admin/profile",
+     user_id,
+     calculated,
+     stored: profile.profile_completion
+   });
+
+Acceptance criteria:
+- Dashboard completion = Profile page completion = AdminRegistros completion.
+- My profile must show the same percentage in all three places.
+- Dashboard ProfileCompletionCard must be visible again.
+- No hardcoded 70, 75, 85, or 100 values.
+- No duplicate local formulas.
+- Build must pass.

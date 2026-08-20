@@ -1,0 +1,229 @@
+Necesito implementar la pagina de examen simulacro de VCA en PipingBox.
+
+## Contexto del proyecto
+
+- Framework: React 18.3 + TypeScript + Vite + Tailwind 3.4
+- Componentes UI: shadcn/ui (Button, Card, Progress, RadioGroup, Dialog, Badge ya existen)
+- i18n: react-i18next
+- Tema: dark (#0a0a0a, #0d0d0d, zinc-800/80, #f59e0b)
+- Router: useParams para examType ('bvca' | 'volvca')
+- Supabase: src/lib/supabase.ts
+- NO es Next.js. Sin 'use client'. Imports con @.
+
+## Archivo a crear
+
+### src/pages/AcademyExam.tsx (REEMPLAZAR placeholder)
+
+Pagina de examen simulacro con temporizador y formato oficial.
+
+### Flujo del examen:
+
+PANTALLA 1: INTRO (pre-examen)
+- Titulo: "VCA Practice Exam - {B-VCA | VOL-VCA}"
+- Card informativa:
+  - Numero de preguntas: 40 (B-VCA) o 70 (VOL-VCA)
+  - Tiempo limite: 60 min (B-VCA) o 105 min (VOL-VCA)
+  - Puntuacion minima: 28/40 (B-VCA) o 49/70 (VOL-VCA)
+  - Formato: Multiple choice A/B/C
+  - Reglas: Una sola respuesta correcta por pregunta. No se puede volver atras en el examen oficial.
+- Checkbox: "Entiendo las reglas del examen"
+- Boton "Iniciar examen" (disabled hasta marcar checkbox)
+- Al clickar: empieza el timer y se muestra la pantalla de examen
+
+PANTALLA 2: EXAMEN (activo)
+- HEADER fijo:
+  - Timer cuenta atras (mm:ss) en grande, cambia a rojo si quedan <5 min
+  - Progress: "Pregunta X de Y"
+  - Barra de progreso
+  - Boton "Finalizar examen" (con confirmacion Dialog)
+- CUERPO:
+  - Una pregunta a la vez (no todas juntas como en el quiz de modulo)
+  - Texto de pregunta grande
+  - RadioGroup con 3 opciones A/B/C
+  - Boton "Siguiente" (disabled hasta seleccionar una opcion)
+  - Boton "Anterior" (volver a pregunta previa, permite cambiar respuesta)
+  - En la pregunta final: boton "Finalizar y ver resultados"
+- NAVEGACION:
+  - Grid de numeros 1-40 (o 1-70) en la parte inferior o lateral
+  - Numeros respondidos en amber, no respondidos en gris
+  - Click en numero salta a esa pregunta
+- Timer:
+  - useEffect con setInterval cada 1 segundo
+  - Cuando llega a 00:00: auto-submit
+  - Avisar cuando queden 5 minutos (toast warning)
+
+PANTALLA 3: RESULTADOS (post-examen)
+- Card grande de resultado:
+  - APROBADO (verde) o SUSPENSO (rojo)
+  - Score: X/Y correctas (Z%)
+  - Tiempo usado: mm:ss
+  - Tipo de examen
+  - Fecha
+- Stats:
+  - Tiempo usado vs limite
+  - Porcentaje de acierto
+  - Preguntas por categoria (opcional, si hay tiempo)
+- Boton "Revisar respuestas" que expande todas las preguntas con:
+  - Tu respuesta (correcta/incorrecta)
+  - Respuesta correcta
+  - Explicacion
+- Boton "Nuevo examen" (reinicia)
+- Boton "Volver a Academy"
+- Guardar resultado en Supabase tabla app_14da0f1941_academy_mock_exams
+
+### Seleccion de preguntas
+
+Importar todas las preguntas de src/lib/vca-questions.ts (creado en prompt 2).
+
+Logica de seleccion:
+- Si examType === 'bvca': filtrar preguntas donde isBVCA === true, seleccionar 40 aleatorias
+- Si examType === 'volvca': filtrar donde isVOLVCA === true, seleccionar 70 aleatorias
+- Usar algoritmo de shuffle (Fisher-Yates) para aleatorizar
+- Si hay menos preguntas de las necesarias, repetir algunas (warning en consola)
+
+### Estado del examen
+
+Usar useState y useRef:
+
+const [phase, setPhase] = useState<'intro' | 'exam' | 'results'>('intro');
+const [questions, setQuestions] = useState<VCAQuestion[]>([]);
+const [currentIdx, setCurrentIdx] = useState(0);
+const [answers, setAnswers] = useState<Record<number, 'A'|'B'|'C'>>({});
+const [timeLeft, setTimeLeft] = useState(examDurationSec);
+const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+const startTimeRef = useRef<number>(0);
+
+### Timer implementation
+
+useEffect(() => {
+  if (phase !== 'exam') return;
+  const interval = setInterval(() => {
+    setTimeLeft(prev => {
+      if (prev <= 1) {
+        clearInterval(interval);
+        handleSubmit();
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+  return () => clearInterval(interval);
+}, [phase]);
+
+Formato del timer:
+const formatTime = (sec: number) => {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+};
+
+### Guardado en Supabase
+
+const handleSubmit = async () => {
+  const correct = questions.filter(q => answers[q.id] === q.correctAnswer).length;
+  const total = questions.length;
+  const percentage = Math.round((correct / total) * 100);
+  const passed = correct >= (examType === 'bvca' ? 28 : 49);
+  const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+
+  // Guardar
+  try {
+    if (user) {
+      await supabase.from('app_14da0f1941_academy_mock_exams').insert({
+        user_id: user.id,
+        exam_type: examType,
+        total_questions: total,
+        correct_answers: correct,
+        passed,
+        duration_seconds: duration,
+        completed_at: new Date().toISOString(),
+      });
+    }
+  } catch (e) {
+    console.warn('Could not save exam result:', e);
+  }
+
+  setPhase('results');
+};
+
+### UI specifications
+
+- Timer: text-3xl font-mono font-bold, color normal text-[#f59e0b], urgente text-rose-500 animate-pulse
+- Question card: max-w-3xl mx-auto, bg-[#0d0d0d] border border-zinc-800/80 p-8
+- Question text: text-lg text-zinc-100 leading-relaxed mb-6
+- Option: flex items-center gap-3 p-4 border border-zinc-800 hover:border-zinc-700 cursor-pointer transition
+- Option selected: border-[#f59e0b] bg-[#f59e0b]/5
+- Option letter badge: h-8 w-8 rounded-full border-2 border-zinc-700 flex items-center justify-center font-bold
+- Option letter selected: border-[#f59e0b] text-[#f59e0b] bg-[#f59e0b]/10
+- Navigation grid: grid grid-cols-10 gap-2, cada numero h-9 w-9 text-xs
+- Numero respondido: bg-[#f59e0b]/20 text-[#f59e0b] border border-[#f59e0b]/50
+- Numero actual: ring-2 ring-[#f59e0b]
+- Numero no respondido: bg-zinc-900 text-zinc-500 border border-zinc-800
+- Resultado APROBADO: text-emerald-400, border-emerald-500, bg-emerald-500/10
+- Resultado SUSPENSO: text-rose-400, border-rose-500, bg-rose-500/10
+
+### Responsive
+
+- En mobile: la grid de navegacion de numeros va abajo, scrollable horizontalmente
+- Timer y progreso sticky en top
+- Botones Anterior/Siguiente full width en mobile
+
+### i18n
+
+Anadir claves a en.json y es.json:
+
+"academy": {
+  ...claves existentes...,
+  "examIntroTitle": "VCA Practice Exam",
+  "examIntroBVCA": "B-VCA (Basic Safety)",
+  "examIntroVOLVCA": "VOL-VCA (Operational Supervisors)",
+  "examIntroQuestions": "Questions",
+  "examIntroDuration": "Duration",
+  "examIntroPassScore": "Pass Score",
+  "examIntroFormat": "Format",
+  "examIntroFormatValue": "Multiple choice (A/B/C)",
+  "examIntroRules": "Rules",
+  "examIntroRule1": "Only one correct answer per question",
+  "examIntroRule2": "You cannot go back in the official exam (practice mode allows it)",
+  "examIntroRule3": "The exam auto-submits when time runs out",
+  "examIntroRule4": "You need 70% to pass",
+  "examUnderstand": "I understand the exam rules",
+  "examStart": "Start Exam",
+  "examQuestionOf": "Question {{current}} of {{total}}",
+  "examNext": "Next",
+  "examPrevious": "Previous",
+  "examFinish": "Finish & See Results",
+  "examFinishConfirm": "Finish Exam?",
+  "examFinishConfirmText": "Are you sure you want to finish? You have {{unanswered}} unanswered questions.",
+  "examFinishConfirmYes": "Yes, finish",
+  "examFinishConfirmNo": "Continue exam",
+  "examTimeUp": "Time's up!",
+  "examTimeWarning": "5 minutes remaining!",
+  "examResultPassed": "PASSED",
+  "examResultFailed": "FAILED",
+  "examResultScore": "{{correct}}/{{total}} correct ({{percentage}}%)",
+  "examResultTime": "Time used: {{time}}",
+  "examReviewAnswers": "Review Answers",
+  "examNewExam": "New Exam",
+  "examBackToAcademy": "Back to Academy",
+  "examYourAnswer": "Your answer",
+  "examCorrectAnswer": "Correct answer",
+  "examNoAnswer": "Not answered"
+}
+
+## Resumen
+
+CREAR:
+- src/pages/AcademyExam.tsx (reemplazar placeholder)
+
+MODIFICAR:
+- src/i18n/locales/en.json
+- src/i18n/locales/es.json
+
+NO TOCAR:
+- Academy.tsx
+- AcademyModule.tsx
+- vca-questions.ts
+- vca-lessons.ts
+- Componentes ui/*
+- supabase.ts

@@ -1,0 +1,221 @@
+Necesito implementar la pagina de detalle de un modulo de VCA Academy en PipingBox.
+
+## Contexto del proyecto
+
+- Framework: React 18.3 + TypeScript + Vite + Tailwind 3.4
+- Componentes UI: shadcn/ui (Button, Card, Badge, Progress, RadioGroup, Tabs, Accordion, Alert, Dialog ya existen)
+- i18n: react-i18next
+- Tema: dark (#0a0a0a bg, #0d0d0d cards, zinc-800/80 borders, #f59e0b amber)
+- Router: react-router-dom v6, useParams para moduleId
+- Supabase: src/lib/supabase.ts
+- NO es Next.js. Sin 'use client'. Imports con @.
+
+## Archivo a crear
+
+### src/pages/AcademyModule.tsx (REEMPLAZAR el placeholder)
+
+Pagina de detalle de modulo con 2 sub-tabs: "Estudiar" y "Examen del modulo".
+
+Estructura:
+
+1. HEADER del modulo:
+- Breadcrumb: Academy > Module X
+- Boton "Volver" que navega a /academy
+- Icono del modulo (mapear por id)
+- Numero de modulo (ej: "Module 15")
+- Titulo (i18n: academy.module{id}.title)
+- Descripcion (i18n: academy.module{id}.description)
+- Stats bar: X preguntas | Y min estimados | Nivel B-VCA/VOL-VCA
+- Progress bar del modulo si hay progreso previo
+
+2. TAB "Estudiar" (Study):
+- Contenido de la leccion en formato HTML enriquecido
+- Usar un componente que renderice el contenido desde un objeto en memoria
+- El contenido debe estar estructurado en secciones con:
+  - Titulo de seccion (h3)
+  - Parrafos de texto
+  - Listas con bullet points
+  - Tablas de datos (ej: clases de fuego, voltajes seguros)
+  - Callouts destacados (tips, advertencias) con estilo border-l-2 border-[#f59e0b] bg-[#f59e0b]/5 p-4
+- Al final de la leccion: boton "Ir al examen del modulo" que cambia al tab Examen
+- Barra de progreso de lectura (scroll progress)
+
+3. TAB "Examen del modulo" (Quiz):
+- Muestra todas las preguntas del modulo de una vez (formato lista, no paginado)
+- Cada pregunta:
+  - Numero de pregunta
+  - Texto de la pregunta
+  - RadioGroup con 3 opciones (A, B, C)
+  - Cada opcion muestra la letra en un badge + el texto
+- Boton "Enviar respuestas" al final
+- Al enviar:
+  - Calcular score
+  - Mostrar resultado: X/Y correctas, porcentaje
+  - Marcar cada pregunta como correcta (verde) o incorrecta (rojo)
+  - Mostrar respuesta correcta en las falladas
+  - Mostrar explicacion si existe
+  - Boton "Reintentar" y boton "Volver al curso"
+  - Guardar progreso en Supabase si hay userId
+
+### Datos de preguntas
+
+Crear src/lib/vca-questions.ts con un array de preguntas de ejemplo (minimo 5 preguntas por modulo, 110+ total).
+
+Estructura de cada pregunta:
+{
+  id: 1,
+  moduleId: 1,
+  questionText: "Which measure can the Inspection Service take?",
+  optionA: "Dismiss unsafe employees",
+  optionB: "Impose a work prohibition order",
+  optionC: "Conduct investigations at companies on Health and Safety",
+  correctAnswer: 'C',
+  explanation: "The Inspection Service supervises compliance but does not dismiss employees - that is the employer's role.",
+  difficulty: 'medium',
+  isBVCA: true,
+  isVOLVCA: true
+}
+
+Usar las preguntas reales del documento PIPINGBOX-VCA-COURSE-CONTENT.md. Importar las preguntas de los 22 modulos. Para cada modulo, incluir minimo las preguntas listadas en el documento. El texto de las preguntas puede estar en ingles (el examen oficial se ofrece en ingles).
+
+### Funcionalidad de guardado en Supabase
+
+Al completar el quiz, guardar en tabla app_14da0f1941_academy_progress:
+
+try {
+  await supabase
+    .from('app_14da0f1941_academy_progress')
+    .upsert({
+      user_id: user.id,
+      module_id: moduleId,
+      completed: score >= 70,
+      score: percentage,
+      best_score: Math.max(existingScore, percentage),
+      attempts: (existingAttempts || 0) + 1,
+      last_attempt_at: new Date().toISOString(),
+    });
+} catch (e) {
+  // Si la tabla no existe, no bloquear la UI
+  console.warn('Could not save progress:', e);
+}
+
+### UI del quiz
+
+- Pregunta contenedor: border border-zinc-800/80 bg-[#0d0d0d] p-5 mb-4
+- Opciones: RadioGroup con RadioGroupItem + Label
+- Opcion seleccionada: ring-2 ring-[#f59e0b]
+- Opcion correcta (post-submit): border-emerald-500 bg-emerald-500/10
+- Opcion incorrecta seleccionada (post-submit): border-rose-500 bg-rose-500/10
+- Opcion correcta no seleccionada (post-submit): border-emerald-500/50
+- Badge de letra: h-7 w-7 rounded-full border flex items-center justify-center text-xs font-bold
+
+### Callouts en la leccion
+
+Usar componente Alert de shadcn/ui con variantes personalizadas:
+- Info: border-l-2 border-sky-500 bg-sky-500/5
+- Warning: border-l-2 border-[#f59e0b] bg-[#f59e0b]/5
+- Danger: border-l-2 border-rose-500 bg-rose-500/5
+
+## Contenido de las lecciones
+
+El contenido de cada leccion debe ser rico y educativo. Para cada modulo, crear un objeto LESSON_CONTENT con secciones. Ejemplo para modulo 9 (Fire):
+
+const lessonContent = {
+  sections: [
+    {
+      title: 'Fire Fundamentals',
+      paragraphs: [
+        'Fire requires 5 elements (the fire pentagon): fuel, oxygen, ignition source, temperature, and chain reaction.',
+        'Removing any of these elements extinguishes the fire.',
+      ],
+      bullets: [
+        'Fuel: the material that burns',
+        'Oxygen: normally 21% in air',
+        'Ignition source: spark, flame, heat',
+      ],
+    },
+    {
+      title: 'Fire Classes',
+      table: {
+        headers: ['Class', 'Materials', 'Examples'],
+        rows: [
+          ['A', 'Solids', 'Wood, paper, plastic, textile'],
+          ['B', 'Liquids', 'Petrol, oil, alcohol, paint'],
+          ['C', 'Gases', 'Methane, propane, butane, acetylene'],
+          ['D', 'Metals', 'Magnesium, aluminium, potassium, sodium'],
+        ],
+      },
+    },
+    {
+      title: 'Extinguishing Methods',
+      table: {
+        headers: ['Class', 'Water', 'Powder', 'Foam', 'Sand', 'CO2', 'Blanket'],
+        rows: [
+          ['A', 'Yes', 'ABC', 'Yes', '', '', 'Yes'],
+          ['B', 'No', 'ABC/BC', 'Yes', 'Yes', '', ''],
+          ['C', 'No', 'ABC/BC', '', '', '', ''],
+          ['D', 'No', 'Specific', '', '', '', ''],
+        ],
+      },
+      callout: {
+        type: 'danger',
+        text: 'NEVER use water on Class B (liquid) fires! Burning liquids splatter and float on water, spreading the fire.',
+      },
+    },
+  ],
+};
+
+Crear contenido similar para TODOS los 22 modulos basado en el documento PIPINGBOX-VCA-COURSE-CONTENT.md. Cada modulo debe tener minimo 3 secciones con contenido sustancial.
+
+## Renderizado de contenido
+
+Crear componente LessonRenderer que tome el objeto LESSON_CONTENT y renderice:
+- Titulo de seccion: h3 text-lg font-semibold text-zinc-100 mt-6 mb-3
+- Parrafo: text-sm text-zinc-300 leading-relaxed mb-3
+- Lista: ul list-disc list-inside space-y-1 text-sm text-zinc-300 mb-3
+- Tabla: usar Table de shadcn/ui con header bg-zinc-900 y cells text-sm
+- Callout: usar Alert con clase segun tipo
+
+## i18n
+
+Anadir claves a en.json y es.json bajo "academy":
+
+"academy": {
+  ...claves existentes...,
+  "moduleStudy": "Study",
+  "moduleQuiz": "Module Quiz",
+  "moduleQuizSubtitle": "Test your knowledge",
+  "questionNumber": "Question {{number}}",
+  "submitAnswers": "Submit Answers",
+  "retryQuiz": "Retry",
+  "backToCourse": "Back to Course",
+  "goToQuiz": "Go to Quiz",
+  "goToStudy": "Go to Study",
+  "scoreResult": "You scored {{correct}}/{{total}} ({{percentage}}%)",
+  "passedModule": "Module passed!",
+  "failedModule": "Score below 70%. Keep studying!",
+  "correctAnswer": "Correct answer",
+  "yourAnswer": "Your answer",
+  "explanation": "Explanation",
+  "readingProgress": "Reading progress",
+  "backToAcademy": "Back to Academy",
+  "moduleCompleted": "Module Completed"
+}
+
+## Resumen
+
+CREAR:
+- src/lib/vca-questions.ts (110+ preguntas, minimo 5 por modulo)
+- src/lib/vca-lessons.ts (contenido de 22 lecciones)
+- src/components/LessonRenderer.tsx
+
+MODIFICAR:
+- src/pages/AcademyModule.tsx (reemplazar placeholder)
+- src/i18n/locales/en.json
+- src/i18n/locales/es.json
+
+NO TOCAR:
+- Academy.tsx (ya hecho en prompt 1)
+- AcademyExam.tsx (se hace en prompt 3)
+- Componentes ui/*
+- supabase.ts

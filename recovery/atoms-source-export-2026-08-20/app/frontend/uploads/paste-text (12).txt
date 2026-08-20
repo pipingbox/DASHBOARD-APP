@@ -1,0 +1,51 @@
+The Jobs page looks good, but Apply Now is not reflected in the dashboard.
+
+IMPORTANT:
+Do not redesign anything.
+Only connect the Apply Now workflow to Supabase and dashboard counters.
+
+CURRENT ISSUE:
+When clicking "Apply Now" on a job, the dashboard "My Applications" still shows 0.
+
+TASKS:
+
+1. Verify if a job_applications table exists.
+   If not, create:
+   app_14da0f1941_job_applications
+
+Columns:
+id uuid primary key default gen_random_uuid()
+created_at timestamptz default now()
+user_id uuid not null
+job_title text
+company_name text
+location text
+contract_type text
+status text default 'applied'
+
+2. When user clicks Apply Now:
+
+* get authenticated user with supabase.auth.getUser()
+* insert a new record into app_14da0f1941_job_applications
+* include user_id: user.id
+* include job title, company, location, contract type, status
+
+3. Prevent duplicate applications:
+   same user should not apply twice to the same job title + company.
+
+4. Show success toast:
+   "Application submitted successfully"
+
+5. Update dashboard:
+   "My Applications" card should count records from app_14da0f1941_job_applications where user_id = auth.uid()
+
+6. Add RLS policies:
+   Authenticated users can insert, read, update, and delete only their own applications.
+
+7. After applying:
+
+* button should change from "Apply Now" to "Applied"
+* dashboard should update automatically or after refresh.
+
+EXPECTED RESULT:
+Clicking Apply Now creates a real application record in Supabase and increases My Applications count in the dashboard.

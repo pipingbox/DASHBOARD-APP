@@ -1,0 +1,69 @@
+Perform a COMPLETE internationalization audit (i18n audit) of the entire application.
+
+Current issue:
+Portuguese users still see many Spanish texts across the platform.
+
+The app currently has:
+- mixed hardcoded Spanish strings
+- incomplete translation keys
+- onboarding partially untranslated
+- workday/day log sections in Spanish
+- menu/sidebar items untranslated
+- placeholders and labels untranslated
+- validation messages untranslated
+- admin dashboard partially untranslated
+
+I need FULL multilingual consistency.
+
+Tasks:
+
+1. Scan the ENTIRE frontend codebase
+2. Detect ALL hardcoded Spanish strings
+3. Replace them with translation keys
+4. Ensure ALL components use the i18n translation system
+5. Ensure all pages support:
+   - Spanish
+   - English
+   - Portuguese
+
+Priority areas:
+- onboarding
+- workday logs
+- add workday form
+- sidebar menu
+- dashboard
+- profile settings
+- admin pages
+- forms
+- placeholders
+- validation errors
+- buttons
+- notifications
+- modal dialogs
+- empty states
+- loading states
+
+Also:
+- detect translation keys missing in pt.json
+- automatically generate missing Portuguese translations
+- ensure namespace consistency
+- ensure no fallback to Spanish when Portuguese is selected
+
+Very important:
+Search BOTH:
+- frontend hardcoded strings
+- backend-generated labels/messages
+
+Also inspect:
+- Supabase stored labels/content if applicable
+- seed/default data
+- onboarding default values
+
+After fixing:
+Generate a report with:
+- files corrected
+- missing translations added
+- remaining untranslated strings (if any)
+
+Goal:
+100% Portuguese UI consistency.

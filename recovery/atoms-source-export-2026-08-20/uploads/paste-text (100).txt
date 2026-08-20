@@ -1,0 +1,56 @@
+He encontrado el problema exacto.
+
+La consola muestra:
+
+[WorkerSearch] Visible profiles: 0
+[WorkerSearch] Excluded [private/no name]: 31
+
+Pero los perfiles sí tienen nombre válido.
+Por tanto, TODOS están siendo excluidos porque profile_visibility sigue llegando como 'private'.
+
+Necesito revisar por qué los perfiles siguen con:
+profile_visibility = 'private'
+
+incluso después de aparecer como MARKETPLACE READY en admin.
+
+Objetivos:
+
+1. Revisar el badge MARKETPLACE READY:
+- confirmar qué condición usa
+- comprobar si depende solo de marketplace_ready=true
+- verificar si ignora profile_visibility
+
+2. Revisar el proceso “Publicar perfil”:
+- confirmar que realmente actualiza:
+  profile_visibility = 'public'
+- confirmar persistencia en Supabase
+
+3. Revisar Pedro Crespo específicamente:
+- log completo:
+  full_name
+  marketplace_ready
+  profile_visibility
+  onboarding_status
+
+4. Revisar por qué CompanyWorkersSearch recibe:
+  profile_visibility = 'private'
+para todos los usuarios.
+
+5. Si el admin pulsa “Publicar perfil”:
+debe ejecutarse:
+- marketplace_ready=true
+- profile_visibility='public'
+- onboarding_status='MARKETPLACE_READY'
+
+6. Añadir log:
+[WorkerSearch] EXCLUDED because PRIVATE:
+nombre + user_id + profile_visibility
+
+7. Confirmar en Supabase con query directa:
+SELECT full_name, marketplace_ready, profile_visibility
+FROM app_14da0f1941_profiles
+WHERE full_name ILIKE '%Pedro%';
+
+Problema real actual:
+Los perfiles NO están realmente públicos.
+El badge MARKETPLACE READY no coincide con profile_visibility real.

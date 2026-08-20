@@ -1,0 +1,118 @@
+We need to upgrade the Company View into a professional B2B company workspace.
+
+Current problem:
+The Company View still feels like a worker dashboard with extra items. A company should not see worker-specific concepts like “Perfil / CV” as a main company menu item. Companies need a dedicated workspace focused on hiring, candidates, documentation, workforce requests and analytics.
+
+Goal:
+Create a more professional Company View sidebar and add a new Documentation module concept.
+
+IMPORTANT:
+Do not break the existing worker view.
+Worker view and company view must have clearly different navigation.
+
+Company View sidebar structure should be:
+
+ENTORNO EMPRESA
+
+1. Dashboard
+2. Vacantes
+3. Candidatos
+4. Buscar trabajadores
+5. Mensajes
+6. Documentación
+7. Solicitudes de personal
+8. Analítica
+
+Then a separated section:
+
+EMPRESA
+
+9. Perfil de empresa
+10. Configuración
+11. Facturación / Planes
+
+Bottom:
+
+- Cambiar a modo Worker
+- Cerrar sesión
+
+Remove/hide from Company View:
+- Perfil / CV
+- Mis candidaturas
+- any worker-only navigation items
+
+Keep worker-only items only in Worker View.
+
+Documentation module:
+Create a first lightweight version of a company documentation area.
+
+Purpose:
+Industrial companies need to exchange, store and track documents with workers/candidates.
+
+The Documentation page should include categories:
+- Worker documents
+- Company documents
+- Shared documents
+- Contracts
+- Certificates
+- Payroll / allowances
+- Safety documents
+- Medical / compliance documents
+
+Statuses:
+- Pending
+- Sent
+- Signed
+- Approved
+- Rejected
+- Expired
+- Requires update
+
+Initial UI:
+- Dark industrial PipingBox style
+- Cards or table layout
+- Filters by worker, job, document type and status
+- Upload document button
+- Empty state if no documents exist
+- Demo/example rows are acceptable for now if database is not ready
+
+Important UX:
+- Do not make this just a file upload page.
+- Present it as “Industrial Documentation Management”.
+- It should feel useful for HR, recruiters, contractors and industrial workforce coordination.
+
+Company Profile page:
+Replace worker-style profile with a real company profile structure.
+
+Company profile fields:
+- Company name
+- Logo
+- Sector
+- Subsector
+- Company description
+- Headquarters location
+- Operating countries / regions
+- Company type: EPC, Contractor, Subcontractor, Staffing Agency, Owner, Engineering
+- Number of employees
+- Website
+- LinkedIn
+- Specialties/tags: Piping, Welding, Shutdowns, Oil & Gas, Pharma, Offshore, Mechanical, QA/QC, Maintenance, Construction
+- Operational capabilities: Turnarounds, Maintenance, Construction, Commissioning, Staffing, QA/QC, Safety
+
+Do not implement complex backend logic yet unless existing tables already support it.
+First focus:
+- correct navigation
+- correct company UX
+- clean structure
+- professional layout
+- no worker/CV concepts in Company View
+
+Acceptance criteria:
+- Company View sidebar looks like a professional B2B workspace.
+- Worker View remains unchanged.
+- Company View no longer shows “Perfil / CV”.
+- Company has “Perfil de empresa”.
+- New “Documentación” page exists and is reachable from the Company View.
+- Documentation page has professional industrial document management structure.
+- No existing applications, messages, jobs or profiles are broken.
+- Build and lint pass.

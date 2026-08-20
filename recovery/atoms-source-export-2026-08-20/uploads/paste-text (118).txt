@@ -1,0 +1,482 @@
+TOMS PROMPT — Biblioteca de Accesorios V1
+
+Ticket: PB-ASSETS-IMPLEMENT-001 Estado: READY FOR EXECUTION Fuentes aprobadas:
+
+
+
+
+
+07-DESIGN/02-ASSETS/APPROVED/BIBLIOTECA_V1/ASSET_SET.md
+
+
+
+02-PRODUCT/ACCESSORY_LIBRARY_VISUAL_SPEC_V1.md
+
+Restriccion: Este prompt traduce fielmente el diseno aprobado. No reinterpreta estilo, perspectiva, iluminacion ni seleccion de componentes.
+
+
+
+PARTE 1 — ESTILO VISUAL GLOBAL
+
+Aplicar a los 20 assets sin excepcion:
+
+
+
+
+
+Material: Acero inoxidable o metal satinado neutro.
+
+
+
+Fondo: Negro o gris carbon uniforme. Sin degradados, sin escenas, sin suelo visible.
+
+
+
+Iluminacion: Estudio, suave y controlada. Sin reflejos duros. Sin sombras dramaticas.
+
+
+
+Perspectiva: 3/4, consistente en los 20 assets. Misma altura de camara y angulo.
+
+
+
+Encuadre: Pieza centrada con margen de seguridad alrededor. Espacio suficiente para que la pieza no toque los bordes.
+
+
+
+Escala visual: Misma proporcion aparente en toda la familia. Una brida no debe parecer del tamano de un espárrago.
+
+
+
+Temperatura de color: Neutra, uniforme en los 20 assets.
+
+Prohibiciones absolutas
+
+
+
+
+
+Sin logotipos ni marcas de fabricante.
+
+
+
+Sin texto, numeros, normas ni grabados sobre la pieza.
+
+
+
+Sin rotulos debajo del elemento dentro del asset.
+
+
+
+Sin decoraciones, escenas de taller ni fondos complejos.
+
+
+
+Sin branding PIPINGBOX.
+
+
+
+Sin texto generado por IA sobre la superficie metalica.
+
+
+
+PARTE 2 — LOS 20 ASSETS INDIVIDUALES
+
+Cada asset se genera como archivo individual. El prompt de cada pieza combina el estilo global (Parte 1) con la descripcion especifica.
+
+Asset 01 — PB-ASSET-0001 — Codo BW
+
+Componente: Codo 90 grados Long Radius, conexion Butt Weld. Detalles: Dos extremos biselados para soldadura. Radio largo (1.5D). Curvatura suave y continua. Se deben apreciar claramente ambos extremos del codo y la curvatura completa.
+
+Asset 02 — PB-ASSET-0002 — Tee BW
+
+Componente: Tee igual (equal tee), conexion Butt Weld. Detalles: Tres extremos biselados del mismo diametro. Forma de T simetrica. La rama (branch) sale perpendicular al cuerpo principal (run).
+
+Asset 03 — PB-ASSET-0003 — Reduccion concentrica BW
+
+Componente: Reduccion concentrica, conexion Butt Weld. Detalles: Transicion coaxial de diametro mayor a menor. Los dos ejes coinciden. Ambos extremos biselados.
+
+Asset 04 — PB-ASSET-0004 — Reduccion excentrica BW
+
+Componente: Reduccion excentrica, conexion Butt Weld. Detalles: Transicion de diametro mayor a menor con un lado plano (flat side). Los ejes NO coinciden. Un generatriz recta visible. Ambos extremos biselados.
+
+Asset 05 — PB-ASSET-0005 — Tapa BW (Cap)
+
+Componente: Tapa (cap), conexion Butt Weld. Detalles: Cierre semiesferico o semieliptico en un extremo de tuberia. Un solo extremo biselado, el otro cerrado con forma redondeada.
+
+Asset 06 — PB-ASSET-0006 — Stub End
+
+Componente: Stub end (lap-joint stub end). Detalles: Pieza corta con un extremo biselado y un reborde (lap) en el otro extremo para apoyar contra una brida lap-joint. El reborde debe ser claramente visible.
+
+Asset 07 — PB-ASSET-0007 — Brida Weld Neck
+
+Componente: Brida Weld Neck (cuello largo soldado). Detalles: Disco circular con taladros para esparragos. Cuello conico largo que termina en bisel para soldadura. La cara de la brida (raised face) debe ser visible. Los taladros deben tener geometria coherente y distribucion uniforme.
+
+Asset 08 — PB-ASSET-0008 — Esparrago (Stud Bolt)
+
+Componente: Esparrago con dos tuercas hexagonales. Detalles: Barra roscada con una tuerca en cada extremo. Sin texto, sin numeros de grado, sin marcas de fabricante grabadas. La rosca debe ser visible pero sin exagerar.
+
+Asset 09 — PB-ASSET-0009 — Junta (Gasket)
+
+Componente: Junta tipo Spiral Wound Gasket. Detalles: Anillo con espiral metalica visible (wound metal strips). Anillo interior y exterior (inner ring + outer centering ring). La textura espiral debe ser reconocible.
+
+Asset 10 — PB-ASSET-0010 — Gate Valve
+
+Componente: Valvula de compuerta (gate valve), conexion BRIDADA (flanged). Detalles: Cuerpo robusto con bonete superior, volante (handwheel) en la parte superior, y BRIDAS en ambos extremos con taladros visibles. NO socket weld. NO roscada. Debe ser claramente una valvula de compuerta bridada. QA critico: Verificar que se ven las bridas con taladros, no extremos lisos.
+
+Asset 11 — PB-ASSET-0011 — Globe Valve
+
+Componente: Valvula de globo (globe valve), conexion bridada. Detalles: Cuerpo con forma bulbosa o esferica caracteristica. Bonete y volante en la parte superior. Bridas en ambos extremos. Visualmente diferente de la gate valve: el cuerpo de la globe tiene perfil mas redondeado y el flujo cambia de direccion internamente (aunque el interior no se ve, la forma exterior lo refleja).
+
+Asset 12 — PB-ASSET-0012 — Check Valve
+
+Componente: Valvula de retencion (check valve), conexion bridada. Detalles: Cuerpo compacto con bridas en ambos extremos. SIN volante. El mecanismo es automatico (no se opera manualmente). Debe diferenciarse visualmente de gate y globe por la ausencia de volante y por un cuerpo mas corto o aplanado.
+
+Asset 13 — PB-ASSET-0013 — Ball Valve
+
+Componente: Valvula de bola (ball valve), conexion bridada. Detalles: Cuerpo con palanca lateral (lever handle), no volante. Bridas en ambos extremos. La palanca es el elemento diferenciador principal respecto a las otras valvulas.
+
+Asset 14 — PB-ASSET-0014 — Butterfly Valve
+
+Componente: Valvula de mariposa (butterfly valve), conexion wafer/lug. Detalles: Cuerpo fino tipo disco (wafer body) que se intercala entre bridas. Palanca o actuador en la parte superior. El cuerpo es significativamente mas delgado que las demas valvulas. Los taladros lug o la configuracion wafer deben ser visibles.
+
+Asset 15 — PB-ASSET-0015 — Filtro Y (Y-Strainer)
+
+Componente: Filtro Y (Y-strainer), conexion bridada. Detalles: Cuerpo con forma de Y invertida. Una rama principal (in-out) con bridas y una rama inclinada inferior (camara del filtro) con tapa roscada o bridada. La forma de Y debe ser inconfundible.
+
+Asset 16 — PB-ASSET-0016 — Weldolet
+
+Componente: Weldolet (ramal soldado a tope), conexion BW de salida. Detalles: Pieza que se suelda sobre la superficie de una tuberia principal para crear una derivacion. Base contorneada que se adapta a la curvatura del tubo principal. Extremo de salida biselado (butt weld). NO tiene rosca. NO tiene socket. QA critico: La conexion de salida es BW (biselada), no SW ni roscada.
+
+Asset 17 — PB-ASSET-0017 — Sockolet
+
+Componente: Sockolet (ramal socket weld), conexion SW de salida. Detalles: Similar al weldolet en la base (contorneada al tubo principal), pero el extremo de salida tiene un SOCKET interno visible (cavidad cilindrica donde entra la tuberia pequena). La diferencia con el weldolet es que la salida NO es biselada sino un hueco cilindrico. QA critico: La salida es SW (socket visible), no biselada.
+
+Asset 18 — PB-ASSET-0018 — Threadolet
+
+Componente: Threadolet (ramal roscado), conexion roscada de salida. Detalles: Similar al weldolet en la base, pero el extremo de salida tiene ROSCA INTERNA (female thread). Se deben apreciar las estrias de la rosca en el interior de la salida. La diferencia con weldolet y sockolet es que la salida muestra un roscado. QA critico: La salida es roscada (hilos de rosca visibles internamente), no biselada ni socket.
+
+Asset 19 — PB-ASSET-0019 — Tee roscada
+
+Componente: Tee roscada (threaded tee / screwed fitting). Detalles: Tee con tres conexiones roscadas. Mas compacta que la tee BW. Las roscas internas (female) deben ser visibles o al menos sugeridas en los tres extremos. Cuerpo mas grueso y corto que la tee BW.
+
+Asset 20 — PB-ASSET-0020 — Ciego de linea (Spectacle Blind)
+
+Componente: Spectacle blind (ciega-gafas / ciego de linea). Detalles: Pieza plana con forma de dos circulos unidos por una barra central (forma de gafas). Un circulo es el disco ciego (solid plate) y el otro es el anillo abierto (spacer ring). Taladros para esparragos alrededor de cada circulo. La pieza es delgada y plana.
+
+
+
+PARTE 3 — ESPECIFICACIONES DE EXPORTACION
+
+Formato de archivo
+
+
+
+
+
+Formato preferido: PNG con fondo oscuro integrado, o WebP.
+
+
+
+Alternativa: PNG con fondo transparente si se necesita adaptar a la UI.
+
+
+
+Resolucion minima: Suficiente para que la pieza sea nitida en detalle (detail view).
+
+Variantes por asset
+
+Generar 3 variantes de cada asset sin alterar la geometria ni el estilo:
+
+
+
+
+
+
+
+Variante
+
+
+
+Uso
+
+
+
+Requisito
+
+
+
+
+
+card
+
+
+
+Tarjeta de categoria en la biblioteca
+
+
+
+Legible a tamano pequeno (~200px)
+
+
+
+
+
+detail
+
+
+
+Pagina de detalle del accesorio
+
+
+
+Alta resolucion, pieza prominente
+
+
+
+
+
+mobile
+
+
+
+Tarjeta en dispositivo movil
+
+
+
+Reconocible a ~120px
+
+Nomenclatura de archivos
+
+PB-ASSET-0001_elbow-90-lr-bw_card.png
+PB-ASSET-0001_elbow-90-lr-bw_detail.png
+PB-ASSET-0001_elbow-90-lr-bw_mobile.png
+
+Patron: {ID}_{slug}_{variante}.{extension}
+
+
+
+PARTE 4 — CHECKLIST QA POR ASSET
+
+Antes de aprobar cada asset, verificar:
+
+
+
+
+
+
+
+#
+
+
+
+Verificacion
+
+
+
+Criterio
+
+
+
+
+
+1
+
+
+
+Componente correcto
+
+
+
+El accesorio representado coincide con su nombre
+
+
+
+
+
+2
+
+
+
+Conexion correcta
+
+
+
+BW, SW, roscada, bridada o wafer/lug segun la tabla
+
+
+
+
+
+3
+
+
+
+Sin texto
+
+
+
+Ningun texto, numero o grabado sobre la pieza
+
+
+
+
+
+4
+
+
+
+Bridas con taladros
+
+
+
+Si es bridada, los taladros son visibles y coherentes
+
+
+
+
+
+5
+
+
+
+Valvulas diferenciables
+
+
+
+Gate, Globe, Check, Ball y Butterfly son distintas entre si
+
+
+
+
+
+6
+
+
+
+Olets diferenciables
+
+
+
+Weldolet (BW), Sockolet (SW) y Threadolet (rosca) se distinguen
+
+
+
+
+
+7
+
+
+
+Estilo coherente
+
+
+
+Mismo material, fondo, luz y perspectiva que el resto
+
+
+
+
+
+8
+
+
+
+Legible en movil
+
+
+
+Reconocible a tamano de tarjeta pequena
+
+
+
+
+
+9
+
+
+
+Contraste dark mode
+
+
+
+La pieza se distingue del fondo en modo oscuro
+
+
+
+
+
+10
+
+
+
+Gate Valve bridada
+
+
+
+Asset 10 muestra bridas, no SW ni roscada
+
+
+
+PARTE 5 — SECUENCIA DE EJECUCION RECOMENDADA
+
+
+
+
+
+Generar los 20 assets en variante detail primero.
+
+
+
+Ejecutar QA contra la checklist de Parte 4.
+
+
+
+Corregir los assets que no pasen QA.
+
+
+
+Generar variantes card y mobile a partir de los detail aprobados.
+
+
+
+Registrar rutas finales en el indice de assets.
+
+
+
+Presentar capturas desktop y mobile al Product Owner.
+
+
+
+RESTRICCIONES FINALES
+
+
+
+
+
+No redisenar como iconos lineales.
+
+
+
+No usar fotografias de stock de fabricantes reales.
+
+
+
+No cambiar el tipo de conexion durante la implementacion.
+
+
+
+No fusionar tees iguales y reductoras en un mismo visual.
+
+
+
+No mostrar todas las columnas dimensionales por defecto en la UI.
+
+
+
+No abrir nuevas funcionalidades hasta completar esta implementacion.
+
+
+
+Terminologia obligatoria: eje (no centro de tubo), eje a extremo, avance, descuento, longitud de corte, cara a cara.
+

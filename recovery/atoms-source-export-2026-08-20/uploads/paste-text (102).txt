@@ -1,0 +1,432 @@
+Necesito implementar la nueva PipingBox Academy con el curso VCA completo en el proyecto PipingBox.
+
+## Contexto del proyecto
+
+- Framework: React 18.3 + TypeScript + Vite + Tailwind 3.4
+- Componentes UI: shadcn/ui (Button, Card, Badge, Progress, Tabs, Select, Accordion, Dialog ya existen en src/components/ui/)
+- i18n: react-i18next con archivos en src/i18n/locales/en.json y es.json
+- Tema: dark (#0a0a0a bg, #0d0d0d cards, zinc-800/80 borders, #f59e0b amber accent)
+- Supabase: cliente en src/lib/supabase.ts con TABLES ya definido
+- Router: react-router-dom v6, lazy loading con React.lazy y Suspense
+- NO es Next.js. NO usar 'use client'.
+- Imports con alias @ (apunta a src/)
+- Componente PageHeader ya existe en src/components/PageHeader.tsx
+
+## Contexto de negocio
+
+PipingBox Academy tiene 22 modulos del curso VCA (Safety for Intermediaries and Supervisors).
+El examen oficial B-VCA tiene 40 preguntas (60 min), VOL-VCA tiene 70 preguntas (105 min).
+El contenido esta basado en un libro de 190 paginas de OpleidenSnel con 252 preguntas tipo examen A/B/C.
+
+## Archivos a crear
+
+### 1. Crear src/lib/academy-data.ts
+
+Archivo con los 22 modulos del curso VCA en TypeScript. Cada modulo tiene:
+- id (numero 1-22)
+- title (en ingles, clave de i18n)
+- titleKey (ej: 'academy.module1.title')
+- descriptionKey
+- questionCount
+- isBVCA (boolean, true para B-VCA basico)
+- isVOLVCA (boolean, true para VOL-VCA supervisores)
+- icon (nombre de icono de lucide-react)
+- color (clase tailwind para el acento del modulo)
+- estimatedMinutes
+
+Exportar:
+- VCA_MODULES: array de los 22 modulos
+- VCA_EXAM_INFO: { bvca: { questions: 40, passScore: 28, durationMin: 60 }, volvca: { questions: 70, passScore: 49, durationMin: 105 } }
+
+Los 22 modulos son:
+1. Legislation (Shield) - 15q - B+VOL
+2. Dangers, Risks and Prevention (AlertTriangle) - 11q - B+VOL
+3. Accidents: Causes and Prevention (Bandage) - 12q - B+VOL
+4. Safe Behavior (Users) - 9q - B+VOL
+5. Tasks, Rights, Duties and Consultations (ClipboardList) - 19q - VOL only
+6. Procedures, Instructions and Signs (FileText) - 10q - B+VOL
+7. Preparations for Emergencies (Siren) - 9q - B+VOL
+8. Hazardous Substances (FlaskConical) - 24q - B+VOL
+9. Fire and Explosions (Flame) - 18q - B+VOL
+10. Equipment and Tools (Wrench) - 21q - B+VOL
+11. Demolition Activities (Hammer) - 3q - B+VOL
+12. Welding, Cutting and Burning (Zap) - 4q - B+VOL
+13. Excavations (Shovel) - 4q - B+VOL
+14. Working at Height (TrendingUp) - 9q - B+VOL
+15. Electricity (Plug) - 20q - B+VOL
+16. Confined Spaces (Box) - 10q - B+VOL
+17. Hoisting (Anchor) - 10q - B+VOL
+18. Radiation (Radiation) - 6q - B+VOL
+19. Ergonomics at Work (Armchair) - 14q - B+VOL
+20. Noise at Work (Volume2) - 9q - B+VOL
+21. Personal Protective Equipment (HardHat) - 15q - B+VOL
+22. Signage and Marking (Signpost) - 10q - B+VOL
+
+Colores rotativos para modulos (usar clases text-[]): amber (#f59e0b), emerald (#10b981), sky (#0ea5e9), violet (#8b5cf6), rose (#f43f5e), orange (#f97316). Asignar en orden ciclico.
+
+### 2. Crear src/lib/academy-types.ts
+
+Tipos TypeScript:
+
+export interface VCAModule {
+  id: number;
+  titleKey: string;
+  descriptionKey: string;
+  questionCount: number;
+  isBVCA: boolean;
+  isVOLVCA: boolean;
+  iconName: string;
+  colorClass: string;
+  estimatedMinutes: number;
+}
+
+export interface VCAQuestion {
+  id: number;
+  moduleId: number;
+  questionText: string;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  correctAnswer: 'A' | 'B' | 'C';
+  explanation?: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  isBVCA: boolean;
+  isVOLVCA: boolean;
+}
+
+export interface VCAUserProgress {
+  moduleId: number;
+  completed: boolean;
+  score: number;
+  attempts: number;
+  lastAttemptAt: string | null;
+  bestScore: number;
+}
+
+export interface VCAMockExamResult {
+  id: string;
+  userId: string;
+  examType: 'bvca' | 'volvca';
+  totalQuestions: number;
+  correctAnswers: number;
+  passed: boolean;
+  durationSeconds: number;
+  completedAt: string;
+  questionResults: Array<{
+    questionId: number;
+    selectedAnswer: 'A' | 'B' | 'C';
+    correct: boolean;
+  }>;
+}
+
+### 3. Crear src/pages/Academy.tsx (REEMPLAZAR el archivo existente completamente)
+
+El nuevo Academy.tsx debe tener 3 secciones usando Tabs:
+
+TAB 1: "Cursos" (default)
+- Header con titulo y descripcion
+- Hero card del curso VCA con:
+  - Icono GraduationCap grande en amber
+  - Titulo "VCA Safety Certification"
+  - Subtitulo "B-VCA & VOL-VCA Preparation Course"
+  - Stats: 22 modulos | 252 preguntas | 6 idiomas
+  - Progress bar global del usuario (suma de progreso de todos los modulos)
+  - Boton "Empezar curso" que navega al primer modulo no completado
+- Grid de 22 modulos (3 columnas en desktop, 1 en mobile):
+  - Cada card muestra: numero, icono, titulo, descripcion corta, numero de preguntas, tiempo estimado
+  - Badge de nivel: "B-VCA" si isBVCA, "VOL-VCA" si isVOLVCA
+  - Progress bar individual si el usuario tiene progreso
+  - Estado: "No empezado" (gris), "En progreso" (amber), "Completado" (emerald) con checkmark
+  - Click en card navega a /academy/module/:id
+- Seccion "Proximos cursos" con 3 cards en gris/disabled:
+  - Piping Fundamentals (Coming Soon)
+  - ASME B31.3 Process Piping (Coming Soon)
+  - Welding Certification (Coming Soon)
+
+TAB 2: "Examen de practica"
+- Selector de tipo de examen: B-VCA (40 preg, 60 min) | VOL-VCA (70 preg, 105 min)
+- Card informativa con:
+  - Numero de preguntas
+  - Tiempo limite
+  - Puntuacion minima para aprobar (28/40 B-VCA, 49/70 VOL-VCA)
+  - Validez del certificado oficial: 10 anos
+  - Nota: "PipingBox prepara para el examen oficial. No emite certificacion propia."
+- Boton "Iniciar examen simulacro" que navega a /academy/exam/:type
+- Historial de examenes anteriores (si los hay) en tabla:
+  - Fecha, tipo, puntuacion, resultado (Aprobo/Suspendio), duracion
+  - Boton "Revisar" para ver respuestas
+
+TAB 3: "Mis certificados"
+- Lista de modulos completados con score
+- Certificado de preparacion PipingBox (descargable PDF) cuando el usuario completa todos los modulos
+- Stat cards: Modulos completados, Promedio de score, Examenes realizados, Mejor examen
+
+Estados:
+- Si no hay sesion de usuario: mostrar contenido pero sin progreso (todo "No empezado")
+- Cargar progreso desde Supabase si hay userId
+- Loading states con Skeleton
+- Error state con mensaje y boton retry
+
+## Archivos a modificar
+
+### 4. Modificar src/App.tsx
+
+Anadir rutas lazy:
+
+import AcademyModule from './pages/AcademyModule';
+import AcademyExam from './pages/AcademyExam';
+
+En el bloque de rutas, despues de la ruta /academy existente, anadir:
+<Route path="/academy/module/:moduleId" element={withShellRoles(<AcademyModule />, ['admin','worker'])} />
+<Route path="/academy/exam/:examType" element={withShellRoles(<AcademyExam />, ['admin','worker'])} />
+
+### 5. Modificar src/i18n/locales/en.json
+
+Anadir claves bajo "academy":
+
+"academy": {
+  "eyebrow": "PipingBox Academy",
+  "title": "Industrial Training Academy",
+  "description": "Certification preparation and technical courses for piping professionals.",
+  "tabsCourses": "Courses",
+  "tabsExams": "Practice Exam",
+  "tabsCertificates": "My Certificates",
+  "vcaHeroTitle": "VCA Safety Certification",
+  "vcaHeroSubtitle": "B-VCA & VOL-VCA Preparation Course",
+  "vcaHeroStatsModules": "22 modules",
+  "vcaHeroStatsQuestions": "252 questions",
+  "vcaHeroStatsLanguages": "6 languages",
+  "startCourse": "Start Course",
+  "continueCourse": "Continue",
+  "reviewModule": "Review",
+  "module": "Module",
+  "lessons": "{{count}} questions",
+  "estimatedTime": "{{minutes}} min",
+  "statusNotStarted": "Not started",
+  "statusInProgress": "In progress",
+  "statusCompleted": "Completed",
+  "levelBVCA": "B-VCA",
+  "levelVOLVCA": "VOL-VCA",
+  "levelBoth": "B-VCA + VOL-VCA",
+  "upcomingCourses": "Coming Soon",
+  "pipingFundamentalsTitle": "Piping Fundamentals",
+  "pipingFundamentalsDesc": "Pipe classes, fittings, supports, and basic isometric reading.",
+  "asmeB313Title": "ASME B31.3 Process Piping",
+  "asmeB313Desc": "Design, fabrication, examination, and testing workflows.",
+  "weldingCertTitle": "Welding Certification",
+  "weldingCertDesc": "WPS, PQR, welder qualification, and inspection basics.",
+  "comingSoon": "Coming Soon",
+  "examTitle": "Practice Exam",
+  "examSubtitle": "Simulate the official VCA exam",
+  "examTypeBVCA": "B-VCA (Basic Safety)",
+  "examTypeVOLVCA": "VOL-VCA (Operational Supervisors)",
+  "examQuestions": "{{count}} questions",
+  "examDuration": "{{minutes}} minutes",
+  "examPassScore": "Pass: {{score}}/{{total}} (70%)",
+  "examValidity": "Valid 10 years (official)",
+  "examDisclaimer": "PipingBox prepares you for the official exam. We do not issue official certification.",
+  "startExam": "Start Practice Exam",
+  "examHistory": "Exam History",
+  "examHistoryEmpty": "No exams taken yet",
+  "examDate": "Date",
+  "examType": "Type",
+  "examScore": "Score",
+  "examResult": "Result",
+  "examPassed": "PASSED",
+  "examFailed": "FAILED",
+  "examDurationLabel": "Duration",
+  "reviewExam": "Review",
+  "certificatesTitle": "My Certificates",
+  "certModulesCompleted": "Modules Completed",
+  "certAverageScore": "Average Score",
+  "certExamsTaken": "Exams Taken",
+  "certBestExam": "Best Exam Score",
+  "certPipingBoxPrep": "PipingBox Preparation Certificate",
+  "certDownload": "Download Certificate",
+  "certCompleteAll": "Complete all 22 modules to earn your PipingBox preparation certificate.",
+  "module1": { "title": "Legislation", "description": "Health & Safety laws, ARBO, CE marking, working hours legislation." },
+  "module2": { "title": "Dangers, Risks and Prevention", "description": "Risk = Probability x Effect. RI&E, LMRA, task risk analysis." },
+  "module3": { "title": "Accidents: Causes and Prevention", "description": "Domino theory, accident pyramid, investigation, prevention." },
+  "module4": { "title": "Safe Behavior", "description": "Causes of unsafe behavior, alcohol & drugs, supervisor role." },
+  "module5": { "title": "Tasks, Rights, Duties and Consultations", "description": "Employer/employee obligations, work interruption right, SCC certification." },
+  "module6": { "title": "Procedures, Instructions and Signs", "description": "General vs specific safety rules, work permits, LOTO, flanges." },
+  "module7": { "title": "Preparations for Emergencies", "description": "BHV team, emergency plan, evacuation, first aid requirements." },
+  "module8": { "title": "Hazardous Substances", "description": "R/S phrases, NFPA diamond, MSDS, asbestos, CO, gas cylinders." },
+  "module9": { "title": "Fire and Explosions", "description": "Fire pentagon, classes A-D, extinguishing methods, flash point, Ex zones." },
+  "module10": { "title": "Equipment and Tools", "description": "Machine safety, dead man switch, emergency stop, hand tools, grinders." },
+  "module11": { "title": "Demolition Activities", "description": "Demolition plan, collapse risks, ceramic fibers." },
+  "module12": { "title": "Welding, Cutting and Burning", "description": "Gas welding, electric welding, UV/IR radiation, fume extraction." },
+  "module13": { "title": "Excavations", "description": "Underground utilities, collapse risks, ladders, fencing." },
+  "module14": { "title": "Working at Height", "description": "2.5m threshold, ladders, scaffolds, harnesses, floor openings." },
+  "module15": { "title": "Electricity", "description": "4 hazards, RCD 30mA, safe voltages, static electricity, cable reels." },
+  "module16": { "title": "Confined Spaces", "description": "Characteristics, O2 >19%, permanent watch, safe voltages, welding inside." },
+  "module17": { "title": "Hoisting", "description": "Crane types, sling angle <120deg, chains, wire ropes, wind limits." },
+  "module18": { "title": "Radiation", "description": "Ionizing vs non-ionizing, X-ray, nuclear, measurement, medical exams." },
+  "module19": { "title": "Ergonomics at Work", "description": "Vibrations, climate, physical/mental stress, 25kg lifting, posture." },
+  "module20": { "title": "Noise at Work", "description": "Hearing damage, 3dB doubling, 6dB distance, 80/85 dB thresholds." },
+  "module21": { "title": "Personal Protective Equipment", "description": "Eye, hearing, respiratory, head, hand, foot, body, fall protection." },
+  "module22": { "title": "Signage and Marking", "description": "5 sign groups: prohibition, obligation, warning, safety, fire equipment." }
+}
+
+### 6. Modificar src/i18n/locales/es.json
+
+Mismas claves que en.json pero en espanol:
+
+"academy": {
+  "eyebrow": "PipingBox Academy",
+  "title": "Academia de Formacion Industrial",
+  "description": "Preparacion para certificaciones y cursos tecnicos para profesionales de tuberias.",
+  "tabsCourses": "Cursos",
+  "tabsExams": "Examen de practica",
+  "tabsCertificates": "Mis certificados",
+  "vcaHeroTitle": "Certificacion de Seguridad VCA",
+  "vcaHeroSubtitle": "Curso de preparacion B-VCA y VOL-VCA",
+  "vcaHeroStatsModules": "22 modulos",
+  "vcaHeroStatsQuestions": "252 preguntas",
+  "vcaHeroStatsLanguages": "6 idiomas",
+  "startCourse": "Empezar curso",
+  "continueCourse": "Continuar",
+  "reviewModule": "Repasar",
+  "module": "Modulo",
+  "lessons": "{{count}} preguntas",
+  "estimatedTime": "{{minutes}} min",
+  "statusNotStarted": "No empezado",
+  "statusInProgress": "En progreso",
+  "statusCompleted": "Completado",
+  "levelBVCA": "B-VCA",
+  "levelVOLVCA": "VOL-VCA",
+  "levelBoth": "B-VCA + VOL-VCA",
+  "upcomingCourses": "Proximamente",
+  "pipingFundamentalsTitle": "Fundamentos de Tuberias",
+  "pipingFundamentalsDesc": "Clases de tuberia, accesorios, soportes y lectura isometrica basica.",
+  "asmeB313Title": "ASME B31.3 Tuberias de Proceso",
+  "asmeB313Desc": "Diseno, fabricacion, inspeccion y workflows de prueba.",
+  "weldingCertTitle": "Certificacion de Soldadura",
+  "weldingCertDesc": "WPS, PQR, calificacion de soldador y bases de inspeccion.",
+  "comingSoon": "Proximamente",
+  "examTitle": "Examen de Practica",
+  "examSubtitle": "Simula el examen oficial VCA",
+  "examTypeBVCA": "B-VCA (Seguridad Basica)",
+  "examTypeVOLVCA": "VOL-VCA (Supervisores Operacionales)",
+  "examQuestions": "{{count}} preguntas",
+  "examDuration": "{{minutes}} minutos",
+  "examPassScore": "Aprobar: {{score}}/{{total}} (70%)",
+  "examValidity": "Validez 10 anos (oficial)",
+  "examDisclaimer": "PipingBox te prepara para el examen oficial. No emitimos certificacion propia.",
+  "startExam": "Iniciar examen simulacro",
+  "examHistory": "Historial de examenes",
+  "examHistoryEmpty": "No has hecho ningun examen todavia",
+  "examDate": "Fecha",
+  "examType": "Tipo",
+  "examScore": "Puntuacion",
+  "examResult": "Resultado",
+  "examPassed": "APROBADO",
+  "examFailed": "SUSPENSO",
+  "examDurationLabel": "Duracion",
+  "reviewExam": "Revisar",
+  "certificatesTitle": "Mis Certificados",
+  "certModulesCompleted": "Modulos Completados",
+  "certAverageScore": "Puntuacion Media",
+  "certExamsTaken": "Examenes Realizados",
+  "certBestExam": "Mejor Examen",
+  "certPipingBoxPrep": "Certificado de Preparacion PipingBox",
+  "certDownload": "Descargar Certificado",
+  "certCompleteAll": "Completa los 22 modulos para obtener tu certificado de preparacion PipingBox.",
+  "module1": { "title": "Legislacion", "description": "Leyes de Seguridad y Salud, ARBO, marcaje CE, legislacion de horas." },
+  "module2": { "title": "Peligros, Riesgos y Prevencion", "description": "Riesgo = Probabilidad x Efecto. RI&E, LMRA, analisis de riesgo de tarea." },
+  "module3": { "title": "Accidentes: Causas y Prevencion", "description": "Teoria del domino, piramide de accidentes, investigacion, prevencion." },
+  "module4": { "title": "Comportamiento Seguro", "description": "Causas de comportamiento inseguro, alcohol y drogas, rol del supervisor." },
+  "module5": { "title": "Tareas, Derechos, Deberes y Consultas", "description": "Obligaciones empleador/empleado, derecho a interrumpir, certificacion SCC." },
+  "module6": { "title": "Procedimientos, Instrucciones y Senales", "description": "Reglas generales vs especificas, permisos de trabajo, LOTO, bridas." },
+  "module7": { "title": "Preparacion para Emergencias", "description": "Equipo BHV, plan de emergencia, evacuacion, primeros auxilios." },
+  "module8": { "title": "Sustancias Peligrosas", "description": "Frases R/S, diamante NFPA, MSDS, amianto, CO, cilindros de gas." },
+  "module9": { "title": "Incendio y Explosiones", "description": "Pentagono del fuego, clases A-D, metodos de extincion, punto de inflamacion, zonas Ex." },
+  "module10": { "title": "Equipos y Herramientas", "description": "Seguridad de maquinas, hombre muerto, parada de emergencia, herramientas manuales." },
+  "module11": { "title": "Actividades de Demolicion", "description": "Plan de demolicion, riesgos de colapso, fibras ceramicas." },
+  "module12": { "title": "Soldadura, Corte y Quema", "description": "Soldadura con gas, electrica, radiacion UV/IR, extraccion de humos." },
+  "module13": { "title": "Excavaciones", "description": "Servicios subterraneos, riesgos de derrumbe, escaleras, vallado." },
+  "module14": { "title": "Trabajo en Altura", "description": "Umbral 2.5m, escaleras, andamios, arneses, aberturas en suelo." },
+  "module15": { "title": "Electricidad", "description": "4 peligros, diferencial 30mA, voltajes seguros, electricidad estatica, carretes." },
+  "module16": { "title": "Espacios Confinados", "description": "Caracteristicas, O2 >19%, vigilante permanente, voltajes seguros, soldadura interior." },
+  "module17": { "title": "Izaje", "description": "Tipos de grua, angulo eslinga <120deg, cadenas, cables de acero, viento." },
+  "module18": { "title": "Radiacion", "description": "Ionizante vs no ionizante, rayos X, nuclear, medicion, examenes medicos." },
+  "module19": { "title": "Ergonomia en el Trabajo", "description": "Vibraciones, clima, estres fisico/mental, levantamiento 25kg, postura." },
+  "module20": { "title": "Ruido en el Trabajo", "description": "Dano auditivo, 3dB duplicacion, 6dB distancia, umbrales 80/85 dB." },
+  "module21": { "title": "Equipos de Proteccion Personal", "description": "Ojos, oidos, respiratoria, cabeza, manos, pies, cuerpo, anticaidas." },
+  "module22": { "title": "Senalizacion y Marcado", "description": "5 grupos: prohibicion, obligacion, advertencia, seguridad, equipos incendio." }
+}
+
+## Especificaciones de UI
+
+### Tema (OBLIGATORIO seguir exactamente):
+- Fondo general: bg-[#0a0a0a]
+- Cards: bg-[#0d0d0d] border border-zinc-800/80
+- Hover cards: hover:border-[#f59e0b] transition
+- Accent: text-[#f59e0b]
+- Eyebrow: text-[10px] uppercase tracking-[0.25em] text-[#f59e0b]
+- Labels: text-xs uppercase tracking-wider text-zinc-400
+- Resultado destacad: border-l-2 border-[#f59e0b] bg-[#f59e0b]/5 p-4
+- Progress bar: usar componente Progress de shadcn/ui con clase [&>div]:bg-[#f59e0b]
+
+### Layout:
+- Container: space-y-8
+- PageHeader: usar componente existente
+- Tabs: usar Tabs de shadcn/ui, TabsList con bg-[#0d0d0d]
+- Grid modulos: grid gap-5 sm:grid-cols-2 lg:grid-cols-3
+- Card modulo: flex flex-col p-6, min-height 200px
+
+### Iconos por modulo (lucide-react):
+Mapear iconName a componente. Importar dinamicamente o usar un objeto de mapeo:
+import { Shield, AlertTriangle, Bandage, Users, ClipboardList, FileText, Siren, FlaskConical, Flame, Wrench, Hammer, Zap, Shovel, TrendingUp, Plug, Box, Anchor, Radiation, Armchair, Volume2, HardHat, Signpost } from 'lucide-react';
+
+### Funcionalidad:
+
+1. useAuth hook para obtener userId:
+const { user } = useAuth();
+
+2. Cargar progreso desde Supabase (si hay user):
+const { data: progress } = useQuery({
+  queryKey: ['academy-progress', user?.id],
+  queryFn: async () => {
+    if (!user) return null;
+    const { data } = await supabase
+      .from('app_14da0f1941_academy_progress')
+      .select('*')
+      .eq('user_id', user.id);
+    return data;
+  },
+  enabled: !!user,
+});
+
+NOTA: La tabla app_14da0f1941_academy_progress puede no existir todavia. Usar try/catch y si falla, mostrar todo como "No empezado". No bloquear la UI si Supabase falla.
+
+3. Calcular progreso global:
+const completedCount = progress?.filter(p => p.completed).length || 0;
+const globalProgress = (completedCount / VCA_MODULES.length) * 100;
+
+4. Navegacion con useNavigate:
+- Click en modulo: navigate(`/academy/module/${module.id}`)
+- Click en empezar examen: navigate(`/academy/exam/${examType}`)
+
+5. Determinar modulo a continuar:
+const nextModule = VCA_MODULES.find(m => !completedIds.has(m.id)) || VCA_MODULES[0];
+
+## Resumen
+
+CREAR:
+- src/lib/academy-data.ts
+- src/lib/academy-types.ts
+- src/pages/AcademyModule.tsx (placeholder con PageHeader y "Loading...")
+- src/pages/AcademyExam.tsx (placeholder con PageHeader y "Loading...")
+
+MODIFICAR:
+- src/pages/Academy.tsx (reemplazar completamente)
+- src/App.tsx (anadir 2 rutas lazy)
+- src/i18n/locales/en.json (anadir claves academy)
+- src/i18n/locales/es.json (anadir claves academy)
+
+NO TOCAR:
+- src/components/PageHeader.tsx
+- src/components/ui/* (ya existen todos los necesarios)
+- src/lib/supabase.ts
+- Cualquier otra pagina existente

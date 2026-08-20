@@ -1,0 +1,2464 @@
+schema_version: "1.0.0"
+id: PB-DIM-ASME-B36-10M-PIPE
+component_id: PB-COMP-PIPE-SEAMLESS-ASME-B36-10M
+standard_id: PB-STD-ASME-B36-10M
+dataset_type: standard
+system: mixed
+
+selectors:
+  - key: nps
+    label: "Nominal Pipe Size"
+    unit: "in"
+    type: string
+  - key: dn
+    label: "Diametre Nominal"
+    unit: "mm"
+    type: integer
+  - key: schedule
+    label: "Schedule"
+    unit: ""
+    type: string
+
+fields:
+  - key: od_in
+    label: "Outside Diameter"
+    unit: "in"
+    type: number
+    fabrication_priority: 1
+  - key: od_mm
+    label: "Outside Diameter"
+    unit: "mm"
+    type: number
+    fabrication_priority: 1
+  - key: wt_in
+    label: "Wall Thickness"
+    unit: "in"
+    type: number
+    fabrication_priority: 2
+  - key: wt_mm
+    label: "Wall Thickness"
+    unit: "mm"
+    type: number
+    fabrication_priority: 2
+  - key: id_in
+    label: "Inside Diameter"
+    unit: "in"
+    type: number
+  - key: id_mm
+    label: "Inside Diameter"
+    unit: "mm"
+    type: number
+  - key: weight_kg_per_m
+    label: "Weight per meter"
+    unit: "kg/m"
+    type: number
+    fabrication_priority: 3
+  - key: weight_lb_per_ft
+    label: "Weight per foot"
+    unit: "lb/ft"
+    type: number
+
+rows:
+  # ═══════════════════════════════════════════════════════════
+  # NPS 1/8 (DN 6) — OD 0.405" / 10.29 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "1/8"
+    dn: 6
+    schedule: "STD"
+    od_in: 0.405
+    od_mm: 10.29
+    wt_in: 0.068
+    wt_mm: 1.73
+    id_in: 0.269
+    id_mm: 6.83
+    weight_kg_per_m: 0.37
+    weight_lb_per_ft: 0.25
+
+  - nps: "1/8"
+    dn: 6
+    schedule: "XS"
+    od_in: 0.405
+    od_mm: 10.29
+    wt_in: 0.095
+    wt_mm: 2.41
+    id_in: 0.215
+    id_mm: 5.46
+    weight_kg_per_m: 0.47
+    weight_lb_per_ft: 0.31
+
+  - nps: "1/8"
+    dn: 6
+    schedule: "SCH 10"
+    od_in: 0.405
+    od_mm: 10.29
+    wt_in: 0.049
+    wt_mm: 1.24
+    id_in: 0.307
+    id_mm: 7.80
+    weight_kg_per_m: 0.28
+    weight_lb_per_ft: 0.19
+
+  - nps: "1/8"
+    dn: 6
+    schedule: "SCH 40"
+    od_in: 0.405
+    od_mm: 10.29
+    wt_in: 0.068
+    wt_mm: 1.73
+    id_in: 0.269
+    id_mm: 6.83
+    weight_kg_per_m: 0.37
+    weight_lb_per_ft: 0.25
+
+  - nps: "1/8"
+    dn: 6
+    schedule: "SCH 80"
+    od_in: 0.405
+    od_mm: 10.29
+    wt_in: 0.095
+    wt_mm: 2.41
+    id_in: 0.215
+    id_mm: 5.46
+    weight_kg_per_m: 0.47
+    weight_lb_per_ft: 0.31
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 1/4 (DN 8) — OD 0.540" / 13.72 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "1/4"
+    dn: 8
+    schedule: "STD"
+    od_in: 0.540
+    od_mm: 13.72
+    wt_in: 0.088
+    wt_mm: 2.24
+    id_in: 0.364
+    id_mm: 9.24
+    weight_kg_per_m: 0.63
+    weight_lb_per_ft: 0.42
+
+  - nps: "1/4"
+    dn: 8
+    schedule: "XS"
+    od_in: 0.540
+    od_mm: 13.72
+    wt_in: 0.119
+    wt_mm: 3.02
+    id_in: 0.302
+    id_mm: 7.67
+    weight_kg_per_m: 0.80
+    weight_lb_per_ft: 0.54
+
+  - nps: "1/4"
+    dn: 8
+    schedule: "SCH 10"
+    od_in: 0.540
+    od_mm: 13.72
+    wt_in: 0.065
+    wt_mm: 1.65
+    id_in: 0.410
+    id_mm: 10.42
+    weight_kg_per_m: 0.49
+    weight_lb_per_ft: 0.33
+
+  - nps: "1/4"
+    dn: 8
+    schedule: "SCH 40"
+    od_in: 0.540
+    od_mm: 13.72
+    wt_in: 0.088
+    wt_mm: 2.24
+    id_in: 0.364
+    id_mm: 9.24
+    weight_kg_per_m: 0.63
+    weight_lb_per_ft: 0.42
+
+  - nps: "1/4"
+    dn: 8
+    schedule: "SCH 80"
+    od_in: 0.540
+    od_mm: 13.72
+    wt_in: 0.119
+    wt_mm: 3.02
+    id_in: 0.302
+    id_mm: 7.67
+    weight_kg_per_m: 0.80
+    weight_lb_per_ft: 0.54
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 3/8 (DN 10) — OD 0.675" / 17.15 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "3/8"
+    dn: 10
+    schedule: "STD"
+    od_in: 0.675
+    od_mm: 17.15
+    wt_in: 0.091
+    wt_mm: 2.31
+    id_in: 0.493
+    id_mm: 12.52
+    weight_kg_per_m: 0.84
+    weight_lb_per_ft: 0.57
+
+  - nps: "3/8"
+    dn: 10
+    schedule: "XS"
+    od_in: 0.675
+    od_mm: 17.15
+    wt_in: 0.126
+    wt_mm: 3.20
+    id_in: 0.423
+    id_mm: 10.74
+    weight_kg_per_m: 1.10
+    weight_lb_per_ft: 0.74
+
+  - nps: "3/8"
+    dn: 10
+    schedule: "SCH 10"
+    od_in: 0.675
+    od_mm: 17.15
+    wt_in: 0.065
+    wt_mm: 1.65
+    id_in: 0.545
+    id_mm: 13.84
+    weight_kg_per_m: 0.63
+    weight_lb_per_ft: 0.42
+
+  - nps: "3/8"
+    dn: 10
+    schedule: "SCH 40"
+    od_in: 0.675
+    od_mm: 17.15
+    wt_in: 0.091
+    wt_mm: 2.31
+    id_in: 0.493
+    id_mm: 12.52
+    weight_kg_per_m: 0.84
+    weight_lb_per_ft: 0.57
+
+  - nps: "3/8"
+    dn: 10
+    schedule: "SCH 80"
+    od_in: 0.675
+    od_mm: 17.15
+    wt_in: 0.126
+    wt_mm: 3.20
+    id_in: 0.423
+    id_mm: 10.74
+    weight_kg_per_m: 1.10
+    weight_lb_per_ft: 0.74
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 1/2 (DN 15) — OD 0.840" / 21.34 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "1/2"
+    dn: 15
+    schedule: "STD"
+    od_in: 0.840
+    od_mm: 21.34
+    wt_in: 0.109
+    wt_mm: 2.77
+    id_in: 0.622
+    id_mm: 15.80
+    weight_kg_per_m: 1.27
+    weight_lb_per_ft: 0.85
+
+  - nps: "1/2"
+    dn: 15
+    schedule: "XS"
+    od_in: 0.840
+    od_mm: 21.34
+    wt_in: 0.147
+    wt_mm: 3.73
+    id_in: 0.546
+    id_mm: 13.87
+    weight_kg_per_m: 1.62
+    weight_lb_per_ft: 1.09
+
+  - nps: "1/2"
+    dn: 15
+    schedule: "SCH 10"
+    od_in: 0.840
+    od_mm: 21.34
+    wt_in: 0.083
+    wt_mm: 2.11
+    id_in: 0.674
+    id_mm: 17.12
+    weight_kg_per_m: 1.00
+    weight_lb_per_ft: 0.67
+
+  - nps: "1/2"
+    dn: 15
+    schedule: "SCH 40"
+    od_in: 0.840
+    od_mm: 21.34
+    wt_in: 0.109
+    wt_mm: 2.77
+    id_in: 0.622
+    id_mm: 15.80
+    weight_kg_per_m: 1.27
+    weight_lb_per_ft: 0.85
+
+  - nps: "1/2"
+    dn: 15
+    schedule: "SCH 80"
+    od_in: 0.840
+    od_mm: 21.34
+    wt_in: 0.147
+    wt_mm: 3.73
+    id_in: 0.546
+    id_mm: 13.87
+    weight_kg_per_m: 1.62
+    weight_lb_per_ft: 1.09
+
+  - nps: "1/2"
+    dn: 15
+    schedule: "SCH 160"
+    od_in: 0.840
+    od_mm: 21.34
+    wt_in: 0.187
+    wt_mm: 4.75
+    id_in: 0.466
+    id_mm: 11.84
+    weight_kg_per_m: 1.94
+    weight_lb_per_ft: 1.31
+
+  - nps: "1/2"
+    dn: 15
+    schedule: "XXS"
+    od_in: 0.840
+    od_mm: 21.34
+    wt_in: 0.294
+    wt_mm: 7.47
+    id_in: 0.252
+    id_mm: 6.40
+    weight_kg_per_m: 2.55
+    weight_lb_per_ft: 1.71
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 3/4 (DN 20) — OD 1.050" / 26.67 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "3/4"
+    dn: 20
+    schedule: "STD"
+    od_in: 1.050
+    od_mm: 26.67
+    wt_in: 0.113
+    wt_mm: 2.87
+    id_in: 0.824
+    id_mm: 20.93
+    weight_kg_per_m: 1.68
+    weight_lb_per_ft: 1.13
+
+  - nps: "3/4"
+    dn: 20
+    schedule: "XS"
+    od_in: 1.050
+    od_mm: 26.67
+    wt_in: 0.154
+    wt_mm: 3.91
+    id_in: 0.742
+    id_mm: 18.85
+    weight_kg_per_m: 2.19
+    weight_lb_per_ft: 1.47
+
+  - nps: "3/4"
+    dn: 20
+    schedule: "SCH 10"
+    od_in: 1.050
+    od_mm: 26.67
+    wt_in: 0.083
+    wt_mm: 2.11
+    id_in: 0.884
+    id_mm: 22.45
+    weight_kg_per_m: 1.28
+    weight_lb_per_ft: 0.86
+
+  - nps: "3/4"
+    dn: 20
+    schedule: "SCH 40"
+    od_in: 1.050
+    od_mm: 26.67
+    wt_in: 0.113
+    wt_mm: 2.87
+    id_in: 0.824
+    id_mm: 20.93
+    weight_kg_per_m: 1.68
+    weight_lb_per_ft: 1.13
+
+  - nps: "3/4"
+    dn: 20
+    schedule: "SCH 80"
+    od_in: 1.050
+    od_mm: 26.67
+    wt_in: 0.154
+    wt_mm: 3.91
+    id_in: 0.742
+    id_mm: 18.85
+    weight_kg_per_m: 2.19
+    weight_lb_per_ft: 1.47
+
+  - nps: "3/4"
+    dn: 20
+    schedule: "SCH 160"
+    od_in: 1.050
+    od_mm: 26.67
+    wt_in: 0.219
+    wt_mm: 5.56
+    id_in: 0.612
+    id_mm: 15.54
+    weight_kg_per_m: 2.89
+    weight_lb_per_ft: 1.94
+
+  - nps: "3/4"
+    dn: 20
+    schedule: "XXS"
+    od_in: 1.050
+    od_mm: 26.67
+    wt_in: 0.308
+    wt_mm: 7.82
+    id_in: 0.434
+    id_mm: 11.02
+    weight_kg_per_m: 3.64
+    weight_lb_per_ft: 2.44
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 1 (DN 25) — OD 1.315" / 33.40 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "1"
+    dn: 25
+    schedule: "STD"
+    od_in: 1.315
+    od_mm: 33.40
+    wt_in: 0.133
+    wt_mm: 3.38
+    id_in: 1.049
+    id_mm: 26.64
+    weight_kg_per_m: 2.50
+    weight_lb_per_ft: 1.68
+
+  - nps: "1"
+    dn: 25
+    schedule: "XS"
+    od_in: 1.315
+    od_mm: 33.40
+    wt_in: 0.179
+    wt_mm: 4.55
+    id_in: 0.957
+    id_mm: 24.31
+    weight_kg_per_m: 3.24
+    weight_lb_per_ft: 2.17
+
+  - nps: "1"
+    dn: 25
+    schedule: "SCH 10"
+    od_in: 1.315
+    od_mm: 33.40
+    wt_in: 0.109
+    wt_mm: 2.77
+    id_in: 1.097
+    id_mm: 27.86
+    weight_kg_per_m: 2.09
+    weight_lb_per_ft: 1.40
+
+  - nps: "1"
+    dn: 25
+    schedule: "SCH 40"
+    od_in: 1.315
+    od_mm: 33.40
+    wt_in: 0.133
+    wt_mm: 3.38
+    id_in: 1.049
+    id_mm: 26.64
+    weight_kg_per_m: 2.50
+    weight_lb_per_ft: 1.68
+
+  - nps: "1"
+    dn: 25
+    schedule: "SCH 80"
+    od_in: 1.315
+    od_mm: 33.40
+    wt_in: 0.179
+    wt_mm: 4.55
+    id_in: 0.957
+    id_mm: 24.31
+    weight_kg_per_m: 3.24
+    weight_lb_per_ft: 2.17
+
+  - nps: "1"
+    dn: 25
+    schedule: "SCH 160"
+    od_in: 1.315
+    od_mm: 33.40
+    wt_in: 0.250
+    wt_mm: 6.35
+    id_in: 0.815
+    id_mm: 20.70
+    weight_kg_per_m: 4.24
+    weight_lb_per_ft: 2.85
+
+  - nps: "1"
+    dn: 25
+    schedule: "XXS"
+    od_in: 1.315
+    od_mm: 33.40
+    wt_in: 0.358
+    wt_mm: 9.09
+    id_in: 0.599
+    id_mm: 15.22
+    weight_kg_per_m: 5.45
+    weight_lb_per_ft: 3.66
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 1-1/4 (DN 32) — OD 1.660" / 42.16 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "1-1/4"
+    dn: 32
+    schedule: "STD"
+    od_in: 1.660
+    od_mm: 42.16
+    wt_in: 0.140
+    wt_mm: 3.56
+    id_in: 1.380
+    id_mm: 35.05
+    weight_kg_per_m: 3.39
+    weight_lb_per_ft: 2.27
+
+  - nps: "1-1/4"
+    dn: 32
+    schedule: "XS"
+    od_in: 1.660
+    od_mm: 42.16
+    wt_in: 0.191
+    wt_mm: 4.85
+    id_in: 1.278
+    id_mm: 32.46
+    weight_kg_per_m: 4.47
+    weight_lb_per_ft: 3.00
+
+  - nps: "1-1/4"
+    dn: 32
+    schedule: "SCH 10"
+    od_in: 1.660
+    od_mm: 42.16
+    wt_in: 0.109
+    wt_mm: 2.77
+    id_in: 1.442
+    id_mm: 36.63
+    weight_kg_per_m: 2.69
+    weight_lb_per_ft: 1.81
+
+  - nps: "1-1/4"
+    dn: 32
+    schedule: "SCH 40"
+    od_in: 1.660
+    od_mm: 42.16
+    wt_in: 0.140
+    wt_mm: 3.56
+    id_in: 1.380
+    id_mm: 35.05
+    weight_kg_per_m: 3.39
+    weight_lb_per_ft: 2.27
+
+  - nps: "1-1/4"
+    dn: 32
+    schedule: "SCH 80"
+    od_in: 1.660
+    od_mm: 42.16
+    wt_in: 0.191
+    wt_mm: 4.85
+    id_in: 1.278
+    id_mm: 32.46
+    weight_kg_per_m: 4.47
+    weight_lb_per_ft: 3.00
+
+  - nps: "1-1/4"
+    dn: 32
+    schedule: "SCH 160"
+    od_in: 1.660
+    od_mm: 42.16
+    wt_in: 0.250
+    wt_mm: 6.35
+    id_in: 1.160
+    id_mm: 29.46
+    weight_kg_per_m: 5.61
+    weight_lb_per_ft: 3.77
+
+  - nps: "1-1/4"
+    dn: 32
+    schedule: "XXS"
+    od_in: 1.660
+    od_mm: 42.16
+    wt_in: 0.382
+    wt_mm: 9.70
+    id_in: 0.896
+    id_mm: 22.76
+    weight_kg_per_m: 7.77
+    weight_lb_per_ft: 5.22
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 1-1/2 (DN 40) — OD 1.900" / 48.26 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "1-1/2"
+    dn: 40
+    schedule: "STD"
+    od_in: 1.900
+    od_mm: 48.26
+    wt_in: 0.145
+    wt_mm: 3.68
+    id_in: 1.610
+    id_mm: 40.89
+    weight_kg_per_m: 4.05
+    weight_lb_per_ft: 2.72
+
+  - nps: "1-1/2"
+    dn: 40
+    schedule: "XS"
+    od_in: 1.900
+    od_mm: 48.26
+    wt_in: 0.200
+    wt_mm: 5.08
+    id_in: 1.500
+    id_mm: 38.10
+    weight_kg_per_m: 5.41
+    weight_lb_per_ft: 3.63
+
+  - nps: "1-1/2"
+    dn: 40
+    schedule: "SCH 10"
+    od_in: 1.900
+    od_mm: 48.26
+    wt_in: 0.109
+    wt_mm: 2.77
+    id_in: 1.682
+    id_mm: 42.72
+    weight_kg_per_m: 3.11
+    weight_lb_per_ft: 2.09
+
+  - nps: "1-1/2"
+    dn: 40
+    schedule: "SCH 40"
+    od_in: 1.900
+    od_mm: 48.26
+    wt_in: 0.145
+    wt_mm: 3.68
+    id_in: 1.610
+    id_mm: 40.89
+    weight_kg_per_m: 4.05
+    weight_lb_per_ft: 2.72
+
+  - nps: "1-1/2"
+    dn: 40
+    schedule: "SCH 80"
+    od_in: 1.900
+    od_mm: 48.26
+    wt_in: 0.200
+    wt_mm: 5.08
+    id_in: 1.500
+    id_mm: 38.10
+    weight_kg_per_m: 5.41
+    weight_lb_per_ft: 3.63
+
+  - nps: "1-1/2"
+    dn: 40
+    schedule: "SCH 160"
+    od_in: 1.900
+    od_mm: 48.26
+    wt_in: 0.281
+    wt_mm: 7.14
+    id_in: 1.338
+    id_mm: 33.99
+    weight_kg_per_m: 7.25
+    weight_lb_per_ft: 4.87
+
+  - nps: "1-1/2"
+    dn: 40
+    schedule: "XXS"
+    od_in: 1.900
+    od_mm: 48.26
+    wt_in: 0.400
+    wt_mm: 10.16
+    id_in: 1.100
+    id_mm: 27.94
+    weight_kg_per_m: 9.56
+    weight_lb_per_ft: 6.41
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 2 (DN 50) — OD 2.375" / 60.33 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "2"
+    dn: 50
+    schedule: "STD"
+    od_in: 2.375
+    od_mm: 60.33
+    wt_in: 0.154
+    wt_mm: 3.91
+    id_in: 2.067
+    id_mm: 52.50
+    weight_kg_per_m: 5.44
+    weight_lb_per_ft: 3.65
+
+  - nps: "2"
+    dn: 50
+    schedule: "XS"
+    od_in: 2.375
+    od_mm: 60.33
+    wt_in: 0.218
+    wt_mm: 5.54
+    id_in: 1.939
+    id_mm: 49.25
+    weight_kg_per_m: 7.48
+    weight_lb_per_ft: 5.02
+
+  - nps: "2"
+    dn: 50
+    schedule: "SCH 10"
+    od_in: 2.375
+    od_mm: 60.33
+    wt_in: 0.109
+    wt_mm: 2.77
+    id_in: 2.157
+    id_mm: 54.79
+    weight_kg_per_m: 3.93
+    weight_lb_per_ft: 2.64
+
+  - nps: "2"
+    dn: 50
+    schedule: "SCH 40"
+    od_in: 2.375
+    od_mm: 60.33
+    wt_in: 0.154
+    wt_mm: 3.91
+    id_in: 2.067
+    id_mm: 52.50
+    weight_kg_per_m: 5.44
+    weight_lb_per_ft: 3.65
+
+  - nps: "2"
+    dn: 50
+    schedule: "SCH 80"
+    od_in: 2.375
+    od_mm: 60.33
+    wt_in: 0.218
+    wt_mm: 5.54
+    id_in: 1.939
+    id_mm: 49.25
+    weight_kg_per_m: 7.48
+    weight_lb_per_ft: 5.02
+
+  - nps: "2"
+    dn: 50
+    schedule: "SCH 160"
+    od_in: 2.375
+    od_mm: 60.33
+    wt_in: 0.344
+    wt_mm: 8.74
+    id_in: 1.687
+    id_mm: 42.85
+    weight_kg_per_m: 11.11
+    weight_lb_per_ft: 7.46
+
+  - nps: "2"
+    dn: 50
+    schedule: "XXS"
+    od_in: 2.375
+    od_mm: 60.33
+    wt_in: 0.436
+    wt_mm: 11.07
+    id_in: 1.503
+    id_mm: 38.18
+    weight_kg_per_m: 13.44
+    weight_lb_per_ft: 9.03
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 2-1/2 (DN 65) — OD 2.875" / 73.03 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "2-1/2"
+    dn: 65
+    schedule: "STD"
+    od_in: 2.875
+    od_mm: 73.03
+    wt_in: 0.203
+    wt_mm: 5.16
+    id_in: 2.469
+    id_mm: 62.71
+    weight_kg_per_m: 8.63
+    weight_lb_per_ft: 5.79
+
+  - nps: "2-1/2"
+    dn: 65
+    schedule: "XS"
+    od_in: 2.875
+    od_mm: 73.03
+    wt_in: 0.276
+    wt_mm: 7.01
+    id_in: 2.323
+    id_mm: 59.00
+    weight_kg_per_m: 11.41
+    weight_lb_per_ft: 7.66
+
+  - nps: "2-1/2"
+    dn: 65
+    schedule: "SCH 10"
+    od_in: 2.875
+    od_mm: 73.03
+    wt_in: 0.120
+    wt_mm: 3.05
+    id_in: 2.635
+    id_mm: 66.93
+    weight_kg_per_m: 5.26
+    weight_lb_per_ft: 3.53
+
+  - nps: "2-1/2"
+    dn: 65
+    schedule: "SCH 40"
+    od_in: 2.875
+    od_mm: 73.03
+    wt_in: 0.203
+    wt_mm: 5.16
+    id_in: 2.469
+    id_mm: 62.71
+    weight_kg_per_m: 8.63
+    weight_lb_per_ft: 5.79
+
+  - nps: "2-1/2"
+    dn: 65
+    schedule: "SCH 80"
+    od_in: 2.875
+    od_mm: 73.03
+    wt_in: 0.276
+    wt_mm: 7.01
+    id_in: 2.323
+    id_mm: 59.00
+    weight_kg_per_m: 11.41
+    weight_lb_per_ft: 7.66
+
+  - nps: "2-1/2"
+    dn: 65
+    schedule: "SCH 160"
+    od_in: 2.875
+    od_mm: 73.03
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 2.125
+    id_mm: 53.98
+    weight_kg_per_m: 14.92
+    weight_lb_per_ft: 10.01
+
+  - nps: "2-1/2"
+    dn: 65
+    schedule: "XXS"
+    od_in: 2.875
+    od_mm: 73.03
+    wt_in: 0.552
+    wt_mm: 14.02
+    id_in: 1.771
+    id_mm: 44.98
+    weight_kg_per_m: 20.39
+    weight_lb_per_ft: 13.69
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 3 (DN 80) — OD 3.500" / 88.90 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "3"
+    dn: 80
+    schedule: "STD"
+    od_in: 3.500
+    od_mm: 88.90
+    wt_in: 0.216
+    wt_mm: 5.49
+    id_in: 3.068
+    id_mm: 77.93
+    weight_kg_per_m: 11.29
+    weight_lb_per_ft: 7.58
+
+  - nps: "3"
+    dn: 80
+    schedule: "XS"
+    od_in: 3.500
+    od_mm: 88.90
+    wt_in: 0.300
+    wt_mm: 7.62
+    id_in: 2.900
+    id_mm: 73.66
+    weight_kg_per_m: 15.27
+    weight_lb_per_ft: 10.25
+
+  - nps: "3"
+    dn: 80
+    schedule: "SCH 10"
+    od_in: 3.500
+    od_mm: 88.90
+    wt_in: 0.120
+    wt_mm: 3.05
+    id_in: 3.260
+    id_mm: 82.80
+    weight_kg_per_m: 6.46
+    weight_lb_per_ft: 4.33
+
+  - nps: "3"
+    dn: 80
+    schedule: "SCH 40"
+    od_in: 3.500
+    od_mm: 88.90
+    wt_in: 0.216
+    wt_mm: 5.49
+    id_in: 3.068
+    id_mm: 77.93
+    weight_kg_per_m: 11.29
+    weight_lb_per_ft: 7.58
+
+  - nps: "3"
+    dn: 80
+    schedule: "SCH 80"
+    od_in: 3.500
+    od_mm: 88.90
+    wt_in: 0.300
+    wt_mm: 7.62
+    id_in: 2.900
+    id_mm: 73.66
+    weight_kg_per_m: 15.27
+    weight_lb_per_ft: 10.25
+
+  - nps: "3"
+    dn: 80
+    schedule: "SCH 160"
+    od_in: 3.500
+    od_mm: 88.90
+    wt_in: 0.438
+    wt_mm: 11.13
+    id_in: 2.624
+    id_mm: 66.65
+    weight_kg_per_m: 21.35
+    weight_lb_per_ft: 14.32
+
+  - nps: "3"
+    dn: 80
+    schedule: "XXS"
+    od_in: 3.500
+    od_mm: 88.90
+    wt_in: 0.600
+    wt_mm: 15.24
+    id_in: 2.300
+    id_mm: 58.42
+    weight_kg_per_m: 27.68
+    weight_lb_per_ft: 18.58
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 3-1/2 (DN 90) — OD 4.000" / 101.60 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "3-1/2"
+    dn: 90
+    schedule: "STD"
+    od_in: 4.000
+    od_mm: 101.60
+    wt_in: 0.226
+    wt_mm: 5.74
+    id_in: 3.548
+    id_mm: 90.12
+    weight_kg_per_m: 13.57
+    weight_lb_per_ft: 9.11
+
+  - nps: "3-1/2"
+    dn: 90
+    schedule: "XS"
+    od_in: 4.000
+    od_mm: 101.60
+    wt_in: 0.318
+    wt_mm: 8.08
+    id_in: 3.364
+    id_mm: 85.45
+    weight_kg_per_m: 18.64
+    weight_lb_per_ft: 12.51
+
+  - nps: "3-1/2"
+    dn: 90
+    schedule: "SCH 40"
+    od_in: 4.000
+    od_mm: 101.60
+    wt_in: 0.226
+    wt_mm: 5.74
+    id_in: 3.548
+    id_mm: 90.12
+    weight_kg_per_m: 13.57
+    weight_lb_per_ft: 9.11
+
+  - nps: "3-1/2"
+    dn: 90
+    schedule: "SCH 80"
+    od_in: 4.000
+    od_mm: 101.60
+    wt_in: 0.318
+    wt_mm: 8.08
+    id_in: 3.364
+    id_mm: 85.45
+    weight_kg_per_m: 18.64
+    weight_lb_per_ft: 12.51
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 4 (DN 100) — OD 4.500" / 114.30 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "4"
+    dn: 100
+    schedule: "STD"
+    od_in: 4.500
+    od_mm: 114.30
+    wt_in: 0.237
+    wt_mm: 6.02
+    id_in: 4.026
+    id_mm: 102.26
+    weight_kg_per_m: 16.07
+    weight_lb_per_ft: 10.79
+
+  - nps: "4"
+    dn: 100
+    schedule: "XS"
+    od_in: 4.500
+    od_mm: 114.30
+    wt_in: 0.337
+    wt_mm: 8.56
+    id_in: 3.826
+    id_mm: 97.18
+    weight_kg_per_m: 22.32
+    weight_lb_per_ft: 14.98
+
+  - nps: "4"
+    dn: 100
+    schedule: "SCH 10"
+    od_in: 4.500
+    od_mm: 114.30
+    wt_in: 0.120
+    wt_mm: 3.05
+    id_in: 4.260
+    id_mm: 108.20
+    weight_kg_per_m: 8.36
+    weight_lb_per_ft: 5.61
+
+  - nps: "4"
+    dn: 100
+    schedule: "SCH 40"
+    od_in: 4.500
+    od_mm: 114.30
+    wt_in: 0.237
+    wt_mm: 6.02
+    id_in: 4.026
+    id_mm: 102.26
+    weight_kg_per_m: 16.07
+    weight_lb_per_ft: 10.79
+
+  - nps: "4"
+    dn: 100
+    schedule: "SCH 80"
+    od_in: 4.500
+    od_mm: 114.30
+    wt_in: 0.337
+    wt_mm: 8.56
+    id_in: 3.826
+    id_mm: 97.18
+    weight_kg_per_m: 22.32
+    weight_lb_per_ft: 14.98
+
+  - nps: "4"
+    dn: 100
+    schedule: "SCH 120"
+    od_in: 4.500
+    od_mm: 114.30
+    wt_in: 0.438
+    wt_mm: 11.13
+    id_in: 3.624
+    id_mm: 92.05
+    weight_kg_per_m: 28.27
+    weight_lb_per_ft: 18.96
+
+  - nps: "4"
+    dn: 100
+    schedule: "SCH 160"
+    od_in: 4.500
+    od_mm: 114.30
+    wt_in: 0.531
+    wt_mm: 13.49
+    id_in: 3.438
+    id_mm: 87.33
+    weight_kg_per_m: 33.54
+    weight_lb_per_ft: 22.51
+
+  - nps: "4"
+    dn: 100
+    schedule: "XXS"
+    od_in: 4.500
+    od_mm: 114.30
+    wt_in: 0.674
+    wt_mm: 17.12
+    id_in: 3.152
+    id_mm: 80.06
+    weight_kg_per_m: 40.99
+    weight_lb_per_ft: 27.54
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 5 (DN 125) — OD 5.563" / 141.30 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "5"
+    dn: 125
+    schedule: "STD"
+    od_in: 5.563
+    od_mm: 141.30
+    wt_in: 0.258
+    wt_mm: 6.55
+    id_in: 5.047
+    id_mm: 128.19
+    weight_kg_per_m: 21.77
+    weight_lb_per_ft: 14.62
+
+  - nps: "5"
+    dn: 125
+    schedule: "XS"
+    od_in: 5.563
+    od_mm: 141.30
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 4.813
+    id_mm: 122.25
+    weight_kg_per_m: 30.97
+    weight_lb_per_ft: 20.78
+
+  - nps: "5"
+    dn: 125
+    schedule: "SCH 10"
+    od_in: 5.563
+    od_mm: 141.30
+    wt_in: 0.134
+    wt_mm: 3.40
+    id_in: 5.295
+    id_mm: 134.49
+    weight_kg_per_m: 11.57
+    weight_lb_per_ft: 7.77
+
+  - nps: "5"
+    dn: 125
+    schedule: "SCH 40"
+    od_in: 5.563
+    od_mm: 141.30
+    wt_in: 0.258
+    wt_mm: 6.55
+    id_in: 5.047
+    id_mm: 128.19
+    weight_kg_per_m: 21.77
+    weight_lb_per_ft: 14.62
+
+  - nps: "5"
+    dn: 125
+    schedule: "SCH 80"
+    od_in: 5.563
+    od_mm: 141.30
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 4.813
+    id_mm: 122.25
+    weight_kg_per_m: 30.97
+    weight_lb_per_ft: 20.78
+
+  - nps: "5"
+    dn: 125
+    schedule: "SCH 120"
+    od_in: 5.563
+    od_mm: 141.30
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 4.563
+    id_mm: 115.90
+    weight_kg_per_m: 40.27
+    weight_lb_per_ft: 27.04
+
+  - nps: "5"
+    dn: 125
+    schedule: "SCH 160"
+    od_in: 5.563
+    od_mm: 141.30
+    wt_in: 0.625
+    wt_mm: 15.88
+    id_in: 4.313
+    id_mm: 109.55
+    weight_kg_per_m: 49.11
+    weight_lb_per_ft: 32.96
+
+  - nps: "5"
+    dn: 125
+    schedule: "XXS"
+    od_in: 5.563
+    od_mm: 141.30
+    wt_in: 0.750
+    wt_mm: 19.05
+    id_in: 4.063
+    id_mm: 103.20
+    weight_kg_per_m: 57.43
+    weight_lb_per_ft: 38.55
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 6 (DN 150) — OD 6.625" / 168.28 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "6"
+    dn: 150
+    schedule: "STD"
+    od_in: 6.625
+    od_mm: 168.28
+    wt_in: 0.280
+    wt_mm: 7.11
+    id_in: 6.065
+    id_mm: 154.05
+    weight_kg_per_m: 28.26
+    weight_lb_per_ft: 18.97
+
+  - nps: "6"
+    dn: 150
+    schedule: "XS"
+    od_in: 6.625
+    od_mm: 168.28
+    wt_in: 0.432
+    wt_mm: 10.97
+    id_in: 5.761
+    id_mm: 146.33
+    weight_kg_per_m: 42.56
+    weight_lb_per_ft: 28.57
+
+  - nps: "6"
+    dn: 150
+    schedule: "SCH 10"
+    od_in: 6.625
+    od_mm: 168.28
+    wt_in: 0.134
+    wt_mm: 3.40
+    id_in: 6.357
+    id_mm: 161.47
+    weight_kg_per_m: 13.83
+    weight_lb_per_ft: 9.29
+
+  - nps: "6"
+    dn: 150
+    schedule: "SCH 40"
+    od_in: 6.625
+    od_mm: 168.28
+    wt_in: 0.280
+    wt_mm: 7.11
+    id_in: 6.065
+    id_mm: 154.05
+    weight_kg_per_m: 28.26
+    weight_lb_per_ft: 18.97
+
+  - nps: "6"
+    dn: 150
+    schedule: "SCH 80"
+    od_in: 6.625
+    od_mm: 168.28
+    wt_in: 0.432
+    wt_mm: 10.97
+    id_in: 5.761
+    id_mm: 146.33
+    weight_kg_per_m: 42.56
+    weight_lb_per_ft: 28.57
+
+  - nps: "6"
+    dn: 150
+    schedule: "SCH 120"
+    od_in: 6.625
+    od_mm: 168.28
+    wt_in: 0.562
+    wt_mm: 14.27
+    id_in: 5.501
+    id_mm: 139.73
+    weight_kg_per_m: 54.20
+    weight_lb_per_ft: 36.39
+
+  - nps: "6"
+    dn: 150
+    schedule: "SCH 160"
+    od_in: 6.625
+    od_mm: 168.28
+    wt_in: 0.719
+    wt_mm: 18.26
+    id_in: 5.187
+    id_mm: 131.75
+    weight_kg_per_m: 67.56
+    weight_lb_per_ft: 45.35
+
+  - nps: "6"
+    dn: 150
+    schedule: "XXS"
+    od_in: 6.625
+    od_mm: 168.28
+    wt_in: 0.864
+    wt_mm: 21.95
+    id_in: 4.897
+    id_mm: 124.38
+    weight_kg_per_m: 79.22
+    weight_lb_per_ft: 53.16
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 8 (DN 200) — OD 8.625" / 219.08 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "8"
+    dn: 200
+    schedule: "STD"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.322
+    wt_mm: 8.18
+    id_in: 7.981
+    id_mm: 202.72
+    weight_kg_per_m: 42.55
+    weight_lb_per_ft: 28.55
+
+  - nps: "8"
+    dn: 200
+    schedule: "XS"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 7.625
+    id_mm: 193.68
+    weight_kg_per_m: 64.64
+    weight_lb_per_ft: 43.39
+
+  - nps: "8"
+    dn: 200
+    schedule: "SCH 10"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.148
+    wt_mm: 3.76
+    id_in: 8.329
+    id_mm: 211.56
+    weight_kg_per_m: 19.96
+    weight_lb_per_ft: 13.40
+
+  - nps: "8"
+    dn: 200
+    schedule: "SCH 20"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.250
+    wt_mm: 6.35
+    id_in: 8.125
+    id_mm: 206.38
+    weight_kg_per_m: 33.31
+    weight_lb_per_ft: 22.36
+
+  - nps: "8"
+    dn: 200
+    schedule: "SCH 40"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.322
+    wt_mm: 8.18
+    id_in: 7.981
+    id_mm: 202.72
+    weight_kg_per_m: 42.55
+    weight_lb_per_ft: 28.55
+
+  - nps: "8"
+    dn: 200
+    schedule: "SCH 60"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.406
+    wt_mm: 10.31
+    id_in: 7.813
+    id_mm: 198.45
+    weight_kg_per_m: 53.09
+    weight_lb_per_ft: 35.64
+
+  - nps: "8"
+    dn: 200
+    schedule: "SCH 80"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 7.625
+    id_mm: 193.68
+    weight_kg_per_m: 64.64
+    weight_lb_per_ft: 43.39
+
+  - nps: "8"
+    dn: 200
+    schedule: "SCH 100"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.594
+    wt_mm: 15.09
+    id_in: 7.437
+    id_mm: 188.90
+    weight_kg_per_m: 75.92
+    weight_lb_per_ft: 50.87
+
+  - nps: "8"
+    dn: 200
+    schedule: "SCH 120"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.719
+    wt_mm: 18.26
+    id_in: 7.187
+    id_mm: 182.55
+    weight_kg_per_m: 90.44
+    weight_lb_per_ft: 60.63
+
+  - nps: "8"
+    dn: 200
+    schedule: "SCH 140"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.812
+    wt_mm: 20.62
+    id_in: 7.001
+    id_mm: 177.83
+    weight_kg_per_m: 100.92
+    weight_lb_per_ft: 67.76
+
+  - nps: "8"
+    dn: 200
+    schedule: "SCH 160"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.906
+    wt_mm: 23.01
+    id_in: 6.813
+    id_mm: 173.05
+    weight_kg_per_m: 111.27
+    weight_lb_per_ft: 74.69
+
+  - nps: "8"
+    dn: 200
+    schedule: "XXS"
+    od_in: 8.625
+    od_mm: 219.08
+    wt_in: 0.875
+    wt_mm: 22.23
+    id_in: 6.875
+    id_mm: 174.63
+    weight_kg_per_m: 107.92
+    weight_lb_per_ft: 72.42
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 10 (DN 250) — OD 10.750" / 273.05 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "10"
+    dn: 250
+    schedule: "STD"
+    od_in: 10.750
+    od_mm: 273.05
+    wt_in: 0.365
+    wt_mm: 9.27
+    id_in: 10.020
+    id_mm: 254.51
+    weight_kg_per_m: 60.31
+    weight_lb_per_ft: 40.48
+
+  - nps: "10"
+    dn: 250
+    schedule: "XS"
+    od_in: 10.750
+    od_mm: 273.05
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 9.750
+    id_mm: 247.65
+    weight_kg_per_m: 81.55
+    weight_lb_per_ft: 54.74
+
+  - nps: "10"
+    dn: 250
+    schedule: "SCH 10"
+    od_in: 10.750
+    od_mm: 273.05
+    wt_in: 0.165
+    wt_mm: 4.19
+    id_in: 10.420
+    id_mm: 264.67
+    weight_kg_per_m: 27.78
+    weight_lb_per_ft: 18.65
+
+  - nps: "10"
+    dn: 250
+    schedule: "SCH 20"
+    od_in: 10.750
+    od_mm: 273.05
+    wt_in: 0.250
+    wt_mm: 6.35
+    id_in: 10.250
+    id_mm: 260.35
+    weight_kg_per_m: 41.77
+    weight_lb_per_ft: 28.04
+
+  - nps: "10"
+    dn: 250
+    schedule: "SCH 40"
+    od_in: 10.750
+    od_mm: 273.05
+    wt_in: 0.365
+    wt_mm: 9.27
+    id_in: 10.020
+    id_mm: 254.51
+    weight_kg_per_m: 60.31
+    weight_lb_per_ft: 40.48
+
+  - nps: "10"
+    dn: 250
+    schedule: "SCH 60"
+    od_in: 10.750
+    od_mm: 273.05
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 9.750
+    id_mm: 247.65
+    weight_kg_per_m: 81.55
+    weight_lb_per_ft: 54.74
+
+  - nps: "10"
+    dn: 250
+    schedule: "SCH 80"
+    od_in: 10.750
+    od_mm: 273.05
+    wt_in: 0.594
+    wt_mm: 15.09
+    id_in: 9.562
+    id_mm: 242.87
+    weight_kg_per_m: 96.01
+    weight_lb_per_ft: 64.43
+
+  - nps: "10"
+    dn: 250
+    schedule: "SCH 100"
+    od_in: 10.750
+    od_mm: 273.05
+    wt_in: 0.719
+    wt_mm: 18.26
+    id_in: 9.312
+    id_mm: 236.53
+    weight_kg_per_m: 114.75
+    weight_lb_per_ft: 77.03
+
+  - nps: "10"
+    dn: 250
+    schedule: "SCH 120"
+    od_in: 10.750
+    od_mm: 273.05
+    wt_in: 0.844
+    wt_mm: 21.44
+    id_in: 9.062
+    id_mm: 230.17
+    weight_kg_per_m: 133.06
+    weight_lb_per_ft: 89.30
+
+  - nps: "10"
+    dn: 250
+    schedule: "SCH 140"
+    od_in: 10.750
+    od_mm: 273.05
+    wt_in: 1.000
+    wt_mm: 25.40
+    id_in: 8.750
+    id_mm: 222.25
+    weight_kg_per_m: 155.12
+    weight_lb_per_ft: 104.04
+
+  - nps: "10"
+    dn: 250
+    schedule: "SCH 160"
+    od_in: 10.750
+    od_mm: 273.05
+    wt_in: 1.125
+    wt_mm: 28.58
+    id_in: 8.500
+    id_mm: 215.90
+    weight_kg_per_m: 172.33
+    weight_lb_per_ft: 115.57
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 12 (DN 300) — OD 12.750" / 323.85 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "12"
+    dn: 300
+    schedule: "STD"
+    od_in: 12.750
+    od_mm: 323.85
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 12.000
+    id_mm: 304.80
+    weight_kg_per_m: 73.88
+    weight_lb_per_ft: 49.56
+
+  - nps: "12"
+    dn: 300
+    schedule: "XS"
+    od_in: 12.750
+    od_mm: 323.85
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 11.750
+    id_mm: 298.45
+    weight_kg_per_m: 97.46
+    weight_lb_per_ft: 65.42
+
+  - nps: "12"
+    dn: 300
+    schedule: "SCH 10"
+    od_in: 12.750
+    od_mm: 323.85
+    wt_in: 0.180
+    wt_mm: 4.57
+    id_in: 12.390
+    id_mm: 314.71
+    weight_kg_per_m: 35.98
+    weight_lb_per_ft: 24.17
+
+  - nps: "12"
+    dn: 300
+    schedule: "SCH 20"
+    od_in: 12.750
+    od_mm: 323.85
+    wt_in: 0.250
+    wt_mm: 6.35
+    id_in: 12.250
+    id_mm: 311.15
+    weight_kg_per_m: 49.73
+    weight_lb_per_ft: 33.38
+
+  - nps: "12"
+    dn: 300
+    schedule: "SCH 40"
+    od_in: 12.750
+    od_mm: 323.85
+    wt_in: 0.406
+    wt_mm: 10.31
+    id_in: 11.938
+    id_mm: 303.23
+    weight_kg_per_m: 79.73
+    weight_lb_per_ft: 53.52
+
+  - nps: "12"
+    dn: 300
+    schedule: "SCH 60"
+    od_in: 12.750
+    od_mm: 323.85
+    wt_in: 0.562
+    wt_mm: 14.27
+    id_in: 11.626
+    id_mm: 295.30
+    weight_kg_per_m: 109.00
+    weight_lb_per_ft: 73.15
+
+  - nps: "12"
+    dn: 300
+    schedule: "SCH 80"
+    od_in: 12.750
+    od_mm: 323.85
+    wt_in: 0.688
+    wt_mm: 17.48
+    id_in: 11.374
+    id_mm: 288.90
+    weight_kg_per_m: 132.08
+    weight_lb_per_ft: 88.63
+
+  - nps: "12"
+    dn: 300
+    schedule: "SCH 100"
+    od_in: 12.750
+    od_mm: 323.85
+    wt_in: 0.844
+    wt_mm: 21.44
+    id_in: 11.062
+    id_mm: 280.97
+    weight_kg_per_m: 159.87
+    weight_lb_per_ft: 107.27
+
+  - nps: "12"
+    dn: 300
+    schedule: "SCH 120"
+    od_in: 12.750
+    od_mm: 323.85
+    wt_in: 1.000
+    wt_mm: 25.40
+    id_in: 10.750
+    id_mm: 273.05
+    weight_kg_per_m: 186.97
+    weight_lb_per_ft: 125.44
+
+  - nps: "12"
+    dn: 300
+    schedule: "SCH 140"
+    od_in: 12.750
+    od_mm: 323.85
+    wt_in: 1.125
+    wt_mm: 28.58
+    id_in: 10.500
+    id_mm: 266.70
+    weight_kg_per_m: 208.15
+    weight_lb_per_ft: 139.67
+
+  - nps: "12"
+    dn: 300
+    schedule: "SCH 160"
+    od_in: 12.750
+    od_mm: 323.85
+    wt_in: 1.312
+    wt_mm: 33.32
+    id_in: 10.126
+    id_mm: 257.20
+    weight_kg_per_m: 238.76
+    weight_lb_per_ft: 160.20
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 14 (DN 350) — OD 14.000" / 355.60 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "14"
+    dn: 350
+    schedule: "STD"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 13.250
+    id_mm: 336.55
+    weight_kg_per_m: 81.33
+    weight_lb_per_ft: 54.57
+
+  - nps: "14"
+    dn: 350
+    schedule: "XS"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 13.000
+    id_mm: 330.20
+    weight_kg_per_m: 107.39
+    weight_lb_per_ft: 72.09
+
+  - nps: "14"
+    dn: 350
+    schedule: "SCH 10"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 0.188
+    wt_mm: 4.78
+    id_in: 13.624
+    id_mm: 346.05
+    weight_kg_per_m: 41.36
+    weight_lb_per_ft: 27.73
+
+  - nps: "14"
+    dn: 350
+    schedule: "SCH 20"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 0.312
+    wt_mm: 7.92
+    id_in: 13.376
+    id_mm: 339.75
+    weight_kg_per_m: 67.90
+    weight_lb_per_ft: 45.61
+
+  - nps: "14"
+    dn: 350
+    schedule: "SCH 30"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 13.250
+    id_mm: 336.55
+    weight_kg_per_m: 81.33
+    weight_lb_per_ft: 54.57
+
+  - nps: "14"
+    dn: 350
+    schedule: "SCH 40"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 0.438
+    wt_mm: 11.13
+    id_in: 13.124
+    id_mm: 333.35
+    weight_kg_per_m: 94.55
+    weight_lb_per_ft: 63.44
+
+  - nps: "14"
+    dn: 350
+    schedule: "SCH 60"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 0.594
+    wt_mm: 15.09
+    id_in: 12.812
+    id_mm: 325.43
+    weight_kg_per_m: 126.71
+    weight_lb_per_ft: 85.07
+
+  - nps: "14"
+    dn: 350
+    schedule: "SCH 80"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 0.750
+    wt_mm: 19.05
+    id_in: 12.500
+    id_mm: 317.50
+    weight_kg_per_m: 158.10
+    weight_lb_per_ft: 106.11
+
+  - nps: "14"
+    dn: 350
+    schedule: "SCH 100"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 0.938
+    wt_mm: 23.83
+    id_in: 12.124
+    id_mm: 307.95
+    weight_kg_per_m: 195.04
+    weight_lb_per_ft: 130.87
+
+  - nps: "14"
+    dn: 350
+    schedule: "SCH 120"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 1.094
+    wt_mm: 27.79
+    id_in: 11.812
+    id_mm: 300.02
+    weight_kg_per_m: 224.65
+    weight_lb_per_ft: 150.72
+
+  - nps: "14"
+    dn: 350
+    schedule: "SCH 140"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 1.250
+    wt_mm: 31.75
+    id_in: 11.500
+    id_mm: 292.10
+    weight_kg_per_m: 253.56
+    weight_lb_per_ft: 170.11
+
+  - nps: "14"
+    dn: 350
+    schedule: "SCH 160"
+    od_in: 14.000
+    od_mm: 355.60
+    wt_in: 1.406
+    wt_mm: 35.71
+    id_in: 11.188
+    id_mm: 284.18
+    weight_kg_per_m: 281.70
+    weight_lb_per_ft: 188.98
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 16 (DN 400) — OD 16.000" / 406.40 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "16"
+    dn: 400
+    schedule: "STD"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 15.250
+    id_mm: 387.35
+    weight_kg_per_m: 93.27
+    weight_lb_per_ft: 62.58
+
+  - nps: "16"
+    dn: 400
+    schedule: "XS"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 15.000
+    id_mm: 381.00
+    weight_kg_per_m: 123.30
+    weight_lb_per_ft: 82.77
+
+  - nps: "16"
+    dn: 400
+    schedule: "SCH 10"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 0.188
+    wt_mm: 4.78
+    id_in: 15.624
+    id_mm: 396.85
+    weight_kg_per_m: 47.39
+    weight_lb_per_ft: 31.75
+
+  - nps: "16"
+    dn: 400
+    schedule: "SCH 20"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 0.312
+    wt_mm: 7.92
+    id_in: 15.376
+    id_mm: 390.55
+    weight_kg_per_m: 77.83
+    weight_lb_per_ft: 52.27
+
+  - nps: "16"
+    dn: 400
+    schedule: "SCH 30"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 15.250
+    id_mm: 387.35
+    weight_kg_per_m: 93.27
+    weight_lb_per_ft: 62.58
+
+  - nps: "16"
+    dn: 400
+    schedule: "SCH 40"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 15.000
+    id_mm: 381.00
+    weight_kg_per_m: 123.30
+    weight_lb_per_ft: 82.77
+
+  - nps: "16"
+    dn: 400
+    schedule: "SCH 60"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 0.656
+    wt_mm: 16.66
+    id_in: 14.688
+    id_mm: 373.08
+    weight_kg_per_m: 160.12
+    weight_lb_per_ft: 107.44
+
+  - nps: "16"
+    dn: 400
+    schedule: "SCH 80"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 0.844
+    wt_mm: 21.44
+    id_in: 14.312
+    id_mm: 363.53
+    weight_kg_per_m: 203.53
+    weight_lb_per_ft: 136.57
+
+  - nps: "16"
+    dn: 400
+    schedule: "SCH 100"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 1.031
+    wt_mm: 26.19
+    id_in: 13.938
+    id_mm: 354.02
+    weight_kg_per_m: 245.56
+    weight_lb_per_ft: 164.78
+
+  - nps: "16"
+    dn: 400
+    schedule: "SCH 120"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 1.219
+    wt_mm: 30.96
+    id_in: 13.562
+    id_mm: 344.47
+    weight_kg_per_m: 286.64
+    weight_lb_per_ft: 192.34
+
+  - nps: "16"
+    dn: 400
+    schedule: "SCH 140"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 1.438
+    wt_mm: 36.53
+    id_in: 13.124
+    id_mm: 333.35
+    weight_kg_per_m: 333.19
+    weight_lb_per_ft: 223.58
+
+  - nps: "16"
+    dn: 400
+    schedule: "SCH 160"
+    od_in: 16.000
+    od_mm: 406.40
+    wt_in: 1.594
+    wt_mm: 40.49
+    id_in: 12.812
+    id_mm: 325.43
+    weight_kg_per_m: 365.35
+    weight_lb_per_ft: 245.11
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 18 (DN 450) — OD 18.000" / 457.20 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "18"
+    dn: 450
+    schedule: "STD"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 17.250
+    id_mm: 438.15
+    weight_kg_per_m: 105.21
+    weight_lb_per_ft: 70.59
+
+  - nps: "18"
+    dn: 450
+    schedule: "XS"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 17.000
+    id_mm: 431.80
+    weight_kg_per_m: 139.20
+    weight_lb_per_ft: 93.45
+
+  - nps: "18"
+    dn: 450
+    schedule: "SCH 10"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 0.188
+    wt_mm: 4.78
+    id_in: 17.624
+    id_mm: 447.65
+    weight_kg_per_m: 53.26
+    weight_lb_per_ft: 35.79
+
+  - nps: "18"
+    dn: 450
+    schedule: "SCH 20"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 0.312
+    wt_mm: 7.92
+    id_in: 17.376
+    id_mm: 441.35
+    weight_kg_per_m: 87.71
+    weight_lb_per_ft: 58.90
+
+  - nps: "18"
+    dn: 450
+    schedule: "SCH 30"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 0.438
+    wt_mm: 11.13
+    id_in: 17.124
+    id_mm: 434.95
+    weight_kg_per_m: 122.38
+    weight_lb_per_ft: 82.16
+
+  - nps: "18"
+    dn: 450
+    schedule: "SCH 40"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 0.562
+    wt_mm: 14.27
+    id_in: 16.876
+    id_mm: 428.65
+    weight_kg_per_m: 155.80
+    weight_lb_per_ft: 104.57
+
+  - nps: "18"
+    dn: 450
+    schedule: "SCH 60"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 0.750
+    wt_mm: 19.05
+    id_in: 16.500
+    id_mm: 419.10
+    weight_kg_per_m: 205.74
+    weight_lb_per_ft: 138.05
+
+  - nps: "18"
+    dn: 450
+    schedule: "SCH 80"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 0.938
+    wt_mm: 23.83
+    id_in: 16.124
+    id_mm: 409.55
+    weight_kg_per_m: 254.55
+    weight_lb_per_ft: 170.81
+
+  - nps: "18"
+    dn: 450
+    schedule: "SCH 100"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 1.156
+    wt_mm: 29.36
+    id_in: 15.688
+    id_mm: 398.47
+    weight_kg_per_m: 309.62
+    weight_lb_per_ft: 207.66
+
+  - nps: "18"
+    dn: 450
+    schedule: "SCH 120"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 1.375
+    wt_mm: 34.93
+    id_in: 15.250
+    id_mm: 387.35
+    weight_kg_per_m: 363.57
+    weight_lb_per_ft: 243.92
+
+  - nps: "18"
+    dn: 450
+    schedule: "SCH 140"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 1.562
+    wt_mm: 39.67
+    id_in: 14.876
+    id_mm: 377.85
+    weight_kg_per_m: 408.26
+    weight_lb_per_ft: 273.88
+
+  - nps: "18"
+    dn: 450
+    schedule: "SCH 160"
+    od_in: 18.000
+    od_mm: 457.20
+    wt_in: 1.781
+    wt_mm: 45.24
+    id_in: 14.438
+    id_mm: 366.73
+    weight_kg_per_m: 459.97
+    weight_lb_per_ft: 308.58
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 20 (DN 500) — OD 20.000" / 508.00 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "20"
+    dn: 500
+    schedule: "STD"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 19.250
+    id_mm: 488.95
+    weight_kg_per_m: 117.15
+    weight_lb_per_ft: 78.60
+
+  - nps: "20"
+    dn: 500
+    schedule: "XS"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 19.000
+    id_mm: 482.60
+    weight_kg_per_m: 155.12
+    weight_lb_per_ft: 104.13
+
+  - nps: "20"
+    dn: 500
+    schedule: "SCH 10"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 0.218
+    wt_mm: 5.54
+    id_in: 19.564
+    id_mm: 496.92
+    weight_kg_per_m: 68.68
+    weight_lb_per_ft: 46.05
+
+  - nps: "20"
+    dn: 500
+    schedule: "SCH 20"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 19.250
+    id_mm: 488.95
+    weight_kg_per_m: 117.15
+    weight_lb_per_ft: 78.60
+
+  - nps: "20"
+    dn: 500
+    schedule: "SCH 30"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 19.000
+    id_mm: 482.60
+    weight_kg_per_m: 155.12
+    weight_lb_per_ft: 104.13
+
+  - nps: "20"
+    dn: 500
+    schedule: "SCH 40"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 0.594
+    wt_mm: 15.09
+    id_in: 18.812
+    id_mm: 477.82
+    weight_kg_per_m: 183.42
+    weight_lb_per_ft: 123.06
+
+  - nps: "20"
+    dn: 500
+    schedule: "SCH 60"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 0.812
+    wt_mm: 20.62
+    id_in: 18.376
+    id_mm: 466.75
+    weight_kg_per_m: 247.83
+    weight_lb_per_ft: 166.34
+
+  - nps: "20"
+    dn: 500
+    schedule: "SCH 80"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 1.031
+    wt_mm: 26.19
+    id_in: 17.938
+    id_mm: 455.62
+    weight_kg_per_m: 311.17
+    weight_lb_per_ft: 208.70
+
+  - nps: "20"
+    dn: 500
+    schedule: "SCH 100"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 1.281
+    wt_mm: 32.54
+    id_in: 17.438
+    id_mm: 442.93
+    weight_kg_per_m: 381.53
+    weight_lb_per_ft: 256.07
+
+  - nps: "20"
+    dn: 500
+    schedule: "SCH 120"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 1.500
+    wt_mm: 38.10
+    id_in: 17.000
+    id_mm: 431.80
+    weight_kg_per_m: 441.49
+    weight_lb_per_ft: 296.20
+
+  - nps: "20"
+    dn: 500
+    schedule: "SCH 140"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 1.750
+    wt_mm: 44.45
+    id_in: 16.500
+    id_mm: 419.10
+    weight_kg_per_m: 508.36
+    weight_lb_per_ft: 341.01
+
+  - nps: "20"
+    dn: 500
+    schedule: "SCH 160"
+    od_in: 20.000
+    od_mm: 508.00
+    wt_in: 1.969
+    wt_mm: 50.01
+    id_in: 16.062
+    id_mm: 407.97
+    weight_kg_per_m: 564.81
+    weight_lb_per_ft: 378.87
+
+  # ═══════════════════════════════════════════════════════════
+  # NPS 24 (DN 600) — OD 24.000" / 609.60 mm
+  # ═══════════════════════════════════════════════════════════
+  - nps: "24"
+    dn: 600
+    schedule: "STD"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 23.250
+    id_mm: 590.55
+    weight_kg_per_m: 141.12
+    weight_lb_per_ft: 94.62
+
+  - nps: "24"
+    dn: 600
+    schedule: "XS"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 0.500
+    wt_mm: 12.70
+    id_in: 23.000
+    id_mm: 584.20
+    weight_kg_per_m: 186.97
+    weight_lb_per_ft: 125.49
+
+  - nps: "24"
+    dn: 600
+    schedule: "SCH 10"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 0.218
+    wt_mm: 5.54
+    id_in: 23.564
+    id_mm: 598.53
+    weight_kg_per_m: 82.52
+    weight_lb_per_ft: 55.37
+
+  - nps: "24"
+    dn: 600
+    schedule: "SCH 20"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 0.375
+    wt_mm: 9.53
+    id_in: 23.250
+    id_mm: 590.55
+    weight_kg_per_m: 141.12
+    weight_lb_per_ft: 94.62
+
+  - nps: "24"
+    dn: 600
+    schedule: "SCH 30"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 0.562
+    wt_mm: 14.27
+    id_in: 22.876
+    id_mm: 581.05
+    weight_kg_per_m: 209.64
+    weight_lb_per_ft: 140.67
+
+  - nps: "24"
+    dn: 600
+    schedule: "SCH 40"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 0.688
+    wt_mm: 17.48
+    id_in: 22.624
+    id_mm: 574.65
+    weight_kg_per_m: 255.41
+    weight_lb_per_ft: 171.34
+
+  - nps: "24"
+    dn: 600
+    schedule: "SCH 60"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 0.969
+    wt_mm: 24.61
+    id_in: 22.062
+    id_mm: 560.37
+    weight_kg_per_m: 355.26
+    weight_lb_per_ft: 238.33
+
+  - nps: "24"
+    dn: 600
+    schedule: "SCH 80"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 1.219
+    wt_mm: 30.96
+    id_in: 21.562
+    id_mm: 547.68
+    weight_kg_per_m: 441.49
+    weight_lb_per_ft: 296.20
+
+  - nps: "24"
+    dn: 600
+    schedule: "SCH 100"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 1.531
+    wt_mm: 38.89
+    id_in: 20.938
+    id_mm: 531.83
+    weight_kg_per_m: 547.70
+    weight_lb_per_ft: 367.37
+
+  - nps: "24"
+    dn: 600
+    schedule: "SCH 120"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 1.812
+    wt_mm: 46.02
+    id_in: 20.376
+    id_mm: 517.55
+    weight_kg_per_m: 639.92
+    weight_lb_per_ft: 429.22
+
+  - nps: "24"
+    dn: 600
+    schedule: "SCH 140"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 2.062
+    wt_mm: 52.37
+    id_in: 19.876
+    id_mm: 504.85
+    weight_kg_per_m: 720.10
+    weight_lb_per_ft: 483.11
+
+  - nps: "24"
+    dn: 600
+    schedule: "SCH 160"
+    od_in: 24.000
+    od_mm: 609.60
+    wt_in: 2.344
+    wt_mm: 59.54
+    id_in: 19.312
+    id_mm: 490.53
+    weight_kg_per_m: 807.63
+    weight_lb_per_ft: 542.73
+
+notes:
+  - "STD = SCH 40 for NPS <= 10 in. For NPS 12+ STD wall = 3/8 in (9.53 mm)."
+  - "XS = SCH 80 for NPS <= 8 in. For NPS 10+ XS wall = 1/2 in (12.70 mm)."
+  - "ID calculated as OD - 2*WT."
+  - "Weight calculated per ASME formula: W = 0.02466*(OD-WT)*WT kg/m."
+
+quality:
+  validation_status: draft
+  confidence: 0.70
+  sources:
+    - name: ASME B36.10M-2018 Table 1
+      url: https://www.asme.org
+      access_date: "2026-07-26"
+      note: Wall thickness and OD from standard tables.
+
+lifecycle:
+  created_at: "2026-07-26"
+  updated_at: "2026-07-26"

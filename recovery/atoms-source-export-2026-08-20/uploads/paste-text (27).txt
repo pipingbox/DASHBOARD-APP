@@ -1,0 +1,85 @@
+ACT AS A SENIOR SUPABASE SECURITY ENGINEER.
+
+We fixed jobs table permissions successfully.
+
+Now the Post Job flow fails with:
+
+permission denied for table users
+
+IMPORTANT:
+Do not disable RLS.
+Do not expose all users publicly.
+
+We must safely allow authenticated role checks and self-access only.
+
+==================================================
+GOAL
+==================================================
+
+Fix secure access to the users table used by the Company Job Publishing flow.
+
+==================================================
+STEP 1 — IDENTIFY USAGE
+==================================================
+
+Inspect where the Post Job flow accesses the users table.
+
+Likely purposes:
+- checking current user role
+- getting company profile info
+- getting company name
+
+==================================================
+STEP 2 — SAFE SELF ACCESS ONLY
+==================================================
+
+Enable safe RLS on users table.
+
+Authenticated users may:
+- read ONLY their own user row
+- update ONLY their own user row
+
+using:
+
+auth.uid() = id
+
+==================================================
+STEP 3 — CREATE SAFE POLICIES
+==================================================
+
+Policies required:
+
+SELECT:
+auth.uid() = id
+
+UPDATE:
+USING (
+auth.uid() = id
+)
+WITH CHECK (
+auth.uid() = id
+)
+
+==================================================
+STEP 4 — ADMIN ACCESS
+==================================================
+
+Admins may safely view all users for Admin Center functionality.
+
+==================================================
+STEP 5 — VERIFY POST JOB FLOW
+==================================================
+
+Ensure Post Job only reads:
+- current authenticated user
+- not all users
+
+Avoid:
+- public user queries
+- unrestricted selects
+
+==================================================
+FINAL RESULT
+==================================================
+
+The Post Job publishing flow can safely read the authenticated company user data and publish jobs successfully without exposing the users table publicly.

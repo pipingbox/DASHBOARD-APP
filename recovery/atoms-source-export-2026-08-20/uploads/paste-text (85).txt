@@ -1,0 +1,66 @@
+He revisado los logs reales de Supabase.
+
+Problema confirmado:
+- GET /rest/v1/beta_feedback_reports devuelve 403
+- POST /rest/v1/beta_feedback_reports devuelve 403
+
+La tabla public.beta_feedback_reports existe, pero Row Level Security está bloqueando lectura e inserción.
+
+Necesito corregir las políticas RLS de Feedback Beta.
+
+Objetivo:
+Permitir que usuarios autenticados puedan enviar reportes y que solo admins puedan leerlos desde el panel admin.
+
+Implementar migración SQL segura para:
+
+1. Tabla public.beta_feedback_reports
+- Mantener RLS activado.
+- Permitir INSERT a usuarios autenticados.
+- Permitir SELECT solo a admins.
+- Permitir UPDATE solo a admins para cambiar status y priority.
+- No permitir DELETE salvo admin.
+
+2. Política INSERT
+Usuarios autenticados pueden crear reportes si:
+- user_id es igual a auth.uid()
+- o user_id es null si el sistema no lo está enviando correctamente todavía.
+
+3. Política SELECT admin
+Usar la lógica de admin existente de la app.
+Probablemente el rol admin está en:
+public.app_14da0f1941_profiles.role = 'admin'
+o sistema equivalente.
+
+Si no existe helper, crear función segura:
+
+public.is_admin_user()
+
+que compruebe si existe un perfil con:
+user_id = auth.uid()
+role = 'admin'
+
+4. Crear bucket si falta:
+- feedback-screenshots
+- public false
+- jpg, jpeg, png, webp
+- límite 5 MB
+
+5. Políticas Storage:
+- Usuarios autenticados pueden subir archivos al bucket feedback-screenshots.
+- Admins pueden leer archivos del bucket.
+- No permitir acceso público general si no es necesario.
+
+6. Corregir frontend:
+- Si el usuario está autenticado, enviar user_id = auth.uid().
+- Si no hay imagen, insertar reporte sin intentar subir archivo.
+- Si hay imagen, subir a bucket y guardar screenshot_url/path.
+- Mostrar error claro si Supabase devuelve 403:
+  “No tienes permisos para realizar esta acción.”
+
+7. Importante:
+- No crear una segunda tabla.
+- Usar la tabla existente public.beta_feedback_reports.
+- No desactivar RLS globalmente.
+- No usar service role en frontend.
+- Mantener el diseño actual.
+- Mantener i18n.

@@ -1,0 +1,56 @@
+The Work Experience form is failing because the frontend fields do not match the actual Supabase schema.
+
+Current issue:
+The app is trying to use columns like:
+- company
+- project
+- city
+
+but the real table uses:
+- company_name
+- project_name
+- city_region
+
+Fix the Work Experience module.
+
+Requirements:
+
+1. Use public.app_worker_experiences as the only source of truth.
+
+2. Map frontend fields correctly:
+
+Frontend → Database
+--------------------------------
+company → company_name
+project → project_name
+city → city_region
+description → description_original
+visibleForCompanies → visible_to_companies
+
+3. Existing DB fields:
+- company_name
+- position
+- project_name
+- city_region
+- country
+- start_date
+- end_date
+- currently_working
+- description_original
+- description_en
+- responsibilities
+- visible_to_companies
+- language_original
+
+4. Update:
+- create experience
+- edit experience
+- fetch experience
+- candidate detail rendering
+
+5. Use try/catch/finally.
+6. Show toast errors properly.
+7. Prevent modal freeze on insert/update failure.
+8. Keep the current dark industrial design.
+9. Do not recreate tables.
+10. Do not remove certifications or CV modules.

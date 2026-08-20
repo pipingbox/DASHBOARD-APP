@@ -1,0 +1,65 @@
+Deep i18n audit and fix.
+
+Problem:
+The platform language selector is set to Spanish, but many UI areas still show English:
+- Left sidebar: Company Dashboard, Jobs Management, Post Job, Candidates, Worker Search, Admin View, etc.
+- Dashboard buttons: Add Workday.
+- Salary modal: Salary Rate Presets, Manage your rate presets, Saved presets, New preset, Work location, Normal rate, Extra rate, Create preset, etc.
+- Other dashboard/workday/rate labels may also be hardcoded.
+
+Goal:
+When the user selects Spanish, the full platform must show Spanish. When English is selected, English. Same for other configured languages if available.
+
+Required:
+1. Search the full frontend for hardcoded English user-facing strings.
+2. Prioritize:
+   - AppShell / sidebar navigation
+   - Dashboard
+   - Workday modal
+   - Salary rate presets modal
+   - Profile page
+   - Admin area
+   - Job/company/worker modules
+3. Replace hardcoded strings with i18next `t()` calls.
+4. Add missing keys to:
+   - src/i18n/locales/es.json
+   - src/i18n/locales/en.json
+5. For now, at minimum fully support ES and EN.
+6. Keep the current visual layout exactly the same.
+7. Do not change business logic.
+8. Do not change Dashboard profile completion layout.
+9. Add a small fallback only if a key is missing, but do not leave visible English in Spanish mode.
+
+Spanish translations to use:
+- Company Dashboard → Panel de empresa
+- Jobs Management → Gestión de vacantes
+- Post Job → Publicar vacante
+- Candidates → Candidatos
+- Worker Search → Buscar trabajadores
+- Admin View → Vista admin
+- Add Workday → Añadir jornada
+- Salary Rate Presets → Tarifas predefinidas
+- Manage your rate presets → Gestiona tus tarifas predefinidas
+- Save the rates you use often so logging a workday is a one-click job. → Guarda tus tarifas habituales para registrar una jornada en un solo clic.
+- Saved presets → Tarifas guardadas
+- New preset → Nueva tarifa
+- Name → Nombre
+- Work location → Ubicación de trabajo
+- Normal rate → Tarifa normal
+- Extra rate → Tarifa extra
+- KM rate (optional) → Tarifa por km (opcional)
+- Currency → Moneda
+- Create preset → Crear tarifa
+- New → Nueva
+- Edit → Editar
+- Delete → Eliminar
+- Create → Crear
+- Save → Guardar
+- Cancel → Cancelar
+
+Acceptance criteria:
+- With Spanish selected, the sidebar shows Spanish.
+- The salary/rate presets modal is fully Spanish.
+- The Add Workday button is Spanish.
+- No visible English remains in the main dashboard/profile/admin navigation.
+- Build passes.

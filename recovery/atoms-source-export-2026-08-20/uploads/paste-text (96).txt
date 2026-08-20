@@ -1,0 +1,105 @@
+Create a real Workforce Request management pipeline system.
+
+Current issue:
+"Request Workforce" submissions are isolated forms and are not connected to the admin operational workflow.
+
+Goal:
+Transform Workforce Requests into real operational staffing pipeline objects.
+
+Required behavior:
+
+1. Every submitted Workforce Request must:
+- Be stored as a structured operational request
+- Appear in Admin dashboard
+- Appear in Company View
+- Be trackable through staffing stages
+
+2. Create new admin section:
+"Workforce Requests"
+
+3. Workforce Request fields:
+- Company
+- Contact Person
+- Country
+- Worker Type
+- Workers Requested
+- Workers Assigned
+- Coverage Percentage
+- Estimated Start Date
+- Project Duration
+- Priority
+- Status
+- Recruiter Assigned
+- Notes
+- Documentation Progress
+
+4. Required statuses:
+- New
+- Reviewing
+- Recruiting
+- Partially Staffed
+- Fully Staffed
+- In Progress
+- Completed
+- Archived
+
+5. Add worker assignment system:
+Admin/recruiters can:
+- Search workers
+- Assign workers to request
+- Remove workers
+- Track assigned count
+
+6. Coverage logic:
+Example:
+15 requested
+8 assigned
+= 53% coverage
+
+7. Documentation integration:
+Track:
+- contracts
+- certifications
+- onboarding
+- compliance
+- medical
+- payroll docs
+
+8. Company View improvements:
+Company should see:
+- requested workers
+- assigned workers
+- staffing progress
+- request status
+
+9. Admin View improvements:
+Admin can:
+- manage all requests
+- assign recruiters
+- assign workers
+- monitor staffing operations
+
+10. Database architecture:
+Create proper relational structure between:
+- workforce_requests
+- assigned_workers
+- company_profiles
+- worker_profiles
+- documents
+- messages
+
+11. UI:
+Keep industrial dark PipingBox style.
+
+12. Do not break:
+- existing jobs system
+- candidates system
+- messaging system
+
+Acceptance criteria:
+- Workforce requests appear in Admin
+- Recruiters can assign workers
+- Coverage updates dynamically
+- Companies can monitor staffing progress
+- Documentation workflow connects correctly
+- Build and lint pass

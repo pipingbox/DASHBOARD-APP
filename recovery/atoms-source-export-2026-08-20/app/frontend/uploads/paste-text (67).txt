@@ -1,0 +1,52 @@
+The issue is NOT fixed.
+
+I verified directly in Supabase and the database migration was NEVER applied.
+
+Critical error:
+column "profile_completion" does not exist
+
+That means:
+- the new centralized completion system was NOT created in Supabase
+- frontend components are still using old independent calculations
+- dashboard/profile/admin continue showing different percentages
+
+STOP all frontend work.
+
+You must now APPLY THE REAL DATABASE MIGRATION.
+
+Required actions:
+
+1. Create these columns in public.app_14da0f1941_profiles:
+
+ALTER TABLE public.app_14da0f1941_profiles
+ADD COLUMN IF NOT EXISTS profile_completion INTEGER DEFAULT 0,
+ADD COLUMN IF NOT EXISTS onboarding_status TEXT DEFAULT 'AUTH_ONLY',
+ADD COLUMN IF NOT EXISTS marketplace_ready BOOLEAN DEFAULT false;
+
+2. Ensure migration is ACTUALLY executed in Supabase production database.
+
+3. Create ONE centralized calculateProfileCompletion() function/service.
+
+4. Recalculate ALL existing users.
+
+5. Save results into database after profile update.
+
+6. ALL pages must read:
+- profile_completion
+- onboarding_status
+- marketplace_ready
+
+DIRECTLY from database.
+
+7. Remove old local frontend-only completion calculations.
+
+8. After migration:
+verify in SQL that these columns exist.
+
+9. Then verify Gaspar profile:
+- Dashboard %
+- Profile %
+- Admin %
+must all be identical.
+
+The migration has NOT been applied yet. Fix that first before anything else.

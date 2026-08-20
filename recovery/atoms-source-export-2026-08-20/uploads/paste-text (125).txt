@@ -1,0 +1,103 @@
+Accede a la cuenta Stripe vinculada al proyecto PIPINGBOX.
+
+CONTEXTO
+El proyecto tiene una especificacion de catalogo comercial en
+brain/10-CORPORATE/STRIPE_INTEGRATION_SPEC.md, seccion 3.1. La base de datos de
+Supabase tiene una tabla app_stripe_prices que debe quedar alineada con Stripe.
+Stripe es la fuente de verdad para importe, moneda, periodicidad y estado activo.
+No lo es para la semantica de producto: eso vive en el campo product_key, que es
+un identificador interno de PipingBox.
+
+MODO DE TRABAJO
+- Trabaja EXCLUSIVAMENTE en test mode. No toques live mode.
+- No actives pagos en produccion.
+- Si detectas diferencias entre Stripe y la especificacion, NO las corrijas:
+  reportalas.
+
+OBJETIVO 1 — Inventario
+Comprueba si ya existen productos y precios en la cuenta. Lista todo lo que
+encuentres, incluido lo que no aparezca en la especificacion.
+
+OBJETIVO 2 — Creacion de lo que falte
+Crea unicamente los productos de la especificacion que no existan todavia.
+
+REQUISITO CRITICO — metadata.product_key
+Cada Price que crees DEBE llevar el metadata:
+
+    metadata: { "product_key": "<clave exacta de la tabla de abajo>" }
+
+Esto no es opcional. Todo el codigo de PipingBox decide que desbloquea una compra
+a partir de product_key (por ejemplo, cualquier clave que empiece por
+"premium_tools" concede acceso a las herramientas premium). Stripe no conoce ese
+concepto. Sin este metadata, la sincronizacion automatica posterior no tiene
+ninguna clave fiable con la que emparejar filas, y tendriamos que adivinar por
+nombre de producto, que es fragil y se rompe en cuanto se traduzca un nombre.
+
+Si algun producto YA existe en Stripe pero su Price NO tiene metadata.product_key,
+no crees uno nuevo: reportalo en el informe como "falta metadata". El metadata de
+un Price si es editable, a diferencia del importe.
+
+CATALOGO (STRIPE_INTEGRATION_SPEC.md 3.1, corregido 2026-08-01)
+
+  product_key             | importe   | tipo          | periodicidad
+  ------------------------|-----------|---------------|-------------
+  premium_tools_monthly   | EUR 4.99  | subscription  | month
+  premium_tools_annual    | EUR 39.00 | subscription  | year
+  vca_exams_unlimited     | EUR 39.90 | one_time      | -
+  vca_course_bvca         | EUR 59.90 | one_time      | -
+  vca_course_volvca       | EUR 79.90 | one_time      | -
+  vca_bundle_technical    | EUR 89.90 | one_time      | -   (NO CREAR — ver nota)
+  prl_course_basico       | EUR 29.90 | one_time      | -
+  vca_booking_standard    | EUR 10.00 | one_time      | -
+  vca_booking_urgent      | EUR 15.00 | one_time      | -
+  job_credit_1            | EUR 29.00 | one_time      | -
+  job_credit_5            | EUR 129.00| one_time      | -
+  job_credit_20           | EUR 399.00| one_time      | -
+  enterprise_annual       | negociado | subscription  | year
+
+  Crea 11 de los 13. Los dos que NO debes crear son vca_bundle_technical y
+  enterprise_annual.
+
+  NOTA vca_bundle_technical: NO lo crees. El bundle necesita un curso tecnico de
+  pago con el que empaquetarse y todavia no existe ninguno (Piping Fundamentals
+  es gratuito). La fila ya esta sembrada en la base de datos como inactiva,
+  esperando. Se creara en Stripe el dia que salga el primer curso tecnico.
+
+  NOTA enterprise_annual: el importe se negocia por cliente. NO crees un Price
+  fijo. Crea solo el Product y reportalo. El checkout de enterprise se resolvera
+  con precios ad-hoc o quotes.
+
+  Todos los importes en EUR. Los importes de la tabla estan en euros; en la API
+  de Stripe van en centimos (4.99 EUR = 499).
+
+OBJETIVO 3 — Verificacion
+Para cada producto, comprueba y reporta:
+  - moneda == EUR
+  - importe == el de la especificacion
+  - tipo (one_time / recurring) == el de la especificacion
+  - periodicidad (month / year) == la de la especificacion
+  - metadata.product_key presente y con el valor exacto
+  - price activo (no archivado)
+
+OBJETIVO 4 — Informe
+Devuelve una tabla con una fila por precio:
+
+  product_key | product_id | price_id | tipo | importe | moneda | periodicidad |
+  metadata OK | estado | discrepancias
+
+Y por separado:
+  - Productos encontrados en Stripe que NO estan en la especificacion.
+  - Productos de la especificacion que NO se han podido crear, y por que.
+  - Cualquier diferencia entre Stripe y la especificacion (sin corregir).
+
+OBJETIVO 5 — Webhook endpoint
+Reporta si existe algun webhook endpoint configurado en la cuenta y a que URL
+apunta. No crees ninguno todavia: la Edge Function de destino aun no esta
+desplegada.
+
+LO QUE NO DEBES HACER
+- No toques live mode.
+- No archives ni modifiques precios existentes.
+- No corrijas discrepancias por tu cuenta.
+- No crees vca_bundle_technical ni un Price para enterprise_annual.
+- No configures webhooks.

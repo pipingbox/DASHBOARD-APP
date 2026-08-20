@@ -1,0 +1,487 @@
+schema_version: "1.0.0"
+id: PB-DIM-FLANGE-LJ-CLASS300
+component_id: PB-COMP-FLANGE-LJ
+standard_id: PB-STD-ASME-B16-5
+dataset_type: standard
+system: mixed
+
+selectors:
+  - key: nps
+    label: "Nominal Pipe Size"
+    unit: "in"
+    type: string
+  - key: dn
+    label: "Diametre Nominal"
+    unit: "mm"
+    type: integer
+  - key: class
+    label: "Pressure Class"
+    unit: ""
+    type: integer
+
+fields:
+  - key: od_flange_in
+    label: "Flange OD"
+    unit: "in"
+    type: number
+  - key: od_flange_mm
+    label: "Flange OD"
+    unit: "mm"
+    type: number
+  - key: thickness_in
+    label: "Flange Thickness"
+    unit: "in"
+    type: number
+  - key: thickness_mm
+    label: "Flange Thickness"
+    unit: "mm"
+    type: number
+  - key: bolt_circle_in
+    label: "Bolt Circle Diameter"
+    unit: "in"
+    type: number
+  - key: bolt_circle_mm
+    label: "Bolt Circle Diameter"
+    unit: "mm"
+    type: number
+  - key: num_bolts
+    label: "Number of Bolts"
+    unit: ""
+    type: integer
+  - key: bolt_dia_in
+    label: "Bolt Diameter"
+    unit: "in"
+    type: number
+  - key: bolt_dia_mm
+    label: "Bolt Diameter"
+    unit: "mm"
+    type: number
+  - key: bore_in
+    label: "Bore Diameter"
+    unit: "in"
+    type: number
+  - key: bore_mm
+    label: "Bore Diameter"
+    unit: "mm"
+    type: number
+  - key: flange_od_in
+    label: "Lap OD (stub end OD)"
+    unit: "in"
+    type: number
+  - key: flange_od_mm
+    label: "Lap OD (stub end OD)"
+    unit: "mm"
+    type: number
+  - key: weight_approx_lb
+    label: "Approximate Weight"
+    unit: "lb"
+    type: number
+  - key: weight_approx_kg
+    label: "Approximate Weight"
+    unit: "kg"
+    type: number
+
+rows:
+  # ═══════════════════════════════════════════════════════════
+  # Lap Joint Flanges — ASME B16.5 Class 300
+  # Source: ASME B16.5-2020 Table 7 + Table E-1
+  # Includes flange_od (lap/stub end OD)
+  # ═══════════════════════════════════════════════════════════
+  - nps: "1/2"
+    dn: 15
+    class: 300
+    od_flange_in: 3.75
+    od_flange_mm: 95.25
+    thickness_in: 0.56
+    thickness_mm: 14.22
+    bolt_circle_in: 2.62
+    bolt_circle_mm: 66.55
+    num_bolts: 4
+    bolt_dia_in: 0.625
+    bolt_dia_mm: 15.88
+    bore_in: 0.88
+    bore_mm: 22.35
+    flange_od_in: 1.19
+    flange_od_mm: 30.23
+    weight_approx_lb: 2
+    weight_approx_kg: 0.9
+
+  - nps: "3/4"
+    dn: 20
+    class: 300
+    od_flange_in: 4.62
+    od_flange_mm: 117.35
+    thickness_in: 0.62
+    thickness_mm: 15.75
+    bolt_circle_in: 3.25
+    bolt_circle_mm: 82.55
+    num_bolts: 4
+    bolt_dia_in: 0.750
+    bolt_dia_mm: 19.05
+    bore_in: 1.06
+    bore_mm: 26.92
+    flange_od_in: 1.50
+    flange_od_mm: 38.10
+    weight_approx_lb: 3
+    weight_approx_kg: 1.4
+
+  - nps: "1"
+    dn: 25
+    class: 300
+    od_flange_in: 4.88
+    od_flange_mm: 123.83
+    thickness_in: 0.69
+    thickness_mm: 17.53
+    bolt_circle_in: 3.50
+    bolt_circle_mm: 88.90
+    num_bolts: 4
+    bolt_dia_in: 0.750
+    bolt_dia_mm: 19.05
+    bore_in: 1.32
+    bore_mm: 33.53
+    flange_od_in: 1.84
+    flange_od_mm: 46.74
+    weight_approx_lb: 4
+    weight_approx_kg: 1.8
+
+  - nps: "1-1/4"
+    dn: 32
+    class: 300
+    od_flange_in: 5.25
+    od_flange_mm: 133.35
+    thickness_in: 0.75
+    thickness_mm: 19.05
+    bolt_circle_in: 3.88
+    bolt_circle_mm: 98.55
+    num_bolts: 4
+    bolt_dia_in: 0.750
+    bolt_dia_mm: 19.05
+    bore_in: 1.66
+    bore_mm: 42.16
+    flange_od_in: 2.22
+    flange_od_mm: 56.39
+    weight_approx_lb: 5
+    weight_approx_kg: 2.3
+
+  - nps: "1-1/2"
+    dn: 40
+    class: 300
+    od_flange_in: 6.12
+    od_flange_mm: 155.45
+    thickness_in: 0.81
+    thickness_mm: 20.57
+    bolt_circle_in: 4.50
+    bolt_circle_mm: 114.30
+    num_bolts: 4
+    bolt_dia_in: 0.875
+    bolt_dia_mm: 22.23
+    bore_in: 1.90
+    bore_mm: 48.26
+    flange_od_in: 2.56
+    flange_od_mm: 65.02
+    weight_approx_lb: 6
+    weight_approx_kg: 2.7
+
+  - nps: "2"
+    dn: 50
+    class: 300
+    od_flange_in: 6.50
+    od_flange_mm: 165.10
+    thickness_in: 0.88
+    thickness_mm: 22.35
+    bolt_circle_in: 5.00
+    bolt_circle_mm: 127.00
+    num_bolts: 8
+    bolt_dia_in: 0.625
+    bolt_dia_mm: 15.88
+    bore_in: 2.38
+    bore_mm: 60.45
+    flange_od_in: 3.06
+    flange_od_mm: 77.72
+    weight_approx_lb: 8
+    weight_approx_kg: 3.6
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 300
+    od_flange_in: 7.50
+    od_flange_mm: 190.50
+    thickness_in: 1.00
+    thickness_mm: 25.40
+    bolt_circle_in: 5.88
+    bolt_circle_mm: 149.35
+    num_bolts: 8
+    bolt_dia_in: 0.750
+    bolt_dia_mm: 19.05
+    bore_in: 2.88
+    bore_mm: 73.15
+    flange_od_in: 3.56
+    flange_od_mm: 90.42
+    weight_approx_lb: 11
+    weight_approx_kg: 5.0
+
+  - nps: "3"
+    dn: 80
+    class: 300
+    od_flange_in: 8.25
+    od_flange_mm: 209.55
+    thickness_in: 1.12
+    thickness_mm: 28.45
+    bolt_circle_in: 6.62
+    bolt_circle_mm: 168.15
+    num_bolts: 8
+    bolt_dia_in: 0.750
+    bolt_dia_mm: 19.05
+    bore_in: 3.50
+    bore_mm: 88.90
+    flange_od_in: 4.25
+    flange_od_mm: 107.95
+    weight_approx_lb: 14
+    weight_approx_kg: 6.4
+
+  - nps: "3-1/2"
+    dn: 90
+    class: 300
+    od_flange_in: 9.00
+    od_flange_mm: 228.60
+    thickness_in: 1.19
+    thickness_mm: 30.23
+    bolt_circle_in: 7.25
+    bolt_circle_mm: 184.15
+    num_bolts: 8
+    bolt_dia_in: 0.875
+    bolt_dia_mm: 22.23
+    bore_in: 4.00
+    bore_mm: 101.60
+    flange_od_in: 4.81
+    flange_od_mm: 122.17
+    weight_approx_lb: 17
+    weight_approx_kg: 7.7
+
+  - nps: "4"
+    dn: 100
+    class: 300
+    od_flange_in: 10.75
+    od_flange_mm: 273.05
+    thickness_in: 1.25
+    thickness_mm: 31.75
+    bolt_circle_in: 7.88
+    bolt_circle_mm: 200.15
+    num_bolts: 8
+    bolt_dia_in: 0.875
+    bolt_dia_mm: 22.23
+    bore_in: 4.50
+    bore_mm: 114.30
+    flange_od_in: 5.31
+    flange_od_mm: 134.87
+    weight_approx_lb: 22
+    weight_approx_kg: 10.0
+
+  - nps: "5"
+    dn: 125
+    class: 300
+    od_flange_in: 13.00
+    od_flange_mm: 330.20
+    thickness_in: 1.38
+    thickness_mm: 35.05
+    bolt_circle_in: 9.25
+    bolt_circle_mm: 234.95
+    num_bolts: 8
+    bolt_dia_in: 0.875
+    bolt_dia_mm: 22.23
+    bore_in: 5.56
+    bore_mm: 141.22
+    flange_od_in: 6.56
+    flange_od_mm: 166.62
+    weight_approx_lb: 34
+    weight_approx_kg: 15.4
+
+  - nps: "6"
+    dn: 150
+    class: 300
+    od_flange_in: 14.00
+    od_flange_mm: 355.60
+    thickness_in: 1.44
+    thickness_mm: 36.58
+    bolt_circle_in: 10.62
+    bolt_circle_mm: 269.75
+    num_bolts: 12
+    bolt_dia_in: 0.875
+    bolt_dia_mm: 22.23
+    bore_in: 6.63
+    bore_mm: 168.40
+    flange_od_in: 7.69
+    flange_od_mm: 195.33
+    weight_approx_lb: 42
+    weight_approx_kg: 19.1
+
+  - nps: "8"
+    dn: 200
+    class: 300
+    od_flange_in: 17.50
+    od_flange_mm: 444.50
+    thickness_in: 1.62
+    thickness_mm: 41.15
+    bolt_circle_in: 13.00
+    bolt_circle_mm: 330.20
+    num_bolts: 12
+    bolt_dia_in: 1.000
+    bolt_dia_mm: 25.40
+    bore_in: 8.63
+    bore_mm: 219.20
+    flange_od_in: 9.69
+    flange_od_mm: 246.13
+    weight_approx_lb: 72
+    weight_approx_kg: 32.7
+
+  - nps: "10"
+    dn: 250
+    class: 300
+    od_flange_in: 20.50
+    od_flange_mm: 520.70
+    thickness_in: 1.88
+    thickness_mm: 47.75
+    bolt_circle_in: 15.25
+    bolt_circle_mm: 387.35
+    num_bolts: 16
+    bolt_dia_in: 1.125
+    bolt_dia_mm: 28.58
+    bore_in: 10.75
+    bore_mm: 273.05
+    flange_od_in: 12.00
+    flange_od_mm: 304.80
+    weight_approx_lb: 110
+    weight_approx_kg: 49.9
+
+  - nps: "12"
+    dn: 300
+    class: 300
+    od_flange_in: 24.00
+    od_flange_mm: 609.60
+    thickness_in: 2.00
+    thickness_mm: 50.80
+    bolt_circle_in: 17.75
+    bolt_circle_mm: 450.85
+    num_bolts: 16
+    bolt_dia_in: 1.250
+    bolt_dia_mm: 31.75
+    bore_in: 12.75
+    bore_mm: 323.85
+    flange_od_in: 14.38
+    flange_od_mm: 365.25
+    weight_approx_lb: 160
+    weight_approx_kg: 72.6
+
+  - nps: "14"
+    dn: 350
+    class: 300
+    od_flange_in: 25.25
+    od_flange_mm: 641.35
+    thickness_in: 2.12
+    thickness_mm: 53.85
+    bolt_circle_in: 20.25
+    bolt_circle_mm: 514.35
+    num_bolts: 20
+    bolt_dia_in: 1.125
+    bolt_dia_mm: 28.58
+    bore_in: 14.00
+    bore_mm: 355.60
+    flange_od_in: 15.75
+    flange_od_mm: 400.05
+    weight_approx_lb: 190
+    weight_approx_kg: 86.2
+
+  - nps: "16"
+    dn: 400
+    class: 300
+    od_flange_in: 27.75
+    od_flange_mm: 704.85
+    thickness_in: 2.25
+    thickness_mm: 57.15
+    bolt_circle_in: 22.50
+    bolt_circle_mm: 571.50
+    num_bolts: 20
+    bolt_dia_in: 1.250
+    bolt_dia_mm: 31.75
+    bore_in: 16.00
+    bore_mm: 406.40
+    flange_od_in: 17.75
+    flange_od_mm: 450.85
+    weight_approx_lb: 250
+    weight_approx_kg: 113.4
+
+  - nps: "18"
+    dn: 450
+    class: 300
+    od_flange_in: 31.00
+    od_flange_mm: 787.40
+    thickness_in: 2.38
+    thickness_mm: 60.45
+    bolt_circle_in: 24.75
+    bolt_circle_mm: 628.65
+    num_bolts: 24
+    bolt_dia_in: 1.250
+    bolt_dia_mm: 31.75
+    bore_in: 18.00
+    bore_mm: 457.20
+    flange_od_in: 19.88
+    flange_od_mm: 504.95
+    weight_approx_lb: 320
+    weight_approx_kg: 145.1
+
+  - nps: "20"
+    dn: 500
+    class: 300
+    od_flange_in: 33.75
+    od_flange_mm: 857.25
+    thickness_in: 2.50
+    thickness_mm: 63.50
+    bolt_circle_in: 27.00
+    bolt_circle_mm: 685.80
+    num_bolts: 24
+    bolt_dia_in: 1.250
+    bolt_dia_mm: 31.75
+    bore_in: 20.00
+    bore_mm: 508.00
+    flange_od_in: 22.00
+    flange_od_mm: 558.80
+    weight_approx_lb: 390
+    weight_approx_kg: 176.9
+
+  - nps: "24"
+    dn: 600
+    class: 300
+    od_flange_in: 41.00
+    od_flange_mm: 1041.40
+    thickness_in: 2.75
+    thickness_mm: 69.85
+    bolt_circle_in: 32.00
+    bolt_circle_mm: 812.80
+    num_bolts: 24
+    bolt_dia_in: 1.500
+    bolt_dia_mm: 38.10
+    bore_in: 24.00
+    bore_mm: 609.60
+    flange_od_in: 26.12
+    flange_od_mm: 663.45
+    weight_approx_lb: 570
+    weight_approx_kg: 258.5
+
+notes:
+  - "Lap Joint flanges per ASME B16.5-2020, Class 300."
+  - "flange_od is the OD of the stub end lap (pipe OD + lap ring)."
+  - "Dimensions from Table 7; bolt data from Table E-1."
+  - "Weights are approximate (flange ring only, stub end separate)."
+
+quality:
+  validation_status: draft
+  confidence: 0.70
+  sources:
+    - name: ASME B16.5-2020 Table 7 & Table E-1
+      url: https://www.asme.org
+      access_date: "2026-07-26"
+      note: Class 300 lap joint flange dimensions.
+
+lifecycle:
+  created_at: "2026-07-26"
+  updated_at: "2026-07-26"

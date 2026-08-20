@@ -1,0 +1,76 @@
+Necesito revisar y corregir la pantalla /company/workers-search de PipingBox.
+
+Problema:
+En el panel admin aparecen:
+- Total usuarios: 31
+- Trabajadores: 28
+- Solicitudes: 17
+- Solicitudes de personal: 5
+
+Pero en la pantalla de empresa “Búsqueda de Trabajadores” no aparece ningún trabajador, incluso con todos los filtros en “All”. El mensaje mostrado es: “No se encontraron trabajadores”.
+
+Objetivo:
+Los trabajadores registrados deben aparecer en la búsqueda de empresa, al menos si tienen perfil de trabajador creado, aunque el perfil no esté completado al 100%, o definir claramente qué condición los oculta.
+
+Revisar exactamente:
+
+1. Localizar el componente/página:
+- /company/workers-search
+- Worker search
+- Buscar trabajadores
+- Candidate search / workers search
+
+2. Identificar qué consulta Supabase ejecuta esa pantalla:
+- tabla
+- vista
+- RPC
+- filtros aplicados
+- joins
+- condiciones como role, user_type, profile_type, availability, status, is_public, profile_completed, deleted_at, company_id, etc.
+
+3. Comparar esa consulta con los datos que usa el panel admin para mostrar “Trabajadores: 28”.
+Necesito saber por qué admin cuenta 28 trabajadores pero company search devuelve 0.
+
+4. Revisar Supabase RLS:
+Comprobar si la empresa autenticada tiene permiso SELECT sobre:
+- profiles
+- worker_profiles
+- workers
+- user_profiles
+- documents/certifications si afectan a la búsqueda
+- cualquier view o RPC usada por workers-search
+
+5. Revisar si existe una view o RPC específica para empresas.
+Si existe, comprobar si está filtrando demasiado.
+
+6. Añadir logs temporales en consola:
+- usuario autenticado
+- rol del usuario
+- query ejecutada
+- filtros aplicados
+- error Supabase si existe
+- número de resultados antes y después de filtros frontend
+
+7. Crear diagnóstico SQL para Supabase:
+- contar usuarios auth
+- contar perfiles públicos
+- contar trabajadores por role/profile_type
+- contar trabajadores con perfil completo
+- contar trabajadores disponibles
+- contar trabajadores visibles para empresas
+- detectar usuarios auth sin fila de profile
+
+8. Corregir el problema de forma segura:
+- Si faltan perfiles, usar o arreglar la función “Rellenar Perfiles”.
+- Si el filtro es demasiado restrictivo, ajustarlo.
+- Si es RLS, crear política SELECT para que empresas puedan ver perfiles públicos de trabajadores.
+- Si la vista/RPC está mal, corregirla.
+- Si el frontend filtra después de recibir datos, corregir el filtrado.
+
+9. Resultado esperado:
+Con filtros en All, la pantalla /company/workers-search debe mostrar todos los trabajadores visibles.
+La búsqueda por nombre, habilidad o palabra clave debe funcionar.
+Los filtros por puesto, país, disponibilidad, certificación y experiencia no deben ocultar todos los resultados por defecto.
+
+Importante:
+No romper la privacidad. La empresa debe ver solo información profesional pública del trabajador, no datos sensibles ni documentos privados salvo que el trabajador los haya marcado como visibles o sean necesarios para candidatura.

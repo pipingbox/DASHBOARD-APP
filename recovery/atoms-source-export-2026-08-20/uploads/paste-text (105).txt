@@ -1,0 +1,241 @@
+Necesito implementar la herramienta "Pipe Data Tables" en el proyecto PipingBox.
+
+## Contexto del proyecto
+
+- Framework: React 18.3 + TypeScript + Vite + Tailwind 3.4
+- UI: shadcn/ui (Button, Input, Label, Select ya existen)
+- i18n: react-i18next
+- Tema: dark (#0a0a0a bg, #0d0d0d cards, zinc-800/80 borders, #f59e0b amber accent)
+- Supabase: tabla 'app_14da0f1941_tool_usage'
+- Recharts ya esta instalado en dependencias
+- La dependencia @radix-ui/react-tabs esta instalada pero el componente tabs.tsx NO existe
+
+## Archivos a crear/modificar
+
+### 1. Crear src/components/ui/tabs.tsx (shadcn/ui Tabs)
+
+Crear el wrapper de shadcn/ui para Tabs usando @radix-ui/react-tabs (ya instalado).
+Exportar: Tabs, TabsList, TabsTrigger, TabsContent.
+Estilo dark: TabsList bg-zinc-900 border-zinc-800, TabsTrigger data-[state=active]:bg-[#f59e0b] data-[state=active]:text-black text-zinc-400.
+
+### 2. Crear src/tools/PipeDataTables.tsx
+
+Componente funcional que recibe { userId?: string }.
+
+Implementar 3 tabs:
+
+#### TAB 1: PIPE DIMENSIONS (ASME B36.10M Carbon Steel + B36.19M Stainless)
+
+Tabla interactiva con las siguientes columnas:
+NPS | DN | OD (mm) | OD (in) | y despues una columna por cada Schedule con el Wall Thickness (mm):
+Schedules: 5S, 10S, 10, 20, 30, STD, 40, 60, XS, 80, 100, 120, 140, 160, XXS
+
+Datos COMPLETOS (ASME B36.10M / B36.19M - NO inventar, usar valores estandar):
+
+NPS 1/8" (DN6, OD 10.3mm): 
+  10S=0.89, 10=0.89, STD/40=1.24, XS/80=1.73
+
+NPS 1/4" (DN8, OD 13.7mm):
+  10S=1.24, 10=1.24, STD/40=1.65, XS/80=2.24
+
+NPS 3/8" (DN10, OD 17.1mm):
+  10S=1.24, 10=1.24, STD/40=1.65, XS/80=2.31
+
+NPS 1/2" (DN15, OD 21.3mm):
+  5S=1.65, 10S=2.11, 10=2.11, STD/40=2.77, XS/80=3.73, 160=4.78, XXS=7.47
+
+NPS 3/4" (DN20, OD 26.7mm):
+  5S=1.65, 10S=2.11, 10=2.11, STD/40=2.87, XS/80=3.91, 160=5.56, XXS=7.82
+
+NPS 1" (DN25, OD 33.4mm):
+  5S=1.65, 10S=2.77, 10=2.77, STD/40=3.38, XS/80=4.55, 160=6.35, XXS=9.09
+
+NPS 1-1/4" (DN32, OD 42.2mm):
+  5S=1.65, 10S=2.77, 10=2.77, STD/40=3.56, XS/80=4.85, 160=6.35, XXS=9.70
+
+NPS 1-1/2" (DN40, OD 48.3mm):
+  5S=1.65, 10S=2.77, 10=2.77, STD/40=3.68, XS/80=5.08, 160=7.14, XXS=10.15
+
+NPS 2" (DN50, OD 60.3mm):
+  5S=1.65, 10S=2.77, 10=2.77, STD/40=3.91, XS/80=5.54, 160=8.74, XXS=11.07
+
+NPS 2-1/2" (DN65, OD 73.0mm):
+  5S=2.11, 10S=3.05, 10=3.05, STD/40=5.16, XS/80=7.01, 160=9.53, XXS=14.02
+
+NPS 3" (DN80, OD 88.9mm):
+  5S=2.11, 10S=3.05, 10=3.05, STD/40=5.49, XS/80=7.62, 160=11.13, XXS=15.24
+
+NPS 3-1/2" (DN90, OD 101.6mm):
+  5S=2.11, 10S=3.05, STD/40=5.74, XS/80=8.08
+
+NPS 4" (DN100, OD 114.3mm):
+  5S=2.11, 10S=3.05, 10=3.05, STD/40=6.02, 60=7.14, XS/80=8.56, 100=11.13, 120=13.49, 140=17.12, 160=23.83, XXS=17.12
+
+NPS 5" (DN125, OD 141.3mm):
+  5S=2.77, 10S=3.40, 10=3.40, STD/40=6.55, 60=7.92, XS/80=9.53, 100=12.70, 120=15.88, 140=19.05, 160=23.83, XXS=19.05
+
+NPS 6" (DN150, OD 168.3mm):
+  5S=2.77, 10S=3.40, 10=3.40, STD/40=7.11, 60=8.74, XS/80=10.97, 100=14.27, 120=18.26, 140=21.95, 160=27.79, XXS=21.95
+
+NPS 8" (DN200, OD 219.1mm):
+  5S=2.77, 10S=3.76, 10=3.76, 20=6.35, 30=7.04, STD=8.18, 40=8.18, 60=10.31, XS=12.70, 80=12.70, 100=15.09, 120=18.26, 140=20.62, 160=23.01, XXS=22.23
+
+NPS 10" (DN250, OD 273.0mm):
+  5S=3.40, 10S=4.19, 10=4.19, 20=6.35, 30=7.80, STD=9.27, 40=9.27, 60=12.70, XS=12.70, 80=15.09, 100=18.26, 120=21.44, 140=25.40, 160=28.58, XXS=25.40
+
+NPS 12" (DN300, OD 323.8mm):
+  5S=3.96, 10S=4.57, 10=4.57, 20=6.35, 30=8.38, STD=9.52, 40=10.31, 60=14.27, XS=12.70, 80=17.48, 100=21.44, 120=25.40, 140=28.58, 160=33.32, XXS=25.40
+
+NPS 14" (DN350, OD 355.6mm):
+  5S=3.96, 10S=4.78, 10=4.78, 20=7.92, 30=9.52, STD=9.52, 40=11.13, 60=15.09, XS=12.70, 80=19.05, 100=23.83, 120=27.79, 140=31.75, 160=35.71
+
+NPS 16" (DN400, OD 406.4mm):
+  5S=4.19, 10S=4.78, 10=4.78, 20=7.92, 30=9.52, STD=9.52, 40=12.70, 60=16.66, XS=12.70, 80=21.44, 100=26.19, 120=30.96, 140=36.53, 160=40.49
+
+NPS 18" (DN450, OD 457.2mm):
+  5S=4.19, 10S=4.78, 10=4.78, 20=7.92, STD=9.52, 30=11.13, 40=14.27, 60=19.05, XS=12.70, 80=23.83, 100=29.36, 120=34.93, 140=39.67, 160=45.24
+
+NPS 20" (DN500, OD 508.0mm):
+  5S=4.78, 10S=5.54, 10=5.54, 20=9.52, STD=9.52, 30=12.70, 40=15.09, 60=20.62, XS=12.70, 80=26.19, 100=32.54, 120=38.10, 140=44.45, 160=50.01
+
+NPS 24" (DN600, OD 609.6mm):
+  5S=5.54, 10S=6.35, 10=6.35, 20=9.52, STD=9.52, 30=14.27, 40=17.48, 60=24.61, XS=12.70, 80=30.96, 100=38.89, 120=46.02, 140=52.37, 160=59.54
+
+Funcionalidades de la tabla:
+- Input de busqueda por NPS o DN (filter en tiempo real)
+- Toggle mm/inches para el OD (boton con icono)
+- Scroll horizontal en mobile con la primera columna (NPS) sticky/fixed
+- Filas con hover:bg-zinc-800/30
+- Celdas vacias (donde no existe ese schedule para ese NPS) mostrar "-" en text-zinc-700
+- Header sticky en scroll vertical
+- Peso por metro: calcular automaticamente con formula: W = (OD - WT) * WT * 0.02466 kg/m (solo para acero al carbono)
+- Mostrar peso como ultima columna "kg/m" basado en el schedule seleccionado
+
+#### TAB 2: FLANGE DIMENSIONS (ASME B16.5)
+
+Tabla con filtros por Class (150, 300, 600, 900, 1500, 2500):
+
+Columnas: NPS | OD Flange (mm) | Thickness (mm) | BCD (mm) | No. Bolts | Bolt Dia (mm) | Bolt Length (mm) | RF Dia (mm)
+
+Datos para Class 150:
+1/2" → 89.0, 11.2, 60.5, 4, 12.7 (1/2"), -, 34.9
+3/4" → 98.5, 12.7, 69.9, 4, 12.7, -, 42.9
+1" → 108.0, 14.2, 79.2, 4, 12.7, -, 50.8
+1-1/4" → 117.5, 15.7, 88.9, 4, 12.7, -, 63.5
+1-1/2" → 127.0, 17.5, 98.6, 4, 12.7, -, 73.2
+2" → 152.4, 19.0, 120.7, 4, 15.8 (5/8"), -, 92.1
+2-1/2" → 177.8, 22.4, 139.7, 4, 15.8, -, 104.6
+3" → 190.5, 23.8, 152.4, 4, 15.8, -, 127.0
+3-1/2" → 215.9, 23.8, 177.8, 8, 15.8, -, 139.7
+4" → 228.6, 23.8, 190.5, 8, 15.8, -, 157.2
+5" → 254.0, 23.8, 215.9, 8, 19.0 (3/4"), -, 185.7
+6" → 279.4, 25.4, 241.3, 8, 19.0, -, 215.9
+8" → 342.9, 28.4, 298.5, 8, 19.0, -, 269.7
+10" → 406.4, 30.2, 362.0, 12, 22.2 (7/8"), -, 323.9
+12" → 482.6, 31.8, 431.8, 12, 22.2, -, 381.0
+14" → 533.4, 34.9, 476.3, 12, 25.4 (1"), -, 412.8
+16" → 596.9, 36.5, 539.8, 16, 25.4, -, 469.9
+18" → 635.0, 39.6, 577.9, 16, 28.4 (1-1/8"), -, 533.4
+20" → 698.5, 42.9, 635.0, 20, 28.4, -, 584.2
+24" → 812.8, 47.6, 749.3, 20, 31.8 (1-1/4"), -, 692.2
+
+Incluir tambien datos para Class 300 (los valores cambian). Puedes encontrar datos Class 300 en ASME B16.5.
+
+Para las demas clases (600, 900, 1500, 2500) mostrar placeholder "Data coming soon" por ahora.
+
+Select dropdown para elegir la clase.
+Mismos estilos de tabla que Tab 1.
+
+#### TAB 3: BOLT TORQUE (ASME PCC-1 Reference)
+
+Tabla con valores de torque para pernos de brida:
+
+Columnas: Bolt Size | Grade B7 Lubricated (Nm) | Grade B7 Dry (Nm) | Grade B8 Lubricated (Nm) | Grade B8 Dry (Nm)
+
+Datos:
+1/2" (M12) → 47, 68, 26, 38
+5/8" (M16) → 95, 136, 54, 78
+3/4" (M20) → 169, 244, 95, 136
+7/8" (M22) → 271, 390, 149, 214
+1" (M24) → 406, 583, 224, 322
+1-1/8" (M27) → 583, 840, 325, 468
+1-1/4" (M30) → 813, 1170, 447, 644
+1-3/8" (M33) → 1085, 1560, 597, 861
+1-1/2" (M36) → 1424, 2049, 779, 1120
+1-5/8" (M39) → 1810, 2605, 990, 1424
+1-3/4" (M42) → 2278, 3278, 1234, 1776
+
+Warning amarillo debajo de la tabla:
+"Values are for reference only. Always follow the project specification and flange manufacturer recommendations. Torque values assume ASME PCC-1 guidelines."
+
+### 3. Modificar src/pages/Tools.tsx
+
+Agregar al array TOOLS una nueva herramienta DESPUES de la existente 'unit-converter':
+{ key: 'pipe-data', nameKey: 'tools.pipeData', icon: Table2, categoryKey: 'tools.categoryReference' }
+
+Importar Table2 de lucide-react en las importaciones existentes.
+
+Importar PipeDataTables:
+import PipeDataTables from '@/tools/PipeDataTables';
+
+Agregar renderizado condicional:
+) : active === 'pipe-data' ? (
+  <PipeDataTables userId={user?.id} />
+) : (
+
+NO modificar el Wall Thickness ni el Unit Converter.
+
+### 4. Agregar i18n keys
+
+En en.json seccion "tools":
+"pipeData": "Pipe Data Tables",
+"pipeDataSubtitle": "Pipe dimensions, flange data and bolt torque reference",
+"tabPipeDimensions": "Pipe Dimensions",
+"tabFlangeDimensions": "Flange Dimensions",
+"tabBoltTorque": "Bolt Torque",
+"searchSize": "Search by NPS or DN...",
+"toggleUnits": "Toggle mm / inches",
+"flangeClass": "Flange Class",
+"weight": "Weight",
+"bolted": "Bolted",
+"lubricated": "Lubricated",
+"dry": "Dry (unlubricated)",
+"boltSize": "Bolt Size",
+"torqueWarning": "Values are for reference only. Always follow the project specification and flange manufacturer recommendations.",
+"schedule": "Schedule",
+"wallThicknessCol": "WT (mm)",
+"comingSoonData": "Data for this class coming soon"
+
+En es.json seccion "tools":
+"pipeData": "Tablas de Datos de Tubería",
+"pipeDataSubtitle": "Dimensiones de tubería, datos de bridas y torque de pernos",
+"tabPipeDimensions": "Dimensiones Tubería",
+"tabFlangeDimensions": "Dimensiones Bridas",
+"tabBoltTorque": "Torque de Pernos",
+"searchSize": "Buscar por NPS o DN...",
+"toggleUnits": "Alternar mm / pulgadas",
+"flangeClass": "Clase de Brida",
+"weight": "Peso",
+"bolted": "Atornillado",
+"lubricated": "Lubricado",
+"dry": "Seco (sin lubricar)",
+"boltSize": "Tamaño perno",
+"torqueWarning": "Valores de referencia. Sigue siempre la especificación del proyecto y las recomendaciones del fabricante.",
+"schedule": "Schedule",
+"wallThicknessCol": "WT (mm)",
+"comingSoonData": "Datos para esta clase próximamente"
+
+## Resumen de archivos
+
+CREAR:
+- src/components/ui/tabs.tsx (shadcn/ui Tabs wrapper)
+- src/tools/PipeDataTables.tsx
+
+MODIFICAR:
+- src/pages/Tools.tsx (agregar tool + import + renderizado)
+- src/i18n/locales/en.json
+- src/i18n/locales/es.json
+
+NO TOCAR:
+- Wall Thickness Calculator
+- UnitConverter.tsx

@@ -1,0 +1,65 @@
+{
+  "status": "success",
+  "results": [
+    {
+      "status": "success",
+      "filename": "PB-ASSET-0001_elbow-90-lr-bw_detail.png",
+      "url": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5olycaiza/PB-ASSET-0001_elbow-90-lr-bw_detail.png",
+      "path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5olycaiza/PB-ASSET-0001_elbow-90-lr-bw_detail.png",
+      "absolute_path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5olycaiza/PB-ASSET-0001_elbow-90-lr-bw_detail.png"
+    },
+    {
+      "status": "success",
+      "filename": "PB-ASSET-0002_tee-equal-bw_detail.png",
+      "url": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5oyqcai2q/PB-ASSET-0002_tee-equal-bw_detail.png",
+      "path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5oyqcai2q/PB-ASSET-0002_tee-equal-bw_detail.png",
+      "absolute_path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5oyqcai2q/PB-ASSET-0002_tee-equal-bw_detail.png"
+    },
+    {
+      "status": "success",
+      "filename": "PB-ASSET-0003_reducer-concentric-bw_detail.png",
+      "url": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5phicaiyq/PB-ASSET-0003_reducer-concentric-bw_detail.png",
+      "path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5phicaiyq/PB-ASSET-0003_reducer-concentric-bw_detail.png",
+      "absolute_path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5phicaiyq/PB-ASSET-0003_reducer-concentric-bw_detail.png"
+    },
+    {
+      "status": "success",
+      "filename": "PB-ASSET-0004_reducer-eccentric-bw_detail.png",
+      "url": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5puacaiya/PB-ASSET-0004_reducer-eccentric-bw_detail.png",
+      "path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5puacaiya/PB-ASSET-0004_reducer-eccentric-bw_detail.png",
+      "absolute_path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5puacaiya/PB-ASSET-0004_reducer-eccentric-bw_detail.png"
+    },
+    {
+      "status": "success",
+      "filename": "PB-ASSET-0005_cap-bw_detail.png",
+      "url": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5qcycaiza/PB-ASSET-0005_cap-bw_detail.png",
+      "path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5qcycaiza/PB-ASSET-0005_cap-bw_detail.png",
+      "absolute_path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-13/smp5qcycaiza/PB-ASSET-0005_cap-bw_detail.png"
+    },
+    {
+      "status": "success",
+      "filename": "PB-ASSET-FICHA-MOCKUP-001_desktop_obra.png",
+      "url": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-19/syuyfuycaizq/PB-ASSET-FICHA-MOCKUP-001_desktop_obra.png",
+      "path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-19/syuyfuycaizq/PB-ASSET-FICHA-MOCKUP-001_desktop_obra.png",
+      "absolute_path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-19/syuyfuycaizq/PB-ASSET-FICHA-MOCKUP-001_desktop_obra.png"
+    },
+    {
+      "status": "success",
+      "filename": "PB-ASSET-FICHA-MOCKUP-001_desktop_ingenieria.png",
+      "url": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-19/syuygbycai2a/PB-ASSET-FICHA-MOCKUP-001_desktop_ingenieria.png",
+      "path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-19/syuygbycai2a/PB-ASSET-FICHA-MOCKUP-001_desktop_ingenieria.png",
+      "absolute_path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-19/syuygbycai2a/PB-ASSET-FICHA-MOCKUP-001_desktop_ingenieria.png"
+    },
+    {
+      "status": "success",
+      "filename": "PB-ASSET-FICHA-MOCKUP-001_mobile_obra.png",
+      "url": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-19/syuygqicaiza/PB-ASSET-FICHA-MOCKUP-001_mobile_obra.png",
+      "path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-19/syuygqicaiza/PB-ASSET-FICHA-MOCKUP-001_mobile_obra.png",
+      "absolute_path": "https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-07-19/syuygqicaiza/PB-ASSET-FICHA-MOCKUP-001_mobile_obra.png"
+    }
+  ],
+  "success_count": 8,
+  "failed_count": 0,
+  "running_count": 0,
+  "message": "Generated 8/8 images total"
+}

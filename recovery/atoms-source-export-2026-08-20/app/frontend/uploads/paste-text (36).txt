@@ -1,0 +1,66 @@
+BUGFIX — Candidate profile access denied from Company Candidates.
+
+IMPORTANT:
+Do not redesign anything.
+Do not expose all profiles publicly.
+Do not weaken normal user privacy.
+
+CURRENT STATUS:
+
+* Company Candidates now shows real applicants.
+* Clicking "View Profile" opens candidate profile route.
+* But it shows "Access Denied".
+
+GOAL:
+Allow authorized company users and admin preview mode to view candidate profiles when the candidate applied to their job.
+
+TASKS:
+
+1. Inspect the candidate profile route:
+   /candidate/:userId
+   or current candidate profile route.
+
+2. Update route access logic.
+
+Authorized access should be allowed for:
+
+* primary admin: [gaspardelhierromata@gmail.com](mailto:gaspardelhierromata@gmail.com)
+* admin role
+* jobs_moderator role
+* real company user if there is an application where:
+  app_14da0f1941_job_applications.user_id = candidateUserId
+  AND app_14da0f1941_job_applications.company_user_id = auth.uid()
+* admin preview mode = Company View, for testing only
+
+3. In Admin Preview Company View:
+   allow viewing candidate profile for applications visible in /company/candidates.
+
+4. Candidate profile should load profile data from:
+   app_14da0f1941_profiles
+
+using:
+id = candidateUserId
+or the correct profile user_id field used by the app.
+
+5. Do not require the viewer to be the same user as candidate.
+
+6. Keep normal worker privacy:
+   Workers can only view their own profile unless explicitly allowed by application relationship.
+
+7. Add safe RLS if needed:
+
+* user can read own profile
+* primary admin can read all profiles
+* company can read profile only if candidate applied to one of its jobs
+* jobs_moderator can read candidate profiles
+
+8. Add console logging:
+
+* viewer user id
+* viewer role
+* preview mode
+* candidate user id
+* access check result
+
+EXPECTED RESULT:
+From /company/candidates, clicking "View Profile" opens the real candidate profile instead of Access Denied.

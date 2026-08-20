@@ -1,0 +1,45 @@
+Investigate and fix the profile onboarding upload issues reported by users.
+
+Current problems:
+1. Users cannot upload CV files.
+2. Users cannot upload profile photos.
+3. In the years of experience field, the input shows “0” by default and users have to delete it manually.
+
+Tasks:
+- Review the full onboarding/profile update flow.
+- Review CV upload logic.
+- Review profile photo upload logic.
+- Review Supabase Storage buckets, upload paths, file validation and public/signed URL generation.
+- Check whether RLS policies or bucket policies are blocking normal authenticated users.
+- Check console/network errors during upload.
+- Add clear user-facing error messages if upload fails.
+- Do not show fake success if upload fails.
+- Ensure uploaded CV/photo URL is saved correctly in the user profile table.
+- Ensure refreshing the page does not lose already saved profile data.
+
+Storage requirements:
+- Profile photos should support jpg, jpeg, png, webp.
+- CV should support pdf, doc, docx.
+- Use safe filenames with user_id and timestamp.
+- Avoid spaces and special characters in storage paths.
+- Create bucket if missing, or document exact required bucket names.
+- Ensure authenticated users can upload only to their own folder.
+- Ensure users can read their own uploaded files.
+- Admins can read all uploaded files.
+
+Years of experience field:
+- Do not default to 0.
+- Initial value should be empty/null if the user has not entered anything.
+- Placeholder should show example text like “e.g. 5”.
+- Only save a number when the user actually enters one.
+- Prevent NaN values.
+- Allow 0 only if the user intentionally types 0.
+
+Acceptance criteria:
+- A new user can upload profile photo successfully.
+- A new user can upload CV successfully.
+- The profile photo appears immediately after upload.
+- The CV remains saved after refresh.
+- The profile table stores correct photo_url and cv_url/document_url.
+- Years of experience field is empty by default, not 0.
+- Build and lint pass.

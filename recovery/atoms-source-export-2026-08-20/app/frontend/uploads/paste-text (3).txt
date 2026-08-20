@@ -1,0 +1,70 @@
+Do not integrate BuddyBoss or WordPress.
+
+Build a native PipingBox Community module inside the existing React + Vite + Supabase app.
+
+The Community should work like a lightweight industrial Reddit/Discord hybrid.
+
+Create:
+
+1. Community channels page
+- Show existing channels
+- Each channel has name, description, member count, post count
+- Open channel button
+
+2. Channel detail page
+Route:
+/community/:channelSlug
+
+Show:
+- Channel title
+- Channel description
+- List of posts
+- Create post button
+- Search/filter posts
+
+3. Post creation
+Fields:
+- Title
+- Body
+- Channel
+- Optional tags
+- Optional attachment-ready structure for future
+
+4. Post detail page
+Route:
+/community/:channelSlug/post/:postId
+
+Show:
+- Post title
+- Body
+- Author profile
+- Created date
+- Comments
+- Add comment form
+- Useful/like button
+
+5. Supabase tables:
+community_channels
+community_posts
+community_comments
+community_post_likes
+saved_posts
+
+6. Security:
+Use RLS.
+Users can:
+- Read public community content
+- Create posts only when authenticated
+- Edit/delete only their own posts
+- Comment only when authenticated
+Admins can moderate all content
+
+7. Design:
+Keep Dark Industrial Minimalism.
+Use current PipingBox sidebar and top navigation.
+No mock backend.
+Use real Supabase data.
+
+Important:
+This module must be native to PipingBox and independent from WordPress/BuddyBoss.
+Build it scalable so it can later support groups, private messages, badges, verified users and company communities.

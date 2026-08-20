@@ -1,0 +1,91 @@
+Perform a COMPLETE referral system audit.
+
+Critical issue:
+A new user (Hugo Jorge Pereira Rito) registered using my referral link,
+but the referral was NOT assigned.
+
+The user account was created successfully,
+but the referral relationship failed.
+
+Investigate the ENTIRE referral flow end-to-end.
+
+Audit ALL of the following:
+
+1. Referral URL capture
+- query params
+- ref codes
+- source params
+- campaign params
+
+2. Referral persistence
+- localStorage
+- sessionStorage
+- cookies
+- auth metadata
+
+3. Signup flow
+- email/password signup
+- Google OAuth signup
+- onboarding flow
+- redirect flow
+
+4. Supabase auth integration
+- auth.users metadata
+- trigger functions
+- profile creation
+- referral insertion
+
+5. Database tables
+Check:
+- profiles
+- referrals
+- referral_logs
+- referral_events
+- onboarding tables
+- any edge functions
+
+6. Detect where the referral is being lost
+
+Very important:
+Trace the COMPLETE lifecycle:
+referral click
+→ landing
+→ signup
+→ auth creation
+→ onboarding
+→ profile creation
+→ referral assignment
+
+Also verify:
+- race conditions
+- async failures
+- redirect resets
+- OAuth callback issues
+- onboarding overwrites
+- missing metadata mapping
+
+Then:
+
+A) Fix the referral system permanently
+B) Ensure referrals work for:
+   - email signup
+   - Google OAuth
+   - onboarding continuation
+C) Add fallback recovery logic
+D) Prevent lost referrals forever
+
+Add:
+- console logs
+- server logs
+- Supabase logs
+- debug mode
+
+Finally:
+Create an admin diagnostic panel showing:
+- captured referral
+- assigned referral
+- missing referral reason
+- referral lifecycle state
+
+Goal:
+Referral attribution must be 100% reliable.

@@ -1,0 +1,92 @@
+# Progress
+
+## Task Breakdown
+- [x] Create BranchLayoutTool component (branch-layout)
+- [x] Create UnitConverterTool component (unit-converter)
+- [x] Create PipeDimensionsTool component (pipe-dimensions)
+- [x] Create PressureDropTool component (pressure-drop)
+- [x] Update Tools.tsx to register new tools and import components
+- [x] Add i18n keys for all new tools (en.json + es.json)
+- [x] Complete translations for de.json, fr.json, nl.json, pt.json (including pipeData/pd keys)
+- [x] Create vca-questions.ts (re-export with typed interface)
+- [x] Create vca-lessons.ts (22 modules with rich lesson content)
+- [x] Create LessonRenderer.tsx component
+- [x] Create AcademyModule.tsx page (Study + Quiz tabs)
+- [x] Add route /academy/:moduleId in App.tsx
+- [x] Update Academy.tsx with VCA module grid navigation
+- [x] Add i18n keys for module page (en, es, nl)
+- [x] Create AcademyExam.tsx (3-phase exam simulator: intro, exam, results)
+- [x] Add route /academy/exam/:examType in App.tsx
+- [x] Add exam i18n keys (en.json + es.json)
+- [x] Create supabase/migrations/academy_tables.sql (3 tables + RLS + indexes)
+- [x] Add academyProgress/academyMockExams/academyExamAnswers to TABLES in supabase.ts
+- [x] Create src/lib/certificate-generator.ts (jsPDF landscape A4 dark/gold)
+- [x] Integrate certificate download in Academy.tsx with tabs (Courses/VCA/Certificates)
+- [x] Rewrite Index.tsx landing page with real Supabase count queries, spec-compliant FAQ, proper icons
+- [x] Update landing i18n keys (en.json + es.json) with new hero, FAQ, stats, footer content
+- [x] Add ASME B16.5 flange data for Class 600, 900, 1500, 2500 to PipeDimensionsTool
+- [x] Redesign ElbowCut SVG with realistic pipe body, straight extensions, filled sections, dimension labels
+- [x] Create ToolBase reusable component with standardized sections
+- [x] Create BoltsNutsTool with SVG technical drawing (ANSI B16.5)
+- [x] Create FlangesTool with SVG technical drawing (ANSI B16.5)
+- [x] Redesign Tools.tsx with card-based catalog grid + new color scheme
+- [x] Update i18n keys for new tools and catalog
+- [x] Create VCAExamBookingPage.tsx (public page with course/booking/pricing tabs)
+- [x] Create VCACourseContent.tsx component (module accordion with lessons)
+- [x] Create VCAExamBooking.tsx component (exam centers list with filters)
+- [x] Add public routes /academy/vca-course and /academy/vca-booking in App.tsx
+- [x] Add VCA CTA section to Index.tsx landing page with stats and links
+- [x] Add VCA Academy link in landing page navbar and footer
+- [x] Add social proof section to Index.tsx (testimonials + trust badges)
+- [x] Update all locale files (en, de, fr, nl, pt) with complete landing section including socialProof keys
+- [x] Create useJobCredits.ts hook (query job_credits table by user_id)
+- [x] Create PricingCards.tsx component (3 plans: Single $49, Pack 5 $199, Pack 10 $349)
+- [x] Create create-checkout-session edge function (Stripe Checkout with JWT verification)
+- [x] Create stripe-webhook edge function (checkout.session.completed → insert credits)
+- [x] Create job_credits_table.sql migration (table + RLS policies + index)
+- [x] Add jobCredits to TABLES in supabase.ts
+- [x] Integrate credits banner + pricing modal in CompanyDashboard.tsx
+- [x] Extract TrustMetrics.tsx (animated counter + metric cards) from Jobs.tsx
+- [x] Extract JobSkeleton.tsx from Jobs.tsx
+- [x] Create JobDetail.tsx (modal detail panel with job info + apply)
+- [x] Create SavedJobs.tsx (localStorage-based saved jobs section)
+- [x] Refactor Jobs.tsx to import extracted components (196 lines, under 200)
+- [x] Configure PWA with vite-plugin-pwa (manifest, workbox, icons, update prompt)
+- [x] Improve onboarding wizard UX (role selection cards, stepped progress bar, skills/company info steps, role-based redirect)
+- [x] Verify and integrate Accessories Library tool (14 fitting categories, toolRegistry, /free-tools public route, i18n EN/ES)
+- [x] PB-028: Redesign AccessoriesLibrary with realistic inline SVG drawings, detail card for selected accessories, i18n sync (6 locales)
+- [x] BRAIN-TOOLS-003: Complete Branch Connection Calculator (hole size, saddle profile, reinforcement pad ASME B31.3, cross-section SVG, printable template)
+- [x] Add i18n translations for Color Lookup tool in all 6 locales (en, es, nl, fr, de, pt) with `color` namespace
+- [x] Apply visual polish to ColorLookup.tsx (gradient header, animated results, improved swatch, copy feedback, better spacing)
+- [x] PB-ASSET-FICHA-MOCKUP-001: Create AccessoryDetailPage.tsx (full technical data sheet for Codo 90° LR BW)
+- [x] Create AccessoriesLibrary.tsx stub with family grid and pilot accessory navigation
+- [x] Generate 3 UI mockup images for AccessoryDetailPage (desktop obra, desktop ingeniería, mobile obra)
+- [x] Wire AccessoriesLibrary + AccessoryDetailPage into Tools.tsx catalog and detail view
+- [x] ATOM-002: Generate 3 YAML files for PIDM catalog (ASME B36.10M pipe schedules) — 193 rows validated
+- [x] ATOM-003: Generate 5 YAML files for PIDM catalog (ASME B16.5 Class 300 flanges: SO, BL, SW, THD, LJ) — 100 rows validated
+- [x] ATOM-004: Generate 4 YAML files for PIDM catalog (Valves Class 300+600: Gate, Globe, Ball, Check) — 104 rows validated
+- [x] ATOM-005: Generate 4 YAML files for PIDM catalog (Gaskets ASME B16.20: 2 PB-COMP + 2 PB-DIM, Spiral Wound 40 rows + Ring Joint 57 rows) — 97 rows validated
+- [x] ATOM-006: Generate 1 YAML file for PIDM catalog (Stud Bolts Class 300+600, 20 NPS × 2 clases = 40 rows) — validated
+- [x] STRIPE-CATALOG: Setup completo en TEST MODE — 12 productos, 11 precios, metadata OK, 0 discrepancias, webhook confirmado
+- [x] CLEAN-FABRICATED-DATA: Eliminados todos los datos fabricados de Jobs/Companies (STATIC_JOBS, FeaturedCarousel, ActivityFeed, TRUST metrics, directorio hardcodeado). 19/19 cadenas prohibidas ausentes en bundle. Solo queda "static-page" (infraestructura Vite prerender, legítimo).
+
+## Progress Log
+- 2026-06-28: Starting implementation of 4 new tools + i18n completion
+- 2026-06-28: All 4 tools implemented, Tools.tsx updated, i18n 100% for all 6 locales. Lint clean, build success.
+- 2026-07-01: Rewrote PipeDimensionsTool with 3 tabs (Pipe Dimensions ASME B36.10M with 15 schedules, Flange Dimensions ASME B16.5 Class 150/300, Bolt Torque ASME PCC-1). Created tabs.tsx shadcn/ui component.
+- 2026-07-01: Rewrote ElbowCutTool with full SVG visualization, slider, ASME B16.9 elbow data, common angles table, mm/in toggle. Created slider.tsx shadcn/ui component and src/tools/data/elbowData.ts.
+- 2026-07-01: Updated i18n (en.json + es.json) with all new keys. Lint clean, build success.
+- 2026-07-01: Created AcademyExam.tsx with full exam simulator (intro/exam/results phases, timer, Fisher-Yates shuffle, navigation grid, Supabase save). Added exam i18n keys. Lint clean, build success.
+- 2026-07-01: Created academy_tables.sql migration (3 tables with RLS), certificate-generator.ts (jsPDF dark/gold A4 landscape), updated TABLES in supabase.ts, refactored Academy.tsx with 3 tabs including certificate download. Lint clean, build success.
+- 2026-07-04: Rewrote Index.tsx landing page: real Supabase count queries (workers/companies), spec FAQ (VCA pricing, free tools, no official cert), UserCheck/Calculator icons, "Explore tools" CTA, "Made in Europe" footer. Updated en.json + es.json. Lint clean, build success.
+- 2026-07-04: Refactored Jobs.tsx into modular structure: extracted Job type to src/lib/jobs/types.ts, moved static data/helpers to src/lib/jobs/static-data.ts, created ActivityFeed, FeaturedJobCard, ApplyJobButton components. Updated all imports. Lint clean, build success.
+- 2026-07-05: FEAT Flange Library v2.0 — Complete redesign of FlangesTool.tsx with professional technical SVG drawings (WN/SO/BL), dimension lines with arrows, visibility toggles, modal with tabs, cross-linking section, improved cards.
+- 2026-07-05: Phase 2 — Flange Library guided flow (Standard→Type→Class→NPS→Result), added 400# and 2500# pressure classes, renamed "Pipe Data Tables" to "Pipe Library" in all 6 locales (en/es/nl/de/fr/pt), unit toggle in detail modal. Lint clean, build success.
+- 2026-07-08: PB-028 — Redesigned AccessoriesLibrary.tsx: replaced emoji icons with 14 realistic inline SVG technical drawings (elbows, tees, reducers, caps, valves, flanges, stud bolts, gaskets, stub ends, olets, socket weld, threaded, spectacle blinds, Y-strainers). Added detail card showing only selected element's dimensions/advance/prefab data. Added Select filters (NPS, type, class). Added new i18n keys (allSizes, all, searchPlaceholder, selectRow, advanceNote, advanceLabel) to all 6 locales. TSC clean, lint clean, build success.
+- 2026-07-08: BRAIN-TOOLS-003 — Complete rewrite of BranchLayoutTool.tsx into full Branch Connection Calculator: NPS+Schedule selectors for header/branch, hole size calculation, ASME B31.3 §304.3.3 reinforcement area analysis (A_req, A1, A2), pad sizing (thickness/OD/width), cross-section SVG with dimension lines and pad visualization, improved flat pattern SVG with filled area and min/max markers, isometric 3D view with pad ring, dimension table with arc length column. i18n updated for all 6 locales (en/es/nl/de/fr/pt). TSC clean, lint clean, build success.
+- 2026-07-19: PB-ASSET-FICHA-MOCKUP-001 — Created AccessoryDetailPage.tsx: Zone A (breadcrumb, title, ID, APROBADO badge, unit toggle), Zone B (5 tabs), Vista Rápida (image+data+table+accordion consejo+CTA), Dimensiones (NPS/Schedule selectors, full table, SVG placeholder, 3D MVP2 placeholder), Normativa (standards+materials), Compatibilidades (hierarchical list Pipe/Flange/Valve/Gasket), Descargas (4 download items). Modo Obra (simplified) vs Modo Ingeniería (all tabs) toggle. Palette matches spec (#0a0a0a/#0d0d0d/#111/amber-500/green-500). Mobile responsive (stacked, select tabs, horizontal scroll table). Created AccessoriesLibrary.tsx stub with family grid navigation. TSC clean, lint clean, build success.
+- 2026-07-26: ATOM-002 — Generated 3 YAML files for PIDM catalog (ASME B36.10M): PB-STD-ASME-B36-10M.yaml (norma), PB-COMP-PIPE-SEAMLESS-ASME-B36-10M.yaml (componente maestro), PB-DIM-ASME-B36-10M-PIPE.yaml (193 filas dimensionales, 23 NPS × schedules reales). Validación Python: OD correctos, ID=OD-2*WT ✓, fórmula peso ✓, STD=SCH40 para NPS≤10 ✓. 1 corrección de redondeo aplicada (NPS 24 SCH 160).
+- 2026-07-26: ATOM-003 — Generated 5 YAML files for PIDM catalog (ASME B16.5 Class 300 flanges): SO, BL, SW, THD, LJ. 20 filas × 5 tipos = 100 filas totales. Validación Python: BL sin bore/hub ✓, SW con socket_depth ✓, LJ con flange_od ✓, SO/THD con bore+hub ✓, class=300 en todas ✓, OD/bolt pattern consistente entre tipos ✓.
+- 2026-07-26: ATOM-004 — Generated 4 YAML files for PIDM catalog (Valves Class 300+600): Gate (API 600), Globe (API 600), Ball (API 608), Check (API 594). 13 NPS × 2 clases × 4 tipos = 104 filas totales. Validación Python: F2F Class 600 ≥ Class 300 ✓, Weight Class 600 > Class 300 ✓, Globe F2F > Gate F2F (13/13) ✓, Gate=Ball=Check F2F Class 300 (long pattern) ✓, mm=in×25.4 ✓, DN mapping correcto ✓.
+- 2026-07-26: ATOM-005 — Generated 4 YAML files for PIDM catalog (Gaskets ASME B16.20): 2 PB-COMP (Spiral Wound CGI + Ring Joint Oval/Oct) + 2 PB-DIM (SW: 20 NPS × 2 clases = 40 filas, RJ: 19 NPS × 3 clases = 57 filas). Total: 97 filas. Validación Python: inner_ring_id < gasket_id ✓, gasket_od < centering_ring_od ✓, thickness=0.175 ✓, ring_number R-xx format ✓, pitch_diameter entre ID y OD ✓, height > width ✓.
+- 2026-07-26: ATOM-006 — Generated 1 YAML file (PB-DIM-STUD-BOLTS-CLASS300-600.yaml): 20 NPS × 2 clases = 40 filas. Validación Python: num_studs = flange num_bolts 20/20 ✓, stud_dia = flange bolt_dia 20/20 ✓, C600 length ≥ C300 20/20 ✓, C600 dia ≥ C300 20/20 ✓, mm conversions 80/80 ✓, nut_size = stud_dia 40/40 ✓.

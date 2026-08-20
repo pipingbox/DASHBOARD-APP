@@ -1,0 +1,56 @@
+Add full company logo support to Company Profile.
+
+Current issue:
+Company accounts do not have a company logo/avatar system. The top-right avatar still uses the personal user image instead of a company identity.
+
+Required features:
+
+1. Add company logo upload section to Company Profile
+- Upload image
+- Replace image
+- Remove image
+- Preview image
+- Accept PNG/JPG/WebP
+- Max 5MB
+
+2. Store logo in Supabase Storage
+Suggested bucket:
+- company-logos
+
+3. Save logo URL/path in company profile table
+
+4. Display company logo in:
+- Top-right navbar avatar (Company View)
+- Company cards
+- Candidate/company interactions
+- Job postings
+- Company Profile page
+- Search results
+
+5. Fallback behavior
+If no logo exists:
+- Show industrial company placeholder icon
+- NOT worker avatar
+
+6. Permissions
+- Only company owner/admin can edit logo
+- Workers cannot modify company logo
+
+7. UI requirements
+- Same dark industrial design system
+- Rounded professional company avatar style
+- Responsive
+- Keep existing worker avatar system separate
+
+8. Technical requirements
+- Do not break worker profile photos
+- Separate company identity from worker identity
+- Use existing upload/storage architecture where possible
+- Add loading + success/error states
+
+Acceptance criteria:
+- Company can upload logo
+- Logo persists after refresh/login
+- Navbar avatar changes to company logo in Company View
+- Worker View still shows worker avatar
+- Build and lint pass

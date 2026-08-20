@@ -1,0 +1,21 @@
+schema_version: "1.0.0"
+id: PB-STD-ASME-B36-10M
+organization: ASME
+code: B36.10M
+designation: ASME B36.10M
+title: Welded and Seamless Wrought Steel Pipe
+edition: "2018"
+status: active
+scope: >
+  Covers the standardization of dimensions of welded and seamless
+  wrought steel pipe for high or low temperatures and pressures.
+roles:
+  - dimensions
+  - wall_thickness
+  - schedules
+applicable_families:
+  - pipe
+source:
+  url: https://www.asme.org/codes-standards/find-codes-standards/b36-10m
+  license_note: Dimensional data from public reference tables.
+  access_date: "2026-07-26"

@@ -1,0 +1,78 @@
+He revisado Supabase directamente.
+
+Proyecto activo: pipingbox
+Tabla existente: public.beta_feedback_reports
+La tabla existe, pero actualmente tiene 0 reportes.
+Buckets actuales:
+- app_14da0f1941_avatars
+- app_14da0f1941_certificates
+- worker-documents
+
+No existe bucket para capturas de feedback.
+
+Necesito corregir el sistema Feedback Beta.
+
+Objetivo:
+Hacer que el envío de reportes funcione correctamente con o sin imagen adjunta.
+
+Implementar:
+
+1. Crear o usar bucket de Supabase Storage:
+- Nombre: feedback-screenshots
+- Uso: guardar capturas adjuntas a reportes beta
+- Tipos permitidos: jpg, jpeg, png, webp
+- Tamaño máximo: 5 MB
+
+2. Flujo sin imagen:
+- Si el usuario no adjunta imagen, NO intentar subir archivo.
+- Insertar igualmente el reporte en public.beta_feedback_reports.
+- Guardar screenshot_url como null.
+
+3. Flujo con imagen:
+- Subir primero la imagen al bucket feedback-screenshots.
+- Crear nombre único:
+  feedback/{user_id_or_anonymous}/{timestamp}-{filename}
+- Guardar la URL o path resultante en screenshot_url.
+- Después insertar el reporte en beta_feedback_reports.
+
+4. Tabla beta_feedback_reports:
+Usar la tabla existente. No crear otra.
+Campos actuales:
+- id
+- created_at
+- user_id
+- user_email
+- category
+- description
+- screenshot_url
+- page_url
+- user_agent
+- screen_size
+- status
+- priority
+
+5. RLS / permisos:
+- Usuarios autenticados deben poder insertar reportes.
+- Usuarios autenticados deben poder subir imágenes al bucket feedback-screenshots.
+- Solo admins deben poder leer todos los reportes.
+- Si todavía no existe lógica clara de admin, mantener el panel admin protegido con el sistema actual de roles de la app.
+
+6. Manejo de errores:
+- Reemplazar “TypeError: Failed to fetch” por mensajes claros.
+- Añadir console.error detallado para:
+  - error de conexión Supabase
+  - error de subida a Storage
+  - error de insert en beta_feedback_reports
+  - error de permisos RLS
+- El usuario debe ver:
+  “No se pudo enviar el reporte. Inténtalo de nuevo.”
+- Si el envío funciona:
+  “Reporte enviado correctamente.”
+
+7. Importante:
+- No romper el diseño actual del modal.
+- No romper las traducciones i18n.
+- No romper el panel admin.
+- El reporte debe enviarse aunque no haya imagen.
+- No guardar archivos binarios en la tabla.
+- Solo guardar screenshot_url o screenshot_path.

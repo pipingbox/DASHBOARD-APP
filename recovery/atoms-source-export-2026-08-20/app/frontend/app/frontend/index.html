@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/logos/logo-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/logos/logo-icon.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/assets/logos/logo-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/logos/logo-icon.png" />
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Theme & App Identity -->
+    <meta name="theme-color" content="#f59e0b" />
+    <meta name="apple-mobile-web-app-title" content="PipingBox" />
+    <meta name="application-name" content="PipingBox" />
+    <meta name="msapplication-TileColor" content="#0d0d0d" />
+
+    <!-- Primary Meta Tags -->
+    <title>PipingBox — Industrial Workforce Platform | Tools, Jobs, Academy</title>
+    <meta name="title" content="PipingBox — Industrial Workforce Platform" />
+    <meta name="description" content="Free engineering tools, industrial jobs, certification training (VCA, SCC, OSHA, PRL), and community for pipefitters, welders, QA/QC inspectors, and industrial companies." />
+    <meta name="author" content="PipingBox" />
+    <meta name="keywords" content="pipefitter, welder, piping, ASME B31.3, pipe calculator, elbow cut, flange rating, VCA, SCC, OSHA, industrial jobs, pipe stress, CAESAR II, NPS, schedule" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://pipingbox.com/" />
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pipingbox.com/" />
+    <meta property="og:title" content="PipingBox — Industrial Workforce Platform" />
+    <meta property="og:description" content="Free engineering tools, industrial jobs, certification training, and community for pipefitters, welders, and industrial professionals. ASME, API, OSHA, VCA, SCC." />
+    <meta property="og:image" content="https://pipingbox.com/assets/logos/logo-horizontal.png" />
+    <meta property="og:site_name" content="PipingBox" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://pipingbox.com/" />
+    <meta name="twitter:title" content="PipingBox — Industrial Workforce Platform" />
+    <meta name="twitter:description" content="Free engineering tools, industrial jobs, certification training, and community for pipefitters, welders, and industrial professionals." />
+    <meta name="twitter:image" content="https://pipingbox.com/assets/logos/logo-horizontal.png" />
+
+    <!-- Structured Data: Organization + WebSite -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://pipingbox.com/#organization",
+          "name": "PipingBox",
+          "url": "https://pipingbox.com/",
+          "logo": "https://pipingbox.com/assets/logos/logo-horizontal.png",
+          "description": "Industrial workforce platform: engineering tools, jobs, certification training, and community for pipefitters, welders, and industrial professionals.",
+          "areaServed": ["Europe", "USA", "Latin America", "India", "Middle East"],
+          "knowsAbout": ["ASME B31.3", "API 570", "VCA", "SCC", "OSHA", "PRL", "Piping", "Welding", "Pipefitting"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://pipingbox.com/#website",
+          "url": "https://pipingbox.com/",
+          "name": "PipingBox",
+          "publisher": { "@id": "https://pipingbox.com/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://pipingbox.com/jobs?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V04RD9W0J4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-V04RD9W0J4');
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

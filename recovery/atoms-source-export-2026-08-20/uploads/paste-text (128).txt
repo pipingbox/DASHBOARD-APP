@@ -1,0 +1,134 @@
+Necesito que ejecutes una tarea de seguridad e higiene SEO sobre los proyectos de PIPINGBOX.
+No es una tarea de producto: no cambies ningún diseño, ningún texto ni ninguna funcionalidad.
+
+## CONTEXTO
+
+PIPINGBOX tiene 8 hostnames públicos desplegados en Atoms:
+
+pipingbox.com (apex)      www.pipingbox.com         app.pipingbox.com
+academy.pipingbox.com     community.pipingbox.com   tools.pipingbox.com
+jobs.pipingbox.com        companies.pipingbox.com   early.pipingbox.com
+
+He auditado los 8 y he encontrado tres defectos que necesito corregidos.
+
+## OBJETIVO 1 — HTTPS OBLIGATORIO (PRIORIDAD MÁXIMA)
+
+Problema verificado:
+
+  GET http://app.pipingbox.com/   -> 200  (sirve la aplicación real, NO redirige)
+  GET http://www.pipingbox.com/   -> 200  (idem)
+  GET https://pipingbox.com/      -> 302  Location: http://www.pipingbox.com/
+
+Es decir: la aplicación se sirve por HTTP en claro, y el apex redirige HACIA HTTP,
+degradando el protocolo.
+
+Es crítico porque app.pipingbox.com tiene el login de la plataforma y usa Supabase con
+flowType: "implicit", lo que significa que el token de acceso viaja en el fragmento de la
+URL. Nuestros usuarios son profesionales industriales que trabajan en obras y talleres con
+redes wifi compartidas.
+
+Lo que necesito:
+
+1. Que los 8 hostnames redirijan http:// a https:// con un 301 (permanente), conservando
+   la ruta y los parámetros.
+2. Que https://pipingbox.com/ haga 301 (ahora hace 302) hacia https://www.pipingbox.com/
+3. Que los 8 hostnames envíen la cabecera:
+   Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+IMPORTANTE sobre el orden del punto 3. No añadas includeSubDomains hasta haber verificado
+que los 8 subdominios sirven HTTPS con certificado válido. Si alguno queda sin certificado
+correcto, includeSubDomains lo dejaría inaccesible y el navegador recordaría esa directiva
+durante un año. Secuencia correcta: primero puntos 1 y 2, verificar los 8, y después el 3.
+
+Ten en cuenta que los hosts están en dos configuraciones distintas: www, academy y jobs
+salen por Cloudflare, y app, tools, companies, early y community salen por nginx. Puede que
+haya que aplicarlo en dos sitios.
+
+## OBJETIVO 2 — RETIRAR jobs.pipingbox.com
+
+Problema verificado: ese host está publicado con los valores por defecto de la plantilla:
+
+  <title>shadcnui</title>
+  <meta name="description" content="Atoms Generated Project">
+
+Y es indexable por Google. Es un subdominio de nuestra marca sirviendo el nombre de una
+librería de componentes.
+
+Lo que necesito: no arregles el título. Ese host se retira por decisión de arquitectura.
+Configura:
+
+  https://jobs.pipingbox.com/*   ->   301   ->   https://app.pipingbox.com/jobs
+
+Si el 301 no fuera posible de inmediato, aplica como medida puente:
+  - <meta name="robots" content="noindex,nofollow"> en el <head>
+  - robots.txt con: User-agent: *  /  Disallow: /
+
+## OBJETIVO 3 — SITEMAPS QUE APUNTAN A DOMINIOS QUE NO SON NUESTROS
+
+Problema verificado:
+
+  www.pipingbox.com      -> sitemap declarado: atoms.template.com
+  academy.pipingbox.com  -> sitemap declarado: atoms.template.com
+  early.pipingbox.com    -> sitemap declarado: m8z37s.atoms.world
+
+Esos son dominios de plantilla y de infraestructura interna de Atoms. No son nuestros y no
+existen como sitios públicos.
+
+Lo que necesito:
+  - www.pipingbox.com/robots.txt     -> Sitemap: https://www.pipingbox.com/sitemap.xml
+  - academy.pipingbox.com/robots.txt -> Sitemap: https://academy.pipingbox.com/sitemap.xml
+  - early.pipingbox.com/robots.txt   -> User-agent: * / Disallow: /   (este host se deprecia)
+
+Y que los sitemap.xml de www y academy contengan sus URLs reales, no las de la plantilla.
+
+## OBJETIVO 4 — ANALÍTICA EN LOS SATÉLITES
+
+app.pipingbox.com tiene Google Analytics con el id G-V04RD9W0J4. Los otros siete hosts no
+tienen ninguna analítica, así que no tenemos ni un dato del tráfico de 7 de nuestras 8
+puertas de entrada.
+
+Lo que necesito: instalar ese mismo gtag (G-V04RD9W0J4) en:
+  www, academy, community, tools, companies, early
+
+No en jobs, que se retira en el objetivo 2.
+
+Necesito medir esos hosts durante dos semanas antes de decidir el orden en que se retiran.
+
+## OBJETIVO 5 — PREGUNTA, NO TAREA
+
+En www.pipingbox.com, academy.pipingbox.com y jobs.pipingbox.com he detectado un backend
+respondiendo:
+
+  GET /api/v1/auth/me   ->   401   {"detail":"Authentication credentials were not provided"}
+
+He comprobado que en esos tres sitios NO hay formulario de contraseña y que su botón de
+acceso es un enlace directo a app.pipingbox.com, así que entiendo que ese endpoint es
+infraestructura de la plataforma Atoms y no un registro de usuarios de PIPINGBOX.
+
+Necesito que me lo confirmes antes de que retiremos esos proyectos:
+
+1. ¿Ese /api/v1/auth/* es de la plataforma Atoms o es un backend específico de estos
+   proyectos?
+2. ¿Existe algún registro de usuarios asociado a los proyectos de www, academy o jobs?
+3. ¿Existe algún lead, suscriptor, formulario de contacto o lista de correo capturada en
+   esos proyectos, incluido early.pipingbox.com?
+4. Si existe cualquiera de esas cosas, NO la borres: expórtala y dime dónde está.
+
+Esto es lo único que bloquea la retirada de esos hosts. No queremos apagar un proyecto y
+descubrir después que había gente registrada dentro.
+
+## RESTRICCIONES
+
+- No cambies ningún diseño, color, texto ni funcionalidad.
+- No toques app.pipingbox.com más allá de la configuración de HTTPS/HSTS. Es la aplicación
+  productiva con usuarios reales.
+- No borres ningún proyecto.
+- No modifiques nada relacionado con Supabase ni con Stripe.
+
+## INFORME QUE NECESITO
+
+1. Qué has cambiado y en qué host.
+2. Confirmación de los redirects con el código de estado real (curl -I).
+3. Confirmación de la cabecera HSTS.
+4. Respuesta a las 4 preguntas del objetivo 5.
+5. Cualquier cosa que no hayas podido hacer y por qué.

@@ -1,0 +1,65 @@
+Fix onboarding data loss permanently.
+
+Current critical issue:
+A user filled onboarding/profile data, then CV upload failed and after refreshing the page all entered information was lost.
+
+This means onboarding form data is only stored in frontend state and not safely persisted.
+
+Required fix:
+
+1. Add progressive autosave
+- Save onboarding/profile fields to Supabase immediately when the user completes or edits each field.
+- Do not wait until final submit.
+- Debounce saves by 500–1000ms.
+- Show subtle save status:
+  - Saving...
+  - Saved
+  - Error saving
+
+2. Restore draft after refresh
+- On page load, fetch the user profile from public.app_14da0f1941_profiles.
+- Prefill the onboarding/profile form with any saved data.
+- Never reset filled fields to empty if Supabase has existing data.
+
+3. Make CV upload independent
+- CV upload must not block or reset the rest of the profile.
+- If CV upload fails, keep all other form data.
+- Show a clear error message.
+- Allow retry.
+- Do not refresh the page.
+- Do not clear local form state.
+
+4. Add local backup
+- Store temporary onboarding draft in localStorage while editing.
+- Key format: pipingbox_onboarding_draft_{user_id}
+- Clear it only after Supabase save succeeds and onboarding is completed.
+- If Supabase save fails, keep local draft and restore it on reload.
+
+5. Protect against accidental refresh
+- If unsaved changes exist, warn before page unload.
+- After autosave succeeds, remove warning.
+
+6. Update onboarding status safely
+- Partial profile should stay AUTH_ONLY or ONBOARDING_STARTED.
+- When enough required fields are completed, update onboarding_status.
+- Do not mark marketplace_ready until required profile fields are complete.
+
+7. Add admin visibility
+- In admin registrations, show whether user has:
+  - auth account
+  - profile row
+  - onboarding draft saved
+  - CV uploaded
+  - last profile update timestamp
+
+8. Do not redesign the UI.
+9. Do not remove current onboarding fields.
+10. Do not break existing completed profiles.
+
+Acceptance criteria:
+- User can fill half the onboarding, refresh, and data remains.
+- CV upload failure does not erase form fields.
+- Returning user resumes onboarding where they left.
+- Supabase profile fields update progressively.
+- LocalStorage draft protects against network/upload errors.
+- Build passes.

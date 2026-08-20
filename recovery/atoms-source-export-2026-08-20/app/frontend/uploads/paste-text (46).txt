@@ -1,0 +1,82 @@
+We have two bugs in the Profile / CV and Candidate detail modules.
+
+Bug 1:
+Certifications are not displaying in the worker profile page or in the company candidate detail page.
+
+Fix requirements:
+1. Use table:
+   public.app_worker_certifications
+
+2. Fetch certifications using the authenticated worker user id in the worker Profile / CV page.
+
+3. In the company Candidate Detail page, fetch certifications using the candidate's real auth user id.
+   Do not use application id, job id, company id, or profile id.
+   Resolve the candidate user id from candidate.user_id, candidate.worker_id, applicant_id, or profile.user_id.
+
+4. Use this query:
+   supabase
+     .from("app_worker_certifications")
+     .select("*")
+     .eq("user_id", candidateUserId)
+
+5. Render using the actual column names:
+   certification_name
+   issuing_organization
+   credential_id
+   verification_url
+   issue_date
+   expiration_date
+   certificate_file_url
+
+6. Add temporary console logs:
+   - current logged user id
+   - candidate object
+   - resolved candidateUserId
+   - certifications response data
+   - certifications response error
+
+7. If data exists, render certification cards.
+8. If no data exists, show empty state.
+9. If error exists, show "Unable to load certifications."
+
+Bug 2:
+Saving certification alert preferences fails.
+
+A new table exists:
+public.app_worker_certification_alert_preferences
+
+Fields:
+- id
+- user_id
+- reminder_days
+- show_in_app
+- created_at
+- updated_at
+
+Fix requirements:
+1. When saving preferences, upsert into:
+   public.app_worker_certification_alert_preferences
+
+2. Use conflict target:
+   user_id
+
+3. Example:
+   supabase
+     .from("app_worker_certification_alert_preferences")
+     .upsert({
+       user_id: user.id,
+       reminder_days: selectedReminderDays,
+       show_in_app: showInAppWarnings,
+       updated_at: new Date().toISOString()
+     }, { onConflict: "user_id" })
+
+4. Load existing preferences when opening the Profile / CV page.
+5. If no preferences exist, default to:
+   reminder_days = 90
+   show_in_app = true
+
+6. Use try/catch/finally.
+7. Show toast success and error messages.
+8. Do not freeze the UI if saving fails.
+9. Keep current design.
+10. Do not recreate existing tables.

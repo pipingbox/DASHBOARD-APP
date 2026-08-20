@@ -1,0 +1,52 @@
+He detectado un problema importante en el sistema Feedback Beta relacionado con internacionalización (i18n).
+
+Actualmente:
+- El panel de feedback solo cambia correctamente entre español e inglés.
+- Cuando el usuario cambia el idioma global de la aplicación a francés, alemán, portugués u otros idiomas, el modal/panel de feedback permanece parcialmente en español o inglés.
+
+Quiero corregir esto correctamente.
+
+Objetivo:
+El sistema Feedback Beta debe usar exactamente el mismo sistema de internacionalización global de la aplicación.
+
+Implementa lo siguiente:
+
+1. Integración completa con i18n global
+- El modal de feedback debe reaccionar automáticamente al idioma activo de la app.
+- No usar textos hardcodeados.
+- Utilizar las mismas traducciones y hooks/context existentes del proyecto.
+
+2. Añadir soporte completo para:
+- Español
+- Inglés
+- Francés
+- Alemán
+- Portugués
+
+3. Traducir todos los textos del sistema feedback:
+- Título modal
+- Categorías
+- Placeholders
+- Botones
+- Confirmaciones
+- Mensajes beta
+- Mensajes de error
+- Tooltip del botón flotante
+
+4. Añadir fallback seguro:
+- Si falta una traducción, usar inglés por defecto.
+- Nunca mostrar undefined ni claves técnicas.
+
+5. Revisar renderizado:
+- Verificar que los textos largos en alemán o francés no rompan el layout.
+- Mantener responsive móvil.
+
+6. Código limpio
+- Centralizar todas las traducciones en archivos i18n.
+- No duplicar textos.
+- Preparar estructura para añadir idiomas futuros fácilmente.
+
+7. Importante
+- No romper el sistema actual.
+- Mantener diseño actual del modal y botón flotante.
+- Priorizar estabilidad y consistencia con el idioma global de la app.

@@ -1,0 +1,75 @@
+Accede a la cuenta Stripe vinculada al proyecto PIPINGBOX (acct_1TqIdcAL98aWullI).
+
+MODO DE TRABAJO
+- Trabaja EXCLUSIVAMENTE en test mode. No toques live mode.
+- Si detectas diferencias con lo que te indico, NO las corrijas: repórtalas.
+- No archives ni modifiques precios que ya existan.
+
+OBJETIVO 1 — Inventario
+Lista todos los productos y precios que ya existan en la cuenta, incluidos los
+que no aparezcan en la tabla de abajo.
+
+OBJETIVO 2 — Crear lo que falte
+Crea únicamente los productos de la tabla que no existan todavía.
+
+REQUISITO CRÍTICO — metadata.product_key
+Cada Price que crees DEBE llevar:
+
+    metadata: { "product_key": "<clave exacta de la tabla>" }
+
+No es opcional. Todo el código de PipingBox decide qué desbloquea una compra a
+partir de product_key. Stripe no conoce ese concepto. Sin este metadata, la
+sincronización automática posterior no tiene con qué emparejar filas.
+
+Si un producto ya existe pero su Price NO tiene metadata.product_key, no crees
+uno nuevo: repórtalo como "falta metadata". El metadata sí es editable; el
+importe no.
+
+CATÁLOGO
+
+  product_key             | importe    | tipo         | periodicidad
+  ------------------------|------------|--------------|-------------
+  premium_tools_monthly   | EUR 4.99   | subscription | month
+  premium_tools_annual    | EUR 39.00  | subscription | year
+  vca_exams_unlimited     | EUR 39.90  | one_time     | -
+  vca_course_bvca         | EUR 59.90  | one_time     | -
+  vca_course_volvca       | EUR 79.90  | one_time     | -
+  prl_course_basico       | EUR 29.90  | one_time     | -
+  vca_booking_standard    | EUR 10.00  | one_time     | -
+  vca_booking_urgent      | EUR 15.00  | one_time     | -
+  job_credit_1            | EUR 29.00  | one_time     | -
+  job_credit_5            | EUR 129.00 | one_time     | -
+  job_credit_20           | EUR 399.00 | one_time     | -
+  enterprise_annual       | negociado  | subscription | year
+
+  Son 11 Products + Prices, más 1 Product sin Price (enterprise_annual).
+
+  enterprise_annual: el importe se negocia por cliente. NO crees un Price fijo.
+  Crea solo el Product y repórtalo.
+
+  Todos los importes en EUR. En la API de Stripe van en céntimos
+  (4.99 EUR = 499).
+
+OBJETIVO 3 — Verificación
+Para cada producto comprueba y reporta:
+  - moneda == EUR
+  - importe == el de la tabla
+  - tipo (one_time / recurring) == el de la tabla
+  - periodicidad (month / year) == la de la tabla
+  - metadata.product_key presente y con el valor exacto
+  - price activo, no archivado
+
+OBJETIVO 4 — Informe
+Una tabla con una fila por precio:
+
+  product_key | product_id | price_id | tipo | importe | moneda |
+  periodicidad | metadata OK | estado | discrepancias
+
+Y por separado:
+  - Productos en Stripe que NO están en la tabla.
+  - Productos de la tabla que no se han podido crear, y por qué.
+
+OBJETIVO 5 — Webhooks
+Confirma que existe un endpoint apuntando a
+https://mwdauubztjxkbrefirbg.supabase.co/functions/v1/stripe-webhook
+y lista los eventos suscritos. No crees ni modifiques ninguno.

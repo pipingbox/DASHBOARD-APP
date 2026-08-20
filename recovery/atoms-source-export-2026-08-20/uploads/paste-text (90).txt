@@ -1,0 +1,81 @@
+CRITICAL BUG — Profile data saved/calculated but not visible or not persisted correctly.
+
+Issue:
+A test user filled these profile fields:
+- full name
+- position/title
+- current company
+- location
+- years of experience
+- skills
+- bio
+- availability and mobility
+- CV upload
+- profile photo
+
+However, after saving/refreshing:
+- title is not visible
+- company is not visible
+- location is not visible
+- years of experience remains 0
+- skills are not visible
+- bio is empty
+- photo disappears
+- CV upload says successful but CV is not visible
+- profile completion still increases, meaning some logic thinks the fields exist
+
+This means the app has a mismatch between:
+- form state
+- Supabase saved profile row
+- profile completion calculation
+- visible profile preview
+- CV/photo upload fields
+
+Fix required:
+1. Audit the Profile/CV page completely.
+2. Ensure all form fields map to the correct Supabase columns in app_14da0f1941_profiles:
+   - full_name
+   - title
+   - company
+   - location
+   - years_experience
+   - skills
+   - bio
+   - avatar_url
+   - cv_file_url
+   - cv_file_name
+   - cv_file_path
+   - employment_status
+   - availability_status
+   - available_from
+   - willing_to_travel
+   - willing_to_relocate
+   - preferred_regions
+   - rotation_preference
+   - notice_period
+3. Fix any mismatch between cv_url, cv_file_url and document tables.
+4. After CV upload, immediately update the profile row with the CV URL/path/name.
+5. After photo upload, immediately update avatar_url.
+6. Do not calculate profile completion from local temporary state. Calculate it only from saved Supabase data.
+7. After saving, refetch the profile from Supabase and render from that source.
+8. Prevent update payloads from overwriting existing values with null, empty strings or default 0.
+9. Years of experience must be empty/null by default, not 0.
+10. Skills must persist as an array and reload correctly into the input.
+11. Availability/mobility fields must persist and reload correctly.
+12. Add proper save error messages. Do not show success unless Supabase confirms update.
+13. Add console diagnostics for:
+   - save payload
+   - Supabase update response
+   - profile refetch response
+   - upload result
+   - profile completion source data
+
+Acceptance criteria:
+- User fills profile fields, saves, refreshes, and all fields remain visible.
+- Profile preview shows title, company, location, years, skills and bio correctly.
+- Profile completion only marks items completed when saved data exists in Supabase.
+- CV upload appears visible after refresh.
+- Photo upload appears visible after refresh.
+- Availability and mobility remain saved after refresh.
+- No existing values are overwritten with null/0 by partial updates.
+- Build and lint pass.

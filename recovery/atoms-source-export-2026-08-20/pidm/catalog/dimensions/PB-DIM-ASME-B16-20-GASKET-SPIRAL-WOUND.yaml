@@ -1,0 +1,653 @@
+schema_version: "1.0.0"
+id: PB-DIM-ASME-B16-20-GASKET-SPIRAL-WOUND
+component_id: PB-COMP-GASKET-SPIRAL-WOUND-ASME-B16-20
+standard_id: PB-STD-ASME-B16-20
+dataset_type: standard
+system: mixed
+
+selectors:
+  - key: nps
+    label: "Nominal Pipe Size"
+    unit: "in"
+    type: string
+  - key: dn
+    label: "Diametre Nominal"
+    unit: "mm"
+    type: integer
+  - key: class
+    label: "Pressure Class"
+    unit: ""
+    type: integer
+
+fields:
+  - key: gasket_od_in
+    label: "Gasket OD"
+    unit: "in"
+    type: number
+  - key: gasket_od_mm
+    label: "Gasket OD"
+    unit: "mm"
+    type: number
+  - key: gasket_id_in
+    label: "Gasket ID"
+    unit: "in"
+    type: number
+  - key: gasket_id_mm
+    label: "Gasket ID"
+    unit: "mm"
+    type: number
+  - key: thickness_in
+    label: "Thickness"
+    unit: "in"
+    type: number
+  - key: thickness_mm
+    label: "Thickness"
+    unit: "mm"
+    type: number
+  - key: inner_ring_id_in
+    label: "Inner Ring ID"
+    unit: "in"
+    type: number
+  - key: inner_ring_id_mm
+    label: "Inner Ring ID"
+    unit: "mm"
+    type: number
+  - key: centering_ring_od_in
+    label: "Centering Ring OD"
+    unit: "in"
+    type: number
+  - key: centering_ring_od_mm
+    label: "Centering Ring OD"
+    unit: "mm"
+    type: number
+
+rows:
+  # ═══════════════════════════════════════════════════════════
+  # Spiral Wound Gasket — ASME B16.20 (Type CGI)
+  # Class 150 — 20 NPS
+  # ═══════════════════════════════════════════════════════════
+
+  - nps: "1/2"
+    dn: 15
+    class: 150
+    gasket_od_in: 1.88
+    gasket_od_mm: 47.75
+    gasket_id_in: 0.75
+    gasket_id_mm: 19.05
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 0.63
+    inner_ring_id_mm: 16.00
+    centering_ring_od_in: 2.12
+    centering_ring_od_mm: 53.85
+
+  - nps: "3/4"
+    dn: 20
+    class: 150
+    gasket_od_in: 2.25
+    gasket_od_mm: 57.15
+    gasket_id_in: 1.00
+    gasket_id_mm: 25.40
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 0.88
+    inner_ring_id_mm: 22.35
+    centering_ring_od_in: 2.62
+    centering_ring_od_mm: 66.55
+
+  - nps: "1"
+    dn: 25
+    class: 150
+    gasket_od_in: 2.62
+    gasket_od_mm: 66.55
+    gasket_id_in: 1.25
+    gasket_id_mm: 31.75
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 1.13
+    inner_ring_id_mm: 28.70
+    centering_ring_od_in: 3.00
+    centering_ring_od_mm: 76.20
+
+  - nps: "1-1/4"
+    dn: 32
+    class: 150
+    gasket_od_in: 3.00
+    gasket_od_mm: 76.20
+    gasket_id_in: 1.63
+    gasket_id_mm: 41.40
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 1.50
+    inner_ring_id_mm: 38.10
+    centering_ring_od_in: 3.38
+    centering_ring_od_mm: 85.85
+
+  - nps: "1-1/2"
+    dn: 40
+    class: 150
+    gasket_od_in: 3.38
+    gasket_od_mm: 85.85
+    gasket_id_in: 1.88
+    gasket_id_mm: 47.75
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 1.75
+    inner_ring_id_mm: 44.45
+    centering_ring_od_in: 3.75
+    centering_ring_od_mm: 95.25
+
+  - nps: "2"
+    dn: 50
+    class: 150
+    gasket_od_in: 4.12
+    gasket_od_mm: 104.65
+    gasket_id_in: 2.38
+    gasket_id_mm: 60.45
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 2.25
+    inner_ring_id_mm: 57.15
+    centering_ring_od_in: 4.75
+    centering_ring_od_mm: 120.65
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 150
+    gasket_od_in: 4.88
+    gasket_od_mm: 123.95
+    gasket_id_in: 2.88
+    gasket_id_mm: 73.15
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 2.75
+    inner_ring_id_mm: 69.85
+    centering_ring_od_in: 5.50
+    centering_ring_od_mm: 139.70
+
+  - nps: "3"
+    dn: 80
+    class: 150
+    gasket_od_in: 5.38
+    gasket_od_mm: 136.65
+    gasket_id_in: 3.50
+    gasket_id_mm: 88.90
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 3.38
+    inner_ring_id_mm: 85.85
+    centering_ring_od_in: 6.00
+    centering_ring_od_mm: 152.40
+
+  - nps: "3-1/2"
+    dn: 90
+    class: 150
+    gasket_od_in: 5.88
+    gasket_od_mm: 149.35
+    gasket_id_in: 4.00
+    gasket_id_mm: 101.60
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 3.88
+    inner_ring_id_mm: 98.55
+    centering_ring_od_in: 6.50
+    centering_ring_od_mm: 165.10
+
+  - nps: "4"
+    dn: 100
+    class: 150
+    gasket_od_in: 6.38
+    gasket_od_mm: 162.05
+    gasket_id_in: 4.50
+    gasket_id_mm: 114.30
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 4.38
+    inner_ring_id_mm: 111.25
+    centering_ring_od_in: 7.00
+    centering_ring_od_mm: 177.80
+
+  - nps: "5"
+    dn: 125
+    class: 150
+    gasket_od_in: 7.50
+    gasket_od_mm: 190.50
+    gasket_id_in: 5.56
+    gasket_id_mm: 141.22
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 5.44
+    inner_ring_id_mm: 138.18
+    centering_ring_od_in: 8.50
+    centering_ring_od_mm: 215.90
+
+  - nps: "6"
+    dn: 150
+    class: 150
+    gasket_od_in: 8.75
+    gasket_od_mm: 222.25
+    gasket_id_in: 6.63
+    gasket_id_mm: 168.40
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 6.50
+    inner_ring_id_mm: 165.10
+    centering_ring_od_in: 9.50
+    centering_ring_od_mm: 241.30
+
+  - nps: "8"
+    dn: 200
+    class: 150
+    gasket_od_in: 10.88
+    gasket_od_mm: 276.35
+    gasket_id_in: 8.63
+    gasket_id_mm: 219.20
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 8.50
+    inner_ring_id_mm: 215.90
+    centering_ring_od_in: 11.75
+    centering_ring_od_mm: 298.45
+
+  - nps: "10"
+    dn: 250
+    class: 150
+    gasket_od_in: 13.38
+    gasket_od_mm: 339.85
+    gasket_id_in: 10.75
+    gasket_id_mm: 273.05
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 10.63
+    inner_ring_id_mm: 270.00
+    centering_ring_od_in: 14.25
+    centering_ring_od_mm: 361.95
+
+  - nps: "12"
+    dn: 300
+    class: 150
+    gasket_od_in: 15.75
+    gasket_od_mm: 400.05
+    gasket_id_in: 12.75
+    gasket_id_mm: 323.85
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 12.63
+    inner_ring_id_mm: 320.80
+    centering_ring_od_in: 16.62
+    centering_ring_od_mm: 422.15
+
+  - nps: "14"
+    dn: 350
+    class: 150
+    gasket_od_in: 17.00
+    gasket_od_mm: 431.80
+    gasket_id_in: 14.00
+    gasket_id_mm: 355.60
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 13.75
+    inner_ring_id_mm: 349.25
+    centering_ring_od_in: 18.00
+    centering_ring_od_mm: 457.20
+
+  - nps: "16"
+    dn: 400
+    class: 150
+    gasket_od_in: 19.25
+    gasket_od_mm: 488.95
+    gasket_id_in: 16.00
+    gasket_id_mm: 406.40
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 15.75
+    inner_ring_id_mm: 400.05
+    centering_ring_od_in: 20.25
+    centering_ring_od_mm: 514.35
+
+  - nps: "18"
+    dn: 450
+    class: 150
+    gasket_od_in: 21.62
+    gasket_od_mm: 549.15
+    gasket_id_in: 18.00
+    gasket_id_mm: 457.20
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 17.75
+    inner_ring_id_mm: 450.85
+    centering_ring_od_in: 22.62
+    centering_ring_od_mm: 574.55
+
+  - nps: "20"
+    dn: 500
+    class: 150
+    gasket_od_in: 23.75
+    gasket_od_mm: 603.25
+    gasket_id_in: 20.00
+    gasket_id_mm: 508.00
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 19.75
+    inner_ring_id_mm: 501.65
+    centering_ring_od_in: 24.75
+    centering_ring_od_mm: 628.65
+
+  - nps: "24"
+    dn: 600
+    class: 150
+    gasket_od_in: 27.62
+    gasket_od_mm: 701.55
+    gasket_id_in: 24.00
+    gasket_id_mm: 609.60
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 23.75
+    inner_ring_id_mm: 603.25
+    centering_ring_od_in: 29.00
+    centering_ring_od_mm: 736.60
+
+  # ═══════════════════════════════════════════════════════════
+  # Class 300 — 20 NPS
+  # ═══════════════════════════════════════════════════════════
+
+  - nps: "1/2"
+    dn: 15
+    class: 300
+    gasket_od_in: 1.88
+    gasket_od_mm: 47.75
+    gasket_id_in: 0.75
+    gasket_id_mm: 19.05
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 0.63
+    inner_ring_id_mm: 16.00
+    centering_ring_od_in: 2.12
+    centering_ring_od_mm: 53.85
+
+  - nps: "3/4"
+    dn: 20
+    class: 300
+    gasket_od_in: 2.25
+    gasket_od_mm: 57.15
+    gasket_id_in: 1.00
+    gasket_id_mm: 25.40
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 0.88
+    inner_ring_id_mm: 22.35
+    centering_ring_od_in: 2.62
+    centering_ring_od_mm: 66.55
+
+  - nps: "1"
+    dn: 25
+    class: 300
+    gasket_od_in: 2.62
+    gasket_od_mm: 66.55
+    gasket_id_in: 1.25
+    gasket_id_mm: 31.75
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 1.13
+    inner_ring_id_mm: 28.70
+    centering_ring_od_in: 3.00
+    centering_ring_od_mm: 76.20
+
+  - nps: "1-1/4"
+    dn: 32
+    class: 300
+    gasket_od_in: 3.00
+    gasket_od_mm: 76.20
+    gasket_id_in: 1.63
+    gasket_id_mm: 41.40
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 1.50
+    inner_ring_id_mm: 38.10
+    centering_ring_od_in: 3.38
+    centering_ring_od_mm: 85.85
+
+  - nps: "1-1/2"
+    dn: 40
+    class: 300
+    gasket_od_in: 3.50
+    gasket_od_mm: 88.90
+    gasket_id_in: 1.88
+    gasket_id_mm: 47.75
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 1.75
+    inner_ring_id_mm: 44.45
+    centering_ring_od_in: 3.88
+    centering_ring_od_mm: 98.55
+
+  - nps: "2"
+    dn: 50
+    class: 300
+    gasket_od_in: 4.12
+    gasket_od_mm: 104.65
+    gasket_id_in: 2.38
+    gasket_id_mm: 60.45
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 2.25
+    inner_ring_id_mm: 57.15
+    centering_ring_od_in: 4.75
+    centering_ring_od_mm: 120.65
+
+  - nps: "2-1/2"
+    dn: 65
+    class: 300
+    gasket_od_in: 5.00
+    gasket_od_mm: 127.00
+    gasket_id_in: 2.88
+    gasket_id_mm: 73.15
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 2.75
+    inner_ring_id_mm: 69.85
+    centering_ring_od_in: 5.62
+    centering_ring_od_mm: 142.75
+
+  - nps: "3"
+    dn: 80
+    class: 300
+    gasket_od_in: 5.50
+    gasket_od_mm: 139.70
+    gasket_id_in: 3.50
+    gasket_id_mm: 88.90
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 3.38
+    inner_ring_id_mm: 85.85
+    centering_ring_od_in: 6.12
+    centering_ring_od_mm: 155.45
+
+  - nps: "3-1/2"
+    dn: 90
+    class: 300
+    gasket_od_in: 5.88
+    gasket_od_mm: 149.35
+    gasket_id_in: 4.00
+    gasket_id_mm: 101.60
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 3.88
+    inner_ring_id_mm: 98.55
+    centering_ring_od_in: 6.50
+    centering_ring_od_mm: 165.10
+
+  - nps: "4"
+    dn: 100
+    class: 300
+    gasket_od_in: 6.50
+    gasket_od_mm: 165.10
+    gasket_id_in: 4.50
+    gasket_id_mm: 114.30
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 4.38
+    inner_ring_id_mm: 111.25
+    centering_ring_od_in: 7.12
+    centering_ring_od_mm: 180.85
+
+  - nps: "5"
+    dn: 125
+    class: 300
+    gasket_od_in: 7.62
+    gasket_od_mm: 193.55
+    gasket_id_in: 5.56
+    gasket_id_mm: 141.22
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 5.44
+    inner_ring_id_mm: 138.18
+    centering_ring_od_in: 8.62
+    centering_ring_od_mm: 218.95
+
+  - nps: "6"
+    dn: 150
+    class: 300
+    gasket_od_in: 8.75
+    gasket_od_mm: 222.25
+    gasket_id_in: 6.63
+    gasket_id_mm: 168.40
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 6.50
+    inner_ring_id_mm: 165.10
+    centering_ring_od_in: 9.62
+    centering_ring_od_mm: 244.35
+
+  - nps: "8"
+    dn: 200
+    class: 300
+    gasket_od_in: 11.00
+    gasket_od_mm: 279.40
+    gasket_id_in: 8.63
+    gasket_id_mm: 219.20
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 8.50
+    inner_ring_id_mm: 215.90
+    centering_ring_od_in: 11.88
+    centering_ring_od_mm: 301.75
+
+  - nps: "10"
+    dn: 250
+    class: 300
+    gasket_od_in: 13.50
+    gasket_od_mm: 342.90
+    gasket_id_in: 10.75
+    gasket_id_mm: 273.05
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 10.63
+    inner_ring_id_mm: 270.00
+    centering_ring_od_in: 14.38
+    centering_ring_od_mm: 365.25
+
+  - nps: "12"
+    dn: 300
+    class: 300
+    gasket_od_in: 15.88
+    gasket_od_mm: 403.35
+    gasket_id_in: 12.75
+    gasket_id_mm: 323.85
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 12.63
+    inner_ring_id_mm: 320.80
+    centering_ring_od_in: 16.75
+    centering_ring_od_mm: 425.45
+
+  - nps: "14"
+    dn: 350
+    class: 300
+    gasket_od_in: 17.12
+    gasket_od_mm: 434.85
+    gasket_id_in: 14.00
+    gasket_id_mm: 355.60
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 13.75
+    inner_ring_id_mm: 349.25
+    centering_ring_od_in: 18.12
+    centering_ring_od_mm: 460.25
+
+  - nps: "16"
+    dn: 400
+    class: 300
+    gasket_od_in: 19.38
+    gasket_od_mm: 492.25
+    gasket_id_in: 16.00
+    gasket_id_mm: 406.40
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 15.75
+    inner_ring_id_mm: 400.05
+    centering_ring_od_in: 20.38
+    centering_ring_od_mm: 517.65
+
+  - nps: "18"
+    dn: 450
+    class: 300
+    gasket_od_in: 21.75
+    gasket_od_mm: 552.45
+    gasket_id_in: 18.00
+    gasket_id_mm: 457.20
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 17.75
+    inner_ring_id_mm: 450.85
+    centering_ring_od_in: 22.75
+    centering_ring_od_mm: 577.85
+
+  - nps: "20"
+    dn: 500
+    class: 300
+    gasket_od_in: 23.88
+    gasket_od_mm: 606.55
+    gasket_id_in: 20.00
+    gasket_id_mm: 508.00
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 19.75
+    inner_ring_id_mm: 501.65
+    centering_ring_od_in: 24.88
+    centering_ring_od_mm: 631.95
+
+  - nps: "24"
+    dn: 600
+    class: 300
+    gasket_od_in: 27.75
+    gasket_od_mm: 704.85
+    gasket_id_in: 24.00
+    gasket_id_mm: 609.60
+    thickness_in: 0.175
+    thickness_mm: 4.45
+    inner_ring_id_in: 23.75
+    inner_ring_id_mm: 603.25
+    centering_ring_od_in: 29.12
+    centering_ring_od_mm: 739.65
+
+notes:
+  - "Spiral wound gasket dimensions per ASME B16.20."
+  - "Type CGI: inner ring (SS304) + flexible graphite filler + centering ring (CS)."
+  - "Thickness is standard 0.175 in (4.45 mm) for all sizes."
+  - "Centering ring OD fits inside bolt circle for proper alignment."
+  - "Inner ring ID is slightly smaller than gasket ID (protects winding)."
+  - "Class 300 gasket OD may be slightly larger than Class 150 for same NPS (wider RF)."
+
+quality:
+  validation_status: draft
+  confidence: 0.75
+  sources:
+    - name: ASME B16.20-2017
+      url: https://www.asme.org
+      access_date: "2026-07-26"
+      note: Spiral wound gasket dimensions for RF flanges.
+
+lifecycle:
+  created_at: "2026-07-26"
+  updated_at: "2026-07-26"

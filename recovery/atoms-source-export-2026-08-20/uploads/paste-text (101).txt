@@ -1,0 +1,48 @@
+Necesito desplegar temporalmente la rama "fix/profile-visibility-completion-upload" del repositorio GitHub para probar cambios en móvil antes de mergear a main.
+
+La rama contiene estos cambios en los siguientes archivos:
+
+1. app/frontend/src/lib/profileCompletion.ts (NUEVO)
+   - Helper recalculateAndSaveProfileCompletion() que recalcula profile_completion basado en datos reales del perfil
+
+2. app/frontend/src/lib/uploadHelpers.ts (NUEVO)
+   - compressImage(): compresión de imágenes en cliente antes de subir
+   - uploadWithTimeout(): wrapper con timeout de 30s para uploads a Supabase Storage
+   - isAcceptedImage(): validación de MIME con soporte HEIC/HEIF
+   - isAcceptedDocument(): validación de documentos PDF
+
+3. app/frontend/src/components/AvatarUpload.tsx (MODIFICADO)
+   - Usa compressImage() antes de subir la foto
+   - Usa uploadWithTimeout() en vez de supabase.storage.upload directo
+   - Acepta HEIC/HEIF además de JPG/PNG/WebP
+   - Fallback de MIME type por extensión de archivo
+   - Mensajes de error claros en vez de loading infinito
+   - Llama recalculateAndSaveProfileCompletion() tras subir avatar
+
+4. app/frontend/src/components/onboarding/OnboardingWizard.tsx (MODIFICADO)
+   - Cambia bucket de 'profile_pictures' a STORAGE_BUCKETS.avatars (app_14da0f1941_avatars)
+   - skipOnboarding() ahora establece profile_visibility: 'public' y cv_visible: true
+
+5. app/frontend/src/components/profile/CVUploadSection.tsx (MODIFICADO)
+   - Llama recalculateAndSaveProfileCompletion() al subir y al eliminar CV
+
+6. app/frontend/src/components/profile/CertificationsSection.tsx (MODIFICADO)
+   - Añade HEIC/HEIF a tipos permitidos
+   - Fallback de MIME por extensión
+   - Llama recalculateAndSaveProfileCompletion() al guardar, crear y eliminar certificación
+
+7. app/frontend/src/components/profile/DocumentsSection.tsx (MODIFICADO)
+   - Llama recalculateAndSaveProfileCompletion() al subir y eliminar documento
+
+8. app/frontend/src/components/profile/WorkExperienceSection.tsx (MODIFICADO)
+   - Llama recalculateAndSaveProfileCompletion() al guardar, crear y eliminar experiencia
+
+9. app/frontend/src/pages/Profile.tsx (MODIFICADO)
+   - Llama recalculateAndSaveProfileCompletion() al guardar perfil
+
+NO toques los archivos SQL (carpeta sql/). Son solo scripts de referencia.
+
+Por favor:
+1. Haz pull de la rama fix/profile-visibility-completion-upload desde GitHub
+2. Despliega o genera un preview para poder probar en móvil
+3. No mergees a main

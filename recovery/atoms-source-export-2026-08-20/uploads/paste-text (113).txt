@@ -1,0 +1,358 @@
+[1 tool called]
+
+Aquí está el prompt completo para Atoms. Es autocontenido — puedes copiarlo y pegarlo directamente:
+
+---
+
+```markdown
+# PROMPT PARA ATOMS — BRAIN-TOOLS-001 Fase 2: Accessory Library + Flange Library v2
+
+## ⚠️ ANTES DE EMPEZAR
+1. `git clone https://github.com/pipingbox/DASHBOARD-APP.git` (NO hacer `git init`)
+2. Trabaja en la rama `main`
+3. **NO toques** `src/tools/elbow-cut/ElbowCut.tsx` — es el diseño de referencia visual y está perfecto
+4. **NO toques** `src/tools/flange-library/flange-data.ts` — los datos son correctos (solo ampliaremos el tipo)
+5. **NO toques** `src/tools/flange-library/gasket-bolt-data.ts` — correcto
+6. **NO toques** `src/tools/branch-template/BranchTemplate.tsx` — correcto
+7. Documento de referencia en el Brain: `02-PRODUCT/ACCESSORY_LIBRARY_STRATEGY.md`
+
+## OBJETIVO GENERAL
+Implementar la **Fase 2** del roadmap de la Biblioteca de Accesorios (DEC-52):
+1. Añadir clases de presión 400# y 2500# al tipo `PressureClass`
+2. Renombrar "Pipe Data Tables" a "Pipe Library" (solo display, no rutas)
+3. Refactorizar Flange Library al **flujo guiado** (Standard → Type → Class → NPS → Result)
+4. Rediseñar el SVG del Flange Library con **dibujos técnicos profesionales con cotas** (dimension lines con flechas, extension lines, labels)
+5. Añadir toggles de visibilidad (cotas / centro / agujeros / relleno) — patrón ElbowCut
+6. Añadir toggle de unidades (mm / pulgadas) en el modal de detalle
+7. Mantener 100% la funcionalidad existente: filtros, cross-linking (gasket + bolts + torque), PremiumGate (Export PDF PRO), TechnicalSearch
+
+---
+
+## TAREA 1: Ampliar PressureClass con 400# y 2500#
+
+**Archivo:** `src/tools/flange-library/flange-data.ts`
+
+Actualmente:
+```typescript
+export type PressureClass = '150#' | '300#' | '600#' | '900#' | '1500#';
+```
+
+Cambiar a:
+```typescript
+export type PressureClass = '150#' | '300#' | '400#' | '600#' | '900#' | '1500#' | '2500#';
+```
+
+**Importante:** ASME B16.5 cubre 150#–2500#. 400# es menos común pero válido.
+- NO inventes datos para 400# y 2500#. Si no hay specs reales en `FLANGE_SPECS`, simplemente deja que el tipo lo acepte y que los filtros muestren "No results" si no hay specs.
+- Si encuentras datos oficiales ASME B16.5 para 400# y 2500# en NPS comunes (1/2"–24"), puedes añadirlos a `FLANGE_SPECS`, pero **prioriza no inventar**. Marca con comentario `// TODO: verify against ASME B16.5 table` si los añades.
+
+---
+
+## TAREA 2: Renombrar "Pipe Data Tables" a "Pipe Library" (solo display)
+
+**Archivos:**
+- `src/tools/registry.tsx` — cambiar `nameKey: 'tools.pipeDataTables'` a `nameKey: 'tools.pipeLibrary'`
+- `src/i18n/locales/en.json` — añadir `"pipeLibrary": "Pipe Library"` y mantener `pipeDataTables` por compatibilidad
+- `src/i18n/locales/es.json` — `"pipeLibrary": "Biblioteca de Tuberías"`
+- Repetir para nl, fr, de, pt, it (traducciones simples)
+
+**No cambies** la key `pipe-dimensions` del registry (rompería rutas). Solo el `nameKey` y las traducciones.
+
+---
+
+## TAREA 3: Refactorizar Flange Library a flujo guiado
+
+**Archivo:** `src/tools/flange-library/FlangeLibrary.tsx`
+
+### Problema actual
+La grid muestra TODOS los specs (270 cards) antes de filtrar. El usuario se ahoga en thumbnails.
+
+### Solución: flujo guiado de 5 pasos
+El usuario NO ve cards hasta que selecciona los 4 filtros. El flujo es:
+
+```
+Paso 1: Standard     → solo ASME B16.5 disponible ahora (mostrar como badge, no selector)
+Paso 2: Type         → WN | SO | BL  (3 botones grandes)
+Paso 3: Class        → 150# | 300# | 400# | 600# | 900# | 1500# | 2500#  (botones, solo los que tengan specs para ese type)
+Paso 4: NPS          → 1/2" | 3/4" | 1" | ... | 24"  (solo los que existan para type+class)
+Paso 5: RESULT       → SVG grande + cotas + tabla + cross-links
+```
+
+### UX del flujo guiado
+- Cada paso se habilita solo cuando el anterior está seleccionado (estilo wizard).
+- Los pasos 3 y 4 muestran SOLO las opciones que tienen specs reales (filtra `FLANGE_SPECS` por type, luego por class, luego por nps).
+- Cuando llegas al paso 5, se muestra UN solo resultado (el spec exacto) con el SVG grande.
+- Botón "Back" para cambiar de paso sin perder los ya seleccionados.
+- Mantener la barra de búsqueda libre (TechnicalSearch) como alternativa al wizard — si el usuario busca "6 inch WN 300#", se salta el wizard y va directo al resultado.
+
+### Estructura del componente refactorizado
+
+```typescript
+export function FlangeLibrary({ user }) {
+  // Wizard state
+  const [step, setStep] = useState<1|2|3|4|5>(1);
+  const [selectedType, setSelectedType] = useState<FlangeType | null>(null);
+  const [selectedClass, setSelectedClass] = useState<PressureClass | null>(null);
+  const [selectedNps, setSelectedNps] = useState<string | null>(null);
+
+  // Compute available options at each step (filter FLANGE_SPECS)
+  const availableTypes = FLANGE_TYPES;
+  const availableClasses = selectedType
+    ? [...new Set(FLANGE_SPECS.filter(s => s.type === selectedType).map(s => s.pressureClass))]
+    : [];
+  const availableNps = (selectedType && selectedClass)
+    ? [...new Set(FLANGE_SPECS.filter(s => s.type === selectedType && s.pressureClass === selectedClass).map(s => s.nps))]
+    : [];
+
+  // Result spec
+  const resultSpec = (selectedType && selectedClass && selectedNps)
+    ? FLANGE_SPECS.find(s => s.type === selectedType && s.pressureClass === selectedClass && s.nps === selectedNps) ?? null
+    : null;
+
+  // ... render wizard steps + result
+}
+```
+
+---
+
+## TAREA 4: Rediseñar SVG con dibujos técnicos profesionales + cotas
+
+**Archivo:** `src/tools/flange-library/FlangeLibrary.tsx` (dentro del modal de resultado)
+
+### Diseño de referencia
+`src/tools/elbow-cut/ElbowCut.tsx` — el cliente lo ama. Cópiale el PATRÓN VISUAL:
+- Controles de visibilidad (checkboxes) para toggle de cotas/centro/agujeros/relleno
+- SVG grande con viewBox, paths coloreados, labels de dimensiones inline
+- Paleta: cyan `#22d3ee`, naranja `#f97316`, blanco punteado, ámbar `#f59e0b`, rojo `#ef4444`
+- Bordes `rounded-sm`, fondos `#0d0d0d`, bordes `border-zinc-800`
+
+### Problemas actuales del SVG
+El SVG actual de cada tipo de flange (WN/SO/BL) es un esquema con 4-5 líneas y un rectángulo. Parece un placeholder, no un drawing técnico.
+
+### Solución: rediseñar los 3 SVGs (WN, SO, BL) como drawings técnicos profesionales
+
+**Vista lateral realista del flange** con proporciones correctas (usar `spec.od`, `spec.flangeThickness`, `spec.boltCircleDiameter`, `spec.hubLength`, `spec.pipeOD` para escalar):
+- Hub taper real para WN (Weld Neck) — el cono de transición entre pipe y flange
+- Weld prep visible (bevel) en WN
+- Raised face visible (RF) — la cara elevada donde asienta la junta
+- Bolt holes representados correctamente (número real de `spec.numBolts`, distribución en círculo)
+- Hatching en blind flange (BL) para indicar sólido
+- Pipe stub a ambos lados con OD correcto
+
+### Sistema de cotas técnico profesional
+- **Dimension lines**: líneas horizontales/verticales con flechas en ambos extremos
+- **Extension lines**: líneas cortas perpendiculares desde el objeto hasta la dimension line
+- **Labels**: el valor numérico encima de la dimension line (ej: "Ø 318 mm")
+
+Cotas a mostrar en el SVG del modal:
+- Ø Outside Diameter (OD) — horizontal sobre el flange
+- Flange thickness — vertical a la derecha
+- Bolt circle diameter (BCD) — horizontal con línea de centro punteada
+- Hub length (solo WN) — vertical
+- Pipe OD — horizontal sobre el pipe stub
+- Raised face height — pequeña cota vertical
+- Bolt hole Ø — cota en un agujero
+
+### Toggles de visibilidad (como ElbowCut)
+```typescript
+const [showDimensions, setShowDimensions] = useState(true);
+const [showCenter, setShowCenter] = useState(true);
+const [showBoltHoles, setShowBoltHoles] = useState(true);
+const [showFill, setShowFill] = useState(true);
+```
+
+### Funciones auxiliares a crear
+
+```typescript
+// Dimension line con flechas en ambos extremos
+function DimensionLine({
+  x1, y1, x2, y2,
+  label,
+  color = '#f59e0b',
+  orientation = 'horizontal' // | 'vertical' | 'diagonal'
+}): JSX.Element
+
+// Extension line (línea corta desde el objeto hasta la cota)
+function ExtensionLine({ x, y, length, direction }): JSX.Element
+
+// Cálculo de escala para que el flange quepa en el viewBox
+function calculateScale(spec: FlangeSpec, viewWidth: number, viewHeight: number): number
+
+// Convertir mm a inches (para toggle de unidades)
+function mmToInches(mm: number): string  // "12.52"" o "1/2""
+function formatDimension(mm: number, unit: 'mm' | 'in'): string
+```
+
+### Paleta de colores
+- Flange body: `#27272a` (zinc-800) stroke, `#18181b` (zinc-900) fill
+- Cotas/dimension lines: `#f59e0b` (ámbar)
+- Labels de cotas: `#f59e0b` fill, font-size 9-10
+- Bolt holes: `#f59e0b` stroke
+- Center line: `#52525b` dashed
+- Pipe: `#52525b` stroke
+- Raised face: `#22d3ee` (cyan) highlight
+- Hub taper: `#f97316` (naranja) highlight en WN
+- Cross-hatching (BL): `#52525b` lines
+
+---
+
+## TAREA 5: Modal de detalle con tabs y toggle de unidades
+
+**Layout del modal de resultado (paso 5 del wizard):**
+
+```
+┌─────────────────────────────────────────────────────┐
+│ [WN] [300#] [6"]  ASME B16.5              [×]       │
+├─────────────────────────────────────────────────────┤
+│ ☑ Dimensions  ☐ Center  ☐ Bolt holes  ☐ Fill       │
+│                                    Unit: [mm | in]  │
+├─────────────────────────────────────────────────────┤
+│  ┌─────────────────────────┐  ┌──────────────────┐  │
+│  │                         │  │ OD:        318 mm│  │
+│  │   SVG GRANDE            │  │ Thickness: 31.8mm│  │
+│  │   (400×300 mínimo)      │  │ BCD:     269.9 mm│  │
+│  │   con cotas + bolts     │  │ Bolts:       12  │  │
+│  │                         │  │ Bolt Ø:   22.3 mm│  │
+│  │                         │  │ Weight:   13.5 kg│  │
+│  └─────────────────────────┘  └──────────────────┘  │
+├─────────────────────────────────────────────────────┤
+│ [Dimensions] [Cross-Link] [Notes]                   │
+├─────────────────────────────────────────────────────┤
+│ Tab "Dimensions": SVG + tabla (arriba)              │
+│ Tab "Cross-Link": gasket + bolts + torque (MANTENER)│
+│ Tab "Notes": disclaimer + ASME reference            │
+├─────────────────────────────────────────────────────┤
+│ [Export PDF — PRO]                                  │
+└─────────────────────────────────────────────────────┘
+```
+
+- El SVG grande va en el tab "Dimensions" (no en los 3 tabs).
+- El tab "Cross-Link" mantiene el cross-linking existente (gasket + bolts + torque ASME PCC-1) — **NO romper**.
+- Toggle de unidades (mm/in) afecta al SVG y a la tabla simultáneamente.
+
+---
+
+## TAREA 6: Cards de la grid (solo para el modo búsqueda libre)
+
+Cuando el usuario usa la barra de búsqueda en lugar del wizard, se muestran cards. Mejorarlas:
+- SVG mini (120×80) con proporciones correctas del flange
+- 3-4 dimensiones clave overlaid como labels pequeños (OD, BCD, thickness)
+- Badge de tipo (WN/SO/BL) más visible
+- Al hover, mostrar un preview de las cotas principales
+- Mantener peso, nº pernos, OD en la parte inferior
+
+---
+
+## DATOS DISPONIBLES EN FlangeSpec (NO cambiar la interfaz)
+
+```typescript
+interface FlangeSpec {
+  type: 'WN' | 'SO' | 'BL';
+  typeLabel: string;
+  pressureClass: '150#'|'300#'|'400#'|'600#'|'900#'|'1500#'|'2500#';  // ← ampliada
+  facing: 'RF' | 'RTJ';
+  nps: string;
+  pipeOD: number;
+  od: number;
+  flangeThickness: number;
+  boltCircleDiameter: number;
+  numBolts: number;
+  boltHoleDiameter: number;
+  boltSize: string;
+  studLength: number;
+  hubDiameterEnd?: number;
+  hubDiameterBase?: number;
+  hubLength?: number;
+  boreDiameter?: number;
+  weight: number;
+  gasketOD: number;
+  gasketID: number;
+  gasketType: string;
+}
+```
+
+---
+
+## CRITERIOS DE ACEPTACIÓN
+
+### Funcionalidad
+- ✅ El tipo `PressureClass` acepta 400# y 2500#
+- ✅ "Pipe Data Tables" se muestra como "Pipe Library" en EN y ES (mínimo)
+- ✅ El wizard de 5 pasos funciona: Standard → Type → Class → NPS → Result
+- ✅ Cada paso solo habilita opciones con specs reales
+- ✅ La barra de búsqueda libre sigue funcionando como alternativa
+- ✅ TechnicalSearch sigue resolviendo queries de flanges al resultado correcto
+- ✅ El cross-linking (gasket + bolts + torque) funciona igual que antes
+- ✅ El PremiumGate (Export PDF PRO) funciona igual que antes
+
+### Visual
+- ✅ El SVG del modal se ve como un drawing técnico de manual de fabricación
+- ✅ Las cotas tienen flechas, extensions lines y labels con unidades (mm o in)
+- ✅ Los toggles de visibilidad funcionan (cotas, centro, agujeros, relleno)
+- ✅ Las proporciones del flange son realistas (no esquemáticas)
+- ✅ WN muestra hub taper + weld prep + raised face
+- ✅ SO muestra pipe through + fillet welds
+- ✅ BL muestra hatching de sólido
+- ✅ Los nº de bolt holes coinciden con `spec.numBolts`
+- ✅ El toggle mm/in afecta SVG y tabla simultáneamente
+- ✅ Las cards (modo búsqueda) se ven más profesionales
+
+### Técnico
+- ✅ Build pasa sin errores TypeScript (`npx tsc --noEmit`)
+- ✅ `npm run dev` funciona y la página carga en http://localhost:5173/tools
+- ✅ Click en "Flange Library" → wizard → seleccionar WN → 300# → 6" → SVG con cotas
+- ✅ No hay errores en consola del navegador
+- ✅ Mobile-first: el wizard y el modal funcionan en 375px de ancho
+
+---
+
+## COMMIT
+
+```
+FEAT: BRAIN-TOOLS-001 Fase 2 — Accessory Library + Flange Library v2
+
+- PressureClass ampliado: 400# y 2500# añadidos (ASME B16.5 completo)
+- Pipe Data Tables renombrado a Pipe Library (display)
+- Flange Library refactorizado a flujo guiado (Standard→Type→Class→NPS→Result)
+- SVG rediseñado: dibujos técnicos profesionales con cotas (dimension lines + extension lines + labels)
+- Toggles de visibilidad (cotas/centro/agujeros/relleno) — patrón ElbowCut
+- Toggle de unidades (mm/in) en modal de detalle
+- WN: hub taper + weld prep + raised face
+- SO: pipe through + fillet welds
+- BL: hatching de sólido
+- Cards mejoradas con cotas overlaid (modo búsqueda)
+- Mantiene cross-linking gasket+bolts+torque (Fase 3)
+- Mantiene PremiumGate (Fase 6)
+- Mantiene TechnicalSearch integration (Fase 5)
+- Diseño alineado con ElbowCut.tsx (referencia visual)
+- Source: 02-PRODUCT/ACCESSORY_LIBRARY_STRATEGY.md (DEC-52)
+```
+
+---
+
+## AL ACABAR
+
+1. `npx tsc --noEmit` — debe pasar sin errores
+2. `npm run build` — debe pasar
+3. `npm run dev` — verificar que carga en http://localhost:5173/tools
+4. Click en "Flange Library" → wizard → WN → 300# → 6" → verificar SVG con cotas
+5. Probar toggle mm/in
+6. Probar los 4 toggles de visibilidad
+7. Verificar mobile (375px)
+8. `git add . && git commit -m "..."`
+9. `git push origin main`
+10. Reporta commit hash
+
+---
+
+## REFERENCIAS DEL BRAIN (lectura opcional para contexto)
+
+Si tienes acceso al repositorio PIPINGBOX-BRAIN:
+- `02-PRODUCT/ACCESSORY_LIBRARY_STRATEGY.md` — arquitectura completa (15 categorías, flujo guiado, cross-linking graph, roadmap 8 fases)
+- `09-HISTORY/MAJOR_DECISIONS.md` DEC-52 — decisión registrada
+- `05-AI/AGENT_FAST_CONTEXT.md` — reglas no negociables (dark theme, rounded-sm, mobile-first, TABLES constants)
+```
+
+---
+
+Cópialo y pégalo en Atoms. Cuando Atoms termine y haga push, avísame para verificar el resultado visualmente y mover el ticket a `DONE/`.

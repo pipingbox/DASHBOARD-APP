@@ -1,0 +1,136 @@
+ACT AS A SENIOR FULL STACK SAAS ENGINEER.
+
+We are starting PRIO 3:
+REAL DATA CONNECTIONS for the PipingBox recruitment ecosystem.
+
+IMPORTANT:
+Do not redesign the UI.
+Do not break:
+- Admin Center
+- Company Dashboard
+- Worker Dashboard
+- Community
+- Existing navigation
+- Role system
+
+Only connect REAL database functionality safely.
+
+==================================================
+GOAL
+==================================================
+
+Connect the Company Job Publishing form to Supabase.
+
+The form already exists at:
+
+/company/post-job
+
+We now need REAL job creation.
+
+==================================================
+STEP 1 — CONNECT TO DATABASE
+==================================================
+
+Use existing jobs table if available.
+
+If no suitable table exists:
+create safe table:
+
+app_14da0f1941_jobs
+
+Columns:
+
+- id
+- created_at
+- company_user_id
+- company_name
+- title
+- location
+- country
+- discipline
+- contract_type
+- salary_range
+- rotation
+- description
+- requirements
+- status
+- applications_count
+
+==================================================
+STEP 2 — PUBLISH JOB
+==================================================
+
+When company submits form:
+
+Insert new row into jobs table.
+
+Default values:
+- status = 'open'
+- applications_count = 0
+
+==================================================
+STEP 3 — COMPANY OWNERSHIP
+==================================================
+
+Store:
+company_user_id = auth.uid()
+
+This is critical.
+
+==================================================
+STEP 4 — JOBS MANAGEMENT PAGE
+==================================================
+
+/company/jobs
+
+Must now read REAL jobs from database.
+
+Only show jobs where:
+company_user_id = auth.uid()
+
+Display:
+- title
+- location
+- status
+- created date
+- applications count
+
+==================================================
+STEP 5 — EMPTY STATES
+==================================================
+
+If no jobs:
+show clean empty state.
+
+==================================================
+STEP 6 — LOADING STATES
+==================================================
+
+Add:
+- loading spinner
+- success toast
+- error toast
+
+==================================================
+STEP 7 — ACCESS SECURITY
+==================================================
+
+Enable proper RLS ownership.
+
+Company users:
+- can create own jobs
+- can view own jobs
+- can update own jobs
+- cannot see jobs from other companies
+
+==================================================
+STEP 8 — ADMIN PREVIEW SUPPORT
+==================================================
+
+Admin preview mode should still work.
+
+==================================================
+FINAL RESULT
+==================================================
+
+Companies can now publish REAL jobs into Supabase and manage them inside the Company Dashboard.

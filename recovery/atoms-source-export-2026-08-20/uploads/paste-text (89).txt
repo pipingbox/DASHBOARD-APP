@@ -1,0 +1,132 @@
+CRITICAL PRODUCTION BUG FIX — Profile data loss and uploads failing.
+
+Real users are now testing the platform and we have confirmed multiple severe onboarding/profile persistence issues.
+
+Confirmed cases:
+
+CASE 1 — Worker profile:
+User filled onboarding/profile data.
+When trying to upload CV, upload froze/faulted.
+After refresh, ALL profile data was lost.
+
+CASE 2 — Company profile:
+User filled company profile:
+- company name
+- description
+- feedback
+etc.
+Data appeared in UI but was NOT persisted after refresh.
+
+This is now a production-critical issue.
+
+Investigate and FIX the ENTIRE persistence architecture for:
+- worker profiles
+- company profiles
+- onboarding
+- uploads
+- autosave
+- profile updates
+
+ROOT CAUSE ANALYSIS REQUIRED:
+Determine exactly where data is failing:
+- frontend state only?
+- failed Supabase upsert?
+- upload blocking save?
+- RLS policies?
+- storage bucket permissions?
+- async race conditions?
+- invalid payload structure?
+- optimistic UI without backend confirmation?
+- React state reset?
+- onboarding draft not persisted?
+
+REQUIRED FIXES:
+
+1. Progressive autosave
+- Save immediately after field changes.
+- Do NOT wait for final submit.
+- Debounce save by ~800ms.
+- Persist directly to Supabase.
+
+2. Draft persistence
+- Save onboarding draft to localStorage.
+- Restore automatically after refresh/crash.
+
+3. Upload isolation
+- CV/photo uploads must NEVER erase other profile data.
+- Upload errors must not reset form state.
+- Uploads should be independent async actions.
+
+4. Real save confirmation
+- Do NOT show success unless Supabase confirms save.
+- Show proper error messages.
+
+5. Company profile persistence
+Verify these fields persist correctly:
+- company
+- company_description
+- company_website
+- company_country
+- company_industry
+- feedback/comments
+- logo/avatar
+
+6. Worker profile persistence
+Verify these fields persist correctly:
+- full_name
+- title
+- years_experience
+- skills
+- bio
+- avatar_url
+- cv_file_url
+- availability
+- location
+
+7. Upload system audit
+Check:
+- storage bucket existence
+- bucket policies
+- signed/public URLs
+- file path generation
+- MIME validation
+- max file size
+- upload progress handling
+
+8. Prevent total data loss
+Refreshing the page must NEVER erase already entered data.
+
+9. Years of experience bug
+- Remove default 0.
+- Empty by default.
+- Placeholder only.
+
+10. Add diagnostics
+Add temporary logs:
+- save attempts
+- upload attempts
+- Supabase responses
+- upload failures
+- rejected policies
+
+11. Admin observability
+Create visibility for:
+- onboarding state
+- failed uploads
+- incomplete profiles
+- draft restored
+- save errors
+
+IMPORTANT:
+Do NOT redesign UI.
+Focus ONLY on reliability, persistence and upload stability.
+
+Acceptance criteria:
+- Users can refresh safely without losing progress.
+- CV upload works.
+- Avatar upload works.
+- Company profile saves correctly.
+- Data persists after refresh.
+- Upload failures no longer wipe forms.
+- No fake success states.
+- Build passes.

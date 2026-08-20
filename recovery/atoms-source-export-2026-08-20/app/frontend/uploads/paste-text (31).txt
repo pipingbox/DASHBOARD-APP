@@ -1,0 +1,101 @@
+BUGFIX — Company Candidates does not show workers who applied to company jobs.
+
+IMPORTANT:
+Do not redesign anything.
+Do not break existing Jobs, Applications, Admin Center, Company Dashboard, or role system.
+
+==================================================
+CURRENT STATUS
+==============
+
+* Company can publish jobs successfully.
+* Worker can apply to jobs.
+* Dashboard application counter works.
+* But company view /company/candidates does not show the worker who applied.
+
+==================================================
+GOAL
+====
+
+Connect company candidates to real job applications.
+
+==================================================
+TASKS
+=====
+
+1. Inspect app_14da0f1941_job_applications.
+
+2. Ensure application records include enough data to link to company jobs:
+
+* user_id
+* job_id if available
+* job_title
+* company_name
+* company_user_id if available
+* status
+* created_at
+
+3. If app_14da0f1941_job_applications does not include job_id:
+   add job_id uuid nullable.
+
+4. If it does not include company_user_id:
+   add company_user_id uuid nullable.
+
+5. Update Apply Now flow:
+   When worker applies to a job from app_14da0f1941_jobs, insert:
+
+* user_id: worker user.id
+* job_id: job.id
+* company_user_id: job.company_user_id
+* job_title: job.title
+* company_name: job.company_name
+* location: job.location
+* contract_type: job.contract_type
+* status: 'applied'
+
+6. Update /company/candidates:
+   Fetch applications where:
+   company_user_id = auth.uid()
+
+In Admin Company Preview mode, allow admin to see all candidate applications or demo-safe data.
+
+7. Candidate cards should show:
+
+* worker name if available from profile
+* job title applied for
+* location
+* application status
+* applied date
+* skills if available
+* View Profile button
+
+8. Add status controls for company:
+
+* applied
+* reviewed
+* interview
+* shortlisted
+* rejected
+* hired
+
+9. Update application status in Supabase.
+
+10. Add safe RLS:
+
+* workers can read their own applications
+* companies can read applications for their own jobs
+* companies can update status for applications to their own jobs
+* admin can read all
+
+Do not expose all applications publicly.
+
+==================================================
+EXPECTED RESULT
+===============
+
+When a worker applies to a company job:
+
+* the worker sees it in My Applications
+* the company sees the worker in /company/candidates
+* the company can update candidate status
+* Admin can monitor it

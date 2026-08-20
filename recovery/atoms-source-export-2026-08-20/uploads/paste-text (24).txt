@@ -1,0 +1,182 @@
+ACT AS A SENIOR B2B SAAS PRODUCT ENGINEER.
+
+We need to fix and complete the Company Dashboard quick action routes.
+
+IMPORTANT:
+Do not redesign the Company Dashboard.
+Do not break Admin Center, Jobs, Applications, Community, Content Drafts, Worker Dashboard, Profile/CV, or role system.
+
+Only create proper company-specific routes and connect the quick action buttons correctly.
+
+==================================================
+CURRENT ISSUE
+=============
+
+On /company-dashboard:
+
+* Post New Job currently redirects to generic /jobs
+* Search Workers currently redirects to generic /jobs
+* View Candidates currently redirects to generic /companies
+* Request Workforce works correctly
+
+We need real company-side pages.
+
+==================================================
+GOAL
+====
+
+Create dedicated company routes:
+
+1. /company/jobs
+2. /company/post-job
+3. /company/candidates
+4. /company/workers-search
+5. /company/workforce-requests
+6. /company/profile
+7. /company/analytics
+
+==================================================
+STEP 1 — UPDATE QUICK ACTION BUTTONS
+====================================
+
+Update buttons:
+
+Post New Job → /company/post-job
+Request Workforce → existing working workforce request form
+Search Workers → /company/workers-search
+View Candidates → /company/candidates
+
+==================================================
+STEP 2 — COMPANY NAVIGATION
+===========================
+
+When in Company View or company role, sidebar should show:
+
+* Company Dashboard → /company-dashboard
+* Jobs Management → /company/jobs
+* Post Job → /company/post-job
+* Candidates → /company/candidates
+* Worker Search → /company/workers-search
+* Workforce Requests → /company/workforce-requests
+* Company Profile → /company/profile
+* Analytics → /company/analytics
+* Community
+
+==================================================
+STEP 3 — CREATE PLACEHOLDER PAGES
+=================================
+
+Create professional placeholder pages for now.
+
+Each page must clearly say what it will manage.
+
+A) /company/jobs
+Title: Jobs Management
+Purpose: manage company job listings
+Show:
+
+* Active jobs
+* Draft jobs
+* Closed jobs
+* "Post New Job" button
+
+B) /company/post-job
+Title: Post New Job
+Purpose: create a new industrial job listing
+For now create a functional form UI with fields:
+
+* Job title
+* Company name
+* Location
+* Country
+* Discipline
+* Contract type
+* Salary range
+* Rotation
+* Description
+* Requirements
+  Button:
+  Publish Job
+
+Do not connect publishing yet unless simple and safe.
+
+C) /company/candidates
+Title: Candidates
+Purpose: review workers who applied to company jobs
+Show placeholder candidate cards:
+
+* name
+* role
+* location
+* skills
+* application status
+
+D) /company/workers-search
+Title: Worker Search
+Purpose: search available industrial workers
+Show filter UI:
+
+* role
+* country
+* availability
+* certification
+* experience level
+
+E) /company/workforce-requests
+Title: Workforce Requests
+Purpose: manage submitted workforce requests
+Read from:
+app_14da0f1941_company_leads
+Show requests connected to the company where possible.
+If company matching is not ready, show safe placeholder and existing requests in admin preview only.
+
+F) /company/profile
+Title: Company Profile
+Purpose: manage company identity
+Show editable company profile layout:
+
+* company name
+* industry
+* country
+* website
+* description
+* verification status
+
+G) /company/analytics
+Title: Company Analytics
+Purpose: recruitment metrics for company
+Show placeholder metrics:
+
+* job views
+* applications
+* candidate saves
+* workforce requests
+
+==================================================
+STEP 4 — ACCESS PROTECTION
+==========================
+
+Company routes should be accessible only to:
+
+* real company role
+* admin preview mode
+
+Workers should not access company routes.
+
+==================================================
+STEP 5 — UX QUALITY
+===================
+
+Use the existing PipingBox dark industrial SaaS style:
+
+* black background
+* orange accents
+* professional B2B cards
+* consistent spacing
+* responsive layout
+
+==================================================
+FINAL RESULT
+============
+
+Company Dashboard quick actions must now lead to real company-specific pages instead of generic worker/public pages.

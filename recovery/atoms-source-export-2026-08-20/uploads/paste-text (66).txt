@@ -1,0 +1,124 @@
+Critical architecture fix required.
+
+Root cause identified:
+The database currently does NOT store:
+- profile_completion
+- onboarding_status
+- marketplace_ready
+
+Only frontend components are calculating percentages independently.
+
+This is why:
+- Dashboard shows 0%
+- Profile page shows 100%
+- Admin Registros shows 85%
+
+Different frontend components are using different calculations.
+
+THIS MUST BE FIXED AT DATABASE + SERVICE LEVEL.
+
+IMPLEMENTATION PLAN
+
+PART 1 — DATABASE
+
+Add these columns to app_14da0f1941_profiles:
+
+- profile_completion INTEGER DEFAULT 0
+- onboarding_status TEXT DEFAULT 'AUTH_ONLY'
+- marketplace_ready BOOLEAN DEFAULT false
+
+Possible onboarding statuses:
+- AUTH_ONLY
+- PROFILE_STARTED
+- MARKETPLACE_READY
+- PROFESSIONAL_COMPLETE
+
+PART 2 — SINGLE SOURCE OF TRUTH
+
+Create ONE centralized utility/service:
+
+calculateProfileCompletion(profile)
+
+This function becomes the ONLY completion engine in the app.
+
+NO component may calculate completion independently anymore.
+
+PART 3 — UNIFIED WEIGHTS
+
+Use the exact same weights everywhere:
+
+- full_name → 10
+- role/title → 10
+- current_company OR employment_status → 10
+- location → 10
+- years_experience → 10
+- skills/specialties → 15
+- bio/about → 10
+- availability_status → 10
+- willing_to_travel/relocate → 5
+- cv_visible/profile visibility → 5
+- profile photo → 5
+
+TOTAL = 100
+
+PART 4 — STATUS RULES
+
+0–30:
+AUTH_ONLY
+
+31–69:
+PROFILE_STARTED
+
+70–89:
+MARKETPLACE_READY
+
+90–100:
+PROFESSIONAL_COMPLETE
+
+marketplace_ready = true only if:
+- completion >= 70
+- profile visibility is public
+
+PART 5 — SAVE RESULTS
+
+Every time profile updates:
+- recalculate percentage
+- recalculate onboarding_status
+- recalculate marketplace_ready
+- save values into database
+
+PART 6 — ALL MODULES MUST READ DATABASE VALUE ONLY
+
+Dashboard:
+READ profile_completion from database
+
+Profile page:
+READ profile_completion from database
+
+Admin Registros:
+READ profile_completion from database
+
+Worker Search:
+READ marketplace_ready from database
+
+NO frontend-only calculations allowed anymore.
+
+PART 7 — MIGRATION
+
+Run recalculation for all existing users.
+
+Expected final result for Gaspar:
+- Dashboard: same %
+- Profile page: same %
+- Admin Registros: same %
+- Marketplace state synchronized everywhere
+
+PART 8 — DEBUG
+
+Temporarily log:
+- calculated fields
+- final percentage
+- onboarding status
+- saved database values
+
+Do not continue with any new features until this inconsistency is fully solved.
