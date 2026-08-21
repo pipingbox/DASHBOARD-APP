@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 export function useUnreadMessages() {
   const { user, profile } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
+  const mountedRef = useRef(true);
 
   const userRole = profile?.role || 'worker';
   const isCompany = userRole === 'company' || userRole === 'admin';
@@ -37,23 +38,35 @@ export function useUnreadMessages() {
         (sum, row) => sum + ((row as Record<string, number>)[unreadCol] || 0),
         0
       );
-      setUnreadCount(total);
+      if (mountedRef.current) {
+        setUnreadCount(total);
+      }
     } catch (err) {
       console.error('Failed to fetch unread count:', err);
     }
   }, [user, isCompany]);
 
   useEffect(() => {
+    mountedRef.current = true;
+
+    if (!user) {
+      setUnreadCount(0);
+      return;
+    }
+
+    // Fetch immediately
     fetchUnread();
 
-    // Subscribe to conversation changes to update unread count in real-time
-    if (!user) return;
+    // Generate a unique channel name per effect instance to avoid
+    // Supabase's internal channel cache conflicts (especially in React Strict Mode)
+    const instanceId = Math.random().toString(36).slice(2, 8);
+    const channelName = `unread-msgs-${user.id}-${instanceId}`;
 
     // TD-12: Subscribe to conversation changes scoped to the current user only.
     // Previously subscribed to ALL conversation changes (performance waste).
     const col = isCompany ? 'company_user_id' : 'worker_user_id';
     const channel = supabase
-      .channel('unread-messages')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -63,19 +76,27 @@ export function useUnreadMessages() {
           filter: `${col}=eq.${user.id}`,
         },
         () => {
-          fetchUnread();
+          if (mountedRef.current) {
+            fetchUnread();
+          }
         }
       )
       .subscribe();
 
-    // Also poll every 30 seconds as a fallback
-    const interval = setInterval(fetchUnread, 30000);
+    // Poll every 30 seconds as a fallback
+    const interval = setInterval(() => {
+      if (mountedRef.current) {
+        fetchUnread();
+      }
+    }, 30000);
 
     return () => {
-      supabase.removeChannel(channel);
+      mountedRef.current = false;
       clearInterval(interval);
+      supabase.removeChannel(channel);
     };
-  }, [user, fetchUnread]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, isCompany]);
 
   return { unreadCount, refetch: fetchUnread };
 }

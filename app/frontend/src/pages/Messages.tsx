@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   MessageSquare,
   Send,
@@ -48,28 +49,8 @@ interface Message {
 
 type QuickAction = 'interview' | 'documents' | 'availability';
 
-const QUICK_ACTIONS: { key: QuickAction; label: string; icon: typeof Calendar; message: string }[] = [
-  {
-    key: 'interview',
-    label: 'Invite to Interview',
-    icon: Calendar,
-    message: '📅 We would like to invite you for an interview. Please let us know your available times.',
-  },
-  {
-    key: 'documents',
-    label: 'Request Documents',
-    icon: FileText,
-    message: '📄 Could you please send us the following documents: updated CV, certifications, and references.',
-  },
-  {
-    key: 'availability',
-    label: 'Request Availability',
-    icon: Clock,
-    message: '🕐 Could you share your availability for the upcoming weeks? We would like to schedule you.',
-  },
-];
-
 export default function Messages() {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -84,6 +65,27 @@ export default function Messages() {
 
   const userRole = profile?.role || 'worker';
   const isCompany = userRole === 'company' || userRole === 'admin';
+
+  const QUICK_ACTIONS: { key: QuickAction; labelKey: string; icon: typeof Calendar; messageKey: string }[] = [
+    {
+      key: 'interview',
+      labelKey: 'messages.inviteToInterview',
+      icon: Calendar,
+      messageKey: 'messages.inviteToInterviewMsg',
+    },
+    {
+      key: 'documents',
+      labelKey: 'messages.requestDocuments',
+      icon: FileText,
+      messageKey: 'messages.requestDocumentsMsg',
+    },
+    {
+      key: 'availability',
+      labelKey: 'messages.requestAvailability',
+      icon: Clock,
+      messageKey: 'messages.requestAvailabilityMsg',
+    },
+  ];
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -109,7 +111,7 @@ export default function Messages() {
         const otherId = isCompany ? conv.worker_user_id : conv.company_user_id;
         const { data: otherProfile } = await supabase
           .from(TABLES.profiles)
-          .select('full_name, username, avatar_url')
+          .select('full_name, username, avatar_url, email')
           .eq('user_id', otherId)
           .single();
 
@@ -123,9 +125,16 @@ export default function Messages() {
           jobTitle = job?.title;
         }
 
+        // Build display name with multiple fallbacks
+        const displayName =
+          otherProfile?.full_name?.trim() ||
+          otherProfile?.username?.trim() ||
+          otherProfile?.email?.split('@')[0] ||
+          t('messages.unknown');
+
         enriched.push({
           ...conv,
-          other_name: otherProfile?.full_name || otherProfile?.username || 'Unknown',
+          other_name: displayName,
           other_avatar: otherProfile?.avatar_url,
           job_title: jobTitle,
         });
@@ -147,7 +156,7 @@ export default function Messages() {
     } finally {
       setLoading(false);
     }
-  }, [user, isCompany, searchParams]);
+  }, [user, isCompany, searchParams, t]);
 
   // Fetch messages for selected conversation
   const fetchMessages = useCallback(async () => {
@@ -237,7 +246,7 @@ export default function Messages() {
       await fetchMessages();
     } catch (err: unknown) {
       console.error('Failed to send message:', err);
-      toast.error('Failed to send message');
+      toast.error(t('messages.sendFailed'));
     } finally {
       setSending(false);
     }
@@ -246,7 +255,7 @@ export default function Messages() {
   const handleQuickAction = (action: QuickAction) => {
     const qa = QUICK_ACTIONS.find((a) => a.key === action);
     if (qa) {
-      handleSend(qa.message);
+      handleSend(t(qa.messageKey));
     }
   };
 
@@ -278,7 +287,7 @@ export default function Messages() {
     if (days === 0) {
       return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } else if (days === 1) {
-      return 'Yesterday';
+      return t('messages.yesterday');
     } else if (days < 7) {
       return d.toLocaleDateString([], { weekday: 'short' });
     }
@@ -302,7 +311,7 @@ export default function Messages() {
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-zinc-800 px-4 py-3 sm:px-6">
         <MessageSquare className="h-5 w-5 text-amber-500" />
-        <h1 className="text-lg font-semibold">Messages</h1>
+        <h1 className="text-lg font-semibold">{t('messages.title')}</h1>
         {totalUnread > 0 && (
           <Badge className="bg-amber-600 text-black text-xs">{totalUnread}</Badge>
         )}
@@ -319,11 +328,11 @@ export default function Messages() {
           {conversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-zinc-500 px-6 text-center">
               <MessageSquare className="h-12 w-12 mb-3 text-zinc-700" />
-              <p className="text-sm">No conversations yet</p>
+              <p className="text-sm">{t('messages.noConversations')}</p>
               <p className="text-xs mt-1 text-zinc-600">
                 {isCompany
-                  ? 'Message candidates from their profile page'
-                  : 'Companies will contact you when interested'}
+                  ? t('messages.description')
+                  : t('messages.companiesWillContact')}
               </p>
             </div>
           ) : (
@@ -366,7 +375,7 @@ export default function Messages() {
                     )}
                     <div className="flex items-center justify-between mt-0.5">
                       <p className="text-xs text-zinc-500 truncate">
-                        {conv.last_message || 'No messages yet'}
+                        {conv.last_message || t('messages.noMessagesYet')}
                       </p>
                       {unread > 0 && (
                         <Badge className="bg-amber-600 text-black text-[10px] h-5 min-w-[20px] flex-shrink-0 ml-2">
@@ -433,7 +442,7 @@ export default function Messages() {
                       className="text-[10px] h-7 border-zinc-700 text-zinc-400 hover:text-amber-400 hover:border-amber-600/50 whitespace-nowrap flex-shrink-0"
                     >
                       <action.icon className="h-3 w-3 mr-1" />
-                      {action.label}
+                      {t(action.labelKey)}
                     </Button>
                   ))}
                 </div>
@@ -443,7 +452,7 @@ export default function Messages() {
               <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
                 {messages.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-zinc-600 text-sm">
-                    Start the conversation...
+                    {t('messages.noMessagesYet')}
                   </div>
                 ) : (
                   messages.map((msg) => {
@@ -500,7 +509,7 @@ export default function Messages() {
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type a message..."
+                    placeholder={t('messages.typeMessage')}
                     rows={1}
                     className="flex-1 resize-none rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-amber-600/50 focus:outline-none focus:ring-1 focus:ring-amber-600/30"
                   />
@@ -522,7 +531,7 @@ export default function Messages() {
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-zinc-600">
               <MessageSquare className="h-16 w-16 mb-4 text-zinc-800" />
-              <p className="text-sm">Select a conversation</p>
+              <p className="text-sm">{t('messages.noConversations')}</p>
             </div>
           )}
         </div>
