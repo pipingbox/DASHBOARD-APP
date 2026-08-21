@@ -83,6 +83,8 @@ export const TABLES = {
   pidmComponents: 'pidm_components',
   pidmDimensionSets: 'pidm_dimension_sets',
   pidmDimensions: 'pidm_dimensions',
+  // Beta feedback (solo-produccion, Apendice B — PB-DRIFT-001)
+  betaFeedbackReports: 'beta_feedback_reports',
 } as const;
 
 export const STORAGE_BUCKETS = {
