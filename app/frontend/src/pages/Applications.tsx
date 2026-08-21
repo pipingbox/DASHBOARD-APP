@@ -40,17 +40,17 @@ interface Application {
 
 type StatusFilter = 'all' | 'applied' | 'reviewed' | 'interview' | 'shortlisted' | 'rejected' | 'hired';
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  applied: { label: 'Applied', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
-  reviewed: { label: 'Reviewed', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
-  interview: { label: 'Interview', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/30' },
-  shortlisted: { label: 'Shortlisted', color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/30' },
-  rejected: { label: 'Rejected', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
-  hired: { label: 'Hired', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+const STATUS_KEYS: Record<string, { i18nKey: string; color: string; bg: string }> = {
+  applied: { i18nKey: 'applications.applied', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
+  reviewed: { i18nKey: 'applications.reviewed', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
+  interview: { i18nKey: 'applications.interview', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/30' },
+  shortlisted: { i18nKey: 'applications.shortlisted', color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/30' },
+  rejected: { i18nKey: 'applications.rejected', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
+  hired: { i18nKey: 'applications.hired', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
 };
 
 export default function Applications() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -74,7 +74,7 @@ export default function Applications() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      toast.error('Failed to load applications');
+      toast.error(t('applications.loadFailed'));
       console.error('[Applications] Supabase error:', error.message, error.details, error.hint, error.code);
     } else {
       console.log('[Applications] Loaded', data?.length ?? 0, 'applications');
@@ -92,9 +92,9 @@ export default function Applications() {
       .eq('user_id', user!.id);
 
     if (error) {
-      toast.error('Failed to withdraw application');
+      toast.error(t('applications.withdrawFailed'));
     } else {
-      toast.success('Application withdrawn');
+      toast.success(t('applications.withdrawSuccess'));
       setApplications((prev) => prev.filter((a) => a.id !== id));
     }
     setWithdrawingId(null);
@@ -119,7 +119,7 @@ export default function Applications() {
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString(i18n.language, { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   const getRelativeTime = (dateStr: string) => {
@@ -127,11 +127,11 @@ export default function Applications() {
     const d = new Date(dateStr);
     const diffMs = now.getTime() - d.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    return `${Math.floor(diffDays / 30)} months ago`;
+    if (diffDays === 0) return t('applications.today');
+    if (diffDays === 1) return t('applications.yesterday');
+    if (diffDays < 7) return t('common.daysAgo', { count: diffDays });
+    if (diffDays < 30) return t('common.daysAgo', { count: Math.floor(diffDays / 7) * 7 });
+    return t('common.daysAgo', { count: diffDays });
   };
 
   // Loading skeleton
@@ -171,16 +171,16 @@ export default function Applications() {
         <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800/60 ring-1 ring-zinc-700">
           <Briefcase className="h-10 w-10 text-zinc-500" />
         </div>
-        <h2 className="text-xl font-semibold text-zinc-200">No Applications Yet</h2>
+        <h2 className="text-xl font-semibold text-zinc-200">{t('applications.noApplications')}</h2>
         <p className="mt-2 max-w-sm text-sm text-zinc-500">
-          You haven't applied to any jobs yet. Start exploring opportunities and build your application history.
+          {t('applications.noApplicationsDesc')}
         </p>
         <Button
           onClick={() => navigate('/jobs')}
           className="mt-6 bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
         >
           <Search className="mr-2 h-4 w-4" />
-          Browse Jobs
+          {t('applications.browseMoreJobs')}
         </Button>
       </div>
     );
@@ -191,9 +191,9 @@ export default function Applications() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100">My Applications</h1>
+          <h1 className="text-2xl font-bold text-zinc-100">{t('applications.title')}</h1>
           <p className="mt-1 text-sm text-zinc-500">
-            {applications.length} application{applications.length !== 1 ? 's' : ''} total
+            {t('applications.applicationCount', { count: applications.length })}
           </p>
         </div>
         <Button
@@ -201,13 +201,13 @@ export default function Applications() {
           className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
         >
           <Briefcase className="mr-2 h-4 w-4" />
-          Browse More Jobs
+          {t('applications.browseMoreJobs')}
         </Button>
       </div>
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+        {Object.entries(STATUS_KEYS).map(([key, cfg]) => (
           <button
             key={key}
             onClick={() => setStatusFilter(statusFilter === key ? 'all' : (key as StatusFilter))}
@@ -219,7 +219,7 @@ export default function Applications() {
             )}
           >
             <p className={cn('text-lg font-bold', cfg.color)}>{statusCounts[key] || 0}</p>
-            <p className="text-[11px] text-zinc-500 font-medium">{cfg.label}</p>
+            <p className="text-[11px] text-zinc-500 font-medium">{t(cfg.i18nKey)}</p>
           </button>
         ))}
       </div>
@@ -229,7 +229,7 @@ export default function Applications() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
           <Input
-            placeholder="Search by job title or company..."
+            placeholder={t('applications.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 bg-zinc-900/60 border-zinc-800 text-zinc-200 placeholder:text-zinc-600"
@@ -243,7 +243,7 @@ export default function Applications() {
             className="border-zinc-700 text-zinc-400 hover:text-zinc-200"
           >
             <Filter className="mr-1.5 h-3.5 w-3.5" />
-            Clear Filter
+            {t('applications.all')}
           </Button>
         )}
       </div>
@@ -252,11 +252,11 @@ export default function Applications() {
       <div className="grid gap-4">
         {filteredApplications.length === 0 ? (
           <div className="py-12 text-center">
-            <p className="text-zinc-500">No applications match your filters.</p>
+            <p className="text-zinc-500">{t('applications.noMatchingApplications')}</p>
           </div>
         ) : (
           filteredApplications.map((app) => {
-            const statusCfg = STATUS_CONFIG[app.status] || STATUS_CONFIG.applied;
+            const statusCfg = STATUS_KEYS[app.status] || STATUS_KEYS.applied;
             return (
               <div
                 key={app.id}
@@ -307,7 +307,7 @@ export default function Applications() {
                       variant="outline"
                       className={cn('text-xs font-medium border', statusCfg.bg, statusCfg.color)}
                     >
-                      {statusCfg.label}
+                      {t(statusCfg.i18nKey)}
                     </Badge>
                   </div>
                 </div>
@@ -321,7 +321,7 @@ export default function Applications() {
                     className="text-xs text-zinc-400 hover:text-zinc-200"
                   >
                     <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                    View Jobs
+                    {t('applications.viewJobs')}
                   </Button>
                   <Button
                     variant="ghost"
@@ -331,7 +331,7 @@ export default function Applications() {
                     className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10"
                   >
                     <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                    {withdrawingId === app.id ? 'Withdrawing…' : 'Withdraw'}
+                    {withdrawingId === app.id ? t('applications.withdrawing') : t('applications.withdraw')}
                   </Button>
                 </div>
               </div>

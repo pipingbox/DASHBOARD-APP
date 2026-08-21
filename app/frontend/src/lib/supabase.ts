@@ -60,7 +60,6 @@ export const TABLES = {
   vcaExamCenters: 'app_vca_exam_centers', // DEPRECATED — use certificationExamCenters (DEC-51)
   vcaBookings: 'app_vca_bookings',        // DEPRECATED — use certificationBookings (DEC-51)
   // Generic certification platform (DEC-51, BRAIN-VCA-002)
-  certifications: 'app_certifications',
   certificationModules: 'app_certification_modules',
   certificationLessons: 'app_certification_lessons',
   certificationExamCenters: 'app_certification_exam_centers',
@@ -70,7 +69,12 @@ export const TABLES = {
   academyLessons: 'app_academy_lessons',
   academyProgress: 'app_academy_progress',
   academyCertificates: 'app_academy_certificates',
+  academyMockExams: 'app_14da0f1941_academy_mock_exams',
+  academyExamAnswers: 'app_14da0f1941_academy_exam_answers',
   certificationAccessGrants: 'app_certification_access_grants',
+  // Workforce request pipeline (PB-DRIFT-001 reconciliation)
+  workforceRequests: 'app_14da0f1941_workforce_requests',
+  workforceAssignments: 'app_14da0f1941_workforce_assignments',
   // Stripe / monetization (PB-STRIPE-001 Fase 2, DEC-30)
   // Client access is read-only; all writes happen in Edge Functions via service_role.
   stripePrices: 'app_stripe_prices',
