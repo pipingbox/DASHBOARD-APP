@@ -40,6 +40,16 @@ import {
 } from '@/components/ui/alert-dialog';
 import type { WorkerDocument } from '@/lib/workerProfile';
 import { normalizeDocument } from '@/lib/workerProfile';
+import {
+  isValidDocOrImageFile,
+  isHeicFile,
+  validateFileSize,
+  getFileExtension,
+  formatFileSize,
+  ACCEPT_DOCS_AND_IMAGES,
+} from '@/lib/fileUploadUtils';
+import { uploadWithTimeout } from '@/lib/uploadHelpers';
+import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
 const DOCUMENT_TYPES = [
   'passport',
@@ -55,13 +65,6 @@ const DOCUMENT_TYPES = [
 ] as const;
 
 
-
-function formatFileSize(bytes: number | null): string {
-  if (!bytes) return '';
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 function getMimeIcon(mimeType: string | null) {
   if (!mimeType) return <File className="h-4 w-4 text-[#f59e0b]" />;
@@ -95,6 +98,7 @@ export function DocumentsSection() {
   const [deleteTarget, setDeleteTarget] = useState<WorkerDocument | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   // Form state
   const [documentType, setDocumentType] = useState<string>('other');
@@ -142,6 +146,7 @@ export function DocumentsSection() {
     setNotes('');
     setExpiresAt('');
     setIsVisible(true);
+    setUploadError(null);
   };
 
   const openAdd = () => {
@@ -165,28 +170,35 @@ export function DocumentsSection() {
 
   const handleFileUpload = async (file: File) => {
     if (!user) return;
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error(t('workerProfile.documents.fileTooBig', { defaultValue: 'File is too large (max 10MB)' }));
+    setUploadError(null);
+
+    // Validate file size
+    const sizeError = validateFileSize(file, 10);
+    if (sizeError) {
+      setUploadError(sizeError);
+      toast.error(sizeError);
       return;
     }
 
-    // Validate file type
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!allowedTypes.some((t) => file.type.startsWith(t.split('/')[0]) || file.type === t)) {
-      // Allow any image/* or the specific doc types
-      if (!file.type.startsWith('image/') && !allowedTypes.includes(file.type)) {
-        toast.error(t('workerProfile.documents.invalidType', { defaultValue: 'Unsupported file type. Please upload PDF or image files.' }));
-        return;
-      }
+    // Validate file type (mobile-friendly: checks MIME + extension, includes HEIC)
+    if (!isValidDocOrImageFile(file)) {
+      const msg = t('workerProfile.documents.invalidType', { defaultValue: 'Tipo de archivo no soportado. Acepta: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.' });
+      setUploadError(msg);
+      toast.error(msg);
+      return;
+    }
+
+    // Inform about HEIC
+    if (isHeicFile(file)) {
+      toast.info('Foto HEIC detectada. Se subirá correctamente.');
     }
 
     setUploading(true);
     try {
-      const ext = file.name.split('.').pop() || 'pdf';
+      const ext = getFileExtension(file.name) || 'pdf';
       const path = `${user.id}/doc-${Date.now()}.${ext}`;
       const bucketName = STORAGE_BUCKETS.certificates;
 
-      // Logging: bucket, file type, file size
       console.log('[DocumentsSection] File upload starting:', {
         bucket: bucketName,
         path,
@@ -195,12 +207,16 @@ export function DocumentsSection() {
         fileName: file.name,
       });
 
-      const { error } = await supabase.storage
-        .from(bucketName)
-        .upload(path, file, { upsert: false, cacheControl: '3600' });
+      const { error } = await uploadWithTimeout(bucketName, path, file, {
+        upsert: false,
+        cacheControl: '3600',
+        timeoutMs: 120000,
+      });
       if (error) {
-        console.error('[DocumentsSection] Upload error:', { bucket: bucketName, path, error });
-        toast.error(t('workerProfile.documents.uploadFailed', { defaultValue: 'Upload failed: ' }) + error.message);
+        console.error('[DocumentsSection] Upload error:', { bucket: bucketName, path, error: error.message });
+        const msg = t('workerProfile.documents.uploadFailed', { defaultValue: 'Error al subir: ' }) + error.message;
+        setUploadError(msg);
+        toast.error(msg);
         setUploading(false);
         return;
       }
@@ -216,10 +232,13 @@ export function DocumentsSection() {
       setFileName(file.name);
       setFileSize(file.size);
       setMimeType(file.type || null);
+      setUploadError(null);
       toast.success(t('workerProfile.documents.fileUploaded', { defaultValue: 'File uploaded successfully' }));
     } catch (err) {
       console.error('[DocumentsSection] Upload unexpected error:', err);
-      toast.error(t('workerProfile.documents.uploadFailed', { defaultValue: 'Upload failed unexpectedly' }));
+      const msg = t('workerProfile.documents.uploadFailed', { defaultValue: 'Error inesperado al subir el archivo' });
+      setUploadError(msg);
+      toast.error(msg);
     }
     setUploading(false);
   };
@@ -271,6 +290,8 @@ export function DocumentsSection() {
       toast.success(t('workerProfile.documents.added', { defaultValue: 'Document added successfully' }));
       setDialogOpen(false);
       load();
+      // Recalculate profile completion (non-blocking)
+      if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
     } catch (err) {
       console.error('Submit exception:', err);
       toast.error(t('workerProfile.documents.saveFailed', { defaultValue: 'Failed to save document' }));
@@ -289,6 +310,8 @@ export function DocumentsSection() {
     } else {
       toast.success(t('workerProfile.documents.deleted', { defaultValue: 'Document deleted' }));
       load();
+      // Recalculate profile completion (non-blocking)
+      if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
     }
     setDeleteTarget(null);
   };
@@ -458,6 +481,7 @@ export function DocumentsSection() {
                       setFileName('');
                       setFileSize(null);
                       setMimeType(null);
+                      setUploadError(null);
                     }}
                     className="text-xs uppercase tracking-wider text-zinc-500 hover:text-red-400"
                   >
@@ -465,11 +489,9 @@ export function DocumentsSection() {
                   </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="flex w-full items-center justify-center gap-2 border border-dashed border-zinc-800 bg-zinc-950 px-3 py-6 text-xs uppercase tracking-[0.15em] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:opacity-50"
+                /* Mobile fix: Use <label> wrapping hidden input instead of button + programmatic click */
+                <label
+                  className={`flex w-full cursor-pointer items-center justify-center gap-2 border border-dashed border-zinc-800 bg-zinc-950 px-3 py-6 text-xs uppercase tracking-[0.15em] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b] ${uploading ? 'pointer-events-none opacity-50' : ''}`}
                 >
                   {uploading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -479,19 +501,29 @@ export function DocumentsSection() {
                   {uploading
                     ? t('workerProfile.documents.uploading', { defaultValue: 'Uploading...' })
                     : t('workerProfile.documents.uploadFile', { defaultValue: 'Click to upload file' })}
-                </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept={ACCEPT_DOCS_AND_IMAGES}
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file);
+                      if (e.target) e.target.value = '';
+                    }}
+                  />
+                </label>
               )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="application/pdf,image/*,.doc,.docx"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFileUpload(file);
-                  e.target.value = '';
-                }}
-              />
+              {/* Upload error visible on mobile */}
+              {uploadError && (
+                <div className="rounded border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
+                  ⚠️ {uploadError}
+                </div>
+              )}
+              <p className="text-[10px] text-zinc-600">
+                PDF, DOC, DOCX, JPG, PNG, WebP, HEIC — máx. 10 MB
+              </p>
             </div>
 
             <div className="space-y-2">

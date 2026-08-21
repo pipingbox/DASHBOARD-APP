@@ -40,6 +40,8 @@ import {
 import type { WorkerCertification } from '@/lib/workerProfile';
 import { normalizeCertification } from '@/lib/workerProfile';
 import { syncCertificationReminders, deleteCertificationReminders } from '@/lib/certificationReminders';
+import { uploadWithTimeout, resolveFileMime } from '@/lib/uploadHelpers';
+import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
 export function CertificationsSection() {
   const { t } = useTranslation();
@@ -53,6 +55,7 @@ export function CertificationsSection() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   // Alert preferences state
   const [reminderDays, setReminderDays] = useState<number>(90);
@@ -204,56 +207,96 @@ export function CertificationsSection() {
   };
 
   const handleFileUpload = async (file: File) => {
-    if (!user) return;
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
+    if (!user) {
+      console.warn('[CertUpload] No user session, aborting');
+      return;
+    }
+
+    // Mobile browsers often report empty or generic MIME types.
+    // Validate by extension as fallback when file.type is unreliable.
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/heic', 'image/heif'];
+    const allowedExtensions = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'heic', 'heif'];
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const mimeOk = file.type && allowedTypes.includes(file.type);
+    const extOk = allowedExtensions.includes(ext);
+
+    const resolvedMime = resolveFileMime(file);
+
+    console.log('[CertUpload] File selected:', {
+      name: file.name,
+      type: file.type || '(empty)',
+      size: file.size,
+      ext,
+      mimeOk,
+      extOk,
+      resolvedMime,
+    });
+
+    if (!mimeOk && !extOk) {
+      console.warn('[CertUpload] Rejected: invalid type and extension');
       toast.error(t('workerProfile.certifications.invalidFileType'));
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
+      console.warn('[CertUpload] Rejected: file too large', file.size);
       toast.error(t('workerProfile.certifications.fileTooBig'));
       return;
     }
+
     setUploading(true);
+    setUploadProgress(0);
+    console.log('[CertUpload] setUploading(true)');
+
     try {
-      const ext = file.name.split('.').pop() || 'pdf';
-      const path = `${user.id}/cert-${Date.now()}.${ext}`;
+      const filePath = `${user.id}/cert-${Date.now()}.${ext || 'pdf'}`;
       const bucketName = STORAGE_BUCKETS.workerDocuments;
 
-      // Logging: bucket, file type, file size
-      console.log('[CertificationsSection] File upload starting:', {
+      console.log('[CertUpload] Upload config:', {
         bucket: bucketName,
-        path,
-        fileType: file.type,
+        path: filePath,
+        resolvedMime,
         fileSize: file.size,
         fileName: file.name,
       });
 
-      const { error } = await supabase.storage
-        .from(bucketName)
-        .upload(path, file, { upsert: false, cacheControl: '3600' });
+      setUploadProgress(30);
+
+      const { error } = await uploadWithTimeout(bucketName, filePath, file, {
+        upsert: true,
+        cacheControl: '3600',
+        timeoutMs: 120000,
+        contentType: resolvedMime,
+      });
 
       if (error) {
-        console.error('[CertificationsSection] Upload error:', { bucket: bucketName, path, error });
-        toast.error(error.message);
+        console.error('[CertUpload] Upload failed:', {
+          error: error.message,
+          bucket: bucketName,
+          path: filePath,
+        });
+        toast.error(error.message || t('common.unexpectedError'));
         return;
       }
 
-      console.log('[CertificationsSection] Upload success:', { bucket: bucketName, path });
+      setUploadProgress(100);
+      console.log('[CertUpload] Upload success, getting public URL');
 
-      const { data } = supabase.storage
+      const { data: urlData } = supabase.storage
         .from(bucketName)
-        .getPublicUrl(path);
+        .getPublicUrl(filePath);
 
-      console.log('[CertificationsSection] Public URL:', data.publicUrl);
-      setFileUrl(data.publicUrl);
+      console.log('[CertUpload] Public URL:', urlData.publicUrl);
+      setFileUrl(urlData.publicUrl);
       setFileName(file.name);
       toast.success(t('workerProfile.certifications.fileUploaded'));
     } catch (uploadErr) {
-      console.error('[CertificationsSection] Upload unexpected error:', uploadErr);
+      console.error('[CertUpload] Unexpected exception:', uploadErr);
       toast.error(t('common.unexpectedError'));
     } finally {
+      console.log('[CertUpload] setUploading(false) — finally block');
       setUploading(false);
+      // Reset progress after a brief delay so user sees 100%
+      setTimeout(() => setUploadProgress(0), 1500);
     }
   };
 
@@ -265,6 +308,17 @@ export function CertificationsSection() {
       return;
     }
     setSaving(true);
+    console.log('[CertSave] === SAVE STARTED ===');
+    const saveStartTime = Date.now();
+
+    // Hard timeout: if save takes > 20s, force-reset UI state
+    const saveTimeoutId = setTimeout(() => {
+      console.error('[CertSave] HARD TIMEOUT: save exceeded 20s, force-resetting UI');
+      setSaving(false);
+      setDialogOpen(false);
+      toast.error('Save timed out. Your certificate may have been saved — please refresh to check.');
+    }, 20000);
+
     try {
       // Build payload using ONLY allowed fields (no legacy fields)
       const payload: Record<string, unknown> = {
@@ -284,108 +338,131 @@ export function CertificationsSection() {
         visible_to_companies: isVisible,
       };
 
+      console.log('[CertSave] Payload built:', JSON.stringify(payload, null, 2));
+
       if (editing) {
-        console.log('[CertificationsSection] UPDATE payload:', payload);
+        console.log('[CertSave] MODE: UPDATE, cert id:', editing.id);
+        console.log('[CertSave] Before supabase.update()...');
         const { error } = await supabase
           .from('app_worker_certifications')
           .update(payload)
           .eq('id', editing.id);
+        console.log('[CertSave] After supabase.update(), elapsed:', Date.now() - saveStartTime, 'ms');
+        console.log('[CertSave] Update error:', error || 'none');
+
         if (error) {
-          console.error('[CertificationsSection] update error:', error);
           toast.error(error.message);
           return;
         }
+
         // Optimistic update
+        console.log('[CertSave] Applying optimistic update...');
         setItems((prev) =>
           prev.map((i) => (i.id === editing.id ? { ...i, ...payload } : i))
         );
         toast.success(t('workerProfile.certifications.updated'));
 
-        // Sync reminders when expiration_date changes
-        try {
-          const result = await syncCertificationReminders(user.id, editing.id, payload.expiry_date as string | null);
-          if (result.remindersCreated > 0) {
-            toast.success(t('workerProfile.certifications.remindersScheduled', { count: result.remindersCreated }));
-          } else if (!payload.expiry_date) {
-            toast.info(t('workerProfile.certifications.noExpiryNoReminders'));
-          }
-        } catch (reminderErr) {
-          console.error('[CertificationsSection] Reminder sync failed:', reminderErr);
-          toast.error(t('workerProfile.certifications.reminderSyncFailed'));
-        }
-      } else {
-        // Step 1: Get fresh authenticated user
-        const { data: authData, error: authError } = await supabase.auth.getUser();
-
-        // Step 2: Log authenticated user details
-        console.log('[CertificationsSection] auth.getUser() result:', {
-          user: authData?.user ?? null,
-          userId: authData?.user?.id ?? null,
-          authError: authError ?? null,
-        });
-
-        // Step 3: Abort if no user session
-        if (authError || !authData?.user) {
-          console.error('[CertificationsSection] No authenticated user session');
-          toast.error('User session not found. Please sign in again.');
-          return;
-        }
-
-        const authUserId = authData.user.id;
-
-        // Step 4: Guard against null/undefined user_id
-        if (!authUserId) {
-          console.error('[CertificationsSection] user_id is null or undefined, aborting insert');
-          toast.error('User session not found. Please sign in again.');
-          return;
-        }
-
-        // Step 5: Build final insert payload with user_id
-        const insertPayload = { ...payload, user_id: authUserId };
-
-        // Step 6: Log final insert payload
-        console.log('[CertificationsSection] Final INSERT payload:', JSON.stringify(insertPayload, null, 2));
-
-        // Step 7: Insert into public.app_worker_certifications
-        const { data, error } = await supabase
-          .from('app_worker_certifications')
-          .insert(insertPayload)
-          .select()
-          .single();
-
-        // Step 8: Log full Supabase response
-        console.log('[CertificationsSection] Supabase insert response data:', data);
-        console.error('[CertificationsSection] Supabase insert response error:', error);
-
-        if (error) {
-          toast.error(error.message);
-          return;
-        }
-        if (data) {
-          setItems((prev) => [data as WorkerCertification, ...prev]);
-
-          // Create reminders for new certification
-          try {
-            const result = await syncCertificationReminders(authUserId, (data as WorkerCertification).id, payload.expiry_date as string | null);
+        // Sync reminders (non-blocking — don't let this hang the UI)
+        console.log('[CertSave] Syncing reminders (non-blocking)...');
+        syncCertificationReminders(user.id, editing.id, payload.expiry_date as string | null)
+          .then((result) => {
             if (result.remindersCreated > 0) {
               toast.success(t('workerProfile.certifications.remindersScheduled', { count: result.remindersCreated }));
             } else if (!payload.expiry_date) {
               toast.info(t('workerProfile.certifications.noExpiryNoReminders'));
             }
-          } catch (reminderErr) {
-            console.error('[CertificationsSection] Reminder sync failed:', reminderErr);
-            toast.error(t('workerProfile.certifications.reminderSyncFailed'));
-          }
+            console.log('[CertSave] Reminders synced:', result);
+          })
+          .catch((reminderErr) => {
+            console.error('[CertSave] Reminder sync failed (non-blocking):', reminderErr);
+          });
+      } else {
+        // INSERT mode
+        console.log('[CertSave] MODE: INSERT');
+
+        // Step 1: Get fresh authenticated user
+        console.log('[CertSave] Getting fresh auth user...');
+        const { data: authData, error: authError } = await supabase.auth.getUser();
+        console.log('[CertSave] auth.getUser() completed, elapsed:', Date.now() - saveStartTime, 'ms');
+        console.log('[CertSave] auth result:', {
+          userId: authData?.user?.id ?? null,
+          authError: authError?.message ?? null,
+        });
+
+        // Step 2: Abort if no user session
+        if (authError || !authData?.user) {
+          console.error('[CertSave] No authenticated user session');
+          toast.error('User session not found. Please sign in again.');
+          return;
+        }
+
+        const authUserId = authData.user.id;
+        if (!authUserId) {
+          console.error('[CertSave] user_id is null or undefined, aborting insert');
+          toast.error('User session not found. Please sign in again.');
+          return;
+        }
+
+        // Step 3: Build final insert payload with user_id
+        const insertPayload = { ...payload, user_id: authUserId };
+        console.log('[CertSave] Final INSERT payload:', JSON.stringify(insertPayload, null, 2));
+
+        // Step 4: Insert into Supabase
+        console.log('[CertSave] Before supabase.insert()...');
+        const { data, error } = await supabase
+          .from('app_worker_certifications')
+          .insert(insertPayload)
+          .select()
+          .single();
+        console.log('[CertSave] After supabase.insert(), elapsed:', Date.now() - saveStartTime, 'ms');
+        console.log('[CertSave] Insert response data:', data);
+        console.log('[CertSave] Insert response error:', error || 'none');
+
+        if (error) {
+          toast.error(error.message);
+          return;
+        }
+
+        if (data) {
+          console.log('[CertSave] Insert successful, updating local state...');
+          setItems((prev) => [data as WorkerCertification, ...prev]);
+
+          // Create reminders (non-blocking — don't let this hang the UI)
+          console.log('[CertSave] Syncing reminders for new cert (non-blocking)...');
+          syncCertificationReminders(authUserId, (data as WorkerCertification).id, payload.expiry_date as string | null)
+            .then((result) => {
+              if (result.remindersCreated > 0) {
+                toast.success(t('workerProfile.certifications.remindersScheduled', { count: result.remindersCreated }));
+              } else if (!payload.expiry_date) {
+                toast.info(t('workerProfile.certifications.noExpiryNoReminders'));
+              }
+              console.log('[CertSave] Reminders synced for new cert:', result);
+            })
+            .catch((reminderErr) => {
+              console.error('[CertSave] Reminder sync failed (non-blocking):', reminderErr);
+            });
         } else {
-          await load();
+          console.log('[CertSave] No data returned from insert, reloading list...');
+          // Non-blocking reload — don't await
+          load().catch((loadErr) => {
+            console.error('[CertSave] Reload failed (non-blocking):', loadErr);
+          });
         }
         toast.success(t('workerProfile.certifications.added'));
       }
+
+      console.log('[CertSave] Closing dialog...');
       setDialogOpen(false);
+      console.log('[CertSave] === SAVE COMPLETED === elapsed:', Date.now() - saveStartTime, 'ms');
+
+      // Recalculate profile completion (non-blocking)
+      if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
     } catch (err) {
-      console.error('[CertificationsSection] unexpected error:', err);
+      console.error('[CertSave] Unexpected exception:', err);
       toast.error(t('common.unexpectedError'));
     } finally {
+      clearTimeout(saveTimeoutId);
+      console.log('[CertSave] finally block — setSaving(false), elapsed:', Date.now() - saveStartTime, 'ms');
       setSaving(false);
     }
   };
@@ -408,6 +485,8 @@ export function CertificationsSection() {
         setItems(previousItems);
       } else {
         toast.success(t('workerProfile.certifications.deleted'));
+        // Recalculate profile completion (non-blocking)
+        if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
       }
     } catch {
       toast.error(t('common.unexpectedError'));
@@ -618,8 +697,22 @@ export function CertificationsSection() {
       </div>
 
       {/* Add/Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={(open) => { if (!saving) setDialogOpen(open); }}>
-        <DialogContent className="max-w-2xl border-zinc-800 bg-[#0d0d0d]">
+      <Dialog open={dialogOpen} onOpenChange={(open) => { if (!saving && !uploading) setDialogOpen(open); }}>
+        <DialogContent
+          className="max-w-2xl border-zinc-800 bg-[#0d0d0d]"
+          onInteractOutside={(e) => {
+            // Prevent dialog from closing when file picker is open (mobile)
+            if (uploading) e.preventDefault();
+          }}
+          onPointerDownOutside={(e) => {
+            // Prevent dialog from closing on pointer down outside (mobile file picker)
+            if (uploading) e.preventDefault();
+          }}
+          onFocusOutside={(e) => {
+            // Prevent dialog from closing on focus loss (mobile file picker opens native UI)
+            e.preventDefault();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>
               {editing
@@ -627,6 +720,23 @@ export function CertificationsSection() {
                 : t('workerProfile.certifications.addTitle')}
             </DialogTitle>
           </DialogHeader>
+
+          {/* File input OUTSIDE the form to prevent mobile form submission issues */}
+          <input
+            ref={fileInputRef}
+            id="cert-file-upload-input"
+            type="file"
+            accept="application/pdf,image/png,image/jpeg,image/jpg,image/webp"
+            className="sr-only"
+            tabIndex={-1}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileUpload(file);
+              // Reset so same file can be re-selected
+              e.target.value = '';
+            }}
+          />
+
           <form onSubmit={submit} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
@@ -688,7 +798,7 @@ export function CertificationsSection() {
               </div>
             </div>
 
-            {/* File Upload */}
+            {/* File Upload - uses label[htmlFor] pattern for reliable mobile file picker */}
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wider text-zinc-400">
                 {t('workerProfile.certifications.file')}
@@ -711,36 +821,41 @@ export function CertificationsSection() {
                   </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="flex w-full items-center justify-center gap-2 border border-dashed border-zinc-800 bg-zinc-950 px-3 py-6 text-xs uppercase tracking-[0.15em] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:opacity-50"
-                >
-                  {uploading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Upload className="h-4 w-4" />
+                <div className="space-y-2">
+                  <label
+                    htmlFor="cert-file-upload-input"
+                    aria-disabled={uploading}
+                    className={`flex w-full cursor-pointer items-center justify-center gap-2 border border-dashed border-zinc-800 bg-zinc-950 px-3 py-6 text-xs uppercase tracking-[0.15em] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b] ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
+                  >
+                    {uploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Upload className="h-4 w-4" />
+                    )}
+                    {uploading
+                      ? `${t('common.loading')} ${uploadProgress}%`
+                      : t('workerProfile.certifications.uploadFile')}
+                  </label>
+                  {uploading && (
+                    <div className="w-full space-y-1">
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+                        <div
+                          className="h-full rounded-full bg-[#f59e0b] transition-all duration-300 ease-out"
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                      <p className="text-center text-[11px] text-zinc-500">
+                        {uploadProgress < 100
+                          ? `${uploadProgress}% ${t('workerProfile.certifications.uploading') || 'uploading...'}`
+                          : `✓ ${t('workerProfile.certifications.uploadComplete') || 'Upload complete'}`}
+                      </p>
+                    </div>
                   )}
-                  {uploading
-                    ? t('common.loading')
-                    : t('workerProfile.certifications.uploadFile')}
-                </button>
+                </div>
               )}
               <p className="text-[11px] text-zinc-600">
                 {t('workerProfile.certifications.fileHint')}
               </p>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="application/pdf,image/png,image/jpeg,image/jpg,image/webp"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFileUpload(file);
-                  e.target.value = '';
-                }}
-              />
             </div>
 
             <div className="space-y-2">

@@ -13,6 +13,14 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import {
+  isValidDocumentFile,
+  validateFileSize,
+  getSafeDocExtension,
+  ACCEPT_DOCUMENTS,
+} from '@/lib/fileUploadUtils';
+import { uploadWithTimeout } from '@/lib/uploadHelpers';
+import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
 export function CVUploadSection() {
   const { t } = useTranslation();
@@ -20,6 +28,7 @@ export function CVUploadSection() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [removing, setRemoving] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const cvFileUrl = profile?.cv_file_url as string | null;
   const cvFileName = profile?.cv_file_name as string | null;
@@ -27,19 +36,29 @@ export function CVUploadSection() {
 
   const handleUpload = async (file: File) => {
     if (!user) return;
-    if (file.type !== 'application/pdf') {
-      toast.error(t('workerProfile.cv.pdfOnly'));
+    setUploadError(null);
+
+    // Validate file type (mobile-friendly: checks both MIME and extension)
+    if (!isValidDocumentFile(file)) {
+      const msg = t('workerProfile.cv.allowedFormats', 'Solo se aceptan archivos PDF, DOC y DOCX');
+      setUploadError(msg);
+      toast.error(msg);
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error(t('workerProfile.cv.fileTooBig'));
+
+    // Validate file size
+    const sizeError = validateFileSize(file, 10);
+    if (sizeError) {
+      setUploadError(sizeError);
+      toast.error(sizeError);
       return;
     }
+
     setUploading(true);
-    const path = `${user.id}/cv-${Date.now()}.pdf`;
+    const safeExt = `.${getSafeDocExtension(file.name)}`;
+    const path = `${user.id}/cv-${Date.now()}${safeExt}`;
     const bucketName = STORAGE_BUCKETS.certificates;
 
-    // Logging: bucket, file type, file size
     console.log('[CVUploadSection] File upload starting:', {
       bucket: bucketName,
       path,
@@ -48,13 +67,17 @@ export function CVUploadSection() {
       fileName: file.name,
     });
 
-    const { error } = await supabase.storage
-      .from(bucketName)
-      .upload(path, file, { upsert: false, cacheControl: '3600' });
+    const { error } = await uploadWithTimeout(bucketName, path, file, {
+      upsert: false,
+      cacheControl: '3600',
+      timeoutMs: 120000,
+    });
     if (error) {
-      console.error('[CVUploadSection] Upload error:', { bucket: bucketName, path, error });
+      console.error('[CVUploadSection] Upload error:', { bucket: bucketName, path, error: error.message });
       setUploading(false);
-      toast.error(error.message);
+      const msg = `Error al subir: ${error.message}`;
+      setUploadError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -66,56 +89,90 @@ export function CVUploadSection() {
 
     console.log('[CVUploadSection] Public URL:', data.publicUrl);
 
-    const { error: updateError } = await supabase
+    const { data: upsertedData, error: updateError } = await supabase
       .from(TABLES.profiles)
-      .update({
-        cv_file_url: data.publicUrl,
-        cv_file_name: file.name,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', user.id);
+      .upsert(
+        {
+          user_id: user.id,
+          cv_file_url: data.publicUrl,
+          cv_file_name: file.name,
+          cv_file_path: path,
+          cv_uploaded_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      )
+      .select()
+      .single();
 
     setUploading(false);
-    if (updateError) {
-      toast.error(updateError.message);
+    if (updateError || !upsertedData) {
+      console.error('[CVUploadSection] Profile upsert error:', updateError?.message);
+      const msg = t('workerProfile.cv.saveError', 'CV uploaded but failed to save reference: ') + (updateError?.message || 'No data returned');
+      setUploadError(msg);
+      toast.error(msg);
       return;
     }
+    console.log('[CVUploadSection] Profile upserted with CV fields:', {
+      cv_file_url: data.publicUrl,
+      cv_file_name: file.name,
+      cv_file_path: path,
+    });
+    setUploadError(null);
     toast.success(t('workerProfile.cv.uploaded'));
     await refreshProfile();
+    // Recalculate profile completion (non-blocking)
+    recalculateAndSaveProfileCompletion(user.id).catch(() => {});
   };
 
   const handleRemove = async () => {
     if (!user) return;
     setRemoving(true);
-    const { error } = await supabase
+    const { data: upsertedData, error } = await supabase
       .from(TABLES.profiles)
-      .update({
-        cv_file_url: null,
-        cv_file_name: null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', user.id);
+      .upsert(
+        {
+          user_id: user.id,
+          cv_file_url: null,
+          cv_file_name: null,
+          cv_file_path: null,
+          cv_uploaded_at: null,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      )
+      .select()
+      .single();
     setRemoving(false);
-    if (error) {
-      toast.error(error.message);
+    if (error || !upsertedData) {
+      console.error('[CVUploadSection] Remove upsert failed:', error?.message);
+      toast.error(error?.message || 'Failed to remove CV');
       return;
     }
     toast.success(t('workerProfile.cv.removed'));
     await refreshProfile();
+    // Recalculate profile completion (non-blocking)
+    recalculateAndSaveProfileCompletion(user.id).catch(() => {});
   };
 
   const toggleVisibility = async () => {
     if (!user) return;
     try {
-      const { error } = await supabase
+      const { data: upsertedData, error } = await supabase
         .from(TABLES.profiles)
-        .update({
-          cv_visible: !cvVisible,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('user_id', user.id);
-      if (error) {
-        toast.error(error.message);
+        .upsert(
+          {
+            user_id: user.id,
+            cv_visible: !cvVisible,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id' }
+        )
+        .select()
+        .single();
+      if (error || !upsertedData) {
+        console.error('[CVUploadSection] Toggle visibility upsert failed:', error?.message);
+        toast.error(error?.message || 'Failed to update visibility');
         return;
       }
       toast.success(
@@ -154,10 +211,12 @@ export function CVUploadSection() {
                   <p className="text-sm font-medium text-zinc-200 truncate">
                     {cvFileName || 'CV.pdf'}
                   </p>
-                  <p className="text-xs text-zinc-500">PDF</p>
+                  <p className="text-xs text-zinc-500">
+                    {cvFileName?.match(/\.(docx?)$/i) ? 'DOC' : 'PDF'}
+                  </p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <a
                   href={cvFileUrl}
                   target="_blank"
@@ -167,15 +226,24 @@ export function CVUploadSection() {
                   <Download className="h-3 w-3" />
                   {t('workerProfile.cv.view')}
                 </a>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="inline-flex items-center gap-1 border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.15em] text-zinc-300 hover:border-zinc-600 hover:text-zinc-200"
+                {/* Mobile fix: Use <label> instead of button + programmatic click */}
+                <label
+                  className={`inline-flex cursor-pointer items-center gap-1 border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.15em] text-zinc-300 hover:border-zinc-600 hover:text-zinc-200 ${uploading ? 'pointer-events-none opacity-50' : ''}`}
                 >
                   <Upload className="h-3 w-3" />
                   {t('workerProfile.cv.replace')}
-                </button>
+                  <input
+                    type="file"
+                    accept={ACCEPT_DOCUMENTS}
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleUpload(file);
+                      if (e.target) e.target.value = '';
+                    }}
+                  />
+                </label>
                 <Button
                   type="button"
                   variant="ghost"
@@ -205,11 +273,9 @@ export function CVUploadSection() {
             </div>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="flex w-full items-center justify-center gap-2 border border-dashed border-zinc-800 bg-zinc-950 px-3 py-8 text-xs uppercase tracking-[0.15em] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:opacity-50"
+          /* Mobile fix: Use <label> for the upload area instead of button + programmatic click */
+          <label
+            className={`flex w-full cursor-pointer items-center justify-center gap-2 border border-dashed border-zinc-800 bg-zinc-950 px-3 py-8 text-xs uppercase tracking-[0.15em] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b] ${uploading ? 'pointer-events-none opacity-50' : ''}`}
           >
             {uploading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -219,21 +285,32 @@ export function CVUploadSection() {
             {uploading
               ? t('common.loading')
               : t('workerProfile.cv.uploadPdf')}
-          </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={ACCEPT_DOCUMENTS}
+              className="hidden"
+              disabled={uploading}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleUpload(file);
+                if (e.target) e.target.value = '';
+              }}
+            />
+          </label>
         )}
       </div>
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="application/pdf"
-        className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) handleUpload(file);
-          e.target.value = '';
-        }}
-      />
+      {/* Error message - visible on mobile with clear styling */}
+      {uploadError && (
+        <div className="mt-3 rounded border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
+          ⚠️ {uploadError}
+        </div>
+      )}
+
+      <p className="mt-2 text-[10px] text-zinc-600">
+        PDF, DOC, DOCX — máx. 10 MB
+      </p>
     </section>
   );
 }

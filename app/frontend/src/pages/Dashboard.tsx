@@ -470,39 +470,43 @@ export default function Dashboard() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-1 border border-zinc-800/80 bg-[#0d0d0d] p-5">
-          {profile && (
-            <div className="flex items-start gap-4">
-              <div className="flex h-14 w-14 items-center justify-center overflow-hidden bg-zinc-900 text-[#f59e0b]">
-                {profile.avatar_url && profile.show_avatar !== false ? (
-                  <img
-                    src={profile.avatar_url}
-                    alt={profile.full_name || 'avatar'}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <UserCircle2 className="h-8 w-8" />
-                )}
+        <div className="lg:col-span-1 space-y-4">
+          <div className="border border-zinc-800/80 bg-[#0d0d0d] p-5">
+            {profile && (
+              <div className="flex items-start gap-4">
+                <div className="flex h-14 w-14 items-center justify-center overflow-hidden bg-zinc-900 text-[#f59e0b]">
+                  {profile.avatar_url && profile.show_avatar !== false ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt={profile.full_name || 'avatar'}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <UserCircle2 className="h-8 w-8" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">
+                    {t('dashboard.yourProfile')}
+                  </p>
+                  <p className="mt-1 text-base font-semibold text-zinc-100 truncate">
+                    {profile.full_name || t('dashboard.unnamedUser')}
+                  </p>
+                  {profile.title && (
+                    <p className="mt-1 text-xs text-zinc-500">{profile.title}</p>
+                  )}
+                  <Link
+                    to="/profile"
+                    className="mt-3 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-[#f59e0b] hover:underline"
+                  >
+                    {t('dashboard.editProfile')} <ArrowRight className="h-3 w-3" />
+                  </Link>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">
-                  {t('dashboard.yourProfile')}
-                </p>
-                <p className="mt-1 text-base font-semibold text-zinc-100 truncate">
-                  {profile.full_name || t('dashboard.unnamedUser')}
-                </p>
-                {profile.title && (
-                  <p className="mt-1 text-xs text-zinc-500">{profile.title}</p>
-                )}
-                <Link
-                  to="/profile"
-                  className="mt-3 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-[#f59e0b] hover:underline"
-                >
-                  {t('dashboard.editProfile')} <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
+          {/* Profile Completion Card — always visible */}
+          <ProfileCompletionCard />
         </div>
 
         <div className="lg:col-span-2 grid gap-4 sm:grid-cols-3">
@@ -753,9 +757,6 @@ export default function Dashboard() {
           )}
         </WidgetShell>
       </div>
-
-      {/* Profile Completion Card */}
-      <ProfileCompletionCard />
 
       {/* Pending Job Invitations for Workers */}
       <PendingInvitationsWidget />

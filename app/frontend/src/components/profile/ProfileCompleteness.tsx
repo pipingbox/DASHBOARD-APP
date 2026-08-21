@@ -18,7 +18,10 @@ import {
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import {
+  calculateProfileCompletion,
   getCompletionStatus,
+  type ProfileCompletionInput,
+  type ProfileCompletionResult,
   type CompletionStatusLevel,
 } from '@/lib/profileCompletion';
 
@@ -28,18 +31,12 @@ interface CompletenessItem {
   icon: React.ReactNode;
 }
 
-function getStatusLevel(percentage: number): CompletionStatusLevel {
-  return getCompletionStatus(percentage);
-}
-
 export function ProfileCompleteness() {
   const { t } = useTranslation();
   const { user, profile } = useAuth();
+  const [result, setResult] = useState<ProfileCompletionResult | null>(null);
   const [items, setItems] = useState<CompletenessItem[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Read directly from DB-stored value — no local calculation
-  const percentage = (profile as Record<string, unknown>)?.profile_completion as number ?? 0;
 
   useEffect(() => {
     if (!user || !profile) return;
@@ -50,7 +47,7 @@ export function ProfileCompleteness() {
     if (!user || !profile) return;
     setLoading(true);
 
-    // Fetch counts only for the checklist display (not for percentage calculation)
+    // Fetch counts for calculation
     let experienceCount = 0;
     let certificationCount = 0;
     let documentCount = 0;
@@ -78,6 +75,35 @@ export function ProfileCompleteness() {
       // Continue with zeros
     }
 
+    // Use the centralized calculation engine
+    const input: ProfileCompletionInput = {
+      avatar_url: profile.avatar_url,
+      full_name: profile.full_name,
+      title: profile.title,
+      company: profile.company,
+      location: profile.location,
+      years_experience: profile.years_experience,
+      skills: profile.skills,
+      bio: profile.bio,
+      cv_file_url: profile.cv_file_url,
+      cv_url: profile.cv_url,
+      experience_count: experienceCount,
+      certification_count: certificationCount,
+      document_count: documentCount,
+    };
+
+    const calculated = calculateProfileCompletion(input);
+
+    console.log("[PROFILE_COMPLETION]", {
+      source: "profile",
+      user_id: user.id,
+      calculated: calculated.percentage,
+      stored: profile.profile_completion,
+    });
+
+    setResult(calculated);
+
+    // Build checklist items with icons for display
     const iconMap: Record<string, React.ReactNode> = {
       photo: <Camera className="h-3.5 w-3.5" />,
       fullName: <User className="h-3.5 w-3.5" />,
@@ -93,29 +119,24 @@ export function ProfileCompleteness() {
       documents: <FolderOpen className="h-3.5 w-3.5" />,
     };
 
-    // Simple field checks for checklist (not used for percentage)
-    const p = profile as Record<string, unknown>;
-    const checklistItems: CompletenessItem[] = [
-      { key: 'photo', completed: !!(p.avatar_url), icon: iconMap.photo },
-      { key: 'fullName', completed: !!(p.full_name), icon: iconMap.fullName },
-      { key: 'position', completed: !!(p.title), icon: iconMap.position },
-      { key: 'company', completed: !!(p.company), icon: iconMap.company },
-      { key: 'location', completed: !!(p.location), icon: iconMap.location },
-      { key: 'yearsExperience', completed: !!(p.years_experience), icon: iconMap.yearsExperience },
-      { key: 'skills', completed: Array.isArray(p.skills) ? (p.skills as unknown[]).length > 0 : !!(p.skills), icon: iconMap.skills },
-      { key: 'bio', completed: !!(p.bio), icon: iconMap.bio },
-      { key: 'cv', completed: !!(p.cv_file_url) || !!(p.cv_url), icon: iconMap.cv },
-      { key: 'experience', completed: experienceCount > 0, icon: iconMap.experience },
-      { key: 'certification', completed: certificationCount > 0, icon: iconMap.certification },
-      { key: 'documents', completed: documentCount > 0, icon: iconMap.documents },
-    ];
+    const checklistItems: CompletenessItem[] = calculated.items.map((item) => ({
+      key: item.key,
+      completed: item.completed,
+      icon: iconMap[item.key] || <User className="h-3.5 w-3.5" />,
+    }));
 
     setItems(checklistItems);
     setLoading(false);
-  };
 
-  const statusLevel = getStatusLevel(percentage);
-  const missingItems = items.filter((item) => !item.completed);
+    // Optionally sync back to DB as cached value (non-blocking)
+    if (calculated.percentage !== profile.profile_completion) {
+      supabase
+        .from(TABLES.profiles)
+        .update({ profile_completion: calculated.percentage })
+        .eq('user_id', user.id)
+        .then(() => {});
+    }
+  };
 
   if (loading) {
     return (
@@ -130,6 +151,12 @@ export function ProfileCompleteness() {
       </div>
     );
   }
+
+  if (!result) return null;
+
+  const percentage = result.percentage;
+  const statusLevel = result.status;
+  const missingItems = items.filter((item) => !item.completed);
 
   return (
     <div className="border border-zinc-800/80 bg-[#0d0d0d] p-6 space-y-4">
@@ -148,13 +175,15 @@ export function ProfileCompleteness() {
           style={{
             width: `${percentage}%`,
             background:
-              percentage >= 90
-                ? 'linear-gradient(90deg, #f59e0b, #22c55e)'
-                : percentage >= 70
-                  ? 'linear-gradient(90deg, #f59e0b, #eab308)'
-                  : percentage >= 40
-                    ? '#f59e0b'
-                    : '#ef4444',
+              percentage >= 100
+                ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+                : percentage >= 90
+                  ? 'linear-gradient(90deg, #f59e0b, #22c55e)'
+                  : percentage >= 70
+                    ? 'linear-gradient(90deg, #f59e0b, #eab308)'
+                    : percentage >= 40
+                      ? '#f59e0b'
+                      : '#ef4444',
           }}
         />
       </div>
@@ -231,7 +260,7 @@ export function ProfileCompleteness() {
 
 /**
  * Compact badge version for CandidateProfile page (company view)
- * Reads profile_completion directly from the database
+ * Uses calculateProfileCompletion for consistency
  */
 export function ProfileCompletenessBadge({ userId }: { userId: string }) {
   const { t } = useTranslation();
@@ -239,20 +268,72 @@ export function ProfileCompletenessBadge({ userId }: { userId: string }) {
 
   useEffect(() => {
     if (!userId) return;
-    fetchCompletion();
+    fetchAndCalculateCompletion();
   }, [userId]);
 
-  const fetchCompletion = async () => {
+  const fetchAndCalculateCompletion = async () => {
     try {
+      // Fetch profile data
       const { data: profileData } = await supabase
         .from(TABLES.profiles)
-        .select('profile_completion')
+        .select('avatar_url, full_name, title, company, location, years_experience, skills, bio, cv_file_url, cv_url')
         .eq('user_id', userId)
         .single();
 
-      if (profileData) {
-        setPercentage(profileData.profile_completion ?? 0);
+      if (!profileData) return;
+
+      // Fetch related counts
+      let experience_count = 0;
+      let certification_count = 0;
+      let document_count = 0;
+
+      try {
+        const [expRes, certRes, docRes] = await Promise.all([
+          supabase
+            .from(TABLES.workerExperiences)
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', userId),
+          supabase
+            .from(TABLES.workerCertifications)
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', userId),
+          supabase
+            .from(TABLES.workerDocuments)
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', userId),
+        ]);
+        experience_count = expRes.count ?? 0;
+        certification_count = certRes.count ?? 0;
+        document_count = docRes.error ? 0 : (docRes.count ?? 0);
+      } catch {
+        // Continue with zeros
       }
+
+      const input: ProfileCompletionInput = {
+        avatar_url: profileData.avatar_url,
+        full_name: profileData.full_name,
+        title: profileData.title,
+        company: profileData.company,
+        location: profileData.location,
+        years_experience: profileData.years_experience,
+        skills: profileData.skills,
+        bio: profileData.bio,
+        cv_file_url: profileData.cv_file_url,
+        cv_url: profileData.cv_url,
+        experience_count,
+        certification_count,
+        document_count,
+      };
+
+      const result = calculateProfileCompletion(input);
+
+      console.log("[PROFILE_COMPLETION]", {
+        source: "badge",
+        user_id: userId,
+        calculated: result.percentage,
+      });
+
+      setPercentage(result.percentage);
     } catch {
       // Silently fail
     }
@@ -260,7 +341,7 @@ export function ProfileCompletenessBadge({ userId }: { userId: string }) {
 
   if (percentage === null) return null;
 
-  const statusLevel = getStatusLevel(percentage);
+  const statusLevel = getCompletionStatus(percentage);
   const colorClass =
     statusLevel === 'recruiter_ready'
       ? 'bg-green-500/10 text-green-400 border-green-500/30'
