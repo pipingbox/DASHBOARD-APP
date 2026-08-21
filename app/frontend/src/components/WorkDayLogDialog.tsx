@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Loader2, Plus, Settings2, Trash2 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
@@ -34,12 +35,9 @@ import { RatePresetManager } from './RatePresetManager';
 interface WorkDayLogDialogProps {
   onChanged?: () => void;
   trigger?: React.ReactNode;
-  // Controlled-open mode, used from calendar day clicks.
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  // Prefill for a specific date
   initialDate?: string;
-  // Existing log being edited
   existingLog?: WorkDayLog | null;
 }
 
@@ -52,7 +50,7 @@ interface FormState {
   extra_rate: string;
   kilometers: string;
   kilometer_rate: string;
-  travel_allowance_override: string; // allows user to type a flat allowance
+  travel_allowance_override: string;
   currency: CurrencyCode;
   notes: string;
   preset_id: string | null;
@@ -82,6 +80,7 @@ export function WorkDayLogDialog({
   existingLog,
 }: WorkDayLogDialogProps) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
@@ -99,7 +98,6 @@ export function WorkDayLogDialog({
   const [presetEditId, setPresetEditId] = useState<string | null>(null);
 
   const loadPresets = async () => {
-    // Use supabase.auth.getUser() for a fresh, server-validated user id
     const { data: authData } = await supabase.auth.getUser();
     const uid = authData?.user?.id;
     if (!uid) return;
@@ -116,7 +114,6 @@ export function WorkDayLogDialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, user]);
 
-  // Prefill from existing log or initialDate when opening
   useEffect(() => {
     if (!open) return;
     if (existingLog) {
@@ -200,39 +197,39 @@ export function WorkDayLogDialog({
 
   const validate = (): boolean => {
     const next: Partial<Record<keyof FormState, string>> = {};
-    if (!form.log_date) next.log_date = 'Date is required';
-    if (!form.location.trim()) next.location = 'Location is required';
+    if (!form.log_date) next.log_date = t('workday.dateRequired');
+    if (!form.location.trim()) next.location = t('workday.locationRequired');
 
     const hn = Number(form.normal_hours);
     if (form.normal_hours === '' || Number.isNaN(hn) || hn < 0) {
-      next.normal_hours = 'Enter normal hours';
-    } else if (hn > 24) next.normal_hours = 'Must be 24 or less';
+      next.normal_hours = t('workday.enterNormalHours');
+    } else if (hn > 24) next.normal_hours = t('workday.max24');
 
     const he = Number(form.extra_hours);
     if (form.extra_hours !== '' && (Number.isNaN(he) || he < 0)) {
-      next.extra_hours = 'Invalid';
-    } else if (he > 24) next.extra_hours = 'Must be 24 or less';
+      next.extra_hours = t('workday.invalid');
+    } else if (he > 24) next.extra_hours = t('workday.max24');
 
     const rn = Number(form.normal_rate);
     if (form.normal_rate === '' || Number.isNaN(rn) || rn < 0) {
-      next.normal_rate = 'Enter normal rate';
+      next.normal_rate = t('workday.enterNormalRate');
     }
     const re = Number(form.extra_rate);
     if (form.extra_rate === '' || Number.isNaN(re) || re < 0) {
-      next.extra_rate = 'Enter extra rate';
+      next.extra_rate = t('workday.enterExtraRate');
     }
 
     if (form.kilometers !== '') {
       const k = Number(form.kilometers);
-      if (Number.isNaN(k) || k < 0) next.kilometers = 'Invalid';
+      if (Number.isNaN(k) || k < 0) next.kilometers = t('workday.invalid');
     }
     if (form.kilometer_rate !== '') {
       const k = Number(form.kilometer_rate);
-      if (Number.isNaN(k) || k < 0) next.kilometer_rate = 'Invalid';
+      if (Number.isNaN(k) || k < 0) next.kilometer_rate = t('workday.invalid');
     }
     if (form.travel_allowance_override !== '') {
-      const t = Number(form.travel_allowance_override);
-      if (Number.isNaN(t) || t < 0) next.travel_allowance_override = 'Invalid';
+      const tv = Number(form.travel_allowance_override);
+      if (Number.isNaN(tv) || tv < 0) next.travel_allowance_override = t('workday.invalid');
     }
 
     setErrors(next);
@@ -242,11 +239,11 @@ export function WorkDayLogDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      toast.error('You must be signed in');
+      toast.error(t('workday.mustBeSignedIn'));
       return;
     }
     if (!validate()) {
-      toast.error('Please fix the highlighted fields');
+      toast.error(t('workday.fixFields'));
       return;
     }
 
@@ -279,7 +276,6 @@ export function WorkDayLogDialog({
         .eq('id', existingLog.id)
         .eq('user_id', user.id));
     } else {
-      // Upsert on (user_id, log_date) — if a log exists for this date, update it.
       ({ error } = await supabase
         .from(TABLES.workDayLogs)
         .upsert(payload, { onConflict: 'user_id,log_date' }));
@@ -287,11 +283,11 @@ export function WorkDayLogDialog({
     setSubmitting(false);
 
     if (error) {
-      toast.error('Failed to save workday', { description: error.message });
+      toast.error(t('workday.failedToSave'), { description: error.message });
       return;
     }
 
-    toast.success(existingLog ? 'Workday updated' : 'Workday saved', {
+    toast.success(existingLog ? t('workday.workdayUpdated') : t('workday.workdaySaved'), {
       description: `${form.log_date} • ${formatCurrency(salary.finalTotal, form.currency)} total`,
     });
     setOpen(false);
@@ -300,7 +296,7 @@ export function WorkDayLogDialog({
 
   const handleDelete = async () => {
     if (!user || !existingLog) return;
-    if (!window.confirm('Delete this workday entry?')) return;
+    if (!window.confirm(t('workday.confirmDelete'))) return;
     setDeleting(true);
     const { error } = await supabase
       .from(TABLES.workDayLogs)
@@ -309,10 +305,10 @@ export function WorkDayLogDialog({
       .eq('user_id', user.id);
     setDeleting(false);
     if (error) {
-      toast.error('Failed to delete', { description: error.message });
+      toast.error(t('workday.failedToDelete'), { description: error.message });
       return;
     }
-    toast.success('Workday deleted');
+    toast.success(t('workday.workdayDeleted'));
     setOpen(false);
     onChanged?.();
   };
@@ -333,7 +329,7 @@ export function WorkDayLogDialog({
             {trigger ?? (
               <Button className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Workday
+                {t('dashboard.addWorkday')}
               </Button>
             )}
           </SheetTrigger>
@@ -344,13 +340,13 @@ export function WorkDayLogDialog({
         >
           <SheetHeader className="space-y-1">
             <p className="text-[10px] uppercase tracking-[0.25em] text-[#f59e0b]">
-              Work Day / Salary Log
+              {t('workday.eyebrow')}
             </p>
             <SheetTitle className="text-zinc-100">
-              {existingLog ? 'Edit workday' : 'New workday entry'}
+              {existingLog ? t('workday.editTitle') : t('workday.newTitle')}
             </SheetTitle>
             <SheetDescription className="text-zinc-500">
-              Track hours, gross salary, location and optional travel allowance.
+              {t('workday.description')}
             </SheetDescription>
           </SheetHeader>
 
@@ -361,7 +357,7 @@ export function WorkDayLogDialog({
                 htmlFor="preset"
                 className="text-xs uppercase tracking-[0.2em] text-zinc-400"
               >
-                Rate preset
+                {t('workday.ratePreset')}
               </Label>
               <div className="flex gap-2">
                 <select
@@ -370,7 +366,7 @@ export function WorkDayLogDialog({
                   onChange={(e) => applyPreset(e.target.value)}
                   className="flex h-9 flex-1 border border-zinc-800 bg-zinc-950 px-3 py-1 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#f59e0b]"
                 >
-                  <option value="">— No preset —</option>
+                  <option value="">{t('workday.noPreset')}</option>
                   {presets.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -390,7 +386,7 @@ export function WorkDayLogDialog({
                 </Button>
               </div>
               <p className="text-[10px] text-zinc-600">
-                Selecting a preset auto-fills location and rates. You can still edit each field.
+                {t('workday.presetHint')}
               </p>
             </div>
 
@@ -401,7 +397,7 @@ export function WorkDayLogDialog({
                   htmlFor="log_date"
                   className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                 >
-                  Date <span className="text-[#f59e0b]">*</span>
+                  {t('workday.date')} <span className="text-[#f59e0b]">*</span>
                 </Label>
                 <Input
                   id="log_date"
@@ -419,7 +415,7 @@ export function WorkDayLogDialog({
                   htmlFor="currency"
                   className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                 >
-                  Currency
+                  {t('workday.currency')}
                 </Label>
                 <select
                   id="currency"
@@ -442,11 +438,11 @@ export function WorkDayLogDialog({
                 htmlFor="location"
                 className="text-xs uppercase tracking-[0.2em] text-zinc-400"
               >
-                Work location / site <span className="text-[#f59e0b]">*</span>
+                {t('workday.workLocation')} <span className="text-[#f59e0b]">*</span>
               </Label>
               <Input
                 id="location"
-                placeholder="e.g. Fluxys Loenhout"
+                placeholder={t('workday.locationPlaceholder')}
                 value={form.location}
                 onChange={(e) => update('location', e.target.value)}
                 className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-[#f59e0b]"
@@ -457,7 +453,7 @@ export function WorkDayLogDialog({
             {/* Hours */}
             <div className="border-t border-zinc-800/60 pt-5">
               <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 mb-3">
-                Hours
+                {t('workday.hours')}
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -465,7 +461,7 @@ export function WorkDayLogDialog({
                     htmlFor="normal_hours"
                     className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                   >
-                    Normal hours <span className="text-[#f59e0b]">*</span>
+                    {t('workday.normalHours')} <span className="text-[#f59e0b]">*</span>
                   </Label>
                   <Input
                     id="normal_hours"
@@ -487,7 +483,7 @@ export function WorkDayLogDialog({
                     htmlFor="extra_hours"
                     className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                   >
-                    Extra hours
+                    {t('workday.extraHours')}
                   </Label>
                   <Input
                     id="extra_hours"
@@ -510,7 +506,7 @@ export function WorkDayLogDialog({
             {/* Rates */}
             <div className="border-t border-zinc-800/60 pt-5">
               <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 mb-3">
-                Gross hourly rates
+                {t('workday.grossHourlyRates')}
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -518,7 +514,7 @@ export function WorkDayLogDialog({
                     htmlFor="normal_rate"
                     className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                   >
-                    Normal rate ({symbol}) <span className="text-[#f59e0b]">*</span>
+                    {t('workday.normalRate')} ({symbol}) <span className="text-[#f59e0b]">*</span>
                   </Label>
                   <Input
                     id="normal_rate"
@@ -539,7 +535,7 @@ export function WorkDayLogDialog({
                     htmlFor="extra_rate"
                     className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                   >
-                    Extra rate ({symbol}) <span className="text-[#f59e0b]">*</span>
+                    {t('workday.extraRate')} ({symbol}) <span className="text-[#f59e0b]">*</span>
                   </Label>
                   <Input
                     id="extra_rate"
@@ -561,7 +557,7 @@ export function WorkDayLogDialog({
             {/* Travel */}
             <div className="border-t border-zinc-800/60 pt-5">
               <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 mb-3">
-                Travel (optional)
+                {t('workday.travel')}
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -569,7 +565,7 @@ export function WorkDayLogDialog({
                     htmlFor="kilometers"
                     className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                   >
-                    Kilometers driven
+                    {t('workday.kilometersDriven')}
                   </Label>
                   <Input
                     id="kilometers"
@@ -590,7 +586,7 @@ export function WorkDayLogDialog({
                     htmlFor="kilometer_rate"
                     className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                   >
-                    Km rate ({symbol}/km)
+                    {t('workday.kmRate')} ({symbol}/km)
                   </Label>
                   <Input
                     id="kilometer_rate"
@@ -612,14 +608,14 @@ export function WorkDayLogDialog({
                   htmlFor="travel_override"
                   className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                 >
-                  Travel allowance total (override)
+                  {t('workday.travelAllowanceOverride')}
                 </Label>
                 <Input
                   id="travel_override"
                   type="number"
                   min="0"
                   step="0.01"
-                  placeholder="Leave blank to auto-calc from km × rate"
+                  placeholder={t('workday.travelOverridePlaceholder')}
                   value={form.travel_allowance_override}
                   onChange={(e) => update('travel_allowance_override', e.target.value)}
                   className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-[#f59e0b]"
@@ -633,36 +629,36 @@ export function WorkDayLogDialog({
             {/* Live totals */}
             <div className="border border-zinc-800 bg-zinc-950/60 p-4">
               <p className="text-[10px] uppercase tracking-[0.25em] text-[#f59e0b] mb-3">
-                Day totals (auto)
+                {t('workday.dayTotals')}
               </p>
               <dl className="space-y-2 text-sm">
                 <div className="flex items-center justify-between">
-                  <dt className="text-zinc-500">Normal gross</dt>
+                  <dt className="text-zinc-500">{t('workday.normalGross')}</dt>
                   <dd className="font-mono text-zinc-100">
                     {formatCurrency(salary.normalSalary, form.currency)}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between">
-                  <dt className="text-zinc-500">Extra gross</dt>
+                  <dt className="text-zinc-500">{t('workday.extraGross')}</dt>
                   <dd className="font-mono text-zinc-100">
                     {formatCurrency(salary.extraSalary, form.currency)}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between">
-                  <dt className="text-zinc-500">Total gross salary</dt>
+                  <dt className="text-zinc-500">{t('workday.totalGrossSalary')}</dt>
                   <dd className="font-mono text-zinc-100">
                     {formatCurrency(salary.totalSalary, form.currency)}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between">
-                  <dt className="text-zinc-500">Travel allowance</dt>
+                  <dt className="text-zinc-500">{t('workday.travelAllowance')}</dt>
                   <dd className="font-mono text-zinc-100">
                     {formatCurrency(salary.travelAllowance, form.currency)}
                   </dd>
                 </div>
                 <div className="flex items-center justify-between border-t border-zinc-800 pt-2 mt-2">
                   <dt className="text-xs uppercase tracking-[0.2em] text-zinc-300">
-                    Final day total
+                    {t('workday.finalDayTotal')}
                   </dt>
                   <dd className="font-mono text-lg font-semibold text-[#f59e0b]">
                     {formatCurrency(salary.finalTotal, form.currency)}
@@ -670,18 +666,18 @@ export function WorkDayLogDialog({
                 </div>
               </dl>
               <p className="mt-3 text-[10px] text-zinc-600">
-                Gross salary only — taxes and deductions are not calculated.
+                {t('workday.grossDisclaimer')}
               </p>
             </div>
 
             {/* Notes */}
             <div className="space-y-2">
               <Label htmlFor="notes" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                Notes
+                {t('workday.notes')}
               </Label>
               <Textarea
                 id="notes"
-                placeholder="Any context for this workday…"
+                placeholder={t('workday.notesPlaceholder')}
                 rows={3}
                 value={form.notes}
                 onChange={(e) => update('notes', e.target.value)}
@@ -700,7 +696,7 @@ export function WorkDayLogDialog({
                     disabled={deleting || submitting}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    {deleting ? 'Deleting…' : 'Delete'}
+                    {deleting ? t('workday.deleting') : t('workday.delete')}
                   </Button>
                 )}
               </div>
@@ -712,7 +708,7 @@ export function WorkDayLogDialog({
                   onClick={() => setOpen(false)}
                   disabled={submitting}
                 >
-                  Cancel
+                  {t('workday.cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -722,12 +718,12 @@ export function WorkDayLogDialog({
                   {submitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving…
+                      {t('workday.saving')}
                     </>
                   ) : existingLog ? (
-                    'Update workday'
+                    t('workday.updateWorkday')
                   ) : (
-                    'Save workday'
+                    t('workday.saveWorkday')
                   )}
                 </Button>
               </div>

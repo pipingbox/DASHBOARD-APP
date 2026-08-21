@@ -428,6 +428,12 @@ export default function Index() {
             <Link to="/login" className="transition hover:text-zinc-300">
               {t('landing.signIn', { defaultValue: 'Sign in' })}
             </Link>
+            <Link to="/privacy" className="transition hover:text-zinc-300">
+              {t('footer.privacy', { defaultValue: 'Privacy Policy' })}
+            </Link>
+            <Link to="/terms" className="transition hover:text-zinc-300">
+              {t('footer.terms', { defaultValue: 'Terms of Service' })}
+            </Link>
           </nav>
         </div>
         <p className="mt-4 text-center text-[10px] text-zinc-600">

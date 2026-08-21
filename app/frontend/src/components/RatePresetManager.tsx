@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
-import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -55,7 +55,7 @@ export function RatePresetManager({
   onChanged,
   initialEditId = null,
 }: RatePresetManagerProps) {
-  const { user } = useAuth();
+  const { t } = useTranslation();
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(empty);
   const [saving, setSaving] = useState(false);
@@ -100,18 +100,18 @@ export function RatePresetManager({
 
   const validate = () => {
     const next: Partial<Record<keyof FormState, string>> = {};
-    if (!form.name.trim()) next.name = 'Preset name is required';
+    if (!form.name.trim()) next.name = t('ratePresets.nameRequired');
     const nr = Number(form.normal_rate);
     if (form.normal_rate === '' || Number.isNaN(nr) || nr < 0) {
-      next.normal_rate = 'Enter a valid rate';
+      next.normal_rate = t('ratePresets.enterValidRate');
     }
     const er = Number(form.extra_rate);
     if (form.extra_rate === '' || Number.isNaN(er) || er < 0) {
-      next.extra_rate = 'Enter a valid rate';
+      next.extra_rate = t('ratePresets.enterValidRate');
     }
     if (form.kilometer_rate !== '') {
       const kr = Number(form.kilometer_rate);
-      if (Number.isNaN(kr) || kr < 0) next.kilometer_rate = 'Invalid';
+      if (Number.isNaN(kr) || kr < 0) next.kilometer_rate = t('workday.invalid');
     }
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -120,17 +120,15 @@ export function RatePresetManager({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) {
-      toast.error('Please fix the highlighted fields');
+      toast.error(t('ratePresets.fixFields'));
       return;
     }
     setSaving(true);
 
-    // Always fetch the current authenticated user from Supabase to ensure
-    // we have a valid, fresh user_id that matches the RLS policy.
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData?.user) {
       setSaving(false);
-      toast.error('You must be logged in to save presets');
+      toast.error(t('ratePresets.mustBeLoggedIn'));
       return;
     }
     const currentUserId = authData.user.id;
@@ -158,19 +156,19 @@ export function RatePresetManager({
     setSaving(false);
 
     if (error) {
-      toast.error('Failed to save preset', { description: error.message });
+      toast.error(t('ratePresets.failedToSave'), { description: error.message });
       return;
     }
-    toast.success(editId ? 'Preset updated' : 'Preset created');
+    toast.success(editId ? t('ratePresets.presetUpdated') : t('ratePresets.presetCreated'));
     resetForm();
     onChanged();
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this preset?')) return;
+    if (!window.confirm(t('ratePresets.confirmDelete'))) return;
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData?.user) {
-      toast.error('You must be logged in to delete presets');
+      toast.error(t('ratePresets.mustBeLoggedInDelete'));
       return;
     }
     const currentUserId = authData.user.id;
@@ -180,10 +178,10 @@ export function RatePresetManager({
       .eq('id', id)
       .eq('user_id', currentUserId);
     if (error) {
-      toast.error('Failed to delete', { description: error.message });
+      toast.error(t('ratePresets.failedToDelete'), { description: error.message });
       return;
     }
-    toast.success('Preset deleted');
+    toast.success(t('ratePresets.presetDeleted'));
     if (editId === id) resetForm();
     onChanged();
   };
@@ -193,11 +191,11 @@ export function RatePresetManager({
       <DialogContent className="sm:max-w-2xl bg-[#0a0a0a] border border-zinc-800 text-zinc-100">
         <DialogHeader>
           <p className="text-[10px] uppercase tracking-[0.25em] text-[#f59e0b]">
-            Salary rate presets
+            {t('ratePresets.eyebrow')}
           </p>
-          <DialogTitle className="text-zinc-100">Manage your rate presets</DialogTitle>
+          <DialogTitle className="text-zinc-100">{t('ratePresets.title')}</DialogTitle>
           <DialogDescription className="text-zinc-500">
-            Save the rates you use often so logging a workday is a one-click job.
+            {t('ratePresets.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -206,7 +204,7 @@ export function RatePresetManager({
           <div className="border border-zinc-800 bg-zinc-950/50">
             <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-800">
               <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-                Saved presets
+                {t('ratePresets.savedPresets')}
               </p>
               <Button
                 type="button"
@@ -215,13 +213,13 @@ export function RatePresetManager({
                 className="!bg-transparent !hover:bg-transparent h-7 border-zinc-800 text-zinc-300 hover:text-[#f59e0b] hover:border-[#f59e0b]"
                 onClick={resetForm}
               >
-                <Plus className="mr-1 h-3 w-3" /> New
+                <Plus className="mr-1 h-3 w-3" /> {t('ratePresets.new')}
               </Button>
             </div>
             <div className="max-h-80 overflow-y-auto divide-y divide-zinc-800/80">
               {presets.length === 0 ? (
                 <p className="px-3 py-6 text-center text-xs text-zinc-600">
-                  No presets yet. Create your first one →
+                  {t('ratePresets.noPresetsYet')}
                 </p>
               ) : (
                 presets.map((p) => (
@@ -271,16 +269,16 @@ export function RatePresetManager({
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-3">
             <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-              {editId ? 'Edit preset' : 'New preset'}
+              {editId ? t('ratePresets.editPreset') : t('ratePresets.newPreset')}
             </p>
 
             <div className="space-y-1.5">
               <Label htmlFor="p_name" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                Name <span className="text-[#f59e0b]">*</span>
+                {t('ratePresets.name')} <span className="text-[#f59e0b]">*</span>
               </Label>
               <Input
                 id="p_name"
-                placeholder="e.g. Fluxys Loenhout"
+                placeholder={t('ratePresets.namePlaceholder')}
                 value={form.name}
                 onChange={(e) => update('name', e.target.value)}
                 className="bg-zinc-950 border-zinc-800 text-zinc-100 focus-visible:ring-[#f59e0b]"
@@ -290,11 +288,11 @@ export function RatePresetManager({
 
             <div className="space-y-1.5">
               <Label htmlFor="p_loc" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                Work location
+                {t('ratePresets.workLocation')}
               </Label>
               <Input
                 id="p_loc"
-                placeholder="e.g. Antwerp, BE"
+                placeholder={t('ratePresets.locationPlaceholder')}
                 value={form.location}
                 onChange={(e) => update('location', e.target.value)}
                 className="bg-zinc-950 border-zinc-800 text-zinc-100 focus-visible:ring-[#f59e0b]"
@@ -307,7 +305,7 @@ export function RatePresetManager({
                   htmlFor="p_nr"
                   className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                 >
-                  Normal rate <span className="text-[#f59e0b]">*</span>
+                  {t('ratePresets.normalRate')} <span className="text-[#f59e0b]">*</span>
                 </Label>
                 <Input
                   id="p_nr"
@@ -328,7 +326,7 @@ export function RatePresetManager({
                   htmlFor="p_er"
                   className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                 >
-                  Extra rate <span className="text-[#f59e0b]">*</span>
+                  {t('ratePresets.extraRate')} <span className="text-[#f59e0b]">*</span>
                 </Label>
                 <Input
                   id="p_er"
@@ -352,7 +350,7 @@ export function RatePresetManager({
                   htmlFor="p_km"
                   className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                 >
-                  Km rate (optional)
+                  {t('ratePresets.kmRate')}
                 </Label>
                 <Input
                   id="p_km"
@@ -373,7 +371,7 @@ export function RatePresetManager({
                   htmlFor="p_cur"
                   className="text-xs uppercase tracking-[0.2em] text-zinc-400"
                 >
-                  Currency
+                  {t('ratePresets.currency')}
                 </Label>
                 <select
                   id="p_cur"
@@ -398,7 +396,7 @@ export function RatePresetManager({
                   className="!bg-transparent !hover:bg-transparent border-zinc-800 text-zinc-300 hover:border-zinc-600"
                   onClick={resetForm}
                 >
-                  Cancel edit
+                  {t('ratePresets.cancelEdit')}
                 </Button>
               )}
               <Button
@@ -409,12 +407,12 @@ export function RatePresetManager({
                 {saving ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving…
+                    {t('ratePresets.saving')}
                   </>
                 ) : editId ? (
-                  'Update preset'
+                  t('ratePresets.updatePreset')
                 ) : (
-                  'Create preset'
+                  t('ratePresets.createPreset')
                 )}
               </Button>
             </DialogFooter>

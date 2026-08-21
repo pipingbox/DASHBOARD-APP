@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   FileText,
   Clock,
@@ -25,6 +26,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 /* ─── Constants ─── */
+const CHANNEL_KEYS = ['piping', 'welding', 'jobs', 'tools', 'field', 'updates', 'ideas'] as const;
 const CHANNELS = [
   'Piping & Isometrics',
   'Welding & QA/QC',
@@ -35,6 +37,7 @@ const CHANNELS = [
   'Ideas & Suggestions',
 ];
 
+const DRAFT_TYPE_KEYS = ['technical', 'job', 'update', 'suggestion', 'discussion', 'tip'] as const;
 const DRAFT_TYPES = [
   'Technical post',
   'Job post',
@@ -44,6 +47,7 @@ const DRAFT_TYPES = [
   'Site tip',
 ];
 
+const SOURCE_TYPE_KEYS = ['manual', 'ai', 'external', 'user', 'internal'] as const;
 const SOURCE_TYPES = [
   'Manual',
   'AI Generated',
@@ -91,6 +95,7 @@ function StatusBadge({ status }: { status: string }) {
 
 /* ─── Main Component ─── */
 export default function ContentDrafts() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,6 +113,25 @@ export default function ContentDrafts() {
   const [formTags, setFormTags] = useState('');
   const [formDraftType, setFormDraftType] = useState('Technical post');
   const [submitting, setSubmitting] = useState(false);
+
+  /* ─── i18n helpers for channels/types/sources ─── */
+  const getChannelLabel = (channel: string): string => {
+    const idx = CHANNELS.indexOf(channel);
+    if (idx >= 0) return t(`contentDrafts.channels.${CHANNEL_KEYS[idx]}`);
+    return channel;
+  };
+
+  const getDraftTypeLabel = (dtype: string): string => {
+    const idx = DRAFT_TYPES.indexOf(dtype);
+    if (idx >= 0) return t(`contentDrafts.draftTypes.${DRAFT_TYPE_KEYS[idx]}`);
+    return dtype;
+  };
+
+  const getSourceTypeLabel = (stype: string): string => {
+    const idx = SOURCE_TYPES.indexOf(stype);
+    if (idx >= 0) return t(`contentDrafts.sourceTypes.${SOURCE_TYPE_KEYS[idx]}`);
+    return stype;
+  };
 
   // Fetch drafts
   useEffect(() => {
@@ -146,11 +170,11 @@ export default function ContentDrafts() {
   // Create draft
   const handleCreate = async () => {
     if (!formTitle.trim()) {
-      toast.error('Title is required');
+      toast.error(t('contentDrafts.titleRequired'));
       return;
     }
     if (!user) {
-      toast.error('You must be logged in');
+      toast.error(t('contentDrafts.mustBeLoggedIn'));
       return;
     }
 
@@ -175,11 +199,11 @@ export default function ContentDrafts() {
     setSubmitting(false);
 
     if (error) {
-      toast.error('Failed to create draft', { description: error.message });
+      toast.error(t('contentDrafts.createFailed'), { description: error.message });
       return;
     }
 
-    toast.success('Draft created successfully');
+    toast.success(t('contentDrafts.createSuccess'));
     resetForm();
     setShowCreateForm(false);
     fetchDrafts();
@@ -204,11 +228,11 @@ export default function ContentDrafts() {
       .eq('id', draft.id);
 
     if (error) {
-      toast.error('Failed to update status', { description: error.message });
+      toast.error(t('contentDrafts.statusUpdateFailed'), { description: error.message });
       return;
     }
 
-    toast.success(`Draft ${newStatus}`);
+    toast.success(t('contentDrafts.statusUpdated', { status: newStatus }));
     setSelectedDraft({ ...draft, status: newStatus });
     fetchDrafts();
   };
@@ -221,16 +245,16 @@ export default function ContentDrafts() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Content Engine"
-        title="Content Drafts"
-        description="AI-assisted content workflow — review, approve, and publish community posts."
+        eyebrow={t('contentDrafts.eyebrow')}
+        title={t('contentDrafts.title')}
+        description={t('contentDrafts.descriptionFull')}
         actions={
           <Button
             onClick={() => setShowCreateForm(true)}
             className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
           >
             <Plus className="h-4 w-4 mr-1.5" />
-            Create Draft
+            {t('contentDrafts.createDraft')}
           </Button>
         }
       />
@@ -238,10 +262,10 @@ export default function ContentDrafts() {
       {/* ─── Metrics Cards ─── */}
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         {[
-          { label: 'Total Drafts', value: metrics.total, icon: FileText, color: 'text-zinc-300' },
-          { label: 'Pending Review', value: metrics.pending, icon: Clock, color: 'text-yellow-400' },
-          { label: 'Approved', value: metrics.approved, icon: CheckCircle2, color: 'text-emerald-400' },
-          { label: 'Published', value: metrics.published, icon: Send, color: 'text-blue-400' },
+          { label: t('contentDrafts.totalDrafts'), value: metrics.total, icon: FileText, color: 'text-zinc-300' },
+          { label: t('contentDrafts.pendingReview'), value: metrics.pending, icon: Clock, color: 'text-yellow-400' },
+          { label: t('contentDrafts.approved'), value: metrics.approved, icon: CheckCircle2, color: 'text-emerald-400' },
+          { label: t('contentDrafts.published'), value: metrics.published, icon: Send, color: 'text-blue-400' },
         ].map((m) => (
           <div
             key={m.label}
@@ -274,7 +298,15 @@ export default function ContentDrafts() {
                 : 'text-zinc-500 hover:text-zinc-300 border border-transparent'
             }`}
           >
-            {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
+            {s === 'all'
+              ? t('contentDrafts.all')
+              : s === 'draft'
+                ? t('contentDrafts.draft')
+                : s === 'approved'
+                  ? t('contentDrafts.approved')
+                  : s === 'published'
+                    ? t('contentDrafts.published')
+                    : t('contentDrafts.rejected')}
           </button>
         ))}
       </div>
@@ -297,8 +329,8 @@ export default function ContentDrafts() {
       ) : filteredDrafts.length === 0 ? (
         <div className="border border-zinc-800/60 bg-[#0d0d0d] rounded-sm p-10 text-center">
           <FileText className="h-10 w-10 text-zinc-700 mx-auto mb-3" />
-          <p className="text-sm text-zinc-500">No drafts found</p>
-          <p className="text-xs text-zinc-600 mt-1">Create your first content draft to get started</p>
+          <p className="text-sm text-zinc-500">{t('contentDrafts.noDraftsFound')}</p>
+          <p className="text-xs text-zinc-600 mt-1">{t('contentDrafts.noDraftsDesc')}</p>
         </div>
       ) : (
         <div className="grid gap-3">
@@ -312,12 +344,12 @@ export default function ContentDrafts() {
                 <div className="flex-1 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-sm font-semibold text-zinc-100 group-hover:text-[#f59e0b] transition-colors">
-                      {draft.title || 'Untitled Draft'}
+                      {draft.title || t('contentDrafts.untitledDraft')}
                     </h3>
                     <StatusBadge status={draft.status} />
                     {draft.draft_type && (
                       <span className="px-1.5 py-0.5 text-[9px] uppercase tracking-wider border border-zinc-700 text-zinc-500 rounded-sm">
-                        {draft.draft_type}
+                        {getDraftTypeLabel(draft.draft_type)}
                       </span>
                     )}
                   </div>
@@ -325,7 +357,7 @@ export default function ContentDrafts() {
                     {draft.suggested_channel && (
                       <span className="flex items-center gap-1">
                         <Layers className="h-3 w-3" />
-                        {draft.suggested_channel}
+                        {getChannelLabel(draft.suggested_channel)}
                       </span>
                     )}
                     {draft.language && (
@@ -337,7 +369,7 @@ export default function ContentDrafts() {
                     {draft.source_type && (
                       <span className="flex items-center gap-1">
                         <Sparkles className="h-3 w-3" />
-                        {draft.source_type}
+                        {getSourceTypeLabel(draft.source_type)}
                       </span>
                     )}
                     <span className="flex items-center gap-1">
@@ -368,13 +400,13 @@ export default function ContentDrafts() {
               <div className="flex items-start justify-between">
                 <div className="space-y-1 flex-1">
                   <h2 className="text-lg font-semibold text-zinc-100">
-                    {selectedDraft.title || 'Untitled Draft'}
+                    {selectedDraft.title || t('contentDrafts.untitledDraft')}
                   </h2>
                   <div className="flex items-center gap-2">
                     <StatusBadge status={selectedDraft.status} />
                     {selectedDraft.draft_type && (
                       <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider border border-zinc-700 text-zinc-500 rounded-sm">
-                        {selectedDraft.draft_type}
+                        {getDraftTypeLabel(selectedDraft.draft_type)}
                       </span>
                     )}
                   </div>
@@ -391,16 +423,16 @@ export default function ContentDrafts() {
               <div className="grid grid-cols-2 gap-3">
                 {selectedDraft.suggested_channel && (
                   <div className="space-y-1">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">Channel</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">{t('contentDrafts.channel')}</p>
                     <p className="text-xs text-zinc-300 flex items-center gap-1.5">
                       <Layers className="h-3 w-3 text-[#f59e0b]" />
-                      {selectedDraft.suggested_channel}
+                      {getChannelLabel(selectedDraft.suggested_channel)}
                     </p>
                   </div>
                 )}
                 {selectedDraft.language && (
                   <div className="space-y-1">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">Language</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">{t('contentDrafts.language')}</p>
                     <p className="text-xs text-zinc-300 flex items-center gap-1.5">
                       <Globe className="h-3 w-3 text-[#f59e0b]" />
                       {selectedDraft.language}
@@ -409,12 +441,12 @@ export default function ContentDrafts() {
                 )}
                 {selectedDraft.source_type && (
                   <div className="space-y-1">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">Source Type</p>
-                    <p className="text-xs text-zinc-300">{selectedDraft.source_type}</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">{t('contentDrafts.sourceType')}</p>
+                    <p className="text-xs text-zinc-300">{getSourceTypeLabel(selectedDraft.source_type)}</p>
                   </div>
                 )}
                 <div className="space-y-1">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">Created</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">{t('contentDrafts.created')}</p>
                   <p className="text-xs text-zinc-300">{formatDate(selectedDraft.created_at)}</p>
                 </div>
               </div>
@@ -422,7 +454,7 @@ export default function ContentDrafts() {
               {/* Source URL */}
               {selectedDraft.source_url && (
                 <div className="space-y-1">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">Source URL</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">{t('contentDrafts.sourceUrl')}</p>
                   <a
                     href={selectedDraft.source_url}
                     target="_blank"
@@ -438,7 +470,7 @@ export default function ContentDrafts() {
               {/* Tags */}
               {selectedDraft.tags && (
                 <div className="space-y-1.5">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">Tags</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">{t('contentDrafts.tags')}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {selectedDraft.tags.split(',').map((tag, i) => (
                       <span
@@ -455,10 +487,10 @@ export default function ContentDrafts() {
 
               {/* Content */}
               <div className="space-y-1.5">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">Content</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-medium">{t('contentDrafts.content')}</p>
                 <div className="border border-zinc-800/60 bg-zinc-950/50 rounded-sm p-4 max-h-[300px] overflow-y-auto">
                   <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
-                    {selectedDraft.content || 'No content provided.'}
+                    {selectedDraft.content || t('contentDrafts.noContent')}
                   </p>
                 </div>
               </div>
@@ -468,10 +500,10 @@ export default function ContentDrafts() {
                 <div className="border border-[#f59e0b]/20 bg-[#f59e0b]/5 rounded-sm p-4 space-y-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-[#f59e0b]">
                     <Megaphone className="h-3.5 w-3.5" />
-                    Platform Update Format
+                    {t('contentDrafts.platformUpdateFormat')}
                   </div>
                   <p className="text-[10px] text-zinc-500">
-                    This draft is formatted as a platform update. Consider including: version/change title, what changed, why it matters, and a call to action.
+                    {t('contentDrafts.platformUpdateHint')}
                   </p>
                 </div>
               )}
@@ -481,10 +513,10 @@ export default function ContentDrafts() {
                 <div className="border border-emerald-500/20 bg-emerald-500/5 rounded-sm p-4 space-y-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400">
                     <MessageSquare className="h-3.5 w-3.5" />
-                    User Suggestion Response
+                    {t('contentDrafts.suggestionResponse')}
                   </div>
                   <p className="text-[10px] text-zinc-500">
-                    This draft responds to a user suggestion. Consider including: original suggestion, implemented improvement, thank-you message, and release note style response.
+                    {t('contentDrafts.suggestionResponseHint')}
                   </p>
                 </div>
               )}
@@ -498,7 +530,7 @@ export default function ContentDrafts() {
                     size="sm"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
-                    Approve
+                    {t('contentDrafts.approve')}
                   </Button>
                 )}
                 {selectedDraft.status !== 'rejected' && (
@@ -509,7 +541,7 @@ export default function ContentDrafts() {
                     size="sm"
                   >
                     <XCircle className="h-3.5 w-3.5 mr-1.5" />
-                    Reject
+                    {t('contentDrafts.reject')}
                   </Button>
                 )}
                 {selectedDraft.status === 'approved' && (
@@ -519,7 +551,7 @@ export default function ContentDrafts() {
                     size="sm"
                   >
                     <Send className="h-3.5 w-3.5 mr-1.5" />
-                    Mark Published
+                    {t('contentDrafts.markPublished')}
                   </Button>
                 )}
                 {(selectedDraft.status === 'rejected' || selectedDraft.status === 'published') && (
@@ -530,7 +562,7 @@ export default function ContentDrafts() {
                     size="sm"
                   >
                     <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-                    Reset to Draft
+                    {t('contentDrafts.resetToDraft')}
                   </Button>
                 )}
               </div>
@@ -554,7 +586,7 @@ export default function ContentDrafts() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f59e0b]/10 border border-[#f59e0b]/20">
                     <Plus className="h-4 w-4 text-[#f59e0b]" />
                   </div>
-                  <h3 className="text-sm font-semibold text-zinc-100">Create Draft</h3>
+                  <h3 className="text-sm font-semibold text-zinc-100">{t('contentDrafts.createDraft')}</h3>
                 </div>
                 <button
                   onClick={() => setShowCreateForm(false)}
@@ -569,23 +601,23 @@ export default function ContentDrafts() {
                 {/* Title */}
                 <div className="space-y-1.5">
                   <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">
-                    Title <span className="text-red-400">*</span>
+                    {t('contentDrafts.title')} <span className="text-red-400">*</span>
                   </label>
                   <Input
                     value={formTitle}
                     onChange={(e) => setFormTitle(e.target.value)}
-                    placeholder="Enter draft title..."
+                    placeholder={t('contentDrafts.titlePlaceholder')}
                     className="bg-zinc-950 border-zinc-800 text-zinc-200 focus:border-[#f59e0b]/50"
                   />
                 </div>
 
                 {/* Content */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">Content</label>
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">{t('contentDrafts.content')}</label>
                   <textarea
                     value={formContent}
                     onChange={(e) => setFormContent(e.target.value)}
-                    placeholder="Write your content here..."
+                    placeholder={t('contentDrafts.contentPlaceholder')}
                     rows={6}
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-md text-sm text-zinc-200 p-3 focus:border-[#f59e0b]/50 focus:outline-none focus:ring-1 focus:ring-[#f59e0b]/20 resize-none transition-colors"
                   />
@@ -594,28 +626,28 @@ export default function ContentDrafts() {
                 <div className="grid grid-cols-2 gap-3">
                   {/* Channel */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">Channel</label>
+                    <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">{t('contentDrafts.channel')}</label>
                     <select
                       value={formChannel}
                       onChange={(e) => setFormChannel(e.target.value)}
                       className="w-full h-9 bg-zinc-950 border border-zinc-800 rounded-md text-xs text-zinc-300 px-2.5 focus:border-[#f59e0b]/50 focus:outline-none transition-colors"
                     >
-                      {CHANNELS.map((c) => (
-                        <option key={c} value={c}>{c}</option>
+                      {CHANNELS.map((c, i) => (
+                        <option key={c} value={c}>{t(`contentDrafts.channels.${CHANNEL_KEYS[i]}`)}</option>
                       ))}
                     </select>
                   </div>
 
                   {/* Draft Type */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">Draft Type</label>
+                    <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">{t('contentDrafts.draftType')}</label>
                     <select
                       value={formDraftType}
                       onChange={(e) => setFormDraftType(e.target.value)}
                       className="w-full h-9 bg-zinc-950 border border-zinc-800 rounded-md text-xs text-zinc-300 px-2.5 focus:border-[#f59e0b]/50 focus:outline-none transition-colors"
                     >
-                      {DRAFT_TYPES.map((dt) => (
-                        <option key={dt} value={dt}>{dt}</option>
+                      {DRAFT_TYPES.map((dt, i) => (
+                        <option key={dt} value={dt}>{t(`contentDrafts.draftTypes.${DRAFT_TYPE_KEYS[i]}`)}</option>
                       ))}
                     </select>
                   </div>
@@ -624,25 +656,25 @@ export default function ContentDrafts() {
                 <div className="grid grid-cols-2 gap-3">
                   {/* Source Type */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">Source Type</label>
+                    <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">{t('contentDrafts.sourceType')}</label>
                     <select
                       value={formSourceType}
                       onChange={(e) => setFormSourceType(e.target.value)}
                       className="w-full h-9 bg-zinc-950 border border-zinc-800 rounded-md text-xs text-zinc-300 px-2.5 focus:border-[#f59e0b]/50 focus:outline-none transition-colors"
                     >
-                      {SOURCE_TYPES.map((st) => (
-                        <option key={st} value={st}>{st}</option>
+                      {SOURCE_TYPES.map((st, i) => (
+                        <option key={st} value={st}>{t(`contentDrafts.sourceTypes.${SOURCE_TYPE_KEYS[i]}`)}</option>
                       ))}
                     </select>
                   </div>
 
                   {/* Language */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">Language</label>
+                    <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">{t('contentDrafts.language')}</label>
                     <Input
                       value={formLanguage}
                       onChange={(e) => setFormLanguage(e.target.value)}
-                      placeholder="English"
+                      placeholder={t('contentDrafts.languagePlaceholder')}
                       className="bg-zinc-950 border-zinc-800 text-zinc-200 text-xs h-9 focus:border-[#f59e0b]/50"
                     />
                   </div>
@@ -650,22 +682,22 @@ export default function ContentDrafts() {
 
                 {/* Source URL */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">Source URL</label>
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">{t('contentDrafts.sourceUrl')}</label>
                   <Input
                     value={formSourceUrl}
                     onChange={(e) => setFormSourceUrl(e.target.value)}
-                    placeholder="https://..."
+                    placeholder={t('contentDrafts.sourceUrlPlaceholder')}
                     className="bg-zinc-950 border-zinc-800 text-zinc-200 text-xs focus:border-[#f59e0b]/50"
                   />
                 </div>
 
                 {/* Tags */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">Tags</label>
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">{t('contentDrafts.tags')}</label>
                   <Input
                     value={formTags}
                     onChange={(e) => setFormTags(e.target.value)}
-                    placeholder="piping, welding, offshore (comma separated)"
+                    placeholder={t('contentDrafts.tagsPlaceholder')}
                     className="bg-zinc-950 border-zinc-800 text-zinc-200 text-xs focus:border-[#f59e0b]/50"
                   />
                 </div>
@@ -675,10 +707,10 @@ export default function ContentDrafts() {
                   <div className="border border-[#f59e0b]/20 bg-[#f59e0b]/5 rounded-sm p-3 space-y-1">
                     <p className="text-[10px] font-semibold text-[#f59e0b] flex items-center gap-1.5">
                       <Megaphone className="h-3 w-3" />
-                      Platform Update Tip
+                      {t('contentDrafts.platformUpdateTip')}
                     </p>
                     <p className="text-[10px] text-zinc-500">
-                      Include: version/change title, what changed, why it matters, and a call to action in the content field.
+                      {t('contentDrafts.platformUpdateTipDesc')}
                     </p>
                   </div>
                 )}
@@ -687,10 +719,10 @@ export default function ContentDrafts() {
                   <div className="border border-emerald-500/20 bg-emerald-500/5 rounded-sm p-3 space-y-1">
                     <p className="text-[10px] font-semibold text-emerald-400 flex items-center gap-1.5">
                       <MessageSquare className="h-3 w-3" />
-                      Suggestion Response Tip
+                      {t('contentDrafts.suggestionResponseTip')}
                     </p>
                     <p className="text-[10px] text-zinc-500">
-                      Include: original suggestion, implemented improvement, thank-you message, and release note style response.
+                      {t('contentDrafts.suggestionResponseTipDesc')}
                     </p>
                   </div>
                 )}
@@ -703,14 +735,14 @@ export default function ContentDrafts() {
                   disabled={submitting || !formTitle.trim()}
                   className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
                 >
-                  {submitting ? 'Creating...' : 'Create Draft'}
+                  {submitting ? t('contentDrafts.creating') : t('contentDrafts.createDraft')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => { resetForm(); setShowCreateForm(false); }}
                   className="border-zinc-700 text-zinc-400 !bg-transparent hover:!bg-zinc-900"
                 >
-                  Cancel
+                  {t('contentDrafts.cancel')}
                 </Button>
               </div>
             </div>

@@ -60,7 +60,9 @@ export default function Login() {
             <img
               src="/assets/logos/logo-horizontal.png"
               alt="PipingBox"
-              className="w-[310px] h-auto drop-shadow-[0_0_30px_rgba(245,158,11,0.15)]"
+              width={200}
+              height={200}
+              className="w-[200px] h-[200px] object-contain drop-shadow-[0_0_30px_rgba(245,158,11,0.15)]"
             />
           </div>
 
@@ -100,21 +102,24 @@ export default function Login() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center p-6 lg:p-12">
-        <form onSubmit={onSubmit} className="w-full max-w-md space-y-6">
-          <div className="space-y-3">
-            <div className="lg:hidden mb-4">
+      <div className="flex flex-col items-center justify-center p-6 lg:p-12 min-h-screen">
+        <form onSubmit={onSubmit} className="w-full max-w-md space-y-7">
+          {/* Header section */}
+          <div className="space-y-2">
+            <div className="lg:hidden mb-6">
               <img
                 src="/assets/logos/logo-horizontal.png"
                 alt="PipingBox"
-                className="w-[200px] h-auto"
+                width={200}
+                height={200}
+                className="w-[200px] h-[200px] object-contain"
               />
             </div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#f59e0b]">
               {t('auth.secureAccess')}
             </p>
-            <h2 className="text-3xl font-bold">{t('auth.signInTitle')}</h2>
-            <p className="text-sm text-zinc-400">
+            <h2 className="text-3xl font-bold mt-1">{t('auth.signInTitle')}</h2>
+            <p className="text-sm text-zinc-400 mt-1">
               {t('auth.signInSubtitle')}
             </p>
           </div>
@@ -148,7 +153,7 @@ export default function Login() {
           </Button>
 
           {/* Divider */}
-          <div className="relative">
+          <div className="relative my-2">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-zinc-800" />
             </div>
@@ -159,7 +164,8 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="space-y-4">
+          {/* Form fields */}
+          <div className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-xs uppercase tracking-wider text-zinc-400">
                 {t('common.email')}
@@ -176,12 +182,20 @@ export default function Login() {
               />
             </div>
             <div className="space-y-2">
-              <Label
-                htmlFor="password"
-                className="text-xs uppercase tracking-wider text-zinc-400"
-              >
-                {t('common.password')}
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label
+                  htmlFor="password"
+                  className="text-xs uppercase tracking-wider text-zinc-400"
+                >
+                  {t('common.password')}
+                </Label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-[#f59e0b] hover:underline"
+                >
+                  {t('auth.forgotPassword')}
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -195,6 +209,7 @@ export default function Login() {
             </div>
           </div>
 
+          {/* Submit button */}
           <Button
             type="submit"
             disabled={loading}
@@ -203,6 +218,7 @@ export default function Login() {
             {loading ? t('common.signingIn') : t('common.signIn')}
           </Button>
 
+          {/* Sign up link */}
           <p className="text-center text-sm text-zinc-400">
             {t('auth.noAccount')}{' '}
             <Link
@@ -212,6 +228,17 @@ export default function Login() {
               {t('auth.createOne')}
             </Link>
           </p>
+
+          {/* Legal links - centered below login button */}
+          <div className="flex items-center justify-center gap-3 text-xs text-zinc-600 pt-2">
+            <Link to="/privacy" className="hover:text-zinc-400 transition">
+              {t('footer.privacy', { defaultValue: 'Privacy Policy' })}
+            </Link>
+            <span>·</span>
+            <Link to="/terms" className="hover:text-zinc-400 transition">
+              {t('footer.terms', { defaultValue: 'Terms of Service' })}
+            </Link>
+          </div>
         </form>
       </div>
     </div>

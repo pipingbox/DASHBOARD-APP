@@ -4,5 +4,8 @@ export { default as CompanyCandidates } from './CompanyCandidates';
 export { default as CandidateProfile } from './CandidateProfile';
 export { default as CompanyWorkersSearch } from './CompanyWorkersSearch';
 export { default as CompanyWorkforceRequests } from './CompanyWorkforceRequests';
+export { default as CompanyDocumentation } from './CompanyDocumentation';
 export { default as CompanyProfile } from './CompanyProfile';
 export { default as CompanyAnalytics } from './CompanyAnalytics';
+export { default as CompanySettings } from './CompanySettings';
+export { default as CompanyBilling } from './CompanyBilling';

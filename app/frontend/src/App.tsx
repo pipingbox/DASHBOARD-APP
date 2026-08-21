@@ -10,10 +10,13 @@ import { AppShell } from '@/components/layout/AppShell';
 import { useReferralCapture } from '@/hooks/useReferralCapture';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { OnboardingGate } from '@/components/OnboardingGate';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 import Index from './pages/Index';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import CompanyDashboard from './pages/CompanyDashboard';
 import EnterpriseDashboard from './pages/EnterpriseDashboard';
@@ -43,10 +46,15 @@ import {
   CandidateProfile,
   CompanyWorkersSearch,
   CompanyWorkforceRequests,
+  CompanyDocumentation,
   CompanyProfile,
   CompanyAnalytics,
+  CompanySettings,
+  CompanyBilling,
 } from './pages/company';
 import PricingPage from './pages/PricingPage';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
 
 // BUG-002: Blog connected to router. Lazy-loaded for better bundle splitting.
 // Public routes (no auth) for SEO. Prerendered at build time via vite-prerender.
@@ -119,6 +127,15 @@ const AppRoutes = () => {
         </GuestRoute>
       }
     />
+    <Route
+      path="/forgot-password"
+      element={
+        <GuestRoute>
+          <ForgotPassword />
+        </GuestRoute>
+      }
+    />
+    <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/dashboard" element={withShell(<Dashboard />)} />
     <Route
       path="/company-dashboard"
@@ -153,12 +170,24 @@ const AppRoutes = () => {
       element={withShellRoles(<CompanyWorkforceRequests />, ['admin', 'company'])}
     />
     <Route
+      path="/company/documentation"
+      element={withShellRoles(<CompanyDocumentation />, ['admin', 'company'])}
+    />
+    <Route
       path="/company/profile"
       element={withShellRoles(<CompanyProfile />, ['admin', 'company'])}
     />
     <Route
       path="/company/analytics"
       element={withShellRoles(<CompanyAnalytics />, ['admin', 'company'])}
+    />
+    <Route
+      path="/company/settings"
+      element={withShellRoles(<CompanySettings />, ['admin', 'company'])}
+    />
+    <Route
+      path="/company/billing"
+      element={withShellRoles(<CompanyBilling />, ['admin', 'company'])}
     />
     <Route
       path="/academy"
@@ -262,24 +291,30 @@ const AppRoutes = () => {
         </ProtectedRoute>
       }
     />
+    <Route path="/privacy" element={<Privacy />} />
+    <Route path="/terms" element={<Terms />} />
     <Route path="*" element={<Navigate to="/dashboard" replace />} />
   </Routes>
   );
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <AdminPreviewProvider>
-        <TooltipProvider>
-          <Toaster theme="dark" />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
-      </AdminPreviewProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AdminPreviewProvider>
+          <TooltipProvider>
+            <Toaster theme="dark" />
+            <BrowserRouter>
+              <ErrorBoundary>
+                <AppRoutes />
+              </ErrorBoundary>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AdminPreviewProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
