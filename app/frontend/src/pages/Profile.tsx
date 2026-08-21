@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
-import { FileDown, Loader2 } from 'lucide-react';
+import { FileDown, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { AvatarUpload } from '@/components/AvatarUpload';
 import { CertExpiryBadge } from '@/components/certifications/CertExpiryBadge';
 import { CertExpiryWarnings } from '@/components/certifications/CertExpiryWarnings';
@@ -20,67 +20,177 @@ import { AvailabilityMobilitySection } from '@/components/profile/AvailabilityMo
 import { AICVExtraction } from '@/components/profile/AICVExtraction';
 import { ProfileCompleteness } from '@/components/profile/ProfileCompleteness';
 import { generateCV } from '@/lib/generateCV';
-import { useAutoCV } from '@/hooks/useAutoCV';
+import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import type { Certification } from '@/lib/certifications';
+
+/**
+ * Profile page — strict DB-as-source-of-truth approach.
+ *
+ * Flow:
+ * 1. On mount / when `profile` from auth context changes → populate form from DB row.
+ * 2. User edits fields locally (local state only for typing UX).
+ * 3. On "Guardar perfil" click → send ONLY edited fields to Supabase → refetch → render from refetched row.
+ * 4. Profile completion is calculated from the refetched DB row, never from local state.
+ * 5. No autosave — explicit save only to avoid race conditions.
+ * 6. Avatar and CV are saved by their own components (AvatarUpload, CVUploadSection) which call refreshProfile().
+ */
 
 export default function Profile() {
   const { t } = useTranslation();
   const { profile, user, refreshProfile } = useAuth();
-  const { isStale } = useAutoCV(); // AUTO-003: CV staleness detection
+
+  // Form fields — populated from DB profile
   const [fullName, setFullName] = useState('');
   const [title, setTitle] = useState('');
   const [company, setCompany] = useState('');
   const [location, setLocation] = useState('');
-  const [years, setYears] = useState<number>(0);
+  const [years, setYears] = useState<string>(''); // string to avoid 0 default
   const [skills, setSkills] = useState('');
   const [bio, setBio] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [showAvatar, setShowAvatar] = useState<boolean>(true);
+
+  // UI state
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
+    return () => { isMountedRef.current = false; };
+  }, []);
+
+  // ─── Sync form from DB profile (source of truth) ───
+  useEffect(() => {
     if (!profile) return;
+
+    console.log('[Profile] Syncing form from DB profile:', {
+      full_name: profile.full_name,
+      title: profile.title,
+      company: profile.company,
+      location: profile.location,
+      years_experience: profile.years_experience,
+      skills: profile.skills,
+      bio: profile.bio,
+      avatar_url: profile.avatar_url ? '(set)' : '(null)',
+      cv_file_url: profile.cv_file_url ? '(set)' : '(null)',
+    });
+
     setFullName(profile.full_name ?? '');
     setTitle(profile.title ?? '');
     setCompany(profile.company ?? '');
     setLocation(profile.location ?? '');
-    setYears(profile.years_experience ?? 0);
-    setSkills((profile.skills ?? []).join(', '));
+    // years_experience: show empty string if null/undefined/0-that-was-default
+    const yExp = profile.years_experience;
+    setYears(yExp !== null && yExp !== undefined && yExp !== 0 ? String(yExp) : '');
+    setSkills(Array.isArray(profile.skills) ? profile.skills.join(', ') : '');
     setBio(profile.bio ?? '');
-    setAvatarUrl(profile.avatar_url ?? null);
-    setShowAvatar(profile.show_avatar ?? true);
   }, [profile]);
 
+  // ─── Build save payload — only non-empty edited values ───
+  const buildSavePayload = useCallback(() => {
+    const payload: Record<string, unknown> = {
+      updated_at: new Date().toISOString(),
+    };
+
+    // full_name: send trimmed value or null (never empty string)
+    const trimmedName = fullName.trim();
+    if (trimmedName) payload.full_name = trimmedName;
+    else payload.full_name = null;
+
+    // title
+    const trimmedTitle = title.trim();
+    if (trimmedTitle) payload.title = trimmedTitle;
+    else payload.title = null;
+
+    // company
+    const trimmedCompany = company.trim();
+    if (trimmedCompany) payload.company = trimmedCompany;
+    else payload.company = null;
+
+    // location
+    const trimmedLocation = location.trim();
+    if (trimmedLocation) payload.location = trimmedLocation;
+    else payload.location = null;
+
+    // years_experience: null if empty, otherwise number
+    if (years.trim() === '') {
+      payload.years_experience = null;
+    } else {
+      const parsed = parseInt(years.trim(), 10);
+      payload.years_experience = isNaN(parsed) ? null : parsed;
+    }
+
+    // skills: array of non-empty strings
+    const skillsArr = skills
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    payload.skills = skillsArr.length > 0 ? skillsArr : null;
+
+    // bio
+    const trimmedBio = bio.trim();
+    if (trimmedBio) payload.bio = trimmedBio;
+    else payload.bio = null;
+
+    return payload;
+  }, [fullName, title, company, location, years, skills, bio]);
+
+  // ─── Explicit save (button click) ───
   const save = async (e: FormEvent) => {
     e.preventDefault();
     if (!user) return;
     setSaving(true);
-    const { error } = await supabase
+    setSaveStatus('saving');
+
+    const payload = buildSavePayload();
+
+    console.log('[Profile] Save payload:', { userId: user.id, payload });
+
+    const { data: upsertedData, error } = await supabase
       .from(TABLES.profiles)
-      .update({
-        full_name: fullName,
-        title,
-        company,
-        location,
-        years_experience: Number(years) || 0,
-        skills: skills
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean),
-        bio,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', user.id);
-    setSaving(false);
+      .upsert({ ...payload, user_id: user.id }, { onConflict: 'user_id' })
+      .select()
+      .single();
+
     if (error) {
-      toast.error(error.message);
+      console.error('[Profile] Save FAILED:', error.message, error.details, error.hint);
+      setSaving(false);
+      setSaveStatus('error');
+      toast.error(t('profile.saveError', 'Error saving profile: ') + error.message);
+      // Reset error status after 4s
+      setTimeout(() => { if (isMountedRef.current) setSaveStatus('idle'); }, 4000);
       return;
     }
-    toast.success(t('profile.profileUpdated'));
+
+    if (!upsertedData) {
+      console.error('[Profile] Save returned no data — row may not have been written');
+      setSaving(false);
+      setSaveStatus('error');
+      toast.error(t('profile.saveError', 'Error saving profile: ') + 'No data returned from database');
+      setTimeout(() => { if (isMountedRef.current) setSaveStatus('idle'); }, 4000);
+      return;
+    }
+
+    // Save succeeded — now refetch from DB and update auth context
+    console.log('[Profile] Save OK, row confirmed:', upsertedData.user_id);
     await refreshProfile();
+
+    // After refreshProfile, the useEffect above will re-sync form from the new profile
+    // This guarantees UI shows exactly what DB has
+
+    // Recalculate profile completion (non-blocking)
+    if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
+
+    if (isMountedRef.current) {
+      setSaving(false);
+      setSaveStatus('saved');
+      toast.success(t('profile.profileUpdated'));
+      setTimeout(() => { if (isMountedRef.current) setSaveStatus('idle'); }, 2500);
+    }
   };
 
+  // ─── Generate CV ───
   const handleGenerateCV = async () => {
     if (!user || !profile) return;
     setGenerating(true);
@@ -91,14 +201,6 @@ export default function Profile() {
         .eq('user_id', user.id)
         .order('issue_date', { ascending: false, nullsFirst: false });
       if (error) throw error;
-      // TD-09: normalize unified table columns to Certification interface
-      const normalizedCerts = ((data as Record<string, unknown>[]) ?? []).map((row) => ({
-        ...row,
-        name: row.certification_name ?? row.name ?? '',
-        issuer: row.issuing_organization ?? row.issuer ?? '',
-        file_url: row.certificate_file_url ?? row.file_url ?? null,
-        expiry_date: row.expiration_date ?? row.expiry_date ?? null,
-      })) as Certification[];
       await generateCV({
         profile: {
           ...profile,
@@ -106,14 +208,11 @@ export default function Profile() {
           title: title || profile.title,
           company: company || profile.company,
           location: location || profile.location,
-          years_experience: Number(years) || profile.years_experience,
-          skills: skills
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean),
+          years_experience: years.trim() !== '' ? parseInt(years.trim(), 10) : profile.years_experience,
+          skills: skills.split(',').map((s) => s.trim()).filter(Boolean),
           bio: bio || profile.bio,
         },
-        certifications: normalizedCerts,
+        certifications: (data as Certification[]) ?? [],
       });
       toast.success(t('profile.cvGenerated'));
     } catch (err) {
@@ -123,6 +222,20 @@ export default function Profile() {
       setGenerating(false);
     }
   };
+
+  // ─── Avatar handlers (AvatarUpload saves to DB + calls refreshProfile) ───
+  const handleAvatarChange = useCallback((_url: string | null) => {
+    // AvatarUpload already saved to DB and called refreshProfile.
+    // The useEffect will re-sync form from the updated profile.
+  }, []);
+
+  const handleToggleShow = useCallback((_next: boolean) => {
+    // AvatarUpload already saved to DB and called refreshProfile.
+  }, []);
+
+  // Derived display values from profile (DB source of truth for preview)
+  const avatarUrl = profile?.avatar_url ?? null;
+  const showAvatar = profile?.show_avatar ?? true;
 
   return (
     <div className="space-y-8">
@@ -135,6 +248,24 @@ export default function Profile() {
         <CertExpiryBadge />
       </div>
 
+      {/* Save status indicator */}
+      {saveStatus !== 'idle' && (
+        <div className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-sm border ${
+          saveStatus === 'saving' ? 'border-zinc-700 bg-zinc-900 text-zinc-400' :
+          saveStatus === 'saved' ? 'border-emerald-800 bg-emerald-950 text-emerald-400' :
+          'border-red-800 bg-red-950 text-red-400'
+        }`}>
+          {saveStatus === 'saving' && <Loader2 className="h-3 w-3 animate-spin" />}
+          {saveStatus === 'saved' && <CheckCircle2 className="h-3 w-3" />}
+          {saveStatus === 'error' && <AlertCircle className="h-3 w-3" />}
+          <span>
+            {saveStatus === 'saving' && t('common.saving', 'Saving...')}
+            {saveStatus === 'saved' && t('common.saved', 'Saved')}
+            {saveStatus === 'error' && t('common.saveError', 'Save error')}
+          </span>
+        </div>
+      )}
+
       <CertExpiryWarnings />
 
       {/* Basic Professional Info */}
@@ -144,8 +275,8 @@ export default function Profile() {
             avatarUrl={avatarUrl}
             fullName={fullName}
             showAvatar={showAvatar}
-            onChange={(url) => setAvatarUrl(url)}
-            onToggleShow={(next) => setShowAvatar(next)}
+            onChange={handleAvatarChange}
+            onToggleShow={handleToggleShow}
           />
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -199,7 +330,8 @@ export default function Profile() {
                 type="number"
                 min={0}
                 value={years}
-                onChange={(e) => setYears(Number(e.target.value))}
+                onChange={(e) => setYears(e.target.value)}
+                placeholder="e.g. 5"
                 className="bg-zinc-950 border-zinc-800 focus-visible:ring-[#f59e0b]"
               />
             </div>
@@ -287,7 +419,9 @@ export default function Profile() {
             <div className="mt-4 space-y-1 text-xs text-zinc-500">
               {company && <p>{company}</p>}
               {location && <p>{location}</p>}
-              <p>{t('profile.yearsExperienceShort', { count: years || 0 })}</p>
+              {years.trim() !== '' && parseInt(years.trim(), 10) > 0 && (
+                <p>{t('profile.yearsExperienceShort', { count: parseInt(years.trim(), 10) })}</p>
+              )}
             </div>
             {skills && (
               <div className="mt-4 flex flex-wrap gap-1.5">
@@ -308,21 +442,21 @@ export default function Profile() {
             )}
           </div>
 
-          {/* Profile Completeness Indicator */}
+          {/* Profile Completeness — calculated from DB data via profile context */}
           <ProfileCompleteness />
         </aside>
       </form>
 
-      {/* Availability & Mobility */}
+      {/* Availability & Mobility — has its own save/load from DB */}
       <AvailabilityMobilitySection />
 
-      {/* CV Upload */}
+      {/* CV Upload — saves directly to DB + calls refreshProfile */}
       <CVUploadSection />
 
       {/* Work Experience */}
       <WorkExperienceSection />
 
-      {/* Certifications (with built-in Alert Preferences) */}
+      {/* Certifications */}
       <CertificationsSection />
 
       {/* AI CV Extraction */}

@@ -210,6 +210,82 @@ export function calculateProfileCompletionPercent(input: ProfileCompletionInput)
 }
 
 /**
+ * Recalculate profile completion from real DB data and save back to profile.
+ * Call this after any action that changes profile completeness
+ * (upload avatar, CV, add experience, certification, document, etc.)
+ *
+ * This is a fire-and-forget helper — it won't throw or block UI.
+ */
+export async function recalculateAndSaveProfileCompletion(userId: string): Promise<void> {
+  try {
+    // Dynamic import to avoid circular dependency
+    const { supabase, TABLES } = await import('@/lib/supabase');
+
+    console.log('[recalculateAndSave] Starting for user:', userId);
+
+    // Fetch profile data
+    const { data: profile, error: profileError } = await supabase
+      .from(TABLES.profiles)
+      .select('avatar_url, full_name, title, company, location, years_experience, skills, bio, cv_file_url, cv_url')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (profileError || !profile) {
+      console.error('[recalculateAndSave] Failed to fetch profile:', profileError?.message);
+      return;
+    }
+
+    // Fetch related counts
+    const [expRes, certRes, docRes] = await Promise.all([
+      supabase.from('app_worker_experiences').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+      supabase.from('app_worker_certifications').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+      supabase.from('app_worker_documents').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+    ]);
+
+    const input: ProfileCompletionInput = {
+      avatar_url: profile.avatar_url as string | null,
+      full_name: profile.full_name as string | null,
+      title: profile.title as string | null,
+      company: profile.company as string | null,
+      location: profile.location as string | null,
+      years_experience: profile.years_experience as number | null,
+      skills: profile.skills as string[] | null,
+      bio: profile.bio as string | null,
+      cv_file_url: profile.cv_file_url as string | null,
+      cv_url: profile.cv_url as string | null,
+      experience_count: expRes.count ?? 0,
+      certification_count: certRes.count ?? 0,
+      document_count: docRes.count ?? 0,
+    };
+
+    const result = calculateProfileCompletion(input);
+
+    console.log('[recalculateAndSave] Calculated:', {
+      percentage: result.percentage,
+      status: result.status,
+      isMarketplaceReady: result.isMarketplaceReady,
+    });
+
+    // Save back to profile (non-blocking)
+    const { error: updateError } = await supabase
+      .from(TABLES.profiles)
+      .update({
+        profile_completion: result.percentage,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId);
+
+    if (updateError) {
+      console.error('[recalculateAndSave] Failed to save:', updateError.message);
+    } else {
+      console.log('[recalculateAndSave] Saved profile_completion:', result.percentage);
+    }
+  } catch (err) {
+    console.error('[recalculateAndSave] Unexpected error:', err);
+  }
+}
+
+/**
  * Onboarding-specific completion calculation.
  * During onboarding, we only have partial data (no experience/cert/doc counts yet).
  * This maps onboarding fields to the standard weights.

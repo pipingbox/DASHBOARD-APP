@@ -1,6 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
-import { supabase, TABLES, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase';
-import { COMPLETION_THRESHOLDS } from '@/lib/profileCompletion';
+import { supabase, TABLES } from '@/lib/supabase';
+import {
+  calculateProfileCompletion,
+  COMPLETION_THRESHOLDS,
+  type ProfileCompletionInput,
+} from '@/lib/profileCompletion';
 import {
   Users2,
   Building2,
@@ -21,6 +25,9 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 /* ─── Constants ─── */
+const SUPABASE_URL = 'https://mwdauubztjxkbrefirbg.supabase.co';
+const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13ZGF1dWJ6dGp4a2JyZWZpcmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDY4NTAsImV4cCI6MjA5MzQ4Mjg1MH0.vtFpaUlevj5H65m1xUS84VHLq3B1YEXhX8G6BSP0wos';
 const BACKFILL_URL = `${SUPABASE_URL}/functions/v1/backfill-profiles`;
 
 /* ─── Types ─── */
@@ -77,16 +84,54 @@ interface RegistroUser {
   auth_provider: string;
   has_profile: boolean;
   last_sign_in_at: string | null;
+  // Fields needed for live calculation
+  years_experience: number | null;
+  cv_file_url: string | null;
+  cv_url: string | null;
+  experience_count: number;
+  certification_count: number;
+  document_count: number;
+  /** Live-calculated completion (from calculateProfileCompletion) */
+  calculated_completion: number;
+  /** Admin visibility: last profile update timestamp */
+  updated_at: string | null;
+  /** Admin visibility: whether onboarding draft exists in profile (title or skills set) */
+  has_onboarding_draft: boolean;
+  /** Admin visibility: whether CV is uploaded */
+  has_cv: boolean;
+  /** Admin visibility: onboarding_completed flag */
+  onboarding_completed: boolean;
 }
 
 type OnboardingStatus = 'AUTH_ONLY' | 'PROFILE_STARTED' | 'PROFILE_COMPLETED' | 'MARKETPLACE_READY';
 type RegistroFilter = 'all' | 'complete' | 'incomplete' | 'companies' | 'referrals' | 'orphans';
 
 /* ─── Helpers ─── */
+/** Calculate live completion for a RegistroUser using the centralized engine */
+function calcLiveCompletion(user: RegistroUser): number {
+  if (!user.has_profile) return 0;
+  const input: ProfileCompletionInput = {
+    avatar_url: user.avatar_url,
+    full_name: user.full_name,
+    title: user.position,
+    company: user.company,
+    location: user.location,
+    years_experience: user.years_experience ?? 0,
+    skills: user.skills,
+    bio: user.bio,
+    cv_file_url: user.cv_file_url,
+    cv_url: user.cv_url,
+    experience_count: user.experience_count ?? 0,
+    certification_count: user.certification_count ?? 0,
+    document_count: user.document_count ?? 0,
+  };
+  return calculateProfileCompletion(input).percentage;
+}
+
 function computeOnboardingStatus(user: RegistroUser): OnboardingStatus {
   if (!user.has_profile) return 'AUTH_ONLY';
 
-  const completion = user.profile_completion ?? 0;
+  const completion = user.calculated_completion;
   const hasBasicInfo = !!(user.full_name && user.position);
 
   // MARKETPLACE_READY: minimum useful fields + profile_visibility = public (cv_visible = true)
@@ -171,7 +216,9 @@ export function AdminRegistros() {
             const profile = au.profile;
 
             if (au.has_profile && profile) {
-              return {
+              const hasCv = !!(profile.cv_file_url || profile.cv_url);
+              const hasDraft = !!(profile.title || (Array.isArray(profile.skills) && profile.skills.length > 0));
+              const ru: RegistroUser = {
                 id: profile.id,
                 user_id: au.auth_id,
                 full_name: profile.full_name || au.full_name,
@@ -193,7 +240,20 @@ export function AdminRegistros() {
                 auth_provider: au.auth_provider || 'email',
                 has_profile: true,
                 last_sign_in_at: au.last_sign_in_at,
+                years_experience: profile.years_experience ?? null,
+                cv_file_url: profile.cv_file_url ?? null,
+                cv_url: profile.cv_url ?? null,
+                experience_count: profile.experience_count ?? 0,
+                certification_count: profile.certification_count ?? 0,
+                document_count: profile.document_count ?? 0,
+                calculated_completion: 0,
+                updated_at: profile.updated_at ?? null,
+                has_onboarding_draft: hasDraft,
+                has_cv: hasCv,
+                onboarding_completed: profile.onboarding_completed ?? false,
               };
+              ru.calculated_completion = calcLiveCompletion(ru);
+              return ru;
             } else {
               // Orphan: auth user WITHOUT profile
               return {
@@ -218,7 +278,18 @@ export function AdminRegistros() {
                 auth_provider: au.auth_provider || 'email',
                 has_profile: false,
                 last_sign_in_at: au.last_sign_in_at,
-              };
+                years_experience: null,
+                cv_file_url: null,
+                cv_url: null,
+                experience_count: 0,
+                certification_count: 0,
+                document_count: 0,
+                calculated_completion: 0,
+                updated_at: null,
+                has_onboarding_draft: false,
+                has_cv: false,
+                onboarding_completed: false,
+              } as RegistroUser;
             }
           });
         } else {
@@ -235,7 +306,7 @@ export function AdminRegistros() {
       if (!edgeFunctionWorked) {
         const { data: profiles, error: profilesError } = await supabase
           .from(TABLES.profiles)
-          .select('id, user_id, full_name, role, account_type, created_at, avatar_url, availability_status, cv_visible, bio, title, company, location, skills, referral_code, referred_by_user_id, years_experience, profile_completion, profile_visibility')
+          .select('id, user_id, full_name, role, account_type, created_at, updated_at, avatar_url, availability_status, cv_visible, bio, title, company, location, skills, referral_code, referred_by_user_id, years_experience, profile_completion, profile_visibility, cv_file_url, cv_url, onboarding_completed')
           .order('created_at', { ascending: false })
           .limit(500);
 
@@ -243,33 +314,102 @@ export function AdminRegistros() {
           console.error('[AdminRegistros] Profiles fallback error:', profilesError);
           setError('⚠️ No se pudo conectar con la función edge NI leer perfiles. Verifica permisos.');
         } else {
-          registroUsers = (profiles || []).map((p: any) => ({
-            id: p.id,
-            user_id: p.user_id,
-            full_name: p.full_name,
-            email: null,
-            role: p.role || 'worker',
-            account_type: p.account_type,
-            created_at: p.created_at,
-            avatar_url: p.avatar_url,
-            profile_completion: p.profile_completion ?? 0,
-            availability_status: p.availability_status,
-            cv_visible: p.cv_visible,
-            bio: p.bio,
-            position: p.title,
-            company: p.company,
-            location: p.location,
-            skills: Array.isArray(p.skills) ? p.skills : null,
-            referral_code: p.referral_code,
-            referred_by: p.referred_by_user_id,
-            auth_provider: 'email',
-            has_profile: true,
-            last_sign_in_at: null,
-          }));
+          registroUsers = (profiles || []).map((p: any) => {
+            const hasCv = !!(p.cv_file_url || p.cv_url);
+            const hasDraft = !!(p.title || (Array.isArray(p.skills) && p.skills.length > 0));
+            const ru: RegistroUser = {
+              id: p.id,
+              user_id: p.user_id,
+              full_name: p.full_name,
+              email: null,
+              role: p.role || 'worker',
+              account_type: p.account_type,
+              created_at: p.created_at,
+              avatar_url: p.avatar_url,
+              profile_completion: p.profile_completion ?? 0,
+              availability_status: p.availability_status,
+              cv_visible: p.cv_visible,
+              bio: p.bio,
+              position: p.title,
+              company: p.company,
+              location: p.location,
+              skills: Array.isArray(p.skills) ? p.skills : null,
+              referral_code: p.referral_code,
+              referred_by: p.referred_by_user_id,
+              auth_provider: 'email',
+              has_profile: true,
+              last_sign_in_at: null,
+              years_experience: p.years_experience ?? null,
+              cv_file_url: p.cv_file_url ?? null,
+              cv_url: p.cv_url ?? null,
+              experience_count: 0,
+              certification_count: 0,
+              document_count: 0,
+              calculated_completion: 0,
+              updated_at: p.updated_at ?? null,
+              has_onboarding_draft: hasDraft,
+              has_cv: hasCv,
+              onboarding_completed: p.onboarding_completed ?? false,
+            };
+            ru.calculated_completion = calcLiveCompletion(ru);
+            return ru;
+          });
 
           if (!edgeFunctionWorked) {
             setError('⚠️ Función edge no disponible. Mostrando solo perfiles existentes. Los usuarios huérfanos (solo auth) no aparecerán.');
           }
+        }
+      }
+
+      // ── Fetch real experience/certification/document counts from Supabase ──
+      // The edge function and profiles table do NOT store these counts as columns,
+      // so we must query the related tables directly (same as Dashboard/Profile do).
+      const profileUserIds = registroUsers.filter((u) => u.has_profile).map((u) => u.user_id);
+
+      if (profileUserIds.length > 0) {
+        try {
+          const [expRows, certRows, docRows] = await Promise.all([
+            supabase
+              .from(TABLES.workerExperiences)
+              .select('user_id')
+              .in('user_id', profileUserIds),
+            supabase
+              .from(TABLES.workerCertifications)
+              .select('user_id')
+              .in('user_id', profileUserIds),
+            supabase
+              .from(TABLES.workerDocuments)
+              .select('user_id')
+              .in('user_id', profileUserIds),
+          ]);
+
+          // Build count maps: user_id → count
+          const countMap = (rows: { user_id: string }[] | null) => {
+            const m: Record<string, number> = {};
+            (rows || []).forEach((r) => { m[r.user_id] = (m[r.user_id] || 0) + 1; });
+            return m;
+          };
+
+          const expCounts = countMap(expRows.data as { user_id: string }[] | null);
+          const certCounts = countMap(certRows.data as { user_id: string }[] | null);
+          const docCounts = countMap(docRows.data as { user_id: string }[] | null);
+
+          // Patch each user with real counts and recalculate completion
+          for (const u of registroUsers) {
+            if (!u.has_profile) continue;
+            u.experience_count = expCounts[u.user_id] || 0;
+            u.certification_count = certCounts[u.user_id] || 0;
+            u.document_count = docCounts[u.user_id] || 0;
+            u.calculated_completion = calcLiveCompletion(u);
+
+            console.log("[ADMIN_COMPLETION]", {
+              user_id: u.user_id,
+              calculated: u.calculated_completion,
+              stored: u.profile_completion,
+            });
+          }
+        } catch (countErr) {
+          console.warn('[AdminRegistros] Could not fetch related counts, using profile-only calc:', countErr);
         }
       }
 
@@ -426,7 +566,7 @@ export function AdminRegistros() {
 
   /* ─── Export CSV ─── */
   const handleExportCSV = () => {
-    const headers = ['Nombre', 'Email', 'Fecha Registro', 'Rol', 'Tiene Profile', 'Onboarding Status', 'Profile %', 'Auth Provider', 'Referral Code', 'Referred By'];
+    const headers = ['Nombre', 'Email', 'Fecha Registro', 'Rol', 'Tiene Profile', 'Onboarding Status', 'Profile %', 'Auth Provider', 'Referral Code', 'Referred By', 'Draft Guardado', 'CV Subido', 'Última Actualización'];
     const rows = filteredUsers.map((u) => [
       u.full_name || '',
       u.email || '',
@@ -434,10 +574,13 @@ export function AdminRegistros() {
       u.role === 'user' ? 'worker' : u.role,
       u.has_profile ? 'Sí' : 'No',
       computeOnboardingStatus(u),
-      String(u.profile_completion ?? 0),
+      String(u.calculated_completion),
       u.auth_provider,
       u.referral_code || '',
       u.referred_by || '',
+      u.has_onboarding_draft ? 'Sí' : 'No',
+      u.has_cv ? 'Sí' : 'No',
+      u.updated_at ? new Date(u.updated_at).toLocaleDateString() : '',
     ]);
 
     const csv = [headers.join(','), ...rows.map((r) => r.map((c) => `"${c}"`).join(','))].join('\n');
@@ -589,6 +732,9 @@ export function AdminRegistros() {
                     Referral
                   </th>
                   <th className="text-left py-3 px-4 text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-medium">
+                    Estado Datos
+                  </th>
+                  <th className="text-left py-3 px-4 text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-medium">
                     Acciones
                   </th>
                 </tr>
@@ -599,7 +745,7 @@ export function AdminRegistros() {
                   const badge = getStatusBadge(status);
                   const companyBadge = getAccountTypeBadge(u.role, u.account_type);
                   const normalizedRole = u.role === 'user' ? 'worker' : u.role;
-                  const completion = u.profile_completion ?? 0;
+                  const completion = u.calculated_completion;
                   const isGoogleAuth = u.auth_provider === 'google';
 
                   return (
@@ -735,6 +881,39 @@ export function AdminRegistros() {
                         )}
                       </td>
 
+                      {/* Estado Datos (Admin Visibility) */}
+                      <td className="py-3 px-4">
+                        <div className="flex flex-col gap-1">
+                          {/* Auth account */}
+                          <span className="inline-flex items-center gap-1 text-[9px]">
+                            <span className={u.has_profile ? 'text-emerald-400' : 'text-red-400'}>
+                              {u.has_profile ? '✓' : '✗'}
+                            </span>
+                            <span className="text-zinc-500">Profile</span>
+                          </span>
+                          {/* Onboarding draft */}
+                          <span className="inline-flex items-center gap-1 text-[9px]">
+                            <span className={u.has_onboarding_draft ? 'text-emerald-400' : 'text-zinc-600'}>
+                              {u.has_onboarding_draft ? '✓' : '—'}
+                            </span>
+                            <span className="text-zinc-500">Draft</span>
+                          </span>
+                          {/* CV uploaded */}
+                          <span className="inline-flex items-center gap-1 text-[9px]">
+                            <span className={u.has_cv ? 'text-emerald-400' : 'text-zinc-600'}>
+                              {u.has_cv ? '✓' : '—'}
+                            </span>
+                            <span className="text-zinc-500">CV</span>
+                          </span>
+                          {/* Last update */}
+                          {u.updated_at && (
+                            <span className="text-[9px] text-zinc-600" title={u.updated_at}>
+                              🕐 {new Date(u.updated_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
                       {/* Actions */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1.5">
@@ -754,7 +933,7 @@ export function AdminRegistros() {
                 })}
                 {filteredUsers.length === 0 && (
                   <tr>
-                    <td colSpan={9} className="py-12 text-center text-zinc-500 text-sm">
+                    <td colSpan={10} className="py-12 text-center text-zinc-500 text-sm">
                       No se encontraron usuarios con estos filtros.
                     </td>
                   </tr>

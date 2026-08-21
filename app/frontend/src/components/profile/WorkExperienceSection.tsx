@@ -40,6 +40,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import type { WorkExperience, TranslationLanguage } from '@/lib/workerProfile';
 import { normalizeExperience, TRANSLATION_FIELDS, LANGUAGE_NAMES } from '@/lib/workerProfile';
+import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
 /**
  * Placeholder for AI-powered translation generation.
@@ -323,6 +324,8 @@ export function WorkExperienceSection() {
         toast.success(t('workerProfile.experience.added'));
       }
       setDialogOpen(false);
+      // Recalculate profile completion (non-blocking)
+      if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
     } catch {
       toast.error(t('common.unexpectedError'));
     } finally {
@@ -345,6 +348,8 @@ export function WorkExperienceSection() {
         setItems(previousItems);
       } else {
         toast.success(t('workerProfile.experience.deleted'));
+        // Recalculate profile completion (non-blocking)
+        if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
       }
     } catch {
       toast.error(t('common.unexpectedError'));

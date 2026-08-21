@@ -90,7 +90,9 @@ export default function Register() {
               <img
                 src="/assets/logos/logo-horizontal.png"
                 alt="PipingBox"
-                className="w-[200px] h-auto"
+                width={200}
+                height={200}
+                className="w-[200px] h-[200px] object-contain"
               />
             </div>
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#f59e0b]">
@@ -281,7 +283,9 @@ export default function Register() {
             <img
               src="/assets/logos/logo-horizontal.png"
               alt="PipingBox"
-              className="w-[310px] h-auto drop-shadow-[0_0_30px_rgba(245,158,11,0.15)]"
+              width={200}
+              height={200}
+              className="w-[200px] h-[200px] object-contain drop-shadow-[0_0_30px_rgba(245,158,11,0.15)]"
             />
           </div>
 
@@ -307,6 +311,17 @@ export default function Register() {
           <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-600 pt-4">
             {t('auth.footerTagline')}
           </p>
+
+          {/* Legal links */}
+          <div className="flex items-center gap-3 text-xs text-zinc-600 pt-2">
+            <Link to="/privacy" className="hover:text-zinc-400 transition">
+              {t('footer.privacy', { defaultValue: 'Privacy Policy' })}
+            </Link>
+            <span>·</span>
+            <Link to="/terms" className="hover:text-zinc-400 transition">
+              {t('footer.terms', { defaultValue: 'Terms of Service' })}
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -13,7 +13,8 @@ export type NotificationType =
   | 'NEW_MESSAGE'
   | 'DOCUMENT_REQUEST'
   | 'CERTIFICATE_EXPIRING'
-  | 'ADMIN_ALERT';
+  | 'ADMIN_ALERT'
+  | 'FEEDBACK_RESOLVED';
 
 // ─── Row Interface ───
 export interface NotificationRow {
@@ -191,6 +192,44 @@ export async function notifyAdminAlert(
   });
 }
 
+/** Notify user that their feedback report has been resolved (with duplicate check) */
+export async function notifyFeedbackResolved(
+  userId: string,
+  reportId: string,
+  adminName?: string,
+): Promise<void> {
+  if (!userId || !reportId) return;
+
+  // Check for duplicate: don't create if one already exists for this report
+  try {
+    const { data: existing } = await supabase
+      .from(TABLES.notifications)
+      .select('id')
+      .eq('user_id', userId)
+      .eq('type', 'FEEDBACK_RESOLVED')
+      .eq('related_entity_id', reportId)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      console.log('[NOTIFY] Feedback resolved notification already exists for report:', reportId);
+      return;
+    }
+  } catch {
+    // If check fails, proceed anyway — worst case is a duplicate
+  }
+
+  await createNotification({
+    recipientId: userId,
+    type: 'FEEDBACK_RESOLVED',
+    title: 'Problema resuelto',
+    message: 'Hemos revisado y marcado como resuelto tu reporte. Gracias por ayudarnos a mejorar PipingBox.',
+    relatedEntityType: 'beta_feedback_report',
+    relatedEntityId: reportId,
+    actionUrl: '/dashboard',
+    actorName: adminName,
+  });
+}
+
 /** Notify about a document request */
 export async function notifyDocumentRequest(
   userId: string,
@@ -204,6 +243,46 @@ export async function notifyDocumentRequest(
     relatedEntityType: 'document',
     actionUrl: '/profile',
   });
+}
+
+/** Notify all admin users about a new company lead */
+export async function notifyNewCompanyLead(
+  companyName: string,
+  workersNeeded: string,
+  country: string,
+  leadId?: string,
+): Promise<void> {
+  try {
+    // Fetch all admin users
+    const { data: admins } = await supabase
+      .from(TABLES.profiles)
+      .select('user_id')
+      .eq('role', 'admin');
+
+    if (!admins || admins.length === 0) {
+      console.warn('[notifyNewCompanyLead] No admin users found to notify');
+      return;
+    }
+
+    console.log('[notifyNewCompanyLead] Notifying', admins.length, 'admins about lead from', companyName);
+
+    // Create notification for each admin
+    await Promise.all(
+      admins.map((admin) =>
+        createNotification({
+          recipientId: admin.user_id,
+          type: 'ADMIN_ALERT',
+          title: 'Nueva solicitud de empresa',
+          message: `${companyName} necesita ${workersNeeded} en ${country}`,
+          relatedEntityType: 'company_lead',
+          relatedEntityId: leadId,
+          actionUrl: '/admin',
+        }),
+      ),
+    );
+  } catch (err) {
+    console.error('[notifyNewCompanyLead] Failed:', err);
+  }
 }
 
 // ─── Query Helpers ───

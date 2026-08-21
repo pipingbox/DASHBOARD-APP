@@ -14,6 +14,7 @@ import {
   Mail,
   Loader2,
   X,
+  CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,6 +24,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { NotificationRow, NotificationType } from '@/lib/notifications';
 import { cn } from '@/lib/utils';
 
@@ -60,6 +62,8 @@ function getNotificationMeta(type: NotificationType): NotificationMeta {
       return { icon: Award, iconColor: 'text-yellow-500' };
     case 'ADMIN_ALERT':
       return { icon: ShieldAlert, iconColor: 'text-red-400' };
+    case 'FEEDBACK_RESOLVED':
+      return { icon: CheckCircle2, iconColor: 'text-green-400' };
     default:
       return { icon: Bell, iconColor: 'text-zinc-400' };
   }
@@ -95,6 +99,8 @@ function getNotificationMessage(n: NotificationRow, t: (key: string, opts?: Reco
       return t('notifications.certificateExpiring');
     case 'ADMIN_ALERT':
       return t('notifications.adminAlert');
+    case 'FEEDBACK_RESOLVED':
+      return t('notifications.feedbackResolved');
     default:
       return n.title || t('notifications.empty');
   }
@@ -107,7 +113,7 @@ export function NotificationsBell() {
   const [open, setOpen] = useState(false);
 
   const {
-    unreadCount,
+    unreadCount: notifUnreadCount,
     notifications,
     loading,
     loadNotifications,
@@ -115,6 +121,11 @@ export function NotificationsBell() {
     markAllRead,
     deleteNotification: removeNotification,
   } = useNotifications();
+
+  const { unreadCount: msgUnreadCount } = useUnreadMessages();
+
+  // Combined count: notifications + unread messages
+  const unreadCount = notifUnreadCount + msgUnreadCount;
 
   useEffect(() => {
     if (open) void loadNotifications();

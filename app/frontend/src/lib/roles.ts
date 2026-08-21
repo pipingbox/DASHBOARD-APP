@@ -53,8 +53,11 @@ export const ROUTE_ACCESS: Record<string, UserRole[]> = {
   '/candidate/:userId': ['admin', 'jobs_moderator', 'company'],
   '/company/workers-search': ['admin', 'company'],
   '/company/workforce-requests': ['admin', 'company'],
+  '/company/documentation': ['admin', 'company'],
   '/company/profile': ['admin', 'company'],
   '/company/analytics': ['admin', 'company'],
+  '/company/settings': ['admin', 'company'],
+  '/company/billing': ['admin', 'company'],
 };
 
 /**
@@ -69,8 +72,11 @@ export const NAV_VISIBILITY: Record<string, UserRole[]> = {
   '/company/candidates': ['admin', 'company'],
   '/company/workers-search': ['admin', 'company'],
   '/company/workforce-requests': ['admin', 'company'],
+  '/company/documentation': ['admin', 'company'],
   '/company/profile': ['admin', 'company'],
   '/company/analytics': ['admin', 'company'],
+  '/company/settings': ['admin', 'company'],
+  '/company/billing': ['admin', 'company'],
   '/academy': ['admin', 'worker'],
   '/tools': ['admin', 'worker'],
   '/jobs': ['admin', 'jobs_moderator', 'worker'],
@@ -79,7 +85,7 @@ export const NAV_VISIBILITY: Record<string, UserRole[]> = {
   '/applications': ['admin', 'worker'],
   '/messages': ['admin', 'worker', 'company', 'jobs_moderator'],
   '/content-drafts': ['admin', 'community_moderator'],
-  '/profile': ['admin', 'community_moderator', 'jobs_moderator', 'worker', 'company'],
+  '/profile': ['admin', 'community_moderator', 'jobs_moderator', 'worker'],
 };
 
 /**

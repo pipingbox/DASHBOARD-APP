@@ -1,5 +1,4 @@
 import { supabase, TABLES } from '@/lib/supabase';
-import { getAppBaseUrl } from '@/lib/constants';
 
 export interface Referral {
   id: string;
@@ -147,37 +146,23 @@ export function clearStoredReferralCode(): void {
 /**
  * Check if the referral widget should be visible based on user engagement.
  * Progressive visibility: only show after meaningful engagement.
- * Works for both workers and companies (different engagement signals).
  */
 export async function shouldShowReferralWidget(userId: string): Promise<boolean> {
   try {
+    // Check profile completeness (has full_name, title, skills)
     const { data: profile } = await supabase
       .from(TABLES.profiles)
-      .select('full_name, title, skills, cv_url, cv_file_url, account_type, role, company, bio')
+      .select('full_name, title, skills, cv_url, cv_file_url')
       .eq('user_id', userId)
       .single();
 
     if (!profile) return false;
 
-    const accountType = (profile as Record<string, unknown>).account_type as string | undefined;
-    const role = (profile as Record<string, unknown>).role as string | undefined;
-    const isCompany = accountType === 'company' || role === 'company';
-
     const hasProfile = !!(profile.full_name && profile.title);
-
-    if (isCompany) {
-      // Company engagement: has profile + (company name OR bio OR has posted jobs)
-      const hasCompanyInfo = !!(profile.company || profile.bio);
-      // Check if company has posted jobs (engagement signal).
-      // posted_by stores email, not user_id — fetch profile email via auth or skip.
-      // Simpler: use company name presence as engagement signal for companies.
-      return hasProfile && hasCompanyInfo;
-    }
-
-    // Worker engagement signals
     const hasCV = !!(profile.cv_url || profile.cv_file_url);
     const hasSkills = !!(profile.skills && (profile.skills as string[]).length > 0);
 
+    // Check tool usage
     const { count: toolCount } = await supabase
       .from(TABLES.toolUsage)
       .select('*', { count: 'exact', head: true })
@@ -185,6 +170,7 @@ export async function shouldShowReferralWidget(userId: string): Promise<boolean>
 
     const hasToolUsage = (toolCount ?? 0) >= 1;
 
+    // Check certifications
     const { count: certCount } = await supabase
       .from(TABLES.certifications)
       .select('*', { count: 'exact', head: true })
@@ -192,6 +178,7 @@ export async function shouldShowReferralWidget(userId: string): Promise<boolean>
 
     const hasCerts = (certCount ?? 0) >= 1;
 
+    // Show widget if user has completed profile basics OR has meaningful engagement
     return hasProfile && (hasCV || hasSkills || hasToolUsage || hasCerts);
   } catch {
     return false;
@@ -249,23 +236,11 @@ export async function validateReferralCode(code: string): Promise<string | null>
 
 /**
  * Get referral statistics for a user.
- * Sources (in priority order):
- *   1. profiles.referral_count (set/incremented by admin manual assignment)
- *   2. profiles.referred_by_user_id (set by signup flow or admin)
- *   3. referrals table (legacy, verified entries)
- * Uses the MAX across all sources to ensure no referral is missed.
+ * Primary source: profiles.referred_by_user_id (set by admin manual assignment or signup flow).
+ * Fallback: also checks the referrals table for legacy entries.
  */
 export async function getReferralStats(userId: string): Promise<ReferralStats> {
-  // Fetch the referrer's own profile to get referral_count
-  const { data: ownProfile } = await supabase
-    .from(TABLES.profiles)
-    .select('referral_count')
-    .eq('user_id', userId)
-    .maybeSingle();
-
-  const manualCount = (ownProfile?.referral_count as number) || 0;
-
-  // Count profiles where referred_by_user_id = current user (organic + admin-assigned)
+  // Primary: count profiles where referred_by_user_id = current user
   const { count: profileReferralCount } = await supabase
     .from(TABLES.profiles)
     .select('*', { count: 'exact', head: true })
@@ -278,19 +253,20 @@ export async function getReferralStats(userId: string): Promise<ReferralStats> {
     .eq('referrer_id', userId)
     .eq('status', 'verified');
 
-  // Use the maximum across all sources so nothing is missed
+  // Use the higher count between profiles-based and legacy table
+  // This ensures both admin-assigned and organic referrals are counted
   const profileCount = profileReferralCount ?? 0;
   const legacyCount = legacyVerifiedCount ?? 0;
-  const verified = Math.max(manualCount, profileCount, legacyCount);
+  const verified = Math.max(profileCount, legacyCount);
 
-  // Total includes pending from legacy table too
+  // Total includes pending from legacy table + profile-based count
   const { count: legacyTotalCount } = await supabase
     .from(TABLES.referrals)
     .select('*', { count: 'exact', head: true })
     .eq('referrer_id', userId);
 
   const totalFromLegacy = legacyTotalCount ?? 0;
-  const total = Math.max(verified, totalFromLegacy);
+  const total = Math.max(profileCount, totalFromLegacy);
 
   // Determine current level and rewards
   let currentLevel = 0;
@@ -321,25 +297,67 @@ export async function getReferralStats(userId: string): Promise<ReferralStats> {
 }
 
 /**
- * Process a stored referral code after user registration/login.
- * Called once when user first lands on Dashboard after signup.
- * Handles: validate code → identify referrer → create relationship → mark profile.
+ * RECOVERY: Process a stored referral code after user registration/login.
+ * This is a FALLBACK mechanism — the primary referral assignment happens in ensureProfile (useAuth.tsx).
+ * Called on Dashboard load to catch any referrals that were missed during signup
+ * (e.g. OAuth redirect cleared storage, race conditions, etc.)
  */
 export async function processStoredReferral(userId: string, userEmail?: string): Promise<void> {
+  console.log('[REFERRAL_RECOVERY] Dashboard recovery check for user:', userId);
+
+  // Step 1: Check if user already has a referral assigned
+  try {
+    const { data: profile } = await supabase
+      .from(TABLES.profiles)
+      .select('referred_by_user_id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (profile?.referred_by_user_id) {
+      console.log('[REFERRAL_RECOVERY] User already has referral assigned:', profile.referred_by_user_id);
+      // Clean up any leftover stored codes
+      clearStoredReferralCode();
+      return;
+    }
+  } catch {
+    // Continue with recovery attempt
+  }
+
+  // Step 2: Check for stored referral code
   const code = getStoredReferralCode();
 
-  if (!code) return;
+  if (!code) {
+    console.log('[REFERRAL_RECOVERY] No stored referral code found');
+    return;
+  }
 
-  // Clear immediately to prevent double-processing
-  clearStoredReferralCode();
+  console.log('[REFERRAL_RECOVERY] Found unprocessed referral code:', code);
 
   try {
     // Validate the referral code and get referrer
     const referrerId = await validateReferralCode(code);
 
-    if (!referrerId || referrerId === userId) return;
+    if (!referrerId || referrerId === userId) {
+      console.log('[REFERRAL_RECOVERY] Code invalid or self-referral, clearing');
+      clearStoredReferralCode();
+      return;
+    }
 
-    // Check if referral already exists (prevent duplicates)
+    console.log('[REFERRAL_RECOVERY] Valid referrer found:', referrerId, '— assigning now');
+
+    // Update profile with referred_by_user_id
+    const { error: updateErr } = await supabase
+      .from(TABLES.profiles)
+      .update({ referred_by_user_id: referrerId })
+      .eq('user_id', userId);
+
+    if (updateErr) {
+      console.error('[REFERRAL_RECOVERY] Failed to update profile:', updateErr.message);
+    } else {
+      console.log('[REFERRAL_RECOVERY] ✅ Profile referred_by_user_id set');
+    }
+
+    // Check if referral record already exists (prevent duplicates)
     const { data: existing } = await supabase
       .from(TABLES.referrals)
       .select('id')
@@ -347,38 +365,58 @@ export async function processStoredReferral(userId: string, userEmail?: string):
       .eq('referred_id', userId)
       .maybeSingle();
 
-    if (existing) return;
+    if (!existing) {
+      const { error: insertErr } = await supabase.from(TABLES.referrals).insert({
+        referrer_id: referrerId,
+        referred_id: userId,
+        referred_email: userEmail || '',
+        status: 'pending',
+      });
 
-    // Create the referral record with pending status
-    await supabase.from(TABLES.referrals).insert({
-      referrer_id: referrerId,
-      referred_id: userId,
-      referred_email: userEmail || '',
-      status: 'pending',
-    });
+      if (insertErr) {
+        console.error('[REFERRAL_RECOVERY] Failed to create referral record:', insertErr.message);
+      } else {
+        console.log('[REFERRAL_RECOVERY] ✅ Referral record created');
+      }
+    }
 
-    // Update the referred user's profile with who referred them
-    await supabase
-      .from(TABLES.profiles)
-      .update({ referred_by_user_id: referrerId })
-      .eq('user_id', userId);
+    // Increment referrer stats
+    try {
+      const { data: referrerProfile } = await supabase
+        .from(TABLES.profiles)
+        .select('referral_count')
+        .eq('user_id', referrerId)
+        .maybeSingle();
 
-    // Increment referrer's referral_count so the widget reflects it immediately
-    const { data: referrerProfile } = await supabase
-      .from(TABLES.profiles)
-      .select('referral_count')
-      .eq('user_id', referrerId)
-      .maybeSingle();
+      const currentCount = (referrerProfile?.referral_count as number) || 0;
+      await supabase
+        .from(TABLES.profiles)
+        .update({ referral_count: currentCount + 1 })
+        .eq('user_id', referrerId);
+      console.log('[REFERRAL_RECOVERY] ✅ Referrer count incremented');
+    } catch {
+      // Non-critical
+    }
 
-    const currentCount = (referrerProfile?.referral_count as number) || 0;
-    await supabase
-      .from(TABLES.profiles)
-      .update({ referral_count: currentCount + 1 })
-      .eq('user_id', referrerId);
+    // Store debug info
+    try {
+      localStorage.setItem('pipingbox_last_referral_debug', JSON.stringify({
+        userId,
+        referrerId,
+        referralCode: code,
+        success: true,
+        timestamp: new Date().toISOString(),
+        source: 'dashboard_recovery',
+      }));
+    } catch { /* ignore */ }
 
-  } catch {
-    // Silently fail - referral tracking shouldn't break the app
-    console.warn('[Referrals] Failed to process referral');
+    // Clear stored code after successful processing
+    clearStoredReferralCode();
+    console.log('[REFERRAL_RECOVERY] ✅ Recovery complete');
+
+  } catch (err) {
+    console.error('[REFERRAL_RECOVERY] Recovery failed:', err);
+    // Don't clear the code on failure — next Dashboard load will retry
   }
 }
 
@@ -443,7 +481,8 @@ export async function verifyReferralIfEligible(userId: string): Promise<void> {
  * Get the referral link for sharing.
  */
 export function getReferralLink(code: string): string {
-  return `${getAppBaseUrl()}/register?ref=${code}`;
+  const baseUrl = window.location.origin;
+  return `${baseUrl}/register?ref=${code}`;
 }
 
 /**
@@ -534,4 +573,182 @@ export function getWhatsAppShareUrl(code: string, message: string): string {
   const link = getReferralLink(code);
   const text = encodeURIComponent(`${message}\n${link}`);
   return `https://wa.me/?text=${text}`;
+}
+
+/**
+ * Diagnostic info for admin referral debugging.
+ */
+export interface ReferralDiagnostic {
+  userId: string;
+  email: string | null;
+  fullName: string | null;
+  hasProfile: boolean;
+  referredByUserId: string | null;
+  referredByName: string | null;
+  referralCode: string | null;
+  referralRecordExists: boolean;
+  referralRecordStatus: string | null;
+  storedReferralCode: string | null;
+  lastDebugInfo: Record<string, unknown> | null;
+  issues: string[];
+  lifecycle: string;
+}
+
+/**
+ * Get comprehensive referral diagnostics for a specific user.
+ * Used by admin diagnostic panel.
+ */
+export async function getReferralDiagnostics(userId: string): Promise<ReferralDiagnostic> {
+  const issues: string[] = [];
+  let lifecycle = 'unknown';
+
+  // Get profile
+  const { data: profile } = await supabase
+    .from(TABLES.profiles)
+    .select('user_id, full_name, referral_code, referred_by_user_id')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  const hasProfile = !!profile;
+  const referredByUserId = (profile?.referred_by_user_id as string) ?? null;
+  const referralCode = (profile?.referral_code as string) ?? null;
+
+  // Get referrer name if exists
+  let referredByName: string | null = null;
+  if (referredByUserId) {
+    const { data: referrer } = await supabase
+      .from(TABLES.profiles)
+      .select('full_name')
+      .eq('user_id', referredByUserId)
+      .maybeSingle();
+    referredByName = (referrer?.full_name as string) ?? null;
+  }
+
+  // Check referral record in referrals table
+  const { data: referralRecord } = await supabase
+    .from(TABLES.referrals)
+    .select('id, status')
+    .eq('referred_id', userId)
+    .maybeSingle();
+
+  const referralRecordExists = !!referralRecord;
+  const referralRecordStatus = referralRecord?.status ?? null;
+
+  // Check stored referral code (client-side only)
+  let storedReferralCode: string | null = null;
+  try {
+    storedReferralCode = getStoredReferralCode();
+  } catch { /* ignore */ }
+
+  // Check last debug info
+  let lastDebugInfo: Record<string, unknown> | null = null;
+  try {
+    const raw = localStorage.getItem('pipingbox_last_referral_debug');
+    if (raw) lastDebugInfo = JSON.parse(raw);
+  } catch { /* ignore */ }
+
+  // Diagnose issues
+  if (!hasProfile) {
+    issues.push('No profile found — user may be auth-only (orphan)');
+    lifecycle = 'no_profile';
+  } else if (referredByUserId && referralRecordExists) {
+    lifecycle = 'complete';
+  } else if (referredByUserId && !referralRecordExists) {
+    issues.push('Profile has referred_by_user_id but no referral record in referrals table');
+    lifecycle = 'partial_profile_only';
+  } else if (!referredByUserId && referralRecordExists) {
+    issues.push('Referral record exists but profile.referred_by_user_id is NULL');
+    lifecycle = 'partial_record_only';
+  } else if (storedReferralCode) {
+    issues.push('Stored referral code exists but was never processed');
+    lifecycle = 'unprocessed';
+  } else if (!referredByUserId && !referralRecordExists) {
+    lifecycle = 'no_referral';
+  }
+
+  if (!referralCode) {
+    issues.push('User has no referral_code — cannot be a referrer');
+  }
+
+  // Get email from auth if possible (we can't query auth.users from client, use profile email)
+  const email = null; // Would need edge function to get auth email
+
+  return {
+    userId,
+    email,
+    fullName: (profile?.full_name as string) ?? null,
+    hasProfile,
+    referredByUserId,
+    referredByName,
+    referralCode,
+    referralRecordExists,
+    referralRecordStatus,
+    storedReferralCode,
+    lastDebugInfo,
+    issues,
+    lifecycle,
+  };
+}
+
+/**
+ * Admin: manually assign a referral for a user who was missed.
+ * Creates both the profile link and the referral record.
+ */
+export async function adminAssignReferral(
+  userId: string,
+  referrerId: string,
+  userEmail?: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    console.log('[ADMIN_REFERRAL] Assigning referral:', { userId, referrerId });
+
+    // Update profile
+    const { error: profileErr } = await supabase
+      .from(TABLES.profiles)
+      .update({ referred_by_user_id: referrerId })
+      .eq('user_id', userId);
+
+    if (profileErr) {
+      return { success: false, error: `Profile update failed: ${profileErr.message}` };
+    }
+
+    // Create referral record (prevent duplicates)
+    const { data: existing } = await supabase
+      .from(TABLES.referrals)
+      .select('id')
+      .eq('referrer_id', referrerId)
+      .eq('referred_id', userId)
+      .maybeSingle();
+
+    if (!existing) {
+      const { error: insertErr } = await supabase.from(TABLES.referrals).insert({
+        referrer_id: referrerId,
+        referred_id: userId,
+        referred_email: userEmail || '',
+        status: 'pending',
+      });
+
+      if (insertErr) {
+        return { success: false, error: `Referral record insert failed: ${insertErr.message}` };
+      }
+    }
+
+    // Increment referrer stats
+    const { data: referrerProfile } = await supabase
+      .from(TABLES.profiles)
+      .select('referral_count')
+      .eq('user_id', referrerId)
+      .maybeSingle();
+
+    const currentCount = (referrerProfile?.referral_count as number) || 0;
+    await supabase
+      .from(TABLES.profiles)
+      .update({ referral_count: currentCount + 1 })
+      .eq('user_id', referrerId);
+
+    console.log('[ADMIN_REFERRAL] ✅ Referral assigned successfully');
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: `Unexpected error: ${(err as Error).message}` };
+  }
 }

@@ -1,11 +1,13 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock, Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { calculateOnboardingCompletion } from '@/lib/profileCompletion';
+import { isValidImageFile, isHeicFile, validateFileSize, getSafeImageExtension, ACCEPT_IMAGES } from '@/lib/fileUploadUtils';
 
+/* ─── Constants ─── */
 const ACCOUNT_TYPES = [
   { value: 'worker', label: 'Profesional Industrial', icon: '🔧' },
   { value: 'company', label: 'Empresa', icon: '🏢' },
@@ -46,17 +48,73 @@ const AVAILABILITY_OPTIONS = [
   { value: 'not_available', label: 'No disponible' },
 ];
 
-const TOTAL_STEPS = 9; // UX-001: added step 0 (welcome)
+const TOTAL_STEPS = 8;
+const AUTOSAVE_DEBOUNCE_MS = 800;
 
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
+/* ─── localStorage helpers ─── */
+function getDraftKey(userId: string) {
+  return `pipingbox_onboarding_draft_${userId}`;
+}
+
+interface OnboardingDraft {
+  accountType: 'worker' | 'company';
+  mainRole: string;
+  specialties: string[];
+  country: string;
+  city: string;
+  availability: string;
+  willingToTravel: boolean;
+  willingToRelocate: boolean;
+  profileVisibility: 'public' | 'private';
+  avatarPreview: string | null;
+  step: number;
+  updatedAt: string;
+}
+
+function saveDraftToLocal(userId: string, draft: OnboardingDraft) {
+  try {
+    localStorage.setItem(getDraftKey(userId), JSON.stringify(draft));
+  } catch {
+    // localStorage full or unavailable — silently ignore
+  }
+}
+
+function loadDraftFromLocal(userId: string): OnboardingDraft | null {
+  try {
+    const raw = localStorage.getItem(getDraftKey(userId));
+    if (!raw) return null;
+    return JSON.parse(raw) as OnboardingDraft;
+  } catch {
+    return null;
+  }
+}
+
+function clearDraftFromLocal(userId: string) {
+  try {
+    localStorage.removeItem(getDraftKey(userId));
+  } catch {
+    // ignore
+  }
+}
+
+/* ─── Parse location "city, country" ─── */
+function parseLocation(location: string | null): { city: string; country: string } {
+  if (!location) return { city: '', country: '' };
+  const parts = location.split(',').map((s) => s.trim());
+  if (parts.length >= 2) return { city: parts[0], country: parts.slice(1).join(', ') };
+  return { city: '', country: parts[0] };
+}
+
+/* ─── Component ─── */
 interface OnboardingWizardProps {
-  onComplete: () => void;
+  onComplete: (selectedAccountType?: string) => void;
 }
 
 export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
-  const [step, setStep] = useState(0); // UX-001: start at welcome step
-  const [saving, setSaving] = useState(false);
 
   // Form state
   const [accountType, setAccountType] = useState<'worker' | 'company'>('worker');
@@ -71,119 +129,364 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
+  // UI state
+  const [step, setStep] = useState(1);
+  const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [avatarUploadError, setAvatarUploadError] = useState<string | null>(null);
+  const [restoredFromDraft, setRestoredFromDraft] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Refs for debounce
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isMountedRef = useRef(true);
+
   const progress = Math.round((step / TOTAL_STEPS) * 100);
 
+  /* ─── Restore draft on mount ─── */
+  useEffect(() => {
+    if (!user) return;
+
+    const restoreDraft = async () => {
+      // 1. Try to load from Supabase profile first (source of truth)
+      try {
+        const { data: profileData } = await supabase
+          .from(TABLES.profiles)
+          .select('account_type, title, skills, location, availability_status, willing_to_travel, willing_to_relocate, cv_visible, profile_visibility, avatar_url, full_name')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (profileData) {
+          const hasSupabaseData =
+            profileData.title ||
+            (Array.isArray(profileData.skills) && profileData.skills.length > 0) ||
+            profileData.location ||
+            (profileData.availability_status && profileData.availability_status !== 'not_specified');
+
+          if (hasSupabaseData) {
+            console.log('[Onboarding] Restoring from Supabase profile');
+            const loc = parseLocation(profileData.location);
+
+            if (profileData.account_type === 'worker' || profileData.account_type === 'company') {
+              setAccountType(profileData.account_type);
+            }
+            if (profileData.title) setMainRole(profileData.title);
+            if (Array.isArray(profileData.skills) && profileData.skills.length > 0) setSpecialties(profileData.skills);
+            if (loc.country) setCountry(loc.country);
+            if (loc.city) setCity(loc.city);
+            if (profileData.availability_status && profileData.availability_status !== 'not_specified') {
+              setAvailability(profileData.availability_status);
+            }
+            if (profileData.willing_to_travel) setWillingToTravel(true);
+            if (profileData.willing_to_relocate) setWillingToRelocate(true);
+            if (profileData.profile_visibility === 'private') {
+              setProfileVisibility('private');
+            } else if (profileData.cv_visible === false) {
+              setProfileVisibility('private');
+            }
+            if (profileData.avatar_url) setAvatarPreview(profileData.avatar_url);
+
+            setRestoredFromDraft(true);
+            return; // Supabase data is sufficient
+          }
+        }
+      } catch (err) {
+        console.warn('[Onboarding] Failed to fetch profile for restore:', err);
+      }
+
+      // 2. Fallback: Try localStorage draft
+      const localDraft = loadDraftFromLocal(user.id);
+      if (localDraft) {
+        console.log('[Onboarding] Restoring from localStorage draft');
+        setAccountType(localDraft.accountType);
+        if (localDraft.mainRole) setMainRole(localDraft.mainRole);
+        if (localDraft.specialties.length > 0) setSpecialties(localDraft.specialties);
+        if (localDraft.country) setCountry(localDraft.country);
+        if (localDraft.city) setCity(localDraft.city);
+        if (localDraft.availability) setAvailability(localDraft.availability);
+        setWillingToTravel(localDraft.willingToTravel);
+        setWillingToRelocate(localDraft.willingToRelocate);
+        setProfileVisibility(localDraft.profileVisibility);
+        if (localDraft.avatarPreview) setAvatarPreview(localDraft.avatarPreview);
+        if (localDraft.step > 1) setStep(localDraft.step);
+        setRestoredFromDraft(true);
+      }
+    };
+
+    restoreDraft();
+  }, [user]);
+
+  /* ─── Page unload warning ─── */
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  /* ─── Cleanup on unmount ─── */
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, []);
+
+  /* ─── Build current draft object ─── */
+  const buildDraft = useCallback((): OnboardingDraft => ({
+    accountType,
+    mainRole,
+    specialties,
+    country,
+    city,
+    availability,
+    willingToTravel,
+    willingToRelocate,
+    profileVisibility,
+    avatarPreview,
+    step,
+    updatedAt: new Date().toISOString(),
+  }), [accountType, mainRole, specialties, country, city, availability, willingToTravel, willingToRelocate, profileVisibility, avatarPreview, step]);
+
+  /* ─── Build Supabase update payload from current state ─── */
+  const buildSupabasePayload = useCallback(() => {
+    const completion = calculateOnboardingCompletion({
+      accountType,
+      mainRole,
+      specialties,
+      country,
+      city,
+      availability,
+      willingToTravel,
+      willingToRelocate,
+      profileVisibility,
+      hasAvatar: !!avatarPreview,
+      fullName: profile?.full_name || undefined,
+    });
+
+    const payload: Record<string, unknown> = {
+      account_type: accountType,
+      role: accountType === 'company' ? 'company' : 'worker',
+      title: mainRole || null,
+      skills: specialties.length > 0 ? specialties : null,
+      location: [city, country].filter(Boolean).join(', ') || null,
+      availability_status: availability || 'not_specified',
+      willing_to_travel: willingToTravel,
+      willing_to_relocate: willingToRelocate,
+      cv_visible: profileVisibility === 'public',
+      profile_visibility: profileVisibility,
+      profile_completion: completion,
+      updated_at: new Date().toISOString(),
+    };
+
+    return payload;
+  }, [accountType, mainRole, specialties, country, city, availability, willingToTravel, willingToRelocate, profileVisibility, avatarPreview, profile?.full_name]);
+
+  /* ─── Debounced autosave to Supabase + localStorage ─── */
+  const debouncedAutosave = useCallback(() => {
+    if (!user) return;
+
+    setHasUnsavedChanges(true);
+
+    // Always save to localStorage immediately (fast, offline-safe)
+    saveDraftToLocal(user.id, buildDraft());
+
+    // Debounce Supabase save
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+
+    debounceTimerRef.current = setTimeout(async () => {
+      if (!isMountedRef.current) return;
+
+      setSaveStatus('saving');
+      try {
+        const payload = buildSupabasePayload();
+        const { error } = await supabase
+          .from(TABLES.profiles)
+          .update(payload)
+          .eq('user_id', user.id);
+
+        if (!isMountedRef.current) return;
+
+        if (error) {
+          console.error('[Onboarding] Autosave error:', error.message);
+          setSaveStatus('error');
+        } else {
+          console.log('[Onboarding] Autosaved to Supabase');
+          setSaveStatus('saved');
+          setHasUnsavedChanges(false);
+          // Reset status after 2s
+          setTimeout(() => {
+            if (isMountedRef.current) setSaveStatus('idle');
+          }, 2000);
+        }
+      } catch (err) {
+        console.error('[Onboarding] Autosave exception:', err);
+        if (isMountedRef.current) setSaveStatus('error');
+      }
+    }, AUTOSAVE_DEBOUNCE_MS);
+  }, [user, buildDraft, buildSupabasePayload]);
+
+  /* ─── Trigger autosave when form data changes ─── */
+  useEffect(() => {
+    // Skip the initial mount / restore phase
+    if (!user || !restoredFromDraft) return;
+    debouncedAutosave();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountType, mainRole, specialties, country, city, availability, willingToTravel, willingToRelocate, profileVisibility]);
+
+  /* ─── Specialty toggle ─── */
   const toggleSpecialty = (s: string) => {
     setSpecialties((prev) =>
       prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
     );
   };
 
+  /* ─── Avatar change (independent — failure doesn't reset form) ─── */
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    // Reset input value immediately to allow re-selecting same file on mobile
+    if (e.target) e.target.value = '';
+    if (!file) return;
+
+    setAvatarUploadError(null);
+
+    // Validate file type (mobile-friendly: includes HEIC/HEIF from iPhone)
+    if (!isValidImageFile(file)) {
+      setAvatarUploadError('Solo se aceptan imágenes JPG, PNG, WebP o HEIC');
+      return;
+    }
+    // Validate file size
+    const sizeError = validateFileSize(file, 5);
+    if (sizeError) {
+      setAvatarUploadError(sizeError);
+      return;
+    }
+
+    // Inform about HEIC (preview may not work but upload will succeed)
+    if (isHeicFile(file)) {
+      // HEIC files can't be previewed via FileReader in most browsers
+      // but we still accept and upload them
       setAvatarFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setAvatarPreview(reader.result as string);
-      reader.readAsDataURL(file);
+      setAvatarPreview(null); // Can't preview HEIC in browser
+      setAvatarUploadError(null);
+      // Save to localStorage without preview
+      if (user) {
+        const draft = buildDraft();
+        draft.avatarPreview = null;
+        saveDraftToLocal(user.id, draft);
+      }
+      return;
+    }
+
+    setAvatarFile(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result as string);
+      // Save preview to localStorage draft
+      if (user) {
+        const draft = buildDraft();
+        draft.avatarPreview = reader.result as string;
+        saveDraftToLocal(user.id, draft);
+      }
+    };
+    reader.onerror = () => {
+      setAvatarUploadError('Error al leer el archivo. Intenta de nuevo.');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  /* ─── Upload avatar independently ─── */
+  const uploadAvatar = async (): Promise<string | null> => {
+    if (!avatarFile || !user) return null;
+
+    setAvatarUploadError(null);
+    try {
+      const ext = getSafeImageExtension(avatarFile.name);
+      const path = `avatars/${user.id}/profile-${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('profile_pictures')
+        .upload(path, avatarFile, { upsert: true });
+
+      if (uploadErr) {
+        console.error('[Onboarding] Avatar upload error:', uploadErr.message);
+        setAvatarUploadError(`Error al subir foto: ${uploadErr.message}. Puedes intentar de nuevo.`);
+        return null; // Return null but DON'T throw — form data is safe
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('profile_pictures')
+        .getPublicUrl(path);
+
+      return urlData.publicUrl;
+    } catch (err) {
+      console.error('[Onboarding] Avatar upload exception:', err);
+      setAvatarUploadError('Error de red al subir foto. Puedes intentar de nuevo desde tu perfil.');
+      return null; // Form data is safe
     }
   };
 
-  // Save partial progress after each step
-  const saveStepProgress = useCallback(async (updates: Record<string, unknown>) => {
-    if (!user) return;
-    try {
-      const completion = calculateOnboardingCompletion({
-        accountType,
-        mainRole,
-        specialties,
-        country,
-        city,
-        availability,
-        willingToTravel,
-        willingToRelocate,
-        profileVisibility,
-        hasAvatar: !!avatarPreview,
-        fullName: profile?.full_name || undefined,
-      });
-      await supabase
-        .from(TABLES.profiles)
-        .update({ ...updates, profile_completion: completion })
-        .eq('user_id', user.id);
-    } catch (err) {
-      console.error('[Onboarding] Step save error:', err);
-    }
-  }, [user, accountType, mainRole, specialties, country, city, availability, willingToTravel, willingToRelocate, profileVisibility, avatarPreview, profile?.full_name]);
-
+  /* ─── Final save and complete ─── */
   const saveAndFinish = async () => {
     if (!user) return;
     setSaving(true);
+    setSaveStatus('saving');
 
     try {
-      // Upload avatar if provided
+      // Upload avatar independently — failure doesn't block completion
       let avatarUrl: string | null = null;
       if (avatarFile) {
-        const ext = avatarFile.name.split('.').pop() || 'jpg';
-        const path = `avatars/${user.id}/profile.${ext}`;
-        const { error: uploadErr } = await supabase.storage
-          .from('profile_pictures')
-          .upload(path, avatarFile, { upsert: true });
-        if (!uploadErr) {
-          const { data: urlData } = supabase.storage
-            .from('profile_pictures')
-            .getPublicUrl(path);
-          avatarUrl = urlData.publicUrl;
-        }
+        avatarUrl = await uploadAvatar();
+        // avatarUrl may be null if upload failed — that's OK
       }
 
-      const completion = calculateOnboardingCompletion({
-        accountType,
-        mainRole,
-        specialties,
-        country,
-        city,
-        availability,
-        willingToTravel,
-        willingToRelocate,
-        profileVisibility,
-        hasAvatar: !!avatarUrl || !!avatarPreview,
-        fullName: profile?.full_name || undefined,
-      });
+      const payload = buildSupabasePayload();
+      payload.onboarding_completed = true;
 
-      // Build final update payload
-      const updates: Record<string, unknown> = {
-        account_type: accountType,
-        role: accountType === 'company' ? 'company' : 'worker',
-        title: mainRole || null,
-        skills: specialties,
-        location: [city, country].filter(Boolean).join(', ') || null,
-        availability_status: availability || 'not_specified',
-        willing_to_travel: willingToTravel,
-        willing_to_relocate: willingToRelocate,
-        cv_visible: profileVisibility === 'public',
-        profile_visibility: profileVisibility,
-        profile_completion: completion,
-        onboarding_completed: true,
-      };
+      // Mark as marketplace-ready when profile visibility is public
+      if (profileVisibility === 'public') {
+        payload.marketplace_ready = true;
+        payload.onboarding_status = 'MARKETPLACE_READY';
+      } else {
+        payload.marketplace_ready = false;
+        payload.onboarding_status = 'PROFILE_STARTED';
+      }
 
       if (avatarUrl) {
-        updates.avatar_url = avatarUrl;
+        payload.avatar_url = avatarUrl;
       }
 
       const { error } = await supabase
         .from(TABLES.profiles)
-        .update(updates)
+        .update(payload)
         .eq('user_id', user.id);
 
       if (error) {
         console.error('[Onboarding] Final save error:', error.message);
+        setSaveStatus('error');
+        // Don't return — data was already autosaved progressively
+        // Still navigate to dashboard
+      } else {
+        setSaveStatus('saved');
       }
 
+      // Clear localStorage draft on successful completion
+      clearDraftFromLocal(user.id);
+      setHasUnsavedChanges(false);
+
       await refreshProfile();
-      onComplete();
-      navigate('/dashboard', { replace: true });
+      onComplete(accountType);
     } catch (err) {
       console.error('[Onboarding] Error:', err);
+      setSaveStatus('error');
+      // Even on error, data was autosaved — allow navigation
+      clearDraftFromLocal(user.id);
+      setHasUnsavedChanges(false);
+      await refreshProfile();
+      onComplete(accountType);
     } finally {
       setSaving(false);
     }
@@ -196,19 +499,20 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       case 3: return specialties.length > 0;
       case 4: return !!(country || city);
       case 5: return !!availability;
-      case 6: return true; // travel toggles always valid
+      case 6: return true;
       case 7: return !!profileVisibility;
-      case 8: return true; // photo optional
+      case 8: return true;
       default: return true;
     }
   };
 
   const nextStep = async () => {
     if (step < TOTAL_STEPS) {
-      // Save progress for current step
-      const stepUpdates = getStepUpdates(step);
-      if (stepUpdates && Object.keys(stepUpdates).length > 0) {
-        await saveStepProgress(stepUpdates);
+      // Save current step progress to localStorage with new step
+      if (user) {
+        const draft = buildDraft();
+        draft.step = step + 1;
+        saveDraftToLocal(user.id, draft);
       }
       setStep(step + 1);
     } else {
@@ -216,40 +520,68 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     }
   };
 
-  const getStepUpdates = (currentStep: number): Record<string, unknown> | null => {
-    switch (currentStep) {
-      case 1:
-        return { account_type: accountType, role: accountType === 'company' ? 'company' : 'worker' };
-      case 2:
-        return { title: mainRole };
-      case 3:
-        return { skills: specialties };
-      case 4:
-        return { location: [city, country].filter(Boolean).join(', ') || null };
-      case 5:
-        return { availability_status: availability || 'not_specified' };
-      case 6:
-        return { willing_to_travel: willingToTravel, willing_to_relocate: willingToRelocate };
-      case 7:
-        return { cv_visible: profileVisibility === 'public', profile_visibility: profileVisibility };
-      default:
-        return null;
-    }
-  };
-
   const prevStep = () => {
-    if (step > 1) setStep(step - 1);
+    if (step > 1) {
+      if (user) {
+        const draft = buildDraft();
+        draft.step = step - 1;
+        saveDraftToLocal(user.id, draft);
+      }
+      setStep(step - 1);
+    }
   };
 
   const skipOnboarding = async () => {
     if (!user) return;
-    await supabase
-      .from(TABLES.profiles)
-      .update({ onboarding_completed: true })
-      .eq('user_id', user.id);
+
+    // Save whatever we have so far before skipping
+    try {
+      const payload = buildSupabasePayload();
+      payload.onboarding_completed = true;
+      // Skipped onboarding = profile started but not marketplace ready
+      payload.onboarding_status = 'PROFILE_STARTED';
+      payload.marketplace_ready = false;
+      await supabase
+        .from(TABLES.profiles)
+        .update(payload)
+        .eq('user_id', user.id);
+    } catch {
+      // Best-effort save
+    }
+
+    clearDraftFromLocal(user.id);
+    setHasUnsavedChanges(false);
     await refreshProfile();
     onComplete();
     navigate('/dashboard', { replace: true });
+  };
+
+  /* ─── Save status indicator ─── */
+  const renderSaveStatus = () => {
+    if (saveStatus === 'idle') return null;
+
+    return (
+      <div className="flex items-center gap-1.5 text-[10px] transition-opacity duration-300">
+        {saveStatus === 'saving' && (
+          <>
+            <Loader2 className="h-3 w-3 animate-spin text-zinc-400" />
+            <span className="text-zinc-400">Guardando...</span>
+          </>
+        )}
+        {saveStatus === 'saved' && (
+          <>
+            <Cloud className="h-3 w-3 text-emerald-400" />
+            <span className="text-emerald-400">Guardado</span>
+          </>
+        )}
+        {saveStatus === 'error' && (
+          <>
+            <CloudOff className="h-3 w-3 text-red-400" />
+            <span className="text-red-400">Error al guardar</span>
+          </>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -263,6 +595,11 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
           <p className="mt-1 text-xs text-zinc-500 sm:text-sm">
             Completa lo esencial ahora. Podrás añadir CV, certificados y experiencia después.
           </p>
+          {restoredFromDraft && step > 1 && (
+            <p className="mt-1 text-[10px] text-emerald-400/70">
+              ✓ Progreso anterior restaurado
+            </p>
+          )}
         </div>
 
         {/* Progress bar */}
@@ -271,9 +608,12 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             <span className="text-[10px] uppercase tracking-wider text-zinc-500">
               Paso {step} de {TOTAL_STEPS}
             </span>
-            <span className="text-[10px] font-semibold text-[#f59e0b]">
-              {progress}% completado
-            </span>
+            <div className="flex items-center gap-3">
+              {renderSaveStatus()}
+              <span className="text-[10px] font-semibold text-[#f59e0b]">
+                {progress}% completado
+              </span>
+            </div>
           </div>
           <div className="h-1.5 w-full rounded-full bg-zinc-800">
             <div
@@ -286,37 +626,6 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         {/* Step content */}
         <div className="rounded-lg border border-zinc-800 bg-zinc-950/80 p-5 sm:p-6 min-h-[300px] flex flex-col">
           <div className="flex-1">
-            {/* UX-001: Step 0 — Welcome */}
-            {step === 0 && (
-              <div className="space-y-6 text-center py-6">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#f59e0b]/10 border border-[#f59e0b]/20">
-                  <span className="text-3xl">🔧</span>
-                </div>
-                <div className="space-y-3">
-                  <h2 className="text-xl font-bold text-zinc-100">Welcome to PipingBox</h2>
-                  <p className="text-sm text-zinc-400 max-w-md mx-auto">
-                    Complete your profile so companies can find you. A complete profile
-                    gets 3× more offers and becomes your professional CV automatically.
-                  </p>
-                </div>
-                <div className="grid gap-2 text-left max-w-sm mx-auto">
-                  <div className="flex items-center gap-2 text-xs text-zinc-400">
-                    <Check className="h-3.5 w-3.5 text-[#f59e0b]" />
-                    <span>Be found by industrial companies across Europe</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-zinc-400">
-                    <Check className="h-3.5 w-3.5 text-[#f59e0b]" />
-                    <span>Access free engineering tools and certification prep</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-zinc-400">
-                    <Check className="h-3.5 w-3.5 text-[#f59e0b]" />
-                    <span>Auto-generate a professional CV from your profile</span>
-                  </div>
-                </div>
-                <p className="text-[10px] text-zinc-600">Takes ~2 minutes · You can skip any step</p>
-              </div>
-            )}
-
             {/* Step 1: Account Type */}
             {step === 1 && (
               <div className="space-y-4">
@@ -547,22 +856,27 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                       <Upload className="h-8 w-8 text-zinc-600" />
                     )}
                   </div>
-                  <label className="cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 px-4 py-2 text-xs font-medium text-zinc-300 hover:border-zinc-600 transition">
-                    {avatarPreview ? 'Cambiar foto' : 'Subir foto'}
+                  <label className="cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 px-4 py-2 text-xs font-medium text-zinc-300 hover:border-zinc-600 transition active:bg-zinc-800">
+                    {avatarFile && !avatarPreview ? '📷 Foto HEIC seleccionada' : avatarPreview ? 'Cambiar foto' : 'Subir foto'}
                     <input
                       type="file"
-                      accept="image/*"
+                      accept={ACCEPT_IMAGES}
                       onChange={handleAvatarChange}
                       className="hidden"
                     />
                   </label>
-                  {avatarPreview && (
+                  {(avatarPreview || avatarFile) && (
                     <button
                       onClick={() => { setAvatarFile(null); setAvatarPreview(null); }}
                       className="text-xs text-zinc-500 hover:text-zinc-300"
                     >
                       Quitar foto
                     </button>
+                  )}
+                  {avatarUploadError && (
+                    <div className="rounded-md border border-red-500/30 bg-red-500/5 px-3 py-2 text-xs text-red-400 text-center max-w-xs">
+                      {avatarUploadError}
+                    </div>
                   )}
                   <p className="text-[10px] text-zinc-600 text-center">
                     Puedes omitir este paso y subir tu foto después
