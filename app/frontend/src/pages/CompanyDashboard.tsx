@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { JobInvitationsStatusWidget } from '@/components/JobInvitationsStatusWidget';
 import { ProNetworkWidget } from '@/components/profile/ProNetworkWidget';
+import { useTranslation } from 'react-i18next';
 
 /* ─── Types ─── */
 interface CompanyMetrics {
@@ -54,6 +55,7 @@ interface JobItem {
 
 export default function CompanyDashboard() {
   const { profile } = useAuth();
+  const { t } = useTranslation();
   const [metrics, setMetrics] = useState<CompanyMetrics>({
     activeJobs: 0,
     totalApplications: 0,
@@ -170,13 +172,13 @@ export default function CompanyDashboard() {
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Company Dashboard"
-        title="Recruitment Operations"
-        description="Manage your jobs, workforce requests, and monitor candidate activity."
+        eyebrow={t('companyDashboard.eyebrow')}
+        title={t('companyDashboard.title')}
+        description={t('companyDashboard.description')}
         actions={
           <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#f59e0b]">
             <Building2 className="h-3.5 w-3.5" />
-            Company Portal
+            {t('companyDashboard.companyPortal')}
           </span>
         }
       />
@@ -186,26 +188,26 @@ export default function CompanyDashboard() {
         <QuickAction
           to="/company/post-job"
           icon={Plus}
-          label="Post New Job"
-          description="Create a new job listing"
+          label={t('companyDashboard.postNewJob')}
+          description={t('companyDashboard.postNewJobDesc')}
         />
         <QuickAction
           to="/company/workforce-requests"
           icon={HardHat}
-          label="Request Workforce"
-          description="Submit workforce request"
+          label={t('companyDashboard.requestWorkforce')}
+          description={t('companyDashboard.requestWorkforceDesc')}
         />
         <QuickAction
           to="/company/workers-search"
           icon={Search}
-          label="Search Workers"
-          description="Browse available talent"
+          label={t('companyDashboard.searchWorkers')}
+          description={t('companyDashboard.searchWorkersDesc')}
         />
         <QuickAction
           to="/company/candidates"
           icon={Eye}
-          label="View Candidates"
-          description="Review applications"
+          label={t('companyDashboard.viewCandidates')}
+          description={t('companyDashboard.viewCandidatesDesc')}
         />
       </div>
 
@@ -268,13 +270,14 @@ function QuickAction({
 
 /* ─── Metrics Grid ─── */
 function MetricsGrid({ metrics, loading }: { metrics: CompanyMetrics; loading: boolean }) {
+  const { t } = useTranslation();
   const cards = [
-    { label: 'Active Jobs', value: metrics.activeJobs, icon: Briefcase, color: 'text-emerald-400' },
-    { label: 'Total Applications', value: metrics.totalApplications, icon: ClipboardList, color: 'text-blue-400' },
-    { label: 'Workforce Requests', value: metrics.workforceRequests, icon: HardHat, color: 'text-orange-400' },
-    { label: 'Saved Candidates', value: metrics.savedCandidates, icon: Users, color: 'text-purple-400' },
-    { label: 'Interviews Pending', value: metrics.interviewsPending, icon: Calendar, color: 'text-cyan-400' },
-    { label: 'Hires This Month', value: metrics.hiresThisMonth, icon: TrendingUp, color: 'text-[#f59e0b]' },
+    { label: t('companyDashboard.activeJobs'), value: metrics.activeJobs, icon: Briefcase, color: 'text-emerald-400' },
+    { label: t('companyDashboard.totalApplications'), value: metrics.totalApplications, icon: ClipboardList, color: 'text-blue-400' },
+    { label: t('companyDashboard.workforceRequests'), value: metrics.workforceRequests, icon: HardHat, color: 'text-orange-400' },
+    { label: t('companyDashboard.savedCandidates'), value: metrics.savedCandidates, icon: Users, color: 'text-purple-400' },
+    { label: t('companyDashboard.interviewsPending'), value: metrics.interviewsPending, icon: Calendar, color: 'text-cyan-400' },
+    { label: t('companyDashboard.hiresThisMonth'), value: metrics.hiresThisMonth, icon: TrendingUp, color: 'text-[#f59e0b]' },
   ];
 
   return (
@@ -299,6 +302,7 @@ function MetricsGrid({ metrics, loading }: { metrics: CompanyMetrics; loading: b
 
 /* ─── Activity Feed ─── */
 function ActivityFeed({ activity, loading }: { activity: ActivityItem[]; loading: boolean }) {
+  const { t } = useTranslation();
   const getIcon = (type: ActivityItem['type']) => {
     switch (type) {
       case 'application': return <ClipboardList className="h-3.5 w-3.5 text-blue-400" />;
@@ -321,19 +325,19 @@ function ActivityFeed({ activity, loading }: { activity: ActivityItem[]; loading
 
   const getTypeLabel = (type: ActivityItem['type']) => {
     switch (type) {
-      case 'application': return 'Application';
-      case 'workforce_update': return 'Workforce';
-      case 'job_published': return 'Job Posted';
-      case 'candidate_saved': return 'Saved';
-      case 'candidate_withdrawn': return 'Withdrawn';
+      case 'application': return t('companyDashboard.activityApplication');
+      case 'workforce_update': return t('companyDashboard.activityWorkforce');
+      case 'job_published': return t('companyDashboard.activityJobPosted');
+      case 'candidate_saved': return t('companyDashboard.activitySaved');
+      case 'candidate_withdrawn': return t('companyDashboard.activityWithdrawn');
     }
   };
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-zinc-200">Recent Activity</h3>
-        <span className="text-[10px] text-zinc-500">{activity.length} events</span>
+        <h3 className="text-sm font-semibold text-zinc-200">{t('companyDashboard.recentActivity')}</h3>
+        <span className="text-[10px] text-zinc-500">{t('companyDashboard.events', { count: activity.length })}</span>
       </div>
       <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm divide-y divide-zinc-800/50">
         {loading ? (
@@ -341,7 +345,7 @@ function ActivityFeed({ activity, loading }: { activity: ActivityItem[]; loading
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#f59e0b] border-t-transparent" />
           </div>
         ) : activity.length === 0 ? (
-          <p className="text-sm text-zinc-500 py-12 text-center">No recent activity.</p>
+          <p className="text-sm text-zinc-500 py-12 text-center">{t('companyDashboard.noRecentActivity')}</p>
         ) : (
           activity.map((item) => (
             <div
@@ -373,9 +377,10 @@ function ActivityFeed({ activity, loading }: { activity: ActivityItem[]; loading
 
 /* ─── Company Profile Card ─── */
 function CompanyProfileCard({ profile }: { profile: { full_name?: string; username?: string; avatar_url?: string } | null }) {
+  const { t } = useTranslation();
   return (
     <div className="border border-zinc-800/80 bg-[#0d0d0d] p-5 rounded-sm space-y-4">
-      <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-medium">Company Profile</p>
+      <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-medium">{t('companyDashboard.companyProfileCard')}</p>
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-zinc-800 border border-zinc-700">
           {profile?.avatar_url ? (
@@ -385,7 +390,7 @@ function CompanyProfileCard({ profile }: { profile: { full_name?: string; userna
           )}
         </div>
         <div>
-          <p className="text-sm font-semibold text-zinc-100">{profile?.full_name || 'Company Name'}</p>
+          <p className="text-sm font-semibold text-zinc-100">{profile?.full_name || t('companyDashboard.companyName')}</p>
           <p className="text-[11px] text-zinc-500">@{profile?.username || 'company'}</p>
         </div>
       </div>
@@ -393,19 +398,19 @@ function CompanyProfileCard({ profile }: { profile: { full_name?: string; userna
       <div className="space-y-2">
         <div className="flex items-center gap-2 text-xs text-zinc-400">
           <Globe className="h-3.5 w-3.5 text-zinc-600" />
-          <span>Industrial Services</span>
+          <span>{t('companyDashboard.industrialServices')}</span>
         </div>
         <div className="flex items-center gap-2 text-xs text-zinc-400">
           <MapPin className="h-3.5 w-3.5 text-zinc-600" />
-          <span>International</span>
+          <span>{t('companyDashboard.international')}</span>
         </div>
         <div className="flex items-center gap-2 text-xs text-zinc-400">
           <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-          <span className="text-emerald-400">Verified Company</span>
+          <span className="text-emerald-400">{t('companyDashboard.verifiedCompany')}</span>
         </div>
         <div className="flex items-center gap-2 text-xs text-zinc-400">
           <Layers className="h-3.5 w-3.5 text-zinc-600" />
-          <span>Active Projects: —</span>
+          <span>{t('companyDashboard.activeProjects')}: —</span>
         </div>
       </div>
 
@@ -413,7 +418,7 @@ function CompanyProfileCard({ profile }: { profile: { full_name?: string; userna
         to="/profile"
         className="flex items-center justify-center gap-2 w-full py-2 text-xs font-medium text-[#f59e0b] border border-[#f59e0b]/20 bg-[#f59e0b]/5 rounded-sm hover:bg-[#f59e0b]/10 transition"
       >
-        Edit Profile
+        {t('companyDashboard.editProfile')}
         <ArrowRight className="h-3 w-3" />
       </Link>
     </div>
@@ -422,11 +427,12 @@ function CompanyProfileCard({ profile }: { profile: { full_name?: string; userna
 
 /* ─── Jobs Widget ─── */
 function JobsWidget({ jobs, loading }: { jobs: JobItem[]; loading: boolean }) {
+  const { t } = useTranslation();
   return (
     <div className="border border-zinc-800/80 bg-[#0d0d0d] p-5 rounded-sm space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-medium">Latest Jobs</p>
-        <Link to="/jobs" className="text-[10px] text-[#f59e0b] hover:underline">View All</Link>
+        <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-medium">{t('companyDashboard.latestJobs')}</p>
+        <Link to="/jobs" className="text-[10px] text-[#f59e0b] hover:underline">{t('companyDashboard.viewAll')}</Link>
       </div>
 
       {loading ? (
@@ -434,7 +440,7 @@ function JobsWidget({ jobs, loading }: { jobs: JobItem[]; loading: boolean }) {
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#f59e0b] border-t-transparent" />
         </div>
       ) : jobs.length === 0 ? (
-        <p className="text-xs text-zinc-500 py-4 text-center">No jobs posted yet.</p>
+        <p className="text-xs text-zinc-500 py-4 text-center">{t('companyDashboard.noJobsPosted')}</p>
       ) : (
         <div className="space-y-2">
           {jobs.map((job) => (
@@ -450,7 +456,7 @@ function JobsWidget({ jobs, loading }: { jobs: JobItem[]; loading: boolean }) {
                 </span>
                 <span className="flex items-center gap-1 text-[10px] text-zinc-500">
                   <Users className="h-3 w-3" />
-                  {job.applications_count} apps
+                  {job.applications_count} {t('companyDashboard.apps')}
                 </span>
                 <span className="flex items-center gap-1 text-[10px] text-zinc-500">
                   <Clock className="h-3 w-3" />

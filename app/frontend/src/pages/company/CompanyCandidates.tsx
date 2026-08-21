@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
 import {
   Users,
@@ -52,13 +53,14 @@ type ApplicationStatus = (typeof STATUS_OPTIONS)[number];
 
 /* ─── Status Badge ─── */
 function CandidateStatusBadge({ status }: { status: string }) {
+  const { t } = useTranslation();
   const config: Record<string, { label: string; classes: string; icon: React.ElementType }> = {
-    applied: { label: 'Applied', classes: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30', icon: AlertCircle },
-    reviewed: { label: 'Reviewed', classes: 'bg-blue-500/10 text-blue-400 border-blue-500/30', icon: Eye },
-    interview: { label: 'Interview', classes: 'bg-purple-500/10 text-purple-400 border-purple-500/30', icon: Clock },
-    shortlisted: { label: 'Shortlisted', classes: 'bg-amber-500/10 text-amber-400 border-amber-500/30', icon: Star },
-    rejected: { label: 'Rejected', classes: 'bg-red-500/10 text-red-400 border-red-500/30', icon: XCircle },
-    hired: { label: 'Hired', classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30', icon: CheckCircle2 },
+    applied: { label: t('companyCandidates.applied'), classes: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30', icon: AlertCircle },
+    reviewed: { label: t('companyCandidates.reviewed'), classes: 'bg-blue-500/10 text-blue-400 border-blue-500/30', icon: Eye },
+    interview: { label: t('companyCandidates.interview'), classes: 'bg-purple-500/10 text-purple-400 border-purple-500/30', icon: Clock },
+    shortlisted: { label: t('companyCandidates.shortlisted'), classes: 'bg-amber-500/10 text-amber-400 border-amber-500/30', icon: Star },
+    rejected: { label: t('companyCandidates.rejected'), classes: 'bg-red-500/10 text-red-400 border-red-500/30', icon: XCircle },
+    hired: { label: t('companyCandidates.hired'), classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30', icon: CheckCircle2 },
   };
   const c = config[status] || config.applied;
   const Icon = c.icon;
@@ -73,6 +75,7 @@ function CandidateStatusBadge({ status }: { status: string }) {
 
 /* ─── Main Component ─── */
 export default function CompanyCandidates() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { isRealAdmin, isPreviewMode } = useAdminPreview();
   const navigate = useNavigate();
@@ -140,7 +143,7 @@ export default function CompanyCandidates() {
 
       if (error) {
         console.error('[CompanyCandidates] Fetch applications error:', error.message);
-        toast.error('Failed to load candidates');
+        toast.error(t('companyCandidates.loadFailed', 'Failed to load candidates'));
         setApplications([]);
         setLoading(false);
         return;
@@ -176,7 +179,7 @@ export default function CompanyCandidates() {
       setApplications(apps);
     } catch (err) {
       console.error('Unexpected error:', err);
-      toast.error('Failed to load candidates');
+      toast.error(t('companyCandidates.loadFailed', 'Failed to load candidates'));
     } finally {
       setLoading(false);
     }
@@ -194,9 +197,9 @@ export default function CompanyCandidates() {
       .eq('id', applicationId);
 
     if (error) {
-      toast.error('Failed to update status', { description: error.message });
+      toast.error(t('companyCandidates.statusUpdateFailed'), { description: error.message });
     } else {
-      toast.success(`Status updated to "${newStatus}"`);
+      toast.success(t('companyCandidates.statusUpdated'));
       setApplications((prev) =>
         prev.map((a) => (a.id === applicationId ? { ...a, status: newStatus } : a))
       );
@@ -224,19 +227,19 @@ export default function CompanyCandidates() {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    if (diffHours < 1) return 'Just now';
-    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffHours < 1) return t('companyCandidates.justNow');
+    if (diffHours < 24) return `${diffHours}h`;
     const diffDays = Math.floor(diffHours / 24);
-    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffDays < 7) return `${diffDays}d`;
     return date.toLocaleDateString();
   };
 
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Company"
-        title="Candidates"
-        description="Review workers who applied to your company's job listings."
+        eyebrow={t('companyCandidates.eyebrow')}
+        title={t('companyCandidates.title')}
+        description={t('companyCandidates.description')}
         actions={
           <div className="flex items-center gap-3">
             <button
@@ -244,11 +247,11 @@ export default function CompanyCandidates() {
               className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-zinc-500 hover:text-zinc-300 transition-colors"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
+              {t('companyCandidates.refresh')}
             </button>
             <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500">
               <Users className="h-3.5 w-3.5" />
-              {filtered.length} candidate{filtered.length !== 1 ? 's' : ''}
+              {t('companyCandidates.candidateCount', { count: filtered.length })}
             </span>
           </div>
         }
@@ -261,7 +264,7 @@ export default function CompanyCandidates() {
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search candidates by name, role, or skill..."
+            placeholder={t('companyCandidates.searchPlaceholder')}
             className="flex-1 bg-transparent text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
           />
         </div>
@@ -287,7 +290,7 @@ export default function CompanyCandidates() {
       {loading && (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-zinc-500" />
-          <span className="ml-2 text-sm text-zinc-500">Loading candidates...</span>
+          <span className="ml-2 text-sm text-zinc-500">{t('companyCandidates.loadingCandidates')}</span>
         </div>
       )}
 
@@ -297,11 +300,11 @@ export default function CompanyCandidates() {
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800 mb-4">
             <Users className="h-6 w-6 text-zinc-600" />
           </div>
-          <h3 className="text-sm font-medium text-zinc-300 mb-1">No candidates found</h3>
+          <h3 className="text-sm font-medium text-zinc-300 mb-1">{t('companyCandidates.noCandidatesFound')}</h3>
           <p className="text-xs text-zinc-500 max-w-sm">
             {applications.length === 0
-              ? 'No workers have applied to your jobs yet. Applications will appear here when workers apply.'
-              : 'No candidates match your current filters. Try adjusting your search or status filter.'}
+              ? t('companyCandidates.noCandidatesYet')
+              : t('companyCandidates.noMatchingCandidates')}
           </p>
         </div>
       )}
@@ -327,7 +330,7 @@ export default function CompanyCandidates() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-200">
-                      {app.worker_name || 'Worker'}
+                      {app.worker_name || t('companyCandidates.worker')}
                     </p>
                     <p className="text-[11px] text-zinc-500 flex items-center gap-1">
                       <Briefcase className="h-3 w-3" />
@@ -365,7 +368,7 @@ export default function CompanyCandidates() {
                   ))}
                   {app.worker_skills.length > 4 && (
                     <span className="inline-flex items-center px-2 py-0.5 text-[9px] text-zinc-600">
-                      +{app.worker_skills.length - 4} more
+                      +{app.worker_skills.length - 4} {t('companyCandidates.more')}
                     </span>
                   )}
                 </div>
@@ -381,7 +384,7 @@ export default function CompanyCandidates() {
               {/* Status Control */}
               <div className="pt-2 border-t border-zinc-800/60 space-y-2">
                 <label className="text-[9px] uppercase tracking-wider text-zinc-600 font-medium">
-                  Update Status
+                  {t('companyCandidates.updateStatus')}
                 </label>
                 <select
                   value={app.status}
@@ -404,7 +407,7 @@ export default function CompanyCandidates() {
                   className="flex-1 py-1.5 text-[10px] font-medium uppercase tracking-wider text-[#f59e0b] border border-[#f59e0b]/20 bg-[#f59e0b]/5 rounded-sm hover:bg-[#f59e0b]/10 transition flex items-center justify-center gap-1"
                 >
                   <UserCheck className="h-3 w-3" />
-                  View Profile
+                  {t('companyCandidates.viewProfile')}
                 </button>
               </div>
             </div>

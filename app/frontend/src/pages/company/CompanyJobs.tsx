@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Job {
   id: string;
@@ -29,6 +30,7 @@ interface Job {
 export default function CompanyJobs() {
   const { user } = useAuth();
   const { isRealAdmin, isPreviewMode } = useAdminPreview();
+  const { t } = useTranslation();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,16 +90,16 @@ export default function CompanyJobs() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Company"
-        title="Jobs Management"
-        description="Manage your company job listings — active, draft, and closed positions."
+        eyebrow={t('companyJobs.eyebrow')}
+        title={t('companyJobs.title')}
+        description={t('companyJobs.description')}
         actions={
           <Link
             to="/company/post-job"
             className="inline-flex items-center gap-2 rounded-sm bg-[#f59e0b] px-4 py-2 text-sm font-semibold text-black hover:bg-[#d97706] transition"
           >
             <Plus className="h-4 w-4" />
-            Post New Job
+            {t('companyJobs.postNewJob')}
           </Link>
         }
       />
@@ -122,7 +124,7 @@ export default function CompanyJobs() {
       {/* Error State */}
       {error && (
         <div className="border border-red-500/30 bg-red-500/5 rounded-sm p-4 text-sm text-red-400">
-          Failed to load jobs: {error}
+          {t('companyJobs.failedToLoad', { error })}
         </div>
       )}
 
@@ -136,15 +138,15 @@ export default function CompanyJobs() {
           <Briefcase className="h-10 w-10 text-zinc-700 mb-3" />
           <p className="text-sm text-zinc-400">
             {filter === 'all'
-              ? "You haven't posted any jobs yet."
-              : `No ${filter} jobs found.`}
+              ? t('companyJobs.noJobsYet')
+              : t('companyJobs.noFilteredJobs', { filter })}
           </p>
           <Link
             to="/company/post-job"
             className="mt-4 inline-flex items-center gap-2 text-sm text-[#f59e0b] hover:underline"
           >
             <Plus className="h-3.5 w-3.5" />
-            Create your first job listing
+            {t('companyJobs.createFirst')}
           </Link>
         </div>
       ) : (
@@ -170,7 +172,7 @@ export default function CompanyJobs() {
                   </span>
                   <span className="flex items-center gap-1 text-[10px] text-zinc-500">
                     <Users className="h-3 w-3" />
-                    {job.applications_count ?? 0} applicants
+                    {t('companyJobs.applicants', { count: job.applications_count ?? 0 })}
                   </span>
                 </div>
               </div>
@@ -184,6 +186,7 @@ export default function CompanyJobs() {
 }
 
 function StatusBadge({ status }: { status: string }) {
+  const { t } = useTranslation();
   const isOpen = status === 'open' || status === 'active' || !status;
   const isDraft = status === 'draft';
 
@@ -191,7 +194,7 @@ function StatusBadge({ status }: { status: string }) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm border text-[9px] font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
         <CheckCircle2 className="h-3 w-3" />
-        Active
+        {t('companyJobs.active')}
       </span>
     );
   }
@@ -199,14 +202,14 @@ function StatusBadge({ status }: { status: string }) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm border text-[9px] font-semibold uppercase tracking-wider bg-zinc-500/10 text-zinc-400 border-zinc-500/30">
         <FileText className="h-3 w-3" />
-        Draft
+        {t('companyJobs.draftStatus')}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm border text-[9px] font-semibold uppercase tracking-wider bg-red-500/10 text-red-400 border-red-500/30">
       <XCircle className="h-3 w-3" />
-      Closed
+      {t('companyJobs.closedStatus')}
     </span>
   );
 }

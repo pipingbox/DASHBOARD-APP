@@ -13,10 +13,12 @@ import {
   DollarSign,
   Send,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function CompanyPostJob() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [form, setForm] = useState({
     title: '',
@@ -40,7 +42,7 @@ export default function CompanyPostJob() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.location || !form.discipline) {
-      toast.error('Please fill in required fields: Job Title, Location, Discipline');
+      toast.error(t('companyPostJob.fillRequired'));
       return;
     }
 
@@ -52,7 +54,7 @@ export default function CompanyPostJob() {
 
       if (authError || !authUser) {
         console.error('Auth error:', authError?.message);
-        toast.error('You must be logged in to publish a job.');
+        toast.error(t('companyPostJob.mustBeLoggedIn'));
         setSubmitting(false);
         return;
       }
@@ -108,14 +110,14 @@ export default function CompanyPostJob() {
           details: error.details,
           hint: error.hint,
         });
-        toast.error(`Failed to publish job: ${error.message}`);
+        toast.error(t('companyPostJob.publishFailed', { error: error.message }));
       } else {
-        toast.success('Job published successfully!');
+        toast.success(t('companyPostJob.publishSuccess'));
         navigate('/company/jobs');
       }
     } catch (err: any) {
       console.error('Unexpected error during job publish:', err);
-      toast.error('An unexpected error occurred.');
+      toast.error(t('common.unexpectedError'));
     } finally {
       setSubmitting(false);
     }
@@ -124,64 +126,64 @@ export default function CompanyPostJob() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Company"
-        title="Post New Job"
-        description="Create a new industrial job listing for your company."
+        eyebrow={t('companyPostJob.eyebrow')}
+        title={t('companyPostJob.title')}
+        description={t('companyPostJob.description')}
         actions={
           <Link
             to="/company/jobs"
             className="inline-flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-200 transition"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Jobs
+            {t('companyPostJob.backToJobs')}
           </Link>
         }
       />
 
       <form onSubmit={handleSubmit} className="max-w-3xl space-y-6">
         {/* Basic Info */}
-        <Section title="Basic Information" icon={Briefcase}>
+        <Section title={t('companyPostJob.basicInfo')} icon={Briefcase}>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Job Title *" name="title" value={form.title} onChange={handleChange} placeholder="e.g. Pipe Fitter" />
-            <Field label="Company Name" name="company_name" value={form.company_name} onChange={handleChange} placeholder="Your company" />
+            <Field label={t('companyPostJob.jobTitle')} name="title" value={form.title} onChange={handleChange} placeholder={t('companyPostJob.jobTitlePlaceholder')} />
+            <Field label={t('companyPostJob.companyName')} name="company_name" value={form.company_name} onChange={handleChange} placeholder={t('companyPostJob.companyNamePlaceholder')} />
           </div>
         </Section>
 
         {/* Location */}
-        <Section title="Location & Region" icon={MapPin}>
+        <Section title={t('companyPostJob.locationRegion')} icon={MapPin}>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Location *" name="location" value={form.location} onChange={handleChange} placeholder="e.g. Abu Dhabi, UAE" />
-            <Field label="Country" name="country" value={form.country} onChange={handleChange} placeholder="e.g. UAE" />
+            <Field label={t('companyPostJob.location')} name="location" value={form.location} onChange={handleChange} placeholder={t('companyPostJob.locationPlaceholder')} />
+            <Field label={t('companyPostJob.country')} name="country" value={form.country} onChange={handleChange} placeholder={t('companyPostJob.countryPlaceholder')} />
           </div>
         </Section>
 
         {/* Job Details */}
-        <Section title="Job Details" icon={Wrench}>
+        <Section title={t('companyPostJob.jobDetails')} icon={Wrench}>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Discipline *" name="discipline" value={form.discipline} onChange={handleChange} placeholder="e.g. Piping, Welding, Electrical" />
+            <Field label={t('companyPostJob.discipline')} name="discipline" value={form.discipline} onChange={handleChange} placeholder={t('companyPostJob.disciplinePlaceholder')} />
             <SelectField
-              label="Contract Type"
+              label={t('companyPostJob.contractType')}
               name="contract_type"
               value={form.contract_type}
               onChange={handleChange}
-              options={['', 'Permanent', 'Contract', 'Temporary', 'Freelance']}
+              options={['', t('companyPostJob.permanent'), t('companyPostJob.contract'), t('companyPostJob.temporary'), t('companyPostJob.freelance')]}
             />
           </div>
         </Section>
 
         {/* Compensation */}
-        <Section title="Compensation" icon={DollarSign}>
+        <Section title={t('companyPostJob.compensation')} icon={DollarSign}>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Field label="Salary Min" name="salary_min" value={form.salary_min} onChange={handleChange} placeholder="e.g. 3000" type="number" />
-            <Field label="Salary Max" name="salary_max" value={form.salary_max} onChange={handleChange} placeholder="e.g. 5000" type="number" />
-            <Field label="Rotation" name="rotation" value={form.rotation} onChange={handleChange} placeholder="e.g. 28/28" />
+            <Field label={t('companyPostJob.salaryMin')} name="salary_min" value={form.salary_min} onChange={handleChange} placeholder={t('companyPostJob.salaryMinPlaceholder')} type="number" />
+            <Field label={t('companyPostJob.salaryMax')} name="salary_max" value={form.salary_max} onChange={handleChange} placeholder={t('companyPostJob.salaryMaxPlaceholder')} type="number" />
+            <Field label={t('companyPostJob.rotation')} name="rotation" value={form.rotation} onChange={handleChange} placeholder={t('companyPostJob.rotationPlaceholder')} />
           </div>
         </Section>
 
         {/* Description */}
-        <Section title="Description & Requirements" icon={FileText}>
-          <TextArea label="Job Description" name="description" value={form.description} onChange={handleChange} placeholder="Describe the role, responsibilities, and working conditions..." rows={5} />
-          <TextArea label="Requirements" name="requirements" value={form.requirements} onChange={handleChange} placeholder="List required certifications, experience, and qualifications..." rows={4} />
+        <Section title={t('companyPostJob.descriptionRequirements')} icon={FileText}>
+          <TextArea label={t('companyPostJob.jobDescription')} name="description" value={form.description} onChange={handleChange} placeholder={t('companyPostJob.jobDescPlaceholder')} rows={5} />
+          <TextArea label={t('companyPostJob.requirements')} name="requirements" value={form.requirements} onChange={handleChange} placeholder={t('companyPostJob.requirementsPlaceholder')} rows={4} />
         </Section>
 
         {/* Submit */}
@@ -196,13 +198,13 @@ export default function CompanyPostJob() {
             ) : (
               <Send className="h-4 w-4" />
             )}
-            Publish Job
+            {t('companyPostJob.publishJob')}
           </button>
           <Link
             to="/company/jobs"
             className="px-4 py-2.5 text-sm text-zinc-400 hover:text-zinc-200 transition"
           >
-            Cancel
+            {t('common.cancel')}
           </Link>
         </div>
       </form>

@@ -320,13 +320,13 @@ export default function CompanyWorkersSearch() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Company"
-        title="Worker Search"
-        description="Search available industrial workers by role, location, certifications, and experience."
+        eyebrow={t('companyWorkerSearch.eyebrow')}
+        title={t('companyWorkerSearch.title')}
+        description={t('companyWorkerSearch.description')}
         actions={
           <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500">
             <Search className="h-3.5 w-3.5" />
-            {workers.length > 0 && `${workers.length} result${workers.length !== 1 ? 's' : ''}`}
+            {workers.length > 0 && t('companyWorkerSearch.resultCount', { count: workers.length })}
           </span>
         }
       />
@@ -335,7 +335,7 @@ export default function CompanyWorkersSearch() {
       <div className="flex items-center gap-2 rounded-sm border border-zinc-800 bg-zinc-950 px-4 py-3">
         <Search className="h-5 w-5 text-zinc-500" />
         <input
-          placeholder="Search workers by name, skill, or keyword..."
+          placeholder={t('companyWorkerSearch.searchPlaceholder')}
           value={filters.keyword}
           onChange={(e) => setFilters((prev) => ({ ...prev, keyword: e.target.value }))}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -346,7 +346,7 @@ export default function CompanyWorkersSearch() {
           disabled={loading}
           className="rounded-sm bg-[#f59e0b] px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#d97706] transition disabled:opacity-50"
         >
-          {loading ? 'Searching...' : 'Search'}
+          {loading ? t('companyWorkerSearch.searching') : t('companyWorkerSearch.searchBtn')}
         </button>
       </div>
 
@@ -354,12 +354,12 @@ export default function CompanyWorkersSearch() {
       <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm p-5 space-y-4">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-[#f59e0b]" />
-          <h3 className="text-sm font-semibold text-zinc-200">Filters</h3>
+          <h3 className="text-sm font-semibold text-zinc-200">{t('companyWorkerSearch.filters')}</h3>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <FilterSelect
-            label="Role / Trade"
+            label={t('companyWorkerSearch.roleTrade')}
             name="role"
             value={filters.role}
             onChange={handleChange}
@@ -367,7 +367,7 @@ export default function CompanyWorkersSearch() {
             options={['', 'Pipe Fitter', 'Welder', 'Electrician', 'Rigger', 'Scaffolder', 'Instrument Tech', 'Mechanical Fitter', 'Painter/Blaster']}
           />
           <FilterSelect
-            label="Country"
+            label={t('companyWorkerSearch.country')}
             name="country"
             value={filters.country}
             onChange={handleChange}
@@ -375,15 +375,15 @@ export default function CompanyWorkersSearch() {
             options={['', 'UAE', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Philippines', 'India', 'Poland', 'Romania', 'Kazakhstan']}
           />
           <FilterSelect
-            label="Availability"
+            label={t('companyWorkerSearch.availability')}
             name="availability"
             value={filters.availability}
             onChange={handleChange}
             icon={Clock}
-            options={['', 'Immediately', 'Within 2 weeks', 'Within 1 month', 'Within 3 months']}
+            options={['', t('companyWorkerSearch.immediately'), t('companyWorkerSearch.within2Weeks'), t('companyWorkerSearch.within1Month'), t('companyWorkerSearch.within3Months')]}
           />
           <FilterSelect
-            label="Certification"
+            label={t('companyWorkerSearch.certification')}
             name="certification"
             value={filters.certification}
             onChange={handleChange}
@@ -391,7 +391,7 @@ export default function CompanyWorkersSearch() {
             options={['', 'ASME IX', 'AWS D1.1', '6G', 'CISRS', 'LEEA', 'CompEx', 'NEBOSH', 'IOSH', 'OSHA 30', 'NCCER', 'API 570']}
           />
           <FilterSelect
-            label="Experience Level"
+            label={t('companyWorkerSearch.experienceLevel')}
             name="experience"
             value={filters.experience}
             onChange={handleChange}
@@ -402,10 +402,10 @@ export default function CompanyWorkersSearch() {
 
         <div className="flex items-center gap-3 pt-2">
           <button onClick={handleSearch} className="text-xs text-[#f59e0b] hover:underline">
-            Apply Filters
+            {t('companyWorkerSearch.applyFilters')}
           </button>
           <button onClick={handleClear} className="text-xs text-zinc-500 hover:text-zinc-300">
-            Clear All
+            {t('companyWorkerSearch.clearAll')}
           </button>
         </div>
       </div>
@@ -414,7 +414,7 @@ export default function CompanyWorkersSearch() {
       {loading && (
         <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm p-12 text-center space-y-3">
           <Loader2 className="h-8 w-8 text-[#f59e0b] mx-auto animate-spin" />
-          <p className="text-sm text-zinc-400">Searching workers...</p>
+          <p className="text-sm text-zinc-400">{t('companyWorkerSearch.searchingWorkers')}</p>
         </div>
       )}
 
@@ -423,7 +423,7 @@ export default function CompanyWorkersSearch() {
           <AlertCircle className="h-8 w-8 text-red-400 mx-auto" />
           <p className="text-sm text-red-300">{error}</p>
           <button onClick={handleSearch} className="text-xs text-[#f59e0b] hover:underline">
-            Try again
+            {t('companyWorkerSearch.tryAgain')}
           </button>
         </div>
       )}
@@ -431,8 +431,8 @@ export default function CompanyWorkersSearch() {
       {!loading && !error && searched && workers.length === 0 && (
         <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm p-12 text-center space-y-3">
           <Users className="h-10 w-10 text-zinc-700 mx-auto" />
-          <p className="text-sm text-zinc-400">No workers found. Try changing your filters.</p>
-          <p className="text-[11px] text-zinc-600">Check browser console for debug information.</p>
+          <p className="text-sm text-zinc-400">{t('companyWorkerSearch.noWorkersFound')}</p>
+          <p className="text-[11px] text-zinc-600">{t('companyWorkerSearch.checkConsole')}</p>
         </div>
       )}
 
@@ -440,7 +440,7 @@ export default function CompanyWorkersSearch() {
         <>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {workers.map((worker) => (
-              <WorkerCard key={worker.user_id} worker={worker} onView={() => navigate(`/candidate/${worker.user_id}`)} />
+              <WorkerCard key={worker.user_id} worker={worker} t={t} onView={() => navigate(`/candidate/${worker.user_id}`)} />
             ))}
           </div>
           {hasMore && (
@@ -459,7 +459,7 @@ export default function CompanyWorkersSearch() {
   );
 }
 
-function WorkerCard({ worker, onView }: { worker: WorkerWithCounts; onView: () => void }) {
+function WorkerCard({ worker, onView, t }: { worker: WorkerWithCounts; onView: () => void; t: (key: string, opts?: Record<string, unknown>) => string }) {
   const availabilityBadge = getAvailabilityBadge(worker);
 
   return (
@@ -474,8 +474,8 @@ function WorkerCard({ worker, onView }: { worker: WorkerWithCounts; onView: () =
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold text-zinc-100 truncate">{worker.full_name || worker.username || 'Worker'}</h4>
-          <p className="text-xs text-zinc-400 truncate">{worker.title || 'Position not specified'}</p>
+          <h4 className="text-sm font-semibold text-zinc-100 truncate">{worker.full_name || worker.username || t('companyWorkerSearch.worker')}</h4>
+          <p className="text-xs text-zinc-400 truncate">{worker.title || t('companyWorkerSearch.positionNotSpecified')}</p>
           {worker.company && (
             <p className="text-[11px] text-zinc-500 truncate flex items-center gap-1">
               <Briefcase className="h-3 w-3" />
@@ -495,7 +495,7 @@ function WorkerCard({ worker, onView }: { worker: WorkerWithCounts; onView: () =
         ) : (
           <span className="flex items-center gap-1 text-zinc-600">
             <MapPin className="h-3 w-3" />
-            Location not specified
+            {t('companyWorkerSearch.locationNotSpecified')}
           </span>
         )}
         {worker.years_experience != null && worker.years_experience > 0 && (
@@ -523,7 +523,7 @@ function WorkerCard({ worker, onView }: { worker: WorkerWithCounts; onView: () =
       ) : (
         <div className="flex flex-wrap gap-1.5">
           <span className="rounded-sm bg-zinc-800/50 px-2 py-0.5 text-[10px] text-zinc-600">
-            No skills listed
+            {t('companyWorkerSearch.noSkills')}
           </span>
         </div>
       )}
@@ -536,19 +536,19 @@ function WorkerCard({ worker, onView }: { worker: WorkerWithCounts; onView: () =
           </span>
         ) : (
           <span className="inline-flex items-center gap-1 rounded-sm bg-zinc-800/50 border border-zinc-700/30 px-2 py-0.5 text-[10px] text-zinc-500">
-            Availability not specified
+            {t('companyWorkerSearch.availabilityNotSpecified')}
           </span>
         )}
         {worker.willing_to_travel && (
           <span className="inline-flex items-center gap-1 rounded-sm bg-blue-950/50 border border-blue-800/30 px-2 py-0.5 text-[10px] text-blue-300">
             <Plane className="h-2.5 w-2.5" />
-            Travel
+            {t('companyWorkerSearch.travel')}
           </span>
         )}
         {worker.willing_to_relocate && (
           <span className="inline-flex items-center gap-1 rounded-sm bg-purple-950/50 border border-purple-800/30 px-2 py-0.5 text-[10px] text-purple-300">
             <Home className="h-2.5 w-2.5" />
-            Relocate
+            {t('companyWorkerSearch.relocate')}
           </span>
         )}
       </div>
@@ -592,7 +592,7 @@ function WorkerCard({ worker, onView }: { worker: WorkerWithCounts; onView: () =
         </div>
       ) : (
         <div className="flex flex-wrap gap-1">
-          <span className="text-[9px] text-zinc-600">No certifications</span>
+          <span className="text-[9px] text-zinc-600">{t('companyWorkerSearch.noCertifications')}</span>
         </div>
       )}
 
@@ -602,7 +602,7 @@ function WorkerCard({ worker, onView }: { worker: WorkerWithCounts; onView: () =
         className="w-full flex items-center justify-center gap-2 rounded-sm border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 hover:bg-zinc-800 hover:border-[#f59e0b]/50 transition"
       >
         <Eye className="h-3.5 w-3.5" />
-        View Profile
+        {t('companyWorkerSearch.viewProfile')}
       </button>
     </div>
   );
