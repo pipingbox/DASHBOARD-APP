@@ -79,8 +79,8 @@ function useRealMetrics() {
         const workers = workersRes.count ?? 0;
         const companies = companiesRes.count ?? 0;
 
-        // Tools count: read from registry (single source of truth)
-        const toolsCount = await import('@/tools/registry').then((m) => m.TOOL_REGISTRY.length).catch(() => 11);
+        // Tools count: fixed count from src/pages/Tools.tsx TOOLS array (PD-1 DEC-56, embedded-data architecture)
+        const toolsCount = 12;
 
         setMetrics([
           { label: 'Professionals registered', value: workers },

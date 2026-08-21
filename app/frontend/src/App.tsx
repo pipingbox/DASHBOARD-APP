@@ -24,7 +24,6 @@ import PRLCoursePage from './pages/PRLCoursePage';
 import CourseDetail from './pages/academy/CourseDetail';
 import LessonView from './pages/academy/LessonView';
 import Tools from './pages/Tools';
-import ToolsPage from './pages/ToolsPage';
 import Jobs from './pages/Jobs';
 import Community from './pages/Community';
 import CommunityChannel from './pages/CommunityChannel';
@@ -214,7 +213,7 @@ const AppRoutes = () => {
     />
     <Route
       path="/tools"
-      element={<ToolsPage />}
+      element={withShellRoles(<Tools />, ['admin', 'worker'])}
     />
     <Route
       path="/jobs"
