@@ -22,23 +22,9 @@ export interface TrustMetric {
   icon: LucideIcon;
 }
 
-export interface ActivityItem {
-  text: string;
-  time: string;
-  type: 'application' | 'filled' | 'closed' | 'new';
-}
-
 export interface FilterTag {
   type: string;
   label: string;
   value: string;
 }
 
-export interface JobFilters {
-  query: string;
-  selectedCountries: string[];
-  selectedDisciplines: string[];
-  selectedWorkTypes: string[];
-  selectedContractTypes: string[];
-  urgentOnly: boolean;
-}

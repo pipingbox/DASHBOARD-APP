@@ -14,24 +14,14 @@ import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { TrustMetricsSection } from '@/components/jobs/TrustMetricsSection';
-import { ActivityFeed } from '@/components/jobs/ActivityFeed';
-import { FeaturedCarousel } from '@/components/jobs/FeaturedCarousel';
 import { FilterPanel } from '@/components/jobs/FilterPanel';
 import { JobCard, JobSkeleton } from '@/components/jobs/JobCard';
 import {
-  STATIC_JOBS,
-  ACTIVITY_FEED,
-  COUNTRIES,
-  DISCIPLINES,
-  WORK_TYPES,
-  CONTRACT_TYPES_OPTIONS,
   DISCIPLINE_MAP,
   getCountry,
-  getWorkType,
   getContractTypeLabel,
-} from '@/lib/jobs/static-data';
+} from '@/lib/jobs/utils';
 import type { Job, FilterTag } from '@/lib/jobs/types';
-import { URGENT_INDICES } from '@/data/job-constants';
 
 export default function Jobs() {
   const { t } = useTranslation();
@@ -45,9 +35,7 @@ export default function Jobs() {
   // Filters
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectedDisciplines, setSelectedDisciplines] = useState<string[]>([]);
-  const [selectedWorkTypes, setSelectedWorkTypes] = useState<string[]>([]);
   const [selectedContractTypes, setSelectedContractTypes] = useState<string[]>([]);
-  const [urgentOnly, setUrgentOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
   // Fetch DB jobs + user applications
@@ -86,21 +74,6 @@ export default function Jobs() {
     return () => { mounted = false; };
   }, [user]);
 
-  // Merge static + DB jobs (dedup by title+company)
-  const allJobs = useMemo(() => {
-    const staticWithIds = STATIC_JOBS.map((j, i) => ({
-      ...j,
-      id: `static-${i}`,
-      created_at: new Date(Date.now() - i * 3600000 * 6).toISOString(),
-      posted_by: null,
-    })) as Job[];
-    const dbTitles = new Set(dbJobs.map((j) => `${j.title}|${j.company}`));
-    const uniqueStatic = staticWithIds.filter(
-      (j) => !dbTitles.has(`${j.title}|${j.company}`),
-    );
-    return [...dbJobs, ...uniqueStatic];
-  }, [dbJobs]);
-
   const toggleFilter = useCallback((arr: string[], setArr: React.Dispatch<React.SetStateAction<string[]>>, val: string) => {
     setArr(arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val]);
   }, []);
@@ -108,14 +81,12 @@ export default function Jobs() {
   const removeFilterTag = useCallback((type: string, val: string) => {
     if (type === 'country') setSelectedCountries((p) => p.filter((v) => v !== val));
     if (type === 'discipline') setSelectedDisciplines((p) => p.filter((v) => v !== val));
-    if (type === 'workType') setSelectedWorkTypes((p) => p.filter((v) => v !== val));
     if (type === 'contractType') setSelectedContractTypes((p) => p.filter((v) => v !== val));
-    if (type === 'urgent') setUrgentOnly(false);
   }, []);
 
   // Apply filters
   const filtered = useMemo(() => {
-    let result = allJobs;
+    let result = dbJobs;
     const q = query.trim().toLowerCase();
     if (q) {
       result = result.filter(
@@ -132,53 +103,30 @@ export default function Jobs() {
     if (selectedDisciplines.length > 0) {
       result = result.filter((j) => selectedDisciplines.includes(DISCIPLINE_MAP[j.category ?? ''] ?? 'Other'));
     }
-    if (selectedWorkTypes.length > 0) {
-      result = result.filter((j) => {
-        const idx = STATIC_JOBS.findIndex((s) => s.title === j.title && s.company === j.company);
-        if (idx < 0) {
-          const loc = (j.location ?? '').toLowerCase();
-          const desc = (j.description ?? '').toLowerCase();
-          if (selectedWorkTypes.includes('Offshore') && (loc.includes('offshore') || desc.includes('offshore'))) return true;
-          if (selectedWorkTypes.includes('Onshore') && !loc.includes('offshore') && !desc.includes('offshore')) return true;
-          return false;
-        }
-        return selectedWorkTypes.some((wt) => getWorkType(idx).includes(wt));
-      });
-    }
     if (selectedContractTypes.length > 0) {
       result = result.filter((j) => selectedContractTypes.includes(getContractTypeLabel(j.job_type)));
     }
-    if (urgentOnly) {
-      result = result.filter((j) => {
-        const idx = STATIC_JOBS.findIndex((s) => s.title === j.title && s.company === j.company);
-        return URGENT_INDICES.includes(idx);
-      });
-    }
     return result;
-  }, [allJobs, query, selectedCountries, selectedDisciplines, selectedWorkTypes, selectedContractTypes, urgentOnly]);
+  }, [dbJobs, query, selectedCountries, selectedDisciplines, selectedContractTypes]);
 
-  const hasActiveFilters = selectedCountries.length > 0 || selectedDisciplines.length > 0 || selectedWorkTypes.length > 0 || selectedContractTypes.length > 0 || urgentOnly;
-  const displayJobs = filtered.length > 0 ? filtered : allJobs.slice(0, 6);
+  const hasActiveFilters = selectedCountries.length > 0 || selectedDisciplines.length > 0 || selectedContractTypes.length > 0;
+  const displayJobs = filtered.length > 0 ? filtered : dbJobs.slice(0, 6);
   const showingRecommended = filtered.length === 0 && (query || hasActiveFilters);
 
-  const activeFilterCount = selectedCountries.length + selectedDisciplines.length + selectedWorkTypes.length + selectedContractTypes.length + (urgentOnly ? 1 : 0);
+  const activeFilterCount = selectedCountries.length + selectedDisciplines.length + selectedContractTypes.length;
 
   const activeFilterTags = useMemo<FilterTag[]>(() => {
     const tags: FilterTag[] = [];
     selectedCountries.forEach((v) => tags.push({ type: 'country', label: v, value: v }));
     selectedDisciplines.forEach((v) => tags.push({ type: 'discipline', label: v, value: v }));
-    selectedWorkTypes.forEach((v) => tags.push({ type: 'workType', label: v, value: v }));
     selectedContractTypes.forEach((v) => tags.push({ type: 'contractType', label: v, value: v }));
-    if (urgentOnly) tags.push({ type: 'urgent', label: 'Urgent Only', value: 'urgent' });
     return tags;
-  }, [selectedCountries, selectedDisciplines, selectedWorkTypes, selectedContractTypes, urgentOnly]);
+  }, [selectedCountries, selectedDisciplines, selectedContractTypes]);
 
   const clearFilters = () => {
     setSelectedCountries([]);
     setSelectedDisciplines([]);
-    setSelectedWorkTypes([]);
     setSelectedContractTypes([]);
-    setUrgentOnly(false);
     setQuery('');
   };
 
@@ -210,16 +158,14 @@ export default function Jobs() {
       status: 'applied',
     };
 
-    if (!job.id.startsWith('static-')) {
-      applicationPayload.job_id = job.id;
-      const { data: jobRecord } = await supabase
-        .from(TABLES.jobs)
-        .select('company_user_id')
-        .eq('id', job.id)
-        .single();
-      if (jobRecord?.company_user_id) {
-        applicationPayload.company_user_id = jobRecord.company_user_id;
-      }
+    applicationPayload.job_id = job.id;
+    const { data: jobRecord } = await supabase
+      .from(TABLES.jobs)
+      .select('company_user_id')
+      .eq('id', job.id)
+      .single();
+    if (jobRecord?.company_user_id) {
+      applicationPayload.company_user_id = jobRecord.company_user_id;
     }
 
     const { error } = await supabase.from(TABLES.jobApplications).insert(applicationPayload);
@@ -283,30 +229,18 @@ export default function Jobs() {
 
       <TrustMetricsSection />
 
-      <FeaturedCarousel
-        onApply={apply}
-        appliedKeys={appliedKeys}
-        applyingId={applyingId}
-      />
-
-      <ActivityFeed />
-
       <FilterPanel
         open={showFilters}
         onClose={() => setShowFilters(false)}
         selectedCountries={selectedCountries}
         selectedDisciplines={selectedDisciplines}
-        selectedWorkTypes={selectedWorkTypes}
         selectedContractTypes={selectedContractTypes}
-        urgentOnly={urgentOnly}
         activeFilterCount={activeFilterCount}
         filteredCount={filtered.length}
         toggleFilter={toggleFilter}
         setSelectedCountries={setSelectedCountries}
         setSelectedDisciplines={setSelectedDisciplines}
-        setSelectedWorkTypes={setSelectedWorkTypes}
         setSelectedContractTypes={setSelectedContractTypes}
-        setUrgentOnly={setUrgentOnly}
         clearFilters={clearFilters}
       />
 

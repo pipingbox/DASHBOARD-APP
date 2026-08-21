@@ -3,35 +3,28 @@ import {
   SlidersHorizontal,
   Globe,
   Briefcase,
-  Anchor,
   Building2,
-  AlertTriangle,
   RotateCcw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   COUNTRIES,
   DISCIPLINES,
-  WORK_TYPES,
   CONTRACT_TYPES_OPTIONS,
-} from '@/lib/jobs/static-data';
+} from '@/lib/jobs/utils';
 
 interface FilterPanelProps {
   open: boolean;
   onClose: () => void;
   selectedCountries: string[];
   selectedDisciplines: string[];
-  selectedWorkTypes: string[];
   selectedContractTypes: string[];
-  urgentOnly: boolean;
   activeFilterCount: number;
   filteredCount: number;
   toggleFilter: (arr: string[], setArr: React.Dispatch<React.SetStateAction<string[]>>, val: string) => void;
   setSelectedCountries: React.Dispatch<React.SetStateAction<string[]>>;
   setSelectedDisciplines: React.Dispatch<React.SetStateAction<string[]>>;
-  setSelectedWorkTypes: React.Dispatch<React.SetStateAction<string[]>>;
   setSelectedContractTypes: React.Dispatch<React.SetStateAction<string[]>>;
-  setUrgentOnly: React.Dispatch<React.SetStateAction<boolean>>;
   clearFilters: () => void;
 }
 
@@ -40,17 +33,13 @@ export function FilterPanel({
   onClose,
   selectedCountries,
   selectedDisciplines,
-  selectedWorkTypes,
   selectedContractTypes,
-  urgentOnly,
   activeFilterCount,
   filteredCount,
   toggleFilter,
   setSelectedCountries,
   setSelectedDisciplines,
-  setSelectedWorkTypes,
   setSelectedContractTypes,
-  setUrgentOnly,
   clearFilters,
 }: FilterPanelProps) {
   if (!open) return null;
@@ -86,13 +75,7 @@ export function FilterPanel({
           <div className="flex-1 overflow-y-auto p-5 space-y-6 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
             <FilterGroup label="Country" options={COUNTRIES} selected={selectedCountries} onToggle={(v) => toggleFilter(selectedCountries, setSelectedCountries, v)} icon={Globe} layout="grid" />
             <FilterGroup label="Discipline" options={DISCIPLINES} selected={selectedDisciplines} onToggle={(v) => toggleFilter(selectedDisciplines, setSelectedDisciplines, v)} icon={Briefcase} layout="grid" />
-            <FilterGroup label="Work Type" options={WORK_TYPES} selected={selectedWorkTypes} onToggle={(v) => toggleFilter(selectedWorkTypes, setSelectedWorkTypes, v)} icon={Anchor} layout="grid" />
             <FilterGroup label="Contract Type" options={CONTRACT_TYPES_OPTIONS} selected={selectedContractTypes} onToggle={(v) => toggleFilter(selectedContractTypes, setSelectedContractTypes, v)} icon={Building2} layout="grid" />
-
-            <div className="space-y-3">
-              <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">Priority</label>
-              <UrgentToggle urgentOnly={urgentOnly} setUrgentOnly={setUrgentOnly} />
-            </div>
           </div>
 
           <div className="p-5 border-t border-zinc-800/80 space-y-2.5">
@@ -137,9 +120,7 @@ export function FilterPanel({
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5" style={{ scrollbarWidth: 'none' }}>
             <FilterGroup label="Country" options={COUNTRIES} selected={selectedCountries} onToggle={(v) => toggleFilter(selectedCountries, setSelectedCountries, v)} layout="chips" />
             <FilterGroup label="Discipline" options={DISCIPLINES} selected={selectedDisciplines} onToggle={(v) => toggleFilter(selectedDisciplines, setSelectedDisciplines, v)} layout="chips" />
-            <FilterGroup label="Work Type" options={WORK_TYPES} selected={selectedWorkTypes} onToggle={(v) => toggleFilter(selectedWorkTypes, setSelectedWorkTypes, v)} layout="chips" />
             <FilterGroup label="Contract Type" options={CONTRACT_TYPES_OPTIONS} selected={selectedContractTypes} onToggle={(v) => toggleFilter(selectedContractTypes, setSelectedContractTypes, v)} layout="chips" />
-            <UrgentToggle urgentOnly={urgentOnly} setUrgentOnly={setUrgentOnly} />
           </div>
 
           <div className="px-5 py-4 border-t border-zinc-800/80 space-y-2.5">
@@ -212,32 +193,5 @@ function FilterGroup({
         </div>
       )}
     </div>
-  );
-}
-
-function UrgentToggle({
-  urgentOnly,
-  setUrgentOnly,
-}: {
-  urgentOnly: boolean;
-  setUrgentOnly: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
-  return (
-    <button
-      onClick={() => setUrgentOnly(!urgentOnly)}
-      className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all duration-200 ${
-        urgentOnly
-          ? 'bg-red-500/10 border-red-500/30'
-          : 'bg-zinc-900/60 border-zinc-800 hover:border-zinc-600'
-      }`}
-    >
-      <span className={`flex items-center gap-2 text-xs font-medium ${urgentOnly ? 'text-red-400' : 'text-zinc-400'}`}>
-        <AlertTriangle className="h-3.5 w-3.5" />
-        Urgent Only
-      </span>
-      <div className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${urgentOnly ? 'bg-red-500' : 'bg-zinc-700'}`}>
-        <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${urgentOnly ? 'translate-x-4' : 'translate-x-0.5'}`} />
-      </div>
-    </button>
   );
 }
