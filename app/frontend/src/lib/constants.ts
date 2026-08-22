@@ -1,26 +1,47 @@
 /**
  * Application constants for PipingBox.
- * Production URL is used for all auth redirects to prevent localhost leaking into OAuth flows.
+ *
+ * Auth redirect architecture (PB-CF-MIGRATION step 5-5b):
+ * Auth redirects/callbacks must target the SAME origin the app is actually
+ * running on (production, Cloudflare Workers preview, or localhost), never
+ * a hardcoded domain guessed from "is this localhost or not". Previously
+ * any non-localhost origin was force-redirected to PRODUCTION_URL, which
+ * broke OAuth/magic-link callbacks on the workers.dev preview.
+ *
+ * ALLOWED_AUTH_ORIGINS is the single source of truth for which origins are
+ * trusted to receive auth callbacks. If window.location.origin matches one
+ * of these (or is localhost/127.0.0.1), it is used as-is. Any other/unknown
+ * origin (e.g. a phishing clone or unexpected preview URL) safely falls
+ * back to PRODUCTION_URL instead of leaking the redirect to it.
+ *
+ * NOTE: Supabase Auth's dashboard "Redirect URLs" allowlist must also
+ * include every origin listed here (see AGENTS.md / deployment docs) or
+ * Supabase itself will reject the callback regardless of this code.
  */
 
 const PRODUCTION_URL = 'https://app.pipingbox.com';
+const PREVIEW_URL = 'https://pipingbox-app.pipingbox.workers.dev';
+
+const ALLOWED_AUTH_ORIGINS = [PRODUCTION_URL, PREVIEW_URL];
+
+function isLocalOrigin(origin: string): boolean {
+  return origin.includes('localhost') || origin.includes('127.0.0.1');
+}
 
 /**
  * Returns the correct app base URL based on the environment.
- * In production builds, always returns the production URL.
- * In development (localhost), returns window.location.origin for local testing.
+ * - localhost/127.0.0.1 -> current origin (local dev)
+ * - a known/allowlisted origin (production or preview) -> current origin
+ * - anything else (unexpected host) -> PRODUCTION_URL, as a safe default
  */
 export function getAppBaseUrl(): string {
   if (typeof window === 'undefined') return PRODUCTION_URL;
 
   const origin = window.location.origin;
 
-  // If running on localhost or 127.0.0.1, it's development
-  if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-    return origin;
-  }
+  if (isLocalOrigin(origin)) return origin;
+  if (ALLOWED_AUTH_ORIGINS.includes(origin)) return origin;
 
-  // In production, always use the canonical production URL
   return PRODUCTION_URL;
 }
 
@@ -37,6 +58,5 @@ export function getAuthRedirectUrl(path: string = '/dashboard'): string {
  */
 export function isProduction(): boolean {
   if (typeof window === 'undefined') return true;
-  const origin = window.location.origin;
-  return !origin.includes('localhost') && !origin.includes('127.0.0.1');
+  return window.location.origin === PRODUCTION_URL;
 }
