@@ -1,0 +1,14 @@
+{
+  "name": "pipingbox-app-infra",
+  "private": true,
+  "type": "module",
+  "description": "Infra-only package.json for Cloudflare Workers deployment (wrangler). The actual app lives in app/frontend.",
+  "scripts": {
+    "build": "cd app/frontend && npm run build",
+    "deploy": "wrangler deploy",
+    "deploy:dry-run": "wrangler deploy --dry-run"
+  },
+  "devDependencies": {
+    "wrangler": "^4.125.0"
+  }
+}

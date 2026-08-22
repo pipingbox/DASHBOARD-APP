@@ -1,0 +1,12 @@
+name = "pipingbox-app"
+main = "src/worker.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./app/frontend/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[build]
+command = "cd app/frontend && npm run build"
