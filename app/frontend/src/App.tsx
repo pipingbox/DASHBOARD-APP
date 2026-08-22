@@ -11,6 +11,7 @@ import { useReferralCapture } from '@/hooks/useReferralCapture';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { OnboardingGate } from '@/components/OnboardingGate';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { CompanyVerificationGate } from '@/components/company/CompanyVerificationGate';
 
 import Index from './pages/Index';
 import Login from './pages/Login';
@@ -26,6 +27,8 @@ import SCCCoursePage from './pages/SCCCoursePage';
 import PRLCoursePage from './pages/PRLCoursePage';
 import CourseDetail from './pages/academy/CourseDetail';
 import LessonView from './pages/academy/LessonView';
+import AcademyModule from './pages/AcademyModule';
+import AcademyExam from './pages/AcademyExam';
 import Tools from './pages/Tools';
 import Jobs from './pages/Jobs';
 import Community from './pages/Community';
@@ -74,6 +77,18 @@ const withShell = (node: React.ReactNode) => (
 const withShellRoles = (node: React.ReactNode, allowedRoles: string[]) => (
   <ProtectedRoute allowedRoles={allowedRoles}>
     <AppShell>{node}</AppShell>
+  </ProtectedRoute>
+);
+
+// PD-COMPANY / PB-DRIFT-001: wraps company routes that grant privileges
+// reserved to VERIFIED companies (posting jobs, searching workers, viewing
+// candidates). Gated by CompanyVerificationGate — currently a pass-through
+// while COMPANY_VERIFICATION_ENABLED=false (see component + brain docs).
+const withShellRolesVerified = (node: React.ReactNode, allowedRoles: string[]) => (
+  <ProtectedRoute allowedRoles={allowedRoles}>
+    <AppShell>
+      <CompanyVerificationGate>{node}</CompanyVerificationGate>
+    </AppShell>
   </ProtectedRoute>
 );
 
@@ -151,19 +166,19 @@ const AppRoutes = () => {
     />
     <Route
       path="/company/post-job"
-      element={withShellRoles(<CompanyPostJob />, ['admin', 'company'])}
+      element={withShellRolesVerified(<CompanyPostJob />, ['admin', 'company'])}
     />
     <Route
       path="/company/candidates"
-      element={withShellRoles(<CompanyCandidates />, ['admin', 'company'])}
+      element={withShellRolesVerified(<CompanyCandidates />, ['admin', 'company'])}
     />
     <Route
       path="/candidate/:userId"
-      element={withShellRoles(<CandidateProfile />, ['admin', 'jobs_moderator', 'company'])}
+      element={withShellRolesVerified(<CandidateProfile />, ['admin', 'jobs_moderator', 'company'])}
     />
     <Route
       path="/company/workers-search"
-      element={withShellRoles(<CompanyWorkersSearch />, ['admin', 'company'])}
+      element={withShellRolesVerified(<CompanyWorkersSearch />, ['admin', 'company'])}
     />
     <Route
       path="/company/workforce-requests"
@@ -239,6 +254,15 @@ const AppRoutes = () => {
     <Route
       path="/academy/lesson/:lessonId"
       element={withShellRoles(<LessonView />, ['admin', 'worker', 'company'])}
+    />
+    {/* PD-VCA: VCA exam simulator (ported from production, 2026-08-22) */}
+    <Route
+      path="/academy/module/:moduleId"
+      element={withShellRoles(<AcademyModule />, ['admin', 'worker', 'company'])}
+    />
+    <Route
+      path="/academy/exam/:examType"
+      element={withShellRoles(<AcademyExam />, ['admin', 'worker', 'company'])}
     />
     <Route
       path="/tools"
