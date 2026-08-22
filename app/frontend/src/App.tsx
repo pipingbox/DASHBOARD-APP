@@ -1,7 +1,7 @@
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { AuthProvider } from '@/hooks/useAuth';
 import { AdminPreviewProvider } from '@/contexts/AdminPreviewContext';
@@ -91,6 +91,19 @@ const withShellRolesVerified = (node: React.ReactNode, allowedRoles: string[]) =
     </AppShell>
   </ProtectedRoute>
 );
+
+// PB-DRIFT-001: legacy /academy/:moduleId alias for route parity with
+// production, which used this shorter path before the canonical candidate
+// introduced /academy/module/:moduleId. Only redirects numeric moduleId
+// (1-22) so it doesn't shadow named academy routes like /academy/vca-course
+// — those are matched earlier by React Router since they are more specific.
+const AcademyModuleLegacyRedirect = () => {
+  const { moduleId } = useParams<{ moduleId: string }>();
+  if (!moduleId || !/^([1-9]|1[0-9]|2[0-2])$/.test(moduleId)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <Navigate to={`/academy/module/${moduleId}`} replace />;
+};
 
 const AppRoutes = () => {
   // Capture referral codes from any page URL globally
@@ -263,6 +276,13 @@ const AppRoutes = () => {
     <Route
       path="/academy/exam/:examType"
       element={withShellRoles(<AcademyExam />, ['admin', 'worker', 'company'])}
+    />
+    {/* PB-DRIFT-001: legacy alias, must stay after all specific /academy/* routes above
+        so named paths (vca-course, scc-course, prl-course, course/:slug, lesson/:lessonId,
+        module/:moduleId, exam/:examType) keep matching first. */}
+    <Route
+      path="/academy/:moduleId"
+      element={<AcademyModuleLegacyRedirect />}
     />
     <Route
       path="/tools"
