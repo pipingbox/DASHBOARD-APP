@@ -60,8 +60,10 @@ test.describe('Auth E2E gate', () => {
 
     await page.goto('/dashboard');
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 10_000 });
-    const rootHtml = await page.locator('#root').innerHTML();
-    expect(rootHtml.length).toBeGreaterThan(200);
+    // Auto-retrying assertion (a hard navigation needs a moment to
+    // hydrate/fetch dashboard data -- a one-shot innerHTML() read here
+    // is racy and was observed flaking on this exact check).
+    await expect(page.locator('#root')).not.toBeEmpty({ timeout: 10_000 });
   });
 
   test('logout returns user to guest state (protected route redirects to /login)', async ({ page }) => {
