@@ -8,6 +8,9 @@
     "deploy": "wrangler deploy",
     "deploy:dry-run": "wrangler deploy --dry-run"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
     "wrangler": "^4.125.0"

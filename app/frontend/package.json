@@ -8,6 +8,9 @@
     "preview": "vite preview",
     "postinstall": "echo 'Dependencies installed successfully'"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
     "@metagptx/vite-plugin-source-locator": "latest",
