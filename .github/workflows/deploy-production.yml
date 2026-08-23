@@ -1,0 +1,77 @@
+name: Deploy Cloudflare Workers Production
+
+# PB-CF-MIGRATION step 5-5b gate 1: production deploy is fully decoupled
+# from the preview pipeline (deploy-preview.yml). This workflow:
+#   - NEVER runs on push -- workflow_dispatch only, triggered by hand.
+#   - Requires an explicit commit SHA to deploy (no ambiguous "latest main").
+#   - Is gated behind the GitHub Environment "production". Configure
+#     required reviewers there (Settings -> Environments -> production)
+#     for a real human approval gate -- see
+#     docs/PB-CF-MIGRATION-5-5b-preview-prod-separation.md for the exact
+#     one-time dashboard steps (not scriptable from here).
+#   - Deploys to the SEPARATE Worker "pipingbox-app-prod"
+#     (the [env.production] block in wrangler.toml), never to
+#     "pipingbox-app" (preview, deployed only by deploy-preview.yml).
+#   - Does NOT touch app.pipingbox.com / DNS / Custom Domains / Routes --
+#     [env.production] in wrangler.toml has no [[routes]] / custom_domain
+#     yet. Attaching the domain is a separate, explicitly-authorized step.
+#
+# Rollback procedure: see
+# docs/PB-CF-MIGRATION-5-5b-preview-prod-separation.md
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'Exact commit SHA on main to deploy to production (required; must already be verified on preview)'
+        required: true
+        type: string
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.commit_sha }}
+
+      - name: Validate and confirm deployed commit SHA
+        env:
+          INPUT_SHA: ${{ github.event.inputs.commit_sha }}
+        run: |
+          if [ -z "$INPUT_SHA" ]; then
+            echo "::error::commit_sha input is required and cannot be empty."
+            exit 1
+          fi
+          RESOLVED=$(git rev-parse HEAD)
+          echo "Requested commit_sha: $INPUT_SHA"
+          echo "Resolved HEAD:        $RESOLVED"
+          case "$RESOLVED" in
+            "$INPUT_SHA"*) echo "Commit SHA verified OK -- deploying exactly this commit to PRODUCTION." ;;
+            *) echo "::error::Resolved HEAD ($RESOLVED) does not match requested commit_sha ($INPUT_SHA)."; exit 1 ;;
+          esac
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install root deps (wrangler)
+        run: npm ci
+
+      - name: Install frontend deps
+        working-directory: app/frontend
+        run: npm ci
+
+      - name: Deploy to Cloudflare Workers (PRODUCTION - pipingbox-app-prod)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npx wrangler deploy --env production
