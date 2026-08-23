@@ -26,6 +26,10 @@ on:
       - '.github/workflows/deploy-preview.yml'
   workflow_dispatch: {}
 
+concurrency:
+  group: deploy-preview
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
