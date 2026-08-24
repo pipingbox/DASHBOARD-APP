@@ -53,6 +53,12 @@ const WORKER_NAV_ITEMS = [
 ];
 
 /**
+ * Routes reachable without a session (PB-WEB-005 / F1).
+ * A guest must never be shown workspace entries that immediately bounce to /login.
+ */
+const PUBLIC_NAV_PATHS = ['/academy', '/tools'];
+
+/**
  * Company navigation — structured in two sections:
  * ENTORNO EMPRESA (workspace) + EMPRESA (company settings)
  */
@@ -92,7 +98,7 @@ const NAV_ITEMS = [
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { profile, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [previewDropdownOpen, setPreviewDropdownOpen] = useState(false);
@@ -106,6 +112,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     navigate('/login', { replace: true });
   };
 
+  // PB-WEB-005: public routes render the shell without a session.
+  const isGuest = !user;
+
   // Use effective role (preview role if admin is previewing, real role otherwise)
   const displayRole = effectiveRole;
   const showAdminNav = isRealAdmin && !isPreviewMode;
@@ -115,12 +124,18 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   // Filter nav items based on effective role for preview (non-company views)
   const visibleNavItems = useMemo(() => {
+    // Guests only see routes they can actually open. Showing the full workspace to a
+    // visitor would imply a session that does not exist and every entry would bounce
+    // straight back to /login.
+    if (isGuest) {
+      return WORKER_NAV_ITEMS.filter((item) => PUBLIC_NAV_PATHS.includes(item.to));
+    }
     if (isCompanyView) {
       // Company view uses structured navigation, not flat list
       return [];
     }
     return NAV_ITEMS.filter((item) => isNavVisible(effectiveRole, item.to));
-  }, [effectiveRole, isCompanyView]);
+  }, [effectiveRole, isCompanyView, isGuest]);
 
   // Get current preview label
   const currentPreviewLabel = useMemo(() => {
@@ -318,8 +333,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           )}
 
-          {/* Role badge */}
-          <div className="flex items-center gap-2 px-3 py-1.5">
+          {/* Role badge — hidden for guests: showing a role implies a session */}
+          <div className={cn('items-center gap-2 px-3 py-1.5', isGuest ? 'hidden' : 'flex')}>
             <div
               className={cn(
                 'flex h-5 w-5 items-center justify-center rounded-full border',
@@ -352,13 +367,23 @@ export function AppShell({ children }: { children: ReactNode }) {
             )}
           </div>
 
-          <button
-            onClick={handleSignOut}
-            className="flex w-full items-center gap-3 rounded-sm px-3 py-2 text-sm text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100"
-          >
-            <LogOut className="h-4 w-4" />
-            {t('common.signOut')}
-          </button>
+          {isGuest ? (
+            <Link
+              to="/login"
+              className="flex w-full items-center gap-3 rounded-sm px-3 py-2 text-sm text-[#f59e0b] transition hover:bg-zinc-900"
+            >
+              <UserCircle2 className="h-4 w-4" />
+              {t('common.signIn', 'Log in')}
+            </Link>
+          ) : (
+            <button
+              onClick={handleSignOut}
+              className="flex w-full items-center gap-3 rounded-sm px-3 py-2 text-sm text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100"
+            >
+              <LogOut className="h-4 w-4" />
+              {t('common.signOut')}
+            </button>
+          )}
         </div>
       </aside>
 
@@ -495,7 +520,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </div>
               )}
 
-              <div className="flex items-center gap-2 px-3 py-1.5">
+              <div className={cn('items-center gap-2 px-3 py-1.5', isGuest ? 'hidden' : 'flex')}>
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#f59e0b]/10 border border-[#f59e0b]/20">
                   <span className="text-[8px] font-bold text-[#f59e0b]">
                     {(displayRole === 'user' ? 'W' : displayRole.charAt(0)).toUpperCase()}
@@ -510,13 +535,24 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </span>
                 )}
               </div>
-              <button
-                onClick={handleSignOut}
-                className="flex w-full items-center gap-3 rounded-sm px-3 py-2 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
-              >
-                <LogOut className="h-4 w-4" />
-                {t('common.signOut')}
-              </button>
+              {isGuest ? (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex w-full items-center gap-3 rounded-sm px-3 py-2 text-sm text-[#f59e0b] hover:bg-zinc-900"
+                >
+                  <UserCircle2 className="h-4 w-4" />
+                  {t('common.signIn', 'Log in')}
+                </Link>
+              ) : (
+                <button
+                  onClick={handleSignOut}
+                  className="flex w-full items-center gap-3 rounded-sm px-3 py-2 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+                >
+                  <LogOut className="h-4 w-4" />
+                  {t('common.signOut')}
+                </button>
+              )}
             </div>
           </aside>
         </div>

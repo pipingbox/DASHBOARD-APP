@@ -3,6 +3,7 @@ import type { Session, User } from '@supabase/supabase-js';
 import { supabase, TABLES } from '@/lib/supabase';
 import { getStoredReferralCode, clearStoredReferralCode, validateReferralCode } from '@/lib/referrals';
 import { getAppBaseUrl, getAuthRedirectUrl } from '@/lib/constants';
+import { ONBOARDING_STATUS } from '@/lib/onboarding';
 
 export interface Profile {
   id: string;
@@ -281,7 +282,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         cv_visible: false,
         availability_status: 'not_specified',
         profile_completion: 10,
-        onboarding_completed: resolvedAccountType ? false : false, // Always false for new profiles
+        onboarding_status: ONBOARDING_STATUS.AUTH_ONLY, // canonical: new profiles start here
+        marketplace_ready: false,
         referral_code: `PB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
       };
 
@@ -304,12 +306,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (insertError) {
         console.error('PROFILE CREATION ERROR:', insertError.message);
 
-        // Retry without optional fields — but KEEP referral info for later recovery
+        // Retry without optional fields — but KEEP referral info for later recovery.
+        // referral_code and account_type are generated locally and cannot be recovered
+        // afterwards: dropping them here silently breaks referrals for that user.
         const minimalProfile: Record<string, unknown> = {
           user_id: authUser.id,
           full_name: fullName,
           username: authUser.email?.split('@')[0] ?? null,
           role: assignedRole,
+          account_type: newProfile.account_type,
+          referral_code: newProfile.referral_code,
         };
 
         // Still try to include referral in minimal profile

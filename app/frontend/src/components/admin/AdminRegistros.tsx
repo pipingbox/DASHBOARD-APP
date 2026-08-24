@@ -98,8 +98,8 @@ interface RegistroUser {
   has_onboarding_draft: boolean;
   /** Admin visibility: whether CV is uploaded */
   has_cv: boolean;
-  /** Admin visibility: onboarding_completed flag */
-  onboarding_completed: boolean;
+  /** Admin visibility: canonical onboarding_status (see lib/onboarding.ts) */
+  onboarding_status: string | null;
 }
 
 type OnboardingStatus = 'AUTH_ONLY' | 'PROFILE_STARTED' | 'PROFILE_COMPLETED' | 'MARKETPLACE_READY';
@@ -249,7 +249,7 @@ export function AdminRegistros() {
                 updated_at: profile.updated_at ?? null,
                 has_onboarding_draft: hasDraft,
                 has_cv: hasCv,
-                onboarding_completed: profile.onboarding_completed ?? false,
+                onboarding_status: profile.onboarding_status ?? null,
               };
               ru.calculated_completion = calcLiveCompletion(ru);
               return ru;
@@ -287,7 +287,7 @@ export function AdminRegistros() {
                 updated_at: null,
                 has_onboarding_draft: false,
                 has_cv: false,
-                onboarding_completed: false,
+                onboarding_status: null,
               } as RegistroUser;
             }
           });
@@ -305,7 +305,7 @@ export function AdminRegistros() {
       if (!edgeFunctionWorked) {
         const { data: profiles, error: profilesError } = await supabase
           .from(TABLES.profiles)
-          .select('id, user_id, full_name, role, account_type, created_at, updated_at, avatar_url, availability_status, cv_visible, bio, title, company, location, skills, referral_code, referred_by_user_id, years_experience, profile_completion, profile_visibility, cv_file_url, cv_url, onboarding_completed')
+          .select('id, user_id, full_name, role, account_type, created_at, updated_at, avatar_url, availability_status, cv_visible, bio, title, company, location, skills, referral_code, referred_by_user_id, years_experience, profile_completion, profile_visibility, cv_file_url, cv_url, onboarding_status')
           .order('created_at', { ascending: false })
           .limit(500);
 
@@ -348,7 +348,7 @@ export function AdminRegistros() {
               updated_at: p.updated_at ?? null,
               has_onboarding_draft: hasDraft,
               has_cv: hasCv,
-              onboarding_completed: p.onboarding_completed ?? false,
+              onboarding_status: p.onboarding_status ?? null,
             };
             ru.calculated_completion = calcLiveCompletion(ru);
             return ru;

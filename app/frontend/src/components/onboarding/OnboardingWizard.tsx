@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock, Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { calculateOnboardingCompletion } from '@/lib/profileCompletion';
+import { ONBOARDING_STATUS } from '@/lib/onboarding';
 import { isValidImageFile, isHeicFile, validateFileSize, getSafeImageExtension, ACCEPT_IMAGES } from '@/lib/fileUploadUtils';
 
 /* ─── Constants ─── */
@@ -444,15 +445,14 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       }
 
       const payload = buildSupabasePayload();
-      payload.onboarding_completed = true;
 
       // Mark as marketplace-ready when profile visibility is public
       if (profileVisibility === 'public') {
         payload.marketplace_ready = true;
-        payload.onboarding_status = 'MARKETPLACE_READY';
+        payload.onboarding_status = ONBOARDING_STATUS.MARKETPLACE_READY;
       } else {
         payload.marketplace_ready = false;
-        payload.onboarding_status = 'PROFILE_STARTED';
+        payload.onboarding_status = ONBOARDING_STATUS.PROFILE_STARTED;
       }
 
       if (avatarUrl) {
@@ -537,16 +537,23 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     // Save whatever we have so far before skipping
     try {
       const payload = buildSupabasePayload();
-      payload.onboarding_completed = true;
       // Skipped onboarding = profile started but not marketplace ready
-      payload.onboarding_status = 'PROFILE_STARTED';
+      payload.onboarding_status = ONBOARDING_STATUS.PROFILE_STARTED;
       payload.marketplace_ready = false;
-      await supabase
+      const { error } = await supabase
         .from(TABLES.profiles)
         .update(payload)
         .eq('user_id', user.id);
-    } catch {
+
+      // supabase-js resolves with { error } instead of throwing, so the catch below
+      // never sees a rejected UPDATE. Log it explicitly: silently swallowing this is
+      // exactly how PB-ADMIN-ONBOARDING-SCHEMA-001 stayed invisible in production.
+      if (error) {
+        console.error('[OnboardingWizard] Skip save failed:', error);
+      }
+    } catch (err) {
       // Best-effort save
+      console.error('[OnboardingWizard] Skip save threw:', err);
     }
 
     clearDraftFromLocal(user.id);

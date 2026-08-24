@@ -80,6 +80,16 @@ const withShellRoles = (node: React.ReactNode, allowedRoles: string[]) => (
   </ProtectedRoute>
 );
 
+// PB-WEB-005 (F1): routes reachable WITHOUT a session.
+// DEC-54 requires app.pipingbox.com to expose public routes; the tools are also the
+// acquisition funnel, so gating them behind login contradicts the roadmap.
+//
+// This only removes the route-level auth wall. Per-feature gating stays inside each page:
+// /tools is public but personal/premium state needs an account, /academy exposes the catalog
+// while progress, exams and certificates stay authenticated.
+// AppShell is safe without a session — it reads `profile?.` defensively.
+const withPublicShell = (node: React.ReactNode) => <AppShell>{node}</AppShell>;
+
 // PD-COMPANY / PB-DRIFT-001: wraps company routes that grant privileges
 // reserved to VERIFIED companies (posting jobs, searching workers, viewing
 // candidates). Gated by CompanyVerificationGate — currently a pass-through
@@ -219,7 +229,7 @@ const AppRoutes = () => {
     />
     <Route
       path="/academy"
-      element={withShellRoles(<Academy />, ['admin', 'worker'])}
+      element={withPublicShell(<Academy />)}
     />
     <Route
       path="/academy/vca-course"
@@ -286,7 +296,7 @@ const AppRoutes = () => {
     />
     <Route
       path="/tools"
-      element={withShellRoles(<Tools />, ['admin', 'worker'])}
+      element={withPublicShell(<Tools />)}
     />
     <Route
       path="/jobs"
@@ -310,7 +320,7 @@ const AppRoutes = () => {
     />
     <Route
       path="/companies/request-workers"
-      element={withShellRoles(<RequestWorkers />, ['admin', 'jobs_moderator', 'company'])}
+      element={withPublicShell(<RequestWorkers />)}
     />
     <Route path="/profile" element={withShell(<Profile />)} />
     <Route
