@@ -16,19 +16,14 @@ command = "cd app/frontend && npm run build"
 # Deployed ONLY via .github/workflows/deploy-production.yml -- manual
 # workflow_dispatch with an explicit commit SHA, gated behind the GitHub
 # "production" Environment. NEVER deployed by a push to main.
-# Route attached 2026-08-24: Gaspar GO authorized cutover of app.pipingbox.com.
-# Uses zone_name route (not custom_domain) so the existing DNS record in
-# Cloudflare keeps proxying and Workers intercept before forwarding to origin.
+# Route/domain: app.pipingbox.com → attached manually via CF dashboard
+# (CLOUDFLARE_API_TOKEN lacks Zone:Workers Routes:Edit — see PB-DRIFT-001).
 # ---------------------------------------------------------------------------
 [env.production]
 name = "pipingbox-app-prod"
 main = "src/worker.ts"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-
-[[env.production.routes]]
-pattern = "app.pipingbox.com/*"
-zone_name = "pipingbox.com"
 
 [env.production.assets]
 directory = "./app/frontend/dist"
