@@ -8,10 +8,9 @@ name: Deploy Cloudflare Workers Production
 #   - Deploys to the SEPARATE Worker "pipingbox-app-prod".
 #   - Keeps the cutover reversible: app.pipingbox.com/* is a Worker Route;
 #     the legacy proxied A record remains in DNS as the rollback origin.
-#   - Runs the static schema guard BEFORE deployment, so known-invalid frontend
-#     database column references cannot reach production.
-#   - Is NOT considered green after deploy alone: both the permanent Auth E2E
-#     gate and the approved guest/public-route contract must pass.
+#   - Runs the static schema guard BEFORE deployment.
+#   - Is NOT considered green after deploy alone: Auth E2E, public-route
+#     contract, and RLS security contract must all pass.
 #
 # Rollback point: remove the production Worker Route and traffic falls back
 # to A app -> 107.150.101.9 (proxied, TTL Auto). See the migration docs/Brain.
@@ -116,3 +115,31 @@ jobs:
 
       - name: Verify approved public/protected route surface
         run: npx playwright test tests/public-routes.spec.ts --config=playwright.config.ts
+
+  rls-security:
+    name: Production RLS security contract
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+    steps:
+      - name: Checkout exact deployed app ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.commit_sha }}
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install test dependencies
+        run: npm ci
+
+      - name: Verify lead-table RLS contract
+        run: npx playwright test tests/rls-security.spec.ts --config=playwright.config.ts
