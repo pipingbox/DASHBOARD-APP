@@ -8,8 +8,10 @@ name: Deploy Cloudflare Workers Production
 #   - Deploys to the SEPARATE Worker "pipingbox-app-prod".
 #   - Keeps the cutover reversible: app.pipingbox.com/* is a Worker Route;
 #     the legacy proxied A record remains in DNS as the rollback origin.
-#   - Is NOT considered green after deploy alone: the permanent Auth E2E
-#     reusable workflow must finish 7/7 PASS with zero skipped tests.
+#   - Runs the static schema guard BEFORE deployment, so known-invalid frontend
+#     database column references cannot reach production.
+#   - Is NOT considered green after deploy alone: both the permanent Auth E2E
+#     gate and the approved guest/public-route contract must pass.
 #
 # Rollback point: remove the production Worker Route and traffic falls back
 # to A app -> 107.150.101.9 (proxied, TTL Auto). See the migration docs/Brain.
@@ -57,6 +59,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Schema contract static guard
+        run: node scripts/check-schema-guard.mjs
+
       - name: Install root deps (wrangler)
         run: npm ci
 
@@ -83,3 +88,31 @@ jobs:
     secrets:
       E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
       E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+
+  public-routes:
+    name: Production public-route contract
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PREVIEW_URL: 'https://app.pipingbox.com'
+    steps:
+      - name: Checkout exact deployed app ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.commit_sha }}
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify approved public/protected route surface
+        run: npx playwright test tests/public-routes.spec.ts --config=playwright.config.ts
