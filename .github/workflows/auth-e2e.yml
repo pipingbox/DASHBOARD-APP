@@ -4,7 +4,9 @@ name: Auth E2E Gate
 # - Uses only the dedicated disposable QA account stored in GitHub Secrets.
 # - Never logs credentials.
 # - Can be called by deploy-production.yml or run manually.
-# - Fails if the automated suite is not exactly 7/7 PASS (including any skipped test).
+# - Runs the 7 automatable Auth E2E tests only; the intentionally-manual
+#   OAuth/magic-link case is excluded from this CI gate.
+# - Fails unless the automated suite is exactly 7/7 PASS with zero skipped.
 
 on:
   workflow_call:
@@ -86,10 +88,14 @@ jobs:
         run: |
           set -euo pipefail
 
-          # JSON output lets us distinguish a true 7/7 PASS from Playwright's
-          # otherwise-successful "all skipped" result when credentials are absent.
+          # The spec contains 7 automatable credential/session tests plus one
+          # intentionally skipped OAuth/magic-link manual-verification test.
+          # Exclude that manual-only test from this CI gate, then require an
+          # exact 7/7 PASS so a missing-secret "all skipped" result can never
+          # be mistaken for success.
           npx playwright test tests/auth-e2e.spec.ts \
             --config=playwright.config.ts \
+            --grep-invert='OAuth/magic-link' \
             --reporter=json > playwright-results.json
 
           node <<'NODE'
@@ -129,17 +135,17 @@ jobs:
             process.exit(1);
           }
           if (skipped > 0) {
-            console.error(`::error::Auth E2E gate rejected ${skipped} skipped test(s).`);
+            console.error(`::error::Auth E2E gate rejected ${skipped} skipped automated test(s).`);
             process.exit(1);
           }
           if (failed > 0 || timedOut > 0 || interrupted > 0) {
             console.error('::error::Auth E2E gate contains failed/timed-out/interrupted tests.');
             process.exit(1);
           }
-          if (passed !== 7) {
-            console.error(`::error::Auth E2E gate requires exactly 7 passed tests; observed ${passed}.`);
+          if (passed !== 7 || statuses.length !== 7) {
+            console.error(`::error::Auth E2E gate requires exactly 7 passed automated tests; observed passed=${passed}, total=${statuses.length}.`);
             process.exit(1);
           }
 
-          console.log('Auth E2E gate PASS: 7/7, zero skipped.');
+          console.log('Auth E2E gate PASS: 7/7 automated tests, zero skipped.');
           NODE
