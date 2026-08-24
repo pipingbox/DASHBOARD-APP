@@ -42,9 +42,24 @@ test.describe('PB-WEB-005 public surface', () => {
     // A visitor on a public route must not be shown Sign out or a role badge: it implies
     // an account that does not exist and every workspace link would bounce to /login.
     await page.goto('/tools');
-    await expect(page.getByRole('link', { name: /sign in|log in/i }).first()).toBeVisible({
-      timeout: 10_000,
-    });
-    await expect(page.getByRole('button', { name: /sign out/i })).toHaveCount(0);
+
+    // The "Beta Version" modal renders as an aria-modal dialog, which makes the rest of the
+    // page aria-hidden. Role-based queries then find nothing, so dismiss it first — this is
+    // also what a real visitor does.
+    const continueButton = page.getByRole('button', { name: /continue/i });
+    if (await continueButton.isVisible({ timeout: 5_000 }).catch(() => false)) {
+      await continueButton.click();
+    }
+
+    // Query by href rather than by role: immune to any remaining overlay side effects.
+    await expect(
+      page.locator('a[href="/login"]').first(),
+      'guest must be offered a way to sign in',
+    ).toBeVisible({ timeout: 10_000 });
+
+    await expect(
+      page.getByRole('button', { name: /sign out/i }),
+      'guest must never be shown Sign out',
+    ).toHaveCount(0);
   });
 });
