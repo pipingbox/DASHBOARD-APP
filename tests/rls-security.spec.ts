@@ -103,6 +103,8 @@ test.describe('lead tables — anonymous access', () => {
 
   test('anon CAN still submit the public B2B form', async () => {
     // The whole point of the ticket is closing reads without closing the funnel.
+    // This insert is BLOCKING in RequestWorkers: if it fails the visitor sees an error and
+    // the lead is lost, so a regression here is a total loss of the B2B funnel.
     // Marked clearly as a test lead so it can be filtered out of the pipeline.
     const res = await api.post('/rest/v1/app_14da0f1941_workforce_requests', {
       headers: anonHeaders(),
@@ -120,6 +122,28 @@ test.describe('lead tables — anonymous access', () => {
     expect(
       res.status(),
       'public lead submission must keep working after RLS lockdown',
+    ).toBeLessThan(400);
+  });
+
+  test('anon CAN still write the legacy company_leads row', async () => {
+    // RequestWorkers also inserts into company_leads for backward compatibility. That call is
+    // best-effort (it only warns), so a failure here does NOT break the form — but it would
+    // silently desync the legacy table, which admin views still read.
+    const res = await api.post('/rest/v1/app_14da0f1941_company_leads', {
+      headers: anonHeaders(),
+      data: {
+        company_name: 'RLS-TEST — automated, safe to delete',
+        contact_person: 'RLS Test',
+        email: 'rls-test@pipingbox.com',
+        country: 'Test',
+        worker_type: 'welder',
+        status: 'new',
+      },
+    });
+
+    expect(
+      res.status(),
+      'legacy lead insert must keep working, or the legacy table silently desyncs',
     ).toBeLessThan(400);
   });
 });
