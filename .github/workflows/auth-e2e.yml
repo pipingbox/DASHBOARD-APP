@@ -1,0 +1,145 @@
+name: Auth E2E Gate
+
+# Permanent authentication gate for PIPINGBOX deployments.
+# - Uses only the dedicated disposable QA account stored in GitHub Secrets.
+# - Never logs credentials.
+# - Can be called by deploy-production.yml or run manually.
+# - Fails if the automated suite is not exactly 7/7 PASS (including any skipped test).
+
+on:
+  workflow_call:
+    inputs:
+      target_url:
+        description: 'Deployed origin to test'
+        required: true
+        type: string
+      source_ref:
+        description: 'Exact app commit/ref whose E2E tests must be executed'
+        required: true
+        type: string
+    secrets:
+      E2E_TEST_EMAIL:
+        required: true
+      E2E_TEST_PASSWORD:
+        required: true
+
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Deployed origin to test'
+        required: true
+        default: 'https://app.pipingbox.com'
+        type: string
+      source_ref:
+        description: 'Exact app commit/ref whose E2E tests must be executed'
+        required: true
+        default: 'main'
+        type: string
+
+jobs:
+  auth-e2e:
+    name: Auth E2E — require 7/7 PASS
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PREVIEW_URL: ${{ inputs.target_url }}
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+
+    steps:
+      - name: Validate target and credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${PREVIEW_URL:-}" ]; then
+            echo "::error::target_url is required."
+            exit 1
+          fi
+          if [ -z "${E2E_TEST_EMAIL:-}" ] || [ -z "${E2E_TEST_PASSWORD:-}" ]; then
+            echo "::error::E2E_TEST_EMAIL and E2E_TEST_PASSWORD must both be configured as GitHub Secrets."
+            exit 1
+          fi
+          case "$PREVIEW_URL" in
+            https://*) ;;
+            *) echo "::error::Auth E2E target must use HTTPS."; exit 1 ;;
+          esac
+
+      - name: Checkout exact tested app ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Auth E2E — zero skipped allowed
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # JSON output lets us distinguish a true 7/7 PASS from Playwright's
+          # otherwise-successful "all skipped" result when credentials are absent.
+          npx playwright test tests/auth-e2e.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=json > playwright-results.json
+
+          node <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('playwright-results.json', 'utf8'));
+          const statuses = [];
+
+          function walk(value) {
+            if (!value || typeof value !== 'object') return;
+            if (Array.isArray(value)) {
+              for (const item of value) walk(item);
+              return;
+            }
+            if (Array.isArray(value.results)) {
+              for (const result of value.results) {
+                if (result && typeof result.status === 'string') statuses.push(result.status);
+              }
+            }
+            for (const [key, child] of Object.entries(value)) {
+              if (key !== 'results') walk(child);
+            }
+          }
+
+          walk(report);
+
+          const count = (status) => statuses.filter((s) => s === status).length;
+          const passed = count('passed');
+          const skipped = count('skipped');
+          const failed = count('failed');
+          const timedOut = count('timedOut');
+          const interrupted = count('interrupted');
+
+          console.log(`Auth E2E result: passed=${passed}, skipped=${skipped}, failed=${failed}, timedOut=${timedOut}, interrupted=${interrupted}`);
+
+          if (statuses.length === 0) {
+            console.error('::error::Playwright produced no executable Auth E2E results.');
+            process.exit(1);
+          }
+          if (skipped > 0) {
+            console.error(`::error::Auth E2E gate rejected ${skipped} skipped test(s).`);
+            process.exit(1);
+          }
+          if (failed > 0 || timedOut > 0 || interrupted > 0) {
+            console.error('::error::Auth E2E gate contains failed/timed-out/interrupted tests.');
+            process.exit(1);
+          }
+          if (passed !== 7) {
+            console.error(`::error::Auth E2E gate requires exactly 7 passed tests; observed ${passed}.`);
+            process.exit(1);
+          }
+
+          console.log('Auth E2E gate PASS: 7/7, zero skipped.');
+          NODE
