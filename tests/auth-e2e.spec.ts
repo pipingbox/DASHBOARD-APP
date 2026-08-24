@@ -22,7 +22,11 @@ test.describe('Auth E2E gate', () => {
   test.skip(!hasCreds, 'E2E_TEST_EMAIL / E2E_TEST_PASSWORD not set -- skipping Auth E2E gate');
 
   test('unauthenticated user hitting a protected route is redirected to /login', async ({ page }) => {
-    await page.goto('/companies/request-workers');
+    // Was /companies/request-workers until PB-WEB-005 made that a public B2B lead form.
+    // Use /dashboard: it is the canonical authenticated route and must stay protected.
+    // Public-surface coverage lives in tests/public-routes.spec.ts to keep this gate at
+    // exactly 7 tests.
+    await page.goto('/dashboard');
     await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
   });
 
