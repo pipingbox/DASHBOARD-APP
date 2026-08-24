@@ -1,23 +1,18 @@
 name: Deploy Cloudflare Workers Production
 
-# PB-CF-MIGRATION step 5-5b gate 1: production deploy is fully decoupled
-# from the preview pipeline (deploy-preview.yml). This workflow:
+# Production deploy is fully decoupled from preview (deploy-preview.yml).
+# This workflow:
 #   - NEVER runs on push -- workflow_dispatch only, triggered by hand.
 #   - Requires an explicit commit SHA to deploy (no ambiguous "latest main").
-#   - Is gated behind the GitHub Environment "production". Configure
-#     required reviewers there (Settings -> Environments -> production)
-#     for a real human approval gate -- see
-#     docs/PB-CF-MIGRATION-5-5b-preview-prod-separation.md for the exact
-#     one-time dashboard steps (not scriptable from here).
-#   - Deploys to the SEPARATE Worker "pipingbox-app-prod"
-#     (the [env.production] block in wrangler.toml), never to
-#     "pipingbox-app" (preview, deployed only by deploy-preview.yml).
-#   - Does NOT touch app.pipingbox.com / DNS / Custom Domains / Routes --
-#     [env.production] in wrangler.toml has no [[routes]] / custom_domain
-#     yet. Attaching the domain is a separate, explicitly-authorized step.
+#   - Is gated behind the GitHub Environment "production".
+#   - Deploys to the SEPARATE Worker "pipingbox-app-prod".
+#   - Keeps the cutover reversible: app.pipingbox.com/* is a Worker Route;
+#     the legacy proxied A record remains in DNS as the rollback origin.
+#   - Is NOT considered green after deploy alone: the permanent Auth E2E
+#     reusable workflow must finish 7/7 PASS with zero skipped tests.
 #
-# Rollback procedure: see
-# docs/PB-CF-MIGRATION-5-5b-preview-prod-separation.md
+# Rollback point: remove the production Worker Route and traffic falls back
+# to A app -> 107.150.101.9 (proxied, TTL Auto). See the migration docs/Brain.
 
 on:
   workflow_dispatch:
@@ -75,3 +70,16 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npx wrangler deploy --env production
+
+  auth-e2e:
+    name: Production Auth E2E gate
+    needs: deploy
+    permissions:
+      contents: read
+    uses: ./.github/workflows/auth-e2e.yml
+    with:
+      target_url: 'https://app.pipingbox.com'
+      source_ref: ${{ github.event.inputs.commit_sha }}
+    secrets:
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
