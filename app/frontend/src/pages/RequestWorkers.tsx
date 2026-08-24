@@ -116,10 +116,15 @@ export default function RequestWorkers() {
     };
 
     try {
-      const { data, error } = await supabase
+      // No .select() on purpose (PB-SEC-RLS-WORKFORCE-001).
+      // PostgREST needs SELECT permission to return the inserted row, and this form is
+      // public: anon must be able to INSERT a lead but must never be able to READ leads.
+      // Asking for the row back would either require an anon SELECT policy — which is the
+      // data leak we are closing — or make every public submission look like a failure
+      // while the lead was in fact stored, pushing visitors to resubmit duplicates.
+      const { error } = await supabase
         .from(TABLES.workforceRequests)
-        .insert(workforcePayload)
-        .select();
+        .insert(workforcePayload);
 
       if (error) {
         console.error('[RequestWorkers] Insert error:', error);
@@ -128,14 +133,7 @@ export default function RequestWorkers() {
         return;
       }
 
-      if (!data || data.length === 0) {
-        console.error('[RequestWorkers] Insert returned no data');
-        setSubmitError('Request could not be saved. Please try again or contact support.');
-        setLoading(false);
-        return;
-      }
-
-      console.log('[RequestWorkers] Insert SUCCESS — request id:', data[0]?.id);
+      console.log('[RequestWorkers] Insert SUCCESS');
 
       // Also insert into legacy company_leads table for backward compatibility
       const legacyPayload = {
@@ -160,12 +158,13 @@ export default function RequestWorkers() {
           if (legacyErr) console.warn('[RequestWorkers] Legacy insert failed:', legacyErr.message);
         });
 
-      // Create admin notification (fire-and-forget)
+      // Create admin notification (fire-and-forget).
+      // leadId is omitted: the row id is no longer read back, since returning it would
+      // require an anon SELECT policy on a table holding B2B contact data.
       notifyNewCompanyLead(
         workforcePayload.company_name,
         workforcePayload.worker_type,
         workforcePayload.country || 'Unknown',
-        data[0]?.id,
       ).catch((err) => console.warn('[RequestWorkers] Notification failed:', err));
 
       setLoading(false);

@@ -40,8 +40,28 @@ function calculateCompletion(profile: any, expCount: number, certCount: number, 
   return score;
 }
 
-function getOnboardingStatus(profile: any, completion: number): string {
-  if (completion >= 30) return "MARKETPLACE_READY";
+/**
+ * Whether the user consented to being discoverable in the marketplace.
+ *
+ * PB-ADMIN-ONBOARDING-SCHEMA-001: `marketplace_ready` is NOT a derived completeness flag.
+ * Setting it true exposes the worker's personal data to companies, so it must never be
+ * inferred from profile_completion alone. The user's choice is recorded by the onboarding
+ * wizard in profile_visibility / cv_visible and has to be respected here.
+ */
+function consentsToMarketplace(profile: any): boolean {
+  if (profile.profile_visibility === "public") return true;
+  if (profile.profile_visibility == null && profile.cv_visible === true) return true;
+  return false;
+}
+
+function getOnboardingStatus(
+  profile: any,
+  completion: number,
+  consents: boolean,
+): string {
+  // A complete profile that opted out is PROFILE_COMPLETED, not MARKETPLACE_READY:
+  // it is finished, it is simply not published.
+  if (completion >= 30) return consents ? "MARKETPLACE_READY" : "PROFILE_COMPLETED";
   if (profile.full_name && profile.title) return "PROFILE_STARTED";
   return "AUTH_ONLY";
 }
@@ -78,7 +98,7 @@ Deno.serve(async (req) => {
     }
 
     // Fetch profiles
-    let profilesQuery = `${supabaseUrl}/rest/v1/app_14da0f1941_profiles?select=id,user_id,full_name,title,company,location,years_experience,skills,bio,avatar_url,cv_file_url,cv_url`;
+    let profilesQuery = `${supabaseUrl}/rest/v1/app_14da0f1941_profiles?select=id,user_id,full_name,title,company,location,years_experience,skills,bio,avatar_url,cv_file_url,cv_url,profile_visibility,cv_visible`;
     if (targetUserId) {
       profilesQuery += `&user_id=eq.${targetUserId}`;
     } else {
@@ -170,8 +190,9 @@ Deno.serve(async (req) => {
       const docCount = docCountMap.get(profile.user_id) || 0;
 
       const completion = calculateCompletion(profile, expCount, certCount, docCount);
-      const onboardingStatus = getOnboardingStatus(profile, completion);
-      const marketplaceReady = completion >= 30;
+      const consents = consentsToMarketplace(profile);
+      const onboardingStatus = getOnboardingStatus(profile, completion, consents);
+      const marketplaceReady = completion >= 30 && consents;
 
       // Update profile in database
       const updateUrl = `${supabaseUrl}/rest/v1/app_14da0f1941_profiles?user_id=eq.${profile.user_id}`;
