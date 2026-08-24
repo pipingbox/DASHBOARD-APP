@@ -16,15 +16,18 @@ command = "cd app/frontend && npm run build"
 # Deployed ONLY via .github/workflows/deploy-production.yml -- manual
 # workflow_dispatch with an explicit commit SHA, gated behind the GitHub
 # "production" Environment. NEVER deployed by a push to main.
-# Deliberately has NO [[routes]] / custom_domain yet: attaching
-# app.pipingbox.com is a separate, explicitly-authorized step, not part
-# of this config. See docs/PB-CF-MIGRATION-5-5b-preview-prod-separation.md
+# Custom domain attached 2026-08-24: Gaspar GO authorized cutover of
+# app.pipingbox.com. Wrangler manages the DNS record in the Cloudflare zone.
 # ---------------------------------------------------------------------------
 [env.production]
 name = "pipingbox-app-prod"
 main = "src/worker.ts"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
+
+[[env.production.routes]]
+pattern = "app.pipingbox.com/*"
+custom_domain = true
 
 [env.production.assets]
 directory = "./app/frontend/dist"
