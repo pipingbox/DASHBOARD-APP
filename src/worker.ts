@@ -3,32 +3,29 @@ export interface Env {
 }
 
 // ---------------------------------------------------------------------------
-// PB-WEB-007 (2026-08-25): worker routes cover app, pipingbox.com and www.
+// PB-WEB-007 (2026-08-25): canonical redirect — app + www → pipingbox.com
 //
-// NOTE: The intended 301 redirect (app + www -> pipingbox.com apex) is NOT
-// active here. Reason: Cloudflare has a Redirect Rule
-//   pipingbox.com -> https://www.pipingbox.com  (302)
-// that runs BEFORE Worker Routes in the Cloudflare processing chain. If the
-// Worker also redirects pipingbox.com requests, a redirect loop occurs:
+// Worker Routes registered:
+//   app.pipingbox.com/*   → this worker (pipingbox-app-prod)
+//   www.pipingbox.com/*   → this worker
+//   pipingbox.com/*       → this worker
 //
-//   app -> 301 -> pipingbox.com
-//             -> Redirect Rule 302 -> www.pipingbox.com
-//             -> Worker 301 -> pipingbox.com
-//             -> Redirect Rule 302 -> loop
-//
-// To enable the canonical apex redirect:
-//   1. Delete the pipingbox.com -> www Redirect Rule in Cloudflare Dashboard
-//      (Rules -> Redirect Rules).
-//   2. Uncomment the REDIRECT_HOSTS logic below and redeploy.
-//
-// Current behaviour:
-//   - app.pipingbox.com  -> serves SPA (via Worker + ASSETS)
-//   - pipingbox.com      -> Redirect Rule 302 -> www.pipingbox.com -> Worker -> SPA
-//   - www.pipingbox.com  -> serves SPA (via Worker + ASSETS)
+// The former Cloudflare Redirect Rule (pipingbox.com → www) has been deleted.
+// We now own the full redirect chain here, 301 permanent.
 // ---------------------------------------------------------------------------
+
+const REDIRECT_HOSTS = new Set(['app.pipingbox.com', 'www.pipingbox.com']);
+const CANONICAL = 'https://pipingbox.com';
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    const url = new URL(request.url);
+
+    if (REDIRECT_HOSTS.has(url.hostname)) {
+      const destination = CANONICAL + url.pathname + url.search + url.hash;
+      return Response.redirect(destination, 301);
+    }
+
     return env.ASSETS.fetch(request);
   },
 };
