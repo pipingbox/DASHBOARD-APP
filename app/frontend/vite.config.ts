@@ -38,10 +38,12 @@ export default defineConfig(({ command }) => {
         hostname: 'https://pipingbox.com',
         lastmod: getSitemapLastmod(),
         readable: true,
-        generateRobotsTxt: true,
+        // generateRobotsTxt disabled: we manage robots.txt in public/robots.txt directly
+        // so it can include Disallow directives for private routes (PB-WEB-006).
+        generateRobotsTxt: false,
         // PB-WEB-006: all public routes approved in PB-WEB-005 (F1 + F2).
-        // /academy and /companies/request-workers added after F1; /jobs and /companies after F2.
-        routes: [
+        // vite-plugin-sitemap 0.8.2 uses dynamicRoutes, not routes.
+        dynamicRoutes: [
           '/',
           '/tools',
           '/academy',
