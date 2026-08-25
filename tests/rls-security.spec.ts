@@ -129,6 +129,9 @@ test.describe('lead tables — anonymous access', () => {
     // RequestWorkers also inserts into company_leads for backward compatibility. That call is
     // best-effort (it only warns), so a failure here does NOT break the form — but it would
     // silently desync the legacy table, which admin views still read.
+    // Payload mirrors exactly what RequestWorkers.tsx sends as legacyPayload.
+    // company_leads uses workers_needed, NOT worker_type (that is a workforce_requests column).
+    // Sending an unknown column causes a 400 schema error, not an auth error.
     const res = await api.post('/rest/v1/app_14da0f1941_company_leads', {
       headers: anonHeaders(),
       data: {
@@ -136,8 +139,10 @@ test.describe('lead tables — anonymous access', () => {
         contact_person: 'RLS Test',
         email: 'rls-test@pipingbox.com',
         country: 'Test',
-        worker_type: 'welder',
+        workers_needed: 'welder',
         status: 'new',
+        priority: 'normal',
+        archived: false,
       },
     });
 
