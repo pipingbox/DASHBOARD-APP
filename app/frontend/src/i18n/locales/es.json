@@ -466,7 +466,154 @@
     "examBackToAcademy": "Volver a Academia",
     "examYourAnswer": "Tu respuesta",
     "examCorrectAnswer": "Respuesta correcta",
-    "examNoAnswer": "Sin responder"
+    "examNoAnswer": "Sin responder",
+    "intro": {
+      "compact": {
+        "title": "Sigue construyendo tu conocimiento industrial",
+        "cta": "Ir al catálogo"
+      },
+      "hero": {
+        "label": "PipingBox Academy",
+        "title": "Formación Industrial Creada para el",
+        "titleHighlight": "Mundo Real",
+        "subtitle": "Cursos estructurados, rutas de aprendizaje práctico y conocimiento técnico para profesionales de piping, soldadores, inspectores QA/QC y equipos de proyecto.",
+        "cta": "Ver el catálogo",
+        "ctaSecondary": "Explorar empleos",
+        "imageAlt": "Planta industrial de tuberías al anochecer"
+      },
+      "areas": {
+        "label": "Áreas de conocimiento",
+        "title": "Enfocado en",
+        "titleHighlight": "Habilidades Industriales Reales",
+        "subtitle": "Los dominios técnicos que cubre PipingBox Academy. Cada área corresponde a lo que realmente ocurre en obra.",
+        "view": "Ver cursos",
+        "items": {
+          "pipefitting": {
+            "title": "Fundamentos de Pipefitting",
+            "description": "Técnicas básicas de pipefitting y prácticas de campo."
+          },
+          "isometrics": {
+            "title": "Lectura de Isométricos",
+            "description": "Lee e interpreta planos isométricos con confianza."
+          },
+          "welding": {
+            "title": "Soldadura e Inspección",
+            "description": "Procesos de soldadura, defectos y criterios de inspección."
+          },
+          "qaqc": {
+            "title": "QA/QC y Documentación",
+            "description": "Procedimientos de control de calidad y documentación de obra."
+          },
+          "standards": {
+            "title": "Normas Industriales",
+            "description": "ASME, API, ISO — aplicadas donde importa."
+          },
+          "hydrotest": {
+            "title": "Hidroprueba y Comisionado",
+            "description": "Procedimientos de prueba de presión y comisionado."
+          },
+          "safety": {
+            "title": "Seguridad y Procedimientos",
+            "description": "PTW, LOTO, ATEX y fundamentos de seguridad en obra."
+          }
+        }
+      },
+      "work": {
+        "label": "Una plataforma",
+        "title": "Aprende, Trabaja y Crece en",
+        "titleHighlight": "Una Plataforma",
+        "subtitle": "Academy no está sola — está completamente conectada con el resto del ecosistema PipingBox.",
+        "imageAlt": "Equipo industrial trabajando en tubería de gran diámetro",
+        "items": {
+          "tools": {
+            "title": "Herramientas",
+            "description": "Calculadoras técnicas conectadas a lo que aprendes: espesores, MAWP, volúmenes de hidroprueba y más."
+          },
+          "jobs": {
+            "title": "Empleos",
+            "description": "Empleos reales de piping en Europa, USA, LATAM y Medio Oriente. Tu aprendizaje se traduce en trabajo."
+          },
+          "community": {
+            "title": "Comunidad",
+            "description": "Comparte casos de obra, haz preguntas técnicas y aprende de profesionales reales."
+          },
+          "companies": {
+            "title": "Empresas",
+            "description": "Forma equipos, asigna rutas de aprendizaje y construye una fuerza laboral estandarizada."
+          }
+        }
+      },
+      "method": {
+        "label": "Metodología",
+        "title": "Aprendizaje Estructurado,",
+        "titleHighlight": "No Contenido Aleatorio",
+        "subtitle": "Tres capas complementarias diseñadas para llevarte desde los fundamentos hasta certificaciones reales.",
+        "blocks": {
+          "courses": {
+            "title": "Cursos",
+            "description": "Módulos técnicos individuales enfocados en temas industriales reales."
+          },
+          "paths": {
+            "title": "Rutas de Aprendizaje",
+            "description": "Formación estructurada paso a paso, de principiante a avanzado."
+          },
+          "certifications": {
+            "title": "Certificaciones",
+            "description": "Certificaciones oficiales ligadas a requisitos reales del sector, con reserva de examen.",
+            "cta": "Reserva tu examen"
+          }
+        },
+        "steps": {
+          "choose": {
+            "title": "Elige tu ruta de aprendizaje",
+            "description": "Selecciona la ruta que coincida con tu rol u objetivo."
+          },
+          "complete": {
+            "title": "Completa los cursos",
+            "description": "Estudia módulos basados en situaciones reales de obra."
+          },
+          "track": {
+            "title": "Sigue tu progreso",
+            "description": "Monitorea tu crecimiento y habilidades en el panel."
+          },
+          "apply": {
+            "title": "Aplica en proyectos reales",
+            "description": "Lleva lo aprendido directamente al campo."
+          }
+        }
+      },
+      "audience": {
+        "professionals": {
+          "title": "Para Profesionales",
+          "description": "Construye el conocimiento industrial que el mercado laboral realmente demanda, a tu ritmo.",
+          "items": {
+            "a": "Aprende a tu ritmo",
+            "b": "Construye conocimiento técnico",
+            "c": "Mejora tus oportunidades laborales",
+            "d": "Conecta el aprendizaje con el trabajo real"
+          },
+          "cta": "Crea tu cuenta"
+        },
+        "companies": {
+          "title": "Para Empresas",
+          "description": "Forma a tu equipo más rápido, estandariza el conocimiento y prepara equipos para proyectos reales.",
+          "items": {
+            "a": "Forma equipos más rápido",
+            "b": "Estandariza el conocimiento",
+            "c": "Asigna rutas de aprendizaje",
+            "d": "Prepara la fuerza laboral para proyectos"
+          },
+          "cta": "Para empresas"
+        }
+      },
+      "catalog": {
+        "label": "El catálogo",
+        "title": "Empieza por lo que ya está disponible",
+        "subtitle": "El catálogo se construye con profesionales del sector. Todo lo que aparece abajo está activo y disponible ahora.",
+        "count_one": "{{count}} curso",
+        "count_other": "{{count}} cursos"
+      }
+    }
   },
   "tools": {
     "eyebrow": "Tools",
@@ -727,7 +874,6 @@
       "d_ago": "hace {{count}}d",
       "w_ago": "hace {{count}}s"
     },
-
     "filterJobs": "Filtrar Empleos",
     "activeFilterCount": "{{count}} filtro activo",
     "activeFilterCount_plural": "{{count}} filtros activos",

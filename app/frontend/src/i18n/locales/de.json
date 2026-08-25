@@ -410,7 +410,154 @@
         "description": "Stützweitentabellen, Federhänger und Konstantlast-Design."
       }
     },
-    "startCourse": "Kurs starten"
+    "startCourse": "Kurs starten",
+    "intro": {
+      "compact": {
+        "title": "Bauen Sie Ihr industrielles Wissen weiter aus",
+        "cta": "Zum Katalog"
+      },
+      "hero": {
+        "label": "PipingBox Academy",
+        "title": "Industrielle Ausbildung für die",
+        "titleHighlight": "Reale Welt",
+        "subtitle": "Strukturierte Kurse, praktische Lernpfade und technisches Wissen für Piping-Fachleute, Schweißer, QA/QC-Inspektoren und Projektteams.",
+        "cta": "Katalog ansehen",
+        "ctaSecondary": "Jobs erkunden",
+        "imageAlt": "Industrielle Rohrleitungsanlage in der Dämmerung"
+      },
+      "areas": {
+        "label": "Wissensbereiche",
+        "title": "Fokussiert auf",
+        "titleHighlight": "Reale Industrielle Fähigkeiten",
+        "subtitle": "Die technischen Bereiche, die PipingBox Academy abdeckt. Jeder Bereich entspricht der Realität auf der Baustelle.",
+        "view": "Kurse ansehen",
+        "items": {
+          "pipefitting": {
+            "title": "Pipefitting-Grundlagen",
+            "description": "Grundlegende Pipefitting-Techniken und Feldpraktiken."
+          },
+          "isometrics": {
+            "title": "Isometrische Zeichnungen",
+            "description": "Lesen und interpretieren Sie isometrische Zeichnungen sicher."
+          },
+          "welding": {
+            "title": "Schweißen und Inspektion",
+            "description": "Schweißverfahren, Fehler und Inspektionskriterien."
+          },
+          "qaqc": {
+            "title": "QA/QC und Dokumentation",
+            "description": "Qualitätskontrollverfahren und Baudokumentation."
+          },
+          "standards": {
+            "title": "Industrienormen",
+            "description": "ASME, API, ISO — angewandt wo es zählt."
+          },
+          "hydrotest": {
+            "title": "Hydrotest und Inbetriebnahme",
+            "description": "Druckprüfungs- und Inbetriebnahmeverfahren."
+          },
+          "safety": {
+            "title": "Sicherheit und Verfahren",
+            "description": "PTW, LOTO, ATEX und Grundlagen der Baustellensicherheit."
+          }
+        }
+      },
+      "work": {
+        "label": "Eine Plattform",
+        "title": "Lernen, Arbeiten und Wachsen auf",
+        "titleHighlight": "Einer Plattform",
+        "subtitle": "Academy steht nicht allein — sie ist vollständig mit dem PipingBox-Ökosystem verbunden.",
+        "imageAlt": "Industrieteam bei der Arbeit an Großrohrleitungen",
+        "items": {
+          "tools": {
+            "title": "Werkzeuge",
+            "description": "Technische Rechner verbunden mit Ihrem Lernen: Wandstärken, MAWP, Volumina und mehr."
+          },
+          "jobs": {
+            "title": "Jobs",
+            "description": "Echte Piping-Jobs in Europa, USA, LATAM und Naher Osten."
+          },
+          "community": {
+            "title": "Community",
+            "description": "Teilen Sie Fälle, stellen Sie technische Fragen und lernen Sie von Profis."
+          },
+          "companies": {
+            "title": "Unternehmen",
+            "description": "Schulen Sie Teams, weisen Sie Lernpfade zu und bauen Sie standardisierte Arbeitskräfte auf."
+          }
+        }
+      },
+      "method": {
+        "label": "Methodik",
+        "title": "Strukturiertes Lernen,",
+        "titleHighlight": "Kein Zufälliger Inhalt",
+        "subtitle": "Drei ergänzende Ebenen, die Sie von den Grundlagen bis zu Zertifizierungen führen.",
+        "blocks": {
+          "courses": {
+            "title": "Kurse",
+            "description": "Einzelne technische Module zu realen industriellen Themen."
+          },
+          "paths": {
+            "title": "Lernpfade",
+            "description": "Schrittweise strukturierte Ausbildung vom Anfänger bis zum Fortgeschrittenen."
+          },
+          "certifications": {
+            "title": "Zertifizierungen",
+            "description": "Offizielle Zertifizierungen nach realen Branchenanforderungen, mit Prüfungsbuchung.",
+            "cta": "Prüfung buchen"
+          }
+        },
+        "steps": {
+          "choose": {
+            "title": "Wählen Sie Ihren Lernpfad",
+            "description": "Wählen Sie den Pfad, der zu Ihrer Rolle passt."
+          },
+          "complete": {
+            "title": "Kurse abschließen",
+            "description": "Studieren Sie Module basierend auf realen Situationen."
+          },
+          "track": {
+            "title": "Fortschritt verfolgen",
+            "description": "Verfolgen Sie Ihr Wachstum im Dashboard."
+          },
+          "apply": {
+            "title": "Wissen anwenden",
+            "description": "Bringen Sie das Gelernte direkt ins Feld."
+          }
+        }
+      },
+      "audience": {
+        "professionals": {
+          "title": "Für Fachleute",
+          "description": "Bauen Sie das industrielle Wissen auf, das der Arbeitsmarkt wirklich verlangt, in Ihrem Tempo.",
+          "items": {
+            "a": "Lernen Sie in Ihrem Tempo",
+            "b": "Bauen Sie technisches Wissen auf",
+            "c": "Verbessern Sie Ihre Jobchancen",
+            "d": "Verbinden Sie Lernen mit realer Arbeit"
+          },
+          "cta": "Konto erstellen"
+        },
+        "companies": {
+          "title": "Für Unternehmen",
+          "description": "Schulen Sie Ihre Teams schneller, standardisieren Sie Wissen und bereiten Sie Teams auf Projekte vor.",
+          "items": {
+            "a": "Teams schneller schulen",
+            "b": "Wissen standardisieren",
+            "c": "Lernpfade zuweisen",
+            "d": "Arbeitskräfte vorbereiten"
+          },
+          "cta": "Für Unternehmen"
+        }
+      },
+      "catalog": {
+        "label": "Der Katalog",
+        "title": "Beginnen Sie mit dem, was heute verfügbar ist",
+        "subtitle": "Der Katalog entsteht gemeinsam mit Fachleuten aus der Praxis. Alles Folgende ist aktiv und sofort verfügbar.",
+        "count_one": "{{count}} Kurs",
+        "count_other": "{{count}} Kurse"
+      }
+    }
   },
   "tools": {
     "eyebrow": "Tools",
@@ -619,7 +766,6 @@
       "d_ago": "vor {{count}} T",
       "w_ago": "vor {{count}} W"
     },
-
     "filterJobs": "Stellen filtern",
     "activeFilterCount": "{{count}} aktiver Filter",
     "activeFilterCount_plural": "{{count}} aktive Filter",

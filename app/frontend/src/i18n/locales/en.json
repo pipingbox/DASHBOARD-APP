@@ -466,7 +466,154 @@
     "examBackToAcademy": "Back to Academy",
     "examYourAnswer": "Your answer",
     "examCorrectAnswer": "Correct answer",
-    "examNoAnswer": "Not answered"
+    "examNoAnswer": "Not answered",
+    "intro": {
+      "compact": {
+        "title": "Keep building your industrial knowledge",
+        "cta": "Go to catalog"
+      },
+      "hero": {
+        "label": "PipingBox Academy",
+        "title": "Industrial Training Built for the",
+        "titleHighlight": "Real World",
+        "subtitle": "Structured courses, practical learning paths and technical knowledge designed for piping professionals, welders, QA/QC inspectors and project teams.",
+        "cta": "Browse the catalog",
+        "ctaSecondary": "Explore Jobs",
+        "imageAlt": "Industrial piping plant at dusk"
+      },
+      "areas": {
+        "label": "Knowledge areas",
+        "title": "Focused on",
+        "titleHighlight": "Real Industrial Skills",
+        "subtitle": "The technical domains PipingBox Academy covers. Every area maps to what actually happens on site.",
+        "view": "View courses",
+        "items": {
+          "pipefitting": {
+            "title": "Pipefitting Fundamentals",
+            "description": "Core pipefitting techniques and field practices."
+          },
+          "isometrics": {
+            "title": "Isometric Reading",
+            "description": "Read and interpret isometric drawings with confidence."
+          },
+          "welding": {
+            "title": "Welding Basics & Inspection",
+            "description": "Welding processes, defects and inspection criteria."
+          },
+          "qaqc": {
+            "title": "QA/QC & Documentation",
+            "description": "Quality control procedures and site documentation."
+          },
+          "standards": {
+            "title": "Industrial Standards",
+            "description": "ASME, API, ISO — applied where it matters."
+          },
+          "hydrotest": {
+            "title": "Hydrotesting & Commissioning",
+            "description": "Pressure testing and commissioning procedures."
+          },
+          "safety": {
+            "title": "Safety & Procedures",
+            "description": "PTW, LOTO, ATEX and jobsite safety fundamentals."
+          }
+        }
+      },
+      "work": {
+        "label": "One platform",
+        "title": "Learn, Work and Grow in",
+        "titleHighlight": "One Platform",
+        "subtitle": "Academy doesn't stand alone — it's fully connected with the rest of the PipingBox ecosystem.",
+        "imageAlt": "Industrial crew working on large-diameter pipe",
+        "items": {
+          "tools": {
+            "title": "Tools",
+            "description": "Technical calculators connected to what you learn: thickness, MAWP, hydrotest volumes and more."
+          },
+          "jobs": {
+            "title": "Jobs",
+            "description": "Real piping jobs across Europe, USA, LATAM and Middle East. Your learning translates to work."
+          },
+          "community": {
+            "title": "Community",
+            "description": "Share site cases, ask technical questions and learn from real professionals."
+          },
+          "companies": {
+            "title": "Companies",
+            "description": "Train teams, assign learning paths and build a standardized workforce ready for projects."
+          }
+        }
+      },
+      "method": {
+        "label": "Method",
+        "title": "Structured Learning,",
+        "titleHighlight": "Not Random Content",
+        "subtitle": "Three complementary layers designed to take you from fundamentals to real-world certifications.",
+        "blocks": {
+          "courses": {
+            "title": "Courses",
+            "description": "Individual technical modules focused on real industrial topics."
+          },
+          "paths": {
+            "title": "Learning Paths",
+            "description": "Step-by-step structured training from beginner to advanced level."
+          },
+          "certifications": {
+            "title": "Certifications",
+            "description": "Official certifications linked to real industry requirements, with exam booking.",
+            "cta": "Book your exam"
+          }
+        },
+        "steps": {
+          "choose": {
+            "title": "Choose your learning path",
+            "description": "Pick the path that matches your role or goal."
+          },
+          "complete": {
+            "title": "Complete courses",
+            "description": "Study modules built on real site situations."
+          },
+          "track": {
+            "title": "Track your progress",
+            "description": "Follow your growth and skills in the dashboard."
+          },
+          "apply": {
+            "title": "Apply knowledge on real projects",
+            "description": "Take what you learn directly to the field."
+          }
+        }
+      },
+      "audience": {
+        "professionals": {
+          "title": "For Professionals",
+          "description": "Build the industrial knowledge the job market actually demands, at your own pace.",
+          "items": {
+            "a": "Learn at your own pace",
+            "b": "Build technical knowledge",
+            "c": "Improve job opportunities",
+            "d": "Connect learning with real work"
+          },
+          "cta": "Create your account"
+        },
+        "companies": {
+          "title": "For Companies",
+          "description": "Train your workforce faster, standardize knowledge and prepare teams for real projects.",
+          "items": {
+            "a": "Train teams faster",
+            "b": "Standardize knowledge",
+            "c": "Assign learning paths",
+            "d": "Prepare workforce for projects"
+          },
+          "cta": "For companies"
+        }
+      },
+      "catalog": {
+        "label": "The catalog",
+        "title": "Start with what is available today",
+        "subtitle": "The catalog is being built with professionals from the field. Everything below is live and available now.",
+        "count_one": "{{count}} course",
+        "count_other": "{{count}} courses"
+      }
+    }
   },
   "tools": {
     "eyebrow": "Tools",
@@ -727,7 +874,6 @@
       "d_ago": "{{count}}d ago",
       "w_ago": "{{count}}w ago"
     },
-
     "filterJobs": "Filter Jobs",
     "activeFilterCount": "{{count}} active filter",
     "activeFilterCount_plural": "{{count}} active filters",

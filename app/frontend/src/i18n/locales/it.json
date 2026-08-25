@@ -305,7 +305,154 @@
     "lessons": "{{count}} lezioni",
     "levelBeginner": "Principiante",
     "levelIntermediate": "Intermedio",
-    "levelAdvanced": "Avanzato"
+    "levelAdvanced": "Avanzato",
+    "intro": {
+      "compact": {
+        "title": "Continua a costruire la tua conoscenza industriale",
+        "cta": "Vai al catalogo"
+      },
+      "hero": {
+        "label": "PipingBox Academy",
+        "title": "Formazione industriale creata per il",
+        "titleHighlight": "mondo reale",
+        "subtitle": "Corsi strutturati e percorsi di apprendimento pratici per professionisti del piping, saldatori, ispettori QA/QC e team di progetto.",
+        "cta": "Vedi il catalogo",
+        "ctaSecondary": "Esplora i lavori",
+        "imageAlt": "Impianto industriale di tubazioni al tramonto"
+      },
+      "areas": {
+        "label": "Aree di conoscenza",
+        "title": "Focalizzati su",
+        "titleHighlight": "competenze industriali reali",
+        "subtitle": "I domini tecnici coperti da PipingBox Academy. Ogni area corrisponde a ciò che accade realmente in cantiere.",
+        "view": "Vedi i corsi",
+        "items": {
+          "pipefitting": {
+            "title": "Fondamenti di Pipefitting",
+            "description": "Tecniche di pipefitting e pratiche di cantiere."
+          },
+          "isometrics": {
+            "title": "Lettura di Isometrici",
+            "description": "Leggere e interpretare i disegni isometrici con sicurezza."
+          },
+          "welding": {
+            "title": "Saldatura e Ispezione",
+            "description": "Processi di saldatura, difetti e criteri di ispezione."
+          },
+          "qaqc": {
+            "title": "QA/QC e Documentazione",
+            "description": "Procedure di controllo qualità e documentazione di cantiere."
+          },
+          "standards": {
+            "title": "Norme Industriali",
+            "description": "ASME, API, ISO — applicate dove contano."
+          },
+          "hydrotest": {
+            "title": "Idrocollaudo e Messa in Servizio",
+            "description": "Prove di pressione e procedure di commissioning."
+          },
+          "safety": {
+            "title": "Sicurezza e Procedure",
+            "description": "PTW, LOTO, ATEX e fondamenti di sicurezza in cantiere."
+          }
+        }
+      },
+      "work": {
+        "label": "Una piattaforma",
+        "title": "Impara, lavora e cresci su",
+        "titleHighlight": "una sola piattaforma",
+        "subtitle": "Academy non è isolata: ciò che impari si collega direttamente al resto di PipingBox.",
+        "imageAlt": "Squadra industriale al lavoro su tubazioni di grande diametro",
+        "items": {
+          "tools": {
+            "title": "Tools",
+            "description": "Calcolatori tecnici collegati a ciò che impari: spessori, MAWP, volumi di idrocollaudo e altro."
+          },
+          "jobs": {
+            "title": "Jobs",
+            "description": "Lavori reali nel piping in Europa, USA, LATAM e Medio Oriente. La formazione si traduce in lavoro."
+          },
+          "community": {
+            "title": "Community",
+            "description": "Condividi casi di cantiere, poni domande tecniche e impara da professionisti veri."
+          },
+          "companies": {
+            "title": "Companies",
+            "description": "Forma i team, assegna percorsi e costruisci una forza lavoro pronta per i progetti."
+          }
+        }
+      },
+      "method": {
+        "label": "Metodologia",
+        "title": "Apprendimento strutturato,",
+        "titleHighlight": "non contenuti casuali",
+        "subtitle": "Tre livelli complementari pensati per portarti dai fondamenti alle certificazioni reali.",
+        "blocks": {
+          "courses": {
+            "title": "Corsi",
+            "description": "Moduli tecnici individuali focalizzati su temi industriali reali."
+          },
+          "paths": {
+            "title": "Percorsi",
+            "description": "Formazione strutturata passo dopo passo, dal livello base a quello avanzato."
+          },
+          "certifications": {
+            "title": "Certificazioni",
+            "description": "Certificazioni ufficiali legate ai requisiti reali del settore, con prenotazione dell'esame.",
+            "cta": "Prenota l'esame"
+          }
+        },
+        "steps": {
+          "choose": {
+            "title": "Scegli il tuo percorso",
+            "description": "Seleziona il percorso adatto al tuo ruolo o obiettivo."
+          },
+          "complete": {
+            "title": "Completa i corsi",
+            "description": "Studia moduli costruiti su situazioni reali di cantiere."
+          },
+          "track": {
+            "title": "Monitora i progressi",
+            "description": "Segui la tua crescita e le tue competenze nella dashboard."
+          },
+          "apply": {
+            "title": "Applica sul campo",
+            "description": "Porta ciò che impari direttamente sui progetti reali."
+          }
+        }
+      },
+      "audience": {
+        "professionals": {
+          "title": "Per i professionisti",
+          "description": "Costruisci le conoscenze industriali che il mercato del lavoro richiede davvero, al tuo ritmo.",
+          "items": {
+            "a": "Impara al tuo ritmo",
+            "b": "Costruisci conoscenza tecnica",
+            "c": "Migliora le opportunità di lavoro",
+            "d": "Collega la formazione al lavoro reale"
+          },
+          "cta": "Crea il tuo account"
+        },
+        "companies": {
+          "title": "Per le aziende",
+          "description": "Forma la tua forza lavoro più rapidamente, standardizza le conoscenze e prepara i team ai progetti reali.",
+          "items": {
+            "a": "Forma i team più rapidamente",
+            "b": "Standardizza le conoscenze",
+            "c": "Assegna percorsi formativi",
+            "d": "Prepara il personale ai progetti"
+          },
+          "cta": "Per le aziende"
+        }
+      },
+      "catalog": {
+        "label": "Il catalogo",
+        "title": "Inizia da ciò che è disponibile oggi",
+        "subtitle": "Il catalogo è costruito con professionisti del settore. Tutto ciò che segue è attivo e disponibile ora.",
+        "count_one": "{{count}} corso",
+        "count_other": "{{count}} corsi"
+      }
+    }
   },
   "tools": {
     "eyebrow": "Centro Tecnico",

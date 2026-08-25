@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   GraduationCap,
   Clock,
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
+import { AcademyIntro } from '@/components/academy/AcademyIntro';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -53,6 +54,33 @@ export default function Academy() {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  /* PB-WEB-010: the acquisition layer deep-links into a catalog filter
+     (/academy?category=…#catalog), so the active category is URL-driven. */
+  useEffect(() => {
+    const fromUrl = searchParams.get('category');
+    if (fromUrl && CATEGORIES.includes(fromUrl)) setActiveCategory(fromUrl);
+  }, [searchParams]);
+
+  const selectCategory = useCallback(
+    (cat: string) => {
+      setActiveCategory(cat);
+      const next = new URLSearchParams(searchParams);
+      if (cat === 'All') next.delete('category');
+      else next.set('category', cat);
+      setSearchParams(next, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
+
+  /* PB-WEB-010 / decision B1: only areas backed by a real published course
+     get a catalog CTA. Derived from live data, so it self-corrects as the
+     catalog grows — no hardcoded availability to maintain. */
+  const availableCategories = useMemo(
+    () => new Set(courses.map((c) => c.category).filter(Boolean)),
+    [courses],
+  );
 
   const fetchCourses = useCallback(async () => {
     setLoading(true);
@@ -119,17 +147,29 @@ export default function Academy() {
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        eyebrow={t('academy.eyebrow', 'Certification Training')}
-        title={t('academy.title', 'PipingBox Academy')}
-        description="Certification preparation and technical courses for pipefitters, welders, and engineers."
-        actions={
-          <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500">
-            <GraduationCap className="h-3.5 w-3.5" />
-            {courses.length} Courses
-          </span>
-        }
+      {/* PB-WEB-010: acquisition layer. Guests get the full A–F narrative;
+          signed-in users get a strongly collapsed strip so the catalog leads. */}
+      <AcademyIntro
+        courseCount={courses.length}
+        availableCategories={availableCategories}
+        compact={Boolean(user)}
       />
+
+      {/* Catalog anchor — every primary CTA above points here. */}
+      <div id="catalog" className="scroll-mt-6 space-y-8">
+        {user && (
+          <PageHeader
+            eyebrow={t('academy.eyebrow', 'Certification Training')}
+            title={t('academy.title', 'PipingBox Academy')}
+            description="Certification preparation and technical courses for pipefitters, welders, and engineers."
+            actions={
+              <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500">
+                <GraduationCap className="h-3.5 w-3.5" />
+                {courses.length} Courses
+              </span>
+            }
+          />
+        )}
 
       {/* Quick link to VCA booking */}
       <Link
@@ -162,7 +202,7 @@ export default function Academy() {
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => selectCategory(cat)}
               className={`px-2.5 py-1 rounded-sm text-[10px] uppercase tracking-wider font-medium transition ${
                 activeCategory === cat
                   ? 'bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/30'
@@ -282,6 +322,7 @@ export default function Academy() {
           })}
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -431,7 +431,154 @@
     "moduleCompleted": "Module Voltooid",
     "questionsCount": "{{count}} vragen",
     "estimatedTime": "{{min}} min",
-    "level": "Niveau"
+    "level": "Niveau",
+    "intro": {
+      "compact": {
+        "title": "Blijf uw industriële kennis opbouwen",
+        "cta": "Naar de catalogus"
+      },
+      "hero": {
+        "label": "PipingBox Academy",
+        "title": "Industriële Training Gebouwd voor de",
+        "titleHighlight": "Echte Wereld",
+        "subtitle": "Gestructureerde cursussen, praktische leerpaden en technische kennis voor piping-professionals, lassers, QA/QC-inspecteurs en projectteams.",
+        "cta": "Bekijk de catalogus",
+        "ctaSecondary": "Vacatures bekijken",
+        "imageAlt": "Industriële leidinginstallatie bij schemering"
+      },
+      "areas": {
+        "label": "Kennisgebieden",
+        "title": "Gericht op",
+        "titleHighlight": "Echte Industriële Vaardigheden",
+        "subtitle": "De technische domeinen die PipingBox Academy dekt. Elk gebied sluit aan op wat er echt op de werf gebeurt.",
+        "view": "Cursussen bekijken",
+        "items": {
+          "pipefitting": {
+            "title": "Pipefitting Basiskennis",
+            "description": "Basistechnieken en veldpraktijken."
+          },
+          "isometrics": {
+            "title": "Isometrisch Lezen",
+            "description": "Lees en interpreteer isometrische tekeningen met vertrouwen."
+          },
+          "welding": {
+            "title": "Lassen en Inspectie",
+            "description": "Lasprocessen, defecten en inspectiecriteria."
+          },
+          "qaqc": {
+            "title": "QA/QC en Documentatie",
+            "description": "Kwaliteitscontroleprocedures en bouwdocumentatie."
+          },
+          "standards": {
+            "title": "Industriële Normen",
+            "description": "ASME, API, ISO — toegepast waar het telt."
+          },
+          "hydrotest": {
+            "title": "Hydrotest en Inbedrijfstelling",
+            "description": "Druktest- en inbedrijfstellingsprocedures."
+          },
+          "safety": {
+            "title": "Veiligheid en Procedures",
+            "description": "PTW, LOTO, ATEX en basisveiligheid op locatie."
+          }
+        }
+      },
+      "work": {
+        "label": "Eén platform",
+        "title": "Leer, Werk en Groei op",
+        "titleHighlight": "Eén Platform",
+        "subtitle": "Academy staat niet alleen — het is volledig verbonden met het PipingBox-ecosysteem.",
+        "imageAlt": "Industrieel team werkt aan leidingen met grote diameter",
+        "items": {
+          "tools": {
+            "title": "Gereedschap",
+            "description": "Technische calculators verbonden met uw leerproces: wanddiktes, MAWP, volumes en meer."
+          },
+          "jobs": {
+            "title": "Vacatures",
+            "description": "Echte piping-vacatures in Europa, USA, LATAM en Midden-Oosten."
+          },
+          "community": {
+            "title": "Community",
+            "description": "Deel cases, stel technische vragen en leer van echte professionals."
+          },
+          "companies": {
+            "title": "Bedrijven",
+            "description": "Train teams, wijs leerpaden toe en bouw gestandaardiseerd personeel op."
+          }
+        }
+      },
+      "method": {
+        "label": "Methode",
+        "title": "Gestructureerd Leren,",
+        "titleHighlight": "Geen Willekeurige Inhoud",
+        "subtitle": "Drie complementaire lagen ontworpen om u van de basis naar certificeringen te brengen.",
+        "blocks": {
+          "courses": {
+            "title": "Cursussen",
+            "description": "Individuele technische modules gericht op echte industriële onderwerpen."
+          },
+          "paths": {
+            "title": "Leerpaden",
+            "description": "Stapsgewijze gestructureerde training van beginner tot gevorderd."
+          },
+          "certifications": {
+            "title": "Certificeringen",
+            "description": "Officiële certificeringen gekoppeld aan echte sectoreisen, met examenreservering.",
+            "cta": "Boek uw examen"
+          }
+        },
+        "steps": {
+          "choose": {
+            "title": "Kies uw leerpad",
+            "description": "Selecteer het pad dat bij uw rol past."
+          },
+          "complete": {
+            "title": "Voltooi cursussen",
+            "description": "Bestudeer modules gebaseerd op echte situaties."
+          },
+          "track": {
+            "title": "Volg uw voortgang",
+            "description": "Monitor uw groei in het dashboard."
+          },
+          "apply": {
+            "title": "Pas kennis toe",
+            "description": "Breng wat u leert direct naar het veld."
+          }
+        }
+      },
+      "audience": {
+        "professionals": {
+          "title": "Voor Professionals",
+          "description": "Bouw de industriële kennis op die de arbeidsmarkt echt vraagt, op uw eigen tempo.",
+          "items": {
+            "a": "Leer op uw eigen tempo",
+            "b": "Bouw technische kennis op",
+            "c": "Verbeter uw kansen",
+            "d": "Verbind leren met echt werk"
+          },
+          "cta": "Maak uw account aan"
+        },
+        "companies": {
+          "title": "Voor Bedrijven",
+          "description": "Train uw teams sneller, standaardiseer kennis en bereid teams voor op projecten.",
+          "items": {
+            "a": "Teams sneller trainen",
+            "b": "Kennis standaardiseren",
+            "c": "Leerpaden toewijzen",
+            "d": "Personeel voorbereiden"
+          },
+          "cta": "Voor bedrijven"
+        }
+      },
+      "catalog": {
+        "label": "De catalogus",
+        "title": "Begin met wat vandaag beschikbaar is",
+        "subtitle": "De catalogus wordt gebouwd met professionals uit het veld. Alles hieronder is actief en nu beschikbaar.",
+        "count_one": "{{count}} cursus",
+        "count_other": "{{count}} cursussen"
+      }
+    }
   },
   "tools": {
     "eyebrow": "Tools",
@@ -640,7 +787,6 @@
       "d_ago": "{{count}} d geleden",
       "w_ago": "{{count}} w geleden"
     },
-
     "filterJobs": "Vacatures filteren",
     "activeFilterCount": "{{count}} actief filter",
     "activeFilterCount_plural": "{{count}} actieve filters",
