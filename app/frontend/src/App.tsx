@@ -298,9 +298,11 @@ const AppRoutes = () => {
       path="/tools"
       element={withPublicShell(<Tools />)}
     />
+    {/* PB-WEB-005 F2: /jobs public. DEC-54 requires marketplace routes open without auth.
+        The apply() action already handles !user gracefully (toast "Sign in to apply"). */}
     <Route
       path="/jobs"
-      element={withShellRoles(<Jobs />, ['admin', 'jobs_moderator', 'worker', 'company'])}
+      element={withPublicShell(<Jobs />)}
     />
     <Route
       path="/community"
@@ -314,9 +316,11 @@ const AppRoutes = () => {
       path="/community/:channelSlug/post/:postId"
       element={withShellRoles(<CommunityPost />, ['admin', 'community_moderator', 'worker'])}
     />
+    {/* PB-WEB-005 F2: /companies public. Companies.tsx has no auth dependency — it is a
+        marketing/metrics page. CTAs link to /companies/request-workers (already public). */}
     <Route
       path="/companies"
-      element={withShellRoles(<Companies />, ['admin', 'jobs_moderator', 'company'])}
+      element={withPublicShell(<Companies />)}
     />
     <Route
       path="/companies/request-workers"
