@@ -9,6 +9,7 @@ import { ProtectedRoute, GuestRoute } from '@/components/ProtectedRoute';
 import { AppShell } from '@/components/layout/AppShell';
 import { useReferralCapture } from '@/hooks/useReferralCapture';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useSeo } from '@/hooks/useSeo';
 import { OnboardingGate } from '@/components/OnboardingGate';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { CompanyVerificationGate } from '@/components/company/CompanyVerificationGate';
@@ -120,6 +121,8 @@ const AppRoutes = () => {
   useReferralCapture();
   // Set dynamic page titles for browser tab
   useDocumentTitle();
+  // PB-WEB-006: canonical + hreflang + lang attribute per route
+  useSeo();
 
   return (
   <Routes>

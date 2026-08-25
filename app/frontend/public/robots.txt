@@ -1,2 +1,14 @@
 User-agent: *
 Allow: /
+
+# Disallow authenticated-only routes (no value for crawlers, protects user privacy).
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /applications
+Disallow: /messages
+Disallow: /admin
+Disallow: /company/
+Disallow: /community
+
+# PB-WEB-006: sitemap generated at build time by vite-plugin-sitemap.
+Sitemap: https://pipingbox.com/sitemap.xml

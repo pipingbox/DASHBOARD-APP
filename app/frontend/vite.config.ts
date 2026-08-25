@@ -39,13 +39,16 @@ export default defineConfig(({ command }) => {
         lastmod: getSitemapLastmod(),
         readable: true,
         generateRobotsTxt: true,
-        // Explicit public routes for SEO (I18N-05 fix)
+        // PB-WEB-006: all public routes approved in PB-WEB-005 (F1 + F2).
+        // /academy and /companies/request-workers added after F1; /jobs and /companies after F2.
         routes: [
           '/',
           '/tools',
+          '/academy',
           '/jobs',
           '/pricing',
           '/companies',
+          '/companies/request-workers',
           '/blog',
         ],
       }),
