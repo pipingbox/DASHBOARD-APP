@@ -45,6 +45,31 @@ zone_name = "pipingbox.com"
 pattern = "www.pipingbox.com/*"
 zone_name = "pipingbox.com"
 
+# ---------------------------------------------------------------------------
+# PB-WEB-008 phase A: satellite retirement. Each route makes the Worker
+# intercept the satellite at the edge and 301 it onto its canonical section.
+# The legacy origin is NOT shut down — it stays reachable if the route is
+# removed, so rollback is per-satellite and instant.
+#
+# Phase B (academy, jobs) is intentionally absent: both still expose a live
+# /api/v1 backend that has never been inventoried. Blocked by PB-WEB-003.
+# ---------------------------------------------------------------------------
+[[env.production.routes]]
+pattern = "tools.pipingbox.com/*"
+zone_name = "pipingbox.com"
+
+[[env.production.routes]]
+pattern = "community.pipingbox.com/*"
+zone_name = "pipingbox.com"
+
+[[env.production.routes]]
+pattern = "companies.pipingbox.com/*"
+zone_name = "pipingbox.com"
+
+[[env.production.routes]]
+pattern = "early.pipingbox.com/*"
+zone_name = "pipingbox.com"
+
 [env.production.assets]
 directory = "./app/frontend/dist"
 binding = "ASSETS"
