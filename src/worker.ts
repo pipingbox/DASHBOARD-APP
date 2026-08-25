@@ -15,7 +15,7 @@ export interface Env {
 //   community.pipingbox.com/*  → 301 → /community
 //   companies.pipingbox.com/*  → 301 → /companies
 //   early.pipingbox.com/*      → 301 → /
-//   academy.pipingbox.com/*    → pass-through + X-Robots-Tag (NOT a redirect)
+//   (academy.pipingbox.com is NOT routed here — see PB-WEB-002 note below)
 //
 // The former Cloudflare Redirect Rule (pipingbox.com → www) has been deleted.
 // We own the full redirect chain here, 301 permanent.
@@ -44,25 +44,27 @@ const SATELLITE_TARGETS: Record<string, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// PB-WEB-002 — reversible SEO containment.
+// PB-WEB-002 — attempted SEO containment for academy, ROLLED BACK 2026-08-25.
 //
-// academy.pipingbox.com is a live, fully indexable legacy site competing with
-// the canonical domain, and it serves /blog: an empty shadcn/ui starter
-// scaffold titled "Blog | shadcnui", declared in its sitemap with priority 1.0.
-// It cannot be redirected yet (PB-WEB-008 phase B is blocked by PB-WEB-003).
+// The plan was to route academy.pipingbox.com/* through this Worker, proxy the
+// legacy origin with fetch(request) and add X-Robots-Tag: noindex.
 //
-// So we do the minimum reversible thing: proxy the origin response untouched
-// and add a noindex header. No redirect, no content change, no origin change.
+// It regressed: academy served the CANONICAL SPA instead of its own content.
 //
-// Per Cloudflare's Routes documentation, calling fetch() on the incoming
-// Request from a Worker mounted on a *Route* issues a subrequest to the
-// application server defined in the zone's DNS — it does NOT re-invoke this
-// Worker. (This differs from Custom Domains, where it would loop.)
+// Root cause: this Worker has a Static Assets binding. Cloudflare resolves a
+// matching asset — including the single-page-application fallback to
+// index.html — BEFORE the Worker script runs. So for real page paths the
+// pass-through branch never executed and academy got this app's index.html.
+// Only paths with no asset match (/_cb-<random>) reached the Worker, which is
+// exactly why the first verification probe looked green. Probing a synthetic
+// uncached path is the right way to defeat edge cache, but it is the wrong way
+// to validate asset-serving behaviour: it exercises a different code path.
 //
-// Rollback: remove 'academy.pipingbox.com' below and drop its route block from
-// wrangler.toml, then redeploy. The origin is never modified.
+// Conclusion: a Worker with an ASSETS binding cannot transparently proxy a
+// foreign origin. Adding noindex to academy requires a mechanism outside this
+// Worker — a Cloudflare Transform Rule (Modify Response Header), or a change
+// at the Atoms origin.
 // ---------------------------------------------------------------------------
-const NOINDEX_HOSTS = new Set(['academy.pipingbox.com']);
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -78,19 +80,6 @@ export default {
     const satelliteTarget = SATELLITE_TARGETS[url.hostname];
     if (satelliteTarget) {
       return Response.redirect(CANONICAL + satelliteTarget, 301);
-    }
-
-    if (NOINDEX_HOSTS.has(url.hostname)) {
-      // Fail open: if anything goes wrong reaching the origin, serve the
-      // original response rather than turning a live host into an error page.
-      const originResponse = await fetch(request);
-      try {
-        const tagged = new Response(originResponse.body, originResponse);
-        tagged.headers.set('X-Robots-Tag', 'noindex, nofollow');
-        return tagged;
-      } catch {
-        return originResponse;
-      }
     }
 
     return env.ASSETS.fetch(request);
