@@ -70,6 +70,17 @@ zone_name = "pipingbox.com"
 pattern = "early.pipingbox.com/*"
 zone_name = "pipingbox.com"
 
+# ---------------------------------------------------------------------------
+# PB-WEB-002: academy is routed here ONLY to inject X-Robots-Tag: noindex.
+# This is NOT a satellite retirement — the Worker proxies the legacy origin
+# response untouched, so academy keeps serving its own content from its own
+# origin. Removing this block restores the previous behaviour exactly.
+# Phase B (a real 301 for academy and jobs) stays blocked by PB-WEB-003.
+# ---------------------------------------------------------------------------
+[[env.production.routes]]
+pattern = "academy.pipingbox.com/*"
+zone_name = "pipingbox.com"
+
 [env.production.assets]
 directory = "./app/frontend/dist"
 binding = "ASSETS"
