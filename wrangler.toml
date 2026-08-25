@@ -35,6 +35,16 @@ compatibility_flags = ["nodejs_compat"]
 pattern = "app.pipingbox.com/*"
 zone_name = "pipingbox.com"
 
+# PB-WEB-007: apex and www now served by the same Worker.
+# The Worker redirects app/* and www/* → pipingbox.com (301).
+[[env.production.routes]]
+pattern = "pipingbox.com/*"
+zone_name = "pipingbox.com"
+
+[[env.production.routes]]
+pattern = "www.pipingbox.com/*"
+zone_name = "pipingbox.com"
+
 [env.production.assets]
 directory = "./app/frontend/dist"
 binding = "ASSETS"
