@@ -44,27 +44,38 @@ const SATELLITE_TARGETS: Record<string, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// PB-WEB-002 — attempted SEO containment for academy, ROLLED BACK 2026-08-25.
+// PB-WEB-002 — reversible SEO containment for academy.
 //
-// The plan was to route academy.pipingbox.com/* through this Worker, proxy the
-// legacy origin with fetch(request) and add X-Robots-Tag: noindex.
+// academy.pipingbox.com is a live, fully indexable legacy site competing with
+// the canonical domain, and it serves /blog: an empty shadcn/ui starter
+// scaffold titled "Blog | shadcnui", declared in its sitemap with priority 1.0.
+// It cannot be redirected yet (PB-WEB-008 phase B is blocked by PB-WEB-003).
 //
-// It regressed: academy served the CANONICAL SPA instead of its own content.
+// So we do the minimum reversible thing: proxy the Atoms origin response
+// untouched and add a noindex header. No redirect, no content change, and no
+// change at the origin.
 //
-// Root cause: this Worker has a Static Assets binding. Cloudflare resolves a
-// matching asset — including the single-page-application fallback to
-// index.html — BEFORE the Worker script runs. So for real page paths the
-// pass-through branch never executed and academy got this app's index.html.
-// Only paths with no asset match (/_cb-<random>) reached the Worker, which is
-// exactly why the first verification probe looked green. Probing a synthetic
-// uncached path is the right way to defeat edge cache, but it is the wrong way
-// to validate asset-serving behaviour: it exercises a different code path.
+// fetch(request) reaches the legacy origin rather than looping: per
+// Cloudflare's Routes behaviour a subrequest to a URL matching the Worker's
+// own *Route* goes to the application server defined in the zone's DNS.
+// Verified in production — the proxied response carries the origin's
+// cf-cache-status: DYNAMIC, not an edge-cached artefact.
 //
-// Conclusion: a Worker with an ASSETS binding cannot transparently proxy a
-// foreign origin. Adding noindex to academy requires a mechanism outside this
-// Worker — a Cloudflare Transform Rule (Modify Response Header), or a change
-// at the Atoms origin.
+// REQUIRES assets.run_worker_first = true in wrangler.toml. Without it,
+// Cloudflare resolves a matching static asset — including the SPA fallback to
+// index.html — before this script runs, and academy silently receives THIS
+// app's index.html. That regression happened on 2026-08-25 and is the whole
+// reason the flag is set. Note the diagnostic trap: probing a synthetic
+// uncached path (/_cb-<ts>) defeats edge cache but has no asset match, so it
+// exercises the Worker while real page paths never reach it. It reported green
+// while the site was broken. Always diff real page bytes against a baseline.
+//
+// Rollback: removing this branch is NOT sufficient. While the route exists the
+// default branch would serve academy this app's assets. The route itself must
+// be deleted in the Cloudflare dashboard — `wrangler deploy` cannot delete
+// routes with the current token.
 // ---------------------------------------------------------------------------
+const NOINDEX_HOSTS = new Set(['academy.pipingbox.com']);
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -80,6 +91,19 @@ export default {
     const satelliteTarget = SATELLITE_TARGETS[url.hostname];
     if (satelliteTarget) {
       return Response.redirect(CANONICAL + satelliteTarget, 301);
+    }
+
+    if (NOINDEX_HOSTS.has(url.hostname)) {
+      const originResponse = await fetch(request);
+      try {
+        const tagged = new Response(originResponse.body, originResponse);
+        tagged.headers.set('X-Robots-Tag', 'noindex, nofollow');
+        return tagged;
+      } catch {
+        // Fail open: serve the origin response unmodified rather than turn a
+        // live host into an error page.
+        return originResponse;
+      }
     }
 
     return env.ASSETS.fetch(request);

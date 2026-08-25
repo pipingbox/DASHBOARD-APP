@@ -71,25 +71,31 @@ pattern = "early.pipingbox.com/*"
 zone_name = "pipingbox.com"
 
 # ---------------------------------------------------------------------------
-# PB-WEB-002 — ROLLED BACK 2026-08-25. Do not re-add this route as-is.
+# PB-WEB-002: academy.pipingbox.com/* is routed to this Worker to inject
+# X-Robots-Tag: noindex. It is NOT a satellite retirement — the Worker proxies
+# the legacy Atoms origin response untouched, so academy keeps serving its own
+# content. Phase B (a real 301) stays blocked by PB-WEB-003.
 #
-# An academy.pipingbox.com/* route was added to inject X-Robots-Tag: noindex
-# via a pass-through fetch(). It caused a regression: academy started serving
-# the CANONICAL SPA instead of its own legacy content.
-#
-# Root cause: this Worker has a Static Assets binding. Cloudflare resolves a
-# matching asset (including the single-page-application fallback to index.html)
-# BEFORE the Worker script runs, so the pass-through branch was never reached
-# for real page paths. Only paths with no asset match — e.g. /_cb-<random> —
-# actually executed the Worker, which is why the first probe looked green.
-#
-# A Worker with an ASSETS binding therefore cannot act as a transparent proxy
-# for a foreign origin. Injecting noindex on academy needs a mechanism that
-# does not involve this Worker: a Cloudflare Transform Rule (Modify Response
-# Header), or a change at the Atoms origin itself.
+# IMPORTANT — this route cannot be removed by `wrangler deploy`. The API token
+# lacks the permission, and wrangler warns:
+#   "Existing routes for this Worker in such zones will not be deleted."
+# Rollback therefore requires deleting the route in the Cloudflare dashboard
+# (Workers & Pages → pipingbox-app-prod → Settings → Domains & Routes), not
+# just reverting this file.
 # ---------------------------------------------------------------------------
+[[env.production.routes]]
+pattern = "academy.pipingbox.com/*"
+zone_name = "pipingbox.com"
 
 [env.production.assets]
 directory = "./app/frontend/dist"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
+# PB-WEB-002: the Worker script must run BEFORE static assets are resolved.
+# Without this, Cloudflare serves a matching asset — including the SPA
+# fallback to index.html — without ever invoking the Worker, so foreign hosts
+# routed here (academy) receive THIS app's index.html instead of their own
+# origin. That exact regression happened on 2026-08-25.
+# Canonical traffic is unaffected: the Worker's default branch still calls
+# env.ASSETS.fetch(request).
+run_worker_first = true
