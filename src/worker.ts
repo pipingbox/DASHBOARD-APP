@@ -15,16 +15,20 @@ export interface Env {
 //   community.pipingbox.com/*  → 301 → /community
 //   companies.pipingbox.com/*  → 301 → /companies
 //   early.pipingbox.com/*      → 301 → /
-//   (academy.pipingbox.com is NOT routed here — see PB-WEB-002 note below)
+//   jobs.pipingbox.com/*       → 301 → /jobs        (phase B)
+//   academy.pipingbox.com/*    → pass-through + noindex, NOT a redirect
 //
 // The former Cloudflare Redirect Rule (pipingbox.com → www) has been deleted.
 // We own the full redirect chain here, 301 permanent.
 //
-// NOT retired yet (phase B, blocked by PB-WEB-003):
-//   academy.pipingbox.com and jobs.pipingbox.com still expose a live /api/v1
-//   backend. Their storage buckets and auth users have not been inventoried,
-//   so neither host may be redirected yet. academy is routed here ONLY to
-//   inject a noindex header; its content and origin are untouched.
+// Phase B status (PB-WEB-003 closed its data gate 2026-08-25 — Atoms inventory
+// returned 0 storage buckets, 0 objects and no end users on either project):
+//   jobs    → retired. It held no data and no content of its own; it was
+//             already a bridge page pointing at the canonical app.
+//   academy → NOT retired. It still holds the only content worth migrating
+//             (copy in 6 languages + 5 CDN images, see PB-WEB-010). It stays
+//             served from its own origin with a noindex header until that
+//             migration lands.
 // ---------------------------------------------------------------------------
 
 const CANONICAL = 'https://pipingbox.com';
@@ -41,6 +45,7 @@ const SATELLITE_TARGETS: Record<string, string> = {
   'community.pipingbox.com': '/community',
   'companies.pipingbox.com': '/companies',
   'early.pipingbox.com': '/',
+  'jobs.pipingbox.com': '/jobs',
 };
 
 // ---------------------------------------------------------------------------

@@ -70,6 +70,13 @@ zone_name = "pipingbox.com"
 pattern = "early.pipingbox.com/*"
 zone_name = "pipingbox.com"
 
+# PB-WEB-008 phase B: jobs retired. PB-WEB-003 confirmed it holds no data
+# (0 storage buckets, 0 objects, no end users) and no content of its own —
+# it was already a bridge page pointing at the canonical app.
+[[env.production.routes]]
+pattern = "jobs.pipingbox.com/*"
+zone_name = "pipingbox.com"
+
 # ---------------------------------------------------------------------------
 # PB-WEB-002: academy.pipingbox.com/* is routed to this Worker to inject
 # X-Robots-Tag: noindex. It is NOT a satellite retirement — the Worker proxies
