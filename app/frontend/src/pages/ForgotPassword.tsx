@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { PipingBoxLogo } from '@/components/PipingBoxLogo';
 
 export default function ForgotPassword() {
   const { t } = useTranslation();
@@ -50,13 +51,7 @@ export default function ForgotPassword() {
 
         <div className="relative flex flex-col items-start space-y-8">
           <div className="w-full flex justify-start">
-            <img
-              src="/assets/logos/logo-horizontal.png"
-              alt="PipingBox"
-              width={200}
-              height={200}
-              className="w-[200px] h-[200px] object-contain drop-shadow-[0_0_30px_rgba(245,158,11,0.15)]"
-            />
+            <PipingBoxLogo variant="auth" />
           </div>
           <div className="h-px w-20 bg-gradient-to-r from-[#f59e0b] to-transparent" />
           <h1 className="text-4xl font-bold leading-tight tracking-tight">
@@ -75,13 +70,7 @@ export default function ForgotPassword() {
       <div className="flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-md space-y-6">
           <div className="lg:hidden mb-4">
-            <img
-              src="https://mgx-backend-cdn.metadl.com/generate/images/747553/2026-05-19/o3sycyqaagpa/logo-horizontal_variant_1.png"
-              alt="PipingBox"
-              width={200}
-              height={200}
-              className="w-[200px] h-[200px] object-contain"
-            />
+            <PipingBoxLogo variant="auth" />
           </div>
 
           {sent ? (

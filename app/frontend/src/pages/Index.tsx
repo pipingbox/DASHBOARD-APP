@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
+import { PipingBoxLogo } from '@/components/PipingBoxLogo';
 import {
   UserCheck,
   Calculator,
@@ -202,9 +203,7 @@ export default function Index() {
       <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-[#0a0a0a]/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link to="/" className="flex items-center gap-1">
-            <span className="text-lg font-bold tracking-tight">
-              Piping<span className="text-[#f59e0b]">Box</span>
-            </span>
+            <PipingBoxLogo variant="header" />
           </Link>
           <div className="flex items-center gap-3">
             <Link
