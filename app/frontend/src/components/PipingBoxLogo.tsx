@@ -29,14 +29,16 @@ export function PipingBoxLogo({ size = 48, className = '', variant = 'icon' }: P
   }
 
   // header variant: compacto y proporcional para navbar público
+  // Mobile fix: canvas has ~16% transparent padding; at h=28 artwork is only ~35px wide.
+  // On mobile (≤768px) we render h=48px so the visible artwork reaches ~100px wide.
   if (variant === 'header') {
     return (
       <img
         src="/assets/logos/logo-horizontal.png"
         alt="PipingBox"
         height={28}
-        style={{ height: 28, width: 'auto' }}
-        className={`object-contain ${className}`}
+        style={{ width: 'auto' }}
+        className={`object-contain h-12 sm:h-7 ${className}`}
       />
     );
   }
