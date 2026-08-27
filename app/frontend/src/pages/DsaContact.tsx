@@ -41,7 +41,7 @@ export default function DsaContact() {
         <div className="mb-10 flex flex-col items-center gap-4">
           <PipingBoxLogo />
           <h1 className="text-3xl font-bold text-white">DSA Contact Points</h1>
-          <p className="text-sm text-zinc-500">Last updated: May 20, 2026</p>
+          <p className="text-sm text-zinc-500">Last updated: August 27, 2026</p>
         </div>
 
         {/* Back link */}
