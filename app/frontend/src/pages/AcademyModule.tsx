@@ -395,12 +395,27 @@ export default function AcademyModule() {
                     })}
                   </RadioGroup>
 
-                  {/* Show correct answer explanation after submit */}
+                  {/* Show correct answer + explanation + officialRef after submit */}
                   {submitted && answers[question.id] !== question.correctAnswer && (
                     <div className="mt-3 p-3 rounded-md bg-emerald-500/5 border border-emerald-500/20">
                       <p className="text-xs text-emerald-400 font-medium">
                         {t('academy.correctAnswer', 'Correct answer')}: {question.correctAnswer}
                       </p>
+                    </div>
+                  )}
+                  {submitted && question.explanation && (
+                    <div className="mt-2 p-3 rounded-md bg-zinc-800/50 border border-zinc-700/50">
+                      <p className="text-xs text-zinc-400 font-medium mb-1">
+                        {t('academy.examExplanation', 'Explanation')}
+                      </p>
+                      <p className="text-xs text-zinc-300">{question.explanation}</p>
+                    </div>
+                  )}
+                  {submitted && question.officialRef && (
+                    <div className="mt-2">
+                      <Badge variant="outline" className="text-[10px] border-zinc-700 text-zinc-500">
+                        {t('academy.examStudyReference', 'Study reference')}: {question.officialRef}
+                      </Badge>
                     </div>
                   )}
                 </div>

@@ -15,12 +15,22 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { VCA_QUESTIONS } from '@/lib/academy-questions';
-import { VCAQuestion } from '@/lib/academy-types';
+import {
+  VCAQuestion,
+  QuestionAnswer,
+  SingleChoiceQuestion,
+  MultipleChoiceQuestion,
+  TrueFalseMatrixQuestion,
+  OrderingQuestion,
+  MatchingQuestion,
+} from '@/lib/academy-types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import {
   ArrowLeft,
   ArrowRight,
+  ArrowUp,
+  ArrowDown,
   CheckCircle2,
   XCircle,
   Clock,
@@ -28,6 +38,7 @@ import {
   RotateCcw,
   ChevronRight,
   AlertTriangle,
+  BookOpen,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -49,10 +60,545 @@ function formatTime(sec: number): string {
 
 type ExamType = 'bvca' | 'volvca';
 
-const EXAM_CONFIG: Record<ExamType, { questions: number; duration: number; passScore: number }> = {
-  bvca: { questions: 40, duration: 60 * 60, passScore: 28 },
-  volvca: { questions: 70, duration: 105 * 60, passScore: 49 },
+// Corrected VCA exam config: B-VCA 40q/60min/65%, VOL-VCA 60q/60min/65%
+const EXAM_CONFIG: Record<ExamType, { questions: number; duration: number; passScore: number; maxPoints: number }> = {
+  bvca:   { questions: 40, duration: 60 * 60, passScore: 26, maxPoints: 4000 },
+  volvca: { questions: 60, duration: 60 * 60, passScore: 39, maxPoints: 6000 },
 };
+
+// ─── SCORING ─────────────────────────────────────────────────────────────────
+
+function scoreQuestion(question: VCAQuestion, answer: QuestionAnswer | undefined): number {
+  if (answer === undefined || answer === null) return 0;
+
+  switch (question.questionType) {
+    case 'single_choice': {
+      return (answer as string) === question.correctAnswer ? 100 : 0;
+    }
+    case 'multiple_choice': {
+      const selected = (answer as string[]) || [];
+      const correctIds = question.options.filter(o => o.isCorrect).map(o => o.id);
+      const totalCorrect = correctIds.length;
+      if (totalCorrect === 0) return 0;
+      const pointsPerItem = 100 / totalCorrect;
+      let score = 0;
+      for (const opt of question.options) {
+        const userSelected = selected.includes(opt.id);
+        if (opt.isCorrect && userSelected) score += pointsPerItem;
+        else if (!opt.isCorrect && userSelected) score -= pointsPerItem;
+      }
+      return Math.max(0, Math.round(score));
+    }
+    case 'true_false_matrix': {
+      const userAnswers = (answer as Record<string, boolean>) || {};
+      const totalStatements = question.statements.length;
+      if (totalStatements === 0) return 0;
+      const pointsPerStatement = 100 / totalStatements;
+      let score = 0;
+      for (const stmt of question.statements) {
+        if (userAnswers[stmt.id] === stmt.isTrue) score += pointsPerStatement;
+        // Wrong answers do NOT deduct for matrix type
+      }
+      return Math.round(score);
+    }
+    case 'ordering': {
+      const userOrder = (answer as string[]) || [];
+      const correct = [...question.items]
+        .sort((a, b) => a.correctPosition - b.correctPosition)
+        .map(i => i.id);
+      return JSON.stringify(userOrder) === JSON.stringify(correct) ? 100 : 0;
+    }
+    case 'matching': {
+      const userMatches = (answer as Record<string, string>) || {};
+      const allCorrect = question.rightItems.every(r => userMatches[r.matchesLeftId] === r.id);
+      return allCorrect ? 100 : 0;
+    }
+  }
+}
+
+// ─── QUESTION INPUT RENDERERS ─────────────────────────────────────────────────
+
+function SingleChoiceInput({
+  question,
+  answer,
+  setAnswer,
+}: {
+  question: SingleChoiceQuestion;
+  answer: QuestionAnswer | undefined;
+  setAnswer: (a: QuestionAnswer) => void;
+}) {
+  const current = (answer as string) || '';
+  return (
+    <RadioGroup
+      value={current}
+      onValueChange={(val) => setAnswer(val)}
+      className="space-y-3"
+    >
+      {(['A', 'B', 'C'] as const).map(letter => {
+        const optText = question[`option${letter}` as 'optionA' | 'optionB' | 'optionC'];
+        const isSelected = current === letter;
+        return (
+          <div
+            key={letter}
+            onClick={() => setAnswer(letter)}
+            className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${
+              isSelected
+                ? 'border-[#f59e0b] bg-[#f59e0b]/5'
+                : 'border-zinc-800 hover:border-zinc-700'
+            }`}
+          >
+            <div className={`h-8 w-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 ${
+              isSelected
+                ? 'border-[#f59e0b] text-[#f59e0b] bg-[#f59e0b]/10'
+                : 'border-zinc-700 text-zinc-500'
+            }`}>
+              {letter}
+            </div>
+            <RadioGroupItem value={letter} id={`exam-${question.id}-${letter}`} className="sr-only" />
+            <Label htmlFor={`exam-${question.id}-${letter}`} className="text-sm text-zinc-300 cursor-pointer flex-1">
+              {optText}
+            </Label>
+          </div>
+        );
+      })}
+    </RadioGroup>
+  );
+}
+
+function MultipleChoiceInput({
+  question,
+  answer,
+  setAnswer,
+}: {
+  question: MultipleChoiceQuestion;
+  answer: QuestionAnswer | undefined;
+  setAnswer: (a: QuestionAnswer) => void;
+}) {
+  const { t } = useTranslation();
+  const selected = (answer as string[]) || [];
+
+  const toggle = (id: string) => {
+    const next = selected.includes(id)
+      ? selected.filter(x => x !== id)
+      : [...selected, id];
+    setAnswer(next);
+  };
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-[#f59e0b] font-medium mb-2">
+        {t('academy.questionTypeMultipleChoice', 'Select all correct answers')}
+      </p>
+      {question.options.map(opt => {
+        const isSelected = selected.includes(opt.id);
+        return (
+          <div
+            key={opt.id}
+            onClick={() => toggle(opt.id)}
+            className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${
+              isSelected
+                ? 'border-[#f59e0b] bg-[#f59e0b]/5'
+                : 'border-zinc-800 hover:border-zinc-700'
+            }`}
+          >
+            <div className={`h-5 w-5 rounded border-2 flex items-center justify-center shrink-0 ${
+              isSelected
+                ? 'border-[#f59e0b] bg-[#f59e0b]/20'
+                : 'border-zinc-700'
+            }`}>
+              {isSelected && <div className="h-2.5 w-2.5 rounded-sm bg-[#f59e0b]" />}
+            </div>
+            <span className="text-sm text-zinc-300 flex-1">{opt.text}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TrueFalseMatrixInput({
+  question,
+  answer,
+  setAnswer,
+}: {
+  question: TrueFalseMatrixQuestion;
+  answer: QuestionAnswer | undefined;
+  setAnswer: (a: QuestionAnswer) => void;
+}) {
+  const { t } = useTranslation();
+  const userAnswers = (answer as Record<string, boolean>) || {};
+
+  const setStatement = (id: string, val: boolean) => {
+    setAnswer({ ...userAnswers, [id]: val });
+  };
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-[#f59e0b] font-medium mb-2">
+        {t('academy.questionTypeTrueFalse', 'Indicate true or false for each statement')}
+      </p>
+      {question.statements.map(stmt => {
+        const val = userAnswers[stmt.id];
+        return (
+          <div key={stmt.id} className="border border-zinc-800 rounded-md p-4">
+            <p className="text-sm text-zinc-300 mb-3">{stmt.text}</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setStatement(stmt.id, true)}
+                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium border transition-all ${
+                  val === true
+                    ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
+                    : 'border-zinc-700 text-zinc-400 hover:border-zinc-600'
+                }`}
+              >
+                {t('academy.trueFalseTrue', 'True')}
+              </button>
+              <button
+                onClick={() => setStatement(stmt.id, false)}
+                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium border transition-all ${
+                  val === false
+                    ? 'border-rose-500 bg-rose-500/10 text-rose-400'
+                    : 'border-zinc-700 text-zinc-400 hover:border-zinc-600'
+                }`}
+              >
+                {t('academy.trueFalseFalse', 'False')}
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function OrderingInput({
+  question,
+  answer,
+  setAnswer,
+}: {
+  question: OrderingQuestion;
+  answer: QuestionAnswer | undefined;
+  setAnswer: (a: QuestionAnswer) => void;
+}) {
+  const { t } = useTranslation();
+  // Initialize with shuffled order if no answer yet
+  const defaultOrder = shuffle(question.items.map(i => i.id));
+  const orderedIds = (answer as string[]) || defaultOrder;
+
+  // Ensure all items are present (in case answer was set before items were known)
+  const allIds = question.items.map(i => i.id);
+  const safeOrder = orderedIds.length === allIds.length ? orderedIds : defaultOrder;
+
+  const moveUp = (idx: number) => {
+    if (idx === 0) return;
+    const next = [...safeOrder];
+    [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+    setAnswer(next);
+  };
+
+  const moveDown = (idx: number) => {
+    if (idx === safeOrder.length - 1) return;
+    const next = [...safeOrder];
+    [next[idx], next[idx + 1]] = [next[idx + 1], next[idx]];
+    setAnswer(next);
+  };
+
+  const itemMap = Object.fromEntries(question.items.map(i => [i.id, i.text]));
+
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-[#f59e0b] font-medium mb-2">
+        {t('academy.questionTypeOrdering', 'Arrange in the correct order')}
+      </p>
+      {safeOrder.map((id, idx) => (
+        <div
+          key={id}
+          className="flex items-center gap-3 p-3 rounded-md border border-zinc-800 bg-zinc-900/50"
+        >
+          <span className="text-xs text-zinc-500 w-5 text-center font-mono">{idx + 1}</span>
+          <span className="text-sm text-zinc-300 flex-1">{itemMap[id]}</span>
+          <div className="flex flex-col gap-1">
+            <button
+              onClick={() => moveUp(idx)}
+              disabled={idx === 0}
+              className="p-1 rounded text-zinc-500 hover:text-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed"
+              title={t('academy.orderingMoveUp', 'Move up')}
+            >
+              <ArrowUp className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => moveDown(idx)}
+              disabled={idx === safeOrder.length - 1}
+              className="p-1 rounded text-zinc-500 hover:text-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed"
+              title={t('academy.orderingMoveDown', 'Move down')}
+            >
+              <ArrowDown className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MatchingInput({
+  question,
+  answer,
+  setAnswer,
+}: {
+  question: MatchingQuestion;
+  answer: QuestionAnswer | undefined;
+  setAnswer: (a: QuestionAnswer) => void;
+}) {
+  const { t } = useTranslation();
+  const userMatches = (answer as Record<string, string>) || {};
+
+  const setMatch = (leftId: string, rightId: string) => {
+    setAnswer({ ...userMatches, [leftId]: rightId });
+  };
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-[#f59e0b] font-medium mb-2">
+        {t('academy.questionTypeMatching', 'Match each item on the left to the correct option on the right')}
+      </p>
+      {question.leftItems.map(left => {
+        const selected = userMatches[left.id] || '';
+        return (
+          <div key={left.id} className="border border-zinc-800 rounded-md p-4">
+            <p className="text-sm text-zinc-200 font-medium mb-2">{left.text}</p>
+            <select
+              value={selected}
+              onChange={e => setMatch(left.id, e.target.value)}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-sm text-zinc-300 focus:outline-none focus:border-[#f59e0b]"
+            >
+              <option value="">{t('academy.matchingSelectMatch', 'Select match...')}</option>
+              {question.rightItems.map(right => (
+                <option key={right.id} value={right.id}>
+                  {right.text}
+                </option>
+              ))}
+            </select>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function renderQuestionInput(
+  question: VCAQuestion,
+  answer: QuestionAnswer | undefined,
+  setAnswer: (a: QuestionAnswer) => void,
+) {
+  switch (question.questionType) {
+    case 'single_choice':
+      return <SingleChoiceInput question={question} answer={answer} setAnswer={setAnswer} />;
+    case 'multiple_choice':
+      return <MultipleChoiceInput question={question} answer={answer} setAnswer={setAnswer} />;
+    case 'true_false_matrix':
+      return <TrueFalseMatrixInput question={question} answer={answer} setAnswer={setAnswer} />;
+    case 'ordering':
+      return <OrderingInput question={question} answer={answer} setAnswer={setAnswer} />;
+    case 'matching':
+      return <MatchingInput question={question} answer={answer} setAnswer={setAnswer} />;
+  }
+}
+
+// ─── REVIEW RENDERERS ─────────────────────────────────────────────────────────
+
+function ReviewSingleChoice({
+  question,
+  answer,
+}: {
+  question: SingleChoiceQuestion;
+  answer: QuestionAnswer | undefined;
+}) {
+  const userAnswer = answer as string | undefined;
+  return (
+    <div className="ml-7 space-y-1 text-xs">
+      {(['A', 'B', 'C'] as const).map(letter => {
+        const optText = question[`option${letter}` as 'optionA' | 'optionB' | 'optionC'];
+        const isUserChoice = userAnswer === letter;
+        const isCorrectChoice = question.correctAnswer === letter;
+        let style = 'text-zinc-500';
+        if (isCorrectChoice) style = 'text-emerald-400 font-medium';
+        else if (isUserChoice && !isCorrectChoice) style = 'text-rose-400 line-through';
+        return (
+          <p key={letter} className={style}>
+            {letter}. {optText}
+            {isCorrectChoice && ' ✓'}
+            {isUserChoice && !isCorrectChoice && ' ✗'}
+          </p>
+        );
+      })}
+      {!userAnswer && (
+        <p className="text-zinc-600 italic">Not answered</p>
+      )}
+    </div>
+  );
+}
+
+function ReviewMultipleChoice({
+  question,
+  answer,
+}: {
+  question: MultipleChoiceQuestion;
+  answer: QuestionAnswer | undefined;
+}) {
+  const selected = (answer as string[]) || [];
+  return (
+    <div className="ml-7 space-y-1 text-xs">
+      {question.options.map(opt => {
+        const isSelected = selected.includes(opt.id);
+        const isCorrect = opt.isCorrect;
+        let style = 'text-zinc-500';
+        let suffix = '';
+        if (isCorrect && isSelected) { style = 'text-emerald-400 font-medium'; suffix = ' ✓'; }
+        else if (isCorrect && !isSelected) { style = 'text-amber-400'; suffix = ' (missed ✓)'; }
+        else if (!isCorrect && isSelected) { style = 'text-rose-400 line-through'; suffix = ' ✗'; }
+        return (
+          <p key={opt.id} className={style}>
+            {opt.text}{suffix}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+function ReviewTrueFalseMatrix({
+  question,
+  answer,
+}: {
+  question: TrueFalseMatrixQuestion;
+  answer: QuestionAnswer | undefined;
+}) {
+  const { t } = useTranslation();
+  const userAnswers = (answer as Record<string, boolean>) || {};
+  return (
+    <div className="ml-7 space-y-2 text-xs">
+      {question.statements.map(stmt => {
+        const userVal = userAnswers[stmt.id];
+        const isCorrect = userVal === stmt.isTrue;
+        const correctLabel = stmt.isTrue
+          ? t('academy.trueFalseTrue', 'True')
+          : t('academy.trueFalseFalse', 'False');
+        const userLabel = userVal === undefined
+          ? '—'
+          : userVal
+            ? t('academy.trueFalseTrue', 'True')
+            : t('academy.trueFalseFalse', 'False');
+        return (
+          <div key={stmt.id} className={`p-2 rounded ${isCorrect ? 'bg-emerald-500/5' : 'bg-rose-500/5'}`}>
+            <p className="text-zinc-300 mb-1">{stmt.text}</p>
+            <p className={isCorrect ? 'text-emerald-400' : 'text-rose-400'}>
+              {t('academy.examYourStatement', 'Your answer: {{answer}}').replace('{{answer}}', userLabel)}
+              {' · '}
+              {t('academy.examCorrectStatement', 'Correct: {{answer}}').replace('{{answer}}', correctLabel)}
+              {isCorrect ? ' ✓' : ' ✗'}
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ReviewOrdering({
+  question,
+  answer,
+}: {
+  question: OrderingQuestion;
+  answer: QuestionAnswer | undefined;
+}) {
+  const { t } = useTranslation();
+  const userOrder = (answer as string[]) || [];
+  const correctOrder = [...question.items]
+    .sort((a, b) => a.correctPosition - b.correctPosition)
+    .map(i => i.id);
+  const itemMap = Object.fromEntries(question.items.map(i => [i.id, i.text]));
+  const isAllCorrect = JSON.stringify(userOrder) === JSON.stringify(correctOrder);
+
+  return (
+    <div className="ml-7 text-xs space-y-3">
+      <div>
+        <p className="text-zinc-500 mb-1">{t('academy.examYourOrder', 'Your order')}:</p>
+        {userOrder.map((id, idx) => {
+          const isCorrectPos = correctOrder[idx] === id;
+          return (
+            <p key={id} className={isCorrectPos ? 'text-emerald-400' : 'text-rose-400'}>
+              {idx + 1}. {itemMap[id] || id} {isCorrectPos ? '✓' : '✗'}
+            </p>
+          );
+        })}
+      </div>
+      {!isAllCorrect && (
+        <div>
+          <p className="text-zinc-500 mb-1">{t('academy.examCorrectOrder', 'Correct order')}:</p>
+          {correctOrder.map((id, idx) => (
+            <p key={id} className="text-emerald-400">
+              {idx + 1}. {itemMap[id] || id}
+            </p>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReviewMatching({
+  question,
+  answer,
+}: {
+  question: MatchingQuestion;
+  answer: QuestionAnswer | undefined;
+}) {
+  const { t } = useTranslation();
+  const userMatches = (answer as Record<string, string>) || {};
+  const rightMap = Object.fromEntries(question.rightItems.map(r => [r.id, r.text]));
+
+  return (
+    <div className="ml-7 space-y-2 text-xs">
+      {question.leftItems.map(left => {
+        const correctRight = question.rightItems.find(r => r.matchesLeftId === left.id);
+        const userRightId = userMatches[left.id];
+        const isCorrect = userRightId === correctRight?.id;
+        return (
+          <div key={left.id} className={`p-2 rounded ${isCorrect ? 'bg-emerald-500/5' : 'bg-rose-500/5'}`}>
+            <p className="text-zinc-300 font-medium mb-1">{left.text}</p>
+            <p className={isCorrect ? 'text-emerald-400' : 'text-rose-400'}>
+              {t('academy.examYourStatement', 'Your answer: {{answer}}').replace('{{answer}}', userRightId ? rightMap[userRightId] || '—' : '—')}
+              {isCorrect ? ' ✓' : ''}
+            </p>
+            {!isCorrect && correctRight && (
+              <p className="text-emerald-400">
+                {t('academy.examCorrectStatement', 'Correct: {{answer}}').replace('{{answer}}', correctRight.text)}
+              </p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function renderReview(question: VCAQuestion, answer: QuestionAnswer | undefined) {
+  switch (question.questionType) {
+    case 'single_choice':
+      return <ReviewSingleChoice question={question} answer={answer} />;
+    case 'multiple_choice':
+      return <ReviewMultipleChoice question={question} answer={answer} />;
+    case 'true_false_matrix':
+      return <ReviewTrueFalseMatrix question={question} answer={answer} />;
+    case 'ordering':
+      return <ReviewOrdering question={question} answer={answer} />;
+    case 'matching':
+      return <ReviewMatching question={question} answer={answer} />;
+  }
+}
+
+// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
 export default function AcademyExam() {
   const { examType } = useParams<{ examType: string }>();
@@ -66,15 +612,83 @@ export default function AcademyExam() {
   const [phase, setPhase] = useState<'intro' | 'exam' | 'results'>('intro');
   const [questions, setQuestions] = useState<VCAQuestion[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, 'A' | 'B' | 'C'>>({});
+  const [answers, setAnswers] = useState<Record<string, QuestionAnswer>>({});
   const [timeLeft, setTimeLeft] = useState(config.duration);
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
   const [rulesAccepted, setRulesAccepted] = useState(false);
   const [showReview, setShowReview] = useState(false);
-  const [result, setResult] = useState<{ correct: number; total: number; percentage: number; passed: boolean; duration: number } | null>(null);
+  const [result, setResult] = useState<{
+    correct: number;
+    total: number;
+    totalPoints: number;
+    maxPoints: number;
+    percentage: number;
+    passed: boolean;
+    duration: number;
+  } | null>(null);
+
   const startTimeRef = useRef<number>(0);
   const warningShownRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ── Stale closure fix: keep a ref that always points to current answers ──
+  const answersRef = useRef<Record<string, QuestionAnswer>>(answers);
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  // Keep a ref to the latest questions too (set once on exam start, but safe)
+  const questionsRef = useRef<VCAQuestion[]>(questions);
+  useEffect(() => {
+    questionsRef.current = questions;
+  }, [questions]);
+
+  // ── handleSubmit reads from refs so it's safe to call from timer ──
+  const handleSubmitRef = useRef<() => void>(() => {});
+
+  const handleSubmit = useCallback(async () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    const currentQuestions = questionsRef.current;
+    const currentAnswers = answersRef.current;
+
+    let totalPoints = 0;
+    let correctCount = 0;
+    for (const q of currentQuestions) {
+      const pts = scoreQuestion(q, currentAnswers[q.id]);
+      totalPoints += pts;
+      if (pts === 100) correctCount++;
+    }
+
+    const maxPoints = currentQuestions.length * 100;
+    const percentage = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
+    // Pass at 65% of total points
+    const passed = percentage >= 65;
+    const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+
+    setResult({ correct: correctCount, total: currentQuestions.length, totalPoints, maxPoints, percentage, passed, duration });
+
+    try {
+      if (user?.id) {
+        await supabase.from('app_14da0f1941_academy_mock_exams').insert({
+          user_id: user.id,
+          exam_type: type,
+          total_questions: currentQuestions.length,
+          correct_answers: correctCount,
+          passed,
+          duration_seconds: duration,
+          completed_at: new Date().toISOString(),
+        });
+      }
+    } catch (e) {
+      console.warn('Could not save exam result:', e);
+    }
+
+    setPhase('results');
+  }, [type, user]);
+
+  // Update the ref every render so the timer always calls the latest version
+  handleSubmitRef.current = handleSubmit;
 
   // Select questions on exam start
   const startExam = useCallback(() => {
@@ -104,14 +718,15 @@ export default function AcademyExam() {
     setPhase('exam');
   }, [type, config]);
 
-  // Timer
+  // Timer — uses handleSubmitRef.current to avoid stale closure
   useEffect(() => {
     if (phase !== 'exam') return;
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
           if (timerRef.current) clearInterval(timerRef.current);
-          handleSubmit();
+          // Call via ref so we always get the latest handleSubmit with current answers
+          handleSubmitRef.current();
           return 0;
         }
         if (prev === 301 && !warningShownRef.current) {
@@ -124,38 +739,7 @@ export default function AcademyExam() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [phase]);
-
-  const handleSubmit = useCallback(async () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-
-    const correct = questions.filter(q => answers[q.id] === q.correctAnswer).length;
-    const total = questions.length;
-    const percentage = Math.round((correct / total) * 100);
-    const passed = correct >= config.passScore;
-    const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
-
-    setResult({ correct, total, percentage, passed, duration });
-
-    // Save to Supabase
-    try {
-      if (user?.id) {
-        await supabase.from('app_14da0f1941_academy_mock_exams').insert({
-          user_id: user.id,
-          exam_type: type,
-          total_questions: total,
-          correct_answers: correct,
-          passed,
-          duration_seconds: duration,
-          completed_at: new Date().toISOString(),
-        });
-      }
-    } catch (e) {
-      console.warn('Could not save exam result:', e);
-    }
-
-    setPhase('results');
-  }, [questions, answers, config.passScore, type, user]);
+  }, [phase, t]);
 
   const handleNewExam = () => {
     setPhase('intro');
@@ -167,6 +751,11 @@ export default function AcademyExam() {
   const currentQuestion = questions[currentIdx];
   const answeredCount = Object.keys(answers).length;
   const unansweredCount = questions.length - answeredCount;
+
+  const setCurrentAnswer = useCallback((a: QuestionAnswer) => {
+    if (!currentQuestion) return;
+    setAnswers(prev => ({ ...prev, [currentQuestion.id]: a }));
+  }, [currentQuestion]);
 
   // ─── INTRO PHASE ───
   if (phase === 'intro') {
@@ -210,7 +799,7 @@ export default function AcademyExam() {
           </div>
 
           {/* Info Card */}
-          <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-lg p-6 mb-6">
+          <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-lg p-6 mb-4">
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
                 <p className="text-xs text-zinc-500 mb-1">{t('academy.examIntroQuestions', 'Questions')}</p>
@@ -221,8 +810,12 @@ export default function AcademyExam() {
                 <p className="text-lg font-semibold text-zinc-100">{config.duration / 60} min</p>
               </div>
               <div>
-                <p className="text-xs text-zinc-500 mb-1">{t('academy.examIntroPassScore', 'Pass Score')}</p>
-                <p className="text-lg font-semibold text-zinc-100">{config.passScore}/{config.questions} (70%)</p>
+                <p className="text-xs text-zinc-500 mb-1">{t('academy.examPassScore', 'Pass Score')}</p>
+                <p className="text-lg font-semibold text-zinc-100">
+                  {t('academy.examPassScoreValue', '65% ({{threshold}}/{{max}} pts)')
+                    .replace('{{threshold}}', String(Math.round(config.maxPoints * 0.65)))
+                    .replace('{{max}}', String(config.maxPoints))}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-zinc-500 mb-1">{t('academy.examIntroFormat', 'Format')}</p>
@@ -248,10 +841,20 @@ export default function AcademyExam() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#f59e0b] mt-0.5">•</span>
-                  {t('academy.examIntroRule4', 'You need 70% to pass')}
+                  {t('academy.examIntroRule4', 'You need 65% to pass')}
                 </li>
               </ul>
             </div>
+          </div>
+
+          {/* Language note */}
+          <div className="border border-zinc-800/50 bg-zinc-900/30 rounded-lg p-4 mb-6 text-xs text-zinc-500 space-y-1">
+            <p>{t('academy.examLanguageNote', 'This simulator uses English questions.')}</p>
+            <p>
+              {type === 'bvca'
+                ? t('academy.examLanguageBVCA', 'The official B-VCA exam is available in up to 20 languages at exam centers.')
+                : t('academy.examLanguageVOLVCA', 'The official VOL-VCA exam is available in Dutch, English, German and French.')}
+            </p>
           </div>
 
           {/* Checkbox + Start */}
@@ -303,10 +906,15 @@ export default function AcademyExam() {
                 : t('academy.examResultFailed', 'FAILED')}
             </h2>
             <p className="text-lg text-zinc-200 mb-1">
-              {t('academy.examResultScore', '{{correct}}/{{total}} correct ({{percentage}}%)')
-                .replace('{{correct}}', String(result.correct))
-                .replace('{{total}}', String(result.total))
+              {t('academy.examTotalPoints', '{{points}}/{{max}} points ({{percentage}}%)')
+                .replace('{{points}}', String(result.totalPoints))
+                .replace('{{max}}', String(result.maxPoints))
                 .replace('{{percentage}}', String(result.percentage))}
+            </p>
+            <p className="text-sm text-zinc-400 mb-1">
+              {t('academy.examCorrectCount', '{{correct}} of {{total}} questions correct')
+                .replace('{{correct}}', String(result.correct))
+                .replace('{{total}}', String(result.total))}
             </p>
             <p className="text-sm text-zinc-400 mb-1">
               {t('academy.examResultTime', 'Time used: {{time}}').replace('{{time}}', formatTime(result.duration))}
@@ -327,9 +935,9 @@ export default function AcademyExam() {
               <p className="text-xs text-zinc-500">/ {formatTime(config.duration)}</p>
             </div>
             <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-lg p-4 text-center">
-              <p className="text-xs text-zinc-500 mb-1">{t('academy.examIntroPassScore', 'Pass Score')}</p>
+              <p className="text-xs text-zinc-500 mb-1">{t('academy.examPassScore', 'Pass Score')}</p>
               <p className="text-lg font-semibold text-zinc-100">{result.percentage}%</p>
-              <p className="text-xs text-zinc-500">/ 70%</p>
+              <p className="text-xs text-zinc-500">/ 65%</p>
             </div>
             <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-lg p-4 text-center">
               <p className="text-xs text-zinc-500 mb-1">{t('academy.examIntroQuestions', 'Questions')}</p>
@@ -337,6 +945,30 @@ export default function AcademyExam() {
               <p className="text-xs text-zinc-500">/ {result.total}</p>
             </div>
           </div>
+
+          {/* Book Official Exam CTA — shown only on PASSED */}
+          {result.passed && (
+            <div className="border border-emerald-500/30 bg-emerald-500/5 rounded-lg p-5 mb-6">
+              <div className="flex items-start gap-3">
+                <BookOpen className="h-5 w-5 text-emerald-400 mt-0.5 shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-zinc-100 mb-1">
+                    {t('academy.examBookOfficialCTA', 'Ready for your certificate?')}
+                  </p>
+                  <p className="text-xs text-zinc-400 mb-3">
+                    {t('academy.examBookOfficialText', 'Book your official VCA exam with an authorized exam center.')}
+                  </p>
+                  <Button
+                    onClick={() => navigate('/academy/vca-booking')}
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
+                  >
+                    {t('academy.examBookOfficialButton', 'Book Official Exam')}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-3 mb-6">
@@ -368,46 +1000,56 @@ export default function AcademyExam() {
           {showReview && (
             <div className="space-y-4">
               {questions.map((q, qi) => {
-                const userAnswer = answers[q.id];
-                const isCorrect = userAnswer === q.correctAnswer;
+                const ans = answers[q.id];
+                const pts = scoreQuestion(q, ans);
+                const isFullCredit = pts === 100;
+                const isPartial = pts > 0 && pts < 100;
                 return (
                   <div
                     key={q.id}
                     className={`border rounded-lg p-5 ${
-                      isCorrect
+                      isFullCredit
                         ? 'border-emerald-500/30 bg-emerald-500/5'
-                        : 'border-rose-500/30 bg-rose-500/5'
+                        : isPartial
+                          ? 'border-amber-500/30 bg-amber-500/5'
+                          : 'border-rose-500/30 bg-rose-500/5'
                     }`}
                   >
                     <div className="flex items-start gap-3 mb-3">
                       <span className="text-xs text-zinc-500 mt-0.5">#{qi + 1}</span>
-                      {isCorrect ? (
+                      {isFullCredit ? (
                         <CheckCircle2 className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
                       ) : (
-                        <XCircle className="h-4 w-4 text-rose-400 mt-0.5 shrink-0" />
+                        <XCircle className={`h-4 w-4 mt-0.5 shrink-0 ${isPartial ? 'text-amber-400' : 'text-rose-400'}`} />
                       )}
-                      <p className="text-sm text-zinc-200">{q.questionText}</p>
+                      <div className="flex-1">
+                        <p className="text-sm text-zinc-200">{q.questionText}</p>
+                        <p className="text-xs text-zinc-500 mt-0.5">
+                          {t('academy.examPartialScore', 'Partial score: {{score}}/100 pts').replace('{{score}}', String(pts))}
+                        </p>
+                      </div>
                     </div>
-                    <div className="ml-7 space-y-1 text-xs">
-                      {(['A', 'B', 'C'] as const).map(letter => {
-                        const optText = q[`option${letter}` as keyof VCAQuestion] as string;
-                        const isUserChoice = userAnswer === letter;
-                        const isCorrectChoice = q.correctAnswer === letter;
-                        let style = 'text-zinc-500';
-                        if (isCorrectChoice) style = 'text-emerald-400 font-medium';
-                        else if (isUserChoice && !isCorrectChoice) style = 'text-rose-400 line-through';
-                        return (
-                          <p key={letter} className={style}>
-                            {letter}. {optText}
-                            {isCorrectChoice && ' ✓'}
-                            {isUserChoice && !isCorrectChoice && ' ✗'}
-                          </p>
-                        );
-                      })}
-                      {!userAnswer && (
-                        <p className="text-zinc-600 italic">{t('academy.examNoAnswer', 'Not answered')}</p>
-                      )}
-                    </div>
+
+                    {renderReview(q, ans)}
+
+                    {/* Explanation */}
+                    {q.explanation && (
+                      <div className="mt-3 ml-7 p-3 rounded-md bg-zinc-800/50 border border-zinc-700/50">
+                        <p className="text-xs text-zinc-400 font-medium mb-1">
+                          {t('academy.examExplanation', 'Explanation')}
+                        </p>
+                        <p className="text-xs text-zinc-300">{q.explanation}</p>
+                      </div>
+                    )}
+
+                    {/* Official Reference */}
+                    {q.officialRef && (
+                      <div className="mt-2 ml-7">
+                        <Badge variant="outline" className="text-[10px] border-zinc-700 text-zinc-500">
+                          {t('academy.examStudyReference', 'Study reference')}: {q.officialRef}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -464,39 +1106,7 @@ export default function AcademyExam() {
               </p>
               <p className="text-lg text-zinc-100 leading-relaxed mb-6">{currentQuestion.questionText}</p>
 
-              <RadioGroup
-                value={answers[currentQuestion.id] || ''}
-                onValueChange={(val) => setAnswers(prev => ({ ...prev, [currentQuestion.id]: val as 'A' | 'B' | 'C' }))}
-                className="space-y-3"
-              >
-                {(['A', 'B', 'C'] as const).map(letter => {
-                  const optText = currentQuestion[`option${letter}` as keyof VCAQuestion] as string;
-                  const isSelected = answers[currentQuestion.id] === letter;
-                  return (
-                    <div
-                      key={letter}
-                      onClick={() => setAnswers(prev => ({ ...prev, [currentQuestion.id]: letter }))}
-                      className={`flex items-center gap-3 p-4 rounded-md border cursor-pointer transition-all ${
-                        isSelected
-                          ? 'border-[#f59e0b] bg-[#f59e0b]/5'
-                          : 'border-zinc-800 hover:border-zinc-700'
-                      }`}
-                    >
-                      <div className={`h-8 w-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 ${
-                        isSelected
-                          ? 'border-[#f59e0b] text-[#f59e0b] bg-[#f59e0b]/10'
-                          : 'border-zinc-700 text-zinc-500'
-                      }`}>
-                        {letter}
-                      </div>
-                      <RadioGroupItem value={letter} id={`exam-${currentQuestion.id}-${letter}`} className="sr-only" />
-                      <Label htmlFor={`exam-${currentQuestion.id}-${letter}`} className="text-sm text-zinc-300 cursor-pointer flex-1">
-                        {optText}
-                      </Label>
-                    </div>
-                  );
-                })}
-              </RadioGroup>
+              {renderQuestionInput(currentQuestion, answers[currentQuestion.id], setCurrentAnswer)}
             </div>
           )}
 

@@ -3,6 +3,7 @@ import { VCAQuestion } from "./academy-types";
 export const VCA_QUESTIONS: VCAQuestion[] = [
   {
     "id": "m1q1",
+    "questionType": "single_choice",
     "questionText": "What measure can the Inspection Service take?",
     "optionA": "Hold a meeting to discuss working conditions.",
     "optionB": "Impose a fine.",
@@ -12,10 +13,13 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Legislation",
     "difficulty": "easy",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+    "explanation": "The Inspection Service (Labour Inspectorate) can carry out health checks, stop work, and impose fines. Organising meetings is not one of their enforcement powers.",
+    "officialRef": "Module 1 — Legislation"
   },
   {
     "id": "m1q2",
+    "questionType": "single_choice",
     "questionText": "What is the objective of the Health and Safety legislation?",
     "optionA": "Providing the best possible working conditions.",
     "optionB": "Reducing the number of accidents at work.",
@@ -25,10 +29,13 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Legislation",
     "difficulty": "easy",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+    "explanation": "The primary objective of H&S legislation is to provide the best possible working conditions for all employees, covering health, safety, and welfare.",
+    "officialRef": "Module 1 — Legislation"
   },
   {
     "id": "m1q3",
+    "questionType": "single_choice",
     "questionText": "Which of the measures below can the Inspection Service take?",
     "optionA": "Have one or more employees fired.",
     "optionB": "Have the work stopped.",
@@ -38,10 +45,13 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Legislation",
     "difficulty": "easy",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+    "explanation": "The Inspection Service can stop work when there is imminent danger. They cannot fire employees — that is the employer's authority.",
+    "officialRef": "Module 1 — Legislation"
   },
   {
     "id": "m1q4",
+    "questionType": "single_choice",
     "questionText": "What does the CE mark on an article indicate?",
     "optionA": "The article meets the minimum European requirements.",
     "optionB": "The article may only be traded within the EU.",
@@ -55,6 +65,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m1q5",
+    "questionType": "single_choice",
     "questionText": "What is one of the objectives of the environmental management act?",
     "optionA": "Control waste flows during the entire production process.",
     "optionB": "Protect the environment against harmful business activities.",
@@ -68,6 +79,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m1q6",
+    "questionType": "single_choice",
     "questionText": "What does ARBO describe?",
     "optionA": "ARBO describes the working conditions (occupational health and safety).",
     "optionB": "ARBO describes the moments in which the Labour Inspectorate has to be informed.",
@@ -81,6 +93,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m1q7",
+    "questionType": "single_choice",
     "questionText": "What is the applicability of the Health and Safety legislation?",
     "optionA": "Rights and obligations of employer and employee in health and safety at home.",
     "optionB": "Rights and obligations of employer and employee in health and safety at the workplace.",
@@ -94,6 +107,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m1q8",
+    "questionType": "single_choice",
     "questionText": "At which locations does the H&S legislation apply?",
     "optionA": "All locations where work is carried out.",
     "optionB": "All locations where no work is carried out.",
@@ -107,6 +121,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m1q9",
+    "questionType": "single_choice",
     "questionText": "The H&S legislation applies to:",
     "optionA": "The employer.",
     "optionB": "The employees.",
@@ -120,6 +135,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m1q10",
+    "questionType": "single_choice",
     "questionText": "The H&S legislation does not relate to:",
     "optionA": "Health",
     "optionB": "Welfare",
@@ -133,6 +149,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m1q11",
+    "questionType": "single_choice",
     "questionText": "The H&S legislation applies to:",
     "optionA": "The employer",
     "optionB": "The employee",
@@ -146,6 +163,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m1q12",
+    "questionType": "single_choice",
     "questionText": "What is not an assumption behind the H&S legislation?",
     "optionA": "Support provided by experts or services.",
     "optionB": "Various employees do not have to collaborate.",
@@ -159,6 +177,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m1q13",
+    "questionType": "single_choice",
     "questionText": "What is an important task of the experts in prevention?",
     "optionA": "Cooperate in the risk inventory evaluation.",
     "optionB": "Supervise employers.",
@@ -172,6 +191,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m1q14",
+    "questionType": "single_choice",
     "questionText": "Important objectives of the working hours legislation are:",
     "optionA": "To delineate maximum working hours and minimum rest hours.",
     "optionB": "To promote the possibility to combine work and care tasks.",
@@ -185,6 +205,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m1q15",
+    "questionType": "single_choice",
     "questionText": "Principles of the CE identification symbols are:",
     "optionA": "A CE mark must be attached by the manufacturer and importer.",
     "optionB": "The CE mark is not required for every piece of equipment.",
@@ -198,6 +219,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m2q1",
+    "questionType": "single_choice",
     "questionText": "How is the concept of risk described?",
     "optionA": "Risk = probability X effect.",
     "optionB": "Risk = hazard X probability.",
@@ -207,10 +229,13 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Dangers, Risks and Prevention",
     "difficulty": "easy",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+    "explanation": "Risk is calculated as Probability × Effect (consequence). A high probability of a minor event can equal the same risk as a low probability of a catastrophic event.",
+    "officialRef": "Module 2 — Dangers, Risks and Prevention"
   },
   {
     "id": "m2q2",
+    "questionType": "single_choice",
     "questionText": "Hazards at the workplace are:",
     "optionA": "Noise.",
     "optionB": "Radiation.",
@@ -220,10 +245,13 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Dangers, Risks and Prevention",
     "difficulty": "easy",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+    "explanation": "Both noise and radiation are recognised workplace hazards under H&S legislation. They can cause long-term health damage even without immediate visible injury.",
+    "officialRef": "Module 2 — Dangers, Risks and Prevention"
   },
   {
     "id": "m2q3",
+    "questionType": "single_choice",
     "questionText": "What is not a source of dangers and risks at the workplace?",
     "optionA": "Equipment.",
     "optionB": "Behaviour of the employee.",
@@ -237,6 +265,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m2q4",
+    "questionType": "single_choice",
     "questionText": "In which way can prevention be tackled practically?",
     "optionA": "Preventing unsafe situations.",
     "optionB": "Preventing unsafe actions.",
@@ -250,6 +279,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m2q5",
+    "questionType": "single_choice",
     "questionText": "What is an unsafe situation?",
     "optionA": "A situation complying to conditions for safe working.",
     "optionB": "A situation where people are not wearing PPE with mandatory signs.",
@@ -263,6 +293,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m2q6",
+    "questionType": "single_choice",
     "questionText": "Which action is an unsafe action?",
     "optionA": "Working with permits where imposed.",
     "optionB": "Using tools incorrectly.",
@@ -276,6 +307,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m2q7",
+    "questionType": "single_choice",
     "questionText": "What is the best way to deal with unsafe situations?",
     "optionA": "Removing the cause.",
     "optionB": "Calling others.",
@@ -289,6 +321,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m2q8",
+    "questionType": "single_choice",
     "questionText": "The various steps in an RI&E are:",
     "optionA": "1. Evaluating risks / 2. Identifying hazards / 3. Making inventory",
     "optionB": "1. Identifying hazards / 2. Making inventory of risks / 3. Evaluating risks",
@@ -302,6 +335,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m2q9",
+    "questionType": "single_choice",
     "questionText": "What does LMRA stand for?",
     "optionA": "Labour Market Regulatory Authority.",
     "optionB": "Last Minute Risk Analysis.",
@@ -315,6 +349,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m2q10",
+    "questionType": "single_choice",
     "questionText": "What is the objective of the work planning?",
     "optionA": "To determine the time needed to finish the work.",
     "optionB": "To determine a working method that is safe and does not cause health damage.",
@@ -328,6 +363,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m2q11",
+    "questionType": "single_choice",
     "questionText": "What is an approach of the intermediary for high-risk tasks?",
     "optionA": "Agreements with the hiring company about informing the temporary worker.",
     "optionB": "Information to the temporary worker regarding the high-risk tasks.",
@@ -341,6 +377,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m3q1",
+    "questionType": "single_choice",
     "questionText": "What is the cause of most accidents?",
     "optionA": "Human error.",
     "optionB": "Poor working conditions.",
@@ -350,10 +387,13 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Accidents: Causes and Prevention",
     "difficulty": "easy",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+    "explanation": "Unsafe behaviour (human error, shortcuts) is the leading cause of workplace accidents. Technical failures and environmental factors also contribute but less frequently.",
+    "officialRef": "Module 3 — Accidents: Causes and Prevention"
   },
   {
     "id": "m3q2",
+    "questionType": "single_choice",
     "questionText": "According to Lateiner, which factors play a role in accidents?",
     "optionA": "Background, human error and unsafe situations and operations.",
     "optionB": "The surroundings, human error and unsafe situations.",
@@ -367,6 +407,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m3q3",
+    "questionType": "single_choice",
     "questionText": "Drawing up procedures for action when accidents occur is a measure towards:",
     "optionA": "Surroundings.",
     "optionB": "Organization.",
@@ -380,6 +421,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m3q4",
+    "questionType": "single_choice",
     "questionText": "Which parts must be in the final report of an accident investigation?",
     "optionA": "Drawings of the accident, witness statements and measures taken.",
     "optionB": "Analysis, conclusions and recommendations.",
@@ -393,6 +435,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m3q5",
+    "questionType": "single_choice",
     "questionText": "The two direct causes of an accident or incident are:",
     "optionA": "Unsafe actions or broken equipment.",
     "optionB": "Unsafe actions or unsafe situations.",
@@ -406,6 +449,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m3q6",
+    "questionType": "single_choice",
     "questionText": "What is not a person-related factor that can lead to an incident?",
     "optionA": "Insufficient planning.",
     "optionB": "Insufficient attention.",
@@ -419,6 +463,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m3q7",
+    "questionType": "single_choice",
     "questionText": "To which person must an accident be reported?",
     "optionA": "The Labour Inspectorate.",
     "optionB": "Your immediate colleagues.",
@@ -432,6 +477,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m3q8",
+    "questionType": "single_choice",
     "questionText": "What must one do with all accidents or near accidents?",
     "optionA": "Provide more PPEs.",
     "optionB": "Record the happening.",
@@ -445,6 +491,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m3q9",
+    "questionType": "single_choice",
     "questionText": "Who is responsible for the accident investigations?",
     "optionA": "The hiring company.",
     "optionB": "The temporary employment agency.",
@@ -458,6 +505,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m3q10",
+    "questionType": "single_choice",
     "questionText": "Who is responsible for the absence due to illness?",
     "optionA": "The hiring company.",
     "optionB": "The temporary employment agency.",
@@ -471,6 +519,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m3q11",
+    "questionType": "single_choice",
     "questionText": "What is the objective of the Eligibility for Permanent Invalidity Benefit Act?",
     "optionA": "To improve reintegration of new employees.",
     "optionB": "To improve reintegration of sick employees within or outside the company.",
@@ -484,6 +533,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m3q12",
+    "questionType": "single_choice",
     "questionText": "What is an obligation of the temporary employment agency within the Invalidity Benefit Act?",
     "optionA": "Both answers are correct.",
     "optionB": "If negligent, the obligation to pay wages can be extended by one year.",
@@ -497,6 +547,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m4q1",
+    "questionType": "single_choice",
     "questionText": "Which is a cause of an accident by falling and stumbling?",
     "optionA": "A flat anti-slip floor.",
     "optionB": "Loose cables and ropes.",
@@ -510,6 +561,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m4q2",
+    "questionType": "single_choice",
     "questionText": "What is not a cause of unsafe behaviour?",
     "optionA": "Lack of example function.",
     "optionB": "Unwillingness (not wanting to).",
@@ -523,6 +575,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m4q3",
+    "questionType": "single_choice",
     "questionText": "Which policy element influences human behaviour for safe work?",
     "optionA": "A sanction policy.",
     "optionB": "Clarity about the priority of safe working.",
@@ -536,6 +589,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m4q4",
+    "questionType": "single_choice",
     "questionText": "Why is the role of the supervisor important for human behaviour?",
     "optionA": "The supervisor is a rolemodel.",
     "optionB": "The supervisor lets employees determine the working method.",
@@ -549,6 +603,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m4q5",
+    "questionType": "single_choice",
     "questionText": "A general rule of behaviour for safe working is?",
     "optionA": "Being critical towards yourself.",
     "optionB": "Employees should not intervene but report to supervisor.",
@@ -562,6 +617,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m4q6",
+    "questionType": "single_choice",
     "questionText": "Which is not behaviour that promotes safe working?",
     "optionA": "Attention to personal hygiene, order and tidiness.",
     "optionB": "Only think about your own health and safety.",
@@ -575,6 +631,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m4q7",
+    "questionType": "single_choice",
     "questionText": "The influence of alcohol and drugs on safe working causes:",
     "optionA": "Reduced or problematic working.",
     "optionB": "No changes in behaviour.",
@@ -588,6 +645,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m4q8",
+    "questionType": "single_choice",
     "questionText": "What is expected regarding alcohol and drug use for safe working?",
     "optionA": "Use is allowed when supervisors know about it.",
     "optionB": "Searching for help in the event of chronic problematic use.",
@@ -601,6 +659,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m4q9",
+    "questionType": "single_choice",
     "questionText": "A task of the intermediary for promoting safe working is?",
     "optionA": "Both answers are correct.",
     "optionB": "Information to the temporary worker about necessity of safe working.",
@@ -614,6 +673,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q1",
+    "questionType": "single_choice",
     "questionText": "What are obligations of employers according to H&S legislation?",
     "optionA": "To provide information and instruction about hazards at work.",
     "optionB": "To report hazardous situations to the manager.",
@@ -623,10 +683,13 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Tasks, Rights, Duties and Discussions",
     "difficulty": "easy",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+    "explanation": "Employees have the right to refuse unsafe work without fear of reprisal. This is a fundamental right under H&S legislation.",
+    "officialRef": "Module 5 — Tasks, Rights, Duties"
   },
   {
     "id": "m5q2",
+    "questionType": "single_choice",
     "questionText": "What are obligations of employees according to the working conditions act?",
     "optionA": "Call in the labour inspectorate.",
     "optionB": "To report hazardous situations to the manager/supervisor.",
@@ -640,6 +703,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q3",
+    "questionType": "single_choice",
     "questionText": "When do employees have the right to interrupt their work?",
     "optionA": "If PPE is not available.",
     "optionB": "If the Labour Inspectorate comes to investigate.",
@@ -653,6 +717,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q4",
+    "questionType": "single_choice",
     "questionText": "Who participates in the works council consultation?",
     "optionA": "Departmental management and employees.",
     "optionB": "All employees, including temporary personnel.",
@@ -666,6 +731,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q5",
+    "questionType": "single_choice",
     "questionText": "What is the difference between SCC* and SCC** certification?",
     "optionA": "SCC* focuses on safety structures, SCC** includes environmental care.",
     "optionB": "SCC* focuses on direct safety control, SCC** includes safety structures.",
@@ -679,6 +745,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q6",
+    "questionType": "single_choice",
     "questionText": "What must one do in the event of immediate danger?",
     "optionA": "Fix the risks which caused the danger.",
     "optionB": "Keep working until someone tells you to stop.",
@@ -692,6 +759,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q7",
+    "questionType": "single_choice",
     "questionText": "What is a benefit of workplace inspections?",
     "optionA": "Provide good insight into the safety situation.",
     "optionB": "Increase safety awareness.",
@@ -705,6 +773,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q8",
+    "questionType": "single_choice",
     "questionText": "A statutory liability with respect to H&S is:",
     "optionA": "The temporary employment agency is responsible for occupational accident insurance.",
     "optionB": "The hiring company has specific tasks.",
@@ -718,6 +787,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q9",
+    "questionType": "single_choice",
     "questionText": "The difference between the formal and actual employer is:",
     "optionA": "The actual employer is the one under whose authority the temporary worker works.",
     "optionB": "Both answers are correct.",
@@ -731,6 +801,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q10",
+    "questionType": "single_choice",
     "questionText": "Who is responsible for working conditions in temporary work?",
     "optionA": "The temporary employer delivers personal working conditions to hiring company.",
     "optionB": "The temporary employment agency is responsible.",
@@ -744,6 +815,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q11",
+    "questionType": "single_choice",
     "questionText": "A statutory liability with respect to H&S is arranged as:",
     "optionA": "A special relationship: agency, hiring company, Labour Inspectorate and worker.",
     "optionB": "A triangular relationship: agency, hiring company and worker.",
@@ -757,6 +829,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q12",
+    "questionType": "single_choice",
     "questionText": "A H&S aspect important when assigning a temporary worker is:",
     "optionA": "Requesting the requisite H&S documents.",
     "optionB": "The procedure for applications and recording H&S agreements.",
@@ -770,6 +843,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q13",
+    "questionType": "single_choice",
     "questionText": "What must be discussed with the user enterprise regarding medical examination?",
     "optionA": "For which jobs is a medical examination required.",
     "optionB": "Medical examination by the supervisor.",
@@ -783,6 +857,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q14",
+    "questionType": "single_choice",
     "questionText": "Elements that the temporary worker dossier must contain are:",
     "optionA": "Job-oriented limitations.",
     "optionB": "Copy of an identification document.",
@@ -796,6 +871,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q15",
+    "questionType": "single_choice",
     "questionText": "What is not a necessary focus when the user enterprise submits an application?",
     "optionA": "Required medical suitability.",
     "optionB": "Who will provide instructions for PPE.",
@@ -809,6 +885,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q16",
+    "questionType": "single_choice",
     "questionText": "What must be done to verify agreements with the user enterprise?",
     "optionA": "A formal introduction to co-workers.",
     "optionB": "Reception at the company; meeting the supervisor.",
@@ -822,6 +899,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q17",
+    "questionType": "single_choice",
     "questionText": "An aspect to focus on when evaluating temporary work is:",
     "optionA": "Issuing PPE and work clothing.",
     "optionB": "Facilities such as changing room, canteen, sanitary amenities.",
@@ -835,6 +913,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q18",
+    "questionType": "single_choice",
     "questionText": "What is important in H&S meetings within the temporary employment agency?",
     "optionA": "Involvement of the Labour Inspectorate.",
     "optionB": "Involvement of the co-workers.",
@@ -848,6 +927,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m5q19",
+    "questionType": "single_choice",
     "questionText": "What is the involvement of the temporary worker in HSE meetings?",
     "optionA": "The temporary worker must take part in HSE meetings at the user enterprise.",
     "optionB": "The intermediary informs the worker about the existence of HSE meetings.",
@@ -861,6 +941,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m6q1",
+    "questionType": "single_choice",
     "questionText": "The procedure for reporting a fire falls under the:",
     "optionA": "SCC procedures.",
     "optionB": "General safety rules.",
@@ -874,6 +955,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m6q2",
+    "questionType": "single_choice",
     "questionText": "What must be described in a work permit?",
     "optionA": "The relevant control points from the SCC.",
     "optionB": "The number of employees with an IER diploma.",
@@ -887,6 +969,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m6q3",
+    "questionType": "single_choice",
     "questionText": "General safety rules are intended for:",
     "optionA": "One department of the company.",
     "optionB": "Temporary agency workers.",
@@ -900,6 +983,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m6q4",
+    "questionType": "single_choice",
     "questionText": "General safety rules:",
     "optionA": "Must be recorded in writing.",
     "optionB": "Are tool specific rules on the usage.",
@@ -913,6 +997,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m6q5",
+    "questionType": "single_choice",
     "questionText": "Specific safety rules do not relate to:",
     "optionA": "Lunch breaks.",
     "optionB": "Ventilation.",
@@ -926,6 +1011,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m6q6",
+    "questionType": "single_choice",
     "questionText": "A guideline concerning specific safety rules is:",
     "optionA": "Should also be understood by native speakers.",
     "optionB": "Must be released to all employees.",
@@ -939,6 +1025,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m6q7",
+    "questionType": "single_choice",
     "questionText": "A function of a connection flange is:",
     "optionA": "To shut off supply lines to vessels, tanks or installations.",
     "optionB": "To separate sections of pipe.",
@@ -952,6 +1039,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m6q8",
+    "questionType": "single_choice",
     "questionText": "What is not a section of the work permit concerning requested activities?",
     "optionA": "How the activities will take place.",
     "optionB": "Where the activities will take place.",
@@ -965,6 +1053,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m6q9",
+    "questionType": "single_choice",
     "questionText": "What is a section in the work permit for measures by the operational employee?",
     "optionA": "All items of PPE must be stated here.",
     "optionB": "The measures that operational employees must take to work safely.",
@@ -978,6 +1067,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m6q10",
+    "questionType": "single_choice",
     "questionText": "What does the duty to pass on information entail?",
     "optionA": "Both answers are correct.",
     "optionB": "The agency must pass on information regarding the workplace.",
@@ -991,6 +1081,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m7q1",
+    "questionType": "single_choice",
     "questionText": "Which task belongs to the role of emergency response officers?",
     "optionA": "Extinguishing a starting fire and restricting damage and injury.",
     "optionB": "Participating in the accident investigation team.",
@@ -1004,6 +1095,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m7q2",
+    "questionType": "single_choice",
     "questionText": "What is a concept of an emergency situation?",
     "optionA": "Emergency situations caused by accidents, fire, explosion, uncontrolled escape of substances.",
     "optionB": "Threat due to bad weather, natural disasters, social unrest, terrorist attack.",
@@ -1017,6 +1109,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m7q3",
+    "questionType": "single_choice",
     "questionText": "A company emergency plan is:",
     "optionA": "A description of measures and provisions prepared for emergency situations.",
     "optionB": "A list of measures to make sure working conditions are safe.",
@@ -1030,6 +1123,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m7q4",
+    "questionType": "single_choice",
     "questionText": "Limit effects of possible emergency situations is the purpose of:",
     "optionA": "The set of working conditions.",
     "optionB": "An (internal) company emergency plan.",
@@ -1043,6 +1137,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m7q5",
+    "questionType": "single_choice",
     "questionText": "What is not a phase in controlling emergency situations?",
     "optionA": "First alarm.",
     "optionB": "Second alarm.",
@@ -1056,6 +1151,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m7q6",
+    "questionType": "single_choice",
     "questionText": "The first alarm in emergency situations is:",
     "optionA": "A list of ways to alarm people.",
     "optionB": "A description of the ways an emergency can be reported and what information must be communicated.",
@@ -1069,6 +1165,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m7q7",
+    "questionType": "single_choice",
     "questionText": "A component of the termination of the emergency situation is:",
     "optionA": "The way in which the termination is notified.",
     "optionB": "Who is authorised to declare the emergency terminated.",
@@ -1082,6 +1179,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m7q8",
+    "questionType": "single_choice",
     "questionText": "One of the minimum requirements for first aid is:",
     "optionA": "Trained emergency response team members.",
     "optionB": "First Aid equipment always available.",
@@ -1095,6 +1193,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m7q9",
+    "questionType": "single_choice",
     "questionText": "Which sequence is correct for an evacuation signal?",
     "optionA": "1: Stop work / 2: Do not use lifts / 3: Go to assembly point.",
     "optionB": "1: Stop work / 2: Do not use lifts / 3: Report presence at assembly point.",
@@ -1108,6 +1207,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q1",
+    "questionType": "single_choice",
     "questionText": "How can you tell which risks a hazardous product presents from its label?",
     "optionA": "From the S phrases.",
     "optionB": "From the M phrases.",
@@ -1117,10 +1217,13 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Hazardous Substances",
     "difficulty": "easy",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+    "explanation": "An SDS (Safety Data Sheet) provides essential information about hazardous substances: composition, hazards, first aid, handling, storage, and disposal.",
+    "officialRef": "Module 8 — Hazardous Substances"
   },
   {
     "id": "m8q2",
+    "questionType": "single_choice",
     "questionText": "What does the yellow surface of the diamond hazard warning sign indicate?",
     "optionA": "Reactivity hazard.",
     "optionB": "Health hazard.",
@@ -1134,6 +1237,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q3",
+    "questionType": "single_choice",
     "questionText": "Which poisonous effect does carbon monoxide have?",
     "optionA": "Paralysis of your sense of smell.",
     "optionB": "Oxygen is no longer absorbed into the blood.",
@@ -1147,6 +1251,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q4",
+    "questionType": "single_choice",
     "questionText": "What information is in a material safety data sheet?",
     "optionA": "Information about steps to work in a confined space.",
     "optionB": "Information about permits necessary to work with the product.",
@@ -1160,6 +1265,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q5",
+    "questionType": "single_choice",
     "questionText": "Under normal conditions, the oxygen in the air is:",
     "optionA": "21%.",
     "optionB": "19%.",
@@ -1173,6 +1279,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q6",
+    "questionType": "single_choice",
     "questionText": "Lack of ventilation:",
     "optionA": "Eliminates the lack of oxygen.",
     "optionB": "Can cause an oxygen concentration which is too low.",
@@ -1186,6 +1293,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q7",
+    "questionType": "single_choice",
     "questionText": "A white shoulder on a cylinder means:",
     "optionA": "Carbon dioxide.",
     "optionB": "Air.",
@@ -1199,6 +1307,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q8",
+    "questionType": "single_choice",
     "questionText": "When storing gas cylinders:",
     "optionA": "One has to secure them properly.",
     "optionB": "One should put them in special cellars.",
@@ -1212,6 +1321,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q9",
+    "questionType": "single_choice",
     "questionText": "What is the meaning of hazardous substances?",
     "optionA": "Materials which explode easily if mixed with high oxygen.",
     "optionB": "Materials that pose a danger to health and/or to the environment.",
@@ -1225,6 +1335,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q10",
+    "questionType": "single_choice",
     "questionText": "Hazardous substances at the workplace are indicated with:",
     "optionA": "A square danger symbol, black on a red background.",
     "optionB": "A square danger symbol, black on an orange background.",
@@ -1238,6 +1349,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q11",
+    "questionType": "single_choice",
     "questionText": "Vaccinations is a precautionary measure for working with:",
     "optionA": "Biological substances.",
     "optionB": "Flammable substances.",
@@ -1251,6 +1363,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q12",
+    "questionType": "single_choice",
     "questionText": "Biological substances can be present in:",
     "optionA": "Agriculture.",
     "optionB": "Contaminated soil.",
@@ -1264,6 +1377,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q13",
+    "questionType": "single_choice",
     "questionText": "Professional removal of spilt product is a preventive measure against:",
     "optionA": "Fire.",
     "optionB": "Falling objects.",
@@ -1277,6 +1391,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q14",
+    "questionType": "single_choice",
     "questionText": "What is not a cause of leaks?",
     "optionA": "Damage (e.g. fork-lift truck collision).",
     "optionB": "Erroneous procedure when transferring containers.",
@@ -1290,6 +1405,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q15",
+    "questionType": "single_choice",
     "questionText": "Slipping is a consequence of:",
     "optionA": "Environmental contamination.",
     "optionB": "Leaks.",
@@ -1303,6 +1419,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q16",
+    "questionType": "single_choice",
     "questionText": "The hazard of organic solvents is:",
     "optionA": "Flammable or highly flammable.",
     "optionB": "Corrosive.",
@@ -1316,6 +1433,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q17",
+    "questionType": "single_choice",
     "questionText": "An example of cyclic compounds is:",
     "optionA": "Zinc.",
     "optionB": "Phenol.",
@@ -1329,6 +1447,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q18",
+    "questionType": "single_choice",
     "questionText": "The chance of mesothelioma is a health effect related to:",
     "optionA": "Benzene.",
     "optionB": "White spirit.",
@@ -1342,6 +1461,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q19",
+    "questionType": "single_choice",
     "questionText": "What is not a possible location of asbestos?",
     "optionA": "In newly built houses.",
     "optionB": "Roofing material and wall cladding.",
@@ -1355,6 +1475,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q20",
+    "questionType": "single_choice",
     "questionText": "What is not a legal stipulation with respect to asbestos?",
     "optionA": "New use and processing of asbestos is allowed.",
     "optionB": "Waste containing asbestos must be collected separately.",
@@ -1368,6 +1489,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q21",
+    "questionType": "single_choice",
     "questionText": "A concept of the periodic medical examination is:",
     "optionA": "Determine whether the candidate remains suitable to work with substances.",
     "optionB": "Determine whether the candidate remains suitable to work with the hazardous substance.",
@@ -1381,6 +1503,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q22",
+    "questionType": "single_choice",
     "questionText": "Safety recommendations on the new labels describe:",
     "optionA": "The measures to avoid change in working conditions.",
     "optionB": "The measures to avoid risks when working with the product.",
@@ -1394,6 +1517,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q23",
+    "questionType": "single_choice",
     "questionText": "The numbers on a hazard diamond go from:",
     "optionA": "1 to 5.",
     "optionB": "0 to 4.",
@@ -1407,6 +1531,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m8q24",
+    "questionType": "single_choice",
     "questionText": "The measures to avoid risks when working with the product are described in:",
     "optionA": "The H phrases.",
     "optionB": "The R phrases.",
@@ -1420,6 +1545,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q1",
+    "questionType": "single_choice",
     "questionText": "What is a disadvantage of extinguishing a fire with water?",
     "optionA": "The burning material may react severely to water.",
     "optionB": "Operators are hindered by smoke.",
@@ -1429,10 +1555,13 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Fire and Explosions",
     "difficulty": "medium",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+    "explanation": "The fire triangle requires fuel, oxygen, and heat (ignition source). Removing any one element extinguishes or prevents fire.",
+    "officialRef": "Module 9 — Fire and Explosions"
   },
   {
     "id": "m9q2",
+    "questionType": "single_choice",
     "questionText": "What must you know before extinguishing a fire?",
     "optionA": "How long it has been burning.",
     "optionB": "How high is the temperature.",
@@ -1446,6 +1575,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q3",
+    "questionType": "single_choice",
     "questionText": "What must be done first when a fire is detected?",
     "optionA": "If possible extinguish it yourself.",
     "optionB": "Guide people to safety.",
@@ -1459,6 +1589,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q4",
+    "questionType": "single_choice",
     "questionText": "What does an explosion limit signify?",
     "optionA": "The highest/lowest temperature of a solid at which an explosion can occur.",
     "optionB": "The highest/lowest concentration of a gas in air at which an explosion can occur.",
@@ -1472,6 +1603,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q5",
+    "questionType": "single_choice",
     "questionText": "What is meant by the flash point?",
     "optionA": "The highest/lowest concentration of gas and air for explosion.",
     "optionB": "The highest/lowest temperature of a solid for explosion.",
@@ -1485,6 +1617,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q6",
+    "questionType": "single_choice",
     "questionText": "What result can an excess of oxygen have during a fire?",
     "optionA": "Easier ignition of flammable substances.",
     "optionB": "Prolonged burning.",
@@ -1498,6 +1631,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q7",
+    "questionType": "single_choice",
     "questionText": "A flammable substance:",
     "optionA": "Is needed for a fire or explosion.",
     "optionB": "Always is a gas.",
@@ -1511,6 +1645,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q8",
+    "questionType": "single_choice",
     "questionText": "What is an explosion?",
     "optionA": "A fire caused by a flammable substance.",
     "optionB": "A very rapidly developing fire that releases a pressure wave.",
@@ -1524,6 +1659,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q9",
+    "questionType": "single_choice",
     "questionText": "What does a class A fire involve?",
     "optionA": "Gases.",
     "optionB": "Liquids.",
@@ -1537,6 +1673,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q10",
+    "questionType": "single_choice",
     "questionText": "The sign that indicates an explosion risk zone:",
     "optionA": "Displays Ex.",
     "optionB": "Displays Er.",
@@ -1550,6 +1687,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q11",
+    "questionType": "single_choice",
     "questionText": "An explosion risk environment is:",
     "optionA": "Where special measures must be taken to prevent ignition of explosive mixtures.",
     "optionB": "Where it is not possible for an explosive mixture to arise.",
@@ -1563,6 +1701,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q12",
+    "questionType": "single_choice",
     "questionText": "A requirement for the hot work watch is:",
     "optionA": "Minimal five years experience with fire.",
     "optionB": "A specific training.",
@@ -1576,6 +1715,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q13",
+    "questionType": "single_choice",
     "questionText": "When treating burns:",
     "optionA": "Flush with water for at least 5 minutes.",
     "optionB": "Flush with water for at least 15 minutes.",
@@ -1589,6 +1729,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q14",
+    "questionType": "single_choice",
     "questionText": "When extinguishing a fire one must not:",
     "optionA": "Remain alert even when fire appears extinguished.",
     "optionB": "Ensure your own safety at all times.",
@@ -1602,6 +1743,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q15",
+    "questionType": "single_choice",
     "questionText": "Fire blankets:",
     "optionA": "Cool.",
     "optionB": "Displace oxygen.",
@@ -1615,6 +1757,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q16",
+    "questionType": "single_choice",
     "questionText": "A disadvantage of extinguishing with a fire blanket is:",
     "optionA": "Chance of freeze wounds.",
     "optionB": "One has to get close to the seat of the fire.",
@@ -1628,6 +1771,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q17",
+    "questionType": "single_choice",
     "questionText": "A disadvantage of extinguishing with carbon dioxide is:",
     "optionA": "Can create a suffocating atmosphere.",
     "optionB": "Chance of freeze wounds due to low temperature.",
@@ -1641,6 +1785,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m9q18",
+    "questionType": "single_choice",
     "questionText": "An extinguishing characteristic of sand is:",
     "optionA": "Sand displaces oxygen.",
     "optionB": "Sand excludes oxygen.",
@@ -1654,6 +1799,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q1",
+    "questionType": "single_choice",
     "questionText": "What must you look out for when using chisels?",
     "optionA": "Only use chisels with no burrs on the cutting edge.",
     "optionB": "Only use chisels that have been tested.",
@@ -1667,6 +1813,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q2",
+    "questionType": "single_choice",
     "questionText": "Why may you never wear gloves with machines that have rotating parts?",
     "optionA": "Because your hands do not contact the rotating parts.",
     "optionB": "Because the machine can be damaged.",
@@ -1680,6 +1827,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q3",
+    "questionType": "single_choice",
     "questionText": "What does working safely with pillar drills mean?",
     "optionA": "Making use of the riving knife.",
     "optionB": "Clamp the workpiece in a secure way.",
@@ -1693,6 +1841,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q4",
+    "questionType": "single_choice",
     "questionText": "What must hammers be provided with to prevent accidents?",
     "optionA": "A plastic handle.",
     "optionB": "A metal handle.",
@@ -1706,6 +1855,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q5",
+    "questionType": "single_choice",
     "questionText": "What is the purpose of a dead man switch on a pneumatic tool?",
     "optionA": "This allows the operator to take breaks.",
     "optionB": "To put the tool in warm up position.",
@@ -1719,6 +1869,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q6",
+    "questionType": "single_choice",
     "questionText": "What must be present on a table circular saw?",
     "optionA": "A glass shield.",
     "optionB": "A blade guard attached to a robust stand.",
@@ -1732,6 +1883,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q7",
+    "questionType": "single_choice",
     "questionText": "Electrical hand tools for 230 volts:",
     "optionA": "Must be double insulated.",
     "optionB": "Must be provided with safety earthing.",
@@ -1745,6 +1897,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q8",
+    "questionType": "single_choice",
     "questionText": "A periodic inspection has to be done:",
     "optionA": "On machines and power tools.",
     "optionB": "Every week.",
@@ -1758,6 +1911,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q9",
+    "questionType": "single_choice",
     "questionText": "A machine will stop as quickly as possible when:",
     "optionA": "The emergency stop is used.",
     "optionB": "The operating handle is released.",
@@ -1771,6 +1925,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q10",
+    "questionType": "single_choice",
     "questionText": "What is a pallet trolley?",
     "optionA": "A vehicle to transport people.",
     "optionB": "A vehicle to move loads over different heights.",
@@ -1784,6 +1939,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q11",
+    "questionType": "single_choice",
     "questionText": "A requirement for a forklift truck driver is:",
     "optionA": "Use of the safety belt.",
     "optionB": "Possessing the tested expertise.",
@@ -1797,6 +1953,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q12",
+    "questionType": "single_choice",
     "questionText": "What is not a safety measure for forklift trucks?",
     "optionA": "Do not take a passenger if no special seat is available.",
     "optionB": "One can increase the contra weight when needed.",
@@ -1810,6 +1967,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q13",
+    "questionType": "single_choice",
     "questionText": "When working with saws:",
     "optionA": "The blade must be well tensioned.",
     "optionB": "The blade must not be too sharp.",
@@ -1823,6 +1981,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q14",
+    "questionType": "single_choice",
     "questionText": "When working with knives:",
     "optionA": "Teeth must face forward.",
     "optionB": "Do not slide an extendable blade too far out.",
@@ -1836,6 +1995,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q15",
+    "questionType": "single_choice",
     "questionText": "When working with small work pieces:",
     "optionA": "One must hold them with one hand.",
     "optionB": "One must clamp the workpiece.",
@@ -1849,6 +2009,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q16",
+    "questionType": "single_choice",
     "questionText": "Trousers and gloves made of special fibre are used when:",
     "optionA": "Working with a chain saw.",
     "optionB": "Working with screwdrivers.",
@@ -1862,6 +2023,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q17",
+    "questionType": "single_choice",
     "questionText": "A nailer/stapler must have:",
     "optionA": "An extra handle on the side.",
     "optionB": "A protection against undesired firing.",
@@ -1875,6 +2037,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q18",
+    "questionType": "single_choice",
     "questionText": "A riving knife is used with:",
     "optionA": "A hand-held circular saw.",
     "optionB": "A chain saw.",
@@ -1888,6 +2051,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q19",
+    "questionType": "single_choice",
     "questionText": "Which information has to be present on a grinding disc?",
     "optionA": "The minimum allowable rotational speed.",
     "optionB": "The manufacturer name.",
@@ -1901,6 +2065,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q20",
+    "questionType": "single_choice",
     "questionText": "When working with pneumatically powered hand tools one must:",
     "optionA": "Shut off air supply after use.",
     "optionB": "Take regular breaks when using vibrating tools.",
@@ -1914,6 +2079,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m10q21",
+    "questionType": "single_choice",
     "questionText": "When working with bench grinders, what is not a possible hazard?",
     "optionA": "Health complaints due to inhaling hazardous dust.",
     "optionB": "The riving knife can come loose.",
@@ -1927,6 +2093,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m11q1",
+    "questionType": "single_choice",
     "questionText": "A hazard during demolition is?",
     "optionA": "Instability of demolition front.",
     "optionB": "Protruding parts of construction.",
@@ -1940,6 +2107,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m11q2",
+    "questionType": "single_choice",
     "questionText": "During demolition work one must have:",
     "optionA": "A fall arrest device.",
     "optionB": "Sufficient break times.",
@@ -1953,6 +2121,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m11q3",
+    "questionType": "single_choice",
     "questionText": "What must one do when removing ceramic fibres?",
     "optionA": "Break everything in little pieces.",
     "optionB": "Do not use a chute.",
@@ -1966,6 +2135,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m12q1",
+    "questionType": "single_choice",
     "questionText": "What must one do when gas welding with oxygen and acetylene?",
     "optionA": "Acetylene cylinders stored upright or at least 25 degrees.",
     "optionB": "Acetylene cylinders stored upright or at least 30 degrees.",
@@ -1979,6 +2149,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m12q2",
+    "questionType": "single_choice",
     "questionText": "What is a risk of gas welding?",
     "optionA": "Air is heavier than propane.",
     "optionB": "Backdraft.",
@@ -1992,6 +2163,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m12q3",
+    "questionType": "single_choice",
     "questionText": "What is a safety measure when electric welding is done?",
     "optionA": "Personal protection: welding mask, apron, clothing, safety shoes.",
     "optionB": "Welding curtains to protect from UV and infrared radiation.",
@@ -2005,6 +2177,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m12q4",
+    "questionType": "single_choice",
     "questionText": "What is not a risk associated with electric welding?",
     "optionA": "Blinding due to infrared radiation.",
     "optionB": "Burnt cornea due to heat radiation.",
@@ -2018,6 +2191,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m13q1",
+    "questionType": "single_choice",
     "questionText": "Why is it important to excavate carefully?",
     "optionA": "Economic winnings.",
     "optionB": "Security of delivery of utility companies.",
@@ -2031,6 +2205,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m13q2",
+    "questionType": "single_choice",
     "questionText": "What is not a risk associated with excavating?",
     "optionA": "Suffocation due to damaging gas pipes.",
     "optionB": "Electrocution due to damaging live cables.",
@@ -2044,6 +2219,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m13q3",
+    "questionType": "single_choice",
     "questionText": "What is a rule for carefully excavating?",
     "optionA": "Report any different position or damage to the person in charge.",
     "optionB": "Only excavate after position of cables determined by test trenches within 1.5m.",
@@ -2057,6 +2233,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m13q4",
+    "questionType": "single_choice",
     "questionText": "When working in or near an excavation you must:",
     "optionA": "Install a ladder.",
     "optionB": "Use fencing at risky places.",
@@ -2070,6 +2247,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m14q1",
+    "questionType": "single_choice",
     "questionText": "From which height must the employer take measures to prevent falling?",
     "optionA": "From 3.5 meters.",
     "optionB": "From 1.5 meters.",
@@ -2079,10 +2257,13 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Working at Height",
     "difficulty": "medium",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+    "explanation": "Working at heights above 2 metres requires fall protection measures. The hierarchy is: collective protection first (guardrails), then personal protection (harness).",
+    "officialRef": "Module 14 — Working at Height"
   },
   {
     "id": "m14q2",
+    "questionType": "single_choice",
     "questionText": "What safety measure reduces danger of falling on a flat roof?",
     "optionA": "A roof edge safety system.",
     "optionB": "Walk boards.",
@@ -2096,6 +2277,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m14q3",
+    "questionType": "single_choice",
     "questionText": "What must be checked before a ladder may be used?",
     "optionA": "Whether the ladder is no longer than 12 meters.",
     "optionB": "If set up at an angle of approximately 75 degrees.",
@@ -2109,6 +2291,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m14q4",
+    "questionType": "single_choice",
     "questionText": "What must persons in a suspended scaffold use?",
     "optionA": "A retracting harness.",
     "optionB": "A renal support belt.",
@@ -2122,6 +2305,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m14q5",
+    "questionType": "single_choice",
     "questionText": "On which side must a rolling scaffold be climbed?",
     "optionA": "Front.",
     "optionB": "Inside.",
@@ -2135,6 +2319,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m14q6",
+    "questionType": "single_choice",
     "questionText": "What should you preferably do with a floor opening?",
     "optionA": "Keep your distance during work.",
     "optionB": "Cover it with solid material.",
@@ -2148,6 +2333,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m14q7",
+    "questionType": "single_choice",
     "questionText": "What is not a hazard of working near wall and floor openings?",
     "optionA": "Being struck by an object falling through an opening.",
     "optionB": "Falling through a floor opening.",
@@ -2161,6 +2347,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m14q8",
+    "questionType": "single_choice",
     "questionText": "A ladder is used for:",
     "optionA": "For carrying out minor activities.",
     "optionB": "Bridging a certain height.",
@@ -2174,6 +2361,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m14q9",
+    "questionType": "single_choice",
     "questionText": "The reach at maximum one arm length is a rule for working with:",
     "optionA": "Pillar drills.",
     "optionB": "Ladders.",
@@ -2187,6 +2375,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q1",
+    "questionType": "single_choice",
     "questionText": "Is a layman allowed to work on live electrical installations?",
     "optionA": "Yes, provided the layman is over 21 years.",
     "optionB": "Yes, but only if the expert is constantly available.",
@@ -2200,6 +2389,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q2",
+    "questionType": "single_choice",
     "questionText": "What does an earth leakage circuit breaker do?",
     "optionA": "It diverts high tension current to the earth wire.",
     "optionB": "It disconnects the power at a certain leakage current.",
@@ -2213,6 +2403,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q3",
+    "questionType": "single_choice",
     "questionText": "Which safe voltage must you use in a confined space?",
     "optionA": "Direct current (max 50V) or alternating current (max 130V).",
     "optionB": "Direct current (max 12V) or alternating current (max 120V).",
@@ -2226,6 +2417,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q4",
+    "questionType": "single_choice",
     "questionText": "What can cause accidents through electricity?",
     "optionA": "The lack of earthing.",
     "optionB": "Pressing the emergency stop.",
@@ -2239,6 +2431,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q5",
+    "questionType": "single_choice",
     "questionText": "What is the greatest danger from current through the body?",
     "optionA": "The shock reaction.",
     "optionB": "The occurrence of burns.",
@@ -2252,6 +2445,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q6",
+    "questionType": "single_choice",
     "questionText": "Electrocution is a hazard related to:",
     "optionA": "The use of hazardous substances.",
     "optionB": "The use of electricity.",
@@ -2265,6 +2459,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q7",
+    "questionType": "single_choice",
     "questionText": "Injury due to electrical current does not depend on:",
     "optionA": "The current intensity.",
     "optionB": "The duration of current passing through the body.",
@@ -2278,6 +2473,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q8",
+    "questionType": "single_choice",
     "questionText": "The intensity of current through the body depends on:",
     "optionA": "Resistance of the surface, excluding footwear.",
     "optionB": "Voltage.",
@@ -2291,6 +2487,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q9",
+    "questionType": "single_choice",
     "questionText": "How does a short circuit occur?",
     "optionA": "When two parts at different voltages come in direct contact.",
     "optionB": "When two parts at the same voltages come in direct contact.",
@@ -2304,6 +2501,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q10",
+    "questionType": "single_choice",
     "questionText": "The occurrence and size of an electric arc is determined by:",
     "optionA": "Current intensity.",
     "optionB": "The potential difference between the parts.",
@@ -2317,6 +2515,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q11",
+    "questionType": "single_choice",
     "questionText": "Antistatic shoes are worn when:",
     "optionA": "Working in confined spaces.",
     "optionB": "Working with static electricity.",
@@ -2330,6 +2529,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q12",
+    "questionType": "single_choice",
     "questionText": "A hazard of static electricity is:",
     "optionA": "Discharge can result in a spark.",
     "optionB": "Sensitive electronic equipment can be damaged.",
@@ -2343,6 +2543,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q13",
+    "questionType": "single_choice",
     "questionText": "In which situation will static electricity not occur?",
     "optionA": "In rooms with a low oxygen level.",
     "optionB": "For liquids flowing through a plastic pipe or being stirred.",
@@ -2356,6 +2557,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q14",
+    "questionType": "single_choice",
     "questionText": "What is not a protection method for housings?",
     "optionA": "Double insulation protects against penetration of dust and moisture.",
     "optionB": "Protection against impact and falling objects.",
@@ -2369,6 +2571,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q15",
+    "questionType": "single_choice",
     "questionText": "A hazard of using power cables and extension cables is:",
     "optionA": "The power cables are too short.",
     "optionB": "Tripping over cables.",
@@ -2382,6 +2585,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q16",
+    "questionType": "single_choice",
     "questionText": "When using a cable reel one must:",
     "optionA": "Unwind the cable completely from the reel.",
     "optionB": "Not use them in confined spaces.",
@@ -2395,6 +2599,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q17",
+    "questionType": "single_choice",
     "questionText": "When a cable reel is not completely unwound:",
     "optionA": "It can cause static electricity.",
     "optionB": "It can become very hot and cause a fire.",
@@ -2408,6 +2613,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q18",
+    "questionType": "single_choice",
     "questionText": "The protection value of the earth leakage circuit breaker for construction site is:",
     "optionA": "300 mA.",
     "optionB": "25 mA.",
@@ -2421,6 +2627,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q19",
+    "questionType": "single_choice",
     "questionText": "A safety measure before working with electrical equipment is:",
     "optionA": "Visually check for damage and non-conformities.",
     "optionB": "Report damage and do not use damaged equipment.",
@@ -2434,6 +2641,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m15q20",
+    "questionType": "single_choice",
     "questionText": "When using electricity:",
     "optionA": "Scaffolding must be placed on rubber mats.",
     "optionB": "Scaffolding must be earthed.",
@@ -2447,6 +2655,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m16q1",
+    "questionType": "single_choice",
     "questionText": "What is one feature of a confined space?",
     "optionA": "Poor access.",
     "optionB": "Good lighting.",
@@ -2460,6 +2669,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m16q2",
+    "questionType": "single_choice",
     "questionText": "Is a manhole guard compulsory while working in an enclosed space?",
     "optionA": "Yes, but he may leave when measurements are completed.",
     "optionB": "No, unless indicated in the contractor license.",
@@ -2473,6 +2683,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m16q3",
+    "questionType": "single_choice",
     "questionText": "How can a suffocation hazard occur in confined space?",
     "optionA": "Through defects in the electrical installation.",
     "optionB": "Through high concentrations of oxygen.",
@@ -2486,6 +2697,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m16q4",
+    "questionType": "single_choice",
     "questionText": "Which type of voltage below is safe?",
     "optionA": "120 Volt alternating current.",
     "optionB": "240 Volt direct current.",
@@ -2499,6 +2711,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m16q5",
+    "questionType": "single_choice",
     "questionText": "What is not an example of a confined space?",
     "optionA": "Storage reservoirs or tanks.",
     "optionB": "Welding tents in/near deep excavations.",
@@ -2512,6 +2725,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m16q6",
+    "questionType": "single_choice",
     "questionText": "A rule for carrying out measurements in a confined space is:",
     "optionA": "Measurements must be carried out by the supervisor.",
     "optionB": "Measurements must be carried out by the employee in the space.",
@@ -2525,6 +2739,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m16q7",
+    "questionType": "single_choice",
     "questionText": "When supervising a confined space, this should be taken into account:",
     "optionA": "Communication should not take place in danger of collapsing.",
     "optionB": "Warning the emergency services if the person is in danger.",
@@ -2538,6 +2753,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m16q8",
+    "questionType": "single_choice",
     "questionText": "The permanent attendant must:",
     "optionA": "Be present when there are flammable materials.",
     "optionB": "Be on site all the time.",
@@ -2551,6 +2767,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m16q9",
+    "questionType": "single_choice",
     "questionText": "The duration of stay in a confined space:",
     "optionA": "Is related to where the confined space is.",
     "optionB": "Must be as short as possible.",
@@ -2564,6 +2781,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m16q10",
+    "questionType": "single_choice",
     "questionText": "A safety measure to reduce electrocution risk in a confined space is:",
     "optionA": "Both answers are correct.",
     "optionB": "Remove electricity from equipment in the correct manner.",
@@ -2577,6 +2795,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m17q1",
+    "questionType": "single_choice",
     "questionText": "When should hoisting operations be suspended?",
     "optionA": "Observe the crane manufacturer instructions for windforce.",
     "optionB": "Above wind force 4.",
@@ -2590,6 +2809,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m17q2",
+    "questionType": "single_choice",
     "questionText": "Which is a hoisting tool?",
     "optionA": "A sling.",
     "optionB": "A retaining strap.",
@@ -2603,6 +2823,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m17q3",
+    "questionType": "single_choice",
     "questionText": "What are two slings on a steel ring called?",
     "optionA": "A two legged bridle.",
     "optionB": "A pair of slings.",
@@ -2616,6 +2837,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m17q4",
+    "questionType": "single_choice",
     "questionText": "What is recorded in a crane logbook?",
     "optionA": "Which inspection certificates are compulsory.",
     "optionB": "Which weights may be moved over which distance.",
@@ -2629,6 +2851,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m17q5",
+    "questionType": "single_choice",
     "questionText": "Which statement about chains is CORRECT?",
     "optionA": "With chains along sharp edges you use edge protectors.",
     "optionB": "Chains with stretched links can be used if weight does not exceed limit.",
@@ -2642,6 +2865,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m17q6",
+    "questionType": "single_choice",
     "questionText": "What is not an example of hoisting equipment?",
     "optionA": "A tower crane.",
     "optionB": "A rolling bridge.",
@@ -2655,6 +2879,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m17q7",
+    "questionType": "single_choice",
     "questionText": "What can one do with hoisting equipment?",
     "optionA": "Move loads vertically.",
     "optionB": "Move loads horizontally.",
@@ -2668,6 +2893,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m17q8",
+    "questionType": "single_choice",
     "questionText": "A general danger when working with hoisting material is:",
     "optionA": "Load falling.",
     "optionB": "Hoisting equipment toppling.",
@@ -2681,6 +2907,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m17q9",
+    "questionType": "single_choice",
     "questionText": "Outriggers are used when working with:",
     "optionA": "Pillar drills.",
     "optionB": "Hazardous materials.",
@@ -2694,6 +2921,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m17q10",
+    "questionType": "single_choice",
     "questionText": "Steel cables:",
     "optionA": "Must not be knotted.",
     "optionB": "Should be stored in a damp room.",
@@ -2707,6 +2935,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m18q1",
+    "questionType": "single_choice",
     "questionText": "Infrared radiation is?",
     "optionA": "Non-ionizing radiation.",
     "optionB": "Ionizing radiation.",
@@ -2720,6 +2949,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m18q2",
+    "questionType": "single_choice",
     "questionText": "A safety measure against ionising radiation is:",
     "optionA": "Keep as far away as possible.",
     "optionB": "Cordon off the area around the source.",
@@ -2733,6 +2963,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m18q3",
+    "questionType": "single_choice",
     "questionText": "A medical examination is an obligation for employees who:",
     "optionA": "Work with hazardous substances over a short period.",
     "optionB": "Work with equipment or substances that emit ionising radiation.",
@@ -2746,6 +2977,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m18q4",
+    "questionType": "single_choice",
     "questionText": "Monitoring radiation safety and hygiene is a task of:",
     "optionA": "The supervisor.",
     "optionB": "The radiation expert.",
@@ -2759,6 +2991,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m18q5",
+    "questionType": "single_choice",
     "questionText": "What is the difference between ionising and non-ionising radiation?",
     "optionA": "Non ionising radiation is the only radiation which creates ions.",
     "optionB": "Non ionising radiation is weaker than ionising radiation.",
@@ -2772,6 +3005,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m18q6",
+    "questionType": "single_choice",
     "questionText": "A safety measure to prevent non-ionising radiation damaging health is:",
     "optionA": "Pay attention to instructions on appliances.",
     "optionB": "Respect the instructions related to duration of use.",
@@ -2785,6 +3019,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q1",
+    "questionType": "single_choice",
     "questionText": "What does not determine conditions of the working environment?",
     "optionA": "The supervisor.",
     "optionB": "The vibration.",
@@ -2798,6 +3033,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q2",
+    "questionType": "single_choice",
     "questionText": "A type of physical vibrations is:",
     "optionA": "Vibrations of the hand/arm from mechanical tools.",
     "optionB": "Vibration of the body from a vehicle or moving floor.",
@@ -2811,6 +3047,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q3",
+    "questionType": "single_choice",
     "questionText": "What is not a health complaint from vibrations to the body?",
     "optionA": "Infections to the skin.",
     "optionB": "Muscle ache.",
@@ -2824,6 +3061,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q4",
+    "questionType": "single_choice",
     "questionText": "Maintaining moisture balance is a control measure:",
     "optionA": "When working with hazardous substances.",
     "optionB": "To ensure there will not be fires.",
@@ -2837,6 +3075,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q5",
+    "questionType": "single_choice",
     "questionText": "A factor that influences physical stress is:",
     "optionA": "Working position/posture.",
     "optionB": "Both answers are correct.",
@@ -2850,6 +3089,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q6",
+    "questionType": "single_choice",
     "questionText": "A function of a break during work is:",
     "optionA": "To have a nice informal talk with co-workers.",
     "optionB": "To prevent overloading.",
@@ -2863,6 +3103,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q7",
+    "questionType": "single_choice",
     "questionText": "Chronic tiredness is a health hazard:",
     "optionA": "Working overtime once a month.",
     "optionB": "Of static stress.",
@@ -2876,6 +3117,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q8",
+    "questionType": "single_choice",
     "questionText": "The relationship with your colleagues:",
     "optionA": "Influences the working hours scheme.",
     "optionB": "Should always be positive.",
@@ -2889,6 +3131,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q9",
+    "questionType": "single_choice",
     "questionText": "The correct posture during manual lifting and moving is:",
     "optionA": "Keep the load as close as possible to the body.",
     "optionB": "Lift with a straight back and bend knees.",
@@ -2902,6 +3145,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q10",
+    "questionType": "single_choice",
     "questionText": "What is not a condition where standing work is preferred?",
     "optionA": "When frequently reaching down, up or far away.",
     "optionB": "If forces exceeding 30 N (3.0 kg) must be used.",
@@ -2915,6 +3159,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q11",
+    "questionType": "single_choice",
     "questionText": "The optimum sitting position during work is:",
     "optionA": "Good support of the upper legs on the seat.",
     "optionB": "Relief of the shoulders, for instance arm supports.",
@@ -2928,6 +3173,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q12",
+    "questionType": "single_choice",
     "questionText": "What is a guideline for correct sitting during work?",
     "optionA": "Ensure an optimal sitting position.",
     "optionB": "When in the optimal position, keep working this way as long as possible.",
@@ -2941,6 +3187,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q13",
+    "questionType": "single_choice",
     "questionText": "The advised maximum weight of 25 Kg is a safety measure for:",
     "optionA": "Lifting when seated.",
     "optionB": "Manual lifting.",
@@ -2954,6 +3201,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m19q14",
+    "questionType": "single_choice",
     "questionText": "The correct posture during manual lifting is:",
     "optionA": "Lift with a straight back and bend knees.",
     "optionB": "Keep the load as close as possible to the body.",
@@ -2967,6 +3215,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m20q1",
+    "questionType": "single_choice",
     "questionText": "What is the effect of excessively loud noises in the workplace?",
     "optionA": "It increases risk in the workplace.",
     "optionB": "If hearing protection is worn, loud noise has no effect.",
@@ -2980,6 +3229,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m20q2",
+    "questionType": "single_choice",
     "questionText": "Which factors determine whether noise is harmful?",
     "optionA": "Exposure time and resistance of the ossicle.",
     "optionB": "Pitch and strength of the noise.",
@@ -2993,6 +3243,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m20q3",
+    "questionType": "single_choice",
     "questionText": "Two equal sound sources together increase the sound level by:",
     "optionA": "3 dB.",
     "optionB": "6 dB.",
@@ -3006,6 +3257,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m20q4",
+    "questionType": "single_choice",
     "questionText": "Exposure to excess noise causes:",
     "optionA": "White fingers.",
     "optionB": "Permanent brain damage.",
@@ -3019,6 +3271,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m20q5",
+    "questionType": "single_choice",
     "questionText": "Doubling the distance to noises gives a reduction of approximately:",
     "optionA": "3 dB(A).",
     "optionB": "6 dB(A).",
@@ -3032,6 +3285,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m20q6",
+    "questionType": "single_choice",
     "questionText": "Having difficulty making phone calls is a symptom of:",
     "optionA": "Temporary hearing loss.",
     "optionB": "A noisy background.",
@@ -3045,6 +3299,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m20q7",
+    "questionType": "single_choice",
     "questionText": "The measurement unit for sound (pressure) level is:",
     "optionA": "Lumen.",
     "optionB": "Decibel.",
@@ -3058,6 +3313,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m20q8",
+    "questionType": "single_choice",
     "questionText": "The correct order to control excess noise is:",
     "optionA": "1. Reduce source / 2. Use hearing protection / 3. Damp noise / 4. Screen off",
     "optionB": "1. Use hearing protection / 2. Screen off / 3. Damp noise / 4. Reduce source",
@@ -3071,6 +3327,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m20q9",
+    "questionType": "single_choice",
     "questionText": "Which measures must the employer take at these sound levels?",
     "optionA": "From 85 dB(A), providing hearing examination and hearing protection.",
     "optionB": "From 80 dB(A), providing hearing examination and hearing protection.",
@@ -3084,6 +3341,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q1",
+    "questionType": "single_choice",
     "questionText": "Why should people in industry not wear metal safety helmets?",
     "optionA": "A metal helmet can injure the head.",
     "optionB": "A metal helmet cannot sufficiently cushion falling objects.",
@@ -3093,10 +3351,13 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Personal Protective Equipment",
     "difficulty": "easy",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+    "explanation": "PPE is always the last resort in the hierarchy of control. It protects only the wearer and relies on correct use. Collective measures are always preferred.",
+    "officialRef": "Module 21 — Personal Protective Equipment"
   },
   {
     "id": "m21q2",
+    "questionType": "single_choice",
     "questionText": "For which activities is a dust filter mask breathing protection?",
     "optionA": "When spraying paint.",
     "optionB": "When welding.",
@@ -3110,6 +3371,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q3",
+    "questionType": "single_choice",
     "questionText": "In which situations do safety goggles offer good protection?",
     "optionA": "For activities where acid splashes occur.",
     "optionB": "With work above the head.",
@@ -3123,6 +3385,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q4",
+    "questionType": "single_choice",
     "questionText": "When working with noise level higher than 85 dB(A):",
     "optionA": "Hearing protection is recommended.",
     "optionB": "The employee may choose to use hearing protection.",
@@ -3136,6 +3399,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q5",
+    "questionType": "single_choice",
     "questionText": "PPE must be:",
     "optionA": "Available in one size.",
     "optionB": "On site at every workplace.",
@@ -3149,6 +3413,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q6",
+    "questionType": "single_choice",
     "questionText": "The difference between safety glasses and a welding mask:",
     "optionA": "Welding masks protect from infrared radiation; goggles protect from flying particles.",
     "optionB": "Safety glasses protect from UV; welding masks protect from flying particles.",
@@ -3162,6 +3427,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q7",
+    "questionType": "single_choice",
     "questionText": "Too low oxygen concentration is a hazard for:",
     "optionA": "The environment.",
     "optionB": "Fires.",
@@ -3175,6 +3441,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q8",
+    "questionType": "single_choice",
     "questionText": "Self-contained breathing protection must be used:",
     "optionA": "If there are high and unknown concentrations of hazardous substances.",
     "optionB": "If there is less than 19% oxygen in the air.",
@@ -3188,6 +3455,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q9",
+    "questionType": "single_choice",
     "questionText": "What is not a rule for using fall protection?",
     "optionA": "Safety harnesses must fit well and be adjusted to the wearer.",
     "optionB": "Fall protection devices that have arrested a fall can be used again.",
@@ -3201,6 +3469,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q10",
+    "questionType": "single_choice",
     "questionText": "Warning clothing is used:",
     "optionA": "At low temperatures.",
     "optionB": "To make the wearer visible.",
@@ -3214,6 +3483,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q11",
+    "questionType": "single_choice",
     "questionText": "Slipping is a hazard to:",
     "optionA": "Hands and arms.",
     "optionB": "Feet and legs.",
@@ -3227,6 +3497,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q12",
+    "questionType": "single_choice",
     "questionText": "Various forms of hand and arm protection are:",
     "optionA": "Gloves with anti-slip sole.",
     "optionB": "Gloves with extended wrist and/or arm protection.",
@@ -3240,6 +3511,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q13",
+    "questionType": "single_choice",
     "questionText": "A main property of a safety helmet is:",
     "optionA": "Interior: absorbs a shock and distributes it over the head.",
     "optionB": "Exterior: absorbs a shock and distributes it over the head.",
@@ -3253,6 +3525,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q14",
+    "questionType": "single_choice",
     "questionText": "Hazards for the head during work are:",
     "optionA": "Impact.",
     "optionB": "Falling objects.",
@@ -3266,6 +3539,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m21q15",
+    "questionType": "single_choice",
     "questionText": "A nose and mouth cover is used for:",
     "optionA": "Against particles and gases or vapours.",
     "optionB": "Covering the entire face.",
@@ -3279,6 +3553,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m22q1",
+    "questionType": "single_choice",
     "questionText": "Which characteristics apply to a mandatory sign?",
     "optionA": "It is round, blue, and has a white symbol.",
     "optionB": "It is triangular and yellow with a black symbol.",
@@ -3292,6 +3567,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m22q2",
+    "questionType": "single_choice",
     "questionText": "Which requirements apply to warning signs at the workplace?",
     "optionA": "The design must be clear to all.",
     "optionB": "They must be attached at a safe height.",
@@ -3305,6 +3581,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m22q3",
+    "questionType": "single_choice",
     "questionText": "A group of signs is:",
     "optionA": "Mandatory signs.",
     "optionB": "First Aid signs.",
@@ -3318,6 +3595,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m22q4",
+    "questionType": "single_choice",
     "questionText": "A sign that prohibits something is:",
     "optionA": "Circular red sign with a white edge and red diagonal.",
     "optionB": "Triangular yellow sign with a black edge.",
@@ -3331,6 +3609,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m22q5",
+    "questionType": "single_choice",
     "questionText": "A triangular yellow sign with a black edge is the design of:",
     "optionA": "A provision sign.",
     "optionB": "A warning sign.",
@@ -3344,6 +3623,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m22q6",
+    "questionType": "single_choice",
     "questionText": "The general meaning of warning signs is:",
     "optionA": "Prohibiting something.",
     "optionB": "The route to provisions.",
@@ -3357,6 +3637,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m22q7",
+    "questionType": "single_choice",
     "questionText": "A square or rectangular green sign with a white symbol is for:",
     "optionA": "Mandatory signs.",
     "optionB": "Warning signs.",
@@ -3370,6 +3651,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m22q8",
+    "questionType": "single_choice",
     "questionText": "Fire-fighting equipment is located at signs which are:",
     "optionA": "Square/rectangular and green with a white sign.",
     "optionB": "Square/rectangular and red with a white sign.",
@@ -3383,6 +3665,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m22q9",
+    "questionType": "single_choice",
     "questionText": "The general meaning for fire-fighting equipment:",
     "optionA": "Indicates where equipment can be found: the route to it.",
     "optionB": "Indicates where equipment can be found: the place itself.",
@@ -3396,6 +3679,7 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
   },
   {
     "id": "m22q10",
+    "questionType": "single_choice",
     "questionText": "Yellow or white stripes are used for:",
     "optionA": "Marking the top and bottom step of stairs.",
     "optionB": "Markings of passages and stacking areas.",
@@ -3405,6 +3689,263 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Signs and Markings",
     "difficulty": "easy",
     "isBVCA": true,
-    "isVOLVCA": true
+    "isVOLVCA": true,
+
+  // ─── MULTIPLE CHOICE QUESTIONS ───────────────────────────────────────────────
+  {
+    id: 'mc001',
+    questionType: 'multiple_choice',
+    questionText: 'Which of the following are mandatory when working at heights above 2 metres?',
+    options: [
+      { id: 'a', text: 'Safety harness with lanyard', isCorrect: true },
+      { id: 'b', text: 'Hard hat', isCorrect: true },
+      { id: 'c', text: 'Safety boots with steel toecap', isCorrect: true },
+      { id: 'd', text: 'High-visibility vest', isCorrect: false },
+      { id: 'e', text: 'Hearing protection', isCorrect: false },
+    ],
+    moduleId: 14,
+    moduleName: 'Working at Height',
+    difficulty: 'medium',
+    isBVCA: true,
+    isVOLVCA: true,
+    explanation: 'Working at heights requires fall protection (harness + lanyard), head protection and foot protection as minimum. Hi-vis and hearing protection depend on the specific environment.',
+    officialRef: 'Module 14 — Working at Height',
+    studyTopic: 'working-at-heights',
+  },
+  {
+    id: 'mc002',
+    questionType: 'multiple_choice',
+    questionText: 'Which of the following are classified as hazardous substances under REACH regulation?',
+    options: [
+      { id: 'a', text: 'Asbestos fibres', isCorrect: true },
+      { id: 'b', text: 'Benzene', isCorrect: true },
+      { id: 'c', text: 'Drinking water', isCorrect: false },
+      { id: 'd', text: 'Silica dust', isCorrect: true },
+      { id: 'e', text: 'Compressed air', isCorrect: false },
+    ],
+    moduleId: 8,
+    moduleName: 'Hazardous Substances',
+    difficulty: 'medium',
+    isBVCA: false,
+    isVOLVCA: true,
+    explanation: 'Asbestos, benzene, and silica dust are all classified as hazardous substances with strict exposure limits. Drinking water and compressed air are not classified as hazardous under REACH.',
+    officialRef: 'Module 8 — Hazardous Substances',
+    studyTopic: 'hazardous-substances',
+  },
+  {
+    id: 'mc003',
+    questionType: 'multiple_choice',
+    questionText: 'Which of the following are valid methods to prevent fire in a workplace?',
+    options: [
+      { id: 'a', text: 'Removing ignition sources near flammable materials', isCorrect: true },
+      { id: 'b', text: 'Storing flammable liquids in approved safety cabinets', isCorrect: true },
+      { id: 'c', text: 'Increasing ventilation to dilute flammable vapours', isCorrect: true },
+      { id: 'd', text: 'Using water to clean up all chemical spills', isCorrect: false },
+      { id: 'e', text: 'Keeping fire extinguishers locked away to prevent misuse', isCorrect: false },
+    ],
+    moduleId: 9,
+    moduleName: 'Fire and Explosions',
+    difficulty: 'medium',
+    isBVCA: true,
+    isVOLVCA: true,
+    explanation: 'Fire prevention involves removing ignition sources, proper storage of flammables, and adequate ventilation. Water should not be used on chemical spills (may spread or react). Extinguishers must be accessible, not locked away.',
+    officialRef: 'Module 9 — Fire and Explosions',
+    studyTopic: 'fire-explosion',
+  },
+
+  // ─── TRUE/FALSE MATRIX QUESTIONS ─────────────────────────────────────────────
+  {
+    id: 'tf001',
+    questionType: 'true_false_matrix',
+    questionText: 'Indicate whether each of the following statements about hazardous substances is true or false:',
+    statements: [
+      { id: 's1', text: 'An SDS (Safety Data Sheet) must always be available on site', isTrue: true },
+      { id: 's2', text: 'Hazardous substances must be stored in their original containers', isTrue: true },
+      { id: 's3', text: 'You can dispose of chemical waste in regular garbage', isTrue: false },
+      { id: 's4', text: 'Ventilation is only required for liquids, not gases', isTrue: false },
+    ],
+    moduleId: 8,
+    moduleName: 'Hazardous Substances',
+    difficulty: 'medium',
+    isBVCA: false,
+    isVOLVCA: true,
+    explanation: 'SDS must be available per REACH regulation. Original containers prevent confusion. Chemical waste must follow specific disposal routes. Both liquids and gases can require ventilation.',
+    officialRef: 'Module 8 — Hazardous Substances',
+    studyTopic: 'hazardous-substances',
+  },
+  {
+    id: 'tf002',
+    questionType: 'true_false_matrix',
+    questionText: 'Indicate whether each of the following statements about PPE is true or false:',
+    statements: [
+      { id: 's1', text: 'PPE is the first line of defence in the hierarchy of control', isTrue: false },
+      { id: 's2', text: 'The employer is responsible for providing PPE free of charge', isTrue: true },
+      { id: 's3', text: 'Damaged PPE must be replaced immediately', isTrue: true },
+      { id: 's4', text: 'PPE with a CE mark meets minimum European safety requirements', isTrue: true },
+    ],
+    moduleId: 21,
+    moduleName: 'Personal Protective Equipment',
+    difficulty: 'easy',
+    isBVCA: true,
+    isVOLVCA: true,
+    explanation: 'PPE is the last resort in the hierarchy of control, not the first. Employers must provide PPE free of charge. Damaged PPE must be replaced. CE marking confirms compliance with EU safety standards.',
+    officialRef: 'Module 21 — Personal Protective Equipment',
+    studyTopic: 'ppe',
+  },
+  {
+    id: 'tf003',
+    questionType: 'true_false_matrix',
+    questionText: 'Indicate whether each of the following statements about working in confined spaces is true or false:',
+    statements: [
+      { id: 's1', text: 'A permit-to-work is always required before entering a confined space', isTrue: true },
+      { id: 's2', text: 'Atmospheric testing is only needed if there is a visible hazard', isTrue: false },
+      { id: 's3', text: 'A standby person must be present outside the confined space', isTrue: true },
+      { id: 's4', text: 'Rescue equipment must be available before entry', isTrue: true },
+    ],
+    moduleId: 16,
+    moduleName: 'Confined Spaces',
+    difficulty: 'hard',
+    isBVCA: false,
+    isVOLVCA: true,
+    explanation: 'Confined space entry always requires a permit-to-work. Atmospheric testing is mandatory regardless of visible hazards (oxygen deficiency is invisible). A standby person and rescue equipment are always required.',
+    officialRef: 'Module 16 — Confined Spaces',
+    studyTopic: 'confined-spaces',
+  },
+
+  // ─── ORDERING QUESTIONS ───────────────────────────────────────────────────────
+  {
+    id: 'ord001',
+    questionType: 'ordering',
+    questionText: 'Place the steps of the hierarchy of control (elimination to last resort) in the correct order, starting from the most preferred:',
+    items: [
+      { id: 'i1', text: 'Administrative controls (procedures, training)', correctPosition: 3 },
+      { id: 'i2', text: 'Elimination of the hazard', correctPosition: 0 },
+      { id: 'i3', text: 'Personal Protective Equipment (PPE)', correctPosition: 4 },
+      { id: 'i4', text: 'Substitution (replace with less hazardous)', correctPosition: 1 },
+      { id: 'i5', text: 'Engineering controls (physical barriers)', correctPosition: 2 },
+    ],
+    moduleId: 3,
+    moduleName: 'Accidents: Causes and Prevention',
+    difficulty: 'hard',
+    isBVCA: false,
+    isVOLVCA: true,
+    explanation: 'The hierarchy of control runs from Elimination → Substitution → Engineering → Administrative → PPE. PPE is always the last resort because it relies on correct use by the individual.',
+    officialRef: 'Module 3 — Risk Prevention',
+    studyTopic: 'risk-prevention',
+  },
+  {
+    id: 'ord002',
+    questionType: 'ordering',
+    questionText: 'Place the steps for responding to a chemical spill in the correct order:',
+    items: [
+      { id: 'i1', text: 'Notify supervisor and complete incident report', correctPosition: 3 },
+      { id: 'i2', text: 'Evacuate the immediate area and warn others', correctPosition: 0 },
+      { id: 'i3', text: 'Clean up using appropriate absorbent materials and PPE', correctPosition: 2 },
+      { id: 'i4', text: 'Identify the substance using the SDS', correctPosition: 1 },
+    ],
+    moduleId: 8,
+    moduleName: 'Hazardous Substances',
+    difficulty: 'medium',
+    isBVCA: false,
+    isVOLVCA: true,
+    explanation: 'In a chemical spill: first evacuate and warn others, then identify the substance via SDS, then clean up with correct PPE and materials, and finally report the incident.',
+    officialRef: 'Module 8 — Hazardous Substances',
+    studyTopic: 'hazardous-substances',
+  },
+  {
+    id: 'ord003',
+    questionType: 'ordering',
+    questionText: 'Place the steps for using a fire extinguisher (PASS technique) in the correct order:',
+    items: [
+      { id: 'i1', text: 'Squeeze the handle to discharge the agent', correctPosition: 2 },
+      { id: 'i2', text: 'Pull the safety pin', correctPosition: 0 },
+      { id: 'i3', text: 'Sweep from side to side at the base of the fire', correctPosition: 3 },
+      { id: 'i4', text: 'Aim the nozzle at the base of the fire', correctPosition: 1 },
+    ],
+    moduleId: 9,
+    moduleName: 'Fire and Explosions',
+    difficulty: 'easy',
+    isBVCA: true,
+    isVOLVCA: true,
+    explanation: 'The PASS technique: Pull the pin → Aim at the base → Squeeze the handle → Sweep side to side. Always aim at the base of the fire, not the flames.',
+    officialRef: 'Module 9 — Fire and Explosions',
+    studyTopic: 'fire-explosion',
+  },
+
+  // ─── MATCHING QUESTIONS ───────────────────────────────────────────────────────
+  {
+    id: 'mat001',
+    questionType: 'matching',
+    questionText: 'Match each type of fire extinguisher to the class of fire it is designed for:',
+    leftItems: [
+      { id: 'l1', text: 'Water extinguisher' },
+      { id: 'l2', text: 'CO₂ extinguisher' },
+      { id: 'l3', text: 'Foam extinguisher' },
+      { id: 'l4', text: 'Dry powder extinguisher' },
+    ],
+    rightItems: [
+      { id: 'r1', text: 'Class A — Solid materials (wood, paper)', matchesLeftId: 'l1' },
+      { id: 'r2', text: 'Class B — Flammable liquids (petrol, oil)', matchesLeftId: 'l3' },
+      { id: 'r3', text: 'Class C — Electrical fires', matchesLeftId: 'l2' },
+      { id: 'r4', text: 'Class A, B and C fires (multipurpose)', matchesLeftId: 'l4' },
+    ],
+    moduleId: 9,
+    moduleName: 'Fire and Explosions',
+    difficulty: 'medium',
+    isBVCA: true,
+    isVOLVCA: true,
+    explanation: 'Water: class A solids only. Foam: class B liquids (and A). CO₂: electrical (class C) — displaces oxygen without leaving residue. Dry powder: versatile (A, B, C) but leaves residue.',
+    officialRef: 'Module 9 — Fire and Explosions',
+    studyTopic: 'fire-explosion',
+  },
+  {
+    id: 'mat002',
+    questionType: 'matching',
+    questionText: 'Match each safety sign colour to its meaning:',
+    leftItems: [
+      { id: 'l1', text: 'Red' },
+      { id: 'l2', text: 'Yellow / Amber' },
+      { id: 'l3', text: 'Blue' },
+      { id: 'l4', text: 'Green' },
+    ],
+    rightItems: [
+      { id: 'r1', text: 'Prohibition or fire equipment', matchesLeftId: 'l1' },
+      { id: 'r2', text: 'Warning / caution', matchesLeftId: 'l2' },
+      { id: 'r3', text: 'Mandatory action (must do)', matchesLeftId: 'l3' },
+      { id: 'r4', text: 'Safe condition / emergency escape', matchesLeftId: 'l4' },
+    ],
+    moduleId: 22,
+    moduleName: 'Signs and Markings',
+    difficulty: 'easy',
+    isBVCA: true,
+    isVOLVCA: true,
+    explanation: 'ISO 7010 colour coding: Red = prohibition/fire, Yellow = warning, Blue = mandatory, Green = safe condition/emergency. These are standardised across the EU.',
+    officialRef: 'Module 22 — Signs and Markings',
+    studyTopic: 'signs-markings',
+  },
+  {
+    id: 'mat003',
+    questionType: 'matching',
+    questionText: 'Match each type of PPE to the hazard it primarily protects against:',
+    leftItems: [
+      { id: 'l1', text: 'Ear defenders / earplugs' },
+      { id: 'l2', text: 'Respirator (FFP3 mask)' },
+      { id: 'l3', text: 'Safety goggles' },
+      { id: 'l4', text: 'Anti-vibration gloves' },
+    ],
+    rightItems: [
+      { id: 'r1', text: 'Noise-induced hearing loss', matchesLeftId: 'l1' },
+      { id: 'r2', text: 'Inhalation of fine dust and aerosols', matchesLeftId: 'l2' },
+      { id: 'r3', text: 'Chemical splash or flying particles to eyes', matchesLeftId: 'l3' },
+      { id: 'r4', text: 'Hand-arm vibration syndrome (HAVS)', matchesLeftId: 'l4' },
+    ],
+    moduleId: 21,
+    moduleName: 'Personal Protective Equipment',
+    difficulty: 'medium',
+    isBVCA: true,
+    isVOLVCA: true,
+    explanation: 'Each PPE type is matched to its primary hazard. Ear defenders protect against noise. FFP3 respirators protect against fine particles. Goggles protect eyes. Anti-vibration gloves reduce HAVS risk from power tools.',
+    officialRef: 'Module 21 — Personal Protective Equipment',
+    studyTopic: 'ppe',
   }
 ];
