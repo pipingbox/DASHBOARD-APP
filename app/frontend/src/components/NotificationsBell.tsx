@@ -15,6 +15,7 @@ import {
   Loader2,
   X,
   CheckCircle2,
+  Megaphone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -64,6 +65,8 @@ function getNotificationMeta(type: NotificationType): NotificationMeta {
       return { icon: ShieldAlert, iconColor: 'text-red-400' };
     case 'FEEDBACK_RESOLVED':
       return { icon: CheckCircle2, iconColor: 'text-green-400' };
+    case 'PRODUCT_UPDATE':
+      return { icon: Megaphone, iconColor: 'text-indigo-400' };
     default:
       return { icon: Bell, iconColor: 'text-zinc-400' };
   }
@@ -101,6 +104,8 @@ function getNotificationMessage(n: NotificationRow, t: (key: string, opts?: Reco
       return t('notifications.adminAlert');
     case 'FEEDBACK_RESOLVED':
       return t('notifications.feedbackResolved');
+    case 'PRODUCT_UPDATE':
+      return n.title || t('notifications.productUpdate', 'New feature available');
     default:
       return n.title || t('notifications.empty');
   }

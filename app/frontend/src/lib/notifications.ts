@@ -15,7 +15,8 @@ export type NotificationType =
   | 'DOCUMENT_REQUEST'
   | 'CERTIFICATE_EXPIRING'
   | 'ADMIN_ALERT'
-  | 'FEEDBACK_RESOLVED';
+  | 'FEEDBACK_RESOLVED'
+  | 'PRODUCT_UPDATE';
 
 // ─── Row Interface ───
 export interface NotificationRow {
@@ -356,4 +357,129 @@ export async function deleteNotification(notificationId: string): Promise<void> 
     .from(TABLES.notifications)
     .delete()
     .eq('id', notificationId);
+}
+
+// ─── Profile improvement suggestions (PB-NOTIF-001 Fase 3) ────────────────
+//
+// Each suggestion uses PROFILE_INCOMPLETE type + related_entity_id = "field:<key>"
+// for dedup. The same suggestion is not re-sent within SUGGESTION_COOLDOWN_DAYS.
+
+const SUGGESTION_COOLDOWN_DAYS = 30;
+
+export interface ProfileSuggestionInput {
+  title: string | null | undefined;
+  skills: string[] | null | undefined;
+  location: string | null | undefined;
+  languages: string[] | null | undefined;
+  years_experience: number | null | undefined;
+  availability_status: string | null | undefined;
+}
+
+/** Returns up to `maxSuggestions` actionable suggestions for the given profile gaps. */
+export function buildProfileSuggestions(
+  profile: ProfileSuggestionInput,
+  maxSuggestions = 3,
+): { fieldKey: string; message: string }[] {
+  const suggestions: { fieldKey: string; message: string }[] = [];
+
+  if (!profile.title?.trim())
+    suggestions.push({
+      fieldKey: 'title',
+      message: 'Añade tu especialización (ej. Piping Designer, Welder) para aparecer en búsquedas relevantes.',
+    });
+
+  if (!profile.skills || profile.skills.length === 0)
+    suggestions.push({
+      fieldKey: 'skills',
+      message: 'Añade tus habilidades técnicas para mejorar tu compatibilidad con ofertas.',
+    });
+
+  if (!profile.location?.trim())
+    suggestions.push({
+      fieldKey: 'location',
+      message: 'Añade tu ubicación para recibir ofertas locales y proyectos cercanos.',
+    });
+
+  if (!profile.languages || profile.languages.length === 0)
+    suggestions.push({
+      fieldKey: 'languages',
+      message: 'Indica los idiomas en que puedes trabajar para acceder a más oportunidades.',
+    });
+
+  if (!profile.years_experience || profile.years_experience === 0)
+    suggestions.push({
+      fieldKey: 'years_experience',
+      message: 'Añade tus años de experiencia para que las empresas puedan evaluar tu perfil correctamente.',
+    });
+
+  if (!profile.availability_status)
+    suggestions.push({
+      fieldKey: 'availability_status',
+      message: 'Indica tu disponibilidad actual para recibir invitaciones de empresas.',
+    });
+
+  return suggestions.slice(0, maxSuggestions);
+}
+
+/**
+ * Send actionable profile improvement notifications.
+ * Each field deduped independently with a 30-day cooldown so the user
+ * only receives each suggestion once a month at most.
+ */
+export async function notifyProfileSuggestions(
+  userId: string,
+  profile: ProfileSuggestionInput,
+): Promise<void> {
+  const suggestions = buildProfileSuggestions(profile);
+  if (suggestions.length === 0) return;
+
+  const cooloff = new Date(Date.now() - SUGGESTION_COOLDOWN_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+  for (const { fieldKey, message } of suggestions) {
+    const entityId = `field:${fieldKey}`;
+
+    // Dedup: skip if already sent within cooldown window
+    const { data: existing } = await supabase
+      .from(TABLES.notifications)
+      .select('id')
+      .eq('user_id', userId)
+      .eq('type', 'PROFILE_INCOMPLETE')
+      .eq('related_entity_id', entityId)
+      .gte('created_at', cooloff)
+      .limit(1);
+
+    if (existing && existing.length > 0) continue;
+
+    await createNotification({
+      recipientId: userId,
+      type: 'PROFILE_INCOMPLETE',
+      title: 'Completa tu perfil',
+      message,
+      relatedEntityType: 'profile',
+      relatedEntityId: entityId,
+      actionUrl: '/profile',
+    });
+  }
+}
+
+// ─── PRODUCT_UPDATE helpers ────────────────────────────────────────────────
+
+/**
+ * Notify a single user about a new product update/announcement.
+ * In practice this is called in bulk by the broadcast-notification Edge Function.
+ */
+export async function notifyProductUpdate(
+  userId: string,
+  title: string,
+  message: string,
+  actionUrl = '/dashboard',
+): Promise<void> {
+  await createNotification({
+    recipientId: userId,
+    type: 'PRODUCT_UPDATE',
+    title,
+    message,
+    relatedEntityType: 'announcement',
+    actionUrl,
+  });
 }

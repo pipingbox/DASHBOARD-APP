@@ -18,6 +18,7 @@ import { CVUploadSection } from '@/components/profile/CVUploadSection';
 import { DocumentsSection } from '@/components/profile/DocumentsSection';
 import { AvailabilityMobilitySection } from '@/components/profile/AvailabilityMobilitySection';
 import { AICVExtraction } from '@/components/profile/AICVExtraction';
+import { notifyProfileSuggestions } from '@/lib/notifications';
 import { ProfileCompleteness } from '@/components/profile/ProfileCompleteness';
 import { generateCV } from '@/lib/generateCV';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
@@ -181,6 +182,20 @@ export default function Profile() {
 
     // Recalculate profile completion (non-blocking)
     if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
+
+    // Send targeted improvement suggestions for any remaining gaps (PB-NOTIF-001 Fase 3).
+    // Fire-and-forget with 30-day dedup per field so the user is never spammed.
+    if (user) {
+      const savedPayload = payload as Record<string, unknown>;
+      notifyProfileSuggestions(user.id, {
+        title: savedPayload.title as string | null,
+        skills: savedPayload.skills as string[] | null,
+        location: savedPayload.location as string | null,
+        languages: savedPayload.languages as string[] | null,
+        years_experience: savedPayload.years_experience as number | null,
+        availability_status: savedPayload.availability_status as string | null,
+      }).catch(() => {});
+    }
 
     if (isMountedRef.current) {
       setSaving(false);
