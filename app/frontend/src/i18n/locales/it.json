@@ -870,6 +870,20 @@
       "premium_perks": "Vantaggi Premium"
     }
   },
+  "workday": {
+    "autoFilledFromLastEntry": "Compilato automaticamente dall'ultima voce — modifica se necessario.",
+    "clearAutoFill": "Cancella",
+    "monthlyReport": "Report mensile",
+    "downloadPdf": "Scarica PDF",
+    "pdfColumns": "Colonne da includere",
+    "companyNameForReport": "Nome azienda (opzionale)",
+    "includeSignatureBlock": "Includi blocco firma",
+    "daysWorked": "Giorni lavorati",
+    "totalHours": "Ore totali",
+    "grossSalary": "Stipendio lordo",
+    "finalTotal": "Totale finale",
+    "location": "Posizione"
+  },
   "admin": {
     "notifications": {
       "title": "Centro Notifiche",

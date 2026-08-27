@@ -91,6 +91,7 @@ export function WorkDayLogDialog({
 
   const [presets, setPresets] = useState<RatePreset[]>([]);
   const [form, setForm] = useState<FormState>(makeInitial(initialDate));
+  const [autoFilled, setAutoFilled] = useState(false); // true when form was pre-filled from last entry
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
@@ -138,7 +139,44 @@ export function WorkDayLogDialog({
         preset_id: existingLog.preset_id,
       });
     } else {
+      // Auto-fill from the most recent entry (Modo automático — PB-WORKDAY-002).
+      // Load the last entry silently; the user can clear with one click.
+      setAutoFilled(false);
       setForm(makeInitial(initialDate));
+      if (user) {
+        supabase
+          .from(TABLES.workDayLogs)
+          .select('*')
+          .eq('user_id', user.id)
+          .order('log_date', { ascending: false })
+          .limit(1)
+          .then(({ data }) => {
+            const last = data?.[0] as WorkDayLog | undefined;
+            if (!last) return;
+            setForm({
+              log_date: initialDate ?? todayIso(),
+              location: last.location ?? '',
+              normal_hours: String(last.normal_hours ?? ''),
+              extra_hours: String(last.extra_hours ?? '0'),
+              normal_rate: String(last.normal_rate ?? ''),
+              extra_rate: String(last.extra_rate ?? ''),
+              kilometers:
+                last.kilometers != null && last.kilometers !== 0
+                  ? String(last.kilometers)
+                  : '',
+              kilometer_rate:
+                last.kilometer_rate != null && last.kilometer_rate !== 0
+                  ? String(last.kilometer_rate)
+                  : '',
+              travel_allowance_override: '',
+              currency: (last.currency as CurrencyCode) || DEFAULT_CURRENCY,
+              notes: '',
+              preset_id: last.preset_id,
+            });
+            setAutoFilled(true);
+          })
+          .catch(() => { /* non-critical — form stays empty */ });
+      }
     }
     setErrors({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -351,6 +389,19 @@ export function WorkDayLogDialog({
           </SheetHeader>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+            {/* Auto-fill banner — shown when form was pre-filled from last entry */}
+            {autoFilled && !existingLog && (
+              <div className="flex items-center justify-between rounded-lg border border-[#f59e0b]/30 bg-[#f59e0b]/10 px-3 py-2 text-xs text-[#f59e0b]">
+                <span>{t('workday.autoFilledFromLastEntry', 'Auto-filled from your last entry — adjust as needed.')}</span>
+                <button
+                  type="button"
+                  onClick={() => { setForm(makeInitial(initialDate)); setAutoFilled(false); }}
+                  className="ml-3 underline hover:no-underline opacity-80 hover:opacity-100 shrink-0"
+                >
+                  {t('workday.clearAutoFill', 'Clear')}
+                </button>
+              </div>
+            )}
             {/* Preset selector */}
             <div className="space-y-2">
               <Label

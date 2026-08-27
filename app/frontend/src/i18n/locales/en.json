@@ -1352,7 +1352,19 @@
     "workdaySaved": "Workday saved",
     "confirmDelete": "Delete this workday entry?",
     "failedToDelete": "Failed to delete",
-    "workdayDeleted": "Workday deleted"
+    "workdayDeleted": "Workday deleted",
+    "autoFilledFromLastEntry": "Auto-filled from your last entry — adjust as needed.",
+    "clearAutoFill": "Clear",
+    "monthlyReport": "Monthly report",
+    "downloadPdf": "Download PDF",
+    "pdfColumns": "Columns to include",
+    "companyNameForReport": "Company name (optional)",
+    "includeSignatureBlock": "Include signature block",
+    "daysWorked": "Days worked",
+    "totalHours": "Total hours",
+    "grossSalary": "Gross salary",
+    "finalTotal": "Grand total",
+    "location": "Location"
   },
   "ratePresets": {
     "eyebrow": "Salary rate presets",

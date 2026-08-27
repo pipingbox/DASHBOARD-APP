@@ -1244,7 +1244,19 @@
     "workdaySaved": "Arbeitstag gespeichert",
     "confirmDelete": "Diesen Arbeitstag löschen?",
     "failedToDelete": "Löschen fehlgeschlagen",
-    "workdayDeleted": "Arbeitstag gelöscht"
+    "workdayDeleted": "Arbeitstag gelöscht",
+    "autoFilledFromLastEntry": "Automatisch ausgefüllt aus letztem Eintrag — nach Bedarf anpassen.",
+    "clearAutoFill": "Leeren",
+    "monthlyReport": "Monatsbericht",
+    "downloadPdf": "PDF herunterladen",
+    "pdfColumns": "Einzuschließende Spalten",
+    "companyNameForReport": "Firmenname (optional)",
+    "includeSignatureBlock": "Unterschriftsblock einschließen",
+    "daysWorked": "Gearbeitete Tage",
+    "totalHours": "Gesamtstunden",
+    "grossSalary": "Bruttogehalt",
+    "finalTotal": "Gesamtsumme",
+    "location": "Standort"
   },
   "ratePresets": {
     "eyebrow": "Lohnvorlagen",

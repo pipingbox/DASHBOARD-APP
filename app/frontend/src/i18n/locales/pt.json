@@ -1244,7 +1244,19 @@
     "workdaySaved": "Jornada guardada",
     "confirmDelete": "Eliminar esta jornada?",
     "failedToDelete": "Falha ao eliminar",
-    "workdayDeleted": "Jornada eliminada"
+    "workdayDeleted": "Jornada eliminada",
+    "autoFilledFromLastEntry": "Preenchido automaticamente a partir da sua última entrada — ajuste conforme necessário.",
+    "clearAutoFill": "Limpar",
+    "monthlyReport": "Relatório mensal",
+    "downloadPdf": "Baixar PDF",
+    "pdfColumns": "Colunas a incluir",
+    "companyNameForReport": "Nome da empresa (opcional)",
+    "includeSignatureBlock": "Incluir bloco de assinatura",
+    "daysWorked": "Dias trabalhados",
+    "totalHours": "Horas totais",
+    "grossSalary": "Salário bruto",
+    "finalTotal": "Total final",
+    "location": "Localização"
   },
   "ratePresets": {
     "eyebrow": "Tarifas guardadas",

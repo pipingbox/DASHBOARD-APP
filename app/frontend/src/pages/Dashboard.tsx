@@ -23,6 +23,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { WorkDayLogDialog } from '@/components/WorkDayLogDialog';
 import { WorkDayCalendar } from '@/components/WorkDayCalendar';
+import { WorkDayMonthReport } from '@/components/WorkDayMonthReport';
 import { RatePresetManager } from '@/components/RatePresetManager';
 import { ProNetworkWidget } from '@/components/profile/ProNetworkWidget';
 import { PendingInvitationsWidget } from '@/components/PendingInvitationsWidget';
@@ -639,18 +640,25 @@ export default function Dashboard() {
             eyebrow={t('dashboard.workDayLog')}
             title={t('dashboard.latestEntries')}
             right={
-              <WorkDayLogDialog
-                onChanged={handleLogChanged}
-                trigger={
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="!bg-transparent !hover:bg-transparent h-8 border-zinc-800 text-zinc-300 hover:text-[#f59e0b] hover:border-[#f59e0b]"
-                  >
-                    <Plus className="mr-1 h-3 w-3" /> {t('dashboard.newEntry')}
-                  </Button>
-                }
-              />
+              <div className="flex items-center gap-2">
+                <WorkDayMonthReport
+                  currentMonthLogs={monthLogs}
+                  currentYear={viewYear}
+                  currentMonthIndex={viewMonth}
+                />
+                <WorkDayLogDialog
+                  onChanged={handleLogChanged}
+                  trigger={
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="!bg-transparent !hover:bg-transparent h-8 border-zinc-800 text-zinc-300 hover:text-[#f59e0b] hover:border-[#f59e0b]"
+                    >
+                      <Plus className="mr-1 h-3 w-3" /> {t('dashboard.newEntry')}
+                    </Button>
+                  }
+                />
+              </div>
             }
           >
             {recentLogsLoading ? (

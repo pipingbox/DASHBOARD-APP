@@ -1265,7 +1265,19 @@
     "workdaySaved": "Werkdag opgeslagen",
     "confirmDelete": "Deze werkdag verwijderen?",
     "failedToDelete": "Verwijderen mislukt",
-    "workdayDeleted": "Werkdag verwijderd"
+    "workdayDeleted": "Werkdag verwijderd",
+    "autoFilledFromLastEntry": "Automatisch ingevuld vanuit je laatste invoer — pas aan waar nodig.",
+    "clearAutoFill": "Wissen",
+    "monthlyReport": "Maandrapport",
+    "downloadPdf": "PDF downloaden",
+    "pdfColumns": "Kolommen om op te nemen",
+    "companyNameForReport": "Bedrijfsnaam (optioneel)",
+    "includeSignatureBlock": "Handtekeningblok toevoegen",
+    "daysWorked": "Gewerkte dagen",
+    "totalHours": "Totale uren",
+    "grossSalary": "Brutoloon",
+    "finalTotal": "Eindtotaal",
+    "location": "Locatie"
   },
   "ratePresets": {
     "eyebrow": "Tariefsjablonen",
