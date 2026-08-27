@@ -201,7 +201,7 @@ export default function Index() {
     <div className="min-h-screen bg-[#0a0a0a] text-zinc-100">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-[#0a0a0a]/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
           <Link to="/" className="flex items-center gap-1">
             <PipingBoxLogo variant="header" />
           </Link>

@@ -7,7 +7,7 @@ interface PipingBoxLogoProps {
    *   'horizontal'     — símbolo + wordmark, height=size, width=auto (sidebar/shell interior)
    *   'horizontal-alt' — variante horizontal alternativa
    *   'auth'           — logo horizontal con mayor presencia para auth pages (h=72px)
-   *   'header'         — logo horizontal compacto para navbar público (h=28px fijo)
+   *   'header'         — logo de marca para navbar público (h=112px, ×4 del original)
    */
   variant?: 'icon' | 'horizontal' | 'horizontal-alt' | 'auth' | 'header';
 }
@@ -28,17 +28,17 @@ export function PipingBoxLogo({ size = 48, className = '', variant = 'icon' }: P
     );
   }
 
-  // header variant: compacto y proporcional para navbar público
-  // Mobile fix: canvas has ~16% transparent padding; at h=28 artwork is only ~35px wide.
-  // On mobile (≤768px) we render h=48px so the visible artwork reaches ~100px wide.
+  // header variant: logo con presencia de marca para navbar público de la landing.
+  // h-28 = 112px = ×4 respecto al h-7 (28px) original.
+  // El canvas tiene ~16% de padding transparente → artwork visible ~94px.
+  // El header usa py-5 para dar espacio al logo más alto.
   if (variant === 'header') {
     return (
       <img
         src="/assets/logos/logo-horizontal.png"
         alt="PipingBox"
-        height={28}
         style={{ width: 'auto' }}
-        className={`object-contain h-12 sm:h-7 ${className}`}
+        className={`object-contain h-28 ${className}`}
       />
     );
   }
