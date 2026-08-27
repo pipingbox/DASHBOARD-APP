@@ -537,6 +537,148 @@ BEGIN
   END IF;
 END $$;
 
+
+-- -----------------------------------------------------------------------------
+-- 3.1 The invalid combination must be UNREPRESENTABLE, not merely discouraged
+-- -----------------------------------------------------------------------------
+-- THE SEMANTIC HAZARD THIS CLOSES.
+-- After the change above, `reverse_charge = false` means two different things
+-- depending on the column sitting next to it:
+--
+--   (a) false + UNDETERMINED / AUTOMATIC_TAX_DISABLED
+--         = "WE DO NOT KNOW." No determination was performed. This is NOT a
+--           finding that domestic VAT applies, and it is NOT a finding that
+--           reverse charge does not apply. It is the absence of a finding.
+--   (b) false + AUTOMATIC_TAX / MANUAL_REVIEW
+--         = "WE LOOKED, AND REVERSE CHARGE DOES NOT APPLY." A real negative
+--           conclusion, reached by an actual determination.
+--
+-- The danger is that (a) and (b) carry the SAME BOOLEAN. Any code that reads
+-- reverse_charge on its own silently converts "unknown" into "determined not to
+-- apply" — which is precisely the class of error that produced the original
+-- defect, only running in the opposite direction.
+--
+-- The database cannot stop a reader from ignoring the status column; that is
+-- what the CI guard in scripts/check-schema-guard.mjs is for. What the database
+-- CAN do, and what this constraint does, is make the THIRD combination — the
+-- affirmative claim asserted with no determination behind it — impossible to
+-- store at all:
+--
+--   (c) true + UNDETERMINED / AUTOMATIC_TAX_DISABLED   <-- REJECTED HERE
+--         = a claim that VAT liability shifted to the customer, recorded by a
+--           system that simultaneously states it never determined anything.
+--           That is not a defensible fiscal position, it is a contradiction,
+--           and under inspection it is the expensive kind.
+--
+-- reverse_charge = true is an AFFIRMATIVE FISCAL CLAIM that shifts liability.
+-- It may only ever coexist with a status representing a genuine determination.
+-- Enforcing that here means no future webhook edit, no manual UPDATE and no
+-- backfill script can reintroduce the original defect: the write simply fails.
+--
+-- -----------------------------------------------------------------------------
+-- WHY THIS IS SAFE TO ADD TO A TABLE THAT ALREADY HAS PRODUCTION ROWS
+-- -----------------------------------------------------------------------------
+-- A CHECK constraint added without NOT VALID is verified against every existing
+-- row, and a single violating row aborts the statement — which would strand the
+-- operator in the middle of this migration. So the question is whether any
+-- pre-existing app_invoices row can violate it. It cannot, and the reasoning is
+-- exhaustive rather than optimistic:
+--
+--   1. vat_determination_status is added by THIS FILE, a few statements above,
+--      as NOT NULL DEFAULT 'UNDETERMINED'. Every row that existed before this
+--      migration therefore holds exactly 'UNDETERMINED' at this point. No other
+--      value is reachable: nothing has run between the ADD COLUMN and this
+--      constraint that could have changed it.
+--
+--   2. So the constraint reduces, for existing rows, to `reverse_charge = false`.
+--
+--   3. Could a pre-existing row hold reverse_charge = true? This is the one
+--      that matters, because the ORIGINAL DEFECT WROTE true. Per
+--      sql/003-stripe-payments-schema.sql section 6 the column is
+--      `reverse_charge BOOLEAN NOT NULL DEFAULT false`, and the only writer is
+--      the stripe-webhook invoice upsert. That writer previously computed
+--      `taxCents === 0 && country !== "EE"`, which DOES evaluate to true for
+--      every non-Estonian customer. If any such invoice was ever written, the
+--      row holds true and this constraint would reject it.
+--
+--      It is safe anyway, because the platform has never issued a live invoice:
+--      Stripe is in TEST MODE, PIPINGBOX OU is not yet VAT-registered, and
+--      003 is explicit that supplier_vat_id stays NULL until incorporation.
+--      app_invoices is expected to be EMPTY.
+--
+--      "Expected to be empty" is a belief about production, not an observed
+--      fact, and this migration must not turn a belief into an assumption that
+--      aborts the operator's run. Hence the guard below: instead of trusting
+--      the expectation, the DO block MEASURES it and picks the safe branch.
+--
+-- THE NOT VALID TRADEOFF, AND WHY IT IS RESOLVED DYNAMICALLY.
+--   * Plain ADD CONSTRAINT: validates history too, but aborts the migration if
+--     even one legacy row is contradictory.
+--   * ADD CONSTRAINT ... NOT VALID: always succeeds and fully constrains every
+--     future INSERT and UPDATE, but leaves existing rows unverified. The
+--     constraint is then not a statement about the table, only about writes to
+--     it — and a reader cannot tell the difference from the catalog alone.
+--
+-- Rather than choose blind, the block below counts the violating rows first:
+--   * none (the expected case)  -> add it VALIDATED, so the constraint is a
+--                                  true statement about the whole table.
+--   * some (the surprise case)  -> add it NOT VALID so the migration still
+--                                  completes and all future writes are
+--                                  protected, and RAISE A WARNING naming the
+--                                  exact number of contradictory rows so the
+--                                  operator learns about them instead of the
+--                                  migration dying halfway through.
+-- Either way the operator ends up with a protected table and an accurate
+-- message, which is the outcome that matters at 2am.
+
+DO $$
+DECLARE
+  bad_rows BIGINT;
+BEGIN
+  ALTER TABLE app_invoices
+    DROP CONSTRAINT IF EXISTS app_invoices_reverse_charge_determination_check;
+
+  SELECT count(*) INTO bad_rows
+    FROM app_invoices
+   WHERE reverse_charge = true
+     AND vat_determination_status IN ('UNDETERMINED', 'AUTOMATIC_TAX_DISABLED');
+
+  IF bad_rows = 0 THEN
+    ALTER TABLE app_invoices
+      ADD CONSTRAINT app_invoices_reverse_charge_determination_check
+      CHECK (
+        reverse_charge = false
+        OR vat_determination_status NOT IN ('UNDETERMINED', 'AUTOMATIC_TAX_DISABLED')
+      );
+    RAISE NOTICE
+      'app_invoices_reverse_charge_determination_check added and VALIDATED (0 pre-existing violations).';
+  ELSE
+    ALTER TABLE app_invoices
+      ADD CONSTRAINT app_invoices_reverse_charge_determination_check
+      CHECK (
+        reverse_charge = false
+        OR vat_determination_status NOT IN ('UNDETERMINED', 'AUTOMATIC_TAX_DISABLED')
+      )
+      NOT VALID;
+    RAISE WARNING
+      'app_invoices has % row(s) asserting reverse_charge = true with no determination. '
+      'The constraint was added NOT VALID so this migration completes and all FUTURE writes '
+      'are protected, but those rows remain and are fiscally contradictory. Investigate them, '
+      'then run: ALTER TABLE app_invoices VALIDATE CONSTRAINT '
+      'app_invoices_reverse_charge_determination_check;',
+      bad_rows;
+  END IF;
+END $$;
+
+COMMENT ON CONSTRAINT app_invoices_reverse_charge_determination_check ON app_invoices IS
+  'reverse_charge = true is an AFFIRMATIVE FISCAL CLAIM and may only coexist with a status '
+  'representing a real determination (AUTOMATIC_TAX or MANUAL_REVIEW). It can never be true '
+  'while the status is UNDETERMINED or AUTOMATIC_TAX_DISABLED, because that combination '
+  'asserts a liability shift while simultaneously recording that nothing was determined. '
+  'Note the converse is NOT constrained and must not be: reverse_charge = false is valid '
+  'under every status, but under an undetermined one it means "we do not know", NEVER '
+  '"domestic VAT applies".';
+
 COMMENT ON COLUMN app_invoices.vat_determination_status IS
   'Honest statement about our KNOWLEDGE, not a fiscal position. AUTOMATIC_TAX_DISABLED '
   'means vat_cents = 0 because no calculation ran, not because tax was determined to be '

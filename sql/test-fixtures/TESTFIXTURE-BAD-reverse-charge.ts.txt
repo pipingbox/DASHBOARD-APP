@@ -1,0 +1,29 @@
+####  T E S T   F I X T U R E  —  N O T   P R O D U C T I O N   C O D E  ####
+
+Stored with a .txt extension ON PURPOSE. The schema guard walks app/frontend/src
+for .ts/.tsx files; keeping this as .txt means it is never compiled by tsc,
+never bundled, and never scanned where it sits. The guard test copies it into
+a temporary .ts file, runs the guard, and deletes it.
+
+Below is the DELIBERATELY NON-COMPLIANT snippet used to prove that the
+reverse_charge check actually fires. Every one of these three cases reads the
+boolean while the qualifier vat_determination_status is nowhere in scope.
+
+---------------------------------------------------------------------------
+
+export function invoiceIsDomestic(invoice: { reverse_charge: boolean }) {
+  // THE BUG THIS GUARD CATCHES: `false` here may mean "we never determined
+  // anything". Treating it as a positive finding of domestic VAT is exactly
+  // the silent conversion of unknown into determined.
+  return invoice.reverse_charge === false;
+}
+
+export function vatLabel(row: any) {
+  if (row.reverse_charge) {
+    return "Reverse charge";
+  }
+  return "VAT applies";
+}
+
+export const summarise = (rows: any[]) =>
+  rows.filter((r) => !r.reverse_charge).length;

@@ -669,6 +669,115 @@ if (driftErrors.length > 0) {
 }
 
 // =============================================================================
+// PB-MARKET-REVENUE-EVENTS-001 — reverse_charge may never be read alone.
+//
+// THE SEMANTIC HAZARD.
+// app_invoices.reverse_charge is a boolean, but `false` carries two completely
+// different meanings depending on vat_determination_status beside it:
+//
+//   false + UNDETERMINED / AUTOMATIC_TAX_DISABLED  = "WE DO NOT KNOW."
+//   false + AUTOMATIC_TAX / MANUAL_REVIEW          = "determined not to apply."
+//
+// Both are the literal value `false`. Code that reads the boolean on its own
+// therefore silently converts "we never determined this" into "we determined it
+// does not apply" — a positive fiscal conclusion nobody ever reached. That is
+// the same class of defect as the original `taxCents === 0 && country !== "EE"`
+// inference, just running in the other direction.
+//
+// The CHECK constraint in sql/005-revenue-events.sql section 3.1 makes the
+// contradictory WRITE (true + undetermined) unrepresentable. It cannot do
+// anything about a READ. This is the read-side half, and the two are deliberately
+// independent: a constraint protects the data, this protects the interpretation.
+//
+// THE RULE: any TypeScript that mentions reverse_charge must also mention
+// vat_determination_status within the same scope, so that whoever reads the
+// boolean has the qualifier physically in front of them.
+//
+// FALSE-POSITIVE POSTURE — DELIBERATELY FORGIVING.
+// A guard that cries wolf gets bypassed, and a bypassed guard is worse than no
+// guard because it also carries false assurance. Three concessions:
+//
+//   1. SCOPE IS A GENEROUS WINDOW, NOT A PARSER. "Same scope" is approximated
+//      as a +/- SCOPE_WINDOW-line neighbourhood rather than by parsing the AST.
+//      Real call sites read and write these two fields within a few lines of
+//      each other (the stripe-webhook upsert has them adjacent), so the window
+//      is comfortably larger than the realistic distance. Being approximate
+//      here costs nothing: the failure mode of a too-large window is letting a
+//      borderline case through, which is the direction a guard should err in.
+//
+//   2. COMMENTS COUNT AS HANDLING. A line documenting why reverse_charge is not
+//      being interpreted satisfies the rule. Discussing the hazard in prose is
+//      exactly the awareness this check exists to force, and refusing to accept
+//      it would punish the most careful authors.
+//
+//   3. AN EXPLICIT, GREPPABLE ESCAPE HATCH. See below.
+//
+// THE ESCAPE HATCH.
+//   Put `schema-guard-allow-reverse-charge` in a comment on the line itself or
+//   the line directly above it, with a reason:
+//
+//     // schema-guard-allow-reverse-charge: rendering the raw audit row, no
+//     // fiscal interpretation is performed on this value.
+//     const raw = invoice.reverse_charge;
+//
+//   It is deliberately verbose and deliberately greppable: silencing this check
+//   should be a visible, reviewable act that a reviewer can find in one search,
+//   never an accident. `rg schema-guard-allow-reverse-charge` enumerates every
+//   exemption in the codebase.
+// =============================================================================
+
+const REVERSE_CHARGE_COL = 'reverse_charge';
+const VAT_STATUS_COL = 'vat_determination_status';
+const REVERSE_CHARGE_ESCAPE = 'schema-guard-allow-reverse-charge';
+const SCOPE_WINDOW = 12;
+
+const reverseChargeViolations = [];
+
+for (const file of walk(SRC)) {
+  const rel = relative(SRC, file).split('\\').join('/');
+  const lines = readFileSync(file, 'utf8').split('\n');
+
+  lines.forEach((line, i) => {
+    // \b so that vat_reverse_charge_note or reverse_charged do not trip it.
+    if (!new RegExp(`\\b${REVERSE_CHARGE_COL}\\b`).test(line)) return;
+
+    // Escape hatch: this line, or the line immediately above it.
+    const hatch =
+      line.includes(REVERSE_CHARGE_ESCAPE) ||
+      (i > 0 && lines[i - 1].includes(REVERSE_CHARGE_ESCAPE));
+    if (hatch) return;
+
+    const from = Math.max(0, i - SCOPE_WINDOW);
+    const to = Math.min(lines.length, i + SCOPE_WINDOW + 1);
+    const scope = lines.slice(from, to).join('\n');
+    if (scope.includes(VAT_STATUS_COL)) return;
+
+    reverseChargeViolations.push({ file: rel, line: i + 1, text: line.trim() });
+  });
+}
+
+if (reverseChargeViolations.length > 0) {
+  console.error('\nreverse_charge read without vat_determination_status:\n');
+  for (const v of reverseChargeViolations) {
+    console.error(`  ${v.file}:${v.line}`);
+    console.error(`    ${v.text}`);
+  }
+  console.error(
+    `\n  reverse_charge = false means TWO different things: "we do not know"\n` +
+      `  (vat_determination_status UNDETERMINED / AUTOMATIC_TAX_DISABLED) and\n` +
+      `  "determined not to apply" (AUTOMATIC_TAX / MANUAL_REVIEW). Reading the\n` +
+      `  boolean alone turns the first into the second — asserting a fiscal\n` +
+      `  conclusion nobody reached.\n\n` +
+      `  Handle ${VAT_STATUS_COL} in the same scope, or, if no fiscal\n` +
+      `  interpretation is being made, annotate the line:\n\n` +
+      `    // ${REVERSE_CHARGE_ESCAPE}: <why this read is not a determination>\n\n` +
+      `  ${reverseChargeViolations.length} violation(s). See PB-MARKET-REVENUE-EVENTS-001 ` +
+      `and sql/005-revenue-events.sql section 3.1.\n`,
+  );
+  process.exit(1);
+}
+
+// =============================================================================
 // Advisory — sensitive columns leaving the database.
 //
 // iban, tax_identification_number, tin_issuing_state, legal_name and
@@ -720,4 +829,8 @@ console.log(
 console.log(
   'Revenue events OK: append-only (SELECT-only policies and grants), zero derived columns, ' +
     'fiscal_nature carries no silent default.',
+);
+console.log(
+  'Reverse-charge OK: no TypeScript reads reverse_charge without handling ' +
+    'vat_determination_status in the same scope.',
 );

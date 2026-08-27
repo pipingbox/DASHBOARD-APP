@@ -659,6 +659,92 @@ COMMENT ON TABLE app_marketplace_course_reviews IS
 -- in the database rather than the application because the cap is a contractual
 -- commitment: two concurrent approvals through different code paths would
 -- otherwise be able to create an eleventh founding instructor.
+--
+-- THE CAP IS 10. That number is a product decision and is not up for
+-- adjustment here. What follows changes only HOW RELIABLY it is enforced.
+--
+-- -----------------------------------------------------------------------------
+-- CONCURRENCY — WHY THE COUNT ALONE IS NOT ENOUGH (amended before first run)
+-- -----------------------------------------------------------------------------
+-- Counting rows and comparing to a limit is not safe under PostgreSQL's default
+-- READ COMMITTED isolation. Each transaction's snapshot shows only rows
+-- committed before its statement began, plus its own uncommitted changes. Two
+-- concurrent transactions competing for the LAST free slot therefore each see
+-- 9 committed rows plus 1 row of their own = 10, neither exceeds the limit,
+-- both pass the check and both commit. The table ends up with 11.
+--
+-- THIS WAS REPRODUCED, NOT THEORISED. Against PostgreSQL 16.4 with two real
+-- concurrent sessions the unprotected trigger produced 11 founding instructors
+-- on every attempt, with no error raised to either session. The harness is
+-- sql/test-fixtures/TESTFIXTURE-run-founding-cap-race.sh.
+--
+-- DEFERRABILITY DOES NOT HELP AND WAS NEVER GOING TO. The trigger is a
+-- CONSTRAINT TRIGGER, but INITIALLY IMMEDIATE vs INITIALLY DEFERRED only moves
+-- the check between "end of statement" and "end of transaction". Both points
+-- are still INSIDE the racing transaction, evaluated against that
+-- transaction's own snapshot. Deferral changes WHEN the count is taken; it
+-- creates no cross-transaction visibility and no mutual exclusion, so it
+-- cannot close the window. The original comment on this trigger claimed the
+-- check was thereby "serialized", which was simply not true.
+--
+-- THE FIX: take a transaction-scoped advisory lock BEFORE counting. The lock
+-- makes the read-then-decide sequence atomic with respect to any other
+-- transaction that also intends to create a founding instructor: the second
+-- one blocks until the first commits, and then counts 10 and is refused
+-- correctly. pg_advisory_xact_lock releases automatically at COMMIT or
+-- ROLLBACK, so no code path can leak it — there is no unlock to forget and no
+-- unlock to skip on the error path.
+--
+-- ADVISORY LOCK KEY: 4820251001
+--   Chosen to be readable and traceable rather than random, and written as a
+--   literal rather than computed, so that the value can never shift underneath
+--   the system. Read as 4-8-2025-1001:
+--     4       -- migration 004, the file that owns this lock
+--     8       -- separator digit, kept so the key cannot be confused with a
+--             --   bare date and cannot be produced by an accidental typo of
+--             --   a smaller number
+--     2025    -- year the key was allocated
+--     1001    -- sequence number within migration 004's allocation block, so
+--             --   004 can allocate further keys (1002, 1003, ...) without
+--             --   ever revisiting this reasoning
+--   A hash of the table name was considered and rejected: hashtext() is not a
+--   documented-stable API across major versions, so a key derived from it could
+--   in principle change under an upgrade, and a lock key that moves is a lock
+--   that silently stops excluding anything.
+--
+--   It is a bigint, so it uses the single-argument 64-bit advisory lock space.
+--   That space is SEPARATE from the two-argument (int, int) space, which is a
+--   deliberate part of the choice: anything that later uses the two-int form
+--   cannot collide with this key no matter what integers it picks.
+--
+--   WHY IT MUST NOT COLLIDE. Advisory locks are a single database-wide
+--   namespace with no ownership and no registry enforced by PostgreSQL. Two
+--   unrelated features that happen to pick the same key will block each other
+--   for reasons neither one's code explains, producing latency or deadlocks
+--   that are extremely hard to attribute. Conversely, a key accidentally
+--   REUSED by a feature that takes it in a different order than this trigger
+--   does is a deadlock waiting to happen.
+--
+--   LOCK REGISTRY — ANY NEW ADVISORY LOCK IN THIS SYSTEM MUST BE ADDED HERE:
+--     4820251001  founding-instructor cap (this file, section 5)
+--   Before calling pg_advisory_xact_lock anywhere else, add the key to this
+--   list. A key that is not in the list is not safe to assume free.
+--
+-- SCOPE OF SERIALISATION — deliberately narrow. The lock is taken ONLY when the
+-- row being written is actually a founding instructor (the early return above
+-- it runs first). Ordinary instructor inserts and updates — the overwhelming
+-- majority of traffic on this table — never touch it and are not serialised at
+-- all. Only founding-instructor writes contend, there are at most 10 of them in
+-- the programme's lifetime, and they are performed by admins, so the
+-- throughput cost is irrelevant while the correctness gain is absolute.
+--
+-- COVERS UPDATE AS WELL AS INSERT. The trigger fires on INSERT OR UPDATE OF
+-- is_founding_instructor, so promoting an existing STANDARD instructor into the
+-- founding tier is checked on exactly the same path and takes the same lock.
+-- This was verified: the promotion-by-UPDATE route raced to 11 before the fix
+-- and holds at 10 after it. Had the trigger been INSERT-only, promotion would
+-- have been an uncovered path and the cap would have been bypassable by
+-- inserting as STANDARD and updating a moment later.
 
 CREATE OR REPLACE FUNCTION app_marketplace_enforce_founding_cap()
 RETURNS TRIGGER
@@ -671,6 +757,13 @@ BEGIN
   IF NEW.is_founding_instructor IS NOT TRUE THEN
     RETURN NEW;
   END IF;
+
+  -- Serialise every would-be founding instructor against every other one.
+  -- MUST be before the count: taking it afterwards would lock a decision that
+  -- had already been made on stale data, which is no protection at all.
+  -- Transaction-scoped, so it is released on COMMIT and on ROLLBACK alike.
+  -- Key 4820251001 — see the lock registry in the comment above.
+  PERFORM pg_advisory_xact_lock(4820251001);
 
   SELECT count(*) INTO founding_count
     FROM app_marketplace_instructors
@@ -686,8 +779,12 @@ BEGIN
 END;
 $$;
 
--- AFTER + DEFERRABLE INITIALLY IMMEDIATE so the count sees the new row and the
--- check is serialized at statement end rather than racing mid-statement.
+-- AFTER, so the count includes the row being written and the arithmetic is
+-- "existing + mine" with no off-by-one. DEFERRABLE INITIALLY IMMEDIATE is kept
+-- for the operational escape hatch it provides — an admin performing a bulk
+-- correction can SET CONSTRAINTS ... DEFERRED to let a multi-row statement
+-- reach a consistent end state — but note that deferrability is NOT what makes
+-- the cap safe. The advisory lock inside the function is. See above.
 DROP TRIGGER IF EXISTS trg_app_marketplace_founding_cap ON app_marketplace_instructors;
 CREATE CONSTRAINT TRIGGER trg_app_marketplace_founding_cap
   AFTER INSERT OR UPDATE OF is_founding_instructor ON app_marketplace_instructors
