@@ -70,7 +70,13 @@ jobs:
       - name: Checkout exact tested app ref
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.source_ref }}
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact tested SHA
+        env:
+          INPUT_SHA: ${{ inputs.source_ref }}
+        run: git checkout "$INPUT_SHA"
 
       - name: Set up Node 22
         uses: actions/setup-node@v4

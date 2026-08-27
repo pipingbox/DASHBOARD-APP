@@ -36,7 +36,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.commit_sha }}
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact deploy SHA
+        env:
+          INPUT_SHA: ${{ github.event.inputs.commit_sha }}
+        run: git checkout "$INPUT_SHA"
 
       - name: Validate and confirm deployed commit SHA
         env:
@@ -100,7 +106,13 @@ jobs:
       - name: Checkout exact deployed app ref
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.commit_sha }}
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact deploy SHA
+        env:
+          INPUT_SHA: ${{ github.event.inputs.commit_sha }}
+        run: git checkout "$INPUT_SHA"
 
       - name: Set up Node 22
         uses: actions/setup-node@v4
@@ -131,7 +143,13 @@ jobs:
       - name: Checkout exact deployed app ref
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.commit_sha }}
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact deploy SHA
+        env:
+          INPUT_SHA: ${{ github.event.inputs.commit_sha }}
+        run: git checkout "$INPUT_SHA"
 
       - name: Set up Node 22
         uses: actions/setup-node@v4
