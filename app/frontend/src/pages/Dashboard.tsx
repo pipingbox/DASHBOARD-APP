@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Briefcase,
@@ -155,6 +155,33 @@ export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const { user, profile, loading: authLoading } = useAuth();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const purchaseStatus = searchParams.get('purchase');
+
+  // Post-purchase query param handler
+  useEffect(() => {
+    if (purchaseStatus === 'success') {
+      const timer = setTimeout(() => {
+        setSearchParams((prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete('purchase');
+          next.delete('session_id');
+          return next;
+        }, { replace: true } as Parameters<typeof setSearchParams>[1]);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+    if (purchaseStatus === 'canceled') {
+      const timer = setTimeout(() => {
+        setSearchParams((prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete('purchase');
+          return next;
+        }, { replace: true } as Parameters<typeof setSearchParams>[1]);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [purchaseStatus, setSearchParams]);
 
   const [stats, setStats] = useState<Stats>({
     jobsOpen: 0,
@@ -467,6 +494,17 @@ export default function Dashboard() {
 
       {fetchError && (
         <ErrorState message={fetchError} onRetry={handleRetry} retryLabel={t('common.retry')} />
+      )}
+
+      {purchaseStatus === 'success' && (
+        <div className="mb-4 rounded-lg border border-green-700/50 bg-green-900/20 px-4 py-3 text-sm text-green-400">
+          ✓ Payment successful — your plan is now active.
+        </div>
+      )}
+      {purchaseStatus === 'canceled' && (
+        <div className="mb-4 rounded-lg border border-zinc-700/50 bg-zinc-900/20 px-4 py-3 text-sm text-zinc-400">
+          Checkout canceled — no charge was made.
+        </div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-3">

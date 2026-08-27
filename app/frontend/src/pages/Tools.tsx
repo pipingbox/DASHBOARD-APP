@@ -12,6 +12,8 @@ import {
   Table2,
   Paintbrush,
   ArrowLeft,
+  Crown,
+  Loader2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
@@ -19,8 +21,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
+import { usePremium } from '@/hooks/usePremium';
 import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
+import { redirectToCheckout } from '@/lib/stripe';
 import ElbowCutTool from '@/components/tools/ElbowCutTool';
 import BranchLayoutTool from '@/components/tools/BranchLayoutTool';
 import UnitConverterTool from '@/components/tools/UnitConverterTool';
@@ -58,6 +62,7 @@ const TOOLS: ToolDef[] = [
 export default function Tools() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { status: premiumStatus } = usePremium();
   const [active, setActive] = useState<string | null>(null);
   const [d, setD] = useState('168.3');
   const [p, setP] = useState('5');
@@ -65,6 +70,22 @@ export default function Tools() {
   const [y, setY] = useState('0.4');
   const [result, setResult] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  const handleUpgrade = async (interval: 'month' | 'year') => {
+    setCheckoutLoading(true);
+    setCheckoutError(null);
+    const productKey = interval === 'month' ? 'premium_tools_monthly' : 'premium_tools_annual';
+    const reason = await redirectToCheckout(productKey);
+    if (reason === 'not_authenticated') {
+      window.location.href = '/login?next=/tools';
+    } else if (reason) {
+      setCheckoutError('Could not start checkout. Please try again.');
+      setCheckoutLoading(false);
+    }
+    // si null → el browser ya está navegando a Stripe
+  };
 
   const compute = async () => {
     const D = Number(d);
@@ -103,6 +124,46 @@ export default function Tools() {
           title={t('tools.title')}
           description={t('tools.description')}
         />
+
+        {/* Upgrade banner — visible only for non-premium users */}
+        {!premiumStatus.isPremium && (
+          <div className="rounded-xl border border-[#f59e0b]/30 bg-[#f59e0b]/5 px-5 py-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#f59e0b]/10 text-[#f59e0b]">
+                  <Crown className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#F5F7FA]">Unlock Premium Tools</p>
+                  <p className="text-[11px] text-[#A3A9B3]">
+                    PDF exports, printable templates, torque reports &amp; more.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  disabled={checkoutLoading}
+                  onClick={() => handleUpgrade('month')}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#f59e0b]/40 bg-transparent px-3 py-1.5 text-xs font-semibold text-[#f59e0b] transition hover:bg-[#f59e0b]/10 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {checkoutLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                  {checkoutLoading ? 'Loading...' : 'Monthly €4.99'}
+                </button>
+                <button
+                  disabled={checkoutLoading}
+                  onClick={() => handleUpgrade('year')}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#f59e0b] px-3 py-1.5 text-xs font-semibold text-black transition hover:bg-[#d97706] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {checkoutLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                  {checkoutLoading ? 'Loading...' : 'Annual €39 (save 35%)'}
+                </button>
+              </div>
+            </div>
+            {checkoutError && (
+              <p className="mt-2 text-[11px] text-red-400">{checkoutError}</p>
+            )}
+          </div>
+        )}
 
         {/* Card Grid Catalog */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

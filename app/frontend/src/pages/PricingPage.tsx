@@ -12,6 +12,7 @@ interface Plan {
   description: string;
   features: { text: string; included: boolean }[];
   cta: string;
+  ctaHref?: string; // mailto: for plans without Stripe price yet
   highlighted?: boolean;
 }
 
@@ -45,6 +46,7 @@ const PLANS: Plan[] = [
       { text: 'Analytics dashboard', included: false },
     ],
     cta: 'Start free trial',
+    ctaHref: 'mailto:hello@pipingbox.com?subject=PipingBox%20Professional',
     highlighted: true,
   },
   {
@@ -61,6 +63,7 @@ const PLANS: Plan[] = [
       { text: 'Analytics dashboard + export', included: true },
     ],
     cta: 'Contact sales',
+    ctaHref: 'mailto:hello@pipingbox.com?subject=PipingBox%20Enterprise',
   },
 ];
 
@@ -137,16 +140,29 @@ export default function PricingPage() {
                 ))}
               </ul>
 
-              <Link
-                to="/register"
-                className={`mt-8 block rounded-md py-2.5 text-center text-sm font-semibold transition ${
-                  plan.highlighted
-                    ? 'bg-[#f59e0b] text-black hover:bg-[#d97706]'
-                    : 'border border-zinc-700 text-zinc-200 hover:bg-zinc-900'
-                }`}
-              >
-                {plan.cta}
-              </Link>
+              {plan.ctaHref ? (
+                <a
+                  href={plan.ctaHref}
+                  className={`mt-8 block rounded-md py-2.5 text-center text-sm font-semibold transition ${
+                    plan.highlighted
+                      ? 'bg-[#f59e0b] text-black hover:bg-[#d97706]'
+                      : 'border border-zinc-700 text-zinc-200 hover:bg-zinc-900'
+                  }`}
+                >
+                  {plan.cta}
+                </a>
+              ) : (
+                <Link
+                  to="/register"
+                  className={`mt-8 block rounded-md py-2.5 text-center text-sm font-semibold transition ${
+                    plan.highlighted
+                      ? 'bg-[#f59e0b] text-black hover:bg-[#d97706]'
+                      : 'border border-zinc-700 text-zinc-200 hover:bg-zinc-900'
+                  }`}
+                >
+                  {plan.cta}
+                </Link>
+              )}
             </div>
           ))}
         </div>
