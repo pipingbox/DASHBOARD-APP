@@ -611,7 +611,11 @@ Deno.serve(async (req) => {
           // Deferred to PB-MARKET-TAX-001. Do not improvise it here.
           // -------------------------------------------------------------------
           // WHAT WAS WRONG. This line used to read:
-          //
+          // schema-guard-allow-reverse-charge: the next line QUOTES the deleted
+          // defect as evidence; it is not a read. vat_determination_status does
+          // appear in this same block, just beyond the guard's line window,
+          // because this explanation is long. Documenting a hazard thoroughly
+          // should not be punished — but silencing the guard must stay visible.
           //   reverse_charge: taxCents === 0 && (invoice.customer_address?.country ?? "EE") !== "EE"
           //
           // automatic_tax is OFF (create-checkout enables it only when

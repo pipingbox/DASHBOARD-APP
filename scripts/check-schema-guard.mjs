@@ -733,8 +733,24 @@ const SCOPE_WINDOW = 12;
 
 const reverseChargeViolations = [];
 
-for (const file of walk(SRC)) {
-  const rel = relative(SRC, file).split('\\').join('/');
+// Scope note: SRC alone is NOT enough here. The only code in this repository
+// that actually touches reverse_charge is supabase/functions/stripe-webhook,
+// which lives outside app/frontend/src. A guard that skips the single file it
+// exists to protect is theatre: it reports green while covering nothing. Every
+// other check in this file is frontend-shaped, so the wider scope applies here
+// only, and the reported path is repo-relative to keep the two roots distinct.
+const EDGE_FUNCTIONS = join(__dirname, '..', 'supabase', 'functions');
+const REPO_ROOT = join(__dirname, '..');
+const reverseChargeRoots = [SRC, EDGE_FUNCTIONS].filter((dir) => {
+  try {
+    return statSync(dir).isDirectory();
+  } catch {
+    return false;
+  }
+});
+
+for (const file of reverseChargeRoots.flatMap((root) => walk(root))) {
+  const rel = relative(REPO_ROOT, file).split('\\').join('/');
   const lines = readFileSync(file, 'utf8').split('\n');
 
   lines.forEach((line, i) => {
