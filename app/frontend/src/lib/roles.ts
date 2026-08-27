@@ -7,13 +7,19 @@
  * - jobs_moderator: Recruitment management
  * - worker: Standard user experience
  * - company: Company-focused interface
+ * - academy_instructor: Course marketplace instructor (PB-MARKET-SCHEMA-001)
  *
  * Future-ready for:
- * - academy_instructor
  * - verified_recruiter
  * - regional_moderator
  * - premium_company
  * - support_staff
+ *
+ * NOTE on academy_instructor: the role exists in the RBAC model, but the
+ * instructor's own pipeline state does NOT live here. It lives in
+ * app_marketplace_instructors.instructor_status. Do not confuse it with the
+ * worker ONBOARDING_STATUS ladder or with profiles.marketplace_ready, which
+ * belong to the JOB marketplace (see lib/onboarding.ts).
  */
 
 export type UserRole =
@@ -21,7 +27,8 @@ export type UserRole =
   | 'community_moderator'
   | 'jobs_moderator'
   | 'worker'
-  | 'company';
+  | 'company'
+  | 'academy_instructor';
 
 export const ALL_ROLES: UserRole[] = [
   'admin',
@@ -29,6 +36,7 @@ export const ALL_ROLES: UserRole[] = [
   'jobs_moderator',
   'worker',
   'company',
+  'academy_instructor',
 ];
 
 export const DEFAULT_ROLE: UserRole = 'worker';
@@ -36,15 +44,24 @@ export const DEFAULT_ROLE: UserRole = 'worker';
 /**
  * Route access map — defines which roles can access each route.
  * Routes not listed here are accessible to all authenticated users.
+ *
+ * academy_instructor: NO instructor-specific route is declared here on purpose.
+ * The instructor dashboard does not exist yet — there is no <Route> serving it
+ * in App.tsx — and declaring a route that no component serves would make
+ * hasRouteAccess() return true for a 404. Only the routes an instructor
+ * legitimately needs today are granted: /academy (they must be able to see the
+ * catalog their own course lives in) and /messages (QA review correspondence).
+ * When the instructor dashboard ships, add its real path here and to
+ * NAV_VISIBILITY in the same commit that adds the <Route>.
  */
 export const ROUTE_ACCESS: Record<string, UserRole[]> = {
   '/admin': ['admin'],
   '/content-drafts': ['admin', 'community_moderator'],
   '/applications': ['admin', 'worker'],
-  '/messages': ['admin', 'worker', 'company', 'jobs_moderator'],
+  '/messages': ['admin', 'worker', 'company', 'jobs_moderator', 'academy_instructor'],
   '/companies': ['admin', 'jobs_moderator', 'company'],
   '/companies/request-workers': ['admin', 'jobs_moderator', 'company'],
-  '/academy': ['admin', 'worker'],
+  '/academy': ['admin', 'worker', 'academy_instructor'],
   '/tools': ['admin', 'worker'],
   '/company-dashboard': ['admin', 'company'],
   '/company/jobs': ['admin', 'company'],
@@ -65,7 +82,7 @@ export const ROUTE_ACCESS: Record<string, UserRole[]> = {
  * Admin always sees everything — handled in the sidebar component.
  */
 export const NAV_VISIBILITY: Record<string, UserRole[]> = {
-  '/dashboard': ['admin', 'community_moderator', 'jobs_moderator', 'worker'],
+  '/dashboard': ['admin', 'community_moderator', 'jobs_moderator', 'worker', 'academy_instructor'],
   '/company-dashboard': ['admin', 'company'],
   '/company/jobs': ['admin', 'company'],
   '/company/post-job': ['admin', 'company'],
@@ -77,15 +94,15 @@ export const NAV_VISIBILITY: Record<string, UserRole[]> = {
   '/company/analytics': ['admin', 'company'],
   '/company/settings': ['admin', 'company'],
   '/company/billing': ['admin', 'company'],
-  '/academy': ['admin', 'worker'],
+  '/academy': ['admin', 'worker', 'academy_instructor'],
   '/tools': ['admin', 'worker'],
   '/jobs': ['admin', 'jobs_moderator', 'worker'],
   '/community': ['admin', 'community_moderator', 'worker', 'company'],
   '/companies': ['admin', 'jobs_moderator'],
   '/applications': ['admin', 'worker'],
-  '/messages': ['admin', 'worker', 'company', 'jobs_moderator'],
+  '/messages': ['admin', 'worker', 'company', 'jobs_moderator', 'academy_instructor'],
   '/content-drafts': ['admin', 'community_moderator'],
-  '/profile': ['admin', 'community_moderator', 'jobs_moderator', 'worker'],
+  '/profile': ['admin', 'community_moderator', 'jobs_moderator', 'worker', 'academy_instructor'],
 };
 
 /**
@@ -160,6 +177,7 @@ export function getRoleLabel(role: string): string {
     jobs_moderator: 'JOBS MODERATOR',
     worker: 'WORKER',
     company: 'COMPANY',
+    academy_instructor: 'INSTRUCTOR',
     user: 'WORKER',
   };
   return labels[role] ?? 'USER';
@@ -174,4 +192,5 @@ export const PREVIEW_ROLE_OPTIONS: { value: UserRole | 'admin'; label: string }[
   { value: 'company', label: 'Company View' },
   { value: 'community_moderator', label: 'Community Moderator View' },
   { value: 'jobs_moderator', label: 'Jobs Moderator View' },
+  { value: 'academy_instructor', label: 'Academy Instructor View' },
 ];

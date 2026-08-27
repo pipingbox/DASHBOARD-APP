@@ -82,6 +82,13 @@ export const TABLES = {
   subscriptions: 'app_subscriptions',
   stripeEvents: 'app_stripe_events',
   invoices: 'app_invoices',
+  // Course marketplace (PB-MARKET-SCHEMA-001, sql/004-marketplace-schema.sql)
+  // NOTE: unrelated to profiles.marketplace_ready, which belongs to the JOB
+  // marketplace (see lib/onboarding.ts). Different domain, different vocabulary.
+  marketplaceInstructors: 'app_marketplace_instructors',
+  marketplaceInstructorsPublic: 'app_marketplace_instructors_public',
+  marketplaceCourseReviews: 'app_marketplace_course_reviews',
+  marketplaceDsaNotices: 'app_marketplace_dsa_notices',
   // PIDM Catalog (Phase C — PIDM-CATALOG-EXPANSION-001)
   pidmStandards: 'pidm_standards',
   pidmComponents: 'pidm_components',
