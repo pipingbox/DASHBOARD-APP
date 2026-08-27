@@ -10,6 +10,7 @@ export type NotificationType =
   | 'REFERRAL_JOINED'
   | 'REFERRAL_VERIFIED'
   | 'JOB_INVITATION'
+  | 'JOB_MATCH'
   | 'NEW_MESSAGE'
   | 'DOCUMENT_REQUEST'
   | 'CERTIFICATE_EXPIRING'
@@ -131,6 +132,26 @@ export async function notifyJobInvitation(
     type: 'JOB_INVITATION',
     title: 'Invitación de trabajo',
     message: `Has recibido una invitación de trabajo: ${jobTitle}`,
+    relatedEntityType: 'job',
+    relatedEntityId: jobId,
+    actionUrl: '/jobs',
+    actorName: companyName,
+  });
+}
+
+/** Notify worker about a new job match (score >= threshold, fired by job-match-notify Edge Function) */
+export async function notifyJobMatch(
+  workerId: string,
+  jobTitle: string,
+  jobId: string,
+  score: number,
+  companyName?: string,
+): Promise<void> {
+  await createNotification({
+    recipientId: workerId,
+    type: 'JOB_MATCH',
+    title: 'Nueva oferta compatible',
+    message: `${score}% de compatibilidad con "${jobTitle}"${companyName ? ` en ${companyName}` : ''}.`,
     relatedEntityType: 'job',
     relatedEntityId: jobId,
     actionUrl: '/jobs',

@@ -101,7 +101,11 @@ export default function CompanyPostJob() {
 
       console.log('Inserting job with payload:', JSON.stringify(jobPayload, null, 2));
 
-      const { error } = await supabase.from(TABLES.jobs).insert(jobPayload);
+      const { data: jobRow, error } = await supabase
+        .from(TABLES.jobs)
+        .insert(jobPayload)
+        .select('id')
+        .single();
 
       if (error) {
         console.error('Job insert error details:', {
@@ -112,6 +116,12 @@ export default function CompanyPostJob() {
         });
         toast.error(t('companyPostJob.publishFailed', { error: error.message }));
       } else {
+        // Trigger job-match-notify fire-and-forget (PB-NOTIF-001 Fase 2)
+        if (jobRow?.id) {
+          supabase.functions
+            .invoke('job-match-notify', { body: { job_id: jobRow.id } })
+            .catch((err) => console.warn('[CompanyPostJob] job-match-notify failed:', err));
+        }
         toast.success(t('companyPostJob.publishSuccess'));
         navigate('/company/jobs');
       }
