@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { notifyNewMessage } from '@/lib/notifications';
 
 interface Conversation {
   id: string;
@@ -224,6 +225,15 @@ export default function Messages() {
       });
 
       if (msgError) throw msgError;
+
+      // Notify the recipient in-app (fire-and-forget, PB-NOTIF-001 Fase 1).
+      // Only fires if the recipient is a different user (no self-notification).
+      if (receiverId && receiverId !== user.id) {
+        const senderName = profile?.full_name?.trim() || 'Someone';
+        notifyNewMessage(receiverId, senderName, user.id).catch((err) =>
+          console.warn('[Messages] notifyNewMessage failed:', err),
+        );
+      }
 
       // Update conversation
       const unreadCol = isCompany ? 'unread_worker' : 'unread_company';

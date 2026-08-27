@@ -189,7 +189,7 @@ Deno.serve(async (req) => {
             <p style="color: #a1a1aa; font-size: 14px; line-height: 1.6;">
               Renew your certifications and update your profile to stay visible to recruiters and companies on PipingBox.
             </p>
-            <a href="https://app.pipingbox.com/profile" style="display: inline-block; background: #f59e0b; color: #000; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: 600; margin-top: 8px;">
+            <a href="https://pipingbox.com/profile" style="display: inline-block; background: #f59e0b; color: #000; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: 600; margin-top: 8px;">
               Update Profile
             </a>
             <p style="color: #52525b; font-size: 12px; margin-top: 24px;">
@@ -233,6 +233,35 @@ Deno.serve(async (req) => {
         console.log(`[cert-expiry-alerts] [DEV] Would email ${user.email}: ${user.certs.length} certs`);
         console.log(certList);
         sentCount++;
+      }
+
+      // Write in-app notifications (PB-NOTIF-001 Fase 1).
+      // Dedup: skip if a CERTIFICATE_EXPIRING notif for the same cert was already
+      // created in the last 7 days to avoid daily spam.
+      for (const cert of user.certs) {
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const { data: existing } = await supabase
+          .from("app_14da0f1941_notifications")
+          .select("id")
+          .eq("user_id", user.user_id)
+          .eq("type", "CERTIFICATE_EXPIRING")
+          .eq("related_entity_id", cert.name)
+          .gte("created_at", sevenDaysAgo)
+          .limit(1);
+
+        if (existing && existing.length > 0) continue;
+
+        const urgencyPrefix = cert.days_until_expiry <= 7 ? "URGENT — " : "";
+        await supabase.from("app_14da0f1941_notifications").insert({
+          user_id: user.user_id,
+          type: "CERTIFICATE_EXPIRING",
+          title: `${urgencyPrefix}Certificate expiring soon`,
+          message: `${cert.name} expires in ${cert.days_until_expiry} day${cert.days_until_expiry !== 1 ? "s" : ""} (${cert.expiry_date}).`,
+          related_entity_type: "certification",
+          related_entity_id: cert.name,
+          action_url: "/profile/certifications",
+          is_read: false,
+        });
       }
     }
 
