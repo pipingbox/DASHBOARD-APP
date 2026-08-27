@@ -669,17 +669,21 @@ obvio del kit.
 
 ### 8.1 Qué hace el webhook al cerrarse la disputa — verificado en el código
 
-Del caso `charge.dispute.closed`:
+Del caso `charge.dispute.closed`, **ya corregido** (v2 desplegada aún tiene la
+versión anterior; ver 8.2):
 
 ```ts
-const won  = dispute.status === "won";
-const lost = dispute.status === "lost";
+const won      = dispute.status === "won";
+const lost     = dispute.status === "lost";
+const terminal = won || lost;
 
-// app_orders:
-.update({ status: lost ? "chargeback" : "paid" })
+// app_orders: solo se toca en un desenlace terminal
+if (paymentIntentId && terminal) {
+  .update({ status: lost ? "chargeback" : "paid" })
+}
 
 // evento:
-event_type:         lost ? "CHARGEBACK" : "CHARGEBACK_REVERSAL",
+event_type:         lost ? "CHARGEBACK" : won ? "CHARGEBACK_REVERSAL" : "ADJUSTMENT",
 gross_amount_cents: won  ? (dispute.amount ?? 0) : 0,
 ```
 
@@ -689,28 +693,39 @@ Mapeo real, exhaustivo:
 | --- | --- | --- | --- |
 | `lost` | `CHARGEBACK` | `0` | `chargeback` |
 | `won` | `CHARGEBACK_REVERSAL` | `+dispute.amount` | `paid` |
-| cualquier otro (p. ej. `warning_closed`) | `CHARGEBACK_REVERSAL` | `0` | `paid` |
+| cualquier otro (p. ej. `warning_closed`) | `ADJUSTMENT` | `0` | **sin tocar** |
 
-### 8.2 ⚠️ DEFECTO CONOCIDO en la tercera fila — léalo antes de ejecutar
+### 8.2 La tercera fila era un defecto — CORREGIDO antes de esta prueba
 
-`won` y `lost` se calculan de forma **independiente**, y las tres consecuencias
-usan predicados distintos (`lost` para el tipo y el estado de la orden, `won`
-para el importe). Para cualquier estado terminal que no sea ni `won` ni `lost`,
-las dos banderas son `false` y el webhook escribe un **`CHARGEBACK_REVERSAL` con
-`gross_amount_cents = 0`** y devuelve la orden a `paid`.
+Hasta el commit anterior, `won` y `lost` se calculaban de forma independiente y
+las consecuencias usaban predicados distintos (`lost` para el tipo y el estado de
+la orden, `won` para el importe). Para cualquier estado que no fuera ni `won` ni
+`lost`, ambas banderas quedaban en `false` y el webhook escribía un
+**`CHARGEBACK_REVERSAL` con `gross_amount_cents = 0`** y devolvía la orden a
+`paid`.
 
-Eso es una afirmación falsa en un libro mayor de hechos: un `CHARGEBACK_REVERSAL`
-afirma que la retirada de fondos se revirtió, y el `0` afirma que se revirtió por
-cero — mientras el `CHARGEBACK` de `-14900` del paso 7 sigue en pie. La
-combinación deja el neto en `-14900` **y además** una fila que dice que hubo
-reversión. El comentario del código lo presenta como intencionado
-("`warning_closed` y similares … se tratan como reversión de la retirada
-provisional"), pero el efecto contable no coincide con esa intención: una
-reversión de importe cero no revierte nada.
+Eso era una afirmación falsa en un libro mayor de hechos. Un
+`CHARGEBACK_REVERSAL` afirma que la retirada de fondos se revirtió, y el `0`
+afirma que se revirtió por cero — mientras el `CHARGEBACK` de `-14900` del paso 7
+seguía en pie. Peor aún, devolver la orden a `paid` afirmaba que el dinero estaba
+bien en medio de una disputa viva.
 
-**Esto se documenta aquí como defecto, no como comportamiento correcto.** No es
-un fallo que esta prueba deba provocar ni arreglar. La ruta elegida en 8.3 lo
-esquiva de forma determinista.
+Stripe define **siete** estados de disputa, y solo dos son desenlaces
+financieros terminales. Derivar una conclusión de «no es `lost`» trataba a los
+otros cinco como equivalentes a una victoria: exactamente la misma forma de
+defecto que la vieja inferencia de IVA, que convertía la ausencia de evidencia en
+una afirmación positiva.
+
+**Corregido:** solo se afirma con evidencia positiva. Un estado no terminal se
+registra como `ADJUSTMENT` con importe `0`, preservando el estado observado en
+`raw_payload` sin interpretarlo, y **la orden no se toca**.
+
+> **Nota de versión.** La corrección está en el código pero **no en la función
+> desplegada**: el redeploy v2 que usted verificó es anterior. Esta prueba debe
+> ejecutarse contra v2, y la ruta de 8.3 no pasa por la rama corregida, de modo
+> que el resultado esperado es idéntico en ambas versiones. Redespliegue la
+> función **después** de completar la prueba, no antes, para que el entorno
+> verificado no cambie a mitad de ejecución.
 
 ### 8.3 RUTA A TOMAR: acepte la disputa (cierre como `lost`)
 

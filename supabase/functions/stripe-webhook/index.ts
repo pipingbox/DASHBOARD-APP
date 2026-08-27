@@ -932,16 +932,26 @@ Deno.serve(async (req) => {
             ? dispute.payment_intent
             : (dispute.payment_intent?.id ?? null);
 
+        // Stripe reports seven possible dispute statuses. Only two are terminal
+        // financial outcomes; the rest are early-warning or in-flight states.
+        // Deriving a conclusion from "not lost" would treat every one of them as
+        // equivalent to a win — the same defect shape as the old VAT
+        // reverse-charge inference, which turned an absence of evidence into a
+        // positive claim.
+        // So: assert only on positive evidence, and record anything else as an
+        // ADJUSTMENT that preserves the observed status without interpreting it.
         const won = dispute.status === "won";
-        // 'warning_closed' and similar terminal states are neither a win nor a
-        // loss of funds; treated as a reversal of the provisional withdrawal.
         const lost = dispute.status === "lost";
+        const terminal = won || lost;
 
-        if (paymentIntentId) {
+        if (paymentIntentId && terminal) {
           await supabase
             .from("app_orders")
-            // Lost: the funds are gone, and this is NOT 'refunded'. Otherwise
-            // the charge stands and the order returns to 'paid'.
+            // Lost: the funds are gone, and this is NOT 'refunded'. Won: the
+            // charge stands and the order returns to 'paid'. A non-terminal
+            // status is deliberately left alone: moving it to 'paid' would
+            // affirm the money is fine while the -amount CHARGEBACK still
+            // stands, which is a false statement about a live dispute.
             .update({ status: lost ? "chargeback" : "paid" })
             .eq("stripe_payment_intent_id", paymentIntentId);
         }
@@ -951,6 +961,7 @@ Deno.serve(async (req) => {
           dispute.id,
           "status=",
           dispute.status ?? "unknown",
+          terminal ? "" : "(non-terminal: recorded as ADJUSTMENT, order untouched)",
         );
 
         try {
@@ -967,9 +978,16 @@ Deno.serve(async (req) => {
             course_id: attribution.course_id,
             instructor_id: attribution.instructor_id,
             // Lost -> the CHARGEBACK stands (recorded again at closure with the
-            // final settlement facts). Anything else -> the withdrawal is
-            // reversed.
-            event_type: lost ? "CHARGEBACK" : "CHARGEBACK_REVERSAL",
+            // final settlement facts). Won -> the withdrawal is reversed.
+            // Neither -> ADJUSTMENT: a zero-amount CHARGEBACK_REVERSAL would
+            // claim to reverse something that was never reversed, while the
+            // earlier negative CHARGEBACK remains on the ledger. The raw status
+            // is preserved in raw_payload for later interpretation.
+            event_type: lost
+              ? "CHARGEBACK"
+              : won
+                ? "CHARGEBACK_REVERSAL"
+                : "ADJUSTMENT",
             occurred_at: toIso(event.created) ?? new Date().toISOString(),
             currency: (dispute.currency || "eur").toUpperCase(),
             // Won: money coming back, positive. Lost: already withdrawn at
