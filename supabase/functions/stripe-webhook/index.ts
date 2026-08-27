@@ -103,6 +103,20 @@ async function resolveUserId(
 // The one arithmetic that IS allowed is sign normalisation and reading a value
 // Stripe itself already computed (e.g. balance_transaction.fee), because those
 // are transcriptions, not interpretations.
+//
+// PB-MARKET-REVENUE-LIVEMODE-001 — ALWAYS RECORD `livemode`.
+// Every revenue-event write below transcribes `event.livemode`. It is read off
+// the EVENT, not off the nested object: the event is the delivery Stripe
+// authenticated with the webhook signature, so its flag is the one that
+// actually describes the mode this delivery came from, and it is present on
+// every event object regardless of type or API version.
+//
+// This matters more than a normal field because the events table is
+// APPEND-ONLY: no UPDATE, no DELETE, ever. A row written without this flag is
+// permanently indistinguishable from real revenue at the column level, and a
+// test-mode transaction would sit inside the production revenue ledger forever.
+// Requires sql/006-revenue-events-livemode.sql to be applied FIRST — PostgREST
+// rejects the whole row if the column is missing.
 
 /** Shape of an app_marketplace_revenue_events row. Facts only — no derived field. */
 interface RevenueEventRow {
@@ -135,6 +149,12 @@ interface RevenueEventRow {
   stripe_event_id: string;
   stripe_object_id: string | null;
   raw_payload: Record<string, unknown> | null;
+  // PB-MARKET-REVENUE-LIVEMODE-001. Stripe's own flag, transcribed unchanged:
+  // true = real money, false = test mode. Not optional in this interface even
+  // though the column is nullable, so that a new call site cannot forget it —
+  // omitting it is a compile error, whereas a missing NULL would be a silent
+  // unmarkable row in an APPEND-ONLY ledger that can never be corrected.
+  livemode: boolean | null;
 }
 
 /**
@@ -568,6 +588,8 @@ Deno.serve(async (req) => {
               stripe_event_id: event.id,
               stripe_object_id: session.id,
               raw_payload: session as unknown as Record<string, unknown>,
+              // Real money or a test-mode run. Transcribed from the event.
+              livemode: event.livemode,
             });
           } catch (captureErr) {
             console.error(
@@ -809,6 +831,8 @@ Deno.serve(async (req) => {
               stripe_event_id: event.id,
               stripe_object_id: charge.id,
               raw_payload: charge as unknown as Record<string, unknown>,
+              // Real money or a test-mode run. Transcribed from the event.
+              livemode: event.livemode,
             });
           } catch (captureErr) {
             console.error("stripe-webhook: refund capture failed for", charge.id, captureErr);
@@ -886,6 +910,8 @@ Deno.serve(async (req) => {
             stripe_event_id: event.id,
             stripe_object_id: dispute.id,
             raw_payload: dispute as unknown as Record<string, unknown>,
+            // Real money or a test-mode run. Transcribed from the event.
+            livemode: event.livemode,
           });
         } catch (captureErr) {
           console.error("stripe-webhook: dispute capture failed for", dispute.id, captureErr);
@@ -966,6 +992,8 @@ Deno.serve(async (req) => {
             stripe_event_id: event.id,
             stripe_object_id: dispute.id,
             raw_payload: dispute as unknown as Record<string, unknown>,
+            // Real money or a test-mode run. Transcribed from the event.
+            livemode: event.livemode,
           });
         } catch (captureErr) {
           console.error(

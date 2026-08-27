@@ -295,6 +295,13 @@ const MARKETPLACE_SCHEMA = {
       'raw_payload',
       'created_at',
     ],
+    // PB-MARKET-REVENUE-LIVEMODE-001. Columns added to this table by a LATER
+    // forward migration. 004 and 005 are APPLIED in production and are no
+    // longer amendable in place, so anything new arrives in its own file and
+    // must be checked against that file rather than against 005.
+    laterColumns: {
+      '006-revenue-events-livemode.sql': ['livemode'],
+    },
   },
 };
 
@@ -473,8 +480,10 @@ const driftErrors = [];
 const migrations = {};
 const REQUIRED_MIGRATIONS = new Set([
   ...Object.values(MARKETPLACE_SCHEMA).map((t) => t.migration),
+  ...Object.values(MARKETPLACE_SCHEMA).flatMap((t) => Object.keys(t.laterColumns ?? {})),
   '004-marketplace-schema.sql',
   '005-revenue-events.sql',
+  '006-revenue-events-livemode.sql',
 ]);
 
 for (const file of REQUIRED_MIGRATIONS) {
@@ -517,6 +526,38 @@ for (const [table, { migration, columns }] of Object.entries(MARKETPLACE_SCHEMA)
         `column "${col}" of ${table} is declared in check-schema-guard.mjs but does ` +
           `not appear in sql/${migration}.`,
       );
+    }
+  }
+}
+
+// 2b. PB-MARKET-REVENUE-LIVEMODE-001 — columns added by a LATER forward
+//     migration are checked against THAT file, not against the one that created
+//     the table. Checking them against the creating migration would be wrong in
+//     both directions: it would fail for a column that legitimately arrived
+//     later, and it would pass if someone amended an already-applied file in
+//     place, which is precisely what must not happen now that 004 and 005 are
+//     live in production.
+//
+//     They must also be ADD COLUMN IF NOT EXISTS: the table already exists in
+//     production, so a plain ADD COLUMN is not idempotent and breaks a re-run.
+for (const [table, { laterColumns }] of Object.entries(MARKETPLACE_SCHEMA)) {
+  for (const [migration, columns] of Object.entries(laterColumns ?? {})) {
+    const sql = migrations[migration];
+    if (!sql) continue;
+    for (const col of columns) {
+      if (!sql.includes(col)) {
+        driftErrors.push(
+          `column "${col}" of ${table} is declared in check-schema-guard.mjs as added by ` +
+            `sql/${migration}, but does not appear in that file.`,
+        );
+      }
+      if (!sql.includes(`ADD COLUMN IF NOT EXISTS ${col}`)) {
+        driftErrors.push(
+          `${table}.${col} is expected to be added by "ADD COLUMN IF NOT EXISTS ${col}" in ` +
+            `sql/${migration}, but that statement was not found. ${table} already exists in ` +
+            `production, so a plain ADD COLUMN is not idempotent and breaks a re-run.`,
+        );
+      }
     }
   }
 }
@@ -600,7 +641,13 @@ const DERIVED_NAME_PATTERNS = [
 
 const eventsTable = MARKETPLACE_SCHEMA.app_marketplace_revenue_events;
 if (eventsTable) {
-  for (const col of eventsTable.columns) {
+  // Later-migration columns are scanned too: a derived column smuggled in via a
+  // forward migration is exactly as much of a defect as one in the original.
+  const allEventColumns = [
+    ...eventsTable.columns,
+    ...Object.values(eventsTable.laterColumns ?? {}).flat(),
+  ];
+  for (const col of allEventColumns) {
     const hit = DERIVED_NAME_PATTERNS.find((re) => re.test(col));
     if (hit) {
       driftErrors.push(
@@ -619,8 +666,20 @@ if (eventsTable) {
   //
   //    Scoped to policies whose statement actually names the events table, so
   //    an unrelated policy in the same migration cannot trip it.
-  const sql = migrations['005-revenue-events.sql'];
-  if (sql) {
+  //
+  //    PB-MARKET-REVENUE-LIVEMODE-001: this now sweeps EVERY migration that
+  //    touches the table, not just the one that created it. 005 is applied and
+  //    frozen, so the only way append-only can be weakened from here on is a
+  //    forward migration — which is exactly the file this loop has to read.
+  const APPEND_ONLY_MIGRATIONS = [
+    '005-revenue-events.sql',
+    ...Object.keys(eventsTable.laterColumns ?? {}),
+  ];
+
+  for (const migration of APPEND_ONLY_MIGRATIONS) {
+    const sql = migrations[migration];
+    if (!sql) continue;
+
     for (const block of sql.split(/CREATE POLICY/i).slice(1)) {
       const statement = block.split(';')[0];
       if (!statement.includes('app_marketplace_revenue_events')) continue;
@@ -628,22 +687,12 @@ if (eventsTable) {
       const cmd = statement.match(/\bFOR\s+(SELECT|INSERT|UPDATE|DELETE|ALL)\b/i);
       if (cmd && cmd[1].toUpperCase() !== 'SELECT') {
         driftErrors.push(
-          `sql/005-revenue-events.sql declares a "FOR ${cmd[1].toUpperCase()}" policy on ` +
+          `sql/${migration} declares a "FOR ${cmd[1].toUpperCase()}" policy on ` +
             `app_marketplace_revenue_events. That table is APPEND-ONLY: it must have SELECT ` +
             `policies and nothing else. Writes come from service_role only, and a ` +
             `correction is a new ADJUSTMENT event, never an edit of a past one.`,
         );
       }
-    }
-
-    // PB-SEC-RLS-WORKFORCE-001: a policy without a matching grant is never
-    // evaluated at all, because PostgREST refuses the request first.
-    if (!/GRANT SELECT ON app_marketplace_revenue_events TO authenticated/.test(sql)) {
-      driftErrors.push(
-        `sql/005-revenue-events.sql has no "GRANT SELECT ON app_marketplace_revenue_events ` +
-          `TO authenticated". PB-SEC-RLS-WORKFORCE-001: a policy without a matching grant ` +
-          `is dead code.`,
-      );
     }
 
     // The mirror image: a write grant would break append-only at the privilege
@@ -653,10 +702,107 @@ if (eventsTable) {
     );
     if (overreaching) {
       driftErrors.push(
-        `sql/005-revenue-events.sql grants a write privilege on ` +
+        `sql/${migration} grants a write privilege on ` +
           `app_marketplace_revenue_events: "${overreaching[0].trim()}". The table is ` +
           `APPEND-ONLY and authenticated must hold SELECT and nothing else.`,
       );
+    }
+  }
+
+  // PB-SEC-RLS-WORKFORCE-001: a policy without a matching grant is never
+  // evaluated at all, because PostgREST refuses the request first. Asserted
+  // against the migration that creates the table and its grants.
+  {
+    const sql = migrations['005-revenue-events.sql'];
+    if (sql && !/GRANT SELECT ON app_marketplace_revenue_events TO authenticated/.test(sql)) {
+      driftErrors.push(
+        `sql/005-revenue-events.sql has no "GRANT SELECT ON app_marketplace_revenue_events ` +
+          `TO authenticated". PB-SEC-RLS-WORKFORCE-001: a policy without a matching grant ` +
+          `is dead code.`,
+      );
+    }
+  }
+
+  // 8. PB-MARKET-REVENUE-LIVEMODE-001 — livemode must stay a THREE-STATE FACT.
+  //
+  //    The whole argument for the column is that it records only what Stripe
+  //    reported. A DEFAULT would make the database assert a provenance it never
+  //    observed: DEFAULT true fabricates "real money" for historical rows and
+  //    overstates revenue, DEFAULT false reclassifies real revenue as test data
+  //    and deletes it from every report. The table is APPEND-ONLY, so either
+  //    mistake is permanent and uncorrectable. NULL means "written before the
+  //    flag existed", and that is a true statement about the world.
+  {
+    const sql = migrations['006-revenue-events-livemode.sql'];
+    if (sql) {
+      // Matched against the ADD COLUMN STATEMENT itself for the same reason as
+      // the index check below: this file argues at length about why a default
+      // would be wrong, and a whole-file search would trip over its own
+      // explanation. Anchored to a line start so a "--" comment cannot match.
+      const addStatement = (sql.match(
+        /^ALTER TABLE[^;]*ADD COLUMN IF NOT EXISTS livemode[^;]*;/im,
+      ) ?? [])[0];
+
+      if (!addStatement) {
+        driftErrors.push(
+          `sql/006-revenue-events-livemode.sql has no "ADD COLUMN IF NOT EXISTS livemode" ` +
+            `statement. app_marketplace_revenue_events already exists in production, so the ` +
+            `column must be added idempotently by a forward migration.`,
+        );
+      } else {
+        if (/\bDEFAULT\b/i.test(addStatement)) {
+          driftErrors.push(
+            `sql/006-revenue-events-livemode.sql gives livemode a DEFAULT: ` +
+              `"${addStatement.trim()}". That default is a fabricated observation: true ` +
+              `would assert "real money" about rows nobody observed, false would reclassify ` +
+              `real revenue as test data. The table is APPEND-ONLY, so the mistake could ` +
+              `never be corrected. Keep it nullable with no default — NULL honestly means ` +
+              `"written before the flag existed".`,
+          );
+        }
+
+        if (/\bNOT\s+NULL\b/i.test(addStatement)) {
+          driftErrors.push(
+            `sql/006-revenue-events-livemode.sql declares livemode NOT NULL. Rows written ` +
+              `before this migration genuinely have unknown provenance, and NOT NULL would ` +
+              `force a back-filled guess into an APPEND-ONLY ledger.`,
+          );
+        }
+      }
+
+      // The partial index must not be keyed on "= true": that predicate excludes
+      // every pre-006 NULL row, so the index would be unusable for the honest
+      // query and would reward writing the wrong one in order to hit it.
+      //
+      // Matched against the actual CREATE INDEX STATEMENT, not against the file
+      // as a whole. The prose in this migration discusses the correct predicate
+      // at length, so a substring search over the whole file would be satisfied
+      // by the explanation of the rule even if the statement itself broke it —
+      // a guard that passes because the documentation is good is theatre.
+      //
+      // Anchored to the start of a line so the phrase "CREATE INDEX IF NOT
+      // EXISTS" appearing inside a "--" comment cannot be mistaken for the
+      // statement: comment lines begin with "--", real statements do not.
+      const indexStatement = (sql.match(
+        /^CREATE INDEX IF NOT EXISTS[^;]*livemode[^;]*;/im,
+      ) ?? [])[0];
+
+      if (!indexStatement) {
+        driftErrors.push(
+          `sql/006-revenue-events-livemode.sql has no CREATE INDEX statement for livemode. ` +
+            `"Real revenue only" is the near-universal query over this table and needs a ` +
+            `supporting partial index.`,
+        );
+      } else if (!/WHERE livemode IS DISTINCT FROM false/i.test(indexStatement)) {
+        driftErrors.push(
+          `sql/006-revenue-events-livemode.sql's livemode index is not predicated on ` +
+            `"WHERE livemode IS DISTINCT FROM false": "${indexStatement.trim()}". The ` +
+            `real-revenue query must include pre-006 rows of unknown provenance and exclude ` +
+            `only rows OBSERVED to be test; an index on "livemode = true" would silently ` +
+            `drop every historical row and would reward writing that wrong predicate in ` +
+            `order to hit the index.`,
+        );
+      }
     }
   }
 }
@@ -794,6 +940,49 @@ if (reverseChargeViolations.length > 0) {
 }
 
 // =============================================================================
+// PB-MARKET-REVENUE-LIVEMODE-001 — every revenue-event write must record
+// livemode.
+//
+// THE FAILURE THIS PREVENTS. app_marketplace_revenue_events is APPEND-ONLY: no
+// UPDATE, no DELETE, ever. A row inserted without livemode is permanently
+// indistinguishable from real revenue at the column level — it cannot be
+// corrected and it cannot be removed, so a single forgotten call site puts
+// unmarkable test money in the production ledger forever.
+//
+// The TypeScript interface already makes omission a compile error, but the
+// guard runs in CI without a Deno type-check over the Edge Functions, so the
+// property is asserted structurally here as well: every recordRevenueEvent call
+// must carry a livemode field. Counting is enough and is deliberately simple —
+// it cannot be satisfied by a comment, and it fails loudly when a fifth event
+// type is added and the new call site forgets the flag.
+// =============================================================================
+
+const WEBHOOK = join(EDGE_FUNCTIONS, 'stripe-webhook', 'index.ts');
+
+try {
+  const webhookSrc = readFileSync(WEBHOOK, 'utf8');
+  const calls = (webhookSrc.match(/recordRevenueEvent\(\{/g) ?? []).length;
+  const flags = (webhookSrc.match(/^\s*livemode:\s*event\.livemode,\s*$/gm) ?? []).length;
+
+  if (calls > 0 && flags !== calls) {
+    console.error(
+      `\nsupabase/functions/stripe-webhook/index.ts has ${calls} recordRevenueEvent(...) ` +
+        `call(s) but ${flags} "livemode: event.livemode" assignment(s).\n\n` +
+        `  Every revenue-event write must transcribe Stripe's livemode flag.\n` +
+        `  app_marketplace_revenue_events is APPEND-ONLY, so a row written without it is\n` +
+        `  permanently indistinguishable from real revenue: it cannot be updated and it\n` +
+        `  cannot be deleted. Read it from the EVENT (event.livemode), which is the\n` +
+        `  delivery Stripe signed, not from the nested object.\n\n` +
+        `  See sql/006-revenue-events-livemode.sql and PB-MARKET-REVENUE-LIVEMODE-001.\n`,
+    );
+    process.exit(1);
+  }
+} catch {
+  // The webhook is not present in every checkout shape; absence is not a
+  // failure here, and the SQL-side checks above still hold.
+}
+
+// =============================================================================
 // Advisory — sensitive columns leaving the database.
 //
 // iban, tax_identification_number, tin_issuing_state, legal_name and
@@ -837,14 +1026,22 @@ console.log(
 );
 console.log(
   `Marketplace schema OK: ${Object.keys(MARKETPLACE_SCHEMA).length} tables, ` +
-    `${Object.values(MARKETPLACE_SCHEMA).reduce((n, t) => n + t.columns.length, 0)} columns, ` +
+    `${Object.values(MARKETPLACE_SCHEMA).reduce(
+      (n, t) => n + t.columns.length + Object.values(t.laterColumns ?? {}).flat().length,
+      0,
+    )} columns, ` +
     `${ACADEMY_COURSES_ADDED_COLUMNS.length} app_academy_courses + ` +
     `${ORDERS_ADDED_COLUMNS.length} app_orders + ${INVOICES_ADDED_COLUMNS.length} app_invoices ` +
-    `additions verified against sql/004-marketplace-schema.sql and sql/005-revenue-events.sql.`,
+    `additions verified against sql/004-marketplace-schema.sql, sql/005-revenue-events.sql ` +
+    `and sql/006-revenue-events-livemode.sql.`,
 );
 console.log(
-  'Revenue events OK: append-only (SELECT-only policies and grants), zero derived columns, ' +
-    'fiscal_nature carries no silent default.',
+  'Revenue events OK: append-only (SELECT-only policies and grants) across 005 and every ' +
+    'forward migration, zero derived columns, fiscal_nature carries no silent default.',
+);
+console.log(
+  'Livemode OK: nullable with no default (three-state fact), partial index predicated on ' +
+    '"IS DISTINCT FROM false", and every recordRevenueEvent call transcribes event.livemode.',
 );
 console.log(
   'Reverse-charge OK: no TypeScript reads reverse_charge without handling ' +
