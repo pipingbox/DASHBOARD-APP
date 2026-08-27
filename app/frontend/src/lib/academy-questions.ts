@@ -3689,7 +3689,8 @@ export const VCA_QUESTIONS: VCAQuestion[] = [
     "moduleName": "Signs and Markings",
     "difficulty": "easy",
     "isBVCA": true,
-    "isVOLVCA": true,
+    "isVOLVCA": true
+  },
 
   // ─── MULTIPLE CHOICE QUESTIONS ───────────────────────────────────────────────
   {
