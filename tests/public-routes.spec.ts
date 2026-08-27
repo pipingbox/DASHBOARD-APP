@@ -18,6 +18,7 @@ import { test, expect } from '@playwright/test';
  * F2 (2026-08-25): /jobs, /companies — unblocked after PB-ADMIN-ONBOARDING-SCHEMA-001
  *                  confirmed in production: 12 profiles repaired, marketplace_ready correct,
  *                  recalculate-profiles v9 ACTIVE (consent-aware).
+ * PB-MARKET-PROD-001 §7.2 (block 0.1): /dsa — DSA arts. 11 and 12 contact points.
  */
 
 const PUBLIC_ROUTES = [
@@ -26,6 +27,11 @@ const PUBLIC_ROUTES = [
   '/companies/request-workers',
   '/jobs',        // F2 — marketplace public; apply() handles !user gracefully
   '/companies',   // F2 — marketing/metrics page, no auth dependency
+  // PB-MARKET-PROD-001 §7.2 — legal obligation, not an acquisition choice: DSA arts. 11
+  // and 12 require the contact points to be "easily accessible" to authorities and to
+  // recipients of the service. Gating them behind login would itself be the
+  // non-compliance. Static page, no auth dependency, like /terms and /privacy.
+  '/dsa',
 ];
 
 test.describe('PB-WEB-005 public surface', () => {

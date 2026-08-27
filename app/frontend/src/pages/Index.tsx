@@ -433,6 +433,9 @@ export default function Index() {
             <Link to="/terms" className="transition hover:text-zinc-300">
               {t('footer.terms', { defaultValue: 'Terms of Service' })}
             </Link>
+            <Link to="/dsa" className="transition hover:text-zinc-300">
+              {t('footer.dsa', { defaultValue: 'DSA Contact Points' })}
+            </Link>
           </nav>
         </div>
         <p className="mt-4 text-center text-[10px] text-zinc-600">

@@ -612,6 +612,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link to="/terms" className="hover:text-zinc-400 transition">
               {t('footer.terms', { defaultValue: 'Terms of Service' })}
             </Link>
+            <span>·</span>
+            <Link to="/dsa" className="hover:text-zinc-400 transition">
+              {t('footer.dsa', { defaultValue: 'DSA Contact Points' })}
+            </Link>
           </div>
         </footer>
       </div>
