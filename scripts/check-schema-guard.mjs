@@ -93,6 +93,70 @@ const FORBIDDEN = [
       'Net Course Revenue calculation is blocked by PB-MARKET-TAX-001. Do not introduce ' +
       'a column or a client-side computation for it.',
   },
+  // ---------------------------------------------------------------------------
+  // PB-MARKET-REVENUE-EVENTS-001 — derived revenue names.
+  //
+  // app_marketplace_revenue_events (sql/005-revenue-events.sql) is an
+  // APPEND-ONLY ledger of OBSERVED FACTS with ZERO derived columns. Every name
+  // below is a DERIVATION: a function of other columns whose formula depends on
+  // a Net Course Revenue definition that PB-MARKET-TAX-001 has not settled.
+  //
+  // Does NCR net the Stripe fee? The VAT? A refund? A chargeback fee? A coupon
+  // the platform funded? Each answer produces a different number from the SAME
+  // facts. Writing any of these into a column, or computing them in the client,
+  // silently picks one answer for every historical row — and the choice becomes
+  // invisible the day after it is made. Instructor Balance and Payout must be
+  // views or computations over the event log, never stored values.
+  {
+    name: 'instructor_share',
+    reason:
+      'is a derived value and must not exist. app_marketplace_revenue_events stores only ' +
+      'observed facts; any share depends on the Net Course Revenue definition, which is ' +
+      'blocked by PB-MARKET-TAX-001.',
+  },
+  {
+    name: 'instructor_earnings',
+    reason:
+      'is a derived value. Compute it from app_marketplace_revenue_events once the Net ' +
+      'Course Revenue definition is settled (PB-MARKET-TAX-001); never store it.',
+  },
+  {
+    name: 'instructor_balance',
+    reason:
+      'Instructor Balance is a DERIVED concept and is deliberately not a table or a column. ' +
+      'A stored balance is a cached derivation that drifts; derive it from the append-only ' +
+      'event log instead. Blocked by PB-MARKET-TAX-001.',
+  },
+  {
+    name: 'platform_fee',
+    reason:
+      'is a derived value and implies a revenue split that has not been defined. ' +
+      'Blocked by PB-MARKET-TAX-001.',
+  },
+  {
+    name: 'platform_commission',
+    reason:
+      'is a derived value and implies a revenue split that has not been defined. ' +
+      'Blocked by PB-MARKET-TAX-001.',
+  },
+  {
+    name: 'take_rate',
+    reason:
+      'is a percentage and a derived value. Percentages are channel-dependent and live in ' +
+      'application config, never in the database. Blocked by PB-MARKET-TAX-001.',
+  },
+  {
+    name: 'revenue_split',
+    reason:
+      'is a derived value. The split is channel-dependent and its definition is blocked by ' +
+      'PB-MARKET-TAX-001. app_marketplace_revenue_events records facts, not allocations.',
+  },
+  {
+    name: 'payout_amount',
+    reason:
+      'Payout is a DERIVED concept and is deliberately not implemented. No payout engine, ' +
+      'no Stripe Connect, no self-billing until PB-MARKET-TAX-001 closes.',
+  },
 ];
 
 /**
@@ -102,78 +166,156 @@ const FORBIDDEN = [
  * literal appearing in a `.select(...)`, `.eq(...)`, `.insert(...)` or
  * `.update(...)` chain is impossible to attribute statically with a grep. So
  * this map is NOT used to validate call sites — it is the canonical, reviewable
- * record of what sql/004-marketplace-schema.sql creates, kept next to the
- * FORBIDDEN list so that the two cannot drift.
+ * record of what the marketplace migrations create, kept next to the FORBIDDEN
+ * list so that the two cannot drift.
  *
- * MAINTENANCE RULE: adding a column to sql/004-marketplace-schema.sql without
- * adding it here is a review defect. The consistency check below fails the
- * build if a table listed here is missing from src/lib/supabase.ts TABLES.
+ * `migration` names the file each table must be created by, so that a table
+ * introduced in a later migration can be checked precisely instead of weakening
+ * the check into "appears in some SQL file somewhere".
+ *
+ * MAINTENANCE RULE: adding a column to a marketplace migration without adding
+ * it here is a review defect. The consistency check below fails the build if a
+ * table listed here is missing from src/lib/supabase.ts TABLES.
  */
 const MARKETPLACE_SCHEMA = {
-  app_marketplace_instructors: [
-    'id',
-    'user_id',
-    'instructor_status',
-    'display_name',
-    'bio',
-    'headline',
-    'is_founding_instructor',
-    'revenue_share_tier',
-    'tax_country',
-    'tax_identification_number',
-    'tin_issuing_state',
-    'vat_number',
-    'iban',
-    'legal_name',
-    'legal_address',
-    'identity_document_status',
-    'dac7_reportable',
-    'dac7_data_complete', // GENERATED — read-only
-    'applied_at',
-    'approved_at',
-    'suspended_at',
-    'created_at',
-    'updated_at',
-  ],
-  app_marketplace_course_reviews: [
-    'id',
-    'course_id',
-    'reviewer_id',
-    'review_status',
-    'technical_checklist',
-    'pedagogical_checklist',
-    'plagiarism_check_status',
-    'plagiarism_notes',
-    'reviewer_notes',
-    'instructor_response',
-    'submitted_at',
-    'reviewed_at',
-    'created_at',
-    'updated_at',
-  ],
-  app_marketplace_dsa_notices: [
-    'id',
-    'notice_reference',
-    'content_type',
-    'content_id',
-    'content_url',
-    'reporter_name',
-    'reporter_email',
-    'reporter_is_trusted_flagger',
-    'reason_category',
-    'reason_detail',
-    'good_faith_declaration',
-    'status',
-    'decision',
-    'statement_of_reasons',
-    'action_taken',
-    'appeal_deadline_at',
-    'acknowledged_at',
-    'decided_at',
-    'created_at',
-    'updated_at',
-  ],
+  app_marketplace_instructors: {
+    migration: '004-marketplace-schema.sql',
+    columns: [
+      'id',
+      'user_id',
+      'instructor_status',
+      'display_name',
+      'bio',
+      'headline',
+      'is_founding_instructor',
+      'revenue_share_tier',
+      'tax_country',
+      'tax_identification_number',
+      'tin_issuing_state',
+      'vat_number',
+      // PB-MARKET-REVENUE-EVENTS-001 — registral only, decides no treatment.
+      'vat_number_status',
+      'vies_consultation_number',
+      'vies_validated_at',
+      'legal_form',
+      'business_registration_number',
+      'date_of_birth',
+      'iban',
+      'legal_name',
+      'legal_address',
+      'identity_document_status',
+      'dac7_reportable',
+      'dac7_data_complete', // GENERATED — read-only
+      'applied_at',
+      'approved_at',
+      'suspended_at',
+      'created_at',
+      'updated_at',
+    ],
+  },
+  app_marketplace_course_reviews: {
+    migration: '004-marketplace-schema.sql',
+    columns: [
+      'id',
+      'course_id',
+      'reviewer_id',
+      'review_status',
+      'technical_checklist',
+      'pedagogical_checklist',
+      'plagiarism_check_status',
+      'plagiarism_notes',
+      'reviewer_notes',
+      'instructor_response',
+      'submitted_at',
+      'reviewed_at',
+      'created_at',
+      'updated_at',
+    ],
+  },
+  app_marketplace_dsa_notices: {
+    migration: '004-marketplace-schema.sql',
+    columns: [
+      'id',
+      'notice_reference',
+      'content_type',
+      'content_id',
+      'content_url',
+      'reporter_name',
+      'reporter_email',
+      'reporter_is_trusted_flagger',
+      'reason_category',
+      'reason_detail',
+      'good_faith_declaration',
+      'status',
+      'decision',
+      'statement_of_reasons',
+      'action_taken',
+      'appeal_deadline_at',
+      'acknowledged_at',
+      'decided_at',
+      'created_at',
+      'updated_at',
+    ],
+  },
+  // ---------------------------------------------------------------------------
+  // PB-MARKET-REVENUE-EVENTS-001 — APPEND-ONLY, OBSERVED FACTS ONLY.
+  //
+  // EVERY column below is a fact read off a Stripe object at the moment of the
+  // transaction. NONE is a function of another column. If a column added here
+  // could be COMPUTED from the others, it does not belong in the table. Check 5
+  // below runs this list against the derived-name patterns, so declaring a
+  // derived column here fails the build rather than legitimising it.
+  // ---------------------------------------------------------------------------
+  app_marketplace_revenue_events: {
+    migration: '005-revenue-events.sql',
+    columns: [
+      'id',
+      'order_id',
+      'course_id',
+      'instructor_id',
+      'event_type',
+      'occurred_at',
+      'currency',
+      'gross_amount_cents',
+      'tax_amount_cents',
+      'discount_amount_cents',
+      'stripe_fee_cents',
+      'net_settled_cents',
+      'coupon_code',
+      'promotion_id',
+      'discount_funded_by',
+      'buyer_country',
+      'buyer_country_evidence',
+      'buyer_vat_number',
+      'buyer_is_business',
+      'instructor_tier_at_event',
+      'acquisition_channel',
+      'stripe_event_id',
+      'stripe_object_id',
+      'raw_payload',
+      'created_at',
+    ],
+  },
 };
+
+/** Columns added to the pre-existing app_orders by migration 005. */
+const ORDERS_ADDED_COLUMNS = [
+  'course_id',
+  'instructor_id',
+  'instructor_tier_at_sale',
+  'acquisition_channel',
+  'referral_code',
+  'referring_user_id',
+  'refunded_amount_cents',
+];
+
+/** Columns added to the pre-existing app_invoices by migration 005. */
+const INVOICES_ADDED_COLUMNS = [
+  'vat_determination_status',
+  'customer_country_evidence',
+  'customer_vat_number_status',
+  'automatic_tax_enabled',
+];
 
 /** Columns added to the pre-existing app_academy_courses by migration 004. */
 const ACADEMY_COURSES_ADDED_COLUMNS = [
@@ -194,10 +336,45 @@ const SENSITIVE_COLUMNS = [
   'tin_issuing_state',
   'legal_address',
   'legal_name',
+  // PB-MARKET-REVENUE-EVENTS-001. DAC7 identifiers for natural persons and
+  // entities, plus the student personal data carried on a revenue event. The
+  // product spec's hard GDPR rule is that instructors receive NO student
+  // personal data, so any appearance of these in frontend code deserves a look:
+  // instructor-facing code must go through
+  // app_marketplace_revenue_events_instructor, which omits them entirely.
+  'business_registration_number',
+  'date_of_birth',
+  'raw_payload',
+  'buyer_country_evidence',
+  'buyer_vat_number',
 ];
 
-/** Files allowed to mention a forbidden name (documentation of why it is forbidden). */
-const ALLOWLIST = new Set(['lib/onboarding.ts', 'lib/marketplace.ts']);
+/**
+ * Files allowed to mention a forbidden name (documentation of why it is forbidden).
+ *
+ * SECURITY PROPERTY — AN ALLOWLIST ENTRY IS A HOLE IN THE GUARD.
+ * Every name here is a file that may write anything, unchecked. That is
+ * acceptable only for files that exist and have been reviewed.
+ *
+ * PB-MARKET-REVENUE-EVENTS-001 removed 'lib/marketplace.ts' from this set. It
+ * named a file that HAD NEVER EXISTED, which is strictly worse than a stale
+ * entry: it was a pre-authorised exemption lying in wait for whoever created
+ * that path next. They would have inherited a blanket bypass without ever
+ * asking for one and without the review that granting an exemption is supposed
+ * to require. Nothing would have failed — the guard would simply have stopped
+ * looking at the one file most likely to write marketplace columns.
+ *
+ * BOTH remedies are applied, not one:
+ *   (a) the dead entry is deleted, and
+ *   (b) the integrity check below FAILS THE BUILD if any entry does not resolve
+ *       to a real file.
+ * (a) alone fixes today and leaves the mechanism free to rot again the moment a
+ * file is renamed or deleted — which is exactly how this hole appeared. (b)
+ * alone would have passed today with the hole still open, since the entry was
+ * already there. Together, an exemption can be neither stale nor speculative:
+ * it must name a file that exists at the moment the guard runs.
+ */
+const ALLOWLIST = new Set(['lib/onboarding.ts']);
 
 const EXTENSIONS = ['.ts', '.tsx'];
 
@@ -212,6 +389,40 @@ function walk(dir) {
     }
   }
   return out;
+}
+
+// =============================================================================
+// Allowlist integrity — PB-MARKET-REVENUE-EVENTS-001.
+//
+// Runs BEFORE the grep, because a stale or speculative entry silently disables
+// the grep for that path, and there is no value in reporting a clean scan that
+// was performed through a hole. See the comment on ALLOWLIST for why an entry
+// naming a non-existent file is worse than a merely stale one.
+// =============================================================================
+
+const allowlistErrors = [];
+for (const rel of ALLOWLIST) {
+  let ok = false;
+  try {
+    ok = statSync(join(SRC, rel)).isFile();
+  } catch {
+    ok = false;
+  }
+  if (!ok) {
+    allowlistErrors.push(
+      `ALLOWLIST entry "${rel}" does not resolve to a file under app/frontend/src. ` +
+        `An allowlist entry is an unchecked write permission: pointing it at a ` +
+        `non-existent path pre-authorises whoever creates that file next, with no review. ` +
+        `Delete the entry, or fix the path.`,
+    );
+  }
+}
+
+if (allowlistErrors.length > 0) {
+  console.error('\nSchema-guard allowlist integrity failure:\n');
+  for (const e of allowlistErrors) console.error(`  - ${e}`);
+  console.error(`\n${allowlistErrors.length} problem(s). See PB-MARKET-REVENUE-EVENTS-001.\n`);
+  process.exit(1);
 }
 
 const violations = [];
@@ -244,66 +455,94 @@ if (violations.length > 0) {
 }
 
 // =============================================================================
-// PB-MARKET-SCHEMA-001 — consistency checks between the SQL migration, the
-// TABLES constant and this guard.
+// PB-MARKET-SCHEMA-001 / PB-MARKET-REVENUE-EVENTS-001 — consistency checks
+// between the SQL migrations, the TABLES constant and this guard.
 //
-// The FORBIDDEN grep above catches columns that must never be written. These
-// three checks catch the opposite failure: the migration and the frontend
+// The FORBIDDEN grep above catches columns that must never be written. The
+// checks below catch the opposite failure: the migrations and the frontend
 // drifting apart silently, which is how a non-existent column reference gets
 // introduced in the first place.
 // =============================================================================
 
-const SQL_MIGRATION = join(__dirname, '..', 'sql', '004-marketplace-schema.sql');
+const SQL_DIR = join(__dirname, '..', 'sql');
 const SUPABASE_LIB = join(SRC, 'lib', 'supabase.ts');
 
 const driftErrors = [];
 
-let sql = '';
-try {
-  sql = readFileSync(SQL_MIGRATION, 'utf8');
-} catch {
-  driftErrors.push(
-    `sql/004-marketplace-schema.sql is missing. The marketplace tables in this guard ` +
-      `have no migration backing them.`,
-  );
+/** Migration contents keyed by file name, read once and reused by every check. */
+const migrations = {};
+const REQUIRED_MIGRATIONS = new Set([
+  ...Object.values(MARKETPLACE_SCHEMA).map((t) => t.migration),
+  '004-marketplace-schema.sql',
+  '005-revenue-events.sql',
+]);
+
+for (const file of REQUIRED_MIGRATIONS) {
+  try {
+    migrations[file] = readFileSync(join(SQL_DIR, file), 'utf8');
+  } catch {
+    migrations[file] = null;
+    driftErrors.push(
+      `sql/${file} is missing. Tables and columns declared in this guard against it ` +
+        `have no migration backing them.`,
+    );
+  }
 }
 
 const supabaseLib = readFileSync(SUPABASE_LIB, 'utf8');
 
-if (sql) {
-  // 1. Every table this guard knows about must actually be created by the migration.
-  for (const table of Object.keys(MARKETPLACE_SCHEMA)) {
-    if (!sql.includes(`CREATE TABLE IF NOT EXISTS ${table}`)) {
+// 1. Every table this guard knows about must be created by ITS OWN migration.
+//    Checking against "any SQL file" would let a table declared here be
+//    satisfied by an unrelated file that merely mentions the name.
+for (const [table, { migration }] of Object.entries(MARKETPLACE_SCHEMA)) {
+  const sql = migrations[migration];
+  if (!sql) continue;
+  if (!sql.includes(`CREATE TABLE IF NOT EXISTS ${table}`)) {
+    driftErrors.push(
+      `"${table}" is declared in check-schema-guard.mjs but is not created by ` +
+        `sql/${migration}.`,
+    );
+  }
+}
+
+// 2. Every column this guard knows about must appear in its migration. Catches
+//    the case where a column is renamed in SQL but not here — the exact drift
+//    that produces a write to a non-existent column.
+for (const [table, { migration, columns }] of Object.entries(MARKETPLACE_SCHEMA)) {
+  const sql = migrations[migration];
+  if (!sql) continue;
+  for (const col of columns) {
+    if (!sql.includes(col)) {
       driftErrors.push(
-        `"${table}" is declared in check-schema-guard.mjs but is not created by ` +
-          `sql/004-marketplace-schema.sql.`,
+        `column "${col}" of ${table} is declared in check-schema-guard.mjs but does ` +
+          `not appear in sql/${migration}.`,
       );
     }
   }
+}
 
-  // 2. Every column this guard knows about must appear in the migration. Catches
-  //    the case where a column is renamed in SQL but not here — the exact drift
-  //    that produces a write to a non-existent column.
-  for (const [table, columns] of Object.entries(MARKETPLACE_SCHEMA)) {
-    for (const col of columns) {
-      if (!sql.includes(col)) {
-        driftErrors.push(
-          `column "${col}" of ${table} is declared in check-schema-guard.mjs but does ` +
-            `not appear in sql/004-marketplace-schema.sql.`,
-        );
-      }
-    }
-  }
+// 3. Every column a migration adds to a PRE-EXISTING table must be an explicit
+//    ADD COLUMN IF NOT EXISTS. A plain ADD COLUMN would make the migration
+//    non-idempotent and fail on re-run.
+const ADDED_COLUMN_CHECKS = [
+  {
+    table: 'app_academy_courses',
+    migration: '004-marketplace-schema.sql',
+    columns: ACADEMY_COURSES_ADDED_COLUMNS,
+  },
+  { table: 'app_orders', migration: '005-revenue-events.sql', columns: ORDERS_ADDED_COLUMNS },
+  { table: 'app_invoices', migration: '005-revenue-events.sql', columns: INVOICES_ADDED_COLUMNS },
+];
 
-  // 3. Every column the migration adds to the pre-existing app_academy_courses
-  //    must be an explicit ADD COLUMN IF NOT EXISTS. A plain ADD COLUMN would
-  //    make the migration non-idempotent and fail on re-run.
-  for (const col of ACADEMY_COURSES_ADDED_COLUMNS) {
+for (const { table, migration, columns } of ADDED_COLUMN_CHECKS) {
+  const sql = migrations[migration];
+  if (!sql) continue;
+  for (const col of columns) {
     if (!sql.includes(`ADD COLUMN IF NOT EXISTS ${col}`)) {
       driftErrors.push(
-        `app_academy_courses.${col} is expected to be added by ` +
-          `"ADD COLUMN IF NOT EXISTS ${col}" in sql/004-marketplace-schema.sql, but that ` +
-          `statement was not found. Non-idempotent migrations break re-runs.`,
+        `${table}.${col} is expected to be added by "ADD COLUMN IF NOT EXISTS ${col}" in ` +
+          `sql/${migration}, but that statement was not found. Non-idempotent migrations ` +
+          `break re-runs.`,
       );
     }
   }
@@ -317,6 +556,108 @@ for (const table of Object.keys(MARKETPLACE_SCHEMA)) {
       `"${table}" is not present in the TABLES constant of src/lib/supabase.ts. ` +
         `Add it so call sites do not hardcode the table name.`,
     );
+  }
+}
+
+// 5. PB-MARKET-REVENUE-EVENTS-001 — fiscal_nature must carry NO DEFAULT.
+//    A default here is a SILENT FISCAL ASSUMPTION: a course nobody classified
+//    would be recorded as pre-recorded by the system, with nothing indicating
+//    the question went unanswered. A misclassification must be a visible
+//    omission (a failing INSERT), never a system-chosen answer.
+{
+  const sql = migrations['004-marketplace-schema.sql'];
+  if (sql && /fiscal_nature\s+TEXT[^;]*DEFAULT/i.test(sql)) {
+    driftErrors.push(
+      `sql/004-marketplace-schema.sql declares fiscal_nature with a DEFAULT. That default ` +
+        `is a silent fiscal assumption: it answers, on the system's behalf, the single most ` +
+        `important classification question in the data model. Add the column nullable, ` +
+        `backfill, then SET NOT NULL without a default.`,
+    );
+  }
+}
+
+// 6. PB-MARKET-REVENUE-EVENTS-001 — NO DERIVED COLUMN ON THE EVENTS TABLE.
+//
+//    The declared column list is cross-checked against the derived-revenue
+//    patterns. This is the structural half of the rule: FORBIDDEN stops the
+//    frontend from REFERENCING such a name, and this stops the guard's own
+//    schema record from ever DECLARING one as legitimate. Without it, someone
+//    adding `instructor_share_cents` to both the migration and this list would
+//    sail through.
+const DERIVED_NAME_PATTERNS = [
+  /net_course_revenue/i,
+  /instructor_share/i,
+  /instructor_earnings/i,
+  /instructor_balance/i,
+  /platform_fee/i,
+  /platform_commission/i,
+  /take_rate/i,
+  /revenue_split/i,
+  /payout/i,
+  /percentage/i,
+  /_percent$/i,
+];
+
+const eventsTable = MARKETPLACE_SCHEMA.app_marketplace_revenue_events;
+if (eventsTable) {
+  for (const col of eventsTable.columns) {
+    const hit = DERIVED_NAME_PATTERNS.find((re) => re.test(col));
+    if (hit) {
+      driftErrors.push(
+        `app_marketplace_revenue_events."${col}" matches the derived-revenue pattern ` +
+          `${hit}. That table is an APPEND-ONLY ledger of OBSERVED FACTS with zero derived ` +
+          `columns: a derived column silently picks a Net Course Revenue definition that ` +
+          `PB-MARKET-TAX-001 has not made. Instructor Balance and Payout must be views or ` +
+          `computations over the events, never stored columns.`,
+      );
+    }
+  }
+
+  // 7. Append-only is enforced by the ABSENCE of INSERT/UPDATE/DELETE policies
+  //    and the absence of write grants. Absence is invisible in review and
+  //    trivially undone, so both halves are asserted here rather than trusted.
+  //
+  //    Scoped to policies whose statement actually names the events table, so
+  //    an unrelated policy in the same migration cannot trip it.
+  const sql = migrations['005-revenue-events.sql'];
+  if (sql) {
+    for (const block of sql.split(/CREATE POLICY/i).slice(1)) {
+      const statement = block.split(';')[0];
+      if (!statement.includes('app_marketplace_revenue_events')) continue;
+
+      const cmd = statement.match(/\bFOR\s+(SELECT|INSERT|UPDATE|DELETE|ALL)\b/i);
+      if (cmd && cmd[1].toUpperCase() !== 'SELECT') {
+        driftErrors.push(
+          `sql/005-revenue-events.sql declares a "FOR ${cmd[1].toUpperCase()}" policy on ` +
+            `app_marketplace_revenue_events. That table is APPEND-ONLY: it must have SELECT ` +
+            `policies and nothing else. Writes come from service_role only, and a ` +
+            `correction is a new ADJUSTMENT event, never an edit of a past one.`,
+        );
+      }
+    }
+
+    // PB-SEC-RLS-WORKFORCE-001: a policy without a matching grant is never
+    // evaluated at all, because PostgREST refuses the request first.
+    if (!/GRANT SELECT ON app_marketplace_revenue_events TO authenticated/.test(sql)) {
+      driftErrors.push(
+        `sql/005-revenue-events.sql has no "GRANT SELECT ON app_marketplace_revenue_events ` +
+          `TO authenticated". PB-SEC-RLS-WORKFORCE-001: a policy without a matching grant ` +
+          `is dead code.`,
+      );
+    }
+
+    // The mirror image: a write grant would break append-only at the privilege
+    // layer regardless of what the policies say.
+    const overreaching = sql.match(
+      /GRANT[^;]*\b(INSERT|UPDATE|DELETE)\b[^;]*ON app_marketplace_revenue_events[^;]*;/i,
+    );
+    if (overreaching) {
+      driftErrors.push(
+        `sql/005-revenue-events.sql grants a write privilege on ` +
+          `app_marketplace_revenue_events: "${overreaching[0].trim()}". The table is ` +
+          `APPEND-ONLY and authenticated must hold SELECT and nothing else.`,
+      );
+    }
   }
 }
 
@@ -366,8 +707,17 @@ if (sensitiveHits.length > 0) {
 
 console.log('Schema guard OK: no forbidden column references.');
 console.log(
+  `Allowlist OK: ${ALLOWLIST.size} entr${ALLOWLIST.size === 1 ? 'y' : 'ies'}, all resolving ` +
+    `to real files.`,
+);
+console.log(
   `Marketplace schema OK: ${Object.keys(MARKETPLACE_SCHEMA).length} tables, ` +
-    `${Object.values(MARKETPLACE_SCHEMA).reduce((n, c) => n + c.length, 0)} columns, ` +
-    `${ACADEMY_COURSES_ADDED_COLUMNS.length} app_academy_courses additions verified ` +
-    `against sql/004-marketplace-schema.sql.`,
+    `${Object.values(MARKETPLACE_SCHEMA).reduce((n, t) => n + t.columns.length, 0)} columns, ` +
+    `${ACADEMY_COURSES_ADDED_COLUMNS.length} app_academy_courses + ` +
+    `${ORDERS_ADDED_COLUMNS.length} app_orders + ${INVOICES_ADDED_COLUMNS.length} app_invoices ` +
+    `additions verified against sql/004-marketplace-schema.sql and sql/005-revenue-events.sql.`,
+);
+console.log(
+  'Revenue events OK: append-only (SELECT-only policies and grants), zero derived columns, ' +
+    'fiscal_nature carries no silent default.',
 );

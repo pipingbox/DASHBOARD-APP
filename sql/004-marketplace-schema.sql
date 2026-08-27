@@ -65,6 +65,22 @@
 --
 -- STATUS: NOT APPLIED. This file has never been executed against any database.
 -- It must be run against Supabase by the operator. See section 11.
+--
+-- AMENDED 2026-08 (PB-MARKET-REVENUE-EVENTS-001) while still UNEXECUTED, which
+-- is why these are edits in place rather than a follow-up migration:
+--   * fiscal_nature no longer carries DEFAULT 'pregrabado'. It is added
+--     nullable, backfilled for the pre-existing PipingBox Originals, then set
+--     NOT NULL with no default. A misclassified course must be a visible
+--     omission, not a silent system assumption. See section 3 and 3.1b.
+--   * app_marketplace_instructors gains legal_form, business_registration_number
+--     and date_of_birth. The differing treatment of individuals, sole traders
+--     and companies is one of the open questions in PB-MARKET-TAX-001, and the
+--     schema could not tell them apart. Capturing the legal form does not
+--     decide its treatment; failing to capture it makes the decision
+--     unimplementable. DAC7 needs the same discriminator.
+--   * app_marketplace_instructors gains vat_number_status, plus
+--     vies_consultation_number and vies_validated_at. Purely registral.
+-- None of these amendments computes, splits or interprets anything.
 -- =============================================================================
 
 
@@ -169,6 +185,63 @@ CREATE TABLE IF NOT EXISTS app_marketplace_instructors (
                                              -- mandatory for an instructor is still open in
                                              -- PB-MARKET-TAX-001. Do not add NOT NULL here
                                              -- until that ticket closes.
+
+  -- ---------------------------------------------------------------------------
+  -- VAT-number STATE. Registral only: this records WHAT WE KNOW, never what the
+  -- tax consequence of knowing it is.
+  -- ---------------------------------------------------------------------------
+  -- With `vat_number TEXT` alone, NULL is ambiguous: it cannot distinguish
+  -- "this instructor is a private individual and has no VAT number" from "the
+  -- onboarding form was never completed". Those are opposite situations — the
+  -- first is a settled fact, the second is missing data — and collapsing them
+  -- makes it impossible to know later whether anyone ever asked.
+  --
+  -- vies_consultation_number is the reference VIES returns for a validation
+  -- request. It is the EVIDENCE. A reverse-charge position asserted without the
+  -- consultation reference collapses under inspection, because the platform
+  -- cannot show it validated the counterparty's number on the date of supply.
+  -- Storing it decides nothing; not storing it makes the decision unprovable.
+  --
+  -- NOTHING here computes a VAT treatment. The determination is PB-MARKET-TAX-001.
+  vat_number_status           TEXT NOT NULL DEFAULT 'NOT_PROVIDED'
+                                CHECK (vat_number_status IN (
+                                  'NOT_PROVIDED',    -- never asked / never answered
+                                  'NOT_APPLICABLE',  -- asked; instructor has no VAT number
+                                  'PROVIDED',        -- a number was given, not yet validated
+                                  'VIES_VALIDATED',  -- confirmed valid by VIES
+                                  'VIES_INVALID'     -- VIES rejected it
+                                )),
+  vies_consultation_number    TEXT,          -- VIES reference. Required evidence for any future
+                                             -- reverse-charge position. Registral, not a decision.
+  vies_validated_at           TIMESTAMPTZ,   -- when the VIES check above was performed
+
+  -- ---------------------------------------------------------------------------
+  -- LEGAL FORM. Capturing it does NOT decide its treatment; failing to capture
+  -- it makes the decision unimplementable.
+  -- ---------------------------------------------------------------------------
+  -- One of the open questions in PB-MARKET-TAX-001 is precisely that private
+  -- individuals, sole traders and companies are treated differently (VAT
+  -- registration, invoicing/self-billing, withholding, DAC7 field set). Today
+  -- the schema cannot tell them apart at all, so whichever answer that ticket
+  -- reaches would be unimplementable against historical instructors without a
+  -- retroactive data-collection campaign.
+  --
+  -- DAC7 also needs the discriminator directly: an ENTITY must report a
+  -- business registration number, and a NATURAL PERSON without a TIN must
+  -- report a date of birth.
+  --
+  -- All three are NULLABLE. Requiring them today would block onboarding on a
+  -- question the tax ticket has not answered yet, which is the opposite of the
+  -- intent: capture now, decide later.
+  legal_form                  TEXT
+                                CHECK (legal_form IS NULL OR legal_form IN (
+                                  'INDIVIDUAL',    -- natural person, not registered as a trader
+                                  'SOLE_TRADER',   -- natural person registered as self-employed
+                                  'COMPANY'        -- legal entity
+                                )),
+  business_registration_number TEXT,         -- SENSITIVE. DAC7: required for ENTITY sellers.
+  date_of_birth               DATE,          -- SENSITIVE. DAC7: required for a natural person
+                                             -- with no TIN. Never expose beyond owner/admin.
   iban                        TEXT,          -- SENSITIVE. Payout destination. No payout logic
                                              -- exists yet (blocked by PB-MARKET-TAX-001);
                                              -- this column only stores what onboarding captures.
@@ -218,6 +291,52 @@ CREATE TABLE IF NOT EXISTS app_marketplace_instructors (
   updated_at                  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- 2.1 Columns added to app_marketplace_instructors AFTER the first draft of this
+--     file was written. The CREATE TABLE above already declares them, but
+--     `CREATE TABLE IF NOT EXISTS` is a no-op on an existing table and adds
+--     nothing, so a database created from an earlier draft would silently lack
+--     them. These statements make the amendment converge on both paths.
+--     Same reason the constraints are added through a catalog check below.
+
+ALTER TABLE app_marketplace_instructors
+  ADD COLUMN IF NOT EXISTS vat_number_status TEXT NOT NULL DEFAULT 'NOT_PROVIDED';
+ALTER TABLE app_marketplace_instructors
+  ADD COLUMN IF NOT EXISTS vies_consultation_number TEXT;
+ALTER TABLE app_marketplace_instructors
+  ADD COLUMN IF NOT EXISTS vies_validated_at TIMESTAMPTZ;
+ALTER TABLE app_marketplace_instructors
+  ADD COLUMN IF NOT EXISTS legal_form TEXT;
+ALTER TABLE app_marketplace_instructors
+  ADD COLUMN IF NOT EXISTS business_registration_number TEXT;
+ALTER TABLE app_marketplace_instructors
+  ADD COLUMN IF NOT EXISTS date_of_birth DATE;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+     WHERE conname = 'app_marketplace_instructors_vat_number_status_check'
+  ) THEN
+    ALTER TABLE app_marketplace_instructors
+      ADD CONSTRAINT app_marketplace_instructors_vat_number_status_check
+      CHECK (vat_number_status IN (
+        'NOT_PROVIDED', 'NOT_APPLICABLE', 'PROVIDED', 'VIES_VALIDATED', 'VIES_INVALID'
+      ));
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+     WHERE conname = 'app_marketplace_instructors_legal_form_check'
+  ) THEN
+    ALTER TABLE app_marketplace_instructors
+      ADD CONSTRAINT app_marketplace_instructors_legal_form_check
+      CHECK (legal_form IS NULL OR legal_form IN (
+        'INDIVIDUAL', 'SOLE_TRADER', 'COMPANY'
+      ));
+  END IF;
+END $$;
+
+
 CREATE INDEX IF NOT EXISTS idx_app_marketplace_instructors_user
   ON app_marketplace_instructors(user_id);
 CREATE INDEX IF NOT EXISTS idx_app_marketplace_instructors_status
@@ -244,7 +363,22 @@ COMMENT ON COLUMN app_marketplace_instructors.revenue_share_tier IS
 COMMENT ON COLUMN app_marketplace_instructors.dac7_data_complete IS
   'GENERATED STORED. Read-only: never include it in an INSERT/UPDATE payload.';
 COMMENT ON COLUMN app_marketplace_instructors.vat_number IS
-  'Nullable on purpose: mandatory-or-not is still open in PB-MARKET-TAX-001.';
+  'Nullable on purpose: mandatory-or-not is still open in PB-MARKET-TAX-001. '
+  'Read it together with vat_number_status — NULL alone cannot distinguish '
+  '"has no VAT number" from "never asked".';
+COMMENT ON COLUMN app_marketplace_instructors.vat_number_status IS
+  'Registral state of the VAT number. Records what we know; decides no VAT treatment.';
+COMMENT ON COLUMN app_marketplace_instructors.vies_consultation_number IS
+  'VIES consultation reference. Evidence for any future reverse-charge position; '
+  'without it the position is unprovable under inspection.';
+COMMENT ON COLUMN app_marketplace_instructors.legal_form IS
+  'INDIVIDUAL | SOLE_TRADER | COMPANY. Captured, not interpreted: the differing '
+  'treatment of each is an open question in PB-MARKET-TAX-001.';
+COMMENT ON COLUMN app_marketplace_instructors.business_registration_number IS
+  'SENSITIVE. DAC7 requires it for ENTITY sellers. Owner and admin only.';
+COMMENT ON COLUMN app_marketplace_instructors.date_of_birth IS
+  'SENSITIVE personal data. DAC7 requires it for a natural person with no TIN. '
+  'Owner and admin only.';
 
 
 -- =============================================================================
@@ -262,8 +396,29 @@ COMMENT ON COLUMN app_marketplace_instructors.vat_number IS
 ALTER TABLE app_academy_courses
   ADD COLUMN IF NOT EXISTS instructor_id UUID;
 
+-- fiscal_nature — NO DEFAULT ON PURPOSE (amended before first execution).
+--
+-- It was originally added as NOT NULL DEFAULT 'pregrabado'. That default is a
+-- silent fiscal assumption: an instructor who uploads a live or 1-to-1 course
+-- and forgets to classify it would be recorded as pre-recorded by the system,
+-- with nothing anywhere indicating that nobody ever answered the question. The
+-- product spec calls fiscal_nature the single most important field in the data
+-- model precisely because the VAT and place-of-supply treatment hangs off it.
+-- A misclassification must therefore be a VISIBLE OMISSION (an INSERT that
+-- fails), never a silent system-chosen answer.
+--
+-- Sequence below, and it must stay in this order to remain idempotent:
+--   1. add the column NULLABLE (a NOT NULL add without a default would fail
+--      outright on a table that already has rows)
+--   2. backfill in 3.1 — pre-existing rows are genuinely PipingBox Originals,
+--      produced in-house and pre-recorded, so 'pregrabado' is an observed fact
+--      for them, not an assumption
+--   3. SET NOT NULL in 3.1b, WITHOUT re-establishing a default
+--
+-- Net effect: every course created from now on must classify itself
+-- explicitly. Do not "restore" the default.
 ALTER TABLE app_academy_courses
-  ADD COLUMN IF NOT EXISTS fiscal_nature TEXT NOT NULL DEFAULT 'pregrabado';
+  ADD COLUMN IF NOT EXISTS fiscal_nature TEXT;
 
 ALTER TABLE app_academy_courses
   ADD COLUMN IF NOT EXISTS taxonomy_category TEXT;
@@ -305,6 +460,45 @@ UPDATE app_academy_courses
 -- instructor_id is left NULL for these rows by definition: NULL means
 -- "PipingBox Original, no third-party instructor". No UPDATE needed — the
 -- column was just added and is already NULL everywhere.
+
+
+-- 3.1b fiscal_nature becomes NOT NULL — WITHOUT A DEFAULT.
+--
+--      Runs AFTER the backfill above, so no pre-existing row can block it.
+--      DROP DEFAULT first and unconditionally: if an earlier draft of this file
+--      was ever applied it left DEFAULT 'pregrabado' behind, and re-running must
+--      converge on the intended state rather than preserve the old one.
+--
+--      From here on an INSERT that omits fiscal_nature FAILS LOUDLY. That is the
+--      point: the application must ask the question and record the answer.
+--      Do not add `SET DEFAULT` back.
+
+ALTER TABLE app_academy_courses
+  ALTER COLUMN fiscal_nature DROP DEFAULT;
+
+DO $$
+BEGIN
+  -- Guard the SET NOT NULL: if any row is still NULL the statement would abort
+  -- the whole migration. Raise a clear message instead of a generic constraint
+  -- violation, because the fix is "classify those courses", not "retry".
+  IF EXISTS (SELECT 1 FROM app_academy_courses WHERE fiscal_nature IS NULL) THEN
+    RAISE EXCEPTION
+      'fiscal_nature is still NULL on % course(s). Classify them (pregrabado | en_vivo | con_componente_1a1) before re-running this migration.',
+      (SELECT count(*) FROM app_academy_courses WHERE fiscal_nature IS NULL);
+  END IF;
+
+  -- Idempotent: only set it if it is not already NOT NULL.
+  IF EXISTS (
+    SELECT 1
+      FROM information_schema.columns
+     WHERE table_schema = 'public'
+       AND table_name   = 'app_academy_courses'
+       AND column_name  = 'fiscal_nature'
+       AND is_nullable  = 'YES'
+  ) THEN
+    ALTER TABLE app_academy_courses ALTER COLUMN fiscal_nature SET NOT NULL;
+  END IF;
+END $$;
 
 
 -- 3.2 Constraints, added idempotently. ADD CONSTRAINT has no IF NOT EXISTS in
@@ -1063,6 +1257,25 @@ CREATE TRIGGER trg_app_marketplace_dsa_notices_updated
 -- Expected: 0 rows. Founding cap holds.
 -- SELECT count(*) FROM app_marketplace_instructors
 --  WHERE is_founding_instructor = true HAVING count(*) > 10;
+
+-- AMENDMENT CHECK — Expected: fiscal_nature is is_nullable = 'NO' and
+-- column_default IS NULL. A non-null default here means the silent fiscal
+-- assumption came back.
+-- SELECT column_name, is_nullable, column_default
+--   FROM information_schema.columns
+--  WHERE table_schema = 'public'
+--    AND table_name   = 'app_academy_courses'
+--    AND column_name  = 'fiscal_nature';
+
+-- AMENDMENT CHECK — Expected: the 6 registral columns exist on the instructors
+-- table, all nullable except vat_number_status.
+-- SELECT column_name, data_type, is_nullable, column_default
+--   FROM information_schema.columns
+--  WHERE table_schema = 'public'
+--    AND table_name   = 'app_marketplace_instructors'
+--    AND column_name IN ('legal_form','business_registration_number','date_of_birth',
+--                        'vat_number_status','vies_consultation_number','vies_validated_at')
+--  ORDER BY column_name;
 
 
 -- =============================================================================

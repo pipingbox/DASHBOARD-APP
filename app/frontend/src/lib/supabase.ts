@@ -89,6 +89,16 @@ export const TABLES = {
   marketplaceInstructorsPublic: 'app_marketplace_instructors_public',
   marketplaceCourseReviews: 'app_marketplace_course_reviews',
   marketplaceDsaNotices: 'app_marketplace_dsa_notices',
+  // Revenue events (PB-MARKET-REVENUE-EVENTS-001, sql/005-revenue-events.sql)
+  // APPEND-ONLY ledger of observed economic facts. Written only by the
+  // stripe-webhook Edge Function as service_role; authenticated holds SELECT
+  // and nothing else. Registered here so future call sites do not hardcode the
+  // name — no frontend component queries it today, and the SQL is UNAPPLIED.
+  // Instructor-facing code must use marketplaceRevenueEventsInstructor: the
+  // base table carries the full Stripe object and buyer fields, i.e. student
+  // personal data, which instructors must never receive.
+  marketplaceRevenueEvents: 'app_marketplace_revenue_events',
+  marketplaceRevenueEventsInstructor: 'app_marketplace_revenue_events_instructor',
   // PIDM Catalog (Phase C — PIDM-CATALOG-EXPANSION-001)
   pidmStandards: 'pidm_standards',
   pidmComponents: 'pidm_components',

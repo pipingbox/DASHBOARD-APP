@@ -21,7 +21,26 @@
 //   customer.subscription.updated   → sync status, period, cancel_at_period_end
 //   customer.subscription.deleted   → mark canceled, revoke premium
 //   charge.refunded                 → mark order refunded, revoke access
+//   charge.dispute.created          → mark order disputed, record CHARGEBACK    (PB-MARKET-REVENUE-EVENTS-001)
+//   charge.dispute.closed           → record CHARGEBACK / CHARGEBACK_REVERSAL   (PB-MARKET-REVENUE-EVENTS-001)
 //   payment_intent.payment_failed   → log failure
+//
+// STRIPE DASHBOARD ACTION REQUIRED: charge.dispute.created and
+// charge.dispute.closed must be added to this endpoint's subscribed event list.
+// Handling them in code does nothing until Stripe is told to deliver them.
+//
+// REVENUE-EVENT CAPTURE (PB-MARKET-REVENUE-EVENTS-001):
+//   Economic facts exist only at the instant they happen. The Stripe fee, the
+//   amount actually settled, the coupon applied, the country evidence observed
+//   — none can be reconstructed later. They are written to
+//   app_marketplace_revenue_events as RAW FACTS: nothing here computes a Net
+//   Course Revenue, a split, a platform fee or a balance. Those are blocked by
+//   PB-MARKET-TAX-001 and must be derived from these events once the definition
+//   is settled.
+//
+//   Capture NEVER breaks payment processing. Every revenue-event write and
+//   every extra Stripe call sits behind a try/catch that logs and continues:
+//   losing telemetry is bad, failing a paid customer's access grant is worse.
 //
 // Environment variables required:
 //   - SUPABASE_URL
@@ -67,6 +86,273 @@ async function resolveUserId(
     if (data?.user_id) return data.user_id;
   }
   return null;
+}
+
+// =============================================================================
+// PB-MARKET-REVENUE-EVENTS-001 — raw-fact capture
+// =============================================================================
+// RULE FOR EVERYTHING BELOW: record facts, never derive.
+//
+// Every field written into app_marketplace_revenue_events is a value read
+// directly off a Stripe object. Nothing here computes a Net Course Revenue, an
+// instructor share, a platform fee, a take rate or a balance. If you find
+// yourself writing an arithmetic expression that combines two monetary fields,
+// stop: that is a derivation, and the definition it would encode has not been
+// decided yet (PB-MARKET-TAX-001).
+//
+// The one arithmetic that IS allowed is sign normalisation and reading a value
+// Stripe itself already computed (e.g. balance_transaction.fee), because those
+// are transcriptions, not interpretations.
+
+/** Shape of an app_marketplace_revenue_events row. Facts only — no derived field. */
+interface RevenueEventRow {
+  order_id: string | null;
+  course_id: string | null;
+  instructor_id: string | null;
+  event_type:
+    | "SALE"
+    | "REFUND"
+    | "PARTIAL_REFUND"
+    | "CHARGEBACK"
+    | "CHARGEBACK_REVERSAL"
+    | "ADJUSTMENT";
+  occurred_at: string;
+  currency: string;
+  gross_amount_cents: number | null;
+  tax_amount_cents: number | null;
+  discount_amount_cents: number | null;
+  stripe_fee_cents: number | null;
+  net_settled_cents: number | null;
+  coupon_code: string | null;
+  promotion_id: string | null;
+  discount_funded_by: string | null;
+  buyer_country: string | null;
+  buyer_country_evidence: Record<string, unknown> | null;
+  buyer_vat_number: string | null;
+  buyer_is_business: boolean | null;
+  instructor_tier_at_event: string | null;
+  acquisition_channel: string | null;
+  stripe_event_id: string;
+  stripe_object_id: string | null;
+  raw_payload: Record<string, unknown> | null;
+}
+
+/**
+ * Insert one revenue event. NEVER throws.
+ *
+ * Telemetry must not be able to break payment processing: an instructor's
+ * missing sale row is recoverable from Stripe, a buyer who paid and did not get
+ * access is not. A duplicate stripe_event_id (23505) is the idempotency
+ * guarantee working as designed on a webhook retry, so it is logged at info
+ * level and is not an error.
+ */
+async function recordRevenueEvent(row: RevenueEventRow): Promise<void> {
+  try {
+    const { error } = await supabase.from("app_marketplace_revenue_events").insert(row);
+    if (error) {
+      if (error.code === "23505") {
+        console.log(
+          "stripe-webhook: revenue event already recorded (retry), event=",
+          row.stripe_event_id,
+        );
+        return;
+      }
+      // Includes the "table does not exist" case while sql/005 is unapplied.
+      console.error(
+        "stripe-webhook: revenue event insert failed, type=",
+        row.event_type,
+        "event=",
+        row.stripe_event_id,
+        error,
+      );
+    }
+  } catch (err) {
+    console.error(
+      "stripe-webhook: revenue event insert threw, type=",
+      row.event_type,
+      "event=",
+      row.stripe_event_id,
+      err,
+    );
+  }
+}
+
+/**
+ * Read the fee Stripe actually charged and the amount it actually settled.
+ *
+ * These are OBSERVED FACTS on the balance transaction, not `gross - fee`:
+ * FX conversion, cross-border fees and Stripe's own rounding make that
+ * arithmetic wrong, and the settled figure is the one that reconciles with the
+ * bank.
+ *
+ * Costs one extra API call. Worth it — the fee is unrecoverable after Stripe's
+ * retention window, and it is an input to every future revenue definition.
+ * Returns nulls on any failure: NULL honestly means "not observed", whereas a
+ * defaulted 0 would be a false observation.
+ */
+async function fetchSettlementFacts(
+  balanceTransaction: string | Stripe.BalanceTransaction | null | undefined,
+): Promise<{ stripe_fee_cents: number | null; net_settled_cents: number | null }> {
+  const miss = { stripe_fee_cents: null, net_settled_cents: null };
+  if (!balanceTransaction) return miss;
+
+  try {
+    const bt =
+      typeof balanceTransaction === "string"
+        ? await stripe.balanceTransactions.retrieve(balanceTransaction)
+        : balanceTransaction;
+    return {
+      stripe_fee_cents: bt.fee ?? null,
+      net_settled_cents: bt.net ?? null,
+    };
+  } catch (err) {
+    console.error("stripe-webhook: balance transaction lookup failed", err);
+    return miss;
+  }
+}
+
+/**
+ * Location evidence for the buyer, as observed. EU VAT place-of-supply rules
+ * require two non-contradictory items, so all available sources are kept side
+ * by side rather than reduced to one country.
+ *
+ * This RECORDS evidence. It does not weigh it, reconcile contradictions, or
+ * conclude anything — that determination is PB-MARKET-TAX-001.
+ */
+function buildCountryEvidence(charge: Stripe.Charge | null): Record<string, unknown> | null {
+  if (!charge) return null;
+
+  const cardDetails = charge.payment_method_details?.card ?? null;
+  const evidence: Record<string, unknown> = {
+    source: "stripe.charge",
+    observed_at: new Date().toISOString(),
+    payment_method_type: charge.payment_method_details?.type ?? null,
+    billing_country: charge.billing_details?.address?.country ?? null,
+    // Card issuing country ("BIN country"): a distinct, independent signal from
+    // the self-declared billing address.
+    card_country: cardDetails?.country ?? null,
+  };
+  return evidence;
+}
+
+/** Marketplace attribution facts carried on the order row. */
+interface OrderAttribution {
+  id: string | null;
+  course_id: string | null;
+  instructor_id: string | null;
+  instructor_tier_at_sale: string | null;
+  acquisition_channel: string | null;
+}
+
+const EMPTY_ATTRIBUTION: OrderAttribution = {
+  id: null,
+  course_id: null,
+  instructor_id: null,
+  instructor_tier_at_sale: null,
+  acquisition_channel: null,
+};
+
+/**
+ * Look up the attribution already recorded on the order. Never throws and never
+ * invents: if the order cannot be found the event is still written, with the
+ * attribution left NULL. A NULL is an honest "unknown"; a guess would be data
+ * we made up and could never distinguish from an observation later.
+ */
+async function loadOrderAttribution(
+  match: { paymentIntentId?: string | null; sessionId?: string | null },
+): Promise<OrderAttribution> {
+  try {
+    let query = supabase
+      .from("app_orders")
+      .select("id, course_id, instructor_id, instructor_tier_at_sale, acquisition_channel");
+
+    if (match.paymentIntentId) {
+      query = query.eq("stripe_payment_intent_id", match.paymentIntentId);
+    } else if (match.sessionId) {
+      query = query.eq("stripe_checkout_session_id", match.sessionId);
+    } else {
+      return EMPTY_ATTRIBUTION;
+    }
+
+    const { data, error } = await query.limit(1).maybeSingle();
+    if (error || !data) return EMPTY_ATTRIBUTION;
+    return data as OrderAttribution;
+  } catch (err) {
+    console.error("stripe-webhook: order attribution lookup failed", err);
+    return EMPTY_ATTRIBUTION;
+  }
+}
+
+/**
+ * Retrieve the charge behind a payment intent, expanded with its balance
+ * transaction so the fee and settled amount come back in the same call.
+ * Returns null on failure — the event is then recorded without them.
+ */
+async function fetchChargeForIntent(
+  paymentIntentId: string | null | undefined,
+): Promise<Stripe.Charge | null> {
+  if (!paymentIntentId) return null;
+  try {
+    const intent = await stripe.paymentIntents.retrieve(paymentIntentId, {
+      expand: ["latest_charge.balance_transaction"],
+    });
+    const charge = intent.latest_charge;
+    return charge && typeof charge !== "string" ? charge : null;
+  } catch (err) {
+    console.error("stripe-webhook: charge lookup failed for intent", paymentIntentId, err);
+    return null;
+  }
+}
+
+/**
+ * Discount facts applied to a checkout session.
+ *
+ * allow_promotion_codes is already true in create-checkout, so coupon-bearing
+ * sales already happen in production and are currently recorded nowhere. The
+ * discount total is read from Stripe's own total_details, never recomputed from
+ * list price minus paid.
+ *
+ * discount_funded_by is deliberately left NULL: who bore the cost of a discount
+ * is not visible in the Stripe object, and a guess written into a fact table is
+ * worse than an honest unknown.
+ */
+function extractDiscountFacts(session: Stripe.Checkout.Session): {
+  discount_amount_cents: number | null;
+  coupon_code: string | null;
+  promotion_id: string | null;
+} {
+  const discountCents = session.total_details?.amount_discount ?? null;
+  const firstDiscount = session.discounts?.[0];
+
+  let couponCode: string | null = null;
+  let promotionId: string | null = null;
+
+  if (firstDiscount) {
+    // coupon and promotion_code are EXPANDABLE: in a webhook payload they
+    // normally arrive as bare id strings, not objects. Both shapes are handled
+    // rather than assuming one — an unhandled shape here would silently record
+    // NULL for a sale that did carry a coupon, which is precisely the kind of
+    // quiet fact loss this work exists to stop.
+    //
+    // When only the id is available it IS the recorded value. A coupon id is
+    // still a stable, resolvable reference back to Stripe; it is simply less
+    // readable than the human name. Recording the id beats recording nothing.
+    const coupon = firstDiscount.coupon;
+    if (coupon && typeof coupon !== "string") {
+      couponCode = coupon.name ?? coupon.id ?? null;
+    } else if (typeof coupon === "string") {
+      couponCode = coupon;
+    }
+
+    const promotion = firstDiscount.promotion_code;
+    promotionId = typeof promotion === "string" ? promotion : (promotion?.id ?? null);
+  }
+
+  return {
+    discount_amount_cents: discountCents,
+    coupon_code: couponCode,
+    promotion_id: promotionId,
+  };
 }
 
 Deno.serve(async (req) => {
@@ -214,6 +500,82 @@ Deno.serve(async (req) => {
               }
             }
           }
+
+          // -------------------------------------------------------------------
+          // PB-MARKET-REVENUE-EVENTS-001 — record the SALE as raw facts.
+          // -------------------------------------------------------------------
+          // Wrapped whole: access has already been granted above, and nothing in
+          // this block may be allowed to undo that by throwing. A failure here
+          // costs telemetry, not a customer.
+          try {
+            const paymentIntentId = (session.payment_intent as string | null) ?? null;
+
+            // One extra Stripe call, deliberately. The fee Stripe actually took
+            // and the amount it actually settled exist nowhere in the session
+            // object and are unrecoverable later. fetchChargeForIntent and
+            // fetchSettlementFacts both degrade to null rather than throw.
+            const charge = await fetchChargeForIntent(paymentIntentId);
+            const settlement = await fetchSettlementFacts(charge?.balance_transaction ?? null);
+            const discounts = extractDiscountFacts(session);
+            const attribution = await loadOrderAttribution({
+              paymentIntentId,
+              sessionId: session.id,
+            });
+
+            const customerDetails = session.customer_details ?? null;
+            // Stripe only populates customer_details.tax_ids when
+            // tax_id_collection is enabled on the session — and create-checkout
+            // does NOT enable it today, so in practice this is null right now.
+            //
+            // The read stays in place deliberately: the day tax_id_collection is
+            // switched on, the fact starts being captured with no code change.
+            // A null here means "not collected", NOT "the buyer has no VAT
+            // number", and nothing downstream may read it as the latter.
+            // Presence of a tax id is also NOT evidence of a validated B2B
+            // status — no VIES consultation has taken place (PB-MARKET-TAX-001).
+            const buyerTaxId = customerDetails?.tax_ids?.[0]?.value ?? null;
+
+            await recordRevenueEvent({
+              order_id: attribution.id,
+              course_id: attribution.course_id,
+              instructor_id: attribution.instructor_id,
+              event_type: "SALE",
+              // When it happened per Stripe, not when we wrote it down.
+              occurred_at: toIso(event.created) ?? new Date().toISOString(),
+              currency: (session.currency || "eur").toUpperCase(),
+              // Stripe's own totals, transcribed. Not recomputed from line items.
+              gross_amount_cents: session.amount_total ?? null,
+              tax_amount_cents: session.total_details?.amount_tax ?? null,
+              discount_amount_cents: discounts.discount_amount_cents,
+              stripe_fee_cents: settlement.stripe_fee_cents,
+              net_settled_cents: settlement.net_settled_cents,
+              coupon_code: discounts.coupon_code,
+              promotion_id: discounts.promotion_id,
+              // Unknown at write time and deliberately not guessed.
+              discount_funded_by: null,
+              buyer_country:
+                customerDetails?.address?.country ??
+                charge?.billing_details?.address?.country ??
+                null,
+              buyer_country_evidence: buildCountryEvidence(charge),
+              buyer_vat_number: buyerTaxId,
+              // THREE-STATE. Left null: whether the buyer is a business is not
+              // determined here, and defaulting to false would assert
+              // "consumer" about every buyer nobody asked.
+              buyer_is_business: null,
+              instructor_tier_at_event: attribution.instructor_tier_at_sale,
+              acquisition_channel: attribution.acquisition_channel,
+              stripe_event_id: event.id,
+              stripe_object_id: session.id,
+              raw_payload: session as unknown as Record<string, unknown>,
+            });
+          } catch (captureErr) {
+            console.error(
+              "stripe-webhook: SALE capture failed for session",
+              session.id,
+              captureErr,
+            );
+          }
         }
         break;
       }
@@ -243,6 +605,51 @@ Deno.serve(async (req) => {
         if (userId) {
           const taxCents = invoice.tax ?? 0;
           const netCents = (invoice.amount_paid ?? 0) - taxCents;
+
+          // -------------------------------------------------------------------
+          // VAT DETERMINATION — DELIBERATELY NOT PERFORMED.
+          // Deferred to PB-MARKET-TAX-001. Do not improvise it here.
+          // -------------------------------------------------------------------
+          // WHAT WAS WRONG. This line used to read:
+          //
+          //   reverse_charge: taxCents === 0 && (invoice.customer_address?.country ?? "EE") !== "EE"
+          //
+          // automatic_tax is OFF (create-checkout enables it only when
+          // STRIPE_AUTOMATIC_TAX=true, which stays off until the OU is
+          // VAT-registered), so invoice.tax is ALWAYS 0 and the first operand is
+          // ALWAYS true. The expression collapsed to "country != EE", which
+          // meant EVERY NON-ESTONIAN CUSTOMER WAS RECORDED AS REVERSE CHARGE —
+          // including B2C consumers, for whom reverse charge does not exist.
+          // The `?? "EE"` fallback failed in the opposite direction, silently
+          // marking address-less customers as domestic.
+          //
+          // WHY IT MATTERS. Reverse charge is an AFFIRMATIVE FISCAL CLAIM that
+          // shifts VAT liability onto the customer. Asserting it without a
+          // validated business VAT number and a B2B determination is wrong, and
+          // wrong in the direction that under-declares output VAT.
+          //
+          // WHAT REPLACES IT. Nothing is inferred. Reverse charge may only ever
+          // become true on POSITIVE EVIDENCE: a VAT number validated against
+          // VIES plus an actual B2B determination. Neither exists today, so the
+          // value is false — which is not a claim that the supply is domestic,
+          // it is the ABSENCE of the affirmative claim. vat_determination_status
+          // carries the honest statement of what we know, so the record says
+          // "not determined" instead of asserting a position it cannot support.
+          const automaticTaxEnabled = invoice.automatic_tax?.status === "complete";
+
+          // Raw inputs, recorded so a correct determination stays POSSIBLE
+          // later rather than having to be invented from an empty record.
+          const customerVatId = invoice.customer_tax_ids?.[0]?.value ?? null;
+          const countryEvidence = {
+            source: "stripe.invoice",
+            observed_at: new Date().toISOString(),
+            // No `?? "EE"`. An absent address is recorded as absent.
+            customer_address_country: invoice.customer_address?.country ?? null,
+            customer_shipping_country: invoice.customer_shipping?.address?.country ?? null,
+            customer_tax_id_type: invoice.customer_tax_ids?.[0]?.type ?? null,
+            automatic_tax_status: invoice.automatic_tax?.status ?? null,
+          };
+
           await supabase.from("app_invoices").upsert(
             {
               user_id: userId,
@@ -253,12 +660,28 @@ Deno.serve(async (req) => {
                 : null,
               customer_name: invoice.customer_name,
               customer_country: invoice.customer_address?.country ?? null,
+              customer_vat_id: customerVatId,
               amount_cents: invoice.amount_paid ?? 0,
               vat_cents: taxCents,
               // Derived, not read from Stripe: with automatic_tax off there is
               // no rate to read. Recomputing it keeps the record self-consistent.
               vat_rate: netCents > 0 ? Number(((taxCents / netCents) * 100).toFixed(2)) : 0,
-              reverse_charge: taxCents === 0 && (invoice.customer_address?.country ?? "EE") !== "EE",
+              // NEVER INFERRED. Only positive evidence may set this true, and
+              // no code path produces that evidence yet (PB-MARKET-TAX-001).
+              reverse_charge: false,
+              vat_determination_status: automaticTaxEnabled
+                ? "AUTOMATIC_TAX"
+                : "AUTOMATIC_TAX_DISABLED",
+              automatic_tax_enabled: automaticTaxEnabled,
+              // A number supplied is not a number validated, and NOT_PROVIDED
+              // means "we did not collect one" — never "the customer has none".
+              // tax_id_collection is off in create-checkout, so this is
+              // NOT_PROVIDED in practice today. Recording PROVIDED rather than
+              // VIES_VALIDATED is the whole point: no VIES consultation has
+              // taken place, and without a consultation reference a
+              // reverse-charge position could not be evidenced anyway.
+              customer_vat_number_status: customerVatId ? "PROVIDED" : "NOT_PROVIDED",
+              customer_country_evidence: countryEvidence,
               currency: (invoice.currency || "eur").toUpperCase(),
               pdf_url: invoice.invoice_pdf,
             },
@@ -320,10 +743,232 @@ Deno.serve(async (req) => {
       case "charge.refunded": {
         const charge = event.data.object as Stripe.Charge;
         if (charge.payment_intent) {
+          const paymentIntentId = charge.payment_intent as string;
+
+          // A PARTIAL refund is a different economic event from a full one, and
+          // until now they were indistinguishable: both landed on
+          // status = 'refunded' with no amount recorded anywhere.
+          const refundedCents = charge.amount_refunded ?? 0;
+          const chargedCents = charge.amount ?? 0;
+          const isFullRefund = chargedCents > 0 && refundedCents >= chargedCents;
+
           await supabase
             .from("app_orders")
-            .update({ status: "refunded", refunded_at: new Date().toISOString() })
-            .eq("stripe_payment_intent_id", charge.payment_intent as string);
+            .update({
+              // A partially refunded order is still a paid order: the buyer
+              // keeps what they paid for. Only a full refund unwinds the sale.
+              status: isFullRefund ? "refunded" : "paid",
+              refunded_at: new Date().toISOString(),
+              refunded_amount_cents: refundedCents,
+            })
+            .eq("stripe_payment_intent_id", paymentIntentId);
+
+          // -------------------------------------------------------------------
+          // PB-MARKET-REVENUE-EVENTS-001 — record the refund as raw facts.
+          // -------------------------------------------------------------------
+          try {
+            const attribution = await loadOrderAttribution({ paymentIntentId });
+
+            // The refund has its OWN balance transaction, carrying the fee
+            // treatment Stripe actually applied to the reversal. That is not
+            // the same as the original charge's, and it is not derivable from
+            // it.
+            const latestRefund = charge.refunds?.data?.[0] ?? null;
+            const settlement = await fetchSettlementFacts(
+              latestRefund?.balance_transaction ?? null,
+            );
+
+            await recordRevenueEvent({
+              order_id: attribution.id,
+              course_id: attribution.course_id,
+              instructor_id: attribution.instructor_id,
+              event_type: isFullRefund ? "REFUND" : "PARTIAL_REFUND",
+              occurred_at: toIso(event.created) ?? new Date().toISOString(),
+              currency: (charge.currency || "eur").toUpperCase(),
+              // Negative: money leaving. Sign normalisation only, so that a
+              // period total is a plain SUM with no direction logic — and
+              // therefore nowhere to hide a policy decision.
+              gross_amount_cents: -refundedCents,
+              tax_amount_cents: null,
+              discount_amount_cents: null,
+              stripe_fee_cents: settlement.stripe_fee_cents,
+              net_settled_cents: settlement.net_settled_cents,
+              coupon_code: null,
+              promotion_id: null,
+              discount_funded_by: null,
+              buyer_country: charge.billing_details?.address?.country ?? null,
+              buyer_country_evidence: buildCountryEvidence(charge),
+              buyer_vat_number: null,
+              buyer_is_business: null,
+              instructor_tier_at_event: attribution.instructor_tier_at_sale,
+              acquisition_channel: attribution.acquisition_channel,
+              stripe_event_id: event.id,
+              stripe_object_id: charge.id,
+              raw_payload: charge as unknown as Record<string, unknown>,
+            });
+          } catch (captureErr) {
+            console.error("stripe-webhook: refund capture failed for", charge.id, captureErr);
+          }
+        }
+        break;
+      }
+
+      // -----------------------------------------------------------------------
+      // A CHARGEBACK IS NOT A REFUND. Previously this event was not handled at
+      // all, so a dispute was invisible until it settled and then arrived —
+      // if at all — collapsed into 'refunded'. Different cause (imposed on us,
+      // not decided by us), different liability (contestable), different cost
+      // (a dispute fee), and an open question as to who ultimately bears it.
+      // Recording it separately decides none of that; collapsing it destroys
+      // the evidence needed to decide.
+      case "charge.dispute.created": {
+        const dispute = event.data.object as Stripe.Dispute;
+        const paymentIntentId =
+          typeof dispute.payment_intent === "string"
+            ? dispute.payment_intent
+            : (dispute.payment_intent?.id ?? null);
+
+        if (paymentIntentId) {
+          // 'disputed', not 'chargeback': the dispute is OPEN and the outcome
+          // is unknown. Access is deliberately NOT revoked here — a dispute can
+          // be won, and pre-emptively cutting off a customer who may be in the
+          // right is a support incident, not a control.
+          await supabase
+            .from("app_orders")
+            .update({ status: "disputed" })
+            .eq("stripe_payment_intent_id", paymentIntentId);
+        }
+
+        console.warn(
+          "stripe-webhook: dispute opened",
+          dispute.id,
+          "reason=",
+          dispute.reason ?? "unknown",
+        );
+
+        try {
+          const attribution = await loadOrderAttribution({ paymentIntentId });
+          // Dispute.balance_transactions is an array of FULL BalanceTransaction
+          // objects, not ids, so this needs no extra API call —
+          // fetchSettlementFacts takes either form.
+          const settlement = await fetchSettlementFacts(
+            dispute.balance_transactions?.[0] ?? null,
+          );
+
+          await recordRevenueEvent({
+            order_id: attribution.id,
+            course_id: attribution.course_id,
+            instructor_id: attribution.instructor_id,
+            event_type: "CHARGEBACK",
+            occurred_at: toIso(event.created) ?? new Date().toISOString(),
+            currency: (dispute.currency || "eur").toUpperCase(),
+            // Negative: the funds have been withdrawn pending the outcome.
+            gross_amount_cents: -(dispute.amount ?? 0),
+            tax_amount_cents: null,
+            discount_amount_cents: null,
+            // The dispute fee, as Stripe reported it. An observed cost, not an
+            // allocation of that cost to anybody.
+            stripe_fee_cents: settlement.stripe_fee_cents,
+            net_settled_cents: settlement.net_settled_cents,
+            coupon_code: null,
+            promotion_id: null,
+            discount_funded_by: null,
+            buyer_country: null,
+            buyer_country_evidence: null,
+            buyer_vat_number: null,
+            buyer_is_business: null,
+            instructor_tier_at_event: attribution.instructor_tier_at_sale,
+            acquisition_channel: attribution.acquisition_channel,
+            stripe_event_id: event.id,
+            stripe_object_id: dispute.id,
+            raw_payload: dispute as unknown as Record<string, unknown>,
+          });
+        } catch (captureErr) {
+          console.error("stripe-webhook: dispute capture failed for", dispute.id, captureErr);
+        }
+        break;
+      }
+
+      // -----------------------------------------------------------------------
+      // Outcome of a dispute. `won` means the withdrawal is reversed and the
+      // funds come back, which is a genuinely different event from the original
+      // chargeback and gets its own type rather than an edit of the earlier
+      // row: the event log is append-only, so history is added to, never
+      // rewritten.
+      case "charge.dispute.closed": {
+        const dispute = event.data.object as Stripe.Dispute;
+        const paymentIntentId =
+          typeof dispute.payment_intent === "string"
+            ? dispute.payment_intent
+            : (dispute.payment_intent?.id ?? null);
+
+        const won = dispute.status === "won";
+        // 'warning_closed' and similar terminal states are neither a win nor a
+        // loss of funds; treated as a reversal of the provisional withdrawal.
+        const lost = dispute.status === "lost";
+
+        if (paymentIntentId) {
+          await supabase
+            .from("app_orders")
+            // Lost: the funds are gone, and this is NOT 'refunded'. Otherwise
+            // the charge stands and the order returns to 'paid'.
+            .update({ status: lost ? "chargeback" : "paid" })
+            .eq("stripe_payment_intent_id", paymentIntentId);
+        }
+
+        console.log(
+          "stripe-webhook: dispute closed",
+          dispute.id,
+          "status=",
+          dispute.status ?? "unknown",
+        );
+
+        try {
+          const attribution = await loadOrderAttribution({ paymentIntentId });
+          // Last entry: at closure the array holds the original withdrawal and,
+          // if the dispute was won, the reversal. The last one carries the
+          // final settlement facts. Full objects, so no extra API call.
+          const settlement = await fetchSettlementFacts(
+            dispute.balance_transactions?.[dispute.balance_transactions.length - 1] ?? null,
+          );
+
+          await recordRevenueEvent({
+            order_id: attribution.id,
+            course_id: attribution.course_id,
+            instructor_id: attribution.instructor_id,
+            // Lost -> the CHARGEBACK stands (recorded again at closure with the
+            // final settlement facts). Anything else -> the withdrawal is
+            // reversed.
+            event_type: lost ? "CHARGEBACK" : "CHARGEBACK_REVERSAL",
+            occurred_at: toIso(event.created) ?? new Date().toISOString(),
+            currency: (dispute.currency || "eur").toUpperCase(),
+            // Won: money coming back, positive. Lost: already withdrawn at
+            // creation, so 0 here — the withdrawal was recorded then, and
+            // repeating it would double-count.
+            gross_amount_cents: won ? (dispute.amount ?? 0) : 0,
+            tax_amount_cents: null,
+            discount_amount_cents: null,
+            stripe_fee_cents: settlement.stripe_fee_cents,
+            net_settled_cents: settlement.net_settled_cents,
+            coupon_code: null,
+            promotion_id: null,
+            discount_funded_by: null,
+            buyer_country: null,
+            buyer_country_evidence: null,
+            buyer_vat_number: null,
+            buyer_is_business: null,
+            instructor_tier_at_event: attribution.instructor_tier_at_sale,
+            acquisition_channel: attribution.acquisition_channel,
+            stripe_event_id: event.id,
+            stripe_object_id: dispute.id,
+            raw_payload: dispute as unknown as Record<string, unknown>,
+          });
+        } catch (captureErr) {
+          console.error(
+            "stripe-webhook: dispute closure capture failed for",
+            dispute.id,
+            captureErr,
+          );
         }
         break;
       }
