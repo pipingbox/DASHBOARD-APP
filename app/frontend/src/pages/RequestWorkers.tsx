@@ -165,7 +165,18 @@ export default function RequestWorkers() {
         workforcePayload.company_name,
         workforcePayload.worker_type,
         workforcePayload.country || 'Unknown',
-      ).catch((err) => console.warn('[RequestWorkers] Notification failed:', err));
+      ).catch((err) => console.warn('[RequestWorkers] In-app notification failed:', err));
+
+      // Fire the email Edge Function (PB-SEC-NOTIFY-001).
+      // send_lead_notification handles idempotency, anti-replay (15 min window),
+      // and sends two emails: admin alert + lead confirmation.
+      // Fire-and-forget: if SMTP is not configured it warns and exits cleanly.
+      supabase.functions.invoke('app_14da0f1941_send_lead_notification', {
+        body: {
+          company_name: workforcePayload.company_name,
+          email: workforcePayload.email,
+        },
+      }).catch((err) => console.warn('[RequestWorkers] Email notification failed:', err));
 
       setLoading(false);
       setSubmitted(true);
