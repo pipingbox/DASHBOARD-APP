@@ -1,4 +1,5 @@
 import { supabase, TABLES } from '@/lib/supabase';
+import { notifyReferralJoined, notifyReferralVerified } from '@/lib/notifications';
 
 export interface Referral {
   id: string;
@@ -410,6 +411,23 @@ export async function processStoredReferral(userId: string, userEmail?: string):
       }));
     } catch { /* ignore */ }
 
+    // Notify referrer that their referral has joined (PB-NOTIF-001 fix).
+    try {
+      const { data: referredProfile } = await supabase
+        .from(TABLES.profiles)
+        .select('full_name')
+        .eq('user_id', userId)
+        .maybeSingle();
+      const displayName =
+        (referredProfile?.full_name as string | null)?.trim() ||
+        userEmail?.split('@')[0] ||
+        'Someone';
+      await notifyReferralJoined(referrerId, displayName);
+      console.log('[REFERRAL_RECOVERY] ✅ notifyReferralJoined sent to', referrerId);
+    } catch {
+      // Non-critical
+    }
+
     // Clear stored code after successful processing
     clearStoredReferralCode();
     console.log('[REFERRAL_RECOVERY] ✅ Recovery complete');
@@ -471,6 +489,15 @@ export async function verifyReferralIfEligible(userId: string): Promise<void> {
         verified_at: new Date().toISOString(),
       })
       .eq('id', pendingReferral.id);
+
+    // Notify referrer that the referral has been verified (PB-NOTIF-001 fix).
+    try {
+      const referredName = profile?.full_name?.trim() || 'A new member';
+      await notifyReferralVerified(pendingReferral.referrer_id, referredName);
+      console.log('[Referrals] ✅ notifyReferralVerified sent to', pendingReferral.referrer_id);
+    } catch {
+      // Non-critical
+    }
 
   } catch {
     console.warn('[Referrals] Failed to verify referral');

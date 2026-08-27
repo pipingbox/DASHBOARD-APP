@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase, TABLES } from '@/lib/supabase';
 import { getStoredReferralCode, clearStoredReferralCode, validateReferralCode } from '@/lib/referrals';
+import { notifyReferralJoined } from '@/lib/notifications';
 import { getAppBaseUrl, getAuthRedirectUrl } from '@/lib/constants';
 import { ONBOARDING_STATUS } from '@/lib/onboarding';
 
@@ -139,7 +140,17 @@ async function completeReferralAssignment(
     console.error('[REFERRAL] Stats update error (non-critical):', statsErr);
   }
 
-  // Step 4: Store debug info in localStorage for admin diagnostics
+  // Step 4: Notify referrer that their referral has joined (PB-NOTIF-001 fix).
+  // Uses email prefix as display name — full_name is not yet available at this point.
+  try {
+    const displayName = userEmail?.split('@')[0] || 'Someone';
+    await notifyReferralJoined(referrerId, displayName);
+    console.log('[REFERRAL] ✅ notifyReferralJoined sent to', referrerId);
+  } catch (notifErr) {
+    console.warn('[REFERRAL] notifyReferralJoined failed (non-critical):', notifErr);
+  }
+
+  // Step 5: Store debug info in localStorage for admin diagnostics
   try {
     localStorage.setItem('pipingbox_last_referral_debug', JSON.stringify({
       userId,
