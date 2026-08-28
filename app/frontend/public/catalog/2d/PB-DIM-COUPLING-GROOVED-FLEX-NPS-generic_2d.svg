@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs>
+    <style>
+      .profile   { stroke: #1a1a1a; stroke-width: 2; fill: #e2e5e8; }
+      .housing   { stroke: #1a1a1a; stroke-width: 2; fill: #cdd3d8; }
+      .gasket    { stroke: #1a1a1a; stroke-width: 1.2; fill: #8a8f94; }
+      .bore      { stroke: #555; stroke-width: 1; fill: none; stroke-dasharray: 4 2; }
+      .centerline{ stroke: #999; stroke-width: 0.8; stroke-dasharray: 8 4; fill: none; }
+      .dim-line  { stroke: #c62828; stroke-width: 0.9; fill: none; }
+      .dim-text  { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; fill: #c62828; text-anchor: middle; }
+      .dim-sub   { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #c62828; text-anchor: middle; }
+      .label     { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #666; text-anchor: middle; }
+      .lead      { stroke: #666; stroke-width: 0.7; fill: none; }
+      .title     { font-family: 'Segoe UI', Arial, sans-serif; font-size: 18px; font-weight: 600; fill: #1a1a1a; }
+      .subtitle  { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; fill: #555; }
+      .std-ref   { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #888; }
+      .note      { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10.5px; fill: #888; }
+    </style>
+    <marker id="arr-s" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+      <path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width="0.8"/>
+    </marker>
+    <marker id="arr-e" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width="0.8"/>
+    </marker>
+  </defs>
+
+  <rect width="800" height="700" fill="#fafafa"/>
+
+  <!-- TITLE -->
+  <text x="40" y="40" class="title">Grooved Coupling — Flexible</text>
+  <text x="40" y="60" class="subtitle">Grooved end connection — sectional view</text>
+  <text x="40" y="78" class="std-ref">AWWA C606 | Allows controlled angular deflection and axial movement</text>
+
+  <!-- ==================== SECTIONAL VIEW ==================== -->
+
+  <!-- LEFT PIPE -->
+  <path d="M 120 300 L 330 300 L 330 314 L 352 314 L 352 300 L 392 300
+           L 392 400 L 352 400 L 352 386 L 330 386 L 330 400 L 120 400 Z" class="profile"/>
+  <!-- RIGHT PIPE -->
+  <path d="M 680 300 L 470 300 L 470 314 L 448 314 L 448 300 L 408 300
+           L 408 400 L 448 400 L 448 386 L 470 386 L 470 400 L 680 400 Z" class="profile"/>
+
+  <!-- Bore lines -->
+  <line x1="120" y1="318" x2="392" y2="318" class="bore"/>
+  <line x1="120" y1="382" x2="392" y2="382" class="bore"/>
+  <line x1="408" y1="318" x2="680" y2="318" class="bore"/>
+  <line x1="408" y1="382" x2="680" y2="382" class="bore"/>
+
+  <!-- GASKET (C-shape, straddles the joint, pressure-responsive) -->
+  <path d="M 352 306 L 448 306 L 448 322 L 366 322 L 366 378 L 448 378
+           L 448 394 L 352 394 Z" class="gasket"/>
+
+  <!-- HOUSING SEGMENTS (engage both grooves) -->
+  <path d="M 322 262 L 478 262 L 478 300 L 460 300 L 460 288
+           L 340 288 L 340 300 L 322 300 Z" class="housing"/>
+  <path d="M 322 438 L 478 438 L 478 400 L 460 400 L 460 412
+           L 340 412 L 340 400 L 322 400 Z" class="housing"/>
+
+  <!-- Housing keys seated in the grooves -->
+  <rect x="332" y="288" width="18" height="14" class="housing"/>
+  <rect x="450" y="288" width="18" height="14" class="housing"/>
+  <rect x="332" y="398" width="18" height="14" class="housing"/>
+  <rect x="450" y="398" width="18" height="14" class="housing"/>
+
+  <!-- BOLT PADS + BOLTS -->
+  <rect x="292" y="262" width="30" height="38" class="housing"/>
+  <rect x="292" y="400" width="30" height="38" class="housing"/>
+  <rect x="478" y="262" width="30" height="38" class="housing"/>
+  <rect x="478" y="400" width="30" height="38" class="housing"/>
+  <line x1="307" y1="262" x2="307" y2="438" stroke="#1a1a1a" stroke-width="4"/>
+  <line x1="493" y1="262" x2="493" y2="438" stroke="#1a1a1a" stroke-width="4"/>
+  <rect x="298" y="246" width="18" height="16" fill="#b8bec4" stroke="#1a1a1a" stroke-width="1.5"/>
+  <rect x="484" y="246" width="18" height="16" fill="#b8bec4" stroke="#1a1a1a" stroke-width="1.5"/>
+  <rect x="298" y="438" width="18" height="16" fill="#b8bec4" stroke="#1a1a1a" stroke-width="1.5"/>
+  <rect x="484" y="438" width="18" height="16" fill="#b8bec4" stroke="#1a1a1a" stroke-width="1.5"/>
+
+  <!-- CENTERLINE -->
+  <line x1="100" y1="350" x2="700" y2="350" class="centerline"/>
+  <text x="708" y="354" class="label" fill="#999">CL</text>
+
+  <!-- ==================== CALLOUTS ==================== -->
+  <line x1="341" y1="295" x2="250" y2="200" class="lead"/>
+  <text x="212" y="194" class="label" text-anchor="start">Groove</text>
+
+  <line x1="400" y1="330" x2="560" y2="200" class="lead"/>
+  <text x="564" y="194" class="label" text-anchor="start">Gasket (pressure-responsive)</text>
+
+  <line x1="430" y1="272" x2="600" y2="240" class="lead"/>
+  <text x="604" y="236" class="label" text-anchor="start">Housing segment</text>
+
+  <line x1="307" y1="250" x2="200" y2="240" class="lead"/>
+  <text x="196" y="236" class="label" text-anchor="end">Track-head bolt &amp; nut</text>
+
+  <!-- ==================== DIMENSION CALLOUTS (letters only) ==================== -->
+  <line x1="330" y1="400" x2="330" y2="520" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="352" y1="400" x2="352" y2="520" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="330" y1="510" x2="352" y2="510" class="dim-line" marker-start="url(#arr-s)" marker-end="url(#arr-e)"/>
+  <text x="341" y="534" class="dim-text">B</text>
+  <text x="341" y="549" class="dim-sub">groove width</text>
+
+  <line x1="392" y1="400" x2="392" y2="560" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="330" y1="470" x2="330" y2="560" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="330" y1="552" x2="392" y2="552" class="dim-line" marker-start="url(#arr-s)" marker-end="url(#arr-e)"/>
+  <text x="361" y="576" class="dim-text">A</text>
+  <text x="361" y="591" class="dim-sub">groove to pipe end</text>
+
+  <line x1="470" y1="300" x2="620" y2="300" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="470" y1="314" x2="620" y2="314" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="610" y1="300" x2="610" y2="314" class="dim-line" marker-start="url(#arr-s)" marker-end="url(#arr-e)"/>
+  <text x="646" y="306" class="dim-text">D</text>
+  <text x="652" y="321" class="dim-sub">groove depth</text>
+
+  <!-- ==================== NOTES ==================== -->
+  <text x="40" y="628" class="note">A / B / D per AWWA C606 or the coupling manufacturer's specification for the pipe size, wall thickness and groove method.</text>
+  <text x="40" y="646" class="note">Deflection per joint is limited and size-dependent: take the allowable value from the manufacturer, never assume it.</text>
+  <text x="40" y="664" class="note">FLEXIBLE coupling: clearance between housing key and groove permits limited angular deflection, expansion and contraction at each joint.</text>
+  <text x="40" y="682" class="note">Schematic for identification and training. Verify all dimensions against the governing standard edition before fabrication.</text>
+
+  <text x="760" y="682" class="std-ref" text-anchor="end">PIPINGBOX PIDM</text>
+</svg>

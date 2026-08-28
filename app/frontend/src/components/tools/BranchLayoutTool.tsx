@@ -42,79 +42,185 @@ function computeIntersection(dHeader: number, dBranch: number, angleDeg: number,
   return points;
 }
 
-/* ─── ASME B31.3 Reinforcement Calculation ─── */
-interface ReinforcementResult {
-  dHole: number;         // Hole diameter in header (mm)
-  aRequired: number;     // Required reinforcement area (mm²)
-  a1: number;            // Area from excess header wall (mm²)
-  a2: number;            // Area from excess branch wall (mm²)
-  aAvailable: number;    // Total available area (mm²)
-  padRequired: boolean;  // Whether a reinforcement pad is needed
-  padThickness: number;  // Minimum pad thickness (mm)
-  padWidth: number;      // Pad width along header (mm)
-  padOD: number;         // Pad outer diameter (mm)
+/* ───────────────────────────────────────────────────────────────────────────
+   ASME B31.3 §304.3.3 — Reinforcement of welded branch connections
+
+   Nomenclature follows the Code:
+     A1 = REQUIRED reinforcement area
+     A2 = area resulting from excess header (run) wall thickness
+     A3 = area resulting from excess branch wall thickness
+     A4 = area of welds and added reinforcement (pad/saddle) within the zone
+   Acceptance criterion: A2 + A3 + A4 >= A1
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Reference allowable stresses S (ASME B31.3 Appendix A, Table A-1).
+   Only values that can be stated with confidence are listed, each with an
+   explicit temperature basis. S is ALWAYS a user input; this list is a
+   convenience selector, never an authority. */
+interface AllowableStressRef {
+  id: string;
+  material: string;
+  /** Basic allowable stress in MPa */
+  s: number;
+  /** Explicit temperature basis for the quoted value */
+  basis: string;
 }
 
-function calcReinforcement(
-  headerOD: number, headerWT: number,
-  branchOD: number, branchWT: number,
-  angleDeg: number
-): ReinforcementResult {
-  const angleRad = (angleDeg * Math.PI) / 180;
-  const sinAngle = Math.sin(angleRad);
+const ALLOWABLE_STRESS_REFS: AllowableStressRef[] = [
+  { id: 'a106b', material: 'ASTM A106 Gr. B (seamless CS)', s: 137.9, basis: '−29 °C to 204 °C (−20 °F to 400 °F) · 20.0 ksi' },
+  { id: 'a333gr6', material: 'ASTM A333 Gr. 6 (low-temp CS)', s: 137.9, basis: '−46 °C to 204 °C (−50 °F to 400 °F) · 20.0 ksi' },
+  { id: 'a312tp316l', material: 'ASTM A312 TP316L (austenitic SS)', s: 115.1, basis: '38 °C to 149 °C (100 °F to 300 °F) · 16.7 ksi' },
+];
 
-  // d = (Db - 2*Tb) / sin(angle) — effective hole diameter
-  const branchID = branchOD - 2 * branchWT;
-  const dHole = branchID / sinAngle;
+interface ReinforcementInput {
+  headerOD: number;      // Dh — header outside diameter (mm)
+  headerWT: number;      // Th — header nominal wall thickness (mm)
+  branchOD: number;      // Db — branch outside diameter (mm)
+  branchWT: number;      // Tb — branch nominal wall thickness (mm)
+  angleDeg: number;      // β — angle between branch and header axes (deg)
+  pressure: number;      // P — internal design gauge pressure (MPa)
+  allowableStress: number; // S — basic allowable stress (MPa)
+  qualityFactor: number; // E — weld joint quality factor
+  weldStrengthFactor: number; // W — weld joint strength reduction factor
+  coefficientY: number;  // Y — coefficient per Table 304.1.1
+  corrosion: number;     // c — corrosion/erosion allowance (mm)
+  millTolerance: number; // mill tolerance as a fraction (0.125 = 12.5%)
+  weldLegBranch: number; // branch fillet weld leg (mm)
+  weldLegPad: number;    // pad fillet weld leg (mm)
+  padThickness: number;  // Tr — thickness of user-specified pad (mm), 0 = none
+  padOD: number;         // outside diameter of user-specified pad (mm), 0 = none
+}
 
-  // Required reinforcement area: A_req = d * Th * F (F=1 for internal pressure)
-  const F = 1.0;
-  const aRequired = dHole * headerWT * F;
+interface ReinforcementResult {
+  sinBeta: number;
+  tr: number;            // header pressure design thickness (mm)
+  tb: number;            // branch pressure design thickness (mm)
+  thMin: number;         // header minimum wall after mill tolerance (mm)
+  tbMin: number;         // branch minimum wall after mill tolerance (mm)
+  d1: number;            // effective length removed from header (mm)
+  d2: number;            // half-width of reinforcement zone (mm)
+  l4: number;            // height of reinforcement zone (mm)
+  a1: number;            // REQUIRED area (mm²)
+  a2: number;            // header excess area (mm²)
+  a3: number;            // branch excess area (mm²)
+  a4: number;            // weld + pad area (mm²)
+  aAvailable: number;    // A2 + A3 + A4 (mm²)
+  deficit: number;       // A1 − available, clamped at >= 0 (mm²)
+  adequate: boolean;     // A2 + A3 + A4 >= A1
+  padRequired: boolean;
+  reqPadArea: number;    // additional pad area needed (mm²)
+  reqPadThickness: number; // pad thickness to cover the deficit (mm)
+  reqPadWidth: number;   // pad width each side of the hole (mm)
+  reqPadOD: number;      // resulting pad outside diameter (mm)
+  padWidthLimited: boolean; // true when the d2 width limit cannot cover deficit
+  valid: boolean;        // inputs produce a physically meaningful result
+}
 
-  // A1: excess in header wall within reinforcement zone
-  // Zone width = d (on each side of hole center)
-  const a1 = (2 * dHole - branchID / sinAngle) * (headerWT - headerWT) ; // Simplified: using nominal = min required
-  // For simplicity with nominal thickness: A1 = d * (T - t_required)
-  // Since we use nominal as both, A1 comes from the extra material in the zone
-  // More practical: A1 = (E1*T - F*t_req*d) but with t_req = T (no corrosion), A1 ≈ 0
-  // Real calculation: A1 = larger of (Th - tr)*d or (Th - tr)*(Tb + Th + d/2)
-  // Using conservative approach where tr = Th (no excess in header for nominal calc)
-  const tr_header = headerWT; // Required thickness = nominal (conservative)
-  const actualA1 = Math.max(0, (headerWT - tr_header * 0.875) * dHole * 2);
+/** §304.1.2 pressure design thickness for straight pipe: t = P·D / (2·(S·E·W + P·Y)) */
+function pressureDesignThickness(
+  P: number, D: number, S: number, E: number, W: number, Y: number
+): number {
+  const denom = 2 * (S * E * W + P * Y);
+  if (!(denom > 0)) return NaN;
+  return (P * D) / denom;
+}
 
-  // A2: excess in branch wall within reinforcement zone height
-  // Height of zone = min(2.5*Th, 2.5*Tb + tr)
-  const L4 = Math.min(2.5 * headerWT, 2.5 * branchWT);
-  const tr_branch = branchWT; // Required thickness for branch
-  const actualA2 = Math.max(0, 2 * L4 * (branchWT - tr_branch * 0.875) / sinAngle);
+function calcReinforcement(input: ReinforcementInput): ReinforcementResult {
+  const {
+    headerOD: Dh, headerWT: Th, branchOD: Db, branchWT: Tb, angleDeg,
+    pressure: P, allowableStress: S, qualityFactor: E, weldStrengthFactor: W,
+    coefficientY: Y, corrosion: c, millTolerance,
+    weldLegBranch, weldLegPad, padThickness: Tr, padOD,
+  } = input;
 
-  const aAvailable = actualA1 + actualA2;
-  const padRequired = aAvailable < aRequired;
+  const beta = (angleDeg * Math.PI) / 180;
+  const sinBeta = Math.sin(beta);
 
-  // Pad sizing
-  let padThickness = 0;
-  let padWidth = 0;
-  let padOD = 0;
+  // Pressure design thickness, computed separately for header and branch.
+  const tr = pressureDesignThickness(P, Dh, S, E, W, Y);
+  const tb = pressureDesignThickness(P, Db, S, E, W, Y);
 
-  if (padRequired) {
-    const deficit = aRequired - aAvailable;
-    // Pad width limited to: d or (Tb + Th + d/2) on each side
-    padWidth = Math.min(dHole, branchOD);
-    padThickness = Math.ceil(deficit / padWidth * 10) / 10; // Round up to 0.1mm
-    padThickness = Math.max(padThickness, headerWT); // Minimum = header wall thickness
-    padOD = branchOD + 2 * padWidth;
+  // Mill tolerance applies to the AS-SUPPLIED wall, producing the minimum
+  // wall that may actually be present. It is NOT a required thickness.
+  const thMin = Th * (1 - millTolerance);
+  const tbMin = Tb * (1 - millTolerance);
+
+  const invalid =
+    !isFinite(tr) || !isFinite(tb) || sinBeta <= 0 ||
+    Dh <= 0 || Th <= 0 || Db <= 0 || Tb <= 0;
+
+  // d1 = effective length removed from the header at its surface.
+  const d1 = (Db - 2 * (Tb - c)) / sinBeta;
+
+  // d2 = half-width of the reinforcement zone: greater of d1 or
+  //      (Tb − c) + (Th − c) + d1/2, but never more than Dh.
+  const d2 = Math.min(Math.max(d1, (Tb - c) + (Th - c) + d1 / 2), Dh);
+
+  // L4 = height of the reinforcement zone: lesser of 2.5(Th − c) or
+  //      2.5(Tb − c) + Tr.
+  const l4 = Math.min(2.5 * (Th - c), 2.5 * (Tb - c) + Tr);
+
+  // A1 — REQUIRED area. The (2 − sin β) factor is mandatory.
+  const a1 = Math.max(0, tr * d1 * (2 - sinBeta));
+
+  // A2 — excess header wall within the zone.
+  const a2 = Math.max(0, (2 * d2 - d1) * (thMin - tr - c));
+
+  // A3 — excess branch wall within the zone (both sides, hence the factor 2).
+  const a3 = Math.max(0, (2 * l4 * (tbMin - tb - c)) / sinBeta);
+
+  // A4 — fillet welds plus any reinforcing pad lying inside the zone.
+  // Fillet weld area = leg²/2 each; the branch weld appears twice, and the
+  // pad-to-header weld twice.
+  const branchWeldArea = 2 * (weldLegBranch * weldLegBranch) / 2;
+  const padWeldArea = Tr > 0 ? 2 * (weldLegPad * weldLegPad) / 2 : 0;
+  // Pad material counted only out to the d2 limit and only above the header.
+  const padHalfWidthRaw = padOD > 0 ? (padOD - d1 * sinBeta) / 2 : 0;
+  const padHalfWidth = Math.max(0, Math.min(padHalfWidthRaw, d2 - d1 / 2));
+  const padArea = Tr > 0 ? 2 * padHalfWidth * Tr : 0;
+  const a4 = Math.max(0, branchWeldArea + padWeldArea + padArea);
+
+  const aAvailable = a2 + a3 + a4;
+  const deficit = Math.max(0, a1 - aAvailable);
+  const adequate = aAvailable >= a1;
+
+  // Size a pad for the deficit, honouring the d2 half-width limit.
+  // Usable width each side of the branch = d2 − d1/2.
+  const usableHalfWidth = Math.max(0, d2 - d1 / 2);
+  const totalUsableWidth = 2 * usableHalfWidth;
+  let reqPadThickness = 0;
+  let reqPadWidth = 0;
+  let reqPadOD = 0;
+  let padWidthLimited = false;
+
+  if (!adequate && totalUsableWidth > 0) {
+    reqPadWidth = usableHalfWidth;
+    // Round the thickness up to the next 0.5 mm (plate practice).
+    reqPadThickness = Math.ceil((deficit / totalUsableWidth) * 2) / 2;
+    reqPadOD = d1 * sinBeta + 2 * reqPadWidth;
+    // A pad thicker than the header wall is unusual; flag rather than silently accept.
+    padWidthLimited = reqPadThickness > Th;
+  } else if (!adequate) {
+    padWidthLimited = true;
   }
 
+  const r = (v: number) => (isFinite(v) ? Math.round(v * 100) / 100 : 0);
+
   return {
-    dHole: Math.round(dHole * 100) / 100,
-    aRequired: Math.round(aRequired * 100) / 100,
-    a1: Math.round(actualA1 * 100) / 100,
-    a2: Math.round(actualA2 * 100) / 100,
-    aAvailable: Math.round(aAvailable * 100) / 100,
-    padRequired,
-    padThickness: Math.round(padThickness * 100) / 100,
-    padWidth: Math.round(padWidth * 100) / 100,
-    padOD: Math.round(padOD * 100) / 100,
+    sinBeta: r(sinBeta),
+    tr: r(tr), tb: r(tb), thMin: r(thMin), tbMin: r(tbMin),
+    d1: r(d1), d2: r(d2), l4: r(l4),
+    a1: r(a1), a2: r(a2), a3: r(a3), a4: r(a4),
+    aAvailable: r(aAvailable),
+    deficit: r(deficit),
+    adequate,
+    padRequired: !adequate,
+    reqPadArea: r(deficit),
+    reqPadThickness: r(reqPadThickness),
+    reqPadWidth: r(reqPadWidth),
+    reqPadOD: r(reqPadOD),
+    padWidthLimited,
+    valid: !invalid,
   };
 }
 
@@ -142,6 +248,19 @@ export default function BranchLayoutTool() {
   const [angle, setAngle] = useState(90);
   const [divisions, setDivisions] = useState<number>(24);
 
+  /* ── ASME B31.3 design inputs ── */
+  const [pressure, setPressure] = useState<number>(5);          // P (MPa)
+  const [allowableStress, setAllowableStress] = useState<number>(137.9); // S (MPa)
+  const [qualityFactor, setQualityFactor] = useState<number>(1.0);       // E
+  const [weldStrengthFactor, setWeldStrengthFactor] = useState<number>(1.0); // W
+  const [coefficientY, setCoefficientY] = useState<number>(0.4);         // Y
+  const [corrosion, setCorrosion] = useState<number>(1.5);               // c (mm)
+  const [millTolerancePct, setMillTolerancePct] = useState<number>(12.5);
+  const [weldLegBranch, setWeldLegBranch] = useState<number>(6);
+  const [weldLegPad, setWeldLegPad] = useState<number>(6);
+  const [padThickness, setPadThickness] = useState<number>(0);  // Tr (mm)
+  const [padOD, setPadOD] = useState<number>(0);                // pad OD (mm)
+
   // Derived values
   const headerOD = NPS_OPTIONS.find(o => o.label === headerNPS)?.od ?? 168.3;
   const branchOD = NPS_OPTIONS.find(o => o.label === branchNPS)?.od ?? 88.9;
@@ -153,15 +272,28 @@ export default function BranchLayoutTool() {
 
   const isValid = headerOD > branchOD && headerWT > 0 && branchWT > 0 && angle >= 15 && angle <= 90;
 
+  const designInputsValid =
+    pressure > 0 && allowableStress > 0 && qualityFactor > 0 && weldStrengthFactor > 0 &&
+    corrosion >= 0 && millTolerancePct >= 0 && millTolerancePct < 100;
+
   const points = useMemo(() => {
     if (!isValid) return [];
     return computeIntersection(headerOD, branchOD, angle, divisions);
   }, [headerOD, branchOD, angle, divisions, isValid]);
 
   const reinforcement = useMemo(() => {
-    if (!isValid) return null;
-    return calcReinforcement(headerOD, headerWT, branchOD, branchWT, angle);
-  }, [headerOD, headerWT, branchOD, branchWT, angle, isValid]);
+    if (!isValid || !designInputsValid) return null;
+    return calcReinforcement({
+      headerOD, headerWT, branchOD, branchWT, angleDeg: angle,
+      pressure, allowableStress, qualityFactor, weldStrengthFactor,
+      coefficientY, corrosion, millTolerance: millTolerancePct / 100,
+      weldLegBranch, weldLegPad, padThickness, padOD,
+    });
+  }, [
+    headerOD, headerWT, branchOD, branchWT, angle, isValid, designInputsValid,
+    pressure, allowableStress, qualityFactor, weldStrengthFactor, coefficientY,
+    corrosion, millTolerancePct, weldLegBranch, weldLegPad, padThickness, padOD,
+  ]);
 
   const perimeter = useMemo(() => branchOD * Math.PI, [branchOD]);
 
@@ -171,7 +303,12 @@ export default function BranchLayoutTool() {
       user_id: user.id,
       tool_name: 'Branch Connection Calculator',
       tool_category: 'Fabrication',
-      input_data: { headerNPS, branchNPS, headerSch, branchSch, angle, divisions },
+      input_data: {
+        headerNPS, branchNPS, headerSch, branchSch, angle, divisions,
+        pressure, allowableStress, qualityFactor, weldStrengthFactor,
+        coefficientY, corrosion, millTolerancePct,
+        weldLegBranch, weldLegPad, padThickness, padOD,
+      },
       output_data: { reinforcement, perimeter: perimeter.toFixed(2) },
     });
     toast.success(t('tools.calculationSaved'));
@@ -331,7 +468,199 @@ export default function BranchLayoutTool() {
         </div>
       </div>
 
-      {/* Validation error */}
+      {/* ── ASME B31.3 Design Inputs ── */}
+      <div className="space-y-4 rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
+            {t('tools.branchLayout.designInputs', { defaultValue: 'Design Inputs (ASME B31.3)' })}
+          </p>
+          <span className="text-[9px] text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded">§304.1.2 / §304.3.3</span>
+        </div>
+
+        {/* Material reference selector + allowable stress */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label className="text-xs text-zinc-500">
+              {t('tools.branchLayout.materialReference', { defaultValue: 'Material reference (optional)' })}
+            </Label>
+            <select
+              defaultValue=""
+              onChange={(e) => {
+                const ref = ALLOWABLE_STRESS_REFS.find(m => m.id === e.target.value);
+                if (ref) setAllowableStress(ref.s);
+              }}
+              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
+            >
+              <option value="">
+                {t('tools.branchLayout.materialManual', { defaultValue: 'Enter S manually…' })}
+              </option>
+              {ALLOWABLE_STRESS_REFS.map(m => (
+                <option key={m.id} value={m.id}>{m.material} — {m.s} MPa</option>
+              ))}
+            </select>
+            <p className="text-[10px] text-zinc-600 leading-relaxed">
+              {ALLOWABLE_STRESS_REFS.map(m => `${m.material}: ${m.s} MPa @ ${m.basis}`).join(' · ')}
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs text-zinc-500">
+              S — {t('tools.branchLayout.allowableStress', { defaultValue: 'Basic allowable stress' })} (MPa)
+            </Label>
+            <input
+              type="number" min={0} step={0.1}
+              value={allowableStress}
+              onChange={(e) => setAllowableStress(Number(e.target.value))}
+              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+            />
+          </div>
+        </div>
+
+        {/* Prominent allowable-stress warning */}
+        <div className="border-l-2 border-[#f59e0b] bg-[#f59e0b]/5 p-3">
+          <p className="text-[11px] text-[#f59e0b] leading-relaxed">
+            {t('tools.branchLayout.allowableStressWarning', {
+              defaultValue:
+                'S varies strongly with design temperature. The listed values are reference points at their stated temperature basis only. You must take S from ASME B31.3 Table A-1 of the applicable code edition for the actual design temperature and material condition.',
+            })}
+          </p>
+        </div>
+
+        {/* Numeric design parameters */}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-2">
+            <Label className="text-xs text-zinc-500">
+              P — {t('tools.branchLayout.designPressure', { defaultValue: 'Design pressure' })} (MPa)
+            </Label>
+            <input
+              type="number" min={0} step={0.1}
+              value={pressure}
+              onChange={(e) => setPressure(Number(e.target.value))}
+              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-xs text-zinc-500">
+              E — {t('tools.branchLayout.qualityFactor', { defaultValue: 'Weld joint quality factor' })}
+            </Label>
+            <input
+              type="number" min={0} max={1} step={0.01}
+              value={qualityFactor}
+              onChange={(e) => setQualityFactor(Number(e.target.value))}
+              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-xs text-zinc-500">
+              W — {t('tools.branchLayout.weldStrengthFactor', { defaultValue: 'Weld strength reduction factor' })}
+            </Label>
+            <input
+              type="number" min={0} max={1} step={0.01}
+              value={weldStrengthFactor}
+              onChange={(e) => setWeldStrengthFactor(Number(e.target.value))}
+              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-xs text-zinc-500">
+              Y — {t('tools.branchLayout.coefficientY', { defaultValue: 'Coefficient Y (Table 304.1.1)' })}
+            </Label>
+            <input
+              type="number" min={0} max={1} step={0.01}
+              value={coefficientY}
+              onChange={(e) => setCoefficientY(Number(e.target.value))}
+              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-xs text-zinc-500">
+              c — {t('tools.branchLayout.corrosionAllowance', { defaultValue: 'Corrosion / erosion allowance' })} (mm)
+            </Label>
+            <input
+              type="number" min={0} step={0.1}
+              value={corrosion}
+              onChange={(e) => setCorrosion(Number(e.target.value))}
+              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-xs text-zinc-500">
+              {t('tools.branchLayout.millTolerance', { defaultValue: 'Mill tolerance' })} (%)
+            </Label>
+            <input
+              type="number" min={0} max={99} step={0.5}
+              value={millTolerancePct}
+              onChange={(e) => setMillTolerancePct(Number(e.target.value))}
+              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-xs text-zinc-500">
+              {t('tools.branchLayout.weldLegBranch', { defaultValue: 'Branch fillet weld leg' })} (mm)
+            </Label>
+            <input
+              type="number" min={0} step={0.5}
+              value={weldLegBranch}
+              onChange={(e) => setWeldLegBranch(Number(e.target.value))}
+              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-xs text-zinc-500">
+              {t('tools.branchLayout.weldLegPad', { defaultValue: 'Pad fillet weld leg' })} (mm)
+            </Label>
+            <input
+              type="number" min={0} step={0.5}
+              value={weldLegPad}
+              onChange={(e) => setWeldLegPad(Number(e.target.value))}
+              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+            />
+          </div>
+        </div>
+
+        {/* Existing pad, if any */}
+        <div className="border-t border-zinc-800/60 pt-3">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+            {t('tools.branchLayout.existingPad', { defaultValue: 'Existing reinforcing pad (leave 0 if none)' })}
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-xs text-zinc-500">
+                Tr — {t('tools.branchLayout.padThickness')} (mm)
+              </Label>
+              <input
+                type="number" min={0} step={0.5}
+                value={padThickness}
+                onChange={(e) => setPadThickness(Number(e.target.value))}
+                className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-zinc-500">
+                {t('tools.branchLayout.padOD')} (mm)
+              </Label>
+              <input
+                type="number" min={0} step={1}
+                value={padOD}
+                onChange={(e) => setPadOD(Number(e.target.value))}
+                className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Design input validation error */}
+      {isValid && !designInputsValid && (
+        <div className="border-l-2 border-red-500 bg-red-500/5 p-4">
+          <p className="text-sm text-red-400">
+            {t('tools.branchLayout.errorDesignInputs', {
+              defaultValue: 'Enter a positive design pressure P, allowable stress S, and factors E and W greater than zero.',
+            })}
+          </p>
+        </div>
+      )}
+
       {!isValid && headerOD > 0 && branchOD > 0 && (
         <div className="border-l-2 border-red-500 bg-red-500/5 p-4">
           <p className="text-sm text-red-400">
@@ -346,39 +675,49 @@ export default function BranchLayoutTool() {
         <>
           {/* Results Panel */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Hole Size */}
+            {/* d1 — effective material removed */}
             <div className="rounded-lg border border-[#f59e0b]/30 bg-[#f59e0b]/5 p-4 text-center">
-              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">{t('tools.branchLayout.holeSize')}</p>
-              <p className="mt-1 text-2xl font-bold text-[#f59e0b] font-mono">{reinforcement.dHole.toFixed(1)}</p>
-              <p className="text-[10px] text-zinc-500">mm Ø</p>
+              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
+                {t('tools.branchLayout.d1Label', { defaultValue: 'd1 — Material Removed' })}
+              </p>
+              <p className="mt-1 text-2xl font-bold text-[#f59e0b] font-mono">{reinforcement.d1.toFixed(1)}</p>
+              <p className="text-[10px] text-zinc-500">mm</p>
             </div>
-            {/* Required Area */}
+            {/* A1 — required */}
             <div className="rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4 text-center">
-              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">{t('tools.branchLayout.areaRequired')}</p>
-              <p className="mt-1 text-2xl font-bold text-zinc-100 font-mono">{reinforcement.aRequired.toFixed(1)}</p>
+              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
+                {t('tools.branchLayout.a1Required', { defaultValue: 'A1 — Required Area' })}
+              </p>
+              <p className="mt-1 text-2xl font-bold text-zinc-100 font-mono">{reinforcement.a1.toFixed(1)}</p>
               <p className="text-[10px] text-zinc-500">mm²</p>
             </div>
-            {/* Available Area */}
+            {/* Available */}
             <div className="rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4 text-center">
-              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">{t('tools.branchLayout.areaAvailable')}</p>
-              <p className="mt-1 text-2xl font-bold text-zinc-100 font-mono">{reinforcement.aAvailable.toFixed(1)}</p>
-              <p className="text-[10px] text-zinc-500">mm² (A1 + A2)</p>
-            </div>
-            {/* Pad Status */}
-            <div className={`rounded-lg border p-4 text-center ${reinforcement.padRequired ? 'border-red-500/40 bg-red-500/5' : 'border-emerald-500/40 bg-emerald-500/5'}`}>
-              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">{t('tools.branchLayout.reinforcementPad')}</p>
-              <p className={`mt-1 text-lg font-bold ${reinforcement.padRequired ? 'text-red-400' : 'text-emerald-400'}`}>
-                {reinforcement.padRequired ? t('tools.branchLayout.padRequired') : t('tools.branchLayout.padNotRequired')}
+              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
+                {t('tools.branchLayout.availableArea', { defaultValue: 'Available Area' })}
               </p>
-              {reinforcement.padRequired && (
+              <p className="mt-1 text-2xl font-bold text-zinc-100 font-mono">{reinforcement.aAvailable.toFixed(1)}</p>
+              <p className="text-[10px] text-zinc-500">mm² (A2 + A3 + A4)</p>
+            </div>
+            {/* Acceptance */}
+            <div className={`rounded-lg border p-4 text-center ${reinforcement.adequate ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-red-500/40 bg-red-500/5'}`}>
+              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
+                {t('tools.branchLayout.acceptance', { defaultValue: 'Acceptance (A2+A3+A4 ≥ A1)' })}
+              </p>
+              <p className={`mt-1 text-lg font-bold ${reinforcement.adequate ? 'text-emerald-400' : 'text-red-400'}`}>
+                {reinforcement.adequate
+                  ? t('tools.branchLayout.acceptancePass', { defaultValue: 'ADEQUATE' })
+                  : t('tools.branchLayout.acceptanceFail', { defaultValue: 'PAD REQUIRED' })}
+              </p>
+              {!reinforcement.adequate && (
                 <p className="text-[10px] text-zinc-400 mt-1">
-                  {reinforcement.padThickness} mm × Ø{reinforcement.padOD.toFixed(0)} mm
+                  {t('tools.branchLayout.deficit', { defaultValue: 'Deficit' })}: {reinforcement.deficit.toFixed(1)} mm²
                 </p>
               )}
             </div>
           </div>
 
-          {/* Reinforcement Detail (ASME B31.3) */}
+          {/* Full audit breakdown (ASME B31.3 §304.3.3) */}
           <div className="rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
@@ -386,40 +725,129 @@ export default function BranchLayoutTool() {
               </p>
               <span className="text-[9px] text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded">ASME B31.3 §304.3.3</span>
             </div>
+
+            {/* Thicknesses */}
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+              {t('tools.branchLayout.thicknesses', { defaultValue: 'Pressure design thicknesses (§304.1.2)' })}
+            </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <span className="text-zinc-500">d (hole):</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.dHole} mm</span>
+                <span className="text-zinc-500">t<sub>r</sub> ({t('tools.branchLayout.header', { defaultValue: 'header' })}):</span>
+                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.tr.toFixed(2)} mm</span>
               </div>
               <div>
-                <span className="text-zinc-500">A<sub>req</sub>:</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.aRequired} mm²</span>
+                <span className="text-zinc-500">t<sub>b</sub> ({t('tools.branchLayout.branch', { defaultValue: 'branch' })}):</span>
+                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.tb.toFixed(2)} mm</span>
               </div>
               <div>
-                <span className="text-zinc-500">A<sub>1</sub> (header):</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.a1} mm²</span>
+                <span className="text-zinc-500">T<sub>h,min</sub>:</span>
+                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.thMin.toFixed(2)} mm</span>
               </div>
               <div>
-                <span className="text-zinc-500">A<sub>2</sub> (branch):</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.a2} mm²</span>
+                <span className="text-zinc-500">T<sub>b,min</sub>:</span>
+                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.tbMin.toFixed(2)} mm</span>
               </div>
             </div>
-            {reinforcement.padRequired && (
-              <div className="mt-3 pt-3 border-t border-zinc-800/60 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-                <div>
-                  <span className="text-zinc-500">{t('tools.branchLayout.padThickness')}:</span>
-                  <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.padThickness} mm</span>
+
+            {/* Zone geometry */}
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mt-4 mb-2">
+              {t('tools.branchLayout.zoneGeometry', { defaultValue: 'Reinforcement zone' })}
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div>
+                <span className="text-zinc-500">d<sub>1</sub>:</span>
+                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.d1.toFixed(2)} mm</span>
+              </div>
+              <div>
+                <span className="text-zinc-500">d<sub>2</sub> ({t('tools.branchLayout.halfWidth', { defaultValue: 'half-width' })}):</span>
+                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.d2.toFixed(2)} mm</span>
+              </div>
+              <div>
+                <span className="text-zinc-500">L<sub>4</sub> ({t('tools.branchLayout.zoneHeight', { defaultValue: 'height' })}):</span>
+                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.l4.toFixed(2)} mm</span>
+              </div>
+              <div>
+                <span className="text-zinc-500">sin β:</span>
+                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.sinBeta.toFixed(3)}</span>
+              </div>
+            </div>
+
+            {/* Areas */}
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mt-4 mb-2">
+              {t('tools.branchLayout.areaBreakdown', { defaultValue: 'Area breakdown' })}
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div>
+                <span className="text-zinc-500">A<sub>1</sub> ({t('tools.branchLayout.required', { defaultValue: 'required' })}):</span>
+                <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.a1.toFixed(2)} mm²</span>
+              </div>
+              <div>
+                <span className="text-zinc-500">A<sub>2</sub> ({t('tools.branchLayout.headerExcess', { defaultValue: 'header excess' })}):</span>
+                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.a2.toFixed(2)} mm²</span>
+              </div>
+              <div>
+                <span className="text-zinc-500">A<sub>3</sub> ({t('tools.branchLayout.branchExcess', { defaultValue: 'branch excess' })}):</span>
+                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.a3.toFixed(2)} mm²</span>
+              </div>
+              <div>
+                <span className="text-zinc-500">A<sub>4</sub> ({t('tools.branchLayout.weldsAndPad', { defaultValue: 'welds + pad' })}):</span>
+                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.a4.toFixed(2)} mm²</span>
+              </div>
+            </div>
+
+            {/* Formulae shown for audit */}
+            <div className="mt-3 pt-3 border-t border-zinc-800/60 text-[10px] text-zinc-600 font-mono leading-relaxed space-y-0.5">
+              <p>t = P·D / (2·(S·E·W + P·Y))</p>
+              <p>d1 = [Db − 2·(Tb − c)] / sin β</p>
+              <p>A1 = tr · d1 · (2 − sin β)</p>
+              <p>A2 = (2·d2 − d1) · (Th,min − tr − c)</p>
+              <p>A3 = 2·L4 · (Tb,min − tb − c) / sin β</p>
+            </div>
+
+            {/* Pad sizing for the deficit */}
+            {!reinforcement.adequate && (
+              <div className="mt-3 pt-3 border-t border-zinc-800/60">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                  {t('tools.branchLayout.padSizing', { defaultValue: 'Pad sizing for the deficit' })}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                  <div>
+                    <span className="text-zinc-500">{t('tools.branchLayout.requiredPadArea', { defaultValue: 'Required pad area' })}:</span>
+                    <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadArea.toFixed(2)} mm²</span>
+                  </div>
+                  <div>
+                    <span className="text-zinc-500">{t('tools.branchLayout.padThickness')}:</span>
+                    <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadThickness.toFixed(2)} mm</span>
+                  </div>
+                  <div>
+                    <span className="text-zinc-500">{t('tools.branchLayout.padOD')}:</span>
+                    <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadOD.toFixed(1)} mm</span>
+                  </div>
+                  <div>
+                    <span className="text-zinc-500">{t('tools.branchLayout.padWidth')}:</span>
+                    <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadWidth.toFixed(1)} mm</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-zinc-500">{t('tools.branchLayout.padOD')}:</span>
-                  <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.padOD.toFixed(1)} mm</span>
-                </div>
-                <div>
-                  <span className="text-zinc-500">{t('tools.branchLayout.padWidth')}:</span>
-                  <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.padWidth.toFixed(1)} mm</span>
-                </div>
+                {reinforcement.padWidthLimited && (
+                  <p className="mt-2 text-[11px] text-red-400 leading-relaxed">
+                    {t('tools.branchLayout.padLimitWarning', {
+                      defaultValue:
+                        'The pad needed exceeds the header wall thickness or the d2 width limit. Reconsider the design: use a heavier header, a thicker branch, or an integrally reinforced fitting.',
+                    })}
+                  </p>
+                )}
               </div>
             )}
+          </div>
+
+          {/* Verification disclaimer */}
+          <div className="border-l-2 border-[#f59e0b] bg-[#f59e0b]/5 p-4">
+            <p className="text-[11px] text-[#f59e0b] leading-relaxed">
+              {t('tools.branchLayout.verificationDisclaimer', {
+                defaultValue:
+                  'This result is an aid only and must be verified against the governing edition of ASME B31.3 and the project engineering specification before fabrication. Area replacement per §304.3.3 does not cover external loads, fatigue, or the §304.3.2 limitations on branch connections.',
+              })}
+            </p>
           </div>
 
           {/* Cross-Section SVG */}
@@ -439,7 +867,7 @@ export default function BranchLayoutTool() {
 
               {/* Hole in header */}
               {(() => {
-                const holeW = Math.min(reinforcement.dHole * 0.8, 120);
+                const holeW = Math.min(reinforcement.d1 * 0.8, 120);
                 const cx = 200;
                 return (
                   <g>
@@ -450,7 +878,7 @@ export default function BranchLayoutTool() {
                     <line x1={cx - holeW / 2} y1="122" x2={cx - holeW / 2} y2="128" stroke="#f59e0b" strokeWidth="0.8" />
                     <line x1={cx + holeW / 2} y1="122" x2={cx + holeW / 2} y2="128" stroke="#f59e0b" strokeWidth="0.8" />
                     <text x={cx} y="121" textAnchor="middle" fill="#f59e0b" fontSize="9">
-                      Ø{reinforcement.dHole.toFixed(1)}
+                      Ø{reinforcement.d1.toFixed(1)}
                     </text>
                   </g>
                 );
@@ -481,15 +909,15 @@ export default function BranchLayoutTool() {
 
               {/* Reinforcement pad */}
               {reinforcement.padRequired && (() => {
-                const padW = Math.min(reinforcement.padOD * 0.6, 140);
-                const padH = Math.min(reinforcement.padThickness * 1.5, 12);
+                const padW = Math.min(reinforcement.reqPadOD * 0.6, 140);
+                const padH = Math.min(reinforcement.reqPadThickness * 1.5, 12);
                 const cx = 200;
                 return (
                   <g>
                     <rect x={cx - padW / 2} y={140 - padH} width={padW} height={padH} rx="1"
                       fill="#f59e0b" fillOpacity="0.15" stroke="#f59e0b" strokeWidth="1" strokeDasharray="4,2" />
                     <text x={cx + padW / 2 + 5} y={140 - padH / 2 + 3} fill="#f59e0b" fontSize="8">
-                      PAD {reinforcement.padThickness}mm
+                      PAD {reinforcement.reqPadThickness}mm
                     </text>
                   </g>
                 );
@@ -685,7 +1113,10 @@ export default function BranchLayoutTool() {
 
           {/* Reference note */}
           <p className="text-[10px] text-zinc-600 leading-relaxed">
-            {t('tools.branchLayout.referenceNote')}
+            {t('tools.branchLayout.referenceNoteB313', {
+              defaultValue:
+                'Reinforcement per ASME B31.3 §304.3.3 using the pressure design thickness of §304.1.2. Mill tolerance is applied to the as-supplied wall (Th,min, Tb,min), not treated as a required thickness. Cut-template geometry is independent of the reinforcement check.',
+            })}
           </p>
         </>
       )}

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Wrench,
   Calculator,
@@ -63,7 +64,23 @@ export default function Tools() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { status: premiumStatus } = usePremium();
-  const [active, setActive] = useState<string | null>(null);
+
+  // The open tool lives in the URL so a tool can be linked, bookmarked and
+  // shared, and so the back button leaves the tool instead of the page. It was
+  // previously local state only, which made every tool unreachable by URL.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const active = searchParams.get('t');
+  const setActive = (key: string | null) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (key) next.set('t', key);
+        else next.delete('t');
+        return next;
+      },
+      { replace: false },
+    );
+  };
   const [d, setD] = useState('168.3');
   const [p, setP] = useState('5');
   const [s, setS] = useState('138');

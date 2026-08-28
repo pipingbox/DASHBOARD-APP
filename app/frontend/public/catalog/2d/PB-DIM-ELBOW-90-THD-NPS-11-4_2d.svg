@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs><style>
+    .profile{stroke:#1a1a1a;stroke-width:2;fill:#e2e5e8}
+    .bore{stroke:#555;stroke-width:1;fill:none;stroke-dasharray:4 2}
+    .centerline{stroke:#999;stroke-width:.8;stroke-dasharray:8 4;fill:none}
+    .dim-line{stroke:#c62828;stroke-width:.9;fill:none}
+    .dim-text{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#c62828;text-anchor:middle}
+    .dim-sub{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#c62828;text-anchor:middle}
+    .title{font-family:'Segoe UI',Arial,sans-serif;font-size:18px;font-weight:600;fill:#1a1a1a}
+    .subtitle{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#555}
+    .std-ref{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#888}
+    .note{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888}
+    .label{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#999;text-anchor:middle}
+    .tbl-hdr{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;fill:#1a1a1a;font-weight:600;text-anchor:middle}
+    .tbl-key{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#555;text-anchor:start}
+    .tbl-val{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888;text-anchor:end}
+  </style>
+  <marker id="as" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  <marker id="ae" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  </defs>
+  <rect width="800" height="700" fill="#fafafa"/>
+  <text x="40" y="40" class="title">90° Threaded Elbow</text>
+  <text x="40" y="60" class="subtitle">NPS 1 1/4 (DN 32) — Class 3000 — NPT</text>
+  <text x="40" y="78" class="std-ref">ASME B16.11-2016 | Forged, NPT threaded ends</text>
+  <path d="M 260 395 A 175 175 0 0 0 435 220 L 325 220 A 65 65 0 0 1 260 285 Z" class="profile"/>
+  <path d="M 260 387 A 167 167 0 0 0 427 220" class="bore"/>
+  <path d="M 260 293 A 73 73 0 0 0 333 220" class="bore"/>
+  <line x1="207" y1="395" x2="212" y2="396.5" stroke="#c62828" stroke-width=".6"/>
+  <line x1="308" y1="395" x2="313" y2="396.5" stroke="#c62828" stroke-width=".6"/>
+  <line x1="207" y1="398" x2="212" y2="399.5" stroke="#c62828" stroke-width=".6"/>
+  <line x1="308" y1="398" x2="313" y2="399.5" stroke="#c62828" stroke-width=".6"/>
+  <line x1="207" y1="401" x2="212" y2="402.5" stroke="#c62828" stroke-width=".6"/>
+  <line x1="308" y1="401" x2="313" y2="402.5" stroke="#c62828" stroke-width=".6"/>
+  <line x1="207" y1="404" x2="212" y2="405.5" stroke="#c62828" stroke-width=".6"/>
+  <line x1="308" y1="404" x2="313" y2="405.5" stroke="#c62828" stroke-width=".6"/>
+  <line x1="207" y1="407" x2="212" y2="408.5" stroke="#c62828" stroke-width=".6"/>
+  <line x1="308" y1="407" x2="313" y2="408.5" stroke="#c62828" stroke-width=".6"/>
+  <text x="260" y="424" class="dim-sub">NPT thread</text>
+  <path d="M 260 340 A 120 120 0 0 0 380 220" class="centerline"/>
+  <line x1="260" y1="415" x2="260" y2="210" class="centerline"/>
+  <text x="260" y="205" class="label">CL</text>
+  <line x1="250" y1="220" x2="465" y2="220" class="centerline"/>
+  <text x="470" y="224" class="label" text-anchor="start">CL</text>
+  <circle cx="260" cy="220" r="3" fill="#c62828"/>
+  <text x="248" y="212" class="dim-text">C</text>
+  <line x1="200" y1="220" x2="255" y2="220" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="200" y1="395" x2="255" y2="395" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="205" y1="220" x2="205" y2="395" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="213" y="302.5" class="dim-text" text-anchor="start">A</text>
+  <text x="213" y="317.5" class="dim-sub" text-anchor="start">1.250" | 31.8 mm</text>
+  <line x1="325" y1="190" x2="435" y2="190" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="380" y="183" class="dim-text">OD</text>
+  <text x="380" y="205" class="dim-sub">2.125" | 54.0 mm</text>
+  <rect x="530" y="140" width="240" height="169" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
+  <text x="650" y="160" class="tbl-hdr">NPS 1 1/4 — Key Data</text>
+  <line x1="545" y1="168" x2="755" y2="168" stroke="#eee" stroke-width=".5"/>
+  <text x="550" y="185" class="tbl-key">NPS / DN</text>
+  <text x="750" y="185" class="tbl-val">1 1/4 / 32</text>
+  <text x="550" y="202" class="tbl-key">Class</text>
+  <text x="750" y="202" class="tbl-val">3000</text>
+  <text x="550" y="219" class="tbl-key">A (center-to-end)</text>
+  <text x="750" y="219" class="tbl-val">1.250" | 31.8 mm</text>
+  <text x="550" y="236" class="tbl-key">OD</text>
+  <text x="750" y="236" class="tbl-val">2.125" | 54.0 mm</text>
+  <text x="550" y="253" class="tbl-key">Thread bore</text>
+  <text x="750" y="253" class="tbl-val">1.660" | 42.2 mm</text>
+  <text x="550" y="270" class="tbl-key">Thread type</text>
+  <text x="750" y="270" class="tbl-val">NPT</text>
+  <text x="550" y="287" class="tbl-key">Min wall</text>
+  <text x="750" y="287" class="tbl-val">0.150" | 3.8 mm</text>
+  <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
+  <text x="40" y="648" class="note">90 degree Threaded Elbow per ASME B16.11-2016, Class 3000.</text>
+  <text x="40" y="663" class="note">Thread: ASME B1.20.1 NPT (National Pipe Taper). Forged steel body.</text>
+  <text x="40" y="678" class="note">A = center-to-end. Min wall at intrados. All dims in inches and mm.</text>
+  <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
+</svg>

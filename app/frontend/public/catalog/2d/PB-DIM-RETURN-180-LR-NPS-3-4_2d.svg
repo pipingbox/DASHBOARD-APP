@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs>
+    <style>
+      .profile   { stroke: #1a1a1a; stroke-width: 2; fill: #e2e5e8; }
+      .bore      { stroke: #555; stroke-width: 1; fill: none; stroke-dasharray: 4 2; }
+      .centerline{ stroke: #999; stroke-width: 0.8; stroke-dasharray: 8 4; fill: none; }
+      .dim-line  { stroke: #c62828; stroke-width: 0.9; fill: none; }
+      .dim-text  { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; fill: #c62828; text-anchor: middle; }
+      .dim-sub   { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #c62828; text-anchor: middle; }
+      .label     { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #666; text-anchor: middle; }
+      .title     { font-family: 'Segoe UI', Arial, sans-serif; font-size: 18px; font-weight: 600; fill: #1a1a1a; }
+      .subtitle  { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; fill: #555; }
+      .std-ref   { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #888; }
+      .note      { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10.5px; fill: #888; }
+    </style>
+    <marker id="arrow-start" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+      <path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width="0.8"/>
+    </marker>
+    <marker id="arrow-end" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width="0.8"/>
+    </marker>
+  </defs>
+
+  <rect width="800" height="700" fill="#fafafa"/>
+
+  <!-- TITLE -->
+  <text x="40" y="40" class="title">180° Long Radius Return</text>
+  <text x="40" y="60" class="subtitle">NPS 3/4 (DN 20) — Butt Weld Ends</text>
+  <text x="40" y="78" class="std-ref">ASME B16.9-2018 | U-bend return</text>
+
+  <!-- PROFILE: U-bend with legs -->
+  <!-- Left leg -->
+  <rect x="185" y="250" width="90" height="150" class="profile"/>
+  <!-- Right leg -->
+  <rect x="425" y="250" width="90" height="150" class="profile"/>
+  <!-- Semicircular U-bend at top (arcs upward from legs) -->
+  <path d="M 185 250
+           A 165 165 0 0 1 515 250
+           L 425 250
+           A 75 75 0 0 0 275 250
+           Z" class="profile"/>
+
+  <!-- BORE lines on legs -->
+  <line x1="191" y1="250" x2="191" y2="400" class="bore"/>
+  <line x1="269" y1="250" x2="269" y2="400" class="bore"/>
+  <line x1="431" y1="250" x2="431" y2="400" class="bore"/>
+  <line x1="509" y1="250" x2="509" y2="400" class="bore"/>
+  <!-- Bore arcs in U-bend -->
+  <path d="M 191 250
+           A 159 159 0 0 1 509 250" class="bore"/>
+  <path d="M 269 250
+           A 81 81 0 0 0 431 250" class="bore"/>
+
+  <!-- CENTERLINES vertical through each leg -->
+  <line x1="230" y1="430" x2="230" y2="250" class="centerline"/>
+  <line x1="470" y1="430" x2="470" y2="250" class="centerline"/>
+  <!-- Centerline arc through U-bend -->
+  <path d="M 230 250 A 120 120 0 0 1 470 250" class="centerline"/>
+
+  <!-- CL labels -->
+  <text x="230" y="444" class="label" fill="#999">CL</text>
+  <text x="470" y="444" class="label" fill="#999">CL</text>
+
+  <!-- DIM K (center-to-center, horizontal between leg centerlines) -->
+  <line x1="230" y1="400" x2="230" y2="470" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="470" y1="400" x2="470" y2="470" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="230" y1="460" x2="470" y2="460"
+        class="dim-line" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="350" y="455" class="dim-text">K</text>
+  <text x="350" y="477" class="dim-sub">3.000" | 76.2 mm</text>
+
+  <!-- DIM O (back-to-face, vertical from bottom of legs to top of U) -->
+  <line x1="515" y1="400" x2="585" y2="400" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="350" y1="85" x2="585" y2="85" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="570" y1="85" x2="570" y2="400"
+        class="dim-line" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="595" y="238" class="dim-text">O</text>
+  <text x="595" y="254" class="dim-sub">4.050"</text>
+  <text x="595" y="268" class="dim-sub">102.9 mm</text>
+
+  <!-- DIM D (OD at left leg bottom end) -->
+  <line x1="185" y1="400" x2="185" y2="470" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="275" y1="400" x2="275" y2="470" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="185" y1="460" x2="275" y2="460"
+        class="dim-line" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="230" y="455" class="dim-text">D</text>
+  <text x="230" y="477" class="dim-sub">1.050" | 26.7 mm</text>
+
+  <!-- NOTES -->
+  <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width="0.5"/>
+  <text x="40" y="652" class="note">Dimensions per ASME B16.9-2018.</text>
+  <text x="40" y="666" class="note">K = center-to-center. O = back-to-face. D = outside diameter. 180° Long Radius return.</text>
+  <text x="40" y="680" class="note">Wall thickness varies by schedule. All dimensions in inches and millimeters.</text>
+  <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
+
+  <!-- DATA TABLE -->
+  <rect x="530" y="120" width="240" height="175" rx="4" fill="white" stroke="#ddd" stroke-width="0.8"/>
+  <text x="650" y="140" class="label" font-weight="600" fill="#1a1a1a">NPS 3/4 — Key Data</text>
+  <line x1="545" y1="148" x2="755" y2="148" stroke="#eee" stroke-width="0.5"/>
+  <text x="560" y="165" class="note" text-anchor="start" fill="#555">NPS</text>
+  <text x="735" y="165" class="note" text-anchor="end">3/4</text>
+  <text x="560" y="182" class="note" text-anchor="start" fill="#555">DN</text>
+  <text x="735" y="182" class="note" text-anchor="end">20</text>
+  <text x="560" y="199" class="note" text-anchor="start" fill="#555">K (center-to-center)</text>
+  <text x="735" y="199" class="note" text-anchor="end">3.000" | 76.2 mm</text>
+  <text x="560" y="216" class="note" text-anchor="start" fill="#555">O (back-to-face)</text>
+  <text x="735" y="216" class="note" text-anchor="end">4.050" | 102.9 mm</text>
+  <text x="560" y="233" class="note" text-anchor="start" fill="#555">D (outside dia.)</text>
+  <text x="735" y="233" class="note" text-anchor="end">1.050" | 26.7 mm</text>
+  <text x="560" y="250" class="note" text-anchor="start" fill="#555">Standard</text>
+  <text x="735" y="250" class="note" text-anchor="end">ASME B16.9-2018</text>
+  <text x="560" y="267" class="note" text-anchor="start" fill="#555">End type</text>
+  <text x="735" y="267" class="note" text-anchor="end">Butt Weld (BW)</text>
+
+</svg>

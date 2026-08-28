@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs><style>
+    .profile{stroke:#1a1a1a;stroke-width:2;fill:#e2e5e8}
+    .bore{stroke:#555;stroke-width:1;fill:none;stroke-dasharray:4 2}
+    .centerline{stroke:#999;stroke-width:.8;stroke-dasharray:8 4;fill:none}
+    .dim-line{stroke:#c62828;stroke-width:.9;fill:none}
+    .dim-text{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#c62828;text-anchor:middle}
+    .dim-sub{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#c62828;text-anchor:middle}
+    .title{font-family:'Segoe UI',Arial,sans-serif;font-size:18px;font-weight:600;fill:#1a1a1a}
+    .subtitle{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#555}
+    .std-ref{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#888}
+    .note{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888}
+    .label{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#999;text-anchor:middle}
+    .tbl-hdr{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;fill:#1a1a1a;font-weight:600;text-anchor:middle}
+    .tbl-key{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#555;text-anchor:start}
+    .tbl-val{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888;text-anchor:end}
+  </style>
+  <marker id="as" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  <marker id="ae" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  </defs>
+  <rect width="800" height="700" fill="#fafafa"/>
+  <text x="40" y="40" class="title">Weldolet</text>
+  <text x="40" y="60" class="subtitle">NPS 4 x 3 (DN 100 x 80)</text>
+  <text x="40" y="78" class="std-ref">MSS SP-97 | Integrally reinforced branch outlet</text>
+  <rect x="70" y="380" width="500" height="6" class="profile" fill="#d8dce0"/>
+  <rect x="70" y="500" width="500" height="6" class="profile" fill="#d8dce0"/>
+  <line x1="70" y1="386" x2="570" y2="386" class="bore"/>
+  <line x1="70" y1="500" x2="570" y2="500" class="bore"/>
+  <path d="M 271 380 C 271 357 271 303 271 303 L 271 303 L 369 303 C 369 303 369 357 369 380" class="profile"/>
+  <line x1="277" y1="303" x2="277" y2="386" class="bore"/>
+  <line x1="363" y1="303" x2="363" y2="386" class="bore"/>
+  <line x1="50" y1="443" x2="590" y2="443" class="centerline"/>
+  <text x="595" y="447" class="label" text-anchor="start">CL</text>
+  <line x1="320" y1="273" x2="320" y2="516" class="centerline"/>
+  <text x="320" y="268" class="label">CL</text>
+  <line x1="379.0" y1="380" x2="424.0" y2="380" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="379.0" y1="303.0" x2="424.0" y2="303.0" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="419.0" y1="303.0" x2="419.0" y2="380" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="427.0" y="336.5" class="dim-text" text-anchor="start">H</text>
+  <text x="427.0" y="351.5" class="dim-sub" text-anchor="start">2.750" | 69.9 mm</text>
+  <line x1="277.048" y1="278.0" x2="362.952" y2="278.0" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="320" y="271.0" class="dim-text">Bore</text>
+  <text x="320" y="293.0" class="dim-sub">3.068" | 77.9 mm</text>
+  <line x1="60" y1="380" x2="60" y2="350" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="60" y1="506" x2="60" y2="536" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="40" y1="380" x2="40" y2="506" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="48" y="438.0" class="dim-text" text-anchor="start">Run OD</text>
+  <text x="48" y="453.0" class="dim-sub" text-anchor="start">4.500" | 114.3 mm</text>
+  <rect x="530" y="120" width="240" height="152" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
+  <text x="650" y="140" class="tbl-hdr">NPS 4x3 — Key Data</text>
+  <line x1="545" y1="148" x2="755" y2="148" stroke="#eee" stroke-width=".5"/>
+  <text x="550" y="165" class="tbl-key">NPS (run x branch)</text>
+  <text x="750" y="165" class="tbl-val">4 x 3</text>
+  <text x="550" y="182" class="tbl-key">Run OD</text>
+  <text x="750" y="182" class="tbl-val">4.500" | 114.3 mm</text>
+  <text x="550" y="199" class="tbl-key">Branch bore</text>
+  <text x="750" y="199" class="tbl-val">3.068" | 77.9 mm</text>
+  <text x="550" y="216" class="tbl-key">H (height)</text>
+  <text x="750" y="216" class="tbl-val">2.750" | 69.9 mm</text>
+  <text x="550" y="233" class="tbl-key">Base width</text>
+  <text x="750" y="233" class="tbl-val">3.500" | 88.9 mm</text>
+  <text x="550" y="250" class="tbl-key">Standard</text>
+  <text x="750" y="250" class="tbl-val">MSS SP-97</text>
+  <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
+  <text x="40" y="648" class="note">Weldolet per MSS SP-97: integrally reinforced forged branch outlet.</text>
+  <text x="40" y="663" class="note">H = height from run OD to branch end. Bore = branch inside diameter.</text>
+  <text x="40" y="678" class="note">Weld preparation per ASME B31.3. All dimensions in inches and mm.</text>
+  <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
+</svg>

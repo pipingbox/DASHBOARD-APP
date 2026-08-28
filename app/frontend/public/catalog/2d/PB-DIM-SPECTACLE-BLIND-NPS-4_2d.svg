@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs><style>
+    .profile{stroke:#1a1a1a;stroke-width:2;fill:#e2e5e8}
+    .bore{stroke:#555;stroke-width:1;fill:none;stroke-dasharray:4 2}
+    .centerline{stroke:#999;stroke-width:.8;stroke-dasharray:8 4;fill:none}
+    .dim-line{stroke:#c62828;stroke-width:.9;fill:none}
+    .dim-text{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#c62828;text-anchor:middle}
+    .dim-sub{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#c62828;text-anchor:middle}
+    .title{font-family:'Segoe UI',Arial,sans-serif;font-size:18px;font-weight:600;fill:#1a1a1a}
+    .subtitle{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#555}
+    .std-ref{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#888}
+    .note{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888}
+    .label{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#999;text-anchor:middle}
+    .tbl-hdr{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;fill:#1a1a1a;font-weight:600;text-anchor:middle}
+    .tbl-key{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#555;text-anchor:start}
+    .tbl-val{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888;text-anchor:end}
+  </style>
+  <marker id="as" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  <marker id="ae" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  </defs>
+  <rect width="800" height="700" fill="#fafafa"/>
+  <text x="40" y="40" class="title">Spectacle Blind</text>
+  <text x="40" y="60" class="subtitle">NPS 4 (DN 100) — Class 150</text>
+  <text x="40" y="78" class="std-ref">ASME B16.48-2015 | Figure-8 blind</text>
+  <rect x="339" y="306" width="62" height="28" fill="#d0d5da" stroke="#1a1a1a" stroke-width="1.5"/>
+  <circle cx="240" cy="320" r="99" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="2"/>
+  <text x="240" y="324" class="label" font-weight="600" fill="#555">BLIND</text>
+  <circle cx="322" cy="320" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="298" cy="378" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="240" cy="402" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="182" cy="378" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="158" cy="320" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="182" cy="262" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="240" cy="238" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="298" cy="262" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="240" cy="320" r="82" fill="none" stroke="#999" stroke-width=".5" stroke-dasharray="3 2"/>
+  <circle cx="500" cy="320" r="99" fill="#d8dce0" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="500" cy="320" r="50" fill="#fafafa" stroke="#1a1a1a" stroke-width="1.5"/>
+  <text x="500" y="387.5" class="label" fill="#555">SPACER</text>
+  <circle cx="582" cy="320" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="558" cy="378" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="500" cy="402" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="442" cy="378" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="418" cy="320" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="442" cy="262" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="500" cy="238" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="558" cy="262" r="4" fill="white" stroke="#1a1a1a" stroke-width=".8"/>
+  <circle cx="500" cy="320" r="82" fill="none" stroke="#999" stroke-width=".5" stroke-dasharray="3 2"/>
+  <line x1="126" y1="320" x2="614" y2="320" class="centerline"/>
+  <line x1="240" y1="206" x2="240" y2="434" class="centerline"/>
+  <line x1="500" y1="206" x2="500" y2="434" class="centerline"/>
+  <line x1="141.0" y1="454.0" x2="339.0" y2="454.0" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="240" y="447.0" class="dim-text">D</text>
+  <text x="240" y="469.0" class="dim-sub">9.000" | 228.6 mm</text>
+  <line x1="141.0" y1="424.0" x2="141.0" y2="459.0" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="339.0" y1="424.0" x2="339.0" y2="459.0" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="450.5" y1="191.0" x2="549.5" y2="191.0" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="500" y="184.0" class="dim-text">Pipe OD</text>
+  <text x="500" y="206.0" class="dim-sub">4.500" | 114.3 mm</text>
+  <line x1="450.5" y1="265.5" x2="450.5" y2="186.0" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="549.5" y1="265.5" x2="549.5" y2="186.0" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <rect x="530" y="60" width="240" height="186" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
+  <text x="650" y="80" class="tbl-hdr">NPS 4 — Key Data</text>
+  <line x1="545" y1="88" x2="755" y2="88" stroke="#eee" stroke-width=".5"/>
+  <text x="550" y="105" class="tbl-key">NPS / DN</text>
+  <text x="750" y="105" class="tbl-val">4 / 100</text>
+  <text x="550" y="122" class="tbl-key">Class</text>
+  <text x="750" y="122" class="tbl-val">150</text>
+  <text x="550" y="139" class="tbl-key">D (disc OD)</text>
+  <text x="750" y="139" class="tbl-val">9.000" | 228.6 mm</text>
+  <text x="550" y="156" class="tbl-key">Pipe OD (spacer hole)</text>
+  <text x="750" y="156" class="tbl-val">4.500" | 114.3 mm</text>
+  <text x="550" y="173" class="tbl-key">BCD</text>
+  <text x="750" y="173" class="tbl-val">7.500" | 190.5 mm</text>
+  <text x="550" y="190" class="tbl-key">T blind</text>
+  <text x="750" y="190" class="tbl-val">0.375" | 9.5 mm</text>
+  <text x="550" y="207" class="tbl-key">T spacer</text>
+  <text x="750" y="207" class="tbl-val">0.125" | 3.2 mm</text>
+  <text x="550" y="224" class="tbl-key">Bolts</text>
+  <text x="750" y="224" class="tbl-val">8 x 5/8"</text>
+  <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
+  <text x="40" y="648" class="note">Spectacle Blind per ASME B16.48-2015, Class 150.</text>
+  <text x="40" y="663" class="note">Figure-8 design: blind disc + spacer ring connected by bar.</text>
+  <text x="40" y="678" class="note">Bolt pattern matches mating flange. All dimensions in inches and mm.</text>
+  <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
+</svg>

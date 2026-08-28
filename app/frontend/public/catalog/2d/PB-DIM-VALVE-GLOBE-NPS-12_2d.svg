@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs><style>
+    .profile{stroke:#1a1a1a;stroke-width:2;fill:#e2e5e8}
+    .bore{stroke:#555;stroke-width:1;fill:none;stroke-dasharray:4 2}
+    .centerline{stroke:#999;stroke-width:.8;stroke-dasharray:8 4;fill:none}
+    .dim-line{stroke:#c62828;stroke-width:.9;fill:none}
+    .dim-text{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#c62828;text-anchor:middle}
+    .dim-sub{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#c62828;text-anchor:middle}
+    .title{font-family:'Segoe UI',Arial,sans-serif;font-size:18px;font-weight:600;fill:#1a1a1a}
+    .subtitle{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#555}
+    .std-ref{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#888}
+    .note{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888}
+    .label{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#999;text-anchor:middle}
+    .tbl-hdr{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;fill:#1a1a1a;font-weight:600;text-anchor:middle}
+    .tbl-key{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#555;text-anchor:start}
+    .tbl-val{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888;text-anchor:end}
+  </style>
+  <marker id="as" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  <marker id="ae" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  </defs>
+  <rect width="800" height="700" fill="#fafafa"/>
+  <text x="40" y="40" class="title">Globe Valve</text>
+  <text x="40" y="60" class="subtitle">NPS 12 (DN 300) — Class 150 — Flanged Ends</text>
+  <text x="40" y="78" class="std-ref">API 602 | Globe Valve</text>
+  <ellipse cx="350" cy="370" rx="180" ry="126" class="profile"/>
+  <rect x="158" y="206" width="12" height="328" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="1.5"/>
+  <rect x="530" y="206" width="12" height="328" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="1.5"/>
+  <line x1="158" y1="370" x2="542" y2="370" class="bore"/>
+  <rect x="287" y="21" width="126" height="223" rx="3" fill="#d0d5da" stroke="#1a1a1a" stroke-width="1.5"/>
+  <line x1="350" y1="21" x2="350" y2="-188" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="350" cy="-188" r="162" fill="none" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="188" y1="-188" x2="512" y2="-188" stroke="#1a1a1a" stroke-width="1"/>
+  <line x1="128" y1="370" x2="572" y2="370" class="centerline"/>
+  <text x="123" y="374" class="label" text-anchor="end">CL</text>
+  <line x1="350" y1="506" x2="350" y2="-334" class="centerline"/>
+  <line x1="158.0" y1="506.0" x2="158.0" y2="541.0" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="542.0" y1="506.0" x2="542.0" y2="541.0" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="158.0" y1="536.0" x2="542.0" y2="536.0" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="350" y="529.0" class="dim-text">F-to-F</text>
+  <text x="350" y="551.0" class="dim-sub">20.000" | 508.0 mm</text>
+  <line x1="562.0" y1="370" x2="602.0" y2="370" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="562.0" y1="-314.0" x2="602.0" y2="-314.0" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="597.0" y1="-314.0" x2="597.0" y2="370" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="605.0" y="23.0" class="dim-text" text-anchor="start">H</text>
+  <text x="605.0" y="38.0" class="dim-sub" text-anchor="start">31.000" | 787.4 mm</text>
+  <rect x="540" y="100" width="240" height="186" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
+  <text x="660" y="120" class="tbl-hdr">NPS 12 — Key Data</text>
+  <line x1="555" y1="128" x2="765" y2="128" stroke="#eee" stroke-width=".5"/>
+  <text x="560" y="145" class="tbl-key">NPS / DN</text>
+  <text x="760" y="145" class="tbl-val">12 / 300</text>
+  <text x="560" y="162" class="tbl-key">Class</text>
+  <text x="760" y="162" class="tbl-val">150</text>
+  <text x="560" y="179" class="tbl-key">F-to-F</text>
+  <text x="760" y="179" class="tbl-val">20.000" | 508.0 mm</text>
+  <text x="560" y="196" class="tbl-key">H (center-to-top)</text>
+  <text x="760" y="196" class="tbl-val">31.000" | 787.4 mm</text>
+  <text x="560" y="213" class="tbl-key">Handwheel</text>
+  <text x="760" y="213" class="tbl-val">18.000" | 457.2 mm</text>
+  <text x="560" y="230" class="tbl-key">Weight</text>
+  <text x="760" y="230" class="tbl-val">360 kg</text>
+  <text x="560" y="247" class="tbl-key">Standard</text>
+  <text x="760" y="247" class="tbl-val">API 602</text>
+  <text x="560" y="264" class="tbl-key">End type</text>
+  <text x="760" y="264" class="tbl-val">Flanged RF</text>
+  <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
+  <text x="40" y="648" class="note">Globe Valve per API 602, Class 150, Flanged RF ends.</text>
+  <text x="40" y="663" class="note">F-to-F = face-to-face. H = center of bore to top of actuator.</text>
+  <text x="40" y="678" class="note">Weight is approximate. All dimensions in inches and mm.</text>
+  <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
+</svg>

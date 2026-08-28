@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs>
+    <style>
+      .profile   { stroke: #1a1a1a; stroke-width: 2; fill: #e2e5e8; }
+      .bore      { stroke: #555; stroke-width: 1; fill: none; stroke-dasharray: 4 2; }
+      .centerline{ stroke: #999; stroke-width: 0.8; stroke-dasharray: 8 4; fill: none; }
+      .dim-line  { stroke: #c62828; stroke-width: 0.9; fill: none; }
+      .dim-text  { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; fill: #c62828; text-anchor: middle; }
+      .dim-sub   { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #c62828; text-anchor: middle; }
+      .label     { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #666; text-anchor: middle; }
+      .title     { font-family: 'Segoe UI', Arial, sans-serif; font-size: 18px; font-weight: 600; fill: #1a1a1a; }
+      .subtitle  { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; fill: #555; }
+      .std-ref   { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #888; }
+      .note      { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10.5px; fill: #888; }
+      .angle-arc { stroke: #999; stroke-width: 0.7; fill: none; }
+      .angle-txt { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #999; text-anchor: middle; }
+    </style>
+    <marker id="arrow-start" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+      <path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width="0.8"/>
+    </marker>
+    <marker id="arrow-end" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width="0.8"/>
+    </marker>
+    <marker id="dot" markerWidth="6" markerHeight="6" refX="3" refY="3">
+      <circle cx="3" cy="3" r="2.5" fill="#c62828"/>
+    </marker>
+  </defs>
+
+  <rect width="800" height="700" fill="#fafafa"/>
+
+  <!-- TITLE -->
+  <text x="40" y="40" class="title">90° Short Radius Elbow</text>
+  <text x="40" y="60" class="subtitle">NPS 20 (DN 500) — Butt Weld Ends</text>
+  <text x="40" y="78" class="std-ref">ASME B16.9-2018 | R = 1.0 × NPS</text>
+
+  <!-- PROFILE: outer arc, line to inner, inner arc back, close -->
+  <path d="M 240 455
+           A 275 275 0 0 0 515.0 180.0
+           L 365.0 180.0
+           A 125 125 0 0 1 240 305
+           Z" class="profile"/>
+
+  <!-- BORE (inner wall arcs offset by wt_px) -->
+  <path d="M 240 447
+           A 267 267 0 0 0 507.0 180.0" class="bore"/>
+  <path d="M 240 313
+           A 133 133 0 0 0 373.0 180.0" class="bore"/>
+
+  <!-- CENTERLINES -->
+  <path d="M 240 380 A 200 200 0 0 0 440.0 180.0" class="centerline"/>
+  <!-- CL extension: bottom leg downward -->
+  <line x1="240" y1="380" x2="240" y2="485" class="centerline"/>
+  <!-- CL extension: angled end outward -->
+  <line x1="440.0" y1="180.0" x2="545.0" y2="180.0" class="centerline"/>
+  <!-- CL extension: from center upward -->
+  <line x1="240" y1="110" x2="240" y2="180" class="centerline"/>
+  <!-- CL extension: from center leftward -->
+  <line x1="170" y1="180" x2="240" y2="180" class="centerline"/>
+
+  <!-- CENTER POINT -->
+  <circle cx="240" cy="180" r="3.5" fill="#c62828"/>
+  <text x="228" y="172" class="label" text-anchor="end">C</text>
+
+  <!-- ANGLE INDICATOR ARC -->
+  <path d="M 240 215 A 35 35 0 0 0 275.0 180.0" class="angle-arc"/>
+  <text x="273.2" y="213.2" class="angle-txt">90°</text>
+
+  <!-- DIM A (vertical: center to bottom end) -->
+  <line x1="240" y1="180" x2="115" y2="180" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="240" y1="380" x2="115" y2="380" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="130" y1="180" x2="130" y2="380"
+        class="dim-line" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="95" y="280" class="dim-text" transform="rotate(-90 95 280)">A</text>
+  <text x="72" y="280" class="dim-sub" transform="rotate(-90 72 280)">20.000"</text>
+  <text x="50" y="280" class="dim-sub" transform="rotate(-90 50 280)">508.0 mm</text>
+
+  <!-- DIM A (horizontal: center to angled end) -->
+  <line x1="240" y1="180" x2="240" y2="110" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="440" y1="180" x2="440" y2="110" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="240" y1="120" x2="440" y2="120"
+        class="dim-line" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="340" y="113" class="dim-text">A</text>
+  <text x="340" y="132" class="dim-sub">20.000" | 508.0 mm</text>
+
+  <!-- DIM D (OD at bottom end) -->
+  <line x1="240" y1="305" x2="310" y2="305" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="240" y1="455" x2="310" y2="455" class="dim-line" stroke-dasharray="2 3" opacity="0.5"/>
+  <line x1="295" y1="305" x2="295" y2="455"
+        class="dim-line" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>
+  <text x="340" y="376" class="dim-text">D</text>
+  <text x="340" y="392" class="dim-sub">20.000"</text>
+  <text x="340" y="406" class="dim-sub">508.0 mm</text>
+
+  <!-- DIM R (radius line from center to centerline arc) -->
+  <line x1="240" y1="180" x2="365" y2="245"
+        class="dim-line" marker-end="url(#arrow-end)"/>
+  <text x="311" y="202" class="dim-text">R = 1.0 × NPS</text>
+  <text x="311" y="220" class="dim-sub">20.000" | 508.0 mm</text>
+
+  <!-- CL LABELS -->
+  <text x="555.0" y="174.0" class="label" fill="#999">CL</text>
+  <text x="250" y="489" class="label" fill="#999">CL</text>
+
+  <!-- NOTES -->
+  <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width="0.5"/>
+  <text x="40" y="652" class="note">Dimensions per ASME B16.9-2018, Table 1.</text>
+  <text x="40" y="666" class="note">Short Radius: R = 1.0 × NPS. Outside diameter per ASME B36.10M (carbon steel) / B36.19M (stainless).</text>
+  <text x="40" y="680" class="note">Wall thickness varies by schedule. All dimensions in inches and millimeters.</text>
+  <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
+
+  <!-- DATA TABLE -->
+  <rect x="530" y="420" width="240" height="175" rx="4" fill="white" stroke="#ddd" stroke-width="0.8"/>
+  <text x="650" y="440" class="label" font-weight="600" fill="#1a1a1a">NPS 20 — Key Data</text>
+  <line x1="545" y1="448" x2="755" y2="448" stroke="#eee" stroke-width="0.5"/>
+  <text x="560" y="465" class="note" text-anchor="start" fill="#555">NPS</text>
+  <text x="735" y="465" class="note" text-anchor="end">20</text>
+  <text x="560" y="482" class="note" text-anchor="start" fill="#555">DN</text>
+  <text x="735" y="482" class="note" text-anchor="end">500</text>
+  <text x="560" y="499" class="note" text-anchor="start" fill="#555">A (center-to-end)</text>
+  <text x="735" y="499" class="note" text-anchor="end">20.000" | 508.0 mm</text>
+  <text x="560" y="516" class="note" text-anchor="start" fill="#555">D (outside dia.)</text>
+  <text x="735" y="516" class="note" text-anchor="end">20.000" | 508.0 mm</text>
+  <text x="560" y="533" class="note" text-anchor="start" fill="#555">R (bend radius)</text>
+  <text x="735" y="533" class="note" text-anchor="end">20.000" | 508.0 mm</text>
+  <text x="560" y="550" class="note" text-anchor="start" fill="#555">Standard</text>
+  <text x="735" y="550" class="note" text-anchor="end">ASME B16.9-2018</text>
+  <text x="560" y="567" class="note" text-anchor="start" fill="#555">End type</text>
+  <text x="735" y="567" class="note" text-anchor="end">Butt Weld (BW)</text>
+
+</svg>
