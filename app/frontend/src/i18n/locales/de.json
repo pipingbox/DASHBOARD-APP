@@ -890,7 +890,12 @@
       "classValue": "Class {{value}}",
       "basisWallThickness": "Nach Wanddicke (Schedule), nicht nach Klasse",
       "basisWorkingPressure": "Nach Betriebsdruck des Herstellers",
-      "basisNotApplicable": "Keine eigene Klasse"
+      "basisNotApplicable": "Keine eigene Klasse",
+      "referenceCompatibilityTitle": "Marktreferenz",
+      "referenceCompatibilityBadge": "Nicht normativ",
+      "referenceCompatibilityBasis": "Die Schnittstelle wird durch {{standard}} definiert, nicht durch einen Hersteller.",
+      "referenceCompatibilityBrands": "Marken der Branche",
+      "referenceCompatibilityDisclaimer": "Die genannten Marken sind Eigentum ihrer jeweiligen Inhaber. Sie werden ausschließlich zu Hinweiszwecken genannt, um darauf hinzuweisen, dass die Verbindungsschnittstelle durch die geltende Norm festgelegt ist. PIPINGBOX gibt keine technischen Daten von Herstellern wieder und unterhält zu keiner dieser Marken eine Geschäftsbeziehung, Sponsoring, Verbindung oder Billigung. Ziehen Sie vor der Spezifikation stets die Herstellerdokumentation heran."
     },
     "bolts": {
       "starPatternAria": "Diagramm der sternförmigen Anzugsreihenfolge",

@@ -290,6 +290,41 @@ for (const file of componentFiles) {
   }
   const ratingNote = tech.rating_note ?? null;
 
+  // --- Level 1 REFERENTIAL brand mentions (PB-PARTNER-CATALOG-001) ----------
+  // Trademark names cited under art. 14(1)(c) EUTMR to indicate intended
+  // purpose. This block carries NO manufacturer technical data by design, so
+  // the generator only lets through names, the standard that defines the
+  // interface, and prose. Any other key in the YAML is dropped here rather
+  // than reaching the UI: that keeps a future author from smuggling a vendor
+  // dimension into the published JSON through a field nobody reviewed.
+  let referenceCompatibility = null;
+  const rc = y.reference_compatibility;
+  if (rc && typeof rc === 'object') {
+    const brands = (Array.isArray(rc.brands) ? rc.brands : [])
+      .map((b) => String(b).trim())
+      .filter(Boolean);
+    const basisStandardId = rc.basis?.standard_id ?? null;
+    if (basisStandardId && !standards[basisStandardId]) {
+      fail(`${y.id} reference_compatibility referencia la norma inexistente ${basisStandardId}`);
+    }
+    if (brands.length === 0) {
+      warn(`${y.id} declara reference_compatibility sin marcas`);
+    } else if (!basisStandardId && !rc.basis?.label) {
+      // A brand mention with no standard behind it is exactly the claim we are
+      // not allowed to make, so it must not be publishable as-is.
+      fail(`${y.id} reference_compatibility cita marcas sin norma que defina la interfaz`);
+    } else {
+      referenceCompatibility = {
+        level: rc.level ?? 'referential',
+        legalBasis: rc.legal_basis ?? null,
+        basisStandardId,
+        basisLabel: rc.basis?.label ?? null,
+        brands,
+        note: typeof rc.note === 'string' ? rc.note.trim() : null,
+      };
+    }
+  }
+
   components.push({
     id: y.id,
     slug: meta.slug ?? y.id.toLowerCase(),
@@ -318,6 +353,7 @@ for (const file of componentFiles) {
       relation: c.relation ?? null,
       conditions: c.conditions ?? null,
     })),
+    referenceCompatibility,
     // Publishable requires a resolved 2D drawing. The drawing is the load-
     // bearing asset for an engineering library; the 3D render is presentation.
     // Requiring both would exclude correctly documented components whose render

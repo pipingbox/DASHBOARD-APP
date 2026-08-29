@@ -1005,7 +1005,12 @@
       "classValue": "Class {{value}}",
       "basisWallThickness": "Por espesor de pared (schedule), no por clase",
       "basisWorkingPressure": "Por presión de trabajo del fabricante",
-      "basisNotApplicable": "Sin clase propia"
+      "basisNotApplicable": "Sin clase propia",
+      "referenceCompatibilityTitle": "Referencia de mercado",
+      "referenceCompatibilityBadge": "No normativo",
+      "referenceCompatibilityBasis": "La interfaz la define {{standard}}, no ningún fabricante.",
+      "referenceCompatibilityBrands": "Marcas del sector",
+      "referenceCompatibilityDisclaimer": "Las marcas citadas son propiedad de sus respectivos titulares. Se mencionan únicamente a título indicativo, para señalar que la interfaz de unión está definida por la norma aplicable. PIPINGBOX no reproduce datos técnicos de ningún fabricante ni mantiene relación comercial, patrocinio, asociación ni respaldo con ninguna de estas marcas. Consulte siempre la documentación del fabricante antes de especificar."
     }
   },
   "jobs": {

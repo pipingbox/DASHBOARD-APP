@@ -35,6 +35,28 @@ export interface CatalogCompatibility {
   conditions: Record<string, unknown> | null;
 }
 
+/**
+ * Level 1 REFERENTIAL brand mention (PB-PARTNER-CATALOG-001).
+ *
+ * Trademarks of third parties, cited under art. 14(1)(c) of Regulation (EU)
+ * 2017/1001 solely to indicate the intended purpose of a standardised
+ * component. This type deliberately has NO field able to hold a manufacturer
+ * dimension, pressure or model reference: Level 1 is names + the standard that
+ * defines the interface + prose, nothing else. Manufacturer product data is
+ * Level 2 and requires a signed agreement.
+ */
+export interface CatalogReferenceCompatibility {
+  level: string;
+  /** Cited legal basis, e.g. `Art. 14(1)(c) Regulation (EU) 2017/1001`. */
+  legalBasis: string | null;
+  /** The standard that defines the interface. This — not a brand — is the claim. */
+  basisStandardId: string | null;
+  basisLabel: string | null;
+  /** Brand names only. Never logos, never product references. */
+  brands: string[];
+  note: string | null;
+}
+
 export interface CatalogComponent {
   id: string;
   slug: string;
@@ -65,6 +87,8 @@ export interface CatalogComponent {
   render: string | null;
   fabricationNotes: string[];
   compatibleWith: CatalogCompatibility[];
+  /** Null for every Level 0 record. Only present where brands are cited. */
+  referenceCompatibility: CatalogReferenceCompatibility | null;
   /** True only when a real 2D drawing and a real 3D render both resolved. */
   publishable: boolean;
 }

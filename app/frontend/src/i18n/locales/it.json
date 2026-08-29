@@ -1006,7 +1006,12 @@
       "classValue": "Class {{value}}",
       "basisWallThickness": "Per spessore di parete (schedule), non per classe",
       "basisWorkingPressure": "Per pressione di esercizio del costruttore",
-      "basisNotApplicable": "Nessuna classe propria"
+      "basisNotApplicable": "Nessuna classe propria",
+      "referenceCompatibilityTitle": "Riferimento di mercato",
+      "referenceCompatibilityBadge": "Non normativo",
+      "referenceCompatibilityBasis": "L’interfaccia è definita dalla {{standard}}, non da alcun produttore.",
+      "referenceCompatibilityBrands": "Marchi del settore",
+      "referenceCompatibilityDisclaimer": "I marchi citati sono di proprietà dei rispettivi titolari. Sono menzionati a solo titolo indicativo, per segnalare che l’interfaccia di giunzione è definita dalla norma applicabile. PIPINGBOX non riproduce dati tecnici di alcun produttore e non intrattiene con nessuno di questi marchi rapporti commerciali, sponsorizzazioni, associazioni o approvazioni. Consultare sempre la documentazione del produttore prima di specificare."
     },
     "categoryLibrary": "Libreria Tecnica",
     "categoryInspection": "Ispezione e Codici",

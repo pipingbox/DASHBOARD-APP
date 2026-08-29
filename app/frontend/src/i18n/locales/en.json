@@ -1005,7 +1005,12 @@
       "classValue": "Class {{value}}",
       "basisWallThickness": "By wall thickness (schedule), not by class",
       "basisWorkingPressure": "By manufacturer working pressure",
-      "basisNotApplicable": "No class of its own"
+      "basisNotApplicable": "No class of its own",
+      "referenceCompatibilityTitle": "Market reference",
+      "referenceCompatibilityBadge": "Non-normative",
+      "referenceCompatibilityBasis": "The interface is defined by {{standard}}, not by any manufacturer.",
+      "referenceCompatibilityBrands": "Brands in this sector",
+      "referenceCompatibilityDisclaimer": "The trademarks cited are the property of their respective owners. They are mentioned for indicative purposes only, to signal that the joint interface is defined by the applicable standard. PIPINGBOX reproduces no manufacturer technical data and has no commercial relationship, sponsorship, association or endorsement with any of these brands. Always consult the manufacturer documentation before specifying."
     }
   },
   "jobs": {

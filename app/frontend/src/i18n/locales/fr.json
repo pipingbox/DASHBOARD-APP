@@ -890,7 +890,12 @@
       "classValue": "Class {{value}}",
       "basisWallThickness": "Par épaisseur de paroi (schedule), non par classe",
       "basisWorkingPressure": "Par pression de service du fabricant",
-      "basisNotApplicable": "Pas de classe propre"
+      "basisNotApplicable": "Pas de classe propre",
+      "referenceCompatibilityTitle": "Référence du marché",
+      "referenceCompatibilityBadge": "Non normatif",
+      "referenceCompatibilityBasis": "L’interface est définie par {{standard}}, et non par un fabricant.",
+      "referenceCompatibilityBrands": "Marques du secteur",
+      "referenceCompatibilityDisclaimer": "Les marques citées sont la propriété de leurs titulaires respectifs. Elles sont mentionnées à titre purement indicatif, afin de signaler que l’interface d’assemblage est définie par la norme applicable. PIPINGBOX ne reproduit aucune donnée technique de fabricant et n’entretient avec aucune de ces marques de relation commerciale, de parrainage, d’association ni d’approbation. Consultez toujours la documentation du fabricant avant toute spécification."
     },
     "bolts": {
       "starPatternAria": "Schéma de la séquence de serrage en étoile",

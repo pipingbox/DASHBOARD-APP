@@ -74,6 +74,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -200,6 +201,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -307,6 +309,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -450,6 +453,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -593,6 +597,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -716,6 +721,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -859,6 +865,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -969,6 +976,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -1112,6 +1120,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -1217,6 +1226,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -1359,6 +1369,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -1502,6 +1513,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -1645,6 +1657,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -1700,6 +1713,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -1820,6 +1834,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -1937,6 +1952,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -2021,6 +2037,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -2089,6 +2106,18 @@
           }
         }
       ],
+      "referenceCompatibility": {
+        "level": "referential",
+        "legalBasis": "Art. 14(1)(c) Regulation (EU) 2017/1001",
+        "basisStandardId": "PB-STD-AWWA-C606",
+        "basisLabel": "AWWA C606",
+        "brands": [
+          "Victaulic",
+          "Shurjoint",
+          "Grinnell"
+        ],
+        "note": "The grooved-end interface is defined by AWWA C606, not by any single manufacturer. Brands are named for identification purposes only, to state that this generic record describes the same standardised joint type those systems are built around. No manufacturer data is reproduced and no product-to-product interchangeability is asserted: always confirm groove profile, preparation method, allowable deflection and working pressure against the coupling manufacturer's own documentation."
+      },
       "publishable": true
     },
     {
@@ -2156,6 +2185,18 @@
           }
         }
       ],
+      "referenceCompatibility": {
+        "level": "referential",
+        "legalBasis": "Art. 14(1)(c) Regulation (EU) 2017/1001",
+        "basisStandardId": "PB-STD-AWWA-C606",
+        "basisLabel": "AWWA C606",
+        "brands": [
+          "Victaulic",
+          "Shurjoint",
+          "Grinnell"
+        ],
+        "note": "The grooved-end interface is defined by AWWA C606, not by any single manufacturer. Brands are named for identification purposes only, to state that this generic record describes the same standardised joint type those systems are built around. No manufacturer data is reproduced and no product-to-product interchangeability is asserted: always confirm groove profile, preparation method and working pressure against the coupling manufacturer's own documentation."
+      },
       "publishable": true
     },
     {
@@ -2219,6 +2260,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -2322,6 +2364,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -2377,6 +2420,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -2435,6 +2479,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -2545,6 +2590,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -2655,6 +2701,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -2721,6 +2768,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -2778,6 +2826,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -2841,6 +2890,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -2900,6 +2950,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -2960,6 +3011,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -3023,6 +3075,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -3082,6 +3135,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -3142,6 +3196,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -3202,6 +3257,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -3260,6 +3316,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -3374,6 +3431,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -3488,6 +3546,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -3610,6 +3669,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -3752,6 +3812,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -3862,6 +3923,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -3921,6 +3983,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -3981,6 +4044,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -4044,6 +4108,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -4103,6 +4168,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -4163,6 +4229,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -4223,6 +4290,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -4281,6 +4349,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": false
     },
     {
@@ -4380,6 +4449,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -4481,6 +4551,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -4581,6 +4652,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -4677,6 +4749,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     },
     {
@@ -4782,6 +4855,7 @@
           }
         }
       ],
+      "referenceCompatibility": null,
       "publishable": true
     }
   ],

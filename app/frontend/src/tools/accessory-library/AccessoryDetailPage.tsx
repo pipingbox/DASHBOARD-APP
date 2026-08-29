@@ -14,6 +14,8 @@ import {
   AlertTriangle,
   PackageX,
   Box,
+  Tag,
+  Info,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,6 +26,7 @@ import {
   sizeRank,
   type CatalogComponent,
   type CatalogDrawing,
+  type CatalogReferenceCompatibility,
   type DimensionSet,
   type DimensionField,
 } from '@/tools/catalog';
@@ -421,6 +424,95 @@ function ReferenceNotice() {
 }
 
 /* ─────────────────────────────────────────────
+   Shared: Level 1 referential brand mention
+   ───────────────────────────────────────────── */
+
+/**
+ * PB-PARTNER-CATALOG-001, Level 1 REFERENTIAL.
+ *
+ * Third-party trademarks cited under art. 14(1)(c) EUTMR to indicate intended
+ * purpose. Two rules drive this design and neither is cosmetic:
+ *
+ * 1. It must NOT read as normative data. Level 0 blocks in this file use the
+ *    `bg-[#111]` card on the amber accent; this one is deliberately pushed
+ *    down to a flatter `bg-[#0a0a0a]` card with a dashed separator above it,
+ *    zinc-only accents and no amber, so a reader scanning the page cannot
+ *    mistake a brand name for a standard-derived value.
+ * 2. The disclaimer is not optional chrome. It is what keeps the mention
+ *    inside "honest practices" under art. 14(2), so it renders unconditionally
+ *    whenever brands render — it is never behind a collapsible.
+ */
+function ReferenceCompatibilityBlock({ data }: { data: CatalogReferenceCompatibility }) {
+  const { t } = useTranslation();
+  if (data.brands.length === 0) return null;
+
+  const basis = data.basisLabel ?? data.basisStandardId ?? null;
+
+  return (
+    <section className="mt-6 border-t border-dashed border-zinc-800 pt-5">
+      <div className="rounded-lg border border-zinc-800/60 bg-[#0a0a0a] p-4">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <Tag className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+          <h4 className="text-xs font-medium text-zinc-300">
+            {t('tools.accessoryDetail.referenceCompatibilityTitle', {
+              defaultValue: 'Referencia de mercado',
+            })}
+          </h4>
+          <span className="rounded border border-zinc-700/60 bg-zinc-500/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-zinc-500">
+            {t('tools.accessoryDetail.referenceCompatibilityBadge', {
+              defaultValue: 'No normativo',
+            })}
+          </span>
+        </div>
+
+        {basis && (
+          <p className="mb-3 text-[11px] leading-relaxed text-zinc-500">
+            {t('tools.accessoryDetail.referenceCompatibilityBasis', {
+              defaultValue: 'The interface is defined by {{standard}}, not by any manufacturer.',
+              standard: basis,
+            })}
+          </p>
+        )}
+
+        <p className="mb-1.5 text-[10px] uppercase tracking-wider text-zinc-500">
+          {t('tools.accessoryDetail.referenceCompatibilityBrands', {
+            defaultValue: 'Marcas del sector',
+          })}
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {data.brands.map((brand) => (
+            <span
+              key={brand}
+              className="rounded-md border border-zinc-800/70 bg-[#111] px-2 py-1 text-[11px] text-zinc-400"
+            >
+              {brand}
+            </span>
+          ))}
+        </div>
+
+        {data.note && (
+          <p className="mt-3 text-[11px] leading-relaxed text-zinc-500">{data.note}</p>
+        )}
+
+        {/* Legal notice — always visible, never collapsible. */}
+        <div className="mt-3 flex items-start gap-2 border-t border-zinc-800/60 pt-3">
+          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-600" />
+          <p className="text-[10px] leading-relaxed text-zinc-600">
+            {t('tools.accessoryDetail.referenceCompatibilityDisclaimer', {
+              defaultValue:
+                'Las marcas citadas son propiedad de sus respectivos titulares. Se mencionan únicamente a título indicativo, para señalar que la interfaz de unión está definida por la norma aplicable. PIPINGBOX no reproduce datos técnicos de ningún fabricante ni mantiene relación comercial, patrocinio, asociación ni respaldo con ninguna de estas marcas. Consulte siempre la documentación del fabricante antes de especificar.',
+            })}
+            {data.legalBasis && (
+              <span className="ml-1 text-zinc-700">({data.legalBasis})</span>
+            )}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────
    Tab: Vista Rápida
    ───────────────────────────────────────────── */
 
@@ -619,6 +711,13 @@ function VistaRapidaTab({
             </ul>
           )}
         </div>
+      )}
+
+      {/* Level 1 referential mention. Repeated here because "Modo Obra" has no
+          Compatibilidades tab, and the disclaimer must travel with the brands
+          wherever they are shown — never only in the engineering view. */}
+      {component.referenceCompatibility && (
+        <ReferenceCompatibilityBlock data={component.referenceCompatibility} />
       )}
 
       <Button
@@ -870,61 +969,71 @@ function MetaCell({ label, value }: { label: string; value: string }) {
 
 function CompatibilidadesTab({ component }: { component: CatalogComponent }) {
   const { t } = useTranslation();
+  const reference = component.referenceCompatibility;
 
   if (component.compatibleWith.length === 0) {
     return (
-      <p className="rounded-lg border border-dashed border-zinc-800 bg-[#0a0a0a] px-4 py-8 text-center text-xs text-zinc-500">
-        {t('tools.accessoryDetail.noCompatibilities', {
-          defaultValue: 'No compatibility data recorded for this component.',
-        })}
-      </p>
+      <div>
+        <p className="rounded-lg border border-dashed border-zinc-800 bg-[#0a0a0a] px-4 py-8 text-center text-xs text-zinc-500">
+          {t('tools.accessoryDetail.noCompatibilities', {
+            defaultValue: 'No compatibility data recorded for this component.',
+          })}
+        </p>
+        {reference && <ReferenceCompatibilityBlock data={reference} />}
+      </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      {component.compatibleWith.map((item, idx) => {
-        // `conditions` is a free-form record in the generated data; render
-        // whatever keys exist rather than assuming a fixed shape.
-        const conditions =
-          item.conditions && typeof item.conditions === 'object'
-            ? Object.entries(item.conditions as Record<string, unknown>)
-            : [];
+    <div>
+      {/* Level 0 — standard-derived compatibility. */}
+      <div className="space-y-3">
+        {component.compatibleWith.map((item, idx) => {
+          // `conditions` is a free-form record in the generated data; render
+          // whatever keys exist rather than assuming a fixed shape.
+          const conditions =
+            item.conditions && typeof item.conditions === 'object'
+              ? Object.entries(item.conditions as Record<string, unknown>)
+              : [];
 
-        return (
-          <div key={idx} className="rounded-lg border border-zinc-800/80 bg-[#111] p-4">
-            <div className="mb-2 flex flex-wrap items-center gap-2">
-              <Link2 className="h-3.5 w-3.5 text-amber-500" />
-              <span className="text-sm font-medium text-zinc-100">
-                {item.target ? titleCase(item.target) : '—'}
-              </span>
-              {item.relation && (
-                <span className="text-[10px] text-zinc-500">→ {titleCase(item.relation)}</span>
+          return (
+            <div key={idx} className="rounded-lg border border-zinc-800/80 bg-[#111] p-4">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <Link2 className="h-3.5 w-3.5 text-amber-500" />
+                <span className="text-sm font-medium text-zinc-100">
+                  {item.target ? titleCase(item.target) : '—'}
+                </span>
+                {item.relation && (
+                  <span className="text-[10px] text-zinc-500">→ {titleCase(item.relation)}</span>
+                )}
+              </div>
+
+              {conditions.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {conditions.map(([key, value]) => (
+                    <span
+                      key={key}
+                      className="rounded-md border border-zinc-800/50 bg-[#0a0a0a] px-2 py-1 text-[11px] text-zinc-400"
+                    >
+                      <span className="text-zinc-500">{titleCase(key)}:</span>{' '}
+                      {typeof value === 'boolean'
+                        ? value
+                          ? t('common.yes', { defaultValue: 'Sí' })
+                          : t('common.no', { defaultValue: 'No' })
+                        : displayValue(value as string | number | null)}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[11px] text-zinc-600">—</p>
               )}
             </div>
+          );
+        })}
+      </div>
 
-            {conditions.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {conditions.map(([key, value]) => (
-                  <span
-                    key={key}
-                    className="rounded-md border border-zinc-800/50 bg-[#0a0a0a] px-2 py-1 text-[11px] text-zinc-400"
-                  >
-                    <span className="text-zinc-500">{titleCase(key)}:</span>{' '}
-                    {typeof value === 'boolean'
-                      ? value
-                        ? t('common.yes', { defaultValue: 'Sí' })
-                        : t('common.no', { defaultValue: 'No' })
-                      : displayValue(value as string | number | null)}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[11px] text-zinc-600">—</p>
-            )}
-          </div>
-        );
-      })}
+      {/* Level 1 — referential, kept below and visually separated. */}
+      {reference && <ReferenceCompatibilityBlock data={reference} />}
     </div>
   );
 }
