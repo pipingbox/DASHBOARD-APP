@@ -10,7 +10,7 @@
     "dimensionSets": 59,
     "dimensionRows": 1132,
     "drawings": 386,
-    "renders": 28
+    "renders": 25
   },
   "components": [
     {
@@ -1488,7 +1488,7 @@
         }
       ],
       "drawingStem": "PB-DIM-RETURN-180-LR",
-      "render": "/catalog/3d/PB-ASSET-0010_return-180-lr-bw_3d.webp",
+      "render": null,
       "fabricationNotes": [
         "Verify vendor dimensions when project specifications require them."
       ],
@@ -1631,7 +1631,7 @@
         }
       ],
       "drawingStem": "PB-DIM-RETURN-180-SR",
-      "render": "/catalog/3d/PB-ASSET-0011_return-180-sr-bw_3d.webp",
+      "render": null,
       "fabricationNotes": [
         "Verify vendor dimensions when project specifications require them."
       ],
@@ -2308,7 +2308,7 @@
         }
       ],
       "drawingStem": "PB-DIM-LATERAL-45",
-      "render": "/catalog/3d/PB-ASSET-0017_lateral-45-bw_3d.webp",
+      "render": null,
       "fabricationNotes": [
         "Verify vendor dimensions when project specifications require them."
       ],
