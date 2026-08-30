@@ -44,16 +44,16 @@ type UnitSystem = 'metric' | 'imperial';
 type ViewMode = 'obra' | 'ingenieria';
 type TabKey = 'vista-rapida' | 'dimensiones' | 'normativa' | 'compatibilidades' | 'descargas';
 
-const TABS_OBRA: { key: TabKey; labelKey: string; icon: typeof Eye }[] = [
-  { key: 'vista-rapida', labelKey: 'Vista Rápida', icon: Eye },
+const TABS_OBRA: { key: TabKey; labelKey: string; fallback: string; icon: typeof Eye }[] = [
+  { key: 'vista-rapida', labelKey: 'tools.accessoryDetail.tabQuickView', fallback: 'Quick View', icon: Eye },
 ];
 
-const TABS_INGENIERIA: { key: TabKey; labelKey: string; icon: typeof Eye }[] = [
-  { key: 'vista-rapida', labelKey: 'Vista Rápida', icon: Eye },
-  { key: 'dimensiones', labelKey: 'Dimensiones', icon: Layers },
-  { key: 'normativa', labelKey: 'Normativa', icon: FileText },
-  { key: 'compatibilidades', labelKey: 'Compatibilidades', icon: Link2 },
-  { key: 'descargas', labelKey: 'Descargas', icon: Download },
+const TABS_INGENIERIA: { key: TabKey; labelKey: string; fallback: string; icon: typeof Eye }[] = [
+  { key: 'vista-rapida', labelKey: 'tools.accessoryDetail.tabQuickView', fallback: 'Quick View', icon: Eye },
+  { key: 'dimensiones', labelKey: 'tools.accessoryDetail.tabDimensions', fallback: 'Dimensions', icon: Layers },
+  { key: 'normativa', labelKey: 'tools.accessoryDetail.tabStandards', fallback: 'Standards', icon: FileText },
+  { key: 'compatibilidades', labelKey: 'tools.accessoryDetail.tabCompatibility', fallback: 'Compatibility', icon: Link2 },
+  { key: 'descargas', labelKey: 'tools.accessoryDetail.tabDownloads', fallback: 'Downloads', icon: Download },
 ];
 
 /* ─────────────────────────────────────────────
@@ -174,7 +174,7 @@ export default function AccessoryDetailPage({ accessoryId, onBack }: AccessoryDe
           className="mb-6 flex items-center gap-1 text-xs text-zinc-400 transition-colors hover:text-amber-500"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          <span>{t('common.back', { defaultValue: 'Volver' })}</span>
+          <span>{t('common.back', { defaultValue: 'Back' })}</span>
         </button>
         <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
           <div className="mb-3 rounded-full bg-zinc-800/50 p-3">
@@ -207,10 +207,10 @@ export default function AccessoryDetailPage({ accessoryId, onBack }: AccessoryDe
             className="flex items-center gap-1 text-zinc-400 transition-colors hover:text-amber-500"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            <span>{t('common.back', { defaultValue: 'Volver' })}</span>
+            <span>{t('common.back', { defaultValue: 'Back' })}</span>
           </button>
           <ChevronRight className="h-3 w-3" />
-          <span>{t('tools.accessoriesLibrary.breadcrumb', { defaultValue: 'Biblioteca' })}</span>
+          <span>{t('tools.accessoryDetail.breadcrumbLibrary', { defaultValue: 'Library' })}</span>
           {component.category && (
             <>
               <ChevronRight className="h-3 w-3" />
@@ -245,7 +245,7 @@ export default function AccessoryDetailPage({ accessoryId, onBack }: AccessoryDe
                     : 'bg-[#111] text-zinc-500 hover:text-zinc-300'
                 }`}
               >
-                Métrico
+                {t('tools.accessoryDetail.unitsMetric', { defaultValue: 'Metric' })}
               </button>
               <button
                 onClick={() => setUnits('imperial')}
@@ -255,7 +255,7 @@ export default function AccessoryDetailPage({ accessoryId, onBack }: AccessoryDe
                     : 'bg-[#111] text-zinc-500 hover:text-zinc-300'
                 }`}
               >
-                Imperial
+                {t('tools.accessoryDetail.unitsImperial', { defaultValue: 'Imperial' })}
               </button>
             </div>
           </div>
@@ -268,10 +268,14 @@ export default function AccessoryDetailPage({ accessoryId, onBack }: AccessoryDe
             className="flex items-center gap-1.5 rounded-md border border-zinc-800/80 bg-[#111] px-3 py-1.5 text-[11px] text-zinc-400 transition-all hover:border-amber-500/30 hover:text-amber-500"
           >
             <Settings2 className="h-3.5 w-3.5" />
-            {mode === 'obra' ? 'Modo Obra' : 'Modo Ingeniería'}
+            {mode === 'obra'
+              ? t('tools.accessoryDetail.modeField', { defaultValue: 'Field Mode' })
+              : t('tools.accessoryDetail.modeEngineering', { defaultValue: 'Engineering Mode' })}
           </button>
           <span className="text-[10px] text-zinc-600">
-            {mode === 'obra' ? '(simplificado)' : '(completo)'}
+            {mode === 'obra'
+              ? t('tools.accessoryDetail.modeFieldHint', { defaultValue: '(simplified)' })
+              : t('tools.accessoryDetail.modeEngineeringHint', { defaultValue: '(full)' })}
           </span>
         </div>
       </div>
@@ -292,7 +296,7 @@ export default function AccessoryDetailPage({ accessoryId, onBack }: AccessoryDe
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
-                {tab.labelKey}
+                {t(tab.labelKey, { defaultValue: tab.fallback })}
               </button>
             );
           })}
@@ -306,7 +310,7 @@ export default function AccessoryDetailPage({ accessoryId, onBack }: AccessoryDe
           >
             {tabs.map((tab) => (
               <option key={tab.key} value={tab.key}>
-                {tab.labelKey}
+                {t(tab.labelKey, { defaultValue: tab.fallback })}
               </option>
             ))}
           </select>
@@ -725,7 +729,9 @@ function VistaRapidaTab({
         className="w-full bg-amber-500 text-sm font-medium text-black hover:bg-amber-600 sm:w-auto"
       >
         <Eye className="mr-2 h-4 w-4" />
-        Ver ficha completa (Modo Ingeniería)
+        {t('tools.accessoryDetail.viewFullDatasheet', {
+          defaultValue: 'View full datasheet (Engineering Mode)',
+        })}
       </Button>
     </div>
   );

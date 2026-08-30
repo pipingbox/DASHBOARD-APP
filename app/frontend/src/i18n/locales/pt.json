@@ -895,7 +895,20 @@
       "referenceCompatibilityBadge": "Não normativo",
       "referenceCompatibilityBasis": "A interface é definida pela {{standard}}, não por qualquer fabricante.",
       "referenceCompatibilityBrands": "Marcas do setor",
-      "referenceCompatibilityDisclaimer": "As marcas citadas são propriedade dos respetivos titulares. São mencionadas apenas a título indicativo, para assinalar que a interface de ligação é definida pela norma aplicável. A PIPINGBOX não reproduz dados técnicos de nenhum fabricante nem mantém relação comercial, patrocínio, associação ou aval com qualquer destas marcas. Consulte sempre a documentação do fabricante antes de especificar."
+      "referenceCompatibilityDisclaimer": "As marcas citadas são propriedade dos respetivos titulares. São mencionadas apenas a título indicativo, para assinalar que a interface de ligação é definida pela norma aplicável. A PIPINGBOX não reproduz dados técnicos de nenhum fabricante nem mantém relação comercial, patrocínio, associação ou aval com qualquer destas marcas. Consulte sempre a documentação do fabricante antes de especificar.",
+      "tabQuickView": "Vista rápida",
+      "tabDimensions": "Dimensões",
+      "tabStandards": "Normas",
+      "tabCompatibility": "Compatibilidades",
+      "tabDownloads": "Transferências",
+      "unitsMetric": "Métrico",
+      "unitsImperial": "Imperial",
+      "modeField": "Modo obra",
+      "modeEngineering": "Modo engenharia",
+      "modeFieldHint": "(simplificado)",
+      "modeEngineeringHint": "(completo)",
+      "viewFullDatasheet": "Ver ficha completa (modo engenharia)",
+      "breadcrumbLibrary": "Biblioteca"
     },
     "bolts": {
       "starPatternAria": "Diagrama da sequência de aperto em estrela",

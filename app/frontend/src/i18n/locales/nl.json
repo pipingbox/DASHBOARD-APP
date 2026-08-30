@@ -859,7 +859,20 @@
       "referenceCompatibilityBadge": "Niet-normatief",
       "referenceCompatibilityBasis": "De aansluiting wordt bepaald door {{standard}}, niet door een fabrikant.",
       "referenceCompatibilityBrands": "Merken in deze sector",
-      "referenceCompatibilityDisclaimer": "De genoemde merken zijn eigendom van hun respectieve houders. Zij worden uitsluitend ter indicatie vermeld, om aan te geven dat de koppelingsinterface door de toepasselijke norm wordt bepaald. PIPINGBOX neemt geen technische gegevens van fabrikanten over en onderhoudt met geen van deze merken een commerciële relatie, sponsoring, samenwerking of goedkeuring. Raadpleeg altijd de documentatie van de fabrikant voordat u specificeert."
+      "referenceCompatibilityDisclaimer": "De genoemde merken zijn eigendom van hun respectieve houders. Zij worden uitsluitend ter indicatie vermeld, om aan te geven dat de koppelingsinterface door de toepasselijke norm wordt bepaald. PIPINGBOX neemt geen technische gegevens van fabrikanten over en onderhoudt met geen van deze merken een commerciële relatie, sponsoring, samenwerking of goedkeuring. Raadpleeg altijd de documentatie van de fabrikant voordat u specificeert.",
+      "tabQuickView": "Snelweergave",
+      "tabDimensions": "Afmetingen",
+      "tabStandards": "Normen",
+      "tabCompatibility": "Compatibiliteit",
+      "tabDownloads": "Downloads",
+      "unitsMetric": "Metrisch",
+      "unitsImperial": "Imperiaal",
+      "modeField": "Werfmodus",
+      "modeEngineering": "Engineeringmodus",
+      "modeFieldHint": "(vereenvoudigd)",
+      "modeEngineeringHint": "(volledig)",
+      "viewFullDatasheet": "Volledig gegevensblad bekijken (engineeringmodus)",
+      "breadcrumbLibrary": "Bibliotheek"
     },
     "bolts": {
       "starPatternAria": "Schema van de stervormige aanhaalvolgorde",

@@ -1010,7 +1010,20 @@
       "referenceCompatibilityBadge": "No normativo",
       "referenceCompatibilityBasis": "La interfaz la define {{standard}}, no ningún fabricante.",
       "referenceCompatibilityBrands": "Marcas del sector",
-      "referenceCompatibilityDisclaimer": "Las marcas citadas son propiedad de sus respectivos titulares. Se mencionan únicamente a título indicativo, para señalar que la interfaz de unión está definida por la norma aplicable. PIPINGBOX no reproduce datos técnicos de ningún fabricante ni mantiene relación comercial, patrocinio, asociación ni respaldo con ninguna de estas marcas. Consulte siempre la documentación del fabricante antes de especificar."
+      "referenceCompatibilityDisclaimer": "Las marcas citadas son propiedad de sus respectivos titulares. Se mencionan únicamente a título indicativo, para señalar que la interfaz de unión está definida por la norma aplicable. PIPINGBOX no reproduce datos técnicos de ningún fabricante ni mantiene relación comercial, patrocinio, asociación ni respaldo con ninguna de estas marcas. Consulte siempre la documentación del fabricante antes de especificar.",
+      "tabQuickView": "Vista rápida",
+      "tabDimensions": "Dimensiones",
+      "tabStandards": "Normativa",
+      "tabCompatibility": "Compatibilidades",
+      "tabDownloads": "Descargas",
+      "unitsMetric": "Métrico",
+      "unitsImperial": "Imperial",
+      "modeField": "Modo obra",
+      "modeEngineering": "Modo ingeniería",
+      "modeFieldHint": "(simplificado)",
+      "modeEngineeringHint": "(completo)",
+      "viewFullDatasheet": "Ver ficha completa (modo ingeniería)",
+      "breadcrumbLibrary": "Biblioteca"
     }
   },
   "jobs": {
