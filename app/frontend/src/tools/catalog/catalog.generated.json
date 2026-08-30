@@ -47,7 +47,8 @@
         "2500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de brida segun ASME B16.5. El rango real disponible depende del material y del tamano nominal: Clases 150 a 1500 cubren NPS 1/2 a NPS 24 y la Clase 2500 solo NPS 1/2 a NPS 12. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Flange classes per ASME B16.5. The range actually available depends on the material and the nominal size: Class 150 through Class 1500 cover NPS 1/2 to NPS 24, and Class 2500 only NPS 1/2 to NPS 12. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_5FlangeClasses",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-5",
@@ -112,7 +113,8 @@
         "2500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de brida segun ASME B16.5. El rango real disponible depende del material y del tamano nominal: Clases 150 a 1500 cubren NPS 1/2 a NPS 24 y la Clase 2500 solo NPS 1/2 a NPS 12. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Flange classes per ASME B16.5. The range actually available depends on the material and the nominal size: Class 150 through Class 1500 cover NPS 1/2 to NPS 24, and Class 2500 only NPS 1/2 to NPS 12. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_5FlangeClasses",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-5",
@@ -237,7 +239,8 @@
         "2500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases segun ASME B16.48, para instalacion entre bridas ASME B16.5 de las mismas clases, en tamanos NPS 1/2 a NPS 24. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Classes per ASME B16.48, for installation between ASME B16.5 flanges of the same classes, in sizes NPS 1/2 to NPS 24. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_48Spades",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-48",
@@ -340,7 +343,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -484,7 +488,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -628,7 +633,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -752,7 +758,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -899,7 +906,8 @@
         "6000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos roscados. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase, descontando la profundidad de rosca; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for threaded ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class, deducting the thread depth; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11Threaded",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -1007,7 +1015,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -1154,7 +1163,8 @@
         "9000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos socket weld. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for socket weld ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11SocketWeld",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -1256,7 +1266,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -1400,7 +1411,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -1544,7 +1556,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -1686,7 +1699,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los branch outlets buttwelding MSS SP-97 no se designan por clase numerica. La Tabla 1 de SP-97 los correlaciona con designaciones de pared de tubo (Standard, Extra Strong, Schedule 160). La presion admisible es la calculada para tubo recto sin costura de material y schedule equivalentes, segun el codigo de diseno aplicable.",
+      "ratingNote": "MSS SP-97 buttwelding branch outlets are not designated by a numeric class. Table 1 of SP-97 correlates them with pipe wall designations (Standard, Extra Strong, Schedule 160). The allowable pressure is that calculated for seamless straight pipe of equivalent material and schedule, according to the applicable design code.",
+      "ratingNoteKey": "catalog.ratingNote.sp97ButtweldOutlets",
       "standards": [
         {
           "standardId": "PB-STD-MSS-SP97",
@@ -1750,7 +1764,8 @@
         "2500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "La junta se designa por la clase de la brida ASME B16.5 con la que se monta; ASME B16.20 tabula las dimensiones por clase. El rango real disponible depende del tamano nominal. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "The gasket is designated by the class of the ASME B16.5 flange it is assembled with; ASME B16.20 tabulates the dimensions by class. The range actually available depends on the nominal size. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_20GasketByFlange",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-20",
@@ -1863,7 +1878,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "not_applicable",
-      "ratingNote": "El esparrago no tiene clase propia: se selecciona por la clase de la union bridada ASME B16.5 en la que se monta, que fija diametro, cantidad y longitud. La capacidad del esparrago depende ademas del grado de material (p.ej. ASTM A193 B7 con tuercas A194 2H).",
+      "ratingNote": "The stud bolt has no class of its own: it is selected by the class of the ASME B16.5 flanged joint in which it is installed, which fixes diameter, quantity and length. The capacity of the stud bolt further depends on the material grade (e.g. ASTM A193 B7 with A194 2H nuts).",
+      "ratingNoteKey": "catalog.ratingNote.studBoltByFlangeJoint",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-5",
@@ -1982,6 +1998,7 @@
       "pressureRatings": [],
       "ratingBasis": "not_applicable",
       "ratingNote": "The Y-strainer is not covered by a specific dimensional standard in this catalogue. Manufacturers commonly supply it with flanged ends to ASME B16.5, so the class is set by the flange of the particular model. No class is listed here because there is no verifiable standard that defines one.",
+      "ratingNoteKey": "catalog.ratingNote.yStrainerNoStandard",
       "standards": [
         {
           "standardId": "PB-STD-MANUFACTURER-GENERIC",
@@ -2068,6 +2085,7 @@
       "pressureRatings": [],
       "ratingBasis": "working_pressure",
       "ratingNote": "AWWA C606 standardises the groove and shoulder geometry, not ASME pressure classes. The working pressure of the coupling is declared by the manufacturer for each diameter and verified by hydrostatic test; the purchaser must specify the required internal working pressure.",
+      "ratingNoteKey": "catalog.ratingNote.awwaC606Grooved",
       "standards": [
         {
           "standardId": "PB-STD-AWWA-C606",
@@ -2148,6 +2166,7 @@
       "pressureRatings": [],
       "ratingBasis": "working_pressure",
       "ratingNote": "AWWA C606 standardises the groove and shoulder geometry, not ASME pressure classes. The working pressure of the coupling is declared by the manufacturer for each diameter and verified by hydrostatic test; the purchaser must specify the required internal working pressure.",
+      "ratingNoteKey": "catalog.ratingNote.awwaC606Grooved",
       "standards": [
         {
           "standardId": "PB-STD-AWWA-C606",
@@ -2233,7 +2252,8 @@
         "2500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de brida segun ASME B16.5. El rango real disponible depende del material y del tamano nominal: Clases 150 a 1500 cubren NPS 1/2 a NPS 24 y la Clase 2500 solo NPS 1/2 a NPS 12. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Flange classes per ASME B16.5. The range actually available depends on the material and the nominal size: Class 150 through Class 1500 cover NPS 1/2 to NPS 24, and Class 2500 only NPS 1/2 to NPS 12. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_5FlangeClasses",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-5",
@@ -2291,7 +2311,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -2393,7 +2414,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los branch outlets buttwelding MSS SP-97 no se designan por clase numerica. La Tabla 1 de SP-97 los correlaciona con designaciones de pared de tubo (Standard, Extra Strong, Schedule 160). La presion admisible es la calculada para tubo recto sin costura de material y schedule equivalentes, segun el codigo de diseno aplicable.",
+      "ratingNote": "MSS SP-97 buttwelding branch outlets are not designated by a numeric class. Table 1 of SP-97 correlates them with pipe wall designations (Standard, Extra Strong, Schedule 160). The allowable pressure is that calculated for seamless straight pipe of equivalent material and schedule, according to the applicable design code.",
+      "ratingNoteKey": "catalog.ratingNote.sp97ButtweldOutlets",
       "standards": [
         {
           "standardId": "PB-STD-MSS-SP97",
@@ -2452,7 +2474,8 @@
         "6000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases segun MSS SP-97 Tabla 1 para branch outlets roscados. Estas clases se correlacionan con paredes Extra Strong (3000) y Schedule 160 (6000) y no equivalen a las clases de brida ASME B16.5. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Classes per MSS SP-97 Table 1 for threaded branch outlets. These classes correlate with Extra Strong (3000) and Schedule 160 (6000) walls and are not equivalent to ASME B16.5 flange classes. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.sp97ThreadedOutlets",
       "standards": [
         {
           "standardId": "PB-STD-MSS-SP97",
@@ -2509,7 +2532,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -2620,7 +2644,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -2740,7 +2765,8 @@
         "2500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "La junta se designa por la clase de la brida ASME B16.5 con la que se monta; ASME B16.20 tabula las dimensiones por clase. El rango real disponible depende del tamano nominal. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "The gasket is designated by the class of the ASME B16.5 flange it is assembled with; ASME B16.20 tabulates the dimensions by class. The range actually available depends on the nominal size. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_20GasketByFlange",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-20",
@@ -2799,7 +2825,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "ASME B36.10M solo normaliza dimensiones y schedules; no define clases de presion. La presion admisible del tubo deriva del espesor de pared y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3).",
+      "ratingNote": "ASME B36.10M standardises dimensions and schedules only; it does not define pressure classes. The allowable pressure of the pipe derives from the wall thickness and the material, and is calculated according to the applicable design code (e.g. ASME B31.3).",
+      "ratingNoteKey": "catalog.ratingNote.b36_10mPipe",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B36-10M",
@@ -2863,7 +2890,8 @@
         "2500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de brida segun ASME B16.5. El rango real disponible depende del material y del tamano nominal: Clases 150 a 1500 cubren NPS 1/2 a NPS 24 y la Clase 2500 solo NPS 1/2 a NPS 12. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Flange classes per ASME B16.5. The range actually available depends on the material and the nominal size: Class 150 through Class 1500 cover NPS 1/2 to NPS 24, and Class 2500 only NPS 1/2 to NPS 12. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_5FlangeClasses",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-5",
@@ -2923,7 +2951,8 @@
         "9000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos socket weld. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for socket weld ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11SocketWeld",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -2984,7 +3013,8 @@
         "9000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos socket weld. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for socket weld ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11SocketWeld",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -3048,7 +3078,8 @@
         "2500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de brida segun ASME B16.5. El rango real disponible depende del material y del tamano nominal: Clases 150 a 1500 cubren NPS 1/2 a NPS 24 y la Clase 2500 solo NPS 1/2 a NPS 12. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Flange classes per ASME B16.5. The range actually available depends on the material and the nominal size: Class 150 through Class 1500 cover NPS 1/2 to NPS 24, and Class 2500 only NPS 1/2 to NPS 12. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_5FlangeClasses",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-5",
@@ -3108,7 +3139,8 @@
         "9000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos socket weld. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for socket weld ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11SocketWeld",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -3169,7 +3201,8 @@
         "9000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos socket weld. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for socket weld ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11SocketWeld",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -3230,7 +3263,8 @@
         "9000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos socket weld. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for socket weld ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11SocketWeld",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -3289,7 +3323,8 @@
         "6000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases segun MSS SP-97 Tabla 1 para branch outlets socket welding. Estas clases se correlacionan con paredes Extra Strong (3000) y Schedule 160 (6000) y no equivalen a las clases de brida ASME B16.5. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Classes per MSS SP-97 Table 1 for socket welding branch outlets. These classes correlate with Extra Strong (3000) and Schedule 160 (6000) walls and are not equivalent to ASME B16.5 flange classes. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.sp97SocketWeldOutlets",
       "standards": [
         {
           "standardId": "PB-STD-MSS-SP97",
@@ -3346,7 +3381,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los stub ends ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material. La clase la aporta la brida loca (lap joint) ASME B16.5 que los acompana; verificar la compatibilidad dimensional entre stub end y brida.",
+      "ratingNote": "ASME B16.9 stub ends are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material. The class is provided by the ASME B16.5 lap joint flange that accompanies them; verify the dimensional compatibility between stub end and flange.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9StubEnds",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -3461,7 +3497,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los stub ends ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material. La clase la aporta la brida loca (lap joint) ASME B16.5 que los acompana; verificar la compatibilidad dimensional entre stub end y brida.",
+      "ratingNote": "ASME B16.9 stub ends are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material. The class is provided by the ASME B16.5 lap joint flange that accompanies them; verify the dimensional compatibility between stub end and flange.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9StubEnds",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -3576,7 +3613,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -3699,7 +3737,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -3842,7 +3881,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los accesorios ASME B16.9 no se designan por clase de presion. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula segun el codigo de diseno aplicable (p.ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
+      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-9",
@@ -3956,7 +3996,8 @@
         "6000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos roscados. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase, descontando la profundidad de rosca; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for threaded ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class, deducting the thread depth; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11Threaded",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -4017,7 +4058,8 @@
         "6000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos roscados. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase, descontando la profundidad de rosca; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for threaded ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class, deducting the thread depth; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11Threaded",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -4081,7 +4123,8 @@
         "2500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de brida segun ASME B16.5. El rango real disponible depende del material y del tamano nominal: Clases 150 a 1500 cubren NPS 1/2 a NPS 24 y la Clase 2500 solo NPS 1/2 a NPS 12. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Flange classes per ASME B16.5. The range actually available depends on the material and the nominal size: Class 150 through Class 1500 cover NPS 1/2 to NPS 24, and Class 2500 only NPS 1/2 to NPS 12. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_5FlangeClasses",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-5",
@@ -4141,7 +4184,8 @@
         "6000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos roscados. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase, descontando la profundidad de rosca; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for threaded ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class, deducting the thread depth; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11Threaded",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -4202,7 +4246,8 @@
         "6000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos roscados. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase, descontando la profundidad de rosca; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for threaded ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class, deducting the thread depth; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11Threaded",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -4263,7 +4308,8 @@
         "6000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases de accesorio forjado segun ASME B16.11 para extremos roscados. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presion admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase, descontando la profundidad de rosca; verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Forged fitting classes per ASME B16.11 for threaded ends. These classes are specific to B16.11 and are not equivalent to ASME B16.5 flange classes. The allowable pressure is calculated for seamless straight pipe of the schedule correlated with each class, deducting the thread depth; verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.b16_11Threaded",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B16-11",
@@ -4322,7 +4368,8 @@
         "6000"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases segun MSS SP-97 Tabla 1 para branch outlets roscados. Estas clases se correlacionan con paredes Extra Strong (3000) y Schedule 160 (6000) y no equivalen a las clases de brida ASME B16.5. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Classes per MSS SP-97 Table 1 for threaded branch outlets. These classes correlate with Extra Strong (3000) and Schedule 160 (6000) walls and are not equivalent to ASME B16.5 flange classes. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.sp97ThreadedOutlets",
       "standards": [
         {
           "standardId": "PB-STD-MSS-SP97",
@@ -4383,7 +4430,8 @@
         "800"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases segun API 608 para valvulas de bola metalicas. Extremos bridados y a tope en Clases 150, 300 y 600; extremos socket weld y roscados anaden la Clase 800, que no es una clase listada en ASME B16.34. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Classes per API 608 for metallic ball valves. Flanged and butt weld ends in Class 150, 300 and 600; socket weld and threaded ends add Class 800, which is not a class listed in ASME B16.34. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.api608BallValve",
       "standards": [
         {
           "standardId": "PB-STD-API-608",
@@ -4485,7 +4533,8 @@
         "2500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases segun API 600 para valvulas de compuerta de bonete atornillado, extremos bridados o a tope. Las clases coinciden con las de brida ASME B16.5 / B16.34. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Classes per API 600 for bolted bonnet gate valves, flanged or butt weld ends. The classes coincide with the ASME B16.5 / B16.34 flange classes. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.api600GateValve",
       "standards": [
         {
           "standardId": "PB-STD-API-600",
@@ -4586,7 +4635,8 @@
         "1500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases segun API 602 para valvulas compactas NPS 4 y menores. La Clase 800 no es una clase listada en ASME B16.34: es una clase intermedia de uso extendido para extremos roscados y soldados, y no existe en version bridada. La clase disponible depende del tipo de extremo. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Classes per API 602 for compact valves NPS 4 and smaller. Class 800 is not a class listed in ASME B16.34: it is an intermediate class in widespread use for threaded and welded ends, and does not exist in a flanged version. The available class depends on the end type. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.api602CompactValve",
       "standards": [
         {
           "standardId": "PB-STD-API-602",
@@ -4688,7 +4738,8 @@
         "2500"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Clases segun API 594 para valvulas de retencion wafer, lug, bridadas y a tope. Las Clases 150, 300, 600, 900, 1500 y 2500 corresponden a ASME B16.34; API 594 admite ademas las Clases 125 y 250 de ASME B16.1 (hierro fundido), no incluidas aqui porque este registro declara extremos bridados de acero. Verificar contra la edicion vigente de la norma.",
+      "ratingNote": "Classes per API 594 for wafer, lug, flanged and butt weld check valves. Class 150, 300, 600, 900, 1500 and 2500 correspond to ASME B16.34; API 594 additionally admits Class 125 and 250 of ASME B16.1 (cast iron), not included here because this record declares steel flanged ends. Verify against the current edition of the standard.",
+      "ratingNoteKey": "catalog.ratingNote.api594CheckValve",
       "standards": [
         {
           "standardId": "PB-STD-API-594",
@@ -4779,7 +4830,8 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "Los branch outlets buttwelding MSS SP-97 no se designan por clase numerica. La Tabla 1 de SP-97 los correlaciona con designaciones de pared de tubo (Standard, Extra Strong, Schedule 160). La presion admisible es la calculada para tubo recto sin costura de material y schedule equivalentes, segun el codigo de diseno aplicable.",
+      "ratingNote": "MSS SP-97 buttwelding branch outlets are not designated by a numeric class. Table 1 of SP-97 correlates them with pipe wall designations (Standard, Extra Strong, Schedule 160). The allowable pressure is that calculated for seamless straight pipe of equivalent material and schedule, according to the applicable design code.",
+      "ratingNoteKey": "catalog.ratingNote.sp97ButtweldOutlets",
       "standards": [
         {
           "standardId": "PB-STD-MSS-SP97",

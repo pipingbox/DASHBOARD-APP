@@ -645,7 +645,11 @@ function VistaRapidaTab({
                 </span>
               )}
               {component.ratingNote && (
-                <p className="text-[11px] leading-relaxed text-zinc-500">{component.ratingNote}</p>
+                <p className="text-[11px] leading-relaxed text-zinc-500">
+                  {component.ratingNoteKey
+                    ? t(component.ratingNoteKey, { defaultValue: component.ratingNote })
+                    : component.ratingNote}
+                </p>
               )}
             </div>
           )}

@@ -707,7 +707,26 @@
     },
     "colorLookup": "Ricerca colori industriali (RAL)",
     "colorLookupDesc": "Cerca e identifica i colori industriali RAL Classic con valori HEX/RGB",
-    "accessoriesLibrary": "Libreria accessori",
+    "accessoriesLibrary": {
+      "title": "Libreria accessori",
+      "totals": "{{components}} componenti · {{drawings}} disegni",
+      "searchPlaceholder": "Cerca per nome, tipo, materiale o norma…",
+      "allFamilies": "Tutti",
+      "connection": "Collegamento",
+      "anyConnection": "Qualsiasi collegamento",
+      "standard": "Norma",
+      "anyStandard": "Qualsiasi norma",
+      "pressureClass": "Classe di pressione",
+      "anyPressureClass": "Qualsiasi classe",
+      "classValue": "Classe {{value}}",
+      "clearFilters": "Cancella filtri",
+      "resultCount": "{{count}} di {{total}} componenti",
+      "emptyTitle": "Nessun componente corrispondente",
+      "emptyHint": "Prova un altro termine di ricerca o cancella i filtri attivi.",
+      "cardClasses": "Classe {{list}}",
+      "cardBySchedule": "Rating in base allo schedule",
+      "sizesDrawn": "{{count}} misure disegnate"
+    },
     "accessoriesLibraryDesc": "Catalogo completo di raccordi per tubazioni (ASME B16.9 / B16.5 / B16.34)",
     "unitConverter": "Convertitore Unità",
     "thermalExpansion": "Dilatazione Termica",
@@ -2503,5 +2522,27 @@
     "hint": "Digita un codice RAL (es. 3020) o il nome di un colore",
     "selectColor": "Seleziona un colore per vederne i dettagli",
     "values": "Valori del colore"
+  },
+  "catalog": {
+    "ratingNote": {
+      "b16_9NoPressureClass": "I raccordi ASME B16.9 non sono designati per classe di pressione. La loro capacità deriva dallo spessore di parete (schedule) e dal materiale, e si calcola secondo il codice di progettazione applicabile (p. es. ASME B31.3). La norma copre raccordi di qualsiasi spessore di parete producibile.",
+      "b16_11Threaded": "Classi di raccordo forgiato secondo ASME B16.11 per estremità filettate. Queste classi sono proprie della B16.11 e non equivalgono alle classi di flangia ASME B16.5. La pressione ammissibile si calcola per tubo diritto senza saldatura dello schedule correlato a ciascuna classe, detraendo la profondità di filettatura; verificare rispetto all'edizione vigente della norma.",
+      "b16_11SocketWeld": "Classi di raccordo forgiato secondo ASME B16.11 per estremità socket weld. Queste classi sono proprie della B16.11 e non equivalgono alle classi di flangia ASME B16.5. La pressione ammissibile si calcola per tubo diritto senza saldatura dello schedule correlato a ciascuna classe; verificare rispetto all'edizione vigente della norma.",
+      "b16_5FlangeClasses": "Classi di flangia secondo ASME B16.5. L'intervallo effettivamente disponibile dipende dal materiale e dalla misura nominale: le Classi da 150 a 1500 coprono da NPS 1/2 a NPS 24 e la Classe 2500 solo da NPS 1/2 a NPS 12. Verificare rispetto all'edizione vigente della norma.",
+      "sp97ButtweldOutlets": "I branch outlet buttwelding MSS SP-97 non sono designati per classe numerica. La Tabella 1 della SP-97 li correla con designazioni di parete del tubo (Standard, Extra Strong, Schedule 160). La pressione ammissibile è quella calcolata per tubo diritto senza saldatura di materiale e schedule equivalenti, secondo il codice di progettazione applicabile.",
+      "awwaC606Grooved": "La AWWA C606 normalizza la geometria della gola e dello spallamento, non classi di pressione ASME. La pressione di esercizio del giunto è dichiarata dal fabbricante per ciascun diametro e verificata mediante prova idrostatica; l'acquirente deve specificare la pressione interna di esercizio richiesta.",
+      "b16_20GasketByFlange": "La guarnizione è designata dalla classe della flangia ASME B16.5 con cui viene montata; la ASME B16.20 tabula le dimensioni per classe. L'intervallo effettivamente disponibile dipende dalla misura nominale. Verificare rispetto all'edizione vigente della norma.",
+      "sp97ThreadedOutlets": "Classi secondo MSS SP-97 Tabella 1 per branch outlet filettati. Queste classi si correlano con pareti Extra Strong (3000) e Schedule 160 (6000) e non equivalgono alle classi di flangia ASME B16.5. Verificare rispetto all'edizione vigente della norma.",
+      "b16_9StubEnds": "Gli stub end ASME B16.9 non sono designati per classe di pressione. La loro capacità deriva dallo spessore di parete (schedule) e dal materiale. La classe è fornita dalla flangia folle (lap joint) ASME B16.5 che li accompagna; verificare la compatibilità dimensionale tra stub end e flangia.",
+      "b36_10mPipe": "La ASME B36.10M normalizza solo dimensioni e schedule; non definisce classi di pressione. La pressione ammissibile del tubo deriva dallo spessore di parete e dal materiale, e si calcola secondo il codice di progettazione applicabile (p. es. ASME B31.3).",
+      "sp97SocketWeldOutlets": "Classi secondo MSS SP-97 Tabella 1 per branch outlet socket welding. Queste classi si correlano con pareti Extra Strong (3000) e Schedule 160 (6000) e non equivalgono alle classi di flangia ASME B16.5. Verificare rispetto all'edizione vigente della norma.",
+      "b16_48Spades": "Classi secondo ASME B16.48, per installazione tra flange ASME B16.5 delle stesse classi, nelle misure da NPS 1/2 a NPS 24. Verificare rispetto all'edizione vigente della norma.",
+      "studBoltByFlangeJoint": "Il prigioniero non ha una classe propria: si seleziona in base alla classe del giunto flangiato ASME B16.5 in cui viene montato, che fissa diametro, quantità e lunghezza. La capacità del prigioniero dipende inoltre dal grado di materiale (p. es. ASTM A193 B7 con dadi A194 2H).",
+      "api608BallValve": "Classi secondo API 608 per valvole a sfera metalliche. Estremità flangiate e di testa in Classi 150, 300 e 600; le estremità socket weld e filettate aggiungono la Classe 800, che non è una classe elencata in ASME B16.34. Verificare rispetto all'edizione vigente della norma.",
+      "api594CheckValve": "Classi secondo API 594 per valvole di ritegno wafer, lug, flangiate e di testa. Le Classi 150, 300, 600, 900, 1500 e 2500 corrispondono ad ASME B16.34; API 594 ammette inoltre le Classi 125 e 250 di ASME B16.1 (ghisa), non incluse qui perché questa scheda dichiara estremità flangiate in acciaio. Verificare rispetto all'edizione vigente della norma.",
+      "api600GateValve": "Classi secondo API 600 per valvole a saracinesca con cappello imbullonato, estremità flangiate o butt weld. Le classi coincidono con le classi di flangia ASME B16.5 / B16.34. Verificare rispetto all'edizione vigente della norma.",
+      "api602CompactValve": "Classi secondo API 602 per valvole compatte NPS 4 e inferiori. La Classe 800 non è una classe elencata in ASME B16.34: è una classe intermedia di uso diffuso per estremità filettate e saldate, e non esiste in versione flangiata. La classe disponibile dipende dal tipo di estremità. Verificare rispetto all'edizione vigente della norma.",
+      "yStrainerNoStandard": "Il filtro a Y non è coperto da una norma dimensionale specifica in questo catalogo. I fabbricanti lo forniscono abitualmente con estremità flangiate secondo ASME B16.5, per cui la classe è fissata dalla flangia del modello specifico. Qui non è elencata alcuna classe perché non esiste una norma verificabile che la definisca."
+    }
   }
 }

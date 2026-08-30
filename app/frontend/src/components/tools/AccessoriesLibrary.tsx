@@ -103,7 +103,7 @@ export default function AccessoriesLibrary() {
           </div>
           <div>
             <h3 className="text-lg font-semibold text-zinc-100">
-              {t('tools.accessoriesLibrary', { defaultValue: 'Accessories Library' })}
+              {t('tools.accessoriesLibrary.title', { defaultValue: 'Accessories Library' })}
             </h3>
             {/* Counts come from the catalog, never from a literal. */}
             <p className="text-xs text-zinc-400">

@@ -707,6 +707,27 @@
     },
     "colorLookup": "Pesquisa de Cores Industriais (RAL)",
     "colorLookupDesc": "Pesquise e identifique cores industriais RAL Classic com valores HEX/RGB",
+    "accessoriesLibrary": {
+      "title": "Biblioteca de Acessórios",
+      "totals": "{{components}} componentes · {{drawings}} desenhos",
+      "searchPlaceholder": "Pesquisar por nome, tipo, material ou norma…",
+      "allFamilies": "Todos",
+      "connection": "Ligação",
+      "anyConnection": "Qualquer ligação",
+      "standard": "Norma",
+      "anyStandard": "Qualquer norma",
+      "pressureClass": "Classe de pressão",
+      "anyPressureClass": "Qualquer classe",
+      "classValue": "Classe {{value}}",
+      "clearFilters": "Limpar filtros",
+      "resultCount": "{{count}} de {{total}} componentes",
+      "emptyTitle": "Nenhum componente corresponde",
+      "emptyHint": "Experimente outro termo de pesquisa ou limpe os filtros ativos.",
+      "cardClasses": "Classe {{list}}",
+      "cardBySchedule": "Rating por schedule",
+      "sizesDrawn": "{{count}} medidas desenhadas"
+    },
+    "accessoriesLibraryDesc": "Catálogo completo de acessórios de tubagem (ASME B16.9 / B16.5 / B16.34)",
     "unitConverter": "Conversor de unidades",
     "thermalExpansion": "Dilatação térmica",
     "reynolds": "Número de Reynolds",
@@ -2439,5 +2460,27 @@
     "hint": "Digite um código RAL (ex. 3020) ou nome de cor",
     "selectColor": "Selecione uma cor para ver detalhes",
     "values": "Valores de Cor"
+  },
+  "catalog": {
+    "ratingNote": {
+      "b16_9NoPressureClass": "Os acessórios ASME B16.9 não são designados por classe de pressão. A sua capacidade deriva da espessura de parede (schedule) e do material, e é calculada de acordo com o código de projeto aplicável (p. ex. ASME B31.3). A norma abrange acessórios de qualquer espessura de parede produzível.",
+      "b16_11Threaded": "Classes de acessório forjado segundo ASME B16.11 para extremidades roscadas. Estas classes são próprias da B16.11 e não equivalem às classes de flange ASME B16.5. A pressão admissível é calculada para tubo reto sem costura do schedule correlacionado com cada classe, descontando a profundidade de rosca; verificar face à edição em vigor da norma.",
+      "b16_11SocketWeld": "Classes de acessório forjado segundo ASME B16.11 para extremidades socket weld. Estas classes são próprias da B16.11 e não equivalem às classes de flange ASME B16.5. A pressão admissível é calculada para tubo reto sem costura do schedule correlacionado com cada classe; verificar face à edição em vigor da norma.",
+      "b16_5FlangeClasses": "Classes de flange segundo ASME B16.5. A gama realmente disponível depende do material e do tamanho nominal: as Classes 150 a 1500 cobrem NPS 1/2 a NPS 24 e a Classe 2500 apenas NPS 1/2 a NPS 12. Verificar face à edição em vigor da norma.",
+      "sp97ButtweldOutlets": "Os branch outlets buttwelding MSS SP-97 não são designados por classe numérica. A Tabela 1 da SP-97 correlaciona-os com designações de parede de tubo (Standard, Extra Strong, Schedule 160). A pressão admissível é a calculada para tubo reto sem costura de material e schedule equivalentes, de acordo com o código de projeto aplicável.",
+      "awwaC606Grooved": "A AWWA C606 normaliza a geometria do rasgo e do ressalto, não classes de pressão ASME. A pressão de trabalho do acoplamento é declarada pelo fabricante para cada diâmetro e verificada por ensaio hidrostático; o comprador deve especificar a pressão interna de trabalho requerida.",
+      "b16_20GasketByFlange": "A junta é designada pela classe do flange ASME B16.5 com o qual é montada; a ASME B16.20 tabela as dimensões por classe. A gama realmente disponível depende do tamanho nominal. Verificar face à edição em vigor da norma.",
+      "sp97ThreadedOutlets": "Classes segundo MSS SP-97 Tabela 1 para branch outlets roscados. Estas classes correlacionam-se com paredes Extra Strong (3000) e Schedule 160 (6000) e não equivalem às classes de flange ASME B16.5. Verificar face à edição em vigor da norma.",
+      "b16_9StubEnds": "Os stub ends ASME B16.9 não são designados por classe de pressão. A sua capacidade deriva da espessura de parede (schedule) e do material. A classe é dada pelo flange solto (lap joint) ASME B16.5 que os acompanha; verificar a compatibilidade dimensional entre stub end e flange.",
+      "b36_10mPipe": "A ASME B36.10M normaliza apenas dimensões e schedules; não define classes de pressão. A pressão admissível do tubo deriva da espessura de parede e do material, e é calculada de acordo com o código de projeto aplicável (p. ex. ASME B31.3).",
+      "sp97SocketWeldOutlets": "Classes segundo MSS SP-97 Tabela 1 para branch outlets socket welding. Estas classes correlacionam-se com paredes Extra Strong (3000) e Schedule 160 (6000) e não equivalem às classes de flange ASME B16.5. Verificar face à edição em vigor da norma.",
+      "b16_48Spades": "Classes segundo ASME B16.48, para instalação entre flanges ASME B16.5 das mesmas classes, em tamanhos NPS 1/2 a NPS 24. Verificar face à edição em vigor da norma.",
+      "studBoltByFlangeJoint": "O perno roscado não tem classe própria: é selecionado pela classe da ligação flangeada ASME B16.5 em que é montado, que fixa diâmetro, quantidade e comprimento. A capacidade do perno depende ainda do grau de material (p. ex. ASTM A193 B7 com porcas A194 2H).",
+      "api608BallValve": "Classes segundo API 608 para válvulas de esfera metálicas. Extremidades flangeadas e de topo nas Classes 150, 300 e 600; as extremidades socket weld e roscadas acrescentam a Classe 800, que não é uma classe listada na ASME B16.34. Verificar face à edição em vigor da norma.",
+      "api594CheckValve": "Classes segundo API 594 para válvulas de retenção wafer, lug, flangeadas e de topo. As Classes 150, 300, 600, 900, 1500 e 2500 correspondem à ASME B16.34; a API 594 admite ainda as Classes 125 e 250 da ASME B16.1 (ferro fundido), não incluídas aqui porque este registo declara extremidades flangeadas de aço. Verificar face à edição em vigor da norma.",
+      "api600GateValve": "Classes segundo API 600 para válvulas de cunha com castelo aparafusado, extremidades flangeadas ou butt weld. As classes coincidem com as classes de flange ASME B16.5 / B16.34. Verificar face à edição em vigor da norma.",
+      "api602CompactValve": "Classes segundo API 602 para válvulas compactas NPS 4 e inferiores. A Classe 800 não é uma classe listada na ASME B16.34: é uma classe intermédia de uso generalizado para extremidades roscadas e soldadas, e não existe em versão flangeada. A classe disponível depende do tipo de extremidade. Verificar face à edição em vigor da norma.",
+      "yStrainerNoStandard": "O filtro em Y não está coberto por uma norma dimensional específica neste catálogo. Os fabricantes fornecem-no habitualmente com extremidades flangeadas segundo ASME B16.5, pelo que a classe é fixada pelo flange do modelo concreto. Aqui não se lista qualquer classe porque não existe uma norma verificável que a defina."
+    }
   }
 }

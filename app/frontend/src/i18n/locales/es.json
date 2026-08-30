@@ -706,7 +706,26 @@
     },
     "colorLookup": "Colores Industriales RAL",
     "colorLookupDesc": "Busca e identifica colores industriales RAL Classic con valores HEX/RGB",
-    "accessoriesLibrary": "Biblioteca de Accesorios",
+    "accessoriesLibrary": {
+      "title": "Biblioteca de Accesorios",
+      "totals": "{{components}} componentes · {{drawings}} planos",
+      "searchPlaceholder": "Buscar por nombre, tipo, material o norma…",
+      "allFamilies": "Todos",
+      "connection": "Conexión",
+      "anyConnection": "Cualquier conexión",
+      "standard": "Norma",
+      "anyStandard": "Cualquier norma",
+      "pressureClass": "Clase de presión",
+      "anyPressureClass": "Cualquier clase",
+      "classValue": "Clase {{value}}",
+      "clearFilters": "Limpiar filtros",
+      "resultCount": "{{count}} de {{total}} componentes",
+      "emptyTitle": "Ningún componente coincide",
+      "emptyHint": "Prueba otro término de búsqueda o limpia los filtros activos.",
+      "cardClasses": "Clase {{list}}",
+      "cardBySchedule": "Rating por schedule",
+      "sizesDrawn": "{{count}} medidas dibujadas"
+    },
     "accessoriesLibraryDesc": "Catálogo completo de accesorios de tubería (ASME B16.9 / B16.5 / B16.34)",
     "unitConverter": "Conversor de unidades",
     "thermalExpansion": "Dilatación térmica",
@@ -2498,5 +2517,27 @@
     "hint": "Escribe un código RAL (ej. 3020) o nombre de color",
     "selectColor": "Selecciona un color para ver detalles",
     "values": "Valores de Color"
+  },
+  "catalog": {
+    "ratingNote": {
+      "b16_9NoPressureClass": "Los accesorios ASME B16.9 no se designan por clase de presión. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula según el código de diseño aplicable (p. ej. ASME B31.3). La norma cubre accesorios de cualquier espesor de pared producible.",
+      "b16_11Threaded": "Clases de accesorio forjado según ASME B16.11 para extremos roscados. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presión admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase, descontando la profundidad de rosca; verificar contra la edición vigente de la norma.",
+      "b16_11SocketWeld": "Clases de accesorio forjado según ASME B16.11 para extremos socket weld. Estas clases son propias de B16.11 y no equivalen a las clases de brida ASME B16.5. La presión admisible se calcula para tubo recto sin costura del schedule correlacionado con cada clase; verificar contra la edición vigente de la norma.",
+      "b16_5FlangeClasses": "Clases de brida según ASME B16.5. El rango realmente disponible depende del material y del tamaño nominal: las Clases 150 a 1500 cubren NPS 1/2 a NPS 24 y la Clase 2500 solo NPS 1/2 a NPS 12. Verificar contra la edición vigente de la norma.",
+      "sp97ButtweldOutlets": "Los branch outlets buttwelding MSS SP-97 no se designan por clase numérica. La Tabla 1 de SP-97 los correlaciona con designaciones de pared de tubo (Standard, Extra Strong, Schedule 160). La presión admisible es la calculada para tubo recto sin costura de material y schedule equivalentes, según el código de diseño aplicable.",
+      "awwaC606Grooved": "AWWA C606 normaliza la geometría de la ranura y del resalte, no clases de presión ASME. La presión de trabajo del acoplamiento la declara el fabricante para cada diámetro y se verifica mediante ensayo hidrostático; el comprador debe especificar la presión interna de trabajo requerida.",
+      "b16_20GasketByFlange": "La junta se designa por la clase de la brida ASME B16.5 con la que se monta; ASME B16.20 tabula las dimensiones por clase. El rango realmente disponible depende del tamaño nominal. Verificar contra la edición vigente de la norma.",
+      "sp97ThreadedOutlets": "Clases según MSS SP-97 Tabla 1 para branch outlets roscados. Estas clases se correlacionan con paredes Extra Strong (3000) y Schedule 160 (6000) y no equivalen a las clases de brida ASME B16.5. Verificar contra la edición vigente de la norma.",
+      "b16_9StubEnds": "Los stub ends ASME B16.9 no se designan por clase de presión. Su capacidad deriva del espesor de pared (schedule) y del material. La clase la aporta la brida loca (lap joint) ASME B16.5 que los acompaña; verificar la compatibilidad dimensional entre stub end y brida.",
+      "b36_10mPipe": "ASME B36.10M solo normaliza dimensiones y schedules; no define clases de presión. La presión admisible del tubo deriva del espesor de pared y del material, y se calcula según el código de diseño aplicable (p. ej. ASME B31.3).",
+      "sp97SocketWeldOutlets": "Clases según MSS SP-97 Tabla 1 para branch outlets socket welding. Estas clases se correlacionan con paredes Extra Strong (3000) y Schedule 160 (6000) y no equivalen a las clases de brida ASME B16.5. Verificar contra la edición vigente de la norma.",
+      "b16_48Spades": "Clases según ASME B16.48, para instalación entre bridas ASME B16.5 de las mismas clases, en tamaños NPS 1/2 a NPS 24. Verificar contra la edición vigente de la norma.",
+      "studBoltByFlangeJoint": "El espárrago no tiene clase propia: se selecciona por la clase de la unión bridada ASME B16.5 en la que se monta, que fija diámetro, cantidad y longitud. La capacidad del espárrago depende además del grado de material (p. ej. ASTM A193 B7 con tuercas A194 2H).",
+      "api608BallValve": "Clases según API 608 para válvulas de bola metálicas. Extremos bridados y a tope en Clases 150, 300 y 600; los extremos socket weld y roscados añaden la Clase 800, que no es una clase listada en ASME B16.34. Verificar contra la edición vigente de la norma.",
+      "api594CheckValve": "Clases según API 594 para válvulas de retención wafer, lug, bridadas y a tope. Las Clases 150, 300, 600, 900, 1500 y 2500 corresponden a ASME B16.34; API 594 admite además las Clases 125 y 250 de ASME B16.1 (hierro fundido), no incluidas aquí porque este registro declara extremos bridados de acero. Verificar contra la edición vigente de la norma.",
+      "api600GateValve": "Clases según API 600 para válvulas de compuerta de bonete atornillado, extremos bridados o a tope. Las clases coinciden con las de brida ASME B16.5 / B16.34. Verificar contra la edición vigente de la norma.",
+      "api602CompactValve": "Clases según API 602 para válvulas compactas NPS 4 y menores. La Clase 800 no es una clase listada en ASME B16.34: es una clase intermedia de uso extendido para extremos roscados y soldados, y no existe en versión bridada. La clase disponible depende del tipo de extremo. Verificar contra la edición vigente de la norma.",
+      "yStrainerNoStandard": "El filtro en Y no está cubierto por una norma dimensional específica en este catálogo. Los fabricantes lo suministran habitualmente con extremos bridados según ASME B16.5, por lo que la clase la fija la brida del modelo concreto. Aquí no se lista ninguna clase porque no existe una norma verificable que la defina."
+    }
   }
 }

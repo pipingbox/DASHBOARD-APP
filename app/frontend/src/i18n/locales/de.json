@@ -707,6 +707,27 @@
     },
     "colorLookup": "Industrielle Farbsuche (RAL)",
     "colorLookupDesc": "Suchen und identifizieren Sie RAL Classic Industriefarben mit HEX/RGB-Werten",
+    "accessoriesLibrary": {
+      "title": "Zubehörbibliothek",
+      "totals": "{{components}} Komponenten · {{drawings}} Zeichnungen",
+      "searchPlaceholder": "Suche nach Name, Typ, Werkstoff oder Norm…",
+      "allFamilies": "Alle",
+      "connection": "Anschluss",
+      "anyConnection": "Beliebiger Anschluss",
+      "standard": "Norm",
+      "anyStandard": "Beliebige Norm",
+      "pressureClass": "Druckklasse",
+      "anyPressureClass": "Beliebige Klasse",
+      "classValue": "Klasse {{value}}",
+      "clearFilters": "Filter zurücksetzen",
+      "resultCount": "{{count}} von {{total}} Komponenten",
+      "emptyTitle": "Keine Komponenten gefunden",
+      "emptyHint": "Versuchen Sie einen anderen Suchbegriff oder setzen Sie die aktiven Filter zurück.",
+      "cardClasses": "Klasse {{list}}",
+      "cardBySchedule": "Rating nach Schedule",
+      "sizesDrawn": "{{count}} Größen gezeichnet"
+    },
+    "accessoriesLibraryDesc": "Vollständiger Katalog von Rohrformteilen (ASME B16.9 / B16.5 / B16.34)",
     "unitConverter": "Einheitenumrechner",
     "thermalExpansion": "Wärmedehnung",
     "reynolds": "Reynolds-Zahl",
@@ -2439,5 +2460,27 @@
     "hint": "Geben Sie einen RAL-Code (z.B. 3020) oder Farbnamen ein",
     "selectColor": "Wählen Sie eine Farbe für Details",
     "values": "Farbwerte"
+  },
+  "catalog": {
+    "ratingNote": {
+      "b16_9NoPressureClass": "ASME B16.9 Formstücke werden nicht nach Druckklasse bezeichnet. Ihre Belastbarkeit ergibt sich aus der Wanddicke (schedule) und dem Werkstoff und wird nach dem anzuwendenden Auslegungscode (z. B. ASME B31.3) berechnet. Die Norm erfasst Formstücke jeder herstellbaren Wanddicke.",
+      "b16_11Threaded": "Klassen für Schmiedeformstücke nach ASME B16.11 für Gewindeenden. Diese Klassen sind B16.11-eigen und entsprechen nicht den Flanschklassen nach ASME B16.5. Der zulässige Druck wird für nahtloses gerades Rohr des jeweils der Klasse zugeordneten schedule berechnet, abzüglich der Gewindetiefe; gegen die gültige Ausgabe der Norm prüfen.",
+      "b16_11SocketWeld": "Klassen für Schmiedeformstücke nach ASME B16.11 für socket weld Enden. Diese Klassen sind B16.11-eigen und entsprechen nicht den Flanschklassen nach ASME B16.5. Der zulässige Druck wird für nahtloses gerades Rohr des jeweils der Klasse zugeordneten schedule berechnet; gegen die gültige Ausgabe der Norm prüfen.",
+      "b16_5FlangeClasses": "Flanschklassen nach ASME B16.5. Der tatsächlich verfügbare Bereich hängt vom Werkstoff und von der Nennweite ab: Klasse 150 bis 1500 decken NPS 1/2 bis NPS 24 ab, Klasse 2500 nur NPS 1/2 bis NPS 12. Gegen die aktuelle Ausgabe der Norm prüfen.",
+      "sp97ButtweldOutlets": "MSS SP-97 buttwelding branch outlets werden nicht durch eine numerische Klasse bezeichnet. Tabelle 1 der SP-97 ordnet ihnen Rohrwandbezeichnungen zu (Standard, Extra Strong, Schedule 160). Der zulässige Druck ist der für nahtloses gerades Rohr aus gleichwertigem Werkstoff und schedule berechnete Wert nach dem anzuwendenden Auslegungscode.",
+      "awwaC606Grooved": "AWWA C606 normt die Geometrie von Nut und Bund, nicht ASME-Druckklassen. Der Betriebsdruck der Kupplung wird vom Hersteller für jeden Durchmesser angegeben und durch Druckprüfung nachgewiesen; der Besteller muss den geforderten inneren Betriebsdruck festlegen.",
+      "b16_20GasketByFlange": "Die Dichtung wird nach der Klasse des ASME B16.5 Flansches bezeichnet, mit dem sie eingebaut wird; ASME B16.20 tabelliert die Abmessungen nach Klasse. Der tatsächlich verfügbare Bereich hängt von der Nennweite ab. Gegen die gültige Ausgabe der Norm prüfen.",
+      "sp97ThreadedOutlets": "Klassen nach MSS SP-97 Tabelle 1 für branch outlets mit Gewinde. Diese Klassen korrelieren mit den Wanddicken Extra Strong (3000) und Schedule 160 (6000) und entsprechen nicht den Flanschklassen nach ASME B16.5. Gegen die gültige Ausgabe der Norm prüfen.",
+      "b16_9StubEnds": "ASME B16.9 stub ends werden nicht nach Druckklasse bezeichnet. Ihre Belastbarkeit ergibt sich aus der Wanddicke (schedule) und dem Werkstoff. Die Klasse liefert der zugehörige ASME B16.5 lap joint Losflansch; die Maßkompatibilität zwischen stub end und Flansch prüfen.",
+      "b36_10mPipe": "ASME B36.10M normt nur Abmessungen und schedules; Druckklassen werden nicht definiert. Der zulässige Druck des Rohres ergibt sich aus der Wanddicke und dem Werkstoff und wird nach dem anzuwendenden Auslegungscode (z. B. ASME B31.3) berechnet.",
+      "sp97SocketWeldOutlets": "Klassen nach MSS SP-97 Tabelle 1 für socket welding branch outlets. Diese Klassen korrelieren mit den Wanddicken Extra Strong (3000) und Schedule 160 (6000) und entsprechen nicht den Flanschklassen nach ASME B16.5. Gegen die gültige Ausgabe der Norm prüfen.",
+      "b16_48Spades": "Klassen nach ASME B16.48, für den Einbau zwischen ASME B16.5 Flanschen derselben Klassen, in den Nennweiten NPS 1/2 bis NPS 24. Gegen die gültige Ausgabe der Norm prüfen.",
+      "studBoltByFlangeJoint": "Die Stiftschraube hat keine eigene Klasse: sie wird nach der Klasse der ASME B16.5 Flanschverbindung ausgewählt, in die sie eingebaut wird und die Durchmesser, Anzahl und Länge festlegt. Die Belastbarkeit der Stiftschraube hängt zusätzlich vom Werkstoffgrad ab (z. B. ASTM A193 B7 mit Muttern A194 2H).",
+      "api608BallValve": "Klassen nach API 608 für metallische Kugelhähne. Flansch- und Stumpfschweissenden in Klasse 150, 300 und 600; socket weld und Gewindeenden ergänzen Klasse 800, die in ASME B16.34 nicht als Klasse gelistet ist. Gegen die aktuelle Ausgabe der Norm prüfen.",
+      "api594CheckValve": "Klassen nach API 594 für Rückschlagklappen in Wafer-, Lug-, Flansch- und Stumpfschweissausführung. Klasse 150, 300, 600, 900, 1500 und 2500 entsprechen ASME B16.34; API 594 lässt zusätzlich Klasse 125 und 250 nach ASME B16.1 (Gusseisen) zu, hier nicht enthalten, da dieser Datensatz stählerne Flanschenden ausweist. Gegen die aktuelle Ausgabe der Norm prüfen.",
+      "api600GateValve": "Klassen nach API 600 für Absperrschieber mit geschraubtem Oberteil, Flansch- oder butt weld Enden. Die Klassen stimmen mit den Flanschklassen nach ASME B16.5 / B16.34 überein. Gegen die gültige Ausgabe der Norm prüfen.",
+      "api602CompactValve": "Klassen nach API 602 für Kompaktarmaturen NPS 4 und kleiner. Klasse 800 ist in ASME B16.34 nicht als Klasse gelistet: sie ist eine weit verbreitete Zwischenklasse für Gewinde- und Schweissenden und existiert nicht in Flanschausführung. Die verfügbare Klasse hängt von der Endenausführung ab. Gegen die aktuelle Ausgabe der Norm prüfen.",
+      "yStrainerNoStandard": "Der Y-Schmutzfänger wird in diesem Katalog von keiner spezifischen Maßnorm erfasst. Hersteller liefern ihn üblicherweise mit Flanschenden nach ASME B16.5, sodass die Klasse durch den Flansch des jeweiligen Modells bestimmt wird. Hier wird keine Klasse aufgeführt, da es keine nachprüfbare Norm gibt, die eine solche festlegt."
+    }
   }
 }

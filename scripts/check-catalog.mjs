@@ -81,7 +81,55 @@ for (const c of publishable) {
   }
 }
 
-/* ── 4. the library must not be silently empty ───────────────────────────── */
+/* ── 4. every rating_note_key must resolve in all 7 locales ──────────────── */
+
+// The pressure-class note is the piece of the record a user reads to learn that
+// a fitting has NO class. If its key is missing from a locale, i18next silently
+// falls back to the English prose and that user reads the most delicate
+// technical text in the catalog in a language they may not have. Fail here
+// instead: a key that exists in en.json only is an unfinished translation, not
+// a working fallback.
+const LOCALES_DIR = join(FRONTEND, 'src', 'i18n', 'locales');
+const LOCALES = ['en', 'es', 'nl', 'de', 'fr', 'pt', 'it'];
+
+/** Resolve a dotted key path ("a.b.c") against a parsed locale object. */
+function resolveKey(obj, path) {
+  return path.split('.').reduce((node, part) => (node == null ? undefined : node[part]), obj);
+}
+
+const locales = {};
+for (const code of LOCALES) {
+  const file = join(LOCALES_DIR, `${code}.json`);
+  if (!existsSync(file)) {
+    errors.push(`locale ausente: src/i18n/locales/${code}.json`);
+    continue;
+  }
+  try {
+    locales[code] = JSON.parse(readFileSync(file, 'utf8'));
+  } catch (err) {
+    errors.push(`${code}.json no es JSON valido: ${err.message}`);
+  }
+}
+
+const ratingNoteKeys = new Set();
+for (const c of publishable) {
+  if (c.ratingNoteKey) ratingNoteKeys.add(c.ratingNoteKey);
+  else if (c.ratingNote) errors.push(`${c.id}: tiene ratingNote sin ratingNoteKey`);
+}
+
+let i18nChecked = 0;
+for (const key of [...ratingNoteKeys].sort()) {
+  for (const code of LOCALES) {
+    if (!locales[code]) continue;
+    i18nChecked++;
+    const value = resolveKey(locales[code], key);
+    if (typeof value !== 'string' || !value.trim()) {
+      errors.push(`${code}.json: falta la traduccion de ${key}`);
+    }
+  }
+}
+
+/* ── 5. the library must not be silently empty ───────────────────────────── */
 
 // A generator bug that emitted zero components would otherwise pass every
 // check above trivially, and ship an empty library.
@@ -103,6 +151,7 @@ if (errors.length) {
 
 console.log(
   `✓ catalogo integro: ${publishable.length} componentes publicables, ` +
-  `${checked} assets verificados, ${Object.keys(catalog.standards).length} normativas` +
+  `${checked} assets verificados, ${Object.keys(catalog.standards).length} normativas, ` +
+  `${ratingNoteKeys.size} claves rating_note x ${LOCALES.length} idiomas (${i18nChecked} traducciones)` +
   (withoutRender ? ` (${withoutRender} sin render 3D)` : ''),
 );

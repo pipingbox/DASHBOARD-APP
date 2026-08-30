@@ -55,7 +55,7 @@ const TOOLS: ToolDef[] = [
   { key: 'unit-converter', nameKey: 'tools.unitConverter', descKey: 'tools.unitConverterDesc', icon: Calculator, categoryKey: 'tools.categoryUtility', implemented: true },
   { key: 'wall-thickness', nameKey: 'tools.wallThickness', descKey: 'tools.wallThicknessDesc', icon: Ruler, categoryKey: 'tools.categoryDesign', implemented: true },
   { key: 'color-lookup', nameKey: 'tools.colorLookup', descKey: 'tools.colorLookupDesc', icon: Paintbrush, categoryKey: 'tools.categoryReference', implemented: true },
-  { key: 'accessories-library', nameKey: 'tools.accessoriesLibrary', descKey: 'tools.accessoriesLibraryDesc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
+  { key: 'accessories-library', nameKey: 'tools.accessoriesLibrary.title', descKey: 'tools.accessoriesLibraryDesc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'thermal-expansion', nameKey: 'tools.thermalExpansion', descKey: 'tools.thermalExpansionDesc', icon: Thermometer, categoryKey: 'tools.categoryStress', implemented: false },
   { key: 'reynolds', nameKey: 'tools.reynolds', descKey: 'tools.reynoldsDesc', icon: Beaker, categoryKey: 'tools.categoryHydraulics', implemented: false },
 ];

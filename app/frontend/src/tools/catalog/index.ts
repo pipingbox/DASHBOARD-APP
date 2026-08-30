@@ -79,7 +79,14 @@ export interface CatalogComponent {
    * rather than a missing value.
    */
   ratingBasis: 'pressure_class' | 'wall_thickness' | 'working_pressure' | 'not_applicable' | null;
+  /** Canonical English prose from the Brain YAML. Used as i18n fallback. */
   ratingNote: string | null;
+  /**
+   * i18n key (`catalog.ratingNote.*`) carrying the note in the 7 UI languages.
+   * The UI resolves it with `ratingNote` as `defaultValue`, so the English
+   * prose in the YAML is the real fallback when a locale lacks the key.
+   */
+  ratingNoteKey: string | null;
   standards: CatalogStandardRef[];
   dimensionSets: string[];
   drawings: CatalogDrawing[];

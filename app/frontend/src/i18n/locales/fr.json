@@ -707,6 +707,27 @@
     },
     "colorLookup": "Recherche de Couleurs Industrielles (RAL)",
     "colorLookupDesc": "Recherchez et identifiez les couleurs industrielles RAL Classic avec valeurs HEX/RGB",
+    "accessoriesLibrary": {
+      "title": "Bibliothèque d’accessoires",
+      "totals": "{{components}} composants · {{drawings}} plans",
+      "searchPlaceholder": "Rechercher par nom, type, matériau ou norme…",
+      "allFamilies": "Tous",
+      "connection": "Raccordement",
+      "anyConnection": "Tout raccordement",
+      "standard": "Norme",
+      "anyStandard": "Toute norme",
+      "pressureClass": "Classe de pression",
+      "anyPressureClass": "Toute classe",
+      "classValue": "Classe {{value}}",
+      "clearFilters": "Effacer les filtres",
+      "resultCount": "{{count}} sur {{total}} composants",
+      "emptyTitle": "Aucun composant ne correspond",
+      "emptyHint": "Essayez un autre terme de recherche ou effacez les filtres actifs.",
+      "cardClasses": "Classe {{list}}",
+      "cardBySchedule": "Rating selon le schedule",
+      "sizesDrawn": "{{count}} dimensions dessinées"
+    },
+    "accessoriesLibraryDesc": "Catalogue complet de raccords de tuyauterie (ASME B16.9 / B16.5 / B16.34)",
     "unitConverter": "Convertisseur d'unités",
     "thermalExpansion": "Dilatation thermique",
     "reynolds": "Nombre de Reynolds",
@@ -2439,5 +2460,27 @@
     "hint": "Tapez un code RAL (ex. 3020) ou un nom de couleur",
     "selectColor": "Sélectionnez une couleur pour voir les détails",
     "values": "Valeurs de Couleur"
+  },
+  "catalog": {
+    "ratingNote": {
+      "b16_9NoPressureClass": "Les raccords ASME B16.9 ne sont pas désignés par classe de pression. Leur tenue découle de l'épaisseur de paroi (schedule) et du matériau, et se calcule selon le code de conception applicable (p. ex. ASME B31.3). La norme couvre les raccords de toute épaisseur de paroi productible.",
+      "b16_11Threaded": "Classes de raccords forgés selon ASME B16.11 pour extrémités filetées. Ces classes sont propres à B16.11 et ne sont pas équivalentes aux classes de bride ASME B16.5. La pression admissible est calculée pour un tube droit sans soudure du schedule corrélé à chaque classe, déduction faite de la profondeur de filetage ; vérifier par rapport à l'édition en vigueur de la norme.",
+      "b16_11SocketWeld": "Classes de raccords forgés selon ASME B16.11 pour extrémités socket weld. Ces classes sont propres à B16.11 et ne sont pas équivalentes aux classes de bride ASME B16.5. La pression admissible est calculée pour un tube droit sans soudure du schedule corrélé à chaque classe ; vérifier par rapport à l'édition en vigueur de la norme.",
+      "b16_5FlangeClasses": "Classes de bride selon ASME B16.5. La plage réellement disponible dépend du matériau et de la taille nominale : les Classes 150 à 1500 couvrent NPS 1/2 à NPS 24 et la Classe 2500 uniquement NPS 1/2 à NPS 12. Vérifier par rapport à l'édition en vigueur de la norme.",
+      "sp97ButtweldOutlets": "Les branch outlets buttwelding MSS SP-97 ne sont pas désignés par une classe numérique. Le Tableau 1 de SP-97 les met en correspondance avec des désignations de paroi de tube (Standard, Extra Strong, Schedule 160). La pression admissible est celle calculée pour un tube droit sans soudure de matériau et de schedule équivalents, selon le code de conception applicable.",
+      "awwaC606Grooved": "AWWA C606 normalise la géométrie de la gorge et de l'épaulement, non des classes de pression ASME. La pression de service du raccord est déclarée par le fabricant pour chaque diamètre et vérifiée par essai hydrostatique ; l'acheteur doit spécifier la pression interne de service requise.",
+      "b16_20GasketByFlange": "Le joint est désigné par la classe de la bride ASME B16.5 avec laquelle il est monté ; ASME B16.20 tabule les dimensions par classe. La plage réellement disponible dépend de la taille nominale. Vérifier par rapport à l'édition en vigueur de la norme.",
+      "sp97ThreadedOutlets": "Classes selon MSS SP-97 Tableau 1 pour branch outlets filetés. Ces classes sont corrélées aux parois Extra Strong (3000) et Schedule 160 (6000) et ne sont pas équivalentes aux classes de bride ASME B16.5. Vérifier par rapport à l'édition en vigueur de la norme.",
+      "b16_9StubEnds": "Les stub ends ASME B16.9 ne sont pas désignés par classe de pression. Leur tenue découle de l'épaisseur de paroi (schedule) et du matériau. La classe est apportée par la bride tournante (lap joint) ASME B16.5 qui les accompagne ; vérifier la compatibilité dimensionnelle entre stub end et bride.",
+      "b36_10mPipe": "ASME B36.10M ne normalise que les dimensions et les schedules ; elle ne définit pas de classes de pression. La pression admissible du tube découle de l'épaisseur de paroi et du matériau, et se calcule selon le code de conception applicable (p. ex. ASME B31.3).",
+      "sp97SocketWeldOutlets": "Classes selon MSS SP-97 Tableau 1 pour branch outlets socket welding. Ces classes sont corrélées aux parois Extra Strong (3000) et Schedule 160 (6000) et ne sont pas équivalentes aux classes de bride ASME B16.5. Vérifier par rapport à l'édition en vigueur de la norme.",
+      "b16_48Spades": "Classes selon ASME B16.48, pour montage entre brides ASME B16.5 des mêmes classes, dans les tailles NPS 1/2 à NPS 24. Vérifier par rapport à l'édition en vigueur de la norme.",
+      "studBoltByFlangeJoint": "Le goujon n'a pas de classe propre : il se sélectionne par la classe de l'assemblage à brides ASME B16.5 dans lequel il est monté, qui fixe le diamètre, la quantité et la longueur. La tenue du goujon dépend en outre de la nuance du matériau (p. ex. ASTM A193 B7 avec écrous A194 2H).",
+      "api608BallValve": "Classes selon API 608 pour robinets à tournant sphérique métalliques. Extrémités à brides et bout à bout en Classes 150, 300 et 600 ; les extrémités socket weld et taraudées ajoutent la Classe 800, qui n'est pas une classe listée dans ASME B16.34. Vérifier par rapport à l'édition en vigueur de la norme.",
+      "api594CheckValve": "Classes selon API 594 pour clapets de non-retour wafer, lug, à brides et bout à bout. Les Classes 150, 300, 600, 900, 1500 et 2500 correspondent à ASME B16.34 ; API 594 admet en outre les Classes 125 et 250 d'ASME B16.1 (fonte), non reprises ici car cette fiche déclare des extrémités à brides en acier. Vérifier par rapport à l'édition en vigueur de la norme.",
+      "api600GateValve": "Classes selon API 600 pour robinets-vannes à chapeau boulonné, extrémités à brides ou butt weld. Les classes coïncident avec les classes de bride ASME B16.5 / B16.34. Vérifier par rapport à l'édition en vigueur de la norme.",
+      "api602CompactValve": "Classes selon API 602 pour robinets compacts NPS 4 et inférieurs. La Classe 800 n'est pas une classe listée dans ASME B16.34 : c'est une classe intermédiaire d'usage répandu pour les extrémités taraudées et soudées, et elle n'existe pas en version à brides. La classe disponible dépend du type d'extrémité. Vérifier par rapport à l'édition en vigueur de la norme.",
+      "yStrainerNoStandard": "Le filtre en Y n'est couvert par aucune norme dimensionnelle spécifique dans ce catalogue. Les fabricants le fournissent couramment avec des extrémités à brides selon ASME B16.5, de sorte que la classe est fixée par la bride du modèle concerné. Aucune classe n'est listée ici car il n'existe pas de norme vérifiable qui en définisse une."
+    }
   }
 }

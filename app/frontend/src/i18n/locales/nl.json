@@ -671,6 +671,27 @@
     },
     "colorLookup": "Industriële Kleurzoeker (RAL)",
     "colorLookupDesc": "Zoek en identificeer RAL Classic industriële kleuren met HEX/RGB-waarden",
+    "accessoriesLibrary": {
+      "title": "Accessoirebibliotheek",
+      "totals": "{{components}} componenten · {{drawings}} tekeningen",
+      "searchPlaceholder": "Zoeken op naam, type, materiaal of norm…",
+      "allFamilies": "Alle",
+      "connection": "Verbinding",
+      "anyConnection": "Elke verbinding",
+      "standard": "Norm",
+      "anyStandard": "Elke norm",
+      "pressureClass": "Drukklasse",
+      "anyPressureClass": "Elke klasse",
+      "classValue": "Klasse {{value}}",
+      "clearFilters": "Filters wissen",
+      "resultCount": "{{count}} van {{total}} componenten",
+      "emptyTitle": "Geen componenten gevonden",
+      "emptyHint": "Probeer een andere zoekterm of wis de actieve filters.",
+      "cardClasses": "Klasse {{list}}",
+      "cardBySchedule": "Rating op schedule",
+      "sizesDrawn": "{{count}} maten getekend"
+    },
+    "accessoriesLibraryDesc": "Volledige catalogus van pijpfittingen (ASME B16.9 / B16.5 / B16.34)",
     "unitConverter": "Eenhedenconverter",
     "thermalExpansion": "Thermische uitzetting",
     "reynolds": "Reynoldsgetal",
@@ -2403,5 +2424,27 @@
     "hint": "Typ een RAL-code (bijv. 3020) of kleurnaam",
     "selectColor": "Selecteer een kleur voor details",
     "values": "Kleurwaarden"
+  },
+  "catalog": {
+    "ratingNote": {
+      "b16_9NoPressureClass": "ASME B16.9 fittingen worden niet aangeduid met een drukklasse. Hun capaciteit volgt uit de wanddikte (schedule) en het materiaal, en wordt berekend volgens de toepasselijke ontwerpcode (bijv. ASME B31.3). De norm omvat fittingen van elke produceerbare wanddikte.",
+      "b16_11Threaded": "Klassen voor gesmede fittingen volgens ASME B16.11 voor schroefdraadeinden. Deze klassen zijn eigen aan B16.11 en zijn niet gelijkwaardig aan de flensklassen van ASME B16.5. De toelaatbare druk wordt berekend voor naadloze rechte buis van de schedule die met elke klasse correleert, onder aftrek van de draaddiepte; verifieer tegen de vigerende uitgave van de norm.",
+      "b16_11SocketWeld": "Klassen voor gesmede fittingen volgens ASME B16.11 voor socket weld einden. Deze klassen zijn eigen aan B16.11 en zijn niet gelijkwaardig aan de flensklassen van ASME B16.5. De toelaatbare druk wordt berekend voor naadloze rechte buis van de schedule die met elke klasse correleert; verifieer tegen de vigerende uitgave van de norm.",
+      "b16_5FlangeClasses": "Flensklassen volgens ASME B16.5. Het werkelijk beschikbare bereik hangt af van het materiaal en de nominale maat: Klasse 150 tot en met 1500 dekken NPS 1/2 tot NPS 24, en Klasse 2500 alleen NPS 1/2 tot NPS 12. Controleer tegen de geldende uitgave van de norm.",
+      "sp97ButtweldOutlets": "MSS SP-97 buttwelding branch outlets worden niet met een numerieke klasse aangeduid. Tabel 1 van SP-97 correleert ze met wandaanduidingen van buis (Standard, Extra Strong, Schedule 160). De toelaatbare druk is die berekend voor naadloze rechte buis van gelijkwaardig materiaal en schedule, volgens de toepasselijke ontwerpcode.",
+      "awwaC606Grooved": "AWWA C606 normaliseert de geometrie van de groef en de schouder, niet de ASME drukklassen. De werkdruk van de koppeling wordt door de fabrikant per diameter opgegeven en met een hydrostatische proef geverifieerd; de koper moet de vereiste inwendige werkdruk specificeren.",
+      "b16_20GasketByFlange": "De pakking wordt aangeduid met de klasse van de ASME B16.5 flens waarmee zij wordt gemonteerd; ASME B16.20 tabelleert de afmetingen per klasse. Het werkelijk beschikbare bereik hangt af van de nominale maat. Verifieer tegen de vigerende uitgave van de norm.",
+      "sp97ThreadedOutlets": "Klassen volgens MSS SP-97 Tabel 1 voor branch outlets met schroefdraad. Deze klassen correleren met wanden Extra Strong (3000) en Schedule 160 (6000) en zijn niet gelijkwaardig aan de flensklassen van ASME B16.5. Verifieer tegen de vigerende uitgave van de norm.",
+      "b16_9StubEnds": "ASME B16.9 stub ends worden niet met een drukklasse aangeduid. Hun capaciteit volgt uit de wanddikte (schedule) en het materiaal. De klasse wordt bepaald door de bijbehorende ASME B16.5 lap joint flens; verifieer de dimensionele compatibiliteit tussen stub end en flens.",
+      "b36_10mPipe": "ASME B36.10M normaliseert uitsluitend afmetingen en schedules; de norm definieert geen drukklassen. De toelaatbare druk van de buis volgt uit de wanddikte en het materiaal, en wordt berekend volgens de toepasselijke ontwerpcode (bijv. ASME B31.3).",
+      "sp97SocketWeldOutlets": "Klassen volgens MSS SP-97 Tabel 1 voor socket welding branch outlets. Deze klassen correleren met wanden Extra Strong (3000) en Schedule 160 (6000) en zijn niet gelijkwaardig aan de flensklassen van ASME B16.5. Verifieer tegen de vigerende uitgave van de norm.",
+      "b16_48Spades": "Klassen volgens ASME B16.48, voor montage tussen ASME B16.5 flenzen van dezelfde klassen, in maten NPS 1/2 tot NPS 24. Verifieer tegen de vigerende uitgave van de norm.",
+      "studBoltByFlangeJoint": "De stiftbout heeft geen eigen klasse: hij wordt gekozen op basis van de klasse van de ASME B16.5 flensverbinding waarin hij wordt gemonteerd, die diameter, aantal en lengte vastlegt. De capaciteit van de stiftbout hangt bovendien af van de materiaalkwaliteit (bijv. ASTM A193 B7 met A194 2H moeren).",
+      "api608BallValve": "Klassen volgens API 608 voor metalen kogelkranen. Flens- en stomplasuiteinden in Klasse 150, 300 en 600; socket weld en draaduiteinden voegen Klasse 800 toe, die niet als klasse in ASME B16.34 is opgenomen. Controleer tegen de geldende uitgave van de norm.",
+      "api594CheckValve": "Klassen volgens API 594 voor terugslagkleppen in wafer-, lug-, flens- en stomplasuitvoering. Klasse 150, 300, 600, 900, 1500 en 2500 komen overeen met ASME B16.34; API 594 laat daarnaast Klasse 125 en 250 van ASME B16.1 (gietijzer) toe, hier niet opgenomen omdat dit record stalen flensuiteinden aangeeft. Controleer tegen de geldende uitgave van de norm.",
+      "api600GateValve": "Klassen volgens API 600 voor schuifafsluiters met gebout bonnet, flens- of butt weld einden. De klassen komen overeen met de flensklassen van ASME B16.5 / B16.34. Verifieer tegen de vigerende uitgave van de norm.",
+      "api602CompactValve": "Klassen volgens API 602 voor compacte afsluiters NPS 4 en kleiner. Klasse 800 is geen in ASME B16.34 opgenomen klasse: het is een veel gebruikte tussenklasse voor draad- en lasuiteinden en bestaat niet in flensuitvoering. De beschikbare klasse hangt af van het type uiteinde. Controleer tegen de geldende uitgave van de norm.",
+      "yStrainerNoStandard": "De Y-filter valt in deze catalogus niet onder een specifieke dimensionele norm. Fabrikanten leveren hem gewoonlijk met flenseinden volgens ASME B16.5, zodat de klasse wordt bepaald door de flens van het betreffende model. Hier wordt geen klasse vermeld omdat er geen verifieerbare norm bestaat die er een definieert."
+    }
   }
 }

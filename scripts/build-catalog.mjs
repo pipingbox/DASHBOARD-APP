@@ -288,7 +288,14 @@ for (const file of componentFiles) {
   else if (ratingBasis === 'pressure_class' && pressureRatings.length === 0) {
     warn(`${y.id} declara rating_basis pressure_class pero no lista clases`);
   }
+  // The prose in the YAML is the canonical English fallback. `rating_note_key`
+  // points at the i18n entry that carries the same note in the 7 UI languages,
+  // so the note is translated without seven strings living in every component
+  // file. A record without a key still renders correct English rather than
+  // nothing, which is why the note itself stays in the YAML.
   const ratingNote = tech.rating_note ?? null;
+  const ratingNoteKey = tech.rating_note_key ?? null;
+  if (ratingNote && !ratingNoteKey) warn(`${y.id} tiene rating_note sin rating_note_key`);
 
   // --- Level 1 REFERENTIAL brand mentions (PB-PARTNER-CATALOG-001) ----------
   // Trademark names cited under art. 14(1)(c) EUTMR to indicate intended
@@ -342,6 +349,7 @@ for (const file of componentFiles) {
     pressureRatings,
     ratingBasis,
     ratingNote,
+    ratingNoteKey,
     standards: componentStandards,
     dimensionSets: dims,
     drawings,
