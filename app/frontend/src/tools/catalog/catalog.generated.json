@@ -10,7 +10,7 @@
     "dimensionSets": 59,
     "dimensionRows": 1132,
     "drawings": 386,
-    "renders": 25
+    "renders": 26
   },
   "components": [
     {
@@ -2182,7 +2182,7 @@
         }
       ],
       "drawingStem": "PB-DIM-COUPLING-GROOVED-RIGID",
-      "render": null,
+      "render": "/catalog/3d/PB-ASSET-0030_coupling-grooved-rigid_3d.webp",
       "fabricationNotes": [
         "Groove dimensions depend on pipe size, wall thickness and groove method. Take them from AWWA C606 or the coupling manufacturer, never by measurement of an existing joint.",
         "Roll grooving cold-forms the groove and does not remove material. Cut grooving removes wall material and imposes a minimum wall thickness limit.",
