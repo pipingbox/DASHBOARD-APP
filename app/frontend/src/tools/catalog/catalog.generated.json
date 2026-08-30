@@ -1981,7 +1981,7 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "not_applicable",
-      "ratingNote": "El filtro Y no esta cubierto por una norma dimensional especifica en este catalogo. Los fabricantes lo ofrecen habitualmente con extremos bridados segun ASME B16.5, por lo que la clase la fija la brida del modelo concreto. No se enumera ninguna clase aqui porque no hay norma verificable que la defina.",
+      "ratingNote": "The Y-strainer is not covered by a specific dimensional standard in this catalogue. Manufacturers commonly supply it with flanged ends to ASME B16.5, so the class is set by the flange of the particular model. No class is listed here because there is no verifiable standard that defines one.",
       "standards": [
         {
           "standardId": "PB-STD-MANUFACTURER-GENERIC",
@@ -2067,7 +2067,7 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "working_pressure",
-      "ratingNote": "AWWA C606 normaliza la geometria de la ranura y del hombro, no clases de presion ASME. La presion de trabajo del acoplamiento la declara el fabricante para cada diametro y se verifica por ensayo hidrostatico; el comprador debe especificar la presion interna de trabajo requerida.",
+      "ratingNote": "AWWA C606 standardises the groove and shoulder geometry, not ASME pressure classes. The working pressure of the coupling is declared by the manufacturer for each diameter and verified by hydrostatic test; the purchaser must specify the required internal working pressure.",
       "standards": [
         {
           "standardId": "PB-STD-AWWA-C606",
@@ -2147,7 +2147,7 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "working_pressure",
-      "ratingNote": "AWWA C606 normaliza la geometria de la ranura y del hombro, no clases de presion ASME. La presion de trabajo del acoplamiento la declara el fabricante para cada diametro y se verifica por ensayo hidrostatico; el comprador debe especificar la presion interna de trabajo requerida.",
+      "ratingNote": "AWWA C606 standardises the groove and shoulder geometry, not ASME pressure classes. The working pressure of the coupling is declared by the manufacturer for each diameter and verified by hydrostatic test; the purchaser must specify the required internal working pressure.",
       "standards": [
         {
           "standardId": "PB-STD-AWWA-C606",
