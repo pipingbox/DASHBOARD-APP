@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase, TABLES } from '@/lib/supabase';
+import { catalogStats } from '@/tools/catalog';
 import { PipingBoxLogo } from '@/components/PipingBoxLogo';
 import {
   UserCheck,
@@ -56,51 +56,31 @@ interface RealMetric {
   value: number;
 }
 
+// Landing proof points.
+//
+// These deliberately measure the DEPTH OF THE TECHNICAL LIBRARY, not how many
+// people have signed up. On a young platform a user count is both weak and
+// self-defeating: "47 professionals" invites the reader to conclude we are
+// empty. The library is the opposite — it is genuinely large, and it is the
+// thing a piping professional actually came to evaluate.
+//
+// Every figure below is derived, never typed by hand:
+//   - drawings / dimensionRows / standards come from `catalogStats`, emitted by
+//     scripts/build-catalog.mjs from the Brain YAML at build time.
+//   - IMPLEMENTED_TOOLS counts only tools with `implemented: true` in Tools.tsx.
+//     The previous value (12) counted two tools that do not exist yet.
+//
+// See CHANGELOG v4.81.0: no metric ships without a source.
+const IMPLEMENTED_TOOLS = 10;
+
 function useRealMetrics() {
-  const [metrics, setMetrics] = useState<RealMetric[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        // Count workers: account_type = 'worker' OR (role = 'worker' AND account_type is null)
-        // Count companies: account_type = 'company' OR role = 'company'
-        // Use OR conditions to cover both legacy and current profiles.
-        const [workersRes, companiesRes] = await Promise.all([
-          supabase
-            .from(TABLES.profiles)
-            .select('*', { count: 'exact', head: true })
-            .or('account_type.eq.worker,and(account_type.is.null,role.eq.worker)'),
-          supabase
-            .from(TABLES.profiles)
-            .select('*', { count: 'exact', head: true })
-            .or('account_type.eq.company,role.eq.company'),
-        ]);
-
-        const workers = workersRes.count ?? 0;
-        const companies = companiesRes.count ?? 0;
-
-        // Tools count: fixed count from src/pages/Tools.tsx TOOLS array (PD-1 DEC-56, embedded-data architecture)
-        const toolsCount = 12;
-
-        setMetrics([
-          { label: 'Professionals registered', value: workers },
-          { label: 'Companies', value: companies },
-          { label: 'Free engineering tools', value: toolsCount },
-        ]);
-      } catch {
-        setMetrics([
-          { label: 'Professionals registered', value: 0 },
-          { label: 'Companies', value: 0 },
-          { label: 'Free engineering tools', value: 11 },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
-
-  return { metrics, loading };
+  const metrics: RealMetric[] = [
+    { label: 'Technical drawings', value: catalogStats.drawings },
+    { label: 'Dimensional data rows', value: catalogStats.dimensionRows },
+    { label: 'Standards covered', value: catalogStats.standards },
+    { label: 'Free engineering tools', value: IMPLEMENTED_TOOLS },
+  ];
+  return { metrics, loading: false };
 }
 
 function AnimatedCounter({ metric }: { metric: RealMetric }) {
@@ -108,7 +88,7 @@ function AnimatedCounter({ metric }: { metric: RealMetric }) {
   return (
     <div ref={ref} className="text-center">
       <p className="text-3xl font-bold text-[#f59e0b] tabular-nums sm:text-4xl">
-        {count.toLocaleString()}+
+        {count.toLocaleString()}
       </p>
       <p className="mt-1 text-[11px] uppercase tracking-[0.15em] text-zinc-500">
         {metric.label}
@@ -179,7 +159,7 @@ export default function Index() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const { metrics, loading: metricsLoading } = useRealMetrics();
+  const { metrics } = useRealMetrics();
 
   useEffect(() => {
     if (!loading && user) {
@@ -347,19 +327,8 @@ export default function Index() {
       {/* Real metrics */}
       <section className="border-t border-zinc-800/60 py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="grid grid-cols-3 gap-4">
-            {metricsLoading ? (
-              <>
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="text-center">
-                    <div className="mx-auto h-10 w-20 animate-pulse rounded bg-zinc-800/60" />
-                    <div className="mx-auto mt-2 h-3 w-24 animate-pulse rounded bg-zinc-800/40" />
-                  </div>
-                ))}
-              </>
-            ) : (
-              metrics.map((m) => <AnimatedCounter key={m.label} metric={m} />)
-            )}
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {metrics.map((m) => <AnimatedCounter key={m.label} metric={m} />)}
           </div>
           <p className="mt-6 text-center text-[10px] uppercase tracking-[0.2em] text-zinc-600">
             {t('landing.liveData', { defaultValue: 'Live data — no fabricated numbers' })}
