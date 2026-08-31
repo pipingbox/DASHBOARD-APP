@@ -443,24 +443,6 @@ export default function RequestWorkers() {
           </Button>
         </div>
       </form>
-
-      {/* Trust indicators */}
-      <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm p-6">
-        <div className="grid gap-6 md:grid-cols-3 text-center">
-          <div>
-            <p className="text-2xl font-bold text-[#f59e0b]">500+</p>
-            <p className="text-xs text-zinc-500 mt-1">{t('requestWorkers.qualifiedWorkers', 'Qualified Workers')}</p>
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-[#f59e0b]">24h</p>
-            <p className="text-xs text-zinc-500 mt-1">{t('requestWorkers.responseTime', 'Response Time')}</p>
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-[#f59e0b]">15+</p>
-            <p className="text-xs text-zinc-500 mt-1">{t('requestWorkers.countriesCovered', 'Countries Covered')}</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
