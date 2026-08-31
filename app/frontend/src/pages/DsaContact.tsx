@@ -46,6 +46,28 @@ import { useSeo } from '@/hooks/useSeo';
  *
  * Do not reinstate an entity name here until the PO closes the corporate
  * decision. Tracked in PB-MARKET-PROD-001 subtask 0.1.
+ *
+ * ---------------------------------------------------------------------------
+ * 2026-08-31 (later the same day) — NEUTRALITY CONFIRMED AS THE APPROVED STATE.
+ *
+ * The PO has since ruled. The corporate strategy is BELGIUM FIRST -> ESTONIA OU
+ * LATER, under fiscal and legal review by an external adviser. Until the Belgian
+ * registration formally exists and real registry data is available, it is
+ * forbidden to publish `PipingBox OU`, to state that the company is incorporated
+ * in Estonia, or to invent a legal form, company number, VAT ID or registered
+ * address.
+ *
+ * The wording below is therefore no longer a stopgap: it is the approved state.
+ * Keep `PipingBox` as the platform/brand name, keep `support@pipingbox.com` as
+ * the contact point -- confirmed by the PO on 2026-08-31 to actually RECEIVE
+ * mail, which is what makes publishing it defensible -- and keep the Article 13
+ * conclusion resting only on establishment in the Union.
+ *
+ * ARCHITECTURAL RULE: the operator's legal identity does NOT belong on this
+ * page. It belongs in the Legal Notice / Terms. This page is contact points and
+ * DSA procedure. Keeping them apart means the future Belgium -> PipingBox OU
+ * migration touches one surface and does not force a rewrite of the DSA logic or
+ * a re-review of Article 13. Tracked as MANUAL_ACTIONS #20.
  */
 const AUTHORITIES_CONTACT = 'support@pipingbox.com';
 const RECIPIENTS_CONTACT = 'support@pipingbox.com';
