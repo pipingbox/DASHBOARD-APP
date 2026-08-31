@@ -20,6 +20,32 @@ import { useSeo } from '@/hooks/useSeo';
  * a single point of contact, not a dedicated mailbox, so this is an upgrade rather
  * than a fix. When that mailbox is live, changing AUTHORITIES_CONTACT below is the
  * only code change required.
+ *
+ * ---------------------------------------------------------------------------
+ * 2026-08-31 — OPERATOR IDENTITY REMOVED PENDING A CORPORATE DECISION.
+ *
+ * This page previously stated, thirteen times, that the platform is operated by
+ * "PipingBox OU, a company established in Estonia", and derived its Article 13
+ * conclusion from that premise. That entity DOES NOT EXIST: the canonical memo
+ * `10-CORPORATE/ESTONIA_OU_DECISION_MEMO.md` recommends "Not yet", and on
+ * 2026-08-30 the PO reopened the launch-structure decision (Belgian sole
+ * proprietorship vs. Estonian OU) and explicitly reserved it.
+ *
+ * Declaring a non-existent legal entity is worse here than anywhere else on the
+ * site: this is the page an authority reads. The comment above already contains
+ * the correct reasoning -- publishing something that does not hold up "would turn
+ * a non-compliance by omission into a misrepresentation towards an authority,
+ * which is strictly worse" -- but it had been applied to the mailbox and not to
+ * the operator.
+ *
+ * So the legal form and Member State are simply not asserted. Art. 11 requires a
+ * point of contact, not a registry extract, so omitting them is a lesser gap than
+ * stating a false one, and it is reversible in one edit. The Article 13 wording
+ * below now relies only on establishment in the Union, which holds under BOTH
+ * candidate structures (Belgium now, Estonia later).
+ *
+ * Do not reinstate an entity name here until the PO closes the corporate
+ * decision. Tracked in PB-MARKET-PROD-001 subtask 0.1.
  */
 const AUTHORITIES_CONTACT = 'support@pipingbox.com';
 const RECIPIENTS_CONTACT = 'support@pipingbox.com';
@@ -31,7 +57,7 @@ export default function DsaContact() {
   useSeo({
     title: 'DSA Contact Points — PipingBox',
     description:
-      'Single points of contact of PipingBox OÜ under Articles 11 and 12 of Regulation (EU) 2022/2065 (Digital Services Act), for authorities and for recipients of the service.',
+      'Single points of contact of PipingBox under Articles 11 and 12 of Regulation (EU) 2022/2065 (Digital Services Act), for authorities and for recipients of the service.',
   });
 
   return (
@@ -41,7 +67,7 @@ export default function DsaContact() {
         <div className="mb-10 flex flex-col items-center gap-4">
           <PipingBoxLogo />
           <h1 className="text-3xl font-bold text-white">DSA Contact Points</h1>
-          <p className="text-sm text-zinc-500">Last updated: August 27, 2026</p>
+          <p className="text-sm text-zinc-500">Last updated: August 31, 2026</p>
         </div>
 
         {/* Back link */}
@@ -59,10 +85,9 @@ export default function DsaContact() {
           <section>
             <h2 className="mb-3 text-xl font-semibold text-white">1. Operator and scope</h2>
             <p className="mb-3">
-              The PipingBox platform is operated by PipingBox OÜ, a company established in Estonia.
-              This page sets out the single points of contact designated by PipingBox OÜ under
-              Articles 11 and 12 of Regulation (EU) 2022/2065 (the Digital Services Act), and states
-              the position of PipingBox OÜ regarding Article 13.
+              This page sets out the single points of contact designated by PipingBox, the operator
+              of the platform, under Articles 11 and 12 of Regulation (EU) 2022/2065 (the Digital
+              Services Act), and states its position regarding Article 13.
             </p>
             <p>
               This page is publicly accessible and does not require registration, authentication or
@@ -76,7 +101,7 @@ export default function DsaContact() {
               2. Article 11 — Point of contact for authorities
             </h2>
             <p className="mb-3">
-              PipingBox OÜ designates a single point of contact enabling direct communication, by
+              PipingBox designates a single point of contact enabling direct communication, by
               electronic means, with the authorities of the Member States, the European Commission
               and the European Board for Digital Services, in relation to the application of the
               Digital Services Act.
@@ -95,7 +120,7 @@ export default function DsaContact() {
               routed and prioritised correctly.
             </p>
             <p className="mb-3">
-              <span className="text-zinc-300">Languages of communication.</span> PipingBox OÜ handles
+              <span className="text-zinc-300">Languages of communication.</span> PipingBox handles
               communications from authorities in English and in Spanish. Either language may be used
               and neither is subordinate to the other.
             </p>
@@ -113,8 +138,8 @@ export default function DsaContact() {
               3. Article 12 — Point of contact for recipients of the service
             </h2>
             <p className="mb-3">
-              PipingBox OÜ designates a single point of contact enabling recipients of the service to
-              communicate directly and rapidly with PipingBox OÜ by electronic means. It is available
+              PipingBox designates a single point of contact enabling recipients of the service to
+              communicate directly and rapidly with PipingBox by electronic means. It is available
               to students, instructors and third parties, whether or not they hold a PipingBox
               account.
             </p>
@@ -125,7 +150,7 @@ export default function DsaContact() {
               </a>
             </p>
             <p className="mb-3">
-              <span className="text-zinc-300">Target response time.</span> PipingBox OÜ aims to
+              <span className="text-zinc-300">Target response time.</span> PipingBox aims to
               respond to enquiries received at this point of contact within{' '}
               {RECIPIENTS_RESPONSE_TIME}.
             </p>
@@ -138,7 +163,7 @@ export default function DsaContact() {
               PipingBox team. It is not a chatbot and it does not rely solely on automated means:
               every message received at the address above is read and answered by a person. No
               recipient of the service is required to interact with an automated tool in order to
-              reach PipingBox OÜ.
+              reach PipingBox.
             </p>
           </section>
 
@@ -150,10 +175,10 @@ export default function DsaContact() {
             <p>
               Article 13 of the Digital Services Act requires providers of intermediary services that
               do not have an establishment in the Union to designate a legal representative in a
-              Member State. PipingBox OÜ is established in Estonia, a Member State of the European
-              Union. PipingBox OÜ is therefore not required to designate a legal representative in the
-              Union, and has not designated one. This section is stated explicitly rather than omitted
-              so that the position of PipingBox OÜ under Article 13 is unambiguous.
+              Member State. PipingBox is established in the European Union. It is therefore not
+              required to designate a legal representative in the Union, and has not designated one.
+              This section is stated explicitly rather than omitted so that the position of PipingBox
+              under Article 13 is unambiguous.
             </p>
           </section>
 
