@@ -151,12 +151,26 @@ export default function RequestWorkers() {
         archived: false,
       };
 
-      supabase
+      // The email Edge Function looks the lead up in `company_leads` by
+      // (email, company_name) and answers 404 `no_matching_lead` if it is not there
+      // yet -- sending nothing. So this insert MUST complete before the function is
+      // invoked, otherwise the alert is lost to a race and nobody finds out.
+      // PB-LEADFORM-001: this was fire-and-forget and is the ticket's defect #1.
+      const { error: legacyErr } = await supabase
         .from(TABLES.companyLeads)
-        .insert(legacyPayload)
-        .then(({ error: legacyErr }) => {
-          if (legacyErr) console.warn('[RequestWorkers] Legacy insert failed:', legacyErr.message);
-        });
+        .insert(legacyPayload);
+
+      if (legacyErr) {
+        // Deliberately loud. The visitor is fine -- their request is already stored in
+        // `workforce_requests` above -- but this branch means the email alert CANNOT be
+        // sent, now or ever, because the function will never find the row. Treating it
+        // as a warning is what let the gap stay invisible.
+        console.error(
+          '[RequestWorkers] LEAD ALERT WILL NOT BE SENT — legacy insert failed:',
+          legacyErr.message,
+          '| The lead IS stored in workforce_requests but no email can be triggered.',
+        );
+      }
 
       // Create admin notification (fire-and-forget).
       // leadId is omitted: the row id is no longer read back, since returning it would
@@ -170,13 +184,30 @@ export default function RequestWorkers() {
       // Fire the email Edge Function (PB-SEC-NOTIFY-001).
       // send_lead_notification handles idempotency, anti-replay (15 min window),
       // and sends two emails: admin alert + lead confirmation.
-      // Fire-and-forget: if SMTP is not configured it warns and exits cleanly.
-      supabase.functions.invoke('app_14da0f1941_send_lead_notification', {
-        body: {
-          company_name: workforcePayload.company_name,
-          email: workforcePayload.email,
-        },
-      }).catch((err) => console.warn('[RequestWorkers] Email notification failed:', err));
+      // Only attempted if the row it needs actually exists.
+      if (!legacyErr) {
+        const { data: mailData, error: mailErr } = await supabase.functions.invoke(
+          'app_14da0f1941_send_lead_notification',
+          {
+            body: {
+              company_name: workforcePayload.company_name,
+              email: workforcePayload.email,
+            },
+          },
+        );
+
+        // The function returns 200 with `emailsSent: false` when SMTP is not
+        // configured, i.e. a delivery failure reported as success. Surface that
+        // distinctly instead of letting it pass as an OK.
+        if (mailErr) {
+          console.error('[RequestWorkers] Lead email failed:', mailErr);
+        } else if (mailData && mailData.emailsSent === false) {
+          console.error(
+            '[RequestWorkers] Lead email NOT sent: the function reported success with',
+            'emailsSent=false (typically SMTP not configured in production).',
+          );
+        }
+      }
 
       setLoading(false);
       setSubmitted(true);
