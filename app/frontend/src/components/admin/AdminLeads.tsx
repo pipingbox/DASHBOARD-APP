@@ -76,12 +76,29 @@ function getPriorityBadge(priority: string | null, numWorkers: string | null, st
   );
 }
 
+/**
+ * One internal note, read back from the audit log.
+ *
+ * Notes are NOT stored on `company_leads.notes`. That column sits on a row the
+ * owning company can SELECT through the Data API, and RLS performs no column
+ * masking — anything written there is company-readable regardless of what the
+ * UI renders. See PB-SEC-INTERNAL-DATA-001.
+ */
+interface LeadNote {
+  id: string;
+  created_at: string;
+  actor_email: string | null;
+  details: string | null;
+}
+
 export function AdminLeads() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [notesInput, setNotesInput] = useState('');
   const [savingNotes, setSavingNotes] = useState(false);
+  const [noteHistory, setNoteHistory] = useState<LeadNote[]>([]);
+  const [loadingNotes, setLoadingNotes] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [countryFilter, setCountryFilter] = useState<string>('all');
@@ -165,32 +182,54 @@ export function AdminLeads() {
     });
   };
 
-  const saveNotes = async () => {
-    if (!selectedLead) return;
-    setSavingNotes(true);
-    const { error } = await supabase
-      .from(TABLES.companyLeads)
-      .update({ notes: notesInput })
-      .eq('id', selectedLead.id);
+  const fetchNoteHistory = useCallback(async (leadId: string) => {
+    setLoadingNotes(true);
+    const { data, error } = await supabase
+      .from(TABLES.auditLogs)
+      .select('id, created_at, actor_email, details')
+      .eq('target_type', 'company_lead')
+      .eq('target_id', leadId)
+      .eq('action_type', 'notes_saved')
+      .order('created_at', { ascending: false })
+      .limit(50);
     if (error) {
-      console.error('[AdminLeads] Save notes error:', error);
-      toast.error(`Failed to save notes: ${error.message}`);
-      setSavingNotes(false);
-      return;
+      console.error('[AdminLeads] Note history error:', error.message);
+      setNoteHistory([]);
+    } else {
+      setNoteHistory((data || []) as LeadNote[]);
     }
-    setLeads((prev) =>
-      prev.map((l) => (l.id === selectedLead.id ? { ...l, notes: notesInput } : l))
-    );
-    setSelectedLead((p) => (p ? { ...p, notes: notesInput } : p));
-    setSavingNotes(false);
-    toast.success('Notes saved');
-    // Audit log
-    logAuditEvent({
+    setLoadingNotes(false);
+  }, []);
+
+  /**
+   * Append an internal note.
+   *
+   * Previously this ran `UPDATE company_leads SET notes = ...`, which put
+   * administrative commentary on a company-readable row and overwrote whatever
+   * the previous person had written. Both problems are gone: the note goes to
+   * the admin-only audit log, and it is appended rather than replacing history.
+   */
+  const appendNote = async () => {
+    if (!selectedLead) return;
+    const body = notesInput.trim();
+    if (!body) return;
+
+    setSavingNotes(true);
+    const ok = await logAuditEvent({
       actionType: 'notes_saved',
       targetType: 'company_lead',
       targetId: selectedLead.id,
-      details: `Internal notes updated for ${selectedLead.company_name}`,
+      details: body,
     });
+    setSavingNotes(false);
+
+    if (!ok) {
+      toast.error('Failed to save note — it was not recorded. Check the audit log grants.');
+      return;
+    }
+    setNotesInput('');
+    toast.success('Note added');
+    await fetchNoteHistory(selectedLead.id);
   };
 
   const archiveLead = async (id: string) => {
@@ -213,7 +252,9 @@ export function AdminLeads() {
 
   const openLead = (lead: Lead) => {
     setSelectedLead(lead);
-    setNotesInput(lead.notes || '');
+    setNotesInput('');
+    setNoteHistory([]);
+    void fetchNoteHistory(lead.id);
   };
 
   // Get unique countries for filter
@@ -640,26 +681,68 @@ export function AdminLeads() {
                 </div>
               )}
 
-              {/* Internal Notes */}
+              {/* Internal Notes — append-only, stored in the admin-only audit log */}
               <div className="space-y-2">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-medium flex items-center gap-2">
                   <MessageSquare className="h-3 w-3" />
                   Internal Notes
                 </p>
+
+                <p className="text-[10px] text-zinc-600 leading-relaxed">
+                  Stored in the internal audit log. Append-only and never visible to the company.
+                </p>
+
+                {selectedLead.notes && selectedLead.notes.trim() !== '' && (
+                  <div className="border border-amber-500/30 bg-amber-500/5 rounded-sm p-3 space-y-1">
+                    <p className="text-[10px] uppercase tracking-wider text-amber-500 font-medium">
+                      Legacy note — company-readable
+                    </p>
+                    <p className="text-xs text-zinc-300 whitespace-pre-wrap">{selectedLead.notes}</p>
+                    <p className="text-[10px] text-zinc-500">
+                      Written to <code>company_leads.notes</code> before PB-SEC-INTERNAL-DATA-001. Migrate
+                      it into a new note below, then have it cleared from the column.
+                    </p>
+                  </div>
+                )}
+
                 <textarea
                   value={notesInput}
                   onChange={(e) => setNotesInput(e.target.value)}
-                  placeholder="Add internal notes about this lead..."
-                  rows={4}
+                  placeholder="Add an internal note about this lead..."
+                  rows={3}
                   className="w-full rounded-sm border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#f59e0b] focus:outline-none resize-none"
                 />
                 <button
-                  onClick={saveNotes}
-                  disabled={savingNotes}
+                  onClick={appendNote}
+                  disabled={savingNotes || notesInput.trim() === ''}
                   className="px-4 py-1.5 text-xs font-medium bg-[#f59e0b] text-black rounded-sm hover:bg-[#d97706] transition disabled:opacity-50"
                 >
-                  {savingNotes ? 'Saving...' : 'Save Notes'}
+                  {savingNotes ? 'Saving...' : 'Add Note'}
                 </button>
+
+                <div className="space-y-2 pt-1">
+                  {loadingNotes ? (
+                    <p className="text-[10px] text-zinc-600">Loading note history...</p>
+                  ) : noteHistory.length === 0 ? (
+                    <p className="text-[10px] text-zinc-600">No internal notes yet.</p>
+                  ) : (
+                    noteHistory.map((n) => (
+                      <div key={n.id} className="border border-zinc-800 rounded-sm p-3 bg-zinc-950 space-y-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[10px] text-[#f59e0b] truncate">
+                            {n.actor_email || 'unknown'}
+                          </span>
+                          <span className="text-[10px] text-zinc-600 shrink-0">
+                            {new Date(n.created_at).toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                          {n.details}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase, TABLES } from '@/lib/supabase';
+import { WORKFORCE_ACTION_LABELS } from '@/lib/workforce-admin';
 import {
   Shield,
   Search,
@@ -29,6 +30,7 @@ const ACTION_TYPES = [
   { value: 'content_rejection', label: 'Content Rejected', color: 'bg-red-500/10 text-red-400 border-red-500/30' },
   { value: 'notes_saved', label: 'Notes Saved', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
   { value: 'application_withdrawn', label: 'App Withdrawn', color: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30' },
+  ...WORKFORCE_ACTION_LABELS,
 ];
 
 function getActionColor(actionType: string): string {
@@ -247,24 +249,49 @@ export function AdminAuditLog() {
 }
 
 /* ─── Audit Logger Utility ─── */
+
+/**
+ * Append one event to the audit log. Returns whether it was actually persisted.
+ *
+ * This used to swallow every failure in a bare try/catch, which is why the table
+ * held 0 rows in production despite this being called for months: the Data API
+ * grants were missing, every INSERT came back 401/403, and nobody ever saw it.
+ * A logger that fails silently is worse than no logger — it manufactures the
+ * illusion of a trail. Callers get a boolean and the console gets the reason.
+ *
+ * `actor_email` is taken from the session and must match the JWT claim, which
+ * `al_admin_insert` enforces server-side (PB-SEC-RLS-AUDITLOG-001).
+ */
 export async function logAuditEvent(params: {
   actionType: string;
   targetType: string;
   targetId?: string;
   details?: string;
-}) {
+}): Promise<boolean> {
   try {
     const { data: sessionData } = await supabase.auth.getSession();
-    const email = sessionData?.session?.user?.email || 'unknown';
+    const email = sessionData?.session?.user?.email;
 
-    await supabase.from(TABLES.auditLogs).insert({
+    if (!email) {
+      console.error('[AuditLog] Aborted: no authenticated session email.');
+      return false;
+    }
+
+    const { error } = await supabase.from(TABLES.auditLogs).insert({
       actor_email: email,
       action_type: params.actionType,
       target_type: params.targetType,
       target_id: params.targetId || null,
       details: params.details || null,
     });
+
+    if (error) {
+      console.error('[AuditLog] Failed to persist event:', error.message);
+      return false;
+    }
+    return true;
   } catch (err) {
     console.error('[AuditLog] Failed to log event:', err);
+    return false;
   }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { supabase, TABLES, edgeFunctionUrl } from '@/lib/supabase';
 import {
@@ -21,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AdminLeads } from '@/components/admin/AdminLeads';
+import { AdminWorkforceRequests } from '@/components/admin/AdminWorkforceRequests';
 import { AdminAnalytics } from '@/components/admin/AdminAnalytics';
 import { AdminAuditLog, logAuditEvent } from '@/components/admin/AdminAuditLog';
 import { AdminRegistros } from '@/components/admin/AdminRegistros';
@@ -89,10 +91,34 @@ function getActivityIcon(type: ActivityItem['type']) {
 }
 
 /* ─── Tabs ─── */
-type AdminTab = 'overview' | 'users' | 'registros' | 'activity' | 'leads' | 'analytics' | 'audit' | 'notifications' | 'vca-bookings' | 'company-verification';
+type AdminTab = 'overview' | 'users' | 'registros' | 'activity' | 'workforce' | 'leads' | 'analytics' | 'audit' | 'notifications' | 'vca-bookings' | 'company-verification';
+
+const VALID_TABS: AdminTab[] = ['overview', 'users', 'registros', 'activity', 'workforce', 'leads', 'analytics', 'audit', 'notifications', 'vca-bookings', 'company-verification'];
 
 export default function Admin() {
-  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const activeTab: AdminTab = VALID_TABS.includes(tabParam as AdminTab)
+    ? (tabParam as AdminTab)
+    : 'overview';
+  const deepLinkedRequestId = searchParams.get('request');
+
+  const setActiveTab = useCallback(
+    (tab: AdminTab) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (tab === 'overview') next.delete('tab');
+          else next.set('tab', tab);
+          next.delete('request');
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
   const [counts, setCounts] = useState<OverviewCounts>({
     totalUsers: 0,
     workers: 0,
@@ -120,10 +146,12 @@ export default function Admin() {
   /* ─── Fetch overview counts ─── */
   const refreshCounts = useCallback(async () => {
     setCountsLoading(true);
-    const [profilesRes, appsRes, leadsRes, draftsRes] = await Promise.all([
+    const [profilesRes, appsRes, workforceRes, draftsRes] = await Promise.all([
       supabase.from(TABLES.profiles).select('role'),
       supabase.from(TABLES.jobApplications).select('*', { count: 'exact', head: true }),
-      supabase.from(TABLES.companyLeads).select('*', { count: 'exact', head: true }),
+      // PB-ADMIN-WORKFORCE-001: this tile used to count `company_leads`, so the
+      // number an admin read as "Workforce Requests" was the intake table's.
+      supabase.from(TABLES.workforceRequests).select('*', { count: 'exact', head: true }),
       supabase.from(TABLES.aiContentDrafts).select('*', { count: 'exact', head: true }),
     ]);
 
@@ -137,7 +165,7 @@ export default function Admin() {
       communityModerators: profiles.filter((p) => normalizeRole(p.role) === 'community_moderator').length,
       jobsModerators: profiles.filter((p) => normalizeRole(p.role) === 'jobs_moderator').length,
       totalApplications: appsRes.count ?? 0,
-      totalWorkforceRequests: leadsRes.count ?? 0,
+      totalWorkforceRequests: workforceRes.count ?? 0,
       totalContentDrafts: draftsRes.count ?? 0,
     });
     setCountsLoading(false);
@@ -171,15 +199,17 @@ export default function Admin() {
     let mounted = true;
     (async () => {
       setActivityLoading(true);
-      const [appsRes, leadsRes, draftsRes, usersRes] = await Promise.all([
+      const [appsRes, workforceRes, draftsRes, usersRes] = await Promise.all([
         supabase
           .from(TABLES.jobApplications)
           .select('id, created_at, applicant_name, job_title, company_name')
           .order('created_at', { ascending: false })
           .limit(10),
+        // PB-ADMIN-WORKFORCE-001: the "Workforce Request" activity rows were
+        // built from `company_leads`, not from the operational table.
         supabase
-          .from(TABLES.companyLeads)
-          .select('id, created_at, company_name, workers_needed, country')
+          .from(TABLES.workforceRequests)
+          .select('id, created_at, company_name, workers_requested, worker_type, country')
           .order('created_at', { ascending: false })
           .limit(10),
         supabase
@@ -207,13 +237,13 @@ export default function Admin() {
         });
       });
 
-      (leadsRes.data || []).forEach((l: Record<string, string>) => {
+      (workforceRes.data || []).forEach((w: Record<string, string>) => {
         items.push({
-          id: `lead-${l.id}`,
+          id: `workforce-${w.id}`,
           type: 'workforce_request',
-          title: `${l.company_name || 'Unknown'} requested workforce`,
-          subtitle: `${l.country || 'Unknown country'} · ${l.workers_needed || '?'} workers needed`,
-          date: l.created_at,
+          title: `${w.company_name || 'Unknown'} requested workforce`,
+          subtitle: `${w.country || 'Unknown country'} · ${w.workers_requested ?? '?'} × ${w.worker_type || 'workers'}`,
+          date: w.created_at,
         });
       });
 
@@ -315,7 +345,8 @@ export default function Admin() {
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="h-3.5 w-3.5" /> },
     { id: 'users', label: 'Users', icon: <Users2 className="h-3.5 w-3.5" /> },
     { id: 'activity', label: 'Activity', icon: <Calendar className="h-3.5 w-3.5" /> },
-    { id: 'leads', label: 'Lead Pipeline', icon: <Building2 className="h-3.5 w-3.5" /> },
+    { id: 'workforce', label: 'Workforce Requests', icon: <HardHat className="h-3.5 w-3.5" /> },
+    { id: 'leads', label: 'Lead Pipeline (intake)', icon: <Building2 className="h-3.5 w-3.5" /> },
     { id: 'audit', label: 'Audit Log', icon: <Shield className="h-3.5 w-3.5" /> },
     { id: 'notifications', label: 'Notifications', icon: <Bell className="h-3.5 w-3.5" /> },
     { id: 'vca-bookings', label: 'VCA Bookings', icon: <Calendar className="h-3.5 w-3.5" /> },
@@ -413,6 +444,9 @@ export default function Admin() {
       {activeTab === 'registros' && <AdminRegistros />}
       {activeTab === 'activity' && (
         <ActivityTab activity={activity} loading={activityLoading} />
+      )}
+      {activeTab === 'workforce' && (
+        <AdminWorkforceRequests initialRequestId={deepLinkedRequestId} />
       )}
       {activeTab === 'leads' && <AdminLeads />}
       {activeTab === 'analytics' && <AdminAnalytics />}

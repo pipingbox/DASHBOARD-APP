@@ -15,13 +15,18 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PipelineTimeline } from '@/components/workforce/PipelineTimeline';
-import { CoverageCard } from '@/components/workforce/CoverageCard';
 import { WorkforcePriorityBadge } from '@/components/workforce/WorkforcePriorityBadge';
+import { WORKFORCE_PRIORITIES, getStageFromStatus } from '@/lib/workforce-pipeline';
 import {
-  WORKFORCE_PRIORITIES,
-  computeCoverageFromRequest,
-  getStageFromStatus,
-} from '@/lib/workforce-pipeline';
+  COMPANY_REQUEST_COLUMNS,
+  getCompanyStatusConfig,
+  computeCoverage,
+  getCoverageTone,
+  normalizeDocumentationProgress,
+  isPendingForCompany,
+  isActiveForCompany,
+  isFulfilledForCompany,
+} from '@/lib/workforce-admin';
 
 interface WorkforceRequest {
   id: string;
@@ -36,7 +41,6 @@ interface WorkforceRequest {
   project_duration: string | null;
   priority: string;
   status: string;
-  recruiter_assigned: string | null;
   documentation_progress: Record<string, boolean>;
   created_at: string;
 }
@@ -51,9 +55,14 @@ export default function CompanyWorkforceRequests() {
     (async () => {
       setLoading(true);
       try {
+        // Explicit allow-list, not `select('*')`.
+        // `wr_auth_select_own_or_admin` grants SELECT on the whole row, so a
+        // wildcard ships every administrative column to the company's browser
+        // even when nothing renders it. Internal fields must never be listed
+        // here — internal notes live in the audit trail, not on this table.
         const { data, error } = await supabase
           .from(TABLES.workforceRequests)
-          .select('*')
+          .select(COMPANY_REQUEST_COLUMNS)
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -62,9 +71,7 @@ export default function CompanyWorkforceRequests() {
         // Normalize data - ensure documentation_progress is always an object
         const normalized = (data || []).map((row: Record<string, unknown>) => ({
           ...row,
-          documentation_progress: row.documentation_progress && typeof row.documentation_progress === 'object'
-            ? row.documentation_progress as Record<string, boolean>
-            : { contracts: false, certifications: false, onboarding: false, compliance: false, medical: false, payroll: false },
+          documentation_progress: normalizeDocumentationProgress(row.documentation_progress),
           workers_assigned: (row.workers_assigned as number) ?? 0,
           workers_requested: (row.workers_requested as number) ?? 1,
           coverage_percentage: (row.coverage_percentage as number) ?? 0,
@@ -106,17 +113,17 @@ export default function CompanyWorkforceRequests() {
         <StatCard label={t('companyWorkforce.totalRequests')} value={requests.length} icon={HardHat} />
         <StatCard
           label={t('companyWorkforce.pending')}
-          value={requests.filter((r) => r.status === 'new' || r.status === 'reviewing').length}
+          value={requests.filter((r) => isPendingForCompany(r.status)).length}
           icon={Clock}
         />
         <StatCard
           label={t('companyWorkforce.inProgress')}
-          value={requests.filter((r) => ['recruiting', 'partially_staffed'].includes(r.status)).length}
+          value={requests.filter((r) => isActiveForCompany(r.status)).length}
           icon={Users}
         />
         <StatCard
           label={t('companyWorkforce.fulfilled')}
-          value={requests.filter((r) => ['fully_staffed', 'completed'].includes(r.status)).length}
+          value={requests.filter((r) => isFulfilledForCompany(r.status)).length}
           icon={CheckCircle2}
         />
       </div>
@@ -159,7 +166,8 @@ export default function CompanyWorkforceRequests() {
       ) : (
         <div className="space-y-4">
           {filteredRequests.map((req) => {
-            const coverage = computeCoverageFromRequest(req);
+            const coverage = computeCoverage(req);
+            const coverageTone = getCoverageTone(coverage.percentage);
             const currentStage = getStageFromStatus(req.status);
 
             return (
@@ -188,11 +196,6 @@ export default function CompanyWorkforceRequests() {
                         <Clock className="h-3 w-3" />
                         {new Date(req.created_at).toLocaleDateString()}
                       </span>
-                      {req.recruiter_assigned && (
-                        <span className="text-[10px] text-zinc-500">
-                          Recruiter: {req.recruiter_assigned}
-                        </span>
-                      )}
                     </div>
                   </div>
                   <RequestStatusBadge status={req.status} />
@@ -205,26 +208,25 @@ export default function CompanyWorkforceRequests() {
 
                 {/* Coverage + Documentation */}
                 <div className="mt-3 pt-3 border-t border-zinc-800/50 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Coverage */}
+                  {/* Coverage — real values only: requested, assigned, percentage. */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-[10px] text-zinc-500 flex items-center gap-1">
                         <Users className="h-3 w-3" />
                         {t('companyWorkforce.staffingProgress', 'Staffing Progress')}
                       </span>
-                      <CoverageCard coverage={coverage} compact />
+                      <span className={`text-[11px] font-semibold ${coverageTone.text}`}>
+                        {coverage.requested} {t('companyWorkforce.requestedShort', 'requested')} /{' '}
+                        {coverage.assigned} {t('companyWorkforce.assignedShort', 'assigned')} ·{' '}
+                        {coverage.percentage}%
+                      </span>
                     </div>
                     <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{
-                          width: `${Math.min(100, req.coverage_percentage)}%`,
-                          backgroundColor:
-                            req.coverage_percentage >= 100
-                              ? '#10b981'
-                              : req.coverage_percentage >= 50
-                                ? '#f59e0b'
-                                : '#ef4444',
+                          width: `${coverage.percentage}%`,
+                          backgroundColor: coverageTone.bar,
                         }}
                       />
                     </div>
@@ -271,20 +273,18 @@ function StatCard({ label, value, icon: Icon }: { label: string; value: number; 
   );
 }
 
+/**
+ * Company-facing status badge.
+ *
+ * Reads through the shared projection instead of a local map. The previous
+ * local map had no `cancelled` entry and fell back to `configs.new`, so every
+ * cancelled request was shown to the company as "New" — 19 of the 43 rows in
+ * production. Unknown values now render as themselves rather than as "New".
+ */
 function RequestStatusBadge({ status }: { status: string }) {
-  const configs: Record<string, { bg: string; text: string; label: string }> = {
-    new: { bg: 'bg-blue-500/10 border-blue-500/30', text: 'text-blue-400', label: 'New' },
-    reviewing: { bg: 'bg-cyan-500/10 border-cyan-500/30', text: 'text-cyan-400', label: 'Reviewing' },
-    recruiting: { bg: 'bg-purple-500/10 border-purple-500/30', text: 'text-purple-400', label: 'Recruiting' },
-    partially_staffed: { bg: 'bg-yellow-500/10 border-yellow-500/30', text: 'text-yellow-400', label: 'Partially Staffed' },
-    fully_staffed: { bg: 'bg-emerald-500/10 border-emerald-500/30', text: 'text-emerald-400', label: 'Fully Staffed' },
-    in_progress: { bg: 'bg-indigo-500/10 border-indigo-500/30', text: 'text-indigo-400', label: 'In Progress' },
-    completed: { bg: 'bg-green-500/10 border-green-500/30', text: 'text-green-400', label: 'Completed' },
-    archived: { bg: 'bg-zinc-500/10 border-zinc-500/30', text: 'text-zinc-400', label: 'Archived' },
-  };
-  const cfg = configs[status] || configs.new;
+  const cfg = getCompanyStatusConfig(status);
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-sm border text-[9px] font-semibold uppercase tracking-wider ${cfg.bg} ${cfg.text}`}>
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-sm border text-[9px] font-semibold uppercase tracking-wider ${cfg.color}`}>
       {cfg.label}
     </span>
   );
