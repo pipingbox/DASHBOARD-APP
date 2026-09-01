@@ -303,12 +303,29 @@ export function getCandidateStageConfig(raw: string | null | undefined) {
  * names, positions and internal notes to anonymous callers in the same instant.
  *
  * Order of operations, no shortcuts:
- *   1. apply `sql/PB-SEC-RLS-ASSIGNMENTS-001-rls.sql`  (policies, then grants)
- *   2. apply `sql/PB-SEC-RLS-AUDITLOG-001-rls.sql`
- *   3. run   `sql/PB-ADMIN-WORKFORCE-001-verification.sql` — all checks PASS
- *   4. only then flip this to `true`
+ *   1. apply `sql/PB-SEC-RLS-AUDITLOG-001-rls.sql`
+ *   2. apply `sql/PB-SEC-RLS-ASSIGNMENTS-001-rls.sql`  (policies, then grants)
+ *   3. apply `sql/PB-SEC-INTERNAL-DATA-001-internal-store.sql`
+ *   4. apply `sql/PB-ADMIN-WORKFORCE-001-schema.sql`
+ *   5. run   `sql/PB-ADMIN-WORKFORCE-001-verification.sql` — all checks PASS
+ *   6. only then flip this to `true`
+ *
+ * ─── GATE CLEARED — 2026-09-01 ───
+ *
+ * All four files applied to production (`pipingbox` / `mwdauubztjxkbrefirbg`),
+ * plus `pb_sec_workforce_acl_exact_fix_v491`, which revoked the legacy
+ * `authenticated` grants the first pass had missed — TRUNCATE among them, and
+ * RLS does not apply to TRUNCATE.
+ *
+ * Harness as versioned in PIPINGBOX-BRAIN@cc48517: **31 PASS / 0 FAIL**,
+ * ROLLBACK confirmed, no residue (0 assignments, 0 internal rows, 0 audit
+ * probes), 43 requests intact at 24 `new` / 19 `cancelled`. No dangerous
+ * policies and no dangerous client-role ACLs remain.
+ *
+ * The dormant exposure described above is closed: the policies are admin-only
+ * and the grants are exact. This flag is now `true`.
  */
-export const CANDIDATE_PIPELINE_ENABLED = false;
+export const CANDIDATE_PIPELINE_ENABLED = true;
 
 export const CANDIDATE_PIPELINE_BLOCKED_REASON =
   'Candidate pipeline is locked until PB-SEC-RLS-ASSIGNMENTS-001 (legacy permissive RLS on workforce_assignments) is applied and verified in production.';
