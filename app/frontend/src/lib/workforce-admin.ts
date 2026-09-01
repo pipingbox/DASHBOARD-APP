@@ -325,11 +325,12 @@ export const CANDIDATE_PIPELINE_BLOCKED_REASON =
  *
  * Be honest about what this list does and does not buy: it shrinks the payload
  * the app requests, it does NOT make the excluded columns unreadable. RLS has no
- * column masking, so a company can still ask the Data API for `notes` or
- * `recruiter_assigned` directly. The real control is that `notes` is never
- * written (deprecated at the schema level) and `recruiter_assigned` only ever
- * holds a display name, never an email. Closing that gap structurally is
- * PB-SEC-INTERNAL-DATA-001.
+ * column masking, so a company can still ask the Data API for any column on its
+ * own row. That is why the list is not the control — the control is that the
+ * internal columns are never written. `notes` is deprecated at the schema level,
+ * and recruiter ownership was moved out entirely to the admin-only store
+ * (PB-SEC-INTERNAL-DATA-001), because a frontend allow-list is not a security
+ * boundary.
  */
 export const COMPANY_REQUEST_COLUMNS = [
   'id',
@@ -344,8 +345,8 @@ export const COMPANY_REQUEST_COLUMNS = [
   'project_duration',
   'priority',
   'status',
-  // `recruiter_assigned` is deliberately absent: internal staffing ownership is
-  // not part of the company-facing contract. Never add `notes` here.
+  // `recruiter_assigned` is deprecated and never written; ownership lives in
+  // `workforceRequestInternal`. Never add it, or `notes`, here.
   'documentation_progress',
   'created_at',
 ].join(', ');
@@ -360,6 +361,11 @@ interface PostgrestLikeError {
 /** 42703 — undefined_column. Used by the capability probe. */
 export function isMissingColumnError(error: PostgrestLikeError | null | undefined): boolean {
   return error?.code === '42703';
+}
+
+/** 42P01 — undefined_table. Used by the internal-store capability probe. */
+export function isMissingTableError(error: PostgrestLikeError | null | undefined): boolean {
+  return error?.code === '42P01' || /does not exist/i.test(error?.message ?? '');
 }
 
 /** 23514 — check_violation. Surfaces a CHECK constraint rejecting a new token. */
@@ -387,23 +393,30 @@ export function describeWorkforceError(error: PostgrestLikeError | null | undefi
 export interface WorkforceCapabilities {
   /** `archived` boolean column present on workforce_requests. */
   archived: boolean;
+  /** Admin-only internal store present — see PB-SEC-INTERNAL-DATA-001. */
+  internalStore: boolean;
 }
 
 let capabilitiesPromise: Promise<WorkforceCapabilities> | null = null;
 
 /**
- * One cheap probe per session, cached. Lets the archive control degrade
- * honestly (disabled, with a reason) instead of failing silently when the
- * column has not been created yet.
+ * Two cheap probes per session, cached.
+ *
+ * Lets each control degrade honestly — disabled, with the reason on screen —
+ * instead of failing silently when the schema is not there yet. A control that
+ * pretends to work is worse than one that admits it cannot.
  */
 export function detectWorkforceCapabilities(): Promise<WorkforceCapabilities> {
   if (!capabilitiesPromise) {
     capabilitiesPromise = (async () => {
-      const { error } = await supabase
-        .from(TABLES.workforceRequests)
-        .select('archived')
-        .limit(1);
-      return { archived: !isMissingColumnError(error) && !error };
+      const [archivedProbe, internalProbe] = await Promise.all([
+        supabase.from(TABLES.workforceRequests).select('archived').limit(1),
+        supabase.from(TABLES.workforceRequestInternal).select('request_id').limit(1),
+      ]);
+      return {
+        archived: !isMissingColumnError(archivedProbe.error) && !archivedProbe.error,
+        internalStore: !internalProbe.error,
+      };
     })();
   }
   return capabilitiesPromise;
@@ -559,11 +572,9 @@ export interface RecruiterOption {
  * Queries both roles even though `jobs_moderator` has zero members today, so
  * the selector fills itself once recruiters exist — no code change required.
  *
- * The display name (not the email) is what gets written to
- * `recruiter_assigned`: the company reads that column, and internal staff
- * emails should not travel to a customer's browser. The `user_id` is recorded
- * in the audit entry instead, which is what a future `recruiter_user_id`
- * backfill will read from.
+ * Emails are never stored on the assignment: the internal store keeps the
+ * `user_id` as the stable reference plus a name snapshot, so the case file
+ * still reads correctly if the person is renamed or leaves.
  */
 export async function fetchRecruiterOptions(): Promise<RecruiterOption[]> {
   const { data, error } = await supabase
@@ -584,6 +595,99 @@ export async function fetchRecruiterOptions(): Promise<RecruiterOption[]> {
     }))
     .filter((r) => r.user_id && r.name);
 }
+
+/* ─── Internal case-file store (admin-only) ─── */
+
+/**
+ * Internal, admin-only state of a request.
+ *
+ * Lives in its own table rather than on `workforce_requests` because **RLS
+ * filters rows, not columns**. A company that can SELECT its own request row can
+ * ask the Data API for any column on that row, regardless of what the UI
+ * renders — so an allow-list in the frontend shrinks the payload but is not a
+ * security boundary. The frontend never is. See PB-SEC-INTERNAL-DATA-001.
+ */
+export interface WorkforceInternalState {
+  request_id: string;
+  recruiter_user_id: string | null;
+  recruiter_name: string | null;
+  updated_at?: string | null;
+}
+
+/**
+ * Load internal state for a page of requests, keyed by request id.
+ *
+ * Deliberately a second round-trip instead of a PostgREST embed: embedding
+ * depends on the foreign key being present in the schema cache, which would make
+ * the whole admin list fail while the migration is still pending. Fetching
+ * separately means a missing table costs one disabled control, not a blank page.
+ */
+export async function fetchInternalStates(
+  requestIds: string[],
+): Promise<Map<string, WorkforceInternalState>> {
+  const result = new Map<string, WorkforceInternalState>();
+  if (requestIds.length === 0) return result;
+
+  const { data, error } = await supabase
+    .from(TABLES.workforceRequestInternal)
+    .select('request_id, recruiter_user_id, recruiter_name, updated_at')
+    .in('request_id', requestIds);
+
+  if (error) {
+    // A missing table is the expected state until the migration is applied, and
+    // the capability probe already reports it. Anything else is worth surfacing.
+    if (!isMissingTableError(error)) {
+      console.error('[WorkforceAdmin] Internal state fetch failed:', error.message);
+    }
+    return result;
+  }
+
+  for (const row of data || []) {
+    const state = row as WorkforceInternalState;
+    result.set(state.request_id, state);
+  }
+  return result;
+}
+
+/**
+ * Assign or clear the recruiter who owns a request.
+ *
+ * Upsert on the primary key: one case file has exactly one internal state, and
+ * the database is what guarantees that, not a read-then-write in the client.
+ *
+ * Clearing sets both fields to NULL rather than deleting the row, so the record
+ * that the case file was once assigned survives. No client role holds DELETE on
+ * this table.
+ */
+export async function saveInternalRecruiter(
+  requestId: string,
+  recruiter: RecruiterOption | null,
+): Promise<{ ok: boolean; error?: string }> {
+  const { data: sessionData } = await supabase.auth.getSession();
+
+  const { error } = await supabase
+    .from(TABLES.workforceRequestInternal)
+    .upsert(
+      {
+        request_id: requestId,
+        recruiter_user_id: recruiter?.user_id ?? null,
+        recruiter_name: recruiter?.name ?? null,
+        updated_by: sessionData?.session?.user?.id ?? null,
+      },
+      { onConflict: 'request_id' },
+    );
+
+  if (error) {
+    if (isMissingTableError(error)) {
+      return { ok: false, error: INTERNAL_STORE_BLOCKED_REASON };
+    }
+    return { ok: false, error: describeWorkforceError(error) };
+  }
+  return { ok: true };
+}
+
+export const INTERNAL_STORE_BLOCKED_REASON =
+  'Recruiter assignment is unavailable until PB-SEC-INTERNAL-DATA-001 (admin-only internal store) is applied in production. It is deliberately not stored on the request row, which the company can read.';
 
 /* ─── Documentation progress ─── */
 

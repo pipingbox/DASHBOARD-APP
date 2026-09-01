@@ -40,6 +40,8 @@ import {
   computeCoverage,
   getCoverageTone,
   describeWorkforceError,
+  saveInternalRecruiter,
+  INTERNAL_STORE_BLOCKED_REASON,
   emitWorkforceEvent,
   logWorkforceNote,
   fetchWorkforceTimeline,
@@ -68,13 +70,20 @@ export interface WorkforceRequestRow {
   project_duration: string | null;
   priority: string | null;
   status: string | null;
-  recruiter_assigned: string | null;
   message: string | null;
   documentation_progress: unknown;
   created_at: string | null;
   /** Present only if the column exists — see PB-ADMIN-WORKFORCE-001-schema.sql. */
   updated_at?: string | null;
   archived?: boolean | null;
+  /**
+   * Merged in memory from the admin-only internal store, never selected from
+   * `workforce_requests`. The deprecated `recruiter_assigned` column is
+   * deliberately absent from this type so it cannot be read by accident —
+   * see PB-SEC-INTERNAL-DATA-001.
+   */
+  recruiter_name?: string | null;
+  recruiter_user_id?: string | null;
 }
 
 interface CandidateRow {
@@ -196,21 +205,37 @@ export function AdminWorkforceRequestDetail({ request, capabilities, onClose, on
     if (ok) toast.success(`Priority set to ${label}`);
   };
 
+  /**
+   * Assign the recruiter who owns this request.
+   *
+   * Writes to the admin-only internal store, not to `workforce_requests`. The
+   * company can SELECT its own request row column by column through the Data
+   * API, so internal ownership cannot live there whatever the UI renders.
+   */
   const assignRecruiter = async (userId: string) => {
     const option = recruiters.find((r) => r.user_id === userId) ?? null;
-    // The display name is stored, not the email: the company can read this
-    // column. The user_id rides along in the audit entry so a future
-    // `recruiter_user_id` column can be backfilled from the log.
-    const ok = await persist(
-      { recruiter_assigned: option?.name ?? null },
-      {
-        action: WORKFORCE_AUDIT_ACTIONS.recruiterAssigned,
-        details: option ? `Recruiter assigned: ${option.name}` : 'Recruiter unassigned',
-        actorUserId: option?.user_id ?? null,
-      },
-      'recruiter',
-    );
-    if (ok) toast.success(option ? `Assigned to ${option.name}` : 'Recruiter cleared');
+    setSaving('recruiter');
+
+    const { ok, error } = await saveInternalRecruiter(request.id, option);
+    if (!ok) {
+      toast.error(error ?? 'Failed to assign recruiter');
+      setSaving(null);
+      return;
+    }
+
+    onPatch(request.id, {
+      recruiter_name: option?.name ?? null,
+      recruiter_user_id: option?.user_id ?? null,
+    });
+    await emitWorkforceEvent({
+      action: WORKFORCE_AUDIT_ACTIONS.recruiterAssigned,
+      requestId: request.id,
+      details: option ? `Recruiter assigned: ${option.name}` : 'Recruiter unassigned',
+      actorUserId: option?.user_id ?? null,
+    });
+    await reloadTimeline();
+    setSaving(null);
+    toast.success(option ? `Assigned to ${option.name}` : 'Recruiter cleared');
   };
 
   const saveStaffing = async () => {
@@ -418,8 +443,8 @@ export function AdminWorkforceRequestDetail({ request, capabilities, onClose, on
 
               <Control label="Recruiter / Owner">
                 <select
-                  value={recruiters.find((r) => r.name === request.recruiter_assigned)?.user_id ?? ''}
-                  disabled={saving === 'recruiter'}
+                  value={request.recruiter_user_id ?? ''}
+                  disabled={saving === 'recruiter' || !capabilities.internalStore}
                   onChange={(e) => assignRecruiter(e.target.value)}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-sm px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-[#f59e0b] disabled:opacity-40"
                 >
@@ -428,19 +453,30 @@ export function AdminWorkforceRequestDetail({ request, capabilities, onClose, on
                     <option key={r.user_id} value={r.user_id}>{r.name}</option>
                   ))}
                 </select>
-                {recruiters.length === 0 && (
-                  <p className="mt-1 text-[10px] text-zinc-500">
-                    No internal staff found. The list fills automatically once users hold the admin or
-                    jobs moderator role.
+                {!capabilities.internalStore ? (
+                  <p className="mt-1 text-[10px] text-amber-400 leading-relaxed">
+                    {INTERNAL_STORE_BLOCKED_REASON}
                   </p>
-                )}
-                {request.recruiter_assigned &&
-                  !recruiters.some((r) => r.name === request.recruiter_assigned) && (
-                    <p className="mt-1 text-[10px] text-amber-400">
-                      Currently “{request.recruiter_assigned}”, which no longer matches an internal
-                      profile.
+                ) : (
+                  <>
+                    <p className="mt-1 text-[10px] text-zinc-600">
+                      Stored in the admin-only internal store. Never visible to the company.
                     </p>
-                  )}
+                    {recruiters.length === 0 && (
+                      <p className="mt-1 text-[10px] text-zinc-500">
+                        No internal staff found. The list fills automatically once users hold the
+                        admin or jobs moderator role.
+                      </p>
+                    )}
+                    {request.recruiter_name &&
+                      !recruiters.some((r) => r.user_id === request.recruiter_user_id) && (
+                        <p className="mt-1 text-[10px] text-amber-400">
+                          Currently “{request.recruiter_name}”, which no longer matches an internal
+                          profile.
+                        </p>
+                      )}
+                  </>
+                )}
               </Control>
 
               <Control label="Workers Assigned">

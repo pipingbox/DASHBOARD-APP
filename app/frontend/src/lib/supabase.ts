@@ -75,6 +75,11 @@ export const TABLES = {
   // Workforce request pipeline (PB-DRIFT-001 reconciliation)
   workforceRequests: 'app_14da0f1941_workforce_requests',
   workforceAssignments: 'app_14da0f1941_workforce_assignments',
+  // Admin-only. Internal state of a workforce case file. It is a separate table
+  // because RLS filters rows, not columns: anything stored on
+  // `workforceRequests` is readable by the owning company through the Data API,
+  // whatever the UI chooses to render. See PB-SEC-INTERNAL-DATA-001.
+  workforceRequestInternal: 'app_14da0f1941_workforce_request_internal',
   // Stripe / monetization (PB-STRIPE-001 Fase 2, DEC-30)
   // Client access is read-only; all writes happen in Edge Functions via service_role.
   stripePrices: 'app_stripe_prices',

@@ -22,6 +22,7 @@ import {
   computeCoverage,
   getCoverageTone,
   detectWorkforceCapabilities,
+  fetchInternalStates,
   isArchivedStatus,
   normalizeDocumentationProgress,
   getDocumentationStats,
@@ -38,7 +39,7 @@ type SortKey =
   | 'estimated_start_date'
   | 'priority'
   | 'status'
-  | 'recruiter_assigned'
+  | 'recruiter_name'
   | 'created_at'
   | 'updated_at';
 
@@ -47,7 +48,7 @@ const UNASSIGNED = '__unassigned__';
 export function AdminWorkforceRequests({ initialRequestId }: { initialRequestId?: string | null }) {
   const [requests, setRequests] = useState<WorkforceRequestRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [capabilities, setCapabilities] = useState<WorkforceCapabilities>({ archived: false });
+  const [capabilities, setCapabilities] = useState<WorkforceCapabilities>({ archived: false, internalStore: false });
   const [selectedId, setSelectedId] = useState<string | null>(initialRequestId ?? null);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,9 +79,27 @@ export function AdminWorkforceRequests({ initialRequestId }: { initialRequestId?
       console.error('[AdminWorkforce] Fetch error:', error.message);
       toast.error(`Failed to load workforce requests: ${error.message}`);
       setRequests([]);
-    } else {
-      setRequests((data || []) as WorkforceRequestRow[]);
+      setLoading(false);
+      return;
     }
+
+    const rows = (data || []) as WorkforceRequestRow[];
+
+    // Recruiter ownership comes from the admin-only internal store, never from
+    // the deprecated `recruiter_assigned` column that the company can read.
+    // A separate round-trip rather than a PostgREST embed: if the store is not
+    // there yet, the cost is one disabled control, not a broken list.
+    const internal = await fetchInternalStates(rows.map((r) => r.id));
+    setRequests(
+      rows.map((r) => {
+        const state = internal.get(r.id);
+        return {
+          ...r,
+          recruiter_name: state?.recruiter_name ?? null,
+          recruiter_user_id: state?.recruiter_user_id ?? null,
+        };
+      }),
+    );
     setLoading(false);
   }, []);
 
@@ -100,7 +119,20 @@ export function AdminWorkforceRequests({ initialRequestId }: { initialRequestId?
             toast.success(`New workforce request: ${row.company_name || 'Unknown company'}`);
           } else if (payload.eventType === 'UPDATE') {
             const row = payload.new as WorkforceRequestRow;
-            setRequests((prev) => prev.map((r) => (r.id === row.id ? row : r)));
+            // Preserve the locally merged internal state: the realtime payload
+            // only carries `workforce_requests` columns, so replacing the row
+            // wholesale would blank the recruiter until the next full fetch.
+            setRequests((prev) =>
+              prev.map((r) =>
+                r.id === row.id
+                  ? {
+                      ...row,
+                      recruiter_name: r.recruiter_name ?? null,
+                      recruiter_user_id: r.recruiter_user_id ?? null,
+                    }
+                  : r,
+              ),
+            );
           } else if (payload.eventType === 'DELETE') {
             const row = payload.old as WorkforceRequestRow;
             setRequests((prev) => prev.filter((r) => r.id !== row.id));
@@ -140,7 +172,7 @@ export function AdminWorkforceRequests({ initialRequestId }: { initialRequestId?
   const uniqueRecruiters = useMemo(
     () =>
       Array.from(
-        new Set(requests.map((r) => r.recruiter_assigned).filter(Boolean)),
+        new Set(requests.map((r) => r.recruiter_name).filter(Boolean)),
       ).sort() as string[],
     [requests],
   );
@@ -155,12 +187,12 @@ export function AdminWorkforceRequests({ initialRequestId }: { initialRequestId?
       if (priorityFilter !== 'all' && (r.priority || 'normal') !== priorityFilter) return false;
       if (countryFilter !== 'all' && r.country !== countryFilter) return false;
       if (workerTypeFilter !== 'all' && r.worker_type !== workerTypeFilter) return false;
-      if (recruiterFilter === UNASSIGNED && r.recruiter_assigned) return false;
-      if (recruiterFilter !== 'all' && recruiterFilter !== UNASSIGNED && r.recruiter_assigned !== recruiterFilter) {
+      if (recruiterFilter === UNASSIGNED && r.recruiter_name) return false;
+      if (recruiterFilter !== 'all' && recruiterFilter !== UNASSIGNED && r.recruiter_name !== recruiterFilter) {
         return false;
       }
       if (!q) return true;
-      return [r.company_name, r.contact_person, r.email, r.country, r.worker_type, r.recruiter_assigned]
+      return [r.company_name, r.contact_person, r.email, r.country, r.worker_type, r.recruiter_name]
         .filter(Boolean)
         .some((field) => String(field).toLowerCase().includes(q));
     });
@@ -216,7 +248,7 @@ export function AdminWorkforceRequests({ initialRequestId }: { initialRequestId?
     const assigned = active.reduce((sum, r) => sum + (Number(r.workers_assigned) || 0), 0);
     return {
       total: active.length,
-      unassigned: active.filter((r) => !r.recruiter_assigned).length,
+      unassigned: active.filter((r) => !r.recruiter_name).length,
       needsTriage: active.filter((r) => getWorkforceStatusConfig(r.status).value === 'new').length,
       requested,
       assigned,
@@ -396,7 +428,7 @@ export function AdminWorkforceRequests({ initialRequestId }: { initialRequestId?
                   <Th>Duration</Th>
                   <Th sortKey="priority" active={sortKey} dir={sortDir} onSort={toggleSort}>Priority</Th>
                   <Th sortKey="status" active={sortKey} dir={sortDir} onSort={toggleSort}>Status</Th>
-                  <Th sortKey="recruiter_assigned" active={sortKey} dir={sortDir} onSort={toggleSort}>Recruiter</Th>
+                  <Th sortKey="recruiter_name" active={sortKey} dir={sortDir} onSort={toggleSort}>Recruiter</Th>
                   <Th>Docs</Th>
                   <Th sortKey="created_at" active={sortKey} dir={sortDir} onSort={toggleSort}>Created</Th>
                   <Th sortKey="updated_at" active={sortKey} dir={sortDir} onSort={toggleSort}>Last Update</Th>
@@ -484,8 +516,8 @@ export function AdminWorkforceRequests({ initialRequestId }: { initialRequestId?
                         </span>
                       </td>
                       <td className="py-2.5 px-3 text-xs whitespace-nowrap">
-                        {r.recruiter_assigned ? (
-                          <span className="text-zinc-300">{r.recruiter_assigned}</span>
+                        {r.recruiter_name ? (
+                          <span className="text-zinc-300">{r.recruiter_name}</span>
                         ) : (
                           <span className="text-red-400/70 text-[10px] uppercase tracking-wider">
                             Unassigned
