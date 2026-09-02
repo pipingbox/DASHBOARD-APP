@@ -1,5 +1,44 @@
 import { supabase, TABLES } from '@/lib/supabase';
 import { notifyReferralJoined, notifyReferralVerified } from '@/lib/notifications';
+import { edgeFunctionUrl } from '@/lib/supabase';
+
+async function callReferralsApply(referredId: string, referrerId: string): Promise<boolean> {
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+    if (!accessToken) return false;
+    const res = await fetch(edgeFunctionUrl('referrals-apply'), {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ referred_id: referredId, referrer_id: referrerId }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function callReferralsBootstrap(storedCode?: string): Promise<boolean> {
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+    if (!accessToken) return false;
+    const res = await fetch(edgeFunctionUrl('referrals-bootstrap'), {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ referral_code: storedCode }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 export interface Referral {
   id: string;
@@ -210,14 +249,16 @@ export async function getUserReferralCode(userId: string): Promise<string> {
     return profile.referral_code as string;
   }
 
-  // Generate and store new code
-  const code = generateReferralCode(userId);
-  await supabase
-    .from(TABLES.profiles)
-    .update({ referral_code: code })
-    .eq('user_id', userId);
+  // Generate and store new code via backend.
+  await callReferralsBootstrap();
 
-  return code;
+  const { data: refreshed } = await supabase
+    .from(TABLES.profiles)
+    .select('referral_code')
+    .eq('user_id', userId)
+    .single();
+
+  return (refreshed?.referral_code as string) ?? generateReferralCode(userId);
 }
 
 /**
@@ -346,16 +387,13 @@ export async function processStoredReferral(userId: string, userEmail?: string):
 
     console.log('[REFERRAL_RECOVERY] Valid referrer found:', referrerId, '— assigning now');
 
-    // Update profile with referred_by_user_id
-    const { error: updateErr } = await supabase
-      .from(TABLES.profiles)
-      .update({ referred_by_user_id: referrerId })
-      .eq('user_id', userId);
+    // Apply referral via backend.
+    const applied = await callReferralsApply(userId, referrerId);
 
-    if (updateErr) {
-      console.error('[REFERRAL_RECOVERY] Failed to update profile:', updateErr.message);
+    if (!applied) {
+      console.error('[REFERRAL_RECOVERY] Failed to apply referral via backend');
     } else {
-      console.log('[REFERRAL_RECOVERY] ✅ Profile referred_by_user_id set');
+      console.log('[REFERRAL_RECOVERY] ✅ Referral applied via backend');
     }
 
     // Check if referral record already exists (prevent duplicates)
@@ -381,23 +419,7 @@ export async function processStoredReferral(userId: string, userEmail?: string):
       }
     }
 
-    // Increment referrer stats
-    try {
-      const { data: referrerProfile } = await supabase
-        .from(TABLES.profiles)
-        .select('referral_count')
-        .eq('user_id', referrerId)
-        .maybeSingle();
-
-      const currentCount = (referrerProfile?.referral_count as number) || 0;
-      await supabase
-        .from(TABLES.profiles)
-        .update({ referral_count: currentCount + 1 })
-        .eq('user_id', referrerId);
-      console.log('[REFERRAL_RECOVERY] ✅ Referrer count incremented');
-    } catch {
-      // Non-critical
-    }
+    // Referral stats are updated by the backend Edge Function; skip local update.
 
     // Store debug info
     try {
@@ -729,49 +751,10 @@ export async function adminAssignReferral(
   try {
     console.log('[ADMIN_REFERRAL] Assigning referral:', { userId, referrerId });
 
-    // Update profile
-    const { error: profileErr } = await supabase
-      .from(TABLES.profiles)
-      .update({ referred_by_user_id: referrerId })
-      .eq('user_id', userId);
-
-    if (profileErr) {
-      return { success: false, error: `Profile update failed: ${profileErr.message}` };
+    const applied = await callReferralsApply(userId, referrerId);
+    if (!applied) {
+      return { success: false, error: 'Backend referral assignment failed' };
     }
-
-    // Create referral record (prevent duplicates)
-    const { data: existing } = await supabase
-      .from(TABLES.referrals)
-      .select('id')
-      .eq('referrer_id', referrerId)
-      .eq('referred_id', userId)
-      .maybeSingle();
-
-    if (!existing) {
-      const { error: insertErr } = await supabase.from(TABLES.referrals).insert({
-        referrer_id: referrerId,
-        referred_id: userId,
-        referred_email: userEmail || '',
-        status: 'pending',
-      });
-
-      if (insertErr) {
-        return { success: false, error: `Referral record insert failed: ${insertErr.message}` };
-      }
-    }
-
-    // Increment referrer stats
-    const { data: referrerProfile } = await supabase
-      .from(TABLES.profiles)
-      .select('referral_count')
-      .eq('user_id', referrerId)
-      .maybeSingle();
-
-    const currentCount = (referrerProfile?.referral_count as number) || 0;
-    await supabase
-      .from(TABLES.profiles)
-      .update({ referral_count: currentCount + 1 })
-      .eq('user_id', referrerId);
 
     console.log('[ADMIN_REFERRAL] ✅ Referral assigned successfully');
     return { success: true };

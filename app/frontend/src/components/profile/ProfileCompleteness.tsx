@@ -128,14 +128,7 @@ export function ProfileCompleteness() {
     setItems(checklistItems);
     setLoading(false);
 
-    // Optionally sync back to DB as cached value (non-blocking)
-    if (calculated.percentage !== profile.profile_completion) {
-      supabase
-        .from(TABLES.profiles)
-        .update({ profile_completion: calculated.percentage })
-        .eq('user_id', user.id)
-        .then(() => {});
-    }
+    // profile_completion is backend-controlled; do not sync from the frontend.
   };
 
   if (loading) {

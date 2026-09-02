@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase, TABLES, SUPABASE_ANON_KEY, edgeFunctionUrl } from '@/lib/supabase';
+import { adminAssignReferral } from '@/lib/referrals';
 import {
   calculateProfileCompletion,
   COMPLETION_THRESHOLDS,
@@ -477,33 +478,18 @@ export function AdminRegistros() {
 
     setAssigningReferral(true);
     try {
-      // Update referred_by_user_id on the referido user
-      const { error: updateError } = await supabase
-        .from(TABLES.profiles)
-        .update({ referred_by_user_id: selectedReferrerId })
-        .eq('user_id', referralModal.referidoId);
+      const result = await adminAssignReferral(
+        referralModal.referidoId,
+        selectedReferrerId,
+      );
 
-      if (updateError) {
-        toast.error(`Error al asignar referral: ${updateError.message}`);
+      if (!result.success) {
+        toast.error(`Error al asignar referral: ${result.error}`);
         setAssigningReferral(false);
         return;
       }
 
-      // Increment referrer's referral_count
-      const { data: referrerProfile } = await supabase
-        .from(TABLES.profiles)
-        .select('referral_count')
-        .eq('user_id', selectedReferrerId)
-        .maybeSingle();
-
-      const currentCount = (referrerProfile?.referral_count as number) || 0;
-      await supabase
-        .from(TABLES.profiles)
-        .update({ referral_count: currentCount + 1 })
-        .eq('user_id', selectedReferrerId);
-
       const referrerUser = users.find((u) => u.user_id === selectedReferrerId);
-      console.log('REFERRAL MANUALLY ASSIGNED:', referralModal.referidoName, '←', referrerUser?.full_name || referrerUser?.email);
       toast.success(`✅ Referral asignado: ${referrerUser?.full_name || referrerUser?.email} → ${referralModal.referidoName}`);
 
       setReferralModal({ open: false, referidoId: '', referidoName: '' });

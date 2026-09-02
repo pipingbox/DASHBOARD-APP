@@ -59,7 +59,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 const PRIMARY_ADMIN_EMAIL = 'gaspardelhierromata@gmail.com';
 
 /**
- * Complete the referral assignment: update profile + create referral record + increment stats.
+ * Complete the referral assignment via backend Edge Function.
  * This is the SINGLE source of truth for referral processing.
  * Called after profile creation succeeds.
  */
@@ -69,106 +69,59 @@ async function completeReferralAssignment(
   referrerId: string,
   referralCode: string,
 ): Promise<boolean> {
-  console.log('[REFERRAL] Starting referral assignment:', {
-    userId,
-    userEmail,
-    referrerId,
-    referralCode,
-    timestamp: new Date().toISOString(),
-  });
-
-  let success = true;
-
-  // Step 1: Update profile with referred_by_user_id (correct column name!)
   try {
-    const { error: updateErr } = await supabase
-      .from(TABLES.profiles)
-      .update({ referred_by_user_id: referrerId })
-      .eq('user_id', userId);
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+    if (!accessToken) return false;
 
-    if (updateErr) {
-      console.error('[REFERRAL] Failed to update profile referred_by_user_id:', updateErr.message);
-      success = false;
-    } else {
-      console.log('[REFERRAL] ✅ Profile referred_by_user_id set to', referrerId);
+    const res = await fetch(edgeFunctionUrl('referrals-apply'), {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ referred_id: userId, referrer_id: referrerId }),
+    });
+
+    if (!res.ok) {
+      return false;
     }
-  } catch (err) {
-    console.error('[REFERRAL] Exception updating profile:', err);
-    success = false;
+
+    notifyReferralJoined(referrerId, userEmail?.split('@')[0] || 'Someone').catch(() => {});
+
+    try {
+      localStorage.setItem('pipingbox_last_referral_debug', JSON.stringify({
+        userId,
+        referrerId,
+        referralCode,
+        success: true,
+        timestamp: new Date().toISOString(),
+        source: 'ensureProfile',
+      }));
+    } catch { /* ignore */ }
+
+    return true;
+  } catch {
+    return false;
   }
+}
 
-  // Step 2: Create referral record in referrals table (prevent duplicates)
+async function bootstrapReferrals(userId: string, storedCode: string | null): Promise<void> {
   try {
-    const { data: existing } = await supabase
-      .from(TABLES.referrals)
-      .select('id')
-      .eq('referrer_id', referrerId)
-      .eq('referred_id', userId)
-      .maybeSingle();
-
-    if (!existing) {
-      const { error: insertErr } = await supabase.from(TABLES.referrals).insert({
-        referrer_id: referrerId,
-        referred_id: userId,
-        referred_email: userEmail || '',
-        status: 'pending',
-      });
-
-      if (insertErr) {
-        console.error('[REFERRAL] Failed to insert referral record:', insertErr.message);
-        // Don't mark as failure — profile update is the critical part
-      } else {
-        console.log('[REFERRAL] ✅ Referral record created (pending)');
-      }
-    } else {
-      console.log('[REFERRAL] Referral record already exists, skipping insert');
-    }
-  } catch (err) {
-    console.error('[REFERRAL] Exception creating referral record:', err);
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+    if (!accessToken) return;
+    await fetch(edgeFunctionUrl('referrals-bootstrap'), {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ referral_code: storedCode }),
+    });
+  } catch {
+    // Non-critical; dashboard recovery will retry.
   }
-
-  // Step 3: Increment referrer's referral_count (non-blocking)
-  try {
-    const { data: referrerProfile } = await supabase
-      .from(TABLES.profiles)
-      .select('referral_count')
-      .eq('user_id', referrerId)
-      .maybeSingle();
-
-    const currentCount = (referrerProfile?.referral_count as number) || 0;
-    await supabase
-      .from(TABLES.profiles)
-      .update({ referral_count: currentCount + 1 })
-      .eq('user_id', referrerId);
-
-    console.log('[REFERRAL] ✅ Referrer count incremented to', currentCount + 1);
-  } catch (statsErr) {
-    console.error('[REFERRAL] Stats update error (non-critical):', statsErr);
-  }
-
-  // Step 4: Notify referrer that their referral has joined (PB-NOTIF-001 fix).
-  // Uses email prefix as display name — full_name is not yet available at this point.
-  try {
-    const displayName = userEmail?.split('@')[0] || 'Someone';
-    await notifyReferralJoined(referrerId, displayName);
-    console.log('[REFERRAL] ✅ notifyReferralJoined sent to', referrerId);
-  } catch (notifErr) {
-    console.warn('[REFERRAL] notifyReferralJoined failed (non-critical):', notifErr);
-  }
-
-  // Step 5: Store debug info in localStorage for admin diagnostics
-  try {
-    localStorage.setItem('pipingbox_last_referral_debug', JSON.stringify({
-      userId,
-      referrerId,
-      referralCode,
-      success,
-      timestamp: new Date().toISOString(),
-      source: 'ensureProfile',
-    }));
-  } catch { /* ignore */ }
-
-  return success;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -330,19 +283,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         account_type: assignedAccountType,
         cv_visible: false,
         availability_status: 'not_specified',
-        referral_code: `PB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
         // profile_completion, marketplace_ready y onboarding_status usan defaults de backend.
       };
 
       // Clear stored account type after use
       try { localStorage.removeItem('pipingbox_account_type'); } catch { /* ignore */ }
-
-      // FIX: Use correct column name referred_by_user_id (NOT referred_by)
-      if (referrerId) {
-        newProfile.referred_by_user_id = referrerId;
-      }
-
-      console.log('[ensureProfile] Creating profile with fields:', Object.keys(newProfile));
 
       const { data: inserted, error: insertError } = await supabase
         .from(TABLES.profiles)
@@ -353,22 +298,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (insertError) {
         console.error('PROFILE CREATION ERROR:', insertError.message);
 
-        // Retry without optional fields — but KEEP referral info for later recovery.
-        // referral_code and account_type are generated locally and cannot be recovered
-        // afterwards: dropping them here silently breaks referrals for that user.
+        // Retry without optional fields.
         const minimalProfile: Record<string, unknown> = {
           user_id: authUser.id,
           full_name: fullName,
           username: authUser.email?.split('@')[0] ?? null,
           role: assignedRole,
           account_type: newProfile.account_type,
-          referral_code: newProfile.referral_code,
         };
-
-        // Still try to include referral in minimal profile
-        if (referrerId) {
-          minimalProfile.referred_by_user_id = referrerId;
-        }
 
         const { data: retryInserted, error: retryError } = await supabase
           .from(TABLES.profiles)
@@ -379,7 +316,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (retryError) {
           console.error('PROFILE CREATION ERROR (retry):', retryError.message);
 
-          // Last resort: try absolute minimal without referral
+          // Last resort: try absolute minimal.
           const bareMinimal = {
             user_id: authUser.id,
             full_name: fullName,
@@ -430,22 +367,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           console.log('PROFILE CREATED (bare)', bareInserted?.user_id);
           setProfile((bareInserted as Profile) ?? null);
-
-          // Profile created without referral — complete referral assignment separately
-          if (referrerId && referralCode) {
-            await completeReferralAssignment(authUser.id, authUser.email, referrerId, referralCode);
-          }
+          await bootstrapReferrals(authUser.id, referralCode);
           clearStoredReferralCode();
           return;
         }
 
         console.log('PROFILE CREATED (minimal)', retryInserted?.user_id);
         setProfile((retryInserted as Profile) ?? null);
-
-        // Complete referral assignment (referral record + stats)
-        if (referrerId && referralCode) {
-          await completeReferralAssignment(authUser.id, authUser.email, referrerId, referralCode);
-        }
+        await bootstrapReferrals(authUser.id, referralCode);
         clearStoredReferralCode();
         return;
       }
@@ -453,11 +382,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('PROFILE CREATED', inserted?.user_id);
       setProfile((inserted as Profile) ?? null);
 
-      // Complete referral assignment: create referral record + increment stats
-      // Profile already has referred_by_user_id set, now create the referral table record
-      if (referrerId && referralCode) {
-        await completeReferralAssignment(authUser.id, authUser.email, referrerId, referralCode);
-      }
+      // Bootstrap referral code and assignment via backend.
+      await bootstrapReferrals(authUser.id, referralCode);
 
       // Only clear referral code AFTER everything is done
       clearStoredReferralCode();

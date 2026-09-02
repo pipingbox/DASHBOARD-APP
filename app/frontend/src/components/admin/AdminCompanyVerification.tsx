@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { supabase, TABLES } from '@/lib/supabase';
+import { supabase, TABLES, edgeFunctionUrl } from '@/lib/supabase';
 import { logAuditEvent } from '@/components/admin/AdminAuditLog';
 import { toast } from 'sonner';
 import {
@@ -83,35 +83,54 @@ export function AdminCompanyVerification() {
     setActionLoading(userId);
     const isVerified = newStatus === 'verified';
 
-    const { error } = await supabase
-      .from(TABLES.profiles)
-      .update({
-        company_verified: isVerified,
-        company_status: newStatus,
-      })
-      .eq('user_id', userId);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) {
+        toast.error(t('adminCompanyVerification.updateError', 'Failed to update status'));
+        setActionLoading(null);
+        return;
+      }
 
-    if (error) {
-      console.error('[AdminCompanyVerification] Update error:', error);
-      toast.error(t('adminCompanyVerification.updateError', 'Failed to update status'));
-    } else {
-      toast.success(
-        t('adminCompanyVerification.statusUpdated', 'Company status updated to {{status}}', { status: newStatus })
-      );
-      logAuditEvent({
-        actionType: 'company_verification',
-        targetType: 'user',
-        targetId: userId,
-        details: `Company status changed to ${newStatus}`,
+      const res = await fetch(edgeFunctionUrl('admin-verify-company'), {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          company_verified: isVerified,
+          company_status: newStatus,
+        }),
       });
-      // Update local state
-      setCompanies((prev) =>
-        prev.map((c) =>
-          c.user_id === userId
-            ? { ...c, company_verified: isVerified, company_status: newStatus }
-            : c
-        )
-      );
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('[AdminCompanyVerification] Update error:', data.error);
+        toast.error(t('adminCompanyVerification.updateError', 'Failed to update status'));
+      } else {
+        toast.success(
+          t('adminCompanyVerification.statusUpdated', 'Company status updated to {{status}}', { status: newStatus })
+        );
+        logAuditEvent({
+          actionType: 'company_verification',
+          targetType: 'user',
+          targetId: userId,
+          details: `Company status changed to ${newStatus}`,
+        });
+        // Update local state
+        setCompanies((prev) =>
+          prev.map((c) =>
+            c.user_id === userId
+              ? { ...c, company_verified: isVerified, company_status: newStatus }
+              : c
+          )
+        );
+      }
+    } catch (err) {
+      console.error('[AdminCompanyVerification] Unexpected error:', err);
+      toast.error(t('adminCompanyVerification.updateError', 'Failed to update status'));
     }
     setActionLoading(null);
   };
