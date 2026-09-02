@@ -69,9 +69,18 @@ export async function checkPremiumStatus(userId: string): Promise<PremiumStatus>
     // 1. Check profiles.is_premium_tools (admin manual flag / Stripe sync)
     const { data: profile } = await supabase
       .from(TABLES.profiles)
-      .select('is_premium_tools, premium_expires_at, referral_count')
+      .select('is_premium_tools, premium_expires_at')
       .eq('user_id', userId)
       .maybeSingle();
+
+    // 2. Count verified/completed referrals from the relational source of truth.
+    const { count: referralCount } = await supabase
+      .from(TABLES.referrals)
+      .select('*', { count: 'exact', head: true })
+      .eq('referrer_id', userId)
+      .in('status', ['verified', 'completed', 'pending']);
+
+    const safeCount = referralCount ?? 0;
 
     if (profile?.is_premium_tools) {
       const expires = profile.premium_expires_at as string | null;
@@ -81,29 +90,28 @@ export async function checkPremiumStatus(userId: string): Promise<PremiumStatus>
           isPremium: true,
           source: 'stripe',
           expiresAt: expires,
-          referralLevel: (profile.referral_count as number) ?? 0,
+          referralLevel: safeCount,
         };
       }
     }
 
-    // 2. Check referral level (3+ referrals = Level 1 = premium tools)
-    const referralCount = (profile?.referral_count as number) ?? 0;
-    if (referralCount >= 3) {
+    // 3. Check referral level (3+ referrals = Level 1 = premium tools)
+    if (safeCount >= 3) {
       return {
         isPremium: true,
         source: 'referral',
-        referralLevel: referralCount,
+        referralLevel: safeCount,
       };
     }
 
-    // 3. Check Academy purchases (VCA course = 1 year premium)
+    // 4. Check Academy purchases (VCA course = 1 year premium)
     // TODO: When Academy payment is live, check app_academy_certificates or purchases table
     // For now, this is a placeholder
 
     return {
       isPremium: false,
       source: 'none',
-      referralLevel: referralCount,
+      referralLevel: safeCount,
     };
   } catch {
     return { isPremium: false, source: 'none' };

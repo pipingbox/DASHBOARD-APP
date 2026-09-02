@@ -97,18 +97,6 @@ serve(async (req: Request) => {
         status: 'pending',
       });
     }
-
-    const { data: referrerProfile } = await adminClient
-      .from('app_14da0f1941_profiles')
-      .select('referral_count')
-      .eq('user_id', referrerId)
-      .maybeSingle();
-
-    const currentCount = (referrerProfile?.referral_count as number) ?? 0;
-    await adminClient
-      .from('app_14da0f1941_profiles')
-      .update({ referral_count: currentCount + 1 })
-      .eq('user_id', referrerId);
   }
 
   return new Response(JSON.stringify({ referral_code: code, referrer_id: referrerId }), {

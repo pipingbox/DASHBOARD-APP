@@ -96,12 +96,6 @@ serve(async (req: Request) => {
     .maybeSingle();
 
   if (!existing) {
-    const { data: referredProfile } = await adminClient
-      .from('app_14da0f1941_profiles')
-      .select('full_name')
-      .eq('user_id', referred_id)
-      .maybeSingle();
-
     await adminClient.from('app_14da0f1941_referrals').insert({
       referrer_id,
       referred_id,
@@ -109,18 +103,6 @@ serve(async (req: Request) => {
       status: 'pending',
     });
   }
-
-  const { data: referrerProfile } = await adminClient
-    .from('app_14da0f1941_profiles')
-    .select('referral_count')
-    .eq('user_id', referrer_id)
-    .maybeSingle();
-
-  const currentCount = (referrerProfile?.referral_count as number) ?? 0;
-  await adminClient
-    .from('app_14da0f1941_profiles')
-    .update({ referral_count: currentCount + 1 })
-    .eq('user_id', referrer_id);
 
   return new Response(JSON.stringify({ success: true }), {
     status: 200,
