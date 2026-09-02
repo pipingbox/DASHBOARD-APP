@@ -268,13 +268,19 @@ export function getCoverageTone(percentage: number): { text: string; bar: string
  * Stages stored in app_14da0f1941_workforce_assignments.status.
  * The table exists with 0 rows, so this vocabulary is defined without any
  * migration of existing data.
+ *
+ * 2026-09-02: added `invited` and `interested` to model recruiter outreach
+ * before a formal proposal. `rejected` is the terminal, non-destructive
+ * withdrawal state.
  */
 export const CANDIDATE_STAGES = [
   { value: 'shortlisted', label: 'Shortlisted', color: 'bg-zinc-500/10 text-zinc-300 border-zinc-600' },
+  { value: 'invited', label: 'Invited', color: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
+  { value: 'interested', label: 'Interested', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' },
   { value: 'proposed', label: 'Proposed', color: 'bg-violet-500/10 text-violet-400 border-violet-500/30' },
   { value: 'accepted', label: 'Accepted', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
-  { value: 'rejected', label: 'Rejected', color: 'bg-red-500/10 text-red-400 border-red-500/30' },
   { value: 'deployed', label: 'Deployed', color: 'bg-sky-500/10 text-sky-400 border-sky-500/30' },
+  { value: 'rejected', label: 'Rejected', color: 'bg-red-500/10 text-red-400 border-red-500/30' },
 ] as const;
 
 export type CandidateStage = (typeof CANDIDATE_STAGES)[number]['value'];
@@ -284,6 +290,165 @@ export const COVERAGE_COUNTING_STAGES: CandidateStage[] = ['accepted', 'deployed
 
 export function getCandidateStageConfig(raw: string | null | undefined) {
   return CANDIDATE_STAGES.find((s) => s.value === raw) ?? CANDIDATE_STAGES[0];
+}
+
+/* ─── Worker profile search for the candidate pipeline ─── */
+
+export interface WorkerProfileFilters {
+  keyword?: string;
+  location?: string;
+  workerType?: string;
+  availability?: string;
+  experience?: string;
+  certification?: string;
+  language?: string;
+}
+
+export interface WorkerProfileSearchResult {
+  user_id: string;
+  full_name: string | null;
+  username: string | null;
+  title: string | null;
+  position: string | null;
+  location: string | null;
+  phone: string | null;
+  worker_type: string | null;
+  availability_status: string | null;
+  years_experience: number | null;
+  languages: string[] | null;
+  skills: string[] | null;
+  profile_completion: number | null;
+}
+
+const CANDIDATE_SEARCH_PAGE_SIZE = 20;
+
+/**
+ * Search worker profiles for the candidate pipeline.
+ *
+ * The query is defensive: it builds only the filters that map to columns known
+ * to exist (or that PostgREST tolerates), and it always wraps the network call
+ * so a runtime exception cannot leave the UI stuck in `searching` state.
+ *
+ * No match score is fabricated. Any ranking is left to the database order
+ * (`created_at DESC`) until a real scoring model exists.
+ */
+export async function searchWorkerProfiles(
+  filters: WorkerProfileFilters,
+  page = 0,
+): Promise<{ data: WorkerProfileSearchResult[]; error: Error | null; hasMore: boolean }> {
+  try {
+    let query = supabase
+      .from(TABLES.profiles)
+      .select(
+        'user_id, full_name, username, title, position, location, phone, worker_type, availability_status, years_experience, languages, skills, profile_completion'
+      )
+      .in('role', ['worker', 'user'])
+      .not('full_name', 'is', null);
+
+    const keyword = filters.keyword?.trim();
+    if (keyword && keyword.length >= 2) {
+      query = query.or(
+        `full_name.ilike.%${keyword}%,username.ilike.%${keyword}%,title.ilike.%${keyword}%,position.ilike.%${keyword}%,location.ilike.%${keyword}%`
+      );
+    }
+
+    if (filters.location?.trim()) {
+      query = query.ilike('location', `%${filters.location.trim()}%`);
+    }
+
+    if (filters.workerType?.trim()) {
+      const wt = filters.workerType.trim();
+      query = query.or(`worker_type.ilike.%${wt}%,title.ilike.%${wt}%,position.ilike.%${wt}%`);
+    }
+
+    if (filters.availability?.trim()) {
+      query = query.eq('availability_status', filters.availability.trim());
+    }
+
+    if (filters.experience?.trim()) {
+      const exp = filters.experience.trim();
+      switch (exp) {
+        case '0-2':
+          query = query.lte('years_experience', 2);
+          break;
+        case '3-5':
+          query = query.gte('years_experience', 3).lte('years_experience', 5);
+          break;
+        case '5-10':
+          query = query.gte('years_experience', 5).lte('years_experience', 10);
+          break;
+        case '10+':
+          query = query.gt('years_experience', 10);
+          break;
+      }
+    }
+
+    let certUserIds: string[] | null = null;
+    if (filters.certification?.trim()) {
+      const cert = filters.certification.trim().toLowerCase();
+      const { data: certData, error: certErr } = await supabase
+        .from(TABLES.workerCertifications)
+        .select('user_id')
+        .ilike('name', `%${cert}%`);
+      if (certErr) {
+        console.warn('[searchWorkerProfiles] Cert subquery failed:', certErr.message);
+      } else {
+        certUserIds = Array.from(new Set((certData || []).map((c: { user_id: string }) => c.user_id)));
+        if (certUserIds.length === 0) {
+          return { data: [], error: null, hasMore: false };
+        }
+        query = query.in('user_id', certUserIds);
+      }
+    }
+
+    const from = page * CANDIDATE_SEARCH_PAGE_SIZE;
+    const to = from + CANDIDATE_SEARCH_PAGE_SIZE - 1;
+    query = query.range(from, to).order('created_at', { ascending: false });
+
+    const { data, error } = await query;
+
+    if (error) {
+      return { data: [], error: new Error(error.message), hasMore: false };
+    }
+
+    let rows = (data || []) as WorkerProfileSearchResult[];
+
+    // Language is filtered client-side because the exact column/shape is not
+    // guaranteed across environments. This keeps the UI useful without risking
+    // a 42703 column-does-not-exist error in production.
+    if (filters.language?.trim()) {
+      const lang = filters.language.trim().toLowerCase();
+      rows = rows.filter((r) =>
+        (r.languages || []).some((l) => l.toLowerCase().includes(lang))
+      );
+    }
+
+    return { data: rows, error: null, hasMore: rows.length === CANDIDATE_SEARCH_PAGE_SIZE };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unexpected worker search error';
+    return { data: [], error: new Error(message), hasMore: false };
+  }
+}
+
+/**
+ * Build a WhatsApp deep-link for inviting a candidate.
+ *
+ * No WhatsApp Business API is used — this is just a pre-filled message link.
+ * The recruiter still has to press Send, so no message leaves the device
+ * without human confirmation.
+ */
+export function buildWhatsAppInviteUrl(
+  phone: string,
+  candidateName: string,
+  requestSummary: { company?: string | null; workerType?: string | null; location?: string | null },
+): string {
+  const cleaned = phone.replace(/\D/g, '');
+  if (!cleaned) return '';
+  const company = requestSummary.company || 'your company';
+  const role = requestSummary.workerType || 'the open position';
+  const location = requestSummary.location ? ` in ${requestSummary.location}` : '';
+  const message = `Hi ${candidateName || 'there'}, I'm reaching out from PipingBox on behalf of ${company} regarding ${role}${location}. Would you be interested in learning more?`;
+  return `https://wa.me/${cleaned}?text=${encodeURIComponent(message)}`;
 }
 
 /**
@@ -449,6 +614,8 @@ export const WORKFORCE_AUDIT_ACTIONS = {
   recruiterAssigned: 'workforce_recruiter_assigned',
   note: 'workforce_note',
   candidateAdded: 'workforce_candidate_added',
+  candidateInvited: 'workforce_candidate_invited',
+  candidateInterested: 'workforce_candidate_interested',
   candidateStage: 'workforce_candidate_stage',
   candidateRemoved: 'workforce_candidate_removed',
   coverageUpdate: 'workforce_coverage_update',
@@ -464,6 +631,8 @@ export const WORKFORCE_ACTION_LABELS: { value: string; label: string; color: str
   { value: WORKFORCE_AUDIT_ACTIONS.recruiterAssigned, label: 'WF Recruiter', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' },
   { value: WORKFORCE_AUDIT_ACTIONS.note, label: 'WF Note', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
   { value: WORKFORCE_AUDIT_ACTIONS.candidateAdded, label: 'WF Candidate Added', color: 'bg-violet-500/10 text-violet-400 border-violet-500/30' },
+  { value: WORKFORCE_AUDIT_ACTIONS.candidateInvited, label: 'WF Candidate Invited', color: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
+  { value: WORKFORCE_AUDIT_ACTIONS.candidateInterested, label: 'WF Candidate Interested', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' },
   { value: WORKFORCE_AUDIT_ACTIONS.candidateStage, label: 'WF Candidate Stage', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30' },
   { value: WORKFORCE_AUDIT_ACTIONS.candidateRemoved, label: 'WF Candidate Removed', color: 'bg-red-500/10 text-red-400 border-red-500/30' },
   { value: WORKFORCE_AUDIT_ACTIONS.coverageUpdate, label: 'WF Coverage', color: 'bg-teal-500/10 text-teal-400 border-teal-500/30' },

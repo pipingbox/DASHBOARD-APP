@@ -23,6 +23,8 @@ import {
   Loader2,
   AlertTriangle,
   RefreshCw,
+  Filter,
+  Phone,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { WORKFORCE_PRIORITIES } from '@/lib/workforce-pipeline';
@@ -48,10 +50,14 @@ import {
   fetchRecruiterOptions,
   normalizeDocumentationProgress,
   getDocumentationStats,
+  searchWorkerProfiles,
+  buildWhatsAppInviteUrl,
   type WorkforceCapabilities,
   type WorkforceTimelineEntry,
   type RecruiterOption,
   type CandidateStage,
+  type WorkerProfileSearchResult,
+  type WorkerProfileFilters,
 } from '@/lib/workforce-admin';
 
 /* ─── Types ─── */
@@ -102,7 +108,15 @@ interface WorkerOption {
   full_name: string | null;
   username: string | null;
   title: string | null;
+  position: string | null;
   location: string | null;
+  phone: string | null;
+  worker_type: string | null;
+  availability_status: string | null;
+  years_experience: number | null;
+  languages: string[] | null;
+  skills: string[] | null;
+  profile_completion: number | null;
 }
 
 interface Props {
@@ -570,7 +584,7 @@ export function AdminWorkforceRequestDetail({ request, capabilities, onClose, on
 
           {/* ── 3. Candidate Pipeline ── */}
           <CandidatePipelineBlock
-            requestId={request.id}
+            request={request}
             requestedWorkers={coverage.requested}
             onCoverageRecalculated={(assigned, percentage) => {
               onPatch(request.id, { workers_assigned: assigned, coverage_percentage: percentage });
@@ -666,20 +680,26 @@ export function AdminWorkforceRequestDetail({ request, capabilities, onClose, on
 /* ─── Candidate pipeline ─── */
 
 function CandidatePipelineBlock({
-  requestId,
+  request,
   requestedWorkers,
   onCoverageRecalculated,
 }: {
-  requestId: string;
+  request: WorkforceRequestRow;
   requestedWorkers: number;
   onCoverageRecalculated: (assigned: number, percentage: number) => void;
 }) {
+  const requestId = request.id;
   const [candidates, setCandidates] = useState<CandidateRow[]>([]);
   const [loading, setLoading] = useState(CANDIDATE_PIPELINE_ENABLED);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<WorkerOption[]>([]);
   const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [filters, setFilters] = useState<WorkerProfileFilters>({});
 
   const load = useCallback(async () => {
     if (!CANDIDATE_PIPELINE_ENABLED) return;
@@ -702,27 +722,66 @@ function CandidatePipelineBlock({
     load();
   }, [load]);
 
-  const searchWorkers = async () => {
-    const q = query.trim();
-    if (q.length < 2) {
-      toast.error('Type at least 2 characters');
-      return;
-    }
-    setSearching(true);
-    const { data, error } = await supabase
-      .from(TABLES.profiles)
-      .select('user_id, full_name, username, title, location')
-      .in('role', ['worker', 'user'])
-      .or(`full_name.ilike.%${q}%,username.ilike.%${q}%,title.ilike.%${q}%`)
-      .limit(20);
-    if (error) {
-      console.error('[CandidatePipeline] Worker search failed:', error.message);
-      toast.error(`Search failed: ${error.message}`);
-      setResults([]);
-    } else {
-      setResults((data || []) as WorkerOption[]);
-    }
-    setSearching(false);
+  // Load a default paginated list of available profiles so the recruiter is not
+  // forced to guess a keyword. The same search function is used for explicit
+  // keyword searches.
+  const runSearch = useCallback(
+    async (opts: { nextPage?: number; reset?: boolean } = {}) => {
+      if (!CANDIDATE_PIPELINE_ENABLED) return;
+      const nextPage = opts.nextPage ?? 0;
+      setSearching(true);
+      setSearchError(null);
+      try {
+        const { data, error, hasMore: more } = await searchWorkerProfiles(
+          {
+            keyword: query,
+            ...filters,
+          },
+          nextPage,
+        );
+        if (error) {
+          setSearchError(error.message);
+          setResults([]);
+          setHasMore(false);
+          if (nextPage === 0) {
+            toast.error(`Search failed: ${error.message}`);
+          }
+        } else {
+          setSearchError(null);
+          setHasMore(more);
+          setResults((prev) => (nextPage === 0 || opts.reset ? data : [...prev, ...data]));
+          if (nextPage === 0 && data.length === 0) {
+            toast.info('No profiles match your filters');
+          }
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unexpected search error';
+        setSearchError(message);
+        setResults([]);
+        setHasMore(false);
+        toast.error(`Search failed: ${message}`);
+      } finally {
+        setSearching(false);
+      }
+    },
+    [query, filters],
+  );
+
+  // Initial load: show the first page of profiles as soon as the block mounts.
+  useEffect(() => {
+    runSearch({ nextPage: 0, reset: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const searchWorkers = () => {
+    setPage(0);
+    runSearch({ nextPage: 0, reset: true });
+  };
+
+  const loadMore = () => {
+    const next = page + 1;
+    setPage(next);
+    runSearch({ nextPage: next });
   };
 
   const addCandidate = async (worker: WorkerOption) => {
@@ -731,13 +790,11 @@ function CandidatePipelineBlock({
       return;
     }
     setBusy(worker.user_id);
-    // worker_name / worker_position are denormalised on purpose: the operational
-    // file must stay readable even if the profile changes or is deleted.
     const { error } = await supabase.from(TABLES.workforceAssignments).insert({
       request_id: requestId,
       worker_id: worker.user_id,
       worker_name: worker.full_name || worker.username || 'Unknown',
-      worker_position: worker.title || null,
+      worker_position: worker.title || worker.position || null,
       status: 'shortlisted',
     });
     if (error) {
@@ -757,6 +814,33 @@ function CandidatePipelineBlock({
     setBusy(null);
   };
 
+  const inviteCandidate = async (worker: WorkerOption) => {
+    const phone = worker.phone;
+    if (!phone || !phone.replace(/\D/g, '')) {
+      toast.error('This profile has no verifiable phone number');
+      return;
+    }
+    const url = buildWhatsAppInviteUrl(phone, worker.full_name || worker.username || 'there', {
+      company: request.company_name,
+      workerType: request.worker_type,
+      location: request.location,
+    });
+    if (!url) {
+      toast.error('Could not build WhatsApp invite link');
+      return;
+    }
+    setBusy(`invite-${worker.user_id}`);
+    await emitWorkforceEvent({
+      action: WORKFORCE_AUDIT_ACTIONS.candidateInvited,
+      requestId,
+      details: `Candidate invited via WhatsApp: ${worker.full_name || worker.username || worker.user_id}`,
+      actorUserId: worker.user_id,
+    });
+    window.open(url, '_blank', 'noopener,noreferrer');
+    toast.success('WhatsApp invite opened');
+    setBusy(null);
+  };
+
   const changeStage = async (candidate: CandidateRow, stage: CandidateStage) => {
     setBusy(candidate.id);
     const { error } = await supabase
@@ -766,8 +850,12 @@ function CandidatePipelineBlock({
     if (error) {
       toast.error(`Failed to update stage: ${error.message}`);
     } else {
+      const action =
+        stage === 'interested'
+          ? WORKFORCE_AUDIT_ACTIONS.candidateInterested
+          : WORKFORCE_AUDIT_ACTIONS.candidateStage;
       await emitWorkforceEvent({
-        action: WORKFORCE_AUDIT_ACTIONS.candidateStage,
+        action,
         requestId,
         details: `${candidate.worker_name || 'Candidate'} → ${getCandidateStageConfig(stage).label}`,
       });
@@ -870,6 +958,10 @@ function CandidatePipelineBlock({
     count: candidates.filter((c) => c.status === s.value).length,
   }));
 
+  const updateFilter = (key: keyof WorkerProfileFilters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value || undefined }));
+  };
+
   return (
     <Block
       title="Candidate Pipeline"
@@ -897,51 +989,177 @@ function CandidatePipelineBlock({
         ))}
       </div>
 
-      {/* Search */}
-      <div className="flex items-center gap-2 mb-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && searchWorkers()}
-            placeholder="Search workers by name, username or title..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#f59e0b] focus:outline-none"
-          />
+      {/* Search & filters */}
+      <div className="space-y-2 mb-3">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && searchWorkers()}
+              placeholder="Search workers by name, username, title, location..."
+              className="w-full pl-9 pr-3 py-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#f59e0b] focus:outline-none"
+            />
+          </div>
+          <button
+            onClick={searchWorkers}
+            disabled={searching}
+            className="rounded-sm border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-zinc-400 hover:text-zinc-200 hover:border-zinc-700 transition disabled:opacity-40"
+          >
+            {searching ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Search'}
+          </button>
+          <button
+            onClick={() => setShowFilters((p) => !p)}
+            className={`rounded-sm border border-zinc-800 px-2 py-1.5 text-[10px] uppercase tracking-[0.15em] transition ${
+              showFilters ? 'bg-[#f59e0b]/10 border-[#f59e0b]/30 text-[#f59e0b]' : 'bg-zinc-950 text-zinc-400 hover:text-zinc-200'
+            }`}
+            title="Toggle filters"
+          >
+            <Filter className="h-3 w-3" />
+          </button>
         </div>
-        <button
-          onClick={searchWorkers}
-          disabled={searching}
-          className="rounded-sm border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-zinc-400 hover:text-zinc-200 hover:border-zinc-700 transition disabled:opacity-40"
-        >
-          {searching ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Search'}
-        </button>
+
+        {showFilters && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-2 border border-zinc-800 rounded-sm bg-zinc-950/50">
+            <input
+              value={filters.location || ''}
+              onChange={(e) => updateFilter('location', e.target.value)}
+              placeholder="Location"
+              className="w-full px-2 py-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#f59e0b] focus:outline-none"
+            />
+            <input
+              value={filters.workerType || ''}
+              onChange={(e) => updateFilter('workerType', e.target.value)}
+              placeholder="Worker type / trade"
+              className="w-full px-2 py-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#f59e0b] focus:outline-none"
+            />
+            <select
+              value={filters.availability || ''}
+              onChange={(e) => updateFilter('availability', e.target.value)}
+              className="w-full px-2 py-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-sm text-zinc-300 focus:border-[#f59e0b] focus:outline-none"
+            >
+              <option value="">Any availability</option>
+              <option value="available">Available</option>
+              <option value="not_available">Not available</option>
+              <option value="open_to_offers">Open to offers</option>
+            </select>
+            <select
+              value={filters.experience || ''}
+              onChange={(e) => updateFilter('experience', e.target.value)}
+              className="w-full px-2 py-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-sm text-zinc-300 focus:border-[#f59e0b] focus:outline-none"
+            >
+              <option value="">Any experience</option>
+              <option value="0-2">0–2 years</option>
+              <option value="3-5">3–5 years</option>
+              <option value="5-10">5–10 years</option>
+              <option value="10+">10+ years</option>
+            </select>
+            <input
+              value={filters.certification || ''}
+              onChange={(e) => updateFilter('certification', e.target.value)}
+              placeholder="Certification"
+              className="w-full px-2 py-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#f59e0b] focus:outline-none"
+            />
+            <input
+              value={filters.language || ''}
+              onChange={(e) => updateFilter('language', e.target.value)}
+              placeholder="Language"
+              className="w-full px-2 py-1.5 text-xs bg-zinc-950 border border-zinc-800 rounded-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#f59e0b] focus:outline-none"
+            />
+          </div>
+        )}
+
+        {searchError && (
+          <div className="flex items-start gap-2 rounded-sm border border-red-500/30 bg-red-500/5 p-2 text-[11px] text-red-300">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+            <span>{searchError}</span>
+          </div>
+        )}
       </div>
 
+      {/* Search results */}
       {results.length > 0 && (
-        <div className="mb-3 border border-zinc-800 rounded-sm divide-y divide-zinc-800/60 max-h-48 overflow-y-auto">
-          {results.map((w) => (
-            <div key={w.user_id} className="flex items-center justify-between gap-2 px-3 py-2">
-              <div className="min-w-0">
-                <p className="text-xs text-zinc-200 truncate">{w.full_name || w.username || '—'}</p>
-                <p className="text-[10px] text-zinc-500 truncate">
-                  {[w.title, w.location].filter(Boolean).join(' · ') || 'No title'}
-                </p>
-              </div>
-              <button
-                onClick={() => addCandidate(w)}
-                disabled={busy === w.user_id}
-                className="shrink-0 inline-flex items-center gap-1 rounded-sm bg-[#f59e0b]/10 border border-[#f59e0b]/30 px-2 py-1 text-[10px] uppercase tracking-[0.15em] text-[#f59e0b] hover:bg-[#f59e0b]/20 transition disabled:opacity-40"
-              >
-                <Plus className="h-3 w-3" />
-                Add
-              </button>
-            </div>
-          ))}
+        <div className="mb-3">
+          <div className="flex items-center justify-between mb-1.5">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+              Available profiles
+            </p>
+            <span className="text-[10px] text-zinc-600">
+              {results.length} shown
+            </span>
+          </div>
+          <div className="border border-zinc-800 rounded-sm divide-y divide-zinc-800/60 max-h-64 overflow-y-auto">
+            {results.map((w) => {
+              const already = candidates.some((c) => c.worker_id === w.user_id);
+              return (
+                <div key={w.user_id} className="flex items-center justify-between gap-2 px-3 py-2">
+                  <div className="min-w-0">
+                    <p className="text-xs text-zinc-200 truncate">{w.full_name || w.username || '—'}</p>
+                    <p className="text-[10px] text-zinc-500 truncate">
+                      {[w.title || w.position, w.location, w.worker_type]
+                        .filter(Boolean)
+                        .join(' · ') || 'No title'}
+                    </p>
+                    <p className="text-[9px] text-zinc-600 truncate">
+                      {[
+                        w.availability_status,
+                        w.years_experience != null ? `${w.years_experience} yrs` : null,
+                        (w.languages || []).slice(0, 3).join(', ') || null,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {w.phone && (
+                      <button
+                        onClick={() => inviteCandidate(w)}
+                        disabled={busy === `invite-${w.user_id}` || already}
+                        className="inline-flex items-center gap-1 rounded-sm bg-emerald-500/10 border border-emerald-500/30 px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-emerald-400 hover:bg-emerald-500/20 transition disabled:opacity-40"
+                        title="Invite candidate via WhatsApp"
+                      >
+                        <Phone className="h-3 w-3" />
+                        Invite
+                      </button>
+                    )}
+                    <button
+                      onClick={() => addCandidate(w)}
+                      disabled={busy === w.user_id || already}
+                      className="inline-flex items-center gap-1 rounded-sm bg-[#f59e0b]/10 border border-[#f59e0b]/30 px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-[#f59e0b] hover:bg-[#f59e0b]/20 transition disabled:opacity-40"
+                      title={already ? 'Already in pipeline' : 'Shortlist candidate'}
+                    >
+                      <Plus className="h-3 w-3" />
+                      {already ? 'Added' : 'Add'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {hasMore && (
+            <button
+              onClick={loadMore}
+              disabled={searching}
+              className="w-full mt-2 py-1.5 text-[10px] uppercase tracking-[0.15em] text-zinc-500 hover:text-zinc-300 border border-zinc-800 rounded-sm hover:border-zinc-700 transition disabled:opacity-40"
+            >
+              {searching ? <Loader2 className="h-3 w-3 animate-spin mx-auto" /> : 'Load more'}
+            </button>
+          )}
         </div>
       )}
 
+      {!searching && results.length === 0 && !searchError && (
+        <p className="text-[11px] text-zinc-600 py-3 text-center border border-dashed border-zinc-800 rounded-sm mb-3">
+          No profiles found. Adjust filters or search by keyword.
+        </p>
+      )}
+
       {/* Current candidates */}
+      <div className="flex items-center justify-between mb-1.5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">Pipeline</p>
+        <span className="text-[10px] text-zinc-600">{candidates.length} candidates</span>
+      </div>
       {loading ? (
         <div className="flex justify-center py-6">
           <Loader2 className="h-4 w-4 animate-spin text-[#f59e0b]" />
