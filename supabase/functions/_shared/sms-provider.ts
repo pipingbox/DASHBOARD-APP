@@ -1,6 +1,10 @@
 // _shared/sms-provider.ts
 // Adapter para envio de SMS OTP.
 // PB-PHONE-VERIFICATION-001
+//
+// IMPORTANTE: no hay fallback a console en produccion. Si SMS_PROVIDER no esta
+// configurado con un proveedor real, isConfigured() devuelve false y el caller
+// devuelve sms_provider_not_configured sin escribir OTPs en logs.
 
 export interface SmsMessage {
   to: string; // E.164
@@ -10,17 +14,6 @@ export interface SmsMessage {
 export interface SmsProvider {
   send(message: SmsMessage): Promise<{ messageId?: string; provider: string }>;
   isConfigured(): boolean;
-}
-
-class ConsoleSmsProvider implements SmsProvider {
-  isConfigured(): boolean {
-    return true;
-  }
-
-  async send(message: SmsMessage): Promise<{ messageId?: string; provider: string }> {
-    console.log(`[SMS CONSOLE] to=${message.to} body=${message.body}`);
-    return { messageId: "console", provider: "console" };
-  }
 }
 
 class NoopSmsProvider implements SmsProvider {
@@ -34,10 +27,17 @@ class NoopSmsProvider implements SmsProvider {
 }
 
 export function createSmsProvider(): SmsProvider {
-  const provider = Deno.env.get("SMS_PROVIDER") || "console";
-  if (provider === "console") {
-    return new ConsoleSmsProvider();
+  const provider = Deno.env.get("SMS_PROVIDER");
+  if (!provider) {
+    return new NoopSmsProvider();
   }
-  // P1: Twilio / Vonage
-  return new NoopSmsProvider();
+
+  switch (provider.toLowerCase()) {
+    case "twilio":
+    case "vonage":
+      // P1: implementar adaptador real cuando se contrate proveedor.
+      return new NoopSmsProvider();
+    default:
+      return new NoopSmsProvider();
+  }
 }

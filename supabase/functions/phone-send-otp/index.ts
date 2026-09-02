@@ -1,20 +1,23 @@
 // Edge Function: phone-send-otp
 // Purpose: Generate and send OTP for phone verification.
+//
 // PB-PHONE-VERIFICATION-001
+//
+// Security:
+//   - OTP se almacena como hash bcrypt; nunca se devuelve al cliente.
+//   - Sin SMS_PROVIDER real configurado, devuelve sms_provider_not_configured.
+//   - Normalizacion E.164 con trunk prefix nacional.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
 import { createSmsProvider } from "../_shared/sms-provider.ts";
+import { normalizeToE164 } from "../_shared/phone.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-
-function normalizePhone(phone: string): string {
-  return phone.replace(/\D/g, "");
-}
 
 function generateOtp(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -57,13 +60,17 @@ Deno.serve(async (req) => {
     // ignore
   }
 
-  const phoneE164 = normalizePhone(body.phone_e164 || "");
-  if (!phoneE164 || phoneE164.length < 8) {
+  const countryCode = (body.country_code || "ES").toUpperCase();
+  const normalized = normalizeToE164(countryCode, body.phone_e164 || "");
+
+  if (!normalized.valid || !normalized.e164) {
     return new Response(
-      JSON.stringify({ error: "Invalid phone number" }),
+      JSON.stringify({ error: normalized.error || "Invalid phone number" }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
+
+  const phoneE164 = normalized.e164;
 
   // Rate limit: count active/pending OTPs in the last hour
   const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -115,12 +122,12 @@ Deno.serve(async (req) => {
     );
   }
 
-  // Update profile phone (not verified yet)
+  // Update profile phone (not verified yet). Backend-controlled fields unchanged.
   await supabase
     .from("app_14da0f1941_profiles")
     .update({
       phone_e164: phoneE164,
-      phone_country_code: body.country_code || null,
+      phone_country_code: countryCode,
       phone_verified_at: null,
       whatsapp_opt_in: false,
       whatsapp_opt_in_at: null,
@@ -130,6 +137,13 @@ Deno.serve(async (req) => {
 
   // Send via adapter
   const smsProvider = createSmsProvider();
+  if (!smsProvider.isConfigured()) {
+    return new Response(
+      JSON.stringify({ error: "sms_provider_not_configured" }),
+      { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
   try {
     await smsProvider.send({
       to: phoneE164,

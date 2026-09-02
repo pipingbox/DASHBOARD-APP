@@ -2,10 +2,18 @@
 // Core compartido de candidate matching para job-match-notify y workforce-match-notify.
 // PB-MATCHING-NOTIFICATIONS-001
 //
+// Diseñado contra el schema real de produccion (2026-09-02):
+//   - profiles NO tiene position, country ni languages.
+//   - profiles.preferred_regions es text (no text[]).
+//   - workforce_requests NO tiene title, location, description ni requirements.
+//   - workforce_requests tiene worker_type, country, message.
+//   - Taxonomia real availability_status: available_immediately, not_specified,
+//     not_currently_available, NULL.
+//
 // Responsabilidades:
 //   1. Hard-requirements filter: descalifica candidatos que no cumplen requisitos
 //      obligatorios declarados por la oferta.
-//   2. Scoring determinista con los pesos aprobados en AUTO-001/DEC-AUTO-001.
+//   2. Scoring determinista con los pesos aprobados.
 //   3. Devuelve score, breakdown y razones de descalificacion.
 
 export const WEIGHTS = {
@@ -29,9 +37,14 @@ export interface OpportunityForMatching {
   description: string | null;
   requirements: string | null;
   required_certifications?: string[] | null;
-  required_languages?: string[] | null;
   mandatory_location?: string | null;
   accepts_remote?: boolean | null;
+}
+
+export interface ValidCertification {
+  name: string;
+  is_verified: boolean;
+  is_expired: boolean;
 }
 
 export interface WorkerProfileForMatching {
@@ -40,16 +53,13 @@ export interface WorkerProfileForMatching {
   title: string | null;
   years_experience: number | null;
   location: string | null;
-  country: string | null;
   availability_status: string | null;
   skills: string[] | null;
-  languages: string[] | null;
   profile_completion: number | null;
-  marketplace_ready: boolean | null;
   willing_to_travel: boolean | null;
   willing_to_relocate: boolean | null;
-  preferred_regions: string[] | null;
-  certifications: string[];
+  preferred_regions: string | null;
+  certifications: ValidCertification[];
 }
 
 export interface MatchBreakdown {
@@ -70,6 +80,14 @@ export interface MatchResult {
 
 function norm(s: string | null | undefined): string {
   return (s || "").toLowerCase().trim();
+}
+
+function parsePreferredRegions(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  return raw
+    .split(/[,;|]/)
+    .map((s) => norm(s))
+    .filter((s) => s.length > 0);
 }
 
 function hasOverlap(a: string[], b: string[]): number {
@@ -101,6 +119,69 @@ function arrayValue(value: string[] | null | undefined): string[] {
 }
 
 /**
+ * Determina si un candidato esta disponible para matching.
+ * Taxonomia real de produccion:
+ *   - available_immediately: disponible
+ *   - not_specified / NULL: asumir disponible para scoring, penalizar levemente
+ *   - not_currently_available: no disponible (hard fail)
+ */
+export function isWorkerAvailable(availability: string | null | undefined): boolean {
+  const a = norm(availability);
+  if (a === "not_currently_available") return false;
+  return true;
+}
+
+/**
+ * Roles que se consideran trabajadores candidatos a matching.
+ * Admin y company nunca deben entrar en el motor.
+ */
+export function isWorkerRole(role: string | null | undefined): boolean {
+  const r = norm(role);
+  return r === "worker" || r === "user";
+}
+
+/**
+ * MATCH READY basado en campos reales.
+ * No usa profile_completion ni marketplace_ready.
+ * Debe mantenerse sincronizado con pb_is_match_ready() en SQL.
+ */
+export function isMatchReady(p: {
+  role: string | null;
+  full_name: string | null;
+  title: string | null;
+  location: string | null;
+  availability_status: string | null;
+  years_experience: number | null;
+  skills: string[] | null;
+}): boolean {
+  return (
+    isWorkerRole(p.role) &&
+    p.full_name !== null && btrim(p.full_name) !== "" &&
+    p.title !== null && btrim(p.title) !== "" &&
+    p.location !== null && btrim(p.location) !== "" &&
+    p.availability_status !== null && btrim(p.availability_status) !== "" &&
+    norm(p.availability_status) !== "not_currently_available" &&
+    p.years_experience !== null &&
+    p.skills !== null && Array.isArray(p.skills) && p.skills.length > 0
+  );
+}
+
+function btrim(s: string | null | undefined): string {
+  return (s || "").trim();
+}
+
+/**
+ * Lista de certificaciones validas (no expiradas y, si aplica, verificadas).
+ * is_verified: si la fila tiene el campo y es false, se excluye.
+ * is_expired: si expiry_date/expiration_date existe y es pasada, se excluye.
+ */
+function validCertNames(certs: ValidCertification[]): string[] {
+  return certs
+    .filter((c) => !c.is_expired && c.is_verified)
+    .map((c) => c.name);
+}
+
+/**
  * Evalua hard requirements de una oportunidad contra un worker.
  * Devuelve un array vacio si el worker es elegible.
  */
@@ -110,27 +191,22 @@ export function evaluateHardRequirements(
 ): string[] {
   const reasons: string[] = [];
 
-  // 1. Disponibilidad
-  const availability = norm(worker.availability_status);
-  if (availability === "not_available" || availability === "not_currently_available") {
+  // 1. Rol valido
+  if (!isWorkerRole(worker.role)) {
+    reasons.push("invalid_role");
+  }
+
+  // 2. Disponibilidad
+  if (!isWorkerAvailable(worker.availability_status)) {
     reasons.push("worker_not_available");
   }
 
-  // 2. Certificacion obligatoria requerida por la oferta y no presente
+  // 3. Certificacion obligatoria requerida por la oferta y no presente/valida
   const requiredCerts = arrayValue(opportunity.required_certifications);
   if (requiredCerts.length > 0) {
-    const workerCerts = worker.certifications || [];
+    const workerCerts = validCertNames(worker.certifications);
     if (!hasAnyOverlap(workerCerts, requiredCerts)) {
       reasons.push("missing_required_certification");
-    }
-  }
-
-  // 3. Idioma obligatorio requerido por la oferta y no presente
-  const requiredLanguages = arrayValue(opportunity.required_languages);
-  if (requiredLanguages.length > 0) {
-    const workerLanguages = arrayValue(worker.languages);
-    if (!hasAnyOverlap(workerLanguages, requiredLanguages)) {
-      reasons.push("missing_required_language");
     }
   }
 
@@ -138,18 +214,18 @@ export function evaluateHardRequirements(
   const mandatoryLoc = norm(opportunity.mandatory_location);
   if (mandatoryLoc) {
     const workerLoc = norm(worker.location);
-    const workerCountry = norm(worker.country);
-    const preferredRegions = arrayValue(worker.preferred_regions).map(norm);
+    const preferredRegions = parsePreferredRegions(worker.preferred_regions);
     const acceptsRemote = opportunity.accepts_remote ?? false;
     const willingToTravel = worker.willing_to_travel ?? false;
     const willingToRelocate = worker.willing_to_relocate ?? false;
 
     const matchesLocation =
       workerLoc === mandatoryLoc ||
-      workerCountry === mandatoryLoc ||
       workerLoc.includes(mandatoryLoc) ||
       mandatoryLoc.includes(workerLoc) ||
-      preferredRegions.some((r) => r === mandatoryLoc || r.includes(mandatoryLoc) || mandatoryLoc.includes(r));
+      preferredRegions.some((r) =>
+        r === mandatoryLoc || r.includes(mandatoryLoc) || mandatoryLoc.includes(r)
+      );
 
     if (!matchesLocation && !acceptsRemote && !willingToTravel && !willingToRelocate) {
       reasons.push("location_incompatible");
@@ -201,20 +277,20 @@ export function calculateMatchScore(
   const requiredCerts = requiredCertsFromField.length > 0
     ? requiredCertsFromField
     : requiredCertsFromText;
-  const workerCerts = worker.certifications || [];
+  const workerCertNames = validCertNames(worker.certifications);
   const certScore = requiredCerts.length > 0
-    ? hasOverlap(workerCerts, requiredCerts)
+    ? hasOverlap(workerCertNames, requiredCerts)
     : 0.5;
 
   // 3. Location (15%)
   const jobLoc = norm(opportunity.location);
   const workerLoc = norm(worker.location);
-  const isAvailable = worker.availability_status === "available" || worker.availability_status === "in_2_weeks";
+  const isAvailableImmediately = norm(worker.availability_status) === "available_immediately";
   const locationScore =
     !jobLoc ? 0.5 :
     jobLoc === workerLoc ? 1.0 :
     jobLoc && workerLoc && (jobLoc.includes(workerLoc) || workerLoc.includes(jobLoc)) ? 0.7 :
-    isAvailable ? 0.4 : 0.1;
+    isAvailableImmediately ? 0.4 : 0.1;
 
   // 4. Experience (15%)
   const years = worker.years_experience ?? 0;
@@ -224,11 +300,9 @@ export function calculateMatchScore(
     years >= 2 ? 0.5 :
     years > 0 ? 0.3 : 0.1;
 
-  // 5. Languages (10%)
-  const workerLanguages = arrayValue(worker.languages);
-  const langScore = workerLanguages.length > 0
-    ? Math.min(1, workerLanguages.length / 3)
-    : 0.2;
+  // 5. Languages (10%) — placeholder: no hay modelo real en profiles todavia.
+  // Se asigna un score neutral hasta que exista required_languages real.
+  const langScore = 0.5;
 
   // 6. Profile completion (5%)
   const completionScore = Math.min(1, (worker.profile_completion || 0) / 100);

@@ -13,13 +13,21 @@ export function MatchReadyBanner() {
   if (!profile) return null;
 
   const hasName = Boolean(profile.full_name?.trim());
-  const hasProfession = Boolean(profile.title?.trim() || profile.position?.trim());
+  const hasProfession = Boolean(profile.title?.trim());
   const hasLocation = Boolean(profile.location?.trim());
   const hasAvailability = Boolean(profile.availability_status?.trim());
   const hasExperience = profile.years_experience !== null && profile.years_experience !== undefined;
   const hasSkills = Array.isArray(profile.skills) && profile.skills.length > 0;
 
-  const isMatchReady = hasName && hasProfession && hasLocation && hasAvailability && hasExperience && hasSkills;
+  const isMatchReady =
+    (profile.role === 'worker' || profile.role === 'user') &&
+    hasName &&
+    hasProfession &&
+    hasLocation &&
+    hasAvailability &&
+    profile.availability_status !== 'not_currently_available' &&
+    hasExperience &&
+    hasSkills;
 
   if (isMatchReady) return null;
 

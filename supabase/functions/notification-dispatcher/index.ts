@@ -9,6 +9,13 @@
 //   - whatsapp: feature flag; fails with whatsapp_provider_not_configured until P1
 //
 // Runs every 5 minutes via Supabase cron or scheduled function.
+//
+// Correcciones de seguridad/robustez:
+//   - No lee auth.users directamente; usa Auth Admin API (service_role).
+//   - Concurrencia: reserva el batch atomico via RPC pb_claim_notification_batch
+//     con FOR UPDATE SKIP LOCKED y estado 'processing'.
+//   - Throttling: cuenta real de filas de delivery_logs (sin columna count).
+//   - Procesa pending y scheduled.
 
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { createEmailProvider } from "../_shared/email-provider.ts";
@@ -65,18 +72,15 @@ Deno.serve(async (req) => {
   const emailProvider = createEmailProvider();
   const whatsappProvider = createWhatsAppProvider();
 
-  // 1. Fetch pending notifications
-  const { data: rows, error: fetchError } = await supabase
-    .from("app_14da0f1941_notification_queue")
-    .select("*")
-    .eq("status", "pending")
-    .lte("scheduled_at", new Date().toISOString())
-    .order("scheduled_at", { ascending: true })
-    .limit(batchSize);
+  // 1. Atomically claim a batch of pending/scheduled rows into 'processing'.
+  const { data: rows, error: claimError } = await supabase.rpc(
+    "pb_claim_notification_batch",
+    { p_batch_size: batchSize },
+  );
 
-  if (fetchError) {
+  if (claimError) {
     return new Response(
-      JSON.stringify({ error: fetchError.message }),
+      JSON.stringify({ error: claimError.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
@@ -88,33 +92,14 @@ Deno.serve(async (req) => {
     );
   }
 
-  // 2. Prefetch candidate emails and phones
+  // 2. Prefetch candidate phones and preferences.
   const userIds = [...new Set((rows as QueueRow[]).map((r) => r.candidate_user_id))];
 
   const { data: profiles } = await supabase
     .from("app_14da0f1941_profiles")
-    .select("user_id, phone_e164")
+    .select("user_id, phone_e164, phone_verified_at, whatsapp_opt_in")
     .in("user_id", userIds);
 
-  const { data: authUsers } = await supabase
-    .from("auth.users")
-    .select("id, email")
-    .in("id", userIds);
-
-  const userById = new Map<string, UserIdentity>();
-  for (const u of (authUsers || []) as { id: string; email: string | null }[]) {
-    userById.set(u.id, { id: u.id, email: u.email, phone_e164: null });
-  }
-  for (const p of (profiles || []) as { user_id: string; phone_e164: string | null }[]) {
-    const existing = userById.get(p.user_id);
-    if (existing) {
-      existing.phone_e164 = p.phone_e164;
-    } else {
-      userById.set(p.user_id, { id: p.user_id, email: null, phone_e164: p.phone_e164 });
-    }
-  }
-
-  // 3. Prefetch preferences and throttling counts
   const { data: prefs } = await supabase
     .from("app_14da0f1941_matching_preferences")
     .select("user_id, job_matching_enabled, workforce_invitations_enabled, email_job_alerts, whatsapp_job_alerts")
@@ -130,20 +115,29 @@ Deno.serve(async (req) => {
     prefsByUser.set(p.user_id, p);
   }
 
-  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { data: sentToday } = await supabase
-    .from("app_14da0f1941_delivery_logs")
-    .select("candidate_user_id, channel, count")
-    .gte("created_at", dayAgo)
-    .in("status", ["sent", "delivered"]);
+  // 3. Throttling counts via RPC.
+  const { data: throttleCounts } = await supabase.rpc(
+    "pb_delivery_counts_last_24h",
+    { p_user_ids: userIds },
+  );
 
   const sentCountByUserChannel = new Map<string, number>();
-  for (const s of (sentToday || []) as { candidate_user_id: string; channel: string; count: number }[]) {
+  for (const s of (throttleCounts || []) as { candidate_user_id: string; channel: string; sent_count: number }[]) {
     const key = `${s.candidate_user_id}:${s.channel}`;
-    sentCountByUserChannel.set(key, (sentCountByUserChannel.get(key) || 0) + (s.count || 1));
+    sentCountByUserChannel.set(key, s.sent_count);
   }
 
-  // 4. Process each row
+  // 4. Lazy email resolver via Auth Admin API.
+  const emailCache = new Map<string, string | null>();
+  async function getUserEmail(userId: string): Promise<string | null> {
+    if (emailCache.has(userId)) return emailCache.get(userId)!;
+    const { data, error } = await supabase.auth.admin.getUserById(userId);
+    const email = error || !data.user ? null : data.user.email ?? null;
+    emailCache.set(userId, email);
+    return email;
+  }
+
+  // 5. Process each row
   let processed = 0;
   let succeeded = 0;
   let failed = 0;
@@ -151,24 +145,34 @@ Deno.serve(async (req) => {
   for (const row of rows as QueueRow[]) {
     processed++;
 
-    const user = userById.get(row.candidate_user_id);
+    const profile = (profiles || []).find((p) => p.user_id === row.candidate_user_id);
     const prefs = prefsByUser.get(row.candidate_user_id);
 
-    // Re-verify preferences
+    // Re-verify preferences. Absence of prefs means external channels are OFF.
     if (row.opportunity_type === "job" && prefs?.job_matching_enabled === false) {
-      await cancelQueueRow(supabase, row.id, "job_matching_disabled");
+      await finishQueueRow(supabase, row.id, "cancelled", "job_matching_disabled");
       continue;
     }
     if (row.opportunity_type === "workforce" && prefs?.workforce_invitations_enabled === false) {
-      await cancelQueueRow(supabase, row.id, "workforce_invitations_disabled");
+      await finishQueueRow(supabase, row.id, "cancelled", "workforce_invitations_disabled");
       continue;
     }
-    if (row.channel === "email" && prefs?.email_job_alerts === false) {
-      await cancelQueueRow(supabase, row.id, "email_job_alerts_disabled");
+    if (row.channel === "email" && prefs?.email_job_alerts !== true) {
+      await finishQueueRow(supabase, row.id, "cancelled", "email_job_alerts_disabled");
       continue;
     }
-    if (row.channel === "whatsapp" && prefs?.whatsapp_job_alerts === false) {
-      await cancelQueueRow(supabase, row.id, "whatsapp_job_alerts_disabled");
+    if (row.channel === "whatsapp" && prefs?.whatsapp_job_alerts !== true) {
+      await finishQueueRow(supabase, row.id, "cancelled", "whatsapp_job_alerts_disabled");
+      continue;
+    }
+
+    // Extra phone verification check for whatsapp channel.
+    if (row.channel === "whatsapp" && !profile?.phone_verified_at) {
+      await finishQueueRow(supabase, row.id, "cancelled", "phone_not_verified");
+      continue;
+    }
+    if (row.channel === "whatsapp" && profile?.whatsapp_opt_in !== true) {
+      await finishQueueRow(supabase, row.id, "cancelled", "whatsapp_opt_in_missing");
       continue;
     }
 
@@ -204,11 +208,12 @@ Deno.serve(async (req) => {
         if (!emailProvider.isConfigured()) {
           throw new Error("email_provider_not_configured");
         }
-        if (!user?.email) {
+        const email = await getUserEmail(row.candidate_user_id);
+        if (!email) {
           throw new Error("candidate_email_missing");
         }
         const result = await emailProvider.send({
-          to: user.email,
+          to: email,
           subject: row.payload.title,
           text: row.payload.message,
         });
@@ -219,11 +224,11 @@ Deno.serve(async (req) => {
         if (!whatsappProvider.isConfigured()) {
           throw new Error("whatsapp_provider_not_configured");
         }
-        if (!user?.phone_e164) {
+        if (!profile?.phone_e164) {
           throw new Error("candidate_phone_missing");
         }
         const result = await whatsappProvider.send({
-          to: user.phone_e164,
+          to: profile.phone_e164,
           body: row.payload.message,
         });
         deliveryStatus = "sent";
@@ -299,14 +304,19 @@ Deno.serve(async (req) => {
   );
 });
 
-async function cancelQueueRow(
+async function finishQueueRow(
   supabase: SupabaseClient,
   id: string,
-  reason: string,
+  status: "cancelled" | "failed" | "sent",
+  reason: string | null,
 ) {
   await supabase
     .from("app_14da0f1941_notification_queue")
-    .update({ status: "cancelled", failure_reason: reason })
+    .update({
+      status,
+      failure_reason: reason,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", id);
 }
 
@@ -321,6 +331,7 @@ async function rescheduleQueueRow(
       status: "scheduled",
       scheduled_at: new Date(Date.now() + minutes * 60 * 1000).toISOString(),
       failure_reason: "throttled",
+      updated_at: new Date().toISOString(),
     })
     .eq("id", row.id);
 }

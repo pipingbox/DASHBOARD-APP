@@ -4,6 +4,10 @@
 //
 // PB-MATCHING-NOTIFICATIONS-001
 //
+// Schema real de app_14da0f1941_workforce_requests (produccion):
+//   - worker_type, country, message, status, priority, etc.
+//   - NO title, location, description, requirements.
+//
 // Trigger: Admin clicks "Find matching candidates" in AdminWorkforceRequestDetail.
 // Body: { workforce_request_id }
 //
@@ -13,8 +17,11 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
   calculateMatchScore,
+  isMatchReady,
+  isWorkerRole,
   type OpportunityForMatching,
   type WorkerProfileForMatching,
+  type ValidCertification,
 } from "../_shared/matching.ts";
 
 const corsHeaders = {
@@ -25,31 +32,25 @@ const corsHeaders = {
 
 interface WorkforceRequestRow {
   id: string;
-  title: string | null;
   worker_type: string | null;
-  location: string | null;
   country: string | null;
-  description: string | null;
-  requirements: string | null;
+  message: string | null;
   required_certifications: string[] | null;
-  required_languages: string[] | null;
 }
 
 interface ProfileRow {
   user_id: string;
   role: string | null;
+  full_name: string | null;
   title: string | null;
   location: string | null;
-  country: string | null;
   years_experience: number | null;
   availability_status: string | null;
   skills: string[] | null;
-  languages: string[] | null;
   profile_completion: number | null;
-  marketplace_ready: boolean | null;
   willing_to_travel: boolean | null;
   willing_to_relocate: boolean | null;
-  preferred_regions: string[] | null;
+  preferred_regions: string | null;
   phone_e164: string | null;
   phone_verified_at: string | null;
   whatsapp_opt_in: boolean | null;
@@ -65,33 +66,29 @@ interface MatchingPrefsRow {
 function toOpportunity(request: WorkforceRequestRow): OpportunityForMatching {
   return {
     id: request.id,
-    title: request.title || "Workforce Request",
+    title: "Workforce Request",
     category: request.worker_type,
     discipline: request.worker_type,
-    location: request.location,
+    location: null,
     country: request.country,
-    description: request.description,
-    requirements: request.requirements,
+    description: request.message,
+    requirements: request.message,
     required_certifications: request.required_certifications,
-    required_languages: request.required_languages,
-    mandatory_location: request.location,
+    mandatory_location: request.country,
     accepts_remote: false,
   };
 }
 
-function toWorker(profile: ProfileRow, certs: string[]): WorkerProfileForMatching {
+function toWorker(profile: ProfileRow, certs: ValidCertification[]): WorkerProfileForMatching {
   return {
     user_id: profile.user_id,
     role: profile.role,
     title: profile.title,
     years_experience: profile.years_experience,
     location: profile.location,
-    country: profile.country,
     availability_status: profile.availability_status,
     skills: profile.skills,
-    languages: profile.languages,
     profile_completion: profile.profile_completion,
-    marketplace_ready: profile.marketplace_ready,
     willing_to_travel: profile.willing_to_travel,
     willing_to_relocate: profile.willing_to_relocate,
     preferred_regions: profile.preferred_regions,
@@ -133,7 +130,7 @@ Deno.serve(async (req) => {
   const { data: requests, error: requestError } = await supabase
     .from("app_14da0f1941_workforce_requests")
     .select(
-      "id, title, worker_type, location, country, description, requirements, required_certifications, required_languages",
+      "id, worker_type, country, message, required_certifications",
     )
     .eq("id", requestId)
     .limit(1);
@@ -159,9 +156,9 @@ Deno.serve(async (req) => {
   const { data: workers, error: workersError } = await supabase
     .from("app_14da0f1941_profiles")
     .select(
-      "user_id, role, title, location, country, years_experience, availability_status, skills, languages, profile_completion, marketplace_ready, willing_to_travel, willing_to_relocate, preferred_regions, phone_e164, phone_verified_at, whatsapp_opt_in",
+      "user_id, role, full_name, title, location, years_experience, availability_status, skills, profile_completion, willing_to_travel, willing_to_relocate, preferred_regions, phone_e164, phone_verified_at, whatsapp_opt_in",
     )
-    .or("marketplace_ready.eq.true,profile_completion.gte.80");
+    .or("role.eq.worker,role.eq.user");
 
   if (workersError) {
     return new Response(
@@ -177,17 +174,30 @@ Deno.serve(async (req) => {
     );
   }
 
-  // 3. Fetch certifications
+  // 3. Fetch certifications with validity
   const workerIds = workers.map((w: ProfileRow) => w.user_id);
   const { data: allCerts } = await supabase
     .from("app_worker_certifications")
-    .select("user_id, certification_name")
+    .select("user_id, certification_name, name, is_verified, expiry_date, expiration_date")
     .in("user_id", workerIds);
 
-  const certsByWorker = new Map<string, string[]>();
-  for (const cert of (allCerts || []) as { user_id: string; certification_name: string }[]) {
+  const certsByWorker = new Map<string, ValidCertification[]>();
+  for (const cert of (allCerts || []) as {
+    user_id: string;
+    certification_name?: string | null;
+    name?: string | null;
+    is_verified?: boolean | null;
+    expiry_date?: string | null;
+    expiration_date?: string | null;
+  }[]) {
     if (!certsByWorker.has(cert.user_id)) certsByWorker.set(cert.user_id, []);
-    certsByWorker.get(cert.user_id)!.push(cert.certification_name);
+    const expiry = cert.expiry_date || cert.expiration_date;
+    const isExpired = expiry ? new Date(expiry) < new Date() : false;
+    certsByWorker.get(cert.user_id)!.push({
+      name: cert.certification_name || cert.name || "",
+      is_verified: cert.is_verified !== false,
+      is_expired: isExpired,
+    });
   }
 
   // 4. Fetch matching preferences
@@ -208,6 +218,9 @@ Deno.serve(async (req) => {
 
   for (const worker of workers as ProfileRow[]) {
     evaluated++;
+    if (!isWorkerRole(worker.role)) continue;
+    if (!isMatchReady(worker)) continue;
+
     const workerCerts = certsByWorker.get(worker.user_id) || [];
     const result = calculateMatchScore(opportunity, toWorker(worker, workerCerts));
 
@@ -219,7 +232,7 @@ Deno.serve(async (req) => {
 
     const basePayload = {
       title: "Nueva oportunidad de proyecto PipingBox",
-      message: `${result.score}% de compatibilidad con "${opportunity.title}"${opportunity.location ? ` en ${opportunity.location}` : ""}.`,
+      message: `${result.score}% de compatibilidad con "${opportunity.title}"${opportunity.country ? ` en ${opportunity.country}` : ""}.`,
       action_url: `/workforce/${request.id}`,
       metadata: {
         score: result.score,
@@ -238,7 +251,7 @@ Deno.serve(async (req) => {
       dedupe_key: `workforce:${request.id}:${worker.user_id}:in_app`,
     });
 
-    if (prefs?.email_job_alerts !== false) {
+    if (prefs?.email_job_alerts === true) {
       queueInserts.push({
         opportunity_type: "workforce",
         opportunity_id: request.id,
@@ -273,7 +286,7 @@ Deno.serve(async (req) => {
   if (queueInserts.length > 0) {
     const { error: insertError } = await supabase
       .from("app_14da0f1941_notification_queue")
-      .insert(queueInserts);
+      .upsert(queueInserts, { onConflict: "dedupe_key", ignoreDuplicates: true });
 
     if (insertError) {
       return new Response(

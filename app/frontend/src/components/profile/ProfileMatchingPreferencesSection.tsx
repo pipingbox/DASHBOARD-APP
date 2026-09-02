@@ -21,7 +21,7 @@ export function ProfileMatchingPreferencesSection() {
   const [saving, setSaving] = useState(false);
   const [jobMatching, setJobMatching] = useState(true);
   const [workforceInvitations, setWorkforceInvitations] = useState(true);
-  const [emailAlerts, setEmailAlerts] = useState(true);
+  const [emailAlerts, setEmailAlerts] = useState(false);
   const [whatsappAlerts, setWhatsappAlerts] = useState(false);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export function ProfileMatchingPreferencesSection() {
       if (data) {
         setJobMatching(data.job_matching_enabled ?? true);
         setWorkforceInvitations(data.workforce_invitations_enabled ?? true);
-        setEmailAlerts(data.email_job_alerts ?? true);
+        setEmailAlerts(data.email_job_alerts ?? false);
         setWhatsappAlerts(data.whatsapp_job_alerts ?? false);
       }
     } catch {

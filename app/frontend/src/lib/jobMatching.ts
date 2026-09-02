@@ -5,6 +5,11 @@
 // IMPORTANT: this file must stay in sync with the Edge Function core at
 // supabase/functions/_shared/matching.ts (PB-MATCHING-NOTIFICATIONS-001).
 // Any change to weights, hard requirements or scoring must be mirrored there.
+//
+// Schema real (produccion):
+//   - profiles no tiene position, country ni languages.
+//   - profiles.preferred_regions es text.
+//   - availability_status: available_immediately, not_specified, not_currently_available.
 
 // Weights per DEC-AUTO-001:
 // - Specialty match: 30%
@@ -28,15 +33,12 @@ export interface WorkerProfileForMatching {
   title: string | null;
   years_experience: number | null;
   location: string | null;
-  country: string | null;
   availability_status: string | null;
   skills: string[];
-  languages: string[];
   profile_completion: number | null;
-  marketplace_ready: boolean | null;
   willing_to_travel: boolean | null;
   willing_to_relocate: boolean | null;
-  preferred_regions: string[] | null;
+  preferred_regions: string | null;
   certifications: string[];
 }
 
@@ -51,7 +53,6 @@ export interface JobForMatching {
   salary_min: number | null;
   salary_max: number | null;
   required_certifications?: string[] | null;
-  required_languages?: string[] | null;
   mandatory_location?: string | null;
   accepts_remote?: boolean | null;
 }
@@ -74,6 +75,14 @@ export interface MatchResult {
 
 function normalize(str: string | null | undefined): string {
   return (str || '').toLowerCase().trim();
+}
+
+function parsePreferredRegions(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  return raw
+    .split(/[,;|]/)
+    .map((s) => normalize(s))
+    .filter((s) => s.length > 0);
 }
 
 function hasOverlap(a: string[], b: string[]): number {
@@ -104,6 +113,17 @@ function extractKnownCertsFromText(text: string | null | undefined): string[] {
   return knownCerts.filter((c) => t.includes(c));
 }
 
+export function isWorkerRole(role: string | null | undefined): boolean {
+  const r = normalize(role);
+  return r === 'worker' || r === 'user';
+}
+
+export function isWorkerAvailable(availability: string | null | undefined): boolean {
+  const a = normalize(availability);
+  if (a === 'not_currently_available') return false;
+  return true;
+}
+
 /**
  * Evalua hard requirements de una oferta contra un worker.
  * PB-MATCHING-NOTIFICATIONS-001
@@ -114,8 +134,11 @@ export function evaluateHardRequirements(
 ): string[] {
   const reasons: string[] = [];
 
-  const availability = normalize(worker.availability_status);
-  if (availability === 'not_available' || availability === 'not_currently_available') {
+  if (!isWorkerRole(worker.role)) {
+    reasons.push('invalid_role');
+  }
+
+  if (!isWorkerAvailable(worker.availability_status)) {
     reasons.push('worker_not_available');
   }
 
@@ -124,26 +147,21 @@ export function evaluateHardRequirements(
     reasons.push('missing_required_certification');
   }
 
-  const requiredLanguages = arrayValue(job.required_languages);
-  if (requiredLanguages.length > 0 && !hasAnyOverlap(worker.languages, requiredLanguages)) {
-    reasons.push('missing_required_language');
-  }
-
   const mandatoryLoc = normalize(job.mandatory_location);
   if (mandatoryLoc) {
     const workerLoc = normalize(worker.location);
-    const workerCountry = normalize(worker.country);
-    const preferredRegions = arrayValue(worker.preferred_regions).map(normalize);
+    const preferredRegions = parsePreferredRegions(worker.preferred_regions);
     const acceptsRemote = job.accepts_remote ?? false;
     const willingToTravel = worker.willing_to_travel ?? false;
     const willingToRelocate = worker.willing_to_relocate ?? false;
 
     const matchesLocation =
       workerLoc === mandatoryLoc ||
-      workerCountry === mandatoryLoc ||
       workerLoc.includes(mandatoryLoc) ||
       mandatoryLoc.includes(workerLoc) ||
-      preferredRegions.some((r) => r === mandatoryLoc || r.includes(mandatoryLoc) || mandatoryLoc.includes(r));
+      preferredRegions.some((r) =>
+        r === mandatoryLoc || r.includes(mandatoryLoc) || mandatoryLoc.includes(r)
+      );
 
     if (!matchesLocation && !acceptsRemote && !willingToTravel && !willingToRelocate) {
       reasons.push('location_incompatible');
@@ -198,12 +216,12 @@ export function calculateMatchScore(
   // 3. Location (15%)
   const jobLoc = normalize(job.location);
   const workerLoc = normalize(worker.location);
-  const isAvailable = worker.availability_status === 'available' || worker.availability_status === 'in_2_weeks';
+  const isAvailableImmediately = normalize(worker.availability_status) === 'available_immediately';
   const locationScore =
     !jobLoc ? 0.5 :
     jobLoc === workerLoc ? 1.0 :
     jobLoc && workerLoc && (jobLoc.includes(workerLoc) || workerLoc.includes(jobLoc)) ? 0.7 :
-    isAvailable ? 0.4 : 0.1;
+    isAvailableImmediately ? 0.4 : 0.1;
 
   // 4. Experience (15%)
   const years = worker.years_experience ?? 0;
@@ -213,9 +231,8 @@ export function calculateMatchScore(
     years >= 2 ? 0.5 :
     years > 0 ? 0.3 : 0.1;
 
-  // 5. Languages (10%)
-  const workerLanguages = arrayValue(worker.languages);
-  const langScore = workerLanguages.length > 0 ? Math.min(1, workerLanguages.length / 3) : 0.2;
+  // 5. Languages (10%) — neutral hasta que exista modelo real
+  const langScore = 0.5;
 
   // 6. Profile completion (5%)
   const completionScore = Math.min(1, (worker.profile_completion || 0) / 100);

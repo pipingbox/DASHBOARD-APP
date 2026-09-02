@@ -9,24 +9,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { edgeFunctionUrl } from '@/lib/supabase';
+import { COUNTRY_PHONE_OPTIONS, normalizeToE164 } from '@/lib/phone';
 
-const COUNTRY_OPTIONS = [
-  { code: 'ES', name: 'Spain (+34)', prefix: '34' },
-  { code: 'BE', name: 'Belgium (+32)', prefix: '32' },
-  { code: 'NL', name: 'Netherlands (+31)', prefix: '31' },
-  { code: 'DE', name: 'Germany (+49)', prefix: '49' },
-  { code: 'FR', name: 'France (+33)', prefix: '33' },
-  { code: 'PT', name: 'Portugal (+351)', prefix: '351' },
-  { code: 'IT', name: 'Italy (+39)', prefix: '39' },
-  { code: 'GB', name: 'United Kingdom (+44)', prefix: '44' },
-  { code: 'PL', name: 'Poland (+48)', prefix: '48' },
-  { code: 'RO', name: 'Romania (+40)', prefix: '40' },
-];
-
-function toE164(prefix: string, national: string): string {
-  const digits = national.replace(/\D/g, '');
-  return `${prefix}${digits}`;
-}
+const COUNTRY_OPTIONS = COUNTRY_PHONE_OPTIONS.map((c) => ({
+  code: c.code,
+  name: `${c.code === 'ES' ? 'Spain' : c.code === 'BE' ? 'Belgium' : c.code === 'NL' ? 'Netherlands' : c.code === 'DE' ? 'Germany' : c.code === 'FR' ? 'France' : c.code === 'PT' ? 'Portugal' : c.code === 'IT' ? 'Italy' : c.code === 'GB' ? 'United Kingdom' : c.code === 'PL' ? 'Poland' : 'Romania'} (+${c.prefix})`,
+  prefix: c.prefix,
+}));
 
 /**
  * Seccion de verificacion de telefono E.164 + OTP en /profile.
@@ -58,11 +47,12 @@ export function PhoneVerificationSection() {
 
   const handleSendOtp = async () => {
     if (!user) return;
-    const phone = toE164(selectedCountry.prefix, nationalNumber);
-    if (phone.length < 8) {
+    const normalized = normalizeToE164(countryCode, nationalNumber);
+    if (!normalized.valid || !normalized.e164) {
       toast.error(t('profile.phoneInvalid', 'Please enter a valid phone number'));
       return;
     }
+    const phone = normalized.e164;
     setSending(true);
     try {
       const { data: sessionData } = await supabase.auth.getSession();
