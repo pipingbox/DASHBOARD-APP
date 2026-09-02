@@ -89,6 +89,7 @@ function toWorker(profile: ProfileRow, certs: ValidCertification[]): WorkerProfi
   return {
     user_id: profile.user_id,
     role: profile.role,
+    full_name: profile.full_name,
     title: profile.title,
     years_experience: profile.years_experience,
     location: profile.location,
@@ -186,16 +187,22 @@ Deno.serve(async (req) => {
 
   // 3. Fetch certifications with validity
   const workerIds = workers.map((w: ProfileRow) => w.user_id);
-  const { data: allCerts } = await supabase
+  const { data: allCerts, error: certsError } = await supabase
     .from("app_worker_certifications")
-    .select("user_id, certification_name, name, is_verified, expiry_date, expiration_date")
+    .select("user_id, certification_name, is_verified, expiry_date, expiration_date")
     .in("user_id", workerIds);
+
+  if (certsError) {
+    return new Response(
+      JSON.stringify({ error: certsError.message }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
 
   const certsByWorker = new Map<string, ValidCertification[]>();
   for (const cert of (allCerts || []) as {
     user_id: string;
     certification_name?: string | null;
-    name?: string | null;
     is_verified?: boolean | null;
     expiry_date?: string | null;
     expiration_date?: string | null;
@@ -204,8 +211,8 @@ Deno.serve(async (req) => {
     const expiry = cert.expiry_date || cert.expiration_date;
     const isExpired = expiry ? new Date(expiry) < new Date() : false;
     certsByWorker.get(cert.user_id)!.push({
-      name: cert.certification_name || cert.name || "",
-      is_verified: cert.is_verified !== false, // si la columna no existe, asumir true
+      name: cert.certification_name || "",
+      is_verified: cert.is_verified === true,
       is_expired: isExpired,
     });
   }

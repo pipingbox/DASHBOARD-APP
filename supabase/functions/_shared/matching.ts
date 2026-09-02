@@ -50,6 +50,7 @@ export interface ValidCertification {
 export interface WorkerProfileForMatching {
   user_id: string;
   role: string | null;
+  full_name: string | null;
   title: string | null;
   years_experience: number | null;
   location: string | null;
@@ -171,13 +172,12 @@ function btrim(s: string | null | undefined): string {
 }
 
 /**
- * Lista de certificaciones validas (no expiradas y, si aplica, verificadas).
- * is_verified: si la fila tiene el campo y es false, se excluye.
- * is_expired: si expiry_date/expiration_date existe y es pasada, se excluye.
+ * Lista de certificaciones validas (no expiradas y verificadas explicitamente).
+ * is_verified debe ser true. Un valor NULL no basta para hard requirement.
  */
 function validCertNames(certs: ValidCertification[]): string[] {
   return certs
-    .filter((c) => !c.is_expired && c.is_verified)
+    .filter((c) => !c.is_expired && c.is_verified === true)
     .map((c) => c.name);
 }
 

@@ -1,10 +1,9 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase, TABLES } from '@/lib/supabase';
+import { supabase, TABLES, edgeFunctionUrl } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock, Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { calculateOnboardingCompletion } from '@/lib/profileCompletion';
 import { ONBOARDING_STATUS } from '@/lib/onboarding';
 import { isValidImageFile, isHeicFile, validateFileSize, getSafeImageExtension, ACCEPT_IMAGES } from '@/lib/fileUploadUtils';
 
@@ -254,20 +253,6 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
 
   /* ─── Build Supabase update payload from current state ─── */
   const buildSupabasePayload = useCallback(() => {
-    const completion = calculateOnboardingCompletion({
-      accountType,
-      mainRole,
-      specialties,
-      country,
-      city,
-      availability,
-      willingToTravel,
-      willingToRelocate,
-      profileVisibility,
-      hasAvatar: !!avatarPreview,
-      fullName: profile?.full_name || undefined,
-    });
-
     const payload: Record<string, unknown> = {
       account_type: accountType,
       role: accountType === 'company' ? 'company' : 'worker',
@@ -279,7 +264,8 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       willing_to_relocate: willingToRelocate,
       cv_visible: profileVisibility === 'public',
       profile_visibility: profileVisibility,
-      profile_completion: completion,
+      // NOTA: profile_completion, marketplace_ready y onboarding_status son
+      // columnas protegidas (backend-only). Se actualizan via triggers/RPC.
       updated_at: new Date().toISOString(),
     };
 
@@ -312,10 +298,8 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         if (!isMountedRef.current) return;
 
         if (error) {
-          console.error('[Onboarding] Autosave error:', error.message);
           setSaveStatus('error');
         } else {
-          console.log('[Onboarding] Autosaved to Supabase');
           setSaveStatus('saved');
           setHasUnsavedChanges(false);
           // Reset status after 2s
@@ -441,20 +425,9 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       let avatarUrl: string | null = null;
       if (avatarFile) {
         avatarUrl = await uploadAvatar();
-        // avatarUrl may be null if upload failed — that's OK
       }
 
       const payload = buildSupabasePayload();
-
-      // Mark as marketplace-ready when profile visibility is public
-      if (profileVisibility === 'public') {
-        payload.marketplace_ready = true;
-        payload.onboarding_status = ONBOARDING_STATUS.MARKETPLACE_READY;
-      } else {
-        payload.marketplace_ready = false;
-        payload.onboarding_status = ONBOARDING_STATUS.PROFILE_STARTED;
-      }
-
       if (avatarUrl) {
         payload.avatar_url = avatarUrl;
       }
@@ -465,24 +438,36 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         .eq('user_id', user.id);
 
       if (error) {
-        console.error('[Onboarding] Final save error:', error.message);
         setSaveStatus('error');
-        // Don't return — data was already autosaved progressively
-        // Still navigate to dashboard
       } else {
         setSaveStatus('saved');
       }
 
-      // Clear localStorage draft on successful completion
+      // Backend-controlled fields: onboarding_status, marketplace_ready, profile_completion.
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        if (accessToken) {
+          await fetch(edgeFunctionUrl('complete-onboarding'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ marketplace_ready: profileVisibility === 'public' }),
+          });
+        }
+      } catch {
+        // Non-blocking: core profile data is already saved.
+      }
+
       clearDraftFromLocal(user.id);
       setHasUnsavedChanges(false);
 
       await refreshProfile();
       onComplete(accountType);
     } catch (err) {
-      console.error('[Onboarding] Error:', err);
       setSaveStatus('error');
-      // Even on error, data was autosaved — allow navigation
       clearDraftFromLocal(user.id);
       setHasUnsavedChanges(false);
       await refreshProfile();
@@ -537,23 +522,34 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     // Save whatever we have so far before skipping
     try {
       const payload = buildSupabasePayload();
-      // Skipped onboarding = profile started but not marketplace ready
-      payload.onboarding_status = ONBOARDING_STATUS.PROFILE_STARTED;
-      payload.marketplace_ready = false;
       const { error } = await supabase
         .from(TABLES.profiles)
         .update(payload)
         .eq('user_id', user.id);
 
-      // supabase-js resolves with { error } instead of throwing, so the catch below
-      // never sees a rejected UPDATE. Log it explicitly: silently swallowing this is
-      // exactly how PB-ADMIN-ONBOARDING-SCHEMA-001 stayed invisible in production.
       if (error) {
-        console.error('[OnboardingWizard] Skip save failed:', error);
+        // Best-effort save; continue to complete-onboarding below.
       }
-    } catch (err) {
+    } catch {
       // Best-effort save
-      console.error('[OnboardingWizard] Skip save threw:', err);
+    }
+
+    // Backend-controlled fields: profile remains PROFILE_STARTED, not marketplace ready.
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (accessToken) {
+        await fetch(edgeFunctionUrl('complete-onboarding'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ marketplace_ready: false }),
+        });
+      }
+    } catch {
+      // Non-blocking
     }
 
     clearDraftFromLocal(user.id);

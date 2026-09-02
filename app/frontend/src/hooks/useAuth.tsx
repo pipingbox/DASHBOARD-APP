@@ -5,6 +5,7 @@ import { getStoredReferralCode, clearStoredReferralCode, validateReferralCode } 
 import { notifyReferralJoined } from '@/lib/notifications';
 import { getAppBaseUrl, getAuthRedirectUrl } from '@/lib/constants';
 import { ONBOARDING_STATUS } from '@/lib/onboarding';
+import { edgeFunctionUrl } from '@/lib/supabase';
 
 export interface Profile {
   id: string;
@@ -198,6 +199,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (fetchError) {
         console.error('PROFILE FETCH ERROR:', fetchError.message);
         if (authUser.email === PRIMARY_ADMIN_EMAIL) {
+          // Promote to admin via backend; local synthetic profile reflects it immediately.
+          try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const accessToken = sessionData.session?.access_token;
+            if (accessToken) {
+              await fetch(edgeFunctionUrl('ensure-admin-role'), {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${accessToken}` },
+              });
+            }
+          } catch {
+            // Non-blocking; the next load will retry.
+          }
           setProfile({
             id: authUser.id,
             user_id: authUser.id,
@@ -235,11 +249,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('PROFILE EXISTS', existing.user_id);
         const profileData = existing as Profile;
         if (authUser.email === PRIMARY_ADMIN_EMAIL && profileData.role !== 'admin') {
-          supabase
-            .from(TABLES.profiles)
-            .update({ role: 'admin' })
-            .eq('user_id', authUser.id)
-            .then(() => {});
+          // Promote to admin via backend instead of direct UPDATE.
+          try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const accessToken = sessionData.session?.access_token;
+            if (accessToken) {
+              await fetch(edgeFunctionUrl('ensure-admin-role'), {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${accessToken}` },
+              });
+            }
+          } catch (err) {
+            console.error('[ensureProfile] ensure-admin-role failed:', err);
+          }
           profileData.role = 'admin';
         }
         setProfile(profileData);
@@ -269,10 +291,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Step 2: No existing profile — create one with ALL required fields
       const storedAccountType = localStorage.getItem('pipingbox_account_type') as 'worker' | 'company' | null;
       const metaAccountType = authUser.user_metadata?.account_type as 'worker' | 'company' | undefined;
-      // If no explicit account type was chosen (e.g. Google OAuth without prior selection),
-      // leave as null so the OnboardingGate forces role selection
       const resolvedAccountType = storedAccountType || metaAccountType || null;
-      const assignedRole = authUser.email === PRIMARY_ADMIN_EMAIL ? 'admin' : (resolvedAccountType === 'company' ? 'company' : (resolvedAccountType === 'worker' ? 'worker' : 'user'));
+      // Admin assignment is backend-only. If this is the primary admin, create as
+      // 'user' first and then call ensure-admin-role Edge Function.
+      const isPrimaryAdmin = authUser.email === PRIMARY_ADMIN_EMAIL;
+      const assignedRole = isPrimaryAdmin
+        ? 'user'
+        : (resolvedAccountType === 'company' ? 'company' : (resolvedAccountType === 'worker' ? 'worker' : 'user'));
+      const assignedAccountType = isPrimaryAdmin
+        ? 'user'
+        : (resolvedAccountType || 'worker');
       const fullName = fallbackName || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Engineer';
 
       // Check for referral code from URL/localStorage/sessionStorage/cookie
@@ -299,13 +327,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         full_name: fullName,
         username: authUser.email?.split('@')[0] ?? null,
         role: assignedRole,
-        account_type: assignedRole === 'admin' ? 'admin' : (resolvedAccountType || 'worker'),
+        account_type: assignedAccountType,
         cv_visible: false,
         availability_status: 'not_specified',
-        profile_completion: 10,
-        onboarding_status: ONBOARDING_STATUS.AUTH_ONLY, // canonical: new profiles start here
-        marketplace_ready: false,
         referral_code: `PB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+        // profile_completion, marketplace_ready y onboarding_status usan defaults de backend.
       };
 
       // Clear stored account type after use

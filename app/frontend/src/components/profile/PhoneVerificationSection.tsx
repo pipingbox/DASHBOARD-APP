@@ -11,6 +11,9 @@ import { toast } from 'sonner';
 import { edgeFunctionUrl } from '@/lib/supabase';
 import { COUNTRY_PHONE_OPTIONS, normalizeToE164 } from '@/lib/phone';
 
+const PHONE_VERIFICATION_ENABLED =
+  import.meta.env.VITE_PHONE_VERIFICATION_ENABLED === 'true';
+
 const COUNTRY_OPTIONS = COUNTRY_PHONE_OPTIONS.map((c) => ({
   code: c.code,
   name: `${c.code === 'ES' ? 'Spain' : c.code === 'BE' ? 'Belgium' : c.code === 'NL' ? 'Netherlands' : c.code === 'DE' ? 'Germany' : c.code === 'FR' ? 'France' : c.code === 'PT' ? 'Portugal' : c.code === 'IT' ? 'Italy' : c.code === 'GB' ? 'United Kingdom' : c.code === 'PL' ? 'Poland' : 'Romania'} (+${c.prefix})`,
@@ -20,6 +23,10 @@ const COUNTRY_OPTIONS = COUNTRY_PHONE_OPTIONS.map((c) => ({
 /**
  * Seccion de verificacion de telefono E.164 + OTP en /profile.
  * PB-PHONE-VERIFICATION-001
+ *
+ * IMPORTANTE: phone_e164, phone_verified_at y consentimientos asociados son
+ * backend-controlled. El frontend NO actualiza esas columnas directamente;
+ * usa las Edge Functions phone-send-otp, phone-verify-otp y phone-withdraw-consent.
  */
 export function PhoneVerificationSection() {
   const { t } = useTranslation();
@@ -45,8 +52,15 @@ export function PhoneVerificationSection() {
 
   const selectedCountry = COUNTRY_OPTIONS.find((c) => c.code === countryCode) || COUNTRY_OPTIONS[0];
 
+  const getAccessToken = async () => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+    if (!accessToken) throw new Error('No session');
+    return accessToken;
+  };
+
   const handleSendOtp = async () => {
-    if (!user) return;
+    if (!user || !PHONE_VERIFICATION_ENABLED) return;
     const normalized = normalizeToE164(countryCode, nationalNumber);
     if (!normalized.valid || !normalized.e164) {
       toast.error(t('profile.phoneInvalid', 'Please enter a valid phone number'));
@@ -55,10 +69,7 @@ export function PhoneVerificationSection() {
     const phone = normalized.e164;
     setSending(true);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      if (!accessToken) throw new Error('No session');
-
+      const accessToken = await getAccessToken();
       const res = await fetch(edgeFunctionUrl('phone-send-otp'), {
         method: 'POST',
         headers: {
@@ -81,17 +92,14 @@ export function PhoneVerificationSection() {
   };
 
   const handleVerifyOtp = async () => {
-    if (!user) return;
+    if (!user || !PHONE_VERIFICATION_ENABLED) return;
     if (otp.length !== 6) {
       toast.error(t('profile.otpInvalid', 'Enter the 6-digit code'));
       return;
     }
     setVerifying(true);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      if (!accessToken) throw new Error('No session');
-
+      const accessToken = await getAccessToken();
       const res = await fetch(edgeFunctionUrl('phone-verify-otp'), {
         method: 'POST',
         headers: {
@@ -116,21 +124,16 @@ export function PhoneVerificationSection() {
   };
 
   const handleWithdrawConsent = async () => {
-    if (!user) return;
+    if (!user || !PHONE_VERIFICATION_ENABLED) return;
     try {
-      const { error } = await supabase
-        .from(TABLES.profiles)
-        .update({
-          phone_e164: null,
-          phone_country_code: null,
-          phone_verified_at: null,
-          whatsapp_opt_in: false,
-          whatsapp_opt_in_at: null,
-          whatsapp_opt_in_source: null,
-        })
-        .eq('user_id', user.id);
+      const accessToken = await getAccessToken();
+      const res = await fetch(edgeFunctionUrl('phone-withdraw-consent'), {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(result.error || 'Withdraw failed');
 
-      if (error) throw error;
       await refreshProfile();
       toast.success(t('profile.phoneRemoved', 'Phone and consent removed'));
     } catch (err) {
@@ -139,10 +142,50 @@ export function PhoneVerificationSection() {
     }
   };
 
+  const handleWhatsAppToggle = async (value: boolean) => {
+    if (!user) return;
+    if (value && !verified) {
+      toast.error(t('profile.verifyPhoneFirst', 'Verify your phone first'));
+      return;
+    }
+    // Solo whatsapp_opt_in es editable por el usuario; source/at son backend-controlled.
+    const { error } = await supabase
+      .from(TABLES.profiles)
+      .update({ whatsapp_opt_in: value })
+      .eq('user_id', user.id);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await refreshProfile();
+  };
+
   if (loading) {
     return (
       <div className="border border-zinc-800/80 bg-[#0d0d0d] p-6">
         <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
+      </div>
+    );
+  }
+
+  if (!PHONE_VERIFICATION_ENABLED) {
+    return (
+      <div className="border border-zinc-800/80 bg-[#0d0d0d] p-6 space-y-4">
+        <div className="flex items-start gap-3">
+          <Phone className="mt-0.5 h-5 w-5 text-zinc-400" />
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">
+              {t('profile.phoneVerificationTitle', 'Phone Verification')}
+            </p>
+            <p className="mt-1 text-xs text-zinc-400">
+              {t(
+                'profile.phoneVerificationDisabled',
+                'Phone verification is not enabled yet. We will notify you when WhatsApp alerts become available.',
+              )}
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -188,18 +231,7 @@ export function PhoneVerificationSection() {
             label={t('profile.whatsappOptIn', 'WhatsApp job alerts')}
             description={t('profile.whatsappOptInHint', 'Allow PipingBox to contact me via WhatsApp')}
             checked={profile?.whatsapp_opt_in ?? false}
-            onCheckedChange={async (value) => {
-              if (!user) return;
-              await supabase
-                .from(TABLES.profiles)
-                .update({
-                  whatsapp_opt_in: value,
-                  whatsapp_opt_in_at: value ? new Date().toISOString() : null,
-                  whatsapp_opt_in_source: value ? 'profile_settings' : null,
-                })
-                .eq('user_id', user.id);
-              await refreshProfile();
-            }}
+            onCheckedChange={handleWhatsAppToggle}
           />
           <Button
             variant="outline"
