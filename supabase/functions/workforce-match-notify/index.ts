@@ -1,16 +1,14 @@
-// Edge Function: job-match-notify
-// Purpose: Score all MATCH_READY workers against open job(s) and enqueue
+// Edge Function: workforce-match-notify
+// Purpose: Find MATCH_READY workers for a Workforce Request and enqueue
 //          multichannel notifications according to candidate preferences.
 //
 // PB-MATCHING-NOTIFICATIONS-001
 //
-// Triggers:
-//   a) Called by CompanyPostJob.tsx after a new job is published (body: { job_id }).
-//   b) Manual or cron backfill (body: { all: true }) — limited to last 48h.
+// Trigger: Admin clicks "Find matching candidates" in AdminWorkforceRequestDetail.
+// Body: { workforce_request_id }
 //
-// Dedup: UNIQUE(dedupe_key) on notification_queue prevents duplicate deliveries
-//        for the same (opportunity_type, opportunity_id, candidate_user_id, channel).
-// Threshold: MATCH_THRESHOLD = 60 (env var).
+// Does NOT modify workforce_assignments: shortlisted → invited remains a human
+// admin decision. This function only suggests/queues contacts.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
@@ -25,21 +23,16 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-interface JobRow {
+interface WorkforceRequestRow {
   id: string;
-  title: string;
-  company: string | null;
-  company_name: string | null;
+  title: string | null;
+  worker_type: string | null;
   location: string | null;
   country: string | null;
-  category: string | null;
-  discipline: string | null;
   description: string | null;
   requirements: string | null;
   required_certifications: string[] | null;
   required_languages: string[] | null;
-  mandatory_location: string | null;
-  accepts_remote: boolean | null;
 }
 
 interface ProfileRow {
@@ -64,25 +57,25 @@ interface ProfileRow {
 
 interface MatchingPrefsRow {
   user_id: string;
-  job_matching_enabled: boolean | null;
+  workforce_invitations_enabled: boolean | null;
   email_job_alerts: boolean | null;
   whatsapp_job_alerts: boolean | null;
 }
 
-function toOpportunity(job: JobRow): OpportunityForMatching {
+function toOpportunity(request: WorkforceRequestRow): OpportunityForMatching {
   return {
-    id: job.id,
-    title: job.title,
-    category: job.category,
-    discipline: job.discipline,
-    location: job.location,
-    country: job.country,
-    description: job.description,
-    requirements: job.requirements,
-    required_certifications: job.required_certifications,
-    required_languages: job.required_languages,
-    mandatory_location: job.mandatory_location,
-    accepts_remote: job.accepts_remote,
+    id: request.id,
+    title: request.title || "Workforce Request",
+    category: request.worker_type,
+    discipline: request.worker_type,
+    location: request.location,
+    country: request.country,
+    description: request.description,
+    requirements: request.requirements,
+    required_certifications: request.required_certifications,
+    required_languages: request.required_languages,
+    mandatory_location: request.location,
+    accepts_remote: false,
   };
 }
 
@@ -121,50 +114,46 @@ Deno.serve(async (req) => {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  let jobIds: string[] = [];
-  let allMode = false;
-
+  let requestId: string | null = null;
   try {
     const body = await req.json().catch(() => ({}));
-    if (body.job_id) {
-      jobIds = [body.job_id];
-    } else {
-      allMode = true;
-    }
+    requestId = body.workforce_request_id || null;
   } catch {
-    allMode = true;
+    requestId = null;
   }
 
-  // 1. Fetch job(s)
-  let jobQuery = supabase
-    .from("app_14da0f1941_jobs")
-    .select(
-      "id, title, company, company_name, location, country, category, discipline, description, requirements, required_certifications, required_languages, mandatory_location, accepts_remote",
-    )
-    .eq("status", "open");
-
-  if (!allMode && jobIds.length > 0) {
-    jobQuery = jobQuery.in("id", jobIds);
-  } else {
-    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-    jobQuery = jobQuery.gte("created_at", cutoff);
-  }
-
-  const { data: jobs, error: jobsError } = await jobQuery;
-
-  if (jobsError) {
+  if (!requestId) {
     return new Response(
-      JSON.stringify({ error: jobsError.message }),
+      JSON.stringify({ error: "workforce_request_id is required" }),
+      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  // 1. Fetch workforce request
+  const { data: requests, error: requestError } = await supabase
+    .from("app_14da0f1941_workforce_requests")
+    .select(
+      "id, title, worker_type, location, country, description, requirements, required_certifications, required_languages",
+    )
+    .eq("id", requestId)
+    .limit(1);
+
+  if (requestError) {
+    return new Response(
+      JSON.stringify({ error: requestError.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 
-  if (!jobs || jobs.length === 0) {
+  if (!requests || requests.length === 0) {
     return new Response(
-      JSON.stringify({ enqueued: 0, message: "No jobs to process." }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      JSON.stringify({ error: "Workforce request not found" }),
+      { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
+
+  const request = requests[0] as WorkforceRequestRow;
+  const opportunity = toOpportunity(request);
 
   // 2. Fetch MATCH_READY workers
   const { data: workers, error: workersError } = await supabase
@@ -204,7 +193,7 @@ Deno.serve(async (req) => {
   // 4. Fetch matching preferences
   const { data: allPrefs } = await supabase
     .from("app_14da0f1941_matching_preferences")
-    .select("user_id, job_matching_enabled, email_job_alerts, whatsapp_job_alerts")
+    .select("user_id, workforce_invitations_enabled, email_job_alerts, whatsapp_job_alerts")
     .in("user_id", workerIds);
 
   const prefsByWorker = new Map<string, MatchingPrefsRow>();
@@ -217,74 +206,66 @@ Deno.serve(async (req) => {
   let evaluated = 0;
   let eligible = 0;
 
-  for (const job of jobs as JobRow[]) {
-    const opportunity = toOpportunity(job);
-    const companyName = job.company_name || job.company || undefined;
+  for (const worker of workers as ProfileRow[]) {
+    evaluated++;
+    const workerCerts = certsByWorker.get(worker.user_id) || [];
+    const result = calculateMatchScore(opportunity, toWorker(worker, workerCerts));
 
-    for (const worker of workers as ProfileRow[]) {
-      evaluated++;
-      const workerCerts = certsByWorker.get(worker.user_id) || [];
-      const result = calculateMatchScore(opportunity, toWorker(worker, workerCerts));
+    if (!result.eligible || result.score < threshold) continue;
+    eligible++;
 
-      if (!result.eligible || result.score < threshold) continue;
-      eligible++;
+    const prefs = prefsByWorker.get(worker.user_id);
+    if (prefs?.workforce_invitations_enabled === false) continue;
 
-      const prefs = prefsByWorker.get(worker.user_id);
-      if (prefs?.job_matching_enabled === false) continue;
+    const basePayload = {
+      title: "Nueva oportunidad de proyecto PipingBox",
+      message: `${result.score}% de compatibilidad con "${opportunity.title}"${opportunity.location ? ` en ${opportunity.location}` : ""}.`,
+      action_url: `/workforce/${request.id}`,
+      metadata: {
+        score: result.score,
+        breakdown: result.breakdown,
+        workforce_request_id: request.id,
+      },
+    };
 
-      const basePayload = {
-        title: "Nueva oferta compatible",
-        message: `${result.score}% de compatibilidad con "${job.title}"${companyName ? ` en ${companyName}` : ""}.`,
-        action_url: `/jobs/${job.id}`,
-        metadata: {
-          score: result.score,
-          breakdown: result.breakdown,
-          company_name: companyName ?? null,
-        },
-      };
+    queueInserts.push({
+      opportunity_type: "workforce",
+      opportunity_id: request.id,
+      candidate_user_id: worker.user_id,
+      channel: "in_app",
+      status: "pending",
+      payload: { ...basePayload, channel: "in_app" },
+      dedupe_key: `workforce:${request.id}:${worker.user_id}:in_app`,
+    });
 
-      // In-app always (subject to job_matching_enabled)
+    if (prefs?.email_job_alerts !== false) {
       queueInserts.push({
-        opportunity_type: "job",
-        opportunity_id: job.id,
+        opportunity_type: "workforce",
+        opportunity_id: request.id,
         candidate_user_id: worker.user_id,
-        channel: "in_app",
+        channel: "email",
         status: "pending",
-        payload: { ...basePayload, channel: "in_app" },
-        dedupe_key: `job:${job.id}:${worker.user_id}:in_app`,
+        payload: { ...basePayload, channel: "email" },
+        dedupe_key: `workforce:${request.id}:${worker.user_id}:email`,
       });
+    }
 
-      // Email
-      if (prefs?.email_job_alerts !== false) {
-        queueInserts.push({
-          opportunity_type: "job",
-          opportunity_id: job.id,
-          candidate_user_id: worker.user_id,
-          channel: "email",
-          status: "pending",
-          payload: { ...basePayload, channel: "email" },
-          dedupe_key: `job:${job.id}:${worker.user_id}:email`,
-        });
-      }
+    const whatsappAllowed =
+      whatsappEnabled &&
+      worker.phone_verified_at &&
+      worker.whatsapp_opt_in === true &&
+      prefs?.whatsapp_job_alerts === true;
 
-      // WhatsApp (feature flag + verified + opt-in)
-      const whatsappAllowed =
-        whatsappEnabled &&
-        worker.phone_verified_at &&
-        worker.whatsapp_opt_in === true &&
-        prefs?.whatsapp_job_alerts === true;
-
-      if (whatsappAllowed && worker.phone_e164) {
-        queueInserts.push({
-          opportunity_type: "job",
-          opportunity_id: job.id,
-          candidate_user_id: worker.user_id,
-          channel: "whatsapp",
-          status: "pending",
-          payload: { ...basePayload, channel: "whatsapp" },
-          dedupe_key: `job:${job.id}:${worker.user_id}:whatsapp`,
-        });
-      }
+    if (whatsappAllowed && worker.phone_e164) {
+      queueInserts.push({
+        opportunity_type: "workforce",
+        opportunity_id: request.id,
+        candidate_user_id: worker.user_id,
+        channel: "whatsapp",
+        status: "pending",
+        payload: { ...basePayload, channel: "whatsapp" },
+        dedupe_key: `workforce:${request.id}:${worker.user_id}:whatsapp`,
+      });
     }
   }
 
@@ -306,7 +287,7 @@ Deno.serve(async (req) => {
   return new Response(
     JSON.stringify({
       enqueued,
-      jobs_processed: jobs.length,
+      workforce_request_id: request.id,
       workers_evaluated: evaluated,
       workers_eligible: eligible,
       threshold,

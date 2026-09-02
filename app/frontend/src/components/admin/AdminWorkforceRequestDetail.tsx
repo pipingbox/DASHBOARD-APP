@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import { supabase, TABLES } from '@/lib/supabase';
+import { supabase, TABLES, edgeFunctionUrl } from '@/lib/supabase';
 import {
   X,
   Building2,
@@ -25,6 +25,7 @@ import {
   RefreshCw,
   Filter,
   Phone,
+  Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { WORKFORCE_PRIORITIES } from '@/lib/workforce-pipeline';
@@ -700,6 +701,36 @@ function CandidatePipelineBlock({
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [filters, setFilters] = useState<WorkerProfileFilters>({});
+  const [matching, setMatching] = useState(false);
+
+  const runMatching = async () => {
+    if (!CANDIDATE_PIPELINE_ENABLED) return;
+    setMatching(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) throw new Error('No session');
+
+      const res = await fetch(edgeFunctionUrl('workforce-match-notify'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ workforce_request_id: requestId }),
+      });
+
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(result.error || 'Matching failed');
+
+      toast.success(`Matching finished: ${result.enqueued ?? 0} candidate(s) notified`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Matching failed';
+      toast.error(msg);
+    } finally {
+      setMatching(false);
+    }
+  };
 
   const load = useCallback(async () => {
     if (!CANDIDATE_PIPELINE_ENABLED) return;
@@ -967,14 +998,24 @@ function CandidatePipelineBlock({
       title="Candidate Pipeline"
       icon={Users}
       action={
-        <button
-          onClick={recalculateCoverage}
-          disabled={busy === 'recalc'}
-          className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.15em] text-[#f59e0b] hover:underline disabled:opacity-40"
-        >
-          <RefreshCw className={`h-3 w-3 ${busy === 'recalc' ? 'animate-spin' : ''}`} />
-          Recalculate coverage
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={runMatching}
+            disabled={matching}
+            className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.15em] text-emerald-400 hover:underline disabled:opacity-40"
+          >
+            <Sparkles className={`h-3 w-3 ${matching ? 'animate-pulse' : ''}`} />
+            {matching ? 'Matching...' : 'Find matching candidates'}
+          </button>
+          <button
+            onClick={recalculateCoverage}
+            disabled={busy === 'recalc'}
+            className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.15em] text-[#f59e0b] hover:underline disabled:opacity-40"
+          >
+            <RefreshCw className={`h-3 w-3 ${busy === 'recalc' ? 'animate-spin' : ''}`} />
+            Recalculate coverage
+          </button>
+        </div>
       }
     >
       {/* Stage summary */}

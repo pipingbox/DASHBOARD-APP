@@ -57,6 +57,11 @@ export const TABLES = {
   referrals: 'app_14da0f1941_referrals',
   savedFilters: 'app_14da0f1941_saved_filters',
   jobInvitations: 'app_14da0f1941_job_invitations',
+  // Matching + multichannel notifications (PB-MATCHING-NOTIFICATIONS-001)
+  matchingPreferences: 'app_14da0f1941_matching_preferences',
+  phoneVerifications: 'app_14da0f1941_phone_verifications',
+  notificationQueue: 'app_14da0f1941_notification_queue',
+  deliveryLogs: 'app_14da0f1941_delivery_logs',
   vcaExamCenters: 'app_vca_exam_centers', // DEPRECATED — use certificationExamCenters (DEC-51)
   vcaBookings: 'app_vca_bookings',        // DEPRECATED — use certificationBookings (DEC-51)
   // Generic certification platform (DEC-51, BRAIN-VCA-002)

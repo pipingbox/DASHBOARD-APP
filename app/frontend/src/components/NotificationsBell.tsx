@@ -47,6 +47,9 @@ function getNotificationMeta(type: NotificationType): NotificationMeta {
     case 'job_invitation':
     case 'JOB_INVITATION':
       return { icon: Briefcase, iconColor: 'text-[#f59e0b]' };
+    case 'JOB_MATCH':
+    case 'WORKFORCE_INVITATION':
+      return { icon: Briefcase, iconColor: 'text-emerald-400' };
     case 'PROFILE_INCOMPLETE':
       return { icon: UserCheck, iconColor: 'text-orange-400' };
     case 'PROFILE_READY':
@@ -86,6 +89,10 @@ function getNotificationMessage(n: NotificationRow, t: (key: string, opts?: Reco
     case 'job_invitation':
     case 'JOB_INVITATION':
       return t('notifications.jobInvitation', { title: n.title || '' });
+    case 'JOB_MATCH':
+      return n.message || t('notifications.jobMatch', 'New job match');
+    case 'WORKFORCE_INVITATION':
+      return n.message || t('notifications.workforceInvitation', 'New workforce opportunity');
     case 'PROFILE_INCOMPLETE':
       return t('notifications.profileIncomplete');
     case 'PROFILE_READY':

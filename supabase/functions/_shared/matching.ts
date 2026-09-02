@@ -1,18 +1,12 @@
-// AUTO-001: Job-Worker matching algorithm (client-side scoring).
-// Calculates a match score (0-100) between a job and a worker profile.
-// This is the deterministic scoring logic. AI-based NLP matching (IA-003) is future.
+// _shared/matching.ts
+// Core compartido de candidate matching para job-match-notify y workforce-match-notify.
+// PB-MATCHING-NOTIFICATIONS-001
 //
-// IMPORTANT: this file must stay in sync with the Edge Function core at
-// supabase/functions/_shared/matching.ts (PB-MATCHING-NOTIFICATIONS-001).
-// Any change to weights, hard requirements or scoring must be mirrored there.
-
-// Weights per DEC-AUTO-001:
-// - Specialty match: 30%
-// - Required certifications: 25%
-// - Location / travel availability: 15%
-// - Experience (years): 15%
-// - Languages: 10%
-// - Profile completion: 5%
+// Responsabilidades:
+//   1. Hard-requirements filter: descalifica candidatos que no cumplen requisitos
+//      obligatorios declarados por la oferta.
+//   2. Scoring determinista con los pesos aprobados en AUTO-001/DEC-AUTO-001.
+//   3. Devuelve score, breakdown y razones de descalificacion.
 
 export const WEIGHTS = {
   specialty: 0.30,
@@ -23,37 +17,39 @@ export const WEIGHTS = {
   completion: 0.05,
 } as const;
 
+export type MatchingWeights = typeof WEIGHTS;
+
+export interface OpportunityForMatching {
+  id: string;
+  title: string;
+  category: string | null;
+  discipline: string | null;
+  location: string | null;
+  country: string | null;
+  description: string | null;
+  requirements: string | null;
+  required_certifications?: string[] | null;
+  required_languages?: string[] | null;
+  mandatory_location?: string | null;
+  accepts_remote?: boolean | null;
+}
+
 export interface WorkerProfileForMatching {
+  user_id: string;
   role: string | null;
   title: string | null;
   years_experience: number | null;
   location: string | null;
   country: string | null;
   availability_status: string | null;
-  skills: string[];
-  languages: string[];
+  skills: string[] | null;
+  languages: string[] | null;
   profile_completion: number | null;
   marketplace_ready: boolean | null;
   willing_to_travel: boolean | null;
   willing_to_relocate: boolean | null;
   preferred_regions: string[] | null;
   certifications: string[];
-}
-
-export interface JobForMatching {
-  category: string | null;
-  discipline: string | null;
-  title: string;
-  location: string | null;
-  country: string | null;
-  job_type: string;
-  description: string | null;
-  salary_min: number | null;
-  salary_max: number | null;
-  required_certifications?: string[] | null;
-  required_languages?: string[] | null;
-  mandatory_location?: string | null;
-  accepts_remote?: boolean | null;
 }
 
 export interface MatchBreakdown {
@@ -72,14 +68,14 @@ export interface MatchResult {
   hard_fail_reasons: string[];
 }
 
-function normalize(str: string | null | undefined): string {
-  return (str || '').toLowerCase().trim();
+function norm(s: string | null | undefined): string {
+  return (s || "").toLowerCase().trim();
 }
 
 function hasOverlap(a: string[], b: string[]): number {
   if (a.length === 0 || b.length === 0) return 0;
-  const setA = new Set(a.map(normalize));
-  const setB = new Set(b.map(normalize));
+  const setA = new Set(a.map(norm));
+  const setB = new Set(b.map(norm));
   let matches = 0;
   for (const item of setB) {
     if (setA.has(item)) matches++;
@@ -89,8 +85,14 @@ function hasOverlap(a: string[], b: string[]): number {
 
 function hasAnyOverlap(a: string[], b: string[]): boolean {
   if (a.length === 0 || b.length === 0) return false;
-  const setA = new Set(a.map(normalize));
-  return b.map(normalize).some((item) => setA.has(item));
+  const setA = new Set(a.map(norm));
+  return b.map(norm).some((item) => setA.has(item));
+}
+
+function extractKnownCertsFromText(text: string | null | undefined): string[] {
+  const knownCerts = ["vca", "weld", "cswip", "asnt", "pssr", "atex", "bosiet", "huet", "gwo"];
+  const t = norm(text);
+  return knownCerts.filter((c) => t.includes(c));
 }
 
 function arrayValue(value: string[] | null | undefined): string[] {
@@ -98,43 +100,47 @@ function arrayValue(value: string[] | null | undefined): string[] {
   return Array.isArray(value) ? value : [];
 }
 
-function extractKnownCertsFromText(text: string | null | undefined): string[] {
-  const knownCerts = ['vca', 'weld', 'cswip', 'asnt', 'pssr', 'atex', 'bosiet', 'huet', 'gwo'];
-  const t = normalize(text);
-  return knownCerts.filter((c) => t.includes(c));
-}
-
 /**
- * Evalua hard requirements de una oferta contra un worker.
- * PB-MATCHING-NOTIFICATIONS-001
+ * Evalua hard requirements de una oportunidad contra un worker.
+ * Devuelve un array vacio si el worker es elegible.
  */
 export function evaluateHardRequirements(
-  job: JobForMatching,
+  opportunity: OpportunityForMatching,
   worker: WorkerProfileForMatching,
 ): string[] {
   const reasons: string[] = [];
 
-  const availability = normalize(worker.availability_status);
-  if (availability === 'not_available' || availability === 'not_currently_available') {
-    reasons.push('worker_not_available');
+  // 1. Disponibilidad
+  const availability = norm(worker.availability_status);
+  if (availability === "not_available" || availability === "not_currently_available") {
+    reasons.push("worker_not_available");
   }
 
-  const requiredCerts = arrayValue(job.required_certifications);
-  if (requiredCerts.length > 0 && !hasAnyOverlap(worker.certifications, requiredCerts)) {
-    reasons.push('missing_required_certification');
+  // 2. Certificacion obligatoria requerida por la oferta y no presente
+  const requiredCerts = arrayValue(opportunity.required_certifications);
+  if (requiredCerts.length > 0) {
+    const workerCerts = worker.certifications || [];
+    if (!hasAnyOverlap(workerCerts, requiredCerts)) {
+      reasons.push("missing_required_certification");
+    }
   }
 
-  const requiredLanguages = arrayValue(job.required_languages);
-  if (requiredLanguages.length > 0 && !hasAnyOverlap(worker.languages, requiredLanguages)) {
-    reasons.push('missing_required_language');
+  // 3. Idioma obligatorio requerido por la oferta y no presente
+  const requiredLanguages = arrayValue(opportunity.required_languages);
+  if (requiredLanguages.length > 0) {
+    const workerLanguages = arrayValue(worker.languages);
+    if (!hasAnyOverlap(workerLanguages, requiredLanguages)) {
+      reasons.push("missing_required_language");
+    }
   }
 
-  const mandatoryLoc = normalize(job.mandatory_location);
+  // 4. Ubicacion obligatoria
+  const mandatoryLoc = norm(opportunity.mandatory_location);
   if (mandatoryLoc) {
-    const workerLoc = normalize(worker.location);
-    const workerCountry = normalize(worker.country);
-    const preferredRegions = arrayValue(worker.preferred_regions).map(normalize);
-    const acceptsRemote = job.accepts_remote ?? false;
+    const workerLoc = norm(worker.location);
+    const workerCountry = norm(worker.country);
+    const preferredRegions = arrayValue(worker.preferred_regions).map(norm);
+    const acceptsRemote = opportunity.accepts_remote ?? false;
     const willingToTravel = worker.willing_to_travel ?? false;
     const willingToRelocate = worker.willing_to_relocate ?? false;
 
@@ -146,18 +152,22 @@ export function evaluateHardRequirements(
       preferredRegions.some((r) => r === mandatoryLoc || r.includes(mandatoryLoc) || mandatoryLoc.includes(r));
 
     if (!matchesLocation && !acceptsRemote && !willingToTravel && !willingToRelocate) {
-      reasons.push('location_incompatible');
+      reasons.push("location_incompatible");
     }
   }
 
   return reasons;
 }
 
+/**
+ * Calcula el score de matching entre una oportunidad y un worker.
+ * Si hardFailReasons no esta vacio, el score es 0 y eligible false.
+ */
 export function calculateMatchScore(
-  job: JobForMatching,
+  opportunity: OpportunityForMatching,
   worker: WorkerProfileForMatching,
 ): MatchResult {
-  const hardFailReasons = evaluateHardRequirements(job, worker);
+  const hardFailReasons = evaluateHardRequirements(opportunity, worker);
 
   if (hardFailReasons.length > 0) {
     return {
@@ -175,10 +185,10 @@ export function calculateMatchScore(
     };
   }
 
-  // 1. Specialty match (30%) — job category vs worker title/skills
-  const jobCat = normalize(job.category || job.discipline);
-  const workerTitle = normalize(worker.title);
-  const workerSkills = arrayValue(worker.skills).map(normalize);
+  // 1. Specialty match (30%)
+  const jobCat = norm(opportunity.category || opportunity.discipline);
+  const workerTitle = norm(worker.title);
+  const workerSkills = arrayValue(worker.skills).map(norm);
   const specialtyScore =
     jobCat && workerSkills.includes(jobCat) ? 1.0 :
     jobCat && workerTitle.includes(jobCat) ? 0.8 :
@@ -186,19 +196,20 @@ export function calculateMatchScore(
     0.2;
 
   // 2. Certifications (25%)
-  const requiredCertsFromField = arrayValue(job.required_certifications);
-  const requiredCertsFromText = extractKnownCertsFromText(job.description);
+  const requiredCertsFromField = arrayValue(opportunity.required_certifications);
+  const requiredCertsFromText = extractKnownCertsFromText(opportunity.requirements || opportunity.description);
   const requiredCerts = requiredCertsFromField.length > 0
     ? requiredCertsFromField
     : requiredCertsFromText;
+  const workerCerts = worker.certifications || [];
   const certScore = requiredCerts.length > 0
-    ? hasOverlap(worker.certifications, requiredCerts)
+    ? hasOverlap(workerCerts, requiredCerts)
     : 0.5;
 
   // 3. Location (15%)
-  const jobLoc = normalize(job.location);
-  const workerLoc = normalize(worker.location);
-  const isAvailable = worker.availability_status === 'available' || worker.availability_status === 'in_2_weeks';
+  const jobLoc = norm(opportunity.location);
+  const workerLoc = norm(worker.location);
+  const isAvailable = worker.availability_status === "available" || worker.availability_status === "in_2_weeks";
   const locationScore =
     !jobLoc ? 0.5 :
     jobLoc === workerLoc ? 1.0 :
@@ -215,7 +226,9 @@ export function calculateMatchScore(
 
   // 5. Languages (10%)
   const workerLanguages = arrayValue(worker.languages);
-  const langScore = workerLanguages.length > 0 ? Math.min(1, workerLanguages.length / 3) : 0.2;
+  const langScore = workerLanguages.length > 0
+    ? Math.min(1, workerLanguages.length / 3)
+    : 0.2;
 
   // 6. Profile completion (5%)
   const completionScore = Math.min(1, (worker.profile_completion || 0) / 100);
@@ -247,8 +260,8 @@ export function calculateMatchScore(
 }
 
 export function matchLabel(score: number): { text: string; color: string } {
-  if (score >= 80) return { text: `${score}% match`, color: 'text-emerald-400' };
-  if (score >= 60) return { text: `${score}% match`, color: 'text-[#f59e0b]' };
-  if (score >= 40) return { text: `${score}% match`, color: 'text-zinc-400' };
-  return { text: `${score}%`, color: 'text-zinc-600' };
+  if (score >= 80) return { text: `${score}% match`, color: "text-emerald-400" };
+  if (score >= 60) return { text: `${score}% match`, color: "text-[#f59e0b]" };
+  if (score >= 40) return { text: `${score}% match`, color: "text-zinc-400" };
+  return { text: `${score}%`, color: "text-zinc-600" };
 }

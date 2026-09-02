@@ -15,6 +15,7 @@ export interface Profile {
   bio: string | null;
   role: string;
   title: string | null;
+  position: string | null;
   company: string | null;
   location: string | null;
   years_experience: number | null;
@@ -29,6 +30,10 @@ export interface Profile {
   marketplace_ready: boolean;
   profile_visibility: string | null;
   availability_status: string | null;
+  phone_e164: string | null;
+  phone_country_code: string | null;
+  phone_verified_at: string | null;
+  whatsapp_opt_in: boolean | null;
 }
 
 interface AuthContextValue {
@@ -202,6 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             bio: null,
             role: 'admin',
             title: null,
+            position: null,
             company: null,
             location: null,
             years_experience: 0,
@@ -216,6 +222,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             marketplace_ready: true,
             profile_visibility: 'public',
             availability_status: 'available',
+            phone_e164: null,
+            phone_country_code: null,
+            phone_verified_at: null,
+            whatsapp_opt_in: false,
           });
           return;
         }
@@ -368,6 +378,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               bio: null,
               role: assignedRole,
               title: null,
+              position: null,
               company: null,
               location: null,
               years_experience: 0,
@@ -382,6 +393,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               marketplace_ready: false,
               profile_visibility: null,
               availability_status: 'not_specified',
+              phone_e164: null,
+              phone_country_code: null,
+              phone_verified_at: null,
+              whatsapp_opt_in: false,
             });
             // DON'T clear referral code — Dashboard recovery will try again
             return;
@@ -442,6 +457,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           bio: null,
           role: 'admin',
           title: null,
+          position: null,
           company: null,
           location: null,
           years_experience: 0,
@@ -456,6 +472,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           marketplace_ready: true,
           profile_visibility: 'public',
           availability_status: 'available',
+          phone_e164: null,
+          phone_country_code: null,
+          phone_verified_at: null,
+          whatsapp_opt_in: false,
         });
       } else {
         setProfile({
@@ -467,6 +487,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           bio: null,
           role: 'worker',
           title: null,
+          position: null,
           company: null,
           location: null,
           years_experience: 0,
@@ -481,6 +502,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           marketplace_ready: false,
           profile_visibility: null,
           availability_status: 'not_specified',
+          phone_e164: null,
+          phone_country_code: null,
+          phone_verified_at: null,
+          whatsapp_opt_in: false,
         });
       }
       // DON'T clear referral code on failure — let Dashboard recovery handle it
