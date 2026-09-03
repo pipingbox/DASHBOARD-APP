@@ -488,12 +488,15 @@ export function buildWhatsAppInviteUrl(
  * policies and no dangerous client-role ACLs remain.
  *
  * The dormant exposure described above is closed: the policies are admin-only
- * and the grants are exact. This flag is now `true`.
+ * and the grants are exact. The gate was cleared on 2026-09-01 and the pipeline
+ * was briefly enabled, but it is deliberately returned to `false` while
+ * PB-MATCHING-NOTIFICATIONS-001 DDL/Edge Functions are staged and verified.
+ * Re-enabling requires an explicit operational decision after E2E validation.
  */
-export const CANDIDATE_PIPELINE_ENABLED = true;
+export const CANDIDATE_PIPELINE_ENABLED = false;
 
 export const CANDIDATE_PIPELINE_BLOCKED_REASON =
-  'Candidate pipeline is locked until PB-SEC-RLS-ASSIGNMENTS-001 (legacy permissive RLS on workforce_assignments) is applied and verified in production.';
+  'Candidate pipeline is temporarily disabled while PB-MATCHING-NOTIFICATIONS-001 (matching engine + notification queue) is staged and verified. It was previously cleared by PB-SEC-RLS-ASSIGNMENTS-001; re-enabling requires an explicit operational decision after E2E validation.';
 
 /* ─── Column allow-lists ─── */
 

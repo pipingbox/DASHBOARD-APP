@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { supabase, TABLES } from '@/lib/supabase';
+import { MATCHING_NOTIFICATIONS_ENABLED } from '@/lib/featureFlags';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import {
@@ -116,8 +117,9 @@ export default function CompanyPostJob() {
         });
         toast.error(t('companyPostJob.publishFailed', { error: error.message }));
       } else {
-        // Trigger job-match-notify fire-and-forget (PB-NOTIF-001 Fase 2)
-        if (jobRow?.id) {
+        // Trigger job-match-notify fire-and-forget (PB-NOTIF-001 Fase 2).
+        // Guarded by feature flag until Edge Functions are deployed and verified.
+        if (jobRow?.id && MATCHING_NOTIFICATIONS_ENABLED) {
           supabase.functions
             .invoke('job-match-notify', { body: { job_id: jobRow.id } })
             .catch((err) => console.warn('[CompanyPostJob] job-match-notify failed:', err));
