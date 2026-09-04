@@ -8,10 +8,15 @@
 //   - Owner always has access to their own files.
 //   - Admin/jobs_moderator have access.
 //   - Company access is granted ONLY when the candidate applied to a job
-//     owned by the company, AND the file is explicitly visible.
+//     owned by the company user, AND the file is explicitly visible.
 //   - Uses service_role to create short-lived signed URLs; the key never
 //     leaves the Edge Function.
 //   - Never returns raw legacy public URLs.
+//   - Storage path integrity: bucket allowlist, object must exist, owner
+//     must match owner_user_id, path must be inside the owner's namespace.
+//
+// Fail-closed: any role other than owner / admin / jobs_moderator / company
+// is denied, and the final deny happens before createSignedUrl().
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -28,6 +33,18 @@ interface AccessRequest {
   file_type: "cv" | "document" | "certification";
   record_id?: string;
 }
+
+interface FileRecord {
+  bucket: string;
+  path: string;
+  visibleToCompany: boolean;
+}
+
+const EXPECTED_BUCKETS: Record<string, string> = {
+  cv: "app_14da0f1941_certificates",
+  document: "worker-documents",
+  certification: "worker-documents",
+};
 
 function errorResponse(status: number, message: string) {
   return new Response(
@@ -79,79 +96,36 @@ Deno.serve(async (req) => {
     .eq("user_id", viewerUserId)
     .single();
 
-  if (viewerProfileError) {
-    console.error("[secure-file-access] viewer profile error:", viewerProfileError.message);
-    return errorResponse(500, "Failed to verify viewer");
+  if (viewerProfileError || !viewerProfile) {
+    console.error("[secure-file-access] viewer profile error:", viewerProfileError?.message);
+    return errorResponse(403, "Failed to verify viewer");
   }
 
-  const viewerRole = viewerProfile?.role || "worker";
+  const viewerRole = viewerProfile.role || "worker";
   const isOwner = viewerUserId === owner_user_id;
   const isPrivileged = viewerRole === "admin" || viewerRole === "jobs_moderator";
+  const isCompany = viewerRole === "company";
 
-  let bucket: string | null = null;
-  let path: string | null = null;
+  // Fail-closed: only owner, privileged or company may proceed.
+  if (!isOwner && !isPrivileged && !isCompany) {
+    return errorResponse(403, "Access denied");
+  }
+
+  let fileRecord: FileRecord | null = null;
 
   try {
     if (file_type === "cv") {
-      const { data: profile, error } = await supabase
-        .from("app_14da0f1941_profiles")
-        .select("cv_storage_bucket, cv_storage_path, cv_file_url, cv_visible")
-        .eq("user_id", owner_user_id)
-        .single();
-
-      if (error || !profile) {
-        return errorResponse(404, "Profile not found");
-      }
-
-      if (!isOwner && !isPrivileged && !profile.cv_visible) {
-        return errorResponse(403, "CV not visible to companies");
-      }
-
-      ({ bucket, path } = resolveBucketAndPath(profile.cv_storage_bucket, profile.cv_storage_path, profile.cv_file_url));
+      fileRecord = await resolveCV(supabase, owner_user_id, isOwner || isPrivileged);
     } else if (file_type === "document") {
       if (!record_id) {
         return errorResponse(400, "record_id required for documents");
       }
-
-      const { data: doc, error } = await supabase
-        .from("app_worker_documents")
-        .select("storage_bucket, storage_path, file_url, is_visible")
-        .eq("id", record_id)
-        .eq("user_id", owner_user_id)
-        .single();
-
-      if (error || !doc) {
-        return errorResponse(404, "Document not found");
-      }
-
-      if (!isOwner && !isPrivileged && !doc.is_visible) {
-        return errorResponse(403, "Document not visible to companies");
-      }
-
-      ({ bucket, path } = resolveBucketAndPath(doc.storage_bucket, doc.storage_path, doc.file_url));
+      fileRecord = await resolveDocument(supabase, owner_user_id, record_id, isOwner || isPrivileged);
     } else if (file_type === "certification") {
       if (!record_id) {
         return errorResponse(400, "record_id required for certifications");
       }
-
-      const { data: cert, error } = await supabase
-        .from("app_worker_certifications")
-        .select("storage_bucket, storage_path, certificate_file_url, file_url, is_visible, visible_to_companies")
-        .eq("id", record_id)
-        .eq("user_id", owner_user_id)
-        .single();
-
-      if (error || !cert) {
-        return errorResponse(404, "Certification not found");
-      }
-
-      const visible = cert.is_visible || cert.visible_to_companies;
-      if (!isOwner && !isPrivileged && !visible) {
-        return errorResponse(403, "Certification not visible to companies");
-      }
-
-      const sourceUrl = cert.certificate_file_url || cert.file_url;
-      ({ bucket, path } = resolveBucketAndPath(cert.storage_bucket, cert.storage_path, sourceUrl));
+      fileRecord = await resolveCertification(supabase, owner_user_id, record_id, isOwner || isPrivileged);
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -159,21 +133,38 @@ Deno.serve(async (req) => {
     return errorResponse(500, "Failed to resolve file");
   }
 
-  if (!bucket || !path) {
-    return errorResponse(404, "File location not available");
+  if (!fileRecord) {
+    return errorResponse(404, "File not found");
   }
 
-  // Company access requires an explicit relationship to the candidate.
-  if (!isOwner && !isPrivileged && viewerRole === "company") {
+  // Company access requires an explicit relationship to the candidate and
+  // explicit visibility consent.
+  if (isCompany) {
+    if (!fileRecord.visibleToCompany) {
+      return errorResponse(403, "File not visible to companies");
+    }
     const allowed = await isCompanyAuthorized(supabase, viewerUserId, owner_user_id);
     if (!allowed) {
       return errorResponse(403, "Company not authorized to access this candidate");
     }
   }
 
+  // Final deny gate: never sign unless authorization was explicitly granted.
+  if (!isOwner && !isPrivileged && !isCompany) {
+    return errorResponse(403, "Access denied");
+  }
+
+  // Storage path integrity: bucket allowlist, object exists, owner matches,
+  // path belongs to owner namespace.
+  const integrity = await verifyStorageIntegrity(supabase, file_type, owner_user_id, fileRecord.bucket, fileRecord.path);
+  if (!integrity.ok) {
+    console.error("[secure-file-access] integrity failure:", integrity.message);
+    return errorResponse(403, integrity.message || "Storage integrity check failed");
+  }
+
   const { data: signedData, error: signedError } = await supabase.storage
-    .from(bucket)
-    .createSignedUrl(path, SIGNED_URL_EXPIRY_SECONDS);
+    .from(fileRecord.bucket)
+    .createSignedUrl(fileRecord.path, SIGNED_URL_EXPIRY_SECONDS);
 
   if (signedError || !signedData?.signedUrl) {
     console.error("[secure-file-access] signed url error:", signedError?.message);
@@ -185,6 +176,92 @@ Deno.serve(async (req) => {
     { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
   );
 });
+
+async function resolveCV(
+  supabase: ReturnType<typeof createClient>,
+  owner_user_id: string,
+  skipVisibilityCheck: boolean,
+): Promise<FileRecord | null> {
+  const { data: profile, error } = await supabase
+    .from("app_14da0f1941_profiles")
+    .select("cv_storage_bucket, cv_storage_path, cv_file_url, cv_visible")
+    .eq("user_id", owner_user_id)
+    .single();
+
+  if (error || !profile) {
+    return null;
+  }
+
+  const { bucket, path } = resolveBucketAndPath(profile.cv_storage_bucket, profile.cv_storage_path, profile.cv_file_url);
+  if (!bucket || !path) {
+    return null;
+  }
+
+  return {
+    bucket,
+    path,
+    visibleToCompany: skipVisibilityCheck || Boolean(profile.cv_visible),
+  };
+}
+
+async function resolveDocument(
+  supabase: ReturnType<typeof createClient>,
+  owner_user_id: string,
+  record_id: string,
+  skipVisibilityCheck: boolean,
+): Promise<FileRecord | null> {
+  const { data: doc, error } = await supabase
+    .from("app_worker_documents")
+    .select("storage_bucket, storage_path, file_url, is_visible")
+    .eq("id", record_id)
+    .eq("user_id", owner_user_id)
+    .single();
+
+  if (error || !doc) {
+    return null;
+  }
+
+  const { bucket, path } = resolveBucketAndPath(doc.storage_bucket, doc.storage_path, doc.file_url);
+  if (!bucket || !path) {
+    return null;
+  }
+
+  return {
+    bucket,
+    path,
+    visibleToCompany: skipVisibilityCheck || Boolean(doc.is_visible),
+  };
+}
+
+async function resolveCertification(
+  supabase: ReturnType<typeof createClient>,
+  owner_user_id: string,
+  record_id: string,
+  skipVisibilityCheck: boolean,
+): Promise<FileRecord | null> {
+  const { data: cert, error } = await supabase
+    .from("app_worker_certifications")
+    .select("storage_bucket, storage_path, certificate_file_url, file_url, is_visible, visible_to_companies")
+    .eq("id", record_id)
+    .eq("user_id", owner_user_id)
+    .single();
+
+  if (error || !cert) {
+    return null;
+  }
+
+  const sourceUrl = cert.certificate_file_url || cert.file_url;
+  const { bucket, path } = resolveBucketAndPath(cert.storage_bucket, cert.storage_path, sourceUrl);
+  if (!bucket || !path) {
+    return null;
+  }
+
+  return {
+    bucket,
+    path,
+    visibleToCompany: skipVisibilityCheck || Boolean(cert.is_visible || cert.visible_to_companies),
+  };
+}
 
 function resolveBucketAndPath(
   storageBucket: string | null,
@@ -210,6 +287,51 @@ function resolveBucketAndPath(
   }
 
   return { bucket: null, path: null };
+}
+
+async function verifyStorageIntegrity(
+  supabase: ReturnType<typeof createClient>,
+  file_type: string,
+  owner_user_id: string,
+  bucket: string,
+  path: string,
+): Promise<{ ok: boolean; message?: string }> {
+  const expectedBucket = EXPECTED_BUCKETS[file_type];
+  if (!expectedBucket || bucket !== expectedBucket) {
+    return { ok: false, message: "Bucket not allowed for file type" };
+  }
+
+  // Path must live inside the owner's namespace.
+  if (!path.startsWith(`${owner_user_id}/`)) {
+    return { ok: false, message: "Path does not belong to owner namespace" };
+  }
+
+  const { data: bucketRow, error: bucketError } = await supabase
+    .from("storage.buckets")
+    .select("id")
+    .eq("name", bucket)
+    .single();
+
+  if (bucketError || !bucketRow) {
+    return { ok: false, message: "Bucket not found" };
+  }
+
+  const { data: objectRow, error: objectError } = await supabase
+    .from("storage.objects")
+    .select("id, owner")
+    .eq("bucket_id", bucketRow.id)
+    .eq("name", path)
+    .single();
+
+  if (objectError || !objectRow) {
+    return { ok: false, message: "Storage object not found" };
+  }
+
+  if (objectRow.owner !== owner_user_id) {
+    return { ok: false, message: "Storage object ownership mismatch" };
+  }
+
+  return { ok: true };
 }
 
 async function isCompanyAuthorized(
