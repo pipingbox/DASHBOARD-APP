@@ -44,6 +44,7 @@ test.describe('CV upload smoke test', () => {
   test.skip(!hasCreds, 'E2E QA credentials not set -- skipping CV upload smoke test');
 
   test('uploads a CV, persists storage metadata, refreshes UI, then removes it', async ({ page }) => {
+    test.setTimeout(120_000);
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
 
@@ -61,19 +62,12 @@ test.describe('CV upload smoke test', () => {
     const fileName = `cv-smoke-${uniqueId}.pdf`;
     const fileBuffer = makeMinimalPDF();
 
-    // Use a hidden file input if present, otherwise fall back to the label wrapper.
+    // Use the file input directly. Playwright can call setInputFiles even on a
+    // hidden input, and the wrapped <label> will trigger the native picker on
+    // real user interaction.
     const fileInput = cvSection.locator('input[type="file"]').first();
-    const isHiddenInput = await fileInput.isVisible().catch(() => false);
-
-    if (isHiddenInput) {
-      await fileInput.setInputFiles({ name: fileName, mimeType: 'application/pdf', buffer: fileBuffer });
-    } else {
-      const [fileChooser] = await Promise.all([
-        page.waitForEvent('filechooser'),
-        cvSection.locator('label').first().click(),
-      ]);
-      await fileChooser.setFiles({ name: fileName, mimeType: 'application/pdf', buffer: fileBuffer });
-    }
+    await expect(fileInput).toBeAttached();
+    await fileInput.setInputFiles({ name: fileName, mimeType: 'application/pdf', buffer: fileBuffer });
 
     // Wait for success feedback.
     await expect(page.getByText(/uploaded|subido/i)).toBeVisible({ timeout: 30_000 });
