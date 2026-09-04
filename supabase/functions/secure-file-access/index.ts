@@ -143,7 +143,14 @@ Deno.serve(async (req) => {
     if (!fileRecord.visibleToCompany) {
       return errorResponse(403, "File not visible to companies");
     }
-    const allowed = await isCompanyAuthorized(supabase, viewerUserId, owner_user_id);
+    let allowed = false;
+    try {
+      allowed = await isCompanyAuthorized(supabase, viewerUserId, owner_user_id);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("[secure-file-access] company authorization error:", message);
+      return errorResponse(403, "Company authorization failed");
+    }
     if (!allowed) {
       return errorResponse(403, "Company not authorized to access this candidate");
     }
@@ -156,7 +163,14 @@ Deno.serve(async (req) => {
 
   // Storage path integrity: bucket allowlist, object exists, owner matches,
   // path belongs to owner namespace.
-  const integrity = await verifyStorageIntegrity(supabase, file_type, owner_user_id, fileRecord.bucket, fileRecord.path);
+  let integrity: { ok: boolean; message?: string };
+  try {
+    integrity = await verifyStorageIntegrity(supabase, file_type, owner_user_id, fileRecord.bucket, fileRecord.path);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[secure-file-access] integrity check error:", message);
+    return errorResponse(403, "Storage integrity check failed");
+  }
   if (!integrity.ok) {
     console.error("[secure-file-access] integrity failure:", integrity.message);
     return errorResponse(403, integrity.message || "Storage integrity check failed");
