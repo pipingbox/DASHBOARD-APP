@@ -35,6 +35,32 @@ test.describe('Preview browser smoke test', () => {
     await assertNoBlankBoot(page, '/');
   });
 
+  test('landing i18n renders in Spanish on mobile without object-to-string error', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await assertNoBlankBoot(page, '/?lng=es');
+
+    const body = await page.locator('body').innerText();
+    expect(body).toContain('La plataforma del sector industrial europeo');
+    expect(body).toContain('Para Trabajadores');
+    expect(body).toContain('Para Empresas');
+    expect(body).toContain('Preguntas frecuentes');
+    expect(body).toContain('¿Listo para empezar?');
+    expect(body).not.toContain('returned an object instead of string');
+  });
+
+  test('landing i18n renders in English on mobile without object-to-string error', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await assertNoBlankBoot(page, '/?lng=en');
+
+    const body = await page.locator('body').innerText();
+    expect(body).toContain('The European industrial sector platform');
+    expect(body).toContain('For Workers');
+    expect(body).toContain('For Companies');
+    expect(body).toContain('Frequently asked questions');
+    expect(body).toContain('Ready to get started?');
+    expect(body).not.toContain('returned an object instead of string');
+  });
+
   test('login page is visible', async ({ page }) => {
     await assertNoBlankBoot(page, '/login');
     await expect(page.getByRole('button', { name: /iniciar sesi|log in|sign in/i }).first()).toBeVisible({ timeout: 10_000 }).catch(async () => {

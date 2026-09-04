@@ -189,8 +189,8 @@ export default function Index() {
           <Link to="/" className="flex items-center gap-1">
             <PipingBoxLogo variant="header" />
           </Link>
-          <div className="flex items-center gap-3">
-            <LanguageSelector className="hidden sm:inline-flex" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <LanguageSelector className="inline-flex" />
             <Link
               to="/login"
               className="text-sm text-zinc-400 transition hover:text-zinc-100"
@@ -199,7 +199,7 @@ export default function Index() {
             </Link>
             <Link
               to="/register"
-              className="rounded-md bg-[#f59e0b] px-4 py-1.5 text-sm font-semibold text-black transition hover:bg-[#d97706]"
+              className="rounded-md bg-[#f59e0b] px-3 py-1.5 text-sm font-semibold text-black transition hover:bg-[#d97706] sm:px-4"
             >
               {t('landing.nav.signUp')}
             </Link>

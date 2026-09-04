@@ -63,7 +63,6 @@ void i18n
       pt: { translation: pt },
       it: { translation: it },
     },
-    lng: resolveInitialLanguage(),
     fallbackLng: DEFAULT_LANGUAGE,
     supportedLngs: SUPPORTED_CODES,
     nonExplicitSupportedLngs: true,
@@ -71,8 +70,9 @@ void i18n
       escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage', 'navigator', 'querystring'],
       lookupLocalStorage: LANGUAGE_STORAGE_KEY,
+      lookupQuerystring: 'lng',
       caches: ['localStorage'],
     },
     returnNull: false,
