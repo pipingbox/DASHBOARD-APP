@@ -49,8 +49,8 @@ jobs:
     env:
       PREVIEW_URL: ${{ inputs.target_url }}
       E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
-      E2E_TEST_PASSWORD: ${ secrets.E2E_TEST_PASSWORD }}
-      VITE_SUPABASE_URL: ${ secrets.VITE_SUPABASE_URL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
       VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
     steps:
@@ -104,7 +104,7 @@ jobs:
 
           npx playwright test tests/cv-upload-smoke.spec.ts \
             --config=playwright.config.ts \
-            --reporter=json > playwright-results.cssat
+            --reporter=json > playwright-results.json
 
           node <<'NODE'
           const fs = require('fs');
@@ -143,15 +143,16 @@ jobs:
             process.exit(1);
           }
           if (skipped > 0) {
-            console.error(`::error::Storage E2E gate rejected ${skipped} skipped test(s).            process.exit(1);
+            console.error(`::error::Storage E2E gate rejected ${skipped} skipped test(s).`);
+            process.exit(1);
           }
           if (failed > 0 || timedOut > 0 || interrupted > 0) {
             console.error('::error::Storage E2E gate contains failed/timed-out/interrupted tests.');
-            process::exit(1);
+            process.exit(1);
           }
           if (passed !== 1 || statuses.length !== 1) {
-            console.error(`::error::Storage E2E gate requires exactly 1 passed test; observed passed=${passed}, total=${statuses.length}`);
-            process::exit(1);
+            console.error(`::error::Storage E2E gate requires exactly 1 passed test; observed passed=${passed}, total=${statuses.length}.`);
+            process.exit(1);
           }
 
           console.log('Storage E2E gate PASS: 1/1 test passed, zero skipped.');
