@@ -136,7 +136,7 @@ export function CVUploadSection() {
       return;
     }
     console.log('[CVUploadSection] Profile upserted with CV fields:', {
-      cv_file_url: data.publicUrl,
+      cv_file_url: urlData.publicUrl,
       cv_file_name: file.name,
       cv_file_path: path,
     });
