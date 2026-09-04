@@ -246,14 +246,25 @@ async function isCompanyAuthorized(
   }
 
   // Workforce assignment relationship (company recruiter view).
+  // Production schema uses workforce_assignments(worker_id, request_id) and
+  // workforce_requests(id, company_id). company_id is the user_id of the
+  // company account that owns the request.
   const { data: workforceAssignments } = await supabase
     .from("app_14da0f1941_workforce_assignments")
-    .select("id")
-    .eq("candidate_user_id", candidateUserId)
-    .eq("company_user_id", companyUserId)
-    .limit(1);
+    .select("request_id")
+    .eq("worker_id", candidateUserId);
 
-  if (workforceAssignments && workforceAssignments.length > 0) return true;
+  if (workforceAssignments && workforceAssignments.length > 0) {
+    const requestIds = workforceAssignments.map((wa: { request_id: string }) => wa.request_id);
+    const { data: matchingRequests } = await supabase
+      .from("app_14da0f1941_workforce_requests")
+      .select("id")
+      .in("id", requestIds)
+      .eq("company_id", companyUserId)
+      .limit(1);
+
+    if (matchingRequests && matchingRequests.length > 0) return true;
+  }
 
   return false;
 }
