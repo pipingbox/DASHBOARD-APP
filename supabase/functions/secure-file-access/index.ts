@@ -172,27 +172,34 @@ Deno.serve(async (req) => {
 
   // Storage path integrity: a backend-only RPC confirms the object exists and
   // is owned by the declared owner. We never trust client-editable metadata.
-  let rpcResult: { data?: { result: boolean }; error?: any };
-  try {
-    rpcResult = await supabase.rpc("pb_verify_storage_object_ownership", {
+  const { data: ownershipOk, error: ownershipError } = await supabase.rpc(
+    "pb_verify_storage_object_ownership",
+    {
       p_bucket_name: fileRecord.bucket,
       p_path: fileRecord.path,
       p_owner_user_id: owner_user_id,
-    });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error("[secure-file-access] ownership RPC error:", message);
+    },
+  );
+
+  if (ownershipError) {
+    console.error(
+      "[secure-file-access] ownership RPC returned error:",
+      ownershipError.message,
+    );
     return errorResponse(403, "Storage ownership verification failed");
   }
 
-  if (rpcResult.error) {
-    console.error("[secure-file-access] ownership RPC returned error:", rpcResult.error.message);
-    return errorResponse(403, "Storage ownership verification failed");
-  }
-
-  if (rpcResult.data?.result !== true) {
-    console.error("[secure-file-access] ownership RPC denied:", file_type, fileRecord.bucket, fileRecord.path);
-    return errorResponse(403, "Storage object not found or ownership mismatch");
+  if (ownershipOk !== true) {
+    console.error(
+      "[secure-file-access] ownership RPC denied:",
+      file_type,
+      fileRecord.bucket,
+      fileRecord.path,
+    );
+    return errorResponse(
+      403,
+      "Storage object not found or ownership mismatch",
+    );
   }
 
   const { data: signedData, error: signedError } = await supabase.storage
