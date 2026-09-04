@@ -322,51 +322,6 @@ function resolveBucketAndPath(
   return { bucket: null, path: null };
 }
 
-async function verifyStorageIntegrity(
-  supabase: ReturnType<typeof createClient>,
-  file_type: string,
-  owner_user_id: string,
-  bucket: string,
-  path: string,
-): Promise<{ ok: boolean; message?: string }> {
-  const expectedBucket = EXPECTED_BUCKETS[file_type];
-  if (!expectedBucket || bucket !== expectedBucket) {
-    return { ok: false, message: "Bucket not allowed for file type" };
-  }
-
-  // Path must live inside the owner's namespace.
-  if (!path.startsWith(`${owner_user_id}/`)) {
-    return { ok: false, message: "Path does not belong to owner namespace" };
-  }
-
-  const { data: bucketRow, error: bucketError } = await supabase
-    .from("storage.buckets")
-    .select("id")
-    .eq("name", bucket)
-    .single();
-
-  if (bucketError || !bucketRow) {
-    return { ok: false, message: "Bucket not found" };
-  }
-
-  const { data: objectRow, error: objectError } = await supabase
-    .from("storage.objects")
-    .select("id, owner")
-    .eq("bucket_id", bucketRow.id)
-    .eq("name", path)
-    .single();
-
-  if (objectError || !objectRow) {
-    return { ok: false, message: "Storage object not found" };
-  }
-
-  if (objectRow.owner !== owner_user_id) {
-    return { ok: false, message: "Storage object ownership mismatch" };
-  }
-
-  return { ok: true };
-}
-
 async function isCompanyAuthorized(
   supabase: ReturnType<typeof createClient>,
   companyUserId: string,
