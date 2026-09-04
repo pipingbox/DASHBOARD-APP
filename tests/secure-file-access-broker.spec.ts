@@ -107,7 +107,7 @@ function expectDenied(data: any, error: any) {
 test.describe('secure-file-access broker', () => {
   test.skip(!hasBaseCreds, 'E2E broker credentials not set -- skipping broker access tests');
 
-  test('owner can rtrieve a signed URL for their CV', async () => {
+  test('owner can retrieve a signed URL for their CV', async () => {
     const { supabase, user } = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
 
     const { data: profile } = await getWorkerCV(supabase, user.id);
@@ -124,7 +124,7 @@ test.describe('secure-file-access broker', () => {
     await supabase.auth.signOut();
   });
 
-  test('authorized company can rtrieve a signed URL for a visible CV', async () => {
+  test('authorized company can retrieve a signed URL for a visible CV', async () => {
     test.skip(!hasCompanyCreds, 'Company credentials not set -- skipping authorized company test');
 
     const workerClient = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
@@ -152,7 +152,7 @@ test.describe('secure-file-access broker', () => {
     const workerClient = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
     const workerUserId = workerClient.user.id;
 
-    const companyClient = await signIn(COMPANY_UNAUTH_EMAIL, COMPANY_UNAUTH_PASSWORD!);
+    const companyClient = await signIn(COMPANY_UNAUTH_EMAIL!, COMPANY_UNAUTH_PASSWORD!);
     const { data, error } = await companyClient.supabase.functions.invoke('secure-file-access', {
       body: { owner_user_id: workerUserId, file_type: 'cv' },
     });
@@ -228,7 +228,7 @@ test.describe('secure-file-access broker', () => {
 
     const workerClient = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
     const workerUserId = workerClient.user.id;
-    const { data: profile } = await getWorkerCU(workerClient.supabase, workerUserId);
+    const { data: profile } = await getWorkerCV(workerClient.supabase, workerUserId);
 
     test.skip(!profile?.cv_file_url, 'Worker has no CV uploaded -- skipping admin broker test');
 
