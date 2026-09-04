@@ -52,7 +52,8 @@ test.describe('CV upload smoke test', () => {
     await expect(page.locator('#root')).not.toBeEmpty({ timeout: 10_000 });
 
     // Wait for the CV section to hydrate.
-    const cvSection = page.locator('section').filter({ hasText: /CV|curriculum/i });
+    // Be specific: there is also an "AI Intelligence / AI CV" section on the profile page.
+    const cvSection = page.locator('section').filter({ hasText: /CV\s*\/\s*Resume|Upload your CV|Sube tu CV/i });
     await expect(cvSection).toBeVisible({ timeout: 10_000 });
 
     // Generate a unique file name so we can detect it after refresh.
@@ -75,7 +76,7 @@ test.describe('CV upload smoke test', () => {
     }
 
     // Wait for success feedback.
-    await expect(page.getByText(/uploaded|subido|CV/i)).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(/uploaded|subido/i)).toBeVisible({ timeout: 30_000 });
     await expect(cvSection.getByText(fileName)).toBeVisible({ timeout: 10_000 });
 
     // Capture the signed view link and verify it is a signed URL, not a raw public URL.
