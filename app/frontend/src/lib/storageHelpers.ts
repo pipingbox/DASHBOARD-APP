@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 const SIGNED_URL_EXPIRY_SECONDS = 3600; // 1 hour
 
 /**
- * PB-STORAGE-SECURITY-001 — Secure file URL resolver.
+ * PB-STORAGE-SECURITY-001 — Secure file URL resolver for OWNERS.
  *
  * Never returns a raw legacy public URL. If `pathOrUrl` is a full URL, extracts
  * the canonical bucket/path and requests a short-lived signed URL.
@@ -33,6 +33,45 @@ export async function getSecureFileUrl(
   }
 
   return data.signedUrl;
+}
+
+/**
+ * Request a brokered signed URL for COMPANY/ADMIN viewers.
+ *
+ * Uses the `secure-file-access` Edge Function so the service_role key never
+ * reaches the frontend. Returns null if the viewer is not authorized or the
+ * file is not visible.
+ */
+export async function getBrokerSignedUrl(options: {
+  owner_user_id: string;
+  file_type: 'cv' | 'document' | 'certification';
+  record_id?: string;
+}): Promise<string | null> {
+  const { data, error } = await supabase.functions.invoke('secure-file-access', {
+    body: options,
+  });
+
+  if (error || !data?.signedUrl) {
+    console.error('[storageHelpers] Broker signed URL failed:', error?.message || data?.error);
+    return null;
+  }
+
+  return data.signedUrl as string;
+}
+
+/**
+ * Delete a single Storage object. Returns true on success.
+ */
+export async function deleteStorageObject(
+  bucket: string,
+  path: string,
+): Promise<boolean> {
+  const { error } = await supabase.storage.from(bucket).remove([path]);
+  if (error) {
+    console.error('[storageHelpers] Failed to delete storage object:', { bucket, path, error: error.message });
+    return false;
+  }
+  return true;
 }
 
 /**

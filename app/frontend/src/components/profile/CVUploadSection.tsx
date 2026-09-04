@@ -21,7 +21,11 @@ import {
 } from '@/lib/fileUploadUtils';
 import { uploadWithTimeout } from '@/lib/uploadHelpers';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
-import { getSecureFileUrl, extractStoragePathAndBucket } from '@/lib/storageHelpers';
+import {
+  getSecureFileUrl,
+  extractStoragePathAndBucket,
+  deleteStorageObject,
+} from '@/lib/storageHelpers';
 
 export function CVUploadSection() {
   const { t } = useTranslation();
@@ -135,6 +139,21 @@ export function CVUploadSection() {
       toast.error(msg);
       return;
     }
+
+    // PB-STORAGE-SECURITY-001: delete the previous CV object after the DB
+    // reference has been successfully replaced.
+    const oldBucket = profile?.cv_storage_bucket as string | null;
+    const oldPath = profile?.cv_storage_path as string | null;
+    const oldUrl = profile?.cv_file_url as string | null;
+    if (oldBucket && oldPath && (oldBucket !== bucketName || oldPath !== path)) {
+      await deleteStorageObject(oldBucket, oldPath);
+    } else if (oldUrl) {
+      const extracted = extractStoragePathAndBucket(oldUrl);
+      if (extracted.bucket && extracted.path && (extracted.bucket !== bucketName || extracted.path !== path)) {
+        await deleteStorageObject(extracted.bucket, extracted.path);
+      }
+    }
+
     console.log('[CVUploadSection] Profile upserted with CV fields:', {
       cv_file_url: urlData.publicUrl,
       cv_file_name: file.name,
@@ -150,6 +169,21 @@ export function CVUploadSection() {
   const handleRemove = async () => {
     if (!user) return;
     setRemoving(true);
+
+    // PB-STORAGE-SECURITY-001: delete the Storage object that belongs to this
+    // profile before clearing the DB reference.
+    const bucket = profile?.cv_storage_bucket as string | null;
+    const path = profile?.cv_storage_path as string | null;
+    const url = profile?.cv_file_url as string | null;
+    if (bucket && path) {
+      await deleteStorageObject(bucket, path);
+    } else if (url) {
+      const extracted = extractStoragePathAndBucket(url);
+      if (extracted.bucket && extracted.path) {
+        await deleteStorageObject(extracted.bucket, extracted.path);
+      }
+    }
+
     const { data: upsertedData, error } = await supabase
       .from(TABLES.profiles)
       .upsert(

@@ -27,8 +27,8 @@ import {
   Globe,
   RotateCcw,
 } from 'lucide-react';
-import { supabase, TABLES, STORAGE_BUCKETS } from '@/lib/supabase';
-import { getSecureFileUrl, extractStoragePathAndBucket } from '@/lib/storageHelpers';
+import { supabase, TABLES } from '@/lib/supabase';
+import { getBrokerSignedUrl } from '@/lib/storageHelpers';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminPreview } from '@/contexts/AdminPreviewContext';
 import { Button } from '@/components/ui/button';
@@ -479,33 +479,49 @@ export default function CandidateProfile() {
     return actions;
   };
 
-  const getSignedUrl = async (bucket: string, path: string): Promise<string | null> => {
-    try {
-      console.log('[CandidateProfile] getSignedUrl request:', { bucket, path });
-      const { data, error } = await supabase.storage
-        .from(bucket)
-        .createSignedUrl(path, 3600);
-      if (error || !data?.signedUrl) {
-        console.error('[CandidateProfile] getSignedUrl failed:', { bucket, path, error });
-        return null;
-      }
-      console.log('[CandidateProfile] getSignedUrl success:', { bucket, path, signedUrl: data.signedUrl.substring(0, 80) + '...' });
-      return data.signedUrl;
-    } catch (err) {
-      console.error('[CandidateProfile] getSignedUrl exception:', { bucket, path, err });
-      return null;
+  const getViewerSignedUrlForCV = async (): Promise<string | null> => {
+    if (!userId) return null;
+    return getBrokerSignedUrl({ owner_user_id: userId, file_type: 'cv' });
+  };
+
+  const getViewerSignedUrlForCert = async (cert: WorkerCertification): Promise<string | null> => {
+    if (!userId) return null;
+    return getBrokerSignedUrl({ owner_user_id: userId, file_type: 'certification', record_id: cert.id });
+  };
+
+  const getViewerSignedUrlForDocument = async (doc: WorkerDocument): Promise<string | null> => {
+    if (!userId) return null;
+    return getBrokerSignedUrl({ owner_user_id: userId, file_type: 'document', record_id: doc.id });
+  };
+
+  const handlePreviewCV = async () => {
+    if (!profile?.cv_file_url) return;
+    const signedUrl = await getViewerSignedUrlForCV();
+    if (!signedUrl) {
+      toast.error('Failed to generate CV preview link');
+      return;
+    }
+    setPreviewFile({
+      url: signedUrl,
+      title: profile.cv_file_name || 'CV / Resume',
+      subtitle: profile.full_name || undefined,
+      fileName: profile.cv_file_name || undefined,
+    });
+    setPreviewOpen(true);
+  };
+
+  const handleCVDownload = async () => {
+    const signedUrl = await getViewerSignedUrlForCV();
+    if (signedUrl) {
+      window.open(signedUrl, '_blank');
+    } else {
+      toast.error('Failed to generate CV download link');
     }
   };
 
   const handleCertFileDownload = async (cert: WorkerCertification) => {
     if (!cert.file_url) return;
-    // PB-STORAGE-SECURITY-001: company viewers must never get raw public URLs.
-    // Access is gated by RLS and signed URLs.
-    const bucket =
-      cert.storage_bucket ||
-      extractStoragePathAndBucket(cert.file_url).bucket ||
-      STORAGE_BUCKETS.workerDocuments;
-    const signedUrl = await getSecureFileUrl(bucket, cert.file_url);
+    const signedUrl = await getViewerSignedUrlForCert(cert);
     if (signedUrl) {
       window.open(signedUrl, '_blank');
     } else {
@@ -513,19 +529,49 @@ export default function CandidateProfile() {
     }
   };
 
-  const handleCVDownload = async () => {
-    if (!profile) return;
-    if (!profile.cv_file_url) return;
-    const bucket =
-      (profile.cv_storage_bucket as string | null) ||
-      extractStoragePathAndBucket(profile.cv_file_url).bucket ||
-      STORAGE_BUCKETS.certificates;
-    const signedUrl = await getSecureFileUrl(bucket, profile.cv_file_url);
+  const handleCertPreview = async (cert: WorkerCertification) => {
+    if (!cert.file_url) return;
+    const signedUrl = await getViewerSignedUrlForCert(cert);
+    if (!signedUrl) {
+      toast.error('Failed to generate preview link');
+      return;
+    }
+    setPreviewFile({
+      url: signedUrl,
+      title: cert.certification_name,
+      subtitle: cert.issuing_organization || undefined,
+      expiryDate: cert.expiry_date || cert.expiration_date || undefined,
+      fileName: cert.file_name || undefined,
+    });
+    setPreviewOpen(true);
+  };
+
+  const handleDocumentDownload = async (doc: WorkerDocument) => {
+    if (!doc.file_url) return;
+    const signedUrl = await getViewerSignedUrlForDocument(doc);
     if (signedUrl) {
       window.open(signedUrl, '_blank');
     } else {
-      toast.error('Failed to generate CV download link');
+      toast.error('Failed to generate download link');
     }
+  };
+
+  const handleDocumentPreview = async (doc: WorkerDocument) => {
+    if (!doc.file_url) return;
+    const signedUrl = await getViewerSignedUrlForDocument(doc);
+    if (!signedUrl) {
+      toast.error('Failed to generate preview link');
+      return;
+    }
+    setPreviewFile({
+      url: signedUrl,
+      title: doc.file_name,
+      subtitle: doc.document_type || undefined,
+      expiryDate: doc.expires_at,
+      fileName: doc.file_name,
+      mimeType: doc.mime_type,
+    });
+    setPreviewOpen(true);
   };
 
   const getCertExpiryBadge = (cert: WorkerCertification) => {
@@ -725,17 +771,7 @@ export default function CandidateProfile() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => {
-                if (profile.cv_file_url) {
-                  setPreviewFile({
-                    url: profile.cv_file_url,
-                    title: profile.cv_file_name || 'CV / Resume',
-                    subtitle: profile.full_name || undefined,
-                    fileName: profile.cv_file_name || undefined,
-                  });
-                  setPreviewOpen(true);
-                }
-              }}
+              onClick={handlePreviewCV}
               className="inline-flex items-center gap-1.5 border border-[#f59e0b]/40 bg-[#f59e0b]/10 px-3 py-2 text-xs font-medium text-[#f59e0b] hover:bg-[#f59e0b]/20 cursor-pointer"
             >
               <Eye className="h-3.5 w-3.5" />
@@ -896,16 +932,7 @@ export default function CandidateProfile() {
                         <>
                           <button
                             type="button"
-                            onClick={() => {
-                              setPreviewFile({
-                                url: certFileUrl,
-                                title: cert.certification_name,
-                                subtitle: cert.issuing_organization || undefined,
-                                expiryDate: certExpiry,
-                                fileName: cert.file_name || certFileUrl,
-                              });
-                              setPreviewOpen(true);
-                            }}
+                            onClick={() => handleCertPreview({ ...cert, file_url: certFileUrl })}
                             className="inline-flex items-center gap-1 text-xs text-[#f59e0b] hover:text-[#d97706] border border-[#f59e0b]/30 px-2 py-1 hover:bg-[#f59e0b]/10"
                             title="Ver certificado"
                           >
@@ -983,32 +1010,21 @@ export default function CandidateProfile() {
                         <>
                           <button
                             type="button"
-                            onClick={() => {
-                              setPreviewFile({
-                                url: doc.file_url!,
-                                title: doc.file_name,
-                                subtitle: doc.document_type || undefined,
-                                expiryDate: doc.expires_at,
-                                fileName: doc.file_name,
-                                mimeType: doc.mime_type,
-                              });
-                              setPreviewOpen(true);
-                            }}
+                            onClick={() => handleDocumentPreview(doc)}
                             className="inline-flex items-center gap-1 text-xs text-[#f59e0b] hover:text-[#d97706] border border-[#f59e0b]/30 px-2 py-1 hover:bg-[#f59e0b]/10"
                             title="Ver documento"
                           >
                             <Eye className="h-3 w-3" />
                             Ver
                           </button>
-                          <a
-                            href={doc.file_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            type="button"
+                            onClick={() => handleDocumentDownload(doc)}
                             className="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-700 px-2 py-1 hover:bg-zinc-800"
                             title="Descargar documento"
                           >
                             <Download className="h-3 w-3" />
-                          </a>
+                          </button>
                         </>
                       )}
                     </div>

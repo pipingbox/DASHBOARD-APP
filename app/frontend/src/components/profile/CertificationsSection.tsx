@@ -42,6 +42,7 @@ import { normalizeCertification } from '@/lib/workerProfile';
 import { syncCertificationReminders, deleteCertificationReminders } from '@/lib/certificationReminders';
 import { uploadWithTimeout, resolveFileMime } from '@/lib/uploadHelpers';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
+import { getSecureFileUrl, deleteStorageObject, extractStoragePathAndBucket } from '@/lib/storageHelpers';
 
 export function CertificationsSection() {
   const { t } = useTranslation();
@@ -69,6 +70,8 @@ export function CertificationsSection() {
   const [expiryDate, setExpiryDate] = useState('');
   const [credentialId, setCredentialId] = useState('');
   const [fileUrl, setFileUrl] = useState('');
+  const [storageBucket, setStorageBucket] = useState<string | null>(null);
+  const [storagePath, setStoragePath] = useState<string | null>(null);
   const [fileName, setFileName] = useState('');
   const [notes, setNotes] = useState('');
   const [isVisible, setIsVisible] = useState(true);
@@ -160,6 +163,8 @@ export function CertificationsSection() {
     setExpiryDate('');
     setCredentialId('');
     setFileUrl('');
+    setStorageBucket(null);
+    setStoragePath(null);
     setFileName('');
     setNotes('');
     setIsVisible(true);
@@ -179,6 +184,8 @@ export function CertificationsSection() {
     setExpiryDate(cert.expiry_date ?? '');
     setCredentialId(cert.credential_id ?? '');
     setFileUrl(cert.file_url ?? '');
+    setStorageBucket(cert.storage_bucket ?? null);
+    setStoragePath(cert.storage_path ?? null);
     setFileName(cert.file_name ?? '');
     setNotes(cert.notes ?? '');
     setIsVisible(cert.is_visible);
@@ -287,6 +294,8 @@ export function CertificationsSection() {
 
       console.log('[CertUpload] Public URL:', urlData.publicUrl);
       setFileUrl(urlData.publicUrl);
+      setStorageBucket(bucketName);
+      setStoragePath(filePath);
       setFileName(file.name);
       toast.success(t('workerProfile.certifications.fileUploaded'));
     } catch (uploadErr) {
@@ -336,6 +345,8 @@ export function CertificationsSection() {
         notes: notes.trim() || null,
         is_visible: isVisible,
         visible_to_companies: isVisible,
+        storage_bucket: storageBucket,
+        storage_path: storagePath,
       };
 
       console.log('[CertSave] Payload built:', JSON.stringify(payload, null, 2));
@@ -355,10 +366,26 @@ export function CertificationsSection() {
           return;
         }
 
+        // PB-STORAGE-SECURITY-001: if the file changed, delete the previous object.
+        const oldUrl = editing.file_url;
+        const oldBucket = editing.storage_bucket;
+        const oldPath = editing.storage_path;
+        const newUrl = fileUrl;
+        if (oldUrl && oldUrl !== newUrl) {
+          if (oldBucket && oldPath) {
+            await deleteStorageObject(oldBucket, oldPath);
+          } else {
+            const extracted = extractStoragePathAndBucket(oldUrl);
+            if (extracted.bucket && extracted.path) {
+              await deleteStorageObject(extracted.bucket, extracted.path);
+            }
+          }
+        }
+
         // Optimistic update
         console.log('[CertSave] Applying optimistic update...');
         setItems((prev) =>
-          prev.map((i) => (i.id === editing.id ? { ...i, ...payload } : i))
+          prev.map((i) => (i.id === editing.id ? { ...i, ...payload } : i)),
         );
         toast.success(t('workerProfile.certifications.updated'));
 
@@ -475,6 +502,17 @@ export function CertificationsSection() {
     try {
       // Delete associated reminders first
       await deleteCertificationReminders(deleteTarget.id);
+
+      // PB-STORAGE-SECURITY-001: delete the Storage object that belongs to this
+      // exact record before removing the DB row.
+      if (deleteTarget.storage_bucket && deleteTarget.storage_path) {
+        await deleteStorageObject(deleteTarget.storage_bucket, deleteTarget.storage_path);
+      } else if (deleteTarget.file_url) {
+        const extracted = extractStoragePathAndBucket(deleteTarget.file_url);
+        if (extracted.bucket && extracted.path) {
+          await deleteStorageObject(extracted.bucket, extracted.path);
+        }
+      }
 
       const { error } = await supabase
         .from(TABLES.workerCertifications)
@@ -608,10 +646,24 @@ export function CertificationsSection() {
                   <div className="flex gap-1">
                     {cert.file_url && (
                       <a
-                        href={cert.file_url}
+                        href={cert.storageUrl || '#'}
                         target="_blank"
                         rel="noreferrer"
                         title={t('workerProfile.certifications.viewFile')}
+                        onClick={async (e) => {
+                          const bucket = cert.storage_bucket || STORAGE_BUCKETS.workerDocuments;
+                          const url = await getSecureFileUrl(bucket, cert.file_url);
+                          if (url) {
+                            setItems((prev) =>
+                              prev.map((i) =>
+                                i.id === cert.id ? { ...i, storageUrl: url } : i,
+                              ),
+                            );
+                          } else {
+                            e.preventDefault();
+                            toast.error(t('workerProfile.certifications.viewFileDenied', { defaultValue: 'Access denied' }));
+                          }
+                        }}
                         className="inline-flex items-center gap-1 border border-zinc-800 bg-zinc-900 px-2 py-1 text-[11px] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b]"
                       >
                         <ExternalLink className="h-3 w-3" />
@@ -811,8 +863,17 @@ export function CertificationsSection() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
+                      if (!editing) {
+                        // Add mode: clean up the uploaded object before it is attached to a DB row.
+                        if (storageBucket && storagePath) {
+                          await deleteStorageObject(storageBucket, storagePath);
+                        }
+                      }
+                      // Edit mode: just clear state; the old object is deleted on save if confirmed.
                       setFileUrl('');
+                      setStorageBucket(null);
+                      setStoragePath(null);
                       setFileName('');
                     }}
                     className="text-xs uppercase tracking-wider text-zinc-500 hover:text-red-400"

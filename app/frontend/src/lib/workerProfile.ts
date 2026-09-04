@@ -244,6 +244,10 @@ export interface WorkerDocument {
   verified: boolean;
   is_visible: boolean;
   created_at: string;
+  /** Resolved storage bucket from backfill (client-only). */
+  storage_bucket?: string | null;
+  /** Resolved storage path from backfill (client-only). */
+  storage_path?: string | null;
   /** Resolved signed URL (client-only, not persisted). */
   storageUrl?: string;
 }
@@ -276,5 +280,7 @@ export function normalizeDocument(raw: Record<string, unknown>): WorkerDocument 
     verified: (raw.verified as boolean) ?? false,
     is_visible: raw.is_visible !== false,
     created_at: (raw.created_at as string) || '',
+    storage_bucket: (raw.storage_bucket as string | null) || null,
+    storage_path: (raw.storage_path as string | null) || null,
   };
 }

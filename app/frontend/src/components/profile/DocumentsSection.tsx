@@ -15,7 +15,7 @@ import {
   CalendarClock,
 } from 'lucide-react';
 import { supabase, TABLES, STORAGE_BUCKETS } from '@/lib/supabase';
-import { getSecureFileUrl } from '@/lib/storageHelpers';
+import { getSecureFileUrl, deleteStorageObject, extractStoragePathAndBucket } from '@/lib/storageHelpers';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -105,6 +105,8 @@ export function DocumentsSection() {
   const [documentType, setDocumentType] = useState<string>('other');
   const [fileName, setFileName] = useState('');
   const [fileUrl, setFileUrl] = useState('');
+  const [storageBucket, setStorageBucket] = useState<string | null>(null);
+  const [storagePath, setStoragePath] = useState<string | null>(null);
   const [fileSize, setFileSize] = useState<number | null>(null);
   const [mimeType, setMimeType] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
@@ -142,6 +144,8 @@ export function DocumentsSection() {
     setDocumentType('other');
     setFileName('');
     setFileUrl('');
+    setStorageBucket(null);
+    setStoragePath(null);
     setFileSize(null);
     setMimeType(null);
     setNotes('');
@@ -230,6 +234,8 @@ export function DocumentsSection() {
 
       console.log('[DocumentsSection] Public URL:', data.publicUrl);
       setFileUrl(data.publicUrl);
+      setStorageBucket(bucketName);
+      setStoragePath(path);
       setFileName(file.name);
       setFileSize(file.size);
       setMimeType(file.type || null);
@@ -275,6 +281,8 @@ export function DocumentsSection() {
         document_category: derivedCategory,
         file_name: fileName || 'document',
         file_url: fileUrl,
+        storage_bucket: storageBucket,
+        storage_path: storagePath,
         file_size: fileSize,
         mime_type: mimeType,
         notes: notes.trim() || null,
@@ -302,6 +310,18 @@ export function DocumentsSection() {
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
+
+    // PB-STORAGE-SECURITY-001: delete the Storage object that belongs to this
+    // exact record before removing the DB row. Never delete unrelated objects.
+    if (deleteTarget.storage_bucket && deleteTarget.storage_path) {
+      await deleteStorageObject(deleteTarget.storage_bucket, deleteTarget.storage_path);
+    } else if (deleteTarget.file_url) {
+      const extracted = extractStoragePathAndBucket(deleteTarget.file_url);
+      if (extracted.bucket && extracted.path) {
+        await deleteStorageObject(extracted.bucket, extracted.path);
+      }
+    }
+
     const { error } = await supabase
       .from(TABLES.workerDocuments)
       .delete()
@@ -411,11 +431,10 @@ export function DocumentsSection() {
                       target="_blank"
                       rel="noreferrer"
                       onClick={async (e) => {
-                        if (!doc.file_url) return;
-                        const url = await getSecureFileUrl(
-                          STORAGE_BUCKETS.workerDocuments,
-                          doc.file_url,
-                        );
+                        const bucket = doc.storage_bucket || STORAGE_BUCKETS.workerDocuments;
+                        const sourceUrl = doc.file_url;
+                        if (!sourceUrl) return;
+                        const url = await getSecureFileUrl(bucket, sourceUrl);
                         if (url) {
                           setItems((prev) =>
                             prev.map((i) =>
@@ -494,8 +513,14 @@ export function DocumentsSection() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={async () => {
+                      // Clean up the uploaded object before it is attached to a DB row.
+                      if (storageBucket && storagePath) {
+                        await deleteStorageObject(storageBucket, storagePath);
+                      }
                       setFileUrl('');
+                      setStorageBucket(null);
+                      setStoragePath(null);
                       setFileName('');
                       setFileSize(null);
                       setMimeType(null);
