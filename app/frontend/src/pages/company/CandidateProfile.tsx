@@ -28,6 +28,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { supabase, TABLES, STORAGE_BUCKETS } from '@/lib/supabase';
+import { getSecureFileUrl, extractStoragePathAndBucket } from '@/lib/storageHelpers';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminPreview } from '@/contexts/AdminPreviewContext';
 import { Button } from '@/components/ui/button';
@@ -498,13 +499,13 @@ export default function CandidateProfile() {
 
   const handleCertFileDownload = async (cert: WorkerCertification) => {
     if (!cert.file_url) return;
-    // If it's a full URL (public), open directly
-    if (cert.file_url.startsWith('http')) {
-      window.open(cert.file_url, '_blank');
-      return;
-    }
-    // Otherwise treat as a storage path and get signed URL
-    const signedUrl = await getSignedUrl(STORAGE_BUCKETS.certificates, cert.file_url);
+    // PB-STORAGE-SECURITY-001: company viewers must never get raw public URLs.
+    // Access is gated by RLS and signed URLs.
+    const bucket =
+      cert.storage_bucket ||
+      extractStoragePathAndBucket(cert.file_url).bucket ||
+      STORAGE_BUCKETS.workerDocuments;
+    const signedUrl = await getSecureFileUrl(bucket, cert.file_url);
     if (signedUrl) {
       window.open(signedUrl, '_blank');
     } else {
@@ -514,15 +515,12 @@ export default function CandidateProfile() {
 
   const handleCVDownload = async () => {
     if (!profile) return;
-    // If cv_file_url is a full URL, open directly
-    if (profile.cv_file_url && profile.cv_file_url.startsWith('http')) {
-      window.open(profile.cv_file_url, '_blank');
-      return;
-    }
-    // Otherwise try signed URL from certificates bucket
-    const path = profile.cv_file_url || '';
-    if (!path) return;
-    const signedUrl = await getSignedUrl(STORAGE_BUCKETS.workerDocuments, path);
+    if (!profile.cv_file_url) return;
+    const bucket =
+      (profile.cv_storage_bucket as string | null) ||
+      extractStoragePathAndBucket(profile.cv_file_url).bucket ||
+      STORAGE_BUCKETS.certificates;
+    const signedUrl = await getSecureFileUrl(bucket, profile.cv_file_url);
     if (signedUrl) {
       window.open(signedUrl, '_blank');
     } else {

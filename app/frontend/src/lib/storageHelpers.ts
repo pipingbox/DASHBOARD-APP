@@ -3,14 +3,16 @@ import { supabase } from '@/lib/supabase';
 const SIGNED_URL_EXPIRY_SECONDS = 3600; // 1 hour
 
 /**
- * Returns a signed download URL for a private storage file.
+ * PB-STORAGE-SECURITY-001 — Secure file URL resolver.
  *
- * Handles two cases:
- *  1. Legacy public URLs (start with http) — returned as-is for backward compat.
- *  2. Storage paths — generates a short-lived signed URL.
+ * Never returns a raw legacy public URL. If `pathOrUrl` is a full URL, extracts
+ * the canonical bucket/path and requests a short-lived signed URL.
  *
- * @param bucket  Supabase storage bucket name
- * @param pathOrUrl  Either a storage path ("userId/file.pdf") or a legacy public URL
+ * If the caller does not have explicit access (RLS policy), createSignedUrl
+ * returns an error and this function returns null.
+ *
+ * @param bucket  Supabase storage bucket name (canonical, e.g. 'worker-documents')
+ * @param pathOrUrl  Either a canonical storage path or a legacy public/signed URL
  */
 export async function getSecureFileUrl(
   bucket: string,
@@ -18,12 +20,12 @@ export async function getSecureFileUrl(
 ): Promise<string | null> {
   if (!pathOrUrl) return null;
 
-  // Legacy: already a full URL — return as-is
-  if (pathOrUrl.startsWith('http')) return pathOrUrl;
+  const path = extractStoragePath(pathOrUrl);
+  if (!path) return null;
 
   const { data, error } = await supabase.storage
     .from(bucket)
-    .createSignedUrl(pathOrUrl, SIGNED_URL_EXPIRY_SECONDS);
+    .createSignedUrl(path, SIGNED_URL_EXPIRY_SECONDS);
 
   if (error || !data?.signedUrl) {
     console.error('[storageHelpers] Failed to create signed URL:', error?.message);
@@ -34,17 +36,44 @@ export async function getSecureFileUrl(
 }
 
 /**
- * Extracts the storage path from either a full public URL or a bare path.
- * Useful for storing only the path in the DB when migrating from public URLs.
+ * Extracts the canonical storage bucket and path from a legacy public/signed URL
+ * or from a bare path.
+ *
+ * Supported legacy formats:
+ *   https://<project>.supabase.co/storage/v1/object/public/<bucket>/<path>
+ *   https://<project>.supabase.co/storage/v1/object/sign/<bucket>/<path>?token=...
+ *
+ * If the input is already a bare path, returns it with the caller-provided bucket.
+ *
+ * Returns null if the URL cannot be decomposed (fail-closed).
  */
-export function extractStoragePath(bucket: string, urlOrPath: string): string {
-  if (!urlOrPath.startsWith('http')) return urlOrPath;
+export function extractStoragePathAndBucket(
+  urlOrPath: string,
+): { bucket: string | null; path: string | null } {
+  if (!urlOrPath) return { bucket: null, path: null };
 
-  // Try to extract path after /object/public/{bucket}/
-  const publicMarker = `/object/public/${bucket}/`;
-  const idx = urlOrPath.indexOf(publicMarker);
-  if (idx !== -1) return urlOrPath.slice(idx + publicMarker.length);
+  if (!urlOrPath.startsWith('http')) {
+    return { bucket: null, path: urlOrPath };
+  }
 
-  // Fallback: return as-is (legacy URL that we can't decompose)
-  return urlOrPath;
+  const publicMatch = urlOrPath.match(/\/object\/public\/([^/]+)\/(.+?)(?:\?|$)/);
+  if (publicMatch) {
+    return { bucket: publicMatch[1], path: publicMatch[2] };
+  }
+
+  const signedMatch = urlOrPath.match(/\/object\/sign\/([^/]+)\/(.+?)(?:\?|$)/);
+  if (signedMatch) {
+    return { bucket: signedMatch[1], path: signedMatch[2] };
+  }
+
+  return { bucket: null, path: null };
+}
+
+/**
+ * Convenience wrapper that returns only the path, ignoring the extracted bucket.
+ * Returns null if the URL cannot be decomposed (fail-closed).
+ */
+export function extractStoragePath(urlOrPath: string): string | null {
+  const { path } = extractStoragePathAndBucket(urlOrPath);
+  return path;
 }

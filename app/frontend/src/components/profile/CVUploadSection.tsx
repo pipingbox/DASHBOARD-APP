@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   FileText,
@@ -21,6 +21,7 @@ import {
 } from '@/lib/fileUploadUtils';
 import { uploadWithTimeout } from '@/lib/uploadHelpers';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
+import { getSecureFileUrl, extractStoragePathAndBucket } from '@/lib/storageHelpers';
 
 export function CVUploadSection() {
   const { t } = useTranslation();
@@ -30,9 +31,28 @@ export function CVUploadSection() {
   const [removing, setRemoving] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  const [cvSignedUrl, setCvSignedUrl] = useState<string | null>(null);
+
   const cvFileUrl = profile?.cv_file_url as string | null;
   const cvFileName = profile?.cv_file_name as string | null;
   const cvVisible = (profile?.cv_visible as boolean) ?? true;
+
+  // Resolve legacy or canonical CV URL to a short-lived signed URL.
+  useEffect(() => {
+    let cancelled = false;
+    setCvSignedUrl(null);
+    if (!cvFileUrl) return;
+    const bucket =
+      (profile?.cv_storage_bucket as string | null) ||
+      extractStoragePathAndBucket(cvFileUrl).bucket ||
+      STORAGE_BUCKETS.certificates;
+    getSecureFileUrl(bucket, cvFileUrl).then((url) => {
+      if (!cancelled) setCvSignedUrl(url);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [cvFileUrl, profile?.cv_storage_bucket]);
 
   const handleUpload = async (file: File) => {
     if (!user) return;
@@ -83,18 +103,20 @@ export function CVUploadSection() {
 
     console.log('[CVUploadSection] Upload success:', { bucket: bucketName, path });
 
-    const { data } = supabase.storage
+    const { data: urlData } = supabase.storage
       .from(bucketName)
       .getPublicUrl(path);
 
-    console.log('[CVUploadSection] Public URL:', data.publicUrl);
+    console.log('[CVUploadSection] Public URL:', urlData.publicUrl);
 
     const { data: upsertedData, error: updateError } = await supabase
       .from(TABLES.profiles)
       .upsert(
         {
           user_id: user.id,
-          cv_file_url: data.publicUrl,
+          cv_file_url: urlData.publicUrl,
+          cv_storage_bucket: bucketName,
+          cv_storage_path: path,
           cv_file_name: file.name,
           cv_file_path: path,
           cv_uploaded_at: new Date().toISOString(),
@@ -134,6 +156,8 @@ export function CVUploadSection() {
         {
           user_id: user.id,
           cv_file_url: null,
+          cv_storage_bucket: null,
+          cv_storage_path: null,
           cv_file_name: null,
           cv_file_path: null,
           cv_uploaded_at: null,
@@ -218,7 +242,7 @@ export function CVUploadSection() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <a
-                  href={cvFileUrl}
+                  href={cvSignedUrl || '#'}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.15em] text-zinc-300 hover:border-[#f59e0b] hover:text-[#f59e0b]"

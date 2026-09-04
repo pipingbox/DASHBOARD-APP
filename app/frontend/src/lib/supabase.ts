@@ -121,5 +121,5 @@ export const TABLES = {
 export const STORAGE_BUCKETS = {
   avatars: 'app_14da0f1941_avatars',
   certificates: 'app_14da0f1941_certificates',
-  workerDocuments: 'app_14da0f1941_certificates',
+  workerDocuments: 'worker-documents',
 } as const;

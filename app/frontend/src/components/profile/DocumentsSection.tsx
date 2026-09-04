@@ -15,6 +15,7 @@ import {
   CalendarClock,
 } from 'lucide-react';
 import { supabase, TABLES, STORAGE_BUCKETS } from '@/lib/supabase';
+import { getSecureFileUrl } from '@/lib/storageHelpers';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -197,7 +198,7 @@ export function DocumentsSection() {
     try {
       const ext = getFileExtension(file.name) || 'pdf';
       const path = `${user.id}/doc-${Date.now()}.${ext}`;
-      const bucketName = STORAGE_BUCKETS.certificates;
+      const bucketName = STORAGE_BUCKETS.workerDocuments;
 
       console.log('[DocumentsSection] File upload starting:', {
         bucket: bucketName,
@@ -406,9 +407,26 @@ export function DocumentsSection() {
                   </div>
                   <div className="flex gap-1">
                     <a
-                      href={doc.file_url}
+                      href={doc.storageUrl || '#'}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={async (e) => {
+                        if (!doc.file_url) return;
+                        const url = await getSecureFileUrl(
+                          STORAGE_BUCKETS.workerDocuments,
+                          doc.file_url,
+                        );
+                        if (url) {
+                          setItems((prev) =>
+                            prev.map((i) =>
+                              i.id === doc.id ? { ...i, storageUrl: url } : i,
+                            ),
+                          );
+                        } else {
+                          e.preventDefault();
+                          toast.error(t('workerProfile.documents.accessDenied', { defaultValue: 'Access denied' }));
+                        }
+                      }}
                       className="inline-flex items-center gap-1 border border-zinc-800 bg-zinc-900 px-2 py-1 text-[11px] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b]"
                     >
                       <ExternalLink className="h-3 w-3" />
