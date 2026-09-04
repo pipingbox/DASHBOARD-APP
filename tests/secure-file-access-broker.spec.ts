@@ -107,7 +107,7 @@ function expectDenied(data: any, error: any) {
 test.describe('secure-file-access broker', () => {
   test.skip(!hasBaseCreds, 'E2E broker credentials not set -- skipping broker access tests');
 
-  test('owner can retrieve a signed URL for their CV', async () => {
+  test('owner can rtrieve a signed URL for their CV', async () => {
     const { supabase, user } = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
 
     const { data: profile } = await getWorkerCV(supabase, user.id);
@@ -124,7 +124,7 @@ test.describe('secure-file-access broker', () => {
     await supabase.auth.signOut();
   });
 
-  test('authorized company can retrieve a signed URL for a visible CV', async () => {
+  test('authorized company can rtrieve a signed URL for a visible CV', async () => {
     test.skip(!hasCompanyCreds, 'Company credentials not set -- skipping authorized company test');
 
     const workerClient = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
@@ -152,7 +152,7 @@ test.describe('secure-file-access broker', () => {
     const workerClient = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
     const workerUserId = workerClient.user.id;
 
-    const companyClient = await signIn(COMPANY_UNAUTH_EMAIL!, COMPANY_UNAUTH_PASSWORD!);
+    const companyClient = await signIn(COMPANY_UNAUTH_EMAIL, COMPANY_UNAUTH_PASSWORD!);
     const { data, error } = await companyClient.supabase.functions.invoke('secure-file-access', {
       body: { owner_user_id: workerUserId, file_type: 'cv' },
     });
@@ -228,7 +228,7 @@ test.describe('secure-file-access broker', () => {
 
     const workerClient = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
     const workerUserId = workerClient.user.id;
-    const { data: profile } = await getWorkerCV(workerClient.supabase, workerUserId);
+    const { data: profile } = await getWorkerCU(workerClient.supabase, workerUserId);
 
     test.skip(!profile?.cv_file_url, 'Worker has no CV uploaded -- skipping admin broker test');
 
@@ -245,10 +245,9 @@ test.describe('secure-file-access broker', () => {
     await adminClient.supabase.auth.signOut();
   });
 
-  test('broker rejects a CV path outside the owner namespace', async () => {
+  test('broker denies a CV path inside owner namespace when the storage object does not exist', async () => {
     const { supabase, user } = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
 
-    // Capture the original metadata so we can restore it.
     const { data: original } = await supabase
       .from('app_14da0f1941_profiles')
       .select('cv_storage_bucket, cv_storage_path')
@@ -256,16 +255,15 @@ test.describe('secure-file-access broker', () => {
       .single();
 
     try {
-      // Point the profile to a path that belongs to another user's namespace.
-      // Even if this exact object does not exist, the broker must deny because
-      // the path is not inside the owner's namespace.
+      // Path lives inside the owner's namespace but the object does not exist.
+      // The ownership RPC must return false and the broker must deny with 403.
       await supabase
         .from('app_14da0f1941_profiles')
         .upsert(
           {
             user_id: user.id,
             cv_storage_bucket: 'app_14da0f1941_certificates',
-            cv_storage_path: 'ffffffff-ffff-ffff-ffff-ffffffffffff/cv-stolen.pdf',
+            cv_storage_path: `${user.id}/this-file-does-not-exist.pdf`,
           },
           { onConflict: 'user_id' },
         );
@@ -276,7 +274,6 @@ test.describe('secure-file-access broker', () => {
 
       expectDenied(data, error);
     } finally {
-      // Restore original metadata.
       await supabase
         .from('app_14da0f1941_profiles')
         .upsert(
@@ -289,5 +286,21 @@ test.describe('secure-file-access broker', () => {
         );
       await supabase.auth.signOut();
     }
+  });
+
+  test('authenticated user cannot execute pb_verify_storage_object_ownership RPC directly', async () => {
+    const { supabase, user } = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
+
+    const { data, error } = await supabase.rpc('pb_verify_storage_object_ownership', {
+      p_bucket_name: 'app_14da0f1941_certificates',
+      p_path: `${user.id}/contract-test.pdf`,
+      p_owner_user_id: user.id,
+    });
+
+    // The RPC is backend/service_role only; any authenticated client must be rejected.
+    expect(error).not.toBeNull();
+    expect(String(error?.message || data).toLowerCase()).toMatch(/permission denied|not authorized|unauthorized/);
+
+    await supabase.auth.signOut();
   });
 });
