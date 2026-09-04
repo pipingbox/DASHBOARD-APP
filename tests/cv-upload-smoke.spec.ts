@@ -52,8 +52,8 @@ test.describe('CV upload smoke test', () => {
     await expect(page.locator('#root')).not.toBeEmpty({ timeout: 10_000 });
 
     // Wait for the CV section to hydrate.
-    // Be specific: there is also an "AI Intelligence / AI CV" section on the profile page.
-    const cvSection = page.locator('section').filter({ hasText: /CV\s*\/\s*Resume|Upload your CV|Sube tu CV/i });
+    // Anchor to the start of the section text to avoid matching the "AI Intelligence / AI CV" section.
+    const cvSection = page.locator('section').filter({ hasText: /^CV\s*\/\s*Resume/i });
     await expect(cvSection).toBeVisible({ timeout: 10_000 });
 
     // Generate a unique file name so we can detect it after refresh.
