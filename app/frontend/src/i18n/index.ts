@@ -70,7 +70,7 @@ void i18n
       escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator', 'querystring'],
+      order: ['localStorage', 'querystring', 'navigator'],
       lookupLocalStorage: LANGUAGE_STORAGE_KEY,
       lookupQuerystring: 'lng',
       caches: ['localStorage'],
