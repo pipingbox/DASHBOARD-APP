@@ -35,24 +35,32 @@ test.describe('Preview browser smoke test', () => {
     await assertNoBlankBoot(page, '/');
   });
 
+  // The hero badge and the metric labels carry `text-transform: uppercase`, and
+  // innerText returns the TRANSFORMED text. Comparing against the source casing
+  // fails for a purely cosmetic reason, so normalise before asserting.
+  const landingText = async (page: import('@playwright/test').Page) =>
+    (await page.locator('body').innerText()).toLowerCase();
+
   test('landing i18n renders in Spanish on mobile without object-to-string error', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await assertNoBlankBoot(page, '/?lng=es');
 
-    const body = await page.locator('body').innerText();
-    expect(body).toContain('La plataforma del sector industrial europeo');
-    expect(body).toContain('Para Trabajadores');
-    expect(body).toContain('Para Empresas');
-    expect(body).toContain('Preguntas frecuentes');
-    expect(body).toContain('¿Listo para empezar?');
+    const body = await landingText(page);
+    expect(body).toContain('la plataforma del sector industrial europeo');
+    expect(body).toContain('para trabajadores');
+    expect(body).toContain('para empresas');
+    expect(body).toContain('preguntas frecuentes');
+    expect(body).toContain('¿listo para empezar?');
     expect(body).not.toContain('returned an object instead of string');
 
     // The four counter labels used to be hardcoded English on every locale.
-    expect(body).toContain('Métricas reales');
-    expect(body).toContain('Planos técnicos');
-    expect(body).toContain('Normas cubiertas');
-    expect(body).not.toContain('Technical drawings');
-    expect(body).not.toContain('Standards covered');
+    expect(body).toContain('métricas reales');
+    expect(body).toContain('planos técnicos');
+    expect(body).toContain('filas de datos dimensionales');
+    expect(body).toContain('normas cubiertas');
+    expect(body).toContain('herramientas de ingeniería gratuitas');
+    expect(body).not.toContain('technical drawings');
+    expect(body).not.toContain('standards covered');
 
     // Unverifiable user-count claim. Must not come back.
     expect(body).not.toContain('miles de profesionales');
@@ -62,20 +70,22 @@ test.describe('Preview browser smoke test', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await assertNoBlankBoot(page, '/?lng=en');
 
-    const body = await page.locator('body').innerText();
-    expect(body).toContain('The European industrial sector platform');
-    expect(body).toContain('For Workers');
-    expect(body).toContain('For Companies');
-    expect(body).toContain('Frequently asked questions');
-    expect(body).toContain('Ready to get started?');
+    const body = await landingText(page);
+    expect(body).toContain('the european industrial sector platform');
+    expect(body).toContain('for workers');
+    expect(body).toContain('for companies');
+    expect(body).toContain('frequently asked questions');
+    expect(body).toContain('ready to get started?');
     expect(body).not.toContain('returned an object instead of string');
 
-    expect(body).toContain('Real metrics');
-    expect(body).toContain('Technical drawings');
-    expect(body).toContain('Standards covered');
+    expect(body).toContain('real metrics');
+    expect(body).toContain('technical drawings');
+    expect(body).toContain('dimensional data rows');
+    expect(body).toContain('standards covered');
+    expect(body).toContain('free engineering tools');
 
     // Unverifiable user-count claim. Must not come back.
-    expect(body).not.toContain('Join thousands');
+    expect(body).not.toContain('join thousands');
   });
 
   test('login page is visible', async ({ page }) => {
