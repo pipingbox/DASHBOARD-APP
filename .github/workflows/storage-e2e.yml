@@ -190,3 +190,13 @@ jobs:
           NODE
 
           exit ${PW_EXIT}
+
+      - name: Upload Playwright artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storage-e2e-artifacts-${{ github.run_id }}
+          path: |
+            playwright-output/
+            playwright-results.json
+          retention-days: 3
