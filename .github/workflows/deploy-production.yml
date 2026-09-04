@@ -70,6 +70,9 @@ jobs:
       - name: i18n structural guard (locale schema drift)
         run: node scripts/check-i18n-schema.mjs
 
+      - name: Validate i18n usage in public pages
+        run: node scripts/check-i18n-usage.mjs
+
       - name: Catalog integrity guard
         run: node scripts/check-catalog.mjs
 
