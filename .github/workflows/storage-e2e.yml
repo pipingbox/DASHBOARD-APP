@@ -1,0 +1,158 @@
+name: Storage E2E Gate
+
+# Final smoke gate for PB-STORAGE-SECURITY-001 cutover.
+# - Uses only the dedicated disposable QA account stored in GitHub Secrets.
+# - Never logs credentials.
+# - Runs exclusively tests/cv-upload-smoke.spec.ts against the deployed origin.
+# - Fails if passed != 1, skipped > 0, or failed > 0.
+
+on:
+  workflow_call:
+    inputs:
+      target_url:
+        description: 'Deployed origin to test'
+        required: true
+        type: string
+      source_ref:
+        description: 'Exact app commit/ref whose E2E tests must be executed'
+        required: true
+        type: string
+    secrets:
+      E2E_TEST_EMAIL:
+        required: true
+      E2E_TEST_PASSWORD:
+        required: true
+      VITE_SUPABASE_URL:
+        required: true
+      VITE_SUPABASE_ANON_KEY:
+        required: true
+
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Deployed origin to test'
+        required: true
+        default: 'https://app.pipingbox.com'
+        type: string
+      source_ref:
+        description: 'Exact app commit/ref whose E2E tests must be executed'
+        required: true
+        default: '518fb3d07e5cd9ca5e6c4f20c10be539e7cbae8a'
+        type: string
+
+jobs:
+  storage-e2e:
+    name: CV Upload Storage E2E — require 1/1 PASS
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PREVIEW_URL: ${{ inputs.target_url }}
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${ secrets.E2E_TEST_PASSWORD }}
+      VITE_SUPABASE_URL: ${ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+    steps:
+      - name: Validate target and credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${PREVIEW_URL:-}" ]; then
+            echo "::error::target_url is required."
+            exit 1
+          fi
+          if [ -z "${E2E_TEST_EMAIL:-}" ] || [ -z "${E2E_TEST_PASSWORD:-}" ]; then
+            echo "::error::E2E_TEST_EMAIL and E2E_TEST_PASSWORD must both be configured as GitHub Secrets."
+            exit 1
+          fi
+          if [ -z "${VITE_SUPABASE_URL:-}" ] || [ -z "${VITE_SUPABASE_ANON_KEY:-}" ]; then
+            echo "::error::VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must both be configured as GitHub Secrets."
+            exit 1
+          fi
+          case "$PREVIEW_URL" in
+            https://*) ;;
+            *) echo "::error::Storage E2E target must use HTTPS."; exit 1 ;;
+          esac
+
+      - name: Checkout exact tested app ref
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact tested SHA
+        env:
+          INPUT_SHA: ${{ inputs.source_ref }}
+        run: git checkout "$INPUT_SHA"
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run CV upload smoke — zero skipped allowed
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          npx playwright test tests/cv-upload-smoke.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=json > playwright-results.cssat
+
+          node <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('playwright-results.json', 'utf8'));
+          const statuses = [];
+
+          function walk(value) {
+            if (!value || typeof value !== 'object') return;
+            if (Array.isArray(value)) {
+              for (const item of value) walk(item);
+              return;
+            }
+            if (Array.isArray(value.results)) {
+              for (const result of value.results) {
+                if (result && typeof result.status === 'string') statuses.push(result.status);
+              }
+            }
+            for (const [key, child] of Object.entries(value)) {
+              if (key !== 'results') walk(child);
+            }
+          }
+
+          walk(report);
+
+          const count = (status) => statuses.filter((s) => s === status).length;
+          const passed = count('passed');
+          const skipped = count('skipped');
+          const failed = count('failed');
+          const timedOut = count('timedOut');
+          const interrupted = count('interrupted');
+
+          console.log(`Storage E2E result: passed=${passed}, skipped=${skipped}, failed=${failed}, timedOut=${timedOut}, interrupted=${interrupted}`);
+
+          if (statuses.length === 0) {
+            console.error('::error::Playwright produced no executable Storage E2E results.');
+            process.exit(1);
+          }
+          if (skipped > 0) {
+            console.error(`::error::Storage E2E gate rejected ${skipped} skipped test(s).            process.exit(1);
+          }
+          if (failed > 0 || timedOut > 0 || interrupted > 0) {
+            console.error('::error::Storage E2E gate contains failed/timed-out/interrupted tests.');
+            process::exit(1);
+          }
+          if (passed !== 1 || statuses.length !== 1) {
+            console.error(`::error::Storage E2E gate requires exactly 1 passed test; observed passed=${passed}, total=${statuses.length}`);
+            process::exit(1);
+          }
+
+          console.log('Storage E2E gate PASS: 1/1 test passed, zero skipped.');
+          NODE
