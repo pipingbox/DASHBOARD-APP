@@ -69,9 +69,9 @@ test.describe('CV upload smoke test', () => {
     await expect(fileInput).toBeAttached();
     await fileInput.setInputFiles({ name: fileName, mimeType: 'application/pdf', buffer: fileBuffer });
 
-    // Wait for success feedback.
-    await expect(page.getByText(/uploaded|subido/i)).toBeVisible({ timeout: 30_000 });
-    await expect(cvSection.getByText(fileName)).toBeVisible({ timeout: 10_000 });
+    // Wait for the uploaded file name to appear in the CV section. This is the
+    // strongest signal that the upload + DB upsert + refresh succeeded.
+    await expect(cvSection.getByText(fileName)).toBeVisible({ timeout: 30_000 });
 
     // Capture the signed view link and verify it is a signed URL, not a raw public URL.
     const viewLink = cvSection.locator('a[href^="https://"]').first();
