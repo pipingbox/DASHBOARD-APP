@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { catalogStats } from '@/tools/catalog';
 import { PipingBoxLogo } from '@/components/PipingBoxLogo';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import {
   UserCheck,
   Calculator,
@@ -16,6 +17,10 @@ import {
   ChevronDown,
   Globe,
   Lock,
+  Wrench,
+  IdCard,
+  HardHat,
+  BookOpen,
 } from 'lucide-react';
 
 // BUG-001: Landing page. Replaces the old redirect-only Index.
@@ -97,30 +102,7 @@ function AnimatedCounter({ metric }: { metric: RealMetric }) {
   );
 }
 
-const FAQ_ITEMS = [
-  {
-    q: 'Is PipingBox free for workers?',
-    a: 'Yes. Workers get a free profile, marketplace access, community, and engineering tools — forever. Only Academy certification courses are paid.',
-  },
-  {
-    q: 'Does PipingBox issue official certifications?',
-    a: 'No. PipingBox prepares you for the official certification exams (VCA, SCC, PRL). The certification itself is issued by the official certifying body (SSVV, SCC Stiftung, etc.). PipingBox is a partner, not a competitor.',
-  },
-  {
-    q: 'Which certifications can I prepare for?',
-    a: 'VCA Basic (Belgium/Netherlands), SCC (Germany/DACH), and PRL (Spain). More certifications will be added as we expand.',
-  },
-  {
-    q: 'How much does the VCA course cost?',
-    a: 'The VCA Basic preparation course is 59.90 EUR — about 6x cheaper than classroom training (250-400 EUR).',
-  },
-  {
-    q: 'Do the engineering tools work without registration?',
-    a: 'Yes. The tools are public and free. No login required. Sign up only if you want to save your calculations and access the marketplace.',
-  },
-];
-
-function FaqItem({ item }: { item: { q: string; a: string } }) {
+function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="border border-zinc-800/80 bg-[#0d0d0d]">
@@ -128,32 +110,19 @@ function FaqItem({ item }: { item: { q: string; a: string } }) {
         onClick={() => setOpen(!open)}
         className="flex w-full items-center justify-between px-5 py-4 text-left text-sm font-medium text-zinc-200"
       >
-        {item.q}
+        {question}
         <ChevronDown
           className={`h-4 w-4 shrink-0 text-zinc-500 transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
       {open && (
         <div className="border-t border-zinc-800/60 px-5 py-4 text-sm text-zinc-400">
-          {item.a}
+          {answer}
         </div>
       )}
     </div>
   );
 }
-
-const WORKER_BENEFITS = [
-  { icon: UserCheck, title: 'Verifiable professional profile', desc: 'Build a profile that companies trust. Certifications, experience, and documents in one place.' },
-  { icon: Calculator, title: 'Free engineering tools', desc: 'Wall thickness calculator, unit converter, pipe data tables — built for the field, free forever.' },
-  { icon: GraduationCap, title: 'VCA, SCC & PRL preparation', desc: 'Prepare for certification exams at 6x less cost than classroom training.' },
-  { icon: Briefcase, title: 'Industrial job opportunities', desc: 'Apply to verified industrial projects across Europe. Your profile works for you 24/7.' },
-];
-
-const COMPANY_BENEFITS = [
-  { icon: ShieldCheck, title: 'Verified talent pool', desc: 'Access professionals whose certifications and experience are documented and searchable.' },
-  { icon: Clock, title: 'Faster hiring', desc: 'Stop sifting through irrelevant CVs. Filter by certification, trade, location, and availability.' },
-  { icon: FileCheck, title: 'Compliance & audit', desc: 'Track certification expiry, generate compliance reports, and maintain an auditable hiring trail.' },
-];
 
 export default function Index() {
   const { t } = useTranslation();
@@ -177,6 +146,41 @@ export default function Index() {
 
   if (user) return null;
 
+  const faqItems = [
+    { q: t('landing.faq.q1'), a: t('landing.faq.a1') },
+    { q: t('landing.faq.q2'), a: t('landing.faq.a2') },
+    { q: t('landing.faq.q3'), a: t('landing.faq.a3') },
+    { q: t('landing.faq.q4'), a: t('landing.faq.a4') },
+    { q: t('landing.faq.q5'), a: t('landing.faq.a5') },
+  ];
+
+  const workerBenefits = [
+    { icon: UserCheck, titleKey: 'landing.workers.benefits.profile.title', descKey: 'landing.workers.benefits.profile.desc' },
+    { icon: Calculator, titleKey: 'landing.workers.benefits.tools.title', descKey: 'landing.workers.benefits.tools.desc' },
+    { icon: GraduationCap, titleKey: 'landing.workers.benefits.training.title', descKey: 'landing.workers.benefits.training.desc' },
+    { icon: Briefcase, titleKey: 'landing.workers.benefits.jobs.title', descKey: 'landing.workers.benefits.jobs.desc' },
+  ];
+
+  const companyBenefits = [
+    { icon: ShieldCheck, titleKey: 'landing.companies.benefits.verified.title', descKey: 'landing.companies.benefits.verified.desc' },
+    { icon: Clock, titleKey: 'landing.companies.benefits.time.title', descKey: 'landing.companies.benefits.time.desc' },
+    { icon: FileCheck, titleKey: 'landing.companies.benefits.compliance.title', descKey: 'landing.companies.benefits.compliance.desc' },
+  ];
+
+  const explorePillars = [
+    { icon: Wrench, titleKey: 'landing.explore.tools.title', descKey: 'landing.explore.tools.desc', ctaKey: 'landing.explore.tools.cta', href: '/tools' },
+    { icon: IdCard, titleKey: 'landing.explore.profile.title', descKey: 'landing.explore.profile.desc', ctaKey: 'landing.explore.profile.cta', href: '/register' },
+    { icon: HardHat, titleKey: 'landing.explore.jobs.title', descKey: 'landing.explore.jobs.desc', ctaKey: 'landing.explore.jobs.cta', href: '/jobs' },
+    { icon: BookOpen, titleKey: 'landing.explore.academy.title', descKey: 'landing.explore.academy.desc', ctaKey: 'landing.explore.academy.cta', href: '/academy' },
+  ];
+
+  const trustBadges = [
+    { icon: ShieldCheck, labelKey: 'landing.trust.gdpr' },
+    { icon: FileCheck, labelKey: 'landing.trust.standards' },
+    { icon: Globe, labelKey: 'landing.trust.madeIn' },
+    { icon: Lock, labelKey: 'landing.trust.encrypted' },
+  ];
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-zinc-100">
       {/* Header */}
@@ -186,17 +190,18 @@ export default function Index() {
             <PipingBoxLogo variant="header" />
           </Link>
           <div className="flex items-center gap-3">
+            <LanguageSelector className="hidden sm:inline-flex" />
             <Link
               to="/login"
               className="text-sm text-zinc-400 transition hover:text-zinc-100"
             >
-              {t('landing.signIn', { defaultValue: 'Sign in' })}
+              {t('landing.nav.signIn')}
             </Link>
             <Link
               to="/register"
               className="rounded-md bg-[#f59e0b] px-4 py-1.5 text-sm font-semibold text-black transition hover:bg-[#d97706]"
             >
-              {t('landing.signUpFree', { defaultValue: 'Sign up free' })}
+              {t('landing.nav.signUp')}
             </Link>
           </div>
         </div>
@@ -207,32 +212,27 @@ export default function Index() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(245,158,11,0.08),_transparent_50%)]" />
         <div className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 sm:py-28">
           <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#f59e0b]">
-            {t('landing.eyebrow', { defaultValue: 'The European industrial workforce platform' })}
+            {t('landing.hero.badge')}
           </p>
           <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight sm:text-5xl sm:leading-tight">
-            {t('landing.headline', {
-              defaultValue: 'PipingBox — the ecosystem for industrial professionals and companies',
-            })}
+            {t('landing.hero.headline')}
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg">
-            {t('landing.subheadline', {
-              defaultValue:
-                'Free engineering tools, certified training (VCA / SCC / PRL), verified jobs, and a technical community. Everything an industrial professional needs, in one place.',
-            })}
+            {t('landing.hero.subtitle')}
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               to="/register"
               className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#f59e0b] px-6 py-3 text-sm font-semibold text-black transition hover:bg-[#d97706] sm:w-auto"
             >
-              {t('landing.ctaCreateAccount', { defaultValue: 'Create a free account' })}
+              {t('landing.hero.cta')}
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               to="/tools"
               className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-zinc-700 bg-transparent px-6 py-3 text-sm font-semibold text-zinc-200 transition hover:bg-zinc-900 sm:w-auto"
             >
-              {t('landing.ctaExploreTools', { defaultValue: 'Explore tools' })}
+              {t('landing.hero.ctaSecondary')}
             </Link>
           </div>
         </div>
@@ -242,22 +242,42 @@ export default function Index() {
       <section className="border-t border-zinc-800/60 py-8">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-center">
-            <div className="flex items-center gap-2 text-xs text-zinc-500">
-              <ShieldCheck className="h-4 w-4 text-[#f59e0b]" />
-              <span>GDPR compliant</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-zinc-500">
-              <FileCheck className="h-4 w-4 text-[#f59e0b]" />
-              <span>ASME · EN · ISO standards</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-zinc-500">
-              <Globe className="h-4 w-4 text-[#f59e0b]" />
-              <span>Made in Europe</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-zinc-500">
-              <Lock className="h-4 w-4 text-[#f59e0b]" />
-              <span>Encrypted data</span>
-            </div>
+            {trustBadges.map(({ icon: Icon, labelKey }) => (
+              <div key={labelKey} className="flex items-center gap-2 text-xs text-zinc-500">
+                <Icon className="h-4 w-4 text-[#f59e0b]" />
+                <span>{t(labelKey)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* P1: Explore the platform */}
+      <section className="border-t border-zinc-800/60 py-16 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 className="text-center text-2xl font-bold sm:text-3xl">
+            {t('landing.explore.title')}
+          </h2>
+          <p className="mx-auto mt-2 max-w-xl text-center text-sm text-zinc-400">
+            {t('landing.explore.subtitle')}
+          </p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {explorePillars.map(({ icon: Icon, titleKey, descKey, ctaKey, href }) => (
+              <Link
+                key={titleKey}
+                to={href}
+                className="group border border-zinc-800/80 bg-[#0d0d0d] p-5 rounded-sm transition hover:border-zinc-700"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-[#f59e0b]/10 border border-[#f59e0b]/20">
+                  <Icon className="h-5 w-5 text-[#f59e0b]" />
+                </div>
+                <h3 className="mt-4 text-sm font-semibold text-zinc-100">{t(titleKey)}</h3>
+                <p className="mt-1.5 text-xs leading-5 text-zinc-400">{t(descKey)}</p>
+                <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-[#f59e0b] transition group-hover:gap-2">
+                  {t(ctaKey)} <ArrowRight className="h-3 w-3" />
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -266,26 +286,24 @@ export default function Index() {
       <section className="border-t border-zinc-800/60 py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <h2 className="text-center text-2xl font-bold sm:text-3xl">
-            {t('landing.forWorkers', { defaultValue: 'For workers' })}
+            {t('landing.workers.title')}
           </h2>
           <p className="mx-auto mt-2 max-w-xl text-center text-sm text-zinc-400">
-            {t('landing.forWorkersSubtitle', {
-              defaultValue: 'Everything you need to grow your industrial career — free.',
-            })}
+            {t('landing.workers.subtitle')}
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {WORKER_BENEFITS.map((b) => {
-              const Icon = b.icon;
+            {workerBenefits.map(({ icon: Icon, titleKey, descKey }) => {
+              const title = t(titleKey);
               return (
                 <div
-                  key={b.title}
+                  key={titleKey}
                   className="border border-zinc-800/80 bg-[#0d0d0d] p-5 rounded-sm transition hover:border-zinc-700"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-[#f59e0b]/10 border border-[#f59e0b]/20">
                     <Icon className="h-5 w-5 text-[#f59e0b]" />
                   </div>
-                  <h3 className="mt-4 text-sm font-semibold text-zinc-100">{b.title}</h3>
-                  <p className="mt-1.5 text-xs leading-5 text-zinc-400">{b.desc}</p>
+                  <h3 className="mt-4 text-sm font-semibold text-zinc-100">{title}</h3>
+                  <p className="mt-1.5 text-xs leading-5 text-zinc-400">{t(descKey)}</p>
                 </div>
               );
             })}
@@ -297,26 +315,24 @@ export default function Index() {
       <section className="border-t border-zinc-800/60 py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <h2 className="text-center text-2xl font-bold sm:text-3xl">
-            {t('landing.forCompanies', { defaultValue: 'For companies' })}
+            {t('landing.companies.title')}
           </h2>
           <p className="mx-auto mt-2 max-w-xl text-center text-sm text-zinc-400">
-            {t('landing.forCompaniesSubtitle', {
-              defaultValue: 'Hire verified industrial talent faster, with built-in compliance.',
-            })}
+            {t('landing.companies.subtitle')}
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            {COMPANY_BENEFITS.map((b) => {
-              const Icon = b.icon;
+            {companyBenefits.map(({ icon: Icon, titleKey, descKey }) => {
+              const title = t(titleKey);
               return (
                 <div
-                  key={b.title}
+                  key={titleKey}
                   className="border border-zinc-800/80 bg-[#0d0d0d] p-5 rounded-sm transition hover:border-zinc-700"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-[#f59e0b]/10 border border-[#f59e0b]/20">
                     <Icon className="h-5 w-5 text-[#f59e0b]" />
                   </div>
-                  <h3 className="mt-4 text-sm font-semibold text-zinc-100">{b.title}</h3>
-                  <p className="mt-1.5 text-xs leading-5 text-zinc-400">{b.desc}</p>
+                  <h3 className="mt-4 text-sm font-semibold text-zinc-100">{title}</h3>
+                  <p className="mt-1.5 text-xs leading-5 text-zinc-400">{t(descKey)}</p>
                 </div>
               );
             })}
@@ -331,7 +347,7 @@ export default function Index() {
             {metrics.map((m) => <AnimatedCounter key={m.label} metric={m} />)}
           </div>
           <p className="mt-6 text-center text-[10px] uppercase tracking-[0.2em] text-zinc-600">
-            {t('landing.liveData', { defaultValue: 'Live data — no fabricated numbers' })}
+            {t('landing.stats.title')}
           </p>
         </div>
       </section>
@@ -340,11 +356,11 @@ export default function Index() {
       <section className="border-t border-zinc-800/60 py-16 sm:py-20">
         <div className="mx-auto max-w-2xl px-4 sm:px-6">
           <h2 className="text-center text-2xl font-bold sm:text-3xl">
-            {t('landing.faq', { defaultValue: 'Frequently asked questions' })}
+            {t('landing.faq.title')}
           </h2>
           <div className="mt-8 space-y-3">
-            {FAQ_ITEMS.map((item, i) => (
-              <FaqItem key={i} item={item} />
+            {faqItems.map((item, i) => (
+              <FaqItem key={i} question={item.q} answer={item.a} />
             ))}
           </div>
         </div>
@@ -354,18 +370,16 @@ export default function Index() {
       <section className="border-t border-zinc-800/60 py-16 sm:py-20">
         <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">
           <h2 className="text-2xl font-bold sm:text-3xl">
-            {t('landing.finalCtaTitle', { defaultValue: 'Ready to get started?' })}
+            {t('landing.cta.title')}
           </h2>
           <p className="mt-2 text-sm text-zinc-400">
-            {t('landing.finalCtaSubtitle', {
-              defaultValue: 'Create your free account in less than a minute.',
-            })}
+            {t('landing.cta.subtitle')}
           </p>
           <Link
             to="/register"
             className="mt-6 inline-flex items-center justify-center gap-2 rounded-md bg-[#f59e0b] px-6 py-3 text-sm font-semibold text-black transition hover:bg-[#d97706]"
           >
-            {t('landing.ctaCreateAccount', { defaultValue: 'Create a free account' })}
+            {t('landing.cta.button')}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -374,41 +388,36 @@ export default function Index() {
       {/* Footer */}
       <footer className="border-t border-zinc-800/80 bg-[#0d0d0d] py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6">
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-bold">
-              Piping<span className="text-[#f59e0b]">Box</span>
-            </span>
-            <span className="text-xs text-zinc-600">· Made in Europe</span>
+          <div className="flex items-center gap-3">
+            <PipingBoxLogo variant="horizontal" size={28} />
+            <span className="text-xs text-zinc-600">{t('landing.footer.madeIn')}</span>
           </div>
           <nav className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-500">
             <Link to="/tools" className="transition hover:text-zinc-300">
-              {t('landing.tools', { defaultValue: 'Tools' })}
+              {t('landing.footer.tools')}
             </Link>
             <Link to="/blog" className="transition hover:text-zinc-300">
-              {t('landing.blog', { defaultValue: 'Blog' })}
+              {t('landing.footer.blog')}
             </Link>
             <Link to="/pricing" className="transition hover:text-zinc-300">
-              {t('landing.pricing', { defaultValue: 'Pricing' })}
+              {t('landing.footer.pricing')}
             </Link>
             <Link to="/register" className="transition hover:text-zinc-300">
-              {t('landing.signUpFree', { defaultValue: 'Sign up free' })}
-            </Link>
-            <Link to="/login" className="transition hover:text-zinc-300">
-              {t('landing.signIn', { defaultValue: 'Sign in' })}
+              {t('landing.footer.contact')}
             </Link>
             <Link to="/privacy" className="transition hover:text-zinc-300">
-              {t('footer.privacy', { defaultValue: 'Privacy Policy' })}
+              {t('footer.privacy')}
             </Link>
             <Link to="/terms" className="transition hover:text-zinc-300">
-              {t('footer.terms', { defaultValue: 'Terms of Service' })}
+              {t('footer.terms')}
             </Link>
             <Link to="/dsa" className="transition hover:text-zinc-300">
-              {t('footer.dsa', { defaultValue: 'DSA Contact Points' })}
+              {t('footer.dsa')}
             </Link>
           </nav>
         </div>
         <p className="mt-4 text-center text-[10px] text-zinc-600">
-          © {new Date().getFullYear()} PipingBox. All rights reserved.
+          © {new Date().getFullYear()} PipingBox. {t('landing.footer.rights')}
         </p>
       </footer>
     </div>

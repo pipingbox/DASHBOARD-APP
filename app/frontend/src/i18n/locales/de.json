@@ -2342,7 +2342,8 @@
   },
   "footer": {
     "privacy": "Datenschutzrichtlinie",
-    "terms": "Nutzungsbedingungen"
+    "terms": "Nutzungsbedingungen",
+    "dsa": "DSA-Kontaktpunkte"
   },
   "landing": {
     "companies": {
@@ -2352,8 +2353,8 @@
           "title": "Compliance-Management"
         },
         "time": {
-          "desc": "Reduzieren Sie die Einstellungszeit um bis zu 70% mit vorqualifizierten Rohrleitungsfachkräften.",
-          "title": "Zeitersparnis"
+          "desc": "Filtern Sie nach Zertifizierung, Gewerk, Standort und Verfügbarkeit an einem Ort.",
+          "title": "Strukturierter Einstellungsworkflow"
         },
         "verified": {
           "desc": "Zugang zu geprüften Fachkräften mit verifizierten Qualifikationen und Erfahrung.",
@@ -2382,10 +2383,13 @@
       "title": "Häufig gestellte Fragen"
     },
     "footer": {
+      "tools": "Tools",
+      "blog": "Blog",
+      "pricing": "Preise",
       "contact": "Kontakt",
-      "description": "Die Plattform für Rohrleitungsfachkräfte weltweit.",
       "legal": "Rechtliches",
-      "rights": "Alle Rechte vorbehalten."
+      "rights": "Alle Rechte vorbehalten.",
+      "description": "Die Plattform für Rohrleitungsfachkräfte weltweit."
     },
     "hero": {
       "badge": "Die Plattform für Piping-Profis",
@@ -2398,7 +2402,8 @@
       "companies": "Unternehmen",
       "countries": "Länder",
       "title": "Vertraut von Fachleuten weltweit",
-      "workers": "Fachkräfte"
+      "workers": "Fachkräfte",
+      "tools": "Free tools"
     },
     "workers": {
       "benefits": {
@@ -2421,6 +2426,40 @@
       },
       "subtitle": "Alles was Sie für Ihre Karriere im Rohrleitungsbau brauchen.",
       "title": "Für Fachkräfte"
+    },
+    "nav": {
+      "signIn": "Anmelden",
+      "signUp": "Kostenlos registrieren"
+    },
+    "trust": {
+      "gdpr": "DSGVO-konform",
+      "standards": "ASME · EN · ISO Normen",
+      "madeIn": "Made in Europe",
+      "encrypted": "Verschlüsselte Daten"
+    },
+    "explore": {
+      "title": "PipingBox entdecken",
+      "subtitle": "Was du heute auf der Plattform tun kannst",
+      "tools": {
+        "title": "Technischer Hub",
+        "desc": "Kostenlose Engineering-Tools, Bemaßungsdaten und normativer Kontext für Rohrleitungen.",
+        "cta": "Tools entdecken"
+      },
+      "profile": {
+        "title": "Professionelles Profil",
+        "desc": "Erfahrung, Spezialisierung, Zertifikate und Dokumente für Unternehmen sichtbar.",
+        "cta": "Profil erstellen"
+      },
+      "jobs": {
+        "title": "Jobs & Workforce",
+        "desc": "Geprüfte industrielle Möglichkeiten und direkter Kontakt zu Arbeitgebern.",
+        "cta": "Jobs finden"
+      },
+      "academy": {
+        "title": "Academy & Zertifizierungen",
+        "desc": "VCA-, SCC- und PRL-Vorbereitungsmaterialien und industrielles Lernen.",
+        "cta": "Lernen starten"
+      }
     }
   },
   "workforcePipeline": {

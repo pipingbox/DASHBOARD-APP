@@ -2460,8 +2460,8 @@
           "desc": "Access profiles with validated certifications, proven experience, and industry references."
         },
         "time": {
-          "title": "Reduced hiring time",
-          "desc": "Reduce hiring time by up to 70% with intelligent matching and advanced filters."
+          "title": "Structured hiring workflow",
+          "desc": "Filter by certification, trade, location and availability from one place."
         },
         "compliance": {
           "title": "Compliance and certificate auditing",
@@ -2494,21 +2494,49 @@
       "button": "Create free account"
     },
     "footer": {
-      "description": "The leading platform for the industrial piping and construction sector.",
-      "links": "Links",
-      "toolsLink": "Tools",
-      "blogLink": "Blog",
-      "registerLink": "Register",
-      "loginLink": "Sign in",
-      "legal": "Legal",
+      "tools": "Tools",
+      "blog": "Blog",
+      "pricing": "Pricing",
       "contact": "Contact",
+      "legal": "Legal",
       "rights": "All rights reserved.",
-      "madeIn": "Made in Europe"
+      "description": "The leading platform for the industrial piping and construction sector."
+    },
+    "trust": {
+      "gdpr": "GDPR compliant",
+      "standards": "ASME · EN · ISO standards",
+      "madeIn": "Made in Europe",
+      "encrypted": "Encrypted data"
+    },
+    "explore": {
+      "title": "Explore PipingBox",
+      "subtitle": "What you can do with the platform today",
+      "tools": {
+        "title": "Technical Hub",
+        "desc": "Free engineering tools, dimensional data and standards context for piping work.",
+        "cta": "Explore free tools"
+      },
+      "profile": {
+        "title": "Professional Profile",
+        "desc": "Experience, speciality, certificates and documents visible to companies.",
+        "cta": "Create my profile"
+      },
+      "jobs": {
+        "title": "Jobs & Workforce",
+        "desc": "Verified industrial opportunities and direct contact with employers.",
+        "cta": "Find jobs"
+      },
+      "academy": {
+        "title": "Academy & Certifications",
+        "desc": "VCA, SCC and PRL preparation materials and industrial learning.",
+        "cta": "Start learning"
+      }
     }
   },
   "footer": {
     "privacy": "Privacy Policy",
-    "terms": "Terms of Service"
+    "terms": "Terms of Service",
+    "dsa": "DSA Contact Points"
   },
   "color": {
     "colors": "colors",

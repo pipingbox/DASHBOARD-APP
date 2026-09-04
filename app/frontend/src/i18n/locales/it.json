@@ -2465,8 +2465,8 @@
           "desc": "Accedi a profili con certificazioni convalidate, esperienza comprovata e referenze del settore."
         },
         "time": {
-          "title": "Tempi di assunzione ridotti",
-          "desc": "Riduci i tempi di assunzione fino al 70% grazie al matching intelligente e ai filtri avanzati."
+          "title": "Flusso di assunzione strutturato",
+          "desc": "Filtra per certificazione, mestiere, località e disponibilità da un unico posto."
         },
         "compliance": {
           "title": "Conformità e verifica dei certificati",
@@ -2499,21 +2499,49 @@
       "button": "Crea un account gratuito"
     },
     "footer": {
-      "description": "La piattaforma di riferimento per il settore delle tubazioni industriali e delle costruzioni.",
-      "links": "Link",
-      "toolsLink": "Strumenti",
-      "blogLink": "Blog",
-      "registerLink": "Registrati",
-      "loginLink": "Accedi",
+      "tools": "Strumenti",
+      "blog": "Blog",
+      "pricing": "Prezzi",
+      "contact": "Contatto",
       "legal": "Note legali",
-      "contact": "Contatti",
       "rights": "Tutti i diritti riservati.",
-      "madeIn": "Realizzato in Europa"
+      "description": "La piattaforma di riferimento per il settore delle tubazioni industriali e delle costruzioni."
+    },
+    "trust": {
+      "gdpr": "Conforme GDPR",
+      "standards": "Standard ASME · EN · ISO",
+      "madeIn": "Fatto in Europa",
+      "encrypted": "Dati crittografati"
+    },
+    "explore": {
+      "title": "Esplora PipingBox",
+      "subtitle": "Cosa puoi fare oggi sulla piattaforma",
+      "tools": {
+        "title": "Hub Tecnico",
+        "desc": "Strumenti di ingegneria gratuiti, dati dimensionali e contesto normativo.",
+        "cta": "Esplora gli strumenti"
+      },
+      "profile": {
+        "title": "Profilo Professionale",
+        "desc": "Esperienza, specialità, certificati e documenti visibili alle aziende.",
+        "cta": "Crea il mio profilo"
+      },
+      "jobs": {
+        "title": "Lavoro & Workforce",
+        "desc": "Opportunità industriali verificate e contatto diretto con i datori di lavoro.",
+        "cta": "Trova lavoro"
+      },
+      "academy": {
+        "title": "Academy e Certificazioni",
+        "desc": "Materiali di preparazione VCA, SCC e PRL e formazione industriale.",
+        "cta": "Inizia a imparare"
+      }
     }
   },
   "footer": {
     "privacy": "Informativa sulla privacy",
-    "terms": "Termini di servizio"
+    "terms": "Termini di servizio",
+    "dsa": "Punti di contatto DSA"
   },
   "color": {
     "colors": "colori",

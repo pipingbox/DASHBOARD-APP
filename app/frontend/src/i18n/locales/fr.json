@@ -2342,7 +2342,8 @@
   },
   "footer": {
     "privacy": "Politique de confidentialité",
-    "terms": "Conditions d'utilisation"
+    "terms": "Conditions d'utilisation",
+    "dsa": "Points de contact DSA"
   },
   "landing": {
     "companies": {
@@ -2352,8 +2353,8 @@
           "title": "Gestion de la conformité"
         },
         "time": {
-          "desc": "Réduisez le temps de recrutement jusqu'à 70% avec des tuyauteurs préqualifiés.",
-          "title": "Gain de temps"
+          "desc": "Filtrez par certification, métier, localisation et disponibilité depuis un seul endroit.",
+          "title": "Workflow de recrutement structuré"
         },
         "verified": {
           "desc": "Accès à des professionnels vérifiés avec des qualifications et une expérience confirmées.",
@@ -2382,10 +2383,13 @@
       "title": "Questions fréquentes"
     },
     "footer": {
+      "tools": "Outils",
+      "blog": "Blog",
+      "pricing": "Tarifs",
       "contact": "Contact",
-      "description": "La plateforme pour les professionnels de la tuyauterie dans le monde.",
       "legal": "Mentions légales",
-      "rights": "Tous droits réservés."
+      "rights": "Tous droits réservés.",
+      "description": "La plateforme pour les professionnels de la tuyauterie dans le monde."
     },
     "hero": {
       "badge": "La plateforme pour les pros de la tuyauterie",
@@ -2398,7 +2402,8 @@
       "companies": "Entreprises",
       "countries": "Pays",
       "title": "La confiance des professionnels du monde entier",
-      "workers": "Professionnels"
+      "workers": "Professionnels",
+      "tools": "Free tools"
     },
     "workers": {
       "benefits": {
@@ -2421,6 +2426,40 @@
       },
       "subtitle": "Tout ce dont vous avez besoin pour votre carrière en tuyauterie.",
       "title": "Pour les professionnels"
+    },
+    "nav": {
+      "signIn": "Se connecter",
+      "signUp": "Inscription gratuite"
+    },
+    "trust": {
+      "gdpr": "Conforme RGPD",
+      "standards": "Normes ASME · EN · ISO",
+      "madeIn": "Fabriqué en Europe",
+      "encrypted": "Données chiffrées"
+    },
+    "explore": {
+      "title": "Découvrir PipingBox",
+      "subtitle": "Ce que vous pouvez faire aujourd'hui sur la plateforme",
+      "tools": {
+        "title": "Hub Technique",
+        "desc": "Outils d'ingénierie gratuits, données dimensionnelles et contexte normatif.",
+        "cta": "Explorer les outils"
+      },
+      "profile": {
+        "title": "Profil Professionnel",
+        "desc": "Expérience, spécialité, certificats et documents visibles par les entreprises.",
+        "cta": "Créer mon profil"
+      },
+      "jobs": {
+        "title": "Emplois & Workforce",
+        "desc": "Opportunités industrielles vérifiées et contact direct avec les employeurs.",
+        "cta": "Trouver un emploi"
+      },
+      "academy": {
+        "title": "Academy & Certifications",
+        "desc": "Matériel de préparation VCA, SCC et PRL et apprentissage industriel.",
+        "cta": "Commencer à apprendre"
+      }
     }
   },
   "workforcePipeline": {

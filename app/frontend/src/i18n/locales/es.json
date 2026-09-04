@@ -2460,8 +2460,8 @@
           "desc": "Accede a perfiles con certificaciones validadas, experiencia comprobada y referencias del sector."
         },
         "time": {
-          "title": "Reducción de tiempo de contratación",
-          "desc": "Reduce hasta un 70% el tiempo de contratación con matching inteligente y filtros avanzados."
+          "title": "Flujo de contratación estructurado",
+          "desc": "Filtra por certificación, oficio, ubicación y disponibilidad desde un mismo lugar."
         },
         "compliance": {
           "title": "Compliance y auditoría de certificados",
@@ -2494,21 +2494,49 @@
       "button": "Crear cuenta gratis"
     },
     "footer": {
-      "description": "La plataforma líder para el sector industrial de piping y construcción.",
-      "links": "Enlaces",
-      "toolsLink": "Herramientas",
-      "blogLink": "Blog",
-      "registerLink": "Registrarse",
-      "loginLink": "Iniciar sesión",
-      "legal": "Legal",
+      "tools": "Herramientas",
+      "blog": "Blog",
+      "pricing": "Precios",
       "contact": "Contacto",
+      "legal": "Legal",
       "rights": "Todos los derechos reservados.",
-      "madeIn": "Hecho en Europa"
+      "description": "La plataforma líder para el sector industrial de piping y construcción."
+    },
+    "trust": {
+      "gdpr": "Cumplimiento GDPR",
+      "standards": "Normas ASME · EN · ISO",
+      "madeIn": "Hecho en Europa",
+      "encrypted": "Datos cifrados"
+    },
+    "explore": {
+      "title": "Explora PipingBox",
+      "subtitle": "Lo que puedes hacer hoy en la plataforma",
+      "tools": {
+        "title": "Hub Técnico",
+        "desc": "Herramientas de ingeniería gratuitas, datos dimensionales y contexto normativo.",
+        "cta": "Explorar herramientas"
+      },
+      "profile": {
+        "title": "Perfil Profesional",
+        "desc": "Experiencia, especialidad, certificados y documentos visibles para empresas.",
+        "cta": "Crear mi perfil"
+      },
+      "jobs": {
+        "title": "Empleo y Workforce",
+        "desc": "Oportunidades industriales verificadas y contacto directo con empleadores.",
+        "cta": "Buscar empleo"
+      },
+      "academy": {
+        "title": "Academy y Certificaciones",
+        "desc": "Materiales de preparación VCA, SCC y PRL y formación industrial.",
+        "cta": "Empezar a aprender"
+      }
     }
   },
   "footer": {
-    "privacy": "Política de Privacidad",
-    "terms": "Términos de Servicio"
+    "privacy": "Política de privacidad",
+    "terms": "Términos de servicio",
+    "dsa": "Puntos de contacto DSA"
   },
   "color": {
     "colors": "colores",

@@ -2306,7 +2306,8 @@
   },
   "footer": {
     "privacy": "Privacybeleid",
-    "terms": "Algemene voorwaarden"
+    "terms": "Servicevoorwaarden",
+    "dsa": "DSA-contactpunten"
   },
   "landing": {
     "companies": {
@@ -2316,8 +2317,8 @@
           "title": "Compliance-beheer"
         },
         "time": {
-          "desc": "Verkort de wervingstijd tot 70% met voorgekwalificeerde leidingmonteurs.",
-          "title": "Tijdsbesparing"
+          "desc": "Filter op certificering, vak, locatie en beschikbaarheid vanuit één plek.",
+          "title": "Gestroomlijnde aanwervingsflow"
         },
         "verified": {
           "desc": "Toegang tot geverifieerde vakmensen met bevestigde kwalificaties en ervaring.",
@@ -2346,10 +2347,13 @@
       "title": "Veelgestelde vragen"
     },
     "footer": {
+      "tools": "Tools",
+      "blog": "Blog",
+      "pricing": "Prijzen",
       "contact": "Contact",
-      "description": "Het platform voor leidingbouwprofessionals wereldwijd.",
       "legal": "Juridisch",
-      "rights": "Alle rechten voorbehouden."
+      "rights": "Alle rechten voorbehouden.",
+      "description": "Het platform voor leidingbouwprofessionals wereldwijd."
     },
     "hero": {
       "badge": "Het platform voor piping professionals",
@@ -2362,7 +2366,8 @@
       "companies": "Bedrijven",
       "countries": "Landen",
       "title": "Vertrouwd door professionals wereldwijd",
-      "workers": "Vakmensen"
+      "workers": "Vakmensen",
+      "tools": "Free tools"
     },
     "workers": {
       "benefits": {
@@ -2385,6 +2390,40 @@
       },
       "subtitle": "Alles wat u nodig heeft voor uw carrière in de leidingbouw.",
       "title": "Voor vakmensen"
+    },
+    "nav": {
+      "signIn": "Aanmelden",
+      "signUp": "Gratis registreren"
+    },
+    "trust": {
+      "gdpr": "GDPR-conform",
+      "standards": "ASME · EN · ISO normen",
+      "madeIn": "Gemaakt in Europa",
+      "encrypted": "Versleutelde data"
+    },
+    "explore": {
+      "title": "Verken PipingBox",
+      "subtitle": "Wat je vandaag op het platform kunt doen",
+      "tools": {
+        "title": "Technische Hub",
+        "desc": "Gratis engineeringtools, dimensionale data en normatieve context voor leidingwerk.",
+        "cta": "Tools verkennen"
+      },
+      "profile": {
+        "title": "Professioneel Profiel",
+        "desc": "Ervaring, specialisme, certificaten en documenten zichtbaar voor bedrijven.",
+        "cta": "Profiel aanmaken"
+      },
+      "jobs": {
+        "title": "Banen & Workforce",
+        "desc": "Geverifieerde industriële kansen en direct contact met werkgevers.",
+        "cta": "Banen zoeken"
+      },
+      "academy": {
+        "title": "Academy & Certificeringen",
+        "desc": "VCA-, SCC- en PRL-voorbereidingsmateriaal en industrieel leren.",
+        "cta": "Leren starten"
+      }
     }
   },
   "workforcePipeline": {

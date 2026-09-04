@@ -2348,8 +2348,8 @@
           "title": "Gestão de conformidade"
         },
         "time": {
-          "desc": "Reduza o tempo de contratação em até 70% com tubistas pré-qualificados.",
-          "title": "Economia de tempo"
+          "desc": "Filtre por certificação, ofício, localização e disponibilidade em um só lugar.",
+          "title": "Fluxo de contratação estruturado"
         },
         "verified": {
           "desc": "Acesso a profissionais verificados com qualificações e experiência confirmadas.",
@@ -2378,10 +2378,13 @@
       "title": "Perguntas frequentes"
     },
     "footer": {
+      "tools": "Ferramentas",
+      "blog": "Blog",
+      "pricing": "Preços",
       "contact": "Contato",
-      "description": "A plataforma para profissionais de tubulação no mundo todo.",
       "legal": "Legal",
-      "rights": "Todos os direitos reservados."
+      "rights": "Todos os direitos reservados.",
+      "description": "A plataforma para profissionais de tubulação no mundo todo."
     },
     "hero": {
       "badge": "A plataforma para profissionais de piping",
@@ -2394,7 +2397,8 @@
       "companies": "Empresas",
       "countries": "Países",
       "title": "Confiança de profissionais no mundo todo",
-      "workers": "Profissionais"
+      "workers": "Profissionais",
+      "tools": "Free tools"
     },
     "workers": {
       "benefits": {
@@ -2417,6 +2421,40 @@
       },
       "subtitle": "Tudo o que você precisa para sua carreira em tubulação.",
       "title": "Para profissionais"
+    },
+    "nav": {
+      "signIn": "Entrar",
+      "signUp": "Registre-se grátis"
+    },
+    "trust": {
+      "gdpr": "Conforme com GDPR",
+      "standards": "Normas ASME · EN · ISO",
+      "madeIn": "Feito na Europa",
+      "encrypted": "Dados encriptados"
+    },
+    "explore": {
+      "title": "Explorar o PipingBox",
+      "subtitle": "O que pode fazer hoje na plataforma",
+      "tools": {
+        "title": "Hub Técnico",
+        "desc": "Ferramentas de engenharia gratuitas, dados dimensionais e contexto normativo.",
+        "cta": "Explorar ferramentas"
+      },
+      "profile": {
+        "title": "Perfil Profissional",
+        "desc": "Experiência, especialidade, certificados e documentos visíveis para empresas.",
+        "cta": "Criar meu perfil"
+      },
+      "jobs": {
+        "title": "Empregos & Workforce",
+        "desc": "Oportunidades industriais verificadas e contato direto com empregadores.",
+        "cta": "Encontrar empregos"
+      },
+      "academy": {
+        "title": "Academy & Certificações",
+        "desc": "Material de preparação VCA, SCC e PRL e aprendizado industrial.",
+        "cta": "Começar a aprender"
+      }
     }
   },
   "workforcePipeline": {
@@ -2450,8 +2488,9 @@
     }
   },
   "footer": {
-    "privacy": "Política de Privacidade",
-    "terms": "Termos de Serviço"
+    "privacy": "Política de privacidade",
+    "terms": "Termos de serviço",
+    "dsa": "Pontos de contacto DSA"
   },
   "color": {
     "colors": "cores",
