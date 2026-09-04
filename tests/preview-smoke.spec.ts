@@ -46,6 +46,16 @@ test.describe('Preview browser smoke test', () => {
     expect(body).toContain('Preguntas frecuentes');
     expect(body).toContain('¿Listo para empezar?');
     expect(body).not.toContain('returned an object instead of string');
+
+    // The four counter labels used to be hardcoded English on every locale.
+    expect(body).toContain('Métricas reales');
+    expect(body).toContain('Planos técnicos');
+    expect(body).toContain('Normas cubiertas');
+    expect(body).not.toContain('Technical drawings');
+    expect(body).not.toContain('Standards covered');
+
+    // Unverifiable user-count claim. Must not come back.
+    expect(body).not.toContain('miles de profesionales');
   });
 
   test('landing i18n renders in English on mobile without object-to-string error', async ({ page }) => {
@@ -59,6 +69,13 @@ test.describe('Preview browser smoke test', () => {
     expect(body).toContain('Frequently asked questions');
     expect(body).toContain('Ready to get started?');
     expect(body).not.toContain('returned an object instead of string');
+
+    expect(body).toContain('Real metrics');
+    expect(body).toContain('Technical drawings');
+    expect(body).toContain('Standards covered');
+
+    // Unverifiable user-count claim. Must not come back.
+    expect(body).not.toContain('Join thousands');
   });
 
   test('login page is visible', async ({ page }) => {

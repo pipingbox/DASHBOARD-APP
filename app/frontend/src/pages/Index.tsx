@@ -57,7 +57,7 @@ function useCounter(target: number, duration = 1600) {
 }
 
 interface RealMetric {
-  label: string;
+  labelKey: string;
   value: number;
 }
 
@@ -78,17 +78,20 @@ interface RealMetric {
 // See CHANGELOG v4.81.0: no metric ships without a source.
 const IMPLEMENTED_TOOLS = 10;
 
+// Labels are keys, not text: the counters sit on the public landing and have to
+// read in all seven languages like everything around them.
 function useRealMetrics() {
   const metrics: RealMetric[] = [
-    { label: 'Technical drawings', value: catalogStats.drawings },
-    { label: 'Dimensional data rows', value: catalogStats.dimensionRows },
-    { label: 'Standards covered', value: catalogStats.standards },
-    { label: 'Free engineering tools', value: IMPLEMENTED_TOOLS },
+    { labelKey: 'landing.stats.drawings', value: catalogStats.drawings },
+    { labelKey: 'landing.stats.dimensionRows', value: catalogStats.dimensionRows },
+    { labelKey: 'landing.stats.standards', value: catalogStats.standards },
+    { labelKey: 'landing.stats.tools', value: IMPLEMENTED_TOOLS },
   ];
   return { metrics, loading: false };
 }
 
 function AnimatedCounter({ metric }: { metric: RealMetric }) {
+  const { t } = useTranslation();
   const { count, ref } = useCounter(metric.value);
   return (
     <div ref={ref} className="text-center">
@@ -96,7 +99,7 @@ function AnimatedCounter({ metric }: { metric: RealMetric }) {
         {count.toLocaleString()}
       </p>
       <p className="mt-1 text-[11px] uppercase tracking-[0.15em] text-zinc-500">
-        {metric.label}
+        {t(metric.labelKey)}
       </p>
     </div>
   );
@@ -344,7 +347,7 @@ export default function Index() {
       <section className="border-t border-zinc-800/60 py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {metrics.map((m) => <AnimatedCounter key={m.label} metric={m} />)}
+            {metrics.map((m) => <AnimatedCounter key={m.labelKey} metric={m} />)}
           </div>
           <p className="mt-6 text-center text-[10px] uppercase tracking-[0.2em] text-zinc-600">
             {t('landing.stats.title')}
@@ -390,7 +393,11 @@ export default function Index() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6">
           <div className="flex items-center gap-3">
             <PipingBoxLogo variant="horizontal" size={28} />
-            <span className="text-xs text-zinc-600">{t('landing.footer.madeIn')}</span>
+            {/* `landing.footer.madeIn` never existed in any locale — it only
+                survived because the usage guard was honouring its allowlist in
+                CI mode. Reuse the real, translated key instead of minting a
+                duplicate of the same sentence. */}
+            <span className="text-xs text-zinc-600">{t('landing.trust.madeIn')}</span>
           </div>
           <nav className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-500">
             <Link to="/tools" className="transition hover:text-zinc-300">

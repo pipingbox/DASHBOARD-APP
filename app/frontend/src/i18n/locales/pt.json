@@ -2361,7 +2361,7 @@
     },
     "cta": {
       "button": "Começar gratuitamente",
-      "subtitle": "Junte-se a milhares de profissionais de tubulação no mundo todo.",
+      "subtitle": "Crie gratuitamente o seu perfil profissional e comece hoje a usar as ferramentas de engenharia.",
       "title": "Pronto para começar?"
     },
     "faq": {
@@ -2394,11 +2394,11 @@
       "subtitle": "Gerencie certificações, encontre vagas e conecte-se com líderes da indústria."
     },
     "stats": {
-      "companies": "Empresas",
-      "countries": "Países",
-      "title": "Confiança de profissionais no mundo todo",
-      "workers": "Profissionais",
-      "tools": "Free tools"
+      "title": "Dados reais",
+      "drawings": "Desenhos técnicos",
+      "dimensionRows": "Linhas de dados dimensionais",
+      "standards": "Normas cobertas",
+      "tools": "Ferramentas de engenharia gratuitas"
     },
     "workers": {
       "benefits": {

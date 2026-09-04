@@ -2366,7 +2366,7 @@
     },
     "cta": {
       "button": "Commencer gratuitement",
-      "subtitle": "Rejoignez des milliers de professionnels de la tuyauterie dans le monde.",
+      "subtitle": "Créez gratuitement votre profil professionnel et utilisez dès aujourd'hui les outils d'ingénierie.",
       "title": "Prêt à commencer ?"
     },
     "faq": {
@@ -2399,11 +2399,11 @@
       "subtitle": "Gérez vos certifications, trouvez des postes et connectez-vous avec les leaders de l'industrie."
     },
     "stats": {
-      "companies": "Entreprises",
-      "countries": "Pays",
-      "title": "La confiance des professionnels du monde entier",
-      "workers": "Professionnels",
-      "tools": "Free tools"
+      "title": "Données réelles",
+      "drawings": "Plans techniques",
+      "dimensionRows": "Lignes de données dimensionnelles",
+      "standards": "Normes couvertes",
+      "tools": "Outils d'ingénierie gratuits"
     },
     "workers": {
       "benefits": {

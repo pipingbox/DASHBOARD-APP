@@ -2476,9 +2476,10 @@
     },
     "stats": {
       "title": "Dati reali",
-      "workers": "Professionisti registrati",
-      "companies": "Aziende",
-      "tools": "Strumenti gratuiti"
+      "drawings": "Disegni tecnici",
+      "dimensionRows": "Righe di dati dimensionali",
+      "standards": "Norme coperte",
+      "tools": "Strumenti di ingegneria gratuiti"
     },
     "faq": {
       "title": "Domande frequenti",
@@ -2495,7 +2496,7 @@
     },
     "cta": {
       "title": "Tutto pronto per iniziare?",
-      "subtitle": "Unisciti alle migliaia di professionisti e aziende che si affidano già a PipingBox.",
+      "subtitle": "Crea gratuitamente il tuo profilo professionale e inizia oggi a usare gli strumenti di ingegneria.",
       "button": "Crea un account gratuito"
     },
     "footer": {

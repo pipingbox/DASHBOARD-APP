@@ -98,10 +98,8 @@ const ALLOWED_MISSING_PATHS = new Set([
   'landing.footer.blogLink',
   'landing.footer.links',
   'landing.footer.loginLink',
-  'landing.footer.madeIn',
   'landing.footer.registerLink',
   'landing.footer.toolsLink',
-  'landing.stats.countries',
   'tools.additionalInfo',
   'tools.angle',
   'tools.backToCatalog',
@@ -273,7 +271,11 @@ const errors = [];
 for (const file of files) {
   const keys = extractStaticKeys(file);
   for (const { path, line } of keys) {
-    if (!fullMode && ALLOWED_MISSING_PATHS.has(path)) continue;
+    // The allowlist is inherited debt from PB-I18N-SCHEMA-001 and applies ONLY
+    // to --full mode. In CI (public pages) it must NOT apply: a visitor-facing
+    // key with no translation is the exact defect this guard exists to catch,
+    // and honouring the allowlist here is how `landing.footer.madeIn` shipped
+    // to production missing from all seven locales.
     if (fullMode && ALLOWED_MISSING_PATHS.has(path)) continue;
 
     for (const code of REQUIRED_LOCALES) {

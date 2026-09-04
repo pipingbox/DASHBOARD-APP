@@ -2366,7 +2366,7 @@
     },
     "cta": {
       "button": "Kostenlos starten",
-      "subtitle": "Schließen Sie sich Tausenden von Rohrleitungsfachkräften weltweit an.",
+      "subtitle": "Erstellen Sie Ihr kostenloses Berufsprofil und nutzen Sie die Engineering-Tools ab heute.",
       "title": "Bereit loszulegen?"
     },
     "faq": {
@@ -2399,11 +2399,11 @@
       "subtitle": "Verwalten Sie Zertifizierungen, finden Sie Stellen und verbinden Sie sich mit führenden Unternehmen der Branche."
     },
     "stats": {
-      "companies": "Unternehmen",
-      "countries": "Länder",
-      "title": "Vertraut von Fachleuten weltweit",
-      "workers": "Fachkräfte",
-      "tools": "Free tools"
+      "title": "Echte Kennzahlen",
+      "drawings": "Technische Zeichnungen",
+      "dimensionRows": "Maßdatenzeilen",
+      "standards": "Abgedeckte Normen",
+      "tools": "Kostenlose Engineering-Tools"
     },
     "workers": {
       "benefits": {

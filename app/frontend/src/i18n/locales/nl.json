@@ -2330,7 +2330,7 @@
     },
     "cta": {
       "button": "Gratis beginnen",
-      "subtitle": "Sluit u aan bij duizenden leidingbouwprofessionals wereldwijd.",
+      "subtitle": "Maak gratis uw professionele profiel aan en gebruik de engineeringtools vandaag nog.",
       "title": "Klaar om te beginnen?"
     },
     "faq": {
@@ -2363,11 +2363,11 @@
       "subtitle": "Beheer certificeringen, vind banen en maak contact met toonaangevende bedrijven."
     },
     "stats": {
-      "companies": "Bedrijven",
-      "countries": "Landen",
-      "title": "Vertrouwd door professionals wereldwijd",
-      "workers": "Vakmensen",
-      "tools": "Free tools"
+      "title": "Echte cijfers",
+      "drawings": "Technische tekeningen",
+      "dimensionRows": "Rijen maatgegevens",
+      "standards": "Gedekte normen",
+      "tools": "Gratis engineeringtools"
     },
     "workers": {
       "benefits": {
