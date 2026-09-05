@@ -391,8 +391,11 @@ export default function Index() {
       {/* Footer */}
       <footer className="border-t border-zinc-800/80 bg-[#0d0d0d] py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6">
-          <div className="flex items-center gap-3">
-            <PipingBoxLogo variant="horizontal" size={28} />
+          <div className="flex items-center gap-4">
+            {/* 112px = x4 del tamano original (28px), igualando la presencia de
+                marca que ya tiene el header publico. El PNG lleva ~16% de
+                padding transparente, asi que el artwork visible ronda 94px. */}
+            <PipingBoxLogo variant="horizontal" size={112} />
             {/* `landing.footer.madeIn` never existed in any locale — it only
                 survived because the usage guard was honouring its allowlist in
                 CI mode. Reuse the real, translated key instead of minting a
