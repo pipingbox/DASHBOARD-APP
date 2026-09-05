@@ -36,6 +36,37 @@ function clamp(value: unknown, max: number): string {
   return s.length > max ? `${s.slice(0, max)}...` : s;
 }
 
+/**
+ * Hand the lead back to the queue.
+ *
+ * Claiming happens before the first mail goes out, so any path that claims and
+ * then fails to send must undo the claim. Otherwise the row looks notified,
+ * nothing was delivered, and no retry will ever pick it up again -- a real
+ * commercial lead lost in silence.
+ */
+async function releaseClaim(
+  supabase: ReturnType<typeof createClient>,
+  leadId: string,
+  requestId: string,
+  reason: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("app_14da0f1941_company_leads")
+    .update({ notified_at: null })
+    .eq("id", leadId);
+
+  if (error) {
+    // The lead is now stuck: claimed, unsent, and unreachable by retry. This
+    // needs to be loud enough to find in the logs.
+    console.error(
+      JSON.stringify({ requestId, error: "claim_release_failed", leadId, reason, details: error.message }),
+    );
+    return;
+  }
+
+  console.log(JSON.stringify({ requestId, action: "claim_released", leadId, reason }));
+}
+
 serve(async (req: Request) => {
   const requestId = crypto.randomUUID();
   console.log(JSON.stringify({ requestId, method: req.method, url: req.url }));
@@ -43,6 +74,12 @@ serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
+
+  // Declared out here so the catch-all at the bottom can release a claim that
+  // was taken but never converted into a delivered message.
+  let supabase: ReturnType<typeof createClient> | null = null;
+  let claimedLeadId: string | null = null;
+  let adminMailSent = false;
 
   try {
     let body: any;
@@ -66,7 +103,7 @@ serve(async (req: Request) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    supabase = createClient(supabaseUrl, supabaseKey);
 
     // The lead row — not the request body — is the source of truth.
     //
@@ -138,6 +175,10 @@ serve(async (req: Request) => {
       );
     }
 
+    // From here on the row is claimed. Every exit path that does not deliver
+    // the admin alert must release it again.
+    claimedLeadId = lead.id;
+
     const numWorkers = parseInt(lead.number_of_workers || "0", 10);
     const isUrgentWorkers = numWorkers >= 10;
     const isUrgentDate =
@@ -159,12 +200,15 @@ serve(async (req: Request) => {
     if (!smtpHost || !smtpUser || !smtpPassword) {
       // Release the claim: nothing was sent, so a later retry should be able
       // to send. Leaving it claimed would silently lose the lead's mail.
-      await supabase
-        .from("app_14da0f1941_company_leads")
-        .update({ notified_at: null })
-        .eq("id", lead.id);
+      await releaseClaim(supabase, lead.id, requestId, "smtp_not_configured");
 
-      console.log(JSON.stringify({ requestId, warning: "SMTP not configured, skipping emails" }));
+      const missing = [
+        !smtpHost && "SMTP_HOST",
+        !smtpUser && "SMTP_USER",
+        !smtpPassword && "SMTP_PASSWORD",
+      ].filter(Boolean);
+
+      console.error(JSON.stringify({ requestId, error: "smtp_not_configured", missing, leadId: lead.id }));
       return new Response(
         JSON.stringify({ success: true, priority, emailsSent: false, reason: "SMTP not configured" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -222,6 +266,10 @@ serve(async (req: Request) => {
       html: adminHtml,
     });
 
+    // The internal alert is the one that must not be lost. Once it is out, the
+    // claim stays: re-running would spam jobs@ with duplicates.
+    adminMailSent = true;
+
     console.log(JSON.stringify({ requestId, action: "admin_email_sent", to: "jobs@pipingbox.com", leadId: lead.id }));
 
     const companyHtml = `
@@ -264,12 +312,38 @@ serve(async (req: Request) => {
 
     // Sent to the address stored on the lead row, never to an address taken
     // from the request body.
-    await transporter.sendMail({
-      from: smtpFrom,
-      to: lead.email,
-      subject: "PipingBox Workforce Request Received",
-      html: companyHtml,
-    });
+    //
+    // A failure here is not the same as a failure on the admin alert. The team
+    // already knows about the lead, so the claim must stay put; releasing it
+    // would only duplicate the internal mail on retry. Report it as partial so
+    // the caller can tell "nobody was told" from "the customer wasn't told".
+    try {
+      await transporter.sendMail({
+        from: smtpFrom,
+        to: lead.email,
+        subject: "PipingBox Workforce Request Received",
+        html: companyHtml,
+      });
+    } catch (confirmError: any) {
+      console.error(
+        JSON.stringify({
+          requestId,
+          error: "company_confirmation_failed",
+          leadId: lead.id,
+          details: confirmError?.message,
+        }),
+      );
+      return new Response(
+        JSON.stringify({
+          success: true,
+          priority,
+          emailsSent: "partial",
+          adminNotified: true,
+          reason: "Company confirmation failed",
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     console.log(JSON.stringify({ requestId, action: "company_confirmation_sent", leadId: lead.id }));
 
@@ -279,6 +353,13 @@ serve(async (req: Request) => {
     );
   } catch (error: any) {
     console.error(JSON.stringify({ requestId, error: error.message, stack: error.stack }));
+
+    // A claim taken but never used has to go back, or the lead is unreachable
+    // forever. Only skip this once the admin alert is genuinely out.
+    if (supabase && claimedLeadId && !adminMailSent) {
+      await releaseClaim(supabase, claimedLeadId, requestId, "unhandled_error");
+    }
+
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { notifyNewCompanyLead } from '@/lib/notifications';
+import { notifyNewCompanyLead, notifyLeadEmailFailure } from '@/lib/notifications';
 import { useTranslation } from 'react-i18next';
 
 interface FormData {
@@ -199,13 +199,40 @@ export default function RequestWorkers() {
         // The function returns 200 with `emailsSent: false` when SMTP is not
         // configured, i.e. a delivery failure reported as success. Surface that
         // distinctly instead of letting it pass as an OK.
+        //
+        // A console.error alone is not enough: it lands in the visitor's own
+        // browser, where nobody at PipingBox will see it. Raise an in-app admin
+        // alert too, so a lead that was captured but never emailed is visible
+        // to the team. Never block the submission -- the request IS stored.
         if (mailErr) {
           console.error('[RequestWorkers] Lead email failed:', mailErr);
+          notifyLeadEmailFailure(
+            workforcePayload.company_name,
+            'la función de email devolvió error',
+            workforcePayload.email,
+          ).catch((err) => console.warn('[RequestWorkers] Lead-failure alert failed:', err));
         } else if (mailData && mailData.emailsSent === false) {
           console.error(
             '[RequestWorkers] Lead email NOT sent: the function reported success with',
             'emailsSent=false (typically SMTP not configured in production).',
           );
+          notifyLeadEmailFailure(
+            workforcePayload.company_name,
+            mailData.reason || 'SMTP no configurado',
+            workforcePayload.email,
+          ).catch((err) => console.warn('[RequestWorkers] Lead-failure alert failed:', err));
+        } else if (mailData && mailData.emailsSent === 'partial') {
+          // jobs@ was told, the customer was not. The lead is safe internally,
+          // but somebody has to follow up manually.
+          console.error(
+            '[RequestWorkers] Lead confirmation NOT delivered to the company:',
+            mailData.reason,
+          );
+          notifyLeadEmailFailure(
+            workforcePayload.company_name,
+            'no se pudo enviar la confirmación al cliente',
+            workforcePayload.email,
+          ).catch((err) => console.warn('[RequestWorkers] Lead-failure alert failed:', err));
         }
       }
 

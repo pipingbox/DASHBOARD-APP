@@ -308,6 +308,50 @@ export async function notifyNewCompanyLead(
   }
 }
 
+/**
+ * Notify admins that a lead was captured but its email never went out.
+ *
+ * The Edge Function reports this as HTTP 200, so from the visitor's side it
+ * looks like a success and there is nothing to show them -- their request IS
+ * stored. The problem is purely internal: without this, the only trace is a
+ * console.error in the browser of whoever filled the form, which nobody at
+ * PipingBox will ever read. That is how the SMTP gap stayed invisible.
+ */
+export async function notifyLeadEmailFailure(
+  companyName: string,
+  reason: string,
+  leadEmail?: string,
+): Promise<void> {
+  try {
+    const { data: admins } = await supabase
+      .from(TABLES.profiles)
+      .select('user_id')
+      .eq('role', 'admin');
+
+    if (!admins || admins.length === 0) {
+      console.warn('[notifyLeadEmailFailure] No admin users found to notify');
+      return;
+    }
+
+    const contact = leadEmail ? ` Contactar manualmente: ${leadEmail}` : '';
+
+    await Promise.all(
+      admins.map((admin) =>
+        createNotification({
+          recipientId: admin.user_id,
+          type: 'ADMIN_ALERT',
+          title: 'Aviso: email de lead NO enviado',
+          message: `El lead de ${companyName} se guardó correctamente, pero el email no salió (${reason}).${contact}`,
+          relatedEntityType: 'company_lead',
+          actionUrl: '/admin',
+        }),
+      ),
+    );
+  } catch (err) {
+    console.error('[notifyLeadEmailFailure] Failed:', err);
+  }
+}
+
 // ─── Query Helpers ───
 
 export async function fetchNotifications(userId: string, limit = 30): Promise<NotificationRow[]> {
