@@ -693,6 +693,112 @@ test.describe('secure-file-access broker', () => {
     }
   });
 
+  /* ---------------------------------------------------------------------- *
+   * PB-STORAGE-SECURITY-001 phase 2 — canonical-only records.
+   *
+   * Writers no longer mint public URLs, so a record created today has
+   * storage_bucket/storage_path set and its legacy *_file_url NULL. These tests
+   * prove such a record is fully functional end to end: the broker signs it for
+   * whoever is entitled, and denies everyone else, without any legacy URL to
+   * fall back on.
+   * ---------------------------------------------------------------------- */
+
+  test('canonical-only document and certification carry no legacy URL and are brokered to their owner', async () => {
+    const client = await signIn(SECOND_WORKER_EMAIL!, SECOND_WORKER_PASSWORD!);
+
+    const { data: document, error: documentError } = await client.supabase
+      .from('app_worker_documents')
+      .select('storage_bucket, storage_path, file_url')
+      .eq('id', fixture.documentId)
+      .single();
+    throwIfError('Read canonical document fixture', documentError);
+
+    expect(document?.storage_bucket, 'document bucket').toBe(WORKER_FILES_BUCKET);
+    expect(document?.storage_path, 'document path').toBe(fixture.documentPath);
+    expect(document?.file_url, 'document must carry no legacy URL').toBeNull();
+
+    const { data: certification, error: certificationError } = await client.supabase
+      .from('app_worker_certifications')
+      .select('storage_bucket, storage_path, file_url, certificate_file_url')
+      .eq('id', fixture.certificationId)
+      .single();
+    throwIfError('Read canonical certification fixture', certificationError);
+
+    expect(certification?.storage_bucket, 'certification bucket').toBe(WORKER_FILES_BUCKET);
+    expect(certification?.storage_path, 'certification path').toBe(fixture.certificationPath);
+    expect(certification?.file_url, 'certification must carry no legacy URL').toBeNull();
+    expect(
+      certification?.certificate_file_url,
+      'certification must carry no legacy certificate URL',
+    ).toBeNull();
+
+    const documentAccess = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.secondWorkerId,
+        file_type: 'document',
+        record_id: fixture.documentId,
+      },
+    });
+    await assertSignedUrl('owner canonical document', documentAccess.data, documentAccess.error);
+
+    const certificationAccess = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.secondWorkerId,
+        file_type: 'certification',
+        record_id: fixture.certificationId,
+      },
+    });
+    await assertSignedUrl(
+      'owner canonical certification',
+      certificationAccess.data,
+      certificationAccess.error,
+    );
+
+    await client.supabase.auth.signOut();
+  });
+
+  test('a CV with no legacy URL is still signed for the owner and the authorized company', async () => {
+    const owner = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
+    const { error: clearError } = await owner.supabase
+      .from('app_14da0f1941_profiles')
+      .update({ cv_file_url: null })
+      .eq('user_id', fixture.workerId);
+    throwIfError('Clear legacy CV URL for the canonical fixture', clearError);
+
+    const { data: profile, error: readError } = await owner.supabase
+      .from('app_14da0f1941_profiles')
+      .select('cv_storage_bucket, cv_storage_path, cv_file_url')
+      .eq('user_id', fixture.workerId)
+      .single();
+    throwIfError('Read canonical CV fixture', readError);
+    expect(profile?.cv_file_url, 'CV must carry no legacy URL').toBeNull();
+    expect(profile?.cv_storage_bucket, 'CV bucket').toBe(CV_BUCKET);
+    expect(profile?.cv_storage_path, 'CV path').toBe(fixture.workerCvPath);
+
+    const ownerAccess = await owner.supabase.functions.invoke('secure-file-access', {
+      body: { owner_user_id: fixture.workerId, file_type: 'cv' },
+    });
+    await assertSignedUrl('owner canonical CV', ownerAccess.data, ownerAccess.error);
+    await owner.supabase.auth.signOut();
+
+    const company = await signIn(COMPANY_AUTH_EMAIL!, COMPANY_AUTH_PASSWORD!);
+    const companyAccess = await company.supabase.functions.invoke('secure-file-access', {
+      body: { owner_user_id: fixture.workerId, file_type: 'cv' },
+    });
+    await assertSignedUrl('authorized company canonical CV', companyAccess.data, companyAccess.error);
+    await company.supabase.auth.signOut();
+  });
+
+  test('a CV with no legacy URL is still denied to an unauthorized company', async () => {
+    const client = await signIn(COMPANY_UNAUTH_EMAIL!, COMPANY_UNAUTH_PASSWORD!);
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: { owner_user_id: fixture.workerId, file_type: 'cv' },
+    });
+
+    await assertDenied('unauthorized company canonical CV', data, error);
+    await client.supabase.auth.signOut();
+  });
+
   test('authenticated user cannot execute pb_verify_storage_object_ownership RPC directly', async () => {
     const client = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
     const { data, error } = await client.supabase.rpc('pb_verify_storage_object_ownership', {
