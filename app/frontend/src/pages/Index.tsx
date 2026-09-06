@@ -27,34 +27,20 @@ import {
 // If the user is logged in, redirect to /dashboard.
 // All metrics are real (DEC-33: never fabricated). Dark theme only (DEC-45).
 
-function useCounter(target: number, duration = 1600) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const started = useRef(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started.current) {
-          started.current = true;
-          const start = performance.now();
-          const step = (now: number) => {
-            const progress = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            setCount(Math.floor(eased * target));
-            if (progress < 1) requestAnimationFrame(step);
-          };
-          requestAnimationFrame(step);
-        }
-      },
-      { threshold: 0.3 },
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [target, duration]);
-
-  return { count, ref };
-}
+// P0 credibility: these figures must be correct the instant the DOM exists.
+//
+// They sit directly above the line "Live data - no fabricated numbers", which
+// makes them the one place on this page where being wrong is most expensive.
+// They used to count up from zero on IntersectionObserver intersect, so until
+// the reader scrolled, the DOM read "0 Technical drawings". Anything reading the
+// page early - a link unfurl, a mail security gateway following the URL in an
+// outreach email, a prerender, a screen reader - saw four zeros presented as
+// verified figures, understating figures that are real.
+//
+// A count-up cannot both express the value and be honest at t=0, so the count-up
+// is gone. No reveal animation replaces it: an initial opacity-0 would trade a
+// wrong number for an absent one, which is no better for a snapshot. The figures
+// simply render, immediately and always.
 
 interface RealMetric {
   labelKey: string;
@@ -90,13 +76,12 @@ function useRealMetrics() {
   return { metrics, loading: false };
 }
 
-function AnimatedCounter({ metric }: { metric: RealMetric }) {
+function StatFigure({ metric }: { metric: RealMetric }) {
   const { t } = useTranslation();
-  const { count, ref } = useCounter(metric.value);
   return (
-    <div ref={ref} className="text-center">
+    <div className="text-center">
       <p className="text-3xl font-bold text-[#f59e0b] tabular-nums sm:text-4xl">
-        {count.toLocaleString()}
+        {metric.value.toLocaleString()}
       </p>
       <p className="mt-1 text-[11px] uppercase tracking-[0.15em] text-zinc-500">
         {t(metric.labelKey)}
@@ -347,7 +332,7 @@ export default function Index() {
       <section className="border-t border-zinc-800/60 py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {metrics.map((m) => <AnimatedCounter key={m.labelKey} metric={m} />)}
+            {metrics.map((m) => <StatFigure key={m.labelKey} metric={m} />)}
           </div>
           <p className="mt-6 text-center text-[10px] uppercase tracking-[0.2em] text-zinc-600">
             {t('landing.stats.title')}
@@ -412,7 +397,7 @@ export default function Index() {
             <Link to="/pricing" className="transition hover:text-zinc-300">
               {t('landing.footer.pricing')}
             </Link>
-            <Link to="/register" className="transition hover:text-zinc-300">
+            <Link to="/contact" className="transition hover:text-zinc-300">
               {t('landing.footer.contact')}
             </Link>
             <Link to="/privacy" className="transition hover:text-zinc-300">
