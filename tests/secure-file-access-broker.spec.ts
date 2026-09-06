@@ -164,35 +164,96 @@ async function restoreCvState(
   throwIfError(`Restore CV state for ${userId}`, error);
 }
 
-function expectSignedUrl(data: any, error: any) {
-  expect(error).toBeNull();
-  expect(data?.signedUrl).toMatch(/[?&]token=/);
-  expect(data?.signedUrl).not.toMatch(/\/object\/public\//);
-}
+/**
+ * supabase-js wraps a non-2xx Edge Function reply in a FunctionsHttpError whose
+ * `.message` is only the generic "Edge Function returned a non-2xx status code".
+ * The actual status and body live in `.context`, which is the raw Response.
+ *
+ * Without this, every broker rejection looks identical and there is no way to
+ * tell a visibility denial from a relationship denial from an internal 500.
+ * Run #1 of the gate failed exactly here: "returned non-2xx" and nothing else.
+ */
+async function readInvokeError(error: any): Promise<{ status?: number; body: string }> {
+  const context = error?.context;
+  if (!context) return { body: '' };
 
-function expectDenied(data: any, error: any) {
-  expect(data?.signedUrl).toBeFalsy();
+  const status = typeof context.status === 'number' ? context.status : undefined;
 
-  const status = error?.context?.status;
-  if (typeof status === 'number') {
-    expect([403, 404]).toContain(status);
-    return;
+  let body = '';
+  try {
+    // Clone so the body stays readable if anything else consumes it.
+    if (typeof context.clone === 'function') {
+      body = await context.clone().text();
+    } else if (typeof context.text === 'function') {
+      body = await context.text();
+    }
+  } catch {
+    body = '<body already consumed or unreadable>';
   }
 
-  const msg = String(error?.message || data?.error || '').toLowerCase();
-  expect(
-    msg.includes('not authorized') ||
-    msg.includes('forbidden') ||
-    msg.includes('access denied') ||
-    msg.includes('not found') ||
-    msg.includes('not visible') ||
-    msg.includes('ownership mismatch') ||
-    msg.includes('path does not belong') ||
-    msg.includes('bucket not allowed') ||
-    msg.includes('storage object not found') ||
-    msg.includes('storage integrity') ||
-    msg.includes('non-2xx')
-  ).toBe(true);
+  return { status, body };
+}
+
+/** Broker reason string, e.g. "File not visible to companies". */
+function extractReason(body: string, fallback: unknown): string {
+  try {
+    const parsed = JSON.parse(body);
+    if (parsed && typeof parsed.error === 'string') return parsed.error;
+  } catch {
+    /* body is not JSON; fall through */
+  }
+  return body || String(fallback ?? '');
+}
+
+async function describeFailure(label: string, data: any, error: any): Promise<string> {
+  const { status, body } = await readInvokeError(error);
+  return [
+    `${label}`,
+    `  status: ${status ?? '(none)'}`,
+    `  broker reason: ${extractReason(body, error?.message) || '(empty)'}`,
+    `  raw body: ${body || '(empty)'}`,
+    `  error name: ${error?.name ?? '(none)'}`,
+    `  error message: ${error?.message ?? '(none)'}`,
+    `  data: ${data ? JSON.stringify(data) : '(none)'}`,
+  ].join('\n');
+}
+
+async function assertSignedUrl(label: string, data: any, error: any) {
+  if (error || !data?.signedUrl) {
+    // Surfaces the broker's own reason instead of "non-2xx".
+    throw new Error(await describeFailure(`${label}: expected a signed URL`, data, error));
+  }
+  expect(data.signedUrl).toMatch(/[?&]token=/);
+  expect(data.signedUrl).not.toMatch(/\/object\/public\//);
+}
+
+/**
+ * A denial must be an explicit 403/404 from the broker. A 500, a network error
+ * or an unlabelled failure is NOT a pass: it would prove the request failed,
+ * not that authorization rejected it. The previous version accepted any
+ * "non-2xx" message, so an internal error would have been recorded as a
+ * successful denial.
+ */
+async function assertDenied(label: string, data: any, error: any): Promise<string> {
+  expect(data?.signedUrl, `${label}: expected no signed URL`).toBeFalsy();
+
+  const { status, body } = await readInvokeError(error);
+  const reason = extractReason(body, error?.message);
+
+  if (typeof status !== 'number') {
+    throw new Error(
+      await describeFailure(`${label}: denial had no HTTP status (not a broker rejection)`, data, error),
+    );
+  }
+
+  if (![403, 404].includes(status)) {
+    throw new Error(
+      await describeFailure(`${label}: expected 403/404, got ${status}`, data, error),
+    );
+  }
+
+  console.log(`[broker-e2e] ${label} -> ${status} "${reason}"`);
+  return reason;
 }
 
 async function cleanupFixtures(): Promise<string[]> {
@@ -421,6 +482,33 @@ test.describe('secure-file-access broker', () => {
       if (!application?.id) throw new Error('QA application insert returned no id');
       fixture.applicationId = application.id;
 
+      // Read back exactly what isCompanyAuthorized() looks for, so a company
+      // rejection can be attributed to the broker rather than to a fixture that
+      // silently failed to persist the relationship columns.
+      const { data: relationCheck, error: relationError } = await worker.supabase
+        .from('app_14da0f1941_job_applications')
+        .select('id, user_id, job_id, company_user_id, status')
+        .eq('id', application.id)
+        .maybeSingle();
+
+      console.log(
+        '[broker-e2e] authorization fixture:\n' +
+        `  worker_user_id:   ${worker.user.id}\n` +
+        `  company_user_id:  ${authorizedCompany.user.id}\n` +
+        `  job_id:           ${job.id}\n` +
+        `  application_id:   ${application.id}\n` +
+        `  read-back:        ${relationCheck ? JSON.stringify(relationCheck) : '(none)'}\n` +
+        `  read-back error:  ${relationError?.message ?? '(none)'}`,
+      );
+
+      if (relationCheck && relationCheck.company_user_id !== authorizedCompany.user.id) {
+        throw new Error(
+          'QA application persisted without the expected company_user_id: got ' +
+          `${relationCheck.company_user_id}, expected ${authorizedCompany.user.id}. ` +
+          'The authorization fixture is invalid, so a company denial would be inconclusive.',
+        );
+      }
+
       await worker.supabase.auth.signOut();
       await secondWorker.supabase.auth.signOut();
       await authorizedCompany.supabase.auth.signOut();
@@ -447,7 +535,7 @@ test.describe('secure-file-access broker', () => {
       body: { owner_user_id: fixture.workerId, file_type: 'cv' },
     });
 
-    expectSignedUrl(data, error);
+    await assertSignedUrl('owner CV', data, error);
     await client.supabase.auth.signOut();
   });
 
@@ -457,7 +545,7 @@ test.describe('secure-file-access broker', () => {
       body: { owner_user_id: fixture.workerId, file_type: 'cv' },
     });
 
-    expectSignedUrl(data, error);
+    await assertSignedUrl('authorized company CV', data, error);
     await client.supabase.auth.signOut();
   });
 
@@ -467,7 +555,7 @@ test.describe('secure-file-access broker', () => {
       body: { owner_user_id: fixture.workerId, file_type: 'cv' },
     });
 
-    expectDenied(data, error);
+    await assertDenied('unauthorized company CV', data, error);
     await client.supabase.auth.signOut();
   });
 
@@ -477,7 +565,7 @@ test.describe('secure-file-access broker', () => {
       body: { owner_user_id: fixture.secondWorkerId, file_type: 'cv' },
     });
 
-    expectDenied(data, error);
+    await assertDenied('non-owner worker -> other CV', data, error);
     await client.supabase.auth.signOut();
   });
 
@@ -490,7 +578,7 @@ test.describe('secure-file-access broker', () => {
         record_id: fixture.documentId,
       },
     });
-    expectSignedUrl(ownerResult.data, ownerResult.error);
+    await assertSignedUrl('owner document', ownerResult.data, ownerResult.error);
     await owner.supabase.auth.signOut();
 
     const attacker = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
@@ -501,7 +589,7 @@ test.describe('secure-file-access broker', () => {
         record_id: fixture.documentId,
       },
     });
-    expectDenied(data, error);
+    await assertDenied('non-owner worker -> other document', data, error);
     await attacker.supabase.auth.signOut();
   });
 
@@ -514,7 +602,7 @@ test.describe('secure-file-access broker', () => {
         record_id: fixture.certificationId,
       },
     });
-    expectSignedUrl(ownerResult.data, ownerResult.error);
+    await assertSignedUrl('owner certification', ownerResult.data, ownerResult.error);
     await owner.supabase.auth.signOut();
 
     const attacker = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
@@ -525,7 +613,7 @@ test.describe('secure-file-access broker', () => {
         record_id: fixture.certificationId,
       },
     });
-    expectDenied(data, error);
+    await assertDenied('non-owner worker -> other certification', data, error);
     await attacker.supabase.auth.signOut();
   });
 
@@ -535,7 +623,7 @@ test.describe('secure-file-access broker', () => {
       body: { owner_user_id: fixture.workerId, file_type: 'cv' },
     });
 
-    expectSignedUrl(data, error);
+    await assertSignedUrl('admin CV', data, error);
     await client.supabase.auth.signOut();
   });
 
@@ -556,7 +644,7 @@ test.describe('secure-file-access broker', () => {
       const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
         body: { owner_user_id: fixture.workerId, file_type: 'cv' },
       });
-      expectDenied(data, error);
+      await assertDenied('CV metadata pointing at missing object', data, error);
     } finally {
       const { error } = await client.supabase
         .from('app_14da0f1941_profiles')
