@@ -27,124 +27,30 @@ import {
 // If the user is logged in, redirect to /dashboard.
 // All metrics are real (DEC-33: never fabricated). Dark theme only (DEC-45).
 
-// The counters animate up from zero when they scroll into view. That is fine as
-// a flourish and wrong as a resting state: until the observer fires, the DOM
-// reads "0 Technical drawings" directly above the line "Live data - no
-// fabricated numbers". Anything that reads the page without scrolling it - a
-// link unfurl, a mail security gateway following the URL in an outreach email, a
-// screen reader, a reader who never reaches that section - sees four zeros
-// presented as verified figures.
+// P0 credibility: these figures must be correct the instant the DOM exists.
 //
-// The figures themselves are real and derived at build time from
-// catalog.generated.json, so a resting zero does not merely look empty: it
-// understates them, on the one section of the landing whose whole point is that
-// the numbers are not invented.
+// The four numbers sit directly above the line "Live data - no fabricated
+// numbers", which makes them the one place on this page where being wrong is
+// most expensive. They used to count up from zero on IntersectionObserver
+// intersect, so until the reader scrolled, the DOM read "0 Technical drawings".
+// Anything that reads the page early - a link unfurl, a mail security gateway
+// following the URL in an outreach email, a prerender or snapshot, a screen
+// reader - saw four zeros presented as verified figures, understating real data.
 //
-// So: animate only where the animation can be relied upon to run, and never
-// leave the value at zero. Where IntersectionObserver is unavailable or the
-// reader prefers reduced motion, render the real figure immediately. Where it is
-// available, keep the animation but snap to the real figure if the observer has
-// not fired shortly after mount. The trade-off is that a reader scrolling slowly
-// may find the counters already settled; showing the true number without the
-// flourish is strictly better than showing zero with it.
-const COUNTER_FAILSAFE_MS = 2000;
-
-function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined' || !window.matchMedia) return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-function useCounter(target: number, duration = 1600) {
-  const canAnimate =
-    typeof IntersectionObserver !== 'undefined' && !prefersReducedMotion();
-  const [count, setCount] = useState(canAnimate ? 0 : target);
-  const ref = useRef<HTMLDivElement>(null);
-  const started = useRef(false);
-
-  useEffect(() => {
-    if (!canAnimate) {
-      setCount(target);
-      return;
-    }
-
-    const run = () => {
-      if (started.current) return;
-      started.current = true;
-      const start = performance.now();
-      const step = (now: number) => {
-        const progress = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        setCount(Math.floor(eased * target));
-        if (progress < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    };
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) run();
-      },
-      { threshold: 0.3 },
-    );
-    if (ref.current) observer.observe(ref.current);
-
-    const failsafe = window.setTimeout(() => {
-      if (!started.current) {
-        started.current = true;
-        setCount(target);
-      }
-    }, COUNTER_FAILSAFE_MS);
-
-    return () => {
-      observer.disconnect();
-      window.clearTimeout(failsafe);
-    };
-  }, [target, duration, canAnimate]);
-
-  return { count, ref };
-}
-
-interface RealMetric {
-  labelKey: string;
-  value: number;
-}
-
-// Landing proof points.
+// A count-up cannot both express the value and be honest at t=0, so the count-up
+// is gone. There is no reveal animation either: an initial opacity-0 would trade
+// a wrong number for an absent one, which is no better for a snapshot. The
+// figures simply render, immediately and always.
 //
-// These deliberately measure the DEPTH OF THE TECHNICAL LIBRARY, not how many
-// people have signed up. On a young platform a user count is both weak and
-// self-defeating: "47 professionals" invites the reader to conclude we are
-// empty. The library is the opposite — it is genuinely large, and it is the
-// thing a piping professional actually came to evaluate.
-//
-// Every figure below is derived, never typed by hand:
-//   - drawings / dimensionRows / standards come from `catalogStats`, emitted by
-//     scripts/build-catalog.mjs from the Brain YAML at build time.
-//   - IMPLEMENTED_TOOLS counts only tools with `implemented: true` in Tools.tsx.
-//     The previous value (12) counted two tools that do not exist yet.
-//
-// See CHANGELOG v4.81.0: no metric ships without a source.
-const IMPLEMENTED_TOOLS = 10;
-
-// Labels are keys, not text: the counters sit on the public landing and have to
-// read in all seven languages like everything around them.
-function useRealMetrics() {
-  const metrics: RealMetric[] = [
-    { labelKey: 'landing.stats.drawings', value: catalogStats.drawings },
-    { labelKey: 'landing.stats.dimensionRows', value: catalogStats.dimensionRows },
-    { labelKey: 'landing.stats.standards', value: catalogStats.standards },
-    { labelKey: 'landing.stats.tools', value: IMPLEMENTED_TOOLS },
-  ];
-  return { metrics, loading: false };
-}
-
-function AnimatedCounter({ metric }: { metric: RealMetric }) {
+// The values are not computed here and must not be edited by hand: drawings,
+// dimensionRows and standards come from `catalogStats` (catalog.generated.json,
+// emitted at build time); tools comes from IMPLEMENTED_TOOLS below.
+function StatFigure({ metric }: { metric: RealMetric }) {
   const { t } = useTranslation();
-  const { count, ref } = useCounter(metric.value);
   return (
-    <div ref={ref} className="text-center">
+    <div className="text-center">
       <p className="text-3xl font-bold text-[#f59e0b] tabular-nums sm:text-4xl">
-        {count.toLocaleString()}
+        {metric.value.toLocaleString()}
       </p>
       <p className="mt-1 text-[11px] uppercase tracking-[0.15em] text-zinc-500">
         {t(metric.labelKey)}
@@ -395,7 +301,7 @@ export default function Index() {
       <section className="border-t border-zinc-800/60 py-16 sm:py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {metrics.map((m) => <AnimatedCounter key={m.labelKey} metric={m} />)}
+            {metrics.map((m) => <StatFigure key={m.labelKey} metric={m} />)}
           </div>
           <p className="mt-6 text-center text-[10px] uppercase tracking-[0.2em] text-zinc-600">
             {t('landing.stats.title')}

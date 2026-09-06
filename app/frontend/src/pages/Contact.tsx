@@ -21,12 +21,16 @@ import { useSeo } from '@/hooks/useSeo';
  * published here on that basis.
  *
  * On the absence of a legal entity: this page deliberately does NOT state a legal
- * form, company number, VAT ID or registered address. The approved corporate
- * position is BELGIUM FIRST -> ESTONIA OU LATER, under external review, and until
- * the Belgian registration formally exists it is forbidden to publish
- * `PipingBox OU`, to claim incorporation in Estonia, or to invent registry data.
- * See the standing note in DsaContact.tsx. Neutral wording is the approved state,
- * not a stopgap. Do not add an entity here until the PO closes that decision.
+ * form, company number, VAT ID, registered address, or that PipingBox is
+ * "established" anywhere. The approved corporate position is BELGIUM FIRST ->
+ * ESTONIA OU LATER, under external review, and until the Belgian registration
+ * formally exists it is forbidden to publish `PipingBox OU`, to claim
+ * incorporation in Estonia, or to invent registry data. See the standing note in
+ * DsaContact.tsx. Neutral wording is the approved state, not a stopgap.
+ *
+ * The public copy is kept to one sentence on purpose: this is a contact page, not
+ * a corporate disclosure. Do not grow it into an explanation of the company
+ * structure, and do not add an entity here until the PO closes that decision.
  */
 
 const GENERAL_CONTACT = 'support@pipingbox.com';
@@ -139,12 +143,9 @@ export default function Contact() {
 
           <section className="border-t border-zinc-800/80 pt-6">
             <p className="text-sm text-zinc-500">
-              PipingBox is an early-stage platform, established in the European Union and
-              operated from Europe. Our corporate structure is being formalised with external
-              legal and tax advisers; until that registration is complete we do not publish a
-              legal form or registry details, because we will not state something we cannot yet
-              evidence. The addresses above are monitored and are the correct way to reach us in
-              the meantime.
+              PipingBox is an early-stage platform operated from Europe. Our corporate
+              registration is in progress, so we do not yet publish registry details. The
+              addresses above are monitored and are the way to reach us.
             </p>
           </section>
         </div>
