@@ -12,6 +12,9 @@ export interface Certification {
   qr_code_url: string | null;
   file_url: string | null;
   certificate_file_url?: string | null;
+  /** PB-STORAGE-SECURITY-001: canonical Storage location. */
+  storage_bucket?: string | null;
+  storage_path?: string | null;
   issue_date: string | null;
   expiry_date: string | null;
   expiration_date?: string | null;

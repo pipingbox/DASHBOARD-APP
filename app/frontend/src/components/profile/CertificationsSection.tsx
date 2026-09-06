@@ -43,6 +43,7 @@ import { syncCertificationReminders, deleteCertificationReminders } from '@/lib/
 import { uploadWithTimeout, resolveFileMime } from '@/lib/uploadHelpers';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { getSecureFileUrl, deleteStorageObject, extractStoragePathAndBucket } from '@/lib/storageHelpers';
+import { hasStoredRecordFile } from '@/lib/filePresence';
 
 export function CertificationsSection() {
   const { t } = useTranslation();
@@ -644,7 +645,7 @@ export function CertificationsSection() {
                     )}
                   </div>
                   <div className="flex gap-1">
-                    {cert.file_url && (
+                    {hasStoredRecordFile(cert) && (
                       <a
                         href={cert.storageUrl || '#'}
                         target="_blank"
@@ -652,7 +653,13 @@ export function CertificationsSection() {
                         title={t('workerProfile.certifications.viewFile')}
                         onClick={async (e) => {
                           const bucket = cert.storage_bucket || STORAGE_BUCKETS.workerDocuments;
-                          const url = await getSecureFileUrl(bucket, cert.file_url);
+                          // Canonical path first; legacy URL only for records not yet migrated.
+                          const sourceRef = cert.storage_path || cert.file_url || cert.certificate_file_url;
+                          if (!sourceRef) {
+                            e.preventDefault();
+                            return;
+                          }
+                          const url = await getSecureFileUrl(bucket, sourceRef);
                           if (url) {
                             setItems((prev) =>
                               prev.map((i) =>

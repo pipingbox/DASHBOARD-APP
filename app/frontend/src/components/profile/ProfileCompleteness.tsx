@@ -86,6 +86,8 @@ export function ProfileCompleteness() {
       skills: profile.skills,
       bio: profile.bio,
       cv_file_url: profile.cv_file_url,
+      cv_storage_bucket: profile.cv_storage_bucket,
+      cv_storage_path: profile.cv_storage_path,
       cv_url: profile.cv_url,
       experience_count: experienceCount,
       certification_count: certificationCount,
@@ -269,7 +271,7 @@ export function ProfileCompletenessBadge({ userId }: { userId: string }) {
       // Fetch profile data
       const { data: profileData } = await supabase
         .from(TABLES.profiles)
-        .select('avatar_url, full_name, title, company, location, years_experience, skills, bio, cv_file_url, cv_url')
+        .select('avatar_url, full_name, title, company, location, years_experience, skills, bio, cv_file_url, cv_storage_bucket, cv_storage_path, cv_url')
         .eq('user_id', userId)
         .single();
 
@@ -312,6 +314,8 @@ export function ProfileCompletenessBadge({ userId }: { userId: string }) {
         skills: profileData.skills,
         bio: profileData.bio,
         cv_file_url: profileData.cv_file_url,
+        cv_storage_bucket: profileData.cv_storage_bucket,
+        cv_storage_path: profileData.cv_storage_path,
         cv_url: profileData.cv_url,
         experience_count,
         certification_count,

@@ -13,7 +13,8 @@ import {
   Clock,
   ShieldAlert,
 } from 'lucide-react';
-import { supabase, TABLES } from '@/lib/supabase';
+import { supabase, TABLES, STORAGE_BUCKETS } from '@/lib/supabase';
+import { getSecureFileUrl } from '@/lib/storageHelpers';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import {
@@ -22,6 +23,7 @@ import {
   type ExpiryStatus,
 } from '@/lib/certifications';
 import { CertificationDialog } from './CertificationDialog';
+import { hasStoredRecordFile } from '@/lib/filePresence';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,6 +71,23 @@ export function CertificationList() {
   const [renewMode, setRenewMode] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Certification | null>(null);
 
+  /**
+   * PB-STORAGE-SECURITY-001: never open a raw legacy public URL. Resolve the
+   * canonical object (or the legacy path extracted from the URL) to a
+   * short-lived signed URL first.
+   */
+  const openCertificateFile = async (cert: Certification) => {
+    const bucket = cert.storage_bucket || STORAGE_BUCKETS.workerDocuments;
+    const sourceRef = cert.storage_path || cert.file_url || cert.certificate_file_url;
+    if (!sourceRef) return;
+    const url = await getSecureFileUrl(bucket, sourceRef);
+    if (!url) {
+      toast.error(t('certActions.viewDenied', { defaultValue: 'Access denied' }));
+      return;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   const load = async () => {
     if (!user) return;
     setLoading(true);
@@ -86,6 +105,8 @@ export function CertificationList() {
         name: row.certification_name ?? row.name ?? '',
         issuer: row.issuing_organization ?? row.issuer ?? '',
         file_url: row.certificate_file_url ?? row.file_url ?? null,
+        storage_bucket: row.storage_bucket ?? null,
+        storage_path: row.storage_path ?? null,
         expiry_date: row.expiration_date ?? row.expiry_date ?? null,
       })) as Certification[];
       setItems(normalized);
@@ -218,16 +239,15 @@ export function CertificationList() {
                       )}
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {cert.file_url && (
-                        <a
-                          href={cert.file_url}
-                          target="_blank"
-                          rel="noreferrer"
+                      {hasStoredRecordFile(cert) && (
+                        <button
+                          type="button"
+                          onClick={() => openCertificateFile(cert)}
                           className="inline-flex items-center gap-1 border border-zinc-800 bg-zinc-900 px-2.5 py-1 text-[11px] uppercase tracking-[0.15em] text-zinc-300 hover:border-[#f59e0b] hover:text-[#f59e0b]"
                         >
                           <FileText className="h-3 w-3" />
                           {t('certActions.viewCertificate')}
-                        </a>
+                        </button>
                       )}
                       {cert.verification_url && (
                         <a

@@ -89,6 +89,8 @@ export function ProfileCompletionCard() {
       skills: profile.skills,
       bio: profile.bio,
       cv_file_url: profile.cv_file_url,
+      cv_storage_bucket: profile.cv_storage_bucket,
+      cv_storage_path: profile.cv_storage_path,
       cv_url: profile.cv_url,
       experience_count,
       certification_count,

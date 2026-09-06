@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { hasStoredCv } from '@/lib/filePresence';
 
 /* ─── Constants ─── */
 // TD-01 (DEC-36): Supabase URL and anon key come from the centralized client
@@ -216,7 +217,7 @@ export function AdminRegistros() {
             const profile = au.profile;
 
             if (au.has_profile && profile) {
-              const hasCv = !!(profile.cv_file_url || profile.cv_url);
+              const hasCv = hasStoredCv(profile) || !!profile.cv_url;
               const hasDraft = !!(profile.title || (Array.isArray(profile.skills) && profile.skills.length > 0));
               const ru: RegistroUser = {
                 id: profile.id,
@@ -306,7 +307,7 @@ export function AdminRegistros() {
       if (!edgeFunctionWorked) {
         const { data: profiles, error: profilesError } = await supabase
           .from(TABLES.profiles)
-          .select('id, user_id, full_name, role, account_type, created_at, updated_at, avatar_url, availability_status, cv_visible, bio, title, company, location, skills, referral_code, referred_by_user_id, years_experience, profile_completion, profile_visibility, cv_file_url, cv_url, onboarding_status')
+          .select('id, user_id, full_name, role, account_type, created_at, updated_at, avatar_url, availability_status, cv_visible, bio, title, company, location, skills, referral_code, referred_by_user_id, years_experience, profile_completion, profile_visibility, cv_file_url, cv_storage_bucket, cv_storage_path, cv_url, onboarding_status')
           .order('created_at', { ascending: false })
           .limit(500);
 
@@ -315,7 +316,7 @@ export function AdminRegistros() {
           setError('⚠️ No se pudo conectar con la función edge NI leer perfiles. Verifica permisos.');
         } else {
           registroUsers = (profiles || []).map((p: any) => {
-            const hasCv = !!(p.cv_file_url || p.cv_url);
+            const hasCv = hasStoredCv(p) || !!p.cv_url;
             const hasDraft = !!(p.title || (Array.isArray(p.skills) && p.skills.length > 0));
             const ru: RegistroUser = {
               id: p.id,

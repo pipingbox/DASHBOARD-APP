@@ -432,9 +432,13 @@ export function DocumentsSection() {
                       rel="noreferrer"
                       onClick={async (e) => {
                         const bucket = doc.storage_bucket || STORAGE_BUCKETS.workerDocuments;
-                        const sourceUrl = doc.file_url;
-                        if (!sourceUrl) return;
-                        const url = await getSecureFileUrl(bucket, sourceUrl);
+                        // Canonical path first; legacy URL only for records not yet migrated.
+                        const sourceRef = doc.storage_path || doc.file_url;
+                        if (!sourceRef) {
+                          e.preventDefault();
+                          return;
+                        }
+                        const url = await getSecureFileUrl(bucket, sourceRef);
                         if (url) {
                           setItems((prev) =>
                             prev.map((i) =>
