@@ -259,6 +259,29 @@ test.describe('CandidateProfile no longer gates on legacy URLs', () => {
   });
 });
 
+test.describe('file lifecycle is not gated on the legacy URL', () => {
+  // Replacing or deleting a file must still remove the previous object once
+  // writers stop emitting a URL; otherwise every replacement leaks an orphan.
+  test('certification replacement decides on canonical metadata', () => {
+    const source = read('app/frontend/src/components/profile/CertificationsSection.tsx');
+    expect(source).toContain('const hadPreviousFile = hasStoredRecordFile(editing);');
+    expect(source).toContain('if (hadPreviousFile && fileChanged) {');
+    expect(source).not.toContain('if (oldUrl && oldUrl !== newUrl) {');
+  });
+
+  test('CV replacement and deletion prefer the canonical object', () => {
+    const source = read('app/frontend/src/components/profile/CVUploadSection.tsx');
+    expect(source).toContain('if (oldBucket && oldPath && (oldBucket !== bucketName || oldPath !== path)) {');
+    expect(source).toContain('if (bucket && path) {');
+  });
+
+  test('document deletion prefers the canonical object', () => {
+    const source = read('app/frontend/src/components/profile/DocumentsSection.tsx');
+    expect(source).toContain('if (deleteTarget.storage_bucket && deleteTarget.storage_path) {');
+    expect(source).toContain('} else if (deleteTarget.file_url) {');
+  });
+});
+
 test.describe('no reader opens a raw public URL', () => {
   const READERS = [
     CANDIDATE_PROFILE,

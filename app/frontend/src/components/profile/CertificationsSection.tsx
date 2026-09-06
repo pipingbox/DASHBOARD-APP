@@ -368,14 +368,20 @@ export function CertificationsSection() {
         }
 
         // PB-STORAGE-SECURITY-001: if the file changed, delete the previous object.
-        const oldUrl = editing.file_url;
+        // Gating this on the legacy URL would leak an orphan per replacement once
+        // writers stop emitting one, so the canonical path decides.
+        const oldUrl = editing.file_url || editing.certificate_file_url || null;
         const oldBucket = editing.storage_bucket;
         const oldPath = editing.storage_path;
-        const newUrl = fileUrl;
-        if (oldUrl && oldUrl !== newUrl) {
+        const hadPreviousFile = hasStoredRecordFile(editing);
+        const fileChanged =
+          oldBucket && oldPath
+            ? oldBucket !== storageBucket || oldPath !== storagePath
+            : oldUrl !== fileUrl;
+        if (hadPreviousFile && fileChanged) {
           if (oldBucket && oldPath) {
             await deleteStorageObject(oldBucket, oldPath);
-          } else {
+          } else if (oldUrl) {
             const extracted = extractStoragePathAndBucket(oldUrl);
             if (extracted.bucket && extracted.path) {
               await deleteStorageObject(extracted.bucket, extracted.path);
