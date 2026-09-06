@@ -160,9 +160,9 @@ export function CVUploadSection() {
     }
 
     console.log('[CVUploadSection] Profile upserted with CV fields:', {
-      cv_file_url: urlData.publicUrl,
+      cv_storage_bucket: bucketName,
+      cv_storage_path: path,
       cv_file_name: file.name,
-      cv_file_path: path,
     });
     setUploadError(null);
     toast.success(t('workerProfile.cv.uploaded'));
