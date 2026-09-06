@@ -115,18 +115,15 @@ export function CVUploadSection() {
 
     console.log('[CVUploadSection] Upload success:', { bucket: bucketName, path });
 
-    const { data: urlData } = supabase.storage
-      .from(bucketName)
-      .getPublicUrl(path);
-
-    console.log('[CVUploadSection] Public URL:', urlData.publicUrl);
-
     const { data: upsertedData, error: updateError } = await supabase
       .from(TABLES.profiles)
       .upsert(
         {
           user_id: user.id,
-          cv_file_url: urlData.publicUrl,
+          // PB-STORAGE-SECURITY-001 phase 2: the bucket is private, so a public URL
+          // grants nothing and only misrepresents where the file lives. Cleared on
+          // replacement because the previous object has just been deleted.
+          cv_file_url: null,
           cv_storage_bucket: bucketName,
           cv_storage_path: path,
           cv_file_name: file.name,

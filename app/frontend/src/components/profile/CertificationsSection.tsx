@@ -70,7 +70,7 @@ export function CertificationsSection() {
   const [issueDate, setIssueDate] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [credentialId, setCredentialId] = useState('');
-  const [fileUrl, setFileUrl] = useState('');
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [storageBucket, setStorageBucket] = useState<string | null>(null);
   const [storagePath, setStoragePath] = useState<string | null>(null);
   const [fileName, setFileName] = useState('');
@@ -163,7 +163,7 @@ export function CertificationsSection() {
     setIssueDate('');
     setExpiryDate('');
     setCredentialId('');
-    setFileUrl('');
+    setFileUrl(null);
     setStorageBucket(null);
     setStoragePath(null);
     setFileName('');
@@ -184,7 +184,7 @@ export function CertificationsSection() {
     setIssueDate(cert.issue_date ?? '');
     setExpiryDate(cert.expiry_date ?? '');
     setCredentialId(cert.credential_id ?? '');
-    setFileUrl(cert.file_url ?? '');
+    setFileUrl(cert.file_url ?? cert.certificate_file_url ?? null);
     setStorageBucket(cert.storage_bucket ?? null);
     setStoragePath(cert.storage_path ?? null);
     setFileName(cert.file_name ?? '');
@@ -287,14 +287,10 @@ export function CertificationsSection() {
       }
 
       setUploadProgress(100);
-      console.log('[CertUpload] Upload success, getting public URL');
+      console.log('[CertUpload] Upload success:', { bucket: bucketName, path: filePath });
 
-      const { data: urlData } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(filePath);
-
-      console.log('[CertUpload] Public URL:', urlData.publicUrl);
-      setFileUrl(urlData.publicUrl);
+      // PB-STORAGE-SECURITY-001 phase 2: persist the canonical location only.
+      setFileUrl(null);
       setStorageBucket(bucketName);
       setStoragePath(filePath);
       setFileName(file.name);
@@ -868,7 +864,7 @@ export function CertificationsSection() {
               <Label className="text-xs uppercase tracking-wider text-zinc-400">
                 {t('workerProfile.certifications.file')}
               </Label>
-              {fileUrl ? (
+              {storagePath ? (
                 <div className="flex items-center justify-between border border-zinc-800 bg-zinc-950 p-3">
                   <div className="flex items-center gap-2 text-sm text-zinc-300">
                     <FileText className="h-4 w-4 text-[#f59e0b]" />
@@ -884,7 +880,7 @@ export function CertificationsSection() {
                         }
                       }
                       // Edit mode: just clear state; the old object is deleted on save if confirmed.
-                      setFileUrl('');
+                      setFileUrl(null);
                       setStorageBucket(null);
                       setStoragePath(null);
                       setFileName('');

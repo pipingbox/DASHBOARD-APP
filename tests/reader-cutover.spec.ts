@@ -282,6 +282,59 @@ test.describe('file lifecycle is not gated on the legacy URL', () => {
   });
 });
 
+test.describe('writers persist canonical metadata only (phase 2)', () => {
+  const WRITERS = [
+    'app/frontend/src/components/profile/CVUploadSection.tsx',
+    'app/frontend/src/components/profile/DocumentsSection.tsx',
+    'app/frontend/src/components/profile/CertificationsSection.tsx',
+    'app/frontend/src/components/certifications/CertificationDialog.tsx',
+  ];
+
+  test('no upload flow calls getPublicUrl()', () => {
+    // The buckets are private: a public URL grants nothing and only records a
+    // location that cannot be used, so it must not be minted at all.
+    for (const rel of WRITERS) {
+      expect(read(rel), rel).not.toContain('getPublicUrl(');
+    }
+  });
+
+  test('a new CV writes the canonical location and clears the legacy URL', () => {
+    const source = read('app/frontend/src/components/profile/CVUploadSection.tsx');
+    expect(source).toContain('cv_file_url: null,');
+    expect(source).toContain('cv_storage_bucket: bucketName,');
+    expect(source).toContain('cv_storage_path: path,');
+  });
+
+  test('documents and certifications persist bucket and path', () => {
+    for (const rel of [
+      'app/frontend/src/components/profile/DocumentsSection.tsx',
+      'app/frontend/src/components/profile/CertificationsSection.tsx',
+      'app/frontend/src/components/certifications/CertificationDialog.tsx',
+    ]) {
+      const source = read(rel);
+      expect(source, rel).toContain('storage_bucket: storageBucket,');
+      expect(source, rel).toContain('storage_path: storagePath,');
+    }
+  });
+
+  test('upload dialogs gate on the canonical path, not on a URL', () => {
+    for (const rel of [
+      'app/frontend/src/components/profile/DocumentsSection.tsx',
+      'app/frontend/src/components/profile/CertificationsSection.tsx',
+    ]) {
+      const source = read(rel);
+      expect(source, rel).toContain('{storagePath ? (');
+      expect(source, rel).not.toContain('{fileUrl ? (');
+    }
+  });
+
+  test('no synthetic public URL is built anywhere in the upload flows', () => {
+    for (const rel of WRITERS) {
+      expect(read(rel), rel).not.toMatch(/\/storage\/v1\/object\/public\//);
+    }
+  });
+});
+
 test.describe('no reader opens a raw public URL', () => {
   const READERS = [
     CANDIDATE_PROFILE,
