@@ -541,6 +541,41 @@ test.describe('secure-file-access broker', () => {
 
   test('authorized company can retrieve a signed URL for a visible CV', async () => {
     const client = await signIn(COMPANY_AUTH_EMAIL!, COMPANY_AUTH_PASSWORD!);
+
+    // Gate run #2 returned 403 "Company not authorized to access this candidate"
+    // while the fixture read-back showed the exact row isCompanyAuthorized()
+    // looks for. That narrows the failure to relationship resolution, so replay
+    // the broker's first query from here to tell "the data is wrong" apart from
+    // "the broker cannot see correct data".
+    //
+    // The broker runs this with service_role; this client is the company under
+    // RLS, so an empty result is only conclusive when paired with the error.
+    const probe = await client.supabase
+      .from('app_14da0f1941_job_applications')
+      .select('id, user_id, company_user_id')
+      .eq('user_id', fixture.workerId)
+      .eq('company_user_id', client.user.id)
+      .limit(1);
+
+    console.log(
+      '[broker-e2e] relationship probe (as company, under RLS):\n' +
+      `  viewer id (jwt):      ${client.user.id}\n` +
+      `  fixture company id:   ${fixture.authorizedCompanyId ?? '(unset)'}\n` +
+      `  candidate id queried: ${fixture.workerId}\n` +
+      `  rows:  ${probe.data ? JSON.stringify(probe.data) : '(none)'}\n` +
+      `  error: ${probe.error?.message ?? '(none)'}`,
+    );
+
+    // If the JWT identity differs from the id used to build the fixture, the
+    // broker is right to reject and the fixture is the defect.
+    if (fixture.authorizedCompanyId && client.user.id !== fixture.authorizedCompanyId) {
+      throw new Error(
+        `Company JWT identity (${client.user.id}) differs from the id used to build the ` +
+        `authorization fixture (${fixture.authorizedCompanyId}). The broker rejection is ` +
+        'correct; the fixture is invalid.',
+      );
+    }
+
     const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
       body: { owner_user_id: fixture.workerId, file_type: 'cv' },
     });
