@@ -27,31 +27,79 @@ import {
 // If the user is logged in, redirect to /dashboard.
 // All metrics are real (DEC-33: never fabricated). Dark theme only (DEC-45).
 
+// The counters animate up from zero when they scroll into view. That is fine as
+// a flourish and wrong as a resting state: until the observer fires, the DOM
+// reads "0 Technical drawings" directly above the line "Live data - no
+// fabricated numbers". Anything that reads the page without scrolling it - a
+// link unfurl, a mail security gateway following the URL in an outreach email, a
+// screen reader, a reader who never reaches that section - sees four zeros
+// presented as verified figures.
+//
+// The figures themselves are real and derived at build time from
+// catalog.generated.json, so a resting zero does not merely look empty: it
+// understates them, on the one section of the landing whose whole point is that
+// the numbers are not invented.
+//
+// So: animate only where the animation can be relied upon to run, and never
+// leave the value at zero. Where IntersectionObserver is unavailable or the
+// reader prefers reduced motion, render the real figure immediately. Where it is
+// available, keep the animation but snap to the real figure if the observer has
+// not fired shortly after mount. The trade-off is that a reader scrolling slowly
+// may find the counters already settled; showing the true number without the
+// flourish is strictly better than showing zero with it.
+const COUNTER_FAILSAFE_MS = 2000;
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 function useCounter(target: number, duration = 1600) {
-  const [count, setCount] = useState(0);
+  const canAnimate =
+    typeof IntersectionObserver !== 'undefined' && !prefersReducedMotion();
+  const [count, setCount] = useState(canAnimate ? 0 : target);
   const ref = useRef<HTMLDivElement>(null);
   const started = useRef(false);
 
   useEffect(() => {
+    if (!canAnimate) {
+      setCount(target);
+      return;
+    }
+
+    const run = () => {
+      if (started.current) return;
+      started.current = true;
+      const start = performance.now();
+      const step = (now: number) => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setCount(Math.floor(eased * target));
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !started.current) {
-          started.current = true;
-          const start = performance.now();
-          const step = (now: number) => {
-            const progress = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            setCount(Math.floor(eased * target));
-            if (progress < 1) requestAnimationFrame(step);
-          };
-          requestAnimationFrame(step);
-        }
+        if (entry.isIntersecting) run();
       },
       { threshold: 0.3 },
     );
     if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [target, duration]);
+
+    const failsafe = window.setTimeout(() => {
+      if (!started.current) {
+        started.current = true;
+        setCount(target);
+      }
+    }, COUNTER_FAILSAFE_MS);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(failsafe);
+    };
+  }, [target, duration, canAnimate]);
 
   return { count, ref };
 }
@@ -412,7 +460,7 @@ export default function Index() {
             <Link to="/pricing" className="transition hover:text-zinc-300">
               {t('landing.footer.pricing')}
             </Link>
-            <Link to="/register" className="transition hover:text-zinc-300">
+            <Link to="/contact" className="transition hover:text-zinc-300">
               {t('landing.footer.contact')}
             </Link>
             <Link to="/privacy" className="transition hover:text-zinc-300">

@@ -60,6 +60,7 @@ import PricingPage from './pages/PricingPage';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import DsaContact from './pages/DsaContact';
+import Contact from './pages/Contact';
 
 // BUG-002: Blog connected to router. Lazy-loaded for better bundle splitting.
 // Public routes (no auth) for SEO. Prerendered at build time via vite-prerender.
@@ -356,6 +357,7 @@ const AppRoutes = () => {
     <Route path="/privacy" element={<Privacy />} />
     <Route path="/terms" element={<Terms />} />
     <Route path="/dsa" element={<DsaContact />} />
+    <Route path="/contact" element={<Contact />} />
     <Route path="*" element={<Navigate to="/dashboard" replace />} />
   </Routes>
   );
