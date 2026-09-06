@@ -335,6 +335,48 @@ test.describe('writers persist canonical metadata only (phase 2)', () => {
   });
 });
 
+test.describe('bucket invariant is consistent across writers and broker', () => {
+  // A file is only reachable if the writer and the broker agree on where it
+  // lives: the broker rejects any object stored outside the expected bucket.
+  test('certifications are written to the certificates bucket by every writer', () => {
+    for (const rel of [
+      'app/frontend/src/components/profile/CertificationsSection.tsx',
+      'app/frontend/src/components/certifications/CertificationDialog.tsx',
+    ]) {
+      const source = read(rel);
+      expect(source, rel).toContain('const bucketName = STORAGE_BUCKETS.certificates;');
+      expect(source, rel).not.toContain('const bucketName = STORAGE_BUCKETS.workerDocuments;');
+    }
+  });
+
+  test('documents are written to the worker-documents bucket', () => {
+    const source = read('app/frontend/src/components/profile/DocumentsSection.tsx');
+    expect(source).toContain('const bucketName = STORAGE_BUCKETS.workerDocuments;');
+  });
+
+  test('CVs are written to the certificates bucket', () => {
+    const source = read('app/frontend/src/components/profile/CVUploadSection.tsx');
+    expect(source).toContain('const bucketName = STORAGE_BUCKETS.certificates;');
+  });
+
+  test('reader fallbacks assume the same bucket the writer used', () => {
+    for (const rel of [
+      'app/frontend/src/components/profile/CertificationsSection.tsx',
+      'app/frontend/src/components/certifications/CertificationDialog.tsx',
+      'app/frontend/src/components/certifications/CertificationList.tsx',
+    ]) {
+      expect(read(rel), rel).not.toContain('|| STORAGE_BUCKETS.workerDocuments');
+    }
+  });
+
+  test('the broker expects certifications in the certificates bucket', () => {
+    const source = read('supabase/functions/secure-file-access/index.ts');
+    expect(source).toContain('certification: "app_14da0f1941_certificates"');
+    expect(source).toContain('document: "worker-documents"');
+    expect(source).toContain('cv: "app_14da0f1941_certificates"');
+  });
+});
+
 test.describe('no reader opens a raw public URL', () => {
   const READERS = [
     CANDIDATE_PROFILE,

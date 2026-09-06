@@ -77,7 +77,7 @@ export function CertificationList() {
    * short-lived signed URL first.
    */
   const openCertificateFile = async (cert: Certification) => {
-    const bucket = cert.storage_bucket || STORAGE_BUCKETS.workerDocuments;
+    const bucket = cert.storage_bucket || STORAGE_BUCKETS.certificates;
     const sourceRef = cert.storage_path || cert.file_url || cert.certificate_file_url;
     if (!sourceRef) return;
     const url = await getSecureFileUrl(bucket, sourceRef);

@@ -40,10 +40,19 @@ interface FileRecord {
   visibleToCompany: boolean;
 }
 
+/**
+ * Canonical bucket per file type. The broker refuses to sign anything stored
+ * elsewhere, so this table has to agree with what the writers produce.
+ *
+ * Certificates and CVs live in the certificates bucket; worker-documents is
+ * reserved for documents. Historical documents still sit in the certificates
+ * bucket and are rejected here until they are relocated -- that relocation is
+ * acceptance criterion #11.
+ */
 const EXPECTED_BUCKETS: Record<string, string> = {
   cv: "app_14da0f1941_certificates",
   document: "worker-documents",
-  certification: "worker-documents",
+  certification: "app_14da0f1941_certificates",
 };
 
 function errorResponse(status: number, message: string) {

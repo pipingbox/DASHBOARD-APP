@@ -87,7 +87,7 @@ export function CertificationDialog({
 
   /** Never open the stored object through a public URL. */
   const openUploadedFile = async () => {
-    const bucket = storageBucket || STORAGE_BUCKETS.workerDocuments;
+    const bucket = storageBucket || STORAGE_BUCKETS.certificates;
     const sourceRef = storagePath || fileUrl;
     if (!sourceRef) return;
     const url = await getSecureFileUrl(bucket, sourceRef);

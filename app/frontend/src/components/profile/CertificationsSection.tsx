@@ -257,7 +257,9 @@ export function CertificationsSection() {
 
     try {
       const filePath = `${user.id}/cert-${Date.now()}.${ext || 'pdf'}`;
-      const bucketName = STORAGE_BUCKETS.workerDocuments;
+      // PB-STORAGE-SECURITY-001: certificates live in the certificates bucket.
+      // worker-documents is reserved for documents.
+      const bucketName = STORAGE_BUCKETS.certificates;
 
       console.log('[CertUpload] Upload config:', {
         bucket: bucketName,
@@ -654,7 +656,7 @@ export function CertificationsSection() {
                         rel="noreferrer"
                         title={t('workerProfile.certifications.viewFile')}
                         onClick={async (e) => {
-                          const bucket = cert.storage_bucket || STORAGE_BUCKETS.workerDocuments;
+                          const bucket = cert.storage_bucket || STORAGE_BUCKETS.certificates;
                           // Canonical path first; legacy URL only for records not yet migrated.
                           const sourceRef = cert.storage_path || cert.file_url || cert.certificate_file_url;
                           if (!sourceRef) {
