@@ -29,22 +29,53 @@ import {
 
 // P0 credibility: these figures must be correct the instant the DOM exists.
 //
-// The four numbers sit directly above the line "Live data - no fabricated
-// numbers", which makes them the one place on this page where being wrong is
-// most expensive. They used to count up from zero on IntersectionObserver
-// intersect, so until the reader scrolled, the DOM read "0 Technical drawings".
-// Anything that reads the page early - a link unfurl, a mail security gateway
-// following the URL in an outreach email, a prerender or snapshot, a screen
-// reader - saw four zeros presented as verified figures, understating real data.
+// They sit directly above the line "Live data - no fabricated numbers", which
+// makes them the one place on this page where being wrong is most expensive.
+// They used to count up from zero on IntersectionObserver intersect, so until
+// the reader scrolled, the DOM read "0 Technical drawings". Anything reading the
+// page early - a link unfurl, a mail security gateway following the URL in an
+// outreach email, a prerender, a screen reader - saw four zeros presented as
+// verified figures, understating figures that are real.
 //
 // A count-up cannot both express the value and be honest at t=0, so the count-up
-// is gone. There is no reveal animation either: an initial opacity-0 would trade
-// a wrong number for an absent one, which is no better for a snapshot. The
-// figures simply render, immediately and always.
+// is gone. No reveal animation replaces it: an initial opacity-0 would trade a
+// wrong number for an absent one, which is no better for a snapshot. The figures
+// simply render, immediately and always.
+
+interface RealMetric {
+  labelKey: string;
+  value: number;
+}
+
+// Landing proof points.
 //
-// The values are not computed here and must not be edited by hand: drawings,
-// dimensionRows and standards come from `catalogStats` (catalog.generated.json,
-// emitted at build time); tools comes from IMPLEMENTED_TOOLS below.
+// These deliberately measure the DEPTH OF THE TECHNICAL LIBRARY, not how many
+// people have signed up. On a young platform a user count is both weak and
+// self-defeating: "47 professionals" invites the reader to conclude we are
+// empty. The library is the opposite — it is genuinely large, and it is the
+// thing a piping professional actually came to evaluate.
+//
+// Every figure below is derived, never typed by hand:
+//   - drawings / dimensionRows / standards come from `catalogStats`, emitted by
+//     scripts/build-catalog.mjs from the Brain YAML at build time.
+//   - IMPLEMENTED_TOOLS counts only tools with `implemented: true` in Tools.tsx.
+//     The previous value (12) counted two tools that do not exist yet.
+//
+// See CHANGELOG v4.81.0: no metric ships without a source.
+const IMPLEMENTED_TOOLS = 10;
+
+// Labels are keys, not text: the counters sit on the public landing and have to
+// read in all seven languages like everything around them.
+function useRealMetrics() {
+  const metrics: RealMetric[] = [
+    { labelKey: 'landing.stats.drawings', value: catalogStats.drawings },
+    { labelKey: 'landing.stats.dimensionRows', value: catalogStats.dimensionRows },
+    { labelKey: 'landing.stats.standards', value: catalogStats.standards },
+    { labelKey: 'landing.stats.tools', value: IMPLEMENTED_TOOLS },
+  ];
+  return { metrics, loading: false };
+}
+
 function StatFigure({ metric }: { metric: RealMetric }) {
   const { t } = useTranslation();
   return (
