@@ -16,6 +16,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Loader2, FileText, Upload, RefreshCw } from 'lucide-react';
 import type { Certification } from '@/lib/certifications';
+import { getSecureFileUrl } from '@/lib/storageHelpers';
+import { hasStoredRecordFile } from '@/lib/filePresence';
 
 interface CertificationDialogProps {
   open: boolean;
@@ -44,7 +46,10 @@ export function CertificationDialog({
   const [verificationUrl, setVerificationUrl] = useState('');
   const [issueDate, setIssueDate] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
-  const [fileUrl, setFileUrl] = useState('');
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  // PB-STORAGE-SECURITY-001: canonical location of the uploaded certificate.
+  const [storageBucket, setStorageBucket] = useState<string | null>(null);
+  const [storagePath, setStoragePath] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -57,11 +62,15 @@ export function CertificationDialog({
         // For renew mode, clear dates so user enters new ones
         setIssueDate('');
         setExpiryDate('');
-        setFileUrl('');
+        setFileUrl(null);
+        setStorageBucket(null);
+        setStoragePath(null);
       } else {
         setIssueDate(editing.issue_date ?? '');
         setExpiryDate(editing.expiry_date ?? '');
-        setFileUrl(editing.file_url ?? '');
+        setFileUrl(editing.file_url ?? editing.certificate_file_url ?? null);
+        setStorageBucket(editing.storage_bucket ?? null);
+        setStoragePath(editing.storage_path ?? null);
       }
     } else {
       setName('');
@@ -70,9 +79,24 @@ export function CertificationDialog({
       setVerificationUrl('');
       setIssueDate('');
       setExpiryDate('');
-      setFileUrl('');
+      setFileUrl(null);
+      setStorageBucket(null);
+      setStoragePath(null);
     }
   }, [open, editing, renewMode]);
+
+  /** Never open the stored object through a public URL. */
+  const openUploadedFile = async () => {
+    const bucket = storageBucket || STORAGE_BUCKETS.certificates;
+    const sourceRef = storagePath || fileUrl;
+    if (!sourceRef) return;
+    const url = await getSecureFileUrl(bucket, sourceRef);
+    if (!url) {
+      toast.error(t('profile.certificationDialog.viewFileDenied', { defaultValue: 'Access denied' }));
+      return;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
 
   const handleFileUpload = async (file: File) => {
     if (!user) return;
@@ -110,12 +134,10 @@ export function CertificationDialog({
 
     console.log('[CertificationDialog] Upload success:', { bucket: bucketName, path });
 
-    const { data } = supabase.storage
-      .from(bucketName)
-      .getPublicUrl(path);
-
-    console.log('[CertificationDialog] Public URL:', data.publicUrl);
-    setFileUrl(data.publicUrl);
+    // PB-STORAGE-SECURITY-001 phase 2: persist the canonical location only.
+    setFileUrl(null);
+    setStorageBucket(bucketName);
+    setStoragePath(path);
     setUploading(false);
     toast.success(t('profile.certificationDialog.fileUploaded'));
   };
@@ -150,6 +172,8 @@ export function CertificationDialog({
       qr_code_url: qrDataUrl,
       file_url: fileUrl || null,
       certificate_file_url: fileUrl || null,
+      storage_bucket: storageBucket,
+      storage_path: storagePath,
       issue_date: issueDate || null,
       expiry_date: expiryDate || null,
       expiration_date: expiryDate || null,
@@ -306,22 +330,25 @@ export function CertificationDialog({
             >
               {t('profile.certificationDialog.certificateFile')}
             </Label>
-            {fileUrl ? (
+            {hasStoredRecordFile({
+              storage_bucket: storageBucket,
+              storage_path: storagePath,
+              file_url: fileUrl,
+            }) ? (
               <div className="flex items-center justify-between border border-zinc-800 bg-zinc-950 p-3">
                 <div className="flex items-center gap-2 text-sm text-zinc-300">
                   <FileText className="h-4 w-4 text-[#f59e0b]" />
-                  <a
-                    href={fileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline"
-                  >
+                  <button type="button" onClick={openUploadedFile} className="underline">
                     {t('profile.certificationDialog.viewFile')}
-                  </a>
+                  </button>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setFileUrl('')}
+                  onClick={() => {
+                    setFileUrl(null);
+                    setStorageBucket(null);
+                    setStoragePath(null);
+                  }}
                   className="text-xs uppercase tracking-wider text-zinc-500 hover:text-red-400"
                 >
                   {t('profile.certificationDialog.replace')}

@@ -23,6 +23,23 @@ const corsHeaders = {
  *   Certification:  10%
  *   Documents:       5%
  */
+/**
+ * Whether the profile has a CV, for completion scoring.
+ *
+ * PB-STORAGE-SECURITY-001: the canonical location is cv_storage_bucket +
+ * cv_storage_path. `cv_file_url` used to be the only signal, so once writers stop
+ * emitting public URLs every newly uploaded CV would silently lose these 15
+ * points, dragging profile_completion, marketplace_ready and matching with it.
+ *
+ * `cv_url` is a separate, user-supplied external link and still counts.
+ *
+ * The legacy URL stays as a fallback until historical records are backfilled.
+ */
+function hasCv(profile: any): boolean {
+  const hasCanonicalCv = Boolean(profile.cv_storage_bucket && profile.cv_storage_path);
+  return hasCanonicalCv || Boolean(profile.cv_file_url) || Boolean(profile.cv_url);
+}
+
 function calculateCompletion(profile: any, expCount: number, certCount: number, docCount: number): number {
   let score = 0;
   if (profile.avatar_url && profile.avatar_url.trim().length > 0) score += 10;
@@ -33,7 +50,7 @@ function calculateCompletion(profile: any, expCount: number, certCount: number, 
   if (profile.years_experience && profile.years_experience > 0) score += 5;
   if (profile.skills && Array.isArray(profile.skills) && profile.skills.length > 0) score += 10;
   if (profile.bio && profile.bio.trim().length > 10) score += 10;
-  if (profile.cv_file_url || profile.cv_url) score += 15;
+  if (hasCv(profile)) score += 15;
   if (expCount > 0) score += 15;
   if (certCount > 0) score += 10;
   if (docCount > 0) score += 5;
@@ -147,7 +164,7 @@ Deno.serve(async (req) => {
     }
 
     // Fetch profiles
-    let profilesQuery = `${supabaseUrl}/rest/v1/app_14da0f1941_profiles?select=id,user_id,full_name,title,company,location,years_experience,skills,bio,avatar_url,cv_file_url,cv_url,profile_visibility,cv_visible`;
+    let profilesQuery = `${supabaseUrl}/rest/v1/app_14da0f1941_profiles?select=id,user_id,full_name,title,company,location,years_experience,skills,bio,avatar_url,cv_storage_bucket,cv_storage_path,cv_file_url,cv_url,profile_visibility,cv_visible`;
     if (targetUserId) {
       profilesQuery += `&user_id=eq.${targetUserId}`;
     } else {

@@ -43,6 +43,7 @@ import { syncCertificationReminders, deleteCertificationReminders } from '@/lib/
 import { uploadWithTimeout, resolveFileMime } from '@/lib/uploadHelpers';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { getSecureFileUrl, deleteStorageObject, extractStoragePathAndBucket } from '@/lib/storageHelpers';
+import { hasStoredRecordFile } from '@/lib/filePresence';
 
 export function CertificationsSection() {
   const { t } = useTranslation();
@@ -69,7 +70,7 @@ export function CertificationsSection() {
   const [issueDate, setIssueDate] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [credentialId, setCredentialId] = useState('');
-  const [fileUrl, setFileUrl] = useState('');
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [storageBucket, setStorageBucket] = useState<string | null>(null);
   const [storagePath, setStoragePath] = useState<string | null>(null);
   const [fileName, setFileName] = useState('');
@@ -162,7 +163,7 @@ export function CertificationsSection() {
     setIssueDate('');
     setExpiryDate('');
     setCredentialId('');
-    setFileUrl('');
+    setFileUrl(null);
     setStorageBucket(null);
     setStoragePath(null);
     setFileName('');
@@ -183,7 +184,7 @@ export function CertificationsSection() {
     setIssueDate(cert.issue_date ?? '');
     setExpiryDate(cert.expiry_date ?? '');
     setCredentialId(cert.credential_id ?? '');
-    setFileUrl(cert.file_url ?? '');
+    setFileUrl(cert.file_url ?? cert.certificate_file_url ?? null);
     setStorageBucket(cert.storage_bucket ?? null);
     setStoragePath(cert.storage_path ?? null);
     setFileName(cert.file_name ?? '');
@@ -256,7 +257,9 @@ export function CertificationsSection() {
 
     try {
       const filePath = `${user.id}/cert-${Date.now()}.${ext || 'pdf'}`;
-      const bucketName = STORAGE_BUCKETS.workerDocuments;
+      // PB-STORAGE-SECURITY-001: certificates live in the certificates bucket.
+      // worker-documents is reserved for documents.
+      const bucketName = STORAGE_BUCKETS.certificates;
 
       console.log('[CertUpload] Upload config:', {
         bucket: bucketName,
@@ -286,14 +289,10 @@ export function CertificationsSection() {
       }
 
       setUploadProgress(100);
-      console.log('[CertUpload] Upload success, getting public URL');
+      console.log('[CertUpload] Upload success:', { bucket: bucketName, path: filePath });
 
-      const { data: urlData } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(filePath);
-
-      console.log('[CertUpload] Public URL:', urlData.publicUrl);
-      setFileUrl(urlData.publicUrl);
+      // PB-STORAGE-SECURITY-001 phase 2: persist the canonical location only.
+      setFileUrl(null);
       setStorageBucket(bucketName);
       setStoragePath(filePath);
       setFileName(file.name);
@@ -367,14 +366,20 @@ export function CertificationsSection() {
         }
 
         // PB-STORAGE-SECURITY-001: if the file changed, delete the previous object.
-        const oldUrl = editing.file_url;
+        // Gating this on the legacy URL would leak an orphan per replacement once
+        // writers stop emitting one, so the canonical path decides.
+        const oldUrl = editing.file_url || editing.certificate_file_url || null;
         const oldBucket = editing.storage_bucket;
         const oldPath = editing.storage_path;
-        const newUrl = fileUrl;
-        if (oldUrl && oldUrl !== newUrl) {
+        const hadPreviousFile = hasStoredRecordFile(editing);
+        const fileChanged =
+          oldBucket && oldPath
+            ? oldBucket !== storageBucket || oldPath !== storagePath
+            : oldUrl !== fileUrl;
+        if (hadPreviousFile && fileChanged) {
           if (oldBucket && oldPath) {
             await deleteStorageObject(oldBucket, oldPath);
-          } else {
+          } else if (oldUrl) {
             const extracted = extractStoragePathAndBucket(oldUrl);
             if (extracted.bucket && extracted.path) {
               await deleteStorageObject(extracted.bucket, extracted.path);
@@ -644,15 +649,21 @@ export function CertificationsSection() {
                     )}
                   </div>
                   <div className="flex gap-1">
-                    {cert.file_url && (
+                    {hasStoredRecordFile(cert) && (
                       <a
                         href={cert.storageUrl || '#'}
                         target="_blank"
                         rel="noreferrer"
                         title={t('workerProfile.certifications.viewFile')}
                         onClick={async (e) => {
-                          const bucket = cert.storage_bucket || STORAGE_BUCKETS.workerDocuments;
-                          const url = await getSecureFileUrl(bucket, cert.file_url);
+                          const bucket = cert.storage_bucket || STORAGE_BUCKETS.certificates;
+                          // Canonical path first; legacy URL only for records not yet migrated.
+                          const sourceRef = cert.storage_path || cert.file_url || cert.certificate_file_url;
+                          if (!sourceRef) {
+                            e.preventDefault();
+                            return;
+                          }
+                          const url = await getSecureFileUrl(bucket, sourceRef);
                           if (url) {
                             setItems((prev) =>
                               prev.map((i) =>
@@ -855,7 +866,7 @@ export function CertificationsSection() {
               <Label className="text-xs uppercase tracking-wider text-zinc-400">
                 {t('workerProfile.certifications.file')}
               </Label>
-              {fileUrl ? (
+              {storagePath ? (
                 <div className="flex items-center justify-between border border-zinc-800 bg-zinc-950 p-3">
                   <div className="flex items-center gap-2 text-sm text-zinc-300">
                     <FileText className="h-4 w-4 text-[#f59e0b]" />
@@ -871,7 +882,7 @@ export function CertificationsSection() {
                         }
                       }
                       // Edit mode: just clear state; the old object is deleted on save if confirmed.
-                      setFileUrl('');
+                      setFileUrl(null);
                       setStorageBucket(null);
                       setStoragePath(null);
                       setFileName('');

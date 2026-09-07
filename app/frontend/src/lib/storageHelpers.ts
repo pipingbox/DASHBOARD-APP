@@ -116,3 +116,6 @@ export function extractStoragePath(urlOrPath: string): string | null {
   const { path } = extractStoragePathAndBucket(urlOrPath);
   return path;
 }
+
+/* PB-STORAGE-SECURITY-001 — presence helpers live in a dependency-free module. */
+export { hasStoredFile, hasStoredCv, hasStoredRecordFile } from '@/lib/filePresence';

@@ -1,3 +1,5 @@
+import { hasStoredCv } from './filePresence';
+
 /**
  * Centralized Profile Completion Engine
  *
@@ -90,6 +92,9 @@ export interface ProfileCompletionInput {
   bio?: string | null;
   cv_file_url?: string | null;
   cv_url?: string | null;
+  /** PB-STORAGE-SECURITY-001: canonical CV location. */
+  cv_storage_bucket?: string | null;
+  cv_storage_path?: string | null;
 
   /** Related record counts (from joined tables) */
   experience_count?: number;
@@ -167,7 +172,7 @@ export function calculateProfileCompletion(input: ProfileCompletionInput): Profi
     {
       key: 'cv',
       weight: COMPLETION_WEIGHTS.cv,
-      completed: !!(input.cv_file_url || input.cv_url),
+      completed: hasStoredCv(input) || !!input.cv_url,
     },
     {
       key: 'experience',

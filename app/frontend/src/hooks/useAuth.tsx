@@ -24,6 +24,9 @@ export interface Profile {
   cv_url: string | null;
   cv_file_url: string | null;
   cv_file_name: string | null;
+  // PB-STORAGE-SECURITY-001: canonical CV location; cv_file_url is the legacy fallback.
+  cv_storage_bucket: string | null;
+  cv_storage_path: string | null;
   cv_visible: boolean;
   show_avatar: boolean;
   profile_completion: number;
@@ -182,6 +185,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             cv_url: null,
             cv_file_url: null,
             cv_file_name: null,
+            cv_storage_bucket: null,
+            cv_storage_path: null,
             cv_visible: false,
             show_avatar: true,
             profile_completion: 100,
@@ -349,6 +354,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               cv_url: null,
               cv_file_url: null,
               cv_file_name: null,
+              cv_storage_bucket: null,
+              cv_storage_path: null,
               cv_visible: false,
               show_avatar: true,
               profile_completion: 10,
@@ -417,6 +424,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           cv_url: null,
           cv_file_url: null,
           cv_file_name: null,
+          cv_storage_bucket: null,
+          cv_storage_path: null,
           cv_visible: false,
           show_avatar: true,
           profile_completion: 100,
@@ -447,6 +456,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           cv_url: null,
           cv_file_url: null,
           cv_file_name: null,
+          cv_storage_bucket: null,
+          cv_storage_path: null,
           cv_visible: false,
           show_avatar: true,
           profile_completion: 10,

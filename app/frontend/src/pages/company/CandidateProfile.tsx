@@ -28,7 +28,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
-import { getBrokerSignedUrl } from '@/lib/storageHelpers';
+import { getBrokerSignedUrl, hasStoredCv, hasStoredRecordFile } from '@/lib/storageHelpers';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminPreview } from '@/contexts/AdminPreviewContext';
 import { Button } from '@/components/ui/button';
@@ -70,6 +70,10 @@ interface CandidateProfileData {
   cv_url: string | null;
   cv_file_url: string | null;
   cv_file_name: string | null;
+  // PB-STORAGE-SECURITY-001: canonical location. Presence is derived from these,
+  // with cv_file_url kept only as a fallback for records not yet migrated.
+  cv_storage_bucket: string | null;
+  cv_storage_path: string | null;
   cv_visible: boolean;
   created_at: string;
   show_avatar: boolean;
@@ -377,6 +381,8 @@ export default function CandidateProfile() {
         cv_url: null,
         cv_file_url: null,
         cv_file_name: null,
+        cv_storage_bucket: null,
+        cv_storage_path: null,
         cv_visible: true,
         created_at: (firstApp.created_at as string) || new Date().toISOString(),
         show_avatar: false,
@@ -495,7 +501,7 @@ export default function CandidateProfile() {
   };
 
   const handlePreviewCV = async () => {
-    if (!profile?.cv_file_url) return;
+    if (!hasStoredCv(profile)) return;
     const signedUrl = await getViewerSignedUrlForCV();
     if (!signedUrl) {
       toast.error('Failed to generate CV preview link');
@@ -520,7 +526,7 @@ export default function CandidateProfile() {
   };
 
   const handleCertFileDownload = async (cert: WorkerCertification) => {
-    if (!cert.file_url) return;
+    if (!hasStoredRecordFile(cert)) return;
     const signedUrl = await getViewerSignedUrlForCert(cert);
     if (signedUrl) {
       window.open(signedUrl, '_blank');
@@ -530,7 +536,7 @@ export default function CandidateProfile() {
   };
 
   const handleCertPreview = async (cert: WorkerCertification) => {
-    if (!cert.file_url) return;
+    if (!hasStoredRecordFile(cert)) return;
     const signedUrl = await getViewerSignedUrlForCert(cert);
     if (!signedUrl) {
       toast.error('Failed to generate preview link');
@@ -547,7 +553,7 @@ export default function CandidateProfile() {
   };
 
   const handleDocumentDownload = async (doc: WorkerDocument) => {
-    if (!doc.file_url) return;
+    if (!hasStoredRecordFile(doc)) return;
     const signedUrl = await getViewerSignedUrlForDocument(doc);
     if (signedUrl) {
       window.open(signedUrl, '_blank');
@@ -557,7 +563,7 @@ export default function CandidateProfile() {
   };
 
   const handleDocumentPreview = async (doc: WorkerDocument) => {
-    if (!doc.file_url) return;
+    if (!hasStoredRecordFile(doc)) return;
     const signedUrl = await getViewerSignedUrlForDocument(doc);
     if (!signedUrl) {
       toast.error('Failed to generate preview link');
@@ -631,7 +637,8 @@ export default function CandidateProfile() {
     );
   }
 
-  const showCV = profile.cv_file_url && (isAdminViewer || profile.cv_visible);
+  const candidateHasCv = hasStoredCv(profile);
+  const showCV = candidateHasCv && (isAdminViewer || profile.cv_visible);
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
@@ -787,7 +794,7 @@ export default function CandidateProfile() {
             </button>
             <span className="text-xs text-zinc-500 ml-1">{profile.cv_file_name || ''}</span>
           </div>
-        ) : !profile.cv_file_url ? (
+        ) : !candidateHasCv ? (
           <p className="flex items-center gap-2 text-xs text-zinc-500">
             <FileText className="h-3.5 w-3.5" />
             No CV uploaded yet.
@@ -878,7 +885,7 @@ export default function CandidateProfile() {
           <div className="space-y-3">
             {documents.map((cert) => {
               const certExpiry = cert.expiry_date || cert.expiration_date || null;
-              const certFileUrl = cert.file_url || cert.certificate_file_url || null;
+              const certHasFile = hasStoredRecordFile(cert);
               return (
                 <div key={cert.id} className="border border-zinc-800 bg-zinc-950 p-4">
                   <div className="flex items-start justify-between gap-3">
@@ -928,11 +935,11 @@ export default function CandidateProfile() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      {certFileUrl && (
+                      {certHasFile && (
                         <>
                           <button
                             type="button"
-                            onClick={() => handleCertPreview({ ...cert, file_url: certFileUrl })}
+                            onClick={() => handleCertPreview(cert)}
                             className="inline-flex items-center gap-1 text-xs text-[#f59e0b] hover:text-[#d97706] border border-[#f59e0b]/30 px-2 py-1 hover:bg-[#f59e0b]/10"
                             title="Ver certificado"
                           >
@@ -941,7 +948,7 @@ export default function CandidateProfile() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleCertFileDownload({ ...cert, file_url: certFileUrl })}
+                            onClick={() => handleCertFileDownload(cert)}
                             className="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-700 px-2 py-1 hover:bg-zinc-800"
                             title="Descargar certificado"
                           >
@@ -1006,7 +1013,7 @@ export default function CandidateProfile() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      {doc.file_url && (
+                      {hasStoredRecordFile(doc) && (
                         <>
                           <button
                             type="button"
@@ -1080,7 +1087,7 @@ export default function CandidateProfile() {
         </div>
 
         {/* Legacy CV Link */}
-        {profile.cv_url && !profile.cv_file_url && (
+        {profile.cv_url && !candidateHasCv && (
           <div className="pt-3 border-t border-zinc-800">
             <a
               href={profile.cv_url}

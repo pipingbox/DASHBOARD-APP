@@ -104,7 +104,7 @@ export function DocumentsSection() {
   // Form state
   const [documentType, setDocumentType] = useState<string>('other');
   const [fileName, setFileName] = useState('');
-  const [fileUrl, setFileUrl] = useState('');
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [storageBucket, setStorageBucket] = useState<string | null>(null);
   const [storagePath, setStoragePath] = useState<string | null>(null);
   const [fileSize, setFileSize] = useState<number | null>(null);
@@ -143,7 +143,7 @@ export function DocumentsSection() {
   const resetForm = () => {
     setDocumentType('other');
     setFileName('');
-    setFileUrl('');
+    setFileUrl(null);
     setStorageBucket(null);
     setStoragePath(null);
     setFileSize(null);
@@ -228,12 +228,8 @@ export function DocumentsSection() {
 
       console.log('[DocumentsSection] Upload success:', { bucket: bucketName, path });
 
-      const { data } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(path);
-
-      console.log('[DocumentsSection] Public URL:', data.publicUrl);
-      setFileUrl(data.publicUrl);
+      // PB-STORAGE-SECURITY-001 phase 2: persist the canonical location only.
+      setFileUrl(null);
       setStorageBucket(bucketName);
       setStoragePath(path);
       setFileName(file.name);
@@ -253,7 +249,7 @@ export function DocumentsSection() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    if (!fileUrl) {
+    if (!storagePath) {
       toast.error(t('workerProfile.documents.fileRequired', { defaultValue: 'Please upload a file first' }));
       return;
     }
@@ -280,7 +276,7 @@ export function DocumentsSection() {
         document_type: documentType,
         document_category: derivedCategory,
         file_name: fileName || 'document',
-        file_url: fileUrl,
+        file_url: fileUrl,  // null for new uploads; legacy rows keep theirs
         storage_bucket: storageBucket,
         storage_path: storagePath,
         file_size: fileSize,
@@ -432,9 +428,13 @@ export function DocumentsSection() {
                       rel="noreferrer"
                       onClick={async (e) => {
                         const bucket = doc.storage_bucket || STORAGE_BUCKETS.workerDocuments;
-                        const sourceUrl = doc.file_url;
-                        if (!sourceUrl) return;
-                        const url = await getSecureFileUrl(bucket, sourceUrl);
+                        // Canonical path first; legacy URL only for records not yet migrated.
+                        const sourceRef = doc.storage_path || doc.file_url;
+                        if (!sourceRef) {
+                          e.preventDefault();
+                          return;
+                        }
+                        const url = await getSecureFileUrl(bucket, sourceRef);
                         if (url) {
                           setItems((prev) =>
                             prev.map((i) =>
@@ -502,7 +502,7 @@ export function DocumentsSection() {
               <Label className="text-xs uppercase tracking-wider text-zinc-400">
                 {t('workerProfile.documents.file', { defaultValue: 'File' })} *
               </Label>
-              {fileUrl ? (
+              {storagePath ? (
                 <div className="flex items-center justify-between border border-zinc-800 bg-zinc-950 p-3">
                   <div className="flex items-center gap-2 text-sm text-zinc-300">
                     {getMimeIcon(mimeType)}
@@ -518,7 +518,7 @@ export function DocumentsSection() {
                       if (storageBucket && storagePath) {
                         await deleteStorageObject(storageBucket, storagePath);
                       }
-                      setFileUrl('');
+                      setFileUrl(null);
                       setStorageBucket(null);
                       setStoragePath(null);
                       setFileName('');
@@ -617,7 +617,7 @@ export function DocumentsSection() {
               </Button>
               <Button
                 type="submit"
-                disabled={saving || uploading || !fileUrl}
+                disabled={saving || uploading || !storagePath}
                 className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
               >
                 {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}

@@ -1,6 +1,7 @@
 import { supabase, TABLES } from '@/lib/supabase';
 import { notifyReferralJoined, notifyReferralVerified } from '@/lib/notifications';
 import { edgeFunctionUrl } from '@/lib/supabase';
+import { hasStoredCv } from '@/lib/filePresence';
 
 async function callReferralsApply(referredId: string, referrerId: string): Promise<boolean> {
   try {
@@ -192,14 +193,14 @@ export async function shouldShowReferralWidget(userId: string): Promise<boolean>
     // Check profile completeness (has full_name, title, skills)
     const { data: profile } = await supabase
       .from(TABLES.profiles)
-      .select('full_name, title, skills, cv_url, cv_file_url')
+      .select('full_name, title, skills, cv_url, cv_file_url, cv_storage_bucket, cv_storage_path')
       .eq('user_id', userId)
       .single();
 
     if (!profile) return false;
 
     const hasProfile = !!(profile.full_name && profile.title);
-    const hasCV = !!(profile.cv_url || profile.cv_file_url);
+    const hasCV = hasStoredCv(profile) || !!profile.cv_url;
     const hasSkills = !!(profile.skills && (profile.skills as string[]).length > 0);
 
     // Check tool usage

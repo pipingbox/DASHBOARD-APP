@@ -40,10 +40,25 @@ interface FileRecord {
   visibleToCompany: boolean;
 }
 
-const EXPECTED_BUCKETS: Record<string, string> = {
-  cv: "app_14da0f1941_certificates",
-  document: "worker-documents",
-  certification: "worker-documents",
+/**
+ * Buckets accepted per file type. This is a defense-in-depth control, not the
+ * primary one: an object is only signed after ownership, owner namespace,
+ * visibility and relationship checks all pass. The allowlist exists so a
+ * tampered `storage_bucket` cannot point the broker at an unrelated bucket.
+ *
+ * Documents accept two buckets by design. worker-documents is canonical and is
+ * where every new document is written; app_14da0f1941_certificates is a
+ * documented compatibility exception for the 16 historical documents that
+ * predate the split. They are not relocated: moving them would require either
+ * writing to storage.objects by hand or impersonating their owners, and both
+ * were rejected. See acceptance criterion #11.
+ *
+ * Never widen this to an arbitrary bucket.
+ */
+const ALLOWED_BUCKETS: Record<string, readonly string[]> = {
+  cv: ["app_14da0f1941_certificates"],
+  certification: ["app_14da0f1941_certificates"],
+  document: ["worker-documents", "app_14da0f1941_certificates"],
 };
 
 function errorResponse(status: number, message: string) {
@@ -162,8 +177,8 @@ Deno.serve(async (req) => {
   }
 
   // Bucket allowlist and owner-namespace check before calling the backend RPC.
-  const expectedBucket = EXPECTED_BUCKETS[file_type];
-  if (!expectedBucket || fileRecord.bucket !== expectedBucket) {
+  const allowedBuckets = ALLOWED_BUCKETS[file_type];
+  if (!allowedBuckets || !allowedBuckets.includes(fileRecord.bucket)) {
     return errorResponse(403, "Bucket not allowed for file type");
   }
   if (!fileRecord.path.startsWith(`${owner_user_id}/`)) {

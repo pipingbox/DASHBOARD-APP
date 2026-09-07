@@ -21,6 +21,7 @@ import {
 } from '@/lib/fileUploadUtils';
 import { uploadWithTimeout } from '@/lib/uploadHelpers';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
+import { hasStoredCv } from '@/lib/filePresence';
 import {
   getSecureFileUrl,
   extractStoragePathAndBucket,
@@ -38,6 +39,11 @@ export function CVUploadSection() {
   const [cvSignedUrl, setCvSignedUrl] = useState<string | null>(null);
 
   const cvFileUrl = profile?.cv_file_url as string | null;
+  const cvStorageBucket = profile?.cv_storage_bucket as string | null;
+  const cvStoragePath = profile?.cv_storage_path as string | null;
+  // PB-STORAGE-SECURITY-001: presence comes from canonical metadata, with the
+  // legacy URL as fallback. Reading cv_file_url alone would hide new uploads.
+  const hasCv = hasStoredCv(profile);
   const cvFileName = profile?.cv_file_name as string | null;
   const cvVisible = (profile?.cv_visible as boolean) ?? true;
 
@@ -45,18 +51,20 @@ export function CVUploadSection() {
   useEffect(() => {
     let cancelled = false;
     setCvSignedUrl(null);
-    if (!cvFileUrl) return;
+    if (!hasCv) return;
+    const pathOrUrl = cvStoragePath || cvFileUrl;
+    if (!pathOrUrl) return;
     const bucket =
-      (profile?.cv_storage_bucket as string | null) ||
-      extractStoragePathAndBucket(cvFileUrl).bucket ||
+      cvStorageBucket ||
+      (cvFileUrl ? extractStoragePathAndBucket(cvFileUrl).bucket : null) ||
       STORAGE_BUCKETS.certificates;
-    getSecureFileUrl(bucket, cvFileUrl).then((url) => {
+    getSecureFileUrl(bucket, pathOrUrl).then((url) => {
       if (!cancelled) setCvSignedUrl(url);
     });
     return () => {
       cancelled = true;
     };
-  }, [cvFileUrl, profile?.cv_storage_bucket]);
+  }, [hasCv, cvFileUrl, cvStorageBucket, cvStoragePath]);
 
   const handleUpload = async (file: File) => {
     if (!user) return;
@@ -107,18 +115,15 @@ export function CVUploadSection() {
 
     console.log('[CVUploadSection] Upload success:', { bucket: bucketName, path });
 
-    const { data: urlData } = supabase.storage
-      .from(bucketName)
-      .getPublicUrl(path);
-
-    console.log('[CVUploadSection] Public URL:', urlData.publicUrl);
-
     const { data: upsertedData, error: updateError } = await supabase
       .from(TABLES.profiles)
       .upsert(
         {
           user_id: user.id,
-          cv_file_url: urlData.publicUrl,
+          // PB-STORAGE-SECURITY-001 phase 2: the bucket is private, so a public URL
+          // grants nothing and only misrepresents where the file lives. Cleared on
+          // replacement because the previous object has just been deleted.
+          cv_file_url: null,
           cv_storage_bucket: bucketName,
           cv_storage_path: path,
           cv_file_name: file.name,
@@ -155,9 +160,9 @@ export function CVUploadSection() {
     }
 
     console.log('[CVUploadSection] Profile upserted with CV fields:', {
-      cv_file_url: urlData.publicUrl,
+      cv_storage_bucket: bucketName,
+      cv_storage_path: path,
       cv_file_name: file.name,
-      cv_file_path: path,
     });
     setUploadError(null);
     toast.success(t('workerProfile.cv.uploaded'));
@@ -260,7 +265,7 @@ export function CVUploadSection() {
       </div>
 
       <div className="mt-4">
-        {cvFileUrl ? (
+        {hasCv ? (
           <div className="border border-zinc-800 bg-zinc-950 p-4">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
