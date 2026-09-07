@@ -68,6 +68,37 @@ import { useSeo } from '@/hooks/useSeo';
  * DSA procedure. Keeping them apart means the future Belgium -> PipingBox OU
  * migration touches one surface and does not force a rewrite of the DSA logic or
  * a re-review of Article 13. Tracked as MANUAL_ACTIONS #20.
+ *
+ * ---------------------------------------------------------------------------
+ * 2026-09-06 — ARTICLE 13 PUBLIC POSITIONING DELIBERATELY DEFERRED (PO ruling).
+ *
+ * The public "Article 13 — Legal representative: not applicable" section has been
+ * REMOVED. It is not suppressed because Article 13 was judged inapplicable; it is
+ * removed because we cannot yet evidence the premise it rested on.
+ *
+ * That section concluded non-applicability from the sentence "PipingBox is
+ * established in the European Union". Establishment in the Union is not a
+ * marketing phrase here: it is the exact legal condition Article 13 turns on. A
+ * provider WITHOUT an establishment in the Union must designate a legal
+ * representative. So publishing that sentence is publishing a legal conclusion
+ * about ourselves, on the page an authority reads, while the legal operator is
+ * still not formally registered and its establishment cannot be evidenced.
+ *
+ * The 2026-08-31 entry above reasoned that establishment in the Union "holds
+ * under BOTH candidate structures". That reasoning is superseded: it assumed a
+ * registered operator under one of those structures, and no such registration
+ * exists yet. Until it does, the premise is not ours to assert.
+ *
+ * Therefore: say nothing publicly about Article 13. This is a CONSERVATIVE
+ * OMISSION, not a declaration that Article 13 applies and not a claim that it
+ * does not. Do NOT restore the section, and do NOT replace it with a Belgium,
+ * Estonia or generic EU establishment claim, a legal representative statement, or
+ * any invented entity information.
+ *
+ * Revisit only once the legal operator is registered and reviewed. Articles 11
+ * and 12 contact points are unaffected and remain published: those require a
+ * contact point, not a statement about where we are established.
+ * ---------------------------------------------------------------------------
  */
 const AUTHORITIES_CONTACT = 'support@pipingbox.com';
 const RECIPIENTS_CONTACT = 'support@pipingbox.com';
@@ -109,7 +140,7 @@ export default function DsaContact() {
             <p className="mb-3">
               This page sets out the single points of contact designated by PipingBox, the operator
               of the platform, under Articles 11 and 12 of Regulation (EU) 2022/2065 (the Digital
-              Services Act), and states its position regarding Article 13.
+              Services Act).
             </p>
             <p>
               This page is publicly accessible and does not require registration, authentication or
@@ -189,24 +220,9 @@ export default function DsaContact() {
             </p>
           </section>
 
-          {/* Article 13 */}
-          <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">
-              4. Article 13 — Legal representative: not applicable
-            </h2>
-            <p>
-              Article 13 of the Digital Services Act requires providers of intermediary services that
-              do not have an establishment in the Union to designate a legal representative in a
-              Member State. PipingBox is established in the European Union. It is therefore not
-              required to designate a legal representative in the Union, and has not designated one.
-              This section is stated explicitly rather than omitted so that the position of PipingBox
-              under Article 13 is unambiguous.
-            </p>
-          </section>
-
           {/* Related pages */}
           <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">5. Related information</h2>
+            <h2 className="mb-3 text-xl font-semibold text-white">4. Related information</h2>
             <p>
               See also the{' '}
               <Link to="/terms" className="text-[#f59e0b] hover:underline">
