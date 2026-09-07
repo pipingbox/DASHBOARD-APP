@@ -5,6 +5,11 @@ import { PageHeader } from '@/components/PageHeader';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import {
+  deriveApplicationMetrics,
+  type EnterpriseApplicationRow,
+  type HiringFunnel,
+} from '@/lib/enterpriseMetrics';
+import {
   Briefcase,
   Users,
   ClipboardList,
@@ -47,7 +52,7 @@ interface EnterpriseMetrics {
   totalWorkforceRequests: number;
   totalCandidates: number;
   interviewsScheduled: number;
-  hiresThisMonth: number;
+  hires: number;
   avgTimeToHire: number | null;
   totalRecruiters: number;
 }
@@ -76,14 +81,6 @@ interface RecruiterRow {
   last_active: string | null;
 }
 
-interface HiringFunnel {
-  applications: number;
-  shortlisted: number;
-  interviewed: number;
-  offered: number;
-  hired: number;
-}
-
 export default function EnterpriseDashboard() {
   const { t } = useTranslation();
   const { profile, user } = useAuth();
@@ -96,7 +93,7 @@ export default function EnterpriseDashboard() {
     totalWorkforceRequests: 0,
     totalCandidates: 0,
     interviewsScheduled: 0,
-    hiresThisMonth: 0,
+    hires: 0,
     avgTimeToHire: null,
     totalRecruiters: 1,
   });
@@ -145,7 +142,7 @@ export default function EnterpriseDashboard() {
 
       // Fetch workforce requests
       const { data: wfData, error: wfError } = await supabase
-        .from(TABLES.companyWorkforceRequests)
+        .from(TABLES.workforceRequests)
         .select('id, status')
         .eq('email', companyEmail);
 
@@ -160,50 +157,31 @@ export default function EnterpriseDashboard() {
         cancelled: wfRows.filter((w) => w.status === 'cancelled').length,
       };
 
-      // Fetch applications for hiring funnel
-      const { data: appsData, error: appsError } = await supabase
-        .from(TABLES.applications)
-        .select('id, status')
-        .in(
-          'job_id',
-          allJobs.map((j: { id: string }) => j.id)
-        );
+      // A company with zero jobs is a legitimate empty state, not a failure. Resolve it
+      // here instead of issuing downstream queries with an empty job-id set, so the result
+      // never depends on how PostgREST serialises an empty IN.
+      const jobIds = allJobs.map((j: { id: string }) => j.id);
+      let appRows: EnterpriseApplicationRow[] = [];
 
-      if (appsError) throw appsError;
+      if (jobIds.length > 0) {
+        // One fetch serves the funnel, the distinct-candidate count and the hires metric.
+        const { data: appsData, error: appsError } = await supabase
+          .from(TABLES.jobApplications)
+          .select('id, user_id, status')
+          .in('job_id', jobIds);
 
-      const appRows = (appsData || []) as { status: string }[];
-      const hiringFunnel: HiringFunnel = {
-        applications: appRows.length,
-        shortlisted: appRows.filter((a) => a.status === 'shortlisted').length,
-        interviewed: appRows.filter((a) => a.status === 'interviewed').length,
-        offered: appRows.filter((a) => a.status === 'offered').length,
-        hired: appRows.filter((a) => a.status === 'hired').length,
-      };
+        if (appsError) throw appsError;
 
-      // Fetch distinct candidates (applicants)
-      const { count: candidatesCount } = await supabase
-        .from(TABLES.applications)
-        .select('applicant_id', { count: 'exact', head: true })
-        .in(
-          'job_id',
-          allJobs.map((j: { id: string }) => j.id)
-        );
+        appRows = (appsData || []) as EnterpriseApplicationRow[];
+      }
 
-      // Fetch interviews scheduled (status = 'interviewed' with a date)
+      // "Total Candidates" counts distinct workers, and hires are counted over all
+      // applications: the table has no transition timestamp to build a month window from.
+      // See PB-ENTERPRISE-STATUS-VOCABULARY-001.
+      const { funnel: hiringFunnel, distinctCandidates, hires } =
+        deriveApplicationMetrics(appRows);
+
       const interviewsScheduled = hiringFunnel.interviewed;
-
-      // Hires this month
-      const now = new Date();
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      const { count: hiresCount } = await supabase
-        .from(TABLES.applications)
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'hired')
-        .gte('updated_at', monthStart)
-        .in(
-          'job_id',
-          allJobs.map((j: { id: string }) => j.id)
-        );
 
       // Fetch distinct recruiters (posted_by emails) for this company
       const distinctEmails = Array.from(
@@ -231,10 +209,12 @@ export default function EnterpriseDashboard() {
         totalActiveJobs: activeJobs.length,
         totalApplications,
         totalWorkforceRequests: wfRows.length,
-        totalCandidates: candidatesCount || 0,
+        totalCandidates: distinctCandidates,
         interviewsScheduled,
-        hiresThisMonth: hiresCount || 0,
-        avgTimeToHire: null, // requires application.created_at -> hired.updated_at diff; TODO
+        hires,
+        // Needs a hire timestamp the table does not have; see
+        // PB-ENTERPRISE-STATUS-VOCABULARY-001.
+        avgTimeToHire: null,
         totalRecruiters: Math.max(distinctEmails.length, 1),
       });
 
@@ -309,8 +289,8 @@ export default function EnterpriseDashboard() {
         />
         <KpiCard
           icon={UserCheck}
-          label="Hires This Month"
-          value={metrics.hiresThisMonth}
+          label="Hires"
+          value={metrics.hires}
           accent="#10b981"
         />
         <KpiCard
