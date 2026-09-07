@@ -22,7 +22,9 @@ import {
 //     request fail with PostgREST 42703 (undefined_column) -> the page rendered
 //     "Profile not found" for every visitor. Removed from the projection.
 //   - work experience is read from the canonical TABLES.workerExperiences key
-//     (TABLES.workExperience does not exist -> from(undefined)).
+//     (TABLES.workExperience does not exist -> from(undefined)) and projects
+//     `company_name`; the table has no `company` column, so the old projection would
+//     have failed with 42703 as well.
 //   - certification metadata is intentionally NOT fetched nor rendered here.
 //     `is_visible` defaults to true historically and therefore cannot be treated as
 //     explicit public consent. Public certification visibility semantics are owned by
@@ -43,7 +45,7 @@ interface PublicProfile {
 
 interface WorkExperience {
   id: string;
-  company: string | null;
+  company_name: string | null;
   position: string | null;
   start_date: string | null;
   end_date: string | null;
@@ -99,7 +101,7 @@ export default function PublicWorkerProfile() {
         // Fetch experience (public)
         const { data: expData, error: expErr } = await supabase
           .from(TABLES.workerExperiences)
-          .select('id, company, position, start_date, end_date, description')
+          .select('id, company_name, position, start_date, end_date, description')
           .eq('user_id', id)
           .order('start_date', { ascending: false });
 
@@ -262,7 +264,7 @@ export default function PublicWorkerProfile() {
               {experience.map((exp) => (
                 <div key={exp.id} className="space-y-1">
                   <p className="text-sm font-semibold text-zinc-200">{exp.position || '—'}</p>
-                  <p className="text-xs text-[#f59e0b]">{exp.company || '—'}</p>
+                  <p className="text-xs text-[#f59e0b]">{exp.company_name || '—'}</p>
                   <p className="text-[10px] text-zinc-500">
                     {exp.start_date ? new Date(exp.start_date).toLocaleDateString() : '—'} →{' '}
                     {exp.end_date ? new Date(exp.end_date).toLocaleDateString() : 'Present'}

@@ -61,6 +61,26 @@ const PROFILE_COLUMNS = new Set([
   'cv_visible',
 ]);
 
+/** Columns verified to exist on app_worker_experiences in production. */
+const EXPERIENCE_COLUMNS = new Set([
+  'id',
+  'user_id',
+  'company_name',
+  'position',
+  'location',
+  'start_date',
+  'end_date',
+  'currently_working',
+  'description',
+  'created_at',
+  'updated_at',
+  'project_name',
+  'city_region',
+  'country',
+  'responsibilities',
+  'visible_to_companies',
+]);
+
 test.describe('public worker profile — schema-valid queries', () => {
   test('every projected profile column exists in the real schema', () => {
     const source = read(PUBLIC_PROFILE);
@@ -72,6 +92,19 @@ test.describe('public worker profile — schema-valid queries', () => {
 
     const unknown = columns.filter((c) => !PROFILE_COLUMNS.has(c));
     expect(unknown, `columns absent from app_14da0f1941_profiles: ${unknown.join(', ')}`).toEqual([]);
+  });
+
+  test('every projected experience column exists in the real schema', () => {
+    // The table stores `company_name`; `company` does not exist and made the query
+    // fail with 42703 exactly like `languages` did on profiles.
+    const source = read(PUBLIC_PROFILE);
+    const projection = source.match(/\.select\('([^']*position[^']*)'\)/);
+    expect(projection, 'experience projection not found').not.toBeNull();
+
+    const columns = projection![1].split(',').map((c) => c.trim());
+    const unknown = columns.filter((c) => !EXPERIENCE_COLUMNS.has(c));
+    expect(unknown, `columns absent from app_worker_experiences: ${unknown.join(', ')}`).toEqual([]);
+    expect(columns).toContain('company_name');
   });
 
   test('languages is never projected from profiles', () => {
