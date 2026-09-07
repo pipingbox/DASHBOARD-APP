@@ -1,8 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { generateCV } from '@/lib/generateCV';
+import { generateCV, mapCertificationRowsForCv } from '@/lib/generateCV';
 import { supabase, TABLES } from '@/lib/supabase';
-import type { Certification } from '@/lib/certifications';
 import { toast } from 'sonner';
 
 // AUTO-003: CV auto-refresh hook.
@@ -44,20 +43,26 @@ export function useAutoCV() {
     isGenerating.current = true;
 
     try {
-      // Fetch certifications
-      const { data: certData } = await supabase
+      // Fetch the owner's own certification metadata.
+      // PB-LEGACY-CERT-QUERIES-001: the previous query targeted `worker_user_id` and
+      // joined an empty `certifications` catalog through `certification_id`; neither
+      // exists on the unified table, so the generated CV silently contained zero
+      // certifications. Only metadata is selected here — evidence files and signed URLs
+      // are never included in the CV.
+      const { data: certData, error: certError } = await supabase
         .from(TABLES.workerCertifications)
-        .select('certification_id, issue_date, expiry_date, certifications(name, code, issuing_body)')
-        .eq('worker_user_id', user.id);
+        .select('id, certification_name, issuing_organization, credential_id, issue_date, expiry_date')
+        .eq('user_id', user.id)
+        .order('issue_date', { ascending: false, nullsFirst: false });
 
-      const certifications = (certData || []).map((c) => ({
-        id: (c as { certification_id: string }).certification_id,
-        name: (c as { certifications: { name: string } | null })?.certifications?.name || '',
-        code: (c as { certifications: { code: string } | null })?.certifications?.code || '',
-        issuing_body: (c as { certifications: { issuing_body: string } | null })?.certifications?.issuing_body || '',
-        issue_date: (c as { issue_date: string | null }).issue_date,
-        expiry_date: (c as { expiry_date: string | null }).expiry_date,
-      })) as Certification[];
+      if (certError) {
+        // A failed query must not be interpreted as "this worker has no certifications":
+        // that would produce a CV that silently drops real credentials.
+        toast.error('Could not load your certifications. CV not updated.');
+        return;
+      }
+
+      const certifications = mapCertificationRowsForCv(certData ?? []);
 
       // Generate PDF
       await generateCV({ profile, certifications });

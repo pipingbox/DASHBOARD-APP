@@ -2,9 +2,71 @@ import { jsPDF } from 'jspdf';
 import type { Profile } from '@/hooks/useAuth';
 import type { Certification } from './certifications';
 
+/**
+ * PB-LEGACY-CERT-QUERIES-001: the CV only consumes certification *metadata*.
+ * Evidence files (file_url / certificate_file_url / storage_bucket / storage_path)
+ * and signed URLs are deliberately not part of this contract and must never be
+ * embedded in the generated PDF.
+ *
+ * The unified certifications table stores `certification_name` / `issuing_organization`;
+ * `name` / `issuer` are legacy aliases that are absent when the row is read with
+ * `select('*')`, so both spellings are accepted here.
+ */
+export type CVCertification = Partial<
+  Pick<
+    Certification,
+    | 'name'
+    | 'issuer'
+    | 'certification_name'
+    | 'issuing_organization'
+    | 'credential_id'
+    | 'issue_date'
+    | 'expiry_date'
+    | 'verification_url'
+    | 'qr_code_url'
+  >
+>;
+
 interface GenerateCVParams {
   profile: Profile;
-  certifications: Certification[];
+  certifications: CVCertification[];
+}
+
+/** Columns the CV is allowed to consume. Evidence locations are excluded by design. */
+export const CV_CERTIFICATION_METADATA_COLUMNS = [
+  'certification_name',
+  'issuing_organization',
+  'credential_id',
+  'issue_date',
+  'expiry_date',
+] as const;
+
+/** Canonical column first, legacy `name` alias as fallback. */
+export function resolveCvCertificationName(cert: CVCertification): string {
+  return cert.certification_name || cert.name || '';
+}
+
+/** Canonical column first, legacy `issuer` alias as fallback. */
+export function resolveCvCertificationIssuer(cert: CVCertification): string {
+  return cert.issuing_organization || cert.issuer || '';
+}
+
+/**
+ * Projects raw `app_worker_certifications` rows onto the CV metadata contract.
+ * Anything not listed in CV_CERTIFICATION_METADATA_COLUMNS — in particular
+ * `file_url`, `certificate_file_url`, `storage_bucket` and `storage_path` — is dropped,
+ * so an evidence location can never leak into the generated document.
+ */
+export function mapCertificationRowsForCv(rows: readonly unknown[]): CVCertification[] {
+  return rows.map((row) => {
+    const source = (row ?? {}) as Record<string, unknown>;
+    const mapped: CVCertification = {};
+    for (const column of CV_CERTIFICATION_METADATA_COLUMNS) {
+      const value = source[column];
+      mapped[column] = typeof value === 'string' ? value : null;
+    }
+    return mapped;
+  });
 }
 
 const PAGE_WIDTH = 210;
@@ -115,16 +177,20 @@ export async function generateCV({ profile, certifications }: GenerateCVParams):
       ensureSpace(26);
       const startY = y;
 
+      // Canonical column first, legacy alias as fallback.
+      const certName = resolveCvCertificationName(cert);
+      const certIssuer = resolveCvCertificationIssuer(cert);
+
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10.5);
       doc.setTextColor(20, 20, 20);
-      doc.text(cert.name, MARGIN, y);
+      doc.text(certName, MARGIN, y);
       y += 4.5;
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
       doc.setTextColor(90, 90, 90);
-      doc.text(cert.issuer, MARGIN, y);
+      doc.text(certIssuer, MARGIN, y);
       y += 4;
 
       const detail: string[] = [];

@@ -6,18 +6,30 @@ import {
   MapPin,
   Briefcase,
   Wrench,
-  Globe,
   ArrowLeft,
   ShieldCheck,
   Loader2,
-  Download,
+  AlertTriangle,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 // UX-003: Public worker profile page.
 // Route: /worker/:id — visible to anyone (SEO + shareable).
 // Only shows fields marked as public (cv_visible = true, profile_visibility = 'public').
 // No sensitive data (email, phone, documents) is exposed.
+//
+// PB-LEGACY-CERT-QUERIES-001:
+//   - `languages` is NOT a column of the profiles table; requesting it made every
+//     request fail with PostgREST 42703 (undefined_column) -> the page rendered
+//     "Profile not found" for every visitor. Removed from the projection.
+//   - work experience is read from the canonical TABLES.workerExperiences key
+//     (TABLES.workExperience does not exist -> from(undefined)) and projects
+//     `company_name`; the table has no `company` column, so the old projection would
+//     have failed with 42703 as well.
+//   - certification metadata is intentionally NOT fetched nor rendered here.
+//     `is_visible` defaults to true historically and therefore cannot be treated as
+//     explicit public consent. Public certification visibility semantics are owned by
+//     PB-PUBLIC-CREDENTIAL-VISIBILITY-001. Until that ticket defines opt-in rules this
+//     surface stays fail-closed.
 
 interface PublicProfile {
   full_name: string | null;
@@ -26,7 +38,6 @@ interface PublicProfile {
   bio: string | null;
   years_experience: number | null;
   skills: string[] | null;
-  languages: string[] | null;
   avatar_url: string | null;
   availability_status: string | null;
   profile_completion: number | null;
@@ -34,18 +45,11 @@ interface PublicProfile {
 
 interface WorkExperience {
   id: string;
-  company: string | null;
+  company_name: string | null;
   position: string | null;
   start_date: string | null;
   end_date: string | null;
   description: string | null;
-}
-
-interface WorkerCert {
-  certification_id: string;
-  issue_date: string | null;
-  expiry_date: string | null;
-  certifications: { name: string; code: string } | null;
 }
 
 export default function PublicWorkerProfile() {
@@ -53,23 +57,33 @@ export default function PublicWorkerProfile() {
   const { t } = useTranslation();
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [experience, setExperience] = useState<WorkExperience[]>([]);
-  const [certs, setCerts] = useState<WorkerCert[]>([]);
+  const [experienceFailed, setExperienceFailed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     (async () => {
       setLoading(true);
+      setNotFound(false);
+      setLoadFailed(false);
+      setExperienceFailed(false);
       try {
         // Fetch profile — only public profiles
         const { data: profileData, error: profileErr } = await supabase
           .from(TABLES.profiles)
-          .select('full_name, title, location, bio, years_experience, skills, languages, avatar_url, availability_status, profile_completion, profile_visibility, cv_visible')
+          .select('full_name, title, location, bio, years_experience, skills, avatar_url, availability_status, profile_completion, profile_visibility, cv_visible')
           .eq('user_id', id)
           .maybeSingle();
 
-        if (profileErr || !profileData) {
+        // A query failure is NOT the same as "profile does not exist".
+        if (profileErr) {
+          setLoadFailed(true);
+          return;
+        }
+
+        if (!profileData) {
           setNotFound(true);
           return;
         }
@@ -85,23 +99,21 @@ export default function PublicWorkerProfile() {
         setProfile(p);
 
         // Fetch experience (public)
-        const { data: expData } = await supabase
-          .from(TABLES.workExperience)
-          .select('id, company, position, start_date, end_date, description')
+        const { data: expData, error: expErr } = await supabase
+          .from(TABLES.workerExperiences)
+          .select('id, company_name, position, start_date, end_date, description')
           .eq('user_id', id)
           .order('start_date', { ascending: false });
 
-        setExperience((expData || []) as WorkExperience[]);
-
-        // Fetch certifications (public)
-        const { data: certData } = await supabase
-          .from(TABLES.workerCertifications)
-          .select('certification_id, issue_date, expiry_date, certifications(name, code)')
-          .eq('worker_user_id', id);
-
-        setCerts((certData || []) as WorkerCert[]);
+        if (expErr) {
+          // Surface the failure instead of pretending the worker has no experience.
+          setExperienceFailed(true);
+          setExperience([]);
+        } else {
+          setExperience((expData || []) as WorkExperience[]);
+        }
       } catch {
-        setNotFound(true);
+        setLoadFailed(true);
       } finally {
         setLoading(false);
       }
@@ -116,10 +128,24 @@ export default function PublicWorkerProfile() {
     );
   }
 
+  if (loadFailed) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] text-zinc-100">
+        <AlertTriangle className="h-6 w-6 text-[#f59e0b]" />
+        <p className="mt-3 text-sm text-zinc-300" data-testid="public-profile-load-error">
+          We could not load this profile right now. Please try again later.
+        </p>
+        <Link to="/" className="mt-4 text-sm text-[#f59e0b] hover:underline">
+          ← Back to home
+        </Link>
+      </div>
+    );
+  }
+
   if (notFound || !profile) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] text-zinc-100">
-        <p className="text-sm text-zinc-400">Profile not found or not public.</p>
+        <p className="text-sm text-zinc-400" data-testid="public-profile-not-found">Profile not found or not public.</p>
         <Link to="/" className="mt-4 text-sm text-[#f59e0b] hover:underline">
           ← Back to home
         </Link>
@@ -128,7 +154,6 @@ export default function PublicWorkerProfile() {
   }
 
   const skills = profile.skills || [];
-  const languages = profile.languages || [];
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-zinc-100">
@@ -147,7 +172,7 @@ export default function PublicWorkerProfile() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6" data-testid="public-worker-profile">
         {/* Back link */}
         <Link to="/" className="mb-6 inline-flex items-center gap-1.5 text-xs text-zinc-500 transition hover:text-zinc-300">
           <ArrowLeft className="h-3.5 w-3.5" />
@@ -218,40 +243,28 @@ export default function PublicWorkerProfile() {
           </section>
         )}
 
-        {/* Certifications */}
-        {certs.length > 0 && (
+        {/* Experience */}
+        {experienceFailed && (
           <section className="mt-8">
-            <h2 className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.25em] text-zinc-500">
-              <ShieldCheck className="h-3 w-3" /> Certifications
-            </h2>
-            <div className="mt-2 space-y-2">
-              {certs.map((c) => (
-                <div key={c.certification_id} className="flex items-center justify-between border border-zinc-800/80 bg-[#0d0d0d] px-4 py-2.5 rounded-sm">
-                  <div>
-                    <p className="text-sm font-medium text-zinc-200">
-                      {c.certifications?.name || 'Certification'}
-                    </p>
-                    <p className="text-[10px] text-zinc-500">{c.certifications?.code}</p>
-                  </div>
-                  <div className="text-right text-[10px] text-zinc-500">
-                    {c.issue_date && <p>Issued: {new Date(c.issue_date).toLocaleDateString()}</p>}
-                    {c.expiry_date && <p>Expires: {new Date(c.expiry_date).toLocaleDateString()}</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <h2 className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">Work Experience</h2>
+            <p
+              className="mt-3 flex items-center gap-2 border border-zinc-800/80 bg-[#0d0d0d] px-4 py-3 text-xs text-zinc-400 rounded-sm"
+              data-testid="public-profile-experience-error"
+            >
+              <AlertTriangle className="h-3.5 w-3.5 text-[#f59e0b]" />
+              Work experience could not be loaded.
+            </p>
           </section>
         )}
 
-        {/* Experience */}
-        {experience.length > 0 && (
+        {!experienceFailed && experience.length > 0 && (
           <section className="mt-8">
             <h2 className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">Work Experience</h2>
-            <div className="mt-3 space-y-4 border-l border-zinc-800 pl-4">
+            <div className="mt-3 space-y-4 border-l border-zinc-800 pl-4" data-testid="public-profile-experience-list">
               {experience.map((exp) => (
                 <div key={exp.id} className="space-y-1">
                   <p className="text-sm font-semibold text-zinc-200">{exp.position || '—'}</p>
-                  <p className="text-xs text-[#f59e0b]">{exp.company || '—'}</p>
+                  <p className="text-xs text-[#f59e0b]">{exp.company_name || '—'}</p>
                   <p className="text-[10px] text-zinc-500">
                     {exp.start_date ? new Date(exp.start_date).toLocaleDateString() : '—'} →{' '}
                     {exp.end_date ? new Date(exp.end_date).toLocaleDateString() : 'Present'}
@@ -260,20 +273,6 @@ export default function PublicWorkerProfile() {
                     <p className="text-xs text-zinc-400">{exp.description}</p>
                   )}
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Languages */}
-        {languages.length > 0 && (
-          <section className="mt-8">
-            <h2 className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.25em] text-zinc-500">
-              <Globe className="h-3 w-3" /> Languages
-            </h2>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {languages.map((lang) => (
-                <span key={lang} className="text-xs text-zinc-400">{lang}</span>
               ))}
             </div>
           </section>
