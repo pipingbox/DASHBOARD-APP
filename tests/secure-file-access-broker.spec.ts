@@ -1183,6 +1183,95 @@ test.describe('secure-file-access broker', () => {
     await client.supabase.auth.signOut();
   });
 
+  /* ------------------------------------------------------------------------
+   * Real historical data.
+   *
+   * Every test above builds its own fixture, which is precisely why none of
+   * them caught the deployed v3 refusing real records. This one selects one of
+   * the pre-existing production documents that still live in the certificates
+   * bucket and requires its actual owner to retrieve it.
+   *
+   * Read-only: inserts nothing, updates nothing, deletes nothing, touches no
+   * Storage object, and never prints a signed URL or its token.
+   * ---------------------------------------------------------------------- */
+
+  test('the real owner retrieves a pre-existing historical document', async () => {
+    const client = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
+
+    // RLS restricts this to the caller's own rows, so the record belongs to the
+    // very identity issuing the broker request.
+    const { data: rows, error: queryError } = await client.supabase
+      .from('app_worker_documents')
+      .select('id, document_name, document_type, notes, storage_bucket, storage_path, created_at')
+      .eq('user_id', fixture.workerId)
+      .eq('storage_bucket', CV_BUCKET)
+      .order('created_at', { ascending: true });
+    throwIfError('Query historical documents', queryError);
+
+    // Never select a fixture this suite created itself.
+    const candidates = (rows ?? []).filter((row) => {
+      const haystack = [row.document_name, row.document_type, row.notes, row.storage_path]
+        .filter(Boolean)
+        .join(' ');
+      return !['qa_fixture', 'e2e-broker-', FIXTURE_TAG].some((marker) =>
+        haystack.includes(marker),
+      );
+    });
+
+    expect(
+      candidates.length,
+      'no pre-existing historical document available for this owner',
+    ).toBeGreaterThan(0);
+
+    const target = candidates[0];
+    expect(target.storage_bucket, 'historical bucket').toBe(CV_BUCKET);
+    expect(
+      target.storage_path?.startsWith(`${fixture.workerId}/`),
+      'historical path inside owner namespace',
+    ).toBe(true);
+    console.log(
+      `Historical document selected: id=${target.id} bucket=${target.storage_bucket} created=${target.created_at}`,
+    );
+
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: target.id,
+      },
+    });
+
+    if (error || !data?.signedUrl) {
+      throw new Error(
+        await describeFailure('real historical document: expected a signed URL', data, error),
+      );
+    }
+
+    const signedUrl = data.signedUrl as string;
+    // Assert the URL shape without logging the token.
+    expect(signedUrl).toMatch(/[?&]token=/);
+    expect(signedUrl).toContain('/object/sign/');
+    expect(signedUrl).not.toContain('/object/public/');
+    expect(signedUrl).toContain(CV_BUCKET);
+
+    const response = await fetch(signedUrl, { method: 'GET' });
+    expect(response.status, 'signed URL must return HTTP 200').toBe(200);
+    const bytes = (await response.arrayBuffer()).byteLength;
+    expect(bytes, 'signed URL must serve a non-empty object').toBeGreaterThan(0);
+    console.log(`Signed URL served ${bytes} bytes over a private /object/sign/ path.`);
+
+    // The same object must not be reachable through the legacy public path.
+    const publicAttempt = signedUrl.replace('/object/sign/', '/object/public/').split('?')[0];
+    const publicResponse = await fetch(publicAttempt, { method: 'GET' });
+    expect(
+      publicResponse.status,
+      'legacy public path must not serve the object',
+    ).toBeGreaterThanOrEqual(400);
+    console.log(`Legacy public path rejected with HTTP ${publicResponse.status}.`);
+
+    await client.supabase.auth.signOut();
+  });
+
   test('authenticated user cannot execute pb_verify_storage_object_ownership RPC directly', async () => {
     const client = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
     const { data, error } = await client.supabase.rpc('pb_verify_storage_object_ownership', {
