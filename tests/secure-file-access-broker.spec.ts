@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import fs from 'node:fs';
+import path from 'node:path';
 
 /**
  * Broker access E2E for PB-STORAGE-SECURITY-001 Security NO-GO #5.
@@ -1324,9 +1326,9 @@ test.describe('secure-file-access broker', () => {
  * supabase-js. That proves the read path, and proves nothing about what the
  * deployed frontend actually writes.
  *
- * This block exercises the three real writers through the deployed UI and then
- * inspects the rows they produced. It is what catches a writer that still
- * persists a public URL, or one that targets the wrong bucket.
+ * This block exercises the reachable frontend writers through the deployed UI
+ * and then inspects the rows they produced. It is what catches a writer that
+ * still persists a public URL, or one that targets the wrong bucket.
  *
  * Lives in this file, and not in a dedicated spec, because adding a workflow
  * requires a `workflow` OAuth scope this environment does not have. The gate
@@ -1356,6 +1358,32 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
     certificationPath?: string;
   } = {};
 
+  /**
+   * The QA account's UI language is not fixed, and a locale-specific label is
+   * exactly what hung the first run of this smoke: an English-only regex waits
+   * for a button that renders in another language until the test times out.
+   *
+   * So the labels come from the app's own translation files: every locale's
+   * value for the key becomes an alternative. If a translation changes, the
+   * locator follows it.
+   */
+  function localizedLabelRegex(dottedKey: string): RegExp {
+    const dir = path.join(process.cwd(), 'app/frontend/src/i18n/locales');
+    const variants = new Set<string>();
+
+    for (const file of fs.readdirSync(dir).filter((name) => name.endsWith('.json'))) {
+      const bundle = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf-8'));
+      const value = dottedKey
+        .split('.')
+        .reduce<any>((node, key) => (node == null ? node : node[key]), bundle);
+      if (typeof value === 'string' && value.trim()) variants.add(value.trim());
+    }
+
+    if (variants.size === 0) throw new Error(`No translation found for ${dottedKey}`);
+    const alternatives = [...variants].map((value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    return new RegExp(alternatives.join('|'), 'i');
+  }
+
   function pdfBuffer(label: string): Buffer {
     return Buffer.from(
       `%PDF-1.4\n% PipingBox production writer smoke: ${label}\n1 0 obj<< /Type /Catalog >>endobj\ntrailer<<>>\n%%EOF\n`,
@@ -1364,7 +1392,10 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
   }
 
   async function workerClient() {
-    return signIn(requireEnv('E2E_WORKER_EMAIL', WORKER_EMAIL), requireEnv('E2E_WORKER_PASSWORD', WORKER_PASSWORD));
+    return signIn(
+      requireEnv('E2E_WORKER_EMAIL', WORKER_EMAIL),
+      requireEnv('E2E_WORKER_PASSWORD', WORKER_PASSWORD),
+    );
   }
 
   async function loginUi(page: any) {
@@ -1375,6 +1406,42 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 30_000 });
     await page.goto('/profile');
     await expect(page.locator('#root')).not.toBeEmpty({ timeout: 20_000 });
+  }
+
+  /**
+   * Opens an "add" dialog from a profile section. Every wait has an explicit
+   * timeout so a locator that no longer matches fails in seconds with the
+   * offending selector, instead of consuming the whole test budget in silence.
+   */
+  async function openAddDialog(page: any, addKey: string, step: string) {
+    const trigger = page.getByRole('button', { name: localizedLabelRegex(addKey) }).first();
+    await expect(trigger, `${step}: add trigger must be present`).toBeVisible({ timeout: 30_000 });
+    await trigger.scrollIntoViewIfNeeded();
+    await trigger.click({ timeout: 15_000 });
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog, `${step}: dialog must open`).toBeVisible({ timeout: 20_000 });
+    console.log(`[writer-smoke] ${step}: dialog open`);
+    return dialog;
+  }
+
+  /** Submits a dialog form and surfaces any toast text if it refuses to close. */
+  async function submitDialog(page: any, dialog: any, step: string) {
+    await dialog.locator('button[type="submit"]').first().click({ timeout: 15_000 });
+    try {
+      await expect(dialog).toBeHidden({ timeout: 60_000 });
+    } catch (err) {
+      const toasts = await page
+        .locator('[data-sonner-toast], [role="status"], [role="alert"]')
+        .allInnerTexts()
+        .catch(() => [] as string[]);
+      throw new Error(
+        `${step}: the dialog never closed after submit. Visible notifications: ${
+          toasts.length ? JSON.stringify(toasts) : '(none)'
+        }`,
+      );
+    }
+    console.log(`[writer-smoke] ${step}: submitted`);
   }
 
   /** The signed URL must be private and must actually serve bytes. */
@@ -1394,6 +1461,7 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
       (await response.arrayBuffer()).byteLength,
       `${label}: signed URL must serve a non-empty object`,
     ).toBeGreaterThan(0);
+    console.log(`[writer-smoke] ${label}: broker served a private signed URL`);
   }
 
   test.beforeAll(async () => {
@@ -1429,7 +1497,7 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
   test('the CV writer persists canonical metadata and no public URL', async ({ page }) => {
     test.setTimeout(240_000);
     const runtimeErrors: string[] = [];
-    page.on('pageerror', (e) => runtimeErrors.push(e.message));
+    page.on('pageerror', (e: Error) => runtimeErrors.push(e.message));
 
     await loginUi(page);
 
@@ -1469,16 +1537,10 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
   test('the document writer targets worker-documents with canonical metadata', async ({ page }) => {
     test.setTimeout(240_000);
     const runtimeErrors: string[] = [];
-    page.on('pageerror', (e) => runtimeErrors.push(e.message));
+    page.on('pageerror', (e: Error) => runtimeErrors.push(e.message));
 
     await loginUi(page);
-
-    await page
-      .getByRole('button', { name: /add document|añadir documento|subir documento/i })
-      .first()
-      .click();
-    const dialog = page.getByRole('dialog');
-    await expect(dialog).toBeVisible({ timeout: 20_000 });
+    const dialog = await openAddDialog(page, 'workerProfile.documents.add', 'document writer');
 
     const fileName = `${WRITER_TOKEN}-document.pdf`;
     await dialog
@@ -1486,10 +1548,13 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
       .first()
       .setInputFiles({ name: fileName, mimeType: 'application/pdf', buffer: pdfBuffer(fileName) });
 
-    // The upload finishes when the dialog swaps the picker for the file name.
-    await expect(dialog.getByText(fileName)).toBeVisible({ timeout: 90_000 });
-    await dialog.locator('button[type="submit"]').first().click();
-    await expect(dialog).toBeHidden({ timeout: 60_000 });
+    // The upload finished when the dialog swaps the picker for the file name.
+    await expect(
+      dialog.getByText(fileName),
+      'document writer: upload must confirm with the file name',
+    ).toBeVisible({ timeout: 90_000 });
+
+    await submitDialog(page, dialog, 'document writer');
 
     const client = await workerClient();
     const { data: rows, error } = await client.supabase
@@ -1525,30 +1590,31 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
   test('the certification writer targets the certificates bucket with canonical metadata', async ({ page }) => {
     test.setTimeout(240_000);
     const runtimeErrors: string[] = [];
-    page.on('pageerror', (e) => runtimeErrors.push(e.message));
+    page.on('pageerror', (e: Error) => runtimeErrors.push(e.message));
 
     await loginUi(page);
-
-    await page
-      .getByRole('button', { name: /add certification|añadir certificaci|nueva certificaci/i })
-      .first()
-      .click();
-    const dialog = page.getByRole('dialog');
-    await expect(dialog).toBeVisible({ timeout: 20_000 });
+    const dialog = await openAddDialog(
+      page,
+      'workerProfile.certifications.add',
+      'certification writer',
+    );
 
     const certName = `${WRITER_TOKEN} certification`;
     await dialog.locator('input[required]').first().fill(certName);
     await dialog.locator('input[required]').nth(1).fill('PipingBox QA');
 
     const fileName = `${WRITER_TOKEN}-certification.pdf`;
+    // Stable, language-independent handle on the certificate picker.
     await dialog
-      .locator('input[type="file"]')
+      .locator('#cert-file-upload-input, input[type="file"]')
       .first()
       .setInputFiles({ name: fileName, mimeType: 'application/pdf', buffer: pdfBuffer(fileName) });
-    await expect(dialog.getByText(fileName)).toBeVisible({ timeout: 90_000 });
+    await expect(
+      dialog.getByText(fileName),
+      'certification writer: upload must confirm with the file name',
+    ).toBeVisible({ timeout: 90_000 });
 
-    await dialog.locator('button[type="submit"]').first().click();
-    await expect(dialog).toBeHidden({ timeout: 60_000 });
+    await submitDialog(page, dialog, 'certification writer');
 
     const client = await workerClient();
     const { data: rows, error } = await client.supabase
