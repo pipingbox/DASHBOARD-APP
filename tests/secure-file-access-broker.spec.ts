@@ -1350,6 +1350,13 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
   let writerUserId = '';
   let originalCv: CvState | undefined;
 
+  /**
+   * React error boundaries do not surface through `pageerror` in a production
+   * build: the error is caught and only logged. Without the console channel a
+   * section that crashed looks exactly like a section that was never there.
+   */
+  let consoleErrors: string[] = [];
+
   const created: {
     cvPath?: string;
     documentId?: string;
@@ -1399,6 +1406,11 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
   }
 
   async function loginUi(page: any) {
+    consoleErrors = [];
+    page.on('console', (message: any) => {
+      if (message.type() === 'error') consoleErrors.push(message.text().slice(0, 300));
+    });
+
     await page.goto('/login');
     await page.locator('#email').fill(WORKER_EMAIL!);
     await page.locator('#password').fill(WORKER_PASSWORD!);
@@ -1415,7 +1427,30 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
    */
   async function openAddDialog(page: any, addKey: string, step: string) {
     const trigger = page.getByRole('button', { name: localizedLabelRegex(addKey) }).first();
-    await expect(trigger, `${step}: add trigger must be present`).toBeVisible({ timeout: 30_000 });
+
+    try {
+      await expect(trigger, `${step}: add trigger must be present`).toBeVisible({ timeout: 30_000 });
+    } catch (err) {
+      // A missing trigger has several very different causes -- wrong route, an
+      // error boundary that swallowed the section, a locale we do not know --
+      // and they are indistinguishable from "element not found". Dump what the
+      // page actually is before failing.
+      throw new Error(
+        [
+          `${step}: add trigger not found.`,
+          `  url: ${page.url()}`,
+          `  sections rendered: ${await page.locator('section').count()}`,
+          `  headings: ${JSON.stringify(
+            (await page.getByRole('heading').allInnerTexts().catch(() => [])).slice(0, 25),
+          )}`,
+          `  buttons: ${JSON.stringify(
+            (await page.getByRole('button').allInnerTexts().catch(() => [])).slice(0, 40),
+          )}`,
+          `  console errors: ${JSON.stringify(consoleErrors.slice(0, 12))}`,
+        ].join('\n'),
+      );
+    }
+
     await trigger.scrollIntoViewIfNeeded();
     await trigger.click({ timeout: 15_000 });
 
