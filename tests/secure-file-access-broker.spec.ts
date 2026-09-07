@@ -66,6 +66,15 @@ interface BrokerFixture {
   certificationPath?: string;
   documentId?: string;
   certificationId?: string;
+  historicalDocumentPath?: string;
+  historicalDocumentId?: string;
+  probeDocumentPath?: string;
+  probeDocumentId?: string;
+  certInCertsPath?: string;
+  certInCertsId?: string;
+  certInDocsPath?: string;
+  certInDocsId?: string;
+  secondWorkerCvWrongBucketPath?: string;
   jobId?: string;
   applicationId?: string;
   originalWorkerCv?: CvState;
@@ -282,11 +291,38 @@ async function cleanupFixtures(): Promise<string[]> {
         await restoreCvState(client.supabase, fixture.workerId, fixture.originalWorkerCv);
       }
 
-      if (fixture.workerCvPath) {
+      for (const [table, id, label] of [
+        ['app_worker_documents', fixture.historicalDocumentId, 'historical document row'],
+        ['app_worker_documents', fixture.probeDocumentId, 'probe document row'],
+        ['app_worker_certifications', fixture.certInCertsId, 'certificates-bucket certification row'],
+        ['app_worker_certifications', fixture.certInDocsId, 'documents-bucket certification row'],
+      ] as const) {
+        if (!id) continue;
+        const { error } = await client.supabase.from(table).delete().eq('id', id);
+        throwIfError(`Delete QA ${label}`, error);
+      }
+
+      const certBucketPaths = [
+        fixture.workerCvPath,
+        fixture.historicalDocumentPath,
+        fixture.certInCertsPath,
+      ].filter(Boolean) as string[];
+      if (certBucketPaths.length > 0) {
         const { error } = await client.supabase.storage
           .from(CV_BUCKET)
-          .remove([fixture.workerCvPath]);
-        throwIfError('Delete worker CV fixture', error);
+          .remove(certBucketPaths);
+        throwIfError('Delete worker certificates-bucket fixtures', error);
+      }
+
+      const docBucketPaths = [
+        fixture.probeDocumentPath,
+        fixture.certInDocsPath,
+      ].filter(Boolean) as string[];
+      if (docBucketPaths.length > 0) {
+        const { error } = await client.supabase.storage
+          .from(WORKER_FILES_BUCKET)
+          .remove(docBucketPaths);
+        throwIfError('Delete worker documents-bucket fixtures', error);
       }
 
       await client.supabase.auth.signOut();
@@ -324,12 +360,22 @@ async function cleanupFixtures(): Promise<string[]> {
         throwIfError('Delete second worker CV fixture', error);
       }
 
-      const workerFilePaths = [fixture.documentPath, fixture.certificationPath].filter(Boolean) as string[];
+      const workerFilePaths = [
+        fixture.documentPath,
+        fixture.secondWorkerCvWrongBucketPath,
+      ].filter(Boolean) as string[];
       if (workerFilePaths.length > 0) {
         const { error } = await client.supabase.storage
           .from(WORKER_FILES_BUCKET)
           .remove(workerFilePaths);
         throwIfError('Delete worker document fixtures', error);
+      }
+
+      if (fixture.certificationPath) {
+        const { error } = await client.supabase.storage
+          .from(CV_BUCKET)
+          .remove([fixture.certificationPath]);
+        throwIfError('Delete worker certification fixture', error);
       }
 
       await client.supabase.auth.signOut();
@@ -403,7 +449,8 @@ test.describe('secure-file-access broker', () => {
       fixture.certificationPath = `${secondWorker.user.id}/${certificationName}`;
 
       await uploadFixture(secondWorker.supabase, WORKER_FILES_BUCKET, fixture.documentPath, 'worker document');
-      await uploadFixture(secondWorker.supabase, WORKER_FILES_BUCKET, fixture.certificationPath, 'worker certification');
+      // Certifications are canonical in the certificates bucket.
+      await uploadFixture(secondWorker.supabase, CV_BUCKET, fixture.certificationPath, 'worker certification');
 
       const { data: document, error: documentError } = await secondWorker.supabase
         .from('app_worker_documents')
@@ -437,7 +484,7 @@ test.describe('secure-file-access broker', () => {
           is_visible: true,
           visible_to_companies: true,
           is_verified: false,
-          storage_bucket: WORKER_FILES_BUCKET,
+          storage_bucket: CV_BUCKET,
           storage_path: fixture.certificationPath,
         })
         .select('id')
@@ -445,6 +492,97 @@ test.describe('secure-file-access broker', () => {
       throwIfError('Insert QA certification row', certificationError);
       if (!certification?.id) throw new Error('QA certification insert returned no id');
       fixture.certificationId = certification.id;
+
+      /* Allowlist fixtures, all owned by worker A so the company-relationship
+       * tests below apply to them. Every object is uploaded by its own owner,
+       * so Storage writes the correct owner_id and the ownership RPC passes. */
+      const historicalDocumentName = `e2e-broker-${RUN_TOKEN}-historical-document.pdf`;
+      const probeDocumentName = `e2e-broker-${RUN_TOKEN}-probe-document.pdf`;
+      const certInCertsName = `e2e-broker-${RUN_TOKEN}-cert-in-certificates.pdf`;
+      const certInDocsName = `e2e-broker-${RUN_TOKEN}-cert-in-documents.pdf`;
+      fixture.historicalDocumentPath = `${worker.user.id}/${historicalDocumentName}`;
+      fixture.probeDocumentPath = `${worker.user.id}/${probeDocumentName}`;
+      fixture.certInCertsPath = `${worker.user.id}/${certInCertsName}`;
+      fixture.certInDocsPath = `${worker.user.id}/${certInDocsName}`;
+
+      // Reproduces the real historical layout: a document in the certificates
+      // bucket, exactly like the 16 records that predate the bucket split.
+      await uploadFixture(worker.supabase, CV_BUCKET, fixture.historicalDocumentPath, 'historical document');
+      await uploadFixture(worker.supabase, WORKER_FILES_BUCKET, fixture.probeDocumentPath, 'probe document');
+      await uploadFixture(worker.supabase, CV_BUCKET, fixture.certInCertsPath, 'certification in certificates');
+      await uploadFixture(worker.supabase, WORKER_FILES_BUCKET, fixture.certInDocsPath, 'certification in documents');
+
+      const insertDocument = async (
+        name: string,
+        bucket: string,
+        path: string,
+        label: string,
+      ) => {
+        const { data, error } = await worker.supabase
+          .from('app_worker_documents')
+          .insert({
+            user_id: worker.user.id,
+            document_name: label,
+            document_type: 'qa_fixture',
+            file_name: name,
+            mime_type: 'application/pdf',
+            notes: `${FIXTURE_TAG} ${RUN_TOKEN}`,
+            is_visible: true,
+            visible_to_companies: true,
+            storage_bucket: bucket,
+            storage_path: path,
+          })
+          .select('id')
+          .single();
+        throwIfError(`Insert ${label}`, error);
+        if (!data?.id) throw new Error(`${label} insert returned no id`);
+        return data.id as string;
+      };
+
+      const insertCertification = async (
+        name: string,
+        bucket: string,
+        path: string,
+        label: string,
+      ) => {
+        const { data, error } = await worker.supabase
+          .from('app_worker_certifications')
+          .insert({
+            user_id: worker.user.id,
+            certification_name: label,
+            issuing_organization: 'PipingBox QA',
+            file_name: name,
+            document_name: label,
+            notes: `${FIXTURE_TAG} ${RUN_TOKEN}`,
+            is_visible: true,
+            visible_to_companies: true,
+            is_verified: false,
+            storage_bucket: bucket,
+            storage_path: path,
+          })
+          .select('id')
+          .single();
+        throwIfError(`Insert ${label}`, error);
+        if (!data?.id) throw new Error(`${label} insert returned no id`);
+        return data.id as string;
+      };
+
+      fixture.historicalDocumentId = await insertDocument(
+        historicalDocumentName, CV_BUCKET, fixture.historicalDocumentPath,
+        'QA Historical Layout Document',
+      );
+      fixture.probeDocumentId = await insertDocument(
+        probeDocumentName, WORKER_FILES_BUCKET, fixture.probeDocumentPath,
+        'QA Canonical Document',
+      );
+      fixture.certInCertsId = await insertCertification(
+        certInCertsName, CV_BUCKET, fixture.certInCertsPath,
+        'QA Certification In Certificates Bucket',
+      );
+      fixture.certInDocsId = await insertCertification(
+        certInDocsName, WORKER_FILES_BUCKET, fixture.certInDocsPath,
+        'QA Certification In Documents Bucket',
+      );
 
       const jobTitle = `QA Broker Access ${RUN_TOKEN}`;
       const companyName = `PipingBox QA ${RUN_TOKEN}`;
@@ -724,7 +862,7 @@ test.describe('secure-file-access broker', () => {
       .single();
     throwIfError('Read canonical certification fixture', certificationError);
 
-    expect(certification?.storage_bucket, 'certification bucket').toBe(WORKER_FILES_BUCKET);
+    expect(certification?.storage_bucket, 'certification bucket').toBe(CV_BUCKET);
     expect(certification?.storage_path, 'certification path').toBe(fixture.certificationPath);
     expect(certification?.file_url, 'certification must carry no legacy URL').toBeNull();
     expect(
@@ -796,6 +934,252 @@ test.describe('secure-file-access broker', () => {
     });
 
     await assertDenied('unauthorized company canonical CV', data, error);
+    await client.supabase.auth.signOut();
+  });
+
+  /* ------------------------------------------------------------------------
+   * Bucket allowlist (PB-STORAGE-SECURITY-001 P0B).
+   *
+   * Documents accept two buckets: worker-documents for everything new, and the
+   * certificates bucket as a documented compatibility exception for the 16
+   * historical records. CVs and certifications accept the certificates bucket
+   * only. Everything else is refused before the broker ever reaches Storage.
+   * ---------------------------------------------------------------------- */
+
+  test('owner can retrieve a historical document stored in the certificates bucket', async () => {
+    const client = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
+
+    const { data: row, error: readError } = await client.supabase
+      .from('app_worker_documents')
+      .select('storage_bucket, storage_path')
+      .eq('id', fixture.historicalDocumentId)
+      .single();
+    throwIfError('Read historical document fixture', readError);
+    expect(row?.storage_bucket, 'historical document bucket').toBe(CV_BUCKET);
+
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.historicalDocumentId,
+      },
+    });
+
+    await assertSignedUrl('owner historical document', data, error);
+    await client.supabase.auth.signOut();
+  });
+
+  test('authorized company can retrieve a visible historical document', async () => {
+    const client = await signIn(COMPANY_AUTH_EMAIL!, COMPANY_AUTH_PASSWORD!);
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.historicalDocumentId,
+      },
+    });
+
+    await assertSignedUrl('authorized company historical document', data, error);
+    await client.supabase.auth.signOut();
+  });
+
+  test('unauthorized company is denied a historical document', async () => {
+    const client = await signIn(COMPANY_UNAUTH_EMAIL!, COMPANY_UNAUTH_PASSWORD!);
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.historicalDocumentId,
+      },
+    });
+
+    await assertDenied('unauthorized company historical document', data, error);
+    await client.supabase.auth.signOut();
+  });
+
+  test('a second worker is denied a historical document', async () => {
+    const client = await signIn(SECOND_WORKER_EMAIL!, SECOND_WORKER_PASSWORD!);
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.historicalDocumentId,
+      },
+    });
+
+    await assertDenied('second worker historical document', data, error);
+    await client.supabase.auth.signOut();
+  });
+
+  test('owner can retrieve a canonical document in the worker-documents bucket', async () => {
+    const client = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.probeDocumentId,
+      },
+    });
+
+    await assertSignedUrl('owner canonical document in worker-documents', data, error);
+    await client.supabase.auth.signOut();
+  });
+
+  test('owner can retrieve a certification stored in the certificates bucket', async () => {
+    const client = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'certification',
+        record_id: fixture.certInCertsId,
+      },
+    });
+
+    await assertSignedUrl('owner certification in certificates bucket', data, error);
+    await client.supabase.auth.signOut();
+  });
+
+  test('a certification in the worker-documents bucket is denied even to its owner', async () => {
+    const client = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'certification',
+        record_id: fixture.certInDocsId,
+      },
+    });
+
+    const reason = await assertDenied('owner certification in wrong bucket', data, error);
+    expect(reason).toContain('Bucket not allowed');
+    await client.supabase.auth.signOut();
+  });
+
+  test('a CV in the worker-documents bucket is denied even to its owner', async () => {
+    const client = await signIn(SECOND_WORKER_EMAIL!, SECOND_WORKER_PASSWORD!);
+    const wrongBucketName = `e2e-broker-${RUN_TOKEN}-cv-wrong-bucket.pdf`;
+    fixture.secondWorkerCvWrongBucketPath = `${fixture.secondWorkerId}/${wrongBucketName}`;
+
+    // A real object, correctly owned, in a bucket CVs must never be read from:
+    // the denial can only come from the allowlist.
+    await uploadFixture(
+      client.supabase,
+      WORKER_FILES_BUCKET,
+      fixture.secondWorkerCvWrongBucketPath,
+      'CV in wrong bucket',
+    );
+
+    const { error: pointError } = await client.supabase
+      .from('app_14da0f1941_profiles')
+      .update({
+        cv_storage_bucket: WORKER_FILES_BUCKET,
+        cv_storage_path: fixture.secondWorkerCvWrongBucketPath,
+      })
+      .eq('user_id', fixture.secondWorkerId);
+    throwIfError('Point second worker CV at the wrong bucket', pointError);
+
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: { owner_user_id: fixture.secondWorkerId, file_type: 'cv' },
+    });
+
+    const reason = await assertDenied('owner CV in wrong bucket', data, error);
+    expect(reason).toContain('Bucket not allowed');
+
+    // Restore the valid CV fixture so later tests are unaffected.
+    const { error: restoreError } = await client.supabase
+      .from('app_14da0f1941_profiles')
+      .update({
+        cv_storage_bucket: CV_BUCKET,
+        cv_storage_path: fixture.secondWorkerCvPath,
+      })
+      .eq('user_id', fixture.secondWorkerId);
+    throwIfError('Restore second worker CV fixture', restoreError);
+
+    await client.supabase.auth.signOut();
+  });
+
+  test('a document pointing at an arbitrary third bucket is denied', async () => {
+    const client = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
+    const { error: pointError } = await client.supabase
+      .from('app_worker_documents')
+      .update({ storage_bucket: 'pb-arbitrary-bucket' })
+      .eq('id', fixture.probeDocumentId);
+    throwIfError('Point probe document at an arbitrary bucket', pointError);
+
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.probeDocumentId,
+      },
+    });
+
+    const reason = await assertDenied('document in arbitrary bucket', data, error);
+    expect(reason).toContain('Bucket not allowed');
+
+    const { error: restoreError } = await client.supabase
+      .from('app_worker_documents')
+      .update({ storage_bucket: WORKER_FILES_BUCKET })
+      .eq('id', fixture.probeDocumentId);
+    throwIfError('Restore probe document bucket', restoreError);
+    await client.supabase.auth.signOut();
+  });
+
+  test('a document pointing at a missing object is denied', async () => {
+    const client = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
+    const missingPath = `${fixture.workerId}/e2e-broker-${RUN_TOKEN}-missing.pdf`;
+    const { error: pointError } = await client.supabase
+      .from('app_worker_documents')
+      .update({ storage_path: missingPath })
+      .eq('id', fixture.probeDocumentId);
+    throwIfError('Point probe document at a missing object', pointError);
+
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.probeDocumentId,
+      },
+    });
+
+    const reason = await assertDenied('document with missing object', data, error);
+    expect(reason).toContain('ownership mismatch');
+
+    const { error: restoreError } = await client.supabase
+      .from('app_worker_documents')
+      .update({ storage_path: fixture.probeDocumentPath })
+      .eq('id', fixture.probeDocumentId);
+    throwIfError('Restore probe document path', restoreError);
+    await client.supabase.auth.signOut();
+  });
+
+  test('a document pointing at another user object is denied', async () => {
+    const client = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
+
+    // Points at a real, existing object that belongs to the second worker. The
+    // path is outside the owner namespace, which is refused before Storage is
+    // consulted at all.
+    const { error: pointError } = await client.supabase
+      .from('app_worker_documents')
+      .update({ storage_path: fixture.documentPath })
+      .eq('id', fixture.probeDocumentId);
+    throwIfError('Point probe document at another user object', pointError);
+
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.probeDocumentId,
+      },
+    });
+
+    const reason = await assertDenied('document owned by another user', data, error);
+    expect(reason).toMatch(/owner namespace|ownership mismatch/);
+
+    const { error: restoreError } = await client.supabase
+      .from('app_worker_documents')
+      .update({ storage_path: fixture.probeDocumentPath })
+      .eq('id', fixture.probeDocumentId);
+    throwIfError('Restore probe document path', restoreError);
     await client.supabase.auth.signOut();
   });
 

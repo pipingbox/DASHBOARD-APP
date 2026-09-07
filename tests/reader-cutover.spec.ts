@@ -369,11 +369,62 @@ test.describe('bucket invariant is consistent across writers and broker', () => 
     }
   });
 
-  test('the broker expects certifications in the certificates bucket', () => {
+  test('the broker allowlist matches the agreed invariant exactly', () => {
     const source = read('supabase/functions/secure-file-access/index.ts');
-    expect(source).toContain('certification: "app_14da0f1941_certificates"');
-    expect(source).toContain('document: "worker-documents"');
-    expect(source).toContain('cv: "app_14da0f1941_certificates"');
+
+    // The allowlist is defense-in-depth: widening it silently would let a
+    // tampered storage_bucket point the broker somewhere it should not go.
+    expect(source).toContain('cv: ["app_14da0f1941_certificates"]');
+    expect(source).toContain('certification: ["app_14da0f1941_certificates"]');
+    expect(source).toContain(
+      'document: ["worker-documents", "app_14da0f1941_certificates"]',
+    );
+
+    // The old single-bucket model must be gone, membership must be checked
+    // against the allowlist, and an unknown file type must still be rejected.
+    expect(source).not.toContain('EXPECTED_BUCKETS');
+    expect(source).toContain('!allowedBuckets.includes(fileRecord.bucket)');
+    expect(source).toContain('if (!allowedBuckets ||');
+  });
+
+  test('only the document type accepts more than one bucket', () => {
+    const source = read('supabase/functions/secure-file-access/index.ts');
+    const block = source.slice(
+      source.indexOf('const ALLOWED_BUCKETS'),
+      source.indexOf('};', source.indexOf('const ALLOWED_BUCKETS')),
+    );
+    expect(block, 'ALLOWED_BUCKETS block not found').not.toHaveLength(0);
+
+    const entries = [...block.matchAll(/(\w+):\s*\[([^\]]*)\]/g)].map(
+      ([, type, buckets]) => ({
+        type,
+        buckets: buckets.split(',').map((b) => b.trim().replace(/"/g, '')).filter(Boolean),
+      }),
+    );
+
+    expect(entries.map((e) => e.type).sort()).toEqual([
+      'certification',
+      'cv',
+      'document',
+    ]);
+    for (const entry of entries) {
+      const limit = entry.type === 'document' ? 2 : 1;
+      expect(entry.buckets.length, `${entry.type} bucket count`).toBe(limit);
+      for (const bucket of entry.buckets) {
+        expect(
+          ['worker-documents', 'app_14da0f1941_certificates'],
+          `${entry.type} -> ${bucket}`,
+        ).toContain(bucket);
+      }
+    }
+  });
+
+  test('the certificates bucket is only a compatibility exception for documents', () => {
+    const source = read('supabase/functions/secure-file-access/index.ts');
+    // No writer may target the historical bucket for new documents.
+    expect(read('app/frontend/src/components/profile/DocumentsSection.tsx'))
+      .toContain('const bucketName = STORAGE_BUCKETS.workerDocuments;');
+    expect(source).toContain('compatibility exception');
   });
 });
 
