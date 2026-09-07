@@ -1316,3 +1316,272 @@ test.describe('secure-file-access broker', () => {
     await client.supabase.auth.signOut();
   });
 });
+
+/* ===========================================================================
+ * Production writer smoke — PB-STORAGE-SECURITY-001 frontend cutover.
+ *
+ * Everything above drives the broker directly and builds its fixtures through
+ * supabase-js. That proves the read path, and proves nothing about what the
+ * deployed frontend actually writes.
+ *
+ * This block exercises the three real writers through the deployed UI and then
+ * inspects the rows they produced. It is what catches a writer that still
+ * persists a public URL, or one that targets the wrong bucket.
+ *
+ * Lives in this file, and not in a dedicated spec, because adding a workflow
+ * requires a `workflow` OAuth scope this environment does not have. The gate
+ * that runs this file accepts `passed > 0` with zero skips, so hosting the
+ * smoke here does not weaken its acceptance.
+ *
+ * Serial and self-cleaning: every row and Storage object it creates is removed
+ * in afterAll, and the worker's original CV state is restored.
+ *
+ * Not covered on purpose: CertificationDialog. `CertificationList`, its only
+ * consumer, is exported but never rendered anywhere in the app, so that writer
+ * is not operationally reachable through the UI. Its bucket target and
+ * canonical-metadata contract are pinned by the static guards in
+ * reader-cutover.spec.ts instead.
+ * ========================================================================= */
+
+test.describe.serial('production writer smoke through the deployed frontend', () => {
+  const WRITER_TOKEN = `pbws-${RUN_TOKEN}`;
+  let writerUserId = '';
+  let originalCv: CvState | undefined;
+
+  const created: {
+    cvPath?: string;
+    documentId?: string;
+    documentPath?: string;
+    certificationId?: string;
+    certificationPath?: string;
+  } = {};
+
+  function pdfBuffer(label: string): Buffer {
+    return Buffer.from(
+      `%PDF-1.4\n% PipingBox production writer smoke: ${label}\n1 0 obj<< /Type /Catalog >>endobj\ntrailer<<>>\n%%EOF\n`,
+      'utf-8',
+    );
+  }
+
+  async function workerClient() {
+    return signIn(requireEnv('E2E_WORKER_EMAIL', WORKER_EMAIL), requireEnv('E2E_WORKER_PASSWORD', WORKER_PASSWORD));
+  }
+
+  async function loginUi(page: any) {
+    await page.goto('/login');
+    await page.locator('#email').fill(WORKER_EMAIL!);
+    await page.locator('#password').fill(WORKER_PASSWORD!);
+    await page.getByRole('button', { name: /sign in|iniciar sesi/i }).click();
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 30_000 });
+    await page.goto('/profile');
+    await expect(page.locator('#root')).not.toBeEmpty({ timeout: 20_000 });
+  }
+
+  /** The signed URL must be private and must actually serve bytes. */
+  async function assertBrokerServesPrivately(
+    client: Awaited<ReturnType<typeof signIn>>,
+    label: string,
+    body: Record<string, unknown>,
+  ) {
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', { body });
+    await assertSignedUrl(label, data, error);
+
+    const signedUrl = data.signedUrl as string;
+    expect(signedUrl).toContain('/object/sign/');
+    const response = await fetch(signedUrl, { method: 'GET' });
+    expect(response.status, `${label}: signed URL must return HTTP 200`).toBe(200);
+    expect(
+      (await response.arrayBuffer()).byteLength,
+      `${label}: signed URL must serve a non-empty object`,
+    ).toBeGreaterThan(0);
+  }
+
+  test.beforeAll(async () => {
+    const client = await workerClient();
+    writerUserId = client.user.id;
+    originalCv = await readCvState(client.supabase, writerUserId);
+    await client.supabase.auth.signOut();
+  });
+
+  test.afterAll(async () => {
+    const client = await workerClient();
+
+    if (created.documentId) {
+      await client.supabase.from('app_worker_documents').delete().eq('id', created.documentId);
+    }
+    if (created.certificationId) {
+      await client.supabase.from('app_worker_certifications').delete().eq('id', created.certificationId);
+    }
+    if (created.documentPath) {
+      await client.supabase.storage.from(WORKER_FILES_BUCKET).remove([created.documentPath]);
+    }
+    if (created.certificationPath) {
+      await client.supabase.storage.from(CV_BUCKET).remove([created.certificationPath]);
+    }
+    if (created.cvPath && created.cvPath !== originalCv?.cv_storage_path) {
+      await client.supabase.storage.from(CV_BUCKET).remove([created.cvPath]);
+    }
+
+    await restoreCvState(client.supabase, writerUserId, originalCv);
+    await client.supabase.auth.signOut();
+  });
+
+  test('the CV writer persists canonical metadata and no public URL', async ({ page }) => {
+    test.setTimeout(240_000);
+    const runtimeErrors: string[] = [];
+    page.on('pageerror', (e) => runtimeErrors.push(e.message));
+
+    await loginUi(page);
+
+    // Anchored to the start of the heading so it cannot match the "AI CV" section.
+    const cvSection = page.locator('section').filter({ hasText: /^CV\s*\/\s*Resume/i });
+    await expect(cvSection).toBeVisible({ timeout: 30_000 });
+
+    const fileName = `${WRITER_TOKEN}-cv.pdf`;
+    await cvSection
+      .locator('input[type="file"]')
+      .first()
+      .setInputFiles({ name: fileName, mimeType: 'application/pdf', buffer: pdfBuffer(fileName) });
+    await expect(cvSection.getByText(fileName)).toBeVisible({ timeout: 90_000 });
+
+    const client = await workerClient();
+    const state = await readCvState(client.supabase, writerUserId);
+    created.cvPath = state.cv_storage_path ?? undefined;
+
+    expect(state.cv_storage_bucket, 'CV must land in the certificates bucket').toBe(CV_BUCKET);
+    expect(state.cv_storage_path, 'CV path must be set').toBeTruthy();
+    expect(
+      state.cv_storage_path!.startsWith(`${writerUserId}/`),
+      'CV path must sit inside the owner namespace',
+    ).toBe(true);
+    expect(state.cv_file_name).toBe(fileName);
+    expect(state.cv_file_url, 'the CV writer must not persist a public URL').toBeNull();
+
+    await assertBrokerServesPrivately(client, 'production CV writer', {
+      owner_user_id: writerUserId,
+      file_type: 'cv',
+    });
+
+    await client.supabase.auth.signOut();
+    expect(runtimeErrors, 'no runtime errors during the CV write').toEqual([]);
+  });
+
+  test('the document writer targets worker-documents with canonical metadata', async ({ page }) => {
+    test.setTimeout(240_000);
+    const runtimeErrors: string[] = [];
+    page.on('pageerror', (e) => runtimeErrors.push(e.message));
+
+    await loginUi(page);
+
+    await page
+      .getByRole('button', { name: /add document|añadir documento|subir documento/i })
+      .first()
+      .click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 20_000 });
+
+    const fileName = `${WRITER_TOKEN}-document.pdf`;
+    await dialog
+      .locator('input[type="file"]')
+      .first()
+      .setInputFiles({ name: fileName, mimeType: 'application/pdf', buffer: pdfBuffer(fileName) });
+
+    // The upload finishes when the dialog swaps the picker for the file name.
+    await expect(dialog.getByText(fileName)).toBeVisible({ timeout: 90_000 });
+    await dialog.locator('button[type="submit"]').first().click();
+    await expect(dialog).toBeHidden({ timeout: 60_000 });
+
+    const client = await workerClient();
+    const { data: rows, error } = await client.supabase
+      .from('app_worker_documents')
+      .select('id, user_id, file_name, file_url, storage_bucket, storage_path')
+      .eq('user_id', writerUserId)
+      .eq('file_name', fileName);
+    throwIfError('Read document written by the frontend', error);
+
+    expect(rows?.length, 'the document writer must have inserted exactly one row').toBe(1);
+    const row = rows![0];
+    created.documentId = row.id;
+    created.documentPath = row.storage_path ?? undefined;
+
+    expect(row.storage_bucket, 'new documents must target worker-documents').toBe(WORKER_FILES_BUCKET);
+    expect(row.storage_path, 'document path must be set').toBeTruthy();
+    expect(
+      row.storage_path!.startsWith(`${writerUserId}/`),
+      'document path must sit inside the owner namespace',
+    ).toBe(true);
+    expect(row.file_url, 'the document writer must not persist a legacy/public URL').toBeNull();
+
+    await assertBrokerServesPrivately(client, 'production document writer', {
+      owner_user_id: writerUserId,
+      file_type: 'document',
+      record_id: row.id,
+    });
+
+    await client.supabase.auth.signOut();
+    expect(runtimeErrors, 'no runtime errors during the document write').toEqual([]);
+  });
+
+  test('the certification writer targets the certificates bucket with canonical metadata', async ({ page }) => {
+    test.setTimeout(240_000);
+    const runtimeErrors: string[] = [];
+    page.on('pageerror', (e) => runtimeErrors.push(e.message));
+
+    await loginUi(page);
+
+    await page
+      .getByRole('button', { name: /add certification|añadir certificaci|nueva certificaci/i })
+      .first()
+      .click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible({ timeout: 20_000 });
+
+    const certName = `${WRITER_TOKEN} certification`;
+    await dialog.locator('input[required]').first().fill(certName);
+    await dialog.locator('input[required]').nth(1).fill('PipingBox QA');
+
+    const fileName = `${WRITER_TOKEN}-certification.pdf`;
+    await dialog
+      .locator('input[type="file"]')
+      .first()
+      .setInputFiles({ name: fileName, mimeType: 'application/pdf', buffer: pdfBuffer(fileName) });
+    await expect(dialog.getByText(fileName)).toBeVisible({ timeout: 90_000 });
+
+    await dialog.locator('button[type="submit"]').first().click();
+    await expect(dialog).toBeHidden({ timeout: 60_000 });
+
+    const client = await workerClient();
+    const { data: rows, error } = await client.supabase
+      .from('app_worker_certifications')
+      .select('id, user_id, certification_name, file_url, certificate_file_url, storage_bucket, storage_path')
+      .eq('user_id', writerUserId)
+      .eq('certification_name', certName);
+    throwIfError('Read certification written by the frontend', error);
+
+    expect(rows?.length, 'the certification writer must have inserted exactly one row').toBe(1);
+    const row = rows![0];
+    created.certificationId = row.id;
+    created.certificationPath = row.storage_path ?? undefined;
+
+    expect(row.storage_bucket, 'certifications must target the certificates bucket').toBe(CV_BUCKET);
+    expect(row.storage_path, 'certification path must be set').toBeTruthy();
+    expect(
+      row.storage_path!.startsWith(`${writerUserId}/`),
+      'certification path must sit inside the owner namespace',
+    ).toBe(true);
+    expect(row.file_url, 'the certification writer must not persist a legacy/public URL').toBeNull();
+    expect(
+      row.certificate_file_url,
+      'the certification writer must not persist a legacy/public URL',
+    ).toBeNull();
+
+    await assertBrokerServesPrivately(client, 'production certification writer', {
+      owner_user_id: writerUserId,
+      file_type: 'certification',
+      record_id: row.id,
+    });
+
+    await client.supabase.auth.signOut();
+    expect(runtimeErrors, 'no runtime errors during the certification write').toEqual([]);
+  });
+});
