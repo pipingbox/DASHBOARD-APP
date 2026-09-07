@@ -1416,8 +1416,38 @@ test.describe.serial('production writer smoke through the deployed frontend', ()
     await page.locator('#password').fill(WORKER_PASSWORD!);
     await page.getByRole('button', { name: /sign in|iniciar sesi/i }).click();
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 30_000 });
+    await dismissBetaNotice(page);
     await page.goto('/profile');
     await expect(page.locator('#root')).not.toBeEmpty({ timeout: 20_000 });
+    await dismissBetaNotice(page);
+  }
+
+  /**
+   * Every fresh browser context gets the beta notice, because dismissal lives
+   * in localStorage. It is a Radix modal, so while it is open the rest of the
+   * app is aria-hidden and no role-based locator resolves -- which is why the
+   * document writer failed with a bare "element(s) not found" while the CV
+   * writer passed: uploading needs no click, opening a dialog does.
+   */
+  async function dismissBetaNotice(page: any) {
+    const dialog = page.getByRole('dialog');
+    if (!(await dialog.isVisible().catch(() => false))) return;
+
+    const continueButton = dialog
+      .getByRole('button', { name: localizedLabelRegex('betaFeedback.notice.continueBtn') })
+      .first();
+
+    if (await continueButton.isVisible().catch(() => false)) {
+      await continueButton.click({ timeout: 10_000 });
+    } else {
+      // onOpenChange(false) dismisses it too, so Escape is a valid fallback.
+      await page.keyboard.press('Escape');
+    }
+
+    await expect(dialog, 'the beta notice must close before driving the UI').toBeHidden({
+      timeout: 15_000,
+    });
+    console.log('[writer-smoke] beta notice dismissed');
   }
 
   /**
