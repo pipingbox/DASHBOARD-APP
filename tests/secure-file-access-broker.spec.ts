@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * Broker access E2E for PB-STORAGE-SECURITY-001 Security NO-GO #5.
@@ -396,6 +396,8 @@ async function cleanupFixtures(): Promise<string[]> {
 
   return failures;
 }
+
+let historicalRecord: { id: string; ownerId: string } | null = null;
 
 test.describe('secure-file-access broker', () => {
   test.describe.configure({ mode: 'serial' });
@@ -1187,55 +1189,65 @@ test.describe('secure-file-access broker', () => {
    * Real historical data.
    *
    * Every test above builds its own fixture, which is precisely why none of
-   * them caught the deployed v3 refusing real records. This one selects one of
-   * the pre-existing production documents that still live in the certificates
-   * bucket and requires its actual owner to retrieve it.
+   * them caught the deployed v3 refusing real records. These two exercise an
+   * actual pre-existing production document that still lives in the
+   * certificates bucket.
+   *
+   * The owner's own session cannot be used: all 16 historical documents belong
+   * to real end users, and this suite has no password for them -- fabricating
+   * one would be impersonation. A legitimately privileged admin is the closest
+   * authorized viewer available, and the unauthorized-company counter-test
+   * below proves the widened allowlist did not open the record up to everyone.
    *
    * Read-only: inserts nothing, updates nothing, deletes nothing, touches no
    * Storage object, and never prints a signed URL or its token.
    * ---------------------------------------------------------------------- */
 
-  test('the real owner retrieves a pre-existing historical document', async () => {
-    const client = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
-
-    // RLS restricts this to the caller's own rows, so the record belongs to the
-    // very identity issuing the broker request.
-    const { data: rows, error: queryError } = await client.supabase
+  /** Picks a real historical document belonging to somebody else. */
+  async function selectHistoricalDocument(
+    supabase: SupabaseClient,
+    viewerId: string,
+  ): Promise<{ id: string; user_id: string; storage_path: string; created_at: string }> {
+    const { data: rows, error } = await supabase
       .from('app_worker_documents')
-      .select('id, document_name, document_type, notes, storage_bucket, storage_path, created_at')
-      .eq('user_id', fixture.workerId)
+      .select('id, user_id, document_name, document_type, notes, storage_bucket, storage_path, created_at, is_visible')
       .eq('storage_bucket', CV_BUCKET)
+      .neq('user_id', viewerId)
       .order('created_at', { ascending: true });
-    throwIfError('Query historical documents', queryError);
+    throwIfError('Query historical documents', error);
 
     // Never select a fixture this suite created itself.
     const candidates = (rows ?? []).filter((row) => {
       const haystack = [row.document_name, row.document_type, row.notes, row.storage_path]
         .filter(Boolean)
         .join(' ');
-      return !['qa_fixture', 'e2e-broker-', FIXTURE_TAG].some((marker) =>
+      const isFixture = ['qa_fixture', 'e2e-broker-', FIXTURE_TAG].some((marker) =>
         haystack.includes(marker),
       );
+      return !isFixture && row.is_visible !== false;
     });
 
-    expect(
-      candidates.length,
-      'no pre-existing historical document available for this owner',
-    ).toBeGreaterThan(0);
-
+    expect(candidates.length, 'no pre-existing historical document available').toBeGreaterThan(0);
     const target = candidates[0];
     expect(target.storage_bucket, 'historical bucket').toBe(CV_BUCKET);
     expect(
-      target.storage_path?.startsWith(`${fixture.workerId}/`),
+      target.storage_path?.startsWith(`${target.user_id}/`),
       'historical path inside owner namespace',
     ).toBe(true);
     console.log(
       `Historical document selected: id=${target.id} bucket=${target.storage_bucket} created=${target.created_at}`,
     );
+    return target as { id: string; user_id: string; storage_path: string; created_at: string };
+  }
+
+  test('a legitimate admin retrieves a real pre-existing historical document', async () => {
+    const client = await signIn(ADMIN_EMAIL!, ADMIN_PASSWORD!);
+    const target = await selectHistoricalDocument(client.supabase, client.user.id);
+    historicalRecord = { id: target.id, ownerId: target.user_id };
 
     const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
       body: {
-        owner_user_id: fixture.workerId,
+        owner_user_id: target.user_id,
         file_type: 'document',
         record_id: target.id,
       },
@@ -1269,6 +1281,22 @@ test.describe('secure-file-access broker', () => {
     ).toBeGreaterThanOrEqual(400);
     console.log(`Legacy public path rejected with HTTP ${publicResponse.status}.`);
 
+    await client.supabase.auth.signOut();
+  });
+
+  test('an unauthorized company is denied that same real historical document', async () => {
+    expect(historicalRecord, 'historical record must have been selected').not.toBeNull();
+    const client = await signIn(COMPANY_UNAUTH_EMAIL!, COMPANY_UNAUTH_PASSWORD!);
+
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: historicalRecord!.ownerId,
+        file_type: 'document',
+        record_id: historicalRecord!.id,
+      },
+    });
+
+    await assertDenied('unauthorized company on real historical document', data, error);
     await client.supabase.auth.signOut();
   });
 
