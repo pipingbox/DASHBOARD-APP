@@ -21,7 +21,7 @@ CREATE TABLE public.app_worker_credential_evidence (
 
   -- Auditoria de verificacion admin. Solo via privilegiada.
   verified_at           timestamptz,
-  verified_by           uuid        REFERENCES auth.users(id) ON DELETE SET NULL,
+  verified_by           uuid        REFERENCES auth.users(id) ON DELETE RESTRICT,
 
   -- Extraccion de IA (consumidas por PB-CREDENTIAL-AI-BENCHMARK-001; pobladas por backend).
   ai_extracted_at       timestamptz,
@@ -80,6 +80,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public.app_worker_credential_evidence TO
 CREATE OR REPLACE FUNCTION public.pb_credential_evidence_guard()
 RETURNS trigger
 LANGUAGE plpgsql
+SET search_path = pg_catalog
 AS $$
 DECLARE
   v_is_privileged boolean;
@@ -182,6 +183,7 @@ CREATE TRIGGER credential_evidence_guard
 CREATE OR REPLACE FUNCTION public.pb_credential_evidence_cert_ownership()
 RETURNS trigger
 LANGUAGE plpgsql
+SET search_path = pg_catalog
 AS $$
 DECLARE
   v_cert_owner uuid;
@@ -211,10 +213,10 @@ CREATE TRIGGER credential_evidence_cert_ownership
 ALTER TABLE public.app_worker_credential_evidence ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY evidence_select_own ON public.app_worker_credential_evidence
-  FOR SELECT TO authenticated USING (auth.uid() = user_id OR public.app_is_admin());
+  FOR SELECT TO authenticated USING ((select auth.uid()) = user_id OR public.app_is_admin());
 CREATE POLICY evidence_insert_own ON public.app_worker_credential_evidence
-  FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+  FOR INSERT TO authenticated WITH CHECK ((select auth.uid()) = user_id);
 CREATE POLICY evidence_update_own ON public.app_worker_credential_evidence
-  FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+  FOR UPDATE TO authenticated USING ((select auth.uid()) = user_id) WITH CHECK ((select auth.uid()) = user_id);
 CREATE POLICY evidence_delete_own ON public.app_worker_credential_evidence
-  FOR DELETE TO authenticated USING (auth.uid() = user_id);
+  FOR DELETE TO authenticated USING ((select auth.uid()) = user_id);
