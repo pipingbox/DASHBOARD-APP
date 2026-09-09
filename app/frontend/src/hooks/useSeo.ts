@@ -63,6 +63,8 @@ interface SeoOptions {
   title?: string;
   /** Override the meta description. Falls back to the default in index.html. */
   description?: string;
+  /** If true, add <meta name="robots" content="noindex"> and stay out of search results. */
+  noindex?: boolean;
 }
 
 export function useSeo(options: SeoOptions = {}): void {
@@ -104,5 +106,9 @@ export function useSeo(options: SeoOptions = {}): void {
       setMeta('og:description', options.description, true);
       setMeta('twitter:description', options.description);
     }
-  }, [options.title, options.description]);
+    // PB-SEO-102: noindex on 404 and similar non-indexable pages.
+    if (options.noindex) {
+      setMeta('robots', 'noindex');
+    }
+  }, [options.title, options.description, options.noindex]);
 }

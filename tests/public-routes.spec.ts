@@ -22,16 +22,21 @@ import { test, expect } from '@playwright/test';
  */
 
 const PUBLIC_ROUTES = [
+  '/',
   '/tools',
   '/academy',
   '/companies/request-workers',
-  '/jobs',        // F2 — marketplace public; apply() handles !user gracefully
-  '/companies',   // F2 — marketing/metrics page, no auth dependency
-  // PB-MARKET-PROD-001 §7.2 — legal obligation, not an acquisition choice: DSA arts. 11
-  // and 12 require the contact points to be "easily accessible" to authorities and to
-  // recipients of the service. Gating them behind login would itself be the
-  // non-compliance. Static page, no auth dependency, like /terms and /privacy.
+  '/jobs',
+  '/companies',
   '/dsa',
+  '/privacy',
+  '/terms',
+  '/contact',
+  '/certifications',
+  '/certifications/vca',
+  '/certifications/scc',
+  '/certifications/prl',
+  '/blog/',
 ];
 
 test.describe('PB-WEB-005 public surface', () => {
@@ -67,6 +72,80 @@ test.describe('PB-WEB-005 public surface', () => {
       page.getByRole('button', { name: /sign out/i }),
       'guest must never be shown Sign out',
     ).toHaveCount(0);
+  });
+});
+
+test.describe('PB-SEO-102 Worker route contract', () => {
+  test('valid public deep links stay reachable', async ({ page }) => {
+    for (const path of ['/', '/tools', '/jobs', '/companies', '/certifications/vca']) {
+      await page.goto(path);
+      await expect(page, `${path} must not be a Worker 404`).not.toHaveURL(/404|not-found/, {
+        timeout: 10_000,
+      });
+      await expect(page.locator('body')).not.toContainText('Not found', { timeout: 5000 });
+    }
+  });
+
+  test('valid auth/protected deep links are not edge-404ed', async ({ page }) => {
+    // Worker must not return 404 for valid app routes; auth enforcement is client-side.
+    for (const path of ['/dashboard', '/profile', '/applications', '/messages', '/company/jobs', '/company/settings', '/admin']) {
+      await page.goto(path);
+      await expect(page, `${path} must receive the SPA shell, not 404`).not.toHaveURL(/404|not-found/, {
+        timeout: 10_000,
+      });
+    }
+  });
+
+  test('valid dynamic shapes receive the SPA shell', async ({ page }) => {
+    for (const path of ['/blog/asme-b31-3-vs-b31-1/', '/academy/module/1', '/academy/module/22']) {
+      await page.goto(path);
+      await expect(page, `${path} must be a valid dynamic route`).not.toHaveURL(/404|not-found/, {
+        timeout: 10_000,
+      });
+    }
+  });
+
+  test('unknown routes return HTTP 404 from the Worker', async ({ request }) => {
+    for (const path of ['/this-route-definitely-does-not-exist', '/tools/does-not-exist', '/company/does-not-exist', '/academy/999', '/academy/not-a-real-route', '/random/deep/path']) {
+      const response = await request.get(path);
+      expect(response.status(), `${path} must be 404`).toBe(404);
+      const body = await response.text();
+      expect(body, `${path} must not be the SPA shell`).not.toContain('id="root"');
+    }
+  });
+
+  test('missing static assets return 404, not SPA shell', async ({ request }) => {
+    const response = await request.get('/assets/definitely-missing-file.js');
+    expect(response.status()).toBe(404);
+    const body = await response.text();
+    expect(body).not.toContain('id="root"');
+  });
+
+  test('unknown route + query string remains 404', async ({ request }) => {
+    const response = await request.get('/no-such-route?source=test');
+    expect(response.status()).toBe(404);
+  });
+
+  test('valid route + query string remains valid', async ({ request }) => {
+    const response = await request.get('/tools?source=test');
+    expect(response.status()).toBe(200);
+  });
+
+  test('HEAD reflects GET status for valid and invalid routes', async ({ request }) => {
+    const valid = await request.head('/tools');
+    expect(valid.status()).toBe(200);
+    const invalid = await request.head('/no-such-route');
+    expect(invalid.status()).toBe(404);
+  });
+});
+
+test.describe('PB-SEO-102 NotFound UI', () => {
+  test('unknown client-side route renders NotFound page', async ({ page }) => {
+    await page.goto('/this-route-does-not-exist');
+    await expect(page.getByRole('heading', { name: '404' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('link', { name: /home/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /tools/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /jobs/i })).toBeVisible();
   });
 });
 
