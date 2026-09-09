@@ -15,6 +15,31 @@ if (import.meta.env.PROD) {
   console.info = () => {};
 }
 
+// PB-MOBILE-OFFLINE-TOOLS-001: register service worker for offline Tools.
+// Only in production and only when the runtime supports it.
+function registerServiceWorker() {
+  if (!import.meta.env.PROD || !('serviceWorker' in navigator)) {
+    return;
+  }
+
+  navigator.serviceWorker
+    .register('/sw.js')
+    .then(() => {
+      // Intentionally silent in production (console.info is no-op in PROD).
+    })
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.warn('Service Worker registration failed:', error);
+    });
+
+  // Prompt reload when a new service worker takes control.
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (window.location.pathname.startsWith('/tools')) {
+      window.location.reload();
+    }
+  });
+}
+
 // Load runtime configuration before rendering the app
 async function initializeApp() {
   // Prerendered blog pages are served as pure static HTML for SEO.
@@ -37,6 +62,8 @@ async function initializeApp() {
       error
     );
   }
+
+  registerServiceWorker();
 
   // Render the app
   createRoot(document.getElementById('root')!).render(<App />);

@@ -2,7 +2,7 @@
   "name": "PipingBox - Industrial Workforce Platform",
   "short_name": "PipingBox",
   "description": "Formación, herramientas, empleo, certificaciones y comunidad para profesionales y empresas del sector industrial.",
-  "start_url": "/",
+  "start_url": "/tools",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
