@@ -4,7 +4,7 @@
 
 **Ticket:** PB-TOOLS-STUDBOLT-REVISION-001
 **Branch:** feat/pb-tools-studbolt-revision-001
-**Commit:** 36c3e9ad1f76b3ca15bce390fad7ee1fc6496cce
+**Commit:** bd464f8b63aed6996bcd001fd43a3f00a25cad9d
 
 ## Target standards
 
