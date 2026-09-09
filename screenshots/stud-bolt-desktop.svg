@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 340" width="100%" height="auto" role="img" aria-label="Stud bolt 5/8"-11 UNC-2A, NPS 2" Class 150 RF">
+    <rect width="900" height="340" fill="#0E1117" rx="6" />
+    <defs>
+      <pattern id="studGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a2030" stroke-width="0.3"/></pattern>
+      <marker id="arrL" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6" fill="none" stroke="#FF8C00" stroke-width="1"/></marker>
+      <marker id="arrR" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#FF8C00" stroke-width="1"/></marker>
+      <marker id="arrLB" markerWidth="5" markerHeight="5" refX="0" refY="2.5" orient="auto"><path d="M5,0 L0,2.5 L5,5" fill="none" stroke="#3EA6FF" stroke-width="0.8"/></marker>
+      <marker id="arrRB" markerWidth="5" markerHeight="5" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5" fill="none" stroke="#3EA6FF" stroke-width="0.8"/></marker>
+    </defs>
+    <rect width="900" height="340" fill="url(#studGrid)" opacity="0.5" />
+
+    <rect x="356.40000000000003" y="-53.780120481927696" width="83.2" height="447.5602409638554" fill="#27272a" stroke="#A3A9B3" stroke-width="1.5" rx="2" />
+    <text x="398.00000000000006" y="174" fill="#71717a" font-size="9" text-anchor="middle">FLANGE</text>
+
+    <rect x="439.6" y="-41.780120481927696" width="20.8" height="423.5602409638554" fill="#22d3ee15" stroke="#22d3ee" stroke-width="1" />
+    <text x="450" y="-47.780120481927696" fill="#22d3ee" font-size="8" text-anchor="middle">GASKET</text>
+
+    <rect x="460.4" y="-53.780120481927696" width="83.2" height="447.5602409638554" fill="#27272a" stroke="#A3A9B3" stroke-width="1.5" rx="2" />
+    <text x="502" y="174" fill="#71717a" font-size="9" text-anchor="middle">FLANGE</text>
+
+    <rect x="190" y="120.27108433734941" width="520" height="99.4578313253012" fill="#1a2030" stroke="#FF8C00" stroke-width="1.2" />
+
+    <line x1="197.23614457831326" y1="120.27108433734941" x2="192.17084337349397" y2="219.7289156626506" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" /><line x1="211.70843373493977" y1="120.27108433734941" x2="206.64313253012048" y2="219.7289156626506" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" /><line x1="226.1807228915663" y1="120.27108433734941" x2="221.115421686747" y2="219.7289156626506" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" />
+    <line x1="673.8192771084337" y1="120.27108433734941" x2="668.7539759036143" y2="219.7289156626506" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" /><line x1="688.2915662650603" y1="120.27108433734941" x2="683.226265060241" y2="219.7289156626506" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" /><line x1="702.7638554216867" y1="120.27108433734941" x2="697.6985542168674" y2="219.7289156626506" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" />
+
+    <polygon points="250.33253012048192,123.01204819277109 385.65783132530123,123.01204819277109 402.5734939759036,170 385.65783132530123,216.9879518072289 250.33253012048192,216.9879518072289 233.41686746987955,170" fill="#232A36" stroke="#FF8C00" stroke-width="1.5" />
+    <line x1="275.70602409638553" y1="138.67469879518072" x2="360.2843373493976" y2="138.67469879518072" stroke="#3f3f46" stroke-width="0.5" />
+    <line x1="275.70602409638553" y1="201.32530120481928" x2="360.2843373493976" y2="201.32530120481928" stroke="#3f3f46" stroke-width="0.5" />
+
+    <polygon points="514.3421686746988,123.01204819277109 649.667469879518,123.01204819277109 666.5831325301205,170 649.667469879518,216.9879518072289 514.3421686746988,216.9879518072289 497.42650602409634,170" fill="#232A36" stroke="#FF8C00" stroke-width="1.5" />
+    <line x1="539.7156626506023" y1="138.67469879518072" x2="624.2939759036144" y2="138.67469879518072" stroke="#3f3f46" stroke-width="0.5" />
+    <line x1="539.7156626506023" y1="201.32530120481928" x2="624.2939759036144" y2="201.32530120481928" stroke="#3f3f46" stroke-width="0.5" />
+
+    <text x="450" y="330" fill="#71717a" font-size="8" text-anchor="middle">L no incluye los chaflanes/puntas de los extremos</text>
+
+    <line x1="190" y1="411.7801204819277" x2="710" y2="411.7801204819277" stroke="#FF8C00" stroke-width="1.2" marker-start="url(#arrL)" marker-end="url(#arrR)" />
+    <line x1="190" y1="399.7801204819277" x2="190" y2="417.7801204819277" stroke="#FF8C00" stroke-width="0.6" />
+    <line x1="710" y1="399.7801204819277" x2="710" y2="417.7801204819277" stroke="#FF8C00" stroke-width="0.6" />
+    <text x="450" y="425.7801204819277" fill="#FF8C00" font-size="11" text-anchor="middle" font-weight="bold">L = 3.268" (83 mm)</text>
+
+    <line x1="190" y1="435.7801204819277" x2="233.41686746987955" y2="435.7801204819277" stroke="#FF8C00" stroke-width="1" marker-start="url(#arrL)" marker-end="url(#arrR)" />
+    <text x="211.70843373493977" y="445.7801204819277" fill="#FF8C00" font-size="9" text-anchor="middle">e₁ ≥ 3P (6.9 mm)</text>
+
+    <line x1="666.5831325301205" y1="435.7801204819277" x2="710" y2="435.7801204819277" stroke="#FF8C00" stroke-width="1" marker-start="url(#arrL)" marker-end="url(#arrR)" />
+    <text x="688.2915662650603" y="445.7801204819277" fill="#FF8C00" font-size="9" text-anchor="middle">e₂ ≥ 3P (6.9 mm)</text>
+
+    <text x="450" y="92.27108433734941" fill="#3EA6FF" font-size="10" text-anchor="middle">TPI = 11 · P = 2.309 mm</text>
+    <line x1="442.7669879518072" y1="98.27108433734941" x2="457.2330120481928" y2="98.27108433734941" stroke="#3EA6FF" stroke-width="0.8" marker-start="url(#arrLB)" marker-end="url(#arrRB)" />
+
+    <line x1="450" y1="110.27108433734941" x2="450" y2="223.7289156626506" stroke="#3EA6FF" stroke-width="0.8" stroke-dasharray="3 2" />
+    <text x="456" y="106.27108433734941" fill="#3EA6FF" font-size="10" text-anchor="start">Ø5/8" (15.875 mm)</text>
+
+    <line x1="227.41686746987955" y1="115.01204819277109" x2="408.5734939759036" y2="115.01204819277109" stroke="#3EA6FF" stroke-width="0.8" marker-start="url(#arrLB)" marker-end="url(#arrRB)" />
+    <text x="317.9951807228916" y="109.01204819277109" fill="#3EA6FF" font-size="9" text-anchor="middle">AF 27.0 mm</text>
+
+    <line x1="678.5831325301205" y1="123.01204819277109" x2="678.5831325301205" y2="216.9879518072289" stroke="#3EA6FF" stroke-width="0.8" marker-start="url(#arrLB)" marker-end="url(#arrRB)" />
+    <text x="684.5831325301205" y="173" fill="#3EA6FF" font-size="9" text-anchor="start">H 15.0 mm</text>
+
+    <text x="890" y="18" fill="#A3A9B3" font-size="9" text-anchor="end">2" — Class 150 — RF</text>
+  </svg>

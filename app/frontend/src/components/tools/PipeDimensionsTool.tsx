@@ -10,7 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ArrowRightLeft, AlertTriangle } from 'lucide-react';
+import { AlertTriangle, ArrowRightLeft } from 'lucide-react';
+import { getStudBoltRow, ASME_B16_5_NPS_ORDER, formatInchFraction } from '@/lib/bolting';
 
 /* ═══════════════════════════════════════════════════════════════
    TAB 1: PIPE DIMENSIONS (ASME B36.10M / B36.19M)
@@ -195,7 +196,13 @@ const FLANGE_2500: FlangeRow[] = [
   { nps: '12"', odFlange: 762.0, thickness: 184.2, bcd: 635.0, bolts: 12, boltDia: '2-3/4"', rfDia: 381.0 },
 ];
 
-const FLANGE_CLASSES = ['150', '300', '600', '900', '1500', '2500'] as const;
+const FLANGE_CLASSES = ['150', '300', '400', '600', '900', '1500', '2500'] as const;
+
+function canonicalBolts(classNum: number, nps: string): { bolts: number | null; boltDia: string | null } {
+  const row = getStudBoltRow(classNum, nps);
+  if (!row) return { bolts: null, boltDia: null };
+  return { bolts: row.qty, boltDia: formatInchFraction(row.diaIn) };
+}
 
 /* ═══════════════════════════════════════════════════════════════
    TAB 3: BOLT TORQUE (ASME PCC-1)
@@ -395,23 +402,52 @@ export default function PipeDimensionsTool() {
                   </tr>
                 </thead>
                 <tbody>
-                  {flangeData.map((row) => (
-                    <tr key={row.nps} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
-                      <td className="py-1.5 px-2 text-[#f59e0b] font-medium">{row.nps}</td>
-                      <td className="py-1.5 px-2 text-center font-mono text-zinc-200">{row.odFlange.toFixed(1)}</td>
-                      <td className="py-1.5 px-2 text-center font-mono text-zinc-200">{row.thickness.toFixed(1)}</td>
-                      <td className="py-1.5 px-2 text-center font-mono text-zinc-200">{row.bcd.toFixed(1)}</td>
-                      <td className="py-1.5 px-2 text-center text-zinc-200">{row.bolts}</td>
-                      <td className="py-1.5 px-2 text-center text-zinc-200">{row.boltDia}</td>
-                      <td className="py-1.5 px-2 text-center font-mono text-zinc-200">{row.rfDia.toFixed(1)}</td>
-                    </tr>
-                  ))}
+                  {flangeData.map((row) => {
+                    const bolts = canonicalBolts(Number(flangeClass), row.nps);
+                    return (
+                      <tr key={row.nps} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
+                        <td className="py-1.5 px-2 text-[#f59e0b] font-medium">{row.nps}</td>
+                        <td className="py-1.5 px-2 text-center font-mono text-zinc-200">{row.odFlange.toFixed(1)}</td>
+                        <td className="py-1.5 px-2 text-center font-mono text-zinc-200">{row.thickness.toFixed(1)}</td>
+                        <td className="py-1.5 px-2 text-center font-mono text-zinc-200">{row.bcd.toFixed(1)}</td>
+                        <td className="py-1.5 px-2 text-center text-zinc-200">{bolts.bolts ?? '—'}</td>
+                        <td className="py-1.5 px-2 text-center text-zinc-200">{bolts.boltDia ?? '—'}</td>
+                        <td className="py-1.5 px-2 text-center font-mono text-zinc-200">{row.rfDia.toFixed(1)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           ) : (
-            <div className="flex min-h-[200px] items-center justify-center border border-zinc-800/80 rounded">
-              <p className="text-sm text-zinc-500">{t('tools.comingSoonData')}</p>
+            <div className="space-y-4">
+              <p className="text-xs text-zinc-400">
+                {t('tools.flangeGeometryNotAvailable')}
+              </p>
+              <div className="overflow-x-auto border border-zinc-800/80 rounded">
+                <table className="w-full text-xs whitespace-nowrap">
+                  <thead>
+                    <tr className="bg-zinc-900 border-b border-zinc-800">
+                      <th className="py-2 px-2 text-left text-zinc-400 font-medium">NPS</th>
+                      <th className="py-2 px-2 text-center text-zinc-400 font-medium">No. Studs</th>
+                      <th className="py-2 px-2 text-center text-zinc-400 font-medium">Stud Dia</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ASME_B16_5_NPS_ORDER.map((nps) => {
+                      const bolts = canonicalBolts(Number(flangeClass), nps);
+                      if (!bolts.bolts || !bolts.boltDia) return null;
+                      return (
+                        <tr key={nps} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
+                          <td className="py-1.5 px-2 text-[#f59e0b] font-medium">{nps}</td>
+                          <td className="py-1.5 px-2 text-center text-zinc-200">{bolts.bolts}</td>
+                          <td className="py-1.5 px-2 text-center text-zinc-200">{bolts.boltDia}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </TabsContent>

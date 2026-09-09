@@ -12,6 +12,7 @@ import {
 import { ArrowRightLeft, AlertTriangle, Ruler, Link2, BookOpen, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
+import { getStudBoltRow, formatInchFraction } from '@/lib/bolting';
 import { SocketWeldSVG, ThreadedSVG, LapJointSVG } from './flange-svg-types';
 
 // ═══════════════════════════════════════════════════════════════
@@ -127,6 +128,19 @@ const ALL_FLANGES_300: FlangeSpec[] = [
   ...generateFlangeSpecs('20"', 508.0, 774.7, 63.5, 685.8, 24, '1-1/4"', 35.0, 584.2, 69.9, 170.0),
   ...generateFlangeSpecs('24"', 609.6, 914.4, 69.9, 812.8, 24, '1-1/2"', 41.3, 692.2, 76.2, 250.0),
 ];
+
+// Override bolting data with canonical ASME B16.5 dataset to avoid divergence.
+function applyCanonicalBolting(flanges: FlangeSpec[], pressureClass: number): void {
+  for (const spec of flanges) {
+    const row = getStudBoltRow(pressureClass, spec.nps);
+    if (row) {
+      spec.numBolts = row.qty;
+      spec.boltSize = formatInchFraction(row.diaIn);
+    }
+  }
+}
+applyCanonicalBolting(ALL_FLANGES_150, 150);
+applyCanonicalBolting(ALL_FLANGES_300, 300);
 
 const CLASS_MAP: Record<string, FlangeSpec[]> = { '150': ALL_FLANGES_150, '300': ALL_FLANGES_300 };
 const CLASSES = ['150', '300'] as const;
