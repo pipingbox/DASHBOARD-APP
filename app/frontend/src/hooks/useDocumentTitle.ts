@@ -82,17 +82,8 @@ export function useDocumentTitle() {
       ogDesc.content = desc;
     }
 
-    // Set html lang to en (I18N-03 fix — was hardcoded to 'es')
-    document.documentElement.lang = 'en';
-
-    // Set canonical URL (I18N-04 fix)
-    const canonicalUrl = `https://pipingbox.com${path}`;
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.rel = 'canonical';
-      document.head.appendChild(canonical);
-    }
-    canonical.href = canonicalUrl;
+    // PB-SEO-101: <html lang> and <link rel="canonical"> are owned by useSeo
+    // (dynamic lang from i18next, canonical on every route change). Keeping
+    // them here forced lang="en" and wrote a duplicate canonical.
   }, [location.pathname]);
 }
