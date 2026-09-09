@@ -1,9 +1,11 @@
 # Audit dimensional — Stud Bolts ASME B16.5
 
-**Fecha:** 2026-09-09T08:40:44.920Z
+**Fecha:** 2026-09-09T10:00:00.000Z
 **Baseline objetivo:** ASME B16.5-2025 (texto primario no disponible en este entorno)
 **Fuente canónica:** PIPINGBOX-BRAIN/brain/08-CATALOG/ASME/BOLTING/PB-DIM-ASME-B16-5-STUD-BOLT.yaml
-**Estado de verificación:** cross_reference_only (pending primary source)
+**Estado de verificación:** cross_reference_only (DATA VALIDATION REQUIRED)
+**Branch:** feat/pb-tools-studbolt-revision-001
+**Commit:** 36c3e9ad1f76b3ca15bce390fad7ee1fc6496cce
 
 ## Resumen
 
