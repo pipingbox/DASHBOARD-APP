@@ -3,10 +3,12 @@
  * GENERATED FILE — do not edit by hand.
  *
  * Source: PIPINGBOX-BRAIN brain/08-CATALOG/ASME/PIPE/PB-DIM-ASME-B36-10M-PIPE.yaml
+ * Source commit: 19232bb39a0102e5cf950f55b35f483970751233
+ * Source blob: 9985f64062d1cec1999d783c8ef278dc8214b508
  * Generator: scripts/generate-pipe-standards.mjs
  * Standard: PB-STD-ASME-B36-10M
  * Rows: 193
- * Generated: 2026-09-09T18:34:43.850Z
+ * Deterministic generation — no wall-clock timestamp.
  *
  * Provenance: CROSS_REFERENCE — values derived from ASME B36.10M cross-reference
  * tables. Do not label VERIFIED_PRIMARY until a licensed primary source is checked.
@@ -262,6 +264,7 @@ export const PIPE_DIMENSIONS_PROVENANCE = {
   datasetId: "PB-DIM-ASME-B36-10M-PIPE",
   sourceStatus: 'CROSS_REFERENCE' as const,
   sourceNote: 'Values from ASME B36.10M cross-reference tables. Not verified against a licensed primary text.',
+  sourceCommit: "19232bb39a0102e5cf950f55b35f483970751233",
+  sourceBlob: "9985f64062d1cec1999d783c8ef278dc8214b508",
   rowCount: 193,
-  generatedAt: "2026-09-09T18:34:43.851Z",
 };

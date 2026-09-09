@@ -2,13 +2,14 @@
  * Shared right-triangle geometry for pipe offsets.
  *
  * Internal convention: lengths in mm, angles in degrees.
- * Ticket: PB-TOOLS-FUNCTIONAL-PARITY-001 / W1.A
+ * Ticket: PB-TOOLS-FUNCTIONAL-PARITY-001 / W1.A.1
  */
 
 import { clamp } from '../formatting/index.ts';
 
 const DEG_TO_RAD = Math.PI / 180;
 const RAD_TO_DEG = 180 / Math.PI;
+const ANGLE_TOLERANCE_DEG = 0.01;
 
 export interface RightTriangleSolution {
   a: number; // horizontal advance (mm)
@@ -24,9 +25,23 @@ export interface PartialRightTriangle {
   thetaDeg?: number;
 }
 
+export type GeometryResult<T> =
+  | { success: true; result: T }
+  | { success: false; reason: string };
+
+function isFinitePositive(value: number | undefined): value is number {
+  return value !== undefined && Number.isFinite(value) && value > 0;
+}
+
+function isFiniteNonNegative(value: number | undefined): value is number {
+  return value !== undefined && Number.isFinite(value) && value >= 0;
+}
+
 /**
  * Solve a right triangle given exactly two of {a, b, h, thetaDeg}.
  * Returns all four values. Does not involve fittings.
+ *
+ * Throws for invalid input because the caller must provide a well-formed triangle.
  */
 export function solveRightTriangle(input: PartialRightTriangle): RightTriangleSolution {
   const provided = [input.a, input.b, input.h, input.thetaDeg].filter((v) => v !== undefined && Number.isFinite(v));
@@ -65,6 +80,10 @@ export function solveRightTriangle(input: PartialRightTriangle): RightTriangleSo
     throw new Error('Unable to solve triangle');
   }
 
+  if (![a, b, h, thetaDeg].every(Number.isFinite)) {
+    throw new Error('Triangle solution produced non-finite value');
+  }
+
   return {
     a: Number(a.toFixed(6)),
     b: Number(b.toFixed(6)),
@@ -77,7 +96,7 @@ export interface ElbowOffsetInput {
   a: number;
   b: number;
   clrMm: number; // center-line radius of the elbow (mm)
-  elbowAngleDeg?: number; // angle of each elbow; default 90°
+  elbowAngleDeg: number; // angle of the commercial elbow (e.g. 45, 90)
 }
 
 export interface ElbowOffsetSolution extends RightTriangleSolution {
@@ -88,23 +107,51 @@ export interface ElbowOffsetSolution extends RightTriangleSolution {
 }
 
 /**
- * Offset using two identical elbows.
- * The diagonal center-to-center distance equals the right-triangle hypotenuse.
- * The straight cut length subtracts the take-out of both elbows.
+ * Offset using two identical commercial elbows between two parallel lines.
+ *
+ * The geometry derived from A/B fixes the required elbow angle (theta).
+ * The selected commercial elbow angle must match theta within tolerance.
+ * Incompatible fittings return explicit N/A (no silent result).
  */
-export function solveOffsetWithElbows(input: ElbowOffsetInput): ElbowOffsetSolution {
-  const elbowAngleDeg = input.elbowAngleDeg ?? 90;
+export function solveOffsetWithElbows(
+  input: ElbowOffsetInput
+): GeometryResult<ElbowOffsetSolution> {
+  if (!isFinitePositive(input.a)) return { success: false, reason: 'A must be a positive finite length' };
+  if (!isFinitePositive(input.b)) return { success: false, reason: 'B must be a positive finite length' };
+  if (!isFinitePositive(input.clrMm)) return { success: false, reason: 'CLR must be a positive finite radius' };
+  if (!isFinitePositive(input.elbowAngleDeg) || input.elbowAngleDeg > 90) {
+    return { success: false, reason: 'Elbow angle must be between 0° and 90°' };
+  }
+
   const triangle = solveRightTriangle({ a: input.a, b: input.b });
-  const elbowAngleRad = elbowAngleDeg * DEG_TO_RAD;
+
+  if (Math.abs(triangle.thetaDeg - input.elbowAngleDeg) > ANGLE_TOLERANCE_DEG) {
+    return {
+      success: false,
+      reason: `Geometry requires a ${triangle.thetaDeg.toFixed(2)}° elbow; selected ${input.elbowAngleDeg}° elbow is incompatible for 2D parallel-line offset.`,
+    };
+  }
+
+  const elbowAngleRad = input.elbowAngleDeg * DEG_TO_RAD;
   const takeOutPerElbowMm = input.clrMm * Math.tan(elbowAngleRad / 2);
   const straightCutLengthMm = triangle.h - 2 * takeOutPerElbowMm;
 
+  if (straightCutLengthMm < 0) {
+    return {
+      success: false,
+      reason: `Straight cut length is negative (${straightCutLengthMm.toFixed(2)} mm): the selected elbow radius is too large for this offset geometry.`,
+    };
+  }
+
   return {
-    ...triangle,
-    elbowAngleDeg,
-    takeOutPerElbowMm: Number(takeOutPerElbowMm.toFixed(6)),
-    centerToCenterMm: triangle.h,
-    straightCutLengthMm: Number(straightCutLengthMm.toFixed(6)),
+    success: true,
+    result: {
+      ...triangle,
+      elbowAngleDeg: input.elbowAngleDeg,
+      takeOutPerElbowMm: Number(takeOutPerElbowMm.toFixed(6)),
+      centerToCenterMm: triangle.h,
+      straightCutLengthMm: Number(straightCutLengthMm.toFixed(6)),
+    },
   };
 }
 
@@ -121,20 +168,39 @@ export interface FabricatedOffsetSolution extends RightTriangleSolution {
  * Offset without elbows: a single pipe cut at angle θ/2 on each end and rotated.
  * The total bend angle equals the diagonal angle θ; each cut is half.
  */
-export function solveOffsetWithoutElbows(input: FabricatedOffsetInput): FabricatedOffsetSolution {
+export function solveOffsetWithoutElbows(
+  input: FabricatedOffsetInput
+): GeometryResult<FabricatedOffsetSolution> {
+  if (!isFinitePositive(input.a)) return { success: false, reason: 'A must be a positive finite length' };
+  if (!isFinitePositive(input.b)) return { success: false, reason: 'B must be a positive finite length' };
+
   const triangle = solveRightTriangle({ a: input.a, b: input.b });
   return {
-    ...triangle,
-    cutAnglePerEndDeg: Number((triangle.thetaDeg / 2).toFixed(6)),
+    success: true,
+    result: {
+      ...triangle,
+      cutAnglePerEndDeg: Number((triangle.thetaDeg / 2).toFixed(6)),
+    },
   };
 }
 
-export type OffsetVerificationInput = PartialRightTriangle;
-
 /**
- * Alias for solveRightTriangle used by the verification tool.
- * Given any two of {a, b, h, thetaDeg}, returns the complete triangle.
+ * Partial solver for offset verification.
+ *
+ * Given any two of {a, b, h, thetaDeg}, returns the complete right triangle.
+ * This is NOT the full P3 verification tool (which must also accept three
+ * measured values and compute consistency/tolerance). W1.B does not ship P3.
+ * Ticket: PB-TOOLS-FUNCTIONAL-PARITY-001 / W1.A.1
  */
-export function solveOffsetVerification(input: OffsetVerificationInput): RightTriangleSolution {
-  return solveRightTriangle(input);
+export function solveOffsetVerificationPartial(
+  input: PartialRightTriangle
+): GeometryResult<RightTriangleSolution> {
+  try {
+    return { success: true, result: solveRightTriangle(input) };
+  } catch (err) {
+    return {
+      success: false,
+      reason: err instanceof Error ? err.message : 'Unable to solve verification triangle',
+    };
+  }
 }

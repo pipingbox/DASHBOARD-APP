@@ -3,11 +3,12 @@
  *
  * Convention:
  * - Base units are SI: m, Pa, kg, m³, m², m³/s, N·m, °C.
- * - `convert(value, from, to)` works across any supported units.
- * - `UnitSystem` is a user-facing preference (metric vs imperial).
+ * - Every unit has a physical dimension/category.
+ * - `convert(value, from, to)` rejects dimensionally incompatible units at runtime.
+ * - Prefer category-specific helpers (`convertLength`, etc.) for type safety.
  *
  * No UI labels here — only symbols and factors.
- * Ticket: PB-TOOLS-FUNCTIONAL-PARITY-001 / W1.A
+ * Ticket: PB-TOOLS-FUNCTIONAL-PARITY-001 / W1.A.1
  */
 
 export * from './fractions.ts';
@@ -35,7 +36,20 @@ export type Unit =
   | AngleUnit
   | TemperatureUnit;
 
+export type UnitCategory =
+  | 'length'
+  | 'pressure'
+  | 'weight'
+  | 'volume'
+  | 'area'
+  | 'flowRate'
+  | 'torque'
+  | 'angle'
+  | 'temperature';
+
 interface UnitDef {
+  /** Physical dimension/category of the unit. */
+  category: UnitCategory;
   /** Factor to convert from this unit to the base SI unit. */
   toBase: number;
   /** Unit system the unit belongs to. */
@@ -43,72 +57,72 @@ interface UnitDef {
 }
 
 const LENGTH: Record<LengthUnit, UnitDef> = {
-  mm: { toBase: 0.001, system: 'metric' },
-  cm: { toBase: 0.01, system: 'metric' },
-  m: { toBase: 1, system: 'metric' },
-  in: { toBase: 0.0254, system: 'imperial' },
-  ft: { toBase: 0.3048, system: 'imperial' },
+  mm: { category: 'length', toBase: 0.001, system: 'metric' },
+  cm: { category: 'length', toBase: 0.01, system: 'metric' },
+  m: { category: 'length', toBase: 1, system: 'metric' },
+  in: { category: 'length', toBase: 0.0254, system: 'imperial' },
+  ft: { category: 'length', toBase: 0.3048, system: 'imperial' },
 };
 
 const PRESSURE: Record<PressureUnit, UnitDef> = {
-  Pa: { toBase: 1, system: 'metric' },
-  kPa: { toBase: 1000, system: 'metric' },
-  bar: { toBase: 100000, system: 'metric' },
-  psi: { toBase: 6894.75729, system: 'imperial' },
+  Pa: { category: 'pressure', toBase: 1, system: 'metric' },
+  kPa: { category: 'pressure', toBase: 1000, system: 'metric' },
+  bar: { category: 'pressure', toBase: 100000, system: 'metric' },
+  psi: { category: 'pressure', toBase: 6894.75729, system: 'imperial' },
 };
 
 const WEIGHT: Record<WeightUnit, UnitDef> = {
-  g: { toBase: 0.001, system: 'metric' },
-  kg: { toBase: 1, system: 'metric' },
-  lb: { toBase: 0.45359237, system: 'imperial' },
-  oz: { toBase: 0.02834952, system: 'imperial' },
-  ton_m: { toBase: 1000, system: 'metric' },
-  ton_us: { toBase: 907.18474, system: 'imperial' },
-  ton_uk: { toBase: 1016.04691, system: 'imperial' },
+  g: { category: 'weight', toBase: 0.001, system: 'metric' },
+  kg: { category: 'weight', toBase: 1, system: 'metric' },
+  lb: { category: 'weight', toBase: 0.45359237, system: 'imperial' },
+  oz: { category: 'weight', toBase: 0.02834952, system: 'imperial' },
+  ton_m: { category: 'weight', toBase: 1000, system: 'metric' },
+  ton_us: { category: 'weight', toBase: 907.18474, system: 'imperial' },
+  ton_uk: { category: 'weight', toBase: 1016.04691, system: 'imperial' },
 };
 
 const VOLUME: Record<VolumeUnit, UnitDef> = {
-  ml: { toBase: 0.000001, system: 'metric' },
-  l: { toBase: 0.001, system: 'metric' },
-  m3: { toBase: 1, system: 'metric' },
-  gal_us: { toBase: 0.00378541, system: 'imperial' },
-  gal_uk: { toBase: 0.00454609, system: 'imperial' },
-  ft3: { toBase: 0.0283168, system: 'imperial' },
-  bbl: { toBase: 0.158987, system: 'imperial' },
+  ml: { category: 'volume', toBase: 0.000001, system: 'metric' },
+  l: { category: 'volume', toBase: 0.001, system: 'metric' },
+  m3: { category: 'volume', toBase: 1, system: 'metric' },
+  gal_us: { category: 'volume', toBase: 0.00378541, system: 'imperial' },
+  gal_uk: { category: 'volume', toBase: 0.00454609, system: 'imperial' },
+  ft3: { category: 'volume', toBase: 0.0283168, system: 'imperial' },
+  bbl: { category: 'volume', toBase: 0.158987, system: 'imperial' },
 };
 
 const AREA: Record<AreaUnit, UnitDef> = {
-  mm2: { toBase: 0.000001, system: 'metric' },
-  cm2: { toBase: 0.0001, system: 'metric' },
-  m2: { toBase: 1, system: 'metric' },
-  in2: { toBase: 0.00064516, system: 'imperial' },
-  ft2: { toBase: 0.092903, system: 'imperial' },
+  mm2: { category: 'area', toBase: 0.000001, system: 'metric' },
+  cm2: { category: 'area', toBase: 0.0001, system: 'metric' },
+  m2: { category: 'area', toBase: 1, system: 'metric' },
+  in2: { category: 'area', toBase: 0.00064516, system: 'imperial' },
+  ft2: { category: 'area', toBase: 0.092903, system: 'imperial' },
 };
 
 const FLOW_RATE: Record<FlowRateUnit, UnitDef> = {
-  m3h: { toBase: 1 / 3600, system: 'metric' },
-  lmin: { toBase: 0.001 / 60, system: 'metric' },
-  gpm: { toBase: 0.00378541 / 60, system: 'imperial' },
-  cfm: { toBase: 0.0283168 / 60, system: 'imperial' },
+  m3h: { category: 'flowRate', toBase: 1 / 3600, system: 'metric' },
+  lmin: { category: 'flowRate', toBase: 0.001 / 60, system: 'metric' },
+  gpm: { category: 'flowRate', toBase: 0.00378541 / 60, system: 'imperial' },
+  cfm: { category: 'flowRate', toBase: 0.0283168 / 60, system: 'imperial' },
 };
 
 const TORQUE: Record<TorqueUnit, UnitDef> = {
-  Nm: { toBase: 1, system: 'metric' },
-  ftlb: { toBase: 1.35581795, system: 'imperial' },
+  Nm: { category: 'torque', toBase: 1, system: 'metric' },
+  ftlb: { category: 'torque', toBase: 1.35581795, system: 'imperial' },
 };
 
 const ANGLE: Record<AngleUnit, UnitDef> = {
-  deg: { toBase: 1, system: 'both' },
-  rad: { toBase: 180 / Math.PI, system: 'both' },
+  deg: { category: 'angle', toBase: 1, system: 'both' },
+  rad: { category: 'angle', toBase: 180 / Math.PI, system: 'both' },
 };
 
 const TEMPERATURE: Record<TemperatureUnit, UnitDef> = {
-  C: { toBase: 1, system: 'both' },
-  F: { toBase: 1, system: 'both' },
-  K: { toBase: 1, system: 'both' },
+  C: { category: 'temperature', toBase: 1, system: 'both' },
+  F: { category: 'temperature', toBase: 1, system: 'both' },
+  K: { category: 'temperature', toBase: 1, system: 'both' },
 };
 
-const REGISTRY: Record<string, UnitDef> = {
+const REGISTRY: Record<Unit, UnitDef> = {
   ...LENGTH,
   ...PRESSURE,
   ...WEIGHT,
@@ -124,6 +138,12 @@ export function isKnownUnit(unit: string): unit is Unit {
   return unit in REGISTRY;
 }
 
+export function getUnitCategory(unit: Unit): UnitCategory {
+  const def = REGISTRY[unit];
+  if (!def) throw new Error(`Unknown unit: ${unit}`);
+  return def.category;
+}
+
 export function getUnitSystem(unit: Unit): UnitSystem {
   const def = REGISTRY[unit];
   if (!def) throw new Error(`Unknown unit: ${unit}`);
@@ -132,22 +152,24 @@ export function getUnitSystem(unit: Unit): UnitSystem {
 }
 
 /**
- * Convert a scalar value between any two known units.
- * Temperature uses offset-aware conversion.
+ * Convert a scalar value between any two known units of the SAME dimension.
+ * Rejects dimensionally incompatible units at runtime.
+ * Temperature uses offset-aware conversion and can only convert to temperature.
  */
 export function convert(value: number, from: Unit, to: Unit): number {
   if (from === to) return value;
 
-  // Temperature requires offset handling.
-  if ((from === 'C' || from === 'F' || from === 'K') && (to === 'C' || to === 'F' || to === 'K')) {
-    return convertTemperature(value, from, to);
-  }
-
   const fromDef = REGISTRY[from];
   const toDef = REGISTRY[to];
   if (!fromDef || !toDef) throw new Error(`Unknown unit conversion: ${from} → ${to}`);
-  // value_in_base = value * fromDef.toBase
-  // value_out = value_in_base / toDef.toBase
+  if (fromDef.category !== toDef.category) {
+    throw new Error(`Incompatible dimensions: ${from} (${fromDef.category}) → ${to} (${toDef.category})`);
+  }
+
+  if (fromDef.category === 'temperature') {
+    return convertTemperature(value, from as TemperatureUnit, to as TemperatureUnit);
+  }
+
   return (value * fromDef.toBase) / toDef.toBase;
 }
 
@@ -174,18 +196,63 @@ function convertTemperature(value: number, from: TemperatureUnit, to: Temperatur
   }
 }
 
+/** Type-safe length conversion. */
+export function convertLength(value: number, from: LengthUnit, to: LengthUnit): number {
+  return convert(value, from, to);
+}
+
+/** Type-safe pressure conversion. */
+export function convertPressure(value: number, from: PressureUnit, to: PressureUnit): number {
+  return convert(value, from, to);
+}
+
+/** Type-safe weight conversion. */
+export function convertWeight(value: number, from: WeightUnit, to: WeightUnit): number {
+  return convert(value, from, to);
+}
+
+/** Type-safe volume conversion. */
+export function convertVolume(value: number, from: VolumeUnit, to: VolumeUnit): number {
+  return convert(value, from, to);
+}
+
+/** Type-safe area conversion. */
+export function convertArea(value: number, from: AreaUnit, to: AreaUnit): number {
+  return convert(value, from, to);
+}
+
+/** Type-safe flow-rate conversion. */
+export function convertFlowRate(value: number, from: FlowRateUnit, to: FlowRateUnit): number {
+  return convert(value, from, to);
+}
+
+/** Type-safe torque conversion. */
+export function convertTorque(value: number, from: TorqueUnit, to: TorqueUnit): number {
+  return convert(value, from, to);
+}
+
+/** Type-safe angle conversion. */
+export function convertAngle(value: number, from: AngleUnit, to: AngleUnit): number {
+  return convert(value, from, to);
+}
+
+/** Type-safe temperature conversion. */
+export function convertTemperatureTyped(value: number, from: TemperatureUnit, to: TemperatureUnit): number {
+  return convert(value, from, to);
+}
+
 /**
  * Convert a length in the given unit to millimetres.
  */
 export function toMm(value: number, unit: LengthUnit): number {
-  return convert(value, unit, 'mm');
+  return convertLength(value, unit, 'mm');
 }
 
 /**
  * Convert a length from millimetres to the given unit.
  */
 export function fromMm(value: number, unit: LengthUnit): number {
-  return convert(value, 'mm', unit);
+  return convertLength(value, 'mm', unit);
 }
 
 /**
