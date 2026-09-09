@@ -610,7 +610,8 @@
     "examYourOrder": "Uw volgorde",
     "examCorrectOrder": "Juiste volgorde",
     "examCorrectStatement": "Juist: {{answer}}",
-    "examYourStatement": "Uw antwoord: {{answer}}"
+    "examYourStatement": "Uw antwoord: {{answer}}",
+    "questions": "vragen"
   },
   "tools": {
     "eyebrow": "Tools",
@@ -775,47 +776,16 @@
     },
     "categoryFabrication": "Fabricage",
     "elbowCut": {
-      "angleDeg": "Hoek (°)",
-      "arcExtrados": "Boog buitenzijde",
-      "arcIntrados": "Boog binnenzijde",
-      "arcNeutral": "Neutrale boog",
-      "cutExtrados": "Snede buitenzijde",
-      "cutIntrados": "Snede binnenzijde",
-      "cutLine": "Snijlijn",
-      "desiredAngle": "Gewenste hoek",
-      "elbowRadius": "Bochtradius",
-      "formula": "Snede = (R ± BD/2) × tan(θ/2)",
       "name": "Bochtsnij-calculator",
-      "neutralAxis": "Neutrale as",
-      "nps": "Nominale maat (NPS)",
-      "referenceTable": "Referentietabel",
-      "results": "Resultaten",
-      "schedule": "Schedule",
-      "standard": "Norm",
-      "subtitle": "Snijposities op standaardbochten berekenen",
-      "wallThickness": "Wanddikte"
+      "subtitle": "Snijposities op standaardbochten berekenen"
     },
     "pipeDim": {
-      "boltDia": "Bout-Ø",
-      "boltLen": "Bout-L",
-      "boltSize": "Boutmaat",
-      "bolts": "Aantal bouten",
-      "class": "Klasse",
-      "dry": "Droog",
-      "lubed": "Gesmeerd",
       "name": "Buisgegevenstabellen",
-      "searchPlaceholder": "Zoek NPS of DN...",
-      "showInches": "Tonen in inches",
-      "subtitle": "Referentiegegevens ASME B36.10M / B16.5 / PCC-1",
-      "tabBolt": "Aandraaimoment",
-      "tabFlange": "Flensafmetingen",
-      "tabPipe": "Buisafmetingen",
-      "thickness": "Wanddikte"
+      "subtitle": "Referentiegegevens ASME B36.10M / B16.5 / PCC-1"
     },
     "unitConv": {
       "allConversions": "Alle omrekeningen",
       "catArea": "Oppervlakte",
-      "catDiameter": "Diameter (NPS/DN)",
       "catFlowRate": "Debiet",
       "catLength": "Lengte",
       "catPressure": "Druk",
@@ -824,7 +794,6 @@
       "catWeight": "Gewicht",
       "from": "Van",
       "name": "Eenhedenomrekener",
-      "npsDnTable": "NPS ↔ DN referentietabel",
       "subtitle": "Omrekening tussen technische eenheden",
       "to": "Naar"
     },
