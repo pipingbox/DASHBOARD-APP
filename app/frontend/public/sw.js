@@ -22,10 +22,13 @@ const MAX_RUNTIME_CACHE_ENTRIES = 300;
 function isSupabaseApi(url) {
   return (
     url.hostname.endsWith('.supabase.co') ||
+    url.hostname === 'auth.pipingbox.com' ||
     url.pathname.startsWith('/auth/') ||
     url.pathname.startsWith('/rest/') ||
     url.pathname.startsWith('/realtime/') ||
-    url.pathname.startsWith('/storage/')
+    url.pathname.startsWith('/storage/') ||
+    url.pathname.startsWith('/functions/') ||
+    url.pathname.startsWith('/graphql/')
   );
 }
 

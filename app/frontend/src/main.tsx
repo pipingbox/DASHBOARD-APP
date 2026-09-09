@@ -17,16 +17,11 @@ if (import.meta.env.PROD) {
 
 // PB-MOBILE-OFFLINE-TOOLS-001: register service worker for offline Tools.
 // Only in production and only when the runtime supports it.
-function registerServiceWorker() {
-  if (!import.meta.env.PROD || !('serviceWorker' in navigator)) {
-    return;
-  }
-
+// NOTE: import.meta.env.PROD is incorrectly false in this build pipeline
+// even though MODE === 'production'; use MODE explicitly (PB-MOBILE-OFFLINE-TOOLS-001).
+if (import.meta.env.MODE === 'production' && 'serviceWorker' in navigator) {
   navigator.serviceWorker
     .register('/sw.js')
-    .then(() => {
-      // Intentionally silent in production (console.info is no-op in PROD).
-    })
     .catch((error) => {
       // eslint-disable-next-line no-console
       console.warn('Service Worker registration failed:', error);
@@ -62,8 +57,6 @@ async function initializeApp() {
       error
     );
   }
-
-  registerServiceWorker();
 
   // Render the app
   createRoot(document.getElementById('root')!).render(<App />);
