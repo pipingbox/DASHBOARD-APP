@@ -43,15 +43,34 @@ export default defineConfig(({ command }) => {
         generateRobotsTxt: false,
         // PB-WEB-006: all public routes approved in PB-WEB-005 (F1 + F2).
         // vite-plugin-sitemap 0.8.2 uses dynamicRoutes, not routes.
+        // PB-SEO-101: legal/contact/certification routes added.
+        // vite-plugin-sitemap 0.8.2 builds the route list as
+        // (scan of **\/\*.html in dist) + dynamicRoutes with NO dedup, and it
+        // normalizes every route to the slash-less form. '/' and the blog
+        // pages are already emitted by the dist scan (prerendered HTML), so
+        // listing them here would duplicate <url> entries — they are covered
+        // as long as vite-prerender-plugin emits their HTML, which is
+        // load-bearing for the blog anyway.
+        // Known follow-up (not this ticket): the plugin strips trailing
+        // slashes, so sitemap URLs ('/blog') differ from the canonical
+        // trailing-slash URLs ('/blog/'), and per-route lastmod from
+        // getSitemapLastmod() never matches the normalized routes. Fixing
+        // both means replacing this plugin with explicit sitemap generation.
         dynamicRoutes: [
-          '/',
           '/tools',
           '/academy',
           '/jobs',
           '/pricing',
           '/companies',
           '/companies/request-workers',
-          '/blog',
+          '/contact',
+          '/privacy',
+          '/terms',
+          '/dsa',
+          '/certifications',
+          '/certifications/vca',
+          '/certifications/scc',
+          '/certifications/prl',
         ],
       }),
       ...(blogPrerenderRoutes.length > 0

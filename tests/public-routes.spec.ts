@@ -69,3 +69,48 @@ test.describe('PB-WEB-005 public surface', () => {
     ).toHaveCount(0);
   });
 });
+
+test.describe('PB-SEO-101 acquisition foundation', () => {
+  test('/.well-known/assetlinks.json serves JSON, not the SPA shell', async ({
+    request,
+  }) => {
+    // TWA (PB-GROWTH-GOOGLE-ACQUISITION-001): Digital Asset Links must return
+    // application/json. Until the file existed, the SPA fallback served
+    // index.html with text/html, which breaks Android app-link verification.
+    const response = await request.get('/.well-known/assetlinks.json');
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain('application/json');
+    const body = await response.json();
+    expect(Array.isArray(body)).toBe(true);
+  });
+
+  test('blog post renders real content instead of the not-found view', async ({
+    page,
+  }) => {
+    // The blog content lived at the repo root while every consumer expected it
+    // under app/frontend/seo/content, so production rendered the empty index
+    // and the per-post 404 view. This pins one known post.
+    await page.goto('/blog/asme-b31-3-vs-b31-1/');
+    await expect(
+      page.getByRole('heading', { name: /ASME B31\.3 vs B31\.1/i }).first(),
+      'blog post must render its real title',
+    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/page not found/i)).toHaveCount(0);
+  });
+
+  test('sitemap covers legal, certification and blog-post URLs', async ({
+    request,
+  }) => {
+    const response = await request.get('/sitemap.xml');
+    expect(response.status()).toBe(200);
+    const body = await response.text();
+    for (const url of [
+      'https://pipingbox.com/contact',
+      'https://pipingbox.com/privacy',
+      'https://pipingbox.com/certifications/vca',
+      'https://pipingbox.com/blog/asme-b31-3-vs-b31-1/',
+    ]) {
+      expect(body, `sitemap must include ${url}`).toContain(url);
+    }
+  });
+});
