@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PipingBoxLogo } from '@/components/PipingBoxLogo';
 import { Home, Wrench, Briefcase, SearchX } from 'lucide-react';
 import { useSeo } from '@/hooks/useSeo';
@@ -12,10 +13,11 @@ import { useSeo } from '@/hooks/useSeo';
  * navigations that land on the * route).
  */
 export default function NotFound() {
+  const { t } = useTranslation();
+
   useSeo({
-    title: 'Page Not Found — PipingBox',
-    description:
-      'We could not find the page you were looking for. Explore PipingBox tools, jobs and courses, or return home.',
+    title: t('notFound.title'),
+    description: t('notFound.description'),
     noindex: true,
   });
 
@@ -26,7 +28,7 @@ export default function NotFound() {
         <SearchX className="mb-4 h-16 w-16 text-[#f59e0b]" aria-hidden="true" />
         <h1 className="mb-2 text-4xl font-bold text-white sm:text-5xl">404</h1>
         <p className="mb-8 text-lg text-zinc-400">
-          We could not find that page. It may have been moved or removed.
+          {t('notFound.explanation')}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link
@@ -34,21 +36,21 @@ export default function NotFound() {
             className="inline-flex items-center gap-2 rounded-lg bg-[#f59e0b] px-5 py-2.5 font-semibold text-black hover:bg-amber-400"
           >
             <Home className="h-4 w-4" />
-            Home
+            {t('notFound.home')}
           </Link>
           <Link
             to="/tools"
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-5 py-2.5 font-semibold text-white hover:border-zinc-500"
           >
             <Wrench className="h-4 w-4" />
-            Tools
+            {t('notFound.tools')}
           </Link>
           <Link
             to="/jobs"
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-5 py-2.5 font-semibold text-white hover:border-zinc-500"
           >
             <Briefcase className="h-4 w-4" />
-            Jobs
+            {t('notFound.jobs')}
           </Link>
         </div>
       </div>

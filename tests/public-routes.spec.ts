@@ -109,12 +109,24 @@ test.describe('PB-SEO-102 Worker route contract', () => {
     for (const path of ['/this-route-definitely-does-not-exist', '/tools/does-not-exist', '/company/does-not-exist', '/academy/999', '/academy/not-a-real-route', '/random/deep/path']) {
       const response = await request.get(path);
       expect(response.status(), `${path} must be 404`).toBe(404);
-      const body = await response.text();
-      expect(body, `${path} must not be the SPA shell`).not.toContain('id="root"');
     }
   });
 
-  test('missing static assets return 404, not SPA shell', async ({ request }) => {
+  test('unknown HTML document returns 404 + SPA shell for branded NotFound UI', async ({ page, request }) => {
+    const response = await page.goto('/this-route-does-not-exist');
+    expect(response?.status(), 'direct unknown HTML navigation must be HTTP 404').toBe(404);
+    await expect(page.getByRole('heading', { name: '404' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('link', { name: /home/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /tools/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /jobs/i })).toBeVisible();
+
+    // The response body must be the SPA shell (so React can boot), not a plain text 404.
+    const reqResponse = await request.get('/this-route-does-not-exist');
+    const body = await reqResponse.text();
+    expect(body).toContain('id="root"');
+  });
+
+  test('missing static asset returns 404 and no SPA shell', async ({ request }) => {
     const response = await request.get('/assets/definitely-missing-file.js');
     expect(response.status()).toBe(404);
     const body = await response.text();
@@ -136,6 +148,22 @@ test.describe('PB-SEO-102 Worker route contract', () => {
     expect(valid.status()).toBe(200);
     const invalid = await request.head('/no-such-route');
     expect(invalid.status()).toBe(404);
+  });
+});
+
+test.describe('PB-SEO-102 useSeo noindex lifecycle', () => {
+  test('noindex is set on NotFound and removed after navigating away', async ({ page }) => {
+    await page.goto('/this-route-does-not-exist');
+    await expect(page.getByRole('heading', { name: '404' })).toBeVisible({ timeout: 10_000 });
+
+    const robotsBefore = await page.locator('meta[name="robots"]').getAttribute('content');
+    expect(robotsBefore).toContain('noindex');
+
+    await page.getByRole('link', { name: /tools/i }).click();
+    await expect(page).toHaveURL('/tools', { timeout: 10_000 });
+
+    const robotsAfter = await page.locator('meta[name="robots"]').count();
+    expect(robotsAfter).toBe(0);
   });
 });
 

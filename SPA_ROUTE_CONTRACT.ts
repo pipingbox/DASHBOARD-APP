@@ -184,6 +184,7 @@ export const STATIC_WELL_KNOWN_PATHS = new Set([
   '/sitemap.xml',
   '/site.webmanifest',
   '/.well-known/assetlinks.json',
+  '/sw.js',
 ]);
 
 // Prefixes that are unambiguously static assets (built JS/CSS/images/fonts).

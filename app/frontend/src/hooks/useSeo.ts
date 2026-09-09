@@ -56,6 +56,12 @@ function setMeta(name: string, content: string, prop?: boolean): void {
   el.content = content;
 }
 
+function removeMeta(name: string, prop?: boolean): void {
+  const attr = prop ? 'property' : 'name';
+  const el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${name}"]`);
+  if (el) el.remove();
+}
+
 // ─── hook ────────────────────────────────────────────────────────────────────
 
 interface SeoOptions {
@@ -63,7 +69,7 @@ interface SeoOptions {
   title?: string;
   /** Override the meta description. Falls back to the default in index.html. */
   description?: string;
-  /** If true, add <meta name="robots" content="noindex"> and stay out of search results. */
+  /** If true, add <meta name="robots" content="noindex"> while mounted. */
   noindex?: boolean;
 }
 
@@ -106,9 +112,25 @@ export function useSeo(options: SeoOptions = {}): void {
       setMeta('og:description', options.description, true);
       setMeta('twitter:description', options.description);
     }
-    // PB-SEO-102: noindex on 404 and similar non-indexable pages.
-    if (options.noindex) {
-      setMeta('robots', 'noindex');
-    }
-  }, [options.title, options.description, options.noindex]);
+  }, [options.title, options.description]);
+
+  // PB-SEO-102: page-specific noindex with cleanup. When mounted, capture the
+  // previous robots value (if any), set noindex, and restore/remove on unmount.
+  useEffect(() => {
+    if (!options.noindex) return;
+
+    const selector = 'meta[name="robots"]';
+    const existing = document.head.querySelector<HTMLMetaElement>(selector);
+    const previous = existing?.content ?? null;
+
+    setMeta('robots', 'noindex');
+
+    return () => {
+      if (previous === null) {
+        removeMeta('robots');
+      } else {
+        setMeta('robots', previous);
+      }
+    };
+  }, [options.noindex]);
 }

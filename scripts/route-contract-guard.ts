@@ -31,20 +31,38 @@ while ((match = pathRegex.exec(appSource)) !== null) {
   appPaths.add(match[1]);
 }
 
-const missingFromContract: string[] = [];
+const appNotInContract: string[] = [];
 for (const appPath of appPaths) {
   // Wildcards and redirects inside React Router are not routable pages.
   if (appPath === '*') continue;
-  // Parameterized React Router patterns match the contract syntax 1:1.
   if (!contractPatterns.has(appPath)) {
-    missingFromContract.push(appPath);
+    appNotInContract.push(appPath);
   }
 }
 
-if (missingFromContract.length > 0) {
+const contractNotInApp: string[] = [];
+for (const contractPath of contractPatterns) {
+  if (!appPaths.has(contractPath)) {
+    contractNotInApp.push(contractPath);
+  }
+}
+
+let failed = false;
+
+if (appNotInContract.length > 0) {
   console.error('Route-contract drift detected. These App.tsx paths are missing from SPA_ROUTE_CONTRACT:');
-  for (const p of missingFromContract) console.error(`  - ${p}`);
+  for (const p of appNotInContract) console.error(`  - ${p}`);
+  failed = true;
+}
+
+if (contractNotInApp.length > 0) {
+  console.error('Route-contract drift detected. These SPA_ROUTE_CONTRACT entries no longer exist in App.tsx:');
+  for (const p of contractNotInApp) console.error(`  - ${p}`);
+  failed = true;
+}
+
+if (failed) {
   process.exit(1);
 }
 
-console.log(`Route-contract drift guard PASS: ${appPaths.size} App.tsx path declarations covered by SPA_ROUTE_CONTRACT.`);
+console.log(`Route-contract drift guard PASS: ${appPaths.size} App.tsx path declarations <-> ${contractPatterns.size} SPA_ROUTE_CONTRACT entries are aligned.`);

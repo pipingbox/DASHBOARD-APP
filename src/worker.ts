@@ -28,10 +28,14 @@ const CANONICAL = 'https://pipingbox.com';
  * PB-SEO-102: structural route validation at the edge.
  *
  * Flow per canonical request:
- *   1. Static well-known paths and asset-prefixes go to ASSETS (real 404 if missing).
+ *   1. Static files (well-known, /sw.js, /assets/*, /catalog/*) are served by
+ *      ASSETS. If a static path returns the SPA HTML fallback (because the file
+ *      is missing), we turn it into a real 404.
  *   2. Paths matching SPA_ROUTE_CONTRACT receive the SPA shell (prerendered HTML
  *      if present, otherwise index.html from the static-assets fallback).
- *   3. Everything else returns HTTP 404.
+ *   3. Unknown HTML-document requests receive index.html with HTTP 404 so React
+ *      boots and renders the branded NotFound UI, plus X-Robots-Tag noindex.
+ *   4. Unknown non-document requests receive a minimal HTTP 404.
  *
  * Auth/role enforcement remains client-side; the Worker only guards structural
  * validity so unknown routes no longer return 200 + index.html.
@@ -52,15 +56,14 @@ export default {
       return Response.redirect(CANONICAL + satelliteTarget, 301);
     }
 
-    const pathname = decodeURIComponent(url.pathname);
+    const pathname = safeDecodePathname(url.pathname);
 
-    // 1. Unambiguous static assets: let ASSETS serve, but reject SPA-shell
-    // fallbacks for missing assets under /assets/ or /catalog/.
-    if (isStaticAsset(pathname)) {
+    // 1. Static files: let ASSETS serve, but never let a missing static file
+    // fall back to the SPA shell.
+    if (isStaticPath(pathname)) {
       const response = await env.ASSETS.fetch(request);
       if (
         response.status === 200 &&
-        isStaticAssetPrefix(pathname) &&
         response.headers.get('content-type')?.includes('text/html')
       ) {
         return new Response('Not found', { status: 404 });
@@ -73,16 +76,36 @@ export default {
       return env.ASSETS.fetch(request);
     }
 
-    // 3. Unknown route: real 404, never the SPA shell.
+    // 3. Unknown route.
+    const acceptsHtml = request.headers.get('accept')?.includes('text/html');
+    if (acceptsHtml) {
+      // Serve the SPA shell with HTTP 404 so React Router renders the branded
+      // NotFound UI. Preserve original URL (no redirect).
+      const indexRequest = new Request(`${url.origin}/index.html`, request);
+      const indexResponse = await env.ASSETS.fetch(indexRequest);
+      const headers = new Headers(indexResponse.headers);
+      headers.set('content-type', 'text/html; charset=utf-8');
+      headers.set('x-robots-tag', 'noindex, nofollow');
+      return new Response(indexResponse.body, {
+        status: 404,
+        statusText: 'Not Found',
+        headers,
+      });
+    }
+
     return new Response('Not found', { status: 404 });
   },
 };
 
-function isStaticAsset(pathname: string): boolean {
-  if (STATIC_WELL_KNOWN_PATHS.has(pathname)) return true;
-  return isStaticAssetPrefix(pathname);
+function safeDecodePathname(pathname: string): string {
+  try {
+    return decodeURIComponent(pathname);
+  } catch {
+    return pathname;
+  }
 }
 
-function isStaticAssetPrefix(pathname: string): boolean {
+function isStaticPath(pathname: string): boolean {
+  if (STATIC_WELL_KNOWN_PATHS.has(pathname)) return true;
   return STATIC_ASSET_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
