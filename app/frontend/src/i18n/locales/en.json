@@ -645,7 +645,8 @@
     "examYourOrder": "Your order",
     "examCorrectOrder": "Correct order",
     "examCorrectStatement": "Correct: {{answer}}",
-    "examYourStatement": "Your answer: {{answer}}"
+    "examYourStatement": "Your answer: {{answer}}",
+    "questions": "questions"
   },
   "tools": {
     "eyebrow": "Tools",

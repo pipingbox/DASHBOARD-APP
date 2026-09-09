@@ -1044,11 +1044,7 @@
       "modeEngineeringHint": "(completa)",
       "viewFullDatasheet": "Vedi scheda completa (modalità ingegneria)",
       "breadcrumbLibrary": "Libreria"
-    },
-    "categoryLibrary": "Libreria Tecnica",
-    "categoryInspection": "Ispezione e Codici",
-    "pipeDataTables": "Tabelle Dati Tubazioni",
-    "fittingTakeOff": "Toma dei Raccordi"
+    }
   },
   "jobs": {
     "eyebrow": "Lavori",
