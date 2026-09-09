@@ -16,6 +16,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { parse } from 'yaml';
+import { createHash } from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -23,7 +24,9 @@ const __dirname = dirname(__filename);
 const BRAIN_PATH = join(__dirname, '../../../PIPINGBOX-BRAIN/brain/08-CATALOG/ASME/BOLTING/PB-DIM-ASME-B16-5-STUD-BOLT.yaml');
 const OUT_DIR = join(__dirname, '../src/lib/bolting/generated');
 
-const yaml = parse(readFileSync(BRAIN_PATH, 'utf8'));
+const yamlSource = readFileSync(BRAIN_PATH, 'utf8');
+const sourceHash = createHash('sha256').update(yamlSource).digest('hex').slice(0, 16);
+const yaml = parse(yamlSource);
 const rows = yaml.rows;
 
 function dedupe(arr, keyFn) {
@@ -81,7 +84,7 @@ function fmtNum(n) {
 const threadTs = `/**
  * GENERATED FILE — do not edit manually.
  * Source: ${BRAIN_PATH}
- * Generated at: ${new Date().toISOString()}
+ * Source hash: ${sourceHash}
  *
  * Thread data derived from ASME B1.1-2024 Table 6.
  * Stud external thread Class 2A; nut internal thread Class 2B.
@@ -116,7 +119,7 @@ export function minProtrusionMm(diaIn: number): number | undefined {
 const nutTs = `/**
  * GENERATED FILE — do not edit manually.
  * Source: ${BRAIN_PATH}
- * Generated at: ${new Date().toISOString()}
+ * Source hash: ${sourceHash}
  *
  * Heavy hex nut data derived from ASME B18.2.2-2022.
  */
@@ -141,7 +144,7 @@ export function getHeavyHexNutSpec(nominalDiaIn: number): HeavyHexNutSpec | unde
 const boltingTs = `/**
  * GENERATED FILE — do not edit manually.
  * Source: ${BRAIN_PATH}
- * Generated at: ${new Date().toISOString()}
+ * Source hash: ${sourceHash}
  *
  * Stud bolt data target standard: ASME B16.5-2025.
  * Verification status of source rows: ${yaml.quality?.validation_status ?? 'unknown'} (confidence ${yaml.quality?.confidence ?? 'unknown'}).

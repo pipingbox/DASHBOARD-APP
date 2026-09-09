@@ -1,7 +1,7 @@
 /**
  * GENERATED FILE — do not edit manually.
  * Source: /workspace/DASHBOARD-APP/PIPINGBOX-BRAIN/brain/08-CATALOG/ASME/BOLTING/PB-DIM-ASME-B16-5-STUD-BOLT.yaml
- * Generated at: 2026-09-09T08:58:54.429Z
+ * Source hash: bbe9fad12670814d
  *
  * Thread data derived from ASME B1.1-2024 Table 6.
  * Stud external thread Class 2A; nut internal thread Class 2B.

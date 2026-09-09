@@ -1,7 +1,7 @@
 /**
  * GENERATED FILE — do not edit manually.
  * Source: /workspace/DASHBOARD-APP/PIPINGBOX-BRAIN/brain/08-CATALOG/ASME/BOLTING/PB-DIM-ASME-B16-5-STUD-BOLT.yaml
- * Generated at: 2026-09-09T08:58:54.429Z
+ * Source hash: bbe9fad12670814d
  *
  * Stud bolt data target standard: ASME B16.5-2025.
  * Verification status of source rows: draft (confidence 0.55).

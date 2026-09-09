@@ -1,7 +1,7 @@
 /**
  * GENERATED FILE — do not edit manually.
  * Source: /workspace/DASHBOARD-APP/PIPINGBOX-BRAIN/brain/08-CATALOG/ASME/BOLTING/PB-DIM-ASME-B16-5-STUD-BOLT.yaml
- * Generated at: 2026-09-09T08:58:54.429Z
+ * Source hash: bbe9fad12670814d
  *
  * Heavy hex nut data derived from ASME B18.2.2-2022.
  */
