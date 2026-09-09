@@ -2568,5 +2568,13 @@
       "api602CompactValve": "Clases según API 602 para válvulas compactas NPS 4 y menores. La Clase 800 no es una clase listada en ASME B16.34: es una clase intermedia de uso extendido para extremos roscados y soldados, y no existe en versión bridada. La clase disponible depende del tipo de extremo. Verificar contra la edición vigente de la norma.",
       "yStrainerNoStandard": "El filtro en Y no está cubierto por una norma dimensional específica en este catálogo. Los fabricantes lo suministran habitualmente con extremos bridados según ASME B16.5, por lo que la clase la fija la brida del modelo concreto. Aquí no se lista ninguna clase porque no existe una norma verificable que la defina."
     }
+  },
+  "notFound": {
+    "title": "Página no encontrada — PipingBox",
+    "description": "No hemos podido encontrar la página que buscabas. Explora herramientas, empleos y cursos de PipingBox, o vuelve al inicio.",
+    "explanation": "No hemos podido encontrar esa página. Puede haber sido movida o eliminada.",
+    "home": "Inicio",
+    "tools": "Herramientas",
+    "jobs": "Empleos"
   }
 }

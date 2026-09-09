@@ -2568,5 +2568,13 @@
       "api602CompactValve": "Classes per API 602 for compact valves NPS 4 and smaller. Class 800 is not a class listed in ASME B16.34: it is an intermediate class in widespread use for threaded and welded ends, and does not exist in a flanged version. The available class depends on the end type. Verify against the current edition of the standard.",
       "yStrainerNoStandard": "The Y-strainer is not covered by a specific dimensional standard in this catalogue. Manufacturers commonly supply it with flanged ends to ASME B16.5, so the class is set by the flange of the particular model. No class is listed here because there is no verifiable standard that defines one."
     }
+  },
+  "notFound": {
+    "title": "Page Not Found — PipingBox",
+    "description": "We could not find the page you were looking for. Explore PipingBox tools, jobs and courses, or return home.",
+    "explanation": "We could not find that page. It may have been moved or removed.",
+    "home": "Home",
+    "tools": "Tools",
+    "jobs": "Jobs"
   }
 }

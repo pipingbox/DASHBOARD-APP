@@ -2485,5 +2485,13 @@
       "api602CompactValve": "Klassen volgens API 602 voor compacte afsluiters NPS 4 en kleiner. Klasse 800 is geen in ASME B16.34 opgenomen klasse: het is een veel gebruikte tussenklasse voor draad- en lasuiteinden en bestaat niet in flensuitvoering. De beschikbare klasse hangt af van het type uiteinde. Controleer tegen de geldende uitgave van de norm.",
       "yStrainerNoStandard": "De Y-filter valt in deze catalogus niet onder een specifieke dimensionele norm. Fabrikanten leveren hem gewoonlijk met flenseinden volgens ASME B16.5, zodat de klasse wordt bepaald door de flens van het betreffende model. Hier wordt geen klasse vermeld omdat er geen verifieerbare norm bestaat die er een definieert."
     }
+  },
+  "notFound": {
+    "title": "Pagina niet gevonden — PipingBox",
+    "description": "We konden de pagina die je zocht niet vinden. Ontdek PipingBox-tools, vacatures en cursussen, of ga terug naar de startpagina.",
+    "explanation": "We konden die pagina niet vinden. Mogelijk is deze verplaatst of verwijderd.",
+    "home": "Home",
+    "tools": "Tools",
+    "jobs": "Vacatures"
   }
 }

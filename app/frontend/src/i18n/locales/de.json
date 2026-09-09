@@ -2521,5 +2521,13 @@
       "api602CompactValve": "Klassen nach API 602 für Kompaktarmaturen NPS 4 und kleiner. Klasse 800 ist in ASME B16.34 nicht als Klasse gelistet: sie ist eine weit verbreitete Zwischenklasse für Gewinde- und Schweissenden und existiert nicht in Flanschausführung. Die verfügbare Klasse hängt von der Endenausführung ab. Gegen die aktuelle Ausgabe der Norm prüfen.",
       "yStrainerNoStandard": "Der Y-Schmutzfänger wird in diesem Katalog von keiner spezifischen Maßnorm erfasst. Hersteller liefern ihn üblicherweise mit Flanschenden nach ASME B16.5, sodass die Klasse durch den Flansch des jeweiligen Modells bestimmt wird. Hier wird keine Klasse aufgeführt, da es keine nachprüfbare Norm gibt, die eine solche festlegt."
     }
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden — PipingBox",
+    "description": "Wir konnten die gesuchte Seite nicht finden. Entdecke PipingBox-Tools, Jobs und Kurse, oder kehre zur Startseite zurück.",
+    "explanation": "Wir konnten diese Seite nicht finden. Möglicherweise wurde sie verschoben oder entfernt.",
+    "home": "Startseite",
+    "tools": "Tools",
+    "jobs": "Jobs"
   }
 }

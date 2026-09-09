@@ -2521,5 +2521,13 @@
       "api602CompactValve": "Classes selon API 602 pour robinets compacts NPS 4 et inférieurs. La Classe 800 n'est pas une classe listée dans ASME B16.34 : c'est une classe intermédiaire d'usage répandu pour les extrémités taraudées et soudées, et elle n'existe pas en version à brides. La classe disponible dépend du type d'extrémité. Vérifier par rapport à l'édition en vigueur de la norme.",
       "yStrainerNoStandard": "Le filtre en Y n'est couvert par aucune norme dimensionnelle spécifique dans ce catalogue. Les fabricants le fournissent couramment avec des extrémités à brides selon ASME B16.5, de sorte que la classe est fixée par la bride du modèle concerné. Aucune classe n'est listée ici car il n'existe pas de norme vérifiable qui en définisse une."
     }
+  },
+  "notFound": {
+    "title": "Page introuvable — PipingBox",
+    "description": "Nous n'avons pas trouvé la page recherchée. Explorez les outils, les offres d'emploi et les formations PipingBox, ou retournez à l'accueil.",
+    "explanation": "Nous n'avons pas trouvé cette page. Elle a peut-être été déplacée ou supprimée.",
+    "home": "Accueil",
+    "tools": "Outils",
+    "jobs": "Emplois"
   }
 }
