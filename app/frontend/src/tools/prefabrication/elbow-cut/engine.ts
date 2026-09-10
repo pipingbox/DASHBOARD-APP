@@ -38,22 +38,30 @@ export interface ElbowCutResult {
 
 export type ElbowCutGeometryResult =
   | { success: true; result: ElbowCutResult }
-  | { success: false; reason: string };
+  | {
+      success: false;
+      /** English technical fallback message (not for localized UI). */
+      reason: string;
+      /** Stable machine code for i18n mapping in the UI layer. */
+      code?: string;
+      /** Interpolation params for the localized message. */
+      params?: Record<string, string | number>;
+    };
 
 export function solveElbowCut(input: ElbowCutInput): ElbowCutGeometryResult {
   const { odMm, clrMm, totalAngleDeg, betaDeg } = input;
 
   if (!Number.isFinite(odMm) || odMm <= 0) {
-    return { success: false, reason: 'OD must be a positive finite length' };
+    return { success: false, code: 'od_positive', params: {}, reason: 'OD must be a positive finite length' };
   }
   if (!Number.isFinite(clrMm) || clrMm <= odMm / 2) {
-    return { success: false, reason: 'CLR must be greater than OD/2' };
+    return { success: false, code: 'clr_gt_half_od', params: { clr: clrMm, halfOd: odMm / 2 }, reason: 'CLR must be greater than OD/2' };
   }
   if (!Number.isFinite(totalAngleDeg) || totalAngleDeg <= 0 || totalAngleDeg > 180) {
-    return { success: false, reason: 'Total elbow angle must be between 0° and 180°' };
+    return { success: false, code: 'total_angle_range', params: { max: 180 }, reason: 'Total elbow angle must be between 0° and 180°' };
   }
   if (!Number.isFinite(betaDeg) || betaDeg <= 0 || betaDeg > totalAngleDeg) {
-    return { success: false, reason: 'Cut angle must be between 0° and the total elbow angle' };
+    return { success: false, code: 'beta_range', params: { max: totalAngleDeg }, reason: 'Cut angle must be between 0° and the total elbow angle' };
   }
 
   const betaRad = (betaDeg * Math.PI) / 180;

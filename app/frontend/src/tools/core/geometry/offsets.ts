@@ -27,7 +27,15 @@ export interface PartialRightTriangle {
 
 export type GeometryResult<T> =
   | { success: true; result: T }
-  | { success: false; reason: string };
+  | {
+      success: false;
+      /** English technical fallback message (not for localized UI). */
+      reason: string;
+      /** Stable machine code for i18n mapping in the UI layer. */
+      code?: string;
+      /** Interpolation params for the localized message. */
+      params?: Record<string, string | number>;
+    };
 
 function isFinitePositive(value: number | undefined): value is number {
   return value !== undefined && Number.isFinite(value) && value > 0;
@@ -116,11 +124,11 @@ export interface ElbowOffsetSolution extends RightTriangleSolution {
 export function solveOffsetWithElbows(
   input: ElbowOffsetInput
 ): GeometryResult<ElbowOffsetSolution> {
-  if (!isFinitePositive(input.a)) return { success: false, reason: 'A must be a positive finite length' };
-  if (!isFinitePositive(input.b)) return { success: false, reason: 'B must be a positive finite length' };
-  if (!isFinitePositive(input.clrMm)) return { success: false, reason: 'CLR must be a positive finite radius' };
+  if (!isFinitePositive(input.a)) return { success: false, code: 'ab_positive', params: { field: 'A' }, reason: 'A must be a positive finite length' };
+  if (!isFinitePositive(input.b)) return { success: false, code: 'ab_positive', params: { field: 'B' }, reason: 'B must be a positive finite length' };
+  if (!isFinitePositive(input.clrMm)) return { success: false, code: 'clr_positive', params: {}, reason: 'CLR must be a positive finite radius' };
   if (!isFinitePositive(input.elbowAngleDeg) || input.elbowAngleDeg > 90) {
-    return { success: false, reason: 'Elbow angle must be between 0° and 90°' };
+    return { success: false, code: 'elbow_angle_range', params: { max: 90 }, reason: 'Elbow angle must be between 0° and 90°' };
   }
 
   const triangle = solveRightTriangle({ a: input.a, b: input.b });
@@ -128,6 +136,8 @@ export function solveOffsetWithElbows(
   if (Math.abs(triangle.thetaDeg - input.elbowAngleDeg) > ANGLE_TOLERANCE_DEG) {
     return {
       success: false,
+      code: 'angle_mismatch',
+      params: { required: triangle.thetaDeg.toFixed(2), selected: input.elbowAngleDeg },
       reason: `Geometry requires a ${triangle.thetaDeg.toFixed(2)}° elbow; selected ${input.elbowAngleDeg}° elbow is incompatible for 2D parallel-line offset.`,
     };
   }
@@ -139,6 +149,8 @@ export function solveOffsetWithElbows(
   if (straightCutLengthMm < 0) {
     return {
       success: false,
+      code: 'negative_cut',
+      params: { value: straightCutLengthMm.toFixed(2) },
       reason: `Straight cut length is negative (${straightCutLengthMm.toFixed(2)} mm): the selected elbow radius is too large for this offset geometry.`,
     };
   }
@@ -171,8 +183,8 @@ export interface FabricatedOffsetSolution extends RightTriangleSolution {
 export function solveOffsetWithoutElbows(
   input: FabricatedOffsetInput
 ): GeometryResult<FabricatedOffsetSolution> {
-  if (!isFinitePositive(input.a)) return { success: false, reason: 'A must be a positive finite length' };
-  if (!isFinitePositive(input.b)) return { success: false, reason: 'B must be a positive finite length' };
+  if (!isFinitePositive(input.a)) return { success: false, code: 'ab_positive', params: { field: 'A' }, reason: 'A must be a positive finite length' };
+  if (!isFinitePositive(input.b)) return { success: false, code: 'ab_positive', params: { field: 'B' }, reason: 'B must be a positive finite length' };
 
   const triangle = solveRightTriangle({ a: input.a, b: input.b });
   return {
@@ -195,11 +207,40 @@ export function solveOffsetWithoutElbows(
 export function solveOffsetVerificationPartial(
   input: PartialRightTriangle
 ): GeometryResult<RightTriangleSolution> {
+  const provided = [input.a, input.b, input.h, input.thetaDeg].filter(
+    (v) => v !== undefined && Number.isFinite(v)
+  );
+  if (provided.length !== 2) {
+    return {
+      success: false,
+      code: 'verify_two_values',
+      params: {},
+      reason: 'Exactly two of {a, b, h, thetaDeg} must be provided',
+    };
+  }
+  if (input.a !== undefined && input.h !== undefined && input.h < input.a) {
+    return {
+      success: false,
+      code: 'verify_h_smaller',
+      params: { side: 'A' },
+      reason: 'Hypotenuse h cannot be smaller than advance a',
+    };
+  }
+  if (input.b !== undefined && input.h !== undefined && input.h < input.b) {
+    return {
+      success: false,
+      code: 'verify_h_smaller',
+      params: { side: 'B' },
+      reason: 'Hypotenuse h cannot be smaller than offset b',
+    };
+  }
   try {
     return { success: true, result: solveRightTriangle(input) };
   } catch (err) {
     return {
       success: false,
+      code: 'verify_invalid',
+      params: {},
       reason: err instanceof Error ? err.message : 'Unable to solve verification triangle',
     };
   }

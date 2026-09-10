@@ -2,18 +2,25 @@
  * Pipe comb / parallel-line offset geometry.
  *
  * Internal convention: lengths in mm, angles in degrees.
- * Ticket: PB-TOOLS-FUNCTIONAL-PARITY-001 / W1.A.1
+ * Ticket: PB-TOOLS-FUNCTIONAL-PARITY-001 / W1.B.1
  *
- * Model:
- *   N parallel lines transition from initial center spacing to final center spacing.
- *   Line 0 is the reference (offset = 0). Line i is offset by i * (final - initial).
- *   A common elbow angle fixes the advance A = |deltaSpacing| / tan(elbowAngle).
- *   Each line's travel H_i = sqrt(A² + offset_i²).
- *   The reference line (offset = 0) is a straight run: no elbows, no take-out.
- *   Offset lines use two elbows: straight cut = H_i - 2 * takeOut(elbowAngle, CLR).
+ * Model (common commercial elbow angle for EVERY offset line):
+ *   N parallel lines transition from initial center spacing to final center
+ *   spacing. Line 0 is the reference (offset = 0, straight run: no elbows,
+ *   no take-out). Line i is offset by i * (final - initial).
  *
- * This is the standard workshop pipe-comb model. Per-line fitting geometry is
- * allowed by the type but not required in W1.A.1.
+ *   Every offset line uses two elbows of the SAME selected angle θ:
+ *     advance_i = |offset_i| / tan(θ)   (horizontal run consumed by the jog)
+ *     travel_i  = |offset_i| / sin(θ)   (diagonal between elbow centers)
+ *     takeOut_i = CLR_i * tan(θ / 2)    (same angle, same CLR ⇒ same take-out)
+ *     straight cut_i = travel_i - 2 * takeOut_i
+ *
+ *   Because the angle is common, advances and travels differ per line while
+ *   the bend angle stays exactly the selected commercial elbow angle.
+ *
+ * Failure results carry a stable machine `code` plus interpolation `params`
+ * so the UI can translate them; `reason` is an English technical fallback
+ * only, never rendered directly as localized UI copy.
  */
 
 import type { GeometryResult } from './offsets.ts';
@@ -50,9 +57,11 @@ export interface PipeCombLineResult {
   offsetMm: number;
   /** Absolute offset magnitude (mm). */
   offsetAbsMm: number;
-  /** Travel along the pipe centerline between elbow centers (mm). */
+  /** Horizontal advance consumed by the offset jog (mm). 0 for the reference line. */
+  advanceMm: number;
+  /** Travel along the pipe centerline between elbow centers (mm). 0 for the reference line. */
   travelMm: number;
-  /** Take-out of one elbow (mm). */
+  /** Take-out of one elbow (mm). 0 for the reference line. */
   takeOutPerElbowMm: number;
   /** Straight pipe length to cut between tangent points (mm). */
   straightCutLengthMm: number;
@@ -61,12 +70,16 @@ export interface PipeCombLineResult {
 }
 
 export interface PipeCombSolution {
-  /** Common advance A (mm). */
-  advanceMm: number;
   /** Common elbow angle (degrees). */
   elbowAngleDeg: number;
   /** Number of lines. */
   lineCount: number;
+  /** Spacing step between adjacent lines (mm). Signed. */
+  deltaSpacingMm: number;
+  /** Initial center spacing (mm). */
+  initialSpacingMm: number;
+  /** Final center spacing (mm). */
+  finalSpacingMm: number;
   lines: PipeCombLineResult[];
   /** Longest travel among all lines (mm). */
   maxTravelMm: number;
@@ -89,51 +102,97 @@ export function solvePipeComb(input: PipeCombInput): GeometryResult<PipeCombSolu
   if (!Number.isInteger(input.lineCount) || input.lineCount < MIN_LINES || input.lineCount > MAX_LINES) {
     return {
       success: false,
+      code: 'line_count_range',
+      params: { min: MIN_LINES, max: MAX_LINES },
       reason: `Line count must be an integer between ${MIN_LINES} and ${MAX_LINES}`,
     };
   }
   if (!isFinitePositive(input.initialSpacingMm)) {
-    return { success: false, reason: 'Initial spacing must be a positive finite length' };
+    return {
+      success: false,
+      code: 'spacing_positive',
+      params: { field: 'initial' },
+      reason: 'Initial spacing must be a positive finite length',
+    };
   }
   if (!isFinitePositive(input.finalSpacingMm)) {
-    return { success: false, reason: 'Final spacing must be a positive finite length' };
+    return {
+      success: false,
+      code: 'spacing_positive',
+      params: { field: 'final' },
+      reason: 'Final spacing must be a positive finite length',
+    };
   }
   if (!isFinitePositive(input.elbowAngleDeg) || input.elbowAngleDeg > 90) {
-    return { success: false, reason: 'Elbow angle must be between 0° and 90°' };
+    return {
+      success: false,
+      code: 'elbow_angle_range',
+      params: { max: 90 },
+      reason: 'Elbow angle must be between 0° and 90°',
+    };
   }
   if (!isFinitePositive(input.clrMm)) {
-    return { success: false, reason: 'CLR must be a positive finite radius' };
-  }
-
-  const deltaSpacing = input.finalSpacingMm - input.initialSpacingMm;
-
-  const elbowAngleRad = input.elbowAngleDeg * DEG_TO_RAD;
-  const advanceMm = deltaSpacing === 0 ? 0 : Math.abs(deltaSpacing) / Math.tan(elbowAngleRad);
-  const commonTakeOutMm = deltaSpacing === 0 ? 0 : input.clrMm * Math.tan(elbowAngleRad / 2);
-
-  if (deltaSpacing !== 0 && (!Number.isFinite(advanceMm) || advanceMm <= 0)) {
-    return { success: false, reason: 'Computed advance is not a positive finite value' };
+    return {
+      success: false,
+      code: 'clr_positive',
+      params: {},
+      reason: 'CLR must be a positive finite radius',
+    };
   }
 
   const lineSpecs: PipeCombLineSpec[] = input.lines ?? Array.from({ length: input.lineCount }, (_, i) => ({ id: String(i + 1) }));
   if (lineSpecs.length !== input.lineCount) {
-    return { success: false, reason: 'Per-line specs count must match lineCount' };
+    return {
+      success: false,
+      code: 'per_line_specs_count',
+      params: {},
+      reason: 'Per-line specs count must match lineCount',
+    };
   }
+
+  const deltaSpacing = input.finalSpacingMm - input.initialSpacingMm;
+  const elbowAngleRad = input.elbowAngleDeg * DEG_TO_RAD;
+  const tanTheta = Math.tan(elbowAngleRad);
+  const sinTheta = Math.sin(elbowAngleRad);
+  const tanHalf = Math.tan(elbowAngleRad / 2);
 
   const solvedLines: PipeCombLineResult[] = [];
   for (let i = 0; i < input.lineCount; i++) {
     const spec = lineSpecs[i];
     const offsetMm = i * deltaSpacing;
     const offsetAbsMm = Math.abs(offsetMm);
-    const travelMm = Math.hypot(advanceMm, offsetAbsMm);
-    // The reference line (offset 0) is straight: no elbows, no take-out.
-    const lineTakeOut =
-      deltaSpacing === 0 || offsetAbsMm === 0 ? 0 : (spec.clrMm ?? input.clrMm) * Math.tan(elbowAngleRad / 2);
+    const isReference = offsetAbsMm === 0;
+
+    const lineClr = spec.clrMm ?? input.clrMm;
+    if (!isReference && !isFinitePositive(lineClr)) {
+      return {
+        success: false,
+        code: 'per_line_clr_invalid',
+        params: { line: spec.id },
+        reason: `Line ${spec.id}: per-line CLR must be a positive finite radius`,
+      };
+    }
+
+    // Reference line (offset 0) is straight: no elbows, no take-out.
+    // Offset lines share the SAME elbow angle θ; advance and travel scale with |offset|.
+    const advanceMm = isReference ? 0 : offsetAbsMm / tanTheta;
+    const travelMm = isReference ? 0 : offsetAbsMm / sinTheta;
+    const lineTakeOut = isReference ? 0 : lineClr * tanHalf;
     const straightCutLengthMm = travelMm - 2 * lineTakeOut;
 
+    if (!isReference && (!Number.isFinite(advanceMm) || advanceMm <= 0)) {
+      return {
+        success: false,
+        code: 'advance_invalid',
+        params: { line: spec.id },
+        reason: `Line ${spec.id}: computed advance is not a positive finite value`,
+      };
+    }
     if (straightCutLengthMm < 0) {
       return {
         success: false,
+        code: 'negative_cut',
+        params: { line: spec.id, value: straightCutLengthMm.toFixed(2) },
         reason: `Line ${spec.id}: straight cut length is negative (${straightCutLengthMm.toFixed(2)} mm); CLR too large for this comb geometry.`,
       };
     }
@@ -142,10 +201,11 @@ export function solvePipeComb(input: PipeCombInput): GeometryResult<PipeCombSolu
       id: spec.id,
       offsetMm: Number(offsetMm.toFixed(6)),
       offsetAbsMm: Number(offsetAbsMm.toFixed(6)),
+      advanceMm: Number(advanceMm.toFixed(6)),
       travelMm: Number(travelMm.toFixed(6)),
       takeOutPerElbowMm: Number(lineTakeOut.toFixed(6)),
       straightCutLengthMm: Number(straightCutLengthMm.toFixed(6)),
-      travelDifferenceMm: Number((travelMm - advanceMm).toFixed(6)),
+      travelDifferenceMm: Number((travelMm - 0).toFixed(6)),
     });
   }
 
@@ -156,9 +216,11 @@ export function solvePipeComb(input: PipeCombInput): GeometryResult<PipeCombSolu
   return {
     success: true,
     result: {
-      advanceMm: Number(advanceMm.toFixed(6)),
       elbowAngleDeg: input.elbowAngleDeg,
       lineCount: input.lineCount,
+      deltaSpacingMm: Number(deltaSpacing.toFixed(6)),
+      initialSpacingMm: Number(input.initialSpacingMm.toFixed(6)),
+      finalSpacingMm: Number(input.finalSpacingMm.toFixed(6)),
       lines: solvedLines,
       maxTravelMm: Number(maxTravelMm.toFixed(6)),
       minTravelMm: Number(minTravelMm.toFixed(6)),

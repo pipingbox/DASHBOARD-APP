@@ -13,6 +13,8 @@ import {
   dnToNps,
   odMmToNps,
   isPipeCombinationSupported,
+  getElbowRadius,
+  ELBOW_RADIUS_PROVENANCE,
 } from '../standards/index.ts';
 import {
   PIPE_DIMENSIONS,
@@ -119,6 +121,32 @@ export function runStandardsTests() {
         npsToDnOd.set(r.nps, { dn: r.dn, odMm: r.odMm });
       }
     }
+  });
+
+  test('elbow radius table matches B16.9/Weldbend p.26 center-to-end A', () => {
+    // Weldbend catalog p.26: NPS 6, 90° LR elbow A = 9.00 in = 228.6 mm.
+    assert(near(getElbowRadius('6', 'LR'), 9.0 * 25.4, 1e-9), 'NPS 6 LR = 228.6 mm');
+    assert(near(getElbowRadius('6', 'SR'), 6.0 * 25.4, 1e-9), 'NPS 6 SR = 152.4 mm');
+    // Small sizes: LR A = 1.50 in for NPS 1/2–1.
+    assert(near(getElbowRadius('1/2', 'LR'), 1.5 * 25.4, 1e-9), 'NPS 1/2 LR = 38.1 mm');
+    assert(near(getElbowRadius('1', 'LR'), 1.5 * 25.4, 1e-9), 'NPS 1 LR = 38.1 mm');
+    // NPS 2 LR A = 3.00 in.
+    assert(near(getElbowRadius('2', 'LR'), 3.0 * 25.4, 1e-9), 'NPS 2 LR = 76.2 mm');
+    // NPS 24 LR A = 36.00 in.
+    assert(near(getElbowRadius('24', 'LR'), 36.0 * 25.4, 1e-9), 'NPS 24 LR = 914.4 mm');
+  });
+
+  test('elbow radius table returns explicit N/A without silent fallback', () => {
+    // NPS below 1/2 has no tabulated B16.9 elbow.
+    assert.strictEqual(getElbowRadius('1/8', 'LR'), undefined, 'NPS 1/8 LR = explicit N/A');
+    assert.strictEqual(getElbowRadius('3/8', 'LR'), undefined, 'NPS 3/8 LR = explicit N/A');
+    // Short radius not tabulated below NPS 1.
+    assert.strictEqual(getElbowRadius('1/2', 'SR'), undefined, 'NPS 1/2 SR = explicit N/A');
+    assert.strictEqual(getElbowRadius('3/4', 'SR'), undefined, 'NPS 3/4 SR = explicit N/A');
+    // Unknown NPS.
+    assert.strictEqual(getElbowRadius('7', 'LR'), undefined, 'unknown NPS = explicit N/A');
+    // Provenance remains CROSS_REFERENCE.
+    assert.strictEqual(ELBOW_RADIUS_PROVENANCE.sourceStatus, 'CROSS_REFERENCE');
   });
 
   console.log(`  standards: PASS (${count} tests)`);

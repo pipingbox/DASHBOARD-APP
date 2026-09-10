@@ -11,6 +11,7 @@
 import { runUnitsTests } from '../src/tools/core/tests/units.test.mjs';
 import { runGeometryTests } from '../src/tools/core/tests/geometry.test.mjs';
 import { runStandardsTests } from '../src/tools/core/tests/standards.test.mjs';
+import { runElbowCutTests } from '../src/tools/prefabrication/elbow-cut/engine.test.mjs';
 
 let failed = false;
 let totalTests = 0;
@@ -21,6 +22,7 @@ async function run() {
     ['units', runUnitsTests],
     ['geometry', runGeometryTests],
     ['standards', runStandardsTests],
+    ['elbow-cut', runElbowCutTests],
   ];
   for (const [name, fn] of suites) {
     try {

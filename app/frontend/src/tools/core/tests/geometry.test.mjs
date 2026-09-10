@@ -78,32 +78,56 @@ export function runGeometryTests() {
     assert.strictEqual(bad.success, false, 'only one input rejected');
   });
 
-  test('mitered elbow 3-piece 90° geometry', () => {
-    const res = solveMiteredElbow({ totalAngleDeg: 90, segments: 3, radiusMm: 150, odMm: 88.9 });
+  test('mitered elbow 3-piece 90° tangent geometry', () => {
+    const res = solveMiteredElbow({ totalAngleDeg: 90, segments: 3, radiusMm: 500, odMm: 100 });
     assert.strictEqual(res.success, true);
     if (!res.success) return;
     assert.strictEqual(res.result.segments, 3);
     assert.strictEqual(res.result.numberOfJoints, 2);
-    assert(near(res.result.jointDeflectionDeg, 45), 'joint deflection = 90/2');
-    assert(near(res.result.cutAngleDeg, 22.5), '3-piece 90°: cut = 22.5°');
-    assert.strictEqual(res.result.segmentsGeometry.length, 3);
+    assert(near(res.result.jointDeflectionDeg, 45), 'joint deflection δ = 90/2');
+    assert(near(res.result.cutAngleDeg, 22.5), '3-piece 90°: cut φ = 22.5°');
 
-    // Straight-piece centerline length (chord), not arc length
-    const beta = 45 * (Math.PI / 180);
-    const piece = 2 * 150 * Math.sin(beta / 2);
-    assert(near(res.result.totalCenterLineLengthMm, 3 * piece, 0.01), 'total = N * chord');
-    assert(near(res.result.totalCenterLineLengthMm, 3 * piece, 0.01));
+    // Tangent-length model: T = R · tan(δ/2); end piece = T; middle piece = 2T.
+    const T = 500 * Math.tan(((45 * Math.PI) / 180) / 2);
+    assert(near(res.result.tangentLengthMm, T, 1e-6), 'T = R·tan(δ/2)');
+    const end = res.result.segmentsGeometry[0];
+    const mid = res.result.segmentsGeometry[1];
+    assert.strictEqual(end.kind, 'end');
+    assert.strictEqual(mid.kind, 'middle');
+    assert(near(end.centerLineLengthMm, T, 1e-6), 'end piece centerline = T');
+    assert(near(mid.centerLineLengthMm, 2 * T, 1e-6), 'middle piece centerline = 2T');
 
+    // Swept angle consistency: total centerline = 2·J·T exactly.
+    assert(near(res.result.totalCenterLineLengthMm, 2 * res.result.numberOfJoints * T, 1e-6), 'total = 2·J·T');
+    // End pieces identical (workshop property).
+    assert(near(res.result.segmentsGeometry[2].centerLineLengthMm, end.centerLineLengthMm, 1e-9), 'end pieces identical');
+
+    // Intrados/extrados scale with local bend radius (R ∓ OD/2).
+    assert(near(mid.intradosLengthMm, mid.centerLineLengthMm * ((500 - 50) / 500), 1e-6), 'intrados = L·(R−OD/2)/R');
+    assert(near(mid.extradosLengthMm, mid.centerLineLengthMm * ((500 + 50) / 500), 1e-6), 'extrados = L·(R+OD/2)/R');
     for (const seg of res.result.segmentsGeometry) {
       assert(seg.intradosLengthMm < seg.extradosLengthMm, 'intrados < extrados');
       assert(near(seg.cutAngleDeg, 22.5), 'per-piece cut angle');
     }
   });
 
+  test('mitered elbow 2-piece 90° is a single miter joint', () => {
+    const res = solveMiteredElbow({ totalAngleDeg: 90, segments: 2, radiusMm: 300, odMm: 60 });
+    assert.strictEqual(res.success, true);
+    if (!res.success) return;
+    assert.strictEqual(res.result.numberOfJoints, 1);
+    assert(near(res.result.cutAngleDeg, 45), '2-piece 90°: cut = 45°');
+    assert(res.result.segmentsGeometry.every((s) => s.kind === 'end'), 'only end pieces');
+    // T = R·tan(45°) = R; total = 2T = 2R.
+    assert(near(res.result.totalCenterLineLengthMm, 2 * 300, 1e-6), 'total = 2R');
+  });
+
   test('mitered elbow rejects invalid geometry', () => {
     assert.strictEqual(solveMiteredElbow({ totalAngleDeg: 90, segments: 1, radiusMm: 150, odMm: 88.9 }).success, false, 'N<2 rejected');
     assert.strictEqual(solveMiteredElbow({ totalAngleDeg: 190, segments: 3, radiusMm: 150, odMm: 88.9 }).success, false, 'angle>180 rejected');
     assert.strictEqual(solveMiteredElbow({ totalAngleDeg: 90, segments: 3, radiusMm: 40, odMm: 88.9 }).success, false, 'R <= OD/2 rejected');
+    const bad = solveMiteredElbow({ totalAngleDeg: 90, segments: 1, radiusMm: 150, odMm: 88.9 });
+    if (!bad.success) assert.strictEqual(bad.code, 'segments_min', 'failure carries machine code');
   });
 
   test('pipe comb equal spacing', () => {
@@ -111,21 +135,43 @@ export function runGeometryTests() {
     assert.strictEqual(res.success, true);
     if (!res.success) return;
     assert.strictEqual(res.result.lineCount, 4);
-    assert(near(res.result.advanceMm, 0), 'equal spacing => zero advance');
-    assert(near(res.result.lines[0].offsetMm, 0), 'reference line offset zero');
-    assert(near(res.result.lines[3].offsetMm, 0), 'last line offset zero');
+    assert(near(res.result.deltaSpacingMm, 0), 'equal spacing => zero delta');
+    for (const line of res.result.lines) {
+      assert(near(line.offsetMm, 0), 'all offsets zero');
+      assert(near(line.advanceMm, 0), 'all advances zero (straight runs)');
+      assert(near(line.travelMm, 0), 'all travels zero');
+      assert(near(line.takeOutPerElbowMm, 0), 'no take-out without offset');
+    }
     assert(near(res.result.travelSpreadMm, 0), 'zero travel spread');
   });
 
-  test('pipe comb expanding', () => {
+  test('pipe comb expanding keeps ONE common elbow angle for every line', () => {
     const res = solvePipeComb({ lineCount: 3, initialSpacingMm: 200, finalSpacingMm: 400, elbowAngleDeg: 45, clrMm: 50 });
     assert.strictEqual(res.success, true);
     if (!res.success) return;
-    assert(near(res.result.advanceMm, 200), 'advance = delta/tan(45)');
-    assert(near(res.result.lines[0].offsetMm, 0), 'line 1 offset zero');
-    assert(near(res.result.lines[1].offsetMm, 200), 'line 2 offset = delta');
-    assert(near(res.result.lines[2].offsetMm, 400), 'line 3 offset = 2*delta');
-    assert(near(res.result.lines[2].travelMm, Math.hypot(200, 400)), 'line 3 travel');
+    const thetaRad = (45 * Math.PI) / 180;
+    const [ref, l2, l3] = res.result.lines;
+    assert(near(ref.offsetMm, 0), 'line 1 offset zero');
+    assert(near(l2.offsetMm, 200), 'line 2 offset = delta');
+    assert(near(l3.offsetMm, 400), 'line 3 offset = 2·delta');
+
+    // Common-angle identity per offset line: offset/advance = tan(θ), travel = offset/sin(θ).
+    for (const line of [l2, l3]) {
+      assert(near(line.offsetAbsMm / line.advanceMm, Math.tan(thetaRad), 1e-9), `line ${line.id}: offset/advance = tan(45°)`);
+      assert(near(line.travelMm, line.offsetAbsMm / Math.sin(thetaRad), 1e-6), `line ${line.id}: travel = offset/sin(45°)`);
+      assert(near(line.travelMm / line.advanceMm, 1 / Math.cos(thetaRad), 1e-6), `line ${line.id}: travel/advance = 1/cos(45°)`);
+    }
+    assert(near(l2.advanceMm, 200, 1e-6), 'line 2 advance = 200/tan45');
+    assert(near(l3.advanceMm, 400, 1e-6), 'line 3 advance = 400/tan45');
+    assert(near(l2.travelMm, 200 / Math.SQRT1_2, 1e-3), 'line 2 travel = 282.843');
+    assert(near(l3.travelMm, 400 / Math.SQRT1_2, 1e-3), 'line 3 travel = 565.685');
+
+    // Same angle + same CLR ⇒ same take-out on every offset line.
+    const takeOut = 50 * Math.tan(thetaRad / 2);
+    assert(near(l2.takeOutPerElbowMm, takeOut, 1e-6), 'line 2 take-out');
+    assert(near(l3.takeOutPerElbowMm, takeOut, 1e-6), 'line 3 take-out identical');
+    assert(near(l2.straightCutLengthMm, l2.travelMm - 2 * takeOut, 1e-6), 'line 2 cut');
+    assert(near(l3.straightCutLengthMm, l3.travelMm - 2 * takeOut, 1e-6), 'line 3 cut');
     assert(near(res.result.travelSpreadMm, res.result.maxTravelMm - res.result.minTravelMm), 'spread consistent');
   });
 
@@ -135,6 +181,7 @@ export function runGeometryTests() {
     if (!res.success) return;
     const ref = res.result.lines[0];
     assert(near(ref.takeOutPerElbowMm, 0), 'reference line has no take-out');
+    assert(near(ref.advanceMm, 0), 'reference line has no advance');
     assert(near(ref.straightCutLengthMm, ref.travelMm), 'reference line cut equals travel');
     const offset = res.result.lines[1];
     assert(offset.takeOutPerElbowMm > 0, 'offset line uses elbows');
@@ -149,6 +196,7 @@ export function runGeometryTests() {
     assert(near(res.result.lines[1].offsetMm, -200), 'line 2 offset negative');
     assert(near(res.result.lines[2].offsetMm, -400), 'line 3 offset negative');
     assert(near(res.result.lines[1].offsetAbsMm, 200), 'abs offset positive');
+    assert(near(res.result.lines[1].travelMm, 200 / Math.SQRT1_2, 1e-3), 'contracting travel = |offset|/sin45');
   });
 
   test('pipe comb line count bounds', () => {
@@ -156,14 +204,51 @@ export function runGeometryTests() {
     assert.strictEqual(solvePipeComb({ lineCount: 12, initialSpacingMm: 200, finalSpacingMm: 300, elbowAngleDeg: 45, clrMm: 50 }).success, true, '12 lines valid');
     assert.strictEqual(solvePipeComb({ lineCount: 1, initialSpacingMm: 200, finalSpacingMm: 300, elbowAngleDeg: 45, clrMm: 50 }).success, false, '1 line rejected');
     assert.strictEqual(solvePipeComb({ lineCount: 13, initialSpacingMm: 200, finalSpacingMm: 300, elbowAngleDeg: 45, clrMm: 50 }).success, false, '13 lines rejected');
+    const bad = solvePipeComb({ lineCount: 13, initialSpacingMm: 200, finalSpacingMm: 300, elbowAngleDeg: 45, clrMm: 50 });
+    if (!bad.success) assert.strictEqual(bad.code, 'line_count_range', 'failure carries machine code');
+  });
+
+  test('pipe comb per-line CLR validation', () => {
+    const bad = solvePipeComb({
+      lineCount: 2,
+      initialSpacingMm: 200,
+      finalSpacingMm: 300,
+      elbowAngleDeg: 45,
+      clrMm: 50,
+      lines: [{ id: '1' }, { id: '2', clrMm: Number.NaN }],
+    });
+    assert.strictEqual(bad.success, false, 'NaN per-line CLR rejected');
+    if (!bad.success) assert.strictEqual(bad.code, 'per_line_clr_invalid', 'code identifies per-line CLR');
+
+    const negative = solvePipeComb({
+      lineCount: 2,
+      initialSpacingMm: 200,
+      finalSpacingMm: 300,
+      elbowAngleDeg: 45,
+      clrMm: 50,
+      lines: [{ id: '1' }, { id: '2', clrMm: -5 }],
+    });
+    assert.strictEqual(negative.success, false, 'negative per-line CLR rejected');
+
+    const ok = solvePipeComb({
+      lineCount: 2,
+      initialSpacingMm: 200,
+      finalSpacingMm: 300,
+      elbowAngleDeg: 45,
+      clrMm: 50,
+      lines: [{ id: '1' }, { id: '2', clrMm: 80 }],
+    });
+    assert.strictEqual(ok.success, true, 'valid per-line CLR override accepted');
+    if (ok.success) assert(near(ok.result.lines[1].takeOutPerElbowMm, 80 * Math.tan((45 * Math.PI) / 180 / 2), 1e-6), 'override used');
   });
 
   test('pipe comb rejects negative straight cut', () => {
-    // delta=300, elbow=45 => advance=300; line 2 offset=300 => travel=424.26; R=200 => takeOut=82.84 => cut≈258.6 positive.
-    // Use R=300 to force negative on line 2: takeOut=124.26 => cut≈175.7 still positive. Need larger offset or smaller travel? Try elbow=60 => advance=173, line2 offset=300 travel=346, R=200 takeOut=107.5 cut=131. ok. Need make cut negative: line with offset large relative travel. For contracting final 100 initial 400 delta=-300, elbow=60 => advance=173, line2 offset=-300 travel=346, R=250 takeOut=155.5 cut=35; line3 offset=-600 travel=624, ok. To get negative on line 3, need R large. Use R=350 takeOut=218 => line3 cut=624-436=188 positive. Hmm. Use high line count? line 11 offset=10*delta=3000, travel>3000, R=1000 takeOut=577 cut>0. Need straightCut <0 means travel < 2*takeOut. travel = sqrt(advance^2+offset^2), advance=|delta|/tan(theta). For last line offset=(N-1)*delta. Min travel is offset (if advance=0, delta=0 not possible). Need 2*R*tan(theta/2) > offset. Choose delta small, many lines, R big. E.g. lineCount=12, initial=200, final=250 (delta=50), elbow=45, advance=50, line11 offset=550, travel=552.3. R=300 takeOut=124.3, 2*take=248.5 < travel. R=500 takeOut=207.1, 2*take=414.2 < travel. To get > travel need R very large ~350? For offset=550, need 2*R*tan(22.5)>552 => R>552/(0.828)=666. So R=700 => takeOut=289.9, 2take=579.9>552 -> negative. Use that.
+    // delta=50, 12 lines, θ=45°: line 2 offset=50, travel=50/sin45≈70.71;
+    // CLR=700 ⇒ takeOut≈289.9 ⇒ cut≈70.71−579.87 < 0 ⇒ explicit rejection.
     const res = solvePipeComb({ lineCount: 12, initialSpacingMm: 200, finalSpacingMm: 250, elbowAngleDeg: 45, clrMm: 700 });
     assert.strictEqual(res.success, false, 'negative straight cut must be rejected');
     if (res.success) return;
+    assert.strictEqual(res.code, 'negative_cut', 'code identifies negative cut');
     assert(res.reason.includes('negative'), 'reason mentions negative cut');
   });
 
