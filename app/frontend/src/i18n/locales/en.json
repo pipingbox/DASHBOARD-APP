@@ -1048,7 +1048,10 @@
       "common": {
         "na": "N/A",
         "noResult": "Enter valid parameters to see results",
-        "selectMode": "Select a mode"
+        "selectMode": "Select a mode",
+        "engineBadge": "Pure geometry engine — CROSS_REFERENCE",
+        "results": "Numerical results",
+        "drawing": "Technical drawing"
       },
       "elbowCut": {
         "title": "Elbow Cut Calculator",
@@ -1064,7 +1067,9 @@
         "keptArc": "Kept arc length",
         "discardedArc": "Discarded arc length",
         "noteGeometry": "The cut plane is perpendicular to the elbow bisector. Distances are measured from the tangent line along each surface.",
-        "noteProvenance": "OD/WT from ASME B36.10M (CROSS_REFERENCE). CLR defaults from ASME B16.9 long/short radius tables (CROSS_REFERENCE)."
+        "noteProvenance": "OD/WT from ASME B36.10M (CROSS_REFERENCE). CLR defaults from ASME B16.9 long/short radius tables (CROSS_REFERENCE).",
+        "drawPlaceholder": "Enter parameters to draw the elbow cut",
+        "cutLabel": "cut"
       },
       "offset": {
         "title": "Pipe Offset",
@@ -1083,7 +1088,13 @@
         "errorAngle": "Elbow angle must be between 0° and 90°",
         "errorClr": "Could not determine elbow radius",
         "verifyHint": "Enter exactly two of A, B, H or θ to solve the triangle.",
-        "diagramPlaceholder": "Select a mode to draw the offset"
+        "diagramPlaceholder": "Select a mode to draw the offset",
+        "travel": "H (travel)",
+        "takeOut": "Take-out per elbow",
+        "straightCut": "Straight cut",
+        "centerToCenter": "Center-to-center",
+        "diagonal": "H (diagonal)",
+        "cutAngleEnd": "Cut angle per end"
       },
       "miteredElbow": {
         "title": "Mitered Elbow",
@@ -1093,8 +1104,23 @@
         "segments": "Number of pieces (N)",
         "elbowType": "Radius type",
         "clrOverride": "CLR override",
-        "noteGeometry": "N straight pieces joined by J = N − 1 miter joints. Joint deflection = total angle / J; cut angle per mating end = half the joint deflection.",
-        "noteProvenance": "Lengths are straight-piece chords, not arc lengths. OD from ASME B36.10M (CROSS_REFERENCE). CLR defaults from ASME B16.9 (CROSS_REFERENCE)."
+        "noteGeometry": "N straight pieces joined by J = N − 1 miter joints. Joint deflection δ = total angle / J; cut angle per mating end φ = δ / 2.",
+        "noteProvenance": "Piece lengths follow the tangent model T = R·tan(δ/2) (end piece = T, middle piece = 2T). OD from ASME B36.10M (CROSS_REFERENCE). CLR defaults from ASME B16.9 (CROSS_REFERENCE).",
+        "notes": "N straight pieces joined by J = N − 1 miter joints. δ = total/J, φ = δ/2. Tangent model: T = R·tan(δ/2); end piece = T, middle piece = 2T.",
+        "drawPlaceholder": "Enter parameters to draw the mitered elbow",
+        "nPieces": "N (pieces)",
+        "jJoints": "J (miter joints)",
+        "jointDeflection": "Deflection per joint (δ)",
+        "cutAngleEnd": "Cut angle per end (φ)",
+        "tangentLength": "Tangent length T",
+        "totalCenterline": "Total straight centerline",
+        "piece": "Piece",
+        "kind": "Type",
+        "centerline": "Centerline",
+        "intrados": "Intrados",
+        "extrados": "Extrados",
+        "endPiece": "End",
+        "middlePiece": "Middle"
       },
       "pipeComb": {
         "title": "Pipe Comb",
@@ -1106,7 +1132,41 @@
         "schedule": "Schedule",
         "elbowType": "Elbow type",
         "clrOverride": "CLR override",
-        "noteGeometry": "All lines share the same advance and elbow geometry. Straight cut length = travel − 2·take-out. Negative cuts are rejected explicitly."
+        "noteGeometry": "Every offset line uses two elbows of the same selected angle: travel = offset / sin(θ), advance = offset / tan(θ), straight cut = travel − 2·take-out. The reference line is straight. Negative cuts are rejected explicitly.",
+        "drawPlaceholder": "Enter parameters to draw the pipe comb",
+        "startSpacing": "Start spacing",
+        "endSpacing": "End spacing",
+        "angleLabel": "Elbow angle",
+        "travelSpread": "Travel spread",
+        "line": "Line",
+        "offset": "Offset",
+        "advance": "Advance",
+        "travel": "Travel",
+        "straightCut": "Straight cut",
+        "diff": "Diff"
+      },
+      "errors": {
+        "line_count_range": "Line count must be an integer between {{min}} and {{max}}",
+        "spacing_positive": "Center spacing must be a positive finite length ({{field}})",
+        "elbow_angle_range": "Elbow angle must be between 0° and {{max}}°",
+        "clr_positive": "CLR must be a positive finite radius",
+        "per_line_specs_count": "Per-line specs must match the number of lines",
+        "per_line_clr_invalid": "Line {{line}}: per-line CLR must be a positive finite radius",
+        "advance_invalid": "Line {{line}}: computed advance is invalid",
+        "negative_cut": "Straight cut length is negative ({{value}} mm): the elbow radius is too large for this geometry",
+        "ab_positive": "{{field}} must be a positive finite length",
+        "angle_mismatch": "Geometry requires a {{required}}° elbow; the selected {{selected}}° elbow is incompatible for a 2D parallel-line offset",
+        "verify_two_values": "Provide exactly two of A, B, H or θ",
+        "verify_h_smaller": "H cannot be smaller than {{side}}",
+        "verify_invalid": "Unable to solve the verification triangle",
+        "segments_min": "N must be an integer ≥ {{min}} straight pieces",
+        "total_angle_range": "Total angle must be between 0° and {{max}}°",
+        "radius_positive": "Radius must be a positive finite length",
+        "od_positive": "OD must be a positive finite length",
+        "radius_gt_half_od": "Radius ({{radius}} mm) must be greater than OD/2 ({{halfOd}} mm)",
+        "piece_lengths_invalid": "Computed piece lengths are invalid",
+        "clr_gt_half_od": "CLR must be greater than OD/2",
+        "beta_range": "Cut angle must be between 0° and {{max}}°"
       }
     }
   },
