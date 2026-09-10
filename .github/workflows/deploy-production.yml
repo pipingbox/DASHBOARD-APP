@@ -73,6 +73,11 @@ jobs:
       - name: Validate i18n usage in public pages
         run: node scripts/check-i18n-usage.mjs
 
+      # PB-I18N-LAYER2-001 (D6): debt paid — strict coverage is now a
+      # production gate, not just a local check.
+      - name: i18n coverage strict guard (7 locales at 100%)
+        run: node scripts/check-i18n-coverage.mjs --strict
+
       - name: Catalog integrity guard
         run: node scripts/check-catalog.mjs
 

@@ -92,6 +92,17 @@ jobs:
         with:
           node-version: 22
 
+      # PB-I18N-LAYER2-001 (D6): i18n gates on preview. Debt is paid down
+      # (all 7 locales at 100% parity), so these can now be hard gates.
+      - name: i18n structural guard (locale schema drift)
+        run: node scripts/check-i18n-schema.mjs
+
+      - name: Validate i18n usage in public pages
+        run: node scripts/check-i18n-usage.mjs
+
+      - name: i18n coverage strict guard (7 locales at 100%)
+        run: node scripts/check-i18n-coverage.mjs --strict
+
       - name: Install root deps (wrangler)
         run: npm ci
 
