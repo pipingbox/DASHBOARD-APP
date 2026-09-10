@@ -20,8 +20,11 @@ import { test, expect } from '@playwright/test';
 
 import {
   OBS_EVENT_NAMES,
+  OBS_INTERNAL_SDK_EVENTS,
   buildEventProps,
   sanitizeValue,
+  sanitizeUrlPropertyValue,
+  sanitizePostHogEvent,
   normalizeRoute,
   trackEvent,
   initObservability,
@@ -223,6 +226,153 @@ test.describe('route normalization', () => {
   test('strips numeric ids and keeps static segments', () => {
     expect(normalizeRoute('/academy/module/42/lesson')).toBe('/academy/module/:id/lesson');
     expect(normalizeRoute('/dashboard')).toBe('/dashboard');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 8. before_send — global automatic-property sanitizer (PO review 2026-09-10)
+// ---------------------------------------------------------------------------
+//
+// PostHog attaches $current_url & friends AFTER the per-event allowlist. The
+// global hook must guarantee that query strings (?ref=, ?email=, ?token=),
+// fragments (#...) and raw UUIDs in automatic pathnames NEVER reach the final
+// payload of ANY event, including $web_vitals.
+
+test.describe('before_send global sanitizer', () => {
+  test('reduces $current_url and URL props to origin + normalized pathname', () => {
+    const out = sanitizePostHogEvent({
+      event: 'page_viewed',
+      properties: {
+        $current_url: 'https://pipingbox.app/register?ref=GASPAR-SECRET',
+        $initial_current_url: 'https://pipingbox.app/?ref=GASPAR-SECRET&utm_source=x',
+        $session_entry_url: 'https://pipingbox.app/landing#secret-fragment',
+        $referrer: 'https://www.google.com/search?q=secret+query',
+        $initial_referrer: '$direct',
+        $pathname: '/job/123e4567-e89b-12d3-a456-426614174000',
+        route: '/register',
+      },
+    });
+    expect(out).not.toBeNull();
+    const json = JSON.stringify(out!.properties);
+    expect(json).not.toContain('ref=');
+    expect(json).not.toContain('GASPAR-SECRET');
+    expect(json).not.toContain('#');
+    expect(json).not.toContain('secret');
+    expect(json).not.toContain('123e4567');
+    expect(out!.properties.$current_url).toBe('https://pipingbox.app/register');
+    expect(out!.properties.$initial_current_url).toBe('https://pipingbox.app/');
+    expect(out!.properties.$session_entry_url).toBe('https://pipingbox.app/landing');
+    expect(out!.properties.$referrer).toBe('https://www.google.com/search');
+    expect(out!.properties.$initial_referrer).toBe('$direct');
+    expect(out!.properties.$pathname).toBe('/job/:id');
+  });
+
+  test('?email=, ?token= and #fragment never reach the final payload', () => {
+    const out = sanitizePostHogEvent({
+      event: 'referral_captured',
+      properties: {
+        $current_url: 'https://pipingbox.app/register?email=test@example.com&token=SECRET#frag',
+        origin: 'referral',
+      },
+    });
+    expect(out).not.toBeNull();
+    const json = JSON.stringify(out!.properties);
+    expect(json).not.toContain('test@example.com');
+    expect(json).not.toContain('token=');
+    expect(json).not.toContain('SECRET');
+    expect(json).not.toContain('#frag');
+    expect(out!.properties.$current_url).toBe('https://pipingbox.app/register');
+  });
+
+  test('UUIDs in automatic pathnames are normalized to :id', () => {
+    const out = sanitizeUrlPropertyValue(
+      'https://pipingbox.app/worker/123e4567-e89b-12d3-a456-426614174000?ref=X',
+    );
+    expect(out).toBe('https://pipingbox.app/worker/:id');
+  });
+
+  test('query/fragment-content properties are dropped ($search, $hash)', () => {
+    const out = sanitizePostHogEvent({
+      event: 'page_viewed',
+      properties: { $search: '?ref=GASPAR-SECRET', $hash: '#secret', route: '/' },
+    });
+    expect(out!.properties).not.toHaveProperty('$search');
+    expect(out!.properties).not.toHaveProperty('$hash');
+    expect(JSON.stringify(out!.properties)).not.toContain('GASPAR-SECRET');
+  });
+
+  test('$web_vitals is an allowed internal event and is sanitized too', () => {
+    expect(OBS_INTERNAL_SDK_EVENTS).toContain('$web_vitals');
+    const out = sanitizePostHogEvent({
+      event: '$web_vitals',
+      properties: {
+        $current_url: 'https://pipingbox.app/?ref=GASPAR-SECRET',
+        LCP: 120.5,
+      },
+    });
+    expect(out).not.toBeNull();
+    expect(out!.properties.LCP).toBe(120.5);
+    expect(out!.properties.$current_url).toBe('https://pipingbox.app/');
+  });
+
+  test('unknown event names are dropped (closed ingestion)', () => {
+    expect(
+      sanitizePostHogEvent({ event: '$autocapture', properties: { $current_url: 'https://x.app/' } }),
+    ).toBeNull();
+    expect(sanitizePostHogEvent({ event: 'random_event', properties: {} })).toBeNull();
+    expect(sanitizePostHogEvent({})).toBeNull();
+  });
+
+  test('technical ID properties survive (no false long-token redaction)', () => {
+    const correlationId = '123e4567-e89b-12d3-a456-426614174000';
+    const out = sanitizePostHogEvent({
+      event: 'page_viewed',
+      properties: {
+        correlation_id: correlationId,
+        pb_anonymous_id: correlationId,
+        $session_id: correlationId,
+        $browser_version: '132.0.6834.110',
+      },
+    });
+    expect(out!.properties.correlation_id).toBe(correlationId);
+    expect(out!.properties.pb_anonymous_id).toBe(correlationId);
+    expect(out!.properties.$session_id).toBe(correlationId);
+    expect(out!.properties.$browser_version).toBe('132.0.6834.110');
+  });
+
+  test('no generic deletion of token-named props; values are redacted instead', () => {
+    const out = sanitizePostHogEvent({
+      event: 'page_viewed',
+      properties: {
+        token_hint: 'ok-short-value', // name contains "token" but value is safe: kept
+        some_credential: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9-secret', // long token value: redacted
+      },
+    });
+    expect(out!.properties.token_hint).toBe('ok-short-value');
+    expect(out!.properties.some_credential).not.toContain('eyJhbGci');
+  });
+
+  test('embedded URLs inside message-like props are stripped of query strings', () => {
+    const out = sanitizePostHogEvent({
+      event: 'app_error',
+      properties: {
+        error_message: 'failed after redirect to https://pipingbox.app/x?ref=GASPAR-SECRET',
+      },
+    });
+    expect(out!.properties.error_message).toContain('https://pipingbox.app/x');
+    expect(out!.properties.error_message).not.toContain('ref=');
+    expect(out!.properties.error_message).not.toContain('GASPAR-SECRET');
+  });
+
+  test('$set and $set_once person properties go through the same sanitizer', () => {
+    const out = sanitizePostHogEvent({
+      event: '$identify',
+      properties: {},
+      $set: { $current_url: 'https://pipingbox.app/register?ref=GASPAR-SECRET' },
+      $set_once: { $initial_referrer: 'https://x.app/?utm_campaign=secret' },
+    });
+    expect(out!.$set?.$current_url).toBe('https://pipingbox.app/register');
+    expect(out!.$set_once?.$initial_referrer).toBe('https://x.app/');
   });
 });
 
