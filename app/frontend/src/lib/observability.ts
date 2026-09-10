@@ -177,6 +177,14 @@ export function getAppVersion(): string {
   }
 }
 
+export function getEnvironment(): string {
+  try {
+    return (import.meta.env.VITE_APP_ENV as string | undefined) ?? 'production';
+  } catch {
+    return 'production';
+  }
+}
+
 export function detectDeviceType(): (typeof DEVICE_TYPES)[number] {
   try {
     const ua = navigator.userAgent;
@@ -345,6 +353,11 @@ export function trackEvent(
       emittedDedupeKeys.add(composite);
     }
     const safeProps = buildEventProps(name, props);
+    // Attach environment and app_version to every event so preview traffic
+    // can be excluded from production reports and errors can be traced to a
+    // build SHA.
+    safeProps.environment = getEnvironment();
+    safeProps.app_version = getAppVersion();
     if (!initialized || !client) {
       if (queue.length < MAX_QUEUE) queue.push({ name, props: safeProps });
       return;
@@ -375,6 +388,7 @@ function registerSuperProperties(): void {
       pb_anonymous_id: getAnonymousId(),
       correlation_id: getCorrelationId(),
       app_version: getAppVersion(),
+      environment: getEnvironment(),
       origin: detectOrigin(),
     });
   } catch (err) {
@@ -420,6 +434,10 @@ export async function initObservability(options: InitOptions = {}): Promise<void
       capture_performance: true,
       ip: false, // defense in depth on top of project-level anonymize_ips
       persistence: 'localStorage',
+      // PostHog 1.429+ with defaultIdentifiedOnly=true discards anonymous
+      // events unless person_profiles is explicit. We need anonymous
+      // pre-auth tracking for the referral funnel.
+      person_profiles: 'always',
       loaded: () => {
         /* no-op: flush below */
       },

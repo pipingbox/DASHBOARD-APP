@@ -85,4 +85,6 @@ jobs:
           VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
           # Tag every build with its commit SHA (error tracking per build).
           VITE_APP_VERSION: ${{ github.sha }}
+          # Mark preview traffic so it can be excluded from production reports.
+          VITE_APP_ENV: preview
         run: npx wrangler deploy
