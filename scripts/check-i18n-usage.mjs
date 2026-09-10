@@ -57,152 +57,13 @@ const PUBLIC_PAGES = [
 /**
  * Inherited coverage debt from PB-I18N-SCHEMA-001. Used ONLY in --full mode.
  * May only shrink, never grow.
+ *
+ * PB-I18N-LAYER2-001 paid down all debt: every static t(...) key now exists
+ * in all seven locales, so the allowlist is empty. Keep the mechanism so a
+ * documented, temporary exception can be added if a new gap is ever
+ * intentionally shipped — but an empty list must be the steady state.
  */
-const ALLOWED_MISSING_PATHS = new Set([
-  'academy.examBackToAcademy',
-  'academy.examCorrectAnswer',
-  'academy.examFinish',
-  'academy.examFinishConfirm',
-  'academy.examFinishConfirmNo',
-  'academy.examFinishConfirmText',
-  'academy.examFinishConfirmYes',
-  'academy.examIntroBVCA',
-  'academy.examIntroDuration',
-  'academy.examIntroFormat',
-  'academy.examIntroFormatValue',
-  'academy.examIntroPassScore',
-  'academy.examIntroQuestions',
-  'academy.examIntroRule1',
-  'academy.examIntroRule2',
-  'academy.examIntroRule3',
-  'academy.examIntroRule4',
-  'academy.examIntroRules',
-  'academy.examIntroTitle',
-  'academy.examIntroVOLVCA',
-  'academy.examNewExam',
-  'academy.examNext',
-  'academy.examNoAnswer',
-  'academy.examPrevious',
-  'academy.examQuestionOf',
-  'academy.examResultFailed',
-  'academy.examResultPassed',
-  'academy.examResultScore',
-  'academy.examResultTime',
-  'academy.examReviewAnswers',
-  'academy.examStart',
-  'academy.examTimeUp',
-  'academy.examTimeWarning',
-  'academy.examUnderstand',
-  'academy.examYourAnswer',
-  'academy.questions',
-  'landing.footer.blogLink',
-  'landing.footer.links',
-  'landing.footer.loginLink',
-  'landing.footer.registerLink',
-  'landing.footer.toolsLink',
-  'tools.additionalInfo',
-  'tools.angle',
-  'tools.backToCatalog',
-  'tools.boltSize',
-  'tools.bolted',
-  'tools.bolts.desc',
-  'tools.bolts.description',
-  'tools.bolts.diameter',
-  'tools.bolts.length',
-  'tools.bolts.name',
-  'tools.bolts.nutWidth',
-  'tools.bolts.quantity',
-  'tools.bolts.symbol',
-  'tools.bolts.threadPitch',
-  'tools.bolts.unit',
-  'tools.bolts.value',
-  'tools.categoryInspection',
-  'tools.categoryLayout',
-  'tools.categoryLibrary',
-  'tools.centerArc',
-  'tools.comingSoonData',
-  'tools.commonAngles',
-  'tools.cutAngle',
-  'tools.degrees',
-  'tools.desiredAngle',
-  'tools.discardedPart',
-  'tools.dry',
-  'tools.elbowCut.angleDeg',
-  'tools.elbowCut.arcExtrados',
-  'tools.elbowCut.arcIntrados',
-  'tools.elbowCut.arcNeutral',
-  'tools.elbowCut.cutExtrados',
-  'tools.elbowCut.cutIntrados',
-  'tools.elbowCut.cutLine',
-  'tools.elbowCut.desiredAngle',
-  'tools.elbowCut.elbowRadius',
-  'tools.elbowCut.formula',
-  'tools.elbowCut.neutralAxis',
-  'tools.elbowCut.nps',
-  'tools.elbowCut.referenceTable',
-  'tools.elbowCut.results',
-  'tools.elbowCut.schedule',
-  'tools.elbowCut.standard',
-  'tools.elbowCut.wallThickness',
-  'tools.elbowNote',
-  'tools.elbowRadius',
-  'tools.elbowType',
-  'tools.exportImage',
-  'tools.exportPdf',
-  'tools.extradosArc',
-  'tools.fittingTakeOff',
-  'tools.flangeClass',
-  'tools.flanges',
-  'tools.intradosArc',
-  'tools.longRadius',
-  'tools.lubricated',
-  'tools.numericalResults',
-  'tools.pipeDataTables',
-  'tools.pipeDim.boltDia',
-  'tools.pipeDim.boltLen',
-  'tools.pipeDim.boltSize',
-  'tools.pipeDim.bolts',
-  'tools.pipeDim.class',
-  'tools.pipeDim.dry',
-  'tools.pipeDim.lubed',
-  'tools.pipeDim.searchPlaceholder',
-  'tools.pipeDim.showInches',
-  'tools.pipeDim.tabBolt',
-  'tools.pipeDim.tabFlange',
-  'tools.pipeDim.tabPipe',
-  'tools.pipeDim.thickness',
-  'tools.pipeSize',
-  'tools.pressureDropDesc',
-  'tools.reynoldsDesc',
-  'tools.saveFavorite',
-  'tools.schedule',
-  'tools.searchSize',
-  'tools.shortRadius',
-  'tools.tabBoltTorque',
-  'tools.tabFlangeDimensions',
-  'tools.tabPipeDimensions',
-  'tools.technicalDrawing',
-  'tools.thermalExpansionDesc',
-  'tools.toggleMmIn',
-  'tools.toggleUnits',
-  'tools.torqueWarning',
-  'tools.unitConv.catDiameter',
-  'tools.unitConv.catNpsDn',
-  'tools.unitConv.dn',
-  'tools.unitConv.enterValue',
-  'tools.unitConv.nps',
-  'tools.unitConv.npsDnTable',
-  'tools.unitConv.npsDnTitle',
-  'tools.unitConv.od',
-  'tools.unitConv.searchBySize',
-  'tools.unitConv.selectCategory',
-  'tools.unitConv.swap',
-  'tools.unitConverterDesc',
-  'tools.usablePart',
-  'tools.wallThicknessCol',
-  'tools.wallThicknessDesc',
-  'tools.weight',
-]);
+const ALLOWED_MISSING_PATHS = new Set([]);
 
 const argv = process.argv.slice(2);
 const fullMode = argv.includes('--full');
@@ -224,6 +85,24 @@ function resolve(root, path) {
   }, root);
 }
 
+/**
+ * i18next plural resolution: when a call passes `count` in its options, the
+ * library resolves `<key>_one` / `<key>_other` (JSON v4) instead of the bare
+ * key. The static analyzer only sees the literal key, so a call like
+ * t('academy.intro.catalog.count', ..., { count }) is a false positive unless
+ * the plural leaves are checked too. A key counts as resolved when the line
+ * references `count` AND both `_one` and `_other` exist as strings.
+ */
+function resolveWithPlurals(root, path, lineHasCount) {
+  const direct = resolve(root, path);
+  if (direct !== undefined) return direct;
+  if (!lineHasCount) return undefined;
+  const one = resolve(root, `${path}_one`);
+  const other = resolve(root, `${path}_other`);
+  if (typeof one === 'string' && typeof other === 'string') return one;
+  return undefined;
+}
+
 function walk(dir) {
   const out = [];
   for (const entry of readdirSync(dir)) {
@@ -243,7 +122,7 @@ function extractStaticKeys(file) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     for (const m of line.matchAll(/\bt\(\s*['"`]([a-zA-Z0-9_.-]+)['"`]\s*(?:,\s*\{)?/g)) {
-      keys.push({ path: m[1], line: i + 1 });
+      keys.push({ path: m[1], line: i + 1, lineHasCount: /\bcount\b/.test(line) });
     }
   }
   return keys;
@@ -270,7 +149,7 @@ const errors = [];
 
 for (const file of files) {
   const keys = extractStaticKeys(file);
-  for (const { path, line } of keys) {
+  for (const { path, line, lineHasCount } of keys) {
     // The allowlist is inherited debt from PB-I18N-SCHEMA-001 and applies ONLY
     // to --full mode. In CI (public pages) it must NOT apply: a visitor-facing
     // key with no translation is the exact defect this guard exists to catch,
@@ -279,7 +158,7 @@ for (const file of files) {
     if (fullMode && ALLOWED_MISSING_PATHS.has(path)) continue;
 
     for (const code of REQUIRED_LOCALES) {
-      const value = resolve(locales[code], path);
+      const value = resolveWithPlurals(locales[code], path, lineHasCount);
       if (value === undefined) {
         errors.push({ file: relative(REPO_ROOT, file), line, code, path, kind: 'missing' });
       } else if (typeof value !== 'string') {

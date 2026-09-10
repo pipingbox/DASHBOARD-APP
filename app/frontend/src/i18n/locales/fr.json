@@ -48,7 +48,9 @@
     "loadFailed": "Échec du chargement des données.",
     "unexpectedError": "Une erreur inattendue s'est produite",
     "sending": "Envoi en cours...",
-    "download": "Télécharger"
+    "download": "Télécharger",
+    "saveError": "Erreur d'enregistrement",
+    "saved": "Enregistré"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -79,7 +81,12 @@
     "viewAs": "Voir en tant que",
     "previewMode": "MODE APERÇU",
     "viewingAs": "Vu en tant que",
-    "exitPreview": "Quitter l'aperçu"
+    "exitPreview": "Quitter l'aperçu",
+    "companyBilling": "Facturation / Abonnements",
+    "companyDocumentation": "Gestion Documentaire Industrielle",
+    "companySection": "Entreprise",
+    "companySettings": "Paramètres",
+    "companyWorkspace": "Espace Entreprise"
   },
   "notifications": {
     "title": "Notifications",
@@ -99,7 +106,10 @@
     "documentRequest": "Un document a été demandé.",
     "certificateExpiring": "L'un de vos certificats expire bientôt.",
     "adminAlert": "Alerte administrateur reçue.",
-    "feedbackResolved": "Votre rapport de feedback a été examiné et résolu. Merci d'aider à améliorer PipingBox."
+    "feedbackResolved": "Votre rapport de feedback a été examiné et résolu. Merci d'aider à améliorer PipingBox.",
+    "jobMatch": "Nouvelle correspondance d'emploi",
+    "productUpdate": "Nouvelle fonctionnalité disponible",
+    "workforceInvitation": "Nouvelle opportunité de mission"
   },
   "dashboard": {
     "overview": "Synthèse",
@@ -373,8 +383,43 @@
       "fileUploaded": "Fichier téléchargé",
       "filePdfOrImage": "Veuillez télécharger un fichier PDF ou image",
       "fileUnder10": "Le fichier doit faire moins de 10 Mo",
-      "nameIssuerRequired": "Le nom et l'émetteur sont obligatoires"
-    }
+      "nameIssuerRequired": "Le nom et l'émetteur sont obligatoires",
+      "viewFileDenied": "Accès refusé"
+    },
+    "country": "Pays",
+    "emailJobAlerts": "Alertes e-mail",
+    "emailJobAlertsHint": "Recevoir les opportunités correspondantes par e-mail",
+    "jobMatchingEnabled": "Matching d'emploi",
+    "jobMatchingEnabledHint": "Recevoir des opportunités d'emplois publiés",
+    "matchReadyTitle": "Complétez votre profil pour recevoir des correspondances d'emploi plus précises.",
+    "matchingPreferencesSaved": "Préférences enregistrées",
+    "matchingPreferencesTitle": "Préférences d'emploi et de matching",
+    "otpCode": "Code de vérification",
+    "otpInvalid": "Saisissez le code à 6 chiffres",
+    "otpSendFailed": "Échec de l'envoi du code",
+    "otpSent": "Code de vérification envoyé",
+    "otpVerifyFailed": "Échec de la vérification du code",
+    "phoneInvalid": "Veuillez saisir un numéro de téléphone valide",
+    "phoneNumber": "Numéro de téléphone",
+    "phonePlaceholder": "612 345 678",
+    "phoneRemoved": "Téléphone et consentement supprimés",
+    "phoneVerificationTitle": "Vérification du téléphone",
+    "phoneVerified": "Téléphone vérifié",
+    "phoneVerifiedLabel": "Vérifié",
+    "removePhone": "Supprimer le téléphone / retirer le consentement",
+    "saveError": "Erreur lors de l'enregistrement du profil : ",
+    "saveMatchingPreferences": "Enregistrer les préférences",
+    "sendOtp": "Envoyer le code de vérification",
+    "sendingOtp": "Envoi...",
+    "verifyOtp": "Vérifier",
+    "verifyPhoneFirst": "Vérifiez d'abord votre téléphone",
+    "verifying": "Vérification...",
+    "whatsappJobAlerts": "Alertes WhatsApp",
+    "whatsappJobAlertsHint": "Recevoir les opportunités correspondantes par WhatsApp",
+    "whatsappOptIn": "Alertes d'emploi WhatsApp",
+    "whatsappOptInHint": "Autoriser PipingBox à me contacter via WhatsApp",
+    "workforceInvitationsEnabled": "Invitations de mission",
+    "workforceInvitationsEnabledHint": "Recevoir des invitations à des projets gérés par PipingBox"
   },
   "academy": {
     "eyebrow": "Academy",
@@ -812,7 +857,53 @@
     "categoryFabrication": "Fabrication",
     "elbowCut": {
       "name": "Calculateur de coupe de coude",
-      "subtitle": "Calculer les positions de coupe sur coudes standards"
+      "subtitle": "Calculer les positions de coupe sur coudes standards",
+      "arcCen": "Arc C-C",
+      "arcCentral": "Arc central (neutre)",
+      "arcExt": "Arc extrados :",
+      "arcExterior": "Arc extérieur (extrados)",
+      "arcInt": "Arc intrados :",
+      "arcInterior": "Arc intérieur (intrados)",
+      "cutAngleLabel": "ANGLE DE COUPE",
+      "cutDistExt": "Dist. de coupe extrados :",
+      "cutDistInt": "Dist. de coupe intrados :",
+      "cutExt": "Coupe ext",
+      "cutInt": "Coupe int",
+      "cutLineLabel": "LIGNE DE COUPE",
+      "errorZero": "Saisissez un angle supérieur à 0",
+      "fixedAnglesTable": "Tableau des angles fixes",
+      "formulaArcs": "Longueurs d'arc",
+      "formulaCutDist": "Distances de coupe",
+      "formulaCutNote": "Distance mesurée depuis l'extrémité du coude",
+      "formulaRadius": "Rayon du coude (R)",
+      "formulasTitle": "Formules de calcul",
+      "fullElbow": "Coude complet, aucune coupe nécessaire",
+      "noteAngleMeasure": "L'angle de coupe se mesure depuis l'extrémité du coude",
+      "noteSmallAngle": "Pour les angles < 30°, utiliser un gabarit physique pour plus de précision",
+      "noteTolerance": "Tolérances de coupe : ±2mm recommandé",
+      "notesTitle": "Notes de référence",
+      "radius": "Rayon (R) :",
+      "showCenter": "Centre",
+      "showCutLines": "Coupe",
+      "showDimensions": "Cotes",
+      "showFill": "Remplissage",
+      "sliderAriaLabel": "Angle de coupe du coude",
+      "standards": "Normes de référence",
+      "svgAriaLabel": "Coude à 90 degrés avec ligne de coupe à {{angle}} degrés",
+      "tabCalculator": "Calculateur",
+      "tabFormulas": "Formules et notes",
+      "tip1": "Toujours marquer l'extrados avant de couper",
+      "tip2": "Utiliser un gabarit en carton pour les angles non standard",
+      "tip3": "Vérifier avec un rapporteur numérique après la coupe",
+      "tip4": "Prévoir 2-3mm supplémentaires pour le chanfreinage",
+      "tips": "Conseils pratiques",
+      "varNPS": "Nominal Pipe Size (pouces)",
+      "varOD": "Diamètre extérieur du tube (mm)",
+      "varR": "Rayon de courbure du coude (mm)",
+      "varTheta": "Angle de coupe souhaité (degrés)",
+      "variables": "Variables",
+      "results": "Résultats",
+      "arcNeutral": "Arc neutre (C-C) :"
     },
     "pipeDim": {
       "name": "Tables de données tuyauterie",
@@ -1019,7 +1110,12 @@
       "symbol": "Symbole",
       "thickness": "Épaisseur de bride",
       "unit": "Unité",
-      "value": "Valeur"
+      "value": "Valeur",
+      "disclaimer": "Dimensions nominales selon ASME B16.5-2020. Toujours vérifier avec les données du fabricant avant achat.",
+      "results": "résultats",
+      "subtitle": "Bibliothèque de brides ASME B16.5",
+      "tabLibrary": "Bibliothèque",
+      "tabNotes": "Notes et référence"
     },
     "intradosArc": "Arc intérieur (intrados)",
     "longRadius": "Long rayon (LR)",
@@ -1122,7 +1218,9 @@
     "notFound": "La ressource demandée est introuvable.",
     "incidentCode": "Code d'incident",
     "copyIncidentCode": "Copier le code d'incident",
-    "incidentCodeCopied": "Copié"
+    "incidentCodeCopied": "Copié",
+    "boundaryDesc": "Une erreur inattendue s'est produite. Essayez de recharger cette section.",
+    "boundaryTitle": "Une erreur est survenue"
   },
   "certAlerts": {
     "sectionLabel": "Alertes",
@@ -1160,7 +1258,8 @@
     "renewSuccess": "Certification renouvelée avec succès",
     "deleteSuccess": "Certification supprimée",
     "confirmDeleteTitle": "Supprimer la certification ?",
-    "confirmDeleteDescription": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ? Cette action est irréversible."
+    "confirmDeleteDescription": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ? Cette action est irréversible.",
+    "viewDenied": "Accès refusé"
   },
   "certStatus": {
     "valid": "Valide",
@@ -1217,7 +1316,17 @@
       "generateEnglish": "Générer la version anglaise professionnelle",
       "generatingEnglish": "Génération...",
       "englishGenerated": "Version anglaise générée",
-      "noOriginalText": "Écrivez d'abord une description dans la langue originale"
+      "noOriginalText": "Écrivez d'abord une description dans la langue originale",
+      "allTranslationsGenerated": "Toutes les traductions ont été générées",
+      "generate": "Générer",
+      "generateAll": "Tout générer",
+      "originalText": "Texte original",
+      "selectLanguage": "Sélectionner la langue",
+      "translationGenerated": "Traduction générée : {{lang}}",
+      "translationPlaceholder": "Traduction ({{lang}})",
+      "translations": "Traductions",
+      "translationsAvailable_one": "{{count}} traduction disponible",
+      "translationsAvailable_other": "{{count}} traductions disponibles"
     },
     "documents": {
       "label": "Documents",
@@ -1255,7 +1364,11 @@
         "medical_certificate": "Certificat médical",
         "reference_letter": "Lettre de recommandation",
         "other": "Autre"
-      }
+      },
+      "accessDenied": "Accès refusé",
+      "invalidType": "Type de fichier non pris en charge. Acceptés : PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
+      "saveFailed": "Échec de l'enregistrement du document : ",
+      "verified": "Vérifié"
     },
     "cv": {
       "label": "CV / Curriculum Vitae",
@@ -1268,7 +1381,12 @@
       "removed": "CV supprimé",
       "view": "Voir",
       "replace": "Remplacer",
-      "visibleToCompanies": "CV visible par les entreprises"
+      "visibleToCompanies": "CV visible par les entreprises",
+      "allowedFormats": "Seuls les fichiers PDF, DOC et DOCX sont acceptés",
+      "saveError": "CV téléversé mais échec de l'enregistrement de la référence : ",
+      "visibilityError": "Échec de la mise à jour de la visibilité",
+      "visibilityOff": "Le CV est désormais masqué pour les entreprises",
+      "visibilityOn": "Le CV est désormais visible pour les entreprises"
     },
     "aiExtraction": {
       "label": "Intelligence IA",
@@ -1329,7 +1447,8 @@
       "prefsSaved": "Préférences d'alerte enregistrées",
       "prefsSaveError": "Échec de l'enregistrement des préférences d'alerte",
       "uploadComplete": "Téléchargement terminé",
-      "uploading": "Téléchargement en cours..."
+      "uploading": "Téléchargement en cours...",
+      "viewFileDenied": "Accès refusé"
     }
   },
   "profileCompleteness": {
@@ -1409,7 +1528,8 @@
     "availableNow": "Disponible maintenant",
     "openToOffers": "Ouvert aux offres",
     "notAvailable": "Non disponible",
-    "employed": "En poste"
+    "employed": "En poste",
+    "notWillingToTravel": "Non disponible pour les déplacements"
   },
   "candidateProfile": {
     "messageCandidate": "Contacter le candidat",
@@ -1522,7 +1642,11 @@
       "elite_badge": "Badge élite",
       "exclusive_features": "Fonctionnalités exclusives",
       "premium_perks": "Avantages premium"
-    }
+    },
+    "codeCopied": "Code copié dans le presse-papiers",
+    "copyFailed": "Copie impossible. Veuillez réessayer.",
+    "linkCopied": "Lien copié dans le presse-papiers",
+    "shared": "Partagé avec succès"
   },
   "workday": {
     "eyebrow": "Rapport journalier / Registre de paie",
@@ -1588,7 +1712,8 @@
     "totalHours": "Heures totales",
     "grossSalary": "Salaire brut",
     "finalTotal": "Total final",
-    "location": "Localisation"
+    "location": "Localisation",
+    "companyName": "Nom de l'entreprise (facultatif)"
   },
   "ratePresets": {
     "eyebrow": "Modèles de tarifs",
@@ -1945,7 +2070,10 @@
     "approved": "Approuvé",
     "active": "Actif",
     "saveProfile": "Enregistrer le profil",
-    "profileSaved": "Profil entreprise enregistré."
+    "profileSaved": "Profil entreprise enregistré.",
+    "descriptionPlaceholder": "Décrivez votre entreprise, vos services et vos spécialités (2-3 lignes recommandées)",
+    "saveError": "Erreur lors de l'enregistrement du profil : ",
+    "saved": "Profil d'entreprise enregistré"
   },
   "companyWorkforce": {
     "eyebrow": "Entreprise",
@@ -1966,7 +2094,9 @@
     "international": "International",
     "allPriorities": "Toutes les priorités",
     "results": "Résultats",
-    "staffingProgress": "Progression du recrutement"
+    "staffingProgress": "Progression du recrutement",
+    "assignedShort": "attribués",
+    "requestedShort": "demandés"
   },
   "companyWorkerSearch": {
     "eyebrow": "Entreprise",
@@ -2511,7 +2641,8 @@
         "desc": "Matériel de préparation VCA, SCC et PRL et apprentissage industriel.",
         "cta": "Commencer à apprendre"
       }
-    }
+    },
+    "signUpFree": "Inscrivez-vous gratuitement"
   },
   "workforcePipeline": {
     "aiMatching": {
@@ -2580,5 +2711,110 @@
     "home": "Accueil",
     "tools": "Outils",
     "jobs": "Emplois"
+  },
+  "adminCompanyVerification": {
+    "allStatuses": "Tous les statuts",
+    "approve": "Approuver",
+    "fetchError": "Échec du chargement des entreprises",
+    "noCompanies": "Aucune entreprise trouvée",
+    "pending": "En attente",
+    "refresh": "Actualiser",
+    "reject": "Rejeter",
+    "rejected": "Rejetée",
+    "resetToPending": "Rétablir à En attente",
+    "searchPlaceholder": "Rechercher par nom d'entreprise, contact, secteur...",
+    "statusUpdated": "Statut de l'entreprise mis à jour : {{status}}",
+    "suspend": "Suspendre",
+    "suspended": "Suspendue",
+    "total": "Total",
+    "unnamed": "Entreprise sans nom",
+    "updateError": "Échec de la mise à jour du statut",
+    "verified": "Vérifiée",
+    "website": "Site web"
+  },
+  "companyBilling": {
+    "description": "Gérez votre abonnement et vos moyens de paiement."
+  },
+  "companyDocs": {
+    "allStatuses": "Tous les statuts",
+    "colDate": "Date",
+    "colJob": "Poste",
+    "colSize": "Taille",
+    "colStatus": "Statut",
+    "colTitle": "Document",
+    "colWorker": "Travailleur",
+    "description": "Gérez, échangez et suivez les documents avec les travailleurs et les candidats.",
+    "emptyState": "Aucun document trouvé avec les filtres sélectionnés.",
+    "expired": "Expirés",
+    "infoDescription": "Ce module est conçu pour la coordination documentaire entre entreprises, contractants et travailleurs industriels. Gérez contrats, certifications, permis de travail, paies et documents de sécurité depuis un seul endroit.",
+    "infoTitle": "Gestion Documentaire Industrielle",
+    "pending": "En attente",
+    "requiresUpdate": "À mettre à jour",
+    "searchPlaceholder": "Rechercher par titre, travailleur ou poste...",
+    "totalDocs": "Total Documents",
+    "uploadDocument": "Téléverser un document",
+    "uploadFirst": "Téléverser le premier document"
+  },
+  "companySettings": {
+    "description": "Gérez les préférences et les paramètres de votre entreprise."
+  },
+  "companyVerification": {
+    "contactSupport": "Contacter le support",
+    "pendingDesc": "Le compte de votre entreprise est en attente de vérification. Une fois vérifié par un administrateur, vous aurez un accès complet à la recherche de travailleurs et aux outils de recrutement.",
+    "pendingTitle": "Vérification en attente",
+    "rejectedDesc": "La vérification de votre entreprise a été rejetée. Veuillez contacter le support ou mettre à jour les informations de votre entreprise et les soumettre à nouveau.",
+    "rejectedTitle": "Vérification rejetée",
+    "statusLabel": "Statut de vérification",
+    "statusPending": "En cours d'examen — généralement 1-2 jours ouvrés",
+    "statusRejected": "Rejetée — mettez à jour votre profil et contactez le support",
+    "statusSuspended": "Suspendue — contactez l'administrateur",
+    "statusUnknown": "Statut inconnu",
+    "stepCompanyName": "Nom de l'entreprise renseigné dans votre profil",
+    "stepDescription": "Description de l'entreprise fournie",
+    "stepIndustry": "Secteur et pays spécifiés",
+    "suspendedDesc": "Le compte de votre entreprise a été suspendu. Veuillez contacter l'administrateur pour plus d'informations.",
+    "suspendedTitle": "Compte suspendu",
+    "updateProfile": "Mettre à jour le profil de l'entreprise",
+    "whileWaiting": "En attendant, assurez-vous d'avoir :"
+  },
+  "pricing": {
+    "eyebrow": "Pour les entreprises",
+    "popular": "Le plus populaire",
+    "subtitle": "Les travailleurs sont toujours gratuits. Les entreprises paient pour les outils de recrutement. Aucun frais caché.",
+    "title": "Des tarifs simples et transparents",
+    "workersFree": "Les travailleurs sont toujours gratuits — profil, marketplace, outils et communauté."
+  },
+  "requestWorkers": {
+    "backToRequests": "Retour aux demandes de personnel",
+    "companyName": "Nom de l'entreprise",
+    "contactPerson": "Personne de contact",
+    "country": "Pays",
+    "duration": "Durée du projet",
+    "email": "E-mail",
+    "errors": {
+      "companyRequired": "Le nom de l'entreprise est obligatoire",
+      "contactRequired": "La personne de contact est obligatoire",
+      "emailInvalid": "E-mail invalide",
+      "emailRequired": "L'e-mail est obligatoire",
+      "workerTypeRequired": "Veuillez sélectionner le type de travailleur"
+    },
+    "eyebrow": "Solutions de personnel",
+    "message": "Message complémentaire",
+    "messagePlaceholder": "Dites-nous en plus sur vos exigences de projet, les certifications nécessaires ou tout détail spécifique...",
+    "numWorkers": "Nombre de travailleurs",
+    "received": "Demande reçue",
+    "receivedDesc": "Merci pour votre demande de personnel. Notre équipe examinera vos exigences et vous répondra sous 24 à 48 heures avec une proposition adaptée.",
+    "required": "Champs obligatoires",
+    "retry": "Réessayer",
+    "selectType": "Sélectionner le type de travailleur",
+    "startDate": "Date de début estimée",
+    "submit": "Demander du personnel",
+    "submitAnother": "Envoyer une autre demande",
+    "submitFailed": "Échec de l'envoi",
+    "submitting": "Envoi...",
+    "subtitle": "Besoin de travailleurs industriels qualifiés pour votre projet ? Remplissez le formulaire ci-dessous et notre équipe vous mettra en relation avec des professionnels qualifiés de notre réseau mondial.",
+    "success": "Demande de personnel envoyée !",
+    "title": "Demander du personnel",
+    "workerType": "Type de travailleurs requis"
   }
 }

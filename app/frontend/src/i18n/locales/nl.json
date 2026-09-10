@@ -48,7 +48,9 @@
     "loadFailed": "Laden van gegevens mislukt.",
     "unexpectedError": "Er is een onverwachte fout opgetreden",
     "sending": "Verzenden...",
-    "download": "Downloaden"
+    "download": "Downloaden",
+    "saveError": "Opslaan mislukt",
+    "saved": "Opgeslagen"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -79,7 +81,12 @@
     "viewAs": "Bekijk als",
     "previewMode": "VOORBEELDMODUS",
     "viewingAs": "Bekijken als",
-    "exitPreview": "Voorbeeld sluiten"
+    "exitPreview": "Voorbeeld sluiten",
+    "companyBilling": "Facturering / Abonnementen",
+    "companyDocumentation": "Industrieel Documentbeheer",
+    "companySection": "Bedrijf",
+    "companySettings": "Instellingen",
+    "companyWorkspace": "Bedrijfsomgeving"
   },
   "notifications": {
     "title": "Meldingen",
@@ -99,7 +106,10 @@
     "documentRequest": "Er is een document bij je aangevraagd.",
     "certificateExpiring": "Een van je certificaten verloopt binnenkort.",
     "adminAlert": "Beheerderswaarschuwing ontvangen.",
-    "feedbackResolved": "Je feedbackrapport is beoordeeld en opgelost. Bedankt voor het helpen verbeteren van PipingBox."
+    "feedbackResolved": "Je feedbackrapport is beoordeeld en opgelost. Bedankt voor het helpen verbeteren van PipingBox.",
+    "jobMatch": "Nieuwe vacaturematch",
+    "productUpdate": "Nieuwe functie beschikbaar",
+    "workforceInvitation": "Nieuwe werkmogelijkheid"
   },
   "dashboard": {
     "overview": "Overzicht",
@@ -373,8 +383,43 @@
       "fileUploaded": "Bestand geüpload",
       "filePdfOrImage": "Upload een PDF- of afbeeldingsbestand",
       "fileUnder10": "Bestand moet kleiner zijn dan 10MB",
-      "nameIssuerRequired": "Naam en uitgever zijn verplicht"
-    }
+      "nameIssuerRequired": "Naam en uitgever zijn verplicht",
+      "viewFileDenied": "Toegang geweigerd"
+    },
+    "country": "Land",
+    "emailJobAlerts": "E-mailmeldingen",
+    "emailJobAlertsHint": "Passende vacatures per e-mail ontvangen",
+    "jobMatchingEnabled": "Vacaturematching",
+    "jobMatchingEnabledHint": "Ontvang opportuniteiten van gepubliceerde vacatures",
+    "matchReadyTitle": "Voltooi uw profiel om nauwkeurigere vacaturematches te ontvangen.",
+    "matchingPreferencesSaved": "Voorkeuren opgeslagen",
+    "matchingPreferencesTitle": "Vacature- & Matchingvoorkeuren",
+    "otpCode": "Verificatiecode",
+    "otpInvalid": "Voer de 6-cijferige code in",
+    "otpSendFailed": "Code versturen mislukt",
+    "otpSent": "Verificatiecode verstuurd",
+    "otpVerifyFailed": "Code verifiëren mislukt",
+    "phoneInvalid": "Voer een geldig telefoonnummer in",
+    "phoneNumber": "Telefoonnummer",
+    "phonePlaceholder": "612 345 678",
+    "phoneRemoved": "Telefoonnummer en toestemming verwijderd",
+    "phoneVerificationTitle": "Telefoonverificatie",
+    "phoneVerified": "Telefoonnummer geverifieerd",
+    "phoneVerifiedLabel": "Geverifieerd",
+    "removePhone": "Telefoonnummer verwijderen / toestemming intrekken",
+    "saveError": "Fout bij opslaan van profiel: ",
+    "saveMatchingPreferences": "Voorkeuren opslaan",
+    "sendOtp": "Verificatiecode versturen",
+    "sendingOtp": "Versturen...",
+    "verifyOtp": "Verifiëren",
+    "verifyPhoneFirst": "Verifieer eerst uw telefoonnummer",
+    "verifying": "Verifiëren...",
+    "whatsappJobAlerts": "WhatsApp-meldingen",
+    "whatsappJobAlertsHint": "Passende vacatures via WhatsApp ontvangen",
+    "whatsappOptIn": "WhatsApp-vacaturemeldingen",
+    "whatsappOptInHint": "PipingBox toestaan mij via WhatsApp te benaderen",
+    "workforceInvitationsEnabled": "Werkuitnodigingen",
+    "workforceInvitationsEnabledHint": "Uitnodigingen ontvangen voor door PipingBox beheerde projecten"
   },
   "academy": {
     "eyebrow": "Academy",
@@ -812,7 +857,53 @@
     "categoryFabrication": "Fabricage",
     "elbowCut": {
       "name": "Bochtsnij-calculator",
-      "subtitle": "Snijposities op standaardbochten berekenen"
+      "subtitle": "Snijposities op standaardbochten berekenen",
+      "arcCen": "Boog C-C",
+      "arcCentral": "Middenboog (neutraal)",
+      "arcExt": "Boog extrados:",
+      "arcExterior": "Buitenboog (extrados)",
+      "arcInt": "Boog intrados:",
+      "arcInterior": "Binnenboog (intrados)",
+      "cutAngleLabel": "SNijHOEK",
+      "cutDistExt": "Snijafstand extrados:",
+      "cutDistInt": "Snijafstand intrados:",
+      "cutExt": "Snede buit",
+      "cutInt": "Snede binn",
+      "cutLineLabel": "SNIJLIJN",
+      "errorZero": "Voer een hoek groter dan 0 in",
+      "fixedAnglesTable": "Tabel vaste hoeken",
+      "formulaArcs": "Booglengten",
+      "formulaCutDist": "Snijafstanden",
+      "formulaCutNote": "Afstand gemeten vanaf het uiteinde van de bocht",
+      "formulaRadius": "Boogstraal (R)",
+      "formulasTitle": "Berekeningsformules",
+      "fullElbow": "Volledige bocht, geen snede nodig",
+      "noteAngleMeasure": "De snijhoek wordt gemeten vanaf het uiteinde van de bocht",
+      "noteSmallAngle": "Gebruik bij hoeken < 30° een fysieke sjabloon voor grotere nauwkeurigheid",
+      "noteTolerance": "Snijtoleranties: ±2mm aanbevolen",
+      "notesTitle": "Referentienotities",
+      "radius": "Straal (R):",
+      "showCenter": "Midden",
+      "showCutLines": "Snede",
+      "showDimensions": "Maten",
+      "showFill": "Vulling",
+      "sliderAriaLabel": "Snijhoek van de bocht",
+      "standards": "Referentienormen",
+      "svgAriaLabel": "Bocht van 90 graden met snijlijn op {{angle}} graden",
+      "tabCalculator": "Calculator",
+      "tabFormulas": "Formules & Notities",
+      "tip1": "Markeer altijd de extrados voordat u snijdt",
+      "tip2": "Gebruik een kartonnen sjabloon voor niet-standaard hoeken",
+      "tip3": "Controleer na het snijden met een digitale hoekmeter",
+      "tip4": "Reken op 2-3mm extra voor het afschuinen",
+      "tips": "Praktische Tips",
+      "varNPS": "Nominal Pipe Size (inches)",
+      "varOD": "Buitendiameter van de pijp (mm)",
+      "varR": "Buigstraal van de bocht (mm)",
+      "varTheta": "Gewenste snijhoek (graden)",
+      "variables": "Variabelen",
+      "results": "Resultaten",
+      "arcNeutral": "Neutrale boog (C-C):"
     },
     "pipeDim": {
       "name": "Buisgegevenstabellen",
@@ -1019,7 +1110,12 @@
       "symbol": "Symbool",
       "thickness": "Flensdikte",
       "unit": "Eenheid",
-      "value": "Waarde"
+      "value": "Waarde",
+      "disclaimer": "Nominale afmetingen volgens ASME B16.5-2020. Controleer altijd met fabrikantgegevens vóór aanschaf.",
+      "results": "resultaten",
+      "subtitle": "ASME B16.5 Flensbibliotheek",
+      "tabLibrary": "Bibliotheek",
+      "tabNotes": "Notities & Referentie"
     },
     "intradosArc": "Binnenboog (binnenzijde)",
     "longRadius": "Lange straal (LR)",
@@ -1122,7 +1218,9 @@
     "notFound": "De gevraagde bron is niet gevonden.",
     "incidentCode": "Incidentcode",
     "copyIncidentCode": "Incidentcode kopiëren",
-    "incidentCodeCopied": "Gekopieerd"
+    "incidentCodeCopied": "Gekopieerd",
+    "boundaryDesc": "Er is een onverwachte fout opgetreden. Probeer deze sectie opnieuw te laden.",
+    "boundaryTitle": "Er ging iets mis"
   },
   "certAlerts": {
     "sectionLabel": "Waarschuwingen",
@@ -1160,7 +1258,8 @@
     "renewSuccess": "Certificering succesvol verlengd",
     "deleteSuccess": "Certificering verwijderd",
     "confirmDeleteTitle": "Certificering verwijderen?",
-    "confirmDeleteDescription": "Weet je zeker dat je \"{{name}}\" wilt verwijderen? Dit kan niet ongedaan worden gemaakt."
+    "confirmDeleteDescription": "Weet je zeker dat je \"{{name}}\" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "viewDenied": "Toegang geweigerd"
   },
   "certStatus": {
     "valid": "Geldig",
@@ -1217,7 +1316,17 @@
       "generateEnglish": "Professionele Engelse versie genereren",
       "generatingEnglish": "Genereren...",
       "englishGenerated": "Engelse versie gegenereerd",
-      "noOriginalText": "Schrijf eerst een beschrijving in de oorspronkelijke taal"
+      "noOriginalText": "Schrijf eerst een beschrijving in de oorspronkelijke taal",
+      "allTranslationsGenerated": "Alle vertalingen gegenereerd",
+      "generate": "Genereren",
+      "generateAll": "Alles genereren",
+      "originalText": "Originele tekst",
+      "selectLanguage": "Taal selecteren",
+      "translationGenerated": "Vertaling gegenereerd: {{lang}}",
+      "translationPlaceholder": "Vertaling ({{lang}})",
+      "translations": "Vertalingen",
+      "translationsAvailable_one": "{{count}} vertaling beschikbaar",
+      "translationsAvailable_other": "{{count}} vertalingen beschikbaar"
     },
     "documents": {
       "label": "Documenten",
@@ -1255,7 +1364,11 @@
         "medical_certificate": "Medisch certificaat",
         "reference_letter": "Referentiebrief",
         "other": "Overig"
-      }
+      },
+      "accessDenied": "Toegang geweigerd",
+      "invalidType": "Niet-ondersteund bestandstype. Geaccepteerd: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
+      "saveFailed": "Document opslaan mislukt: ",
+      "verified": "Geverifieerd"
     },
     "cv": {
       "label": "CV / Resume",
@@ -1268,7 +1381,12 @@
       "removed": "CV verwijderd",
       "view": "Bekijken",
       "replace": "Vervangen",
-      "visibleToCompanies": "CV zichtbaar voor bedrijven"
+      "visibleToCompanies": "CV zichtbaar voor bedrijven",
+      "allowedFormats": "Alleen PDF-, DOC- en DOCX-bestanden worden geaccepteerd",
+      "saveError": "CV geüpload, maar referentie opslaan mislukt: ",
+      "visibilityError": "Zichtbaarheid bijwerken mislukt",
+      "visibilityOff": "CV is nu verborgen voor bedrijven",
+      "visibilityOn": "CV is nu zichtbaar voor bedrijven"
     },
     "aiExtraction": {
       "label": "AI Intelligentie",
@@ -1329,7 +1447,8 @@
       "prefsSaved": "Waarschuwingsvoorkeuren opgeslagen",
       "prefsSaveError": "Waarschuwingsvoorkeuren opslaan mislukt",
       "uploadComplete": "Upload voltooid",
-      "uploading": "Bezig met uploaden..."
+      "uploading": "Bezig met uploaden...",
+      "viewFileDenied": "Toegang geweigerd"
     }
   },
   "profileCompleteness": {
@@ -1409,7 +1528,8 @@
     "availableNow": "Nu beschikbaar",
     "openToOffers": "Open voor aanbiedingen",
     "notAvailable": "Niet beschikbaar",
-    "employed": "In dienst"
+    "employed": "In dienst",
+    "notWillingToTravel": "Niet beschikbaar om te reizen"
   },
   "candidateProfile": {
     "messageCandidate": "Kandidaat berichten",
@@ -1522,7 +1642,11 @@
       "elite_badge": "Elite-badge",
       "exclusive_features": "Exclusieve functies",
       "premium_perks": "Premium voordelen"
-    }
+    },
+    "codeCopied": "Code gekopieerd naar klembord",
+    "copyFailed": "Kopiëren mislukt. Probeer het opnieuw.",
+    "linkCopied": "Link gekopieerd naar klembord",
+    "shared": "Succesvol gedeeld"
   },
   "workday": {
     "eyebrow": "Dagstaat / Loonregistratie",
@@ -1588,7 +1712,8 @@
     "totalHours": "Totale uren",
     "grossSalary": "Brutoloon",
     "finalTotal": "Eindtotaal",
-    "location": "Locatie"
+    "location": "Locatie",
+    "companyName": "Bedrijfsnaam (optioneel)"
   },
   "ratePresets": {
     "eyebrow": "Tariefsjablonen",
@@ -1945,7 +2070,10 @@
     "approved": "Goedgekeurd",
     "active": "Actief",
     "saveProfile": "Profiel opslaan",
-    "profileSaved": "Bedrijfsprofiel opgeslagen."
+    "profileSaved": "Bedrijfsprofiel opgeslagen.",
+    "descriptionPlaceholder": "Beschrijf uw bedrijf, diensten en specialisaties (2-3 regels aanbevolen)",
+    "saveError": "Fout bij opslaan van profiel: ",
+    "saved": "Bedrijfsprofiel opgeslagen"
   },
   "companyWorkforce": {
     "eyebrow": "Bedrijf",
@@ -1966,7 +2094,9 @@
     "international": "Internationaal",
     "allPriorities": "Alle prioriteiten",
     "results": "Resultaten",
-    "staffingProgress": "Personeelsvoortgang"
+    "staffingProgress": "Personeelsvoortgang",
+    "assignedShort": "toegewezen",
+    "requestedShort": "aangevraagd"
   },
   "companyWorkerSearch": {
     "eyebrow": "Bedrijf",
@@ -2511,7 +2641,8 @@
         "desc": "VCA-, SCC- en PRL-voorbereidingsmateriaal en industrieel leren.",
         "cta": "Leren starten"
       }
-    }
+    },
+    "signUpFree": "Gratis registreren"
   },
   "workforcePipeline": {
     "aiMatching": {
@@ -2580,5 +2711,110 @@
     "home": "Home",
     "tools": "Tools",
     "jobs": "Vacatures"
+  },
+  "adminCompanyVerification": {
+    "allStatuses": "Alle statussen",
+    "approve": "Goedkeuren",
+    "fetchError": "Bedrijven laden mislukt",
+    "noCompanies": "Geen bedrijven gevonden",
+    "pending": "In behandeling",
+    "refresh": "Vernieuwen",
+    "reject": "Afwijzen",
+    "rejected": "Afgewezen",
+    "resetToPending": "Terug naar In behandeling",
+    "searchPlaceholder": "Zoek op bedrijfsnaam, contactpersoon, sector...",
+    "statusUpdated": "Bedrijfsstatus gewijzigd in {{status}}",
+    "suspend": "Opschorten",
+    "suspended": "Opgeschort",
+    "total": "Totaal",
+    "unnamed": "Naamloos bedrijf",
+    "updateError": "Status bijwerken mislukt",
+    "verified": "Geverifieerd",
+    "website": "Website"
+  },
+  "companyBilling": {
+    "description": "Beheer uw abonnement en betaalmethoden."
+  },
+  "companyDocs": {
+    "allStatuses": "Alle statussen",
+    "colDate": "Datum",
+    "colJob": "Functie",
+    "colSize": "Grootte",
+    "colStatus": "Status",
+    "colTitle": "Document",
+    "colWorker": "Werknemer",
+    "description": "Beheer, deel en volg documenten met werknemers en kandidaten.",
+    "emptyState": "Geen documenten gevonden met de geselecteerde filters.",
+    "expired": "Verlopen",
+    "infoDescription": "Deze module is ontworpen voor documentcoördinatie tussen bedrijven, aannemers en industriële werknemers. Beheer contracten, certificeringen, werkvergunningen, loonlijsten en veiligheidsdocumenten vanaf één plek.",
+    "infoTitle": "Industrieel Documentbeheer",
+    "pending": "In behandeling",
+    "requiresUpdate": "Vereist update",
+    "searchPlaceholder": "Zoek op titel, werknemer of functie...",
+    "totalDocs": "Totaal Documenten",
+    "uploadDocument": "Document uploaden",
+    "uploadFirst": "Upload eerste document"
+  },
+  "companySettings": {
+    "description": "Beheer de voorkeuren en instellingen van uw bedrijf."
+  },
+  "companyVerification": {
+    "contactSupport": "Contact opnemen met support",
+    "pendingDesc": "Het account van uw bedrijf is in afwachting van verificatie. Zodra een beheerder deze heeft goedgekeurd, krijgt u volledige toegang tot de werknemerszoekfunctie en wervingsinstrumenten.",
+    "pendingTitle": "Verificatie in behandeling",
+    "rejectedDesc": "De verificatie van uw bedrijf is afgewezen. Neem contact op met support of werk de bedrijfsgegevens bij en dien opnieuw in.",
+    "rejectedTitle": "Verificatie afgewezen",
+    "statusLabel": "Verificatiestatus",
+    "statusPending": "In beoordeling — doorgaans 1-2 werkdagen",
+    "statusRejected": "Afgewezen — werk uw profiel bij en neem contact op met support",
+    "statusSuspended": "Opgeschort — neem contact op met de beheerder",
+    "statusUnknown": "Onbekende status",
+    "stepCompanyName": "Bedrijfsnaam ingevuld in uw profiel",
+    "stepDescription": "Bedrijfsomschrijving opgegeven",
+    "stepIndustry": "Sector en land opgegeven",
+    "suspendedDesc": "Het account van uw bedrijf is opgeschort. Neem contact op met de beheerder voor meer informatie.",
+    "suspendedTitle": "Account opgeschort",
+    "updateProfile": "Bedrijfsprofiel bijwerken",
+    "whileWaiting": "Zorg er terwijl u wacht voor dat u het volgende heeft:"
+  },
+  "pricing": {
+    "eyebrow": "Voor bedrijven",
+    "popular": "Meest gekozen",
+    "subtitle": "Werknemers zijn altijd gratis. Bedrijven betalen voor wervingstools. Geen verborgen kosten.",
+    "title": "Eenvoudige, transparante prijzen",
+    "workersFree": "Werknemers zijn altijd gratis — profiel, marktplaats, tools en community."
+  },
+  "requestWorkers": {
+    "backToRequests": "Terug naar Personeelsaanvragen",
+    "companyName": "Bedrijfsnaam",
+    "contactPerson": "Contactpersoon",
+    "country": "Land",
+    "duration": "Projectduur",
+    "email": "E-mail",
+    "errors": {
+      "companyRequired": "Bedrijfsnaam is verplicht",
+      "contactRequired": "Contactpersoon is verplicht",
+      "emailInvalid": "Ongeldig e-mailadres",
+      "emailRequired": "E-mailadres is verplicht",
+      "workerTypeRequired": "Selecteer het type werknemer"
+    },
+    "eyebrow": "Personeelsoplossingen",
+    "message": "Aanvullende informatie",
+    "messagePlaceholder": "Vertel ons meer over uw projectvereisten, benodigde certificeringen of andere specifieke details...",
+    "numWorkers": "Aantal werknemers",
+    "received": "Aanvraag ontvangen",
+    "receivedDesc": "Bedankt voor uw personeelsaanvraag. Ons team beoordeelt uw vereisten en neemt binnen 24–48 uur contact met u op met een oplossing op maat.",
+    "required": "Verplichte velden",
+    "retry": "Opnieuw proberen",
+    "selectType": "Selecteer type werknemer",
+    "startDate": "Geschatte startdatum",
+    "submit": "Personeel aanvragen",
+    "submitAnother": "Nog een aanvraag indienen",
+    "submitFailed": "Indienen mislukt",
+    "submitting": "Bezig met indienen...",
+    "subtitle": "Heeft u gekwalificeerde industriële werknemers nodig voor uw project? Vul het formulier in en ons team koppelt u aan gekwalificeerde professionals uit ons wereldwijde netwerk.",
+    "success": "Personeelsaanvraag ingediend!",
+    "title": "Personeel aanvragen",
+    "workerType": "Gewenst type werknemers"
   }
 }

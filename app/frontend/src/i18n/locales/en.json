@@ -48,7 +48,9 @@
     "loadFailed": "Failed to load data.",
     "unexpectedError": "An unexpected error occurred",
     "sending": "Sending...",
-    "download": "Download"
+    "download": "Download",
+    "saveError": "Save error",
+    "saved": "Saved"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -79,7 +81,12 @@
     "viewAs": "View As",
     "previewMode": "PREVIEW MODE",
     "viewingAs": "Viewing as",
-    "exitPreview": "Exit Preview"
+    "exitPreview": "Exit Preview",
+    "companyBilling": "Billing / Plans",
+    "companyDocumentation": "Industrial Document Management",
+    "companySection": "Company",
+    "companySettings": "Settings",
+    "companyWorkspace": "Company Workspace"
   },
   "notifications": {
     "title": "Notifications",
@@ -99,7 +106,10 @@
     "documentRequest": "A document has been requested from you.",
     "certificateExpiring": "One of your certificates is about to expire.",
     "adminAlert": "Admin alert received.",
-    "feedbackResolved": "Your feedback report has been reviewed and resolved. Thank you for helping us improve PipingBox."
+    "feedbackResolved": "Your feedback report has been reviewed and resolved. Thank you for helping us improve PipingBox.",
+    "jobMatch": "New job match",
+    "productUpdate": "New feature available",
+    "workforceInvitation": "New workforce opportunity"
   },
   "dashboard": {
     "overview": "Overview",
@@ -373,8 +383,43 @@
       "fileUploaded": "File uploaded",
       "filePdfOrImage": "Please upload a PDF or image file",
       "fileUnder10": "File must be under 10MB",
-      "nameIssuerRequired": "Name and issuer are required"
-    }
+      "nameIssuerRequired": "Name and issuer are required",
+      "viewFileDenied": "Access denied"
+    },
+    "country": "Country",
+    "emailJobAlerts": "Email alerts",
+    "emailJobAlertsHint": "Send matching opportunities by email",
+    "jobMatchingEnabled": "Job matching",
+    "jobMatchingEnabledHint": "Receive opportunities from published jobs",
+    "matchReadyTitle": "Complete your profile to receive more accurate job matches.",
+    "matchingPreferencesSaved": "Preferences saved",
+    "matchingPreferencesTitle": "Job & Matching Preferences",
+    "otpCode": "Verification code",
+    "otpInvalid": "Enter the 6-digit code",
+    "otpSendFailed": "Failed to send code",
+    "otpSent": "Verification code sent",
+    "otpVerifyFailed": "Failed to verify code",
+    "phoneInvalid": "Please enter a valid phone number",
+    "phoneNumber": "Phone number",
+    "phonePlaceholder": "612 345 678",
+    "phoneRemoved": "Phone and consent removed",
+    "phoneVerificationTitle": "Phone Verification",
+    "phoneVerified": "Phone verified",
+    "phoneVerifiedLabel": "Verified",
+    "removePhone": "Remove phone / withdraw consent",
+    "saveError": "Error saving profile: ",
+    "saveMatchingPreferences": "Save preferences",
+    "sendOtp": "Send verification code",
+    "sendingOtp": "Sending...",
+    "verifyOtp": "Verify",
+    "verifyPhoneFirst": "Verify your phone first",
+    "verifying": "Verifying...",
+    "whatsappJobAlerts": "WhatsApp alerts",
+    "whatsappJobAlertsHint": "Send matching opportunities by WhatsApp",
+    "whatsappOptIn": "WhatsApp job alerts",
+    "whatsappOptInHint": "Allow PipingBox to contact me via WhatsApp",
+    "workforceInvitationsEnabled": "Workforce invitations",
+    "workforceInvitationsEnabledHint": "Receive invitations to PipingBox-managed projects"
   },
   "academy": {
     "eyebrow": "Academy",
@@ -735,7 +780,53 @@
     "categoryFabrication": "Fabrication",
     "elbowCut": {
       "name": "Elbow Cut Calculator",
-      "subtitle": "Calculate where to cut a standard elbow to get any angle"
+      "subtitle": "Calculate where to cut a standard elbow to get any angle",
+      "arcCen": "C-C arc",
+      "arcCentral": "Central arc (neutral)",
+      "arcExt": "Extrados arc:",
+      "arcExterior": "Exterior arc (extrados)",
+      "arcInt": "Intrados arc:",
+      "arcInterior": "Interior arc (intrados)",
+      "cutAngleLabel": "CUT ANGLE",
+      "cutDistExt": "Extrados cut dist.:",
+      "cutDistInt": "Intrados cut dist.:",
+      "cutExt": "Ext cut",
+      "cutInt": "Int cut",
+      "cutLineLabel": "CUT LINE",
+      "errorZero": "Enter an angle greater than 0",
+      "fixedAnglesTable": "Fixed angles table",
+      "formulaArcs": "Arc lengths",
+      "formulaCutDist": "Cut distances",
+      "formulaCutNote": "Distance measured from the end of the elbow",
+      "formulaRadius": "Elbow radius (R)",
+      "formulasTitle": "Calculation Formulas",
+      "fullElbow": "Full elbow, no cut needed",
+      "noteAngleMeasure": "The cut angle is measured from the end of the elbow",
+      "noteSmallAngle": "For angles < 30° use a physical template for greater precision",
+      "noteTolerance": "Cut tolerances: ±2mm recommended",
+      "notesTitle": "Reference Notes",
+      "radius": "Radius (R):",
+      "showCenter": "Center",
+      "showCutLines": "Cut",
+      "showDimensions": "Dimensions",
+      "showFill": "Fill",
+      "sliderAriaLabel": "Elbow cut angle",
+      "standards": "Reference Standards",
+      "svgAriaLabel": "90-degree elbow with cut line at {{angle}} degrees",
+      "tabCalculator": "Calculator",
+      "tabFormulas": "Formulas & Notes",
+      "tip1": "Always mark the extrados before cutting",
+      "tip2": "Use a cardboard template for non-standard angles",
+      "tip3": "Verify with a digital protractor after cutting",
+      "tip4": "Allow 2-3mm extra for beveling",
+      "tips": "Practical Tips",
+      "varNPS": "Nominal Pipe Size (inches)",
+      "varOD": "Pipe outside diameter (mm)",
+      "varR": "Elbow bend radius (mm)",
+      "varTheta": "Desired cut angle (degrees)",
+      "variables": "Variables",
+      "results": "Results",
+      "arcNeutral": "Neutral arc (C-C):"
     },
     "branchLayout": {
       "name": "Branch Connection Calculator",
@@ -971,7 +1062,12 @@
       "rfDia": "Raised Face diameter",
       "bolts": "Number of bolts",
       "boltDia": "Bolt diameter",
-      "pipeOD": "Pipe OD"
+      "pipeOD": "Pipe OD",
+      "disclaimer": "Nominal dimensions per ASME B16.5-2020. Always verify against manufacturer data before procurement.",
+      "results": "results",
+      "subtitle": "ASME B16.5 Flange Library",
+      "tabLibrary": "Library",
+      "tabNotes": "Notes & Reference"
     },
     "pressureDropDesc": "Darcy-Weisbach pressure drop with Swamee-Jain friction factor",
     "unitConverterDesc": "Convert between imperial and metric piping units",
@@ -1122,7 +1218,9 @@
     "notFound": "The requested resource could not be found.",
     "incidentCode": "Incident code",
     "copyIncidentCode": "Copy incident code",
-    "incidentCodeCopied": "Copied"
+    "incidentCodeCopied": "Copied",
+    "boundaryDesc": "An unexpected error occurred. Try reloading this section.",
+    "boundaryTitle": "Something went wrong"
   },
   "certAlerts": {
     "sectionLabel": "Alerts",
@@ -1160,7 +1258,8 @@
     "renewSuccess": "Certification renewed successfully",
     "deleteSuccess": "Certification deleted",
     "confirmDeleteTitle": "Delete certification?",
-    "confirmDeleteDescription": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+    "confirmDeleteDescription": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+    "viewDenied": "Access denied"
   },
   "certStatus": {
     "valid": "Valid",
@@ -1217,7 +1316,17 @@
       "generateEnglish": "Generate professional English version",
       "generatingEnglish": "Generating...",
       "englishGenerated": "English version generated",
-      "noOriginalText": "Please write a description in the original language first"
+      "noOriginalText": "Please write a description in the original language first",
+      "allTranslationsGenerated": "All translations generated",
+      "generate": "Generate",
+      "generateAll": "Generate all",
+      "originalText": "Original text",
+      "selectLanguage": "Select language",
+      "translationGenerated": "Translation generated: {{lang}}",
+      "translationPlaceholder": "Translation ({{lang}})",
+      "translations": "Translations",
+      "translationsAvailable_one": "{{count}} translation available",
+      "translationsAvailable_other": "{{count}} translations available"
     },
     "documents": {
       "label": "Documents",
@@ -1255,7 +1364,11 @@
         "medical_certificate": "Medical Certificate",
         "reference_letter": "Reference Letter",
         "other": "Other"
-      }
+      },
+      "accessDenied": "Access denied",
+      "invalidType": "Unsupported file type. Accepted: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
+      "saveFailed": "Failed to save document: ",
+      "verified": "Verified"
     },
     "cv": {
       "label": "CV / Resume",
@@ -1268,7 +1381,12 @@
       "removed": "CV removed",
       "view": "View",
       "replace": "Replace",
-      "visibleToCompanies": "CV visible to companies"
+      "visibleToCompanies": "CV visible to companies",
+      "allowedFormats": "Only PDF, DOC and DOCX files are accepted",
+      "saveError": "CV uploaded but failed to save reference: ",
+      "visibilityError": "Failed to update visibility",
+      "visibilityOff": "CV is now hidden from companies",
+      "visibilityOn": "CV is now visible to companies"
     },
     "aiExtraction": {
       "label": "AI Intelligence",
@@ -1329,7 +1447,8 @@
       "reminderDays": "Remind me before expiry (days)",
       "showInApp": "Show expiry warnings in app",
       "prefsSaved": "Alert preferences saved",
-      "prefsSaveError": "Failed to save alert preferences"
+      "prefsSaveError": "Failed to save alert preferences",
+      "viewFileDenied": "Access denied"
     }
   },
   "profileCompleteness": {
@@ -1409,7 +1528,8 @@
     "availableNow": "Available Now",
     "openToOffers": "Open to Offers",
     "notAvailable": "Not Available",
-    "employed": "Employed"
+    "employed": "Employed",
+    "notWillingToTravel": "Not available for travel"
   },
   "candidateProfile": {
     "messageCandidate": "Message Candidate",
@@ -1522,7 +1642,11 @@
       "elite_badge": "Elite Badge",
       "exclusive_features": "Exclusive Features",
       "premium_perks": "Premium Perks"
-    }
+    },
+    "codeCopied": "Code copied to clipboard",
+    "copyFailed": "Could not copy. Please try again.",
+    "linkCopied": "Link copied to clipboard",
+    "shared": "Shared successfully"
   },
   "workday": {
     "eyebrow": "Work Day / Salary Log",
@@ -1588,7 +1712,8 @@
     "totalHours": "Total hours",
     "grossSalary": "Gross salary",
     "finalTotal": "Grand total",
-    "location": "Location"
+    "location": "Location",
+    "companyName": "Company name (optional)"
   },
   "ratePresets": {
     "eyebrow": "Salary rate presets",
@@ -1945,7 +2070,10 @@
     "approved": "Approved",
     "active": "Active",
     "saveProfile": "Save Profile",
-    "profileSaved": "Company profile saved."
+    "profileSaved": "Company profile saved.",
+    "descriptionPlaceholder": "Describe your company, services and specialties (2-3 lines recommended)",
+    "saveError": "Error saving profile: ",
+    "saved": "Company profile saved"
   },
   "companyWorkforce": {
     "eyebrow": "Company",
@@ -1966,7 +2094,9 @@
     "international": "International",
     "allPriorities": "All Priorities",
     "results": "results",
-    "staffingProgress": "Staffing Progress"
+    "staffingProgress": "Staffing Progress",
+    "assignedShort": "assigned",
+    "requestedShort": "requested"
   },
   "companyWorkerSearch": {
     "eyebrow": "Company",
@@ -2536,7 +2666,8 @@
         "desc": "VCA, SCC and PRL preparation materials and industrial learning.",
         "cta": "Start learning"
       }
-    }
+    },
+    "signUpFree": "Sign up free"
   },
   "footer": {
     "privacy": "Privacy Policy",
@@ -2580,5 +2711,110 @@
     "home": "Home",
     "tools": "Tools",
     "jobs": "Jobs"
+  },
+  "adminCompanyVerification": {
+    "allStatuses": "All Statuses",
+    "approve": "Approve",
+    "fetchError": "Failed to load companies",
+    "noCompanies": "No companies found",
+    "pending": "Pending",
+    "refresh": "Refresh",
+    "reject": "Reject",
+    "rejected": "Rejected",
+    "resetToPending": "Reset to Pending",
+    "searchPlaceholder": "Search by company name, contact, industry...",
+    "statusUpdated": "Company status updated to {{status}}",
+    "suspend": "Suspend",
+    "suspended": "Suspended",
+    "total": "Total",
+    "unnamed": "Unnamed Company",
+    "updateError": "Failed to update status",
+    "verified": "Verified",
+    "website": "Website"
+  },
+  "companyBilling": {
+    "description": "Manage your subscription and payment methods."
+  },
+  "companyDocs": {
+    "allStatuses": "All statuses",
+    "colDate": "Date",
+    "colJob": "Position",
+    "colSize": "Size",
+    "colStatus": "Status",
+    "colTitle": "Document",
+    "colWorker": "Worker",
+    "description": "Manage, exchange and track documents with workers and candidates.",
+    "emptyState": "No documents found with the selected filters.",
+    "expired": "Expired",
+    "infoDescription": "This module is designed for document coordination between companies, contractors and industrial workers. Manage contracts, certifications, work permits, payroll and safety documents from one place.",
+    "infoTitle": "Industrial Document Management",
+    "pending": "Pending",
+    "requiresUpdate": "Require Update",
+    "searchPlaceholder": "Search by title, worker or position...",
+    "totalDocs": "Total Documents",
+    "uploadDocument": "Upload Document",
+    "uploadFirst": "Upload first document"
+  },
+  "companySettings": {
+    "description": "Manage your company preferences and settings."
+  },
+  "companyVerification": {
+    "contactSupport": "Contact Support",
+    "pendingDesc": "Your company account is pending verification. Once verified by an administrator, you will have full access to the worker search and recruitment tools.",
+    "pendingTitle": "Verification Pending",
+    "rejectedDesc": "Your company verification was rejected. Please contact support or update your company information and resubmit.",
+    "rejectedTitle": "Verification Rejected",
+    "statusLabel": "Verification Status",
+    "statusPending": "Under review — typically 1-2 business days",
+    "statusRejected": "Rejected — please update your profile and contact support",
+    "statusSuspended": "Suspended — contact administrator",
+    "statusUnknown": "Unknown status",
+    "stepCompanyName": "Company name filled in your profile",
+    "stepDescription": "Company description provided",
+    "stepIndustry": "Industry and country specified",
+    "suspendedDesc": "Your company account has been suspended. Please contact the administrator for more information.",
+    "suspendedTitle": "Account Suspended",
+    "updateProfile": "Update Company Profile",
+    "whileWaiting": "While you wait, make sure you have:"
+  },
+  "pricing": {
+    "eyebrow": "For companies",
+    "popular": "Most popular",
+    "subtitle": "Workers are always free. Companies pay for hiring tools. No hidden fees.",
+    "title": "Simple, transparent pricing",
+    "workersFree": "Workers are always free — profile, marketplace, tools, and community."
+  },
+  "requestWorkers": {
+    "backToRequests": "Back to Workforce Requests",
+    "companyName": "Company Name",
+    "contactPerson": "Contact Person",
+    "country": "Country",
+    "duration": "Project Duration",
+    "email": "Email",
+    "errors": {
+      "companyRequired": "Company name is required",
+      "contactRequired": "Contact person is required",
+      "emailInvalid": "Invalid email",
+      "emailRequired": "Email is required",
+      "workerTypeRequired": "Please select worker type"
+    },
+    "eyebrow": "Workforce Solutions",
+    "message": "Additional Message",
+    "messagePlaceholder": "Tell us more about your project requirements, certifications needed, or any specific details...",
+    "numWorkers": "Number of Workers",
+    "received": "Request Received",
+    "receivedDesc": "Thank you for your workforce request. Our team will review your requirements and get back to you within 24–48 hours with a tailored proposal.",
+    "required": "Required fields",
+    "retry": "Retry",
+    "selectType": "Select worker type",
+    "startDate": "Estimated Start Date",
+    "submit": "Request Workforce",
+    "submitAnother": "Submit Another Request",
+    "submitFailed": "Submission Failed",
+    "submitting": "Submitting...",
+    "subtitle": "Need skilled industrial workers for your project? Fill out the form below and our team will match you with qualified professionals from our global network.",
+    "success": "Workforce request submitted!",
+    "title": "Request Workforce",
+    "workerType": "Type of Workers Needed"
   }
 }

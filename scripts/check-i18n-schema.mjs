@@ -118,13 +118,7 @@ const CONTRACTS = [
  * MAINTENANCE RULE: this list may only ever SHRINK. Delete a line when the key
  * is translated in all seven locales. Never add one.
  */
-const BASELINE_MISSING_PATHS = [
-  "landing.footer.blogLink",
-  "landing.footer.links",
-  "landing.footer.loginLink",
-  "landing.footer.registerLink",
-  "landing.footer.toolsLink",
-];
+const BASELINE_MISSING_PATHS = [];
 
 const COVERAGE_DEBT = new Set(BASELINE_MISSING_PATHS);
 
