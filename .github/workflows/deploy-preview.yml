@@ -10,6 +10,14 @@ name: Deploy Cloudflare Workers Preview
 #   CLOUDFLARE_API_TOKEN   Cloudflare API token with Workers Scripts:Edit
 #   VITE_SUPABASE_URL      e.g. https://mwdauubztjxkbrefirbg.supabase.co
 #   VITE_SUPABASE_ANON_KEY Supabase anon (public) key for the pipingbox project
+#   VITE_POSTHOG_KEY       PostHog PUBLIC project API key (phc_..., project 271316).
+#                          PB-OBSERVABILITY-001: public by design (shipped in the
+#                          client bundle); NEVER a personal/private API key here.
+#                          When absent, the observability layer is a fail-open no-op.
+#
+# Optional repo variables (Settings -> Secrets and variables -> Actions → Variables):
+#   VITE_POSTHOG_HOST      PostHog cloud host, e.g. https://eu.i.posthog.com
+#                          (default: EU cloud). Set only if the project lives on US.
 #
 # Deploys ONLY to pipingbox-app.pipingbox.workers.dev (preview). Does NOT
 # touch app.pipingbox.com, DNS, Custom Domains, or routes -- wrangler.toml
@@ -71,4 +79,10 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          # PB-OBSERVABILITY-001: public PostHog project key (never private keys).
+          # VITE_POSTHOG_KEY absent => observability layer builds as fail-open no-op.
+          VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
+          VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
+          # Tag every build with its commit SHA (error tracking per build).
+          VITE_APP_VERSION: ${{ github.sha }}
         run: npx wrangler deploy
