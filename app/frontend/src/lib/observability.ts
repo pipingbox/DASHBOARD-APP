@@ -438,6 +438,10 @@ export async function initObservability(options: InitOptions = {}): Promise<void
       // events unless person_profiles is explicit. We need anonymous
       // pre-auth tracking for the referral funnel.
       person_profiles: 'always',
+      // Preview/testing: PostHog drops bot-like user agents (HeadlessChrome,
+      // etc.) by default. Opt out of that filter so preview verification
+      // events are actually sent to ingestion. Production keeps the default.
+      ...(getEnvironment() === 'preview' ? { opt_out_useragent_filter: true } : {}),
       loaded: () => {
         /* no-op: flush below */
       },
@@ -446,32 +450,6 @@ export async function initObservability(options: InitOptions = {}): Promise<void
     initialized = true;
     registerSuperProperties();
     flushQueue();
-    // DEBUG (preview only): emit a direct diagnostic capture to isolate
-    // whether the SDK or the ingest endpoint is dropping events. This is
-    // a temporary probe with no PII; it will be removed after verification.
-    if (getEnvironment() === 'preview') {
-      try {
-        void fetch(`${host}/capture/`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            api_key: key,
-            event: 'obs_debug_probe',
-            distinct_id: getAnonymousId(),
-            properties: {
-              app_version: getAppVersion(),
-              environment: getEnvironment(),
-              debug_source: 'observability-init',
-              user_agent: navigator.userAgent.slice(0, 80),
-            },
-          }),
-        }).then((r) => {
-          logger.warn('[obs] debug probe status', r.status);
-        });
-      } catch (err) {
-        logger.warn('[obs] debug probe failed (swallowed)', err);
-      }
-    }
   } catch (err) {
     logger.warn('[obs] init failed (observability disabled)', err);
   }
