@@ -72,6 +72,17 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;
 export type ObsOrigin = (typeof OBS_ORIGINS)[number];
 
+/**
+ * SDK-internal event names allowed through `before_send` even though they sit
+ * outside the 9-event functional taxonomy above. Any other event name the SDK
+ * tries to send is dropped at the hook (closed ingestion).
+ * - `$web_vitals`: web performance vitals (capture_performance: true). It is
+ *   a permitted internal telemetry event, NOT part of the functional taxonomy.
+ * - `$identify`: emitted by identify() to merge the anonymous id into the
+ *   technical auth user id.
+ */
+export const OBS_INTERNAL_SDK_EVENTS = ['$web_vitals', '$identify'] as const;
+
 const ACCOUNT_TYPES = ['worker', 'company'] as const;
 const DEVICE_TYPES = ['mobile', 'tablet', 'desktop'] as const;
 
@@ -106,6 +117,144 @@ export function normalizeRoute(pathname: string): string {
       .slice(0, MAX_VALUE_LEN) || '/';
   } catch {
     return '/';
+  }
+}
+
+// ---------------------------------------------------------------------------
+// PostHog before_send — global automatic-property sanitizer
+// ---------------------------------------------------------------------------
+//
+// PostHog attaches automatic web properties ($current_url, $referrer, ...)
+// AFTER our per-event allowlist, so query strings (e.g. ?ref=CODE) and
+// fragments can otherwise reach ingestion. The global `before_send` hook is
+// the last line of defense: EVERY event — custom or automatic, including
+// $web_vitals — passes through it before leaving the browser.
+//
+// NOTE (PO review 2026-09-10): sanitization is allowlist-driven on URL/PII
+// property names. We never delete properties just because the *name* contains
+// "token" — the Project API token is part of the ingestion protocol, not an
+// event property, and generic name-based deletion risks 401s.
+
+/** Automatic PostHog URL properties that must keep origin + pathname only. */
+const URL_PROP_KEYS = new Set([
+  '$current_url',
+  '$initial_current_url',
+  '$session_entry_url',
+  '$referrer',
+  '$initial_referrer',
+]);
+
+/** Key names that semantically carry a URL, href, referrer, link or path. */
+const URL_PROP_NAME_RE = /url|href|referrer|referring|(^|[^a-z])link|page|path/i;
+/** Key names that are query/fragment content by definition: dropped. */
+const QUERY_PROP_NAME_RE = /(^|[$_])(search|query|hash|fragment)(_|$)|queryString/i;
+
+/**
+ * Technical ID property keys exempt from long-token redaction (they are UUIDs
+ * / device ids by design and must stay linkable).
+ */
+const TECHNICAL_ID_KEYS = new Set([
+  'distinct_id',
+  '$distinct_id',
+  '$anon_distinct_id',
+  '$device_id',
+  '$session_id',
+  '$window_id',
+  '$user_id',
+  'pb_anonymous_id',
+  'correlation_id',
+  'incident_code',
+  // semver-like technical values the phone regex would false-positive on
+  '$browser_version',
+  '$lib_version',
+]);
+
+const ABSOLUTE_URL_RE = /https?:\/\/[^\s"'<>\\]+/gi;
+
+/** Redact email/phone/embedded-URL patterns in a plain string value. */
+function redactEmbeddedPatterns(value: string): string {
+  try {
+    return value
+      .replace(EMAIL_RE, '[redacted-email]')
+      .replace(PHONE_RE, '[redacted-phone]')
+      .replace(ABSOLUTE_URL_RE, (m) => {
+        try {
+          const u = new URL(m);
+          return `${u.origin}${normalizeRoute(u.pathname)}`;
+        } catch {
+          return '[redacted-url]';
+        }
+      })
+      .slice(0, MAX_VALUE_LEN);
+  } catch {
+    return '[redacted]';
+  }
+}
+
+/**
+ * Reduce a URL-ish value to origin + normalized pathname. Query string and
+ * fragment are ALWAYS removed. Relative paths are normalized as routes; non
+ * URL values (e.g. PostHog's literal "$direct") fall back to pattern redaction.
+ */
+export function sanitizeUrlPropertyValue(value: string): string {
+  try {
+    const u = new URL(value);
+    return `${u.origin}${normalizeRoute(u.pathname)}`;
+  } catch {
+    if (value.startsWith('/')) return normalizeRoute(value);
+    return redactEmbeddedPatterns(value);
+  }
+}
+
+function sanitizePostHogProperty(key: string, value: unknown): unknown {
+  if (typeof value !== 'string') return value;
+  if (QUERY_PROP_NAME_RE.test(key)) return undefined; // query/fragment content: drop
+  if (URL_PROP_KEYS.has(key) || URL_PROP_NAME_RE.test(key)) {
+    return sanitizeUrlPropertyValue(value);
+  }
+  if (TECHNICAL_ID_KEYS.has(key)) return value.slice(0, MAX_VALUE_LEN);
+  // Other strings: redact credential-like long tokens plus embedded patterns.
+  try {
+    return redactEmbeddedPatterns(value.replace(LONG_TOKEN_RE, '[redacted-token]'));
+  } catch {
+    return '[redacted]';
+  }
+}
+
+export interface PostHogEventLike {
+  event?: string;
+  properties?: Record<string, unknown>;
+  $set?: Record<string, unknown>;
+  $set_once?: Record<string, unknown>;
+}
+
+/**
+ * Sanitize a full PostHog event before it leaves the browser (the `before_send`
+ * hook body). Returns the sanitized event, or null when the event must be
+ * dropped: unknown event name, or an unexpected sanitization failure — privacy
+ * wins over telemetry, and the app itself is never affected (fail-open for the
+ * app, fail-closed for the payload).
+ */
+export function sanitizePostHogEvent<T extends PostHogEventLike>(event: T): T | null {
+  try {
+    const name = event.event;
+    const known =
+      typeof name === 'string' &&
+      (OBS_EVENT_NAMES.includes(name as ObsEventName) ||
+        (OBS_INTERNAL_SDK_EVENTS as readonly string[]).includes(name));
+    if (!known) return null;
+    for (const bag of ['properties', '$set', '$set_once'] as const) {
+      const props = event[bag];
+      if (!props || typeof props !== 'object') continue;
+      for (const key of Object.keys(props)) {
+        const out = sanitizePostHogProperty(key, props[key]);
+        if (out === undefined) delete props[key];
+        else props[key] = out;
+      }
+    }
+    return event;
+  } catch {
+    return null;
   }
 }
 
@@ -442,6 +591,11 @@ export async function initObservability(options: InitOptions = {}): Promise<void
       // etc.) by default. Opt out of that filter so preview verification
       // events are actually sent to ingestion. Production keeps the default.
       ...(getEnvironment() === 'preview' ? { opt_out_useragent_filter: true } : {}),
+      // Global last-line-of-defense sanitizer: PostHog attaches automatic
+      // web properties ($current_url, ...) after our per-event allowlist, so
+      // query strings/fragments must be stripped here for EVERY event,
+      // including $web_vitals. See sanitizePostHogEvent.
+      before_send: (event) => sanitizePostHogEvent(event),
       loaded: () => {
         /* no-op: flush below */
       },
