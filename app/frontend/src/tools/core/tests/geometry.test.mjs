@@ -129,6 +129,18 @@ export function runGeometryTests() {
     assert(near(res.result.travelSpreadMm, res.result.maxTravelMm - res.result.minTravelMm), 'spread consistent');
   });
 
+  test('pipe comb reference line is a straight run without take-out', () => {
+    const res = solvePipeComb({ lineCount: 3, initialSpacingMm: 200, finalSpacingMm: 400, elbowAngleDeg: 45, clrMm: 50 });
+    assert.strictEqual(res.success, true);
+    if (!res.success) return;
+    const ref = res.result.lines[0];
+    assert(near(ref.takeOutPerElbowMm, 0), 'reference line has no take-out');
+    assert(near(ref.straightCutLengthMm, ref.travelMm), 'reference line cut equals travel');
+    const offset = res.result.lines[1];
+    assert(offset.takeOutPerElbowMm > 0, 'offset line uses elbows');
+    assert(near(offset.straightCutLengthMm, offset.travelMm - 2 * offset.takeOutPerElbowMm), 'offset line cut = travel - 2 take-out');
+  });
+
   test('pipe comb contracting', () => {
     const res = solvePipeComb({ lineCount: 3, initialSpacingMm: 400, finalSpacingMm: 200, elbowAngleDeg: 45, clrMm: 50 });
     assert.strictEqual(res.success, true);

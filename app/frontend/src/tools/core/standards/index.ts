@@ -5,3 +5,4 @@
  */
 
 export * from './pipe-dimensions.ts';
+export * from './elbow-radius.ts';

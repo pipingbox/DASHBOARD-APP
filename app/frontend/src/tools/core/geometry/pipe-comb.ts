@@ -9,7 +9,8 @@
  *   Line 0 is the reference (offset = 0). Line i is offset by i * (final - initial).
  *   A common elbow angle fixes the advance A = |deltaSpacing| / tan(elbowAngle).
  *   Each line's travel H_i = sqrt(A² + offset_i²).
- *   Straight cut length = H_i - 2 * takeOut(elbowAngle, CLR).
+ *   The reference line (offset = 0) is a straight run: no elbows, no take-out.
+ *   Offset lines use two elbows: straight cut = H_i - 2 * takeOut(elbowAngle, CLR).
  *
  * This is the standard workshop pipe-comb model. Per-line fitting geometry is
  * allowed by the type but not required in W1.A.1.
@@ -125,7 +126,9 @@ export function solvePipeComb(input: PipeCombInput): GeometryResult<PipeCombSolu
     const offsetMm = i * deltaSpacing;
     const offsetAbsMm = Math.abs(offsetMm);
     const travelMm = Math.hypot(advanceMm, offsetAbsMm);
-    const lineTakeOut = deltaSpacing === 0 ? 0 : (spec.clrMm ?? input.clrMm) * Math.tan(elbowAngleRad / 2);
+    // The reference line (offset 0) is straight: no elbows, no take-out.
+    const lineTakeOut =
+      deltaSpacing === 0 || offsetAbsMm === 0 ? 0 : (spec.clrMm ?? input.clrMm) * Math.tan(elbowAngleRad / 2);
     const straightCutLengthMm = travelMm - 2 * lineTakeOut;
 
     if (straightCutLengthMm < 0) {
