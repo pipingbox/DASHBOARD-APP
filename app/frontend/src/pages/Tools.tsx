@@ -15,6 +15,9 @@ import {
   ArrowLeft,
   Crown,
   Loader2,
+  MoveDiagonal,
+  Shapes,
+  AlignJustify,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
@@ -27,6 +30,7 @@ import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { redirectToCheckout } from '@/lib/stripe';
 import ElbowCutTool from '@/components/tools/ElbowCutTool';
+import NewElbowCutTool from '@/tools/prefabrication/elbow-cut/ElbowCutTool';
 import BranchLayoutTool from '@/components/tools/BranchLayoutTool';
 import UnitConverterTool from '@/components/tools/UnitConverterTool';
 import PressureDropTool from '@/components/tools/PressureDropTool';
@@ -35,6 +39,9 @@ import BoltsNutsTool from '@/components/tools/BoltsNutsTool';
 import FlangesTool from '@/components/tools/FlangesTool';
 import ColorLookup from '@/tools/color-lookup/ColorLookup';
 import AccessoriesLibrary from '@/components/tools/AccessoriesLibrary';
+import OffsetTool from '@/tools/prefabrication/offsets/OffsetTool';
+import MiteredElbowTool from '@/tools/prefabrication/miters/MiteredElbowTool';
+import PipeCombTool from '@/tools/prefabrication/pipe-comb/PipeCombTool';
 
 interface ToolDef {
   key: string;
@@ -49,6 +56,9 @@ const TOOLS: ToolDef[] = [
   { key: 'bolts-nuts', nameKey: 'tools.bolts.name', descKey: 'tools.bolts.desc', icon: Wrench, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'flanges', nameKey: 'tools.flanges.name', descKey: 'tools.flanges.desc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'elbow-cut', nameKey: 'tools.elbowCut.name', descKey: 'tools.elbowCut.subtitle', icon: Scissors, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'pipe-offset', nameKey: 'tools.prefab.offset.title', descKey: 'tools.prefab.offset.tabWithElbows', icon: MoveDiagonal, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'mitered-elbow', nameKey: 'tools.prefab.miteredElbow.title', descKey: 'tools.prefab.miteredElbow.noteGeometry', icon: Shapes, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'pipe-comb', nameKey: 'tools.prefab.pipeComb.title', descKey: 'tools.prefab.pipeComb.noteGeometry', icon: AlignJustify, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'branch-layout', nameKey: 'tools.branchLayout.name', descKey: 'tools.branchLayout.subtitle', icon: GitBranch, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'pipe-dimensions', nameKey: 'tools.pipeDim.name', descKey: 'tools.pipeDim.subtitle', icon: Table2, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'pressure-drop', nameKey: 'tools.pressureDrop.name', descKey: 'tools.pressureDrop.subtitle', icon: Gauge, categoryKey: 'tools.categoryHydraulics', implemented: true },
@@ -256,7 +266,13 @@ export default function Tools() {
         ) : active === 'flanges' ? (
           <FlangesTool />
         ) : active === 'elbow-cut' ? (
-          <ElbowCutTool />
+          <NewElbowCutTool />
+        ) : active === 'pipe-offset' ? (
+          <OffsetTool />
+        ) : active === 'mitered-elbow' ? (
+          <MiteredElbowTool />
+        ) : active === 'pipe-comb' ? (
+          <PipeCombTool />
         ) : active === 'branch-layout' ? (
           <BranchLayoutTool />
         ) : active === 'unit-converter' ? (

@@ -996,6 +996,71 @@
       "round4Desc": "Bei 100 % des Zielmoments fortfahren, jedoch im kreisförmigen Muster im Uhrzeigersinn, bis sich keine Mutter mehr weiterdreht.",
       "round5": "Durchgang 5",
       "round5Desc": "Wenn es die Zeit erlaubt, mindestens 4 h warten und Durchgang 4 wiederholen, um die kurzfristigen Verluste durch Relaxation und Einbettung auszugleichen."
+    },
+    "prefab": {
+      "common": {
+        "na": "N/A",
+        "noResult": "Enter valid parameters to see results",
+        "selectMode": "Select a mode"
+      },
+      "elbowCut": {
+        "title": "Elbow Cut Calculator",
+        "nps": "NPS",
+        "schedule": "Schedule",
+        "elbowType": "Elbow type",
+        "totalAngle": "Total elbow angle",
+        "betaAngle": "Angle to keep (β)",
+        "clrOverride": "CLR override",
+        "cutIntrados": "Cut intrados",
+        "cutCenterline": "Cut centerline",
+        "cutExtrados": "Cut extrados",
+        "keptArc": "Kept arc length",
+        "discardedArc": "Discarded arc length",
+        "noteGeometry": "The cut plane is perpendicular to the elbow bisector. Distances are measured from the tangent line along each surface.",
+        "noteProvenance": "OD/WT from ASME B36.10M (CROSS_REFERENCE). CLR defaults from ASME B16.9 long/short radius tables (CROSS_REFERENCE)."
+      },
+      "offset": {
+        "title": "Pipe Offset",
+        "tabWithElbows": "With elbows",
+        "tabWithoutElbows": "Without elbows",
+        "tabVerify": "Verify",
+        "a": "A (advance)",
+        "b": "B (offset)",
+        "h": "H (travel)",
+        "theta": "θ (angle)",
+        "nps": "NPS",
+        "schedule": "Schedule",
+        "elbowType": "Elbow type",
+        "elbowAngle": "Elbow angle",
+        "clrOverride": "CLR override",
+        "errorAngle": "Elbow angle must be between 0° and 90°",
+        "errorClr": "Could not determine elbow radius",
+        "verifyHint": "Enter exactly two of A, B, H or θ to solve the triangle.",
+        "diagramPlaceholder": "Select a mode to draw the offset"
+      },
+      "miteredElbow": {
+        "title": "Mitered Elbow",
+        "nps": "NPS",
+        "schedule": "Schedule",
+        "totalAngle": "Total angle",
+        "segments": "Number of pieces (N)",
+        "elbowType": "Radius type",
+        "clrOverride": "CLR override",
+        "noteGeometry": "N straight pieces joined by J = N − 1 miter joints. Joint deflection = total angle / J; cut angle per mating end = half the joint deflection.",
+        "noteProvenance": "Lengths are straight-piece chords, not arc lengths. OD from ASME B36.10M (CROSS_REFERENCE). CLR defaults from ASME B16.9 (CROSS_REFERENCE)."
+      },
+      "pipeComb": {
+        "title": "Pipe Comb",
+        "lineCount": "Number of lines",
+        "initialSpacing": "Initial center spacing",
+        "finalSpacing": "Final center spacing",
+        "elbowAngle": "Elbow angle",
+        "nps": "NPS",
+        "schedule": "Schedule",
+        "elbowType": "Elbow type",
+        "clrOverride": "CLR override",
+        "noteGeometry": "All lines share the same advance and elbow geometry. Straight cut length = travel − 2·take-out. Negative cuts are rejected explicitly."
+      }
     }
   },
   "jobs": {
