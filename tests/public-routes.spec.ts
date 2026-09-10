@@ -121,7 +121,13 @@ test.describe('PB-SEO-102 Worker route contract', () => {
     await expect(page.getByRole('link', { name: /jobs/i })).toBeVisible();
 
     // The response body must be the SPA shell (so React can boot), not a plain text 404.
-    const reqResponse = await request.get('/this-route-does-not-exist');
+    // Playwright's APIRequestContext sends Accept: */* (non-document client), which the
+    // Worker intentionally answers with the minimal 404. Request as a document to prove
+    // the HTML branch serves the shell.
+    const reqResponse = await request.get('/this-route-does-not-exist', {
+      headers: { Accept: 'text/html' },
+    });
+    expect(reqResponse.status()).toBe(404);
     const body = await reqResponse.text();
     expect(body).toContain('id="root"');
   });
