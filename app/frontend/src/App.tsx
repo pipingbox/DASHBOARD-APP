@@ -123,7 +123,7 @@ const AppRoutes = () => {
   useReferralCapture();
   // Set dynamic page titles for browser tab
   useDocumentTitle();
-  // PB-WEB-006: canonical + hreflang + lang attribute per route
+  // PB-WEB-006: canonical + lang attribute per route (hreflang: PB-SEO-I18N-URLS-001)
   useSeo();
 
   return (

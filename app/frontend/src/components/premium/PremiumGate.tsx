@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Crown,
@@ -35,6 +36,7 @@ interface PremiumGateProps {
 }
 
 export function PremiumGate({ open, onClose, feature, featureDescription, status }: PremiumGateProps) {
+  const { t } = useTranslation();
   const [plan, setPlan] = useState<'monthly' | 'annual'>('annual');
   const [busy, setBusy] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -55,10 +57,10 @@ export function PremiumGate({ open, onClose, feature, featureDescription, status
       setBusy(false);
       setCheckoutError(
         reason === 'not_authenticated'
-          ? 'Sign in to subscribe.'
+          ? t('checkout.signInToSubscribe')
           : reason === 'not_available'
-            ? 'Subscriptions are not available yet. Email us and we will set it up manually.'
-            : 'Could not start checkout. Please try again.',
+            ? t('checkout.notAvailableSubscription')
+            : t('checkout.errorGeneric'),
       );
     }
   }

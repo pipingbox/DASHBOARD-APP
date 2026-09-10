@@ -98,7 +98,7 @@ export default function Tools() {
     if (reason === 'not_authenticated') {
       window.location.href = '/login?next=/tools';
     } else if (reason) {
-      setCheckoutError('Could not start checkout. Please try again.');
+      setCheckoutError(t('checkout.errorGeneric'));
       setCheckoutLoading(false);
     }
     // si null → el browser ya está navegando a Stripe
