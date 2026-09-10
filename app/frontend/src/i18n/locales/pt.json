@@ -1071,7 +1071,10 @@
     "generic": "Ocorreu um erro. Tente novamente.",
     "network": "Erro de rede. Verifique a sua ligação.",
     "unauthorized": "Não tem permissão para esta ação.",
-    "notFound": "O recurso pedido não foi encontrado."
+    "notFound": "O recurso pedido não foi encontrado.",
+    "incidentCode": "Código de incidente",
+    "copyIncidentCode": "Copiar código de incidente",
+    "incidentCodeCopied": "Copiado"
   },
   "certAlerts": {
     "sectionLabel": "Alertas",

@@ -6,6 +6,7 @@ import { notifyReferralJoined } from '@/lib/notifications';
 import { getAppBaseUrl, getAuthRedirectUrl } from '@/lib/constants';
 import { ONBOARDING_STATUS } from '@/lib/onboarding';
 import { edgeFunctionUrl } from '@/lib/supabase';
+import { identifyUser, resetObservabilityUser, trackEvent, detectOrigin } from '@/lib/observability';
 
 export interface Profile {
   id: string;
@@ -513,8 +514,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(next?.user ?? null);
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
         if (next?.user) await ensureProfile(next.user);
+        // PB-OBSERVABILITY-001: link anonymous session to technical user id.
+        if (next?.user) identifyUser(next.user.id);
       } else if (event === 'SIGNED_OUT') {
         setProfile(null);
+        resetObservabilityUser();
       }
     });
 
@@ -542,6 +546,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch { /* ignore */ }
 
+    // PB-OBSERVABILITY-001: funnel signup_started (closed schema, origin only).
+    trackEvent(
+      'signup_started',
+      { origin: detectOrigin(), account_type: accountType || 'worker' },
+      { dedupeKey: 'signup' },
+    );
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -552,6 +563,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     if (error) return { error: error.message };
     if (data.user) {
+      trackEvent(
+        'auth_created',
+        { origin: detectOrigin(), account_type: accountType || 'worker' },
+        { dedupeKey: `auth:${data.user.id}` },
+      );
       await ensureProfile(data.user, fullName);
     }
     return { error: null };

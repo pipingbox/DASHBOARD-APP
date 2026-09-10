@@ -1035,7 +1035,10 @@
     "generic": "Er ging iets mis. Probeer het opnieuw.",
     "network": "Netwerkfout. Controleer je verbinding.",
     "unauthorized": "Je hebt geen rechten voor deze actie.",
-    "notFound": "De gevraagde bron is niet gevonden."
+    "notFound": "De gevraagde bron is niet gevonden.",
+    "incidentCode": "Incidentcode",
+    "copyIncidentCode": "Incidentcode kopiëren",
+    "incidentCodeCopied": "Gekopieerd"
   },
   "certAlerts": {
     "sectionLabel": "Waarschuwingen",

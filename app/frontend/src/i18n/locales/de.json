@@ -1071,7 +1071,10 @@
     "generic": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
     "network": "Netzwerkfehler. Prüfen Sie Ihre Verbindung.",
     "unauthorized": "Für diese Aktion fehlt die Berechtigung.",
-    "notFound": "Die angeforderte Ressource wurde nicht gefunden."
+    "notFound": "Die angeforderte Ressource wurde nicht gefunden.",
+    "incidentCode": "Vorgangscode",
+    "copyIncidentCode": "Vorgangscode kopieren",
+    "incidentCodeCopied": "Kopiert"
   },
   "certAlerts": {
     "sectionLabel": "Warnungen",

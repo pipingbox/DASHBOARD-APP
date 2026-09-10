@@ -1118,7 +1118,10 @@
     "generic": "Something went wrong. Please try again.",
     "network": "Network error. Please check your connection.",
     "unauthorized": "You are not authorised to perform this action.",
-    "notFound": "The requested resource could not be found."
+    "notFound": "The requested resource could not be found.",
+    "incidentCode": "Incident code",
+    "copyIncidentCode": "Copy incident code",
+    "incidentCodeCopied": "Copied"
   },
   "certAlerts": {
     "sectionLabel": "Alerts",
