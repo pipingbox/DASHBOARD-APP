@@ -80,12 +80,14 @@ export default {
     const acceptsHtml = request.headers.get('accept')?.includes('text/html');
     if (acceptsHtml) {
       // Serve the SPA shell with HTTP 404 so React Router renders the branded
-      // NotFound UI. Preserve original URL (no redirect).
-      const indexRequest = new Request(`${url.origin}/index.html`, request);
+      // NotFound UI. Preserve original URL (no redirect). Request the root path
+      // because the ASSETS binding redirects /index.html to /.
+      const indexRequest = new Request(`${url.origin}/`, request);
       const indexResponse = await env.ASSETS.fetch(indexRequest);
       const headers = new Headers(indexResponse.headers);
       headers.set('content-type', 'text/html; charset=utf-8');
       headers.set('x-robots-tag', 'noindex, nofollow');
+      headers.delete('location');
       return new Response(indexResponse.body, {
         status: 404,
         statusText: 'Not Found',
