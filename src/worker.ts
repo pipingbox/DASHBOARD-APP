@@ -58,6 +58,15 @@ export default {
 
     const pathname = safeDecodePathname(url.pathname);
 
+    // The static SPA loads runtime configuration before mounting React.
+    // Preview has no separate API origin, so return the same-origin default
+    // instead of allowing the legacy /api/config request to blank the app.
+    if (pathname === '/api/config') {
+      return new Response(JSON.stringify({ API_BASE_URL: '' }), {
+        headers: { 'content-type': 'application/json; charset=utf-8' },
+      });
+    }
+
     // 1. Static files: let ASSETS serve, but never let a missing static file
     // fall back to the SPA shell.
     if (isStaticPath(pathname)) {
