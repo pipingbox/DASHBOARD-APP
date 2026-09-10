@@ -47,7 +47,7 @@ function resolvePageKey(path: string): string | null {
 
 export function useDocumentTitle() {
   const location = useLocation();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const path = location.pathname;
@@ -86,5 +86,5 @@ export function useDocumentTitle() {
     // PB-SEO-101: <html lang> and <link rel="canonical"> are owned by useSeo
     // (dynamic lang from i18next, canonical on every route change). Keeping
     // them here forced lang="en" and wrote a duplicate canonical.
-  }, [location.pathname, t]);
+  }, [location.pathname, t, i18n.resolvedLanguage]);
 }
