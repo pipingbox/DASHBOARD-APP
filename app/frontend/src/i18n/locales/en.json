@@ -343,6 +343,35 @@
     "certifications": "Certifications",
     "addCertification": "Add certification",
     "noCertifications": "No certifications added yet.",
+    "matchReadyTitle": "Complete your profile to receive more accurate job matches.",
+    "matchReadyHint": "Complete the missing profile fields to improve your job readiness.",
+    "matchReadyAddExperience": "Add work experience",
+    "matchReadyGap": {
+      "cohort": "Complete worker onboarding",
+      "full_name": "Add your full name",
+      "title": "Add your position or trade",
+      "location": "Add your location",
+      "years_experience": "Add your years of experience",
+      "bio": "Add a professional summary",
+      "skills": "Add at least one skill",
+      "experience": "Add structured work experience",
+      "availability": "Set your availability",
+      "visibility": "Make your profile public"
+    },
+    "matchReadyUnlocks": {
+      "complete": "Complete",
+      "workforceReady": "Workforce Ready",
+      "matchable": "Matchable"
+    },
+    "quickExperience": {
+      "title": "Add work experience",
+      "saved": "Experience added — your work history can now be evaluated by companies.",
+      "savedToast": "Experience added — your work history can now be evaluated by companies.",
+      "moreDetails": "Add more details (optional)",
+      "addAnother": "Add another experience",
+      "addDetails": "Add details",
+      "save": "Save experience"
+    },
     "certificationDialog": {
       "addTitle": "Add certification",
       "editTitle": "Edit certification",

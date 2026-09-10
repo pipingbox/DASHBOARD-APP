@@ -343,6 +343,35 @@
     "certifications": "Certificações",
     "addCertification": "Adicionar certificação",
     "noCertifications": "Ainda sem certificações.",
+    "matchReadyTitle": "Complete o seu perfil para receber oportunidades mais relevantes.",
+    "matchReadyHint": "Complete os dados em falta para melhorar a sua preparação profissional.",
+    "matchReadyAddExperience": "Adicionar experiência profissional",
+    "matchReadyGap": {
+      "cohort": "Concluir o onboarding de trabalhador",
+      "full_name": "Adicionar o nome completo",
+      "title": "Adicionar a função ou profissão",
+      "location": "Adicionar a localização",
+      "years_experience": "Adicionar os anos de experiência",
+      "bio": "Adicionar um resumo profissional",
+      "skills": "Adicionar pelo menos uma competência",
+      "experience": "Adicionar experiência profissional estruturada",
+      "availability": "Definir a disponibilidade",
+      "visibility": "Tornar o perfil público"
+    },
+    "matchReadyUnlocks": {
+      "complete": "Completo",
+      "workforceReady": "Preparado para oportunidades",
+      "matchable": "Disponível para matching"
+    },
+    "quickExperience": {
+      "title": "Adicionar experiência profissional",
+      "saved": "Experiência adicionada — as empresas já podem avaliar o seu percurso.",
+      "savedToast": "Experiência adicionada — as empresas já podem avaliar o seu percurso.",
+      "moreDetails": "Adicionar mais detalhes (opcional)",
+      "addAnother": "Adicionar outra experiência",
+      "addDetails": "Adicionar detalhes",
+      "save": "Guardar experiência"
+    },
     "certificationDialog": {
       "addTitle": "Adicionar certificação",
       "editTitle": "Editar certificação",

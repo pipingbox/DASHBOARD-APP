@@ -10,10 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import type { WorkExperience } from '@/lib/workerProfile';
-import {
-  insertWorkerExperience,
-  updateWorkerExperience,
-} from '@/lib/workerExperienceService';
+import { insertWorkerExperience } from '@/lib/workerExperienceService';
 
 /**
  * Quick Experience Capture — WFA-001 (D18 / PB-WORKFORCE-ACTIVATION).
@@ -27,19 +24,19 @@ import {
  * full section is NOT exposed here. No pseudo-translated content can enter a
  * professional profile through the quick flow.
  *
- * Post-save: "Add details" reopens the saved row with the optional fields
- * expanded (edit via the same service), or "Add another experience" resets
- * the quick form.
+ * Post-save: "Add details" hands the saved row to the existing full
+ * WorkExperienceSection editor, or "Add another experience" resets the form.
  */
 export function ExperienceQuickCapture({
   open,
   onOpenChange,
   onSaved,
+  onAddDetails,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Called after every successful save so the banner can re-query counts. */
   onSaved: () => void;
+  onAddDetails: (experience: WorkExperience) => void;
 }) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -105,11 +102,7 @@ export function ExperienceQuickCapture({
     }
     setSaving(true);
     try {
-      // Single persistence route (shared service). Insert for a new capture;
-      // update when the user chose "Add details" on the just-saved row.
-      const result = savedRow
-        ? await updateWorkerExperience(savedRow.id, user.id, buildInput())
-        : await insertWorkerExperience(user.id, buildInput());
+      const result = await insertWorkerExperience(user.id, buildInput());
 
       if (!result.ok) {
         // Recoverable error: form values are kept so the user can retry.
@@ -348,18 +341,26 @@ export function ExperienceQuickCapture({
                 {t('profile.quickExperience.addAnother', 'Add another experience')}
               </Button>
             )}
-            <Button
-              type="submit"
-              disabled={saving}
-              className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
-            >
-              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {saving
-                ? t('common.saving', 'Saving...')
-                : savedRow
-                  ? t('profile.quickExperience.saveDetails', 'Save details')
+            {savedRow ? (
+              <Button
+                type="button"
+                onClick={() => onAddDetails(savedRow)}
+                className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
+              >
+                {t('profile.quickExperience.addDetails', 'Add details')}
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                disabled={saving}
+                className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
+              >
+                {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {saving
+                  ? t('common.saving', 'Saving...')
                   : t('profile.quickExperience.save', 'Save experience')}
-            </Button>
+              </Button>
+            )}
           </div>
         </form>
       </DialogContent>

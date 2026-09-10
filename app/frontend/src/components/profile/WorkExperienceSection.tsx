@@ -11,10 +11,7 @@ import {
   Calendar,
   Loader2,
   Languages,
-  Sparkles,
-  Globe,
 } from 'lucide-react';
-import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -38,33 +35,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import type { WorkExperience, WorkExperienceInput, TranslationLanguage } from '@/lib/workerProfile';
-import { normalizeExperience, TRANSLATION_FIELDS, LANGUAGE_NAMES } from '@/lib/workerProfile';
+import type { WorkExperience, WorkExperienceInput } from '@/lib/workerProfile';
+import { LANGUAGE_NAMES } from '@/lib/workerProfile';
 import {
+  deleteWorkerExperience,
   insertWorkerExperience,
+  loadWorkerExperiences,
+  setWorkerExperienceVisibility,
   updateWorkerExperience,
 } from '@/lib/workerExperienceService';
-import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
-/**
- * Placeholder for AI-powered translation generation.
- * Replace with actual backend edge function call when ready.
- */
-function generateTranslation(originalText: string, targetLang: TranslationLanguage): string {
-  const lines = originalText.split('\n').filter((l) => l.trim());
-  const polished = lines
-    .map((line) => {
-      const trimmed = line.trim();
-      return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
-    })
-    .join('. ');
-
-  const langLabel = LANGUAGE_NAMES[targetLang] || targetLang.toUpperCase();
-  // Placeholder: in production this would call an AI translation API
-  return `[${langLabel} Translation] ${polished}`;
-}
-
-export function WorkExperienceSection() {
+export function WorkExperienceSection({
+  experienceToEdit,
+  onEditHandled,
+}: {
+  experienceToEdit: WorkExperience | null;
+  onEditHandled: () => void;
+}) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [items, setItems] = useState<WorkExperience[]>([]);
@@ -74,7 +61,6 @@ export function WorkExperienceSection() {
   const [deleteTarget, setDeleteTarget] = useState<WorkExperience | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [generating, setGenerating] = useState(false);
 
   // Form state — mapped to DB column names
   const [position, setPosition] = useState('');
@@ -95,25 +81,15 @@ export function WorkExperienceSection() {
   const [responsibilities, setResponsibilities] = useState('');
   const [visibleToCompanies, setVisibleToCompanies] = useState(true);
 
-  // Translation panel toggle
-  const [showTranslations, setShowTranslations] = useState(false);
-
   const load = async () => {
     if (!user) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from(TABLES.workerExperiences)
-        .select('*')
-        .eq('user_id', user.id)
-        .order('start_date', { ascending: false, nullsFirst: false });
-      if (error) {
-        toast.error(error.message);
+      const result = await loadWorkerExperiences(user.id);
+      if (!result.ok) {
+        toast.error(result.error);
       } else {
-        const normalized = (data ?? []).map((row) =>
-          normalizeExperience(row as Record<string, unknown>)
-        );
-        setItems(normalized);
+        setItems(result.data);
       }
     } catch {
       toast.error(t('common.unexpectedError'));
@@ -145,7 +121,6 @@ export function WorkExperienceSection() {
     setLanguageOriginal('');
     setResponsibilities('');
     setVisibleToCompanies(true);
-    setShowTranslations(false);
   };
 
   const openAdd = () => {
@@ -173,95 +148,33 @@ export function WorkExperienceSection() {
     setLanguageOriginal(exp.language_original ?? '');
     setResponsibilities(exp.responsibilities ?? '');
     setVisibleToCompanies(exp.visible_to_companies);
-    // Show translations panel if any translations exist
-    setShowTranslations(
-      !!(exp.description_en || exp.description_es || exp.description_fr || exp.description_nl || exp.description_de)
-    );
     setDialogOpen(true);
   };
 
+  useEffect(() => {
+    if (!experienceToEdit) return;
+    openEdit(experienceToEdit);
+    onEditHandled();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [experienceToEdit]);
+
   const toggleVisibility = async (exp: WorkExperience) => {
+    if (!user) return;
     const previousItems = [...items];
     const newVal = !exp.visible_to_companies;
     setItems((prev) =>
       prev.map((i) => (i.id === exp.id ? { ...i, visible_to_companies: newVal } : i))
     );
     try {
-      const { error } = await supabase
-        .from(TABLES.workerExperiences)
-        .update({ visible_to_companies: newVal })
-        .eq('id', exp.id);
-      if (error) {
-        toast.error(error.message);
+      const result = await setWorkerExperienceVisibility(exp.id, user.id, newVal);
+      if (!result.ok) {
+        toast.error(result.error);
         setItems(previousItems);
       }
     } catch {
       toast.error(t('common.unexpectedError'));
       setItems(previousItems);
     }
-  };
-
-  const handleGenerateTranslation = (targetLang: TranslationLanguage) => {
-    if (!descriptionOriginal.trim()) {
-      toast.error(t('workerProfile.experience.noOriginalText'));
-      return;
-    }
-    setGenerating(true);
-    setTimeout(() => {
-      const result = generateTranslation(descriptionOriginal, targetLang);
-      switch (targetLang) {
-        case 'en':
-          setDescriptionEn(result);
-          break;
-        case 'es':
-          setDescriptionEs(result);
-          break;
-        case 'fr':
-          setDescriptionFr(result);
-          break;
-        case 'nl':
-          setDescriptionNl(result);
-          break;
-        case 'de':
-          setDescriptionDe(result);
-          break;
-      }
-      setGenerating(false);
-      toast.success(t('workerProfile.experience.translationGenerated', { lang: LANGUAGE_NAMES[targetLang] }));
-    }, 800);
-  };
-
-  const handleGenerateAll = () => {
-    if (!descriptionOriginal.trim()) {
-      toast.error(t('workerProfile.experience.noOriginalText'));
-      return;
-    }
-    setGenerating(true);
-    setTimeout(() => {
-      const langs: TranslationLanguage[] = ['en', 'es', 'fr', 'nl', 'de'];
-      for (const lang of langs) {
-        const result = generateTranslation(descriptionOriginal, lang);
-        switch (lang) {
-          case 'en':
-            setDescriptionEn(result);
-            break;
-          case 'es':
-            setDescriptionEs(result);
-            break;
-          case 'fr':
-            setDescriptionFr(result);
-            break;
-          case 'nl':
-            setDescriptionNl(result);
-            break;
-          case 'de':
-            setDescriptionDe(result);
-            break;
-        }
-      }
-      setGenerating(false);
-      toast.success(t('workerProfile.experience.allTranslationsGenerated'));
-    }, 1200);
   };
 
   const submit = async (e: FormEvent) => {
@@ -318,22 +231,17 @@ export function WorkExperienceSection() {
   };
 
   const confirmDelete = async () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget || !user) return;
     setDeleting(true);
     const previousItems = [...items];
     setItems((prev) => prev.filter((i) => i.id !== deleteTarget.id));
     try {
-      const { error } = await supabase
-        .from(TABLES.workerExperiences)
-        .delete()
-        .eq('id', deleteTarget.id);
-      if (error) {
-        toast.error(error.message);
+      const result = await deleteWorkerExperience(deleteTarget.id, user.id);
+      if (!result.ok) {
+        toast.error(result.error);
         setItems(previousItems);
       } else {
         toast.success(t('workerProfile.experience.deleted'));
-        // Recalculate profile completion (non-blocking)
-        if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
       }
     } catch {
       toast.error(t('common.unexpectedError'));
@@ -342,17 +250,6 @@ export function WorkExperienceSection() {
       setDeleting(false);
       setDeleteTarget(null);
     }
-  };
-
-  /** Count how many translations exist for an experience */
-  const countTranslations = (exp: WorkExperience): number => {
-    let count = 0;
-    if (exp.description_en) count++;
-    if (exp.description_es) count++;
-    if (exp.description_fr) count++;
-    if (exp.description_nl) count++;
-    if (exp.description_de) count++;
-    return count;
   };
 
   return (
@@ -454,15 +351,6 @@ export function WorkExperienceSection() {
                           {exp.description_original}
                         </p>
                       </div>
-                      {/* Show translation count indicator */}
-                      {countTranslations(exp) > 0 && (
-                        <div className="flex items-center gap-1.5">
-                          <Globe className="h-3 w-3 text-blue-400/70" />
-                          <span className="text-[10px] text-blue-400/70">
-                            {t('workerProfile.experience.translationsAvailable', { count: countTranslations(exp) })}
-                          </span>
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
@@ -636,176 +524,6 @@ export function WorkExperienceSection() {
                 placeholder={t('workerProfile.experience.descriptionOriginalPlaceholder')}
                 className="bg-zinc-950 border-zinc-800 text-zinc-100 focus-visible:ring-[#f59e0b] [color-scheme:dark]"
               />
-            </div>
-
-            {/* Translations section */}
-            <div className="border border-zinc-800 rounded-md p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => setShowTranslations(!showTranslations)}
-                  className="flex items-center gap-2 text-sm font-medium text-zinc-300 hover:text-zinc-100"
-                >
-                  <Globe className="h-4 w-4 text-blue-400" />
-                  {t('workerProfile.experience.translations')}
-                  <span className="text-[10px] text-zinc-500 ml-1">
-                    {showTranslations ? '▼' : '▶'}
-                  </span>
-                </button>
-                <Button
-                  type="button"
-                  onClick={handleGenerateAll}
-                  disabled={generating || !descriptionOriginal.trim()}
-                  size="sm"
-                  className="bg-blue-600 text-white hover:bg-blue-700 text-[11px] font-semibold gap-1.5 h-7"
-                >
-                  {generating ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <Sparkles className="h-3 w-3" />
-                  )}
-                  {t('workerProfile.experience.generateAll')}
-                </Button>
-              </div>
-
-              {showTranslations && (
-                <div className="space-y-4 pt-2">
-                  {/* English */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-xs uppercase tracking-wider text-blue-400/70 flex items-center gap-1.5">
-                        <span>🇬🇧</span> English
-                      </Label>
-                      <Button
-                        type="button"
-                        onClick={() => handleGenerateTranslation('en')}
-                        disabled={generating || !descriptionOriginal.trim()}
-                        size="sm"
-                        variant="ghost"
-                        className="text-[10px] text-blue-400 hover:text-blue-300 h-6 px-2"
-                      >
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        {t('workerProfile.experience.generate')}
-                      </Button>
-                    </div>
-                    <Textarea
-                      value={descriptionEn}
-                      onChange={(e) => setDescriptionEn(e.target.value)}
-                      rows={3}
-                      placeholder={t('workerProfile.experience.translationPlaceholder', { lang: 'English' })}
-                      className="bg-zinc-950 border-zinc-800 text-zinc-100 focus-visible:ring-[#f59e0b] [color-scheme:dark] text-sm"
-                    />
-                  </div>
-
-                  {/* Spanish */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-xs uppercase tracking-wider text-blue-400/70 flex items-center gap-1.5">
-                        <span>🇪🇸</span> Español
-                      </Label>
-                      <Button
-                        type="button"
-                        onClick={() => handleGenerateTranslation('es')}
-                        disabled={generating || !descriptionOriginal.trim()}
-                        size="sm"
-                        variant="ghost"
-                        className="text-[10px] text-blue-400 hover:text-blue-300 h-6 px-2"
-                      >
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        {t('workerProfile.experience.generate')}
-                      </Button>
-                    </div>
-                    <Textarea
-                      value={descriptionEs}
-                      onChange={(e) => setDescriptionEs(e.target.value)}
-                      rows={3}
-                      placeholder={t('workerProfile.experience.translationPlaceholder', { lang: 'Español' })}
-                      className="bg-zinc-950 border-zinc-800 text-zinc-100 focus-visible:ring-[#f59e0b] [color-scheme:dark] text-sm"
-                    />
-                  </div>
-
-                  {/* French */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-xs uppercase tracking-wider text-blue-400/70 flex items-center gap-1.5">
-                        <span>🇫🇷</span> Français
-                      </Label>
-                      <Button
-                        type="button"
-                        onClick={() => handleGenerateTranslation('fr')}
-                        disabled={generating || !descriptionOriginal.trim()}
-                        size="sm"
-                        variant="ghost"
-                        className="text-[10px] text-blue-400 hover:text-blue-300 h-6 px-2"
-                      >
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        {t('workerProfile.experience.generate')}
-                      </Button>
-                    </div>
-                    <Textarea
-                      value={descriptionFr}
-                      onChange={(e) => setDescriptionFr(e.target.value)}
-                      rows={3}
-                      placeholder={t('workerProfile.experience.translationPlaceholder', { lang: 'Français' })}
-                      className="bg-zinc-950 border-zinc-800 text-zinc-100 focus-visible:ring-[#f59e0b] [color-scheme:dark] text-sm"
-                    />
-                  </div>
-
-                  {/* Dutch */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-xs uppercase tracking-wider text-blue-400/70 flex items-center gap-1.5">
-                        <span>🇳🇱</span> Nederlands
-                      </Label>
-                      <Button
-                        type="button"
-                        onClick={() => handleGenerateTranslation('nl')}
-                        disabled={generating || !descriptionOriginal.trim()}
-                        size="sm"
-                        variant="ghost"
-                        className="text-[10px] text-blue-400 hover:text-blue-300 h-6 px-2"
-                      >
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        {t('workerProfile.experience.generate')}
-                      </Button>
-                    </div>
-                    <Textarea
-                      value={descriptionNl}
-                      onChange={(e) => setDescriptionNl(e.target.value)}
-                      rows={3}
-                      placeholder={t('workerProfile.experience.translationPlaceholder', { lang: 'Nederlands' })}
-                      className="bg-zinc-950 border-zinc-800 text-zinc-100 focus-visible:ring-[#f59e0b] [color-scheme:dark] text-sm"
-                    />
-                  </div>
-
-                  {/* German */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-xs uppercase tracking-wider text-blue-400/70 flex items-center gap-1.5">
-                        <span>🇩🇪</span> Deutsch
-                      </Label>
-                      <Button
-                        type="button"
-                        onClick={() => handleGenerateTranslation('de')}
-                        disabled={generating || !descriptionOriginal.trim()}
-                        size="sm"
-                        variant="ghost"
-                        className="text-[10px] text-blue-400 hover:text-blue-300 h-6 px-2"
-                      >
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        {t('workerProfile.experience.generate')}
-                      </Button>
-                    </div>
-                    <Textarea
-                      value={descriptionDe}
-                      onChange={(e) => setDescriptionDe(e.target.value)}
-                      rows={3}
-                      placeholder={t('workerProfile.experience.translationPlaceholder', { lang: 'Deutsch' })}
-                      className="bg-zinc-950 border-zinc-800 text-zinc-100 focus-visible:ring-[#f59e0b] [color-scheme:dark] text-sm"
-                    />
-                  </div>
-                </div>
-              )}
             </div>
 
             <div className="space-y-2">

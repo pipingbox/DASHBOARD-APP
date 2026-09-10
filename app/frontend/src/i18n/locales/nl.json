@@ -343,6 +343,35 @@
     "certifications": "Certificeringen",
     "addCertification": "Certificering toevoegen",
     "noCertifications": "Nog geen certificeringen toegevoegd.",
+    "matchReadyTitle": "Voltooi je profiel voor nauwkeurigere vacatures.",
+    "matchReadyHint": "Vul de ontbrekende profielgegevens in om je inzetbaarheid te verbeteren.",
+    "matchReadyAddExperience": "Werkervaring toevoegen",
+    "matchReadyGap": {
+      "cohort": "Rond de onboarding voor werknemers af",
+      "full_name": "Voeg je volledige naam toe",
+      "title": "Voeg je functie of vak toe",
+      "location": "Voeg je locatie toe",
+      "years_experience": "Voeg je ervaringsjaren toe",
+      "bio": "Voeg een professionele samenvatting toe",
+      "skills": "Voeg minstens één vaardigheid toe",
+      "experience": "Voeg gestructureerde werkervaring toe",
+      "availability": "Stel je beschikbaarheid in",
+      "visibility": "Maak je profiel openbaar"
+    },
+    "matchReadyUnlocks": {
+      "complete": "Compleet",
+      "workforceReady": "Inzetbaar",
+      "matchable": "Matchbaar"
+    },
+    "quickExperience": {
+      "title": "Werkervaring toevoegen",
+      "saved": "Werkervaring toegevoegd — bedrijven kunnen je loopbaan nu beoordelen.",
+      "savedToast": "Werkervaring toegevoegd — bedrijven kunnen je loopbaan nu beoordelen.",
+      "moreDetails": "Meer details toevoegen (optioneel)",
+      "addAnother": "Nog een werkervaring toevoegen",
+      "addDetails": "Details toevoegen",
+      "save": "Werkervaring opslaan"
+    },
     "certificationDialog": {
       "addTitle": "Certificering toevoegen",
       "editTitle": "Certificering bewerken",

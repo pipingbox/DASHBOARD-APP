@@ -12,6 +12,7 @@ import {
 } from '@/lib/workforceReadiness';
 import { useWorkforceReadinessTracking } from '@/lib/workforceReadinessEvents';
 import { ExperienceQuickCapture } from '@/components/profile/ExperienceQuickCapture';
+import type { WorkExperience } from '@/lib/workerProfile';
 
 /**
  * Banner contextual que indica qué dato exacto falta para progresar en el
@@ -26,7 +27,11 @@ import { ExperienceQuickCapture } from '@/components/profile/ExperienceQuickCapt
  * WFA-001: cuando el gap canónico es `experience`, el banner ofrece un CTA
  * directo al Quick Experience Capture (sin buscar la sección manualmente).
  */
-export function MatchReadyBanner() {
+export function MatchReadyBanner({
+  onAddExperienceDetails,
+}: {
+  onAddExperienceDetails: (experience: WorkExperience) => void;
+}) {
   const { t } = useTranslation();
   const { profile } = useAuth();
   const [counts, setCounts] = useState<{
@@ -153,6 +158,10 @@ export function MatchReadyBanner() {
         open={quickCaptureOpen}
         onOpenChange={setQuickCaptureOpen}
         onSaved={() => setRefreshKey((k) => k + 1)}
+        onAddDetails={(experience) => {
+          setQuickCaptureOpen(false);
+          onAddExperienceDetails(experience);
+        }}
       />
     </div>
   );
