@@ -98,6 +98,9 @@ export default defineConfig(({ command }) => {
       watch: { usePolling: true, interval: 600 },
     },
     build: {
+      // PB-OBSERVABILITY-001: hidden sourcemaps per build so error stacks can be
+      // resolved per SHA in PostHog error tracking without shipping public maps.
+      sourcemap: 'hidden',
       rollupOptions: {
         output: {
           manualChunks: {

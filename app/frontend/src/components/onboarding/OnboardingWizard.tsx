@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock, Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ONBOARDING_STATUS } from '@/lib/onboarding';
+import { trackEvent } from '@/lib/observability';
 import { isValidImageFile, isHeicFile, validateFileSize, getSafeImageExtension, ACCEPT_IMAGES } from '@/lib/fileUploadUtils';
 
 /* ─── Constants ─── */
@@ -142,6 +143,21 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const isMountedRef = useRef(true);
 
   const progress = Math.round((step / TOTAL_STEPS) * 100);
+
+  /* ─── PB-OBSERVABILITY-001: closed-schema onboarding funnel ─── */
+  useEffect(() => {
+    trackEvent('onboarding_started', { account_type: accountType }, { dedupeKey: 'start' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    trackEvent(
+      'onboarding_step_reached',
+      { step, account_type: accountType },
+      { dedupeKey: `step-${step}` },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   /* ─── Restore draft on mount ─── */
   useEffect(() => {
@@ -554,6 +570,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
 
     clearDraftFromLocal(user.id);
     setHasUnsavedChanges(false);
+    trackEvent('onboarding_completed', { account_type: accountType }, { dedupeKey: 'completed' });
     await refreshProfile();
     onComplete();
     navigate('/dashboard', { replace: true });

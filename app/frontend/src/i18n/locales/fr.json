@@ -1071,7 +1071,10 @@
     "generic": "Une erreur s'est produite. Veuillez réessayer.",
     "network": "Erreur réseau. Vérifiez votre connexion.",
     "unauthorized": "Vous n'avez pas les droits pour cette action.",
-    "notFound": "La ressource demandée est introuvable."
+    "notFound": "La ressource demandée est introuvable.",
+    "incidentCode": "Code d'incident",
+    "copyIncidentCode": "Copier le code d'incident",
+    "incidentCodeCopied": "Copié"
   },
   "certAlerts": {
     "sectionLabel": "Alertes",

@@ -1118,7 +1118,10 @@
     "generic": "Algo ha ido mal. Inténtalo de nuevo.",
     "network": "Error de red. Comprueba tu conexión.",
     "unauthorized": "No tienes permiso para realizar esta acción.",
-    "notFound": "No se ha encontrado el recurso solicitado."
+    "notFound": "No se ha encontrado el recurso solicitado.",
+    "incidentCode": "Código de incidencia",
+    "copyIncidentCode": "Copiar código de incidencia",
+    "incidentCodeCopied": "Copiado"
   },
   "certAlerts": {
     "sectionLabel": "Alertas",

@@ -1123,7 +1123,10 @@
     "generic": "Si è verificato un errore. Riprovi.",
     "network": "Errore di rete. Verifichi la Sua connessione.",
     "unauthorized": "Non è autorizzato a eseguire questa azione.",
-    "notFound": "La risorsa richiesta non è stata trovata."
+    "notFound": "La risorsa richiesta non è stata trovata.",
+    "incidentCode": "Codice incidente",
+    "copyIncidentCode": "Copia codice incidente",
+    "incidentCodeCopied": "Copiato"
   },
   "certAlerts": {
     "sectionLabel": "Avvisi",
