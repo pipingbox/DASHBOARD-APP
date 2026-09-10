@@ -84,7 +84,14 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-V04RD9W0J4');
+      // PB-OBSERVABILITY-001: never send query strings to GA4 — they can
+      // carry referral codes, tokens or UTM parameters.
+      gtag('config', 'G-V04RD9W0J4', {
+        page_location: window.location.origin + window.location.pathname,
+        page_referrer: document.referrer
+          ? new URL(document.referrer).origin + new URL(document.referrer).pathname
+          : '',
+      });
     </script>
   </head>
 
