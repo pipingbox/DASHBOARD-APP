@@ -691,7 +691,8 @@
     "examCorrectOrder": "Correct order",
     "examCorrectStatement": "Correct: {{answer}}",
     "examYourStatement": "Your answer: {{answer}}",
-    "questions": "questions"
+    "questions": "questions",
+    "searchPlaceholder": "Search courses..."
   },
   "tools": {
     "eyebrow": "Tools",
@@ -1713,7 +1714,8 @@
     "grossSalary": "Gross salary",
     "finalTotal": "Grand total",
     "location": "Location",
-    "companyName": "Company name (optional)"
+    "companyName": "Company name (optional)",
+    "companyNamePlaceholder": "Acme Piping S.L."
   },
   "ratePresets": {
     "eyebrow": "Salary rate presets",
@@ -2815,6 +2817,77 @@
     "subtitle": "Need skilled industrial workers for your project? Fill out the form below and our team will match you with qualified professionals from our global network.",
     "success": "Workforce request submitted!",
     "title": "Request Workforce",
-    "workerType": "Type of Workers Needed"
+    "workerType": "Type of Workers Needed",
+    "placeholderFullName": "Full name"
+  },
+  "pageMeta": {
+    "home": {
+      "title": "PipingBox — Industrial Workforce Platform | Tools, Jobs, Academy",
+      "description": "Free engineering tools, industrial jobs, certification training (VCA, SCC, OSHA), and community for pipefitters, welders, and industrial professionals. ASME B31.3 calculators, pipe data tables, elbow cut calculator."
+    },
+    "login": {
+      "title": "PipingBox — Sign In"
+    },
+    "register": {
+      "title": "PipingBox — Create Account",
+      "description": "Create your PipingBox account. Free for workers: profile, jobs, tools, community, and certification prep."
+    },
+    "dashboard": {
+      "title": "PipingBox — Dashboard"
+    },
+    "profile": {
+      "title": "PipingBox — Profile"
+    },
+    "jobs": {
+      "title": "PipingBox — Industrial Job Board | Pipefitter, Welder, QA/QC Jobs",
+      "description": "Industrial job board for pipefitters, welders, QA/QC inspectors, supervisors, and planners. Verified companies across Europe, USA, and Middle East. Apply in one click."
+    },
+    "messages": {
+      "title": "PipingBox — Messages"
+    },
+    "community": {
+      "title": "PipingBox — Community"
+    },
+    "admin": {
+      "title": "PipingBox — Admin"
+    },
+    "applications": {
+      "title": "PipingBox — Applications"
+    },
+    "companyDashboard": {
+      "title": "PipingBox — Company Dashboard"
+    },
+    "enterpriseDashboard": {
+      "title": "PipingBox — Enterprise Dashboard"
+    },
+    "academy": {
+      "title": "PipingBox — Academy | VCA, SCC, PRL, OSHA Certification Prep",
+      "description": "Certification preparation courses: VCA (Belgium/Netherlands), SCC (Germany), PRL (Spain), OSHA 10/30 (USA). Up to 6x cheaper than classroom training."
+    },
+    "tools": {
+      "title": "PipingBox — Technical Hub | Piping Calculators, Fabrication Tools, Component Library",
+      "description": "PipingBox Technical Hub: piping calculators, fabrication tools (elbow cut, branch layout, fitting take-off), pipe data tables, flange rating lookup, unit converter, and more. Free, no login required."
+    },
+    "companies": {
+      "title": "PipingBox — Verified Industrial Employers",
+      "description": "Directory of verified industrial companies hiring pipefitters, welders, and engineers across Europe and USA."
+    },
+    "pricing": {
+      "title": "PipingBox — Pricing | Academy, Enterprise, Job Posts",
+      "description": "PipingBox pricing: Academy certification courses (VCA, SCC, OSHA), enterprise subscriptions, featured job posts. Transparent pricing, no hidden fees."
+    },
+    "company": {
+      "title": "PipingBox — Company"
+    },
+    "blog": {
+      "title": "PipingBox — Blog"
+    }
+  },
+  "checkout": {
+    "errorGeneric": "Could not start checkout. Please try again.",
+    "signInToSubscribe": "Sign in to subscribe.",
+    "signInToPurchase": "Sign in to purchase credits.",
+    "notAvailableSubscription": "Subscriptions are not available yet. Email us and we will set it up manually.",
+    "notAvailablePack": "This pack is not available right now."
   }
 }

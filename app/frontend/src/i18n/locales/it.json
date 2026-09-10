@@ -691,7 +691,8 @@
     "examCorrectOrder": "Ordine corretto",
     "examCorrectStatement": "Corretto: {{answer}}",
     "examYourStatement": "La tua risposta: {{answer}}",
-    "questions": "domande"
+    "questions": "domande",
+    "searchPlaceholder": "Cerca corsi..."
   },
   "tools": {
     "eyebrow": "Centro Tecnico",
@@ -1713,7 +1714,8 @@
     "grossSalary": "Stipendio lordo",
     "finalTotal": "Totale finale",
     "location": "Posizione",
-    "companyName": "Nome dell'azienda (facoltativo)"
+    "companyName": "Nome dell'azienda (facoltativo)",
+    "companyNamePlaceholder": "Acme Piping S.r.l."
   },
   "ratePresets": {
     "eyebrow": "Tariffe predefinite",
@@ -2815,6 +2817,77 @@
     "subtitle": "Hai bisogno di lavoratori industriali qualificati per il tuo progetto? Compila il modulo e il nostro team ti metterà in contatto con professionisti qualificati della nostra rete globale.",
     "success": "Richiesta di personale inviata!",
     "title": "Richiedi Personale",
-    "workerType": "Tipo di Lavoratori Necessari"
+    "workerType": "Tipo di Lavoratori Necessari",
+    "placeholderFullName": "Nome completo"
+  },
+  "pageMeta": {
+    "home": {
+      "title": "PipingBox — Piattaforma di Lavoro Industriale | Strumenti, Lavori, Accademia",
+      "description": "Strumenti di ingegneria gratuiti, lavori industriali, formazione alla certificazione (VCA, SCC, OSHA) e community per tubisti, saldatori e professionisti dell'industria. Calcolatori ASME B31.3, tabelle dati tubi, calcolatore taglio gomiti."
+    },
+    "login": {
+      "title": "PipingBox — Accedi"
+    },
+    "register": {
+      "title": "PipingBox — Crea Account",
+      "description": "Crea il tuo account PipingBox. Gratuito per i lavoratori: profilo, lavori, strumenti, community e preparazione alle certificazioni."
+    },
+    "dashboard": {
+      "title": "PipingBox — Dashboard"
+    },
+    "profile": {
+      "title": "PipingBox — Profilo"
+    },
+    "jobs": {
+      "title": "PipingBox — Bacheca Lavori Industriali | Tubisti, Saldatori, QA/QC",
+      "description": "Bacheca lavori industriali per tubisti, saldatori, ispettori QA/QC, supervisori e pianificatori. Aziende verificate in Europa, USA e Medio Oriente. Candidati con un clic."
+    },
+    "messages": {
+      "title": "PipingBox — Messaggi"
+    },
+    "community": {
+      "title": "PipingBox — Community"
+    },
+    "admin": {
+      "title": "PipingBox — Amministrazione"
+    },
+    "applications": {
+      "title": "PipingBox — Candidature"
+    },
+    "companyDashboard": {
+      "title": "PipingBox — Dashboard Azienda"
+    },
+    "enterpriseDashboard": {
+      "title": "PipingBox — Dashboard Enterprise"
+    },
+    "academy": {
+      "title": "PipingBox — Accademia | Preparazione VCA, SCC, PRL, OSHA",
+      "description": "Corsi di preparazione alle certificazioni: VCA (Belgio/Paesi Bassi), SCC (Germania), PRL (Spagna), OSHA 10/30 (USA). Fino a 6 volte più economico della formazione in aula."
+    },
+    "tools": {
+      "title": "PipingBox — Hub Tecnico | Calcoli Tubazioni, Strumenti di Fabbricazione, Biblioteca Componenti",
+      "description": "Hub Tecnico PipingBox: calcolatori per tubazioni, strumenti di fabbricazione (taglio gomiti, layout diramazioni, fitting take-off), tabelle dati tubi, consultazione classe flange, convertitore di unità e altro. Gratuito, senza registrazione."
+    },
+    "companies": {
+      "title": "PipingBox — Datori di Lavoro Industriali Verificati",
+      "description": "Elenco di aziende industriali verificate che assumono tubisti, saldatori e ingegneri in Europa e negli USA."
+    },
+    "pricing": {
+      "title": "PipingBox — Prezzi | Accademia, Enterprise, Pubblicazione Offerte",
+      "description": "Prezzi PipingBox: corsi di certificazione dell'Accademia (VCA, SCC, OSHA), abbonamenti enterprise, offerte di lavoro in evidenza. Prezzi trasparenti, nessun costo nascosto."
+    },
+    "company": {
+      "title": "PipingBox — Azienda"
+    },
+    "blog": {
+      "title": "PipingBox — Blog"
+    }
+  },
+  "checkout": {
+    "errorGeneric": "Impossibile avviare il pagamento. Riprova.",
+    "signInToSubscribe": "Accedi per abbonarti.",
+    "signInToPurchase": "Accedi per acquistare crediti.",
+    "notAvailableSubscription": "Gli abbonamenti non sono ancora disponibili. Scrivici e lo configureremo manualmente.",
+    "notAvailablePack": "Questo pacchetto non è al momento disponibile."
   }
 }

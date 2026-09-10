@@ -1,7 +1,7 @@
 /**
  * PB-WEB-006 — SEO head management for a React SPA.
  *
- * Manages three concerns that index.html cannot handle statically:
+ * Manages two concerns that index.html cannot handle statically:
  *
  * 1. `<html lang>` — kept in sync with the active i18next language so crawlers
  *    and screen readers receive the correct BCP-47 code instead of the hardcoded "en".
@@ -10,9 +10,13 @@
  *    route change. Without this every page serves the same canonical (the static "/"
  *    in index.html) and Google consolidates all signals to the root.
  *
- * 3. `<link rel="alternate" hreflang>` — declares the six supported languages.
- *    For a SPA the same URL serves all languages, so each alternate points to the
- *    same pathname. The x-default points to the English variant as per Google's docs.
+ * PB-I18N-LAYER2-001 (PO decision D5): the hreflang alternates were removed.
+ * Emitting seven `<link rel="alternate" hreflang>` entries that all point to
+ * the SAME URL is semantically invalid — an alternate must point to a distinct
+ * language version. Google ignores such clusters, and they add noise to the
+ * head. The correct fix is per-language URLs (language-prefixed routes with
+ * canonical + bidirectional hreflang + x-default), which is scoped separately
+ * in PB-SEO-I18N-URLS-001. Do not re-add same-URL alternates here.
  *
  * Usage: call `useSeo()` at the top level of any public-facing page or layout,
  * or once in `App.tsx` to cover all routes globally.
@@ -25,7 +29,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { SUPPORTED_LANGUAGES } from '@/i18n';
 
 const BASE_URL = 'https://pipingbox.com';
 
@@ -89,14 +92,11 @@ export function useSeo(options: SeoOptions = {}): void {
     // 2. Canonical
     setOrCreate('canonical', canonical);
 
-    // 3. hreflang alternates — same URL for every language (SPA, path-based routing).
-    for (const { code } of SUPPORTED_LANGUAGES) {
-      setOrCreate('alternate', canonical, code);
-    }
-    // x-default: points to the English version per Google's recommendation.
-    setOrCreate('alternate', `${BASE_URL}${pathname}`, 'x-default');
+    // PB-I18N-LAYER2-001 (D5): no hreflang alternates — see header comment.
+    // Same-URL alternates were semantically invalid; per-language URLs are
+    // scoped in PB-SEO-I18N-URLS-001.
 
-    // 4. OG / Twitter URL (keep in sync with canonical)
+    // 3. OG / Twitter URL (keep in sync with canonical)
     setMeta('og:url', canonical, true);
     setMeta('twitter:url', canonical);
   }, [pathname]);

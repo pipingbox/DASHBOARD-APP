@@ -691,7 +691,8 @@
     "examTimeUp": "Tijd is om!",
     "examTimeWarning": "Nog 5 minuten!",
     "examUnderstand": "Ik begrijp de examenregels",
-    "examYourAnswer": "Jouw antwoord"
+    "examYourAnswer": "Jouw antwoord",
+    "searchPlaceholder": "Cursussen zoeken..."
   },
   "tools": {
     "eyebrow": "Tools",
@@ -1713,7 +1714,8 @@
     "grossSalary": "Brutoloon",
     "finalTotal": "Eindtotaal",
     "location": "Locatie",
-    "companyName": "Bedrijfsnaam (optioneel)"
+    "companyName": "Bedrijfsnaam (optioneel)",
+    "companyNamePlaceholder": "Acme Piping B.V."
   },
   "ratePresets": {
     "eyebrow": "Tariefsjablonen",
@@ -2815,6 +2817,77 @@
     "subtitle": "Heeft u gekwalificeerde industriële werknemers nodig voor uw project? Vul het formulier in en ons team koppelt u aan gekwalificeerde professionals uit ons wereldwijde netwerk.",
     "success": "Personeelsaanvraag ingediend!",
     "title": "Personeel aanvragen",
-    "workerType": "Gewenst type werknemers"
+    "workerType": "Gewenst type werknemers",
+    "placeholderFullName": "Volledige naam"
+  },
+  "pageMeta": {
+    "home": {
+      "title": "PipingBox — Industrieel Werkplatform | Tools, Vacatures, Academie",
+      "description": "Gratis engineeringtools, industriële vacatures, certificeringstraining (VCA, SCC, OSHA) en community voor pijpfitters, lassers en industriële professionals. ASME B31.3-calculators, pijpgegevenstabellen, bochtsnijcalculator."
+    },
+    "login": {
+      "title": "PipingBox — Inloggen"
+    },
+    "register": {
+      "title": "PipingBox — Account aanmaken",
+      "description": "Maak uw PipingBox-account aan. Gratis voor werknemers: profiel, vacatures, tools, community en certificeringsvoorbereiding."
+    },
+    "dashboard": {
+      "title": "PipingBox — Dashboard"
+    },
+    "profile": {
+      "title": "PipingBox — Profiel"
+    },
+    "jobs": {
+      "title": "PipingBox — Industriële Vacaturebank | Pijpfitter, Lasser, QA/QC",
+      "description": "Industriële vacaturebank voor pijpfitters, lassers, QA/QC-inspecteurs, supervisors en planners. Gecontroleerde bedrijven in Europa, de VS en het Midden-Oosten. Solliciteer met één klik."
+    },
+    "messages": {
+      "title": "PipingBox — Berichten"
+    },
+    "community": {
+      "title": "PipingBox — Community"
+    },
+    "admin": {
+      "title": "PipingBox — Beheer"
+    },
+    "applications": {
+      "title": "PipingBox — Sollicitaties"
+    },
+    "companyDashboard": {
+      "title": "PipingBox — Bedrijfsdashboard"
+    },
+    "enterpriseDashboard": {
+      "title": "PipingBox — Enterprise-dashboard"
+    },
+    "academy": {
+      "title": "PipingBox — Academie | VCA-, SCC-, PRL-, OSHA-certificeringsvoorbereiding",
+      "description": "Certificeringsvoorbereidingscursussen: VCA (België/Nederland), SCC (Duitsland), PRL (Spanje), OSHA 10/30 (VS). Tot 6x goedkoper dan klassikale training."
+    },
+    "tools": {
+      "title": "PipingBox — Technische Hub | Pijpberekeningen, Fabricagetools, Componentenbibliotheek",
+      "description": "PipingBox Technische Hub: pijpcalculators, fabricagetools (bochtsnijden, taklayout, fitting take-off), pijpgegevenstabellen, flensklasse-opzoeking, eenheidsconverter en meer. Gratis, geen inlog vereist."
+    },
+    "companies": {
+      "title": "PipingBox — Gecontroleerde Industriële Werkgevers",
+      "description": "Overzicht van gecontroleerde industriële bedrijven die pijpfitters, lassers en ingenieurs aannemen in Europa en de VS."
+    },
+    "pricing": {
+      "title": "PipingBox — Prijzen | Academie, Enterprise, Vacatureplaatsingen",
+      "description": "PipingBox-prijzen: certificeringscursussen van de Academie (VCA, SCC, OSHA), enterprise-abonnementen, uitgelichte vacatures. Transparante prijzen, geen verborgen kosten."
+    },
+    "company": {
+      "title": "PipingBox — Bedrijf"
+    },
+    "blog": {
+      "title": "PipingBox — Blog"
+    }
+  },
+  "checkout": {
+    "errorGeneric": "Afrekenen kon niet worden gestart. Probeer het opnieuw.",
+    "signInToSubscribe": "Log in om u te abonneren.",
+    "signInToPurchase": "Log in om credits te kopen.",
+    "notAvailableSubscription": "Abonnementen zijn nog niet beschikbaar. Mail ons en wij regelen het handmatig.",
+    "notAvailablePack": "Dit pakket is momenteel niet beschikbaar."
   }
 }

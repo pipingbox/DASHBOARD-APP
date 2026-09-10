@@ -193,7 +193,7 @@ export default function Academy() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search courses..."
+            placeholder={t('academy.searchPlaceholder')}
             className="h-7 w-[200px] bg-transparent text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
           />
         </div>

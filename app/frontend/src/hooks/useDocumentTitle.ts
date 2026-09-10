@@ -1,89 +1,90 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
+/**
+ * PB-I18N-LAYER2-001 — document titles and meta descriptions follow the active
+ * language. The static English maps moved to the `pageMeta.*` i18n namespace;
+ * this hook only maps pathname → key and lets i18next resolve the string.
+ */
 
 const BASE_TITLE = 'PipingBox';
-const APP_TITLE = 'PipingBox';
 
-const PAGE_TITLES: Record<string, string> = {
-  '/': `${BASE_TITLE} — Industrial Workforce Platform | Tools, Jobs, Academy`,
-  '/login': `${BASE_TITLE} — Sign In`,
-  '/register': `${BASE_TITLE} — Create Account`,
-  '/dashboard': `${APP_TITLE} — Dashboard`,
-  '/profile': `${APP_TITLE} — Profile`,
-  '/jobs': `${APP_TITLE} — Industrial Job Board | Pipefitter, Welder, QA/QC Jobs`,
-  '/messages': `${APP_TITLE} — Messages`,
-  '/community': `${APP_TITLE} — Community`,
-  '/admin': `${APP_TITLE} — Admin`,
-  '/applications': `${APP_TITLE} — Applications`,
-  '/company-dashboard': `${APP_TITLE} — Company Dashboard`,
-  '/enterprise-dashboard': `${APP_TITLE} — Enterprise Dashboard`,
-  '/academy': `${APP_TITLE} — Academy | VCA, SCC, PRL, OSHA Certification Prep`,
-  '/tools': `${APP_TITLE} — Technical Hub | Piping Calculators, Fabrication Tools, Component Library`,
-  '/companies': `${APP_TITLE} — Verified Industrial Employers`,
-  '/pricing': `${BASE_TITLE} — Pricing | Academy, Enterprise, Job Posts`,
+// pathname → pageMeta key (order matters: exact match first, then prefix match
+// sorted by longest path).
+const PAGE_META_KEYS: Record<string, string> = {
+  '/': 'home',
+  '/login': 'login',
+  '/register': 'register',
+  '/dashboard': 'dashboard',
+  '/profile': 'profile',
+  '/jobs': 'jobs',
+  '/messages': 'messages',
+  '/community': 'community',
+  '/admin': 'admin',
+  '/applications': 'applications',
+  '/company-dashboard': 'companyDashboard',
+  '/enterprise-dashboard': 'enterpriseDashboard',
+  '/academy': 'academy',
+  '/tools': 'tools',
+  '/companies': 'companies',
+  '/pricing': 'pricing',
 };
 
-const PAGE_DESCRIPTIONS: Record<string, string> = {
-  '/': 'Free engineering tools, industrial jobs, certification training (VCA, SCC, OSHA), and community for pipefitters, welders, and industrial professionals. ASME B31.3 calculators, pipe data tables, elbow cut calculator.',
-  '/tools': 'PipingBox Technical Hub: piping calculators, fabrication tools (elbow cut, branch layout, fitting take-off), pipe data tables, flange rating lookup, unit converter, and more. Free, no login required.',
-  '/jobs': 'Industrial job board for pipefitters, welders, QA/QC inspectors, supervisors, and planners. Verified companies across Europe, USA, and Middle East. Apply in one click.',
-  '/pricing': 'PipingBox pricing: Academy certification courses (VCA, SCC, OSHA), enterprise subscriptions, featured job posts. Transparent pricing, no hidden fees.',
-  '/academy': 'Certification preparation courses: VCA (Belgium/Netherlands), SCC (Germany), PRL (Spain), OSHA 10/30 (USA). Up to 6x cheaper than classroom training.',
-  '/companies': 'Directory of verified industrial companies hiring pipefitters, welders, and engineers across Europe and USA.',
-  '/register': 'Create your PipingBox account. Free for workers: profile, jobs, tools, community, and certification prep.',
-};
+// pages that carry a translated meta description
+const PAGE_DESCRIPTION_KEYS = new Set(['home', 'tools', 'jobs', 'pricing', 'academy', 'companies', 'register']);
+
+function resolvePageKey(path: string): string | null {
+  if (PAGE_META_KEYS[path]) return PAGE_META_KEYS[path];
+  const matchedKey = Object.keys(PAGE_META_KEYS)
+    .filter((key) => key !== '/' && path.startsWith(key))
+    .sort((a, b) => b.length - a.length)[0];
+  if (matchedKey) return PAGE_META_KEYS[matchedKey];
+  if (path.startsWith('/company')) return 'company';
+  if (path.startsWith('/blog')) return 'blog';
+  return null;
+}
 
 export function useDocumentTitle() {
   const location = useLocation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const path = location.pathname;
+    const pageKey = resolvePageKey(path);
 
     // Set title
-    if (PAGE_TITLES[path]) {
-      document.title = PAGE_TITLES[path];
+    if (pageKey) {
+      document.title = t(`pageMeta.${pageKey}.title`, { defaultValue: `${BASE_TITLE}` });
     } else {
-      const matchedKey = Object.keys(PAGE_TITLES)
-        .filter((key) => key !== '/' && path.startsWith(key))
-        .sort((a, b) => b.length - a.length)[0];
-
-      if (matchedKey) {
-        document.title = PAGE_TITLES[matchedKey];
-      } else if (path.startsWith('/company')) {
-        document.title = `${APP_TITLE} — Company`;
-      } else if (path.startsWith('/blog')) {
-        document.title = `${BASE_TITLE} — Blog`;
-      } else {
-        document.title = APP_TITLE;
-      }
+      document.title = BASE_TITLE;
     }
 
     // Set meta description for public pages
-    const descPath = Object.keys(PAGE_DESCRIPTIONS).find(
-      (key) => path === key || (key !== '/' && path.startsWith(key))
-    );
-    if (descPath) {
-      const desc = PAGE_DESCRIPTIONS[descPath];
-      let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.name = 'description';
-        document.head.appendChild(meta);
-      }
-      meta.content = desc;
+    if (pageKey && PAGE_DESCRIPTION_KEYS.has(pageKey)) {
+      const desc = t(`pageMeta.${pageKey}.description`, { defaultValue: '' });
+      if (desc) {
+        let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.name = 'description';
+          document.head.appendChild(meta);
+        }
+        meta.content = desc;
 
-      // Also update OG description
-      let ogDesc = document.querySelector('meta[property="og:description"]') as HTMLMetaElement | null;
-      if (!ogDesc) {
-        ogDesc = document.createElement('meta');
-        ogDesc.setAttribute('property', 'og:description');
-        document.head.appendChild(ogDesc);
+        // Also update OG description
+        let ogDesc = document.querySelector('meta[property="og:description"]') as HTMLMetaElement | null;
+        if (!ogDesc) {
+          ogDesc = document.createElement('meta');
+          ogDesc.setAttribute('property', 'og:description');
+          document.head.appendChild(ogDesc);
+        }
+        ogDesc.content = desc;
       }
-      ogDesc.content = desc;
     }
 
     // PB-SEO-101: <html lang> and <link rel="canonical"> are owned by useSeo
     // (dynamic lang from i18next, canonical on every route change). Keeping
     // them here forced lang="en" and wrote a duplicate canonical.
-  }, [location.pathname]);
+  }, [location.pathname, t]);
 }

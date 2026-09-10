@@ -691,7 +691,8 @@
     "moduleCompleted": "Modul abgeschlossen",
     "questionsCount": "{{count}} Fragen",
     "estimatedTime": "{{min}} Min.",
-    "level": "Niveau"
+    "level": "Niveau",
+    "searchPlaceholder": "Kurse suchen..."
   },
   "tools": {
     "eyebrow": "Tools",
@@ -1713,7 +1714,8 @@
     "grossSalary": "Bruttogehalt",
     "finalTotal": "Gesamtsumme",
     "location": "Standort",
-    "companyName": "Firmenname (optional)"
+    "companyName": "Firmenname (optional)",
+    "companyNamePlaceholder": "Acme Piping GmbH"
   },
   "ratePresets": {
     "eyebrow": "Lohnvorlagen",
@@ -2815,6 +2817,77 @@
     "subtitle": "Benötigen Sie qualifizierte industrielle Arbeitskräfte für Ihr Projekt? Füllen Sie das Formular aus, und unser Team vermittelt Ihnen qualifizierte Fachkräfte aus unserem globalen Netzwerk.",
     "success": "Personalanfrage übermittelt!",
     "title": "Personal anfragen",
-    "workerType": "Benötigter Arbeitskrafttyp"
+    "workerType": "Benötigter Arbeitskrafttyp",
+    "placeholderFullName": "Vollständiger Name"
+  },
+  "pageMeta": {
+    "home": {
+      "title": "PipingBox — Industrielle Arbeitsplattform | Tools, Jobs, Akademie",
+      "description": "Kostenlose Engineering-Tools, industrielle Stellenangebote, Zertifizierungsschulungen (VCA, SCC, OSHA) und Community für Rohrleitungsbauer, Schweißer und Industrieprofis. ASME B31.3-Rechner, Rohrdatentabellen, Bogen-Schnittrechner."
+    },
+    "login": {
+      "title": "PipingBox — Anmelden"
+    },
+    "register": {
+      "title": "PipingBox — Konto erstellen",
+      "description": "Erstellen Sie Ihr PipingBox-Konto. Kostenlos für Arbeitskräfte: Profil, Jobs, Tools, Community und Zertifizierungsvorbereitung."
+    },
+    "dashboard": {
+      "title": "PipingBox — Dashboard"
+    },
+    "profile": {
+      "title": "PipingBox — Profil"
+    },
+    "jobs": {
+      "title": "PipingBox — Industrielle Jobbörse | Rohrleitungsbauer, Schweißer, QA/QC",
+      "description": "Industrielle Jobbörse für Rohrleitungsbauer, Schweißer, QA/QC-Inspektoren, Supervisoren und Planer. Verifizierte Unternehmen in Europa, den USA und dem Nahen Osten. Mit einem Klick bewerben."
+    },
+    "messages": {
+      "title": "PipingBox — Nachrichten"
+    },
+    "community": {
+      "title": "PipingBox — Community"
+    },
+    "admin": {
+      "title": "PipingBox — Verwaltung"
+    },
+    "applications": {
+      "title": "PipingBox — Bewerbungen"
+    },
+    "companyDashboard": {
+      "title": "PipingBox — Unternehmens-Dashboard"
+    },
+    "enterpriseDashboard": {
+      "title": "PipingBox — Enterprise-Dashboard"
+    },
+    "academy": {
+      "title": "PipingBox — Akademie | VCA-, SCC-, PRL-, OSHA-Zertifizierungsvorbereitung",
+      "description": "Vorbereitungskurse für Zertifizierungen: VCA (Belgien/Niederlande), SCC (Deutschland), PRL (Spanien), OSHA 10/30 (USA). Bis zu 6x günstiger als Präsenzschulungen."
+    },
+    "tools": {
+      "title": "PipingBox — Technischer Hub | Rohrleitungsberechnungen, Fertigungstools, Komponentenbibliothek",
+      "description": "PipingBox Technischer Hub: Rohrleitungsberechnungen, Fertigungstools (Bogen-Schnitt, Abzweig-Layout, Fitting Take-Off), Rohrdatentabellen, Flanschklassen-Abfrage, Einheitenumrechner und mehr. Kostenlos, ohne Anmeldung."
+    },
+    "companies": {
+      "title": "PipingBox — Verifizierte industrielle Arbeitgeber",
+      "description": "Verzeichnis verifizierter Industrieunternehmen, die Rohrleitungsbauer, Schweißer und Ingenieure in Europa und den USA einstellen."
+    },
+    "pricing": {
+      "title": "PipingBox — Preise | Akademie, Enterprise, Stellenanzeigen",
+      "description": "PipingBox-Preise: Zertifizierungskurse der Akademie (VCA, SCC, OSHA), Enterprise-Abonnements, hervorgehobene Stellenanzeigen. Transparente Preise, keine versteckten Kosten."
+    },
+    "company": {
+      "title": "PipingBox — Unternehmen"
+    },
+    "blog": {
+      "title": "PipingBox — Blog"
+    }
+  },
+  "checkout": {
+    "errorGeneric": "Checkout konnte nicht gestartet werden. Bitte erneut versuchen.",
+    "signInToSubscribe": "Zum Abonnieren anmelden.",
+    "signInToPurchase": "Zum Kauf von Credits anmelden.",
+    "notAvailableSubscription": "Abonnements sind noch nicht verfügbar. Schreiben Sie uns und wir richten es manuell ein.",
+    "notAvailablePack": "Dieses Paket ist derzeit nicht verfügbar."
   }
 }

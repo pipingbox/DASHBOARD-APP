@@ -691,7 +691,8 @@
     "examCorrectOrder": "Orden correcto",
     "examCorrectStatement": "Correcto: {{answer}}",
     "examYourStatement": "Tu respuesta: {{answer}}",
-    "questions": "preguntas"
+    "questions": "preguntas",
+    "searchPlaceholder": "Buscar cursos..."
   },
   "tools": {
     "eyebrow": "Tools",
@@ -1713,7 +1714,8 @@
     "grossSalary": "Salario bruto",
     "finalTotal": "Total final",
     "location": "Ubicación",
-    "companyName": "Nombre de la empresa (opcional)"
+    "companyName": "Nombre de la empresa (opcional)",
+    "companyNamePlaceholder": "Acme Piping S.L."
   },
   "ratePresets": {
     "eyebrow": "Tarifas predefinidas",
@@ -2815,6 +2817,77 @@
     "subtitle": "¿Necesitas trabajadores industriales cualificados para tu proyecto? Rellena el formulario y nuestro equipo te pondrá en contacto con profesionales cualificados de nuestra red global.",
     "success": "¡Solicitud de personal enviada!",
     "title": "Solicitar Personal",
-    "workerType": "Tipo de Trabajadores Necesarios"
+    "workerType": "Tipo de Trabajadores Necesarios",
+    "placeholderFullName": "Nombre completo"
+  },
+  "pageMeta": {
+    "home": {
+      "title": "PipingBox — Plataforma de Trabajo Industrial | Herramientas, Empleos, Academia",
+      "description": "Herramientas de ingeniería gratuitas, empleos industriales, formación en certificaciones (VCA, SCC, OSHA) y comunidad para montadores, soldadores y profesionales industriales. Calculadoras ASME B31.3, tablas de datos de tuberías, calculadora de corte de codos."
+    },
+    "login": {
+      "title": "PipingBox — Iniciar Sesión"
+    },
+    "register": {
+      "title": "PipingBox — Crear Cuenta",
+      "description": "Crea tu cuenta de PipingBox. Gratis para trabajadores: perfil, empleos, herramientas, comunidad y preparación de certificaciones."
+    },
+    "dashboard": {
+      "title": "PipingBox — Panel"
+    },
+    "profile": {
+      "title": "PipingBox — Perfil"
+    },
+    "jobs": {
+      "title": "PipingBox — Bolsa de Empleo Industrial | Montadores, Soldadores, QA/QC",
+      "description": "Bolsa de empleo industrial para montadores de tuberías, soldadores, inspectores QA/QC, supervisores y planificadores. Empresas verificadas en Europa, EE. UU. y Oriente Medio. Postúlate en un clic."
+    },
+    "messages": {
+      "title": "PipingBox — Mensajes"
+    },
+    "community": {
+      "title": "PipingBox — Comunidad"
+    },
+    "admin": {
+      "title": "PipingBox — Administración"
+    },
+    "applications": {
+      "title": "PipingBox — Solicitudes"
+    },
+    "companyDashboard": {
+      "title": "PipingBox — Panel de Empresa"
+    },
+    "enterpriseDashboard": {
+      "title": "PipingBox — Panel Enterprise"
+    },
+    "academy": {
+      "title": "PipingBox — Academia | Preparación VCA, SCC, PRL, OSHA",
+      "description": "Cursos de preparación de certificaciones: VCA (Bélgica/Países Bajos), SCC (Alemania), PRL (España), OSHA 10/30 (EE. UU.). Hasta 6 veces más barato que la formación presencial."
+    },
+    "tools": {
+      "title": "PipingBox — Hub Técnico | Calculadoras de Tuberías, Herramientas de Fabricación, Biblioteca de Componentes",
+      "description": "Hub Técnico de PipingBox: calculadoras de tuberías, herramientas de fabricación (corte de codos, layout de ramales, fitting take-off), tablas de datos de tuberías, consulta de clase de bridas, conversor de unidades y más. Gratis, sin registro."
+    },
+    "companies": {
+      "title": "PipingBox — Empleadores Industriales Verificados",
+      "description": "Directorio de empresas industriales verificadas que contratan montadores, soldadores e ingenieros en Europa y EE. UU."
+    },
+    "pricing": {
+      "title": "PipingBox — Precios | Academia, Enterprise, Publicación de Empleos",
+      "description": "Precios de PipingBox: cursos de certificación de la Academia (VCA, SCC, OSHA), suscripciones enterprise, ofertas de empleo destacadas. Precios transparentes, sin cargos ocultos."
+    },
+    "company": {
+      "title": "PipingBox — Empresa"
+    },
+    "blog": {
+      "title": "PipingBox — Blog"
+    }
+  },
+  "checkout": {
+    "errorGeneric": "No se pudo iniciar el pago. Inténtalo de nuevo.",
+    "signInToSubscribe": "Inicia sesión para suscribirte.",
+    "signInToPurchase": "Inicia sesión para comprar créditos.",
+    "notAvailableSubscription": "Las suscripciones aún no están disponibles. Escríbenos y lo configuramos manualmente.",
+    "notAvailablePack": "Este paquete no está disponible ahora mismo."
   }
 }
