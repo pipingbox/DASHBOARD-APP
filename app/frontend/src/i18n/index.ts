@@ -54,6 +54,7 @@ void i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
+    lng: resolveInitialLanguage(),
     resources: {
       en: { translation: en },
       es: { translation: es },
