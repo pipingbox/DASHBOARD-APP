@@ -2,14 +2,18 @@ import type { ElbowCutResult } from './engine';
 
 interface ElbowCutDiagramProps {
   result: ElbowCutResult | null;
+  placeholder: string;
+  cutLabel: string;
+  /** Localized, unit-aware length formatter supplied by the tool. */
+  fmt: (v: number) => string;
 }
 
-export function ElbowCutDiagram({ result }: ElbowCutDiagramProps) {
+export function ElbowCutDiagram({ result, placeholder, cutLabel, fmt }: ElbowCutDiagramProps) {
   if (!result) {
     return (
       <svg viewBox="0 0 400 300" className="w-full max-w-md">
         <text x="200" y="150" textAnchor="middle" fill="#A3A9B3" fontSize="12">
-          Enter parameters to draw the elbow cut
+          {placeholder}
         </text>
       </svg>
     );
@@ -86,7 +90,7 @@ export function ElbowCutDiagram({ result }: ElbowCutDiagramProps) {
       />
       {/* Labels */}
       <text x={cx + 10} y={cy - 10} fill="#A3A9B3" fontSize="10">
-        R = {clrMm.toFixed(0)} mm
+        R = {fmt(clrMm)}
       </text>
       <text x={outerStart.x + 8} y={outerStart.y - 6} fill="#A3A9B3" fontSize="10">
         OD
@@ -95,7 +99,7 @@ export function ElbowCutDiagram({ result }: ElbowCutDiagramProps) {
         β = {betaDeg}°
       </text>
       <text x={cutCenter.x + 10} y={cutCenter.y + 6} fill="#FF8C00" fontSize="10">
-        cut = {cutCenterlineMm.toFixed(1)} mm
+        {cutLabel} = {fmt(cutCenterlineMm)}
       </text>
     </svg>
   );

@@ -21,10 +21,9 @@ import {
   ELBOW_RADIUS_PROVENANCE,
 } from '@/tools/core/standards';
 import { toMm, fromMm } from '@/tools/core/units';
+import { mapEngineError, useUnitFieldConversion, type UnitSystem } from '../shared';
 import { solveElbowCut } from './engine';
 import { ElbowCutDiagram } from './ElbowCutDiagram';
-
-type UnitSystem = 'metric' | 'imperial';
 
 export default function ElbowCutTool() {
   const { t } = useTranslation();
@@ -35,6 +34,8 @@ export default function ElbowCutTool() {
   const [totalAngleDeg, setTotalAngleDeg] = useState('90');
   const [betaDeg, setBetaDeg] = useState('45');
   const [clrOverride, setClrOverride] = useState('');
+
+  useUnitFieldConversion(unitSystem, [[clrOverride, setClrOverride]]);
 
   const npsList = useMemo(() => listNps(), []);
   const schedules = useMemo(() => listSchedules(nps), [nps]);
@@ -63,10 +64,10 @@ export default function ElbowCutTool() {
       betaDeg: beta,
     });
     if (res.success === false) {
-      return { result: null, error: res.reason };
+      return { result: null, error: mapEngineError(t, res) };
     }
     return { result: res.result, error: null };
-  }, [dim, clrMm, totalAngleDeg, betaDeg]);
+  }, [dim, clrMm, totalAngleDeg, betaDeg, t]);
 
   const fmt = (v: number) => (unitSystem === 'metric' ? `${v.toFixed(1)} mm` : `${fromMm(v, 'in').toFixed(3)} in`);
 
@@ -180,7 +181,7 @@ export default function ElbowCutTool() {
           )}
         </div>
       }
-      svg={<ElbowCutDiagram result={result} />}
+      svg={<ElbowCutDiagram result={result} placeholder={t('tools.prefab.elbowCut.drawPlaceholder')} cutLabel={t('tools.prefab.elbowCut.cutLabel')} fmt={fmt} />}
       results={
         result ? (
           <table className="w-full text-left text-sm">

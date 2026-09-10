@@ -19,9 +19,8 @@ import {
 } from '@/tools/core/geometry/offsets';
 import { listNps, listSchedules, getPipeDimension, getElbowRadius } from '@/tools/core/standards';
 import { toMm } from '@/tools/core/units';
+import { mapEngineError, useUnitFieldConversion, type UnitSystem } from '../shared';
 import { OffsetWithElbowsDiagram, OffsetWithoutElbowsDiagram, OffsetVerificationDiagram } from './OffsetDiagrams';
-
-type UnitSystem = 'metric' | 'imperial';
 
 export default function OffsetTool() {
   const { t } = useTranslation();
@@ -51,7 +50,7 @@ export default function OffsetTool() {
         </div>
         <div>
           <h3 className="text-lg font-semibold text-[#F5F7FA]">{t('tools.prefab.offset.title')}</h3>
-          <p className="text-xs text-[#A3A9B3]">Pure geometry engine — CROSS_REFERENCE</p>
+          <p className="text-xs text-[#A3A9B3]">{t('tools.prefab.common.engineBadge')}</p>
         </div>
       </div>
 
@@ -98,7 +97,7 @@ export default function OffsetTool() {
 }
 
 interface SectionProps {
-  unitSystem?: UnitSystem;
+  unitSystem: UnitSystem;
   parseLength: (v: string) => number | undefined;
   fmt: (v: number | undefined) => string;
   fmtDeg: (v: number | undefined) => string;
@@ -112,7 +111,14 @@ function WithElbows({ unitSystem, parseLength, fmt, fmtDeg }: SectionProps) {
   const [schedule, setSchedule] = useState('STD');
   const [elbowType, setElbowType] = useState<'LR' | 'SR'>('LR');
   const [elbowAngle, setElbowAngle] = useState('45');
-  const [clrOverride, setClrOverride] = useState('50');
+  const [clrOverride, setClrOverride] = useState('');
+
+  // Unit toggle converts values, preserving physical dimensions.
+  useUnitFieldConversion(unitSystem, [
+    [a, setA],
+    [b, setB],
+    [clrOverride, setClrOverride],
+  ]);
 
   const schedules = useMemo(() => listSchedules(nps), [nps]);
   const dim = useMemo(() => {
@@ -141,7 +147,7 @@ function WithElbows({ unitSystem, parseLength, fmt, fmtDeg }: SectionProps) {
     }
     const res = solveOffsetWithElbows({ a: aMm, b: bMm, clrMm, elbowAngleDeg: angle });
     if (res.success === false) {
-      return { result: null, error: res.reason };
+      return { result: null, error: mapEngineError(t, res) };
     }
     return { result: res.result, error: null };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -209,11 +215,11 @@ function WithElbows({ unitSystem, parseLength, fmt, fmtDeg }: SectionProps) {
       {result ? (
         <table className="w-full text-left text-sm">
           <tbody className="divide-y divide-[#232A36]">
-            <tr><th className="py-2 text-[#A3A9B3] font-normal">H (travel)</th><td className="py-2 text-[#F5F7FA]">{fmt(result.h)}</td></tr>
+            <tr><th className="py-2 text-[#A3A9B3] font-normal">{t('tools.prefab.offset.travel')}</th><td className="py-2 text-[#F5F7FA]">{fmt(result.h)}</td></tr>
             <tr><th className="py-2 text-[#A3A9B3] font-normal">θ</th><td className="py-2 text-[#F5F7FA]">{fmtDeg(result.thetaDeg)}</td></tr>
-            <tr><th className="py-2 text-[#A3A9B3] font-normal">Take-out/elbow</th><td className="py-2 text-[#F5F7FA]">{fmt(result.takeOutPerElbowMm)}</td></tr>
-            <tr><th className="py-2 text-[#A3A9B3] font-normal">Straight cut</th><td className="py-2 text-[#F5F7FA]">{fmt(result.straightCutLengthMm)}</td></tr>
-            <tr><th className="py-2 text-[#A3A9B3] font-normal">Center-to-center</th><td className="py-2 text-[#F5F7FA]">{fmt(result.centerToCenterMm)}</td></tr>
+            <tr><th className="py-2 text-[#A3A9B3] font-normal">{t('tools.prefab.offset.takeOut')}</th><td className="py-2 text-[#F5F7FA]">{fmt(result.takeOutPerElbowMm)}</td></tr>
+            <tr><th className="py-2 text-[#A3A9B3] font-normal">{t('tools.prefab.offset.straightCut')}</th><td className="py-2 text-[#F5F7FA]">{fmt(result.straightCutLengthMm)}</td></tr>
+            <tr><th className="py-2 text-[#A3A9B3] font-normal">{t('tools.prefab.offset.centerToCenter')}</th><td className="py-2 text-[#F5F7FA]">{fmt(result.centerToCenterMm)}</td></tr>
           </tbody>
         </table>
       ) : (
@@ -228,17 +234,22 @@ function WithoutElbows({ unitSystem, parseLength, fmt, fmtDeg }: SectionProps) {
   const [a, setA] = useState('300');
   const [b, setB] = useState('300');
 
+  useUnitFieldConversion(unitSystem, [
+    [a, setA],
+    [b, setB],
+  ]);
+
   const { result, error } = useMemo(() => {
     const aMm = parseLength(a);
     const bMm = parseLength(b);
     if (aMm === undefined || bMm === undefined) return { result: null, error: null };
     const res = solveOffsetWithoutElbows({ a: aMm, b: bMm });
     if (res.success === false) {
-      return { result: null, error: res.reason };
+      return { result: null, error: mapEngineError(t, res) };
     }
     return { result: res.result, error: null };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [a, b, unitSystem]);
+  }, [a, b, unitSystem, t]);
 
   return (
     <div className="space-y-4 rounded-lg border border-[#232A36] bg-[#151A22] p-4">
@@ -253,9 +264,9 @@ function WithoutElbows({ unitSystem, parseLength, fmt, fmtDeg }: SectionProps) {
       {result ? (
         <table className="w-full text-left text-sm">
           <tbody className="divide-y divide-[#232A36]">
-            <tr><th className="py-2 text-[#A3A9B3] font-normal">H (diagonal)</th><td className="py-2 text-[#F5F7FA]">{fmt(result.h)}</td></tr>
+            <tr><th className="py-2 text-[#A3A9B3] font-normal">{t('tools.prefab.offset.diagonal')}</th><td className="py-2 text-[#F5F7FA]">{fmt(result.h)}</td></tr>
             <tr><th className="py-2 text-[#A3A9B3] font-normal">θ</th><td className="py-2 text-[#F5F7FA]">{fmtDeg(result.thetaDeg)}</td></tr>
-            <tr><th className="py-2 text-[#A3A9B3] font-normal">Cut angle / end</th><td className="py-2 text-[#F5F7FA]">{fmtDeg(result.cutAnglePerEndDeg)}</td></tr>
+            <tr><th className="py-2 text-[#A3A9B3] font-normal">{t('tools.prefab.offset.cutAngleEnd')}</th><td className="py-2 text-[#F5F7FA]">{fmtDeg(result.cutAnglePerEndDeg)}</td></tr>
           </tbody>
         </table>
       ) : (
@@ -272,6 +283,12 @@ function Verification({ unitSystem, parseLength, fmt, fmtDeg }: SectionProps) {
   const [h, setH] = useState('424.264');
   const [theta, setTheta] = useState('45');
 
+  useUnitFieldConversion(unitSystem, [
+    [a, setA],
+    [b, setB],
+    [h, setH],
+  ]);
+
   const { result, error } = useMemo(() => {
     const input: { a?: number; b?: number; h?: number; thetaDeg?: number } = {};
     if (a.trim()) input.a = parseLength(a);
@@ -282,11 +299,11 @@ function Verification({ unitSystem, parseLength, fmt, fmtDeg }: SectionProps) {
     if (provided.length !== 2) return { result: null, error: null };
     const res = solveOffsetVerificationPartial(input);
     if (res.success === false) {
-      return { result: null, error: res.reason };
+      return { result: null, error: mapEngineError(t, res) };
     }
     return { result: res.result, error: null };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [a, b, h, theta, unitSystem]);
+  }, [a, b, h, theta, unitSystem, t]);
 
   return (
     <div className="space-y-4 rounded-lg border border-[#232A36] bg-[#151A22] p-4">
