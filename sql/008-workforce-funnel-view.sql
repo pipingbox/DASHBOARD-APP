@@ -16,13 +16,16 @@
 -- literals to the TypeScript constants; if either side changes, the test
 -- fails and forces both to be updated together.
 --
--- PREDICATE RULES (D11/D14/D18):
+-- PREDICATE RULES (D11/D14/D18 + WFA-001):
 --   * Cohort: role = 'worker' ONLY (never 'user' / 'company' / 'admin').
 --   * COMPLETE: full_name, title, location non-empty; years_experience set;
 --     bio > 10 chars (trimmed); skills non-empty array.
 --   * years_experience is a summary field and NEVER substitutes structured
 --     experience rows (app_worker_experiences).
---   * WORKFORCE READY: COMPLETE + >=1 app_worker_experiences row +
+--   * QUALIFYING EXPERIENCE (WFA-001): an app_worker_experiences row counts
+--     only when position AND company_name are non-empty (btrim). Bare or
+--     partial rows do NOT satisfy the predicate.
+--   * WORKFORCE READY: COMPLETE + >=1 QUALIFYING EXPERIENCE row +
 --     availability explicitly specified (AVAILABLE or NOT_AVAILABLE).
 --     NULL / '' / 'not_specified' count as UNKNOWN, not as false.
 --   * MATCHABLE: WORKFORCE READY + PUBLIC (profile_visibility = 'public'
@@ -39,7 +42,14 @@ CREATE OR REPLACE VIEW app_workforce_funnel AS
 WITH counts AS (
   SELECT
     p.user_id,
-    (SELECT count(*) FROM app_worker_experiences e WHERE e.user_id = p.user_id) AS experience_count,
+    -- QUALIFYING EXPERIENCE (WFA-001): position AND company_name non-empty.
+    -- Mirrors isQualifyingExperience() in workforceReadiness.ts verbatim.
+    (
+      SELECT count(*) FROM app_worker_experiences e
+      WHERE e.user_id = p.user_id
+        AND e.position IS NOT NULL AND btrim(e.position) <> ''
+        AND e.company_name IS NOT NULL AND btrim(e.company_name) <> ''
+    ) AS qualifying_experience_count,
     (SELECT count(*) FROM app_worker_certifications c WHERE c.user_id = p.user_id) AS certification_count,
     (SELECT count(*) FROM app_worker_certifications c WHERE c.user_id = p.user_id AND c.verified = true) AS verified_certification_count
   FROM app_14da0f1941_profiles p
@@ -65,7 +75,7 @@ SELECT
       AND p.years_experience IS NOT NULL
       AND p.bio IS NOT NULL AND length(btrim(p.bio)) > 10
       AND coalesce(array_length(p.skills, 1), 0) > 0
-      AND coalesce(c.experience_count, 0) >= 1
+      AND coalesce(c.qualifying_experience_count, 0) >= 1
       AND p.availability_status IS NOT NULL
       AND p.availability_status <> ''
       AND p.availability_status <> 'not_specified'
@@ -79,7 +89,7 @@ SELECT
       AND p.years_experience IS NOT NULL
       AND p.bio IS NOT NULL AND length(btrim(p.bio)) > 10
       AND coalesce(array_length(p.skills, 1), 0) > 0
-      AND coalesce(c.experience_count, 0) >= 1
+      AND coalesce(c.qualifying_experience_count, 0) >= 1
       AND p.availability_status IN (
         'available_immediately',
         'available_soon',

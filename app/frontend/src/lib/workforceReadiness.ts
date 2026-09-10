@@ -13,6 +13,8 @@
  * - The canonical workforce cohort is role === 'worker' (D14). Never 'user'.
  * - years_experience is a summary field; it does NOT replace structured
  *   experience rows in app_worker_experiences.
+ * - WORKFORCE READY requires a QUALIFYING EXPERIENCE: a row with position
+ *   AND company_name non-empty (WFA-001). Any-row counts do not satisfy it.
  * - availability must be explicitly specified; NULL / 'not_specified' / ''
  *   count as UNKNOWN.
  * - PROFILE MATURITY, VISIBILITY and AVAILABILITY are independent dimensions.
@@ -37,12 +39,46 @@ export interface WorkforceReadinessInput {
   availability_status: string | null;
   profile_visibility: string | null;
   cv_visible: boolean | null;
-  /** Rows in app_worker_experiences for this user. */
-  experience_count: number;
+  /**
+   * Rows in app_worker_experiences for this user that satisfy the
+   * QUALIFYING EXPERIENCE predicate (WFA-001): position non-empty AND
+   * company_name non-empty. Any-row counts are NOT accepted here.
+   */
+  qualifying_experience_count: number;
   /** Rows in worker certifications for this user. */
   certification_count: number;
   /** Certification rows with verified evidence. */
   verified_certification_count: number;
+}
+
+/**
+ * Minimal shape of an app_worker_experiences row needed by the predicate.
+ * The row must belong to the user (user_id is enforced by the caller's
+ * query / ownership rules, not re-checked here).
+ */
+export interface QualifyingExperienceRow {
+  position: string | null;
+  company_name: string | null;
+}
+
+/**
+ * QUALIFYING EXPERIENCE (WFA-001, D18):
+ * a row counts as structured professional evidence only when BOTH
+ * - position is non-empty (after trim)
+ * - company_name is non-empty (after trim)
+ * A row missing either is NOT qualifying; years_experience never
+ * substitutes this (D11/D18 rule).
+ */
+export function isQualifyingExperience(row: QualifyingExperienceRow): boolean {
+  return !!row.position?.trim() && !!row.company_name?.trim();
+}
+
+/** Count how many rows satisfy the QUALIFYING EXPERIENCE predicate. */
+export function countQualifyingExperiences(
+  rows: QualifyingExperienceRow[] | null | undefined,
+): number {
+  if (!Array.isArray(rows)) return 0;
+  return rows.filter(isQualifyingExperience).length;
 }
 
 /**
@@ -106,15 +142,17 @@ export function availabilityState(i: WorkforceReadinessInput): AvailabilityState
 }
 
 /**
- * WORKFORCE_READY (D11): COMPLETE + structured experience + known availability.
- * - experience_count >= 1 (app_worker_experiences rows; years_experience does
- *   NOT substitute)
+ * WORKFORCE_READY (D11 + WFA-001): COMPLETE + QUALIFYING structured
+ * experience + known availability.
+ * - qualifying_experience_count >= 1 (app_worker_experiences rows with
+ *   position AND company_name non-empty; years_experience does NOT
+ *   substitute; a bare/partial row does NOT satisfy the predicate)
  * - availability explicitly specified (AVAILABLE or NOT_AVAILABLE)
  */
 export function isWorkforceReady(i: WorkforceReadinessInput): boolean {
   return (
     isComplete(i) &&
-    i.experience_count >= 1 &&
+    i.qualifying_experience_count >= 1 &&
     availabilityState(i) !== 'UNKNOWN'
   );
 }
@@ -202,7 +240,9 @@ export function readinessGaps(i: WorkforceReadinessInput): ReadinessGap[] {
   }
 
   if (gaps.length === 0) {
-    if (i.experience_count < 1) gaps.push({ key: 'experience', unlocks: 'WORKFORCE_READY' });
+    if (i.qualifying_experience_count < 1) {
+      gaps.push({ key: 'experience', unlocks: 'WORKFORCE_READY' });
+    }
     if (availabilityState(i) === 'UNKNOWN') {
       gaps.push({ key: 'availability', unlocks: 'WORKFORCE_READY' });
     }

@@ -29,7 +29,14 @@
 WITH counts AS (
   SELECT
     p.user_id,
-    (SELECT count(*) FROM app_worker_experiences e WHERE e.user_id = p.user_id) AS experience_count,
+    -- QUALIFYING EXPERIENCE (WFA-001): position AND company_name non-empty.
+    -- Mirrors isQualifyingExperience() in workforceReadiness.ts verbatim.
+    (
+      SELECT count(*) FROM app_worker_experiences e
+      WHERE e.user_id = p.user_id
+        AND e.position IS NOT NULL AND btrim(e.position) <> ''
+        AND e.company_name IS NOT NULL AND btrim(e.company_name) <> ''
+    ) AS qualifying_experience_count,
     (SELECT count(*) FROM app_worker_certifications c WHERE c.user_id = p.user_id) AS certification_count,
     (SELECT count(*) FROM app_worker_certifications c WHERE c.user_id = p.user_id AND c.verified = true) AS verified_certification_count
   FROM app_14da0f1941_profiles p
@@ -37,7 +44,7 @@ WITH counts AS (
 w AS (
   SELECT
     p.*,
-    coalesce(c.experience_count, 0) AS experience_count,
+    coalesce(c.qualifying_experience_count, 0) AS qualifying_experience_count,
     coalesce(c.certification_count, 0) AS certification_count,
     coalesce(c.verified_certification_count, 0) AS verified_certification_count
   FROM app_14da0f1941_profiles p
@@ -61,7 +68,7 @@ SELECT
       AND years_experience IS NOT NULL
       AND bio IS NOT NULL AND length(btrim(bio)) > 10
       AND coalesce(array_length(skills, 1), 0) > 0
-      AND experience_count >= 1
+      AND qualifying_experience_count >= 1
       AND availability_status IS NOT NULL
       AND availability_status <> ''
       AND availability_status <> 'not_specified'
@@ -73,7 +80,7 @@ SELECT
       AND years_experience IS NOT NULL
       AND bio IS NOT NULL AND length(btrim(bio)) > 10
       AND coalesce(array_length(skills, 1), 0) > 0
-      AND experience_count >= 1
+      AND qualifying_experience_count >= 1
       AND availability_status IN (
         'available_immediately',
         'available_soon',
@@ -93,14 +100,21 @@ FROM w;
 WITH counts AS (
   SELECT
     p.user_id,
-    (SELECT count(*) FROM app_worker_experiences e WHERE e.user_id = p.user_id) AS experience_count,
+    -- QUALIFYING EXPERIENCE (WFA-001): position AND company_name non-empty.
+    -- Mirrors isQualifyingExperience() in workforceReadiness.ts verbatim.
+    (
+      SELECT count(*) FROM app_worker_experiences e
+      WHERE e.user_id = p.user_id
+        AND e.position IS NOT NULL AND btrim(e.position) <> ''
+        AND e.company_name IS NOT NULL AND btrim(e.company_name) <> ''
+    ) AS qualifying_experience_count,
     (SELECT count(*) FROM app_worker_certifications c WHERE c.user_id = p.user_id) AS certification_count
   FROM app_14da0f1941_profiles p
 ),
 w AS (
   SELECT
     p.*,
-    coalesce(c.experience_count, 0) AS experience_count,
+    coalesce(c.qualifying_experience_count, 0) AS qualifying_experience_count,
     coalesce(c.certification_count, 0) AS certification_count
   FROM app_14da0f1941_profiles p
   LEFT JOIN counts c ON c.user_id = p.user_id
@@ -145,10 +159,11 @@ breakdown AS (
     count(*) FILTER (WHERE false)
   FROM w
   UNION ALL
-  -- structured experience: years_experience NEVER substitutes (D18 rule)
+  -- structured experience: QUALIFYING EXPERIENCE required (WFA-001);
+  -- years_experience NEVER substitutes (D18 rule)
   SELECT 'experience', 'WORKFORCE_READY',
-    count(*) FILTER (WHERE experience_count >= 1),
-    count(*) FILTER (WHERE experience_count = 0),
+    count(*) FILTER (WHERE qualifying_experience_count >= 1),
+    count(*) FILTER (WHERE qualifying_experience_count = 0),
     count(*) FILTER (WHERE false)
   FROM w
   UNION ALL

@@ -64,7 +64,7 @@ export function readinessSnapshot(i: WorkforceReadinessInput): ReadinessSnapshot
       bio: !!i.bio && i.bio.trim().length > 10,
       skills: Array.isArray(i.skills) && i.skills.length > 0,
     },
-    hasExperience: i.experience_count >= 1,
+    hasExperience: i.qualifying_experience_count >= 1,
     availability: availabilityState(i),
     isPublic: isPublic(i),
     isComplete: isComplete(i),
@@ -211,7 +211,7 @@ export function useWorkforceReadinessTracking(
     input.availability_status,
     input.profile_visibility,
     input.cv_visible,
-    input.experience_count,
+    input.qualifying_experience_count,
     input.certification_count,
     input.verified_certification_count,
   ]);

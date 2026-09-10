@@ -29,7 +29,7 @@ function base(overrides: Partial<WorkforceReadinessInput> = {}): WorkforceReadin
     availability_status: 'available_immediately',
     profile_visibility: 'public',
     cv_visible: false,
-    experience_count: 1,
+    qualifying_experience_count: 1,
     certification_count: 0,
     verified_certification_count: 0,
     ...overrides,
@@ -76,7 +76,7 @@ test.describe('diffReadinessEvents — real transitions', () => {
     });
   });
   test('first structured experience emits experience_added', () => {
-    const prev = readinessSnapshot(base({ experience_count: 0 }));
+    const prev = readinessSnapshot(base({ qualifying_experience_count: 0 }));
     const next = readinessSnapshot(base());
     expect(diffReadinessEvents(prev, next)).toContainEqual({ name: 'experience_added' });
   });
@@ -103,7 +103,7 @@ test.describe('diffReadinessEvents — real transitions', () => {
   });
   test('maturity transitions emit reached events', () => {
     const prev = readinessSnapshot(
-      base({ title: null, experience_count: 0, availability_status: null }),
+      base({ title: null, qualifying_experience_count: 0, availability_status: null }),
     );
     const next = readinessSnapshot(base());
     const names = diffReadinessEvents(prev, next).map((e) => e.name);

@@ -73,28 +73,65 @@ test.describe('TS ↔ SQL parity — cohort rule (D14)', () => {
 });
 
 test.describe('TS ↔ SQL parity — structured experience rule', () => {
-  test('experience_count >= 1 required in workforce_ready AND matchable', () => {
+  test('qualifying_experience_count >= 1 required in workforce_ready AND matchable', () => {
     const wr = viewSql.indexOf(') AS workforce_ready');
     const mb = viewSql.indexOf(') AS matchable');
     const complete = viewSql.indexOf(') AS complete');
     const wrBlock = viewSql.slice(complete, wr);
     const mbBlock = viewSql.slice(wr, mb);
-    expect(wrBlock).toMatch(/experience_count.*>=\s*1/);
-    expect(mbBlock).toMatch(/experience_count.*>=\s*1/);
+    expect(wrBlock).toMatch(/qualifying_experience_count.*>=\s*1/);
+    expect(mbBlock).toMatch(/qualifying_experience_count.*>=\s*1/);
   });
   test('COMPLETE does NOT require structured experience (years_experience only as summary)', () => {
     const start = viewSql.indexOf('count(*) FILTER');
     const complete = viewSql.indexOf(') AS complete');
     const completeBlock = viewSql.slice(start, complete);
-    expect(completeBlock).not.toMatch(/experience_count/);
+    expect(completeBlock).not.toMatch(/qualifying_experience_count/);
     expect(completeBlock).toMatch(/years_experience IS NOT NULL/);
   });
   test('baseline query applies the same experience rules', () => {
     const wr = baselineSql.indexOf(') AS workforce_ready');
     const mb = baselineSql.indexOf(') AS matchable');
     const complete = baselineSql.indexOf(') AS complete');
-    expect(baselineSql.slice(complete, wr)).toMatch(/experience_count.*>=\s*1/);
-    expect(baselineSql.slice(wr, mb)).toMatch(/experience_count.*>=\s*1/);
+    expect(baselineSql.slice(complete, wr)).toMatch(/qualifying_experience_count.*>=\s*1/);
+    expect(baselineSql.slice(wr, mb)).toMatch(/qualifying_experience_count.*>=\s*1/);
+  });
+});
+
+test.describe('TS ↔ SQL parity — QUALIFYING EXPERIENCE predicate (WFA-001)', () => {
+  // The SQL counts subquery must filter rows exactly like
+  // isQualifyingExperience(): position AND company_name non-empty (btrim).
+  const qualifyingFilter =
+    /e\.position IS NOT NULL AND btrim\(e\.position\) <> ''\s*\n?\s*AND e\.company_name IS NOT NULL AND btrim\(e\.company_name\) <> ''/;
+
+  test('view counts only qualifying experience rows', () => {
+    expect(viewSql).toMatch(qualifyingFilter);
+    expect(viewSql).not.toMatch(/\) AS experience_count/);
+  });
+  test('baseline query counts only qualifying experience rows in both CTEs', () => {
+    const matches = baselineSql.match(
+      /AS qualifying_experience_count/g,
+    );
+    expect(matches?.length).toBeGreaterThanOrEqual(4); // 2 CTE subqueries + 2 projections
+    expect(baselineSql).not.toMatch(/\) AS experience_count/);
+    const filterMatches = baselineSql.match(
+      /btrim\(e\.position\) <> ''/g,
+    );
+    expect(filterMatches?.length).toBe(2);
+  });
+  test('a bare/partial row (missing position or company_name) cannot satisfy the SQL predicate', () => {
+    // Both SQL files must require BOTH fields; count(*) is inside the same
+    // subquery as both conditions.
+    for (const sql of [viewSql, baselineSql]) {
+      const subqueries = sql.match(
+        /SELECT count\(\*\) FROM app_worker_experiences e[\s\S]*?AS qualifying_experience_count/g,
+      );
+      expect(subqueries?.length).toBeGreaterThanOrEqual(1);
+      for (const q of subqueries ?? []) {
+        expect(q).toContain('e.position IS NOT NULL AND btrim(e.position) <> \'\'');
+        expect(q).toContain('e.company_name IS NOT NULL AND btrim(e.company_name) <> \'\'');
+      }
+    }
   });
 });
 

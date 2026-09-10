@@ -38,8 +38,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import type { WorkExperience, TranslationLanguage } from '@/lib/workerProfile';
+import type { WorkExperience, WorkExperienceInput, TranslationLanguage } from '@/lib/workerProfile';
 import { normalizeExperience, TRANSLATION_FIELDS, LANGUAGE_NAMES } from '@/lib/workerProfile';
+import {
+  insertWorkerExperience,
+  updateWorkerExperience,
+} from '@/lib/workerExperienceService';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
 /**
@@ -263,69 +267,49 @@ export function WorkExperienceSection() {
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    if (!position.trim() || !companyName.trim()) {
-      toast.error(t('workerProfile.experience.titleCompanyRequired'));
-      return;
-    }
     setSaving(true);
     try {
-      const payload = {
-        position: position.trim(),
-        company_name: companyName.trim(),
-        project_name: projectName.trim() || null,
-        city_region: cityRegion.trim() || null,
-        country: country.trim() || null,
-        start_date: startDate || null,
-        end_date: currentlyWorking ? null : endDate || null,
+      const input: WorkExperienceInput = {
+        position,
+        company_name: companyName,
+        project_name: projectName,
+        city_region: cityRegion,
+        country,
+        start_date: startDate,
+        end_date: endDate,
         currently_working: currentlyWorking,
-        description_original: descriptionOriginal.trim() || null,
-        description_en: descriptionEn.trim() || null,
-        description_es: descriptionEs.trim() || null,
-        description_fr: descriptionFr.trim() || null,
-        description_nl: descriptionNl.trim() || null,
-        description_de: descriptionDe.trim() || null,
-        language_original: languageOriginal.trim() || null,
-        responsibilities: responsibilities.trim() || null,
+        description_original: descriptionOriginal,
+        description_en: descriptionEn,
+        description_es: descriptionEs,
+        description_fr: descriptionFr,
+        description_nl: descriptionNl,
+        description_de: descriptionDe,
+        language_original: languageOriginal,
+        responsibilities,
         visible_to_companies: visibleToCompanies,
       };
 
+      // Single persistence route (WFA-001): shared service, no local
+      // insert/update implementation.
+      const result = editing
+        ? await updateWorkerExperience(editing.id, user.id, input)
+        : await insertWorkerExperience(user.id, input);
+
+      if (!result.ok) {
+        toast.error(t(result.error, result.error));
+        return;
+      }
+
       if (editing) {
-        const { error } = await supabase
-          .from(TABLES.workerExperiences)
-          .update(payload)
-          .eq('id', editing.id);
-        if (error) {
-          toast.error(error.message);
-          return;
-        }
         setItems((prev) =>
-          prev.map((i) =>
-            i.id === editing.id
-              ? { ...i, ...payload }
-              : i
-          )
+          prev.map((i) => (i.id === editing.id ? { ...i, ...result.data } : i))
         );
         toast.success(t('workerProfile.experience.updated'));
       } else {
-        const { data, error } = await supabase
-          .from(TABLES.workerExperiences)
-          .insert({ ...payload, user_id: user.id })
-          .select()
-          .single();
-        if (error) {
-          toast.error(error.message);
-          return;
-        }
-        if (data) {
-          setItems((prev) => [normalizeExperience(data as Record<string, unknown>), ...prev]);
-        } else {
-          await load();
-        }
+        setItems((prev) => [result.data, ...prev]);
         toast.success(t('workerProfile.experience.added'));
       }
       setDialogOpen(false);
-      // Recalculate profile completion (non-blocking)
-      if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
     } catch {
       toast.error(t('common.unexpectedError'));
     } finally {

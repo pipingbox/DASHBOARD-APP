@@ -2,13 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Briefcase } from 'lucide-react';
 import {
+  countQualifyingExperiences,
+  isCanonicalWorker,
   isMatchable,
   readinessGaps,
   type WorkforceReadinessInput,
 } from '@/lib/workforceReadiness';
 import { useWorkforceReadinessTracking } from '@/lib/workforceReadinessEvents';
+import { ExperienceQuickCapture } from '@/components/profile/ExperienceQuickCapture';
 
 /**
  * Banner contextual que indica qué dato exacto falta para progresar en el
@@ -19,23 +22,31 @@ import { useWorkforceReadinessTracking } from '@/lib/workforceReadinessEvents';
  * predicates provienen exclusivamente de `@/lib/workforceReadiness.ts`
  * (single source of truth). Un test arquitectónico
  * (tests/match-ready-arch.spec.ts) falla si reaparecen predicates locales.
+ *
+ * WFA-001: cuando el gap canónico es `experience`, el banner ofrece un CTA
+ * directo al Quick Experience Capture (sin buscar la sección manualmente).
  */
 export function MatchReadyBanner() {
   const { t } = useTranslation();
   const { profile } = useAuth();
   const [counts, setCounts] = useState<{
-    experience: number;
+    qualifyingExperience: number;
     certification: number;
     loaded: boolean;
-  }>({ experience: 0, certification: 0, loaded: false });
+  }>({ qualifyingExperience: 0, certification: 0, loaded: false });
+  const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const userId = profile?.user_id ?? null;
 
-  // Counts refresh on mount and whenever the profile is refreshed after a
-  // section save (profile_completion is recalculated on every save).
+  // Counts refresh on mount, whenever the profile is refreshed after a
+  // section save (profile_completion is recalculated on every save), and
+  // after a Quick Experience Capture save (refreshKey).
+  // The experience count uses the canonical QUALIFYING EXPERIENCE predicate
+  // from workforceReadiness.ts — raw row counts are never used.
   useEffect(() => {
     if (!userId) {
-      setCounts({ experience: 0, certification: 0, loaded: false });
+      setCounts({ qualifyingExperience: 0, certification: 0, loaded: false });
       return;
     }
     let cancelled = false;
@@ -43,7 +54,7 @@ export function MatchReadyBanner() {
       const [exp, cert] = await Promise.all([
         supabase
           .from(TABLES.workerExperiences)
-          .select('user_id', { count: 'exact', head: true })
+          .select('position, company_name')
           .eq('user_id', userId),
         supabase
           .from(TABLES.workerCertifications)
@@ -52,7 +63,7 @@ export function MatchReadyBanner() {
       ]);
       if (cancelled) return;
       setCounts({
-        experience: exp.count ?? 0,
+        qualifyingExperience: countQualifyingExperiences(exp.data ?? []),
         certification: cert.count ?? 0,
         loaded: true,
       });
@@ -60,7 +71,7 @@ export function MatchReadyBanner() {
     return () => {
       cancelled = true;
     };
-  }, [userId, profile?.profile_completion]);
+  }, [userId, profile?.profile_completion, refreshKey]);
 
   // Canonical D11 input — data only, no predicates here.
   const input: WorkforceReadinessInput = useMemo(
@@ -75,11 +86,11 @@ export function MatchReadyBanner() {
       availability_status: profile?.availability_status ?? null,
       profile_visibility: profile?.profile_visibility ?? null,
       cv_visible: profile?.cv_visible ?? null,
-      experience_count: counts.experience,
+      qualifying_experience_count: counts.qualifyingExperience,
       certification_count: counts.certification,
       verified_certification_count: 0,
     }),
-    [profile, counts.experience, counts.certification],
+    [profile, counts.qualifyingExperience, counts.certification],
   );
 
   // GA4 transitions: only real D11 state changes emit events; the baseline
@@ -88,21 +99,25 @@ export function MatchReadyBanner() {
 
   if (!profile || isMatchable(input)) return null;
 
-  const gaps = readinessGaps(input).slice(0, 3);
+  const gaps = readinessGaps(input);
+  const topGaps = gaps.slice(0, 3);
+  // CTA condition comes from the canonical gap list, never a local predicate.
+  const experienceGapPresent =
+    isCanonicalWorker(input) && gaps.some((g) => g.key === 'experience');
 
   return (
     <div className="flex items-start gap-3 border border-amber-900/50 bg-amber-950/30 p-4 text-amber-200">
       <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-      <div>
+      <div className="flex-1">
         <p className="text-sm font-medium text-amber-100">
           {t(
             'profile.matchReadyTitle',
             'Complete your profile to receive more accurate job matches.',
           )}
         </p>
-        {gaps.length > 0 ? (
+        {topGaps.length > 0 ? (
           <ul className="mt-1 space-y-0.5">
-            {gaps.map((gap) => (
+            {topGaps.map((gap) => (
               <li key={gap.key} className="text-xs text-amber-200/70">
                 {t(`profile.matchReadyGap.${gap.key}`, gap.key)}{' '}
                 <span className="text-amber-300/80">
@@ -123,7 +138,22 @@ export function MatchReadyBanner() {
             )}
           </p>
         )}
+        {experienceGapPresent && (
+          <button
+            type="button"
+            onClick={() => setQuickCaptureOpen(true)}
+            className="mt-3 inline-flex items-center gap-2 bg-[#f59e0b] px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-black hover:bg-[#d97706]"
+          >
+            <Briefcase className="h-3.5 w-3.5" />
+            {t('profile.matchReadyAddExperience', 'Add work experience')}
+          </button>
+        )}
       </div>
+      <ExperienceQuickCapture
+        open={quickCaptureOpen}
+        onOpenChange={setQuickCaptureOpen}
+        onSaved={() => setRefreshKey((k) => k + 1)}
+      />
     </div>
   );
 }

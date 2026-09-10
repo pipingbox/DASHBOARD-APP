@@ -21,6 +21,8 @@ import {
   hasCredentialVerified,
   maturityState,
   readinessGaps,
+  isQualifyingExperience,
+  countQualifyingExperiences,
   type WorkforceReadinessInput,
 } from '../app/frontend/src/lib/workforceReadiness';
 
@@ -36,7 +38,7 @@ function base(overrides: Partial<WorkforceReadinessInput> = {}): WorkforceReadin
     availability_status: 'available_immediately',
     profile_visibility: 'public',
     cv_visible: false,
-    experience_count: 1,
+    qualifying_experience_count: 1,
     certification_count: 0,
     verified_certification_count: 0,
     ...overrides,
@@ -112,7 +114,7 @@ test.describe('isWorkforceReady (D11)', () => {
     expect(isWorkforceReady(base())).toBe(true);
   });
   test('no structured experience blocks WORKFORCE READY even with years_experience', () => {
-    expect(isWorkforceReady(base({ experience_count: 0 }))).toBe(false);
+    expect(isWorkforceReady(base({ qualifying_experience_count: 0 }))).toBe(false);
   });
   test('UNKNOWN availability blocks WORKFORCE READY', () => {
     expect(isWorkforceReady(base({ availability_status: null }))).toBe(false);
@@ -151,7 +153,7 @@ test.describe('isMatchable (D11)', () => {
     expect(isMatchable(base({ availability_status: 'not_currently_available' }))).toBe(false);
   });
   test('no experience blocks MATCHABLE', () => {
-    expect(isMatchable(base({ experience_count: 0 }))).toBe(false);
+    expect(isMatchable(base({ qualifying_experience_count: 0 }))).toBe(false);
   });
 });
 
@@ -171,7 +173,7 @@ test.describe('maturityState', () => {
     expect(maturityState(base({ title: null, bio: null, skills: null }))).toBe('REGISTERED');
   });
   test('COMPLETE without experience is COMPLETE', () => {
-    expect(maturityState(base({ experience_count: 0 }))).toBe('COMPLETE');
+    expect(maturityState(base({ qualifying_experience_count: 0 }))).toBe('COMPLETE');
   });
   test('ready profile is WORKFORCE_READY', () => {
     expect(maturityState(base())).toBe('WORKFORCE_READY');
@@ -190,7 +192,7 @@ test.describe('readinessGaps', () => {
     expect(gaps.every((g) => g.unlocks === 'COMPLETE')).toBe(true);
   });
   test('after COMPLETE, experience and availability gaps unlock WORKFORCE_READY', () => {
-    const gaps = readinessGaps(base({ experience_count: 0, availability_status: null }));
+    const gaps = readinessGaps(base({ qualifying_experience_count: 0, availability_status: null }));
     expect(gaps.map((g) => g.key)).toEqual(['experience', 'availability']);
     expect(gaps.every((g) => g.unlocks === 'WORKFORCE_READY')).toBe(true);
   });
@@ -201,5 +203,55 @@ test.describe('readinessGaps', () => {
   });
   test('MATCHABLE profile has no gaps', () => {
     expect(readinessGaps(base())).toHaveLength(0);
+  });
+});
+
+test.describe('isQualifyingExperience / countQualifyingExperiences (WFA-001)', () => {
+  test('row with position AND company_name is qualifying', () => {
+    expect(isQualifyingExperience({ position: 'Pipefitter', company_name: 'Piping Co' })).toBe(true);
+  });
+  test('row missing position is NOT qualifying', () => {
+    expect(isQualifyingExperience({ position: null, company_name: 'Piping Co' })).toBe(false);
+    expect(isQualifyingExperience({ position: '   ', company_name: 'Piping Co' })).toBe(false);
+  });
+  test('row missing company_name is NOT qualifying', () => {
+    expect(isQualifyingExperience({ position: 'Pipefitter', company_name: null })).toBe(false);
+    expect(isQualifyingExperience({ position: 'Pipefitter', company_name: '' })).toBe(false);
+  });
+  test('whitespace-only values are NOT qualifying', () => {
+    expect(isQualifyingExperience({ position: '  \t', company_name: '  ' })).toBe(false);
+  });
+  test('countQualifyingExperiences counts only qualifying rows', () => {
+    const rows = [
+      { position: 'Pipefitter', company_name: 'Piping Co' },
+      { position: '', company_name: 'Piping Co' },
+      { position: 'Welder', company_name: null },
+      { position: '  Fitter  ', company_name: '  Refinery X ' },
+    ];
+    expect(countQualifyingExperiences(rows)).toBe(2);
+  });
+  test('countQualifyingExperiences handles null/undefined lists', () => {
+    expect(countQualifyingExperiences(null)).toBe(0);
+    expect(countQualifyingExperiences(undefined)).toBe(0);
+  });
+});
+
+test.describe('WORKFORCE READY requires a QUALIFYING EXPERIENCE (WFA-001)', () => {
+  test('qualifying experience satisfies the predicate', () => {
+    expect(isWorkforceReady(base({ qualifying_experience_count: 1 }))).toBe(true);
+  });
+  test('zero qualifying experiences blocks WORKFORCE READY even with years_experience', () => {
+    expect(isWorkforceReady(base({ qualifying_experience_count: 0 }))).toBe(false);
+    expect(isMatchable(base({ qualifying_experience_count: 0 }))).toBe(false);
+  });
+  test('years_experience alone NEVER substitutes structured experience', () => {
+    // A worker with 10 years of summary experience and 0 qualifying rows is
+    // not WORKFORCE READY (D11/D18 rule, pinned by this test).
+    expect(isWorkforceReady(base({ years_experience: 10, qualifying_experience_count: 0 }))).toBe(false);
+  });
+  test('readiness gap appears only when qualifying experience is missing', () => {
+    const gaps = readinessGaps(base({ qualifying_experience_count: 0 }));
+    expect(gaps.map((g) => g.key)).toContain('experience');
+    expect(readinessGaps(base({ qualifying_experience_count: 1 }))).toHaveLength(0);
   });
 });
