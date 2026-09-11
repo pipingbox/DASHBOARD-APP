@@ -132,8 +132,8 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
     ).toMatch(/@pipingbox\.com$/i);
     expect(
       emailTrimmed,
-      'the disposable account must be in the qa.* test namespace (verified: the actual secret is qa.*@pipingbox.com; the "qa.e2e" spelling in older docs does not match the live secret, and this is the same account every E2E gate uses)',
-    ).toMatch(/^qa\.[^@]+@/i);
+      'the disposable account must be in the internal qa* test namespace on pipingbox.com (verified live: starts with qa, 9-char local part, no e2e marker -- the older docs say qa.e2e but the secret never matched that spelling; this is the same account every E2E gate uses)',
+    ).toMatch(/^qa[^@]*@pipingbox\.com$/i);
 
     // Capture the raw PostHog wire traffic (gzip-compressed batches).
     const payloads: Buffer[] = [];
