@@ -624,20 +624,22 @@ export async function initObservability(options: InitOptions = {}): Promise<void
       // including $web_vitals. See sanitizePostHogEvent.
       // Preview-only diagnostic stages (no payloads, no codes, no keys):
       // lets the gate verification distinguish received / sanitized /
-      // returned / dropped per event in the browser console.
+      // returned / dropped per event in the browser console. Uses
+      // console.warn because main.tsx silences console.log/info in
+      // production builds (TD-13); warn stays live and is preview-gated here.
       before_send:
         getEnvironment() === 'preview'
           ? (event) => {
               const name = event && typeof event === 'object' ? event.event : '(malformed)';
-              console.info(`[pb-obs-diag] before_send received: ${name}`);
+              console.warn(`[pb-obs-diag] before_send received: ${name}`);
               const out = sanitizePostHogEvent(event);
-              console.info(`[pb-obs-diag] before_send ${out ? 'returned' : 'DROPPED'}: ${name}`);
+              console.warn(`[pb-obs-diag] before_send ${out ? 'returned' : 'DROPPED'}: ${name}`);
               return out;
             }
           : (event) => sanitizePostHogEvent(event),
       loaded: () => {
         if (getEnvironment() === 'preview') {
-          console.info('[pb-obs-diag] posthog init loaded (preview)');
+          console.warn('[pb-obs-diag] posthog init loaded (preview)');
         }
       },
     });
