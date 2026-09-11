@@ -41,6 +41,11 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
         if (buf) payloads.push(buf);
       }
     });
+    // Preview diagnostic: the before_send hook logs each event it receives.
+    const diagLogs: string[] = [];
+    page.on('console', (m) => {
+      if (m.text().includes('[pb-obs-diag]')) diagLogs.push(m.text());
+    });
 
     const decodeAll = (): Record<string, unknown>[] =>
       payloads.flatMap((buf) => {
@@ -111,6 +116,10 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
         typeof (e.properties as Record<string, unknown>)?.distinct_id === 'string' &&
         ((e.properties as Record<string, unknown>).distinct_id as string) === identifiedId,
     );
+    if (postAuthEvents.length === 0) {
+      console.log(`decoded after /jobs nav: ${decodedAfterNav.length} events; diag: ${diagLogs.join(' | ') || '(none)'}`);
+      console.log(`all distinct_ids seen: ${[...new Set(decodedAfterNav.map((e) => String((e.properties as Record<string, unknown>)?.distinct_id ?? '?')))].map((d) => redact(d)).join(', ')}`);
+    }
     expect(
       postAuthEvents.length,
       'post-auth events must carry the UUID distinct_id',
