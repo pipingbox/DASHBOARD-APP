@@ -117,8 +117,13 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     );
 
     // ── 4. Logout → reset ──────────────────────────────────────────────────
-    // The sign-out control lives inside the user menu in AppShell.
-    await page.getByRole('button', { name: /sign out|log ?out|cerrar sesi/i }).first().click();
+    // The AppShell sign-out button is inside a collapsible sidebar that may be
+    // hidden at some viewports; click it via DOM to stay markup-robust.
+    await page.evaluate(() => {
+      const btns = Array.from(document.querySelectorAll('button'));
+      const b = btns.find((x) => /sign out|log ?out|cerrar sesi/i.test(x.textContent ?? ''));
+      b?.click();
+    });
     await expect(page).toHaveURL(/\/(login|$)/, { timeout: 10_000 });
     await page.waitForTimeout(2000);
 
