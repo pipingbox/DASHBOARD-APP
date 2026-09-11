@@ -134,6 +134,9 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  // PB-COMPLETE-ONBOARDING-404-001: recoverable finalization failure — the
+  // wizard stays open with the draft intact and offers a retry.
+  const [completionFailed, setCompletionFailed] = useState(false);
   const [avatarUploadError, setAvatarUploadError] = useState<string | null>(null);
   const [restoredFromDraft, setRestoredFromDraft] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -431,10 +434,19 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   };
 
   /* ─── Final save and complete ─── */
+  // PB-COMPLETE-ONBOARDING-404-001: the wizard may ONLY present final success
+  // when the canonical backend finalization (complete-onboarding edge function
+  // -> pb_complete_onboarding RPC) confirms with a 2xx. On any failure (core
+  // PATCH error, missing session, non-2xx response, exception) the wizard
+  // stays open, the local draft is preserved for retry, already-saved core
+  // data is kept, and a recoverable error is shown. The previous pattern
+  // ("fire/best-effort and continue as completed") is removed: it left every
+  // user in AUTH_ONLY while the UI claimed success.
   const saveAndFinish = async () => {
-    if (!user) return;
+    if (!user || saving) return;
     setSaving(true);
     setSaveStatus('saving');
+    setCompletionFailed(false);
 
     try {
       // Upload avatar independently — failure doesn't block completion
@@ -454,29 +466,41 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         .eq('user_id', user.id);
 
       if (error) {
+        // Core data NOT saved: recoverable — stay on the wizard, keep the
+        // draft, let the user retry.
         setSaveStatus('error');
-      } else {
-        setSaveStatus('saved');
+        setCompletionFailed(true);
+        return;
       }
 
-      // Backend-controlled fields: onboarding_status, marketplace_ready, profile_completion.
-      try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const accessToken = sessionData.session?.access_token;
-        if (accessToken) {
-          await fetch(edgeFunctionUrl('complete-onboarding'), {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({ marketplace_ready: profileVisibility === 'public' }),
-          });
-        }
-      } catch {
-        // Non-blocking: core profile data is already saved.
+      // Backend-controlled fields: onboarding_status, marketplace_ready,
+      // profile_completion. A 2xx from this call is REQUIRED to consider the
+      // onboarding finalized; non-2xx must not be treated as success.
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) {
+        setSaveStatus('error');
+        setCompletionFailed(true);
+        return;
+      }
+      const completionRes = await fetch(edgeFunctionUrl('complete-onboarding'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ marketplace_ready: profileVisibility === 'public' }),
+      });
+      if (!completionRes.ok) {
+        // Canonical finalization failed: core data is already saved, but the
+        // onboarding is NOT complete. Do not clear the draft, do not emit
+        // onboarding_completed, do not navigate away — offer a retry.
+        setSaveStatus('error');
+        setCompletionFailed(true);
+        return;
       }
 
+      setSaveStatus('saved');
       clearDraftFromLocal(user.id);
       setHasUnsavedChanges(false);
 
@@ -488,12 +512,10 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
 
       await refreshProfile();
       onComplete(accountType);
-    } catch (err) {
+    } catch {
+      // Any unexpected failure keeps the wizard open with the draft intact.
       setSaveStatus('error');
-      clearDraftFromLocal(user.id);
-      setHasUnsavedChanges(false);
-      await refreshProfile();
-      onComplete(accountType);
+      setCompletionFailed(true);
     } finally {
       setSaving(false);
     }
@@ -938,7 +960,25 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             )}
           </div>
 
-          {/* Navigation buttons */}
+          {/* PB-COMPLETE-ONBOARDING-404-001: recoverable finalization error */}
+        {completionFailed && (
+          <div
+            role="alert"
+            data-testid="onboarding-completion-error"
+            className="mt-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4"
+          >
+            <p className="text-sm font-semibold text-red-400">
+              No se pudo finalizar el onboarding
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-zinc-400">
+              Tus datos se han guardado, pero la confirmación final no se completó.
+              Comprueba tu conexión y pulsa «Finalizar» de nuevo para reintentarlo. Si el
+              problema persiste, puedes completar el proceso más adelante desde tu perfil.
+            </p>
+          </div>
+        )}
+
+        {/* Navigation buttons */}
           <div className="mt-6 flex items-center justify-between pt-4 border-t border-zinc-800">
             <div>
               {step > 1 ? (
