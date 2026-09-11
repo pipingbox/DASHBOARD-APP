@@ -4,7 +4,7 @@ import { supabase, TABLES, edgeFunctionUrl } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock, Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ONBOARDING_STATUS } from '@/lib/onboarding';
+import { ONBOARDING_STATUS, hasCompletedOnboarding } from '@/lib/onboarding';
 import { trackEvent } from '@/lib/observability';
 import { isValidImageFile, isHeicFile, validateFileSize, getSafeImageExtension, ACCEPT_IMAGES } from '@/lib/fileUploadUtils';
 
@@ -480,6 +480,12 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       clearDraftFromLocal(user.id);
       setHasUnsavedChanges(false);
 
+      // PB-OBSERVABILITY-001: emit onboarding_completed ONLY after the
+      // canonical onboarding_status confirms finalization (the RPC behind
+      // complete-onboarding is the source of truth; a failed or non-finalizing
+      // call must not emit).
+      await emitCompletedIfCanonical();
+
       await refreshProfile();
       onComplete(accountType);
     } catch (err) {
@@ -532,6 +538,29 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     }
   };
 
+  /* ─── PB-OBSERVABILITY-001: canonical-completion-gated event ─── */
+  // onboarding_completed may only be emitted after the CANONICAL
+  // onboarding_status (set exclusively by the pb_complete_onboarding RPC
+  // behind the complete-onboarding edge function) confirms the wizard really
+  // finished: PROFILE_COMPLETED or MARKETPLACE_READY. Skipping leaves the
+  // profile in PROFILE_STARTED, which must NOT emit the event.
+  const emitCompletedIfCanonical = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from(TABLES.profiles)
+        .select('onboarding_status')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (data && hasCompletedOnboarding(data.onboarding_status)) {
+        trackEvent('onboarding_completed', { account_type: accountType }, { dedupeKey: 'completed' });
+      }
+    } catch {
+      // Observability must never break onboarding; without canonical
+      // confirmation we must not claim completion.
+    }
+  };
+
   const skipOnboarding = async () => {
     if (!user) return;
 
@@ -570,7 +599,10 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
 
     clearDraftFromLocal(user.id);
     setHasUnsavedChanges(false);
-    trackEvent('onboarding_completed', { account_type: accountType }, { dedupeKey: 'completed' });
+    // Skipping leaves the canonical status in PROFILE_STARTED (the RPC only
+    // sets MARKETPLACE_READY when marketplace_ready=true), so this stays
+    // silent unless the canonical state truly finalizes.
+    await emitCompletedIfCanonical();
     await refreshProfile();
     onComplete();
     navigate('/dashboard', { replace: true });

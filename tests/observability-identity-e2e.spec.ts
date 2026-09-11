@@ -69,15 +69,15 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     // wire BEFORE the pre-flight check below.
     await page.waitForTimeout(4500);
 
-    const anonDistinctId = await page.evaluate(() => {
-      // The canonical anonymous id of the observability layer (device-level,
-      // technical UUID) — NOT the posthog-js persistence key, which is
-      // token-scoped and must never be printed.
-      return localStorage.getItem('pb_obs_anon_id');
-    });
-    expect(anonDistinctId, 'anonymous distinct_id must exist before auth').toBeTruthy();
-    expect(anonDistinctId).not.toContain('@');
-    console.log(`anonymous distinct_id (redacted): ${redact(anonDistinctId)}`);
+    // Gate 6 lesson: this is the observability layer's own device-level
+    // anonymous ID (super-property pb_anonymous_id, localStorage
+    // pb_obs_anon_id) — NOT the PostHog distinct_id, which posthog-js
+    // generates and persists independently (token-scoped key). Never label
+    // it "distinct_id" or the two identifiers get conflated in evidence.
+    const appAnonDeviceId = await page.evaluate(() => localStorage.getItem('pb_obs_anon_id'));
+    expect(appAnonDeviceId, 'app anonymous device id (pb_anonymous_id) must exist before auth').toBeTruthy();
+    expect(appAnonDeviceId).not.toContain('@');
+    console.log(`app anonymous device id pb_anonymous_id (redacted): ${redact(appAnonDeviceId)}`);
 
     // ── 1b. Pre-flight: served build must match the expected SHA ──────────
     // Gate 5 lesson: the shared preview Worker may serve a build whose SHA
