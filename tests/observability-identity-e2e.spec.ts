@@ -117,7 +117,8 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     );
 
     // ── 4. Logout → reset ──────────────────────────────────────────────────
-    await page.getByRole('button', { name: /log ?out|cerrar sesi/i }).first().click();
+    // The sign-out control lives inside the user menu in AppShell.
+    await page.getByRole('button', { name: /sign out|log ?out|cerrar sesi/i }).first().click();
     await expect(page).toHaveURL(/\/(login|$)/, { timeout: 10_000 });
     await page.waitForTimeout(2000);
 
