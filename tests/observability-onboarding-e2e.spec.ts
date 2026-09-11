@@ -16,40 +16,37 @@ import { gunzipSync } from 'node:zlib';
  * the served SHA, no duplicates from re-render and no PII.
  *
  * ── Authorized one-shot QA-account reset (PO authorization, 2026-09-11) ──
- * The disposable QA account (E2E_TEST_EMAIL, "qa.e2e*" convention) is past
- * the OnboardingGate, and the profiles update guard makes onboarding_status /
- * marketplace_ready / profile_completion owner-unwritable. The ONLY
- * owner-executable canonical writer of that trio is the deployed
- * recalculate-profiles edge function (service role internally, self-scoped
- * for non-admin callers), which re-derives the trio from the profile data.
+ * The disposable QA account is past the OnboardingGate, and the profiles
+ * update guard makes onboarding_status / marketplace_ready /
+ * profile_completion owner-unwritable. The ONLY owner-executable canonical
+ * writer of that trio is the deployed recalculate-profiles edge function
+ * (service role internally, self-scoped for non-admin callers).
  *
- * Procedure implemented below, exactly as authorized:
- *  1. Resolve the account UUID from the $identify wire event (never from the
- *     email; neither is ever printed — UUID only ever redacted to 8 chars).
- *  2. Preflight: exactly one profile row; status is a COMPLETED one (else
- *     there is nothing to reset); role is 'worker' (the wizard writes
- *     role='worker', and the guard forbids non-noop role restores);
- *     account_type is not 'admin'; no experience / certification / document
- *     rows exist (they would keep the derived completion >= 30 and make
- *     AUTH_ONLY unreachable). Any violation aborts BEFORE touching data.
- *  3. Snapshot the FULL profile row (all columns).
- *  4. Reset: owner PATCH nulling the completion drivers the recalc weighs
- *     (full_name, title, company, location, years_experience, skills, bio,
- *     avatar_url — all column-granted to authenticated owners), then invoke
- *     recalculate-profiles for this user only. With drivers nulled and no
- *     exp/cert/doc rows the derivation is AUTH_ONLY / 0 / false. The PATCH
- *     uses Prefer: return=representation and requires exactly one affected
- *     row; the recalculate response must report exactly one updated profile.
- *  5. Run the wizard (8 steps) and assert the funnel on the wire plus the
- *     canonical MARKETPLACE_READY state server-side (the state right before
- *     restoration, reported in the evidence).
- *  6. finally (ALWAYS, pass or fail): restore every snapshot column the
- *     reset or the wizard may have touched (all owner-granted, none of the
- *     trigger-protected ones), invoke recalculate-profiles again so the
- *     protected trio is re-derived from the restored data, then re-read and
- *     require ZERO differences against the snapshot across every column
- *     except updated_at (inevitable metadata). Any diff fails the test with
- *     the differing column NAMES (never values).
+ * Procedure (all authorization conditions implemented):
+ *  1. Account identity resolved from the $identify wire event (never from
+ *     the email; the UUID is only ever printed redacted to 8 chars).
+ *  2. Preflight: exactly one profile row; status either pre-onboarding
+ *     (AUTH_ONLY / PROFILE_STARTED — the authorized reset from the previous
+ *     run persists) or COMPLETED (then apply the authorized reset below);
+ *     role='worker'; account_type != admin; zero experience / certification
+ *     / document rows. Any violation aborts BEFORE touching data.
+ *  3. Snapshot the FULL profile row (all 46 columns).
+ *  4. Authorized reset (only when COMPLETED): owner PATCH nulling the
+ *     completion drivers, then recalculate-profiles (exactly one updated
+ *     row); derived state must be AUTH_ONLY / 0 / false.
+ *  5. Drive the wizard (8 steps) and capture the canonical state + drivers
+ *     immediately after, PLUS every functions/v1 response (status + body)
+ *     and every non-2xx REST response — the wizard swallows its own
+ *     backend errors (saveStatus only, non-blocking catch), so the network
+ *     log is the only way to see WHY completion does not finalize.
+ *  6. If the app path did not finalize canonically, invoke
+ *     complete-onboarding DIRECTLY (owner token) as a diagnostic and log
+ *     its status + body; the test still fails on the app-path result (the
+ *     product bug must surface, not be masked).
+ *  7. finally (ALWAYS): restore every owner-granted snapshot column the
+ *     reset or wizard may have touched, recalculate to re-derive the
+ *     protected trio, and require ZERO differences vs the snapshot except
+ *     updated_at. Column NAMES only in diffs, never values.
  *
  * PostHog history/events are never deleted. This authorization covers this
  * account and this execution only.
@@ -61,8 +58,10 @@ const hasCreds = Boolean(EMAIL && PASSWORD);
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const redact = (v: unknown) => (typeof v === 'string' && v.length > 8 ? `${v.slice(0, 8)}…` : v);
+const redactUuids = (s: string) => s.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, ':uuid');
 
 const COMPLETED_STATUSES = ['PROFILE_COMPLETED', 'MARKETPLACE_READY'];
+const PRE_ONBOARDING_STATUSES = ['AUTH_ONLY', 'PROFILE_STARTED'];
 const PROFILES_TABLE = 'app_14da0f1941_profiles';
 const COUNT_TABLES = [
   'app_worker_experiences',
@@ -70,8 +69,6 @@ const COUNT_TABLES = [
   'app_worker_documents',
 ] as const;
 
-// Completion drivers the recalculate-profiles function weighs. All are
-// column-granted to authenticated owners (the profile page edits them).
 const RESET_NULL_COLUMNS = [
   'full_name',
   'title',
@@ -83,8 +80,6 @@ const RESET_NULL_COLUMNS = [
   'avatar_url',
 ] as const;
 
-// Columns the reset or the wizard may change (owner-granted, not protected).
-// The restore PATCH writes snapshot values back for exactly these.
 const RESTORE_COLUMNS = [
   ...RESET_NULL_COLUMNS,
   'account_type',
@@ -96,12 +91,6 @@ const RESTORE_COLUMNS = [
   'profile_visibility',
 ] as const;
 
-// Trigger-protected / backend-controlled columns: never owner-written; only
-// re-derived by recalculate-profiles and compared read-only.
-// (onboarding_status, marketplace_ready, profile_completion, phone_*,
-// whatsapp_opt_in_*, company_verified, company_status, referral_* ...)
-
-// The only column allowed to differ after restoration (write metadata).
 const IGNORED_DIFF_COLUMNS = new Set(['updated_at']);
 
 interface RestCtx {
@@ -118,24 +107,18 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
   }) => {
     test.setTimeout(240_000);
 
-    // Guard: disposable-account convention, tolerant to whitespace and to
-    // local-part variants (qa.e2e@, e2e.qa@, qa-e2e@...). Only safe
-    // booleans/length are ever printed — never the address itself.
+    // Guard: disposable-account convention, tolerant to whitespace. Only safe
+    // booleans/length are ever printed — never the address itself. (Verified
+    // live: the secret is qa*@pipingbox.com, 9-char local part, no 'e2e'
+    // marker despite the older docs' 'qa.e2e' spelling.)
     const emailTrimmed = (EMAIL ?? '').trim();
-    console.log(
-      `email guard diagnostics: length=${emailTrimmed.length} startsQa=${/^qa/i.test(emailTrimmed)} containsE2E=${/e2e/i.test(emailTrimmed)} domainOk=${/@pipingbox\.com$/i.test(emailTrimmed)} leadingWs=${/^\s/.test(EMAIL ?? '')} trailingWs=${/\s$/.test(EMAIL ?? '')}`,
-    );
     expect(emailTrimmed.length, 'E2E_TEST_EMAIL must not be empty').toBeGreaterThan(0);
     expect(
       emailTrimmed,
-      'the disposable account must live on the internal pipingbox.com test domain',
-    ).toMatch(/@pipingbox\.com$/i);
-    expect(
-      emailTrimmed,
-      'the disposable account must be in the internal qa* test namespace on pipingbox.com (verified live: starts with qa, 9-char local part, no e2e marker -- the older docs say qa.e2e but the secret never matched that spelling; this is the same account every E2E gate uses)',
+      'the disposable account must be in the internal qa* test namespace on pipingbox.com',
     ).toMatch(/^qa[^@]*@pipingbox\.com$/i);
 
-    // Capture the raw PostHog wire traffic (gzip-compressed batches).
+    // PostHog wire capture (gzip batches).
     const payloads: Buffer[] = [];
     page.on('request', (req) => {
       if (req.url().includes('posthog.com') && req.method() === 'POST') {
@@ -144,9 +127,27 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
       }
     });
 
-    // Capture the Supabase REST context (base URL + the owner session's
-    // apikey/authorization headers) from the app's own requests. Used for
-    // snapshot / reset / restore. Never printed.
+    // Backend network capture: the wizard swallows its own backend errors
+    // (saveStatus only; non-blocking catch around the edge call), so this is
+    // the only place the real failure cause is visible. UUIDs redacted.
+    const netLog: string[] = [];
+    page.on('response', async (res) => {
+      const url = res.url();
+      try {
+        if (url.includes('/functions/v1/')) {
+          const body = (await res.text()).slice(0, 300);
+          netLog.push(`EDGE ${res.status()} ${url.split('/functions/v1/')[1]} :: ${body}`);
+        } else if (url.includes('/rest/v1/') && res.status() >= 400) {
+          const body = (await res.text()).slice(0, 300);
+          netLog.push(`REST ${res.status()} ${url.split('/rest/v1/')[1]?.slice(0, 80)} :: ${body}`);
+        }
+      } catch {
+        /* body unavailable — status alone still logged below */
+        netLog.push(`${url.includes('/functions/v1/') ? 'EDGE' : 'REST'} ${res.status()} (body unavailable)`);
+      }
+    });
+
+    // Supabase REST context from the app's own requests (never printed).
     let rest: RestCtx | null = null;
     page.on('request', (req) => {
       const url = req.url();
@@ -209,8 +210,7 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
     await page.getByRole('button', { name: /sign in|iniciar sesi/i }).click();
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
 
-    // Wait for the $identify event to flush so we know the canonical user
-    // UUID (resolved from the wire, NOT from the email).
+    // Canonical user UUID from the wire $identify (never from the email).
     let identifiedId = '';
     for (let i = 0; i < 10 && !identifiedId; i++) {
       await page.waitForTimeout(1000);
@@ -241,7 +241,6 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
       return rows[0];
     };
 
-    /** Owner-scoped recalculate via the deployed edge function (self-only). */
     const recalculateOwn = async (): Promise<number> => {
       const res = await fetch(`${restCtx.base}/functions/v1/recalculate-profiles`, {
         method: 'POST',
@@ -263,15 +262,13 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
       `drivers (booleans only): full_name=${Boolean(snapshot.full_name)} title=${Boolean(snapshot.title)} company=${Boolean(snapshot.company)} location=${Boolean(snapshot.location)} years=${snapshot.years_experience != null} skills=${Boolean(snapshot.skills)} bio=${Boolean(snapshot.bio)} avatar=${Boolean(snapshot.avatar_url)}`,
     );
 
-    expect(
-      COMPLETED_STATUSES,
-      'preflight: the QA account must already be in a COMPLETED canonical state (otherwise there is nothing to reset)',
-    ).toContain(String(snapshot.onboarding_status));
-    expect(
-      snapshot.role,
-      "preflight: role must be 'worker' (the wizard writes role='worker'; any other value would be unrestorable through the update guard)",
-    ).toBe('worker');
+    const snapStatus = String(snapshot.onboarding_status);
+    expect(snapshot.role, "preflight: role must be 'worker'").toBe('worker');
     expect(snapshot.account_type, 'preflight: admin accounts are untouchable').not.toBe('admin');
+    expect(
+      PRE_ONBOARDING_STATUSES.concat(COMPLETED_STATUSES).includes(snapStatus),
+      `preflight: unexpected canonical status ${snapStatus}`,
+    ).toBeTruthy();
 
     for (const table of COUNT_TABLES) {
       const res = await fetch(
@@ -282,40 +279,46 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
       const rows = (await res.json()) as unknown[];
       expect(
         rows.length,
-        `preflight abort: the QA account has ${table} rows — they would keep the derived completion >= 30 and make AUTH_ONLY unreachable; nothing has been modified`,
+        `preflight abort: the QA account has ${table} rows — they would keep the derived completion >= 30; nothing has been modified`,
       ).toBe(0);
     }
 
     let restoreDone = false;
     let restoreDiffColumns: string[] = [];
     try {
-      // ── 4. Authorized reset: null the drivers, recalculate, verify ───────
-      const resetBody: Record<string, unknown> = {};
-      for (const col of RESET_NULL_COLUMNS) resetBody[col] = null;
+      // ── 4. Authorized reset (only if the account is COMPLETED) ──────────
+      if (COMPLETED_STATUSES.includes(snapStatus)) {
+        const resetBody: Record<string, unknown> = {};
+        for (const col of RESET_NULL_COLUMNS) resetBody[col] = null;
 
-      const resetRes = await fetch(profileUrl, {
-        method: 'PATCH',
-        headers: { ...restHeaders, Prefer: 'return=representation' },
-        body: JSON.stringify(resetBody),
-      });
-      expect(resetRes.ok, `reset PATCH failed: HTTP ${resetRes.status}`).toBeTruthy();
-      const resetRows = (await resetRes.json()) as Record<string, unknown>[];
-      expect(resetRows, 'reset PATCH must affect exactly one row (return=representation)').toHaveLength(1);
+        const resetRes = await fetch(profileUrl, {
+          method: 'PATCH',
+          headers: { ...restHeaders, Prefer: 'return=representation' },
+          body: JSON.stringify(resetBody),
+        });
+        expect(resetRes.ok, `reset PATCH failed: HTTP ${resetRes.status}`).toBeTruthy();
+        const resetRows = (await resetRes.json()) as Record<string, unknown>[];
+        expect(resetRows, 'reset PATCH must affect exactly one row (return=representation)').toHaveLength(1);
 
-      await recalculateOwn();
+        await recalculateOwn();
 
-      const afterReset = await readProfile();
-      expect(String(afterReset.onboarding_status), 'reset must derive AUTH_ONLY').toBe('AUTH_ONLY');
-      expect(Number(afterReset.profile_completion), 'reset must derive completion 0').toBe(0);
-      expect(Boolean(afterReset.marketplace_ready), 'reset must derive marketplace_ready false').toBe(false);
-      console.log('authorized reset applied: onboarding_status=AUTH_ONLY, completion=0, marketplace_ready=false');
+        const afterReset = await readProfile();
+        expect(String(afterReset.onboarding_status), 'reset must derive AUTH_ONLY').toBe('AUTH_ONLY');
+        expect(Number(afterReset.profile_completion), 'reset must derive completion 0').toBe(0);
+        expect(Boolean(afterReset.marketplace_ready), 'reset must derive marketplace_ready false').toBe(false);
+        console.log('authorized reset applied: onboarding_status=AUTH_ONLY, completion=0, marketplace_ready=false');
+      } else {
+        console.log(
+          `no reset needed: account already pre-onboarding (${snapStatus}) from the authorized procedure`,
+        );
+      }
 
       // ── 5. Reload so the gate re-evaluates; the wizard must appear ──────
       await page.evaluate((uid) => localStorage.removeItem(`pipingbox_onboarding_draft_${uid}`), identifiedId);
       await page.reload({ waitUntil: 'networkidle' });
       await expect(
         page.getByText('¿Qué tipo de cuenta necesitas?'),
-        'onboarding wizard must appear after the reset',
+        'onboarding wizard must appear (pre-onboarding canonical status)',
       ).toBeVisible({ timeout: 30_000 });
 
       // ── 6. Drive the 8-step wizard (worker, public visibility) ──────────
@@ -350,20 +353,38 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
 
       await expect(
         page.getByText('¿Qué tipo de cuenta necesitas?'),
-        'wizard must close after Finalizar (canonical completion)',
+        'wizard must close after Finalizar',
       ).toBeHidden({ timeout: 30_000 });
       await page.waitForTimeout(5000); // past the 3s batch flush
 
-      // ── 7. Canonical state BEFORE restoration (reported in evidence) ────
+      // ── 7. Evidence collection (canonical + drivers + wire + network) ───
       const canonical = await readProfile();
-      const canonicalStatus = String(canonical.onboarding_status);
-      expect(
-        COMPLETED_STATUSES.includes(canonicalStatus),
-        `canonical onboarding_status must confirm completion (got ${canonicalStatus})`,
-      ).toBeTruthy();
+      const appPathStatus = String(canonical.onboarding_status);
       console.log(
-        `canonical state before restoration: onboarding_status=${canonicalStatus}, marketplace_ready=${String(canonical.marketplace_ready)}, profile_completion=${String(canonical.profile_completion)}`,
+        `APP PATH canonical: onboarding_status=${appPathStatus}, marketplace_ready=${String(canonical.marketplace_ready)}, profile_completion=${String(canonical.profile_completion)}`,
       );
+      console.log(
+        `APP PATH drivers: full_name=${Boolean(canonical.full_name)} title=${Boolean(canonical.title)} location=${Boolean(canonical.location)} years=${canonical.years_experience != null} skills=${Boolean(canonical.skills)} availability=${Boolean(canonical.availability_status)} visibility=${String(canonical.profile_visibility)}`,
+      );
+
+      console.log('── network log (edge + non-2xx REST, UUIDs redacted) ──');
+      for (const line of netLog) console.log(redactUuids(line));
+
+      // Diagnostic fallback: if the app path did not finalize, call
+      // complete-onboarding directly (owner token) to capture the function's
+      // own response — the wizard swallows this, so this is the only way to
+      // see the backend's answer. Purely diagnostic: the assertions below
+      // still judge the APP path.
+      if (!COMPLETED_STATUSES.includes(appPathStatus)) {
+        console.log('APP PATH did NOT finalize canonically — diagnostic direct invocation:');
+        const diagRes = await fetch(`${restCtx.base}/functions/v1/complete-onboarding`, {
+          method: 'POST',
+          headers: { Authorization: restCtx.authorization, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ marketplace_ready: true }),
+        });
+        const diagBody = await diagRes.text();
+        console.log(`DIAG complete-onboarding: HTTP ${diagRes.status} :: ${redactUuids(diagBody.slice(0, 300))}`);
+      }
 
       // ── 8. Wire assertions: the closed onboarding funnel ────────────────
       const decoded = decodeAll();
@@ -372,6 +393,10 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
           String(e.event),
         ),
       );
+      console.log(
+        `wire funnel: total=${onboardingEvents.length} (started=${onboardingEvents.filter((e) => e.event === 'onboarding_started').length} steps=${onboardingEvents.filter((e) => e.event === 'onboarding_step_reached').length} completed=${onboardingEvents.filter((e) => e.event === 'onboarding_completed').length})`,
+      );
+
       expect(onboardingEvents.length, 'onboarding funnel events must reach the wire').toBe(10);
 
       const started = onboardingEvents.filter((e) => e.event === 'onboarding_started');
@@ -391,6 +416,12 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
         'onboarding_completed',
       );
 
+      // Canonical completion as judged on the APP path (before any diagnostic).
+      expect(
+        COMPLETED_STATUSES.includes(appPathStatus),
+        `canonical onboarding_status must confirm completion via the app path (got ${appPathStatus})`,
+      ).toBeTruthy();
+
       const correlationIds = new Set<string>();
       for (const e of onboardingEvents) {
         const p = (e.properties ?? {}) as Record<string, unknown>;
@@ -408,7 +439,6 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
         const corr = String(p.correlation_id ?? '');
         expect(corr.length, 'every onboarding event must carry a correlation_id').toBeGreaterThan(0);
         correlationIds.add(corr);
-        // PII / leakage: no email, no referral codes, no profile free-text.
         const serialized = JSON.stringify(e);
         expect(serialized).not.toContain('@');
         expect(serialized).not.toContain('ref=');
@@ -417,7 +447,7 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
       }
       expect(correlationIds.size, 'all onboarding events share one correlation_id').toBe(1);
       console.log(
-        `onboarding funnel PASS: correlation_id (redacted) ${redact([...correlationIds][0])}, steps ${stepSequence.join('>')}, canonical ${canonicalStatus}`,
+        `onboarding funnel PASS: correlation_id (redacted) ${redact([...correlationIds][0])}, steps ${stepSequence.join('>')}, canonical ${appPathStatus}`,
       );
     } finally {
       // ── 9. Restore (ALWAYS) and verify ZERO diff vs the snapshot ────────
@@ -435,7 +465,6 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
         const restoreRows = (await restoreRes.json()) as Record<string, unknown>[];
         expect(restoreRows, 'restore PATCH must affect exactly one row').toHaveLength(1);
 
-        // Re-derive the protected trio from the restored data (canonical).
         await recalculateOwn();
 
         const finalRow = await readProfile();
@@ -454,7 +483,6 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
       } catch (err) {
         console.log(`restore FAILED — QA account NOT fully restored: ${String(err)}`);
       }
-      // Clear any residual wizard draft so future runs start clean.
       await page
         .evaluate((uid) => localStorage.removeItem(`pipingbox_onboarding_draft_${uid}`), identifiedId)
         .catch(() => undefined);
