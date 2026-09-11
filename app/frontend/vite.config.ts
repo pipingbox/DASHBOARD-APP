@@ -80,6 +80,20 @@ export default defineConfig(({ command }) => {
             additionalPrerenderRoutes: blogPrerenderRoutes,
           })
         : []),
+      {
+        // PB-OBSERVABILITY-001: vite-prerender-plugin (post, above) force-sets
+        // build.sourcemap = true "for actionable error messages", which leaks
+        // `//# sourceMappingURL=` into every shipped bundle (public maps).
+        // Re-enforce 'hidden' AFTER it: maps are still generated for CI upload
+        // to PostHog (error tracking per SHA) but never publicly linked.
+        name: 'pb-enforce-hidden-sourcemaps',
+        apply: 'build',
+        enforce: 'post',
+        config(config) {
+          config.build ??= {};
+          config.build.sourcemap = 'hidden';
+        },
+      },
     ],
     resolve: {
       alias: {

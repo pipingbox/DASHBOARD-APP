@@ -315,6 +315,53 @@ test.describe('before_send global sanitizer', () => {
     expect(out!.properties.$current_url).toBe('https://pipingbox.app/');
   });
 
+  test('every event — $web_vitals included — carries environment and app_version', () => {
+    const out = sanitizePostHogEvent({ event: '$web_vitals', properties: {} });
+    expect(out!.properties).toHaveProperty('environment');
+    expect(out!.properties).toHaveProperty('app_version');
+    const custom = sanitizePostHogEvent({ event: 'page_viewed', properties: { route: '/' } });
+    expect(custom!.properties).toHaveProperty('environment');
+    expect(custom!.properties).toHaveProperty('app_version');
+  });
+
+  test('?access_token= and numeric ids in pathname never reach the final payload', () => {
+    const out = sanitizePostHogEvent({
+      event: 'page_viewed',
+      properties: {
+        $current_url: 'https://pipingbox.app/job/42/details?access_token=SECRET-ACCESS#private',
+      },
+    });
+    const json = JSON.stringify(out!.properties);
+    expect(json).not.toContain('access_token');
+    expect(json).not.toContain('SECRET-ACCESS');
+    expect(json).not.toContain('#private');
+    expect(out!.properties.$current_url).toBe('https://pipingbox.app/job/:id/details');
+  });
+
+  test('before_send(null) returns null and never throws', () => {
+    expect(() => {
+      // The SDK contract: null in -> null out, event dropped, no exception.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect(sanitizePostHogEvent(null as any)).toBeNull();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect(sanitizePostHogEvent(undefined as any)).toBeNull();
+    }).not.toThrow();
+  });
+
+  test('an internal sanitization exception drops the event but never breaks the caller', () => {
+    const evilProps = {
+      get $current_url(): string {
+        throw new Error('getter exploded');
+      },
+    };
+    let result: unknown = 'unset';
+    expect(() => {
+      result = sanitizePostHogEvent({ event: 'page_viewed', properties: evilProps });
+    }).not.toThrow();
+    // Fail-closed for the payload: an unsanitizable event is NOT sent.
+    expect(result).toBeNull();
+  });
+
   test('unknown event names are dropped (closed ingestion)', () => {
     expect(
       sanitizePostHogEvent({ event: '$autocapture', properties: { $current_url: 'https://x.app/' } }),
