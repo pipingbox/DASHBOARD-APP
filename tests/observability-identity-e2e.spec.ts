@@ -110,10 +110,11 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     await page.goto('/jobs');
     await page.waitForTimeout(2500);
     // The canonical post-auth distinct_id is the SDK's current distinct_id,
-    // which identify() rotated to the auth.user.id. Read it from the app.
-    const sdkDistinctId = await page.evaluate(async () => {
-      const mod = await import('/src/lib/observability.ts').catch(() => null);
-      return mod && typeof mod.getDistinctId === 'function' ? mod.getDistinctId() : null;
+    // which identify() rotated to the auth.user.id. Read it via the preview
+    // diagnostic handle exposed by the observability layer.
+    const sdkDistinctId = await page.evaluate(() => {
+      const fn = (window as unknown as Record<string, unknown>).__pbObsGetDistinctId;
+      return typeof fn === 'function' ? (fn as () => string | null)() : null;
     });
     const decodedAfterNav = decodeAll();
     const postAuthEvents = decodedAfterNav.filter(
