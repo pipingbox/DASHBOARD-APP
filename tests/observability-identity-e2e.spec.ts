@@ -99,7 +99,13 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     expect(anonLinked.length, '$identify must carry $anon_distinct_id').toBeGreaterThan(0);
 
     // Post-auth events must use the UUID distinct_id, never the email.
-    const postAuthEvents = decoded.filter(
+    // NOTE: the app dedupes page_viewed per route per session, so /dashboard
+    // may not re-emit if the anonymous journey already visited it. Navigate to
+    // a fresh authenticated route to guarantee a post-auth event.
+    await page.goto('/jobs');
+    await page.waitForTimeout(2500);
+    const decodedAfterNav = decodeAll();
+    const postAuthEvents = decodedAfterNav.filter(
       (e) =>
         e.event !== '$identify' &&
         typeof (e.properties as Record<string, unknown>)?.distinct_id === 'string' &&
