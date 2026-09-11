@@ -42,6 +42,11 @@ on:
         required: false
         default: false
         type: boolean
+      expected_sha:
+        description: 'Full SHA the preview Worker must be serving (required when run_identity_e2e=true; the spec aborts before login on mismatch)'
+        required: false
+        default: ''
+        type: string
 
 jobs:
   auth-e2e:
@@ -161,8 +166,58 @@ jobs:
           console.log('Auth E2E gate PASS: 7/7 automated tests, zero skipped.');
           NODE
 
-      - name: Run PB-OBSERVABILITY-001 identity E2E (optional)
-        if: ${{ inputs.run_identity_e2e == true }}
+  identity-e2e:
+    name: PB-OBSERVABILITY-001 identity E2E (preview, SHA-locked)
+    if: ${{ inputs.run_identity_e2e == true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Gate 5 remediation: deploy and E2E must be one coordinated operation.
+    # This job shares the deploy-preview.yml concurrency group, so it waits
+    # for any in-flight preview deploy to finish, and no preview deploy can
+    # overwrite the shared Worker while the identity E2E is running.
+    concurrency:
+      group: deploy-preview
+      cancel-in-progress: false
+    env:
+      PREVIEW_URL: ${{ inputs.target_url }}
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+      EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
+
+    steps:
+      - name: Require expected_sha for the SHA-locked identity E2E
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${EXPECTED_APP_VERSION:-}" ]; then
+            echo "::error::expected_sha is required when run_identity_e2e=true (gate 5: the served build must be traceable to the tested SHA)."
+            exit 1
+          fi
+
+      - name: Checkout exact tested app ref
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact tested SHA
+        env:
+          INPUT_SHA: ${{ inputs.source_ref }}
+        run: git checkout "$INPUT_SHA"
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run identity E2E — served-SHA pre-flight + single clean pass
         shell: bash
         run: |
           set -euo pipefail

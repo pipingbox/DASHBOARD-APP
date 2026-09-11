@@ -36,7 +36,11 @@ on:
 
 concurrency:
   group: deploy-preview
-  cancel-in-progress: true
+  # Gate 5 remediation: NEVER cancel-in-progress. The shared group is also
+  # held by the SHA-locked identity E2E job in auth-e2e.yml; cancelling the
+  # running holder would either kill a live E2E mid-run or overwrite the
+  # Worker it is testing. Queued deploys simply serialize instead.
+  cancel-in-progress: false
 
 jobs:
   deploy:
