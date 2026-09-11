@@ -159,24 +159,20 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     await expect(page).toHaveURL(/\/(login|$)/, { timeout: 10_000 });
     await page.waitForTimeout(2000);
 
-    const afterLogoutDistinctId = await page.evaluate(() => {
-      // After resetObservabilityUser() the posthog-js persistence rotates back
-      // to an anonymous distinct_id. Read it without printing the token-scoped
-      // storage key.
-      for (const key of Object.keys(localStorage)) {
-        if (key.includes('posthog') && key.startsWith('phc_')) {
-          try {
-            const raw = JSON.parse(localStorage.getItem(key) ?? '{}');
-            if (typeof raw.distinct_id === 'string') return raw.distinct_id as string;
-          } catch {
-            /* ignore */
-          }
-        }
-      }
-      return null;
+    // After reset the SDK clears the user distinct_id. Navigate to a public
+    // route to force a post-logout event and confirm it carries a FRESH
+    // anonymous id (a UUID), never the user UUID — shared-device isolation.
+    await page.goto('/about');
+    await page.waitForTimeout(4500); // past the 3s batch flush
+    const postLogoutEvents = decodeAll().filter((e) => {
+      const p = (e.properties ?? {}) as Record<string, unknown>;
+      return typeof p.distinct_id === 'string' && UUID_RE.test(p.distinct_id as string);
     });
-    // After reset the SDK rotates back to an anonymous id (not the user UUID).
-    expect(afterLogoutDistinctId).not.toBe(identifiedId);
-    console.log(`post-logout distinct_id (redacted): ${redact(afterLogoutDistinctId)}`);
+    const postLogoutIds = [...new Set(postLogoutEvents.map((e) => String((e.properties as Record<string, unknown>).distinct_id)))];
+    const freshAnonId = postLogoutIds.find((id) => id !== identifiedId) ?? null;
+    expect(freshAnonId, 'post-logout events must carry a fresh anonymous id').toBeTruthy();
+    expect(freshAnonId).not.toBe(identifiedId);
+    expect(freshAnonId).not.toContain('@');
+    console.log(`post-logout fresh anonymous distinct_id (redacted): ${redact(freshAnonId)}`);
   });
 });
