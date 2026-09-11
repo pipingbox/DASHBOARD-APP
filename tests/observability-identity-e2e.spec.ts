@@ -65,7 +65,9 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
 
     // ── 1. Anonymous referral journey ──────────────────────────────────────
     await page.goto('/?ref=PB-IDENTITY-E2E', { waitUntil: 'networkidle' });
-    await page.waitForTimeout(2500);
+    // Wait past the SDK's 3s batch flush so the anonymous events reach the
+    // wire BEFORE the pre-flight check below.
+    await page.waitForTimeout(4500);
 
     const anonDistinctId = await page.evaluate(() => {
       // The canonical anonymous id of the observability layer (device-level,
@@ -76,6 +78,31 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     expect(anonDistinctId, 'anonymous distinct_id must exist before auth').toBeTruthy();
     expect(anonDistinctId).not.toContain('@');
     console.log(`anonymous distinct_id (redacted): ${redact(anonDistinctId)}`);
+
+    // ── 1b. Pre-flight: served build must match the expected SHA ──────────
+    // Gate 5 lesson: the shared preview Worker may serve a build whose SHA
+    // differs from the ref under test (deploys and E2E runs were previously
+    // uncoordinated). Every wire event carries the served app_version, so
+    // verify it BEFORE logging in and abort the run on any mismatch.
+    const expectedVersion = process.env.EXPECTED_APP_VERSION ?? '';
+    const preFlight = decodeAll();
+    expect(
+      preFlight.length,
+      'pre-flight requires at least one flushed event from the anonymous journey',
+    ).toBeGreaterThan(0);
+    for (const e of preFlight) {
+      const p = (e.properties ?? {}) as Record<string, unknown>;
+      expect(String(p.environment), 'served environment must be preview').toBe('preview');
+      if (expectedVersion) {
+        expect(
+          String(p.app_version),
+          'ABORT: served app_version does not match the expected SHA — deploy the target SHA before running this E2E',
+        ).toBe(expectedVersion);
+      }
+    }
+    console.log(
+      `pre-flight PASS: ${preFlight.length} events from served build ${redact(expectedVersion) || '(no expected SHA set)'}`,
+    );
 
     // ── 2. Login with the disposable QA account ────────────────────────────
     await page.goto('/login');
