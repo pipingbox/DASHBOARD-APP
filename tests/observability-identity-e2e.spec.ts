@@ -108,7 +108,9 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     // may not re-emit if the anonymous journey already visited it. Navigate to
     // a fresh authenticated route to guarantee a post-auth event.
     await page.goto('/jobs');
-    await page.waitForTimeout(2500);
+    // The SDK batches events with a 3s flush interval; wait past it so the
+    // post-auth page_viewed actually leaves the browser.
+    await page.waitForTimeout(4500);
     // The canonical post-auth distinct_id is the SDK's current distinct_id,
     // which identify() rotated to the auth.user.id. Read it via the preview
     // diagnostic handle exposed by the observability layer.
