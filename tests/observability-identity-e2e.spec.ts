@@ -119,6 +119,11 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     if (postAuthEvents.length === 0) {
       console.log(`decoded after /jobs nav: ${decodedAfterNav.length} events; diag: ${diagLogs.join(' | ') || '(none)'}`);
       console.log(`all distinct_ids seen: ${[...new Set(decodedAfterNav.map((e) => String((e.properties as Record<string, unknown>)?.distinct_id ?? '?')))].map((d) => redact(d)).join(', ')}`);
+      console.log(`identifiedId redacted: ${redact(identifiedId)}`);
+      for (const e of decodedAfterNav) {
+        const p = (e.properties ?? {}) as Record<string, unknown>;
+        console.log(`evt=${String(e.event)} distinct_id=${redact(String(p.distinct_id ?? '?'))} isUUID=${UUID_RE.test(String(p.distinct_id ?? ''))}`);
+      }
     }
     expect(
       postAuthEvents.length,
