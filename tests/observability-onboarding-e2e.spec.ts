@@ -388,8 +388,8 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, authorized QA re
         'a non-2xx complete-onboarding response must surface the recoverable error banner',
       ).toBeVisible({ timeout: 30_000 });
       await expect(
-        page.getByText('¿Qué tipo de cuenta necesitas?'),
-        'the wizard must stay open after a non-2xx finalization (no false success)',
+        page.getByText('Foto de perfil (opcional)'),
+        'the wizard must stay open at the final step after a non-2xx finalization (no false success)',
       ).toBeVisible({ timeout: 5_000 });
       console.log('non-2xx handling PASS: recoverable error shown, wizard kept open, no false success');
 
@@ -397,7 +397,7 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, authorized QA re
       await page.getByRole('button', { name: /Finalizar/ }).click();
 
       await expect(
-        page.getByText('¿Qué tipo de cuenta necesitas?'),
+        page.getByText('Foto de perfil (opcional)'),
         'wizard must close after a successful retry',
       ).toBeHidden({ timeout: 30_000 });
       await page.waitForTimeout(5000); // past the 3s batch flush
