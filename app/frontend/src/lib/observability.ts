@@ -150,10 +150,23 @@ const URL_PROP_NAME_RE = /url|href|referrer|referring|(^|[^a-z])link|page|path/i
 const QUERY_PROP_NAME_RE = /(^|[$_])(search|query|hash|fragment)(_|$)|queryString/i;
 
 /**
- * Technical ID property keys exempt from long-token redaction (they are UUIDs
- * / device ids by design and must stay linkable).
+ * Keys whose values pass through UNMODIFIED. Two families:
+ *
+ * 1. Ingestion protocol (PostHog routing credentials): posthog-js puts the
+ *    public project key in EVERY event's `properties.token` and derives the
+ *    batch's top-level `api_key` from it. Redacting it (e.g. as a "long
+ *    token") leaves events unroutable: the endpoint returns 200 and stores
+ *    NOTHING — the exact failure of gate 2 (SHA 573ad7a, 2026-09-11).
+ * 2. Technical identifiers that must stay linkable: UUIDs match the
+ *    long-token regex, and semver-like strings trip the phone regex.
+ *    `app_version` is a 40-hex git SHA — it matches the long-token regex by
+ *    shape, but it is OUR value and must survive for per-build filtering.
  */
-const TECHNICAL_ID_KEYS = new Set([
+const PASSTHROUGH_VALUE_KEYS = new Set([
+  // ingestion protocol — never redact, never delete (PO: no generic token rules)
+  'token',
+  'api_key',
+  // technical ids / linking
   'distinct_id',
   '$distinct_id',
   '$anon_distinct_id',
@@ -161,10 +174,12 @@ const TECHNICAL_ID_KEYS = new Set([
   '$session_id',
   '$window_id',
   '$user_id',
+  '$insert_id',
   'pb_anonymous_id',
   'correlation_id',
   'incident_code',
-  // semver-like technical values the phone regex would false-positive on
+  // technical versions / build stamps
+  'app_version',
   '$browser_version',
   '$lib_version',
 ]);
@@ -212,7 +227,7 @@ function sanitizePostHogProperty(key: string, value: unknown): unknown {
   if (URL_PROP_KEYS.has(key) || URL_PROP_NAME_RE.test(key)) {
     return sanitizeUrlPropertyValue(value);
   }
-  if (TECHNICAL_ID_KEYS.has(key)) return value.slice(0, MAX_VALUE_LEN);
+  if (PASSTHROUGH_VALUE_KEYS.has(key)) return value.slice(0, MAX_VALUE_LEN);
   // Other strings: redact credential-like long tokens plus embedded patterns.
   try {
     return redactEmbeddedPatterns(value.replace(LONG_TOKEN_RE, '[redacted-token]'));
@@ -607,9 +622,23 @@ export async function initObservability(options: InitOptions = {}): Promise<void
       // web properties ($current_url, ...) after our per-event allowlist, so
       // query strings/fragments must be stripped here for EVERY event,
       // including $web_vitals. See sanitizePostHogEvent.
-      before_send: (event) => sanitizePostHogEvent(event),
+      // Preview-only diagnostic stages (no payloads, no codes, no keys):
+      // lets the gate verification distinguish received / sanitized /
+      // returned / dropped per event in the browser console.
+      before_send:
+        getEnvironment() === 'preview'
+          ? (event) => {
+              const name = event && typeof event === 'object' ? event.event : '(malformed)';
+              console.info(`[pb-obs-diag] before_send received: ${name}`);
+              const out = sanitizePostHogEvent(event);
+              console.info(`[pb-obs-diag] before_send ${out ? 'returned' : 'DROPPED'}: ${name}`);
+              return out;
+            }
+          : (event) => sanitizePostHogEvent(event),
       loaded: () => {
-        /* no-op: flush below */
+        if (getEnvironment() === 'preview') {
+          console.info('[pb-obs-diag] posthog init loaded (preview)');
+        }
       },
     });
     client = posthog as unknown as ObsClient;

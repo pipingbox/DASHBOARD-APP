@@ -362,6 +362,35 @@ test.describe('before_send global sanitizer', () => {
     expect(result).toBeNull();
   });
 
+  test('ingestion protocol values pass through unmodified (gate-2 root cause)', () => {
+    // posthog-js routes every event by properties.token (the public project
+    // key) and derives the batch api_key from it. Redacting it made the
+    // endpoint return 200 while storing NOTHING (gate 2, SHA 573ad7a).
+    const publicKey = 'phc_' + 'A1b2'.repeat(12); // 52 chars: matches LONG_TOKEN_RE
+    const sha = 'a'.repeat(40); // git SHA: matches LONG_TOKEN_RE by shape
+    const insertId = 'jicqawx3jhzi6f3d';
+    const out = sanitizePostHogEvent({
+      event: 'page_viewed',
+      properties: {
+        token: publicKey,
+        api_key: publicKey,
+        app_version: sha,
+        $insert_id: insertId,
+        route: '/',
+      },
+    });
+    expect(out!.properties.token).toBe(publicKey);
+    expect(out!.properties.api_key).toBe(publicKey);
+    expect(out!.properties.app_version).toBe(sha);
+    expect(out!.properties.$insert_id).toBe(insertId);
+    // ...while a credential-shaped value in a NON-protocol key still redacts:
+    const other = sanitizePostHogEvent({
+      event: 'page_viewed',
+      properties: { leaked_secret: 'x'.repeat(48), route: '/' },
+    });
+    expect(other!.properties.leaked_secret).toBe('[redacted-token]');
+  });
+
   test('unknown event names are dropped (closed ingestion)', () => {
     expect(
       sanitizePostHogEvent({ event: '$autocapture', properties: { $current_url: 'https://x.app/' } }),
