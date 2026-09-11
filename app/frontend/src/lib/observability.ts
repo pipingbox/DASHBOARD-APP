@@ -252,6 +252,18 @@ export function sanitizePostHogEvent<T extends PostHogEventLike>(event: T): T | 
         else props[key] = out;
       }
     }
+    // environment + app_version are attached HERE, at the hook, so EVERY event
+    // carries them — including SDK-internal events like $web_vitals, which the
+    // SDK does not necessarily enrich with registered super properties. This
+    // keeps preview traffic excludable and every payload traceable to a build.
+    if (event.properties && typeof event.properties === 'object') {
+      if (event.properties.environment === undefined) {
+        event.properties.environment = getEnvironment();
+      }
+      if (event.properties.app_version === undefined) {
+        event.properties.app_version = getAppVersion();
+      }
+    }
     return event;
   } catch {
     return null;
