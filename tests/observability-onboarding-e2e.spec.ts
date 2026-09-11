@@ -155,7 +155,7 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, authorized QA re
     // Track the avatar storage upload (for the finally-block cleanup).
     let uploadedAvatarPath: string | null = null;
     page.on('request', (req) => {
-      const m = req.url().match(/\/storage\/v1\/object\/profile_pictures\/(.+)$/);
+      const m = req.url().match(/\/storage\/v1\/object\/app_14da0f1941_avatars\/(.+)$/);
       if (m && req.method() === 'POST') uploadedAvatarPath = m[1];
     });
 
@@ -511,7 +511,7 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, authorized QA re
       }
       // Best-effort cleanup of the test-uploaded avatar object.
       if (uploadedAvatarPath && rest) {
-        await fetch(`${rest.base}/storage/v1/object/profile_pictures/${uploadedAvatarPath}`, {
+        await fetch(`${rest.base}/storage/v1/object/app_14da0f1941_avatars/${uploadedAvatarPath}`, {
           method: 'DELETE',
           headers: { Authorization: rest.authorization },
         }).catch(() => undefined);

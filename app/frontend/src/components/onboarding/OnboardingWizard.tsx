@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase, TABLES, edgeFunctionUrl } from '@/lib/supabase';
+import { supabase, TABLES, edgeFunctionUrl, STORAGE_BUCKETS } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock, Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -410,9 +410,14 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     setAvatarUploadError(null);
     try {
       const ext = getSafeImageExtension(avatarFile.name);
-      const path = `avatars/${user.id}/profile-${Date.now()}.${ext}`;
+      // PB-COMPLETE-ONBOARDING-404-001: canonical avatar bucket + owner-scoped
+      // path (first folder segment = auth.uid(), required by the storage
+      // policies). The previous 'profile_pictures' bucket does not exist, so
+      // every wizard avatar upload failed silently and profile_completion
+      // lost its 10 avatar points.
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
       const { error: uploadErr } = await supabase.storage
-        .from('profile_pictures')
+        .from(STORAGE_BUCKETS.avatars)
         .upload(path, avatarFile, { upsert: true });
 
       if (uploadErr) {
@@ -422,7 +427,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       }
 
       const { data: urlData } = supabase.storage
-        .from('profile_pictures')
+        .from(STORAGE_BUCKETS.avatars)
         .getPublicUrl(path);
 
       return urlData.publicUrl;
