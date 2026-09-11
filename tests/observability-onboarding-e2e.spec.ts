@@ -286,8 +286,19 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
     let restoreDone = false;
     let restoreDiffColumns: string[] = [];
     try {
-      // ── 4. Authorized reset (only if the account is COMPLETED) ──────────
-      if (COMPLETED_STATUSES.includes(snapStatus)) {
+      // ── 4. Authorized reset (whenever the gate would NOT show) ──────────
+      // OnboardingGate shows the wizard only when the canonical status is
+      // not completed AND (no title+location OR no account type). A
+      // PROFILE_STARTED account WITH basic info therefore gets NO wizard —
+      // the reset (which nulls title/location among the drivers) is what
+      // re-arms the gate. Apply it whenever the current state would not
+      // show the wizard.
+      const gateWouldShow =
+        !COMPLETED_STATUSES.includes(snapStatus) &&
+        (!(snapshot.title && snapshot.location) ||
+          snapshot.role === 'user' ||
+          !snapshot.account_type);
+      if (!gateWouldShow) {
         const resetBody: Record<string, unknown> = {};
         for (const col of RESET_NULL_COLUMNS) resetBody[col] = null;
 
@@ -309,7 +320,7 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
         console.log('authorized reset applied: onboarding_status=AUTH_ONLY, completion=0, marketplace_ready=false');
       } else {
         console.log(
-          `no reset needed: account already pre-onboarding (${snapStatus}) from the authorized procedure`,
+          `no reset needed: gate already armed (${snapStatus}, no basic info)`,
         );
       }
 
