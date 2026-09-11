@@ -45,19 +45,10 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     await page.waitForTimeout(2500);
 
     const anonDistinctId = await page.evaluate(() => {
-      // posthog-js persists the anonymous distinct_id in localStorage under a
-      // key that contains the project token; read it without printing the key.
-      for (const key of Object.keys(localStorage)) {
-        if (key.includes('posthog') && key.startsWith('phc_')) {
-          try {
-            const raw = JSON.parse(localStorage.getItem(key) ?? '{}');
-            if (typeof raw.distinct_id === 'string') return raw.distinct_id as string;
-          } catch {
-            /* ignore */
-          }
-        }
-      }
-      return null;
+      // The canonical anonymous id of the observability layer (device-level,
+      // technical UUID) — NOT the posthog-js persistence key, which is
+      // token-scoped and must never be printed.
+      return localStorage.getItem('pb_obs_anon_id');
     });
     expect(anonDistinctId, 'anonymous distinct_id must exist before auth').toBeTruthy();
     expect(anonDistinctId).not.toContain('@');
@@ -128,6 +119,9 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     await page.waitForTimeout(2000);
 
     const afterLogoutDistinctId = await page.evaluate(() => {
+      // After resetObservabilityUser() the posthog-js persistence rotates back
+      // to an anonymous distinct_id. Read it without printing the token-scoped
+      // storage key.
       for (const key of Object.keys(localStorage)) {
         if (key.includes('posthog') && key.startsWith('phc_')) {
           try {
