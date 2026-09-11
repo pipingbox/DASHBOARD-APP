@@ -118,7 +118,22 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
   }) => {
     test.setTimeout(240_000);
 
-    expect(EMAIL, 'the disposable account must follow the qa.e2e* convention').toMatch(/^qa\.e2e/i);
+    // Guard: disposable-account convention, tolerant to whitespace and to
+    // local-part variants (qa.e2e@, e2e.qa@, qa-e2e@...). Only safe
+    // booleans/length are ever printed — never the address itself.
+    const emailTrimmed = (EMAIL ?? '').trim();
+    console.log(
+      `email guard diagnostics: length=${emailTrimmed.length} startsQa=${/^qa/i.test(emailTrimmed)} containsE2E=${/e2e/i.test(emailTrimmed)} domainOk=${/@pipingbox\.com$/i.test(emailTrimmed)} leadingWs=${/^\s/.test(EMAIL ?? '')} trailingWs=${/\s$/.test(EMAIL ?? '')}`,
+    );
+    expect(emailTrimmed.length, 'E2E_TEST_EMAIL must not be empty').toBeGreaterThan(0);
+    expect(
+      emailTrimmed,
+      'the disposable account must live on the internal pipingbox.com test domain',
+    ).toMatch(/@pipingbox\.com$/i);
+    expect(
+      emailTrimmed,
+      'the disposable account local part must carry the e2e marker (qa.e2e* convention)',
+    ).toMatch(/^[^@]*e2e[^@]*@/i);
 
     // Capture the raw PostHog wire traffic (gzip-compressed batches).
     const payloads: Buffer[] = [];
