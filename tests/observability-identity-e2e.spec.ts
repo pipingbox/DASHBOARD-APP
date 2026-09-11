@@ -109,6 +109,12 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     // a fresh authenticated route to guarantee a post-auth event.
     await page.goto('/jobs');
     await page.waitForTimeout(2500);
+    // The canonical post-auth distinct_id is the SDK's current distinct_id,
+    // which identify() rotated to the auth.user.id. Read it from the app.
+    const sdkDistinctId = await page.evaluate(async () => {
+      const mod = await import('/src/lib/observability.ts').catch(() => null);
+      return mod && typeof mod.getDistinctId === 'function' ? mod.getDistinctId() : null;
+    });
     const decodedAfterNav = decodeAll();
     const postAuthEvents = decodedAfterNav.filter(
       (e) =>
@@ -119,7 +125,7 @@ test.describe('PB-OBSERVABILITY-001 identity E2E (anonymous → authenticated)',
     if (postAuthEvents.length === 0) {
       console.log(`decoded after /jobs nav: ${decodedAfterNav.length} events; diag: ${diagLogs.join(' | ') || '(none)'}`);
       console.log(`all distinct_ids seen: ${[...new Set(decodedAfterNav.map((e) => String((e.properties as Record<string, unknown>)?.distinct_id ?? '?')))].map((d) => redact(d)).join(', ')}`);
-      console.log(`identifiedId redacted: ${redact(identifiedId)}`);
+      console.log(`identifiedId redacted: ${redact(identifiedId)}; sdkDistinctId redacted: ${redact(sdkDistinctId)}`);
       for (const e of decodedAfterNav) {
         const p = (e.properties ?? {}) as Record<string, unknown>;
         console.log(`evt=${String(e.event)} distinct_id=${redact(String(p.distinct_id ?? '?'))} isUUID=${UUID_RE.test(String(p.distinct_id ?? ''))}`);
