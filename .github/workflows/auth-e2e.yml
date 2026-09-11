@@ -47,10 +47,18 @@ on:
         required: false
         default: ''
         type: string
+      run_onboarding_e2e:
+        description: 'Run ONLY the PB-OBSERVABILITY-001 onboarding E2E (observability-onboarding-e2e) in an isolated window — the 7/7 auth gate is skipped for this dispatch'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   auth-e2e:
     name: Auth E2E — require 7/7 PASS
+    # Gate 6: the onboarding E2E needs a truly isolated window (same QA
+    # account, same preview Worker) — skip the auth gate for that dispatch.
+    if: ${{ inputs.run_onboarding_e2e != true }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -222,5 +230,69 @@ jobs:
         run: |
           set -euo pipefail
           npx playwright test tests/observability-identity-e2e.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+  onboarding-e2e:
+    name: PB-OBSERVABILITY-001 onboarding E2E (preview, SHA-locked, isolated window)
+    if: ${{ inputs.run_onboarding_e2e == true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Gate 6: isolated window — this job shares the deploy-preview.yml
+    # concurrency group (no preview deploy can overwrite the shared Worker
+    # mid-run) and the dispatch is mutually exclusive with the identity E2E
+    # and the 7/7 auth gate, so no other browser session touches the QA
+    # account or PostHog during the run.
+    concurrency:
+      group: deploy-preview
+      cancel-in-progress: false
+    env:
+      PREVIEW_URL: ${{ inputs.target_url }}
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+      EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
+
+    steps:
+      - name: Require expected_sha and exclusive dispatch mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${EXPECTED_APP_VERSION:-}" ]; then
+            echo "::error::expected_sha is required when run_onboarding_e2e=true (the served build must be traceable to the tested SHA)."
+            exit 1
+          fi
+          if [ "${{ inputs.run_identity_e2e }}" = "true" ]; then
+            echo "::error::run_onboarding_e2e and run_identity_e2e are mutually exclusive (same QA account, isolated window required)."
+            exit 1
+          fi
+
+      - name: Checkout exact tested app ref
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact tested SHA
+        env:
+          INPUT_SHA: ${{ inputs.source_ref }}
+        run: git checkout "$INPUT_SHA"
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run onboarding E2E — SHA pre-flight, snapshot, funnel, restore
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/observability-onboarding-e2e.spec.ts \
             --config=playwright.config.ts \
             --reporter=line
