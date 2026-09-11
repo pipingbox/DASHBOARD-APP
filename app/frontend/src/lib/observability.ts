@@ -737,6 +737,15 @@ export function getDistinctId(): string | null {
   }
 }
 
+/**
+ * Preview-only diagnostic handle: lets the identity E2E read the SDK's current
+ * distinct_id from the deployed bundle (where module imports are not
+ * reachable). Never exposed outside preview; never carries PII.
+ */
+if (typeof window !== 'undefined' && getEnvironment() === 'preview') {
+  (window as unknown as Record<string, unknown>).__pbObsGetDistinctId = getDistinctId;
+}
+
 /** Link the anonymous session to the technical auth user id. */
 export function identifyUser(
   userId: string,
