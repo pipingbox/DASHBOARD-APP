@@ -544,6 +544,8 @@ export interface ObsClient {
   identify?(distinctId: string, properties?: Record<string, unknown>): void;
   register?(properties: Record<string, unknown>): void;
   reset?(): void;
+  /** Current SDK distinct_id (anonymous pre-auth, canonical UUID post-auth). */
+  get_distinct_id?(): string;
 }
 
 interface QueuedEvent {
@@ -723,6 +725,15 @@ export async function initObservability(options: InitOptions = {}): Promise<void
     flushQueue();
   } catch (err) {
     logger.warn('[obs] init failed (observability disabled)', err);
+  }
+}
+
+/** Current SDK distinct_id (anonymous pre-auth, canonical UUID post-auth). */
+export function getDistinctId(): string | null {
+  try {
+    return client?.get_distinct_id?.() ?? null;
+  } catch {
+    return null;
   }
 }
 
