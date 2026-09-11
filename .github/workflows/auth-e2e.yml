@@ -37,6 +37,11 @@ on:
         required: true
         default: 'main'
         type: string
+      run_identity_e2e:
+        description: 'Also run the PB-OBSERVABILITY-001 identity E2E spec (observability-identity-e2e)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   auth-e2e:
@@ -155,3 +160,12 @@ jobs:
 
           console.log('Auth E2E gate PASS: 7/7 automated tests, zero skipped.');
           NODE
+
+      - name: Run PB-OBSERVABILITY-001 identity E2E (optional)
+        if: ${{ inputs.run_identity_e2e == true }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/observability-identity-e2e.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
