@@ -622,4 +622,62 @@ test.describe('queue and identity', () => {
     identifyUser('user-uuid-456', { account_type: 'root' });
     expect(identified[0].traits).not.toHaveProperty('account_type');
   });
+
+  test('an email is never used as distinct_id (identify input is not PII-checked by design — caller passes auth.user.id)', async () => {
+    // The canonical contract: useAuth calls identifyUser(auth.user.id) — a
+    // Supabase UUID. Guard the layer against accidental PII-shaped ids: an
+    // email-shaped identifier must NOT be sent to the SDK.
+    const { client, identified } = makeClient();
+    await initObservability({ injectedClient: client });
+    identifyUser('someone@example.com');
+    expect(identified).toHaveLength(0);
+    identifyUser('123e4567-e89b-12d3-a456-426614174000');
+    expect(identified).toHaveLength(1);
+    expect(identified[0].id).toBe('123e4567-e89b-12d3-a456-426614174000');
+  });
+
+  test('identify traits never carry PII: email/phone-shaped trait values are redacted', async () => {
+    const { client, identified } = makeClient();
+    await initObservability({ injectedClient: client });
+    identifyUser('123e4567-e89b-12d3-a456-426614174000', {
+      account_type: 'worker',
+      onboarding_status: 'AUTH_ONLY',
+    });
+    expect(identified[0].traits).toEqual({
+      account_type: 'worker',
+      onboarding_status: 'AUTH_ONLY',
+    });
+    // Unknown trait keys are dropped by the allowlist (no $set with PII).
+    identifyUser('123e4567-e89b-12d3-a456-426614174000', {
+      // @ts-expect-error — deliberately out-of-contract trait
+      email: 'someone@example.com',
+    });
+    expect(identified[1].traits ?? {}).not.toHaveProperty('email');
+  });
+
+  test('identify before init is a no-op; SDK failure never breaks auth flow', async () => {
+    const { client, identified } = makeClient();
+    // not initialized: swallowed
+    identifyUser('123e4567-e89b-12d3-a456-426614174000');
+    expect(identified).toHaveLength(0);
+    // SDK throws: swallowed, caller unaffected
+    client.identify = () => {
+      throw new Error('sdk exploded');
+    };
+    await initObservability({ injectedClient: client });
+    expect(() => identifyUser('123e4567-e89b-12d3-a456-426614174000')).not.toThrow();
+  });
+
+  test('user change: reset then identify the new canonical id', async () => {
+    const { client, identified, resets } = makeClient();
+    await initObservability({ injectedClient: client });
+    identifyUser('123e4567-e89b-12d3-a456-426614174000');
+    resetObservabilityUser();
+    identifyUser('223e4567-e89b-12d3-a456-426614174000');
+    expect(resets()).toBe(1);
+    expect(identified.map((i) => i.id)).toEqual([
+      '123e4567-e89b-12d3-a456-426614174000',
+      '223e4567-e89b-12d3-a456-426614174000',
+    ]);
+  });
 });

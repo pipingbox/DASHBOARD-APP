@@ -91,7 +91,11 @@ const DEVICE_TYPES = ['mobile', 'tablet', 'desktop'] as const;
 // ---------------------------------------------------------------------------
 
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
-const PHONE_RE = /(\+?\d[\d\s().-]{7,}\d)/g;
+// Phone-shaped sequences: must start with a '+' or a digit run that is NOT
+// part of a longer alphanumeric token (UUID hex segments like "456-426614…"
+// would otherwise false-positive). Real numbers (+34 612 34 56 78,
+// 612-345-678) still match.
+const PHONE_RE = /(?<![\w])(\+\d[\d\s().-]{7,}\d|\d{3,}[\s().-][\d\s().-]{5,}\d)(?![\w])/g;
 const LONG_TOKEN_RE = /[A-Za-z0-9_-]{32,}/g;
 const MAX_VALUE_LEN = 200;
 
@@ -729,6 +733,13 @@ export function identifyUser(
 ): void {
   try {
     if (!initialized || !client?.identify) return;
+    // Canonical contract: the identifier is the Supabase auth.user.id (UUID).
+    // Refuse PII-shaped identifiers (email/phone) so a caller bug can never
+    // turn an email into a PostHog distinct_id.
+    if (EMAIL_RE.test(userId) || PHONE_RE.test(userId)) {
+      logger.warn('[obs] identify refused: PII-shaped identifier');
+      return;
+    }
     const safeTraits: Record<string, unknown> = {};
     if (traits.account_type && ACCOUNT_TYPES.includes(traits.account_type as never)) {
       safeTraits.account_type = traits.account_type;
