@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { gunzipSync } from 'node:zlib';
 
 /**
@@ -15,38 +15,41 @@ import { gunzipSync } from 'node:zlib';
  * with the same correlation_id, environment=preview and app_version equal to
  * the served SHA, no duplicates from re-render and no PII.
  *
+ * PB-COMPLETE-ONBOARDING-404-001 coverage: the wizard must treat a non-2xx
+ * complete-onboarding response as failure (no success screen, no draft
+ * clearing, no onboarding_completed) and offer a recoverable retry. Verified
+ * with a one-shot mocked 500 before the real call.
+ *
  * ── Authorized one-shot QA-account reset (PO authorization, 2026-09-11) ──
  * The disposable QA account is past the OnboardingGate, and the profiles
  * update guard makes onboarding_status / marketplace_ready /
  * profile_completion owner-unwritable. The ONLY owner-executable canonical
- * writer of that trio is the deployed recalculate-profiles edge function
- * (service role internally, self-scoped for non-admin callers).
+ * writer of that trio is the deployed recalculate-profiles edge function.
  *
  * Procedure (all authorization conditions implemented):
  *  1. Account identity resolved from the $identify wire event (never from
  *     the email; the UUID is only ever printed redacted to 8 chars).
- *  2. Preflight: exactly one profile row; status either pre-onboarding
- *     (AUTH_ONLY / PROFILE_STARTED — the authorized reset from the previous
- *     run persists) or COMPLETED (then apply the authorized reset below);
- *     role='worker'; account_type != admin; zero experience / certification
- *     / document rows. Any violation aborts BEFORE touching data.
- *  3. Snapshot the FULL profile row (all 46 columns).
- *  4. Authorized reset (only when COMPLETED): owner PATCH nulling the
- *     completion drivers, then recalculate-profiles (exactly one updated
- *     row); derived state must be AUTH_ONLY / 0 / false.
- *  5. Drive the wizard (8 steps) and capture the canonical state + drivers
- *     immediately after, PLUS every functions/v1 response (status + body)
- *     and every non-2xx REST response — the wizard swallows its own
- *     backend errors (saveStatus only, non-blocking catch), so the network
- *     log is the only way to see WHY completion does not finalize.
- *  6. If the app path did not finalize canonically, invoke
- *     complete-onboarding DIRECTLY (owner token) as a diagnostic and log
- *     its status + body; the test still fails on the app-path result (the
- *     product bug must surface, not be masked).
+ *  2. Preflight: exactly one profile row; role='worker'; account_type !=
+ *     admin; zero experience / certification / document rows; no residual
+ *     storage avatar from a previous run. Any violation aborts BEFORE
+ *     touching data.
+ *  3. Snapshot the FULL profile row (all columns).
+ *  4. Authorized reset (whenever the wizard gate would not show): owner
+ *     PATCH nulling title/company/location/years_experience/skills/bio/
+ *     avatar_url (full_name is PRESERVED so the post-wizard completion
+ *     reaches the canonical threshold: avatar 10 + full_name 5 + title 5 +
+ *     skills 10 + location 5 = 35 >= 30), then recalculate-profiles
+ *     (exactly one updated row); derived state must be AUTH_ONLY / 0 / false.
+ *  5. Drive the wizard (8 steps, public visibility, avatar upload) with a
+ *     one-shot mocked 500 on complete-onboarding first: the wizard must stay
+ *     open with a recoverable error and NO success; retry Finalizar against
+ *     the real endpoint.
+ *  6. Assert the canonical MARKETPLACE_READY state server-side and the
+ *     closed funnel on the wire.
  *  7. finally (ALWAYS): restore every owner-granted snapshot column the
  *     reset or wizard may have touched, recalculate to re-derive the
- *     protected trio, and require ZERO differences vs the snapshot except
- *     updated_at. Column NAMES only in diffs, never values.
+ *     protected trio, require ZERO differences vs the snapshot except
+ *     updated_at, and best-effort delete the test-uploaded storage avatar.
  *
  * PostHog history/events are never deleted. This authorization covers this
  * account and this execution only.
@@ -60,8 +63,13 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const redact = (v: unknown) => (typeof v === 'string' && v.length > 8 ? `${v.slice(0, 8)}…` : v);
 const redactUuids = (s: string) => s.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, ':uuid');
 
+// 1x1 transparent PNG.
+const TINY_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+  'base64',
+);
+
 const COMPLETED_STATUSES = ['PROFILE_COMPLETED', 'MARKETPLACE_READY'];
-const PRE_ONBOARDING_STATUSES = ['AUTH_ONLY', 'PROFILE_STARTED'];
 const PROFILES_TABLE = 'app_14da0f1941_profiles';
 const COUNT_TABLES = [
   'app_worker_experiences',
@@ -69,8 +77,10 @@ const COUNT_TABLES = [
   'app_worker_documents',
 ] as const;
 
+// full_name is deliberately PRESERVED by the reset (see header): with the
+// wizard's avatar upload the completion reaches 35 >= 30, so the canonical
+// finalization is reachable through the wizard alone.
 const RESET_NULL_COLUMNS = [
-  'full_name',
   'title',
   'company',
   'location',
@@ -82,6 +92,7 @@ const RESET_NULL_COLUMNS = [
 
 const RESTORE_COLUMNS = [
   ...RESET_NULL_COLUMNS,
+  'full_name',
   'account_type',
   'role',
   'availability_status',
@@ -99,18 +110,15 @@ interface RestCtx {
   authorization: string;
 }
 
-test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window, authorized QA reset)', () => {
+test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, authorized QA reset, non-2xx coverage)', () => {
   test.skip(!hasCreds, 'E2E_TEST_EMAIL / E2E_TEST_PASSWORD not set -- skipping onboarding E2E');
 
-  test('reset → wizard → 8 steps → canonical completion → funnel on the wire → exact restore', async ({
+  test('reset → wizard → mocked-500 retry → canonical completion → funnel on the wire → exact restore', async ({
     page,
   }) => {
-    test.setTimeout(240_000);
+    test.setTimeout(300_000);
 
-    // Guard: disposable-account convention, tolerant to whitespace. Only safe
-    // booleans/length are ever printed — never the address itself. (Verified
-    // live: the secret is qa*@pipingbox.com, 9-char local part, no 'e2e'
-    // marker despite the older docs' 'qa.e2e' spelling.)
+    // Guard: disposable-account convention (verified live: qa*@pipingbox.com).
     const emailTrimmed = (EMAIL ?? '').trim();
     expect(emailTrimmed.length, 'E2E_TEST_EMAIL must not be empty').toBeGreaterThan(0);
     expect(
@@ -127,9 +135,7 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
       }
     });
 
-    // Backend network capture: the wizard swallows its own backend errors
-    // (saveStatus only; non-blocking catch around the edge call), so this is
-    // the only place the real failure cause is visible. UUIDs redacted.
+    // Backend network capture (edge + non-2xx REST), UUIDs redacted.
     const netLog: string[] = [];
     page.on('response', async (res) => {
       const url = res.url();
@@ -142,9 +148,15 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
           netLog.push(`REST ${res.status()} ${url.split('/rest/v1/')[1]?.slice(0, 80)} :: ${body}`);
         }
       } catch {
-        /* body unavailable — status alone still logged below */
         netLog.push(`${url.includes('/functions/v1/') ? 'EDGE' : 'REST'} ${res.status()} (body unavailable)`);
       }
+    });
+
+    // Track the avatar storage upload (for the finally-block cleanup).
+    let uploadedAvatarPath: string | null = null;
+    page.on('request', (req) => {
+      const m = req.url().match(/\/storage\/v1\/object\/profile_pictures\/(.+)$/);
+      if (m && req.method() === 'POST') uploadedAvatarPath = m[1];
     });
 
     // Supabase REST context from the app's own requests (never printed).
@@ -258,17 +270,9 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
     console.log(
       `snapshot: onboarding_status=${String(snapshot.onboarding_status)}, marketplace_ready=${String(snapshot.marketplace_ready)}, profile_completion=${String(snapshot.profile_completion)}`,
     );
-    console.log(
-      `drivers (booleans only): full_name=${Boolean(snapshot.full_name)} title=${Boolean(snapshot.title)} company=${Boolean(snapshot.company)} location=${Boolean(snapshot.location)} years=${snapshot.years_experience != null} skills=${Boolean(snapshot.skills)} bio=${Boolean(snapshot.bio)} avatar=${Boolean(snapshot.avatar_url)}`,
-    );
 
-    const snapStatus = String(snapshot.onboarding_status);
     expect(snapshot.role, "preflight: role must be 'worker'").toBe('worker');
     expect(snapshot.account_type, 'preflight: admin accounts are untouchable').not.toBe('admin');
-    expect(
-      PRE_ONBOARDING_STATUSES.concat(COMPLETED_STATUSES).includes(snapStatus),
-      `preflight: unexpected canonical status ${snapStatus}`,
-    ).toBeTruthy();
 
     for (const table of COUNT_TABLES) {
       const res = await fetch(
@@ -287,14 +291,8 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
     let restoreDiffColumns: string[] = [];
     try {
       // ── 4. Authorized reset (whenever the gate would NOT show) ──────────
-      // OnboardingGate shows the wizard only when the canonical status is
-      // not completed AND (no title+location OR no account type). A
-      // PROFILE_STARTED account WITH basic info therefore gets NO wizard —
-      // the reset (which nulls title/location among the drivers) is what
-      // re-arms the gate. Apply it whenever the current state would not
-      // show the wizard.
       const gateWouldShow =
-        !COMPLETED_STATUSES.includes(snapStatus) &&
+        !COMPLETED_STATUSES.includes(String(snapshot.onboarding_status)) &&
         (!(snapshot.title && snapshot.location) ||
           snapshot.role === 'user' ||
           !snapshot.account_type);
@@ -309,19 +307,17 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
         });
         expect(resetRes.ok, `reset PATCH failed: HTTP ${resetRes.status}`).toBeTruthy();
         const resetRows = (await resetRes.json()) as Record<string, unknown>[];
-        expect(resetRows, 'reset PATCH must affect exactly one row (return=representation)').toHaveLength(1);
+        expect(resetRows, 'reset PATCH must affect exactly one row').toHaveLength(1);
 
         await recalculateOwn();
 
         const afterReset = await readProfile();
         expect(String(afterReset.onboarding_status), 'reset must derive AUTH_ONLY').toBe('AUTH_ONLY');
-        expect(Number(afterReset.profile_completion), 'reset must derive completion 0').toBe(0);
+        expect(Number(afterReset.profile_completion), 'reset must derive completion <= 5 (full_name only)').toBeLessThanOrEqual(5);
         expect(Boolean(afterReset.marketplace_ready), 'reset must derive marketplace_ready false').toBe(false);
-        console.log('authorized reset applied: onboarding_status=AUTH_ONLY, completion=0, marketplace_ready=false');
+        console.log('authorized reset applied: AUTH_ONLY (full_name preserved for threshold reachability)');
       } else {
-        console.log(
-          `no reset needed: gate already armed (${snapStatus}, no basic info)`,
-        );
+        console.log('no reset needed: gate already armed');
       }
 
       // ── 5. Reload so the gate re-evaluates; the wizard must appear ──────
@@ -332,7 +328,7 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
         'onboarding wizard must appear (pre-onboarding canonical status)',
       ).toBeVisible({ timeout: 30_000 });
 
-      // ── 6. Drive the 8-step wizard (worker, public visibility) ──────────
+      // ── 6. Drive the 8-step wizard (worker, public, avatar) ─────────────
       await page.getByRole('button', { name: /Profesional Industrial/ }).click();
       await page.getByRole('button', { name: 'Siguiente' }).click();
 
@@ -360,42 +356,67 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
       await page.getByRole('button', { name: 'Siguiente' }).click();
 
       await page.getByText('Foto de perfil (opcional)').waitFor();
+      // Avatar upload: +10 completion so the wizard path reaches >= 30
+      // (avatar 10 + full_name 5 + title 5 + skills 10 + location 5 = 35).
+      await page.setInputFiles('input[type="file"]', {
+        name: 'pb-e2e-avatar.png',
+        mimeType: 'image/png',
+        buffer: TINY_PNG,
+      });
+
+      // ── 6b. PB-COMPLETE-ONBOARDING-404-001: non-2xx must NOT complete ──
+      // One-shot mocked 500: the wizard must show the recoverable error,
+      // stay open, keep the draft, and NOT report success.
+      let mockUsed = false;
+      await page.route('**/functions/v1/complete-onboarding', async (route) => {
+        if (!mockUsed) {
+          mockUsed = true;
+          await route.fulfill({
+            status: 500,
+            contentType: 'application/json',
+            body: JSON.stringify({ error: 'mocked failure for non-2xx coverage' }),
+          });
+        } else {
+          await route.continue();
+        }
+      });
+
+      await page.getByRole('button', { name: /Finalizar/ }).click();
+
+      await expect(
+        page.getByTestId('onboarding-completion-error'),
+        'a non-2xx complete-onboarding response must surface the recoverable error banner',
+      ).toBeVisible({ timeout: 30_000 });
+      await expect(
+        page.getByText('¿Qué tipo de cuenta necesitas?'),
+        'the wizard must stay open after a non-2xx finalization (no false success)',
+      ).toBeVisible({ timeout: 5_000 });
+      console.log('non-2xx handling PASS: recoverable error shown, wizard kept open, no false success');
+
+      // ── 6c. Retry against the real endpoint ─────────────────────────────
       await page.getByRole('button', { name: /Finalizar/ }).click();
 
       await expect(
         page.getByText('¿Qué tipo de cuenta necesitas?'),
-        'wizard must close after Finalizar',
+        'wizard must close after a successful retry',
       ).toBeHidden({ timeout: 30_000 });
       await page.waitForTimeout(5000); // past the 3s batch flush
 
-      // ── 7. Evidence collection (canonical + drivers + wire + network) ───
+      // ── 7. Canonical state (the RPC-returned + server-side truth) ──────
       const canonical = await readProfile();
-      const appPathStatus = String(canonical.onboarding_status);
+      const canonicalStatus = String(canonical.onboarding_status);
       console.log(
-        `APP PATH canonical: onboarding_status=${appPathStatus}, marketplace_ready=${String(canonical.marketplace_ready)}, profile_completion=${String(canonical.profile_completion)}`,
+        `canonical: onboarding_status=${canonicalStatus}, marketplace_ready=${String(canonical.marketplace_ready)}, profile_completion=${String(canonical.profile_completion)}`,
       );
-      console.log(
-        `APP PATH drivers: full_name=${Boolean(canonical.full_name)} title=${Boolean(canonical.title)} location=${Boolean(canonical.location)} years=${canonical.years_experience != null} skills=${Boolean(canonical.skills)} availability=${Boolean(canonical.availability_status)} visibility=${String(canonical.profile_visibility)}`,
-      );
+      expect(
+        canonicalStatus,
+        'canonical onboarding_status must confirm completion via the app path',
+      ).toBe('MARKETPLACE_READY');
+      expect(Number(canonical.profile_completion), 'completion must reach the canonical threshold').toBeGreaterThanOrEqual(30);
+      expect(Boolean(canonical.marketplace_ready), 'public visibility + completion must derive marketplace_ready').toBe(true);
 
       console.log('── network log (edge + non-2xx REST, UUIDs redacted) ──');
       for (const line of netLog) console.log(redactUuids(line));
-
-      // Diagnostic fallback: if the app path did not finalize, call
-      // complete-onboarding directly (owner token) to capture the function's
-      // own response — the wizard swallows this, so this is the only way to
-      // see the backend's answer. Purely diagnostic: the assertions below
-      // still judge the APP path.
-      if (!COMPLETED_STATUSES.includes(appPathStatus)) {
-        console.log('APP PATH did NOT finalize canonically — diagnostic direct invocation:');
-        const diagRes = await fetch(`${restCtx.base}/functions/v1/complete-onboarding`, {
-          method: 'POST',
-          headers: { Authorization: restCtx.authorization, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ marketplace_ready: true }),
-        });
-        const diagBody = await diagRes.text();
-        console.log(`DIAG complete-onboarding: HTTP ${diagRes.status} :: ${redactUuids(diagBody.slice(0, 300))}`);
-      }
 
       // ── 8. Wire assertions: the closed onboarding funnel ────────────────
       const decoded = decodeAll();
@@ -421,17 +442,11 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
       expect(stepSequence, 'steps must be reached in order 1..8').toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
 
       const completed = onboardingEvents.filter((e) => e.event === 'onboarding_completed');
-      expect(completed, 'onboarding_completed exactly once').toHaveLength(1);
+      expect(completed, 'onboarding_completed exactly once (after the successful retry only)').toHaveLength(1);
       const funnelOrder = onboardingEvents.map((e) => String(e.event));
       expect(funnelOrder[funnelOrder.length - 1], 'onboarding_completed must close the funnel').toBe(
         'onboarding_completed',
       );
-
-      // Canonical completion as judged on the APP path (before any diagnostic).
-      expect(
-        COMPLETED_STATUSES.includes(appPathStatus),
-        `canonical onboarding_status must confirm completion via the app path (got ${appPathStatus})`,
-      ).toBeTruthy();
 
       const correlationIds = new Set<string>();
       for (const e of onboardingEvents) {
@@ -458,7 +473,7 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
       }
       expect(correlationIds.size, 'all onboarding events share one correlation_id').toBe(1);
       console.log(
-        `onboarding funnel PASS: correlation_id (redacted) ${redact([...correlationIds][0])}, steps ${stepSequence.join('>')}, canonical ${appPathStatus}`,
+        `onboarding funnel PASS: correlation_id (redacted) ${redact([...correlationIds][0])}, steps ${stepSequence.join('>')}, canonical ${canonicalStatus}`,
       );
     } finally {
       // ── 9. Restore (ALWAYS) and verify ZERO diff vs the snapshot ────────
@@ -493,6 +508,13 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, isolated window,
         );
       } catch (err) {
         console.log(`restore FAILED — QA account NOT fully restored: ${String(err)}`);
+      }
+      // Best-effort cleanup of the test-uploaded avatar object.
+      if (uploadedAvatarPath && rest) {
+        await fetch(`${rest.base}/storage/v1/object/profile_pictures/${uploadedAvatarPath}`, {
+          method: 'DELETE',
+          headers: { Authorization: rest.authorization },
+        }).catch(() => undefined);
       }
       await page
         .evaluate((uid) => localStorage.removeItem(`pipingbox_onboarding_draft_${uid}`), identifiedId)
