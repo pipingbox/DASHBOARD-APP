@@ -453,6 +453,146 @@ test.describe('before_send global sanitizer', () => {
 });
 
 // ---------------------------------------------------------------------------
+// 9. Nested sanitization (gate-3 residual leak, PO review 2026-09-11)
+// ---------------------------------------------------------------------------
+//
+// PostHog nests full web-vital events inside properties like
+// $web_vitals_FCP_event.$current_url — the top-level pass missed them and the
+// referral code reached ingestion. The walker must sanitize URL keys at ANY
+// depth, inside plain objects and arrays, without mutating the input, and
+// drop the event when safety cannot be guaranteed (cycles, depth, non-plain).
+
+test.describe('nested sanitization (gate-3 residual leak)', () => {
+  const NESTED_LEAK =
+    'https://pipingbox-app.pipingbox.workers.dev/?ref=PB-NESTED-SECRET#private';
+
+  test('$web_vitals_FCP_event.$current_url is sanitized at depth', () => {
+    const out = sanitizePostHogEvent({
+      event: '$web_vitals',
+      properties: {
+        $current_url: NESTED_LEAK,
+        $web_vitals_FCP_event: { $current_url: NESTED_LEAK, value: 512.3 },
+      },
+    });
+    expect(out).not.toBeNull();
+    const json = JSON.stringify(out!.properties);
+    expect(json).not.toContain('?');
+    expect(json).not.toContain('#');
+    expect(json).not.toContain('ref=');
+    expect(json).not.toContain('PB-NESTED-SECRET');
+    const nested = out!.properties.$web_vitals_FCP_event as Record<string, unknown>;
+    expect(nested.$current_url).toBe('https://pipingbox-app.pipingbox.workers.dev/');
+    expect(nested.value).toBe(512.3);
+  });
+
+  test('LCP/INP nested events and nested referrer are sanitized too', () => {
+    const out = sanitizePostHogEvent({
+      event: '$web_vitals',
+      properties: {
+        $web_vitals_LCP_event: {
+          $current_url: 'https://pipingbox.app/jobs?ref=PB-NESTED-SECRET',
+          $referrer: 'https://google.com/search?q=secret',
+        },
+        $web_vitals_INP_event: {
+          $current_url: 'https://pipingbox.app/job/42?ref=PB-NESTED-SECRET#frag',
+        },
+      },
+    });
+    const json = JSON.stringify(out!.properties);
+    expect(json).not.toContain('ref=');
+    expect(json).not.toContain('secret');
+    expect(json).not.toContain('#');
+    const lcp = out!.properties.$web_vitals_LCP_event as Record<string, unknown>;
+    expect(lcp.$current_url).toBe('https://pipingbox.app/jobs');
+    expect(lcp.$referrer).toBe('https://google.com/search');
+    const inp = out!.properties.$web_vitals_INP_event as Record<string, unknown>;
+    expect(inp.$current_url).toBe('https://pipingbox.app/job/:id');
+  });
+
+  test('deeply nested objects and arrays are walked', () => {
+    const out = sanitizePostHogEvent({
+      event: 'page_viewed',
+      properties: {
+        route: '/',
+        outer: { inner: { deepest: { $current_url: NESTED_LEAK } } },
+        crumbs: [
+          'https://pipingbox.app/a?ref=PB-NESTED-SECRET',
+          { $current_url: NESTED_LEAK },
+        ],
+      },
+    });
+    const json = JSON.stringify(out!.properties);
+    expect(json).not.toContain('ref=');
+    expect(json).not.toContain('PB-NESTED-SECRET');
+    expect(json).not.toContain('#private');
+    const outer = out!.properties.outer as Record<string, Record<string, Record<string, unknown>>>;
+    expect(outer.inner.deepest.$current_url).toBe(
+      'https://pipingbox-app.pipingbox.workers.dev/',
+    );
+    const crumbs = out!.properties.crumbs as unknown[];
+    expect(crumbs[0]).toBe('https://pipingbox.app/a');
+    expect((crumbs[1] as Record<string, unknown>).$current_url).toBe(
+      'https://pipingbox-app.pipingbox.workers.dev/',
+    );
+  });
+
+  test('protocol fields stay intact in nested context; input is not mutated', () => {
+    const publicKey = 'phc_' + 'A1b2'.repeat(12);
+    const nestedEvent = { $current_url: NESTED_LEAK };
+    const original = {
+      event: '$web_vitals' as const,
+      properties: { token: publicKey, $web_vitals_FCP_event: nestedEvent },
+    };
+    const out = sanitizePostHogEvent(original);
+    expect(out!.properties.token).toBe(publicKey);
+    // immutability: the original nested object still holds the raw URL
+    expect(nestedEvent.$current_url).toBe(NESTED_LEAK);
+    expect(out!.properties.$web_vitals_FCP_event).not.toBe(nestedEvent);
+  });
+
+  test('a controlled circular structure drops the event without throwing', () => {
+    const circular: Record<string, unknown> = { route: '/' };
+    circular.self = circular;
+    let result: unknown = 'unset';
+    expect(() => {
+      result = sanitizePostHogEvent({ event: 'page_viewed', properties: circular });
+    }).not.toThrow();
+    expect(result).toBeNull();
+  });
+
+  test('exceeding the depth limit drops the event (fail-closed)', () => {
+    let deep: Record<string, unknown> = { $current_url: NESTED_LEAK };
+    for (let i = 0; i < 12; i++) deep = { next: deep };
+    expect(sanitizePostHogEvent({ event: 'page_viewed', properties: { deep } })).toBeNull();
+  });
+
+  test('non-plain objects (Date, Map) drop the event — contents not inspectable', () => {
+    expect(
+      sanitizePostHogEvent({ event: 'page_viewed', properties: { when: new Date() } }),
+    ).toBeNull();
+    expect(
+      sanitizePostHogEvent({
+        event: 'page_viewed',
+        properties: { lookup: new Map([['k', 'v']]) },
+      }),
+    ).toBeNull();
+  });
+
+  test('shared references (DAG, no cycle) are allowed and sanitized once each', () => {
+    const shared = { $current_url: NESTED_LEAK };
+    const out = sanitizePostHogEvent({
+      event: '$web_vitals',
+      properties: { a: shared, b: shared },
+    });
+    expect(out).not.toBeNull();
+    const a = out!.properties.a as Record<string, unknown>;
+    const b = out!.properties.b as Record<string, unknown>;
+    expect(a.$current_url).toBe('https://pipingbox-app.pipingbox.workers.dev/');
+    expect(b.$current_url).toBe('https://pipingbox-app.pipingbox.workers.dev/');
+  });
+});
+
+// ---------------------------------------------------------------------------
 // 7. Queue + identity
 // ---------------------------------------------------------------------------
 

@@ -236,6 +236,73 @@ function sanitizePostHogProperty(key: string, value: unknown): unknown {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Recursive sanitization (gate-3 remediation, 2026-09-11)
+// ---------------------------------------------------------------------------
+//
+// PostHog nests full web-vital events inside properties like
+// `$web_vitals_FCP_event.$current_url`, which still carried `?ref=…` past the
+// top-level pass (gate 3). The recursive walker sanitizes URL-keyed strings
+// at ANY depth. Safety contract:
+// - only arrays, plain objects (Object.prototype / null prototype) and JSON
+//   scalar values are traversed; prototypes are never walked;
+// - depth is capped; cycles are detected with a WeakSet (DAG sharing is OK:
+//   entries are released after their subtree completes);
+// - the input is NEVER mutated — sanitized copies are returned;
+// - anything that cannot be guaranteed safe (excessive depth, cycle,
+//   non-plain object) throws and the WHOLE EVENT is dropped by the caller —
+//   fail-closed for the payload, fail-open for the application.
+
+const MAX_SANITIZE_DEPTH = 8;
+
+function sanitizeNestedValue(
+  key: string,
+  value: unknown,
+  depth: number,
+  seen: WeakSet<object>,
+): unknown {
+  if (typeof value === 'string') return sanitizePostHogProperty(key, value);
+  if (value === null || value === undefined || typeof value !== 'object') {
+    return value; // JSON scalars are safe as-is
+  }
+  if (depth >= MAX_SANITIZE_DEPTH) {
+    throw new Error('pb-obs: sanitize depth limit exceeded');
+  }
+  if (seen.has(value)) {
+    throw new Error('pb-obs: cyclic structure in event properties');
+  }
+  if (Array.isArray(value)) {
+    seen.add(value);
+    try {
+      return value.map((item, i) => sanitizeNestedValue(String(i), item, depth + 1, seen));
+    } finally {
+      seen.delete(value);
+    }
+  }
+  const proto: unknown = Object.getPrototypeOf(value);
+  if (proto !== Object.prototype && proto !== null) {
+    // Non-plain object (Date, Map, class instance...): its contents cannot be
+    // inspected safely as JSON — the event is dropped by the caller.
+    throw new Error('pb-obs: non-plain object in event properties');
+  }
+  seen.add(value);
+  try {
+    const out: Record<string, unknown> = {};
+    for (const childKey of Object.keys(value)) {
+      const child = sanitizeNestedValue(
+        childKey,
+        (value as Record<string, unknown>)[childKey],
+        depth + 1,
+        seen,
+      );
+      if (child !== undefined) out[childKey] = child;
+    }
+    return out;
+  } finally {
+    seen.delete(value);
+  }
+}
+
 export interface PostHogEventLike {
   event?: string;
   properties?: Record<string, unknown>;
@@ -248,7 +315,8 @@ export interface PostHogEventLike {
  * hook body). Returns the sanitized event, or null when the event must be
  * dropped: unknown event name, or an unexpected sanitization failure — privacy
  * wins over telemetry, and the app itself is never affected (fail-open for the
- * app, fail-closed for the payload).
+ * app, fail-closed for the payload). Property bags are REPLACED with sanitized
+ * copies; the original nested objects are never mutated.
  */
 export function sanitizePostHogEvent<T extends PostHogEventLike>(event: T): T | null {
   try {
@@ -258,14 +326,16 @@ export function sanitizePostHogEvent<T extends PostHogEventLike>(event: T): T | 
       (OBS_EVENT_NAMES.includes(name as ObsEventName) ||
         (OBS_INTERNAL_SDK_EVENTS as readonly string[]).includes(name));
     if (!known) return null;
+    const seen = new WeakSet<object>();
     for (const bag of ['properties', '$set', '$set_once'] as const) {
       const props = event[bag];
       if (!props || typeof props !== 'object') continue;
+      const out: Record<string, unknown> = {};
       for (const key of Object.keys(props)) {
-        const out = sanitizePostHogProperty(key, props[key]);
-        if (out === undefined) delete props[key];
-        else props[key] = out;
+        const sanitized = sanitizeNestedValue(key, props[key], 0, seen);
+        if (sanitized !== undefined) out[key] = sanitized;
       }
+      event[bag] = out as T[typeof bag];
     }
     // environment + app_version are attached HERE, at the hook, so EVERY event
     // carries them — including SDK-internal events like $web_vitals, which the
