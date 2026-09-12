@@ -733,7 +733,7 @@ export default function ElbowCutTool() {
                 </h4>
                 <div className="space-y-2 text-sm text-zinc-400">
                   <p><strong className="text-zinc-200">ASME B16.9</strong> — Factory-Made Wrought Buttwelding Fittings</p>
-                  <p><strong className="text-zinc-200">ASME B36.10M</strong> — Welded and Seamless Wrought Steel Pipe</p>
+                  <p><strong className="text-zinc-200">ASME B36.10M</strong> — {t('tools.elbowCut.stdB3610Desc')}</p>
                   <p><strong className="text-zinc-200">MSS SP-75</strong> — High Test Wrought BW Fittings</p>
                 </div>
               </div>

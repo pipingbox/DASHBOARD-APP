@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   Clock,
@@ -58,6 +59,7 @@ const CONTENT_ICONS: Record<string, React.ElementType> = {
 };
 
 export default function CourseDetail() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
   const [course, setCourse] = useState<Course | null>(null);
@@ -127,8 +129,8 @@ export default function CourseDetail() {
   if (!course) {
     return (
       <div className="text-center py-24 space-y-3">
-        <p className="text-sm text-zinc-500">Course not found.</p>
-        <Link to="/academy" className="text-xs text-[#f59e0b] hover:underline">← Back to Academy</Link>
+        <p className="text-sm text-zinc-500">{t('academy.course.notFound')}</p>
+        <Link to="/academy" className="text-xs text-[#f59e0b] hover:underline">← {t('academy.backToAcademy')}</Link>
       </div>
     );
   }
@@ -138,7 +140,7 @@ export default function CourseDetail() {
       {/* Back link */}
       <Link to="/academy" className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition">
         <ArrowLeft className="h-3.5 w-3.5" />
-        Back to Academy
+        {t('academy.backToAcademy')}
       </Link>
 
       {/* Course header */}
@@ -165,11 +167,11 @@ export default function CourseDetail() {
               {course.is_premium ? (
                 <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] uppercase tracking-wider bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/20 rounded-sm">
                   <Lock className="h-3 w-3" />
-                  Premium · €{course.price_eur}
+                  {t('academy.course.premiumPrice', { price: course.price_eur })}
                 </span>
               ) : (
                 <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20 rounded-sm">
-                  Free
+                  {t('academy.course.free')}
                 </span>
               )}
             </div>
@@ -180,16 +182,16 @@ export default function CourseDetail() {
             <div className="flex items-center gap-4 text-xs text-zinc-500 pt-1">
               <span className="flex items-center gap-1.5">
                 <BookOpen className="h-3.5 w-3.5" />
-                {totalLessons} lessons
+                {t('academy.course.lessonsCount', { count: totalLessons })}
               </span>
               <span className="flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5" />
-                {course.estimated_hours}h estimated
+                {t('academy.course.estimatedHours', { hours: course.estimated_hours })}
               </span>
               {completedCount > 0 && (
                 <span className="flex items-center gap-1.5 text-[#f59e0b]">
                   <CheckCircle2 className="h-3.5 w-3.5" />
-                  {completedCount}/{totalLessons} completed ({pct}%)
+                  {t('academy.course.completedOf', { completed: completedCount, total: totalLessons, pct })}
                 </span>
               )}
             </div>
@@ -198,7 +200,7 @@ export default function CourseDetail() {
           {course.cert_body && (
             <div className="hidden md:flex flex-col items-center gap-1 text-center shrink-0">
               <Shield className="h-8 w-8 text-[#f59e0b]" />
-              <p className="text-[9px] uppercase tracking-wider text-zinc-600">Official Prep</p>
+              <p className="text-[9px] uppercase tracking-wider text-zinc-600">{t('academy.course.officialPrep')}</p>
               <p className="text-[10px] text-zinc-500">{course.cert_body}</p>
             </div>
           )}
@@ -208,7 +210,7 @@ export default function CourseDetail() {
         {pct > 0 && (
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[10px] text-zinc-500">
-              <span>Course Progress</span>
+              <span>{t('academy.course.progress')}</span>
               <span className="text-[#f59e0b] font-medium">{pct}%</span>
             </div>
             <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
@@ -221,10 +223,10 @@ export default function CourseDetail() {
         {course.cert_body && (
           <div className="border border-[#f59e0b]/20 bg-[#f59e0b]/5 rounded-sm p-3">
             <p className="text-[11px] text-zinc-400 leading-relaxed">
-              <strong className="text-[#f59e0b]">Important:</strong> PipingBox prepares you for the exam.
-              The official certificate is issued by <strong className="text-zinc-300">{course.cert_body}</strong> through recognized exam centers.
+              <strong className="text-[#f59e0b]">{t('academy.course.importantLabel')}</strong>{' '}
+              {t('academy.course.certDisclaimer', { certBody: course.cert_body })}
               {course.slug === 'vca-preparation' && (
-                <> <Link to="/academy/vca-booking" className="text-[#f59e0b] hover:underline">Book your official VCA exam →</Link></>
+                <> <Link to="/academy/vca-booking" className="text-[#f59e0b] hover:underline">{t('academy.course.bookVcaExam')}</Link></>
               )}
             </p>
           </div>
@@ -233,11 +235,11 @@ export default function CourseDetail() {
 
       {/* Lessons list */}
       <div className="space-y-2">
-        <h2 className="text-sm font-semibold text-zinc-200">Course Content</h2>
+        <h2 className="text-sm font-semibold text-zinc-200">{t('academy.course.content')}</h2>
 
         {lessons.length === 0 ? (
           <div className="border border-zinc-800/60 bg-[#0d0d0d] rounded-sm p-6 text-center">
-            <p className="text-xs text-zinc-500">No lessons available yet.</p>
+            <p className="text-xs text-zinc-500">{t('academy.course.noLessons')}</p>
           </div>
         ) : (
           <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm overflow-hidden">
@@ -288,13 +290,13 @@ export default function CourseDetail() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {lesson.duration_minutes} min
+                        {t('academy.course.minutes', { count: lesson.duration_minutes })}
                       </span>
                       {lesson.official_ref && (
                         <span className="text-zinc-700">{lesson.official_ref}</span>
                       )}
                       {lesson.is_free_preview && course.is_premium && (
-                        <span className="text-green-400">Free preview</span>
+                        <span className="text-green-400">{t('academy.course.freePreview')}</span>
                       )}
                     </div>
                   </div>
@@ -311,11 +313,11 @@ export default function CourseDetail() {
       {pct === 100 && (
         <div className="border border-green-500/30 bg-green-500/5 rounded-sm p-5 text-center space-y-2">
           <GraduationCap className="h-8 w-8 text-green-400 mx-auto" />
-          <h3 className="text-sm font-semibold text-zinc-200">Course Completed!</h3>
-          <p className="text-xs text-zinc-400">You've completed all lessons in this course.</p>
+          <h3 className="text-sm font-semibold text-zinc-200">{t('academy.course.completedTitle')}</h3>
+          <p className="text-xs text-zinc-400">{t('academy.course.completedBody')}</p>
           {course.cert_body && (
             <p className="text-xs text-[#f59e0b]">
-              Ready for the official exam? <Link to="/academy/vca-booking" className="underline">Book your exam →</Link>
+              {t('academy.course.readyForExam')} <Link to="/academy/vca-booking" className="underline">{t('academy.course.bookExam')}</Link>
             </p>
           )}
         </div>

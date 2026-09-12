@@ -151,10 +151,8 @@ export default function Tools() {
                   <Crown className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[#F5F7FA]">Unlock Premium Tools</p>
-                  <p className="text-[11px] text-[#A3A9B3]">
-                    PDF exports, printable templates, torque reports &amp; more.
-                  </p>
+                  <p className="text-sm font-semibold text-[#F5F7FA]">{t('tools.premiumBanner.title')}</p>
+                  <p className="text-[11px] text-[#A3A9B3]">{t('tools.premiumBanner.description')}</p>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -164,7 +162,7 @@ export default function Tools() {
                   className="inline-flex items-center gap-1.5 rounded-lg border border-[#f59e0b]/40 bg-transparent px-3 py-1.5 text-xs font-semibold text-[#f59e0b] transition hover:bg-[#f59e0b]/10 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {checkoutLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-                  {checkoutLoading ? 'Loading...' : 'Monthly €4.99'}
+                  {checkoutLoading ? t('tools.premiumBanner.loading') : t('tools.premiumBanner.monthly')}
                 </button>
                 <button
                   disabled={checkoutLoading}
@@ -172,7 +170,7 @@ export default function Tools() {
                   className="inline-flex items-center gap-1.5 rounded-lg bg-[#f59e0b] px-3 py-1.5 text-xs font-semibold text-black transition hover:bg-[#d97706] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {checkoutLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-                  {checkoutLoading ? 'Loading...' : 'Annual €39 (save 35%)'}
+                  {checkoutLoading ? t('tools.premiumBanner.loading') : t('tools.premiumBanner.annual')}
                 </button>
               </div>
             </div>
