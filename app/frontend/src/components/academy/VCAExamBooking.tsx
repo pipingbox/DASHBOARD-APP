@@ -156,15 +156,15 @@ export function VCAExamBooking() {
 
   const handleSubmit = async () => {
     if (!user) {
-      toast.error('Please sign in to submit a booking request');
+      toast.error(t('academy.vcaBooking.signInRequired'));
       return;
     }
     if (!userName || !postalCode) {
-      toast.error('Please fill in your name and postal code');
+      toast.error(t('academy.vcaBooking.fillNameAndPostalCode'));
       return;
     }
     if (!activeCertId) {
-      toast.error('Certification not available. Please try again later.');
+      toast.error(t('academy.vcaBooking.certificationUnavailable'));
       return;
     }
 
@@ -191,11 +191,11 @@ export function VCAExamBooking() {
     setSubmitting(false);
 
     if (error) {
-      toast.error('Failed to submit booking request', { description: error.message });
+      toast.error(t('academy.vcaBooking.submitFailed'), { description: error.message });
       return;
     }
 
-    toast.success('Booking request submitted! PipingBox will contact you within 24h to confirm your exam reservation.');
+    toast.success(t('academy.vcaBooking.submitted'));
     setPostalCode('');
     setPreferredDate('');
     setSelectedCenter(null);

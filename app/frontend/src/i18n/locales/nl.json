@@ -50,7 +50,9 @@
     "sending": "Verzenden...",
     "download": "Downloaden",
     "saveError": "Opslaan mislukt",
-    "saved": "Opgeslagen"
+    "saved": "Opgeslagen",
+    "fixHighlightedFields": "Corrigeer de gemarkeerde velden",
+    "sessionNotFound": "Gebruikerssessie niet gevonden. Meld u opnieuw aan."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -322,7 +324,36 @@
     "sortTop": "Top",
     "postedBy": "Geplaatst door {{name}} · {{time}}",
     "channel": "Kanaal",
-    "post": "Bericht"
+    "post": "Bericht",
+    "notSignedIn": "Niet aangemeld",
+    "failedToCreatePost": "Bericht aanmaken mislukt",
+    "postPublished": "Bericht gepubliceerd",
+    "createPost": {
+      "eyebrow": "Community",
+      "title": "Nieuw bericht aanmaken",
+      "description": "Deel een vraag, een tip of een verhaal van de werkvloer met de PipingBox-community.",
+      "channel": "Kanaal",
+      "postTitle": "Titel",
+      "body": "Inhoud",
+      "locationOptional": "Locatie (optioneel)",
+      "tagsOptional": "Tags (optioneel)",
+      "attachmentOptional": "URL van bijlage (optioneel)",
+      "selectChannel": "— Kies een kanaal —",
+      "titlePlaceholder": "bijv. Beste purge-opstelling voor een DSS TIG-grondlaag?",
+      "bodyPlaceholder": "Deel de details — wat u hebt geprobeerd, wat er misging, wat werkte…",
+      "locationPlaceholder": "Antwerpen, België",
+      "publish": "Bericht publiceren",
+      "publishing": "Publiceren…",
+      "mustBeSignedIn": "U moet aangemeld zijn om te posten",
+      "sessionExpired": "Uw sessie is verlopen. Meld u af en opnieuw aan en probeer het daarna nogmaals.",
+      "serverRejected": "De server heeft de invoer geweigerd. Probeer het opnieuw of neem contact op met de support.",
+      "validation": {
+        "pickChannel": "Kies een kanaal",
+        "titleMin": "De titel moet minimaal 4 tekens bevatten",
+        "titleMax": "De titel is te lang (max. 160)",
+        "bodyMin": "De inhoud moet minimaal 8 tekens bevatten"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Profiel / CV",
@@ -419,7 +450,21 @@
     "whatsappOptIn": "WhatsApp-vacaturemeldingen",
     "whatsappOptInHint": "PipingBox toestaan mij via WhatsApp te benaderen",
     "workforceInvitationsEnabled": "Werkuitnodigingen",
-    "workforceInvitationsEnabledHint": "Uitnodigingen ontvangen voor door PipingBox beheerde projecten"
+    "workforceInvitationsEnabledHint": "Uitnodigingen ontvangen voor door PipingBox beheerde projecten",
+    "avatarHeicNotice": "HEIC-foto gedetecteerd. De foto wordt correct geüpload, maar de voorvertoning werkt mogelijk niet in elke browser.",
+    "avatarUpdated": "Profielfoto bijgewerkt",
+    "avatarRemoved": "Profielfoto verwijderd",
+    "avatarInvalidType": "Alleen JPG-, PNG-, WebP- of HEIC-afbeeldingen worden geaccepteerd",
+    "avatarSaveFailed": "Avatar opslaan in profiel mislukt",
+    "avatarRemoveFailed": "Avatar verwijderen mislukt",
+    "avatarVisibilityFailed": "Zichtbaarheid bijwerken mislukt",
+    "avatarNowVisible": "De foto is nu zichtbaar",
+    "avatarNowHidden": "De foto is nu verborgen",
+    "avatarUploading": "Uploaden…",
+    "avatarChange": "Foto wijzigen",
+    "avatarUpload": "Foto uploaden",
+    "avatarHide": "Foto verbergen",
+    "avatarShow": "Foto tonen"
   },
   "academy": {
     "eyebrow": "Academy",
@@ -726,6 +771,13 @@
       "previous": "Vorige",
       "next": "Volgende",
       "finish": "Afronden"
+    },
+    "vcaBooking": {
+      "signInRequired": "Meld u aan om een boekingsaanvraag in te dienen",
+      "fillNameAndPostalCode": "Vul uw naam en postcode in",
+      "certificationUnavailable": "Certificering niet beschikbaar. Probeer het later opnieuw.",
+      "submitFailed": "Boekingsaanvraag indienen mislukt",
+      "submitted": "Boekingsaanvraag ingediend! PipingBox neemt binnen 24 uur contact met u op om uw examenreservering te bevestigen."
     }
   },
   "tools": {
@@ -1331,7 +1383,8 @@
     "postedTimes": {
       "h_ago": "{{count}} u geleden",
       "d_ago": "{{count}} d geleden",
-      "w_ago": "{{count}} w geleden"
+      "w_ago": "{{count}} w geleden",
+      "justNow": "zojuist"
     },
     "filterJobs": "Vacatures filteren",
     "activeFilterCount": "{{count}} actief filter",
@@ -1344,7 +1397,44 @@
     "priority": "Prioriteit",
     "urgentPositionsOnly": "Alleen urgente vacatures",
     "signInToApply": "Log in om te solliciteren",
-    "applicationFailed": "Sollicitatie versturen mislukt"
+    "applicationFailed": "Sollicitatie versturen mislukt",
+    "roleCount_one": "{{count}} functie",
+    "roleCount_other": "{{count}} functies",
+    "activeFiltersLabel_one": "{{count}} actief filter",
+    "activeFiltersLabel_other": "{{count}} actieve filters",
+    "mustBeLoggedIn": "U moet ingelogd zijn om te solliciteren",
+    "salaryPerYear": "{{amount}} /jaar",
+    "salaryPerMonth": "{{amount}} /maand",
+    "metrics": {
+      "companies": "Bedrijven",
+      "applications": "Sollicitaties"
+    },
+    "options": {
+      "countries": {
+        "belgium": "België",
+        "netherlands": "Nederland",
+        "germany": "Duitsland",
+        "norway": "Noorwegen",
+        "uae": "VAE",
+        "unitedKingdom": "Verenigd Koninkrijk",
+        "usa": "VS"
+      },
+      "disciplines": {
+        "pipefitter": "Pijpfitter",
+        "tigWelder": "TIG-lasser",
+        "qaqc": "QA/QC",
+        "supervisor": "Supervisor",
+        "planner": "Planner",
+        "rigger": "Rigger",
+        "offshoreTechnician": "Offshore-technicus"
+      },
+      "contractTypes": {
+        "freelance": "Freelance",
+        "employee": "Werknemer",
+        "contract": "Contract",
+        "fullTime": "Voltijds"
+      }
+    }
   },
   "companies": {
     "eyebrow": "Bedrijven",
@@ -1510,7 +1600,8 @@
       "accessDenied": "Toegang geweigerd",
       "invalidType": "Niet-ondersteund bestandstype. Geaccepteerd: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
       "saveFailed": "Document opslaan mislukt: ",
-      "verified": "Geverifieerd"
+      "verified": "Geverifieerd",
+      "heicNotice": "HEIC-foto gedetecteerd. De foto wordt correct geüpload."
     },
     "cv": {
       "label": "CV / Resume",
@@ -1590,7 +1681,8 @@
       "showInApp": "Toon vervalwaarschuwingen in app",
       "prefsSaved": "Waarschuwingsvoorkeuren opgeslagen",
       "prefsSaveError": "Waarschuwingsvoorkeuren opslaan mislukt",
-      "viewFileDenied": "Toegang geweigerd"
+      "viewFileDenied": "Toegang geweigerd",
+      "saveTimedOut": "Time-out bij het opslaan. Uw certificaat is mogelijk toch opgeslagen — vernieuw de pagina om dit te controleren."
     }
   },
   "profileCompleteness": {
@@ -1712,7 +1804,9 @@
     "cvResume": "CV / Resume",
     "applicationHistory": "Sollicitatiegeschiedenis",
     "view": "Bekijken",
-    "download": "Downloaden"
+    "download": "Downloaden",
+    "cvPreviewFailed": "Voorvertoningslink voor cv genereren mislukt",
+    "previewFailed": "Voorvertoningslink genereren mislukt"
   },
   "inviteToJob": {
     "buttonLabel": "Uitnodigen voor vacature",
@@ -1857,6 +1951,37 @@
     "location": "Locatie",
     "companyName": "Bedrijfsnaam (optioneel)",
     "companyNamePlaceholder": "Acme Piping B.V."
+  },
+  "dailyLog": {
+    "addDailyLog": "Daglogboek toevoegen",
+    "eyebrow": "Dagelijks piping-logboek",
+    "newEntry": "Nieuwe registratie",
+    "description": "Registreer de ISO, de toewijzing van lassers, de uren en het brutoloon van de dag.",
+    "isoNumber": "ISO-nummer",
+    "isoPlaceholder": "bijv. ISO-PL-2041",
+    "weldersCount": "Aantal lassers",
+    "weldersPlaceholder": "bijv. 4",
+    "normalRatePlaceholder": "bijv. 25,00",
+    "extraRatePlaceholder": "bijv. 37,50",
+    "grossSalaryAuto": "Brutoloon (automatisch)",
+    "normalGrossSalary": "Normaal brutoloon",
+    "extraGrossSalary": "Extra brutoloon",
+    "totalGross": "Totaal bruto",
+    "notesPlaceholder": "Eventuele blokkades, opmerkingen of context voor de ploeg…",
+    "saveEntry": "Registratie opslaan",
+    "saveFailed": "Daglogboek opslaan mislukt",
+    "saved": "Daglogboek opgeslagen",
+    "savedDescription": "ISO {{iso}} — {{amount}} bruto",
+    "validation": {
+      "dateRequired": "Datum is verplicht",
+      "isoRequired": "ISO-nummer is verplicht",
+      "weldersInvalid": "Voer een geldig aantal lassers in",
+      "normalHoursInvalid": "Voer de normale uren in (0 of meer)",
+      "maxHours": "Mag maximaal 24 zijn",
+      "extraHoursInvalid": "Voer een geldig aantal extra uren in",
+      "normalRateInvalid": "Voer een geldig normaal uurtarief in",
+      "extraRateInvalid": "Voer een geldig extra uurtarief in"
+    }
   },
   "ratePresets": {
     "eyebrow": "Tariefsjablonen",

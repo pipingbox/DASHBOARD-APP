@@ -20,6 +20,7 @@ import {
   DISCIPLINE_MAP,
   getCountry,
   getContractTypeLabel,
+  optionLabelKey,
 } from '@/lib/jobs/utils';
 import type { Job, FilterTag } from '@/lib/jobs/types';
 
@@ -117,9 +118,9 @@ export default function Jobs() {
 
   const activeFilterTags = useMemo<FilterTag[]>(() => {
     const tags: FilterTag[] = [];
-    selectedCountries.forEach((v) => tags.push({ type: 'country', label: v, value: v }));
-    selectedDisciplines.forEach((v) => tags.push({ type: 'discipline', label: v, value: v }));
-    selectedContractTypes.forEach((v) => tags.push({ type: 'contractType', label: v, value: v }));
+    selectedCountries.forEach((v) => tags.push({ type: 'country', label: optionLabelKey('countries', v), value: v }));
+    selectedDisciplines.forEach((v) => tags.push({ type: 'discipline', label: optionLabelKey('disciplines', v), value: v }));
+    selectedContractTypes.forEach((v) => tags.push({ type: 'contractType', label: optionLabelKey('contractTypes', v), value: v }));
     return tags;
   }, [selectedCountries, selectedDisciplines, selectedContractTypes]);
 
@@ -132,7 +133,7 @@ export default function Jobs() {
 
   const apply = async (job: Job) => {
     if (!user) {
-      toast.info('Sign in to apply for jobs');
+      toast.info(t('jobs.signInToApply'));
       return;
     }
     const jobKey = `${job.title}|${job.company}`;
@@ -145,7 +146,7 @@ export default function Jobs() {
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData?.user) {
       setApplyingId(null);
-      toast.error('You must be logged in to apply');
+      toast.error(t('jobs.mustBeLoggedIn'));
       return;
     }
 
@@ -176,12 +177,12 @@ export default function Jobs() {
         toast.info(t('jobs.alreadyApplied'));
         setAppliedKeys((s) => new Set(s).add(jobKey));
       } else {
-        toast.error('Failed to submit application', { description: error.message });
+        toast.error(t('jobs.applicationFailed'), { description: error.message });
       }
       return;
     }
 
-    toast.success('Application submitted successfully');
+    toast.success(t('jobs.applicationSubmitted'));
     setAppliedKeys((s) => new Set(s).add(jobKey));
   };
 
@@ -216,7 +217,7 @@ export default function Jobs() {
               }`}
             >
               <Filter className="h-3.5 w-3.5 mr-1.5" />
-              Filters
+              {t('jobs.filters')}
               {activeFilterCount > 0 && (
                 <span className="ml-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#f59e0b] text-[9px] font-bold text-black">
                   {activeFilterCount}
@@ -247,20 +248,20 @@ export default function Jobs() {
       {/* Active Filter Tags */}
       {activeFilterTags.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 animate-in fade-in duration-200">
-          <span className="text-[10px] uppercase tracking-[0.15em] text-zinc-600 font-medium mr-1">Active:</span>
+          <span className="text-[10px] uppercase tracking-[0.15em] text-zinc-600 font-medium mr-1">{t('jobs.active')}</span>
           {activeFilterTags.map((tag) => (
             <button
               key={`${tag.type}-${tag.value}`}
               onClick={() => removeFilterTag(tag.type, tag.value)}
               className="group/tag flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#f59e0b]/30 bg-[#f59e0b]/5 text-xs text-[#f59e0b] font-medium hover:bg-[#f59e0b]/10 hover:border-[#f59e0b]/50 transition-all duration-200"
             >
-              {tag.label}
+              {t(tag.label)}
               <X className="h-3 w-3 opacity-60 group-hover/tag:opacity-100 transition-opacity" />
             </button>
           ))}
           <button onClick={clearFilters} className="flex items-center gap-1 px-2 py-1 text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors">
             <RotateCcw className="h-3 w-3" />
-            Clear all
+            {t('jobs.clearAll')}
           </button>
         </div>
       )}
@@ -269,10 +270,10 @@ export default function Jobs() {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-zinc-200">
-            {showingRecommended ? 'Recommended Jobs' : 'All Open Positions'}
+            {showingRecommended ? t('jobs.recommendedJobs') : t('jobs.allOpenPositions')}
           </h2>
           <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-600">
-            {displayJobs.length} {displayJobs.length === 1 ? 'role' : 'roles'}
+            {t('jobs.roleCount', { count: displayJobs.length })}
           </span>
         </div>
 
@@ -280,10 +281,10 @@ export default function Jobs() {
           <div className="flex items-center gap-2 px-3 py-2 border border-[#f59e0b]/20 bg-[#f59e0b]/5 rounded-sm">
             <TrendingUp className="h-3.5 w-3.5 text-[#f59e0b]" />
             <p className="text-xs text-zinc-400">
-              No exact matches found. Here are some <span className="text-[#f59e0b] font-medium">recommended positions</span> you might like.
+              {t('jobs.noMatchesFound')} <span className="text-[#f59e0b] font-medium">{t('jobs.recommendedPositions')}</span> {t('jobs.youMightLike')}
             </p>
             <button onClick={clearFilters} className="ml-auto text-xs text-[#f59e0b] hover:text-[#d97706] font-medium transition-colors">
-              Clear filters
+              {t('jobs.clearFilters')}
             </button>
           </div>
         )}

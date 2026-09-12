@@ -50,7 +50,9 @@
     "sending": "Изпращане...",
     "download": "Изтегли",
     "saveError": "Грешка при запазване",
-    "saved": "Запазено"
+    "saved": "Запазено",
+    "fixHighlightedFields": "Моля, коригирайте маркираните полета",
+    "sessionNotFound": "Потребителската сесия не е намерена. Моля, влезте отново."
   },
   "nav": {
     "dashboard": "Табло",
@@ -322,7 +324,36 @@
     "sortTop": "Най-популярни",
     "postedBy": "Публикувано от {{name}} · {{time}}",
     "channel": "Канал",
-    "post": "Публикация"
+    "post": "Публикация",
+    "notSignedIn": "Не сте влезли в профила си",
+    "failedToCreatePost": "Публикацията не можа да бъде създадена",
+    "postPublished": "Публикацията е публикувана",
+    "createPost": {
+      "eyebrow": "Общност",
+      "title": "Създаване на нова публикация",
+      "description": "Споделете въпрос, съвет или история от обекта с общността на PipingBox.",
+      "channel": "Канал",
+      "postTitle": "Заглавие",
+      "body": "Съдържание",
+      "locationOptional": "Местоположение (по избор)",
+      "tagsOptional": "Тагове (по избор)",
+      "attachmentOptional": "URL адрес на прикачен файл (по избор)",
+      "selectChannel": "— Изберете канал —",
+      "titlePlaceholder": "напр. Най-добра настройка на продухването за корен TIG на DSS?",
+      "bodyPlaceholder": "Споделете подробностите — какво опитахте, какво се обърка, какво проработи…",
+      "locationPlaceholder": "Антверпен, Белгия",
+      "publish": "Публикуване",
+      "publishing": "Публикуване…",
+      "mustBeSignedIn": "Трябва да сте влезли в профила си, за да публикувате",
+      "sessionExpired": "Сесията ви е изтекла. Моля, излезте и влезте отново, след което опитайте пак.",
+      "serverRejected": "Сървърът отхвърли записа. Моля, опитайте отново или се свържете с поддръжката.",
+      "validation": {
+        "pickChannel": "Изберете канал",
+        "titleMin": "Заглавието трябва да е поне 4 знака",
+        "titleMax": "Заглавието е твърде дълго (макс. 160)",
+        "bodyMin": "Съдържанието на публикацията трябва да е поне 8 знака"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Профил / CV",
@@ -419,7 +450,21 @@
     "whatsappOptIn": "Известия за работа в WhatsApp",
     "whatsappOptInHint": "Разрешавам на PipingBox да се свързва с мен през WhatsApp",
     "workforceInvitationsEnabled": "Покани за работни екипи",
-    "workforceInvitationsEnabledHint": "Получавайте покани за проекти, управлявани от PipingBox"
+    "workforceInvitationsEnabledHint": "Получавайте покани за проекти, управлявани от PipingBox",
+    "avatarHeicNotice": "Открита е снимка във формат HEIC. Тя ще бъде качена правилно, но предварителният преглед може да не работи във всеки браузър.",
+    "avatarUpdated": "Профилната снимка е обновена",
+    "avatarRemoved": "Профилната снимка е премахната",
+    "avatarInvalidType": "Приемат се само изображения във формат JPG, PNG, WebP или HEIC",
+    "avatarSaveFailed": "Аватарът не можа да бъде запазен в профила",
+    "avatarRemoveFailed": "Аватарът не можа да бъде премахнат",
+    "avatarVisibilityFailed": "Видимостта не можа да бъде обновена",
+    "avatarNowVisible": "Снимката вече е видима",
+    "avatarNowHidden": "Снимката вече е скрита",
+    "avatarUploading": "Качване…",
+    "avatarChange": "Смяна на снимката",
+    "avatarUpload": "Качване на снимка",
+    "avatarHide": "Скриване на снимката",
+    "avatarShow": "Показване на снимката"
   },
   "academy": {
     "eyebrow": "Академия",
@@ -726,6 +771,13 @@
       "previous": "Назад",
       "next": "Напред",
       "finish": "Завършване"
+    },
+    "vcaBooking": {
+      "signInRequired": "Моля, влезте в профила си, за да изпратите заявка за резервация",
+      "fillNameAndPostalCode": "Моля, попълнете името и пощенския си код",
+      "certificationUnavailable": "Сертификацията не е налична. Моля, опитайте отново по-късно.",
+      "submitFailed": "Заявката за резервация не можа да бъде изпратена",
+      "submitted": "Заявката за резервация е изпратена! PipingBox ще се свърже с вас в рамките на 24 часа, за да потвърди резервацията на изпита ви."
     }
   },
   "tools": {
@@ -1331,7 +1383,8 @@
     "postedTimes": {
       "h_ago": "преди {{count}} ч",
       "d_ago": "преди {{count}} д",
-      "w_ago": "преди {{count}} седм."
+      "w_ago": "преди {{count}} седм.",
+      "justNow": "току-що"
     },
     "filterJobs": "Филтрирай обявите",
     "activeFilterCount": "{{count}} активен филтър",
@@ -1344,7 +1397,44 @@
     "priority": "Приоритет",
     "urgentPositionsOnly": "Само спешни позиции",
     "signInToApply": "Влезте, за да кандидатствате за обяви",
-    "applicationFailed": "Кандидатурата не можа да бъде изпратена"
+    "applicationFailed": "Кандидатурата не можа да бъде изпратена",
+    "roleCount_one": "{{count}} позиция",
+    "roleCount_other": "{{count}} позиции",
+    "activeFiltersLabel_one": "{{count}} активен филтър",
+    "activeFiltersLabel_other": "{{count}} активни филтри",
+    "mustBeLoggedIn": "Трябва да влезете в профила си, за да кандидатствате",
+    "salaryPerYear": "{{amount}} /год.",
+    "salaryPerMonth": "{{amount}} /мес.",
+    "metrics": {
+      "companies": "Компании",
+      "applications": "Кандидатури"
+    },
+    "options": {
+      "countries": {
+        "belgium": "Белгия",
+        "netherlands": "Нидерландия",
+        "germany": "Германия",
+        "norway": "Норвегия",
+        "uae": "ОАЕ",
+        "unitedKingdom": "Обединено кралство",
+        "usa": "САЩ"
+      },
+      "disciplines": {
+        "pipefitter": "Тръбопроводчик",
+        "tigWelder": "Заварчик TIG",
+        "qaqc": "QA/QC",
+        "supervisor": "Супервайзор",
+        "planner": "Планировчик",
+        "rigger": "Ригер",
+        "offshoreTechnician": "Офшорен техник"
+      },
+      "contractTypes": {
+        "freelance": "На свободна практика",
+        "employee": "Служител",
+        "contract": "Договор",
+        "fullTime": "Пълно работно време"
+      }
+    }
   },
   "companies": {
     "eyebrow": "Компании",
@@ -1510,7 +1600,8 @@
       "accessDenied": "Достъпът е отказан",
       "invalidType": "Неподдържан файлов формат. Приемат се: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
       "saveFailed": "Документът не можа да бъде запазен: ",
-      "verified": "Верифициран"
+      "verified": "Верифициран",
+      "heicNotice": "Открита е снимка във формат HEIC. Тя ще бъде качена правилно."
     },
     "cv": {
       "label": "CV / Автобиография",
@@ -1590,7 +1681,8 @@
       "showInApp": "Показвай предупреждения за изтичане в приложението",
       "prefsSaved": "Настройките за известия са запазени",
       "prefsSaveError": "Запазването на настройките за известия не беше успешно",
-      "viewFileDenied": "Достъпът е отказан"
+      "viewFileDenied": "Достъпът е отказан",
+      "saveTimedOut": "Времето за запазване изтече. Сертификатът ви може да е запазен — моля, обновете страницата, за да проверите."
     }
   },
   "profileCompleteness": {
@@ -1712,7 +1804,9 @@
     "cvResume": "CV / Автобиография",
     "applicationHistory": "История на кандидатурите",
     "view": "Преглед",
-    "download": "Изтегли"
+    "download": "Изтегли",
+    "cvPreviewFailed": "Връзката за преглед на CV не можа да бъде генерирана",
+    "previewFailed": "Връзката за преглед не можа да бъде генерирана"
   },
   "inviteToJob": {
     "buttonLabel": "Покани за обява",
@@ -1857,6 +1951,37 @@
     "location": "Местоположение",
     "companyName": "Име на компанията (по избор)",
     "companyNamePlaceholder": "Acme Piping S.L."
+  },
+  "dailyLog": {
+    "addDailyLog": "Добавяне на дневен отчет",
+    "eyebrow": "Дневен отчет за тръбопровода",
+    "newEntry": "Нов запис",
+    "description": "Запишете ISO, разпределението на заварчиците, часовете и брутното възнаграждение за деня.",
+    "isoNumber": "Номер на ISO",
+    "isoPlaceholder": "напр. ISO-PL-2041",
+    "weldersCount": "Брой заварчици",
+    "weldersPlaceholder": "напр. 4",
+    "normalRatePlaceholder": "напр. 25,00",
+    "extraRatePlaceholder": "напр. 37,50",
+    "grossSalaryAuto": "Брутно възнаграждение (автоматично)",
+    "normalGrossSalary": "Брутно възнаграждение за редовни часове",
+    "extraGrossSalary": "Брутно възнаграждение за извънредни часове",
+    "totalGross": "Общо бруто",
+    "notesPlaceholder": "Пречки, наблюдения или контекст за екипа…",
+    "saveEntry": "Запазване на записа",
+    "saveFailed": "Дневният отчет не можа да бъде запазен",
+    "saved": "Дневният отчет е запазен",
+    "savedDescription": "ISO {{iso}} — {{amount}} бруто",
+    "validation": {
+      "dateRequired": "Датата е задължителна",
+      "isoRequired": "Номерът на ISO е задължителен",
+      "weldersInvalid": "Въведете валиден брой заварчици",
+      "normalHoursInvalid": "Въведете редовни часове (0 или повече)",
+      "maxHours": "Трябва да е 24 или по-малко",
+      "extraHoursInvalid": "Въведете валидни извънредни часове",
+      "normalRateInvalid": "Въведете валидна редовна почасова ставка",
+      "extraRateInvalid": "Въведете валидна почасова ставка за извънредни часове"
+    }
   },
   "ratePresets": {
     "eyebrow": "Шаблони за ставки",

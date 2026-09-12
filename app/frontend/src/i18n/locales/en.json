@@ -50,7 +50,9 @@
     "sending": "Sending...",
     "download": "Download",
     "saveError": "Save error",
-    "saved": "Saved"
+    "saved": "Saved",
+    "fixHighlightedFields": "Please fix the highlighted fields",
+    "sessionNotFound": "User session not found. Please sign in again."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -322,7 +324,36 @@
     "sortTop": "Top",
     "postedBy": "Posted by {{name}} · {{time}}",
     "channel": "Channel",
-    "post": "Post"
+    "post": "Post",
+    "notSignedIn": "Not signed in",
+    "failedToCreatePost": "Failed to create post",
+    "postPublished": "Post published",
+    "createPost": {
+      "eyebrow": "Community",
+      "title": "Create a new post",
+      "description": "Share a question, a tip or a shop-floor story with the PipingBox community.",
+      "channel": "Channel",
+      "postTitle": "Title",
+      "body": "Body",
+      "locationOptional": "Location (optional)",
+      "tagsOptional": "Tags (optional)",
+      "attachmentOptional": "Attachment URL (optional)",
+      "selectChannel": "— Select a channel —",
+      "titlePlaceholder": "e.g. Best purge setup for DSS TIG root?",
+      "bodyPlaceholder": "Share the details — what you tried, what went wrong, what worked…",
+      "locationPlaceholder": "Antwerp, Belgium",
+      "publish": "Publish post",
+      "publishing": "Publishing…",
+      "mustBeSignedIn": "You must be signed in to post",
+      "sessionExpired": "Your session has expired. Please sign out and sign in again, then retry.",
+      "serverRejected": "The server rejected the insert. Please try again or contact support.",
+      "validation": {
+        "pickChannel": "Pick a channel",
+        "titleMin": "Title must be at least 4 characters",
+        "titleMax": "Title is too long (max 160)",
+        "bodyMin": "Post body must be at least 8 characters"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Profile / CV",
@@ -419,7 +450,21 @@
     "whatsappOptIn": "WhatsApp job alerts",
     "whatsappOptInHint": "Allow PipingBox to contact me via WhatsApp",
     "workforceInvitationsEnabled": "Workforce invitations",
-    "workforceInvitationsEnabledHint": "Receive invitations to PipingBox-managed projects"
+    "workforceInvitationsEnabledHint": "Receive invitations to PipingBox-managed projects",
+    "avatarHeicNotice": "HEIC photo detected. It will upload correctly but the preview may not work in every browser.",
+    "avatarUpdated": "Profile picture updated",
+    "avatarRemoved": "Profile photo removed",
+    "avatarInvalidType": "Only JPG, PNG, WebP or HEIC images are accepted",
+    "avatarSaveFailed": "Failed to save avatar to profile",
+    "avatarRemoveFailed": "Failed to remove avatar",
+    "avatarVisibilityFailed": "Failed to update visibility",
+    "avatarNowVisible": "Photo is now visible",
+    "avatarNowHidden": "Photo is now hidden",
+    "avatarUploading": "Uploading…",
+    "avatarChange": "Change photo",
+    "avatarUpload": "Upload photo",
+    "avatarHide": "Hide photo",
+    "avatarShow": "Show photo"
   },
   "academy": {
     "eyebrow": "Academy",
@@ -726,6 +771,13 @@
       "previous": "Previous",
       "next": "Next",
       "finish": "Finish"
+    },
+    "vcaBooking": {
+      "signInRequired": "Please sign in to submit a booking request",
+      "fillNameAndPostalCode": "Please fill in your name and postal code",
+      "certificationUnavailable": "Certification not available. Please try again later.",
+      "submitFailed": "Failed to submit booking request",
+      "submitted": "Booking request submitted! PipingBox will contact you within 24h to confirm your exam reservation."
     }
   },
   "tools": {
@@ -1331,7 +1383,8 @@
     "postedTimes": {
       "h_ago": "{{count}}h ago",
       "d_ago": "{{count}}d ago",
-      "w_ago": "{{count}}w ago"
+      "w_ago": "{{count}}w ago",
+      "justNow": "just now"
     },
     "filterJobs": "Filter Jobs",
     "activeFilterCount": "{{count}} active filter",
@@ -1344,7 +1397,44 @@
     "priority": "Priority",
     "urgentPositionsOnly": "Urgent Positions Only",
     "signInToApply": "Sign in to apply for jobs",
-    "applicationFailed": "Failed to submit application"
+    "applicationFailed": "Failed to submit application",
+    "roleCount_one": "{{count}} role",
+    "roleCount_other": "{{count}} roles",
+    "activeFiltersLabel_one": "{{count}} active filter",
+    "activeFiltersLabel_other": "{{count}} active filters",
+    "mustBeLoggedIn": "You must be logged in to apply",
+    "salaryPerYear": "{{amount}} /yr",
+    "salaryPerMonth": "{{amount}} /mo",
+    "metrics": {
+      "companies": "Companies",
+      "applications": "Applications"
+    },
+    "options": {
+      "countries": {
+        "belgium": "Belgium",
+        "netherlands": "Netherlands",
+        "germany": "Germany",
+        "norway": "Norway",
+        "uae": "UAE",
+        "unitedKingdom": "United Kingdom",
+        "usa": "USA"
+      },
+      "disciplines": {
+        "pipefitter": "Pipefitter",
+        "tigWelder": "TIG Welder",
+        "qaqc": "QA/QC",
+        "supervisor": "Supervisor",
+        "planner": "Planner",
+        "rigger": "Rigger",
+        "offshoreTechnician": "Offshore Technician"
+      },
+      "contractTypes": {
+        "freelance": "Freelance",
+        "employee": "Employee",
+        "contract": "Contract",
+        "fullTime": "Full-time"
+      }
+    }
   },
   "companies": {
     "eyebrow": "Companies",
@@ -1510,7 +1600,8 @@
       "accessDenied": "Access denied",
       "invalidType": "Unsupported file type. Accepted: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
       "saveFailed": "Failed to save document: ",
-      "verified": "Verified"
+      "verified": "Verified",
+      "heicNotice": "HEIC photo detected. It will upload correctly."
     },
     "cv": {
       "label": "CV / Resume",
@@ -1590,7 +1681,8 @@
       "showInApp": "Show expiry warnings in app",
       "prefsSaved": "Alert preferences saved",
       "prefsSaveError": "Failed to save alert preferences",
-      "viewFileDenied": "Access denied"
+      "viewFileDenied": "Access denied",
+      "saveTimedOut": "Save timed out. Your certificate may have been saved — please refresh to check."
     }
   },
   "profileCompleteness": {
@@ -1712,7 +1804,9 @@
     "cvResume": "CV / Resume",
     "applicationHistory": "Application History",
     "view": "View",
-    "download": "Download"
+    "download": "Download",
+    "cvPreviewFailed": "Failed to generate CV preview link",
+    "previewFailed": "Failed to generate preview link"
   },
   "inviteToJob": {
     "buttonLabel": "Invite to Job",
@@ -1857,6 +1951,37 @@
     "location": "Location",
     "companyName": "Company name (optional)",
     "companyNamePlaceholder": "Acme Piping S.L."
+  },
+  "dailyLog": {
+    "addDailyLog": "Add Daily Log",
+    "eyebrow": "Daily Pipe Log",
+    "newEntry": "New entry",
+    "description": "Record ISO, welder allocation, hours and gross salary for the day.",
+    "isoNumber": "ISO number",
+    "isoPlaceholder": "e.g. ISO-PL-2041",
+    "weldersCount": "Welders count",
+    "weldersPlaceholder": "e.g. 4",
+    "normalRatePlaceholder": "e.g. 25.00",
+    "extraRatePlaceholder": "e.g. 37.50",
+    "grossSalaryAuto": "Gross salary (auto)",
+    "normalGrossSalary": "Normal gross salary",
+    "extraGrossSalary": "Extra gross salary",
+    "totalGross": "Total gross",
+    "notesPlaceholder": "Any blockers, observations, or context for the crew…",
+    "saveEntry": "Save entry",
+    "saveFailed": "Failed to save daily log",
+    "saved": "Daily log saved",
+    "savedDescription": "ISO {{iso}} — {{amount}} gross",
+    "validation": {
+      "dateRequired": "Date is required",
+      "isoRequired": "ISO number is required",
+      "weldersInvalid": "Enter a valid welders count",
+      "normalHoursInvalid": "Enter normal hours (0 or more)",
+      "maxHours": "Must be 24 or less",
+      "extraHoursInvalid": "Enter valid extra hours",
+      "normalRateInvalid": "Enter a valid normal hourly rate",
+      "extraRateInvalid": "Enter a valid extra hourly rate"
+    }
   },
   "ratePresets": {
     "eyebrow": "Salary rate presets",

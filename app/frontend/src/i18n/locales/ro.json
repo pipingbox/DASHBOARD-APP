@@ -50,7 +50,9 @@
     "sending": "Se trimite...",
     "download": "Descarcă",
     "saveError": "Eroare la salvare",
-    "saved": "Salvat"
+    "saved": "Salvat",
+    "fixHighlightedFields": "Vă rugăm să corectați câmpurile evidențiate",
+    "sessionNotFound": "Sesiunea utilizatorului nu a fost găsită. Vă rugăm să vă autentificați din nou."
   },
   "nav": {
     "dashboard": "Panou de control",
@@ -322,7 +324,36 @@
     "sortTop": "Populare",
     "postedBy": "Publicat de {{name}} · {{time}}",
     "channel": "Canal",
-    "post": "Postare"
+    "post": "Postare",
+    "notSignedIn": "Nu sunteți autentificat",
+    "failedToCreatePost": "Postarea nu a putut fi creată",
+    "postPublished": "Postare publicată",
+    "createPost": {
+      "eyebrow": "Comunitate",
+      "title": "Creați o postare nouă",
+      "description": "Împărtășiți o întrebare, un sfat sau o poveste de pe șantier cu comunitatea PipingBox.",
+      "channel": "Canal",
+      "postTitle": "Titlu",
+      "body": "Conținut",
+      "locationOptional": "Locație (opțional)",
+      "tagsOptional": "Etichete (opțional)",
+      "attachmentOptional": "URL atașament (opțional)",
+      "selectChannel": "— Selectați un canal —",
+      "titlePlaceholder": "ex. Cea mai bună configurație de purjare pentru rădăcină TIG pe DSS?",
+      "bodyPlaceholder": "Împărtășiți detaliile — ce ați încercat, ce nu a mers, ce a funcționat…",
+      "locationPlaceholder": "Anvers, Belgia",
+      "publish": "Publicați postarea",
+      "publishing": "Se publică…",
+      "mustBeSignedIn": "Trebuie să fiți autentificat pentru a posta",
+      "sessionExpired": "Sesiunea dumneavoastră a expirat. Vă rugăm să vă deconectați, să vă autentificați din nou și apoi să reîncercați.",
+      "serverRejected": "Serverul a respins inserarea. Vă rugăm să încercați din nou sau să contactați asistența.",
+      "validation": {
+        "pickChannel": "Alegeți un canal",
+        "titleMin": "Titlul trebuie să aibă cel puțin 4 caractere",
+        "titleMax": "Titlul este prea lung (max. 160)",
+        "bodyMin": "Conținutul postării trebuie să aibă cel puțin 8 caractere"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Profil / CV",
@@ -419,7 +450,21 @@
     "whatsappOptIn": "Alerte de joburi pe WhatsApp",
     "whatsappOptInHint": "Permit PipingBox să mă contacteze prin WhatsApp",
     "workforceInvitationsEnabled": "Invitații la proiecte",
-    "workforceInvitationsEnabledHint": "Primiți invitații la proiecte gestionate de PipingBox"
+    "workforceInvitationsEnabledHint": "Primiți invitații la proiecte gestionate de PipingBox",
+    "avatarHeicNotice": "Fotografie HEIC detectată. Se va încărca corect, dar previzualizarea poate să nu funcționeze în toate browserele.",
+    "avatarUpdated": "Fotografia de profil a fost actualizată",
+    "avatarRemoved": "Fotografia de profil a fost eliminată",
+    "avatarInvalidType": "Sunt acceptate doar imagini JPG, PNG, WebP sau HEIC",
+    "avatarSaveFailed": "Avatarul nu a putut fi salvat în profil",
+    "avatarRemoveFailed": "Avatarul nu a putut fi eliminat",
+    "avatarVisibilityFailed": "Vizibilitatea nu a putut fi actualizată",
+    "avatarNowVisible": "Fotografia este acum vizibilă",
+    "avatarNowHidden": "Fotografia este acum ascunsă",
+    "avatarUploading": "Se încarcă…",
+    "avatarChange": "Schimbați fotografia",
+    "avatarUpload": "Încărcați o fotografie",
+    "avatarHide": "Ascundeți fotografia",
+    "avatarShow": "Afișați fotografia"
   },
   "academy": {
     "eyebrow": "Academie",
@@ -729,6 +774,13 @@
       "finish": "Finalizare",
       "lessonsCount_few": "{{count}} lecții",
       "minutes_few": "{{count}} min"
+    },
+    "vcaBooking": {
+      "signInRequired": "Vă rugăm să vă autentificați pentru a trimite o cerere de rezervare",
+      "fillNameAndPostalCode": "Vă rugăm să completați numele și codul poștal",
+      "certificationUnavailable": "Certificarea nu este disponibilă. Vă rugăm să încercați din nou mai târziu.",
+      "submitFailed": "Cererea de rezervare nu a putut fi trimisă",
+      "submitted": "Cererea de rezervare a fost trimisă! PipingBox vă va contacta în termen de 24h pentru a confirma rezervarea examenului."
     }
   },
   "tools": {
@@ -1334,7 +1386,8 @@
     "postedTimes": {
       "h_ago": "acum {{count}} h",
       "d_ago": "acum {{count}} z",
-      "w_ago": "acum {{count}} săpt."
+      "w_ago": "acum {{count}} săpt.",
+      "justNow": "chiar acum"
     },
     "filterJobs": "Filtrează locurile de muncă",
     "activeFilterCount": "{{count}} filtru activ",
@@ -1347,7 +1400,46 @@
     "priority": "Prioritate",
     "urgentPositionsOnly": "Doar poziții urgente",
     "signInToApply": "Autentificați-vă pentru a candida la locuri de muncă",
-    "applicationFailed": "Trimiterea candidaturii a eșuat"
+    "applicationFailed": "Trimiterea candidaturii a eșuat",
+    "roleCount_one": "{{count}} post",
+    "roleCount_other": "{{count}} de posturi",
+    "activeFiltersLabel_one": "{{count}} filtru activ",
+    "activeFiltersLabel_other": "{{count}} de filtre active",
+    "mustBeLoggedIn": "Trebuie să fiți autentificat pentru a aplica",
+    "salaryPerYear": "{{amount}} /an",
+    "salaryPerMonth": "{{amount}} /lună",
+    "metrics": {
+      "companies": "Companii",
+      "applications": "Candidaturi"
+    },
+    "options": {
+      "countries": {
+        "belgium": "Belgia",
+        "netherlands": "Țările de Jos",
+        "germany": "Germania",
+        "norway": "Norvegia",
+        "uae": "EAU",
+        "unitedKingdom": "Regatul Unit",
+        "usa": "SUA"
+      },
+      "disciplines": {
+        "pipefitter": "Tubulator",
+        "tigWelder": "Sudor TIG",
+        "qaqc": "QA/QC",
+        "supervisor": "Supervizor",
+        "planner": "Planificator",
+        "rigger": "Rigger",
+        "offshoreTechnician": "Tehnician offshore"
+      },
+      "contractTypes": {
+        "freelance": "Freelancer",
+        "employee": "Angajat",
+        "contract": "Contract",
+        "fullTime": "Normă întreagă"
+      }
+    },
+    "roleCount_few": "{{count}} posturi",
+    "activeFiltersLabel_few": "{{count}} filtre active"
   },
   "companies": {
     "eyebrow": "Companii",
@@ -1514,7 +1606,8 @@
       "accessDenied": "Acces refuzat",
       "invalidType": "Tip de fișier neacceptat. Formate acceptate: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
       "saveFailed": "Salvarea documentului a eșuat: ",
-      "verified": "Verificat"
+      "verified": "Verificat",
+      "heicNotice": "Fotografie HEIC detectată. Se va încărca corect."
     },
     "cv": {
       "label": "CV",
@@ -1594,7 +1687,8 @@
       "showInApp": "Afișează avertizările de expirare în aplicație",
       "prefsSaved": "Preferințele de alertare au fost salvate",
       "prefsSaveError": "Salvarea preferințelor de alertare a eșuat",
-      "viewFileDenied": "Acces refuzat"
+      "viewFileDenied": "Acces refuzat",
+      "saveTimedOut": "Salvarea a expirat. Este posibil ca certificatul să fi fost salvat — vă rugăm să reîmprospătați pagina pentru a verifica."
     }
   },
   "profileCompleteness": {
@@ -1716,7 +1810,9 @@
     "cvResume": "CV",
     "applicationHistory": "Istoricul aplicărilor",
     "view": "Vizualizați",
-    "download": "Descărcați"
+    "download": "Descărcați",
+    "cvPreviewFailed": "Linkul de previzualizare a CV-ului nu a putut fi generat",
+    "previewFailed": "Linkul de previzualizare nu a putut fi generat"
   },
   "inviteToJob": {
     "buttonLabel": "Invitați la un job",
@@ -1861,6 +1957,37 @@
     "location": "Locație",
     "companyName": "Numele companiei (opțional)",
     "companyNamePlaceholder": "Acme Piping S.L."
+  },
+  "dailyLog": {
+    "addDailyLog": "Adăugați jurnal zilnic",
+    "eyebrow": "Jurnal zilnic de țevi",
+    "newEntry": "Înregistrare nouă",
+    "description": "Înregistrați ISO, alocarea sudorilor, orele și salariul brut pentru ziua respectivă.",
+    "isoNumber": "Număr ISO",
+    "isoPlaceholder": "ex. ISO-PL-2041",
+    "weldersCount": "Număr de sudori",
+    "weldersPlaceholder": "ex. 4",
+    "normalRatePlaceholder": "ex. 25,00",
+    "extraRatePlaceholder": "ex. 37,50",
+    "grossSalaryAuto": "Salariu brut (automat)",
+    "normalGrossSalary": "Salariu brut normal",
+    "extraGrossSalary": "Salariu brut suplimentar",
+    "totalGross": "Total brut",
+    "notesPlaceholder": "Blocaje, observații sau context pentru echipă…",
+    "saveEntry": "Salvați înregistrarea",
+    "saveFailed": "Jurnalul zilnic nu a putut fi salvat",
+    "saved": "Jurnal zilnic salvat",
+    "savedDescription": "ISO {{iso}} — {{amount}} brut",
+    "validation": {
+      "dateRequired": "Data este obligatorie",
+      "isoRequired": "Numărul ISO este obligatoriu",
+      "weldersInvalid": "Introduceți un număr valid de sudori",
+      "normalHoursInvalid": "Introduceți orele normale (0 sau mai mult)",
+      "maxHours": "Trebuie să fie cel mult 24",
+      "extraHoursInvalid": "Introduceți un număr valid de ore suplimentare",
+      "normalRateInvalid": "Introduceți un tarif orar normal valid",
+      "extraRateInvalid": "Introduceți un tarif orar suplimentar valid"
+    }
   },
   "ratePresets": {
     "eyebrow": "Tarife salariale predefinite",

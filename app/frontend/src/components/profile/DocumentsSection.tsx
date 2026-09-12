@@ -195,7 +195,7 @@ export function DocumentsSection() {
 
     // Inform about HEIC
     if (isHeicFile(file)) {
-      toast.info('Foto HEIC detectada. Se subirá correctamente.');
+      toast.info(t('workerProfile.documents.heicNotice'));
     }
 
     setUploading(true);

@@ -7,7 +7,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import type { Job } from '@/lib/jobs/types';
-import { formatSalary, formatPostedTime } from '@/lib/jobs/utils';
+import {
+  formatSalary,
+  formatPostedTime,
+  getContractTypeLabel,
+  optionLabelKey,
+} from '@/lib/jobs/utils';
 
 interface JobCardProps {
   job: Job;
@@ -16,10 +21,18 @@ interface JobCardProps {
   onApply: (job: Job) => void;
 }
 
+const KNOWN_JOB_TYPES = ['full-time', 'contract', 'freelance'];
+
 export function JobCard({ job, applied, applying, onApply }: JobCardProps) {
   const { t } = useTranslation();
   const salary = formatSalary(job);
   const postedTime = formatPostedTime(job.created_at);
+  const salaryLabel = salary
+    ? t(salary.period === 'year' ? 'jobs.salaryPerYear' : 'jobs.salaryPerMonth', { amount: salary.amount })
+    : null;
+  const jobTypeLabel = KNOWN_JOB_TYPES.includes(job.job_type)
+    ? t(optionLabelKey('contractTypes', getContractTypeLabel(job.job_type)))
+    : job.job_type;
 
   return (
     <div className="group relative flex flex-col gap-4 border border-zinc-800/80 bg-[#0d0d0d] p-5 rounded-sm hover:border-[#f59e0b]/40 transition-all duration-300 hover:shadow-lg hover:shadow-[#f59e0b]/5 md:flex-row md:items-center md:justify-between">
@@ -53,8 +66,8 @@ export function JobCard({ job, applied, applying, onApply }: JobCardProps) {
               {job.location}
             </span>
           )}
-          <span className="uppercase tracking-[0.15em]">{job.job_type}</span>
-          {salary && <span className="text-[#f59e0b] font-medium">{salary}</span>}
+          <span className="uppercase tracking-[0.15em]">{jobTypeLabel}</span>
+          {salaryLabel && <span className="text-[#f59e0b] font-medium">{salaryLabel}</span>}
         </div>
 
         {job.description && (
@@ -65,7 +78,7 @@ export function JobCard({ job, applied, applying, onApply }: JobCardProps) {
 
         <div className="flex items-center gap-1.5 text-[10px] text-zinc-600">
           <Clock className="h-3 w-3" />
-          Posted {postedTime}
+          {t('jobs.posted')}{postedTime ? ` ${t(`jobs.postedTimes.${postedTime.key}`, { count: postedTime.count })}` : ''}
         </div>
       </div>
 

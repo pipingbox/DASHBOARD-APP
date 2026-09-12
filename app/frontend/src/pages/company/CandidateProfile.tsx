@@ -441,7 +441,7 @@ export default function CandidateProfile() {
       .eq('id', applicationId);
 
     if (error) {
-      toast.error('Failed to update status', { description: error.message });
+      toast.error(t('candidateProfile.statusUpdateFailed'), { description: error.message });
     } else {
       toast.success(`Status updated to "${newStatus}"`);
       setApplications((prev) =>
@@ -504,7 +504,7 @@ export default function CandidateProfile() {
     if (!hasStoredCv(profile)) return;
     const signedUrl = await getViewerSignedUrlForCV();
     if (!signedUrl) {
-      toast.error('Failed to generate CV preview link');
+      toast.error(t('candidateProfile.cvPreviewFailed'));
       return;
     }
     setPreviewFile({
@@ -521,7 +521,7 @@ export default function CandidateProfile() {
     if (signedUrl) {
       window.open(signedUrl, '_blank');
     } else {
-      toast.error('Failed to generate CV download link');
+      toast.error(t('candidateProfile.cvDownloadFailed'));
     }
   };
 
@@ -531,7 +531,7 @@ export default function CandidateProfile() {
     if (signedUrl) {
       window.open(signedUrl, '_blank');
     } else {
-      toast.error('Failed to generate download link');
+      toast.error(t('candidateProfile.downloadFailed'));
     }
   };
 
@@ -539,7 +539,7 @@ export default function CandidateProfile() {
     if (!hasStoredRecordFile(cert)) return;
     const signedUrl = await getViewerSignedUrlForCert(cert);
     if (!signedUrl) {
-      toast.error('Failed to generate preview link');
+      toast.error(t('candidateProfile.previewFailed'));
       return;
     }
     setPreviewFile({
@@ -558,7 +558,7 @@ export default function CandidateProfile() {
     if (signedUrl) {
       window.open(signedUrl, '_blank');
     } else {
-      toast.error('Failed to generate download link');
+      toast.error(t('candidateProfile.downloadFailed'));
     }
   };
 
@@ -566,7 +566,7 @@ export default function CandidateProfile() {
     if (!hasStoredRecordFile(doc)) return;
     const signedUrl = await getViewerSignedUrlForDocument(doc);
     if (!signedUrl) {
-      toast.error('Failed to generate preview link');
+      toast.error(t('candidateProfile.previewFailed'));
       return;
     }
     setPreviewFile({
@@ -721,7 +721,7 @@ export default function CandidateProfile() {
                 if (convId) {
                   navigate(`/messages?conversation=${convId}`);
                 } else {
-                  toast.error('Failed to start conversation');
+                  toast.error(t('candidateProfile.conversationFailed'));
                 }
               }}
             >

@@ -50,7 +50,9 @@
     "sending": "Wird gesendet...",
     "download": "Herunterladen",
     "saveError": "Fehler beim Speichern",
-    "saved": "Gespeichert"
+    "saved": "Gespeichert",
+    "fixHighlightedFields": "Bitte korrigieren Sie die markierten Felder",
+    "sessionNotFound": "Benutzersitzung nicht gefunden. Bitte melden Sie sich erneut an."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -322,7 +324,36 @@
     "sortTop": "Top",
     "postedBy": "Veröffentlicht von {{name}} · {{time}}",
     "channel": "Kanal",
-    "post": "Beitrag"
+    "post": "Beitrag",
+    "notSignedIn": "Nicht angemeldet",
+    "failedToCreatePost": "Beitrag konnte nicht erstellt werden",
+    "postPublished": "Beitrag veröffentlicht",
+    "createPost": {
+      "eyebrow": "Community",
+      "title": "Neuen Beitrag erstellen",
+      "description": "Teilen Sie eine Frage, einen Tipp oder eine Geschichte aus der Werkstatt mit der PipingBox-Community.",
+      "channel": "Kanal",
+      "postTitle": "Titel",
+      "body": "Inhalt",
+      "locationOptional": "Standort (optional)",
+      "tagsOptional": "Tags (optional)",
+      "attachmentOptional": "Anhang-URL (optional)",
+      "selectChannel": "— Kanal auswählen —",
+      "titlePlaceholder": "z. B. Bestes Formier-Setup für eine DSS-TIG-Wurzellage?",
+      "bodyPlaceholder": "Teilen Sie die Details — was Sie versucht haben, was schiefging, was funktioniert hat…",
+      "locationPlaceholder": "Antwerpen, Belgien",
+      "publish": "Beitrag veröffentlichen",
+      "publishing": "Wird veröffentlicht…",
+      "mustBeSignedIn": "Sie müssen angemeldet sein, um einen Beitrag zu veröffentlichen",
+      "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich ab und erneut an und versuchen Sie es dann noch einmal.",
+      "serverRejected": "Der Server hat die Eingabe abgelehnt. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support.",
+      "validation": {
+        "pickChannel": "Wählen Sie einen Kanal",
+        "titleMin": "Der Titel muss mindestens 4 Zeichen lang sein",
+        "titleMax": "Der Titel ist zu lang (max. 160)",
+        "bodyMin": "Der Inhalt muss mindestens 8 Zeichen lang sein"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Profil / CV",
@@ -419,7 +450,21 @@
     "whatsappOptIn": "WhatsApp-Stellenbenachrichtigungen",
     "whatsappOptInHint": "PipingBox erlauben, mich per WhatsApp zu kontaktieren",
     "workforceInvitationsEnabled": "Einsatzeinladungen",
-    "workforceInvitationsEnabledHint": "Einladungen zu von PipingBox verwalteten Projekten erhalten"
+    "workforceInvitationsEnabledHint": "Einladungen zu von PipingBox verwalteten Projekten erhalten",
+    "avatarHeicNotice": "HEIC-Foto erkannt. Es wird korrekt hochgeladen, die Vorschau funktioniert jedoch möglicherweise nicht in jedem Browser.",
+    "avatarUpdated": "Profilbild aktualisiert",
+    "avatarRemoved": "Profilfoto entfernt",
+    "avatarInvalidType": "Es werden nur JPG-, PNG-, WebP- oder HEIC-Bilder akzeptiert",
+    "avatarSaveFailed": "Avatar konnte nicht im Profil gespeichert werden",
+    "avatarRemoveFailed": "Avatar konnte nicht entfernt werden",
+    "avatarVisibilityFailed": "Sichtbarkeit konnte nicht aktualisiert werden",
+    "avatarNowVisible": "Das Foto ist jetzt sichtbar",
+    "avatarNowHidden": "Das Foto ist jetzt verborgen",
+    "avatarUploading": "Wird hochgeladen…",
+    "avatarChange": "Foto ändern",
+    "avatarUpload": "Foto hochladen",
+    "avatarHide": "Foto verbergen",
+    "avatarShow": "Foto anzeigen"
   },
   "academy": {
     "eyebrow": "Academy",
@@ -726,6 +771,13 @@
       "previous": "Zurück",
       "next": "Weiter",
       "finish": "Abschließen"
+    },
+    "vcaBooking": {
+      "signInRequired": "Bitte melden Sie sich an, um eine Buchungsanfrage zu senden",
+      "fillNameAndPostalCode": "Bitte geben Sie Ihren Namen und Ihre Postleitzahl ein",
+      "certificationUnavailable": "Zertifizierung nicht verfügbar. Bitte versuchen Sie es später erneut.",
+      "submitFailed": "Buchungsanfrage konnte nicht gesendet werden",
+      "submitted": "Buchungsanfrage gesendet! PipingBox kontaktiert Sie innerhalb von 24 Stunden, um Ihre Prüfungsreservierung zu bestätigen."
     }
   },
   "tools": {
@@ -1331,7 +1383,8 @@
     "postedTimes": {
       "h_ago": "vor {{count}} Std",
       "d_ago": "vor {{count}} T",
-      "w_ago": "vor {{count}} W"
+      "w_ago": "vor {{count}} W",
+      "justNow": "gerade eben"
     },
     "filterJobs": "Stellen filtern",
     "activeFilterCount": "{{count}} aktiver Filter",
@@ -1344,7 +1397,44 @@
     "priority": "Priorität",
     "urgentPositionsOnly": "Nur dringende Stellen",
     "signInToApply": "Melden Sie sich an, um sich zu bewerben",
-    "applicationFailed": "Bewerbung konnte nicht eingereicht werden"
+    "applicationFailed": "Bewerbung konnte nicht eingereicht werden",
+    "roleCount_one": "{{count}} Stelle",
+    "roleCount_other": "{{count}} Stellen",
+    "activeFiltersLabel_one": "{{count}} aktiver Filter",
+    "activeFiltersLabel_other": "{{count}} aktive Filter",
+    "mustBeLoggedIn": "Sie müssen angemeldet sein, um sich zu bewerben",
+    "salaryPerYear": "{{amount}} /Jahr",
+    "salaryPerMonth": "{{amount}} /Monat",
+    "metrics": {
+      "companies": "Unternehmen",
+      "applications": "Bewerbungen"
+    },
+    "options": {
+      "countries": {
+        "belgium": "Belgien",
+        "netherlands": "Niederlande",
+        "germany": "Deutschland",
+        "norway": "Norwegen",
+        "uae": "VAE",
+        "unitedKingdom": "Vereinigtes Königreich",
+        "usa": "USA"
+      },
+      "disciplines": {
+        "pipefitter": "Rohrschlosser",
+        "tigWelder": "WIG-Schweißer",
+        "qaqc": "QA/QC",
+        "supervisor": "Supervisor",
+        "planner": "Planer",
+        "rigger": "Rigger",
+        "offshoreTechnician": "Offshore-Techniker"
+      },
+      "contractTypes": {
+        "freelance": "Freiberuflich",
+        "employee": "Angestellt",
+        "contract": "Vertrag",
+        "fullTime": "Vollzeit"
+      }
+    }
   },
   "companies": {
     "eyebrow": "Unternehmen",
@@ -1510,7 +1600,8 @@
       "accessDenied": "Zugriff verweigert",
       "invalidType": "Nicht unterstützter Dateityp. Akzeptiert: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
       "saveFailed": "Dokument konnte nicht gespeichert werden: ",
-      "verified": "Verifiziert"
+      "verified": "Verifiziert",
+      "heicNotice": "HEIC-Foto erkannt. Es wird korrekt hochgeladen."
     },
     "cv": {
       "label": "CV / Lebenslauf",
@@ -1590,7 +1681,8 @@
       "showInApp": "Ablaufwarnungen in App anzeigen",
       "prefsSaved": "Warnungseinstellungen gespeichert",
       "prefsSaveError": "Warnungseinstellungen konnten nicht gespeichert werden",
-      "viewFileDenied": "Zugriff verweigert"
+      "viewFileDenied": "Zugriff verweigert",
+      "saveTimedOut": "Zeitüberschreitung beim Speichern. Ihr Zertifikat wurde möglicherweise trotzdem gespeichert — bitte aktualisieren Sie die Seite, um dies zu prüfen."
     }
   },
   "profileCompleteness": {
@@ -1712,7 +1804,9 @@
     "cvResume": "CV / Lebenslauf",
     "applicationHistory": "Bewerbungshistorie",
     "view": "Ansehen",
-    "download": "Herunterladen"
+    "download": "Herunterladen",
+    "cvPreviewFailed": "Vorschaulink für den Lebenslauf konnte nicht erstellt werden",
+    "previewFailed": "Vorschaulink konnte nicht erstellt werden"
   },
   "inviteToJob": {
     "buttonLabel": "Zur Stelle einladen",
@@ -1857,6 +1951,37 @@
     "location": "Standort",
     "companyName": "Firmenname (optional)",
     "companyNamePlaceholder": "Acme Piping GmbH"
+  },
+  "dailyLog": {
+    "addDailyLog": "Tagesbericht hinzufügen",
+    "eyebrow": "Tägliches Rohrleitungsprotokoll",
+    "newEntry": "Neuer Eintrag",
+    "description": "Erfassen Sie ISO, Schweißerzuteilung, Stunden und Bruttolohn des Tages.",
+    "isoNumber": "ISO-Nummer",
+    "isoPlaceholder": "z. B. ISO-PL-2041",
+    "weldersCount": "Anzahl Schweißer",
+    "weldersPlaceholder": "z. B. 4",
+    "normalRatePlaceholder": "z. B. 25,00",
+    "extraRatePlaceholder": "z. B. 37,50",
+    "grossSalaryAuto": "Bruttolohn (automatisch)",
+    "normalGrossSalary": "Normaler Bruttolohn",
+    "extraGrossSalary": "Zusätzlicher Bruttolohn",
+    "totalGross": "Gesamt brutto",
+    "notesPlaceholder": "Hindernisse, Beobachtungen oder Kontext für das Team…",
+    "saveEntry": "Eintrag speichern",
+    "saveFailed": "Tagesbericht konnte nicht gespeichert werden",
+    "saved": "Tagesbericht gespeichert",
+    "savedDescription": "ISO {{iso}} — {{amount}} brutto",
+    "validation": {
+      "dateRequired": "Datum ist erforderlich",
+      "isoRequired": "ISO-Nummer ist erforderlich",
+      "weldersInvalid": "Geben Sie eine gültige Anzahl Schweißer ein",
+      "normalHoursInvalid": "Geben Sie die Normalstunden ein (0 oder mehr)",
+      "maxHours": "Darf höchstens 24 sein",
+      "extraHoursInvalid": "Geben Sie gültige Zusatzstunden ein",
+      "normalRateInvalid": "Geben Sie einen gültigen normalen Stundensatz ein",
+      "extraRateInvalid": "Geben Sie einen gültigen Zusatz-Stundensatz ein"
+    }
   },
   "ratePresets": {
     "eyebrow": "Lohnvorlagen",

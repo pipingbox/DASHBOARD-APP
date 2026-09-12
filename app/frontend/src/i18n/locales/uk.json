@@ -50,7 +50,9 @@
     "sending": "Надсилання...",
     "download": "Завантажити",
     "saveError": "Помилка збереження",
-    "saved": "Збережено"
+    "saved": "Збережено",
+    "fixHighlightedFields": "Будь ласка, виправте виділені поля",
+    "sessionNotFound": "Сесію користувача не знайдено. Будь ласка, увійдіть ще раз."
   },
   "nav": {
     "dashboard": "Панель керування",
@@ -322,7 +324,36 @@
     "sortTop": "Популярні",
     "postedBy": "Опублікував(ла) {{name}} · {{time}}",
     "channel": "Канал",
-    "post": "Допис"
+    "post": "Допис",
+    "notSignedIn": "Ви не ввійшли в систему",
+    "failedToCreatePost": "Не вдалося створити публікацію",
+    "postPublished": "Публікацію опубліковано",
+    "createPost": {
+      "eyebrow": "Спільнота",
+      "title": "Створити нову публікацію",
+      "description": "Поділіться запитанням, порадою або історією з виробництва зі спільнотою PipingBox.",
+      "channel": "Канал",
+      "postTitle": "Заголовок",
+      "body": "Текст",
+      "locationOptional": "Місцезнаходження (необов'язково)",
+      "tagsOptional": "Теги (необов'язково)",
+      "attachmentOptional": "URL вкладення (необов'язково)",
+      "selectChannel": "— Виберіть канал —",
+      "titlePlaceholder": "напр. Найкраще налаштування продувки для кореневого шва TIG на DSS?",
+      "bodyPlaceholder": "Поділіться деталями — що ви спробували, що пішло не так, що спрацювало…",
+      "locationPlaceholder": "Антверпен, Бельгія",
+      "publish": "Опублікувати",
+      "publishing": "Публікація…",
+      "mustBeSignedIn": "Щоб публікувати, потрібно увійти в систему",
+      "sessionExpired": "Ваша сесія завершилася. Будь ласка, вийдіть і увійдіть знову, а потім повторіть спробу.",
+      "serverRejected": "Сервер відхилив запис. Будь ласка, спробуйте ще раз або зверніться до служби підтримки.",
+      "validation": {
+        "pickChannel": "Виберіть канал",
+        "titleMin": "Заголовок має містити щонайменше 4 символи",
+        "titleMax": "Заголовок надто довгий (макс. 160)",
+        "bodyMin": "Текст публікації має містити щонайменше 8 символів"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Профіль / CV",
@@ -419,7 +450,21 @@
     "whatsappOptIn": "Сповіщення про вакансії у WhatsApp",
     "whatsappOptInHint": "Дозволити PipingBox зв'язуватися зі мною через WhatsApp",
     "workforceInvitationsEnabled": "Запрошення до проєктів",
-    "workforceInvitationsEnabledHint": "Отримувати запрошення до проєктів під управлінням PipingBox"
+    "workforceInvitationsEnabledHint": "Отримувати запрошення до проєктів під управлінням PipingBox",
+    "avatarHeicNotice": "Виявлено фото HEIC. Воно завантажиться коректно, але попередній перегляд може не працювати в деяких браузерах.",
+    "avatarUpdated": "Фото профілю оновлено",
+    "avatarRemoved": "Фото профілю видалено",
+    "avatarInvalidType": "Приймаються лише зображення JPG, PNG, WebP або HEIC",
+    "avatarSaveFailed": "Не вдалося зберегти аватар у профілі",
+    "avatarRemoveFailed": "Не вдалося видалити аватар",
+    "avatarVisibilityFailed": "Не вдалося оновити видимість",
+    "avatarNowVisible": "Фото тепер видиме",
+    "avatarNowHidden": "Фото тепер приховане",
+    "avatarUploading": "Завантаження…",
+    "avatarChange": "Змінити фото",
+    "avatarUpload": "Завантажити фото",
+    "avatarHide": "Приховати фото",
+    "avatarShow": "Показати фото"
   },
   "academy": {
     "eyebrow": "Академія",
@@ -732,6 +777,13 @@
       "lessonsCount_many": "{{count}} уроків",
       "minutes_few": "{{count}} хв",
       "minutes_many": "{{count}} хв"
+    },
+    "vcaBooking": {
+      "signInRequired": "Будь ласка, увійдіть, щоб надіслати запит на бронювання",
+      "fillNameAndPostalCode": "Будь ласка, вкажіть ваше ім'я та поштовий індекс",
+      "certificationUnavailable": "Сертифікація недоступна. Будь ласка, спробуйте пізніше.",
+      "submitFailed": "Не вдалося надіслати запит на бронювання",
+      "submitted": "Запит на бронювання надіслано! PipingBox зв'яжеться з вами протягом 24 год, щоб підтвердити реєстрацію на екзамен."
     }
   },
   "tools": {
@@ -1337,7 +1389,8 @@
     "postedTimes": {
       "h_ago": "{{count}} год тому",
       "d_ago": "{{count}} дн тому",
-      "w_ago": "{{count}} тиж тому"
+      "w_ago": "{{count}} тиж тому",
+      "justNow": "щойно"
     },
     "filterJobs": "Фільтрувати вакансії",
     "activeFilterCount": "{{count}} активний фільтр",
@@ -1350,7 +1403,48 @@
     "priority": "Пріоритет",
     "urgentPositionsOnly": "Лише термінові позиції",
     "signInToApply": "Увійдіть, щоб відгукуватися на вакансії",
-    "applicationFailed": "Не вдалося надіслати відгук"
+    "applicationFailed": "Не вдалося надіслати відгук",
+    "roleCount_one": "{{count}} вакансія",
+    "roleCount_other": "{{count}} вакансій",
+    "activeFiltersLabel_one": "{{count}} активний фільтр",
+    "activeFiltersLabel_other": "{{count}} активних фільтрів",
+    "mustBeLoggedIn": "Щоб подати заявку, потрібно увійти",
+    "salaryPerYear": "{{amount}} /рік",
+    "salaryPerMonth": "{{amount}} /місяць",
+    "metrics": {
+      "companies": "Компанії",
+      "applications": "Заявки"
+    },
+    "options": {
+      "countries": {
+        "belgium": "Бельгія",
+        "netherlands": "Нідерланди",
+        "germany": "Німеччина",
+        "norway": "Норвегія",
+        "uae": "ОАЕ",
+        "unitedKingdom": "Велика Британія",
+        "usa": "США"
+      },
+      "disciplines": {
+        "pipefitter": "Трубопровідник",
+        "tigWelder": "Зварювальник TIG",
+        "qaqc": "QA/QC",
+        "supervisor": "Супервайзер",
+        "planner": "Планувальник",
+        "rigger": "Ригер",
+        "offshoreTechnician": "Офшорний технік"
+      },
+      "contractTypes": {
+        "freelance": "Фриланс",
+        "employee": "Штатний працівник",
+        "contract": "Контракт",
+        "fullTime": "Повна зайнятість"
+      }
+    },
+    "roleCount_few": "{{count}} вакансії",
+    "roleCount_many": "{{count}} вакансій",
+    "activeFiltersLabel_few": "{{count}} активні фільтри",
+    "activeFiltersLabel_many": "{{count}} активних фільтрів"
   },
   "companies": {
     "eyebrow": "Компанії",
@@ -1518,7 +1612,8 @@
       "accessDenied": "Доступ заборонено",
       "invalidType": "Непідтримуваний тип файлу. Приймаються: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
       "saveFailed": "Не вдалося зберегти документ: ",
-      "verified": "Перевірено"
+      "verified": "Перевірено",
+      "heicNotice": "Виявлено фото HEIC. Воно завантажиться коректно."
     },
     "cv": {
       "label": "Резюме / CV",
@@ -1598,7 +1693,8 @@
       "showInApp": "Показувати попередження про закінчення терміну дії в додатку",
       "prefsSaved": "Налаштування сповіщень збережено",
       "prefsSaveError": "Не вдалося зберегти налаштування сповіщень",
-      "viewFileDenied": "Доступ заборонено"
+      "viewFileDenied": "Доступ заборонено",
+      "saveTimedOut": "Час збереження вичерпано. Можливо, сертифікат було збережено — будь ласка, оновіть сторінку, щоб перевірити."
     }
   },
   "profileCompleteness": {
@@ -1720,7 +1816,9 @@
     "cvResume": "Резюме / CV",
     "applicationHistory": "Історія заявок",
     "view": "Переглянути",
-    "download": "Завантажити"
+    "download": "Завантажити",
+    "cvPreviewFailed": "Не вдалося створити посилання для попереднього перегляду резюме",
+    "previewFailed": "Не вдалося створити посилання для попереднього перегляду"
   },
   "inviteToJob": {
     "buttonLabel": "Запросити на вакансію",
@@ -1865,6 +1963,37 @@
     "location": "Місце роботи",
     "companyName": "Назва компанії (необов’язково)",
     "companyNamePlaceholder": "Acme Piping S.L."
+  },
+  "dailyLog": {
+    "addDailyLog": "Додати щоденний журнал",
+    "eyebrow": "Щоденний журнал трубопровідних робіт",
+    "newEntry": "Новий запис",
+    "description": "Зафіксуйте ISO, розподіл зварювальників, години та валову зарплату за день.",
+    "isoNumber": "Номер ISO",
+    "isoPlaceholder": "напр. ISO-PL-2041",
+    "weldersCount": "Кількість зварювальників",
+    "weldersPlaceholder": "напр. 4",
+    "normalRatePlaceholder": "напр. 25,00",
+    "extraRatePlaceholder": "напр. 37,50",
+    "grossSalaryAuto": "Валова зарплата (автоматично)",
+    "normalGrossSalary": "Валова зарплата за звичайні години",
+    "extraGrossSalary": "Валова зарплата за понаднормові години",
+    "totalGross": "Разом брутто",
+    "notesPlaceholder": "Перешкоди, спостереження або контекст для бригади…",
+    "saveEntry": "Зберегти запис",
+    "saveFailed": "Не вдалося зберегти щоденний журнал",
+    "saved": "Щоденний журнал збережено",
+    "savedDescription": "ISO {{iso}} — {{amount}} брутто",
+    "validation": {
+      "dateRequired": "Дата є обов'язковою",
+      "isoRequired": "Номер ISO є обов'язковим",
+      "weldersInvalid": "Введіть коректну кількість зварювальників",
+      "normalHoursInvalid": "Введіть звичайні години (0 або більше)",
+      "maxHours": "Має бути не більше 24",
+      "extraHoursInvalid": "Введіть коректну кількість понаднормових годин",
+      "normalRateInvalid": "Введіть коректну звичайну погодинну ставку",
+      "extraRateInvalid": "Введіть коректну понаднормову погодинну ставку"
+    }
   },
   "ratePresets": {
     "eyebrow": "Шаблони ставок оплати",

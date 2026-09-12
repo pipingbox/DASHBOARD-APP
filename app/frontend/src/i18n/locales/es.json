@@ -50,7 +50,9 @@
     "sending": "Enviando...",
     "download": "Descargar",
     "saveError": "Error al guardar",
-    "saved": "Guardado"
+    "saved": "Guardado",
+    "fixHighlightedFields": "Corrija los campos resaltados",
+    "sessionNotFound": "No se encontró la sesión de usuario. Inicie sesión de nuevo."
   },
   "nav": {
     "dashboard": "Panel",
@@ -322,7 +324,36 @@
     "sortTop": "Destacados",
     "postedBy": "Publicado por {{name}} · {{time}}",
     "channel": "Canal",
-    "post": "Publicación"
+    "post": "Publicación",
+    "notSignedIn": "Sesión no iniciada",
+    "failedToCreatePost": "No se pudo crear la publicación",
+    "postPublished": "Publicación publicada",
+    "createPost": {
+      "eyebrow": "Comunidad",
+      "title": "Crear una nueva publicación",
+      "description": "Comparta una pregunta, un consejo o una anécdota de obra con la comunidad de PipingBox.",
+      "channel": "Canal",
+      "postTitle": "Título",
+      "body": "Contenido",
+      "locationOptional": "Ubicación (opcional)",
+      "tagsOptional": "Etiquetas (opcional)",
+      "attachmentOptional": "URL del adjunto (opcional)",
+      "selectChannel": "— Seleccione un canal —",
+      "titlePlaceholder": "p. ej. ¿Mejor configuración de purga para raíz TIG en DSS?",
+      "bodyPlaceholder": "Comparta los detalles: qué probó, qué salió mal, qué funcionó…",
+      "locationPlaceholder": "Amberes, Bélgica",
+      "publish": "Publicar",
+      "publishing": "Publicando…",
+      "mustBeSignedIn": "Debe iniciar sesión para publicar",
+      "sessionExpired": "Su sesión ha expirado. Cierre sesión, vuelva a iniciarla e inténtelo de nuevo.",
+      "serverRejected": "El servidor rechazó la inserción. Inténtelo de nuevo o contacte con soporte.",
+      "validation": {
+        "pickChannel": "Seleccione un canal",
+        "titleMin": "El título debe tener al menos 4 caracteres",
+        "titleMax": "El título es demasiado largo (máx. 160)",
+        "bodyMin": "El contenido debe tener al menos 8 caracteres"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Profile / CV",
@@ -419,7 +450,21 @@
     "whatsappOptIn": "Alertas de empleo por WhatsApp",
     "whatsappOptInHint": "Permitir que PipingBox me contacte por WhatsApp",
     "workforceInvitationsEnabled": "Invitaciones de trabajo",
-    "workforceInvitationsEnabledHint": "Recibir invitaciones a proyectos gestionados por PipingBox"
+    "workforceInvitationsEnabledHint": "Recibir invitaciones a proyectos gestionados por PipingBox",
+    "avatarHeicNotice": "Foto HEIC detectada. Se subirá correctamente, pero la vista previa puede no funcionar en todos los navegadores.",
+    "avatarUpdated": "Foto de perfil actualizada",
+    "avatarRemoved": "Foto de perfil eliminada",
+    "avatarInvalidType": "Solo se aceptan imágenes JPG, PNG, WebP o HEIC",
+    "avatarSaveFailed": "No se pudo guardar el avatar en el perfil",
+    "avatarRemoveFailed": "No se pudo eliminar el avatar",
+    "avatarVisibilityFailed": "No se pudo actualizar la visibilidad",
+    "avatarNowVisible": "La foto ahora es visible",
+    "avatarNowHidden": "La foto ahora está oculta",
+    "avatarUploading": "Subiendo…",
+    "avatarChange": "Cambiar foto",
+    "avatarUpload": "Subir foto",
+    "avatarHide": "Ocultar foto",
+    "avatarShow": "Mostrar foto"
   },
   "academy": {
     "eyebrow": "Academy",
@@ -729,6 +774,13 @@
       "finish": "Finalizar",
       "lessonsCount_many": "{{count}} lecciones",
       "minutes_many": "{{count}} min"
+    },
+    "vcaBooking": {
+      "signInRequired": "Inicie sesión para enviar una solicitud de reserva",
+      "fillNameAndPostalCode": "Indique su nombre y código postal",
+      "certificationUnavailable": "Certificación no disponible. Inténtelo de nuevo más tarde.",
+      "submitFailed": "No se pudo enviar la solicitud de reserva",
+      "submitted": "¡Solicitud de reserva enviada! PipingBox se pondrá en contacto con usted en un plazo de 24 h para confirmar la reserva de su examen."
     }
   },
   "tools": {
@@ -1334,7 +1386,8 @@
     "postedTimes": {
       "h_ago": "hace {{count}}h",
       "d_ago": "hace {{count}}d",
-      "w_ago": "hace {{count}}s"
+      "w_ago": "hace {{count}}s",
+      "justNow": "justo ahora"
     },
     "filterJobs": "Filtrar Empleos",
     "activeFilterCount": "{{count}} filtro activo",
@@ -1347,7 +1400,46 @@
     "priority": "Prioridad",
     "urgentPositionsOnly": "Solo Posiciones Urgentes",
     "signInToApply": "Inicia sesión para postularte",
-    "applicationFailed": "Error al enviar la candidatura"
+    "applicationFailed": "Error al enviar la candidatura",
+    "roleCount_one": "{{count}} puesto",
+    "roleCount_other": "{{count}} puestos",
+    "activeFiltersLabel_one": "{{count}} filtro activo",
+    "activeFiltersLabel_other": "{{count}} filtros activos",
+    "mustBeLoggedIn": "Debes iniciar sesión para postularte",
+    "salaryPerYear": "{{amount}} /año",
+    "salaryPerMonth": "{{amount}} /mes",
+    "metrics": {
+      "companies": "Empresas",
+      "applications": "Candidaturas"
+    },
+    "options": {
+      "countries": {
+        "belgium": "Bélgica",
+        "netherlands": "Países Bajos",
+        "germany": "Alemania",
+        "norway": "Noruega",
+        "uae": "EAU",
+        "unitedKingdom": "Reino Unido",
+        "usa": "EE. UU."
+      },
+      "disciplines": {
+        "pipefitter": "Tubero",
+        "tigWelder": "Soldador TIG",
+        "qaqc": "QA/QC",
+        "supervisor": "Supervisor",
+        "planner": "Planificador",
+        "rigger": "Rigger",
+        "offshoreTechnician": "Técnico offshore"
+      },
+      "contractTypes": {
+        "freelance": "Autónomo",
+        "employee": "Empleado",
+        "contract": "Contrato",
+        "fullTime": "Jornada completa"
+      }
+    },
+    "roleCount_many": "{{count}} puestos",
+    "activeFiltersLabel_many": "{{count}} filtros activos"
   },
   "companies": {
     "eyebrow": "Companies",
@@ -1514,7 +1606,8 @@
       "accessDenied": "Acceso denegado",
       "invalidType": "Tipo de archivo no soportado. Acepta: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
       "saveFailed": "Error al guardar el documento: ",
-      "verified": "Verificado"
+      "verified": "Verificado",
+      "heicNotice": "Foto HEIC detectada. Se subirá correctamente."
     },
     "cv": {
       "label": "CV / Currículum",
@@ -1594,7 +1687,8 @@
       "showInApp": "Mostrar advertencias de vencimiento en la app",
       "prefsSaved": "Preferencias de alertas guardadas",
       "prefsSaveError": "Error al guardar preferencias de alertas",
-      "viewFileDenied": "Acceso denegado"
+      "viewFileDenied": "Acceso denegado",
+      "saveTimedOut": "El guardado ha tardado demasiado. Es posible que su certificado se haya guardado; actualice la página para comprobarlo."
     }
   },
   "profileCompleteness": {
@@ -1716,7 +1810,9 @@
     "cvResume": "CV / Currículum",
     "applicationHistory": "Historial de Candidaturas",
     "view": "Ver",
-    "download": "Descargar"
+    "download": "Descargar",
+    "cvPreviewFailed": "No se pudo generar el enlace de vista previa del CV",
+    "previewFailed": "No se pudo generar el enlace de vista previa"
   },
   "inviteToJob": {
     "buttonLabel": "Invitar a Trabajo",
@@ -1861,6 +1957,37 @@
     "location": "Ubicación",
     "companyName": "Nombre de la empresa (opcional)",
     "companyNamePlaceholder": "Acme Piping S.L."
+  },
+  "dailyLog": {
+    "addDailyLog": "Añadir parte diario",
+    "eyebrow": "Parte diario de tubería",
+    "newEntry": "Nueva entrada",
+    "description": "Registre el ISO, la asignación de soldadores, las horas y el salario bruto del día.",
+    "isoNumber": "Número de ISO",
+    "isoPlaceholder": "p. ej. ISO-PL-2041",
+    "weldersCount": "Número de soldadores",
+    "weldersPlaceholder": "p. ej. 4",
+    "normalRatePlaceholder": "p. ej. 25,00",
+    "extraRatePlaceholder": "p. ej. 37,50",
+    "grossSalaryAuto": "Salario bruto (automático)",
+    "normalGrossSalary": "Salario bruto normal",
+    "extraGrossSalary": "Salario bruto extra",
+    "totalGross": "Total bruto",
+    "notesPlaceholder": "Bloqueos, observaciones o contexto para el equipo…",
+    "saveEntry": "Guardar entrada",
+    "saveFailed": "No se pudo guardar el parte diario",
+    "saved": "Parte diario guardado",
+    "savedDescription": "ISO {{iso}} — {{amount}} bruto",
+    "validation": {
+      "dateRequired": "La fecha es obligatoria",
+      "isoRequired": "El número de ISO es obligatorio",
+      "weldersInvalid": "Introduzca un número de soldadores válido",
+      "normalHoursInvalid": "Introduzca las horas normales (0 o más)",
+      "maxHours": "Debe ser 24 o menos",
+      "extraHoursInvalid": "Introduzca horas extra válidas",
+      "normalRateInvalid": "Introduzca una tarifa horaria normal válida",
+      "extraRateInvalid": "Introduzca una tarifa horaria extra válida"
+    }
   },
   "ratePresets": {
     "eyebrow": "Tarifas predefinidas",
