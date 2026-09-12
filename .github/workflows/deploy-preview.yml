@@ -167,7 +167,13 @@ jobs:
                 /*)    url="$BASE$a" ;;
                 *)     url="$BASE/$a" ;;
               esac
-              if curl -sf "$url" | grep -q "$EXPECTED_SHA"; then
+              # Download-then-grep, NEVER `curl | grep -q`: under
+              # `set -o pipefail`, grep -q exiting on first match SIGPIPEs
+              # curl (exit 23) and turns a SUCCESSFUL check into a failure.
+              # That exact bug made runs 34688438584/34688645158/34688912344
+              # abort against a correctly deployed build.
+              if curl -sf -o /tmp/pb_asset.js "$url" \
+                && grep -q "$EXPECTED_SHA" /tmp/pb_asset.js; then
                 found=1
                 echo "Served bundle carries the expected SHA: $EXPECTED_SHA (asset: $url)"
                 break
