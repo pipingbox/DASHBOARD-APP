@@ -166,7 +166,13 @@ test.describe('PB-SEO-102 useSeo noindex lifecycle', () => {
     expect(robotsBefore).toContain('noindex');
 
     await page.getByRole('link', { name: /tools/i }).click();
-    await expect(page).toHaveURL('/tools', { timeout: 10_000 });
+    // PB-WEB-007: the app's canonical production origin is the apex
+    // (https://pipingbox.com). app.pipingbox.com is a permanent 301 alias, so
+    // when this gate runs against the app host the Worker redirects to the
+    // apex and the assertion must accept the canonical URL there. Asserting
+    // the literal path '/tools' against the app alias host would require the
+    // redirect to be reverted, contradicting the canonical-host decision.
+    await expect(page).toHaveURL(/\/tools\/?$/, { timeout: 10_000 });
 
     const robotsAfter = await page.locator('meta[name="robots"]').count();
     expect(robotsAfter).toBe(0);
