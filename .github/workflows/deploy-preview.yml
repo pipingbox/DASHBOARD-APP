@@ -145,33 +145,39 @@ jobs:
           set -euo pipefail
           BASE="https://pipingbox-app.pipingbox.workers.dev"
           found=0
-          for attempt in 1 2 3 4 5 6 7 8 9 10; do
-            # Cache-bust the shell fetch: the Cloudflare edge can serve a
-            # cached copy of the previous build's index.html (cf-cache-status:
-            # HIT) for a short window after wrangler deploy, which would make
-            # the preflight grep stale asset lists. A unique query string
-            # forces a fresh response; assets are content-hashed already.
-            html="$(curl -sf -H 'Accept: text/html' -H 'Cache-Control: no-cache' "$BASE/?sha_preflight=$EXPECTED_SHA" || true)"
-            if [ -n "$html" ]; then
-              assets="$(printf '%s' "$html" | grep -oE '(src|href)="[^"]+\.(js|mjs)"' | sed -E 's/^(src|href)="//; s/"$//' | sort -u || true)"
-              for a in $assets; do
-                case "$a" in
-                  http*) url="$a" ;;
-                  /*)    url="$BASE$a" ;;
-                  *)     url="$BASE/$a" ;;
-                esac
-                if curl -sf "$url" | grep -q "$EXPECTED_SHA"; then
-                  found=1
-                  echo "Served bundle carries the expected SHA: $EXPECTED_SHA (asset: $url)"
-                  break
-                fi
-              done
+          for attempt in $(seq 1 12); do
+            # Cache-bust the shell fetch (unique query string): the edge can
+            # serve a cached copy of a previous build's index.html right after
+            # a deploy. Assets themselves are content-hashed.
+            status="$(curl -s -o /tmp/pb_shell.html -w '%{http_code}' \
+              -H 'Accept: text/html' -H 'Cache-Control: no-cache' \
+              "$BASE/?sha_preflight=$EXPECTED_SHA" || true)"
+            html_bytes="$(wc -c < /tmp/pb_shell.html 2>/dev/null || echo 0)"
+            assets=""
+            if [ "$status" = "200" ] && [ "$html_bytes" -gt 0 ]; then
+              assets="$(grep -oE '(src|href)="[^"]+\.(js|mjs)"' /tmp/pb_shell.html \
+                | sed -E 's/^(src|href)="//; s/"$//' | sort -u || true)"
             fi
+            asset_count="$(printf '%s' "$assets" | grep -c . || true)"
+            entry="$(printf '%s' "$assets" | grep 'index-' | head -1 || true)"
+            echo "attempt $attempt: http=$status html_bytes=$html_bytes assets=$asset_count entry=${entry:-none}"
+            for a in $assets; do
+              case "$a" in
+                http*) url="$a" ;;
+                /*)    url="$BASE$a" ;;
+                *)     url="$BASE/$a" ;;
+              esac
+              if curl -sf "$url" | grep -q "$EXPECTED_SHA"; then
+                found=1
+                echo "Served bundle carries the expected SHA: $EXPECTED_SHA (asset: $url)"
+                break
+              fi
+            done
             [ "$found" = 1 ] && break
-            echo "Attempt $attempt: SHA not found in served bundle yet; retrying in 15s…"
-            sleep 15
+            echo "SHA $EXPECTED_SHA not found in served bundle yet; retrying in 30s…"
+            sleep 30
           done
           if [ "$found" != 1 ]; then
-            echo "::error::served bundle does NOT embed $EXPECTED_SHA — the Worker is serving a different build. Aborting (do NOT run gates against this preview)."
+            echo "::error::served bundle does NOT embed $EXPECTED_SHA after 12 attempts (~6 min) — the Worker is serving a different build (propagation lag or deploy mismatch). Aborting; do NOT run gates against this preview."
             exit 1
           fi
