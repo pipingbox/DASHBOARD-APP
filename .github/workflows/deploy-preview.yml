@@ -32,7 +32,17 @@ on:
       - 'wrangler.toml'
       - 'src/worker.ts'
       - '.github/workflows/deploy-preview.yml'
-  workflow_dispatch: {}
+  # PB-OBSERVABILITY-PROD-ROLLOUT-001 (ChatGPT review): manual dispatch is
+  # SHA-locked. The run checks out EXACTLY this commit, embeds it as
+  # VITE_APP_VERSION, and verifies after deploy that the served bundle carries
+  # it. This removes the served/declared SHA drift class for good: a dispatch
+  # can never silently build whatever the branch head happens to be.
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'Exact commit SHA (40 hex chars) to build and deploy'
+        required: true
+        type: string
 
 concurrency:
   group: deploy-preview
@@ -48,7 +58,35 @@ jobs:
     permissions:
       contents: read
     steps:
+      # PB-OBSERVABILITY-PROD-ROLLOUT-001: the ONLY source of truth for what
+      # this run builds. For push events it is the pushed commit; for manual
+      # dispatch it is the explicitly requested commit_sha.
+      - name: Resolve expected SHA
+        id: expected_sha
+        run: |
+          set -euo pipefail
+          expected="${{ inputs.commit_sha || github.sha }}"
+          if ! [[ "$expected" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::expected SHA is not a full 40-hex commit: $expected"
+            exit 1
+          fi
+          echo "sha=$expected" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.expected_sha.outputs.sha }}
+
+      - name: Preflight — checkout matches expected SHA exactly
+        env:
+          EXPECTED_SHA: ${{ steps.expected_sha.outputs.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$EXPECTED_SHA" ]; then
+            echo "::error::SHA mismatch — checkout HEAD=$actual, expected=$EXPECTED_SHA. Aborting before build."
+            exit 1
+          fi
+          echo "Preflight OK: building exactly $actual"
 
       - uses: actions/setup-node@v4
         with:
@@ -88,7 +126,47 @@ jobs:
           VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
           VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
           # Tag every build with its commit SHA (error tracking per build).
-          VITE_APP_VERSION: ${{ github.sha }}
+          # PB-OBSERVABILITY-PROD-ROLLOUT-001: MUST be the same resolved SHA
+          # that was checked out — this is what ties the served bundle, the
+          # PostHog app_version property and the declared candidate together.
+          VITE_APP_VERSION: ${{ steps.expected_sha.outputs.sha }}
           # Mark preview traffic so it can be excluded from production reports.
           VITE_APP_ENV: preview
         run: npx wrangler deploy
+
+      # PB-OBSERVABILITY-PROD-ROLLOUT-001 (ChatGPT review): a deploy is only
+      # valid if the SERVED bundle embeds the exact expected SHA. This closes
+      # the loop: checkout SHA == VITE_APP_VERSION == served app_version, so
+      # PostHog's app_version property can be trusted as build identity.
+      - name: Preflight — served bundle embeds the exact SHA
+        env:
+          EXPECTED_SHA: ${{ steps.expected_sha.outputs.sha }}
+        run: |
+          set -euo pipefail
+          BASE="https://pipingbox-app.pipingbox.workers.dev"
+          found=0
+          for attempt in 1 2 3 4 5; do
+            html="$(curl -sf -H 'Accept: text/html' "$BASE/" || true)"
+            if [ -n "$html" ]; then
+              assets="$(printf '%s' "$html" | grep -oE '(src|href)="[^"]+\.(js|mjs)"' | sed -E 's/^(src|href)="//; s/"$//' | sort -u || true)"
+              for a in $assets; do
+                case "$a" in
+                  http*) url="$a" ;;
+                  /*)    url="$BASE$a" ;;
+                  *)     url="$BASE/$a" ;;
+                esac
+                if curl -sf "$url" | grep -q "$EXPECTED_SHA"; then
+                  found=1
+                  echo "Served bundle carries the expected SHA: $EXPECTED_SHA (asset: $url)"
+                  break
+                fi
+              done
+            fi
+            [ "$found" = 1 ] && break
+            echo "Attempt $attempt: SHA not found in served bundle yet; retrying in 15s…"
+            sleep 15
+          done
+          if [ "$found" != 1 ]; then
+            echo "::error::served bundle does NOT embed $EXPECTED_SHA — the Worker is serving a different build. Aborting (do NOT run gates against this preview)."
+            exit 1
+          fi
