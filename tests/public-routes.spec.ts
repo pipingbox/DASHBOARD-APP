@@ -226,4 +226,57 @@ test.describe('PB-SEO-101 acquisition foundation', () => {
       expect(body, `sitemap must include ${url}`).toContain(url);
     }
   });
+
+  // PB-OBSERVABILITY-PROD-ROLLOUT-001 regression: vite-plugin-sitemap
+  // normalized every URL to the slash-less form, so blog entries advertised
+  // their non-canonical 307-redirecting variants. The plugin was replaced by
+  // explicit generation (app/frontend/prerender/sitemap.js). This test pins
+  // the single canonical policy so router, sitemap and canonical links
+  // cannot drift apart again:
+  //   - '/' and blog routes (prerendered directories): trailing slash;
+  //   - every other app route: no trailing slash;
+  //   - no duplicate <loc> entries, canonical hostname only.
+  test('sitemap enforces the canonical trailing-slash policy', async ({
+    request,
+  }) => {
+    const response = await request.get('/sitemap.xml');
+    expect(response.status()).toBe(200);
+    const body = await response.text();
+    const locs = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+
+    expect(locs.length, 'sitemap must not be empty').toBeGreaterThan(0);
+    expect(
+      new Set(locs).size,
+      'sitemap must not contain duplicate URLs',
+    ).toBe(locs.length);
+
+    for (const loc of locs) {
+      expect(loc, `canonical hostname only: ${loc}`).toMatch(
+        /^https:\/\/pipingbox\.com(\/|$)/,
+      );
+    }
+
+    const blogLocs = locs.filter((loc) => loc.includes('/blog'));
+    expect(blogLocs, 'sitemap must cover the blog index').toContain(
+      'https://pipingbox.com/blog/',
+    );
+    for (const loc of blogLocs) {
+      expect(loc, `blog URLs keep their trailing slash: ${loc}`).toMatch(/\/$/);
+      expect(
+        locs,
+        `non-canonical slash-less variant must not coexist: ${loc}`,
+      ).not.toContain(loc.replace(/\/$/, ''));
+    }
+
+    const appLocs = locs.filter(
+      (loc) => loc !== 'https://pipingbox.com/' && !loc.includes('/blog'),
+    );
+    expect(appLocs.length, 'sitemap must cover app routes').toBeGreaterThan(0);
+    for (const loc of appLocs) {
+      expect(
+        loc,
+        `app routes never carry a trailing slash: ${loc}`,
+      ).not.toMatch(/\/$/);
+    }
+  });
 });

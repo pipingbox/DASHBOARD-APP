@@ -4,9 +4,8 @@ import path from 'path';
 import { viteSourceLocator } from '@metagptx/vite-plugin-source-locator';
 import { atoms } from '@metagptx/web-sdk/plugins';
 import { vitePrerenderPlugin } from 'vite-prerender-plugin';
-import Sitemap from 'vite-plugin-sitemap';
+import { pbExplicitSitemapPlugin } from './prerender/sitemap.js';
 import { getBlogRoutes } from './prerender/blog-routes.js';
-import { getSitemapLastmod } from './prerender/blog-sitemap.js';
 
 function escapeHtmlAttr(str: string): string {
   return str
@@ -34,45 +33,14 @@ export default defineConfig(({ command }) => {
       }),
       react(),
       atoms(),
-      Sitemap({
-        hostname: 'https://pipingbox.com',
-        lastmod: getSitemapLastmod(),
-        readable: true,
-        // generateRobotsTxt disabled: we manage robots.txt in public/robots.txt directly
-        // so it can include Disallow directives for private routes (PB-WEB-006).
-        generateRobotsTxt: false,
-        // PB-WEB-006: all public routes approved in PB-WEB-005 (F1 + F2).
-        // vite-plugin-sitemap 0.8.2 uses dynamicRoutes, not routes.
-        // PB-SEO-101: legal/contact/certification routes added.
-        // vite-plugin-sitemap 0.8.2 builds the route list as
-        // (scan of **\/\*.html in dist) + dynamicRoutes with NO dedup, and it
-        // normalizes every route to the slash-less form. '/' and the blog
-        // pages are already emitted by the dist scan (prerendered HTML), so
-        // listing them here would duplicate <url> entries — they are covered
-        // as long as vite-prerender-plugin emits their HTML, which is
-        // load-bearing for the blog anyway.
-        // Known follow-up (not this ticket): the plugin strips trailing
-        // slashes, so sitemap URLs ('/blog') differ from the canonical
-        // trailing-slash URLs ('/blog/'), and per-route lastmod from
-        // getSitemapLastmod() never matches the normalized routes. Fixing
-        // both means replacing this plugin with explicit sitemap generation.
-        dynamicRoutes: [
-          '/tools',
-          '/academy',
-          '/jobs',
-          '/pricing',
-          '/companies',
-          '/companies/request-workers',
-          '/contact',
-          '/privacy',
-          '/terms',
-          '/dsa',
-          '/certifications',
-          '/certifications/vca',
-          '/certifications/scc',
-          '/certifications/prl',
-        ],
-      }),
+      // PB-OBSERVABILITY-PROD-ROLLOUT-001: vite-plugin-sitemap was removed.
+      // It normalized every route to the slash-less form, so blog URLs were
+      // emitted as their non-canonical variants (307 redirects). The
+      // replacement generates the sitemap from the same route sources as the
+      // router/prerenderer under a single canonical policy: '/' and blog
+      // routes keep their trailing slash, app routes never have one.
+      // Canonical route list and policy live in prerender/sitemap.js.
+      pbExplicitSitemapPlugin(),
       ...(blogPrerenderRoutes.length > 0
         ? vitePrerenderPlugin({
             renderTarget: '#root',
