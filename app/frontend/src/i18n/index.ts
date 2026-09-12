@@ -13,6 +13,7 @@ import it from './locales/it.json';
 import ro from './locales/ro.json';
 import uk from './locales/uk.json';
 import pl from './locales/pl.json';
+import bg from './locales/bg.json';
 
 /**
  * PB-I18N-LAYER3-001: `languages.json` is the single canonical list of
@@ -45,6 +46,7 @@ const RESOURCES: Record<string, { translation: Record<string, unknown> }> = {
   ro: { translation: ro },
   uk: { translation: uk },
   pl: { translation: pl },
+  bg: { translation: bg },
 };
 
 for (const code of SUPPORTED_CODES) {

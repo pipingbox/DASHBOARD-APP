@@ -48,5 +48,10 @@
     "code": "pl",
     "label": "Polski",
     "flag": "🇵🇱"
+  },
+  {
+    "code": "bg",
+    "label": "Български",
+    "flag": "🇧🇬"
   }
 ]
