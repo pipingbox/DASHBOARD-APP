@@ -145,8 +145,13 @@ jobs:
           set -euo pipefail
           BASE="https://pipingbox-app.pipingbox.workers.dev"
           found=0
-          for attempt in 1 2 3 4 5; do
-            html="$(curl -sf -H 'Accept: text/html' "$BASE/" || true)"
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            # Cache-bust the shell fetch: the Cloudflare edge can serve a
+            # cached copy of the previous build's index.html (cf-cache-status:
+            # HIT) for a short window after wrangler deploy, which would make
+            # the preflight grep stale asset lists. A unique query string
+            # forces a fresh response; assets are content-hashed already.
+            html="$(curl -sf -H 'Accept: text/html' -H 'Cache-Control: no-cache' "$BASE/?sha_preflight=$EXPECTED_SHA" || true)"
             if [ -n "$html" ]; then
               assets="$(printf '%s' "$html" | grep -oE '(src|href)="[^"]+\.(js|mjs)"' | sed -E 's/^(src|href)="//; s/"$//' | sort -u || true)"
               for a in $assets; do
