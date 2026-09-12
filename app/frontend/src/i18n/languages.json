@@ -38,5 +38,10 @@
     "code": "ro",
     "label": "Română",
     "flag": "🇷🇴"
+  },
+  {
+    "code": "uk",
+    "label": "Українська",
+    "flag": "🇺🇦"
   }
 ]
