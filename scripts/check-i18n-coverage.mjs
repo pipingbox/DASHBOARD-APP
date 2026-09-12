@@ -75,6 +75,19 @@ if (!codes.includes(REFERENCE)) {
   process.exit(2);
 }
 
+// PB-I18N-LAYER3-001: the locale files and the canonical language list must
+// agree exactly. A file without a languages.json entry is dead weight the
+// selector never exposes; an entry without a file is a runtime crash.
+const LANGUAGES_FILE = join(__dirname, '..', 'app', 'frontend', 'src', 'i18n', 'languages.json');
+const declared = JSON.parse(readFileSync(LANGUAGES_FILE, 'utf8')).map((l) => l.code);
+const undeclared = codes.filter((c) => !declared.includes(c));
+const fileless = declared.filter((c) => !codes.includes(c));
+if (undeclared.length || fileless.length) {
+  if (undeclared.length) console.error(`✗ locale file(s) not declared in languages.json: ${undeclared.join(', ')}`);
+  if (fileless.length) console.error(`✗ languages.json entries without a locale file: ${fileless.join(', ')}`);
+  process.exit(2);
+}
+
 const referencePaths = collectLeafPaths(readLocale(REFERENCE));
 const total = referencePaths.size;
 

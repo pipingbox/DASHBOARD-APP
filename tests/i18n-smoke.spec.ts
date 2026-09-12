@@ -29,9 +29,22 @@ import { resolve } from 'path';
  */
 
 const LANGUAGE_STORAGE_KEY = 'pipingbox_language';
+// Same key the app uses (src/lib/betaFeedback.ts). Seeding it reproduces a
+// returning visitor who already pressed "Continue" on the beta notice, so the
+// aria-modal dialog never hides the page under test. The dialog copy itself is
+// still covered by the raw-key / [object Object] assertions on first paint.
+const BETA_DISMISSED_KEY = 'pipingbox_beta_dismissed';
 
-const LOCALES = ['en', 'es', 'nl', 'fr', 'de', 'pt', 'it'] as const;
-type LocaleCode = (typeof LOCALES)[number];
+/**
+ * PB-I18N-LAYER3-001: the locale list is the canonical `languages.json` the
+ * runtime selector and the i18n guards read. Adding a language there is enough
+ * for it to be smoke-tested here — no second hardcoded list.
+ */
+const LANGUAGES = JSON.parse(
+  readFileSync(resolve(process.cwd(), 'app/frontend/src/i18n/languages.json'), 'utf8'),
+) as ReadonlyArray<{ code: string; label: string; flag: string }>;
+const LOCALES = LANGUAGES.map((l) => l.code);
+type LocaleCode = string;
 
 function localeData(code: LocaleCode): Record<string, unknown> {
   // Playwright transpiles spec files as ESM (no __dirname); tests run from the
@@ -50,23 +63,39 @@ function localeString(code: LocaleCode, path: string): string {
   return node;
 }
 
-/** Dismiss the "Beta Version" modal if present (aria-modal hides the page). */
-async function dismissBetaModalIfPresent(page: Page) {
-  const continueButton = page.getByRole('button', { name: /continue|continuar|doorgaan|fortfahren|continuer|continua/i });
+/**
+ * Dismiss the "Beta Version" modal if present (aria-modal hides the page).
+ * The button label is read from the locale file, never from a regex of
+ * guessed translations, so this stays correct for every language.
+ */
+async function dismissBetaModalIfPresent(page: Page, code: LocaleCode = 'en') {
+  const continueButton = page.getByRole('button', {
+    name: localeString(code, 'betaFeedback.notice.continueBtn'),
+    exact: true,
+  });
   if (await continueButton.isVisible({ timeout: 4_000 }).catch(() => false)) {
     await continueButton.click();
   }
 }
 
+/** Seed the stored language and the beta-dismissed flag before any script runs. */
+function seedStorage(page: Page, code: LocaleCode | null) {
+  return page.addInitScript(
+    ({ langKey, betaKey, lang }) => {
+      if (lang) window.localStorage.setItem(langKey, lang);
+      window.localStorage.setItem(betaKey, 'true');
+    },
+    { langKey: LANGUAGE_STORAGE_KEY, betaKey: BETA_DISMISSED_KEY, lang: code },
+  );
+}
+
 for (const code of LOCALES) {
   test.describe(`PB-I18N-LAYER2-001 locale ${code}`, () => {
     test('boot, render and reload in the stored language', async ({ page }) => {
-      await page.addInitScript((value) => {
-        window.localStorage.setItem('pipingbox_language', value);
-      }, code);
+      await seedStorage(page, code);
 
       await page.goto('/tools');
-      await dismissBetaModalIfPresent(page);
+      await dismissBetaModalIfPresent(page, code);
 
       // <html lang> matches the stored locale.
       await expect(page).toHaveURL(/\/tools/);
@@ -100,7 +129,7 @@ for (const code of LOCALES) {
 
       // Reload: the preference must survive.
       await page.reload();
-      await dismissBetaModalIfPresent(page);
+      await dismissBetaModalIfPresent(page, code);
       await expect
         .poll(async () => page.evaluate(() => document.documentElement.lang), { timeout: 10_000 })
         .toBe(code);
@@ -116,9 +145,15 @@ test.describe('PB-I18N-LAYER2-001 language selector', () => {
     // Seed a clean EN state without an init script: init scripts also run on
     // reload, which would erase the very persistence this test verifies.
     await page.goto('/tools');
-    await page.evaluate((key) => window.localStorage.removeItem(key), LANGUAGE_STORAGE_KEY);
+    await page.evaluate(
+      ({ langKey, betaKey }) => {
+        window.localStorage.removeItem(langKey);
+        window.localStorage.setItem(betaKey, 'true');
+      },
+      { langKey: LANGUAGE_STORAGE_KEY, betaKey: BETA_DISMISSED_KEY },
+    );
     await page.reload();
-    await dismissBetaModalIfPresent(page);
+    await dismissBetaModalIfPresent(page, 'en');
 
     // Default is EN (no stored preference + Playwright sends en-US).
     await expect
@@ -142,7 +177,7 @@ test.describe('PB-I18N-LAYER2-001 language selector', () => {
 
     // And survive a reload.
     await page.reload();
-    await dismissBetaModalIfPresent(page);
+    await dismissBetaModalIfPresent(page, 'es');
     await expect
       .poll(async () => page.evaluate(() => document.documentElement.lang), { timeout: 10_000 })
       .toBe('es');
@@ -151,13 +186,53 @@ test.describe('PB-I18N-LAYER2-001 language selector', () => {
       .toBe(localeString('es', 'pageMeta.tools.title'));
   });
 
-  test('unsupported stored value falls back to English', async ({ page }) => {
-    await page.addInitScript(() => {
-      window.localStorage.setItem('pipingbox_language', 'xx');
+  for (const lang of LANGUAGES) {
+    test(`selector lists ${lang.label} and switching to it renders ${lang.code}`, async ({ page }) => {
+      await seedStorage(page, null);
+      await page.goto('/tools');
+      await page.evaluate((key) => window.localStorage.removeItem(key), LANGUAGE_STORAGE_KEY);
+
+      const languageButton = page.getByRole('button', { name: /language/i });
+      await expect(languageButton).toBeVisible({ timeout: 15_000 });
+      await languageButton.click();
+      await page.getByRole('menuitem', { name: lang.label }).click();
+      // The selector keeps the menu open on purpose (onSelect preventDefault);
+      // close it like a visitor would, otherwise Radix aria-hides the page.
+      await page.keyboard.press('Escape');
+
+      await expect
+        .poll(async () => page.evaluate(() => document.documentElement.lang), { timeout: 10_000 })
+        .toBe(lang.code);
+      await expect
+        .poll(async () => page.evaluate(() => document.title), { timeout: 10_000 })
+        .toBe(localeString(lang.code, 'pageMeta.tools.title'));
+      await expect(
+        page.getByRole('heading', { name: localeString(lang.code, 'tools.title') }).first(),
+      ).toBeVisible({ timeout: 10_000 });
     });
+  }
+
+  test('?lng= query wins over the stored preference and is persisted (shareable QA links)', async ({ page }) => {
+    await seedStorage(page, 'en');
+    const target = LOCALES.find((c) => c !== 'en') ?? 'en';
+    await page.goto(`/tools?lng=${target}`);
+    await dismissBetaModalIfPresent(page, target);
+
+    await expect
+      .poll(async () => page.evaluate(() => document.documentElement.lang), { timeout: 10_000 })
+      .toBe(target);
+    await expect
+      .poll(async () => page.evaluate(() => document.title), { timeout: 10_000 })
+      .toBe(localeString(target, 'pageMeta.tools.title'));
+    const stored = await page.evaluate((key) => window.localStorage.getItem(key), LANGUAGE_STORAGE_KEY);
+    expect(stored).toBe(target);
+  });
+
+  test('unsupported stored value falls back to English', async ({ page }) => {
+    await seedStorage(page, 'xx');
 
     await page.goto('/tools');
-    await dismissBetaModalIfPresent(page);
+    await dismissBetaModalIfPresent(page, 'en');
 
     await expect
       .poll(async () => page.evaluate(() => document.documentElement.lang), { timeout: 10_000 })

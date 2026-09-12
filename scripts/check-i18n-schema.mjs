@@ -62,13 +62,18 @@ const argv = process.argv.slice(2);
 const asJson = argv.includes('--json');
 
 /**
- * Locales the product PROMISES. The commercial one-pager sent to manufacturers
- * claims seven interface languages, so "seven files exist" is a contractual
- * property, not an implementation detail. Hardcoded rather than derived from
- * the directory listing on purpose: deriving it would make the guard pass
- * happily the day someone deletes a locale file.
+ * Locales the product PROMISES. Read from the canonical `languages.json`
+ * (PB-I18N-LAYER3-001) — the same list that drives the runtime selector —
+ * and NOT from the directory listing on purpose: deriving it from the files
+ * would make the guard pass happily the day someone deletes a locale file.
+ * A language listed there without a locale file is a hard failure below.
  */
-const REQUIRED_LOCALES = ['en', 'es', 'nl', 'de', 'fr', 'pt', 'it'];
+const LANGUAGES_FILE = join(REPO_ROOT, 'app', 'frontend', 'src', 'i18n', 'languages.json');
+const REQUIRED_LOCALES = JSON.parse(readFileSync(LANGUAGES_FILE, 'utf8')).map((l) => l.code);
+if (REQUIRED_LOCALES.length < 7 || new Set(REQUIRED_LOCALES).size !== REQUIRED_LOCALES.length) {
+  console.error(`✗ languages.json must list at least the 7 historical locales without duplicates (got ${REQUIRED_LOCALES.join(', ')})`);
+  process.exit(2);
+}
 
 /**
  * Namespaces whose shape is asserted against the code that consumes them.

@@ -38,7 +38,10 @@ const REPO_ROOT = join(__dirname, '..');
 const LOCALES_DIR = join(REPO_ROOT, 'app', 'frontend', 'src', 'i18n', 'locales');
 const SRC = join(REPO_ROOT, 'app', 'frontend', 'src');
 
-const REQUIRED_LOCALES = ['en', 'es', 'nl', 'de', 'fr', 'pt', 'it'];
+// PB-I18N-LAYER3-001: canonical language list shared with the app runtime,
+// the other guards and the Playwright smoke. Never hardcode locales here.
+const LANGUAGES_FILE = join(REPO_ROOT, 'app', 'frontend', 'src', 'i18n', 'languages.json');
+const REQUIRED_LOCALES = JSON.parse(readFileSync(LANGUAGES_FILE, 'utf8')).map((l) => l.code);
 
 /**
  * Public pages scanned in default (CI) mode. A visitor can reach these without
