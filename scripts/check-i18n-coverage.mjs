@@ -63,6 +63,27 @@ function pct(part, total) {
   return total === 0 ? 100 : (part / total) * 100;
 }
 
+// PB-I18N-LAYER3-001 — CLDR plural forms.
+// The reference (en) only needs `_one` / `_other`, but i18next resolves the
+// suffix through Intl.PluralRules for the ACTIVE language: ro needs `_few`,
+// uk/pl need `_few` and `_many`. A missing form silently falls back to the
+// English string for 2, 5, 22… so, per locale:
+//   - every category the language requires is REQUIRED (counted as missing);
+//   - a form the language requires is NOT an "extra" even if en lacks it.
+const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/;
+function pluralCategories(code) {
+  try {
+    return new Intl.PluralRules(code).resolvedOptions().pluralCategories;
+  } catch {
+    return ['one', 'other'];
+  }
+}
+function pluralBases(paths) {
+  const bases = new Set();
+  for (const p of paths) if (p.endsWith('_other')) bases.add(p.slice(0, -'_other'.length));
+  return bases;
+}
+
 // ─── main ────────────────────────────────────────────────────────────────────
 
 const codes = readdirSync(LOCALES_DIR)
@@ -93,13 +114,18 @@ const total = referencePaths.size;
 
 const report = codes.map((code) => {
   const paths = collectLeafPaths(readLocale(code));
-  const missing = [...referencePaths].filter((p) => !paths.has(p));
-  const extra = [...paths].filter((p) => !referencePaths.has(p));
+  const required = new Set(referencePaths);
+  const categories = pluralCategories(code);
+  for (const base of pluralBases(referencePaths)) {
+    for (const cat of categories) required.add(`${base}_${cat}`);
+  }
+  const missing = [...required].filter((p) => !paths.has(p));
+  const extra = [...paths].filter((p) => !required.has(p));
   return {
     code,
-    present: total - missing.length,
-    total,
-    coverage: Number(pct(total - missing.length, total).toFixed(1)),
+    present: required.size - missing.length,
+    total: required.size,
+    coverage: Number(pct(required.size - missing.length, required.size).toFixed(1)),
     missing,
     extra,
   };
@@ -141,4 +167,9 @@ if (asJson) {
   );
 }
 
-if (strict && report.some((r) => r.missing.length > 0)) process.exit(1);
+if (strict && report.some((r) => r.missing.length > 0 || r.extra.length > 0)) {
+  for (const r of report) {
+    if (r.extra.length) console.error(`✗ ${r.code}.json has ${r.extra.length} key(s) absent from ${REFERENCE}.json (not a required plural form): ${r.extra.slice(0, 5).join(', ')}${r.extra.length > 5 ? '…' : ''}`);
+  }
+  process.exit(1);
+}

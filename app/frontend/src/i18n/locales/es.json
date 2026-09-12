@@ -657,7 +657,8 @@
         "title": "Empieza por lo que ya está disponible",
         "subtitle": "El catálogo se construye con profesionales del sector. Todo lo que aparece abajo está activo y disponible ahora.",
         "count_one": "{{count}} curso",
-        "count_other": "{{count}} cursos"
+        "count_other": "{{count}} cursos",
+        "count_many": "{{count}} cursos"
       }
     },
     "questionTypeMultipleChoice": "Selecciona todas las respuestas correctas",
@@ -1327,7 +1328,8 @@
       "translationPlaceholder": "Traducción ({{lang}})",
       "translations": "Traducciones",
       "translationsAvailable_one": "{{count}} traducción disponible",
-      "translationsAvailable_other": "{{count}} traducciones disponibles"
+      "translationsAvailable_other": "{{count}} traducciones disponibles",
+      "translationsAvailable_many": "{{count}} traducciones disponibles"
     },
     "documents": {
       "label": "Documentos",

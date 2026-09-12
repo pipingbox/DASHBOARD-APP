@@ -231,6 +231,24 @@ const shapes = Object.fromEntries(
 const allPaths = new Set();
 for (const map of Object.values(shapes)) for (const p of map.keys()) allPaths.add(p);
 
+const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/;
+function pluralCategories(code) {
+  try {
+    return new Intl.PluralRules(code).resolvedOptions().pluralCategories;
+  } catch {
+    return ['one', 'other'];
+  }
+}
+// Every plural base in the reference must carry all categories the locale needs.
+for (const [code, map] of Object.entries(shapes)) {
+  for (const p of shapes.en.keys()) {
+    if (!p.endsWith('_other')) continue;
+    const base = p.slice(0, -'_other'.length);
+    for (const cat of pluralCategories(code)) allPaths.add(`${base}_${cat}`);
+  }
+  void map;
+}
+
 const missing = [];   // case 1
 const typeDrift = []; // case 2
 const empties = [];   // case 3
@@ -255,8 +273,17 @@ for (const path of [...allPaths].sort()) {
     const parent = path.includes('.') ? path.slice(0, path.lastIndexOf('.')) : null;
     const parentAlsoAbsent =
       parent !== null && absent.every((c) => shapes[c].get(parent) === undefined);
-    if (!parentAlsoAbsent && !COVERAGE_DEBT.has(path)) {
-      missing.push({ path, absent, present: [...byLocale.keys()] });
+    // PB-I18N-LAYER3-001: a CLDR plural form (`_few`, `_many`, …) is only
+    // required in the locales whose Intl.PluralRules produce that category.
+    // Absence there is a real gap (reported); absence elsewhere is expected.
+    const pluralMatch = path.match(PLURAL_SUFFIX);
+    const languageSpecificPlural =
+      pluralMatch !== null && shapes.en.has(`${path.slice(0, -pluralMatch[0].length)}_other`);
+    const absentWhereRequired = languageSpecificPlural
+      ? absent.filter((c) => pluralCategories(c).includes(pluralMatch[1]))
+      : absent;
+    if (!parentAlsoAbsent && !COVERAGE_DEBT.has(path) && absentWhereRequired.length > 0) {
+      missing.push({ path, absent: absentWhereRequired, present: [...byLocale.keys()] });
     }
   }
 

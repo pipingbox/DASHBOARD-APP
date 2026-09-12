@@ -601,7 +601,8 @@
         "title": "Comece pelo que já está disponível",
         "subtitle": "O catálogo é construído com profissionais do terreno. Tudo o que se segue está ativo e disponível agora.",
         "count_one": "{{count}} curso",
-        "count_other": "{{count}} cursos"
+        "count_other": "{{count}} cursos",
+        "count_many": "{{count}} cursos"
       }
     },
     "questionTypeMultipleChoice": "Selecione todas as respostas corretas",
@@ -1327,7 +1328,8 @@
       "translationPlaceholder": "Tradução ({{lang}})",
       "translations": "Traduções",
       "translationsAvailable_one": "{{count}} tradução disponível",
-      "translationsAvailable_other": "{{count}} traduções disponíveis"
+      "translationsAvailable_other": "{{count}} traduções disponíveis",
+      "translationsAvailable_many": "{{count}} traduções disponíveis"
     },
     "documents": {
       "label": "Documentos",
