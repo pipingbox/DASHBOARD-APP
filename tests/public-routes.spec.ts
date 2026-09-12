@@ -121,7 +121,13 @@ test.describe('PB-SEO-102 Worker route contract', () => {
     await expect(page.getByRole('link', { name: /jobs/i })).toBeVisible();
 
     // The response body must be the SPA shell (so React can boot), not a plain text 404.
-    const reqResponse = await request.get('/this-route-does-not-exist');
+    // The Worker only serves the SPA shell for HTML-document requests, so the
+    // API request must explicitly send Accept: text/html (Playwright's
+    // APIRequestContext does NOT send it by default, unlike page.goto above).
+    const reqResponse = await request.get('/this-route-does-not-exist', {
+      headers: { accept: 'text/html,application/xhtml+xml' },
+    });
+    expect(reqResponse.status(), 'unknown HTML document must be HTTP 404').toBe(404);
     const body = await reqResponse.text();
     expect(body).toContain('id="root"');
   });
