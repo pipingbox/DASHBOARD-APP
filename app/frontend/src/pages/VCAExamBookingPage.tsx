@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BookOpen, Calendar } from 'lucide-react';
 import { VCACourseContent } from '@/components/academy/VCACourseContent';
 import { VCAExamBooking } from '@/components/academy/VCAExamBooking';
+import { TranslationBetaBanner } from '@/components/beta/TranslationBetaBanner';
 
 /**
  * VCA Exam Booking Page
@@ -9,10 +11,12 @@ import { VCAExamBooking } from '@/components/academy/VCAExamBooking';
  * Routes: /academy/vca-course and /academy/vca-booking
  */
 export default function VCAExamBookingPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'course' | 'booking'>('course');
 
   return (
     <div className="space-y-6">
+      <TranslationBetaBanner />
       {/* Tab selector */}
       <div className="flex items-center gap-2 border-b border-zinc-800/80">
         <button
@@ -24,7 +28,7 @@ export default function VCAExamBookingPage() {
           }`}
         >
           <BookOpen className="h-4 w-4" />
-          Preparation Course
+          {t('academy.coursePage.tabPreparationCourse')}
         </button>
         <button
           onClick={() => setActiveTab('booking')}
@@ -35,7 +39,7 @@ export default function VCAExamBookingPage() {
           }`}
         >
           <Calendar className="h-4 w-4" />
-          Book Official Exam
+          {t('academy.coursePage.tabBookOfficialExam')}
         </button>
       </div>
 

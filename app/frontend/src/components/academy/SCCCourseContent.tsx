@@ -53,7 +53,6 @@ const MODULE_ICONS: Record<string, React.ElementType> = {
 
 interface SCCCourseContentProps {
   variant?: 'Doc 016' | 'Doc 017' | 'Doc 018';
-  showLanguage?: 'de' | 'en';
 }
 
 export function SCCCourseContent({ variant = 'Doc 016' }: SCCCourseContentProps) {

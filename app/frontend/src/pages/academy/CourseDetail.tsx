@@ -17,6 +17,7 @@ import {
   GraduationCap,
 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
+import { localizedCourse } from '@/lib/academy/courseI18n';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
@@ -135,6 +136,8 @@ export default function CourseDetail() {
     );
   }
 
+  const localised = localizedCourse(t, { ...course, description: course.description ?? '' });
+
   return (
     <div className="space-y-6">
       {/* Back link */}
@@ -176,8 +179,8 @@ export default function CourseDetail() {
               )}
             </div>
 
-            <h1 className="text-2xl font-bold text-zinc-100">{course.title}</h1>
-            <p className="text-sm text-zinc-400 max-w-3xl">{course.description}</p>
+            <h1 className="text-2xl font-bold text-zinc-100">{localised.title}</h1>
+            <p className="text-sm text-zinc-400 max-w-3xl">{localised.description}</p>
 
             <div className="flex items-center gap-4 text-xs text-zinc-500 pt-1">
               <span className="flex items-center gap-1.5">
