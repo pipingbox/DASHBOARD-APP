@@ -272,6 +272,49 @@ function checkScript(lang, data, errors, label) {
   }
 }
 
+/**
+ * A translation must never be able to break an exam: the answer key stored in
+ * the metadata has to stay resolvable against the wording of every language.
+ */
+function checkAnswerKeys(lang, questions, errors) {
+  for (const meta of questionMetaCache()) {
+    const wording = questions[meta.id];
+    if (!wording) continue;
+    const at = `${lang} answer key ${meta.id}`;
+    if (meta.questionType === 'single_choice') {
+      const letters = ['A', 'B', 'C'].filter((l) => wording[`option${l}`]);
+      if (!letters.includes(meta.correctAnswer)) {
+        errors.push(`${at}: correctAnswer "${meta.correctAnswer}" has no translated option (${letters.join('/') || 'none'})`);
+      }
+    }
+    for (const field of ['options', 'statements', 'items', 'leftItems', 'rightItems']) {
+      const items = meta[field];
+      if (!Array.isArray(items)) continue;
+      const translated = wording[field] ?? {};
+      for (const item of items) {
+        if (!translated[item.id]?.trim()) errors.push(`${at}: ${field}.${item.id} has no translated text`);
+      }
+    }
+    if (Array.isArray(meta.options) && !meta.options.some((o) => o.isCorrect)) {
+      errors.push(`${at}: no option flagged as correct`);
+    }
+    if (Array.isArray(meta.items)) {
+      const positions = meta.items.map((i) => i.correctPosition).sort((a, b) => a - b).join();
+      const zeroBased = meta.items.map((_, i) => i).join();
+      const oneBased = meta.items.map((_, i) => i + 1).join();
+      if (positions !== zeroBased && positions !== oneBased) errors.push(`${at}: correctPosition is not a permutation`);
+    }
+    if (Array.isArray(meta.rightItems) && Array.isArray(meta.leftItems)) {
+      const left = meta.leftItems.map((l) => l.id);
+      for (const right of meta.rightItems) {
+        if (right.matchesLeftId && !left.includes(right.matchesLeftId)) {
+          errors.push(`${at}: matchesLeftId "${right.matchesLeftId}" does not exist`);
+        }
+      }
+    }
+  }
+}
+
 /** The same module must carry the same translated name in every question. */
 function checkModuleNames(lang, questions, errors) {
   const moduleOf = {};
@@ -315,6 +358,7 @@ function validate(langs) {
     checkScript(lang, lessons, errors, `${lang} lessons`);
     checkScript(lang, questions, errors, `${lang} questions`);
     checkModuleNames(lang, questions, errors);
+    checkAnswerKeys(lang, questions, errors);
     for (const key of SYLLABI) {
       const sp = join(CONTENT, `syllabus-${key}.${lang}.json`);
       if (!existsSync(sp)) {
