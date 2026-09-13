@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
 import { localizedCourse } from '@/lib/academy/courseI18n';
+import { localizedLesson, type LessonContentI18n } from '@/lib/academy/lessonI18n';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
@@ -45,6 +46,7 @@ interface Lesson {
   order_index: number;
   is_free_preview: boolean;
   official_ref: string | null;
+  content_i18n?: Record<string, LessonContentI18n> | null;
 }
 
 interface ProgressEntry {
@@ -60,7 +62,7 @@ const CONTENT_ICONS: Record<string, React.ElementType> = {
 };
 
 export default function CourseDetail() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
   const [course, setCourse] = useState<Course | null>(null);
@@ -246,7 +248,8 @@ export default function CourseDetail() {
           </div>
         ) : (
           <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm overflow-hidden">
-            {lessons.map((lesson, idx) => {
+            {lessons.map((rawLesson, idx) => {
+              const lesson = localizedLesson(i18n.language, rawLesson);
               const Icon = CONTENT_ICONS[lesson.content_type] ?? FileText;
               const lessonStatus = progress[lesson.id] ?? 'not_started';
               const isCompleted = lessonStatus === 'completed';
