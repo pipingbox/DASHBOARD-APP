@@ -772,6 +772,54 @@
       "next": "Next",
       "finish": "Finish"
     },
+    "courseContent": {
+      "officialSyllabus": "Official Syllabus",
+      "meta": "{{lessons}} lessons · {{minutes}} min · {{modules}} modules",
+      "moduleMeta": "{{lessons}} lessons · {{minutes}} min",
+      "oneTimePayment": "one-time payment",
+      "otherLanguagesInEnglish": "other languages read the English material",
+      "legalNoticeLabel": "Legal notice:",
+      "vca": {
+        "title": "VCA Preparation Course",
+        "legalNotice": "PipingBox prepares you for the VCA exam. The official VCA certificate is issued by SSVV/BESACC through recognized exam centers. PipingBox is an independent preparation provider, not affiliated with SSVV/BESACC."
+      },
+      "simulator": {
+        "title": "VCA Exam Simulator — {{count}} questions",
+        "description": "Practice with real-style VCA exam questions. Timer, instant feedback, and detailed explanations. Included with the course.",
+        "bvca": "{{count}} questions (B-VCA)",
+        "volvca": "{{count}} questions (VOL-VCA)",
+        "instantScoring": "Instant scoring"
+      },
+      "scc": {
+        "title": "SCC Preparation Course",
+        "variantOperative": "Operative employees",
+        "variantSupervisor": "Supervisor",
+        "variantSelfEmployed": "Self-employed",
+        "legalNotice": "PipingBox prepares you for the SCC exam. The official SCC certificate is issued by SCC Stiftung (or AUVA in Austria) through recognized exam bodies such as TÜV or DEKRA. PipingBox is an independent preparation provider, not affiliated with SCC Stiftung.",
+        "simulatorTitle": "SCC Exam Simulator — {{count}} questions",
+        "simulatorDescription": "Practice with real-style SCC exam questions. Timer, instant feedback, and detailed explanations. Included with the course.",
+        "simulatorDoc016": "{{count}} questions (Doc 016)",
+        "simulatorDoc017018": "{{count}} questions (Doc 017/018)",
+        "simulatorInstantScoring": "Instant scoring"
+      },
+      "prl": {
+        "titleBasico": "PRL Básico — Occupational Risk Prevention",
+        "titleIntermedio": "PRL Intermedio — Occupational Risk Prevention",
+        "officialTraining": "Official training",
+        "hoursBadge": "{{hours}}h",
+        "meta": "{{lessons}} lessons · {{hours}}h · {{modules}} modules · Ley 31/1995",
+        "legalNotice": "PipingBox provides PRL training in line with Ley 31/1995 de Prevención de Riesgos Laborales and RD 39/1997. PipingBox does not replace the company's in-house or external prevention service, nor its occupational accident insurer. Verification of legal compliance is the responsibility of the Inspección de Trabajo y Seguridad Social.",
+        "certificationTypeLabel": "Certification type:",
+        "certificationTypeText": "Training-based (no exam). On completing 100% of the course, PipingBox issues a",
+        "certificationTypeHighlight": "training certificate",
+        "certificationTypeTail": "that meets the legal PRL training requirement for workers.",
+        "certificateTeaserTitle": "Training certificate — no exam",
+        "certificateTeaserDescription": "Unlike VCA and SCC, PRL has no official exam. The training itself is the legal requirement. On completing 100% of the modules, PipingBox issues a training certificate that meets the Ley 31/1995 requirement for workers.",
+        "badgeCompliance": "Meets Ley 31/1995",
+        "badgeHours": "{{hours}}h of training",
+        "badgeDownloadable": "Downloadable certificate"
+      }
+    },
     "vcaBooking": {
       "signInRequired": "Please sign in to submit a booking request",
       "fillNameAndPostalCode": "Please fill in your name and postal code",
@@ -2741,6 +2789,7 @@
       "submitError": "Failed to send report. Please try again."
     },
     "categories": {
+      "translation": "Translation / wording",
       "ai_error": "AI Error",
       "export": "Export",
       "login_account": "Login / Account",
@@ -3155,5 +3204,15 @@
     "signInToPurchase": "Sign in to purchase credits.",
     "notAvailableSubscription": "Subscriptions are not available yet. Email us and we will set it up manually.",
     "notAvailablePack": "This pack is not available right now."
+  },
+  "translationBanner": {
+    "text": "You are viewing PipingBox in {{language}} — beta translation. Spotted a mistake?",
+    "reportBtn": "Report translation",
+    "emailBtn": "or write to us",
+    "dismiss": "Dismiss notice",
+    "emailSubject": "Translation feedback",
+    "emailBodyLanguage": "Language: {{language}} ({{code}})",
+    "emailBodyPage": "Page",
+    "emailBodyHint": "Please paste the wrong text and how it should read:"
   }
 }

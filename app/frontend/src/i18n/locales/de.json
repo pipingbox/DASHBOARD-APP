@@ -772,6 +772,54 @@
       "next": "Weiter",
       "finish": "Abschließen"
     },
+    "courseContent": {
+      "officialSyllabus": "Offizieller Lehrplan",
+      "meta": "{{lessons}} Lektionen · {{minutes}} Min. · {{modules}} Module",
+      "moduleMeta": "{{lessons}} Lektionen · {{minutes}} Min.",
+      "oneTimePayment": "Einmalzahlung",
+      "otherLanguagesInEnglish": "in weiteren Sprachen wird das englische Lernmaterial verwendet",
+      "legalNoticeLabel": "Rechtlicher Hinweis:",
+      "vca": {
+        "title": "VCA-Vorbereitungskurs",
+        "legalNotice": "PipingBox bereitet Sie auf die VCA-Prüfung vor. Das offizielle VCA-Zertifikat wird von SSVV/BESACC über anerkannte Prüfstellen ausgestellt. PipingBox ist ein unabhängiger Anbieter von Prüfungsvorbereitung und steht in keiner Verbindung zu SSVV/BESACC."
+      },
+      "simulator": {
+        "title": "VCA-Prüfungssimulator — {{count}} Fragen",
+        "description": "Üben Sie mit VCA-Prüfungsfragen im Stil der echten Prüfung. Mit Zeitmessung, sofortiger Rückmeldung und ausführlichen Erläuterungen. Im Kurs enthalten.",
+        "bvca": "{{count}} Fragen (B-VCA)",
+        "volvca": "{{count}} Fragen (VOL-VCA)",
+        "instantScoring": "Sofortige Auswertung"
+      },
+      "scc": {
+        "title": "SCC-Vorbereitungskurs",
+        "variantOperative": "Operativ tätige Mitarbeitende",
+        "variantSupervisor": "Operativ Führungskraft",
+        "variantSelfEmployed": "Selbstständige",
+        "legalNotice": "PipingBox bereitet Sie auf die SCC-Prüfung vor. Das offizielle SCC-Zertifikat wird von SCC Stiftung (oder AUVA in Österreich) über anerkannte Prüfstellen wie TÜV oder DEKRA ausgestellt. PipingBox ist ein unabhängiger Anbieter von Prüfungsvorbereitung und steht in keiner Verbindung zu SCC Stiftung.",
+        "simulatorTitle": "SCC-Prüfungssimulator — {{count}} Fragen",
+        "simulatorDescription": "Üben Sie mit SCC-Prüfungsfragen im Stil der echten Prüfung. Mit Zeitmessung, sofortiger Rückmeldung und ausführlichen Erläuterungen. Im Kurs enthalten.",
+        "simulatorDoc016": "{{count}} Fragen (Doc 016)",
+        "simulatorDoc017018": "{{count}} Fragen (Doc 017/018)",
+        "simulatorInstantScoring": "Sofortige Auswertung"
+      },
+      "prl": {
+        "titleBasico": "PRL Básico — Arbeitsschutz und Prävention von Arbeitsrisiken",
+        "titleIntermedio": "PRL Intermedio — Arbeitsschutz und Prävention von Arbeitsrisiken",
+        "officialTraining": "Offizielle Schulung",
+        "hoursBadge": "{{hours}}h",
+        "meta": "{{lessons}} Lektionen · {{hours}}h · {{modules}} Module · Ley 31/1995",
+        "legalNotice": "PipingBox bietet PRL-Schulungen im Einklang mit Ley 31/1995 de Prevención de Riesgos Laborales und RD 39/1997 an. PipingBox ersetzt weder den internen oder externen Arbeitsschutzdienst des Unternehmens noch dessen Träger der gesetzlichen Unfallversicherung. Die Überprüfung der Einhaltung der rechtlichen Vorgaben obliegt der Inspección de Trabajo y Seguridad Social.",
+        "certificationTypeLabel": "Art der Zertifizierung:",
+        "certificationTypeText": "Auf Grundlage der absolvierten Schulung (ohne Prüfung). Nach Abschluss von 100 % des Kurses stellt PipingBox eine",
+        "certificationTypeHighlight": "Schulungsbescheinigung",
+        "certificationTypeTail": "aus, die die gesetzliche PRL-Schulungspflicht für Beschäftigte erfüllt.",
+        "certificateTeaserTitle": "Schulungsbescheinigung — ohne Prüfung",
+        "certificateTeaserDescription": "Anders als bei VCA und SCC gibt es für PRL keine offizielle Prüfung. Die Sicherheitsschulung selbst ist die gesetzliche Anforderung. Nach Abschluss von 100 % der Module stellt PipingBox eine Schulungsbescheinigung aus, die die Anforderung der Ley 31/1995 für Beschäftigte erfüllt.",
+        "badgeCompliance": "Erfüllt Ley 31/1995",
+        "badgeHours": "{{hours}}h Schulung",
+        "badgeDownloadable": "Bescheinigung zum Herunterladen"
+      }
+    },
     "vcaBooking": {
       "signInRequired": "Bitte melden Sie sich an, um eine Buchungsanfrage zu senden",
       "fillNameAndPostalCode": "Bitte geben Sie Ihren Namen und Ihre Postleitzahl ein",
@@ -2741,6 +2789,7 @@
       "submitError": "Bericht konnte nicht gesendet werden. Bitte erneut versuchen."
     },
     "categories": {
+      "translation": "Übersetzung / Formulierung",
       "ai_error": "KI-Fehler",
       "export": "Export",
       "login_account": "Anmeldung / Konto",
@@ -3155,5 +3204,15 @@
     "signInToPurchase": "Zum Kauf von Credits anmelden.",
     "notAvailableSubscription": "Abonnements sind noch nicht verfügbar. Schreiben Sie uns und wir richten es manuell ein.",
     "notAvailablePack": "Dieses Paket ist derzeit nicht verfügbar."
+  },
+  "translationBanner": {
+    "text": "Sie sehen PipingBox auf {{language}} — Beta-Übersetzung. Fehler entdeckt?",
+    "reportBtn": "Übersetzung melden",
+    "emailBtn": "oder schreiben Sie uns",
+    "dismiss": "Hinweis schließen",
+    "emailSubject": "Feedback zur Übersetzung",
+    "emailBodyLanguage": "Sprache: {{language}} ({{code}})",
+    "emailBodyPage": "Seite",
+    "emailBodyHint": "Fügen Sie den falschen Text ein und wie er lauten sollte:"
   }
 }

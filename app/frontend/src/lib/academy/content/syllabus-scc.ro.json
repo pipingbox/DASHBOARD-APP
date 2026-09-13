@@ -1,0 +1,244 @@
+[
+  {
+    "id": "m1-arbeitssicherheit",
+    "iconKey": "Shield",
+    "officialRef": "SCC §1",
+    "weight": "~30%",
+    "title": "Modulul 1: Securitatea în muncă",
+    "lessons": [
+      {
+        "title": "1.1 Noțiuni de bază privind securitatea în muncă",
+        "duration": "20 min",
+        "topics": [
+          "ArbSchG (Arbeitsschutzgesetz)",
+          "Obligațiile angajatorului și ale angajatului",
+          "Evaluarea riscurilor (Gefährdungsbeurteilung)",
+          "Cultura de securitate pe șantierele industriale"
+        ]
+      },
+      {
+        "title": "1.2 Echipamentul individual de protecție (EIP)",
+        "duration": "15 min",
+        "topics": [
+          "Cască, ochelari de protecție, mănuși, bocanci de protecție",
+          "EIP pentru sudură și tăiere",
+          "Protecția auzului",
+          "Protecția respiratorie"
+        ]
+      },
+      {
+        "title": "1.3 Lucrul la înălțime",
+        "duration": "15 min",
+        "topics": [
+          "Protecția împotriva căderii (Absturzsicherung)",
+          "Securitatea schelelor",
+          "Scări și platforme de lucru",
+          "Verificarea centurii complexe de siguranță"
+        ]
+      },
+      {
+        "title": "1.4 Securitatea mașinilor și a sculelor",
+        "duration": "15 min",
+        "topics": [
+          "Directiva GUVMachine",
+          "Apărători și opriri de urgență",
+          "Verificarea sculelor de mână",
+          "Securitatea la polizare și tăiere"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m2-gefahrstoffe",
+    "iconKey": "AlertTriangle",
+    "officialRef": "SCC §2",
+    "weight": "~20%",
+    "title": "Modulul 2: Substanțe periculoase",
+    "lessons": [
+      {
+        "title": "2.1 GHS și simbolurile de pericol",
+        "duration": "15 min",
+        "topics": [
+          "Pictograme GHS",
+          "Fraze H și P",
+          "Regulamentul CLP",
+          "Fișe cu date de securitate (Sicherheitsdatenblatt)"
+        ]
+      },
+      {
+        "title": "2.2 Azbest și silice",
+        "duration": "15 min",
+        "topics": [
+          "Azbest în conductele vechi (esențial pentru montatorii de țevi)",
+          "Pulbere de silice (cuarț)",
+          "TRGS 519 (azbest)",
+          "TRGS 559 (silice)"
+        ]
+      },
+      {
+        "title": "2.3 Expunerea chimică pe șantierele industriale",
+        "duration": "15 min",
+        "topics": [
+          "Contextul BASF / Bayer / Ludwigshafen",
+          "Instalații chimice — riscuri specifice",
+          "Limite de expunere (AGW)",
+          "Proceduri de decontaminare"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m3-brandschutz",
+    "iconKey": "Flame",
+    "officialRef": "SCC §3",
+    "weight": "~15%",
+    "title": "Modulul 3: Protecția împotriva incendiilor și exploziilor",
+    "lessons": [
+      {
+        "title": "3.1 Clase de incendiu și stingătoare",
+        "duration": "12 min",
+        "topics": [
+          "Clase de incendiu A-D",
+          "Tipuri de stingătoare",
+          "Utilizarea pe șantierele industriale",
+          "Permise de lucru cu foc deschis (Schweißarbeiten)"
+        ]
+      },
+      {
+        "title": "3.2 Protecția împotriva exploziilor (Ex)",
+        "duration": "15 min",
+        "topics": [
+          "Zone ATEX (Zona 0/1/2)",
+          "Echipamente antiex",
+          "Lucrul cu foc deschis în zone Ex",
+          "Permise și măsurători de gaze"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m4-gesetz",
+    "iconKey": "Scale",
+    "officialRef": "SCC §4",
+    "weight": "~10%",
+    "title": "Modulul 4: Noțiuni juridice de bază",
+    "lessons": [
+      {
+        "title": "4.1 Legislația germană privind securitatea muncii",
+        "duration": "15 min",
+        "topics": [
+          "ArbSchG",
+          "BetrSichV (Betriebssicherheitsverordnung)",
+          "Reglementările DGUV",
+          "Răspunderea antreprenorului față de cea a beneficiarului"
+        ]
+      },
+      {
+        "title": "4.2 Sistemul SCC",
+        "duration": "10 min",
+        "topics": [
+          "Guvernanța SCC Stiftung",
+          "Diferențele dintre Doc 016/017/018",
+          "Valabilitate (3-5 ani)",
+          "Procesul de recertificare"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m5-umweltschutz",
+    "iconKey": "Leaf",
+    "officialRef": "SCC §5",
+    "weight": "~10%",
+    "title": "Modulul 5: Protecția mediului",
+    "lessons": [
+      {
+        "title": "5.1 Deșeuri și poluare",
+        "duration": "15 min",
+        "topics": [
+          "Colectarea selectivă a deșeurilor pe șantierele industriale",
+          "KrWG (Kreislaufwirtschaftsgesetz)",
+          "Protecția solului și a apelor",
+          "Raportarea incidentelor de mediu"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m6-erste-hilfe",
+    "iconKey": "HeartPulse",
+    "officialRef": "SCC §6",
+    "weight": "~10%",
+    "title": "Modulul 6: Primul ajutor",
+    "lessons": [
+      {
+        "title": "6.1 Intervenția în caz de urgență pe șantierele industriale",
+        "duration": "15 min",
+        "topics": [
+          "Resuscitare cardiopulmonară (Herz-Lungen-Wiederbelebung)",
+          "Hemoragii severe",
+          "Arsuri (chimice și termice)",
+          "Numere de urgență specifice șantierului"
+        ]
+      },
+      {
+        "title": "6.2 Raportarea accidentelor",
+        "duration": "10 min",
+        "topics": [
+          "Raportarea la BG (Berufsgenossenschaft)",
+          "Raportarea incidentelor fără vătămare",
+          "Cerințe de documentare",
+          "Procesul de cercetare"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-organisation",
+    "iconKey": "ClipboardList",
+    "officialRef": "SCC §7",
+    "weight": "~5%",
+    "title": "Modulul 7: Aspecte organizatorice",
+    "lessons": [
+      {
+        "title": "7.1 Permise și coordonare",
+        "duration": "15 min",
+        "topics": [
+          "Autorizații de lucru (Arbeitserlaubnis)",
+          "Sisteme de permise de lucru",
+          "Coordonarea cu beneficiarul șantierului",
+          "Instruiri (Unterweisung)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-fuehrung",
+    "iconKey": "Users",
+    "officialRef": "SCC §8 (Supervisor)",
+    "weight": "Doc 017/018",
+    "title": "Modulul 8: Conducere și responsabilitate (numai Doc 017/018)",
+    "lessons": [
+      {
+        "title": "8.1 Atribuțiile șefului de echipă",
+        "duration": "20 min",
+        "topics": [
+          "Delegarea sarcinilor în condiții de siguranță",
+          "Instruire și supraveghere",
+          "Documentația pentru personalul de conducere",
+          "Răspunderea juridică (Führungshaftung)"
+        ]
+      },
+      {
+        "title": "8.2 Obligațiile lucrătorului independent",
+        "duration": "15 min",
+        "topics": [
+          "Specific pentru Doc 018",
+          "Evaluarea riscurilor ca lucrător independent",
+          "Asigurare (Berufshaftpflicht)",
+          "Coordonarea cu antreprenorul general"
+        ]
+      }
+    ]
+  }
+]

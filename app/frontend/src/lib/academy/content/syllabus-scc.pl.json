@@ -1,0 +1,244 @@
+[
+  {
+    "id": "m1-arbeitssicherheit",
+    "iconKey": "Shield",
+    "officialRef": "SCC §1",
+    "weight": "~30%",
+    "title": "Moduł 1: Bezpieczeństwo i higiena pracy",
+    "lessons": [
+      {
+        "title": "1.1 Podstawy bezpieczeństwa i higieny pracy",
+        "duration": "20 min",
+        "topics": [
+          "ArbSchG (Arbeitsschutzgesetz)",
+          "Obowiązki pracodawcy i pracownika",
+          "Ocena ryzyka (Gefährdungsbeurteilung)",
+          "Kultura bezpieczeństwa na terenie zakładów przemysłowych"
+        ]
+      },
+      {
+        "title": "1.2 Środki ochrony indywidualnej",
+        "duration": "15 min",
+        "topics": [
+          "Hełm ochronny, okulary ochronne, rękawice, obuwie ochronne",
+          "Środki ochrony indywidualnej do spawania i cięcia",
+          "Ochrona słuchu",
+          "Ochrona dróg oddechowych"
+        ]
+      },
+      {
+        "title": "1.3 Praca na wysokości",
+        "duration": "15 min",
+        "topics": [
+          "Ochrona przed upadkiem z wysokości (Absturzsicherung)",
+          "Bezpieczeństwo rusztowań",
+          "Drabiny i podesty robocze",
+          "Przegląd szelek bezpieczeństwa"
+        ]
+      },
+      {
+        "title": "1.4 Bezpieczeństwo maszyn i narzędzi",
+        "duration": "15 min",
+        "topics": [
+          "Dyrektywa maszynowa GUV",
+          "Osłony i wyłączniki awaryjne",
+          "Kontrola narzędzi ręcznych",
+          "Bezpieczeństwo przy szlifowaniu i cięciu"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m2-gefahrstoffe",
+    "iconKey": "AlertTriangle",
+    "officialRef": "SCC §2",
+    "weight": "~20%",
+    "title": "Moduł 2: Substancje niebezpieczne",
+    "lessons": [
+      {
+        "title": "2.1 GHS i znaki ostrzegawcze",
+        "duration": "15 min",
+        "topics": [
+          "Piktogramy GHS",
+          "Zwroty H i P",
+          "Rozporządzenie CLP",
+          "Karty charakterystyki (Sicherheitsdatenblatt)"
+        ]
+      },
+      {
+        "title": "2.2 Azbest i krzemionka",
+        "duration": "15 min",
+        "topics": [
+          "Azbest w starych rurociągach (kluczowe dla monterów rurociągów)",
+          "Pył krzemionkowy (kwarc)",
+          "TRGS 519 (azbest)",
+          "TRGS 559 (krzemionka)"
+        ]
+      },
+      {
+        "title": "2.3 Narażenie na czynniki chemiczne w zakładach przemysłowych",
+        "duration": "15 min",
+        "topics": [
+          "Kontekst: BASF / Bayer / Ludwigshafen",
+          "Zakłady chemiczne — zagrożenia specyficzne",
+          "Wartości dopuszczalne narażenia (AGW)",
+          "Procedury dekontaminacji"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m3-brandschutz",
+    "iconKey": "Flame",
+    "officialRef": "SCC §3",
+    "weight": "~15%",
+    "title": "Moduł 3: Ochrona przeciwpożarowa i przeciwwybuchowa",
+    "lessons": [
+      {
+        "title": "3.1 Grupy pożarów i gaśnice",
+        "duration": "12 min",
+        "topics": [
+          "Grupy pożarów A-D",
+          "Rodzaje gaśnic",
+          "Zastosowanie na terenie zakładów przemysłowych",
+          "Zezwolenia na prace gorące (Schweißarbeiten)"
+        ]
+      },
+      {
+        "title": "3.2 Ochrona przeciwwybuchowa (Ex)",
+        "duration": "15 min",
+        "topics": [
+          "Strefy ATEX (strefa 0/1/2)",
+          "Urządzenia w wykonaniu przeciwwybuchowym",
+          "Prace gorące w strefach Ex",
+          "Zezwolenia i pomiary stężenia gazów"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m4-gesetz",
+    "iconKey": "Scale",
+    "officialRef": "SCC §4",
+    "weight": "~10%",
+    "title": "Moduł 4: Podstawy prawne",
+    "lessons": [
+      {
+        "title": "4.1 Niemieckie prawo bezpieczeństwa pracy",
+        "duration": "15 min",
+        "topics": [
+          "ArbSchG",
+          "BetrSichV (Betriebssicherheitsverordnung)",
+          "Przepisy DGUV",
+          "Odpowiedzialność wykonawcy a właściciela zakładu"
+        ]
+      },
+      {
+        "title": "4.2 System SCC",
+        "duration": "10 min",
+        "topics": [
+          "Nadzór fundacji SCC Stiftung",
+          "Różnice między dokumentami 016/017/018",
+          "Okres ważności (3-5 lat)",
+          "Proces recertyfikacji"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m5-umweltschutz",
+    "iconKey": "Leaf",
+    "officialRef": "SCC §5",
+    "weight": "~10%",
+    "title": "Moduł 5: Ochrona środowiska",
+    "lessons": [
+      {
+        "title": "5.1 Odpady i zanieczyszczenia",
+        "duration": "15 min",
+        "topics": [
+          "Segregacja odpadów na terenie zakładów przemysłowych",
+          "KrWG (Kreislaufwirtschaftsgesetz)",
+          "Ochrona gleby i wód",
+          "Zgłaszanie zdarzeń środowiskowych"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m6-erste-hilfe",
+    "iconKey": "HeartPulse",
+    "officialRef": "SCC §6",
+    "weight": "~10%",
+    "title": "Moduł 6: Pierwsza pomoc",
+    "lessons": [
+      {
+        "title": "6.1 Postępowanie w sytuacjach awaryjnych w zakładzie przemysłowym",
+        "duration": "15 min",
+        "topics": [
+          "Resuscytacja krążeniowo-oddechowa (Herz-Lungen-Wiederbelebung)",
+          "Krwotok o dużym nasileniu",
+          "Oparzenia (chemiczne i termiczne)",
+          "Numery alarmowe obowiązujące na terenie zakładu"
+        ]
+      },
+      {
+        "title": "6.2 Zgłaszanie wypadków",
+        "duration": "10 min",
+        "topics": [
+          "Zgłoszenie do BG (Berufsgenossenschaft)",
+          "Zgłaszanie zdarzeń potencjalnie wypadkowych",
+          "Wymagania dotyczące dokumentacji",
+          "Przebieg postępowania wyjaśniającego"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-organisation",
+    "iconKey": "ClipboardList",
+    "officialRef": "SCC §7",
+    "weight": "~5%",
+    "title": "Moduł 7: Aspekty organizacyjne",
+    "lessons": [
+      {
+        "title": "7.1 Zezwolenia i koordynacja prac",
+        "duration": "15 min",
+        "topics": [
+          "Zezwolenia na pracę (Arbeitserlaubnis)",
+          "Systemy zezwoleń na pracę",
+          "Koordynacja z właścicielem zakładu",
+          "Instruktaże stanowiskowe (Unterweisung)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-fuehrung",
+    "iconKey": "Users",
+    "officialRef": "SCC §8 (Supervisor)",
+    "weight": "Doc 017/018",
+    "title": "Moduł 8: Kierowanie i odpowiedzialność (tylko dokumenty 017/018)",
+    "lessons": [
+      {
+        "title": "8.1 Obowiązki osoby kierującej pracownikami",
+        "duration": "20 min",
+        "topics": [
+          "Bezpieczne przydzielanie zadań",
+          "Instruktaż i nadzór",
+          "Dokumentacja dla osób kierujących pracownikami",
+          "Odpowiedzialność kierownicza (Führungshaftung)"
+        ]
+      },
+      {
+        "title": "8.2 Obowiązki samozatrudnionego wykonawcy",
+        "duration": "15 min",
+        "topics": [
+          "Wymagania szczególne dokumentu 018",
+          "Ocena ryzyka przy samozatrudnieniu",
+          "Ubezpieczenie (Berufshaftpflicht)",
+          "Koordynacja z wykonawcą generalnym"
+        ]
+      }
+    ]
+  }
+]

@@ -778,6 +778,54 @@
       "minutes_few": "{{count}} хв",
       "minutes_many": "{{count}} хв"
     },
+    "courseContent": {
+      "officialSyllabus": "Офіційна програма",
+      "meta": "Уроків: {{lessons}} · {{minutes}} хв · модулів: {{modules}}",
+      "moduleMeta": "Уроків: {{lessons}} · {{minutes}} хв",
+      "oneTimePayment": "одноразовий платіж",
+      "otherLanguagesInEnglish": "іншими мовами матеріал вивчається англійською",
+      "legalNoticeLabel": "Юридичне застереження:",
+      "vca": {
+        "title": "Підготовчий курс VCA",
+        "legalNotice": "PipingBox готує вас до екзамену VCA. Офіційний сертифікат VCA видає SSVV/BESACC через визнані екзаменаційні центри. PipingBox є незалежним постачальником підготовки та не пов’язаний із SSVV/BESACC."
+      },
+      "simulator": {
+        "title": "Симулятор екзамену VCA — питань: {{count}}",
+        "description": "Тренуйтеся на питаннях у стилі реального екзамену VCA. Таймер, миттєвий зворотний зв’язок і докладні пояснення. Входить до курсу.",
+        "bvca": "Питань: {{count}} (B-VCA)",
+        "volvca": "Питань: {{count}} (VOL-VCA)",
+        "instantScoring": "Миттєве оцінювання"
+      },
+      "scc": {
+        "title": "Підготовчий курс SCC",
+        "variantOperative": "Робітники",
+        "variantSupervisor": "Керівник робіт",
+        "variantSelfEmployed": "Самозайняті особи",
+        "legalNotice": "PipingBox готує вас до екзамену SCC. Офіційний сертифікат SCC видає SCC Stiftung (або AUVA в Австрії) через визнані екзаменаційні органи, такі як TÜV або DEKRA. PipingBox є незалежним постачальником підготовки та не пов’язаний із SCC Stiftung.",
+        "simulatorTitle": "Симулятор екзамену SCC — питань: {{count}}",
+        "simulatorDescription": "Тренуйтеся на питаннях у стилі реального екзамену SCC. Таймер, миттєвий зворотний зв’язок і докладні пояснення. Входить до курсу.",
+        "simulatorDoc016": "Питань: {{count}} (Doc 016)",
+        "simulatorDoc017018": "Питань: {{count}} (Doc 017/018)",
+        "simulatorInstantScoring": "Миттєве оцінювання"
+      },
+      "prl": {
+        "titleBasico": "PRL Básico — охорона праці та запобігання професійним ризикам",
+        "titleIntermedio": "PRL Intermedio — охорона праці та запобігання професійним ризикам",
+        "officialTraining": "Офіційне навчання",
+        "hoursBadge": "{{hours}}h",
+        "meta": "Уроків: {{lessons}} · {{hours}}h · модулів: {{modules}} · Ley 31/1995",
+        "legalNotice": "PipingBox проводить навчання PRL відповідно до Ley 31/1995 de Prevención de Riesgos Laborales та RD 39/1997. PipingBox не замінює власну або зовнішню службу охорони праці підприємства, а також його страховика від нещасних випадків на виробництві. Перевірка відповідності законодавству є обов’язком Inspección de Trabajo y Seguridad Social.",
+        "certificationTypeLabel": "Тип сертифікації:",
+        "certificationTypeText": "На основі навчання (без екзамену). Після проходження 100% курсу PipingBox видає",
+        "certificationTypeHighlight": "свідоцтво про навчання",
+        "certificationTypeTail": "яке відповідає встановленій законом вимозі до навчання PRL для працівників.",
+        "certificateTeaserTitle": "Свідоцтво про навчання — без екзамену",
+        "certificateTeaserDescription": "На відміну від VCA та SCC, PRL не має офіційного екзамену. Саме навчання є вимогою закону. Після проходження 100% модулів PipingBox видає свідоцтво про навчання, яке відповідає вимозі Ley 31/1995 щодо працівників.",
+        "badgeCompliance": "Відповідає Ley 31/1995",
+        "badgeHours": "{{hours}}h навчання",
+        "badgeDownloadable": "Свідоцтво для завантаження"
+      }
+    },
     "vcaBooking": {
       "signInRequired": "Будь ласка, увійдіть, щоб надіслати запит на бронювання",
       "fillNameAndPostalCode": "Будь ласка, вкажіть ваше ім'я та поштовий індекс",
@@ -2753,6 +2801,7 @@
       "submitError": "Не вдалося надіслати звіт. Спробуйте ще раз."
     },
     "categories": {
+      "translation": "Переклад / формулювання",
       "ai_error": "Помилка ШІ",
       "export": "Експорт",
       "login_account": "Вхід / обліковий запис",
@@ -3167,5 +3216,15 @@
     "signInToPurchase": "Увійдіть, щоб придбати кредити.",
     "notAvailableSubscription": "Підписки поки що недоступні. Напишіть нам електронною поштою, і ми налаштуємо все вручну.",
     "notAvailablePack": "Цей пакет зараз недоступний."
+  },
+  "translationBanner": {
+    "text": "Ви бачите PipingBox українською ({{language}}) — бета-переклад. Помітили помилку?",
+    "reportBtn": "Повідомити про переклад",
+    "emailBtn": "або напишіть нам",
+    "dismiss": "Закрити повідомлення",
+    "emailSubject": "Відгук про переклад",
+    "emailBodyLanguage": "Мова: {{language}} ({{code}})",
+    "emailBodyPage": "Сторінка",
+    "emailBodyHint": "Вставте помилковий текст і як має бути правильно:"
   }
 }

@@ -1,0 +1,241 @@
+[
+  {
+    "id": "m1-conceptos",
+    "iconKey": "Scale",
+    "officialRef": "Ley 31/1995 §1",
+    "hours": "4 godziny",
+    "title": "Moduł 1: Pojęcia podstawowe i ramy prawne",
+    "lessons": [
+      {
+        "title": "1.1 Pojęcie pracy i zdrowia",
+        "duration": "45 min",
+        "topics": [
+          "Definicja pracy",
+          "Definicja zdrowia (WHO)",
+          "Praca i zdrowie: wzajemne zależności",
+          "Szkody wynikające z wykonywanej pracy"
+        ]
+      },
+      {
+        "title": "1.2 Ramy prawne",
+        "duration": "60 min",
+        "topics": [
+          "Ley 31/1995 o zapobieganiu ryzyku zawodowemu (LPRL)",
+          "RD 39/1997 — rozporządzenie o służbach prewencyjnych",
+          "Dyrektywy ramowe UE (89/391/EWG)",
+          "Obowiązki pracodawcy i pracownika"
+        ]
+      },
+      {
+        "title": "1.3 Organizacja działań prewencyjnych",
+        "duration": "45 min",
+        "topics": [
+          "Własne i zewnętrzne służby prewencyjne",
+          "Przedstawiciele pracowników ds. prewencji",
+          "Komisja ds. bezpieczeństwa i zdrowia",
+          "Towarzystwa ubezpieczeń wypadkowych (mutuas)"
+        ]
+      },
+      {
+        "title": "1.4 Ryzyko zawodowe i szkoda na zdrowiu",
+        "duration": "30 min",
+        "topics": [
+          "Pojęcie ryzyka zawodowego",
+          "Czynnik ryzyka",
+          "Szkoda: wypadek przy pracy a choroba zawodowa",
+          "Choroby zawodowe (RD 1299/2006)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m2-riesgos-generales",
+    "iconKey": "AlertTriangle",
+    "officialRef": "RD 39/1997 §2",
+    "hours": "4 godziny",
+    "title": "Moduł 2: Zagrożenia ogólne",
+    "lessons": [
+      {
+        "title": "2.1 Upadki i pochwycenia",
+        "duration": "45 min",
+        "topics": [
+          "Upadki na tym samym poziomie",
+          "Upadki z wysokości",
+          "Pochwycenie przez maszyny",
+          "Profilaktyka przy pracach na wysokości"
+        ]
+      },
+      {
+        "title": "2.2 Zagrożenia elektryczne",
+        "duration": "45 min",
+        "topics": [
+          "Dotyk bezpośredni i pośredni",
+          "Strefy zagrożenia elektrycznego (BA4/BA5)",
+          "Prace w pobliżu urządzeń pod napięciem",
+          "Pomieszczenia wilgotne i przewodzące"
+        ]
+      },
+      {
+        "title": "2.3 Zagrożenia chemiczne",
+        "duration": "45 min",
+        "topics": [
+          "Drogi wchłaniania (inhalacyjna, skórna, pokarmowa)",
+          "Niebezpieczne substancje chemiczne",
+          "Zwroty H i P (CLP)",
+          "Karty charakterystyki"
+        ]
+      },
+      {
+        "title": "2.4 Zagrożenie pożarowe",
+        "duration": "45 min",
+        "topics": [
+          "Trójkąt spalania",
+          "Grupy pożarów (A, B, C, D, K)",
+          "Gaśnice przenośne",
+          "Plan ewakuacji"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m3-sector-industrial",
+    "iconKey": "Factory",
+    "officialRef": "RD 39/1997 §3",
+    "hours": "4 godziny",
+    "title": "Moduł 3: Zagrożenia specyficzne dla branży przemysłowej",
+    "lessons": [
+      {
+        "title": "3.1 Spawanie i cięcie tlenowe",
+        "duration": "60 min",
+        "topics": [
+          "Zagrożenia przy spawaniu elektrycznym (SMAW, GMAW, GTAW)",
+          "Dymy spawalnicze (mangan, nikiel, chrom VI)",
+          "Promieniowanie UV/IR",
+          "Cięcie tlenowe: zagrożenie pożarem i wybuchem",
+          "Zezwolenie na prace gorące"
+        ]
+      },
+      {
+        "title": "3.2 Prace przy rurociągach przemysłowych",
+        "duration": "60 min",
+        "topics": [
+          "Przestrzenie zamknięte (RD 681/2003)",
+          "Podnoszenie ładunków (żurawie, wciągniki)",
+          "Prace przy instalacjach pod ciśnieniem",
+          "Oznaczanie i blokowanie (LOTO)"
+        ]
+      },
+      {
+        "title": "3.3 Przestrzenie zamknięte",
+        "duration": "60 min",
+        "topics": [
+          "Definicja i przykłady (zbiorniki, rurociągi, studzienki)",
+          "Atmosfery niebezpieczne (O2, H2S, CO, LEL)",
+          "Zezwolenia na wejście",
+          "Asekurujący i zespół ratowniczy",
+          "Wentylacja i pomiary stężenia gazów"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m4-preventivas",
+    "iconKey": "ShieldCheck",
+    "officialRef": "RD 39/1997 §4",
+    "hours": "4 godziny",
+    "title": "Moduł 4: Środki profilaktyczne i środki ochrony indywidualnej",
+    "lessons": [
+      {
+        "title": "4.1 Środki ochrony indywidualnej",
+        "duration": "60 min",
+        "topics": [
+          "Kategorie środków ochrony indywidualnej (I, II, III)",
+          "Hełm ochronny, okulary, rękawice, obuwie",
+          "Ochronniki słuchu",
+          "Półmaski filtrujące (FFP1/2/3)",
+          "Szelki bezpieczeństwa chroniące przed upadkiem"
+        ]
+      },
+      {
+        "title": "4.2 Znaki bezpieczeństwa",
+        "duration": "45 min",
+        "topics": [
+          "Znaki zakazu (czerwone)",
+          "Znaki ostrzegawcze (żółte)",
+          "Znaki nakazu (niebieskie)",
+          "Znaki ratownicze i ewakuacyjne (zielone)",
+          "Oznakowanie rurociągów (RD 485/1997)"
+        ]
+      },
+      {
+        "title": "4.3 LOTO (blokowanie i oznaczanie)",
+        "duration": "45 min",
+        "topics": [
+          "Odcięcie i blokada źródeł energii",
+          "Oznaczanie blokad",
+          "Procedura LOTO krok po kroku",
+          "Zastosowanie do zaworów i pomp"
+        ]
+      },
+      {
+        "title": "4.4 Zezwolenia na pracę",
+        "duration": "30 min",
+        "topics": [
+          "Zezwolenie na prace gorące",
+          "Zezwolenie na wejście do przestrzeni zamkniętej",
+          "Zezwolenie na pracę na wysokości",
+          "Zezwolenie na pracę przy urządzeniach elektrycznych"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "5-primeros-auxilios",
+    "iconKey": "HeartPulse",
+    "officialRef": "RD 39/1997 §5",
+    "hours": "4 godziny",
+    "title": "Moduł 5: Pierwsza pomoc i sytuacje awaryjne",
+    "lessons": [
+      {
+        "title": "5.1 Resuscytacja krążeniowo-oddechowa (RKO)",
+        "duration": "60 min",
+        "topics": [
+          "Łańcuch przeżycia",
+          "Uciśnięcia klatki piersiowej (30:2)",
+          "Użycie AED (defibrylatora)",
+          "Pozycja bezpieczna na boku"
+        ]
+      },
+      {
+        "title": "5.2 Krwotoki i rany",
+        "duration": "45 min",
+        "topics": [
+          "Krwotoki zewnętrzne",
+          "Ucisk bezpośredni",
+          "Opaska zaciskowa (kiedy ją stosować)",
+          "Rany i oparzenia"
+        ]
+      },
+      {
+        "title": "5.3 Oparzenia chemiczne i termiczne",
+        "duration": "45 min",
+        "topics": [
+          "Klasyfikacja oparzeń (I, II, III stopnia)",
+          "Oparzenia chemiczne (prysznic bezpieczeństwa)",
+          "Postępowanie w ramach pierwszej pomocy",
+          "Ewakuacja poszkodowanego"
+        ]
+      },
+      {
+        "title": "5.4 Plan samoobrony i postępowania w sytuacjach awaryjnych",
+        "duration": "30 min",
+        "topics": [
+          "Plan samoobrony (RD 393/2007)",
+          "Próbne ewakuacje",
+          "Miejsca zbiórki",
+          "Zespoły pierwszej interwencji"
+        ]
+      }
+    ]
+  }
+]

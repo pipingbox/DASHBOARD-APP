@@ -56,7 +56,7 @@ for (const code of SUPPORTED_CODES) {
 }
 
 /** Normalise "ro-RO" / "uk-UA" / "PT" to a supported base code, or null. */
-function toSupportedCode(value: string | null | undefined): SupportedLanguageCode | null {
+export function toSupportedCode(value: string | null | undefined): SupportedLanguageCode | null {
   if (!value) return null;
   const base = value.trim().slice(0, 2).toLowerCase();
   return SUPPORTED_CODES.includes(base) ? base : null;

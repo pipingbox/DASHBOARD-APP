@@ -772,6 +772,54 @@
       "next": "Volgende",
       "finish": "Afronden"
     },
+    "courseContent": {
+      "officialSyllabus": "Officieel lesprogramma",
+      "meta": "{{lessons}} lessen · {{minutes}} min · {{modules}} modules",
+      "moduleMeta": "{{lessons}} lessen · {{minutes}} min",
+      "oneTimePayment": "eenmalige betaling",
+      "otherLanguagesInEnglish": "overige talen volgen het Engelse lesmateriaal",
+      "legalNoticeLabel": "Juridische kennisgeving:",
+      "vca": {
+        "title": "VCA-opleiding ter voorbereiding op het examen",
+        "legalNotice": "PipingBox bereidt u voor op het VCA-examen. Het officiële VCA-certificaat wordt afgegeven door SSVV/BESACC via erkende examencentra. PipingBox is een onafhankelijke aanbieder van examenvoorbereiding en is niet verbonden aan SSVV/BESACC."
+      },
+      "simulator": {
+        "title": "VCA-examensimulator — {{count}} vragen",
+        "description": "Oefen met VCA-examenvragen in de stijl van het echte examen. Met timer, directe feedback en uitgebreide toelichting. Inbegrepen bij de opleiding.",
+        "bvca": "{{count}} vragen (B-VCA)",
+        "volvca": "{{count}} vragen (VOL-VCA)",
+        "instantScoring": "Directe uitslag"
+      },
+      "scc": {
+        "title": "SCC-opleiding ter voorbereiding op het examen",
+        "variantOperative": "Uitvoerende medewerkers",
+        "variantSupervisor": "Operationeel leidinggevende",
+        "variantSelfEmployed": "Zelfstandigen",
+        "legalNotice": "PipingBox bereidt u voor op het SCC-examen. Het officiële SCC-certificaat wordt afgegeven door SCC Stiftung (of AUVA in Oostenrijk) via erkende exameninstanties zoals TÜV of DEKRA. PipingBox is een onafhankelijke aanbieder van examenvoorbereiding en is niet verbonden aan SCC Stiftung.",
+        "simulatorTitle": "SCC-examensimulator — {{count}} vragen",
+        "simulatorDescription": "Oefen met SCC-examenvragen in de stijl van het echte examen. Met timer, directe feedback en uitgebreide toelichting. Inbegrepen bij de opleiding.",
+        "simulatorDoc016": "{{count}} vragen (Doc 016)",
+        "simulatorDoc017018": "{{count}} vragen (Doc 017/018)",
+        "simulatorInstantScoring": "Directe uitslag"
+      },
+      "prl": {
+        "titleBasico": "PRL Básico — preventie van arbeidsrisico's",
+        "titleIntermedio": "PRL Intermedio — preventie van arbeidsrisico's",
+        "officialTraining": "Officiële opleiding",
+        "hoursBadge": "{{hours}}h",
+        "meta": "{{lessons}} lessen · {{hours}}h · {{modules}} modules · Ley 31/1995",
+        "legalNotice": "PipingBox verzorgt PRL-opleidingen in overeenstemming met Ley 31/1995 de Prevención de Riesgos Laborales en RD 39/1997. PipingBox vervangt niet de interne of externe preventiedienst van de onderneming, noch haar verzekeraar voor arbeidsongevallen. Het toezicht op de naleving van de wettelijke verplichtingen is voorbehouden aan de Inspección de Trabajo y Seguridad Social.",
+        "certificationTypeLabel": "Soort certificering:",
+        "certificationTypeText": "Op basis van de gevolgde opleiding (zonder examen). Na afronding van 100% van de opleiding geeft PipingBox een",
+        "certificationTypeHighlight": "opleidingscertificaat",
+        "certificationTypeTail": "af dat voldoet aan de wettelijke PRL-opleidingsplicht voor werknemers.",
+        "certificateTeaserTitle": "Opleidingscertificaat — zonder examen",
+        "certificateTeaserDescription": "In tegenstelling tot VCA en SCC kent PRL geen officieel examen. De veiligheidsopleiding zelf is de wettelijke verplichting. Na afronding van 100% van de modules geeft PipingBox een opleidingscertificaat af dat voldoet aan de eis van Ley 31/1995 voor werknemers.",
+        "badgeCompliance": "Voldoet aan Ley 31/1995",
+        "badgeHours": "{{hours}}h opleiding",
+        "badgeDownloadable": "Certificaat te downloaden"
+      }
+    },
     "vcaBooking": {
       "signInRequired": "Meld u aan om een boekingsaanvraag in te dienen",
       "fillNameAndPostalCode": "Vul uw naam en postcode in",
@@ -2741,6 +2789,7 @@
       "submitError": "Rapport verzenden mislukt. Probeer het opnieuw."
     },
     "categories": {
+      "translation": "Vertaling / formulering",
       "ai_error": "AI-fout",
       "export": "Export",
       "login_account": "Inloggen / Account",
@@ -3155,5 +3204,15 @@
     "signInToPurchase": "Log in om credits te kopen.",
     "notAvailableSubscription": "Abonnementen zijn nog niet beschikbaar. Mail ons en wij regelen het handmatig.",
     "notAvailablePack": "Dit pakket is momenteel niet beschikbaar."
+  },
+  "translationBanner": {
+    "text": "U bekijkt PipingBox in {{language}} — bètavertaling. Een fout gezien?",
+    "reportBtn": "Vertaling melden",
+    "emailBtn": "of mail ons",
+    "dismiss": "Melding sluiten",
+    "emailSubject": "Feedback over de vertaling",
+    "emailBodyLanguage": "Taal: {{language}} ({{code}})",
+    "emailBodyPage": "Pagina",
+    "emailBodyHint": "Plak de onjuiste tekst en hoe het moet zijn:"
   }
 }

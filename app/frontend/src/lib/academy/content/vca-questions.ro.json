@@ -1,0 +1,2024 @@
+{
+  "m1q1": {
+    "questionText": "Ce măsură poate lua Serviciul de Inspecție?",
+    "optionA": "Să organizeze o ședință pentru a discuta condițiile de muncă.",
+    "optionB": "Să aplice o amendă.",
+    "optionC": "Să efectueze un control medical.",
+    "explanation": "Serviciul de Inspecție (Inspecția Muncii) poate efectua controale medicale, poate opri lucrările și poate aplica amenzi. Organizarea de ședințe nu face parte din competențele sale de control.",
+    "officialRef": "Modulul 1 — Legislație",
+    "moduleName": "Legislație"
+  },
+  "m1q2": {
+    "questionText": "Care este obiectivul legislației privind sănătatea și securitatea în muncă?",
+    "optionA": "Asigurarea celor mai bune condiții de muncă posibile.",
+    "optionB": "Reducerea numărului de accidente de muncă.",
+    "optionC": "Îmbunătățirea atmosferei la locul de muncă.",
+    "explanation": "Obiectivul principal al legislației de sănătate și securitate în muncă este să asigure cele mai bune condiții de muncă posibile pentru toți angajații, acoperind sănătatea, securitatea și bunăstarea.",
+    "officialRef": "Modulul 1 — Legislație",
+    "moduleName": "Legislație"
+  },
+  "m1q3": {
+    "questionText": "Care dintre măsurile de mai jos poate fi luată de Serviciul de Inspecție?",
+    "optionA": "Să dispună concedierea unuia sau mai multor angajați.",
+    "optionB": "Să dispună oprirea lucrărilor.",
+    "optionC": "Să efectueze examinări medicale.",
+    "explanation": "Serviciul de Inspecție poate opri lucrările atunci când există un pericol iminent. Nu poate concedia angajați — aceasta este atribuția angajatorului.",
+    "officialRef": "Modulul 1 — Legislație",
+    "moduleName": "Legislație"
+  },
+  "m1q4": {
+    "questionText": "Ce indică marcajul CE aplicat pe un articol?",
+    "optionA": "Articolul îndeplinește cerințele europene minime.",
+    "optionB": "Articolul poate fi comercializat numai în interiorul UE.",
+    "optionC": "Producătorul respectă legea europeană privind sănătatea și securitatea în muncă.",
+    "moduleName": "Legislație"
+  },
+  "m1q5": {
+    "questionText": "Care este unul dintre obiectivele legii privind managementul de mediu?",
+    "optionA": "Controlul fluxurilor de deșeuri pe parcursul întregului proces de producție.",
+    "optionB": "Protejarea mediului împotriva activităților economice nocive.",
+    "optionC": "Protejarea oamenilor împotriva substanțelor periculoase.",
+    "moduleName": "Legislație"
+  },
+  "m1q6": {
+    "questionText": "Ce descrie ARBO?",
+    "optionA": "ARBO descrie condițiile de muncă (sănătatea și securitatea în muncă).",
+    "optionB": "ARBO descrie situațiile în care Inspecția Muncii trebuie să fie informată.",
+    "optionC": "ARBO descrie riscurile lucrului cu substanțe periculoase.",
+    "moduleName": "Legislație"
+  },
+  "m1q7": {
+    "questionText": "Care este domeniul de aplicare al legislației privind sănătatea și securitatea în muncă?",
+    "optionA": "Drepturile și obligațiile angajatorului și ale angajatului privind sănătatea și securitatea la domiciliu.",
+    "optionB": "Drepturile și obligațiile angajatorului și ale angajatului privind sănătatea și securitatea la locul de muncă.",
+    "optionC": "Drepturile și obligațiile angajatului privind sănătatea și securitatea.",
+    "moduleName": "Legislație"
+  },
+  "m1q8": {
+    "questionText": "În ce locuri se aplică legislația de sănătate și securitate în muncă?",
+    "optionA": "În toate locurile în care se desfășoară activități de muncă.",
+    "optionB": "În toate locurile în care nu se desfășoară activități de muncă.",
+    "optionC": "În toate locurile cu condiții speciale de muncă.",
+    "moduleName": "Legislație"
+  },
+  "m1q9": {
+    "questionText": "Legislația de sănătate și securitate în muncă se aplică:",
+    "optionA": "Angajatorului.",
+    "optionB": "Angajaților.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Legislație"
+  },
+  "m1q10": {
+    "questionText": "Legislația de sănătate și securitate în muncă nu se referă la:",
+    "optionA": "Sănătate",
+    "optionB": "Bunăstare",
+    "optionC": "Securitatea patrimoniului",
+    "moduleName": "Legislație"
+  },
+  "m1q11": {
+    "questionText": "Legislația de sănătate și securitate în muncă se aplică:",
+    "optionA": "Angajatorului",
+    "optionB": "Angajatului",
+    "optionC": "Ambele răspunsuri sunt corecte",
+    "moduleName": "Legislație"
+  },
+  "m1q12": {
+    "questionText": "Ce nu constituie o premisă a legislației de sănătate și securitate în muncă?",
+    "optionA": "Sprijinul acordat de experți sau de servicii specializate.",
+    "optionB": "Diverșii angajați nu trebuie să colaboreze.",
+    "optionC": "Consultarea și colaborarea cu angajații.",
+    "moduleName": "Legislație"
+  },
+  "m1q13": {
+    "questionText": "Care este o sarcină importantă a experților în prevenire?",
+    "optionA": "Să participe la inventarierea și evaluarea riscurilor.",
+    "optionB": "Să supravegheze angajatorii.",
+    "optionC": "Să efectueze examinări medicale.",
+    "moduleName": "Legislație"
+  },
+  "m1q14": {
+    "questionText": "Obiectivele importante ale legislației privind timpul de muncă sunt:",
+    "optionA": "Să stabilească durata maximă a timpului de muncă și durata minimă de repaus.",
+    "optionB": "Să faciliteze posibilitatea de a combina munca cu sarcinile de îngrijire.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Legislație"
+  },
+  "m1q15": {
+    "questionText": "Principiile marcajului de identificare CE sunt:",
+    "optionA": "Marcajul CE trebuie aplicat de producător și de importator.",
+    "optionB": "Marcajul CE nu este obligatoriu pentru fiecare echipament.",
+    "optionC": "Marcajul CE trebuie aplicat de producător sau de importator.",
+    "moduleName": "Legislație"
+  },
+  "m2q1": {
+    "questionText": "Cum se definește noțiunea de risc?",
+    "optionA": "Risc = probabilitate X efect.",
+    "optionB": "Risc = pericol X probabilitate.",
+    "optionC": "Risc = efect X pericol.",
+    "explanation": "Riscul se calculează ca Probabilitate × Efect (consecință). O probabilitate mare a unui eveniment minor poate reprezenta același risc ca o probabilitate mică a unui eveniment catastrofal.",
+    "officialRef": "Modulul 2 — Pericole, riscuri și prevenire",
+    "moduleName": "Pericole, riscuri și prevenire"
+  },
+  "m2q2": {
+    "questionText": "Pericolele la locul de muncă sunt:",
+    "optionA": "Zgomotul.",
+    "optionB": "Radiațiile.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "explanation": "Atât zgomotul, cât și radiațiile sunt pericole recunoscute la locul de muncă în legislația de sănătate și securitate. Pot provoca daune de lungă durată sănătății chiar și fără o vătămare imediat vizibilă.",
+    "officialRef": "Modulul 2 — Pericole, riscuri și prevenire",
+    "moduleName": "Pericole, riscuri și prevenire"
+  },
+  "m2q3": {
+    "questionText": "Ce nu constituie o sursă de pericole și riscuri la locul de muncă?",
+    "optionA": "Echipamentele de muncă.",
+    "optionB": "Comportamentul angajatului.",
+    "optionC": "Problemele de acasă.",
+    "moduleName": "Pericole, riscuri și prevenire"
+  },
+  "m2q4": {
+    "questionText": "În ce mod se poate aborda prevenirea în practică?",
+    "optionA": "Prin prevenirea situațiilor periculoase.",
+    "optionB": "Prin prevenirea acțiunilor periculoase.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Pericole, riscuri și prevenire"
+  },
+  "m2q5": {
+    "questionText": "Ce este o situație periculoasă?",
+    "optionA": "O situație care respectă condițiile de lucru în siguranță.",
+    "optionB": "O situație în care persoanele nu poartă echipament individual de protecție, deși există indicatoare de obligativitate.",
+    "optionC": "O situație în care nu se respectă condițiile de lucru în siguranță și care poate duce la un accident.",
+    "moduleName": "Pericole, riscuri și prevenire"
+  },
+  "m2q6": {
+    "questionText": "Care acțiune este o acțiune periculoasă?",
+    "optionA": "Lucrul cu permise de lucru acolo unde acestea sunt impuse.",
+    "optionB": "Utilizarea incorectă a uneltelor.",
+    "optionC": "Utilizarea echipamentului individual de protecție prescris.",
+    "moduleName": "Pericole, riscuri și prevenire"
+  },
+  "m2q7": {
+    "questionText": "Care este cel mai bun mod de a gestiona situațiile periculoase?",
+    "optionA": "Eliminarea cauzei.",
+    "optionB": "Chemarea altor persoane.",
+    "optionC": "Avertizarea celorlalți.",
+    "moduleName": "Pericole, riscuri și prevenire"
+  },
+  "m2q8": {
+    "questionText": "Etapele unei RI&E sunt:",
+    "optionA": "1. Evaluarea riscurilor / 2. Identificarea pericolelor / 3. Întocmirea inventarului",
+    "optionB": "1. Identificarea pericolelor / 2. Întocmirea inventarului riscurilor / 3. Evaluarea riscurilor",
+    "optionC": "1. Identificarea pericolelor / 2. Evaluarea riscurilor / 3. Întocmirea inventarului",
+    "moduleName": "Pericole, riscuri și prevenire"
+  },
+  "m2q9": {
+    "questionText": "Ce înseamnă LMRA?",
+    "optionA": "Autoritatea de Reglementare a Pieței Muncii.",
+    "optionB": "Analiza riscurilor în ultimul minut.",
+    "optionC": "Analiza aleatorie minoră finală.",
+    "moduleName": "Pericole, riscuri și prevenire"
+  },
+  "m2q10": {
+    "questionText": "Care este obiectivul planificării lucrărilor?",
+    "optionA": "Să stabilească timpul necesar pentru finalizarea lucrărilor.",
+    "optionB": "Să stabilească o metodă de lucru sigură și care nu produce daune sănătății.",
+    "optionC": "Să stabilească o modalitate de a finaliza lucrările cât mai repede posibil.",
+    "moduleName": "Pericole, riscuri și prevenire"
+  },
+  "m2q11": {
+    "questionText": "Care este abordarea agentului de muncă temporară pentru sarcinile cu risc ridicat?",
+    "optionA": "Acorduri cu societatea utilizatoare privind informarea lucrătorului temporar.",
+    "optionB": "Informarea lucrătorului temporar cu privire la sarcinile cu risc ridicat.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Pericole, riscuri și prevenire"
+  },
+  "m3q1": {
+    "questionText": "Care este cauza majorității accidentelor?",
+    "optionA": "Eroarea umană.",
+    "optionB": "Condițiile de muncă precare.",
+    "optionC": "Lipsa unei întrețineri corecte a uneltelor.",
+    "explanation": "Comportamentul periculos (eroarea umană, scurtăturile) este principala cauză a accidentelor de muncă. Defecțiunile tehnice și factorii de mediu contribuie de asemenea, dar mai rar.",
+    "officialRef": "Modulul 3 — Accidente: cauze și prevenire",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m3q2": {
+    "questionText": "Potrivit lui Lateiner, care factori intervin în producerea accidentelor?",
+    "optionA": "Contextul, eroarea umană și situațiile și operațiunile periculoase.",
+    "optionB": "Împrejurimile, eroarea umană și situațiile periculoase.",
+    "optionC": "Mediul, eroarea umană și situațiile periculoase.",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m3q3": {
+    "questionText": "Elaborarea procedurilor de intervenție în caz de accident este o măsură care vizează:",
+    "optionA": "Împrejurimile.",
+    "optionB": "Organizarea.",
+    "optionC": "Oamenii.",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m3q4": {
+    "questionText": "Care elemente trebuie să figureze în raportul final al cercetării unui accident?",
+    "optionA": "Schițele accidentului, declarațiile martorilor și măsurile luate.",
+    "optionB": "Analiza, concluziile și recomandările.",
+    "optionC": "Rapoartele de interviu, documentele relevante și fotografiile.",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m3q5": {
+    "questionText": "Cele două cauze directe ale unui accident sau incident sunt:",
+    "optionA": "Acțiuni periculoase sau echipamente defecte.",
+    "optionB": "Acțiuni periculoase sau situații periculoase.",
+    "optionC": "Eroarea umană sau echipamentele defecte.",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m3q6": {
+    "questionText": "Ce nu este un factor legat de persoană care poate duce la un incident?",
+    "optionA": "Planificarea insuficientă.",
+    "optionB": "Atenția insuficientă.",
+    "optionC": "Experiența insuficientă.",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m3q7": {
+    "questionText": "Cărei persoane trebuie raportat un accident?",
+    "optionA": "Inspecției Muncii.",
+    "optionB": "Colegilor din imediata apropiere.",
+    "optionC": "Șefului direct.",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m3q8": {
+    "questionText": "Ce trebuie făcut cu toate accidentele sau cvasiaccidentele?",
+    "optionA": "Să se pună la dispoziție mai multe echipamente individuale de protecție.",
+    "optionB": "Să se înregistreze evenimentul.",
+    "optionC": "Să se identifice factorii care au provocat accidentele.",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m3q9": {
+    "questionText": "Cine răspunde de cercetarea accidentelor?",
+    "optionA": "Societatea utilizatoare.",
+    "optionB": "Agentul de muncă temporară.",
+    "optionC": "Inspecția Muncii.",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m3q10": {
+    "questionText": "Cine răspunde de absența din motive de boală?",
+    "optionA": "Societatea utilizatoare.",
+    "optionB": "Agentul de muncă temporară.",
+    "optionC": "Inspecția Muncii.",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m3q11": {
+    "questionText": "Care este obiectivul legii privind dreptul la indemnizație pentru invaliditate permanentă?",
+    "optionA": "Să îmbunătățească reintegrarea angajaților noi.",
+    "optionB": "Să îmbunătățească reintegrarea angajaților bolnavi în interiorul sau în afara companiei.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m3q12": {
+    "questionText": "Care este o obligație a agentului de muncă temporară în cadrul legii privind indemnizația pentru invaliditate?",
+    "optionA": "Ambele răspunsuri sunt corecte.",
+    "optionB": "În caz de neglijență, obligația de a plăti salariul poate fi prelungită cu un an.",
+    "optionC": "Să întocmească și să pună în aplicare un plan de acțiune pentru reintegrare.",
+    "moduleName": "Accidente: cauze și prevenire"
+  },
+  "m4q1": {
+    "questionText": "Care este o cauză a accidentelor prin cădere și împiedicare?",
+    "optionA": "O pardoseală plană, antiderapantă.",
+    "optionB": "Cabluri și frânghii lăsate libere.",
+    "optionC": "Un loc de muncă ordonat.",
+    "moduleName": "Comportament sigur"
+  },
+  "m4q2": {
+    "questionText": "Ce nu este o cauză a comportamentului periculos?",
+    "optionA": "Lipsa unui exemplu personal.",
+    "optionB": "Lipsa de voință (a nu dori).",
+    "optionC": "Obiective bine formulate.",
+    "moduleName": "Comportament sigur"
+  },
+  "m4q3": {
+    "questionText": "Care element de politică influențează comportamentul uman în direcția lucrului în siguranță?",
+    "optionA": "O politică de sancțiuni.",
+    "optionB": "Claritatea privind prioritatea lucrului în siguranță.",
+    "optionC": "O politică orientată spre buna funcționare a mașinilor.",
+    "moduleName": "Comportament sigur"
+  },
+  "m4q4": {
+    "questionText": "De ce este important rolul șefului direct pentru comportamentul uman?",
+    "optionA": "Șeful direct este un model de urmat.",
+    "optionB": "Șeful direct lasă angajații să stabilească metoda de lucru.",
+    "optionC": "Șeful direct deține informațiile necesare despre angajați, lucrări și circumstanțe.",
+    "moduleName": "Comportament sigur"
+  },
+  "m4q5": {
+    "questionText": "Care este o regulă generală de comportament pentru lucrul în siguranță?",
+    "optionA": "Să fiți critic față de dumneavoastră înșivă.",
+    "optionB": "Angajații nu trebuie să intervină, ci să raporteze șefului direct.",
+    "optionC": "Să consemnați opiniile și să le arhivați.",
+    "moduleName": "Comportament sigur"
+  },
+  "m4q6": {
+    "questionText": "Care nu este un comportament care promovează lucrul în siguranță?",
+    "optionA": "Atenția acordată igienei personale, ordinii și curățeniei.",
+    "optionB": "Să vă gândiți numai la propria sănătate și securitate.",
+    "optionC": "Raportarea situațiilor periculoase și intervenția adecvată.",
+    "moduleName": "Comportament sigur"
+  },
+  "m4q7": {
+    "questionText": "Influența alcoolului și a drogurilor asupra lucrului în siguranță produce:",
+    "optionA": "O capacitate de muncă redusă sau problematică.",
+    "optionB": "Nicio schimbare de comportament.",
+    "optionC": "O bună evaluare a situațiilor.",
+    "moduleName": "Comportament sigur"
+  },
+  "m4q8": {
+    "questionText": "Ce se așteaptă în privința consumului de alcool și droguri pentru lucrul în siguranță?",
+    "optionA": "Consumul este permis atunci când șefii direcți au cunoștință de acesta.",
+    "optionB": "Solicitarea de ajutor în cazul unui consum cronic problematic.",
+    "optionC": "Șeful direct nu trebuie informat despre consumul ocazional.",
+    "moduleName": "Comportament sigur"
+  },
+  "m4q9": {
+    "questionText": "Care este o sarcină a intermediarului pentru promovarea lucrului în siguranță?",
+    "optionA": "Ambele răspunsuri sunt corecte.",
+    "optionB": "Informarea lucrătorului temporar privind necesitatea lucrului în siguranță.",
+    "optionC": "Verificarea cunoștințelor de bază privind securitatea și sănătatea în muncă.",
+    "moduleName": "Comportament sigur"
+  },
+  "m5q1": {
+    "questionText": "Care sunt obligațiile angajatorilor conform legislației de securitate și sănătate în muncă?",
+    "optionA": "Să furnizeze informare și instruire privind pericolele de la locul de muncă.",
+    "optionB": "Să raporteze situațiile periculoase către manager.",
+    "optionC": "Să solicite intervenția Inspecției de Muncă a statului.",
+    "explanation": "Lucrătorii au dreptul de a refuza munca nesigură fără teama de represalii. Acesta este un drept fundamental prevăzut de legislația de securitate și sănătate în muncă.",
+    "officialRef": "Modulul 5 — Sarcini, drepturi, obligații",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q2": {
+    "questionText": "Care sunt obligațiile lucrătorilor conform legii privind condițiile de muncă?",
+    "optionA": "Să solicite intervenția inspecției de muncă.",
+    "optionB": "Să raporteze situațiile periculoase către manager/șeful direct.",
+    "optionC": "Să furnizeze informații privind pericolele de la locul de muncă.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q3": {
+    "questionText": "Când au lucrătorii dreptul de a-și întrerupe activitatea?",
+    "optionA": "Dacă echipamentul individual de protecție nu este disponibil.",
+    "optionB": "Dacă inspecția de muncă vine să efectueze un control.",
+    "optionC": "Dacă apare un pericol iminent și grav pentru persoane.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q4": {
+    "questionText": "Cine participă la consultarea din cadrul consiliului de întreprindere?",
+    "optionA": "Conducerea departamentului și lucrătorii.",
+    "optionB": "Toți lucrătorii, inclusiv personalul temporar.",
+    "optionC": "Angajatorul și reprezentanții lucrătorilor.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q5": {
+    "questionText": "Care este diferența dintre certificarea SCC* și SCC**?",
+    "optionA": "SCC* se axează pe structurile de securitate, SCC** include grija pentru mediu.",
+    "optionB": "SCC* se axează pe controlul direct al securității, SCC** include structurile de securitate.",
+    "optionC": "SCC* se axează pe managementul calității, SCC** include grija pentru condițiile de muncă.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q6": {
+    "questionText": "Ce trebuie să faceți în caz de pericol iminent?",
+    "optionA": "Să remediați riscurile care au provocat pericolul.",
+    "optionB": "Să continuați lucrul până când cineva vă spune să vă opriți.",
+    "optionC": "Să opriți lucrul și/sau să vă asigurați propria securitate.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q7": {
+    "questionText": "Care este un beneficiu al inspecțiilor la locul de muncă?",
+    "optionA": "Oferă o imagine clară a situației privind securitatea.",
+    "optionB": "Cresc gradul de conștientizare a securității.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q8": {
+    "questionText": "O răspundere legală în materie de securitate și sănătate în muncă este:",
+    "optionA": "Agentul de muncă temporară răspunde de asigurarea pentru accidente de muncă.",
+    "optionB": "Întreprinderea utilizatoare are sarcini specifice.",
+    "optionC": "Relațiile dintre întreprinderea utilizatoare, lucrătorul temporar și inspecția de muncă.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q9": {
+    "questionText": "Diferența dintre angajatorul formal și angajatorul de fapt este:",
+    "optionA": "Angajatorul de fapt este cel sub autoritatea căruia lucrează lucrătorul temporar.",
+    "optionB": "Ambele răspunsuri sunt corecte.",
+    "optionC": "Angajatorul formal este cel care are efectiv lucrătorul în încadrare.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q10": {
+    "questionText": "Cine răspunde de condițiile de muncă în cazul muncii temporare?",
+    "optionA": "Angajatorul temporar asigură condiții de muncă individuale la întreprinderea utilizatoare.",
+    "optionB": "Agentul de muncă temporară este cel răspunzător.",
+    "optionC": "Angajatorul de fapt (întreprinderea utilizatoare) este cel răspunzător.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q11": {
+    "questionText": "O răspundere legală în materie de securitate și sănătate în muncă este reglementată ca:",
+    "optionA": "O relație specială: agentul de muncă temporară, întreprinderea utilizatoare, inspecția de muncă și lucrătorul.",
+    "optionB": "O relație triunghiulară: agentul de muncă temporară, întreprinderea utilizatoare și lucrătorul.",
+    "optionC": "Întreprinderea utilizatoare răspunde de obligația de transmitere a informațiilor.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q12": {
+    "questionText": "Un aspect de securitate și sănătate important la repartizarea unui lucrător temporar este:",
+    "optionA": "Solicitarea documentelor necesare de securitate și sănătate în muncă.",
+    "optionB": "Procedura de solicitare și consemnarea acordurilor privind securitatea și sănătatea în muncă.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q13": {
+    "questionText": "Ce trebuie discutat cu întreprinderea utilizatoare în privința examenului medical?",
+    "optionA": "Pentru care posturi este obligatoriu un examen medical.",
+    "optionB": "Examenul medical efectuat de șeful direct.",
+    "optionC": "Furnizarea de informații privind aptitudinea medicală necesară.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q14": {
+    "questionText": "Elementele pe care trebuie să le conțină dosarul lucrătorului temporar sunt:",
+    "optionA": "Limitările legate de post.",
+    "optionB": "Copia unui document de identitate.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q15": {
+    "questionText": "Ce nu constituie un aspect necesar de urmărit atunci când întreprinderea utilizatoare transmite o solicitare?",
+    "optionA": "Aptitudinea medicală necesară.",
+    "optionB": "Cine va asigura instruirea privind echipamentul individual de protecție.",
+    "optionC": "Deținerea unui certificat VOL SCC valabil.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q16": {
+    "questionText": "Ce trebuie făcut pentru a verifica acordurile încheiate cu întreprinderea utilizatoare?",
+    "optionA": "O prezentare formală în fața colegilor de muncă.",
+    "optionB": "Primirea la sediul firmei; întâlnirea cu șeful direct.",
+    "optionC": "Lucrătorul temporar trebuie să își aducă propriul echipament individual de protecție.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q17": {
+    "questionText": "Un aspect de urmărit la evaluarea muncii temporare este:",
+    "optionA": "Distribuirea echipamentului individual de protecție și a echipamentului de lucru.",
+    "optionB": "Facilități precum vestiar, cantină, grupuri sanitare.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q18": {
+    "questionText": "Ce este important în cadrul ședințelor de securitate și sănătate din agentul de muncă temporară?",
+    "optionA": "Implicarea inspecției de muncă.",
+    "optionB": "Implicarea colegilor de muncă.",
+    "optionC": "Implicarea conducerii și a șefilor direcți.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m5q19": {
+    "questionText": "În ce constă implicarea lucrătorului temporar în ședințele HSE?",
+    "optionA": "Lucrătorul temporar trebuie să participe la ședințele HSE din întreprinderea utilizatoare.",
+    "optionB": "Intermediarul îl informează pe lucrător despre existența ședințelor HSE.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Sarcini, drepturi, obligații și consultări"
+  },
+  "m6q1": {
+    "questionText": "Procedura de anunțare a unui incendiu se încadrează în:",
+    "optionA": "Procedurile SCC.",
+    "optionB": "Regulile generale de securitate.",
+    "optionC": "Regulile specifice de securitate.",
+    "moduleName": "Proceduri, instrucțiuni și semnalizare"
+  },
+  "m6q2": {
+    "questionText": "Ce trebuie descris într-un permis de lucru?",
+    "optionA": "Punctele de control relevante din SCC.",
+    "optionB": "Numărul de lucrători cu diplomă IER.",
+    "optionC": "Măsurile care trebuie luate de emitent și de titularul permisului.",
+    "moduleName": "Proceduri, instrucțiuni și semnalizare"
+  },
+  "m6q3": {
+    "questionText": "Regulile generale de securitate sunt destinate:",
+    "optionA": "Unui singur departament al firmei.",
+    "optionB": "Lucrătorilor temporari.",
+    "optionC": "Contractorilor și subcontractorilor.",
+    "moduleName": "Proceduri, instrucțiuni și semnalizare"
+  },
+  "m6q4": {
+    "questionText": "Regulile generale de securitate:",
+    "optionA": "Trebuie consemnate în scris.",
+    "optionB": "Sunt reguli de utilizare specifice fiecărei unelte.",
+    "optionC": "Trebuie redactate într-o singură limbă.",
+    "moduleName": "Proceduri, instrucțiuni și semnalizare"
+  },
+  "m6q5": {
+    "questionText": "Regulile specifice de securitate nu se referă la:",
+    "optionA": "Pauzele de masă.",
+    "optionB": "Ventilație.",
+    "optionC": "Intrarea în spații închise.",
+    "moduleName": "Proceduri, instrucțiuni și semnalizare"
+  },
+  "m6q6": {
+    "questionText": "O regulă de bază privind regulile specifice de securitate este:",
+    "optionA": "Trebuie să fie înțelese și de vorbitorii nativi.",
+    "optionB": "Trebuie aduse la cunoștința tuturor lucrătorilor.",
+    "optionC": "După ce au fost explicate, se poate considera că toată lumea știe ce înseamnă.",
+    "moduleName": "Proceduri, instrucțiuni și semnalizare"
+  },
+  "m6q7": {
+    "questionText": "O funcție a unei flanșe de blindare este:",
+    "optionA": "Să întrerupă conductele de alimentare către recipiente, rezervoare sau instalații.",
+    "optionB": "Să separe tronsoane de conductă.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Proceduri, instrucțiuni și semnalizare"
+  },
+  "m6q8": {
+    "questionText": "Ce nu constituie o rubrică a permisului de lucru privind activitățile solicitate?",
+    "optionA": "Cum se vor desfășura activitățile.",
+    "optionB": "Unde se vor desfășura activitățile.",
+    "optionC": "De ce se vor desfășura activitățile.",
+    "moduleName": "Proceduri, instrucțiuni și semnalizare"
+  },
+  "m6q9": {
+    "questionText": "Ce reprezintă rubrica din permisul de lucru privind măsurile luate de lucrătorul din exploatare?",
+    "optionA": "Aici trebuie menționate toate elementele echipamentului individual de protecție.",
+    "optionB": "Măsurile pe care lucrătorii din exploatare trebuie să le ia pentru a lucra în siguranță.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Proceduri, instrucțiuni și semnalizare"
+  },
+  "m6q10": {
+    "questionText": "Ce presupune obligația de transmitere a informațiilor?",
+    "optionA": "Ambele răspunsuri sunt corecte.",
+    "optionB": "Agentul de muncă temporară trebuie să transmită informațiile privind locul de muncă.",
+    "optionC": "Întreprinderea utilizatoare și agentul de muncă temporară au o obligație comună de informare.",
+    "moduleName": "Proceduri, instrucțiuni și semnalizare"
+  },
+  "m7q1": {
+    "questionText": "Care sarcină aparține rolului echipei de intervenție în situații de urgență?",
+    "optionA": "Stingerea unui incendiu incipient și limitarea pagubelor și a vătămărilor.",
+    "optionB": "Participarea în echipa de cercetare a accidentelor.",
+    "optionC": "Efectuarea măsurătorilor de detecție a gazelor.",
+    "moduleName": "Pregătirea pentru situații de urgență"
+  },
+  "m7q2": {
+    "questionText": "Ce reprezintă o situație de urgență?",
+    "optionA": "Situații de urgență provocate de accidente, incendiu, explozie, scăpări necontrolate de substanțe.",
+    "optionB": "Amenințare din cauza vremii nefavorabile, a calamităților naturale, a tulburărilor sociale, a unui atac terorist.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Pregătirea pentru situații de urgență"
+  },
+  "m7q3": {
+    "questionText": "Un plan de urgență al firmei este:",
+    "optionA": "O descriere a măsurilor și a dotărilor pregătite pentru situații de urgență.",
+    "optionB": "O listă de măsuri care garantează că condițiile de muncă sunt sigure.",
+    "optionC": "O listă de măsuri pe care lucrătorii trebuie să le pregătească înainte de începerea lucrului.",
+    "moduleName": "Pregătirea pentru situații de urgență"
+  },
+  "m7q4": {
+    "questionText": "Limitarea efectelor unor posibile situații de urgență este scopul:",
+    "optionA": "Ansamblului de condiții de muncă.",
+    "optionB": "Unui plan (intern) de urgență al firmei.",
+    "optionC": "Echipei de intervenție în situații de urgență.",
+    "moduleName": "Pregătirea pentru situații de urgență"
+  },
+  "m7q5": {
+    "questionText": "Ce nu constituie o fază în gestionarea situațiilor de urgență?",
+    "optionA": "Prima alarmare.",
+    "optionB": "A doua alarmare.",
+    "optionC": "Încheierea.",
+    "moduleName": "Pregătirea pentru situații de urgență"
+  },
+  "m7q6": {
+    "questionText": "Prima alarmare în situațiile de urgență este:",
+    "optionA": "O listă a modalităților de alarmare a persoanelor.",
+    "optionB": "O descriere a modalităților prin care poate fi anunțată o urgență și a informațiilor care trebuie comunicate.",
+    "optionC": "Un clopot puternic care semnalează că există o urgență.",
+    "moduleName": "Pregătirea pentru situații de urgență"
+  },
+  "m7q7": {
+    "questionText": "O componentă a încheierii situației de urgență este:",
+    "optionA": "Modul în care se comunică încheierea.",
+    "optionB": "Cine are competența de a declara încheiată situația de urgență.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Pregătirea pentru situații de urgență"
+  },
+  "m7q8": {
+    "questionText": "Una dintre cerințele minime privind primul ajutor este:",
+    "optionA": "Membri instruiți ai echipei de intervenție în situații de urgență.",
+    "optionB": "Materiale de prim ajutor disponibile în permanență.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Pregătirea pentru situații de urgență"
+  },
+  "m7q9": {
+    "questionText": "Care succesiune este corectă la un semnal de evacuare?",
+    "optionA": "1: Opriți lucrul / 2: Nu folosiți ascensoarele / 3: Mergeți la punctul de adunare.",
+    "optionB": "1: Opriți lucrul / 2: Nu folosiți ascensoarele / 3: Anunțați-vă prezența la punctul de adunare.",
+    "optionC": "1: Opriți lucrul / 2: Anunțați-vă prezența / 3: Evacuați-vă perpendicular pe direcția vântului.",
+    "moduleName": "Pregătirea pentru situații de urgență"
+  },
+  "m8q1": {
+    "questionText": "Cum puteți afla din etichetă ce riscuri prezintă un produs periculos?",
+    "optionA": "Din frazele S.",
+    "optionB": "Din frazele M.",
+    "optionC": "Din frazele R.",
+    "explanation": "O SDS (fișă cu date de securitate) oferă informații esențiale despre substanțele periculoase: compoziție, pericole, prim ajutor, manipulare, depozitare și eliminare.",
+    "officialRef": "Modulul 8 — Substanțe periculoase",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q2": {
+    "questionText": "Ce indică suprafața galbenă a plăcii de avertizare în formă de romb?",
+    "optionA": "Pericol de reactivitate.",
+    "optionB": "Pericol pentru sănătate.",
+    "optionC": "Pericol de incendiu.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q3": {
+    "questionText": "Ce efect toxic are monoxidul de carbon?",
+    "optionA": "Paralizarea simțului olfactiv.",
+    "optionB": "Oxigenul nu mai este absorbit în sânge.",
+    "optionC": "Un efect iritant asupra căilor respiratorii.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q4": {
+    "questionText": "Ce informații se găsesc într-o fișă cu date de securitate a materialului?",
+    "optionA": "Informații despre etapele de lucru într-un spațiu închis.",
+    "optionB": "Informații despre permisele necesare pentru a lucra cu produsul.",
+    "optionC": "Informații despre pericole și măsurile de securitate pe care trebuie să le luați.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q5": {
+    "questionText": "În condiții normale, oxigenul din aer este de:",
+    "optionA": "21%.",
+    "optionB": "19%.",
+    "optionC": "25%.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q6": {
+    "questionText": "Lipsa ventilației:",
+    "optionA": "Elimină lipsa de oxigen.",
+    "optionB": "Poate provoca o concentrație de oxigen prea scăzută.",
+    "optionC": "Provoacă probleme de respirație.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q7": {
+    "questionText": "Umărul alb al unei butelii înseamnă:",
+    "optionA": "Dioxid de carbon.",
+    "optionB": "Aer.",
+    "optionC": "Oxigen.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q8": {
+    "questionText": "La depozitarea butelilor de gaz:",
+    "optionA": "Acestea trebuie asigurate corespunzător împotriva răsturnării.",
+    "optionB": "Acestea trebuie amplasate în pivnițe speciale.",
+    "optionC": "Acestea trebuie ținute lângă locul de muncă, pentru acces rapid.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q9": {
+    "questionText": "Ce se înțelege prin substanțe periculoase?",
+    "optionA": "Materiale care explodează ușor dacă sunt amestecate cu oxigen în concentrație ridicată.",
+    "optionB": "Materiale care prezintă un pericol pentru sănătate și/sau pentru mediu.",
+    "optionC": "Materiale care necesită instruire specială înainte de utilizare.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q10": {
+    "questionText": "Substanțele periculoase de la locul de muncă sunt semnalizate prin:",
+    "optionA": "Un simbol de pericol pătrat, negru pe fond roșu.",
+    "optionB": "Un simbol de pericol pătrat, negru pe fond portocaliu.",
+    "optionC": "Un simbol de pericol pătrat, negru pe fond galben.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q11": {
+    "questionText": "Vaccinarea este o măsură de precauție pentru lucrul cu:",
+    "optionA": "Substanțe biologice.",
+    "optionB": "Substanțe inflamabile.",
+    "optionC": "Substanțe iritante.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q12": {
+    "questionText": "Substanțele biologice pot fi prezente în:",
+    "optionA": "Agricultură.",
+    "optionB": "Sol contaminat.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q13": {
+    "questionText": "Îndepărtarea profesionistă a produsului scurs este o măsură de prevenire împotriva:",
+    "optionA": "Incendiului.",
+    "optionB": "Căderii obiectelor.",
+    "optionC": "Scurgerilor.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q14": {
+    "questionText": "Ce nu constituie o cauză a scurgerilor?",
+    "optionA": "Deteriorarea (de exemplu, lovirea cu motostivuitorul).",
+    "optionB": "Procedura greșită la transvazarea recipientelor.",
+    "optionC": "Montarea corectă a flanșelor.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q15": {
+    "questionText": "Alunecarea este o consecință a:",
+    "optionA": "Contaminării mediului.",
+    "optionB": "Scurgerilor.",
+    "optionC": "Utilizării substanțelor periculoase.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q16": {
+    "questionText": "Pericolul solvenților organici este că sunt:",
+    "optionA": "Inflamabili sau foarte inflamabili.",
+    "optionB": "Corozivi.",
+    "optionC": "Iritanți.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q17": {
+    "questionText": "Un exemplu de compus ciclic este:",
+    "optionA": "Zincul.",
+    "optionB": "Fenolul.",
+    "optionC": "White spirit.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q18": {
+    "questionText": "Riscul de mezoteliom este un efect asupra sănătății asociat cu:",
+    "optionA": "Benzenul.",
+    "optionB": "White spirit.",
+    "optionC": "Azbestul.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q19": {
+    "questionText": "Care nu este un loc posibil de prezență a azbestului?",
+    "optionA": "În casele construite recent.",
+    "optionB": "Materialele de acoperiș și placările de pereți.",
+    "optionC": "În zidăria cuptoarelor și a cazanelor și în spatele acesteia.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q20": {
+    "questionText": "Care nu este o prevedere legală referitoare la azbest?",
+    "optionA": "Utilizarea și prelucrarea azbestului sunt permise în continuare.",
+    "optionB": "Deșeurile care conțin azbest trebuie colectate separat.",
+    "optionC": "Acolo unde există risc de contact cu azbestul se aplică o etichetă specifică.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q21": {
+    "questionText": "Un principiu al examinării medicale periodice este:",
+    "optionA": "Să se stabilească dacă persoana rămâne aptă să lucreze cu substanțe.",
+    "optionB": "Să se stabilească dacă persoana rămâne aptă să lucreze cu substanța periculoasă respectivă.",
+    "optionC": "Periodicitatea depinde de lucrător.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q22": {
+    "questionText": "Recomandările de securitate de pe etichetele noi descriu:",
+    "optionA": "Măsurile pentru evitarea modificării condițiilor de muncă.",
+    "optionB": "Măsurile pentru evitarea riscurilor la lucrul cu produsul.",
+    "optionC": "Măsurile pentru evitarea incendiului.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q23": {
+    "questionText": "Numerele de pe romburile de pericol merg de la:",
+    "optionA": "1 la 5.",
+    "optionB": "0 la 4.",
+    "optionC": "0 la 5.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m8q24": {
+    "questionText": "Măsurile pentru evitarea riscurilor la lucrul cu produsul sunt descrise în:",
+    "optionA": "Frazele H.",
+    "optionB": "Frazele R.",
+    "optionC": "Frazele S.",
+    "moduleName": "Substanțe periculoase"
+  },
+  "m9q1": {
+    "questionText": "Care este un dezavantaj al stingerii unui incendiu cu apă?",
+    "optionA": "Materialul care arde poate reacționa violent cu apa.",
+    "optionB": "Operatorii sunt împiedicați de fum.",
+    "optionC": "Utilizarea apei este relativ costisitoare.",
+    "explanation": "Triunghiul focului necesită combustibil, oxigen și căldură (sursă de aprindere). Eliminarea oricăruia dintre aceste elemente stinge incendiul sau împiedică apariția lui.",
+    "officialRef": "Modulul 9 — Incendii și explozii",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q2": {
+    "questionText": "Ce trebuie să știți înainte de a stinge un incendiu?",
+    "optionA": "De cât timp arde.",
+    "optionB": "Cât de ridicată este temperatura.",
+    "optionC": "Ce substanță arde.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q3": {
+    "questionText": "Ce trebuie făcut mai întâi atunci când este descoperit un incendiu?",
+    "optionA": "Dacă este posibil, să îl stingeți dumneavoastră.",
+    "optionB": "Să conduceți persoanele în zonă sigură.",
+    "optionC": "Să anunțați incendiul.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q4": {
+    "questionText": "Ce înseamnă o limită de explozie?",
+    "optionA": "Temperatura maximă/minimă a unui solid la care poate avea loc o explozie.",
+    "optionB": "Concentrația maximă/minimă a unui gaz în aer la care poate avea loc o explozie.",
+    "optionC": "Concentrația maximă/minimă de metale la care poate avea loc o explozie.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q5": {
+    "questionText": "Ce se înțelege prin punct de inflamabilitate?",
+    "optionA": "Concentrația maximă/minimă de gaz în aer pentru producerea unei explozii.",
+    "optionB": "Temperatura maximă/minimă a unui solid pentru producerea unei explozii.",
+    "optionC": "Temperatura minimă a unui lichid la care vaporii pot fi aprinși.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q6": {
+    "questionText": "Ce efect poate avea un exces de oxigen în timpul unui incendiu?",
+    "optionA": "Aprinderea mai ușoară a substanțelor inflamabile.",
+    "optionB": "Arderea prelungită.",
+    "optionC": "Înăbușirea incendiului.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q7": {
+    "questionText": "O substanță inflamabilă:",
+    "optionA": "Este necesară pentru un incendiu sau o explozie.",
+    "optionB": "Este întotdeauna un gaz.",
+    "optionC": "Provoacă întotdeauna incendiu sau explozie.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q8": {
+    "questionText": "Ce este o explozie?",
+    "optionA": "Un incendiu provocat de o substanță inflamabilă.",
+    "optionB": "Un incendiu cu dezvoltare foarte rapidă, care eliberează o undă de presiune.",
+    "optionC": "Un incendiu din clasa C.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q9": {
+    "questionText": "Ce implică un incendiu de clasa A?",
+    "optionA": "Gaze.",
+    "optionB": "Lichide.",
+    "optionC": "Materiale solide.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q10": {
+    "questionText": "Semnul care indică o zonă cu risc de explozie:",
+    "optionA": "Afișează Ex.",
+    "optionB": "Afișează Er.",
+    "optionC": "Afișează un simbol de foc.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q11": {
+    "questionText": "Un mediu cu risc de explozie este acela:",
+    "optionA": "În care trebuie luate măsuri speciale pentru a preveni aprinderea amestecurilor explozive.",
+    "optionB": "În care nu este posibilă formarea unui amestec exploziv.",
+    "optionC": "În care nu trebuie luate măsuri speciale.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q12": {
+    "questionText": "O cerință pentru persoana care asigură veghea la lucrul cu foc deschis este:",
+    "optionA": "Minimum cinci ani de experiență cu incendii.",
+    "optionB": "O instruire specifică.",
+    "optionC": "Minimum un an de experiență cu incendii.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q13": {
+    "questionText": "La tratarea arsurilor:",
+    "optionA": "Se spală cu apă timp de cel puțin 5 minute.",
+    "optionB": "Se spală cu apă timp de cel puțin 15 minute.",
+    "optionC": "Se spală cu apă timp de cel puțin 10 minute.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q14": {
+    "questionText": "La stingerea unui incendiu nu trebuie:",
+    "optionA": "Să rămâneți vigilent chiar și atunci când incendiul pare stins.",
+    "optionB": "Să vă asigurați propria securitate în orice moment.",
+    "optionC": "Să plecați pur și simplu atunci când incendiul este stins.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q15": {
+    "questionText": "Păturile ignifuge:",
+    "optionA": "Răcesc.",
+    "optionB": "Dislocuiesc oxigenul.",
+    "optionC": "Izolează focul de oxigen.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q16": {
+    "questionText": "Un dezavantaj al stingerii cu o pătură ignifugă este:",
+    "optionA": "Riscul de degerături.",
+    "optionB": "Trebuie să vă apropiați de focarul incendiului.",
+    "optionC": "Contaminarea.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q17": {
+    "questionText": "Un dezavantaj al stingerii cu dioxid de carbon este:",
+    "optionA": "Poate crea o atmosferă cu risc de asfixiere.",
+    "optionB": "Riscul de degerături din cauza temperaturii scăzute.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m9q18": {
+    "questionText": "O caracteristică de stingere a nisipului este:",
+    "optionA": "Nisipul dislocuiește oxigenul.",
+    "optionB": "Nisipul izolează focul de oxigen.",
+    "optionC": "Nisipul are capacitate de răcire.",
+    "moduleName": "Incendii și explozii"
+  },
+  "m10q1": {
+    "questionText": "La ce trebuie să fiți atent atunci când folosiți dalta?",
+    "optionA": "Folosiți numai dălți fără bavuri pe muchia tăietoare.",
+    "optionB": "Folosiți numai dălți care au fost verificate.",
+    "optionC": "Folosiți numai dălți cu rezistența potrivită.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q2": {
+    "questionText": "De ce nu trebuie să purtați niciodată mănuși la mașinile cu piese în rotație?",
+    "optionA": "Pentru că mâinile dumneavoastră nu ating piesele în rotație.",
+    "optionB": "Pentru că mașina se poate deteriora.",
+    "optionC": "Pentru că mănușa și mâna dumneavoastră pot fi prinse și trase în mașină.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q3": {
+    "questionText": "Ce înseamnă lucrul în siguranță cu mașina de găurit cu coloană?",
+    "optionA": "Utilizarea cuțitului divizor.",
+    "optionB": "Fixarea sigură a piesei de prelucrat.",
+    "optionC": "Utilizarea contrapresiunii la găurire.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q4": {
+    "questionText": "Cu ce trebuie să fie prevăzute ciocanele pentru a preveni accidentele?",
+    "optionA": "Cu un mâner din plastic.",
+    "optionB": "Cu un mâner metalic.",
+    "optionC": "Cu un mâner fixat sigur în capul ciocanului.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q5": {
+    "questionText": "Care este scopul unui buton de siguranță cu revenire automată la o sculă pneumatică?",
+    "optionA": "Îi permite operatorului să facă pauze.",
+    "optionB": "Să pună scula în poziția de încălzire.",
+    "optionC": "Să oprească imediat mașina atunci când mânerul este eliberat.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q6": {
+    "questionText": "Cu ce trebuie să fie dotat un ferăstrău circular cu masă?",
+    "optionA": "Cu un ecran de sticlă.",
+    "optionB": "Cu o apărătoare de disc fixată pe un suport robust.",
+    "optionC": "Cu o protecție împotriva reculului.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q7": {
+    "questionText": "Sculele electrice de mână de 230 volți:",
+    "optionA": "Trebuie să aibă izolație dublă.",
+    "optionB": "Trebuie să fie prevăzute cu împământare de protecție.",
+    "optionC": "Pot fi utilizate numai de o persoană instruită corespunzător.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q8": {
+    "questionText": "O verificare periodică trebuie efectuată:",
+    "optionA": "La mașini și la scule electrice.",
+    "optionB": "În fiecare săptămână.",
+    "optionC": "Pentru a vă asigura că fiecare angajat își place munca.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q9": {
+    "questionText": "O mașină se va opri cât mai repede posibil atunci când:",
+    "optionA": "Este acționat butonul de oprire de urgență.",
+    "optionB": "Este eliberat mânerul de comandă.",
+    "optionC": "Piesele în rotație sunt blocate.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q10": {
+    "questionText": "Ce este un transpalet?",
+    "optionA": "Un vehicul pentru transportul persoanelor.",
+    "optionB": "Un vehicul pentru deplasarea sarcinilor la înălțimi diferite.",
+    "optionC": "Un vehicul cu o înălțime de ridicare de 20 cm.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q11": {
+    "questionText": "O cerință pentru conducătorul de motostivuitor este:",
+    "optionA": "Utilizarea centurii de siguranță.",
+    "optionB": "Deținerea competenței atestate prin examinare.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q12": {
+    "questionText": "Ce nu este o măsură de securitate pentru stivuitoare?",
+    "optionA": "Nu luați un pasager dacă nu există un scaun special.",
+    "optionB": "Se poate mări contragreutatea atunci când este nevoie.",
+    "optionC": "Ambele răspunsuri nu sunt măsuri de securitate.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q13": {
+    "questionText": "La lucrul cu ferăstraie:",
+    "optionA": "Lama trebuie să fie bine întinsă.",
+    "optionB": "Lama nu trebuie să fie prea ascuțită.",
+    "optionC": "Operatorul trebuie să fi urmat o instruire adecvată.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q14": {
+    "questionText": "La lucrul cu cuțitele:",
+    "optionA": "Dinții trebuie să fie orientați spre înainte.",
+    "optionB": "Nu scoateți prea mult în afară lama retractabilă.",
+    "optionC": "Lama trebuie să fie bine întinsă.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q15": {
+    "questionText": "La lucrul cu piese de dimensiuni mici:",
+    "optionA": "Acestea trebuie ținute cu o mână.",
+    "optionB": "Piesa trebuie fixată într-un dispozitiv de prindere.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q16": {
+    "questionText": "Pantalonii și mănușile din fibră specială se folosesc atunci când:",
+    "optionA": "Se lucrează cu un ferăstrău cu lanț.",
+    "optionB": "Se lucrează cu șurubelnițe.",
+    "optionC": "Se lucrează cu ciocane.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q17": {
+    "questionText": "Un pistol de bătut cuie/capse trebuie să aibă:",
+    "optionA": "Un mâner suplimentar pe partea laterală.",
+    "optionB": "O protecție împotriva declanșării accidentale.",
+    "optionC": "Un ecran transparent.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q18": {
+    "questionText": "Un cuțit divizor se folosește la:",
+    "optionA": "Un ferăstrău circular manual.",
+    "optionB": "Un ferăstrău cu lanț.",
+    "optionC": "O șurubelniță.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q19": {
+    "questionText": "Ce informație trebuie să fie prezentă pe un disc abraziv?",
+    "optionA": "Viteza minimă de rotație admisă.",
+    "optionB": "Numele producătorului.",
+    "optionC": "Utilizatorul discului.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q20": {
+    "questionText": "La lucrul cu unelte de mână acționate pneumatic trebuie să:",
+    "optionA": "Închideți alimentarea cu aer după utilizare.",
+    "optionB": "Luați pauze regulate atunci când folosiți unelte vibrante.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m10q21": {
+    "questionText": "La lucrul cu polizoare de banc, ce nu constituie un pericol posibil?",
+    "optionA": "Afecțiuni de sănătate cauzate de inhalarea prafului periculos.",
+    "optionB": "Cuțitul divizor se poate desprinde.",
+    "optionC": "Lovirea sau prinderea de către piese în mișcare.",
+    "moduleName": "Echipamente de lucru"
+  },
+  "m11q1": {
+    "questionText": "Care este un pericol în timpul lucrărilor de demolare?",
+    "optionA": "Instabilitatea frontului de demolare.",
+    "optionB": "Elemente de construcție ieșite în afară.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Lucrări de demolare"
+  },
+  "m11q2": {
+    "questionText": "În timpul lucrărilor de demolare trebuie să aveți:",
+    "optionA": "Un dispozitiv de oprire a căderii.",
+    "optionB": "Timpi de pauză suficienți.",
+    "optionC": "Pauze cât mai puține posibil.",
+    "moduleName": "Lucrări de demolare"
+  },
+  "m11q3": {
+    "questionText": "Ce trebuie făcut la îndepărtarea fibrelor ceramice?",
+    "optionA": "Spargeți totul în bucăți mici.",
+    "optionB": "Nu folosiți un jgheab de evacuare.",
+    "optionC": "Purtați combinezonul de lucru.",
+    "moduleName": "Lucrări de demolare"
+  },
+  "m12q1": {
+    "questionText": "Ce trebuie făcut la sudarea cu gaz folosind oxigen și acetilenă?",
+    "optionA": "Buteliile de acetilenă se depozitează în poziție verticală sau la minimum 25 de grade.",
+    "optionB": "Buteliile de acetilenă se depozitează în poziție verticală sau la minimum 30 de grade.",
+    "optionC": "Buteliile de acetilenă se depozitează în poziție verticală sau la minimum 40 de grade.",
+    "moduleName": "Sudare, tăiere și debitare termică"
+  },
+  "m12q2": {
+    "questionText": "Care este un risc al sudării cu gaz?",
+    "optionA": "Aerul este mai greu decât propanul.",
+    "optionB": "Întoarcerea flăcării.",
+    "optionC": "Buteliile nu sunt sub presiune.",
+    "moduleName": "Sudare, tăiere și debitare termică"
+  },
+  "m12q3": {
+    "questionText": "Care este o măsură de securitate atunci când se execută sudare electrică?",
+    "optionA": "Protecție individuală: mască de sudură, șorț, îmbrăcăminte, bocanci de protecție.",
+    "optionB": "Perdele de sudură pentru protecție împotriva radiațiilor UV și infraroșii.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Sudare, tăiere și debitare termică"
+  },
+  "m12q4": {
+    "questionText": "Ce nu este un risc asociat sudării electrice?",
+    "optionA": "Orbirea cauzată de radiația infraroșie.",
+    "optionB": "Arsura corneei cauzată de radiația termică.",
+    "optionC": "Afecțiuni pulmonare cauzate de inhalarea fumului de sudură.",
+    "moduleName": "Sudare, tăiere și debitare termică"
+  },
+  "m13q1": {
+    "questionText": "De ce este important să se sape cu atenție?",
+    "optionA": "Câștiguri economice.",
+    "optionB": "Siguranța furnizării serviciilor societăților de utilități.",
+    "optionC": "Săpătura se poate surpa.",
+    "moduleName": "Săpături și lucrul la sau în excavații"
+  },
+  "m13q2": {
+    "questionText": "Ce nu este un risc asociat lucrărilor de săpătură?",
+    "optionA": "Asfixierea cauzată de deteriorarea conductelor de gaz.",
+    "optionB": "Electrocutarea cauzată de deteriorarea cablurilor sub tensiune.",
+    "optionC": "Pericol de explozie.",
+    "moduleName": "Săpături și lucrul la sau în excavații"
+  },
+  "m13q3": {
+    "questionText": "Care este o regulă pentru săparea cu atenție?",
+    "optionA": "Raportați persoanei responsabile orice poziție diferită sau orice deteriorare.",
+    "optionB": "Săpați numai după stabilirea poziției cablurilor prin șanțuri de sondaj în limita a 1.5m.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Săpături și lucrul la sau în excavații"
+  },
+  "m13q4": {
+    "questionText": "La lucrul în sau în apropierea unei excavații trebuie să:",
+    "optionA": "Montați o scară.",
+    "optionB": "Folosiți împrejmuiri în locurile periculoase.",
+    "optionC": "Asigurați sprijiniri eficiente și taluzări.",
+    "moduleName": "Săpături și lucrul la sau în excavații"
+  },
+  "m14q1": {
+    "questionText": "De la ce înălțime trebuie angajatorul să ia măsuri pentru prevenirea căderii?",
+    "optionA": "De la 3.5 metri.",
+    "optionB": "De la 1.5 metri.",
+    "optionC": "De la 2.5 metri.",
+    "explanation": "Lucrul la înălțimi de peste 2 metri impune măsuri de protecție împotriva căderii. Ierarhia este următoarea: mai întâi protecția colectivă (balustrade), apoi protecția individuală (centura complexă).",
+    "officialRef": "Modulul 14 — Lucrul la înălțime",
+    "moduleName": "Lucrul la înălțime"
+  },
+  "m14q2": {
+    "questionText": "Ce măsură de securitate reduce pericolul de cădere pe un acoperiș plat?",
+    "optionA": "Un sistem de protecție pe marginea acoperișului.",
+    "optionB": "Podine de circulație.",
+    "optionC": "O centură complexă de siguranță.",
+    "moduleName": "Lucrul la înălțime"
+  },
+  "m14q3": {
+    "questionText": "Ce trebuie verificat înainte ca o scară să poată fi folosită?",
+    "optionA": "Dacă scara nu este mai lungă de 12 metri.",
+    "optionB": "Dacă este așezată la un unghi de aproximativ 75 de grade.",
+    "optionC": "Dacă montanții au capace de oțel la partea inferioară.",
+    "moduleName": "Lucrul la înălțime"
+  },
+  "m14q4": {
+    "questionText": "Ce trebuie să folosească persoanele aflate pe o schelă suspendată?",
+    "optionA": "O centură cu dispozitiv retractabil.",
+    "optionB": "O centură de susținere lombară.",
+    "optionC": "O centură complexă de siguranță.",
+    "moduleName": "Lucrul la înălțime"
+  },
+  "m14q5": {
+    "questionText": "Pe care parte trebuie urcată o schelă mobilă?",
+    "optionA": "Partea din față.",
+    "optionB": "Partea interioară.",
+    "optionC": "Partea din spate.",
+    "moduleName": "Lucrul la înălțime"
+  },
+  "m14q6": {
+    "questionText": "Ce este de preferat să faceți în cazul unei deschideri în pardoseală?",
+    "optionA": "Să păstrați distanța în timpul lucrului.",
+    "optionB": "Să o acoperiți cu material rezistent.",
+    "optionC": "Să purtați o centură complexă de siguranță prinsă la o coardă de siguranță.",
+    "moduleName": "Lucrul la înălțime"
+  },
+  "m14q7": {
+    "questionText": "Ce nu este un pericol al lucrului în apropierea deschiderilor din pereți și pardoseli?",
+    "optionA": "Lovirea de către un obiect care cade prin deschidere.",
+    "optionB": "Căderea printr-o deschidere din pardoseală.",
+    "optionC": "Închiderea unei deschideri mari din pardoseală.",
+    "moduleName": "Lucrul la înălțime"
+  },
+  "m14q8": {
+    "questionText": "O scară se folosește pentru:",
+    "optionA": "Pentru executarea unor activități de mică amploare.",
+    "optionB": "Depășirea unei anumite înălțimi.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Lucrul la înălțime"
+  },
+  "m14q9": {
+    "questionText": "Întinderea la maximum o lungime de braț este o regulă pentru lucrul cu:",
+    "optionA": "Mașini de găurit cu coloană.",
+    "optionB": "Scări.",
+    "optionC": "Ferăstraie de banc.",
+    "moduleName": "Lucrul la înălțime"
+  },
+  "m15q1": {
+    "questionText": "Are voie o persoană neinstruită să lucreze la instalații electrice aflate sub tensiune?",
+    "optionA": "Da, cu condiția ca persoana neinstruită să aibă peste 21 de ani.",
+    "optionB": "Da, dar numai dacă specialistul este permanent disponibil.",
+    "optionC": "Nu, niciodată.",
+    "moduleName": "Electricitate"
+  },
+  "m15q2": {
+    "questionText": "Ce face un întrerupător diferențial de protecție?",
+    "optionA": "Deviază curentul de înaltă tensiune către conductorul de împământare.",
+    "optionB": "Întrerupe alimentarea la un anumit curent de defect.",
+    "optionC": "Funcționează ca o împământare artificială.",
+    "moduleName": "Electricitate"
+  },
+  "m15q3": {
+    "questionText": "Ce tensiune de securitate trebuie să folosiți într-un spațiu închis?",
+    "optionA": "Curent continuu (max. 50V) sau curent alternativ (max. 130V).",
+    "optionB": "Curent continuu (max. 12V) sau curent alternativ (max. 120V).",
+    "optionC": "Curent continuu (max. 120V) sau curent alternativ (max. 50V).",
+    "moduleName": "Electricitate"
+  },
+  "m15q4": {
+    "questionText": "Ce poate provoca accidente prin electricitate?",
+    "optionA": "Lipsa împământării.",
+    "optionB": "Apăsarea butonului de oprire de urgență.",
+    "optionC": "Arderea unei siguranțe.",
+    "moduleName": "Electricitate"
+  },
+  "m15q5": {
+    "questionText": "Care este cel mai mare pericol al trecerii curentului prin corp?",
+    "optionA": "Reacția de șoc.",
+    "optionB": "Apariția arsurilor.",
+    "optionC": "Trecerea curentului prin inimă.",
+    "moduleName": "Electricitate"
+  },
+  "m15q6": {
+    "questionText": "Electrocutarea este un pericol legat de:",
+    "optionA": "Utilizarea substanțelor periculoase.",
+    "optionB": "Utilizarea electricității.",
+    "optionC": "Utilizarea substanțelor inflamabile.",
+    "moduleName": "Electricitate"
+  },
+  "m15q7": {
+    "questionText": "Vătămarea cauzată de curentul electric nu depinde de:",
+    "optionA": "Intensitatea curentului.",
+    "optionB": "Durata trecerii curentului prin corp.",
+    "optionC": "Grosimea pielii.",
+    "moduleName": "Electricitate"
+  },
+  "m15q8": {
+    "questionText": "Intensitatea curentului care trece prin corp depinde de:",
+    "optionA": "Rezistența suprafeței, fără a include încălțămintea.",
+    "optionB": "Tensiune.",
+    "optionC": "Stilul dumneavoastră de viață.",
+    "moduleName": "Electricitate"
+  },
+  "m15q9": {
+    "questionText": "Cum apare un scurtcircuit?",
+    "optionA": "Când două elemente aflate la tensiuni diferite intră în contact direct.",
+    "optionB": "Când două elemente aflate la aceleași tensiuni intră în contact direct.",
+    "optionC": "Când un conductor electric nu este împământat.",
+    "moduleName": "Electricitate"
+  },
+  "m15q10": {
+    "questionText": "Apariția și mărimea unui arc electric sunt determinate de:",
+    "optionA": "Intensitatea curentului.",
+    "optionB": "Diferența de potențial dintre elemente.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Electricitate"
+  },
+  "m15q11": {
+    "questionText": "Bocancii antistatici se poartă atunci când:",
+    "optionA": "Se lucrează în spații închise.",
+    "optionB": "Se lucrează cu electricitate statică.",
+    "optionC": "Se lucrează cu scări.",
+    "moduleName": "Electricitate"
+  },
+  "m15q12": {
+    "questionText": "Un pericol al electricității statice este:",
+    "optionA": "Descărcarea poate produce o scânteie.",
+    "optionB": "Echipamentele electronice sensibile pot fi deteriorate.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Electricitate"
+  },
+  "m15q13": {
+    "questionText": "În care situație nu apare electricitatea statică?",
+    "optionA": "În încăperi cu un nivel scăzut de oxigen.",
+    "optionB": "La lichidele care curg printr-o conductă de plastic sau care sunt agitate.",
+    "optionC": "La mersul pe o pardoseală acoperită cu material plastic.",
+    "moduleName": "Electricitate"
+  },
+  "m15q14": {
+    "questionText": "Ce nu este o metodă de protecție pentru carcase?",
+    "optionA": "Izolația dublă protejează împotriva pătrunderii prafului și a umezelii.",
+    "optionB": "Protecția împotriva impactului și a obiectelor în cădere.",
+    "optionC": "Protecția împotriva pătrunderii umezelii.",
+    "moduleName": "Electricitate"
+  },
+  "m15q15": {
+    "questionText": "Un pericol al utilizării cablurilor de alimentare și a prelungitoarelor este:",
+    "optionA": "Cablurile de alimentare sunt prea scurte.",
+    "optionB": "Împiedicarea de cabluri.",
+    "optionC": "Suprasolicitarea cablului.",
+    "moduleName": "Electricitate"
+  },
+  "m15q16": {
+    "questionText": "La utilizarea unui tambur de cablu trebuie să:",
+    "optionA": "Desfășurați complet cablul de pe tambur.",
+    "optionB": "Nu le folosiți în spații închise.",
+    "optionC": "Nu le desfășurați niciodată complet de pe tambur.",
+    "moduleName": "Electricitate"
+  },
+  "m15q17": {
+    "questionText": "Atunci când un tambur de cablu nu este complet derulat:",
+    "optionA": "Poate genera electricitate statică.",
+    "optionB": "Se poate încălzi foarte puternic și poate provoca un incendiu.",
+    "optionC": "Poate provoca scântei electrice.",
+    "moduleName": "Electricitate"
+  },
+  "m15q18": {
+    "questionText": "Valoarea de protecție a disjunctorului diferențial pentru șantier este:",
+    "optionA": "300 mA.",
+    "optionB": "25 mA.",
+    "optionC": "30 mA.",
+    "moduleName": "Electricitate"
+  },
+  "m15q19": {
+    "questionText": "O măsură de securitate înainte de a lucra cu echipamente electrice este:",
+    "optionA": "Verificarea vizuală pentru deteriorări și neconformități.",
+    "optionB": "Raportarea deteriorărilor și neutilizarea echipamentelor deteriorate.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Electricitate"
+  },
+  "m15q20": {
+    "questionText": "La utilizarea electricității:",
+    "optionA": "Schela trebuie așezată pe covoare de cauciuc.",
+    "optionB": "Schela trebuie legată la pământ.",
+    "optionC": "Nu trebuie făcut nimic special cu schela.",
+    "moduleName": "Electricitate"
+  },
+  "m16q1": {
+    "questionText": "Care este o caracteristică a unui spațiu închis?",
+    "optionA": "Acces dificil.",
+    "optionB": "Iluminat bun.",
+    "optionC": "Spațiu de lucru suficient.",
+    "moduleName": "Spații închise"
+  },
+  "m16q2": {
+    "questionText": "Este obligatorie prezența unui supraveghetor la gura de vizitare în timpul lucrului într-un spațiu închis?",
+    "optionA": "Da, dar poate pleca după finalizarea măsurătorilor.",
+    "optionB": "Nu, cu excepția cazului în care este prevăzut în autorizația antreprenorului.",
+    "optionC": "Da, atât timp cât se află cineva în spațiul închis.",
+    "moduleName": "Spații închise"
+  },
+  "m16q3": {
+    "questionText": "Cum poate apărea pericolul de asfixiere într-un spațiu închis?",
+    "optionA": "Prin defecțiuni ale instalației electrice.",
+    "optionB": "Prin concentrații ridicate de oxigen.",
+    "optionC": "Prin concentrație insuficientă de oxigen.",
+    "moduleName": "Spații închise"
+  },
+  "m16q4": {
+    "questionText": "Care dintre tensiunile de mai jos este sigură?",
+    "optionA": "120 Volți curent alternativ.",
+    "optionB": "240 Volți curent continuu.",
+    "optionC": "120 volți curent continuu.",
+    "moduleName": "Spații închise"
+  },
+  "m16q5": {
+    "questionText": "Ce nu este un exemplu de spațiu închis?",
+    "optionA": "Rezervoare de stocare sau tancuri.",
+    "optionB": "Corturi de sudură în/lângă excavații adânci.",
+    "optionC": "Îngust, mic, umed, alunecos și cu spațiu redus de manevră.",
+    "moduleName": "Spații închise"
+  },
+  "m16q6": {
+    "questionText": "O regulă pentru efectuarea măsurătorilor într-un spațiu închis este:",
+    "optionA": "Măsurătorile trebuie efectuate de șeful de echipă.",
+    "optionB": "Măsurătorile trebuie efectuate de lucrătorul aflat în spațiu.",
+    "optionC": "Măsurătorile trebuie efectuate de o persoană competentă.",
+    "moduleName": "Spații închise"
+  },
+  "m16q7": {
+    "questionText": "La supravegherea unui spațiu închis, trebuie avut în vedere următorul aspect:",
+    "optionA": "Comunicarea nu trebuie să aibă loc în caz de pericol de surpare.",
+    "optionB": "Alertarea serviciilor de urgență dacă persoana se află în pericol.",
+    "optionC": "Supraveghetorul ar trebui să execute și alte lucrări în timpul supravegherii.",
+    "moduleName": "Spații închise"
+  },
+  "m16q8": {
+    "questionText": "Supraveghetorul permanent trebuie:",
+    "optionA": "Să fie prezent atunci când există materiale inflamabile.",
+    "optionB": "Să fie prezent la fața locului în permanență.",
+    "optionC": "Să dețină competențe verificate în mod demonstrabil.",
+    "moduleName": "Spații închise"
+  },
+  "m16q9": {
+    "questionText": "Durata de staționare într-un spațiu închis:",
+    "optionA": "Depinde de locul în care se află spațiul închis.",
+    "optionB": "Trebuie să fie cât mai scurtă posibil.",
+    "optionC": "Nu are importanță.",
+    "moduleName": "Spații închise"
+  },
+  "m16q10": {
+    "questionText": "O măsură de securitate pentru reducerea riscului de electrocutare într-un spațiu închis este:",
+    "optionA": "Ambele răspunsuri sunt corecte.",
+    "optionB": "Scoaterea corectă de sub tensiune a echipamentelor.",
+    "optionC": "Utilizarea tensiunilor de securitate în spațiile închise cu pereți conductori.",
+    "moduleName": "Spații închise"
+  },
+  "m17q1": {
+    "questionText": "Când trebuie întrerupte operațiunile de ridicare?",
+    "optionA": "Se respectă instrucțiunile producătorului macaralei privind forța vântului.",
+    "optionB": "Peste forța vântului 4.",
+    "optionC": "Peste forța vântului 5.",
+    "moduleName": "Ridicarea sarcinilor"
+  },
+  "m17q2": {
+    "questionText": "Care este un accesoriu de ridicare?",
+    "optionA": "O sufă.",
+    "optionB": "O centură de reținere.",
+    "optionC": "O centură complexă de siguranță.",
+    "moduleName": "Ridicarea sarcinilor"
+  },
+  "m17q3": {
+    "questionText": "Cum se numesc două sufe prinse pe un inel de oțel?",
+    "optionA": "Un dispozitiv de legare cu două brațe.",
+    "optionB": "O pereche de sufe.",
+    "optionC": "Un duo.",
+    "moduleName": "Ridicarea sarcinilor"
+  },
+  "m17q4": {
+    "questionText": "Ce se consemnează în registrul macaralei?",
+    "optionA": "Care certificate de inspecție sunt obligatorii.",
+    "optionB": "Care greutăți pot fi deplasate pe care distanță.",
+    "optionC": "Care inspecții au fost efectuate la macara.",
+    "moduleName": "Ridicarea sarcinilor"
+  },
+  "m17q5": {
+    "questionText": "Care afirmație despre lanțuri este CORECTĂ?",
+    "optionA": "La lanțurile trecute peste muchii ascuțite se folosesc protecții de muchie.",
+    "optionB": "Lanțurile cu ochiuri alungite pot fi folosite dacă greutatea nu depășește limita.",
+    "optionC": "Lanțurile nu pot fi niciodată prelungite.",
+    "moduleName": "Ridicarea sarcinilor"
+  },
+  "m17q6": {
+    "questionText": "Ce nu este un exemplu de echipament de ridicat?",
+    "optionA": "O macara turn.",
+    "optionB": "Un pod rulant.",
+    "optionC": "Un transpalet.",
+    "moduleName": "Ridicarea sarcinilor"
+  },
+  "m17q7": {
+    "questionText": "Ce se poate face cu un echipament de ridicat?",
+    "optionA": "Deplasarea sarcinilor pe verticală.",
+    "optionB": "Deplasarea sarcinilor pe orizontală.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Ridicarea sarcinilor"
+  },
+  "m17q8": {
+    "questionText": "Un pericol general la lucrul cu materiale de ridicare este:",
+    "optionA": "Căderea sarcinii.",
+    "optionB": "Răsturnarea echipamentului de ridicat.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Ridicarea sarcinilor"
+  },
+  "m17q9": {
+    "questionText": "Calele stabilizatoare se folosesc la lucrul cu:",
+    "optionA": "Mașini de găurit cu coloană.",
+    "optionB": "Materiale periculoase.",
+    "optionC": "Echipamente de ridicat.",
+    "moduleName": "Ridicarea sarcinilor"
+  },
+  "m17q10": {
+    "questionText": "Cablurile de oțel:",
+    "optionA": "Nu trebuie înnodate.",
+    "optionB": "Trebuie depozitate într-o încăpere umedă.",
+    "optionC": "Pot fi folosite în continuare chiar dacă sunt foarte ruginite.",
+    "moduleName": "Ridicarea sarcinilor"
+  },
+  "m18q1": {
+    "questionText": "Radiația infraroșie este?",
+    "optionA": "Radiație neionizantă.",
+    "optionB": "Radiație ionizantă.",
+    "optionC": "Radiație naturală de fond.",
+    "moduleName": "Radiații"
+  },
+  "m18q2": {
+    "questionText": "O măsură de securitate împotriva radiațiilor ionizante este:",
+    "optionA": "Păstrarea unei distanțe cât mai mari.",
+    "optionB": "Împrejmuirea zonei din jurul sursei.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Radiații"
+  },
+  "m18q3": {
+    "questionText": "Examenul medical este obligatoriu pentru lucrătorii care:",
+    "optionA": "Lucrează cu substanțe periculoase pe o perioadă scurtă.",
+    "optionB": "Lucrează cu echipamente sau substanțe care emit radiații ionizante.",
+    "optionC": "Sunt bolnavi din când în când.",
+    "moduleName": "Radiații"
+  },
+  "m18q4": {
+    "questionText": "Supravegherea securității și igienei radiologice este o sarcină a:",
+    "optionA": "Șefului de echipă.",
+    "optionB": "Expertului în radioprotecție.",
+    "optionC": "Echipei de intervenție în situații de urgență.",
+    "moduleName": "Radiații"
+  },
+  "m18q5": {
+    "questionText": "Care este diferența dintre radiațiile ionizante și cele neionizante?",
+    "optionA": "Radiația neionizantă este singura radiație care creează ioni.",
+    "optionB": "Radiația neionizantă este mai slabă decât radiația ionizantă.",
+    "optionC": "Radiația neionizantă este mai puternică decât radiația ionizantă.",
+    "moduleName": "Radiații"
+  },
+  "m18q6": {
+    "questionText": "O măsură de securitate pentru a preveni afectarea sănătății de către radiațiile neionizante este:",
+    "optionA": "Acordarea atenției instrucțiunilor de pe aparate.",
+    "optionB": "Respectarea instrucțiunilor privind durata de utilizare.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Radiații"
+  },
+  "m19q1": {
+    "questionText": "Ce nu determină condițiile din mediul de muncă?",
+    "optionA": "Șeful de echipă.",
+    "optionB": "Vibrațiile.",
+    "optionC": "Iluminatul.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q2": {
+    "questionText": "Un tip de vibrații fizice este:",
+    "optionA": "Vibrațiile mână/braț provenite de la sculele mecanice.",
+    "optionB": "Vibrațiile corpului provenite de la un vehicul sau de la o platformă în mișcare.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q3": {
+    "questionText": "Ce nu este o afecțiune provocată de vibrațiile transmise corpului?",
+    "optionA": "Infecțiile pielii.",
+    "optionB": "Durerile musculare.",
+    "optionC": "Oboseala.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q4": {
+    "questionText": "Menținerea echilibrului hidric este o măsură de control:",
+    "optionA": "La lucrul cu substanțe periculoase.",
+    "optionB": "Pentru a asigura că nu vor izbucni incendii.",
+    "optionC": "Pentru a asigura confortul la locul de muncă.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q5": {
+    "questionText": "Un factor care influențează solicitarea fizică este:",
+    "optionA": "Poziția de lucru/postura.",
+    "optionB": "Ambele răspunsuri sunt corecte.",
+    "optionC": "Mișcările care trebuie executate.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q6": {
+    "questionText": "O funcție a pauzei în timpul lucrului este:",
+    "optionA": "Purtarea unei discuții informale plăcute cu colegii.",
+    "optionB": "Prevenirea suprasolicitării.",
+    "optionC": "Asigurarea unui timp suficient pentru masa de prânz.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q7": {
+    "questionText": "Oboseala cronică este un risc pentru sănătate:",
+    "optionA": "Al lucrului suplimentar o dată pe lună.",
+    "optionB": "Al solicitării statice.",
+    "optionC": "Al lucrului cu substanțe periculoase.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q8": {
+    "questionText": "Relația cu colegii dumneavoastră:",
+    "optionA": "Influențează programul de lucru.",
+    "optionB": "Ar trebui să fie întotdeauna pozitivă.",
+    "optionC": "Influențează solicitarea psihică.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q9": {
+    "questionText": "Postura corectă la ridicarea și deplasarea manuală a sarcinilor este:",
+    "optionA": "Țineți sarcina cât mai aproape de corp.",
+    "optionB": "Ridicați cu spatele drept și îndoiți genunchii.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q10": {
+    "questionText": "Care nu este o situație în care este de preferat lucrul în poziția stând în picioare?",
+    "optionA": "Când trebuie să vă întindeți frecvent în jos, în sus sau la distanță.",
+    "optionB": "Dacă trebuie utilizate forțe care depășesc 30 N (3,0 kg).",
+    "optionC": "Dacă spațiul pentru picioare este insuficient.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q11": {
+    "questionText": "Poziția optimă de șezut în timpul lucrului este:",
+    "optionA": "Sprijinirea bună a coapselor pe scaun.",
+    "optionB": "Descărcarea umerilor, de exemplu prin suporturi pentru brațe.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q12": {
+    "questionText": "Care este o regulă pentru poziția corectă de șezut în timpul lucrului?",
+    "optionA": "Asigurați o poziție de șezut optimă.",
+    "optionB": "Odată ajuns în poziția optimă, continuați să lucrați astfel cât mai mult timp posibil.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q13": {
+    "questionText": "Greutatea maximă recomandată de 25 Kg este o măsură de securitate pentru:",
+    "optionA": "Ridicarea din poziția șezut.",
+    "optionB": "Ridicarea manuală.",
+    "optionC": "Ridicarea cu macaraua.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m19q14": {
+    "questionText": "Postura corectă la ridicarea manuală este:",
+    "optionA": "Ridicați cu spatele drept și îndoiți genunchii.",
+    "optionB": "Țineți sarcina cât mai aproape de corp.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Locul de muncă ergonomic"
+  },
+  "m20q1": {
+    "questionText": "Care este efectul zgomotului excesiv de puternic la locul de muncă?",
+    "optionA": "Crește riscul la locul de muncă.",
+    "optionB": "Dacă se poartă protecție auditivă, zgomotul puternic nu are niciun efect.",
+    "optionC": "Se poate lucra mai intens, deoarece nu se poate vorbi.",
+    "moduleName": "Zgomotul la locul de muncă"
+  },
+  "m20q2": {
+    "questionText": "Care factori determină dacă zgomotul este vătămător?",
+    "optionA": "Durata de expunere și rezistența oscioarelor auditive.",
+    "optionB": "Înălțimea și intensitatea zgomotului.",
+    "optionC": "Distanța și degajarea de căldură în interiorul urechii.",
+    "moduleName": "Zgomotul la locul de muncă"
+  },
+  "m20q3": {
+    "questionText": "Două surse de zgomot egale, împreună, cresc nivelul de zgomot cu:",
+    "optionA": "3 dB.",
+    "optionB": "6 dB.",
+    "optionC": "9 dB.",
+    "moduleName": "Zgomotul la locul de muncă"
+  },
+  "m20q4": {
+    "questionText": "Expunerea la zgomot excesiv provoacă:",
+    "optionA": "Degete albe.",
+    "optionB": "Leziuni cerebrale permanente.",
+    "optionC": "Pierderea concentrării.",
+    "moduleName": "Zgomotul la locul de muncă"
+  },
+  "m20q5": {
+    "questionText": "Dublarea distanței față de sursele de zgomot dă o reducere de aproximativ:",
+    "optionA": "3 dB(A).",
+    "optionB": "6 dB(A).",
+    "optionC": "9 dB(A).",
+    "moduleName": "Zgomotul la locul de muncă"
+  },
+  "m20q6": {
+    "questionText": "Dificultatea de a purta convorbiri telefonice este un simptom al:",
+    "optionA": "Pierderii temporare a auzului.",
+    "optionB": "Unui fond sonor zgomotos.",
+    "optionC": "Pierderii permanente a auzului.",
+    "moduleName": "Zgomotul la locul de muncă"
+  },
+  "m20q7": {
+    "questionText": "Unitatea de măsură pentru nivelul (presiunii) sonor este:",
+    "optionA": "Lumen.",
+    "optionB": "Decibel.",
+    "optionC": "Amplitudine.",
+    "moduleName": "Zgomotul la locul de muncă"
+  },
+  "m20q8": {
+    "questionText": "Ordinea corectă pentru combaterea zgomotului excesiv este:",
+    "optionA": "1. Reducerea sursei / 2. Utilizarea protecției auditive / 3. Amortizarea zgomotului / 4. Ecranarea",
+    "optionB": "1. Utilizarea protecției auditive / 2. Ecranarea / 3. Amortizarea zgomotului / 4. Reducerea sursei",
+    "optionC": "1. Reducerea sursei / 2. Ecranarea / 3. Amortizarea zgomotului / 4. Utilizarea protecției auditive",
+    "moduleName": "Zgomotul la locul de muncă"
+  },
+  "m20q9": {
+    "questionText": "Ce măsuri trebuie să ia angajatorul la aceste niveluri de zgomot?",
+    "optionA": "De la 85 dB(A), asigurarea examinării auzului și a protecției auditive.",
+    "optionB": "De la 80 dB(A), asigurarea examinării auzului și a protecției auditive.",
+    "optionC": "De la 75 dB(A), asigurarea examinării auzului și a protecției auditive.",
+    "moduleName": "Zgomotul la locul de muncă"
+  },
+  "m21q1": {
+    "questionText": "De ce persoanele care lucrează în industrie nu trebuie să poarte căști de protecție metalice?",
+    "optionA": "O cască metalică poate răni capul.",
+    "optionB": "O cască metalică nu poate amortiza suficient obiectele în cădere.",
+    "optionC": "O cască metalică poate conduce electricitatea.",
+    "explanation": "Echipamentul individual de protecție este întotdeauna ultima soluție din ierarhia măsurilor de control. Protejează numai purtătorul și depinde de utilizarea corectă. Măsurile colective au întotdeauna prioritate.",
+    "officialRef": "Modulul 21 — Echipamentul individual de protecție",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q2": {
+    "questionText": "Pentru care activități o mască cu filtru de praf este o protecție respiratorie potrivită?",
+    "optionA": "La pulverizarea vopselei.",
+    "optionB": "La sudare.",
+    "optionC": "La spargere și dăltuire.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q3": {
+    "questionText": "În ce situații ochelarii de protecție oferă o protecție bună?",
+    "optionA": "La activitățile în care apar stropi de acid.",
+    "optionB": "La lucrul deasupra capului.",
+    "optionC": "La lucrul în spații închise.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q4": {
+    "questionText": "La lucrul cu un nivel de zgomot mai mare de 85 dB(A):",
+    "optionA": "Protecția auditivă este recomandată.",
+    "optionB": "Angajatul poate alege dacă folosește protecția auditivă.",
+    "optionC": "Protecția auditivă este obligatorie.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q5": {
+    "questionText": "Echipamentul individual de protecție trebuie să fie:",
+    "optionA": "Disponibil într-o singură mărime.",
+    "optionB": "Prezent la fiecare loc de muncă.",
+    "optionC": "Testat.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q6": {
+    "questionText": "Diferența dintre ochelarii de protecție și masca de sudură:",
+    "optionA": "Măștile de sudură protejează împotriva radiației infraroșii; ochelarii protejează împotriva particulelor proiectate.",
+    "optionB": "Ochelarii de protecție protejează împotriva radiației UV; măștile de sudură protejează împotriva particulelor proiectate.",
+    "optionC": "Ochelarii de protecție acoperă toată fața, iar măștile de sudură nu.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q7": {
+    "questionText": "O concentrație prea scăzută de oxigen este un pericol pentru:",
+    "optionA": "Mediu.",
+    "optionB": "Incendii.",
+    "optionC": "Respirație.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q8": {
+    "questionText": "Protecția respiratorie autonomă (izolantă) trebuie utilizată:",
+    "optionA": "Dacă există concentrații ridicate și necunoscute de substanțe periculoase.",
+    "optionB": "Dacă în aer există mai puțin de 19% oxigen.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q9": {
+    "questionText": "Ce nu este o regulă la utilizarea echipamentului de protecție împotriva căderii de la înălțime?",
+    "optionA": "Centurile complexe de siguranță trebuie să se potrivească bine și să fie reglate pe purtător.",
+    "optionB": "Dispozitivele de protecție împotriva căderii care au oprit o cădere pot fi folosite din nou.",
+    "optionC": "Corzile de siguranță nu trebuie să fie murdare.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q10": {
+    "questionText": "Îmbrăcămintea de avertizare se folosește:",
+    "optionA": "La temperaturi scăzute.",
+    "optionB": "Pentru a face purtătorul vizibil.",
+    "optionC": "Împotriva contaminării, la sudare și polizare.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q11": {
+    "questionText": "Alunecarea este un pericol pentru:",
+    "optionA": "Mâini și brațe.",
+    "optionB": "Picioare și gambe.",
+    "optionC": "Cap și față.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q12": {
+    "questionText": "Diferite forme de protecție a mâinilor și brațelor sunt:",
+    "optionA": "Mănuși cu talpă antiderapantă.",
+    "optionB": "Mănuși cu manșetă prelungită și/sau protecție a brațului.",
+    "optionC": "Bombeu de oțel pentru protejarea degetelor împotriva obiectelor grele în cădere.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q13": {
+    "questionText": "O proprietate principală a unei căști de protecție este:",
+    "optionA": "Interiorul: absoarbe un șoc și îl distribuie pe suprafața capului.",
+    "optionB": "Exteriorul: absoarbe un șoc și îl distribuie pe suprafața capului.",
+    "optionC": "Interiorul: suficient de rezistent pentru a opri obiectele în cădere.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q14": {
+    "questionText": "Pericolele pentru cap în timpul lucrului sunt:",
+    "optionA": "Lovirea.",
+    "optionB": "Obiectele în cădere.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m21q15": {
+    "questionText": "O semimască pentru nas și gură se folosește:",
+    "optionA": "Împotriva particulelor și a gazelor sau vaporilor.",
+    "optionB": "Pentru acoperirea întregii fețe.",
+    "optionC": "Numai împotriva particulelor, nu împotriva gazelor sau vaporilor.",
+    "moduleName": "Echipamentul individual de protecție"
+  },
+  "m22q1": {
+    "questionText": "Ce caracteristici se aplică unui indicator de obligativitate?",
+    "optionA": "Este rotund, albastru și are un simbol alb.",
+    "optionB": "Este triunghiular și galben, cu un simbol negru.",
+    "optionC": "Este dreptunghiular și verde, cu un simbol alb.",
+    "moduleName": "Indicatoare și marcaje"
+  },
+  "m22q2": {
+    "questionText": "Ce cerințe se aplică indicatoarelor de avertizare la locul de muncă?",
+    "optionA": "Grafica trebuie să fie clară pentru toți.",
+    "optionB": "Trebuie fixate la o înălțime sigură.",
+    "optionC": "De preferință au text în limba neerlandeză.",
+    "moduleName": "Indicatoare și marcaje"
+  },
+  "m22q3": {
+    "questionText": "O grupă de indicatoare este:",
+    "optionA": "Indicatoarele de obligativitate.",
+    "optionB": "Indicatoarele de prim ajutor.",
+    "optionC": "Indicatoarele de ieșire.",
+    "moduleName": "Indicatoare și marcaje"
+  },
+  "m22q4": {
+    "questionText": "Un indicator care interzice ceva este:",
+    "optionA": "Indicator rotund roșu cu margine albă și diagonală roșie.",
+    "optionB": "Indicator triunghiular galben cu margine neagră.",
+    "optionC": "Indicator rotund alb cu margine roșie și diagonală roșie.",
+    "moduleName": "Indicatoare și marcaje"
+  },
+  "m22q5": {
+    "questionText": "Un indicator triunghiular galben cu margine neagră este grafica pentru:",
+    "optionA": "Un indicator de dotări.",
+    "optionB": "Un indicator de avertizare.",
+    "optionC": "Un indicator de obligativitate.",
+    "moduleName": "Indicatoare și marcaje"
+  },
+  "m22q6": {
+    "questionText": "Semnificația generală a indicatoarelor de avertizare este:",
+    "optionA": "Interzicerea unui lucru.",
+    "optionB": "Traseul spre dotări.",
+    "optionC": "Atenție, pericol.",
+    "moduleName": "Indicatoare și marcaje"
+  },
+  "m22q7": {
+    "questionText": "Un indicator pătrat sau dreptunghiular verde cu simbol alb este pentru:",
+    "optionA": "Indicatoare de obligativitate.",
+    "optionB": "Indicatoare de avertizare.",
+    "optionC": "Indicatoare pentru dotările de securitate.",
+    "moduleName": "Indicatoare și marcaje"
+  },
+  "m22q8": {
+    "questionText": "Echipamentele de stingere a incendiilor se află la indicatoarele care sunt:",
+    "optionA": "Pătrate/dreptunghiulare și verzi, cu simbol alb.",
+    "optionB": "Pătrate/dreptunghiulare și roșii, cu simbol alb.",
+    "optionC": "Pătrate/dreptunghiulare și negre, cu simbol alb.",
+    "moduleName": "Indicatoare și marcaje"
+  },
+  "m22q9": {
+    "questionText": "Semnificația generală pentru echipamentele de stingere a incendiilor:",
+    "optionA": "Indică unde poate fi găsit echipamentul: traseul spre acesta.",
+    "optionB": "Indică unde poate fi găsit echipamentul: locul propriu-zis.",
+    "optionC": "Ambele răspunsuri sunt corecte.",
+    "moduleName": "Indicatoare și marcaje"
+  },
+  "m22q10": {
+    "questionText": "Dungile galbene sau albe se folosesc pentru:",
+    "optionA": "Marcarea primei și a ultimei trepte a scărilor.",
+    "optionB": "Marcarea căilor de trecere și a zonelor de stivuire.",
+    "optionC": "Indicatoarele de obligativitate.",
+    "moduleName": "Indicatoare și marcaje"
+  },
+  "mc001": {
+    "questionText": "Care dintre următoarele sunt obligatorii la lucrul la înălțimi de peste 2 metri?",
+    "explanation": "Lucrul la înălțime necesită, ca minim, protecție împotriva căderii (centură complexă + coardă de siguranță), protecția capului și protecția picioarelor. Îmbrăcămintea de mare vizibilitate și protecția auditivă depind de mediul concret de lucru.",
+    "officialRef": "Modulul 14 — Lucrul la înălțime",
+    "moduleName": "Lucrul la înălțime",
+    "options": {
+      "a": "Centură complexă de siguranță cu coardă de siguranță",
+      "b": "Cască de protecție",
+      "c": "Bocanci de protecție cu bombeu de oțel",
+      "d": "Vestă de mare vizibilitate",
+      "e": "Protecție auditivă"
+    }
+  },
+  "mc002": {
+    "questionText": "Care dintre următoarele sunt clasificate ca substanțe periculoase conform regulamentului REACH?",
+    "explanation": "Azbestul, benzenul și praful de siliciu sunt toate clasificate ca substanțe periculoase, cu limite de expunere stricte. Apa potabilă și aerul comprimat nu sunt clasificate ca periculoase în cadrul REACH.",
+    "officialRef": "Modulul 8 — Substanțe periculoase",
+    "moduleName": "Substanțe periculoase",
+    "options": {
+      "a": "Fibre de azbest",
+      "b": "Benzen",
+      "c": "Apă potabilă",
+      "d": "Praf de siliciu",
+      "e": "Aer comprimat"
+    }
+  },
+  "mc003": {
+    "questionText": "Care dintre următoarele sunt metode valabile de prevenire a incendiilor la locul de muncă?",
+    "explanation": "Prevenirea incendiilor înseamnă îndepărtarea surselor de aprindere, depozitarea corectă a materialelor inflamabile și ventilarea adecvată. Apa nu trebuie folosită la deversările de substanțe chimice (le poate împrăștia sau poate reacționa cu ele). Stingătoarele trebuie să fie accesibile, nu încuiate.",
+    "officialRef": "Modulul 9 — Incendii și explozii",
+    "moduleName": "Incendii și explozii",
+    "options": {
+      "a": "Îndepărtarea surselor de aprindere din apropierea materialelor inflamabile",
+      "b": "Depozitarea lichidelor inflamabile în dulapuri de siguranță aprobate",
+      "c": "Creșterea ventilării pentru diluarea vaporilor inflamabili",
+      "d": "Folosirea apei pentru curățarea tuturor deversărilor de substanțe chimice",
+      "e": "Păstrarea stingătoarelor încuiate pentru a preveni utilizarea abuzivă"
+    }
+  },
+  "tf001": {
+    "questionText": "Indicați dacă fiecare dintre următoarele afirmații despre substanțele periculoase este adevărată sau falsă:",
+    "explanation": "Fișa cu date de securitate (SDS) trebuie să fie disponibilă conform regulamentului REACH. Ambalajele originale previn confuziile. Deșeurile chimice trebuie eliminate pe circuite specifice. Atât lichidele, cât și gazele pot necesita ventilare.",
+    "officialRef": "Modulul 8 — Substanțe periculoase",
+    "moduleName": "Substanțe periculoase",
+    "statements": {
+      "s1": "O SDS (fișă cu date de securitate) trebuie să fie întotdeauna disponibilă pe șantier",
+      "s2": "Substanțele periculoase trebuie păstrate în ambalajele lor originale",
+      "s3": "Puteți arunca deșeurile chimice la gunoiul menajer",
+      "s4": "Ventilarea este necesară numai pentru lichide, nu pentru gaze"
+    }
+  },
+  "tf002": {
+    "questionText": "Indicați dacă fiecare dintre următoarele afirmații despre echipamentul individual de protecție este adevărată sau falsă:",
+    "explanation": "Echipamentul individual de protecție este ultima soluție din ierarhia măsurilor de control, nu prima. Angajatorii trebuie să pună la dispoziție echipamentul individual de protecție gratuit. Echipamentul deteriorat trebuie înlocuit. Marcajul CE confirmă conformitatea cu standardele de securitate ale UE.",
+    "officialRef": "Modulul 21 — Echipamentul individual de protecție",
+    "moduleName": "Echipamentul individual de protecție",
+    "statements": {
+      "s1": "Echipamentul individual de protecție este prima linie de apărare din ierarhia măsurilor de control",
+      "s2": "Angajatorul este responsabil pentru punerea la dispoziție gratuită a echipamentului individual de protecție",
+      "s3": "Echipamentul individual de protecție deteriorat trebuie înlocuit imediat",
+      "s4": "Echipamentul individual de protecție cu marcaj CE îndeplinește cerințele minime europene de securitate"
+    }
+  },
+  "tf003": {
+    "questionText": "Indicați dacă fiecare dintre următoarele afirmații despre lucrul în spații închise este adevărată sau falsă:",
+    "explanation": "Intrarea în spații închise necesită întotdeauna un permis de lucru (PTW). Măsurarea atmosferei este obligatorie indiferent de pericolele vizibile (lipsa de oxigen este invizibilă). Un supraveghetor la exterior și echipamentul de salvare sunt întotdeauna obligatorii.",
+    "officialRef": "Modulul 16 — Spații închise",
+    "moduleName": "Spații închise",
+    "statements": {
+      "s1": "Un permis de lucru este întotdeauna necesar înainte de intrarea într-un spațiu închis",
+      "s2": "Măsurarea atmosferei este necesară numai dacă există un pericol vizibil",
+      "s3": "O persoană de supraveghere trebuie să fie prezentă în exteriorul spațiului închis",
+      "s4": "Echipamentul de salvare trebuie să fie disponibil înainte de intrare"
+    }
+  },
+  "ord001": {
+    "questionText": "Așezați etapele ierarhiei măsurilor de control (de la eliminare până la ultima soluție) în ordinea corectă, începând cu cea mai indicată:",
+    "explanation": "Ierarhia măsurilor de control merge de la Eliminare → Substituire → Măsuri tehnice → Măsuri organizatorice → Echipament individual de protecție. Echipamentul individual de protecție este întotdeauna ultima soluție, deoarece depinde de utilizarea corectă de către fiecare persoană.",
+    "officialRef": "Modulul 3 — Prevenirea riscurilor",
+    "moduleName": "Accidente: cauze și prevenire",
+    "items": {
+      "i1": "Măsuri organizatorice (proceduri, instruire)",
+      "i2": "Eliminarea pericolului",
+      "i3": "Echipament individual de protecție (EIP)",
+      "i4": "Substituire (înlocuire cu o variantă mai puțin periculoasă)",
+      "i5": "Măsuri tehnice (bariere fizice)"
+    }
+  },
+  "ord002": {
+    "questionText": "Așezați în ordinea corectă etapele de intervenție în cazul unei deversări de substanțe chimice:",
+    "explanation": "În caz de deversare chimică: mai întâi evacuați și avertizați ceilalți, apoi identificați substanța cu ajutorul SDS, apoi curățați folosind echipamentul individual de protecție și materialele corecte și, în final, raportați incidentul.",
+    "officialRef": "Modulul 8 — Substanțe periculoase",
+    "moduleName": "Substanțe periculoase",
+    "items": {
+      "i1": "Anunțați superiorul ierarhic și completați raportul de incident",
+      "i2": "Evacuați zona imediată și avertizați ceilalți",
+      "i3": "Curățați folosind materiale absorbante adecvate și echipament individual de protecție",
+      "i4": "Identificați substanța cu ajutorul SDS"
+    }
+  },
+  "ord003": {
+    "questionText": "Așezați în ordinea corectă etapele de utilizare a unui stingător (tehnica PASS):",
+    "explanation": "Tehnica PASS: trageți siguranța → țintiți la baza focului → apăsați maneta → baleiați dintr-o parte în alta. Țintiți întotdeauna la baza focului, nu în flăcări.",
+    "officialRef": "Modulul 9 — Incendii și explozii",
+    "moduleName": "Incendii și explozii",
+    "items": {
+      "i1": "Apăsați maneta pentru a evacua agentul de stingere",
+      "i2": "Trageți siguranța",
+      "i3": "Baleiați dintr-o parte în alta la baza focului",
+      "i4": "Îndreptați duza spre baza focului"
+    }
+  },
+  "mat001": {
+    "questionText": "Asociați fiecare tip de stingător cu clasa de incendiu pentru care este destinat:",
+    "explanation": "Apa: numai clasa A, materiale solide. Spuma: clasa B, lichide (și A). CO₂: instalații electrice (clasa C) — înlocuiește oxigenul fără a lăsa reziduuri. Pulberea: polivalentă (A, B, C), dar lasă reziduuri.",
+    "officialRef": "Modulul 9 — Incendii și explozii",
+    "moduleName": "Incendii și explozii",
+    "leftItems": {
+      "l1": "Stingător cu apă",
+      "l2": "Stingător cu CO₂",
+      "l3": "Stingător cu spumă",
+      "l4": "Stingător cu pulbere"
+    },
+    "rightItems": {
+      "r1": "Class A — Materiale solide (lemn, hârtie)",
+      "r2": "Class B — Lichide inflamabile (benzină, ulei)",
+      "r3": "Class C — Incendii la instalații electrice",
+      "r4": "Incendii de Class A, B și C (polivalent)"
+    }
+  },
+  "mat002": {
+    "questionText": "Asociați fiecare culoare a indicatoarelor de securitate cu semnificația sa:",
+    "explanation": "Codul de culori ISO 7010: Roșu = interdicție/incendiu, Galben = avertizare, Albastru = obligativitate, Verde = condiție de siguranță/urgență. Acestea sunt standardizate în toată UE.",
+    "officialRef": "Modulul 22 — Indicatoare și marcaje",
+    "moduleName": "Indicatoare și marcaje",
+    "leftItems": {
+      "l1": "Roșu",
+      "l2": "Galben / portocaliu-ambru",
+      "l3": "Albastru",
+      "l4": "Verde"
+    },
+    "rightItems": {
+      "r1": "Interdicție sau echipament de stingere a incendiilor",
+      "r2": "Avertizare / atenție",
+      "r3": "Acțiune obligatorie (trebuie efectuată)",
+      "r4": "Condiție de siguranță / evacuare de urgență"
+    }
+  },
+  "mat003": {
+    "questionText": "Asociați fiecare tip de echipament individual de protecție cu pericolul împotriva căruia protejează în principal:",
+    "explanation": "Fiecare tip de echipament individual de protecție este asociat pericolului său principal. Antifoanele externe protejează împotriva zgomotului. Măștile de protecție respiratorie FFP3 protejează împotriva particulelor fine. Ochelarii de protecție protejează ochii. Mănușile antivibrații reduc riscul de HAVS provocat de sculele electrice.",
+    "officialRef": "Modulul 21 — Echipamentul individual de protecție",
+    "moduleName": "Echipamentul individual de protecție",
+    "leftItems": {
+      "l1": "Antifoane externe / antifoane interne",
+      "l2": "Mască de protecție respiratorie (FFP3)",
+      "l3": "Ochelari de protecție",
+      "l4": "Mănuși antivibrații"
+    },
+    "rightItems": {
+      "r1": "Pierderea auzului provocată de zgomot",
+      "r2": "Inhalarea prafului fin și a aerosolilor",
+      "r3": "Stropi de substanțe chimice sau particule proiectate în ochi",
+      "r4": "Sindromul de vibrații mână-braț (HAVS)"
+    }
+  }
+}

@@ -775,6 +775,54 @@
       "lessonsCount_few": "{{count}} lecții",
       "minutes_few": "{{count}} min"
     },
+    "courseContent": {
+      "officialSyllabus": "Programă oficială",
+      "meta": "{{lessons}} lecții · {{minutes}} min · {{modules}} module",
+      "moduleMeta": "{{lessons}} lecții · {{minutes}} min",
+      "oneTimePayment": "plată unică",
+      "otherLanguagesInEnglish": "în celelalte limbi materialul se studiază în engleză",
+      "legalNoticeLabel": "Notă legală:",
+      "vca": {
+        "title": "Curs de pregătire VCA",
+        "legalNotice": "PipingBox vă pregătește pentru examenul VCA. Certificatul oficial VCA este emis de SSVV/BESACC prin centre de examinare recunoscute. PipingBox este un furnizor independent de pregătire, fără afiliere la SSVV/BESACC."
+      },
+      "simulator": {
+        "title": "Simulator de examen VCA — {{count}} întrebări",
+        "description": "Exersați cu întrebări în stilul real al examenului VCA. Cronometru, feedback instantaneu și explicații detaliate. Incluse în curs.",
+        "bvca": "{{count}} întrebări (B-VCA)",
+        "volvca": "{{count}} întrebări (VOL-VCA)",
+        "instantScoring": "Punctaj instantaneu"
+      },
+      "scc": {
+        "title": "Curs de pregătire SCC",
+        "variantOperative": "Angajați operativi",
+        "variantSupervisor": "Supervizor",
+        "variantSelfEmployed": "Persoane care desfășoară activități independente",
+        "legalNotice": "PipingBox vă pregătește pentru examenul SCC. Certificatul oficial SCC este emis de SCC Stiftung (sau de AUVA în Austria) prin organisme de examinare recunoscute, precum TÜV sau DEKRA. PipingBox este un furnizor independent de pregătire, fără afiliere la SCC Stiftung.",
+        "simulatorTitle": "Simulator de examen SCC — {{count}} întrebări",
+        "simulatorDescription": "Exersați cu întrebări în stilul real al examenului SCC. Cronometru, feedback instantaneu și explicații detaliate. Incluse în curs.",
+        "simulatorDoc016": "{{count}} întrebări (Doc 016)",
+        "simulatorDoc017018": "{{count}} întrebări (Doc 017/018)",
+        "simulatorInstantScoring": "Punctaj instantaneu"
+      },
+      "prl": {
+        "titleBasico": "PRL Básico — Prevenirea riscurilor profesionale",
+        "titleIntermedio": "PRL Intermedio — Prevenirea riscurilor profesionale",
+        "officialTraining": "Formare oficială",
+        "hoursBadge": "{{hours}}h",
+        "meta": "{{lessons}} lecții · {{hours}}h · {{modules}} module · Ley 31/1995",
+        "legalNotice": "PipingBox oferă formare PRL în conformitate cu Ley 31/1995 de Prevención de Riesgos Laborales și RD 39/1997. PipingBox nu înlocuiește serviciul de prevenire intern sau extern al companiei, nici asigurătorul acesteia pentru accidente de muncă. Verificarea conformității legale este responsabilitatea Inspección de Trabajo y Seguridad Social.",
+        "certificationTypeLabel": "Tipul certificării:",
+        "certificationTypeText": "Pe bază de formare (fără examen). La finalizarea a 100% din curs, PipingBox emite un",
+        "certificationTypeHighlight": "certificat de formare",
+        "certificationTypeTail": "care îndeplinește cerința legală de formare PRL pentru lucrători.",
+        "certificateTeaserTitle": "Certificat de formare — fără examen",
+        "certificateTeaserDescription": "Spre deosebire de VCA și SCC, PRL nu are examen oficial. Formarea în sine este cerința legală. La finalizarea a 100% din module, PipingBox emite un certificat de formare care îndeplinește cerința Ley 31/1995 pentru lucrători.",
+        "badgeCompliance": "Îndeplinește Ley 31/1995",
+        "badgeHours": "{{hours}}h de formare",
+        "badgeDownloadable": "Certificat descărcabil"
+      }
+    },
     "vcaBooking": {
       "signInRequired": "Vă rugăm să vă autentificați pentru a trimite o cerere de rezervare",
       "fillNameAndPostalCode": "Vă rugăm să completați numele și codul poștal",
@@ -2747,6 +2795,7 @@
       "submitError": "Nu s-a putut trimite raportul. Vă rugăm să încercați din nou."
     },
     "categories": {
+      "translation": "Traducere / formulare",
       "ai_error": "Eroare AI",
       "export": "Export",
       "login_account": "Autentificare / Cont",
@@ -3161,5 +3210,15 @@
     "signInToPurchase": "Autentificați-vă pentru a cumpăra credite.",
     "notAvailableSubscription": "Abonamentele nu sunt disponibile încă. Scrieți-ne un e-mail și îl vom configura manual.",
     "notAvailablePack": "Acest pachet nu este disponibil momentan."
+  },
+  "translationBanner": {
+    "text": "Vizualizați PipingBox în {{language}} — traducere în versiune beta. Ați observat o greșeală?",
+    "reportBtn": "Raportați traducerea",
+    "emailBtn": "sau scrieți-ne",
+    "dismiss": "Închideți notificarea",
+    "emailSubject": "Feedback privind traducerea",
+    "emailBodyLanguage": "Limbă: {{language}} ({{code}})",
+    "emailBodyPage": "Pagină",
+    "emailBodyHint": "Lipiți textul greșit și cum ar trebui să apară:"
   }
 }

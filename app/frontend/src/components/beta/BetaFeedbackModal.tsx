@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, Paperclip, X, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,20 +29,30 @@ import {
 interface BetaFeedbackModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Category preselected when the modal opens (e.g. from the translation banner). */
+  initialCategory?: FeedbackCategory;
 }
 
-export function BetaFeedbackModal({ open, onOpenChange }: BetaFeedbackModalProps) {
+export function BetaFeedbackModal({
+  open,
+  onOpenChange,
+  initialCategory = 'other',
+}: BetaFeedbackModalProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [category, setCategory] = useState<FeedbackCategory>('other');
+  const [category, setCategory] = useState<FeedbackCategory>(initialCategory);
   const [description, setDescription] = useState('');
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open) setCategory(initialCategory);
+  }, [open, initialCategory]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -104,7 +114,7 @@ export function BetaFeedbackModal({ open, onOpenChange }: BetaFeedbackModalProps
   };
 
   const resetForm = () => {
-    setCategory('other');
+    setCategory(initialCategory);
     setDescription('');
     setScreenshot(null);
     setScreenshotPreview(null);

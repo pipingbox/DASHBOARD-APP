@@ -772,6 +772,54 @@
       "next": "Напред",
       "finish": "Завършване"
     },
+    "courseContent": {
+      "officialSyllabus": "Официална програма",
+      "meta": "Уроци: {{lessons}} · {{minutes}} мин · модули: {{modules}}",
+      "moduleMeta": "Уроци: {{lessons}} · {{minutes}} мин",
+      "oneTimePayment": "еднократно плащане",
+      "otherLanguagesInEnglish": "на останалите езици материалът се изучава на английски",
+      "legalNoticeLabel": "Правна информация:",
+      "vca": {
+        "title": "Подготвителен курс за VCA",
+        "legalNotice": "PipingBox ви подготвя за изпита VCA. Официалният сертификат VCA се издава от SSVV/BESACC чрез признати изпитни центрове. PipingBox е независим доставчик на подготовка и не е свързан със SSVV/BESACC."
+      },
+      "simulator": {
+        "title": "Симулатор на изпита VCA — въпроси: {{count}}",
+        "description": "Упражнявайте се с въпроси в стила на реалния изпит VCA. Таймер, незабавна обратна връзка и подробни обяснения. Включено в курса.",
+        "bvca": "Въпроси: {{count}} (B-VCA)",
+        "volvca": "Въпроси: {{count}} (VOL-VCA)",
+        "instantScoring": "Незабавно оценяване"
+      },
+      "scc": {
+        "title": "Подготвителен курс за SCC",
+        "variantOperative": "Работници",
+        "variantSupervisor": "Ръководител",
+        "variantSelfEmployed": "Самонаети лица",
+        "legalNotice": "PipingBox ви подготвя за изпита SCC. Официалният сертификат SCC се издава от SCC Stiftung (или AUVA в Австрия) чрез признати изпитни органи като TÜV или DEKRA. PipingBox е независим доставчик на подготовка и не е свързан със SCC Stiftung.",
+        "simulatorTitle": "Симулатор на изпита SCC — въпроси: {{count}}",
+        "simulatorDescription": "Упражнявайте се с въпроси в стила на реалния изпит SCC. Таймер, незабавна обратна връзка и подробни обяснения. Включено в курса.",
+        "simulatorDoc016": "Въпроси: {{count}} (Doc 016)",
+        "simulatorDoc017018": "Въпроси: {{count}} (Doc 017/018)",
+        "simulatorInstantScoring": "Незабавно оценяване"
+      },
+      "prl": {
+        "titleBasico": "PRL Básico — ЗБУТ и предотвратяване на професионалните рискове",
+        "titleIntermedio": "PRL Intermedio — ЗБУТ и предотвратяване на професионалните рискове",
+        "officialTraining": "Официално обучение",
+        "hoursBadge": "{{hours}}h",
+        "meta": "Уроци: {{lessons}} · {{hours}}h · модули: {{modules}} · Ley 31/1995",
+        "legalNotice": "PipingBox провежда обучение PRL в съответствие с Ley 31/1995 de Prevención de Riesgos Laborales и RD 39/1997. PipingBox не замества вътрешната или външната служба по превенция на предприятието, нито неговия осигурител за трудови злополуки. Проверката на съответствието със закона е отговорност на Inspección de Trabajo y Seguridad Social.",
+        "certificationTypeLabel": "Вид сертификация:",
+        "certificationTypeText": "Въз основа на обучение (без изпит). При завършване на 100% от курса PipingBox издава",
+        "certificationTypeHighlight": "удостоверение за обучение",
+        "certificationTypeTail": "което изпълнява законовото изискване за обучение PRL на работниците.",
+        "certificateTeaserTitle": "Удостоверение за обучение — без изпит",
+        "certificateTeaserDescription": "За разлика от VCA и SCC, PRL няма официален изпит. Самото обучение е законовото изискване. При завършване на 100% от модулите PipingBox издава удостоверение за обучение, което изпълнява изискването на Ley 31/1995 за работниците.",
+        "badgeCompliance": "Изпълнява Ley 31/1995",
+        "badgeHours": "{{hours}}h обучение",
+        "badgeDownloadable": "Удостоверение за изтегляне"
+      }
+    },
     "vcaBooking": {
       "signInRequired": "Моля, влезте в профила си, за да изпратите заявка за резервация",
       "fillNameAndPostalCode": "Моля, попълнете името и пощенския си код",
@@ -2741,6 +2789,7 @@
       "submitError": "Докладът не можа да бъде изпратен. Моля, опитайте отново."
     },
     "categories": {
+      "translation": "Превод / формулировка",
       "ai_error": "Грешка на AI",
       "export": "Експортиране",
       "login_account": "Вход / Акаунт",
@@ -3155,5 +3204,15 @@
     "signInToPurchase": "Влезте, за да закупите кредити.",
     "notAvailableSubscription": "Абонаментите още не са налични. Пишете ни по имейл и ще го настроим ръчно.",
     "notAvailablePack": "Този пакет не е наличен в момента."
+  },
+  "translationBanner": {
+    "text": "Разглеждате PipingBox на {{language}} — бета превод. Забелязахте грешка?",
+    "reportBtn": "Докладвайте превода",
+    "emailBtn": "или ни пишете",
+    "dismiss": "Затваряне на съобщението",
+    "emailSubject": "Обратна връзка за превода",
+    "emailBodyLanguage": "Език: {{language}} ({{code}})",
+    "emailBodyPage": "Страница",
+    "emailBodyHint": "Поставете грешния текст и как трябва да бъде:"
   }
 }
