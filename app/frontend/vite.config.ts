@@ -1,11 +1,62 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
+import fs from 'fs';
 import path from 'path';
 import { viteSourceLocator } from '@metagptx/vite-plugin-source-locator';
 import { atoms } from '@metagptx/web-sdk/plugins';
 import { vitePrerenderPlugin } from 'vite-prerender-plugin';
 import { pbExplicitSitemapPlugin } from './prerender/sitemap.js';
 import { getBlogRoutes } from './prerender/blog-routes.js';
+
+/**
+ * PB-PWA-IDENTITY-001: give every non-production deployment its own installable
+ * identity.
+ *
+ * `site.webmanifest` declares `start_url: "/"` and `scope: "/"` — both relative
+ * — so the SAME manifest installs under whatever origin serves it. Preview and
+ * production therefore produced two installed apps with identical name, icons
+ * and identity while intentionally running different commits: an installed app
+ * could show a different version than the browser with nothing on screen
+ * explaining why, and the launcher gave no way to tell them apart.
+ *
+ * This rewrites the built manifest when VITE_APP_ENV marks a non-production
+ * deployment, adding a marked name and its own `id` so the browser treats it as
+ * a separate app. Production is left byte-identical (no `id` injected), so
+ * already-installed production apps keep deriving identity from `start_url`.
+ *
+ * Done at build time on purpose: the preview Worker does not set
+ * `run_worker_first`, so Cloudflare serves a matching static asset without ever
+ * invoking the Worker — an edge-side rewrite would silently never run there.
+ */
+function pbDeploymentManifestIdentity() {
+  return {
+    name: 'pb-deployment-manifest-identity',
+    apply: 'build' as const,
+    enforce: 'post' as const,
+    closeBundle() {
+      const environment = process.env.VITE_APP_ENV?.trim();
+      if (!environment || environment === 'production') return;
+
+      const manifestPath = path.resolve(__dirname, 'dist/site.webmanifest');
+      if (!fs.existsSync(manifestPath)) return;
+
+      let manifest: Record<string, unknown>;
+      try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      } catch {
+        return;
+      }
+
+      const label = environment.charAt(0).toUpperCase() + environment.slice(1);
+      manifest.name = `PipingBox ${label} — not production`;
+      manifest.short_name = `PipingBox ${label}`;
+      // Same-origin id keeps this deployment a distinct installable app.
+      manifest.id = `/?deployment=${environment.toLowerCase()}`;
+
+      fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    },
+  };
+}
 
 function escapeHtmlAttr(str: string): string {
   return str
@@ -41,6 +92,7 @@ export default defineConfig(({ command }) => {
       // routes keep their trailing slash, app routes never have one.
       // Canonical route list and policy live in prerender/sitemap.js.
       pbExplicitSitemapPlugin(),
+      pbDeploymentManifestIdentity(),
       ...(blogPrerenderRoutes.length > 0
         ? vitePrerenderPlugin({
             renderTarget: '#root',

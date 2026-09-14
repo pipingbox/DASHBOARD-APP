@@ -23,51 +23,6 @@ const SATELLITE_TARGETS: Record<string, string> = {
 };
 
 const CANONICAL = 'https://pipingbox.com';
-const CANONICAL_HOST = 'pipingbox.com';
-
-/**
- * PB-PWA-IDENTITY-001: the installed app must never be confusable with another
- * deployment.
- *
- * `site.webmanifest` declares `start_url: "/"` and `scope: "/"`, both relative,
- * so the SAME manifest installs under whatever origin served it. Preview and
- * production therefore produced two installed apps with identical name, icons
- * and identity, while intentionally running different commits — an installed
- * app then shows a different version than the browser with nothing on screen
- * explaining why.
- *
- * Fix: only the canonical production host gets the manifest untouched. Any
- * other origin (preview Worker subdomain, local, ad-hoc) gets a marked name
- * and its own `id`, so the browser treats it as a separate installable app and
- * the launcher entry says which deployment it is.
- *
- * Production identity is deliberately NOT modified: no `id` is injected for the
- * canonical host, so already-installed production apps keep resolving their
- * identity from `start_url` exactly as before.
- */
-async function serveManifest(request: Request, env: Env, url: URL): Promise<Response> {
-  const response = await env.ASSETS.fetch(request);
-  if (url.hostname === CANONICAL_HOST || !response.ok) return response;
-
-  let manifest: Record<string, unknown>;
-  try {
-    manifest = await response.json();
-  } catch {
-    return response;
-  }
-
-  const label = url.hostname.endsWith('.workers.dev') ? 'Preview' : 'Non-production';
-  manifest.name = `PipingBox ${label} — do not use for production data`;
-  manifest.short_name = `PipingBox ${label}`;
-  // Same-origin id: keeps this deployment a distinct installable app.
-  manifest.id = `/?deployment=${label.toLowerCase()}`;
-
-  const headers = new Headers(response.headers);
-  headers.delete('etag');
-  headers.delete('content-length');
-  headers.set('content-type', 'application/manifest+json; charset=utf-8');
-  return new Response(JSON.stringify(manifest), { status: 200, headers });
-}
 
 /**
  * PB-SEO-102: structural route validation at the edge.
@@ -115,11 +70,6 @@ export default {
     // 1. Static files: let ASSETS serve, but never let a missing static file
     // fall back to the SPA shell.
     if (isStaticPath(pathname)) {
-      // PB-PWA-IDENTITY-001: the manifest carries the installed-app identity,
-      // so non-production origins must not hand out the production identity.
-      if (pathname === '/site.webmanifest') {
-        return serveManifest(request, env, url);
-      }
       const response = await env.ASSETS.fetch(request);
       if (
         response.status === 200 &&
