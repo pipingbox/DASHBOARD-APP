@@ -41,9 +41,16 @@ export function maskEmail(email: string): string {
 }
 
 export function isNewSignupIdentity(
-  user: { identities?: readonly unknown[] | null } | null | undefined,
+  user:
+    | { identities?: readonly unknown[] | null; created_at?: string | null }
+    | null
+    | undefined,
+  now: number = Date.now(),
 ): boolean {
-  return Array.isArray(user?.identities) && user.identities.length > 0;
+  if (!Array.isArray(user?.identities) || user.identities.length === 0) return false;
+  const createdAt = Date.parse(user.created_at ?? '');
+  if (!Number.isFinite(createdAt)) return false;
+  return Math.abs(now - createdAt) <= 30_000;
 }
 
 export function safeAuthNextPath(value: string | null | undefined): string {

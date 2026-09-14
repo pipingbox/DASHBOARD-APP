@@ -18,9 +18,28 @@ test.describe('auth confirmation flow helpers', () => {
     expect(maskEmail('invalid')).toBe('');
   });
 
-  test('uses identities only to distinguish a newly created signup', () => {
-    expect(isNewSignupIdentity({ identities: [{ provider: 'email' }] })).toBe(true);
-    expect(isNewSignupIdentity({ identities: [] })).toBe(false);
+  test('distinguishes a new signup and fails safe for ambiguous responses', () => {
+    const now = Date.parse('2026-09-14T09:00:00Z');
+    expect(
+      isNewSignupIdentity(
+        {
+          identities: [{ provider: 'email' }],
+          created_at: '2026-09-14T08:59:55Z',
+        },
+        now,
+      ),
+    ).toBe(true);
+    expect(
+      isNewSignupIdentity(
+        {
+          identities: [{ provider: 'email' }],
+          created_at: '2026-09-14T08:00:00Z',
+        },
+        now,
+      ),
+    ).toBe(false);
+    expect(isNewSignupIdentity({ identities: [{ provider: 'email' }] }, now)).toBe(false);
+    expect(isNewSignupIdentity({ identities: [] }, now)).toBe(false);
     expect(isNewSignupIdentity({})).toBe(false);
     expect(isNewSignupIdentity(null)).toBe(false);
   });
