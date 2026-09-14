@@ -19,6 +19,8 @@ import { CompanyVerificationGate } from '@/components/company/CompanyVerificatio
 import Index from './pages/Index';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import CheckEmail from './pages/CheckEmail';
+import AuthCallback from './pages/AuthCallback';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
@@ -175,6 +177,15 @@ const AppRoutes = () => {
         </GuestRoute>
       }
     />
+    <Route
+      path="/check-email"
+      element={
+        <GuestRoute>
+          <CheckEmail />
+        </GuestRoute>
+      }
+    />
+    <Route path="/auth/callback" element={<AuthCallback />} />
     <Route
       path="/forgot-password"
       element={

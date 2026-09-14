@@ -90,6 +90,8 @@ export const SPA_ROUTE_CONTRACT: RouteRule[] = [
   // ─── GUEST routes ──────────────────────────────────────────────────────────
   { pattern: '/login', visibility: 'GUEST', kind: 'EXACT' },
   { pattern: '/register', visibility: 'GUEST', kind: 'EXACT' },
+  { pattern: '/check-email', visibility: 'GUEST', kind: 'EXACT' },
+  { pattern: '/auth/callback', visibility: 'GUEST', kind: 'EXACT', note: 'Supabase email and OAuth callback' },
   { pattern: '/forgot-password', visibility: 'GUEST', kind: 'EXACT' },
   { pattern: '/reset-password', visibility: 'GUEST', kind: 'EXACT', note: 'token handled via query string' },
 

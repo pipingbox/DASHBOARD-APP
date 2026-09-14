@@ -32,6 +32,12 @@ export const OBS_EVENT_NAMES = [
   'page_viewed',
   'signup_started',
   'auth_created',
+  'signup_confirmation_required',
+  'confirmation_resend_requested',
+  'confirmation_resend_succeeded',
+  'confirmation_resend_failed',
+  'email_confirmation_completed',
+  'signin_blocked_unconfirmed',
   'onboarding_started',
   'onboarding_step_reached',
   'onboarding_completed',
@@ -47,6 +53,54 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   page_viewed: ['route', 'origin', 'locale', 'device_type'],
   signup_started: ['origin', 'account_type'],
   auth_created: ['origin', 'account_type'],
+  signup_confirmation_required: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
+  confirmation_resend_requested: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
+  confirmation_resend_succeeded: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
+  confirmation_resend_failed: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
+  email_confirmation_completed: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
+  signin_blocked_unconfirmed: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
   onboarding_started: ['account_type'],
   onboarding_step_reached: ['step', 'account_type'],
   onboarding_completed: ['account_type'],
@@ -85,6 +139,23 @@ export const OBS_INTERNAL_SDK_EVENTS = ['$web_vitals', '$identify'] as const;
 
 const ACCOUNT_TYPES = ['worker', 'company'] as const;
 const DEVICE_TYPES = ['mobile', 'tablet', 'desktop'] as const;
+const AUTH_PROVIDERS = ['email', 'google'] as const;
+const AUTH_STATUSES = [
+  'requested',
+  'succeeded',
+  'failed',
+  'blocked',
+  'created',
+  'neutral',
+  'completed',
+] as const;
+const AUTH_REASON_CODES = [
+  'email_not_confirmed',
+  'rate_limited',
+  'invalid_callback',
+  'unknown',
+] as const;
+const AUTH_ATTEMPT_BUCKETS = ['first', 'retry'] as const;
 
 // ---------------------------------------------------------------------------
 // PII guard
@@ -583,6 +654,21 @@ export function buildEventProps(
   }
   if ('device_type' in out && !DEVICE_TYPES.includes(out.device_type as never)) {
     delete out.device_type;
+  }
+  if ('provider' in out && !AUTH_PROVIDERS.includes(out.provider as never)) {
+    delete out.provider;
+  }
+  if ('status' in out && !AUTH_STATUSES.includes(out.status as never)) {
+    delete out.status;
+  }
+  if ('reason_code' in out && !AUTH_REASON_CODES.includes(out.reason_code as never)) {
+    delete out.reason_code;
+  }
+  if (
+    'attempt_bucket' in out &&
+    !AUTH_ATTEMPT_BUCKETS.includes(out.attempt_bucket as never)
+  ) {
+    delete out.attempt_bucket;
   }
   return out;
 }
