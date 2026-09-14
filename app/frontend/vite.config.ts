@@ -20,9 +20,11 @@ import { getBlogRoutes } from './prerender/blog-routes.js';
  * explaining why, and the launcher gave no way to tell them apart.
  *
  * This rewrites the built manifest when VITE_APP_ENV marks a non-production
- * deployment, adding a marked name and its own `id` so the browser treats it as
- * a separate app. Production is left byte-identical (no `id` injected), so
- * already-installed production apps keep deriving identity from `start_url`.
+ * deployment, replacing the marked name and overriding `id` so the browser
+ * treats it as a separate app. Production is left byte-identical: it keeps the
+ * canonical `id: "/"` declared in public/site.webmanifest, which equals the id
+ * a browser already derives implicitly from `start_url`, so apps installed
+ * before that field existed keep the exact same identity.
  *
  * Done at build time on purpose: the preview Worker does not set
  * `run_worker_first`, so Cloudflare serves a matching static asset without ever
