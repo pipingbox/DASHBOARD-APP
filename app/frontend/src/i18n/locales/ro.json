@@ -3346,5 +3346,8 @@
     "emailBodyLanguage": "Limbă: {{language}} ({{code}})",
     "emailBodyPage": "Pagină",
     "emailBodyHint": "Lipiți textul greșit și cum ar trebui să apară:"
+  },
+  "deploymentBadge": {
+    "label": "Implementare {{environment}} · build {{build}}"
   }
 }

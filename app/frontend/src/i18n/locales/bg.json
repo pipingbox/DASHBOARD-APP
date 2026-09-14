@@ -3340,5 +3340,8 @@
     "emailBodyLanguage": "Език: {{language}} ({{code}})",
     "emailBodyPage": "Страница",
     "emailBodyHint": "Поставете грешния текст и как трябва да бъде:"
+  },
+  "deploymentBadge": {
+    "label": "Внедряване {{environment}} · build {{build}}"
   }
 }

@@ -3352,5 +3352,8 @@
     "emailBodyLanguage": "Мова: {{language}} ({{code}})",
     "emailBodyPage": "Сторінка",
     "emailBodyHint": "Вставте помилковий текст і як має бути правильно:"
+  },
+  "deploymentBadge": {
+    "label": "Розгортання {{environment}} · build {{build}}"
   }
 }

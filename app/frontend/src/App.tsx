@@ -14,6 +14,7 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useSeo } from '@/hooks/useSeo';
 import { OnboardingGate } from '@/components/OnboardingGate';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { DeploymentBadge } from '@/components/DeploymentBadge';
 import { CompanyVerificationGate } from '@/components/company/CompanyVerificationGate';
 
 import Index from './pages/Index';
@@ -398,6 +399,7 @@ const App = () => {
                 <AppRoutes />
               </ErrorBoundary>
             </BrowserRouter>
+            <DeploymentBadge />
           </TooltipProvider>
         </AdminPreviewProvider>
       </AuthProvider>

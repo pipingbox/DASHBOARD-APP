@@ -3346,5 +3346,8 @@
     "emailBodyLanguage": "Lingua: {{language}} ({{code}})",
     "emailBodyPage": "Pagina",
     "emailBodyHint": "Incolla il testo errato e come dovrebbe essere:"
+  },
+  "deploymentBadge": {
+    "label": "Deployment {{environment}} · build {{build}}"
   }
 }

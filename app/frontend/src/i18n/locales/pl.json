@@ -3352,5 +3352,8 @@
     "emailBodyLanguage": "Język: {{language}} ({{code}})",
     "emailBodyPage": "Strona",
     "emailBodyHint": "Wklej błędny tekst i jak powinien brzmieć:"
+  },
+  "deploymentBadge": {
+    "label": "Wdrożenie {{environment}} · build {{build}}"
   }
 }

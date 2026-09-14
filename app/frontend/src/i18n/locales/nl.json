@@ -3340,5 +3340,8 @@
     "emailBodyLanguage": "Taal: {{language}} ({{code}})",
     "emailBodyPage": "Pagina",
     "emailBodyHint": "Plak de onjuiste tekst en hoe het moet zijn:"
+  },
+  "deploymentBadge": {
+    "label": "{{environment}}-implementatie · build {{build}}"
   }
 }

@@ -3340,5 +3340,8 @@
     "emailBodyLanguage": "Language: {{language}} ({{code}})",
     "emailBodyPage": "Page",
     "emailBodyHint": "Please paste the wrong text and how it should read:"
+  },
+  "deploymentBadge": {
+    "label": "{{environment}} deployment · build {{build}}"
   }
 }
