@@ -2822,7 +2822,13 @@
     "saving": "Salvataggio...",
     "finish": "Termina",
     "next": "Avanti",
-    "completeLater": "Completa più tardi →"
+    "completeLater": "Completa più tardi →",
+    "progressRestored": "✓ Avanzamento precedente ripristinato",
+    "imageError": "Sono accettate solo immagini JPG, PNG, WebP o HEIC fino a 5 MB.",
+    "photoPreviewAlt": "Anteprima della foto del profilo selezionata",
+    "heicSelected": "📷 Foto HEIC selezionata",
+    "completionFailedTitle": "Impossibile completare la configurazione",
+    "completionFailedDescription": "I tuoi dati sono stati salvati, ma la conferma finale non è stata completata. Controlla la connessione e seleziona di nuovo Fine. Se il problema persiste, potrai completare la configurazione in seguito dal tuo profilo."
   },
   "profileCard": {
     "profileCompleted": "Profilo completato",

@@ -2816,7 +2816,13 @@
     "saving": "Speichern...",
     "finish": "Abschließen",
     "next": "Weiter",
-    "completeLater": "Später vervollständigen →"
+    "completeLater": "Später vervollständigen →",
+    "progressRestored": "✓ Vorheriger Fortschritt wiederhergestellt",
+    "imageError": "Es werden nur JPG-, PNG-, WebP- oder HEIC-Bilder bis 5 MB akzeptiert.",
+    "photoPreviewAlt": "Vorschau des ausgewählten Profilfotos",
+    "heicSelected": "📷 HEIC-Foto ausgewählt",
+    "completionFailedTitle": "Die Einrichtung konnte nicht abgeschlossen werden",
+    "completionFailedDescription": "Deine Angaben wurden gespeichert, aber die abschließende Bestätigung wurde nicht abgeschlossen. Prüfe deine Verbindung und wähle erneut Abschließen. Wenn das Problem weiterhin besteht, kannst du die Einrichtung später über dein Profil beenden."
   },
   "profileCard": {
     "profileCompleted": "Profil vollständig",

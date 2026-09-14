@@ -2822,7 +2822,13 @@
     "saving": "Enregistrement...",
     "finish": "Terminer",
     "next": "Suivant",
-    "completeLater": "Compléter plus tard →"
+    "completeLater": "Compléter plus tard →",
+    "progressRestored": "✓ Progression précédente restaurée",
+    "imageError": "Seules les images JPG, PNG, WebP ou HEIC de 5 Mo maximum sont acceptées.",
+    "photoPreviewAlt": "Aperçu de la photo de profil sélectionnée",
+    "heicSelected": "📷 Photo HEIC sélectionnée",
+    "completionFailedTitle": "Impossible de terminer la configuration",
+    "completionFailedDescription": "Vos informations ont été enregistrées, mais la confirmation finale n’a pas abouti. Vérifiez votre connexion et sélectionnez de nouveau Terminer. Si le problème persiste, vous pourrez terminer la configuration plus tard depuis votre profil."
   },
   "profileCard": {
     "profileCompleted": "Profil complété",

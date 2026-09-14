@@ -2816,7 +2816,13 @@
     "saving": "Saving...",
     "finish": "Finish",
     "next": "Next",
-    "completeLater": "Complete later →"
+    "completeLater": "Complete later →",
+    "progressRestored": "✓ Previous progress restored",
+    "imageError": "Only JPG, PNG, WebP or HEIC images up to 5 MB are accepted.",
+    "photoPreviewAlt": "Selected profile photo preview",
+    "heicSelected": "📷 HEIC photo selected",
+    "completionFailedTitle": "We couldn't finish setup",
+    "completionFailedDescription": "Your details were saved, but final confirmation did not complete. Check your connection and select Finish again. If the problem continues, you can complete setup later from your profile."
   },
   "profileCard": {
     "profileCompleted": "Profile completed",

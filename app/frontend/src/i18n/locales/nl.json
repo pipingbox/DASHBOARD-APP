@@ -2816,7 +2816,13 @@
     "saving": "Opslaan...",
     "finish": "Voltooien",
     "next": "Volgende",
-    "completeLater": "Later voltooien →"
+    "completeLater": "Later voltooien →",
+    "progressRestored": "✓ Eerdere voortgang hersteld",
+    "imageError": "Alleen JPG-, PNG-, WebP- of HEIC-afbeeldingen tot 5 MB worden geaccepteerd.",
+    "photoPreviewAlt": "Voorbeeld van de geselecteerde profielfoto",
+    "heicSelected": "📷 HEIC-foto geselecteerd",
+    "completionFailedTitle": "De configuratie kon niet worden voltooid",
+    "completionFailedDescription": "Je gegevens zijn opgeslagen, maar de laatste bevestiging is niet voltooid. Controleer je verbinding en kies opnieuw Voltooien. Als het probleem aanhoudt, kun je de configuratie later vanuit je profiel afronden."
   },
   "profileCard": {
     "profileCompleted": "Profiel voltooid",

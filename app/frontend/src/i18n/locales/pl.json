@@ -2828,7 +2828,13 @@
     "saving": "Zapisywanie...",
     "finish": "Zakończ",
     "next": "Dalej",
-    "completeLater": "Uzupełnij później →"
+    "completeLater": "Uzupełnij później →",
+    "progressRestored": "✓ Przywrócono wcześniejszy postęp",
+    "imageError": "Akceptowane są tylko obrazy JPG, PNG, WebP lub HEIC o rozmiarze do 5 MB.",
+    "photoPreviewAlt": "Podgląd wybranego zdjęcia profilowego",
+    "heicSelected": "📷 Wybrano zdjęcie HEIC",
+    "completionFailedTitle": "Nie udało się zakończyć konfiguracji",
+    "completionFailedDescription": "Twoje dane zostały zapisane, ale końcowe potwierdzenie nie zostało ukończone. Sprawdź połączenie i ponownie wybierz Zakończ. Jeśli problem będzie się powtarzał, możesz dokończyć konfigurację później w swoim profilu."
   },
   "profileCard": {
     "profileCompleted": "Profil uzupełniony",

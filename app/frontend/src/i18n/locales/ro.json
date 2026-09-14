@@ -2822,7 +2822,13 @@
     "saving": "Se salvează...",
     "finish": "Finalizează",
     "next": "Următorul",
-    "completeLater": "Completează mai târziu →"
+    "completeLater": "Completează mai târziu →",
+    "progressRestored": "✓ Progresul anterior a fost restaurat",
+    "imageError": "Sunt acceptate numai imagini JPG, PNG, WebP sau HEIC de maximum 5 MB.",
+    "photoPreviewAlt": "Previzualizarea fotografiei de profil selectate",
+    "heicSelected": "📷 Fotografie HEIC selectată",
+    "completionFailedTitle": "Configurarea nu a putut fi finalizată",
+    "completionFailedDescription": "Datele tale au fost salvate, dar confirmarea finală nu s-a încheiat. Verifică conexiunea și apasă din nou pe Finalizează. Dacă problema persistă, poți termina configurarea ulterior din profil."
   },
   "profileCard": {
     "profileCompleted": "Profil completat",
