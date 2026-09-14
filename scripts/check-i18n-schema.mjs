@@ -442,6 +442,32 @@ for (const { namespace, consumers } of CONTRACTS) {
   }
 }
 
+const semanticErrors = [];
+if (resolve(locales.ro, 'common.fullName') !== 'Nume complet') {
+  semanticErrors.push('ro.json "common.fullName" must be exactly "Nume complet".');
+}
+if (resolve(locales.ro, 'auth.fullNamePlaceholder') !== 'Ioana Popescu') {
+  semanticErrors.push('ro.json "auth.fullNamePlaceholder" must remain "Ioana Popescu".');
+}
+const romanianFullNamePaths = [
+  'common.fullName',
+  'profileCompleteness.items.fullName',
+  'admin.users.fullName',
+  'adminCenter.fullName',
+  'profileCard.items.fullName',
+  'requestWorkers.placeholderFullName',
+];
+
+for (const path of romanianFullNamePaths) {
+  const value = resolve(locales.ro, path);
+  if (typeof value !== 'string' || !/\bnume(?:le)?\b/iu.test(value)) {
+    semanticErrors.push(`ro.json "${path}" must use "nume" for a person's full name.`);
+  }
+  if (typeof value === 'string' && /\bnumăr(?:ul)?\b/iu.test(value)) {
+    semanticErrors.push(`ro.json "${path}" incorrectly uses "număr" (number) for a person's name.`);
+  }
+}
+
 // ─── report ──────────────────────────────────────────────────────────────────
 
 const failed =
@@ -449,6 +475,7 @@ const failed =
   typeDrift.length > 0 ||
   empties.length > 0 ||
   contractErrors.length > 0 ||
+  semanticErrors.length > 0 ||
   collisions.length > 0 ||
   staleDebt.length > 0;
 
@@ -463,6 +490,7 @@ if (asJson) {
         empties,
         collisions,
         contractErrors,
+        semanticErrors,
         staleDebt,
         ok: !failed,
       },
@@ -488,6 +516,7 @@ if (!failed) {
     const subkeys = Object.keys(resolve(locales.en, namespace) ?? {}).length;
     console.log(`  ✓ contract "${namespace}" — ${subkeys} subkeys present in all locales`);
   }
+  console.log('  ✓ Romanian full-name semantics — "nume", never "număr"');
   console.log('\n✓ i18n schema is consistent across all locales.');
   process.exit(0);
 }
@@ -555,6 +584,12 @@ if (contractErrors.length > 0) {
   console.error('');
 }
 
+if (semanticErrors.length > 0) {
+  console.error(`  SEMANTICS — language-specific meaning (${semanticErrors.length}):`);
+  for (const error of semanticErrors) console.error(`    - ${error}`);
+  console.error('');
+}
+
 if (staleDebt.length > 0) {
   console.error(`  STALE BASELINE — debt paid but exemption left behind (${staleDebt.length}):`);
   for (const path of staleDebt.slice(0, 40)) console.error(`    ${path}`);
@@ -573,6 +608,7 @@ const total =
   empties.length +
   collisions.length +
   contractErrors.length +
+  semanticErrors.length +
   staleDebt.length;
 
 console.error(`${total} problem(s). See PB-I18N-SCHEMA-001.\n`);
