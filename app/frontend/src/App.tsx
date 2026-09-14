@@ -15,6 +15,7 @@ import { useSeo } from '@/hooks/useSeo';
 import { OnboardingGate } from '@/components/OnboardingGate';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { CompanyVerificationGate } from '@/components/company/CompanyVerificationGate';
+import { OfflineIndicator } from '@/components/OfflineIndicator';
 
 import Index from './pages/Index';
 import Login from './pages/Login';
@@ -385,6 +386,7 @@ const App = () => {
             <BrowserRouter>
               <ErrorBoundary>
                 <AppRoutes />
+                <OfflineIndicator />
               </ErrorBoundary>
             </BrowserRouter>
           </TooltipProvider>
