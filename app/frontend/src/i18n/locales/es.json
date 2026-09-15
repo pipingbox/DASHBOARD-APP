@@ -2691,7 +2691,8 @@
       "api594CheckValve": "Clases según API 594 para válvulas de retención wafer, lug, bridadas y a tope. Las Clases 150, 300, 600, 900, 1500 y 2500 corresponden a ASME B16.34; API 594 admite además las Clases 125 y 250 de ASME B16.1 (hierro fundido), no incluidas aquí porque este registro declara extremos bridados de acero. Verificar contra la edición vigente de la norma.",
       "api600GateValve": "Clases según API 600 para válvulas de compuerta de bonete atornillado, extremos bridados o a tope. Las clases coinciden con las de brida ASME B16.5 / B16.34. Verificar contra la edición vigente de la norma.",
       "api602CompactValve": "Clases según API 602 para válvulas compactas NPS 4 y menores. La Clase 800 no es una clase listada en ASME B16.34: es una clase intermedia de uso extendido para extremos roscados y soldados, y no existe en versión bridada. La clase disponible depende del tipo de extremo. Verificar contra la edición vigente de la norma.",
-      "yStrainerNoStandard": "El filtro en Y no está cubierto por una norma dimensional específica en este catálogo. Los fabricantes lo suministran habitualmente con extremos bridados según ASME B16.5, por lo que la clase la fija la brida del modelo concreto. Aquí no se lista ninguna clase porque no existe una norma verificable que la defina."
+      "yStrainerNoStandard": "El filtro en Y no está cubierto por una norma dimensional específica en este catálogo. Los fabricantes lo suministran habitualmente con extremos bridados según ASME B16.5, por lo que la clase la fija la brida del modelo concreto. Aquí no se lista ninguna clase porque no existe una norma verificable que la defina.",
+      "noPressureClass": "Los laterales no se designan por clase de presión. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula según el código de diseño aplicable (p. ej. ASME B31.3). Verifique las dimensiones con el fabricante para el schedule aplicable."
     }
   }
 }

@@ -2292,8 +2292,8 @@
     {
       "id": "PB-COMP-LATERAL-45-BW-ASME-B16-9",
       "slug": "lateral-45-bw-asme-b16-9",
-      "name": "Lateral 45° Butt Weld ASME B16.9",
-      "shortName": "Lateral 45° Butt Weld ASME B16.9",
+      "name": "Lateral 45° Butt Weld",
+      "shortName": "Lateral 45° Butt Weld",
       "description": "45-degree lateral with butt weld ends. Provides a branch connection at 45 degrees from the run axis. Used where lower turbulence at the branch junction is desired compared to a 90-degree tee.",
       "status": "approved",
       "version": "0.1",
@@ -2317,18 +2317,18 @@
       ],
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
-      "ratingNote": "ASME B16.9 fittings are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). The standard covers fittings of any producible wall thickness.",
-      "ratingNoteKey": "catalog.ratingNote.b16_9NoPressureClass",
+      "ratingNote": "Laterals are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). Verify dimensions with the manufacturer for the applicable schedule.",
+      "ratingNoteKey": "catalog.ratingNote.noPressureClass",
       "standards": [
         {
-          "standardId": "PB-STD-ASME-B16-9",
+          "standardId": "PB-STD-MANUFACTURER-GENERIC",
           "role": "dimensions",
-          "note": "Per ASME standard."
+          "note": "Dimensions from manufacturer cross-reference. Fabricated laterals fall outside the dimensional scope of ASME B16.9."
         },
         {
           "standardId": "PB-STD-ASME-B16-25",
           "role": "dimensions",
-          "note": "Per ASME standard."
+          "note": "Butt weld end preparation only."
         }
       ],
       "dimensionSets": [
@@ -5534,11 +5534,11 @@
     "PB-STD-MANUFACTURER-GENERIC": {
       "id": "PB-STD-MANUFACTURER-GENERIC",
       "organization": "OTHER",
-      "code": "MANUFACTURER-GENERIC",
-      "title": "Generic Manufacturer Standard (Placeholder)",
+      "code": "Cross-Reference",
+      "title": "Manufacturer Data (Cross-Reference)",
       "edition": "N/A",
       "status": "active",
-      "scope": "Placeholder standard for components that follow general industry practice but are not covered by a specific normative standard. Used when no ASME/API/MSS standard directly applies.",
+      "scope": "Non-normative placeholder for components whose dimensional data comes from manufacturer cross-reference rather than a specific ASME/API/MSS standard. Data shown under this reference is CROSS_REFERENCE provenance and must not be presented as verified against a primary standard.",
       "roles": [
         "dimensions"
       ],
@@ -5546,7 +5546,8 @@
         "y_strainer",
         "basket_strainer",
         "sight_glass",
-        "expansion_joint"
+        "expansion_joint",
+        "lateral"
       ]
     },
     "PB-STD-MSS-SP-95": {
@@ -8103,7 +8104,7 @@
     "PB-DIM-ASME-B16-9-LATERAL-45": {
       "id": "PB-DIM-ASME-B16-9-LATERAL-45",
       "componentId": "PB-COMP-LATERAL-45-BW-ASME-B16-9",
-      "standardId": "PB-STD-ASME-B16-9",
+      "standardId": "PB-STD-MANUFACTURER-GENERIC",
       "system": "mixed",
       "selectors": [
         {

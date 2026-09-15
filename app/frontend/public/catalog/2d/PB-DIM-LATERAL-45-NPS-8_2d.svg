@@ -28,7 +28,7 @@
   <!-- TITLE -->
   <text x="40" y="40" class="title">45° Lateral</text>
   <text x="40" y="60" class="subtitle">NPS 8 (DN 200) — Butt Weld Ends</text>
-  <text x="40" y="78" class="std-ref">ASME B16.9-2018 | Branch at 45° to run</text>
+  <text x="40" y="78" class="std-ref">Manufacturer cross-reference data | Branch at 45° to run</text>
 
   <!-- RUN PIPE (horizontal) -->
   <rect x="130" y="345" width="380" height="110" class="profile"/>
@@ -91,7 +91,7 @@
 
   <!-- NOTES -->
   <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width="0.5"/>
-  <text x="40" y="652" class="note">Dimensions per ASME B16.9-2018.</text>
+  <text x="40" y="652" class="note">Dimensions from manufacturer cross-reference (not dimensioned by ASME B16.9; fabricated laterals fall outside its scope).</text>
   <text x="40" y="666" class="note">C = run center-to-end. M = branch center-to-end (along branch axis). D = outside diameter.</text>
   <text x="40" y="680" class="note">Branch at 45° to run axis. All dimensions in inches and millimeters.</text>
   <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
@@ -111,7 +111,7 @@
   <text x="560" y="233" class="note" text-anchor="start" fill="#555">Branch angle</text>
   <text x="735" y="233" class="note" text-anchor="end">45°</text>
   <text x="560" y="250" class="note" text-anchor="start" fill="#555">Standard</text>
-  <text x="735" y="250" class="note" text-anchor="end">ASME B16.9-2018</text>
+  <text x="735" y="250" class="note" text-anchor="end">Cross-reference/text>
   <text x="560" y="267" class="note" text-anchor="start" fill="#555">End type</text>
   <text x="735" y="267" class="note" text-anchor="end">Butt Weld (BW)</text>
 
