@@ -60,7 +60,7 @@ import { createRequire } from 'node:module';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const APP_ROOT = resolve(__dirname, '..');
-const BRAIN_ROOT = resolve(APP_ROOT, '..');
+const BRAIN_ROOT = process.env.BRAIN_ROOT ? resolve(process.env.BRAIN_ROOT) : resolve(APP_ROOT, '..');
 const STL_DIR = join(BRAIN_ROOT, 'brain', '07-DESIGN', '02-ASSETS', 'CAD_REFERENCE');
 const OUT_DIR_DEFAULT = join(APP_ROOT, 'app', 'frontend', 'public', 'catalog', '3d');
 
@@ -154,31 +154,14 @@ const SIZE_SUFFIX = /_(\d+(?:x\d+)?)in$/;
  *
  * Para volver a incluir uno, basta con borrar su entrada de esta tabla una vez
  * el STL este regenerado y verificado.
+ *
+ * 2026-09-15 (PB-LIBRARY-COMPLETE-001, remediacion visual BW): las tres
+ * entradas originales (return_180_lr, return_180_sr, lateral_45) se retiraron
+ * tras sustituir las mallas por geometria analitica exacta derivada de los
+ * datasets B16.9 gateados (ver 13_BW_VISUAL_QA_MATRIX.md en el Brain). La
+ * evidencia de los defectos originales queda preservada en el historial git.
  */
-const EXCLUDED_STL = new Map([
-  [
-    'return_180_lr_4in.stl',
-    // No es la pieza: bounding box 10.3 x 102.3 x 102.2 mm con 900 triangulos.
-    // Es una lamina plana (un disco), no un tubo curvado 180 grados de radio
-    // 1.5 x NPS. Afecta a PB-COMP-RETURN-180-LR-BW-ASME-B16-9.
-    'geometria incorrecta: lamina plana 10x102x102 mm, no es una curva de retorno',
-  ],
-  [
-    'return_180_sr_4in.stl',
-    // 47 aristas non-manifold (soldando vertices a 1e-4 de la diagonal) y 7683
-    // pares de triangulos no adyacentes que se autointersecan. Normales
-    // incoherentes y superficies que se atraviesan.
-    // Afecta a PB-COMP-RETURN-180-SR-BW-ASME-B16-9.
-    'malla corrupta: 47 aristas non-manifold y autointerseccion masiva',
-  ],
-  [
-    'lateral_45_4in.stl',
-    // 101 aristas abiertas (agujeros reales en la superficie) y 6815 pares de
-    // triangulos autointersecantes en la union del ramal con el run.
-    // Afecta a PB-COMP-LATERAL-45-BW-ASME-B16-9.
-    'malla abierta: 101 aristas abiertas, agujeros reales en la superficie',
-  ],
-]);
+const EXCLUDED_STL = new Map([]);
 
 
 function stlSlug(filename) {
@@ -1003,7 +986,14 @@ function buildCamera(bounds, cfg, pca) {
   const planarRatio = x2 / Math.max(x1, 1e-6);
   const planarRatio0 = x2 / Math.max(x0, 1e-6);
   const revolution = Math.abs(x1 - x2) < Math.max(x1, x2) * 0.12;
-  if (!isFlat && !revolution && planarRatio < 0.72 && planarRatio0 < 0.55) {
+  // A 45° LR elbow is a valid planar elbow even though its CLR makes the
+  // second planar extent almost equal to the tube diameter (x2/x1 ~= 0.75).
+  // The old threshold therefore classified it as a short/revolution-like
+  // piece and aimed the camera at the mouth. Keep the generic guard, but add
+  // the geometry-derived long-planar case; no component name or asset ID is
+  // used here, and no STL/data is changed.
+  const longPlanarElbow = planarRatio0 < 0.48 && planarRatio < 0.82;
+  if (!isFlat && !revolution && (planarRatio < 0.72 || longPlanarElbow) && planarRatio0 < 0.55) {
     // Mirar mayoritariamente a lo largo de la normal del plano, inclinando algo
     // sobre los ejes del plano para que no sea una vista ortogonal plana.
     toEye = normalize([
