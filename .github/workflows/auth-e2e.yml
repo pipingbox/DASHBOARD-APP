@@ -30,7 +30,11 @@ on:
       target_url:
         description: 'Deployed origin to test'
         required: true
-        default: 'https://app.pipingbox.com'
+        # Canonical origin. A manual dispatch used to default to
+        # app.pipingbox.com, which only reaches production through the
+        # PB-WEB-007 301, so a hand-run gate silently measured the legacy hop
+        # instead of the origin users actually land on.
+        default: 'https://pipingbox.com'
         type: string
       source_ref:
         description: 'Exact app commit/ref whose E2E tests must be executed'
