@@ -1445,7 +1445,7 @@ function frameFromDir(bounds, cfg, toEye) {
  * hace por proyeccion real y no por radio, todas las piezas salen con un tamano
  * visual coherente independientemente de su forma.
  */
-function buildCamera(bounds, cfg, pca) {
+function buildCamera(bounds, cfg, pca, forcedToEye = null) {
   const cx = (bounds.minX + bounds.maxX) / 2;
   const cy = (bounds.minY + bounds.maxY) / 2;
   const cz = (bounds.minZ + bounds.maxZ) / 2;
@@ -1521,6 +1521,7 @@ function buildCamera(bounds, cfg, pca) {
       e2[2] * 0.86 + e0[2] * 0.20 + e1[2] * 0.34,
     ]);
   }
+  if (forcedToEye) toEye = normalize(forcedToEye);
 
   // Garantia dura contra la vista axial.
   //
@@ -2138,10 +2139,22 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     catalogViewDir = normalize([0.20, 0.90, 0.42]);
   } else if (pose?.kind === 'revolution-ecc') {
     catalogViewDir = normalize([0.30, -0.90, 0.32]);
+  } else if (pose?.kind === 'elbow' && (
+    stlPath.includes('elbow_90_lr') ||
+    stlPath.includes('elbow_45_lr')
+  )) {
+    catalogViewDir = normalize([0.78, -0.40, 0.46]);
   }
   const cam = pose
     ? frameFromDir(bounds, cfg, catalogViewDir)
-    : buildCamera(bounds, cfg, principalAxes(geo, triCount));
+    : buildCamera(
+      bounds,
+      cfg,
+      principalAxes(geo, triCount),
+      stlPath.includes('elbow_45_lr')
+        ? [0.78, -0.40, 0.46]
+        : null,
+    );
   const gbuf = rasterize({ positions: geo, normals, triCount }, cam, R, R);
   const shaded = shade(gbuf, cam, mips, noise, bounds, R, R, cfg);
   const rgb = composite(shaded, gbuf, R, R, cfg);
