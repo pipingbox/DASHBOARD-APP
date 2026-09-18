@@ -1267,6 +1267,16 @@ function canonicalPose(info, positions, triCount) {
       // La boca mayor va a -X (convencion de catalogo).
       if (mouths[pair.i].radius < mouths[pair.j].radius * 0.999) b0 = v3.neg(b0);
 
+      // An eccentric reducer is identified by the transverse displacement of
+      // its small-end mouth relative to the large-end mouth. This is more
+      // reliable than the radial-normal bias for low-resolution meshes, where
+      // the wall contribution can cancel the actual offset.
+      const large = mouths[pair.i].radius >= mouths[pair.j].radius ? mouths[pair.i] : mouths[pair.j];
+      const small = large === mouths[pair.i] ? mouths[pair.j] : mouths[pair.i];
+      const mouthDelta = v3.sub(small.centroid, large.centroid);
+      const mouthOffset = v3.sub(mouthDelta, v3.scale(b0, v3.dot(mouthDelta, b0)));
+      const isEccentricByMouthCenter = v3.len(mouthOffset) > Math.max(0.5, small.radius * 0.05);
+
       // Roll: solo se fuerza si hay excentricidad real (suma de direcciones
       // radiales claramente sesgada). En piezas de revolucion puras el roll es
       // arbitrario y se deja al referencial fijo, igual para todas.
@@ -1290,9 +1300,11 @@ function canonicalPose(info, positions, triCount) {
       const bias = [sx, sy, sz];
       const biasPerp = v3.sub(bias, v3.scale(b0, v3.dot(bias, b0)));
       kind = 'revolution';
-      if (v3.len(biasPerp) > n * 3 * 0.04) {
+      if (isEccentricByMouthCenter || v3.len(biasPerp) > n * 3 * 0.04) {
         // Excentrica: la cara plana (mayor acumulacion radial) hacia -Y.
-        b1 = v3.neg(v3.unit(biasPerp));
+        b1 = isEccentricByMouthCenter
+          ? v3.neg(v3.unit(mouthOffset))
+          : v3.neg(v3.unit(biasPerp));
         kind = 'revolution-ecc';
       } else {
         b1 = anyPerp(b0);
@@ -2114,12 +2126,19 @@ async function renderPiece(stlPath, cfg, mips, noise) {
   const { normals, bounds } = computeSmoothNormals(geo, triCount, cfg.smoothAngleDeg);
 
   const R = cfg.size * cfg.ss;
-  // The tee/cross family reads best from the original three-quarter angle.
-  // LATERAL-45 is the exception: its single branch needs the opposite side
-  // so the branch opening is not occluded by the run.
-  const catalogViewDir = pose?.kind === 'branch' && stlPath.includes('lateral_45')
-    ? normalize([0.20, 0.90, 0.42])
-    : cfg.catalogViewDir;
+  // The tee/cross family reads best from a branch-facing three-quarter angle:
+  // the run remains legible, while the branch bore is visible enough to
+  // distinguish equal from reducing tees. LATERAL-45 keeps its established
+  // opposite-side view. The eccentric reducer gets a dedicated side view so
+  // the offset small-end bore is not hidden behind the concentric silhouette.
+  let catalogViewDir = cfg.catalogViewDir;
+  if (pose?.kind === 'branch' && stlPath.includes('tee_')) {
+    catalogViewDir = normalize([-0.24, -0.88, 0.42]);
+  } else if (pose?.kind === 'branch' && stlPath.includes('lateral_45')) {
+    catalogViewDir = normalize([0.20, 0.90, 0.42]);
+  } else if (pose?.kind === 'revolution-ecc') {
+    catalogViewDir = normalize([0.30, -0.90, 0.32]);
+  }
   const cam = pose
     ? frameFromDir(bounds, cfg, catalogViewDir)
     : buildCamera(bounds, cfg, principalAxes(geo, triCount));
