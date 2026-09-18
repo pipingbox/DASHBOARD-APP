@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Loader2, Plus } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
@@ -49,6 +50,7 @@ export function CreatePostDialog({
   onCreated,
   trigger,
 }: CreatePostDialogProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(empty(defaultChannelId));
@@ -76,14 +78,14 @@ export function CreatePostDialog({
 
   const validate = () => {
     const next: Partial<Record<keyof FormState, string>> = {};
-    if (!form.channel_id) next.channel_id = 'Pick a channel';
+    if (!form.channel_id) next.channel_id = t('community.createPost.validation.pickChannel');
     if (!form.title.trim() || form.title.trim().length < 4) {
-      next.title = 'Title must be at least 4 characters';
+      next.title = t('community.createPost.validation.titleMin');
     } else if (form.title.length > 160) {
-      next.title = 'Title is too long (max 160)';
+      next.title = t('community.createPost.validation.titleMax');
     }
     if (!form.body.trim() || form.body.trim().length < 8) {
-      next.body = 'Post body must be at least 8 characters';
+      next.body = t('community.createPost.validation.bodyMin');
     }
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -96,13 +98,13 @@ export function CreatePostDialog({
     setSubmitError(null);
 
     if (!user) {
-      const msg = 'You must be signed in to post';
+      const msg = t('community.createPost.mustBeSignedIn');
       setSubmitError(msg);
       toast.error(msg);
       return;
     }
     if (!validate()) {
-      toast.error('Please fix the highlighted fields');
+      toast.error(t('common.fixHighlightedFields'));
       return;
     }
 
@@ -117,10 +119,10 @@ export function CreatePostDialog({
       const session = sessionData?.session;
       if (!session || !session.user) {
         const msg =
-          'Your session has expired. Please sign out and sign in again, then retry.';
+          t('community.createPost.sessionExpired');
         console.error('[CreatePost] No active session found', { sessionData });
         setSubmitError(msg);
-        toast.error('Not signed in', { description: msg });
+        toast.error(t('community.notSignedIn'), { description: msg });
         return;
       }
 
@@ -170,24 +172,24 @@ export function CreatePostDialog({
         });
         const description =
           error?.message ||
-          'The server rejected the insert. Please try again or contact support.';
+          t('community.createPost.serverRejected');
         setSubmitError(description);
-        toast.error('Failed to create post', { description });
+        toast.error(t('community.failedToCreatePost'), { description });
         return;
       }
 
       // 4. Success — confirm, close, hand back to parent for refresh/navigation.
       const ch = channelsById.get(data.channel_id);
-      toast.success('Post published');
+      toast.success(t('community.postPublished'));
       setSubmitError(null);
       setOpen(false);
       onCreated?.({ id: data.id, channelSlug: ch?.slug ?? '' });
     } catch (err) {
       console.error('[CreatePost] unexpected error', err);
       const description =
-        err instanceof Error ? err.message : 'Unexpected error. Please try again.';
+        err instanceof Error ? err.message : t('common.unexpectedError');
       setSubmitError(description);
-      toast.error('Failed to create post', { description });
+      toast.error(t('community.failedToCreatePost'), { description });
     } finally {
       setSubmitting(false);
     }
@@ -209,11 +211,11 @@ export function CreatePostDialog({
       >
         <SheetHeader className="space-y-1">
           <p className="text-[10px] uppercase tracking-[0.25em] text-[#f59e0b]">
-            Community
+            {t('community.createPost.eyebrow')}
           </p>
-          <SheetTitle className="text-zinc-100">Create a new post</SheetTitle>
+          <SheetTitle className="text-zinc-100">{t('community.createPost.title')}</SheetTitle>
           <SheetDescription className="text-zinc-500">
-            Share a question, a tip or a shop-floor story with the PipingBox community.
+            {t('community.createPost.description')}
           </SheetDescription>
         </SheetHeader>
 
@@ -231,7 +233,7 @@ export function CreatePostDialog({
           )}
           <div className="space-y-2">
             <Label htmlFor="channel" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-              Channel <span className="text-[#f59e0b]">*</span>
+              {t('community.createPost.channel')} <span className="text-[#f59e0b]">*</span>
             </Label>
             <select
               id="channel"
@@ -239,7 +241,7 @@ export function CreatePostDialog({
               onChange={(e) => update('channel_id', e.target.value)}
               className="flex h-9 w-full border border-zinc-800 bg-zinc-950 px-3 py-1 text-sm text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#f59e0b]"
             >
-              <option value="">— Select a channel —</option>
+              <option value="">{t('community.createPost.selectChannel')}</option>
               {channels.map((c) => (
                 <option key={c.id} value={c.id}>
                   #{c.slug} · {c.name}
@@ -253,11 +255,11 @@ export function CreatePostDialog({
 
           <div className="space-y-2">
             <Label htmlFor="title" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-              Title <span className="text-[#f59e0b]">*</span>
+              {t('community.createPost.postTitle')} <span className="text-[#f59e0b]">*</span>
             </Label>
             <Input
               id="title"
-              placeholder="e.g. Best purge setup for DSS TIG root?"
+              placeholder={t('community.createPost.titlePlaceholder')}
               value={form.title}
               onChange={(e) => update('title', e.target.value)}
               maxLength={200}
@@ -268,11 +270,11 @@ export function CreatePostDialog({
 
           <div className="space-y-2">
             <Label htmlFor="body" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-              Body <span className="text-[#f59e0b]">*</span>
+              {t('community.createPost.body')} <span className="text-[#f59e0b]">*</span>
             </Label>
             <Textarea
               id="body"
-              placeholder="Share the details — what you tried, what went wrong, what worked…"
+              placeholder={t('community.createPost.bodyPlaceholder')}
               rows={8}
               value={form.body}
               onChange={(e) => update('body', e.target.value)}
@@ -283,11 +285,11 @@ export function CreatePostDialog({
 
           <div className="space-y-2">
             <Label htmlFor="location" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-              Location (optional)
+              {t('community.createPost.locationOptional')}
             </Label>
             <Input
               id="location"
-              placeholder="Antwerp, Belgium"
+              placeholder={t('community.createPost.locationPlaceholder')}
               value={form.location}
               onChange={(e) => update('location', e.target.value)}
               className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-[#f59e0b]"
@@ -299,7 +301,7 @@ export function CreatePostDialog({
 
           <div className="space-y-2">
             <Label htmlFor="tags" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-              Tags (optional)
+              {t('community.createPost.tagsOptional')}
             </Label>
             <Input
               id="tags"
@@ -315,7 +317,7 @@ export function CreatePostDialog({
 
           <div className="space-y-2">
             <Label htmlFor="attachment" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-              Attachment URL (optional)
+              {t('community.createPost.attachmentOptional')}
             </Label>
             <Input
               id="attachment"
@@ -338,7 +340,7 @@ export function CreatePostDialog({
               onClick={() => setOpen(false)}
               disabled={submitting}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               type="submit"
@@ -348,10 +350,10 @@ export function CreatePostDialog({
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Publishing…
+                  {t('community.createPost.publishing')}
                 </>
               ) : (
-                'Publish post'
+                t('community.createPost.publish')
               )}
             </Button>
           </SheetFooter>

@@ -18,6 +18,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { AcademyIntro } from '@/components/academy/AcademyIntro';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
+import { localizedCourse } from '@/lib/academy/courseI18n';
 
 interface Course {
   id: string;
@@ -193,7 +194,7 @@ export default function Academy() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search courses..."
+            placeholder={t('academy.searchPlaceholder')}
             className="h-7 w-[200px] bg-transparent text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none"
           />
         </div>
@@ -293,11 +294,11 @@ export default function Academy() {
                   </div>
 
                   <h3 className="text-sm font-semibold text-zinc-100 group-hover:text-[#f59e0b] transition-colors">
-                    {course.title}
+                    {localizedCourse(t, course).title}
                   </h3>
 
                   <p className="text-[11px] text-zinc-500 line-clamp-2">
-                    {course.description}
+                    {localizedCourse(t, course).description}
                   </p>
 
                   <div className="flex items-center justify-between pt-1 text-[10px] text-zinc-600">

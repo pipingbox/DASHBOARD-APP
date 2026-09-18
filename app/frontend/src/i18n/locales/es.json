@@ -48,7 +48,11 @@
     "loadFailed": "Error al cargar los datos.",
     "unexpectedError": "Ocurrió un error inesperado",
     "sending": "Enviando...",
-    "download": "Descargar"
+    "download": "Descargar",
+    "saveError": "Error al guardar",
+    "saved": "Guardado",
+    "fixHighlightedFields": "Corrija los campos resaltados",
+    "sessionNotFound": "No se encontró la sesión de usuario. Inicie sesión de nuevo."
   },
   "nav": {
     "dashboard": "Panel",
@@ -79,7 +83,12 @@
     "viewAs": "Ver como",
     "previewMode": "MODO VISTA PREVIA",
     "viewingAs": "Viendo como",
-    "exitPreview": "Salir de vista previa"
+    "exitPreview": "Salir de vista previa",
+    "companyBilling": "Facturación / Planes",
+    "companyDocumentation": "Gestión Documental Industrial",
+    "companySection": "Empresa",
+    "companySettings": "Configuración",
+    "companyWorkspace": "Entorno Empresa"
   },
   "notifications": {
     "title": "Notificaciones",
@@ -99,7 +108,10 @@
     "documentRequest": "Se ha solicitado un documento tuyo.",
     "certificateExpiring": "Uno de tus certificados está por vencer.",
     "adminAlert": "Alerta de administrador recibida.",
-    "feedbackResolved": "Hemos revisado y marcado como resuelto tu reporte. Gracias por ayudarnos a mejorar PipingBox."
+    "feedbackResolved": "Hemos revisado y marcado como resuelto tu reporte. Gracias por ayudarnos a mejorar PipingBox.",
+    "jobMatch": "Nueva coincidencia de empleo",
+    "productUpdate": "Nueva función disponible",
+    "workforceInvitation": "Nueva oportunidad de trabajo"
   },
   "dashboard": {
     "overview": "Resumen",
@@ -230,7 +242,37 @@
     "passwordWeak": "Débil — agrega más caracteres",
     "passwordFair": "Regular — sigue así",
     "passwordGood": "Buena — buen trabajo",
-    "passwordStrong": "¡Fuerte — excelente!"
+    "passwordStrong": "¡Fuerte — excelente!",
+    "registrationCompleted": "Registro completado",
+    "accountCreatedTitle": "Tu cuenta se ha creado correctamente",
+    "accountCreatedDescription": "Confirma tu correo electrónico para poder iniciar sesión en PipingBox.",
+    "checkEmailTitle": "Revisa tu correo para continuar",
+    "checkEmailDescription": "Si esta dirección está pendiente de confirmación, recibirás un enlace para completar el registro.",
+    "confirmationSentTo": "Hemos enviado un enlace de confirmación a {{email}}.",
+    "confirmationCheckSpam": "Revisa también las carpetas de spam o correo no deseado.",
+    "waitingForConfirmation": "Esperando confirmación",
+    "openEmail": "Abrir mi correo",
+    "resendConfirmation": "Reenviar correo de confirmación",
+    "resendCountdown": "Reenviar en {{seconds}} s",
+    "alreadyConfirmed": "Ya he confirmado mi correo",
+    "changeEmail": "Cambiar dirección de correo",
+    "confirmationResent": "Te hemos enviado un nuevo enlace de confirmación.",
+    "confirmationResendNeutral": "Si la dirección es válida y está pendiente de confirmación, recibirás un nuevo correo en unos minutos.",
+    "confirmationRateLimited": "Espera unos minutos antes de solicitar otro correo.",
+    "confirmationSignInRequired": "Inicia sesión después de confirmar tu correo.",
+    "emailUnconfirmedTitle": "Correo no confirmado",
+    "emailUnconfirmedDescription": "Tu correo todavía no está confirmado. Revisa tu bandeja de entrada o solicita un nuevo enlace.",
+    "confirmationSuccessTitle": "Correo confirmado",
+    "confirmationSuccessDescription": "Correo confirmado. Ahora vamos a preparar tu perfil profesional.",
+    "oauthSuccessTitle": "Acceso con Google completado",
+    "oauthSuccessDescription": "Google ha verificado tu correo. Ahora vamos a preparar tu perfil.",
+    "authCallbackProcessing": "Completando el acceso",
+    "authCallbackProcessingDesc": "Espera mientras verificamos tu sesión.",
+    "authCallbackErrorTitle": "No hemos podido completar el acceso",
+    "authCallbackErrorDescription": "Este enlace puede no ser válido o haber caducado. Solicita otro correo o vuelve a iniciar sesión.",
+    "authGenericError": "No hemos podido crear tu cuenta. Inténtalo de nuevo.",
+    "signInError": "No hemos podido iniciar sesión. Revisa tus datos e inténtalo de nuevo.",
+    "oauthStartError": "No hemos podido iniciar el acceso con Google. Inténtalo de nuevo."
   },
   "community": {
     "title": "PipingBox Community",
@@ -312,7 +354,36 @@
     "sortTop": "Destacados",
     "postedBy": "Publicado por {{name}} · {{time}}",
     "channel": "Canal",
-    "post": "Publicación"
+    "post": "Publicación",
+    "notSignedIn": "Sesión no iniciada",
+    "failedToCreatePost": "No se pudo crear la publicación",
+    "postPublished": "Publicación publicada",
+    "createPost": {
+      "eyebrow": "Comunidad",
+      "title": "Crear una nueva publicación",
+      "description": "Comparta una pregunta, un consejo o una anécdota de obra con la comunidad de PipingBox.",
+      "channel": "Canal",
+      "postTitle": "Título",
+      "body": "Contenido",
+      "locationOptional": "Ubicación (opcional)",
+      "tagsOptional": "Etiquetas (opcional)",
+      "attachmentOptional": "URL del adjunto (opcional)",
+      "selectChannel": "— Seleccione un canal —",
+      "titlePlaceholder": "p. ej. ¿Mejor configuración de purga para raíz TIG en DSS?",
+      "bodyPlaceholder": "Comparta los detalles: qué probó, qué salió mal, qué funcionó…",
+      "locationPlaceholder": "Amberes, Bélgica",
+      "publish": "Publicar",
+      "publishing": "Publicando…",
+      "mustBeSignedIn": "Debe iniciar sesión para publicar",
+      "sessionExpired": "Su sesión ha expirado. Cierre sesión, vuelva a iniciarla e inténtelo de nuevo.",
+      "serverRejected": "El servidor rechazó la inserción. Inténtelo de nuevo o contacte con soporte.",
+      "validation": {
+        "pickChannel": "Seleccione un canal",
+        "titleMin": "El título debe tener al menos 4 caracteres",
+        "titleMax": "El título es demasiado largo (máx. 160)",
+        "bodyMin": "El contenido debe tener al menos 8 caracteres"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Profile / CV",
@@ -373,8 +444,57 @@
       "fileUploaded": "Archivo subido",
       "filePdfOrImage": "Sube un archivo PDF o imagen",
       "fileUnder10": "El archivo debe ser menor de 10MB",
-      "nameIssuerRequired": "El nombre y la entidad emisora son obligatorios"
-    }
+      "nameIssuerRequired": "El nombre y la entidad emisora son obligatorios",
+      "viewFileDenied": "Acceso denegado"
+    },
+    "country": "País",
+    "emailJobAlerts": "Alertas por email",
+    "emailJobAlertsHint": "Enviar oportunidades coincidentes por email",
+    "jobMatchingEnabled": "Matching de empleo",
+    "jobMatchingEnabledHint": "Recibir oportunidades de empleos publicados",
+    "matchReadyTitle": "Completa tu perfil para recibir coincidencias de empleo más precisas.",
+    "matchingPreferencesSaved": "Preferencias guardadas",
+    "matchingPreferencesTitle": "Preferencias de Empleo y Matching",
+    "otpCode": "Código de verificación",
+    "otpInvalid": "Introduce el código de 6 dígitos",
+    "otpSendFailed": "Error al enviar el código",
+    "otpSent": "Código de verificación enviado",
+    "otpVerifyFailed": "Error al verificar el código",
+    "phoneInvalid": "Introduce un número de teléfono válido",
+    "phoneNumber": "Número de teléfono",
+    "phonePlaceholder": "612 345 678",
+    "phoneRemoved": "Teléfono y consentimiento eliminados",
+    "phoneVerificationTitle": "Verificación de Teléfono",
+    "phoneVerified": "Teléfono verificado",
+    "phoneVerifiedLabel": "Verificado",
+    "removePhone": "Eliminar teléfono / retirar consentimiento",
+    "saveError": "Error al guardar el perfil: ",
+    "saveMatchingPreferences": "Guardar preferencias",
+    "sendOtp": "Enviar código de verificación",
+    "sendingOtp": "Enviando...",
+    "verifyOtp": "Verificar",
+    "verifyPhoneFirst": "Verifica primero tu teléfono",
+    "verifying": "Verificando...",
+    "whatsappJobAlerts": "Alertas por WhatsApp",
+    "whatsappJobAlertsHint": "Enviar oportunidades coincidentes por WhatsApp",
+    "whatsappOptIn": "Alertas de empleo por WhatsApp",
+    "whatsappOptInHint": "Permitir que PipingBox me contacte por WhatsApp",
+    "workforceInvitationsEnabled": "Invitaciones de trabajo",
+    "workforceInvitationsEnabledHint": "Recibir invitaciones a proyectos gestionados por PipingBox",
+    "avatarHeicNotice": "Foto HEIC detectada. Se subirá correctamente, pero la vista previa puede no funcionar en todos los navegadores.",
+    "avatarUpdated": "Foto de perfil actualizada",
+    "avatarRemoved": "Foto de perfil eliminada",
+    "avatarInvalidType": "Solo se aceptan imágenes JPG, PNG, WebP o HEIC",
+    "avatarSaveFailed": "No se pudo guardar el avatar en el perfil",
+    "avatarRemoveFailed": "No se pudo eliminar el avatar",
+    "avatarVisibilityFailed": "No se pudo actualizar la visibilidad",
+    "avatarNowVisible": "La foto ahora es visible",
+    "avatarNowHidden": "La foto ahora está oculta",
+    "avatarUploading": "Subiendo…",
+    "avatarChange": "Cambiar foto",
+    "avatarUpload": "Subir foto",
+    "avatarHide": "Ocultar foto",
+    "avatarShow": "Mostrar foto"
   },
   "academy": {
     "eyebrow": "Academy",
@@ -612,7 +732,8 @@
         "title": "Empieza por lo que ya está disponible",
         "subtitle": "El catálogo se construye con profesionales del sector. Todo lo que aparece abajo está activo y disponible ahora.",
         "count_one": "{{count}} curso",
-        "count_other": "{{count}} cursos"
+        "count_other": "{{count}} cursos",
+        "count_many": "{{count}} cursos"
       }
     },
     "questionTypeMultipleChoice": "Selecciona todas las respuestas correctas",
@@ -645,7 +766,190 @@
     "examYourOrder": "Tu orden",
     "examCorrectOrder": "Orden correcto",
     "examCorrectStatement": "Correcto: {{answer}}",
-    "examYourStatement": "Tu respuesta: {{answer}}"
+    "examYourStatement": "Tu respuesta: {{answer}}",
+    "questions": "preguntas",
+    "searchPlaceholder": "Buscar cursos...",
+    "course": {
+      "notFound": "Curso no encontrado.",
+      "lessonNotFound": "Lección no encontrada.",
+      "premiumPrice": "Premium · {{price}} €",
+      "free": "Gratis",
+      "lessonsCount_one": "{{count}} lección",
+      "lessonsCount_other": "{{count}} lecciones",
+      "estimatedHours": "{{hours}} h estimadas",
+      "completedOf": "{{completed}}/{{total}} completadas ({{pct}}%)",
+      "officialPrep": "Preparación oficial",
+      "progress": "Progreso del curso",
+      "importantLabel": "Importante:",
+      "certDisclaimer": "PipingBox le prepara para el examen. El certificado oficial lo emite {{certBody}} a través de centros de examen reconocidos.",
+      "bookVcaExam": "Reserve su examen oficial VCA →",
+      "content": "Contenido del curso",
+      "noLessons": "Todavía no hay lecciones disponibles.",
+      "minutes_one": "{{count}} min",
+      "minutes_other": "{{count}} min",
+      "freePreview": "Vista previa gratuita",
+      "completedTitle": "¡Curso completado!",
+      "completedBody": "Ha completado todas las lecciones de este curso.",
+      "readyForExam": "¿Preparado para el examen oficial?",
+      "bookExam": "Reserve su examen →",
+      "lessonCompletedToast": "¡Lección completada!",
+      "lessonOf": "Lección {{current}} de {{total}}",
+      "practiceQuiz": "Cuestionario de práctica",
+      "quizComingSoon": "Esta lección incluye un cuestionario de práctica. El motor de cuestionarios estará disponible próximamente. Por ahora, repase el material del curso y marque esta lección como completada.",
+      "contentComingSoon": "El contenido de la lección estará disponible próximamente.",
+      "completed": "Completada",
+      "markComplete": "Marcar como completada",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "finish": "Finalizar",
+      "lessonsCount_many": "{{count}} lecciones",
+      "minutes_many": "{{count}} min"
+    },
+    "courseContent": {
+      "officialSyllabus": "Programa oficial",
+      "meta": "{{lessons}} lecciones · {{minutes}} min · {{modules}} módulos",
+      "moduleMeta": "{{lessons}} lecciones · {{minutes}} min",
+      "oneTimePayment": "pago único",
+      "otherLanguagesInEnglish": "en los demás idiomas el material se consulta en inglés",
+      "legalNoticeLabel": "Aviso legal:",
+      "vca": {
+        "title": "Curso de preparación VCA",
+        "legalNotice": "PipingBox le prepara para el examen VCA. El certificado oficial VCA lo emite SSVV/BESACC a través de centros de examen reconocidos. PipingBox es un proveedor de preparación independiente, sin vinculación con SSVV/BESACC."
+      },
+      "simulator": {
+        "title": "Simulador de examen VCA — {{count}} preguntas",
+        "description": "Practique con preguntas de examen VCA de estilo real. Cronómetro, corrección inmediata y explicaciones detalladas. Incluido en el curso.",
+        "bvca": "{{count}} preguntas (B-VCA)",
+        "volvca": "{{count}} preguntas (VOL-VCA)",
+        "instantScoring": "Puntuación inmediata"
+      },
+      "scc": {
+        "title": "Curso de preparación SCC",
+        "variantOperative": "Personal operativo",
+        "variantSupervisor": "Mando intermedio",
+        "variantSelfEmployed": "Autónomos",
+        "legalNotice": "PipingBox le prepara para el examen SCC. El certificado oficial SCC lo emite SCC Stiftung (o AUVA en Austria) a través de organismos de examen reconocidos como TÜV o DEKRA. PipingBox es un proveedor de preparación independiente, sin vinculación con SCC Stiftung.",
+        "simulatorTitle": "Simulador de examen SCC — {{count}} preguntas",
+        "simulatorDescription": "Practique con preguntas de examen SCC de estilo real. Cronómetro, corrección inmediata y explicaciones detalladas. Incluido en el curso.",
+        "simulatorDoc016": "{{count}} preguntas (Doc 016)",
+        "simulatorDoc017018": "{{count}} preguntas (Doc 017/018)",
+        "simulatorInstantScoring": "Puntuación inmediata"
+      },
+      "prl": {
+        "titleBasico": "PRL Básico — Prevención de Riesgos Laborales",
+        "titleIntermedio": "PRL Intermedio — Prevención de Riesgos Laborales",
+        "officialTraining": "Formación oficial",
+        "hoursBadge": "{{hours}}h",
+        "meta": "{{lessons}} lecciones · {{hours}}h · {{modules}} módulos · Ley 31/1995",
+        "legalNotice": "PipingBox imparte formación en PRL conforme a la Ley 31/1995 de Prevención de Riesgos Laborales y al RD 39/1997. PipingBox no sustituye al servicio de prevención propio o ajeno de la empresa, ni a su mutua de accidentes de trabajo. La verificación del cumplimiento legal corresponde a la Inspección de Trabajo y Seguridad Social.",
+        "certificationTypeLabel": "Tipo de certificación:",
+        "certificationTypeText": "Basada en la formación (sin examen). Al completar el 100 % del curso, PipingBox emite un",
+        "certificationTypeHighlight": "certificado de formación",
+        "certificationTypeTail": "que cumple la obligación legal de formación en PRL de los trabajadores.",
+        "certificateTeaserTitle": "Certificado de formación — sin examen",
+        "certificateTeaserDescription": "A diferencia de VCA y SCC, la PRL no tiene examen oficial. La propia formación es el requisito legal. Al completar el 100 % de los módulos, PipingBox emite un certificado de formación que cumple el requisito de la Ley 31/1995 para los trabajadores.",
+        "badgeCompliance": "Cumple la Ley 31/1995",
+        "badgeHours": "{{hours}}h de formación",
+        "badgeDownloadable": "Certificado descargable"
+      }
+    },
+    "coursePage": {
+      "tabPreparationCourse": "Curso de preparación",
+      "tabBookOfficialExam": "Reservar examen oficial",
+      "scc": {
+        "tabExamAndBooking": "Examen y reserva",
+        "examInfoTitle": "Examen SCC — Información oficial",
+        "examBodyLabel": "Organismo examinador",
+        "formatLabel": "Formato",
+        "formatDoc016": "30 preguntas, 45 min",
+        "formatDoc017018": "40 preguntas, 60 min",
+        "passMarkLabel": "Nota de corte",
+        "passMarkDoc016": "60 % (18/30)",
+        "passMarkDoc017018": "65 % (26/40)",
+        "validityLabel": "Validez",
+        "validityValue": "3–5 años",
+        "examFeeLabel": "Tasa de examen (oficial)",
+        "examFeeValue": "€100–180 (a pagar a TÜV/DEKRA)",
+        "managementFeeLabel": "Tasa de gestión de PipingBox",
+        "managementFeeValue": "€10 Standard / €15 Express",
+        "howBookingWorksTitle": "¿Cómo funciona la reserva?",
+        "bookingStep1": "Te preparas con el curso de PipingBox.",
+        "bookingStep2": "Envías una solicitud de reserva (código postal, idioma, fecha).",
+        "bookingStep3": "PipingBox te contacta en 24–48h para confirmar la disponibilidad.",
+        "bookingStep4": "Pagas la tasa de gestión (€10/€15).",
+        "bookingStep5": "PipingBox reserva tu plaza de examen en TÜV/DEKRA.",
+        "bookingStep6": "Te presentas al examen. El organismo examinador emite tu certificado.",
+        "bookingDisclaimer": "⚠️ PipingBox NO emite certificados SCC. PipingBox prepara y gestiona la reserva. El certificado lo emite SCC Stiftung / AUVA a través del organismo examinador.",
+        "bookingSoon": "Las solicitudes de reserva de examen SCC para Alemania y Austria estarán disponibles próximamente.",
+        "bookingSoonPhase": "Fase 3 — Beta"
+      },
+      "prl": {
+        "variantBasicoMeta": "20h · todos los trabajadores",
+        "variantIntermedioMeta": "60h · supervisores",
+        "tabTrainingCourse": "Curso de formación",
+        "tabCertificateAndLegality": "Certificado y legalidad",
+        "trainingNotExamTitle": "PRL es formación, no examen",
+        "trainingNotExamP1Before": "A diferencia de VCA (Bélgica/Países Bajos) y SCC (Alemania/Austria), que requieren aprobar un examen oficial,",
+        "trainingNotExamP1Strong": "PRL no tiene examen",
+        "trainingNotExamP1After": ". El requisito legal español (Ley 31/1995) es recibir la formación, no aprobar una prueba.",
+        "trainingNotExamP2Before": "Al completar el 100% de los módulos del curso, PipingBox emite un",
+        "trainingNotExamP2Strong": "certificado de formación PRL",
+        "trainingNotExamP2After": "que cumple el requisito legal para trabajadores del sector industrial.",
+        "legalFrameworkTitle": "Marco legal",
+        "mainLawLabel": "Ley principal",
+        "mainLawValue": "Ley 31/1995 de Prevención de Riesgos Laborales",
+        "regulationLabel": "Reglamento",
+        "regulationValue": "RD 39/1997 (Servicios de Prevención)",
+        "bodyLabel": "Organismo",
+        "bodyValue": "INSST (Instituto Nacional de Seguridad y Salud en el Trabajo)",
+        "verificationLabel": "Verificación",
+        "verificationValue": "Inspección de Trabajo y Seguridad Social",
+        "minDurationBasicoLabel": "Duración mínima (Básico)",
+        "minDurationBasicoValue": "20 horas",
+        "durationIntermedioLabel": "Duración (Intermedio)",
+        "durationIntermedioValue": "60 horas",
+        "comparisonTitle": "Comparativa: PRL vs VCA vs SCC",
+        "comparisonDimension": "Dimensión",
+        "comparisonPrlColumn": "PRL (ES)",
+        "comparisonVcaColumn": "VCA (BE/NL)",
+        "comparisonSccColumn": "SCC (DE/AT)",
+        "comparisonTypeRow": "Tipo",
+        "comparisonTypePrl": "Formación",
+        "comparisonTypeVca": "Examen",
+        "comparisonTypeScc": "Examen",
+        "comparisonOfficialExamRow": "Examen oficial",
+        "comparisonOfficialExamPrl": "No",
+        "comparisonOfficialExamVca": "Sí (40q/60min)",
+        "comparisonOfficialExamScc": "Sí (30-40q/45-60min)",
+        "comparisonIssuerRow": "Emite certificado",
+        "comparisonIssuerPrl": "PipingBox (formación)",
+        "comparisonIssuerVca": "SSVV/BeSaCC",
+        "comparisonIssuerScc": "SCC Stiftung/AUVA",
+        "comparisonValidityRow": "Validez",
+        "comparisonValidityPrl": "Periódico (refresh)",
+        "comparisonValidityVca": "10 años",
+        "comparisonValidityScc": "3-5 años",
+        "comparisonPriceRow": "Precio PipingBox",
+        "comparisonMarketRow": "Mercado",
+        "comparisonMarketPrl": "~1.5M trabajadores",
+        "comparisonMarketVca": "~500k exámenes/año",
+        "comparisonMarketScc": "~200k exámenes/año",
+        "notReplaceTitle": "PipingBox NO sustituye:",
+        "notReplaceItem1": "Al servicio de prevención propio o ajeno de tu empresa.",
+        "notReplaceItem2": "A la mutua de accidentes de trabajo (Mutua Universal, Fremap, etc.).",
+        "notReplaceItem3": "A la formación específica que tu empresa debe darte sobre tus riesgos concretos.",
+        "notReplaceItem4": "Al TPC (Trabajos de Prevención en Construcción) si trabajas en construcción.",
+        "doesComplyStrong": "PipingBox SÍ cumple",
+        "doesComplyText": "el requisito legal de formación PRL Básica de 20 horas para trabajadores, conforme al artículo 19 de la Ley 31/1995."
+      }
+    },
+    "vcaBooking": {
+      "signInRequired": "Inicie sesión para enviar una solicitud de reserva",
+      "fillNameAndPostalCode": "Indique su nombre y código postal",
+      "certificationUnavailable": "Certificación no disponible. Inténtelo de nuevo más tarde.",
+      "submitFailed": "No se pudo enviar la solicitud de reserva",
+      "submitted": "¡Solicitud de reserva enviada! PipingBox se pondrá en contacto con usted en un plazo de 24 h para confirmar la reserva de su examen."
+    }
   },
   "tools": {
     "eyebrow": "Tools",
@@ -710,20 +1014,20 @@
       "title": "Biblioteca de Accesorios",
       "totals": "{{components}} componentes · {{drawings}} planos",
       "searchPlaceholder": "Buscar por nombre, tipo, material o norma…",
-      "allFamilies": "Todos",
+      "allFamilies": "Todas",
       "connection": "Conexión",
       "anyConnection": "Cualquier conexión",
       "standard": "Norma",
       "anyStandard": "Cualquier norma",
       "pressureClass": "Clase de presión",
       "anyPressureClass": "Cualquier clase",
-      "classValue": "Clase {{value}}",
+      "classValue": "Class {{value}}",
       "clearFilters": "Limpiar filtros",
       "resultCount": "{{count}} de {{total}} componentes",
       "emptyTitle": "Ningún componente coincide",
-      "emptyHint": "Prueba otro término de búsqueda o limpia los filtros activos.",
-      "cardClasses": "Clase {{list}}",
-      "cardBySchedule": "Rating por schedule",
+      "emptyHint": "Prueba con otro término de búsqueda o limpia los filtros activos.",
+      "cardClasses": "Class {{list}}",
+      "cardBySchedule": "Designación por schedule",
       "sizesDrawn": "{{count}} medidas dibujadas"
     },
     "accessoriesLibraryDesc": "Catálogo completo de accesorios de tubería (ASME B16.9 / B16.5 / B16.34)",
@@ -734,7 +1038,54 @@
     "categoryFabrication": "Fabricación",
     "elbowCut": {
       "name": "Calculadora de Corte de Codos",
-      "subtitle": "Calcula dónde cortar un codo estándar para obtener cualquier ángulo"
+      "subtitle": "Calcula dónde cortar un codo estándar para obtener cualquier ángulo",
+      "arcCen": "Arco C-C",
+      "arcCentral": "Arco central (neutro)",
+      "arcExt": "Arco extradós:",
+      "arcExterior": "Arco exterior (extradós)",
+      "arcInt": "Arco intradós:",
+      "arcInterior": "Arco interior (intradós)",
+      "cutAngleLabel": "ÁNGULO DE CORTE",
+      "cutDistExt": "Dist. corte extradós:",
+      "cutDistInt": "Dist. corte intradós:",
+      "cutExt": "Corte Ext",
+      "cutInt": "Corte Int",
+      "cutLineLabel": "LÍNEA DE CORTE",
+      "errorZero": "Introduce un ángulo mayor que 0",
+      "fixedAnglesTable": "Tabla de ángulos fijos",
+      "formulaArcs": "Longitudes de arco",
+      "formulaCutDist": "Distancias de corte",
+      "formulaCutNote": "Distancia medida desde el extremo del codo",
+      "formulaRadius": "Radio del codo (R)",
+      "formulasTitle": "Fórmulas de Cálculo",
+      "fullElbow": "Codo completo, sin corte necesario",
+      "noteAngleMeasure": "El ángulo de corte se mide desde el extremo del codo",
+      "noteSmallAngle": "Para ángulos < 30° usar plantilla física para mayor precisión",
+      "noteTolerance": "Tolerancias de corte: ±2mm recomendado",
+      "notesTitle": "Notas de Referencia",
+      "radius": "Radio (R):",
+      "showCenter": "Centro",
+      "showCutLines": "Corte",
+      "showDimensions": "Cotas",
+      "showFill": "Relleno",
+      "sliderAriaLabel": "Ángulo de corte del codo",
+      "standards": "Estándares de Referencia",
+      "svgAriaLabel": "Codo de 90 grados con línea de corte a {{angle}} grados",
+      "tabCalculator": "Calculadora",
+      "tabFormulas": "Fórmulas y Notas",
+      "tip1": "Marque siempre el extradós antes de cortar",
+      "tip2": "Use plantilla de cartón para ángulos no estándar",
+      "tip3": "Verifique con transportador digital después del corte",
+      "tip4": "Considere 2-3mm extra para biselado",
+      "tips": "Consejos Prácticos",
+      "varNPS": "Nominal Pipe Size (pulgadas)",
+      "varOD": "Diámetro exterior del tubo (mm)",
+      "varR": "Radio de curvatura del codo (mm)",
+      "varTheta": "Ángulo de corte deseado (grados)",
+      "variables": "Variables",
+      "results": "Resultados",
+      "arcNeutral": "Arco neutro (C-C):",
+      "stdB3610Desc": "Tubería de acero forjado soldada y sin soldadura"
     },
     "branchLayout": {
       "name": "Calculadora de Injertos",
@@ -955,7 +1306,17 @@
       "round4": "Ronda 4",
       "round4Desc": "Continuar al 100 % del par objetivo pero en patrón circular horario, hasta que ninguna tuerca gire más.",
       "round5": "Ronda 5",
-      "round5Desc": "Si el tiempo lo permite, esperar un mínimo de 4 h y repetir la ronda 4 para recuperar las pérdidas por relajación y embebido a corto plazo."
+      "round5Desc": "Si el tiempo lo permite, esperar un mínimo de 4 h y repetir la ronda 4 para recuperar las pérdidas por relajación y embebido a corto plazo.",
+      "legend": {
+        "mainDimensions": "Dimensiones principales",
+        "secondaryDimensions": "Dimensiones secundarias"
+      },
+      "notes": {
+        "noteLabel": "Nota:",
+        "noteText": "Las longitudes incluyen 2 tuercas hexagonales pesadas. Para espárragos, longitud total = longitud efectiva + 2 × espesor de la tuerca. Las longitudes tabuladas corresponden a bridas con cara realzada (RF).",
+        "lubricationLabel": "Lubricación:",
+        "lubricationText": "Se recomienda lubricante antigripante para evitar el gripado en acero inoxidable. El lubricante utilizado determina el factor de tuerca K y, con ello, el par de apriete requerido."
+      }
     },
     "flanges": {
       "name": "Bridas",
@@ -970,7 +1331,101 @@
       "rfDia": "Diámetro Raised Face",
       "bolts": "Cantidad de pernos",
       "boltDia": "Diámetro de perno",
-      "pipeOD": "OD del tubo"
+      "pipeOD": "OD del tubo",
+      "disclaimer": "Dimensiones nominales según ASME B16.5-2020. Verificar siempre con datos del fabricante para adquisición.",
+      "results": "resultados",
+      "subtitle": "Biblioteca de Bridas ASME B16.5",
+      "tabLibrary": "Biblioteca",
+      "tabNotes": "Notas y Referencia",
+      "ui": {
+        "classLabel": "Class {{cls}}",
+        "classHash": "Class {{cls}}#",
+        "facingSubtitle": "ASME B16.5-2020 | Cara RF",
+        "svgAriaLabel": "Brida {{type}} {{nps}} Class {{cls}}",
+        "tabDimensions": "Dimensiones",
+        "tabCrossLink": "Referencias cruzadas",
+        "tabNotesShort": "Notas",
+        "toggleDimensions": "Dimensiones",
+        "toggleCenter": "Centro",
+        "toggleHoles": "Agujeros",
+        "toggleFill": "Relleno",
+        "sideView": "VISTA LATERAL",
+        "frontView": "VISTA FRONTAL",
+        "legendMainDims": "Dimensiones principales (OD, BCD)",
+        "legendRaisedFaceRf": "Cara realzada (RF)",
+        "legendHubWeldPrep": "Cubo / Preparación de soldadura",
+        "legendFilletWelds": "Soldaduras en ángulo",
+        "legendSolidBody": "Cuerpo sólido",
+        "legendDims": "Dimensiones (OD, BCD, T)",
+        "legendRaisedFace": "Cara realzada",
+        "legendHubTaper": "Conicidad del cubo",
+        "legendSolid": "Sólido",
+        "dimension": "Dimensión",
+        "dim": "Dim",
+        "boltHoleDiameter": "Diámetro de agujero de tornillo",
+        "hubLength": "Longitud del cubo",
+        "hubLengthShort": "L cubo",
+        "holeDiaShort": "Ø agujero",
+        "weightApprox": "Peso (aprox.)",
+        "pcs": "uds",
+        "gasket": "Junta",
+        "type": "Tipo",
+        "spiralWound": "Espirometálica",
+        "material": "Material",
+        "bolts": "Tornillos",
+        "size": "Tamaño",
+        "quantity": "Cantidad",
+        "nut": "Tuerca",
+        "torque": "Par de apriete",
+        "target": "Objetivo",
+        "perPcc1": "Según PCC-1",
+        "pattern": "Secuencia",
+        "starCross": "Estrella (cruz)",
+        "passes": "Pasadas",
+        "passesMinimum": "{{count}} mín.",
+        "lubricant": "Lubricante",
+        "premiumFeature": "Función Premium",
+        "premiumFeatureDesc": "Tablas de par detalladas, guía de selección de juntas y calculadora de longitud de tornillos disponibles en el plan PRO.",
+        "standardReference": "Norma de referencia",
+        "standardReferenceText": "ASME B16.5-2020 — Bridas para tuberías y accesorios embridados (NPS 1/2 a NPS 24)",
+        "facing": "Cara",
+        "facingText": "Cara realzada (RF) — realce de 1,6 mm, acabado ranurado 125-250 AARH",
+        "materialText": "ASTM A105 (acero al carbono), A182 F304/F316 (acero inoxidable), A182 F11/F22 (aleado)",
+        "disclaimerTitle": "Aviso legal",
+        "disclaimerFull": "Las dimensiones son valores nominales según ASME B16.5. Verifique siempre con las hojas de datos del fabricante antes de realizar la compra. Los valores de peso son aproximados.",
+        "filterType": "Tipo",
+        "filterClass": "Class",
+        "allTypes": "Todos los tipos",
+        "allSizes": "Todos los tamaños",
+        "typeWeldNeck": "Cuello soldado (WN)",
+        "typeSlipOn": "Deslizante (SO)",
+        "typeBlind": "Ciega (BL)",
+        "clickForDetails": "Haga clic para ver detalles",
+        "flangeTypes": "Tipos de brida",
+        "wnTitle": "WN — Cuello soldado",
+        "wnDesc": "La conicidad del cubo proporciona una transición gradual de tensiones. Ideal para servicio a alta presión, alta temperatura y cíclico. Se suelda a tope a la tubería.",
+        "soTitle": "SO — Deslizante",
+        "soDesc": "La tubería se introduce en la brida y se suelda en ángulo por ambos lados. Menor coste y alineación más sencilla. Adecuada para servicios auxiliares de baja presión.",
+        "blTitle": "BL — Ciega",
+        "blDesc": "Disco sólido para cerrar el extremo de una tubería o la tobera de un recipiente. Se utiliza para pruebas, conexiones futuras o cierre permanente. Sin orificio.",
+        "pressureClasses": "Clases de presión",
+        "ratingAmbient": "Hasta ~{{bar}} bar ({{psi}} psi) a temperatura ambiente",
+        "ratingsNote": "* Los valores nominales disminuyen con la temperatura según ASME B16.5, Tabla 2",
+        "quickReference": "Referencia rápida",
+        "refBcd": "Bolt Circle Diameter — diámetro del círculo de agujeros de tornillos",
+        "refRf": "Raised Face — cara realzada de 1,6 mm (Class 150/300)",
+        "refRtj": "Ring Type Joint — para Class 600 y superiores",
+        "refHub": "Transición cónica entre la tubería y la brida (solo WN)",
+        "standards": "Normas",
+        "stdB165": "Bridas para tuberías y accesorios embridados (NPS 1/2 - 24)",
+        "stdB1647": "Bridas de acero de gran diámetro (NPS 26 - 60)",
+        "stdPcc1": "Directrices para el montaje de uniones embridadas atornilladas en envolventes a presión",
+        "stdB1620": "Juntas metálicas para bridas de tuberías",
+        "matA105": "Acero al carbono (el más común)",
+        "matF304F316": "Acero inoxidable",
+        "matF11F22": "Aleación cromo-molibdeno",
+        "matLf2": "Acero al carbono para baja temperatura"
+      }
     },
     "pressureDropDesc": "Caída de presión Darcy-Weisbach con factor de fricción Swamee-Jain",
     "unitConverterDesc": "Convertir entre unidades imperiales y métricas de tubería",
@@ -1168,6 +1623,13 @@
         "clr_gt_half_od": "El CLR debe ser mayor que OD/2",
         "beta_range": "El ángulo de corte debe estar entre 0° y {{max}}°"
       }
+    },
+    "premiumBanner": {
+      "title": "Desbloquea las herramientas Premium",
+      "description": "Exportación a PDF, plantillas imprimibles, informes de par y más.",
+      "loading": "Cargando...",
+      "monthly": "Mensual 4,99 €",
+      "annual": "Anual 39 € (ahorra un 35 %)"
     }
   },
   "jobs": {
@@ -1217,7 +1679,8 @@
     "postedTimes": {
       "h_ago": "hace {{count}}h",
       "d_ago": "hace {{count}}d",
-      "w_ago": "hace {{count}}s"
+      "w_ago": "hace {{count}}s",
+      "justNow": "justo ahora"
     },
     "filterJobs": "Filtrar Empleos",
     "activeFilterCount": "{{count}} filtro activo",
@@ -1230,7 +1693,46 @@
     "priority": "Prioridad",
     "urgentPositionsOnly": "Solo Posiciones Urgentes",
     "signInToApply": "Inicia sesión para postularte",
-    "applicationFailed": "Error al enviar la candidatura"
+    "applicationFailed": "Error al enviar la candidatura",
+    "roleCount_one": "{{count}} puesto",
+    "roleCount_other": "{{count}} puestos",
+    "activeFiltersLabel_one": "{{count}} filtro activo",
+    "activeFiltersLabel_other": "{{count}} filtros activos",
+    "mustBeLoggedIn": "Debes iniciar sesión para postularte",
+    "salaryPerYear": "{{amount}} /año",
+    "salaryPerMonth": "{{amount}} /mes",
+    "metrics": {
+      "companies": "Empresas",
+      "applications": "Candidaturas"
+    },
+    "options": {
+      "countries": {
+        "belgium": "Bélgica",
+        "netherlands": "Países Bajos",
+        "germany": "Alemania",
+        "norway": "Noruega",
+        "uae": "EAU",
+        "unitedKingdom": "Reino Unido",
+        "usa": "EE. UU."
+      },
+      "disciplines": {
+        "pipefitter": "Tubero",
+        "tigWelder": "Soldador TIG",
+        "qaqc": "QA/QC",
+        "supervisor": "Supervisor",
+        "planner": "Planificador",
+        "rigger": "Rigger",
+        "offshoreTechnician": "Técnico offshore"
+      },
+      "contractTypes": {
+        "freelance": "Autónomo",
+        "employee": "Empleado",
+        "contract": "Contrato",
+        "fullTime": "Jornada completa"
+      }
+    },
+    "roleCount_many": "{{count}} puestos",
+    "activeFiltersLabel_many": "{{count}} filtros activos"
   },
   "companies": {
     "eyebrow": "Companies",
@@ -1243,7 +1745,12 @@
     "generic": "Algo ha ido mal. Inténtalo de nuevo.",
     "network": "Error de red. Comprueba tu conexión.",
     "unauthorized": "No tienes permiso para realizar esta acción.",
-    "notFound": "No se ha encontrado el recurso solicitado."
+    "notFound": "No se ha encontrado el recurso solicitado.",
+    "incidentCode": "Código de incidencia",
+    "copyIncidentCode": "Copiar código de incidencia",
+    "incidentCodeCopied": "Copiado",
+    "boundaryDesc": "Ha ocurrido un error inesperado. Intenta recargar esta sección.",
+    "boundaryTitle": "Algo ha ido mal"
   },
   "certAlerts": {
     "sectionLabel": "Alertas",
@@ -1281,7 +1788,8 @@
     "renewSuccess": "Certificación renovada correctamente",
     "deleteSuccess": "Certificación eliminada",
     "confirmDeleteTitle": "¿Eliminar certificación?",
-    "confirmDeleteDescription": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esta acción no se puede deshacer."
+    "confirmDeleteDescription": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esta acción no se puede deshacer.",
+    "viewDenied": "Acceso denegado"
   },
   "certStatus": {
     "valid": "Válido",
@@ -1338,7 +1846,18 @@
       "generateEnglish": "Generar versión profesional en inglés",
       "generatingEnglish": "Generando...",
       "englishGenerated": "Versión en inglés generada",
-      "noOriginalText": "Por favor escribe una descripción en el idioma original primero"
+      "noOriginalText": "Por favor escribe una descripción en el idioma original primero",
+      "allTranslationsGenerated": "Todas las traducciones generadas",
+      "generate": "Generar",
+      "generateAll": "Generar todo",
+      "originalText": "Texto original",
+      "selectLanguage": "Seleccionar idioma",
+      "translationGenerated": "Traducción generada: {{lang}}",
+      "translationPlaceholder": "Traducción ({{lang}})",
+      "translations": "Traducciones",
+      "translationsAvailable_one": "{{count}} traducción disponible",
+      "translationsAvailable_other": "{{count}} traducciones disponibles",
+      "translationsAvailable_many": "{{count}} traducciones disponibles"
     },
     "documents": {
       "label": "Documentos",
@@ -1376,7 +1895,12 @@
         "medical_certificate": "Certificado Médico",
         "reference_letter": "Carta de Referencia",
         "other": "Otro"
-      }
+      },
+      "accessDenied": "Acceso denegado",
+      "invalidType": "Tipo de archivo no soportado. Acepta: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
+      "saveFailed": "Error al guardar el documento: ",
+      "verified": "Verificado",
+      "heicNotice": "Foto HEIC detectada. Se subirá correctamente."
     },
     "cv": {
       "label": "CV / Currículum",
@@ -1389,7 +1913,12 @@
       "removed": "CV eliminado",
       "view": "Ver",
       "replace": "Reemplazar",
-      "visibleToCompanies": "CV visible para empresas"
+      "visibleToCompanies": "CV visible para empresas",
+      "allowedFormats": "Solo se aceptan archivos PDF, DOC y DOCX",
+      "saveError": "CV subido pero error al guardar la referencia: ",
+      "visibilityError": "Error al actualizar la visibilidad",
+      "visibilityOff": "El CV ahora está oculto para las empresas",
+      "visibilityOn": "El CV ahora es visible para las empresas"
     },
     "aiExtraction": {
       "label": "Inteligencia AI",
@@ -1450,7 +1979,9 @@
       "reminderDays": "Recordarme antes del vencimiento (días)",
       "showInApp": "Mostrar advertencias de vencimiento en la app",
       "prefsSaved": "Preferencias de alertas guardadas",
-      "prefsSaveError": "Error al guardar preferencias de alertas"
+      "prefsSaveError": "Error al guardar preferencias de alertas",
+      "viewFileDenied": "Acceso denegado",
+      "saveTimedOut": "El guardado ha tardado demasiado. Es posible que su certificado se haya guardado; actualice la página para comprobarlo."
     }
   },
   "profileCompleteness": {
@@ -1530,7 +2061,8 @@
     "availableNow": "Disponible Ahora",
     "openToOffers": "Abierto a Ofertas",
     "notAvailable": "No Disponible",
-    "employed": "Empleado"
+    "employed": "Empleado",
+    "notWillingToTravel": "No disponible para viajar"
   },
   "candidateProfile": {
     "messageCandidate": "Enviar Mensaje",
@@ -1571,7 +2103,9 @@
     "cvResume": "CV / Currículum",
     "applicationHistory": "Historial de Candidaturas",
     "view": "Ver",
-    "download": "Descargar"
+    "download": "Descargar",
+    "cvPreviewFailed": "No se pudo generar el enlace de vista previa del CV",
+    "previewFailed": "No se pudo generar el enlace de vista previa"
   },
   "inviteToJob": {
     "buttonLabel": "Invitar a Trabajo",
@@ -1643,7 +2177,11 @@
       "elite_badge": "Insignia Élite",
       "exclusive_features": "Funciones Exclusivas",
       "premium_perks": "Beneficios Premium"
-    }
+    },
+    "codeCopied": "Código copiado al portapapeles",
+    "copyFailed": "No se pudo copiar. Inténtalo de nuevo.",
+    "linkCopied": "Enlace copiado al portapapeles",
+    "shared": "Compartido correctamente"
   },
   "workday": {
     "eyebrow": "Parte de jornada / Salario",
@@ -1709,7 +2247,9 @@
     "totalHours": "Horas totales",
     "grossSalary": "Salario bruto",
     "finalTotal": "Total final",
-    "location": "Ubicación"
+    "location": "Ubicación",
+    "companyName": "Nombre de la empresa (opcional)",
+    "companyNamePlaceholder": "Acme Piping S.L."
   },
   "ratePresets": {
     "eyebrow": "Tarifas predefinidas",
@@ -2066,7 +2606,10 @@
     "approved": "Aprobado",
     "active": "Activo",
     "saveProfile": "Guardar Perfil",
-    "profileSaved": "Perfil de empresa guardado."
+    "profileSaved": "Perfil de empresa guardado.",
+    "descriptionPlaceholder": "Describe tu empresa, servicios y especialidades (se recomiendan 2-3 líneas)",
+    "saveError": "Error al guardar el perfil: ",
+    "saved": "Perfil de empresa guardado"
   },
   "companyWorkforce": {
     "eyebrow": "Empresa",
@@ -2087,7 +2630,9 @@
     "international": "Internacional",
     "allPriorities": "Todas las Prioridades",
     "results": "resultados",
-    "staffingProgress": "Progreso de Dotación"
+    "staffingProgress": "Progreso de Dotación",
+    "assignedShort": "asignados",
+    "requestedShort": "solicitados"
   },
   "companyWorkerSearch": {
     "eyebrow": "Empresa",
@@ -2371,7 +2916,13 @@
     "saving": "Guardando...",
     "finish": "Finalizar",
     "next": "Siguiente",
-    "completeLater": "Completar después →"
+    "completeLater": "Completar después →",
+    "progressRestored": "✓ Progreso anterior restaurado",
+    "imageError": "Solo se aceptan imágenes JPG, PNG, WebP o HEIC de hasta 5 MB.",
+    "photoPreviewAlt": "Vista previa de la foto de perfil seleccionada",
+    "heicSelected": "📷 Foto HEIC seleccionada",
+    "completionFailedTitle": "No se pudo finalizar la configuración",
+    "completionFailedDescription": "Tus datos se han guardado, pero la confirmación final no se completó. Comprueba tu conexión y pulsa Finalizar de nuevo. Si el problema persiste, podrás completar el proceso más adelante desde tu perfil."
   },
   "profileCard": {
     "profileCompleted": "Perfil completado",
@@ -2469,7 +3020,8 @@
       "login_account": "Login / Cuenta",
       "interface": "Interfaz",
       "performance": "Rendimiento",
-      "other": "Otro"
+      "other": "Otro",
+      "translation": "Traducción / redacción"
     }
   },
   "adminFeedback": {
@@ -2657,7 +3209,8 @@
         "desc": "Materiales de preparación VCA, SCC y PRL y formación industrial.",
         "cta": "Empezar a aprender"
       }
-    }
+    },
+    "signUpFree": "Regístrate gratis"
   },
   "footer": {
     "privacy": "Política de privacidad",
@@ -2694,5 +3247,233 @@
       "yStrainerNoStandard": "El filtro en Y no está cubierto por una norma dimensional específica en este catálogo. Los fabricantes lo suministran habitualmente con extremos bridados según ASME B16.5, por lo que la clase la fija la brida del modelo concreto. Aquí no se lista ninguna clase porque no existe una norma verificable que la defina.",
       "noPressureClass": "Los laterales no se designan por clase de presión. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula según el código de diseño aplicable (p. ej. ASME B31.3). Verifique las dimensiones con el fabricante para el schedule aplicable."
     }
+  },
+  "dailyLog": {
+    "addDailyLog": "Añadir parte diario",
+    "eyebrow": "Parte diario de tubería",
+    "newEntry": "Nueva entrada",
+    "description": "Registre el ISO, la asignación de soldadores, las horas y el salario bruto del día.",
+    "isoNumber": "Número de ISO",
+    "isoPlaceholder": "p. ej. ISO-PL-2041",
+    "weldersCount": "Número de soldadores",
+    "weldersPlaceholder": "p. ej. 4",
+    "normalRatePlaceholder": "p. ej. 25,00",
+    "extraRatePlaceholder": "p. ej. 37,50",
+    "grossSalaryAuto": "Salario bruto (automático)",
+    "normalGrossSalary": "Salario bruto normal",
+    "extraGrossSalary": "Salario bruto extra",
+    "totalGross": "Total bruto",
+    "notesPlaceholder": "Bloqueos, observaciones o contexto para el equipo…",
+    "saveEntry": "Guardar entrada",
+    "saveFailed": "No se pudo guardar el parte diario",
+    "saved": "Parte diario guardado",
+    "savedDescription": "ISO {{iso}} — {{amount}} bruto",
+    "validation": {
+      "dateRequired": "La fecha es obligatoria",
+      "isoRequired": "El número de ISO es obligatorio",
+      "weldersInvalid": "Introduzca un número de soldadores válido",
+      "normalHoursInvalid": "Introduzca las horas normales (0 o más)",
+      "maxHours": "Debe ser 24 o menos",
+      "extraHoursInvalid": "Introduzca horas extra válidas",
+      "normalRateInvalid": "Introduzca una tarifa horaria normal válida",
+      "extraRateInvalid": "Introduzca una tarifa horaria extra válida"
+    }
+  },
+  "notFound": {
+    "title": "Página no encontrada — PipingBox",
+    "description": "No hemos podido encontrar la página que buscabas. Explora herramientas, empleos y cursos de PipingBox, o vuelve al inicio.",
+    "explanation": "No hemos podido encontrar esa página. Puede haber sido movida o eliminada.",
+    "home": "Inicio",
+    "tools": "Herramientas",
+    "jobs": "Empleos"
+  },
+  "adminCompanyVerification": {
+    "allStatuses": "Todos los estados",
+    "approve": "Aprobar",
+    "fetchError": "Error al cargar empresas",
+    "noCompanies": "No se encontraron empresas",
+    "pending": "Pendiente",
+    "refresh": "Actualizar",
+    "reject": "Rechazar",
+    "rejected": "Rechazada",
+    "resetToPending": "Restablecer a Pendiente",
+    "searchPlaceholder": "Buscar por nombre de empresa, contacto, sector...",
+    "statusUpdated": "Estado actualizado a {{status}}",
+    "suspend": "Suspender",
+    "suspended": "Suspendida",
+    "total": "Total",
+    "unnamed": "Empresa sin nombre",
+    "updateError": "Error al actualizar el estado",
+    "verified": "Verificada",
+    "website": "Sitio web"
+  },
+  "companyBilling": {
+    "description": "Gestiona tu suscripción y métodos de pago."
+  },
+  "companyDocs": {
+    "allStatuses": "Todos los estados",
+    "colDate": "Fecha",
+    "colJob": "Puesto",
+    "colSize": "Tamaño",
+    "colStatus": "Estado",
+    "colTitle": "Documento",
+    "colWorker": "Trabajador",
+    "description": "Administra, intercambia y da seguimiento a documentos con trabajadores y candidatos.",
+    "emptyState": "No se encontraron documentos con los filtros seleccionados.",
+    "expired": "Expirados",
+    "infoDescription": "Este módulo está diseñado para la coordinación de documentos entre empresas, contratistas y trabajadores industriales. Gestione contratos, certificaciones, permisos de trabajo, nóminas y documentos de seguridad desde un solo lugar.",
+    "infoTitle": "Gestión Documental Industrial",
+    "pending": "Pendientes",
+    "requiresUpdate": "Requieren Actualización",
+    "searchPlaceholder": "Buscar por título, trabajador o puesto...",
+    "totalDocs": "Total Documentos",
+    "uploadDocument": "Subir Documento",
+    "uploadFirst": "Subir primer documento"
+  },
+  "companySettings": {
+    "description": "Gestiona las preferencias y configuración de tu empresa."
+  },
+  "companyVerification": {
+    "contactSupport": "Contactar con Soporte",
+    "pendingDesc": "La cuenta de tu empresa está pendiente de verificación. Una vez verificada por un administrador, tendrás acceso completo a la búsqueda de trabajadores y herramientas de contratación.",
+    "pendingTitle": "Verificación Pendiente",
+    "rejectedDesc": "La verificación de tu empresa fue rechazada. Contacta con soporte o actualiza la información de tu empresa y vuelve a enviarla.",
+    "rejectedTitle": "Verificación Rechazada",
+    "statusLabel": "Estado de Verificación",
+    "statusPending": "En revisión — normalmente 1-2 días laborables",
+    "statusRejected": "Rechazada — actualiza tu perfil y contacta con soporte",
+    "statusSuspended": "Suspendida — contacta con el administrador",
+    "statusUnknown": "Estado desconocido",
+    "stepCompanyName": "Nombre de la empresa completado en tu perfil",
+    "stepDescription": "Descripción de la empresa proporcionada",
+    "stepIndustry": "Sector y país especificados",
+    "suspendedDesc": "La cuenta de tu empresa ha sido suspendida. Contacta con el administrador para más información.",
+    "suspendedTitle": "Cuenta Suspendida",
+    "updateProfile": "Actualizar Perfil de Empresa",
+    "whileWaiting": "Mientras esperas, asegúrate de tener:"
+  },
+  "pricing": {
+    "eyebrow": "Para empresas",
+    "popular": "Más popular",
+    "subtitle": "Los trabajadores siempre son gratis. Las empresas pagan por las herramientas de contratación. Sin cargos ocultos.",
+    "title": "Precios simples y transparentes",
+    "workersFree": "Los trabajadores siempre son gratis — perfil, marketplace, herramientas y comunidad."
+  },
+  "requestWorkers": {
+    "backToRequests": "Volver a Solicitudes de Personal",
+    "companyName": "Nombre de la Empresa",
+    "contactPerson": "Persona de Contacto",
+    "country": "País",
+    "duration": "Duración del Proyecto",
+    "email": "Email",
+    "errors": {
+      "companyRequired": "El nombre de la empresa es obligatorio",
+      "contactRequired": "La persona de contacto es obligatoria",
+      "emailInvalid": "Email no válido",
+      "emailRequired": "El email es obligatorio",
+      "workerTypeRequired": "Selecciona el tipo de trabajador"
+    },
+    "eyebrow": "Soluciones de Personal",
+    "message": "Mensaje Adicional",
+    "messagePlaceholder": "Cuéntanos más sobre los requisitos de tu proyecto, certificaciones necesarias o cualquier detalle específico...",
+    "numWorkers": "Número de Trabajadores",
+    "received": "Solicitud Recibida",
+    "receivedDesc": "Gracias por tu solicitud de personal. Nuestro equipo revisará tus requisitos y te responderá en un plazo de 24–48 horas con una propuesta a medida.",
+    "required": "Campos obligatorios",
+    "retry": "Reintentar",
+    "selectType": "Selecciona el tipo de trabajador",
+    "startDate": "Fecha de Inicio Estimada",
+    "submit": "Solicitar Personal",
+    "submitAnother": "Enviar Otra Solicitud",
+    "submitFailed": "Envío Fallido",
+    "submitting": "Enviando...",
+    "subtitle": "¿Necesitas trabajadores industriales cualificados para tu proyecto? Rellena el formulario y nuestro equipo te pondrá en contacto con profesionales cualificados de nuestra red global.",
+    "success": "¡Solicitud de personal enviada!",
+    "title": "Solicitar Personal",
+    "workerType": "Tipo de Trabajadores Necesarios",
+    "placeholderFullName": "Nombre completo"
+  },
+  "pageMeta": {
+    "home": {
+      "title": "PipingBox — Plataforma de Trabajo Industrial | Herramientas, Empleos, Academia",
+      "description": "Herramientas de ingeniería gratuitas, empleos industriales, formación en certificaciones (VCA, SCC, OSHA) y comunidad para montadores, soldadores y profesionales industriales. Calculadoras ASME B31.3, tablas de datos de tuberías, calculadora de corte de codos."
+    },
+    "login": {
+      "title": "PipingBox — Iniciar Sesión"
+    },
+    "register": {
+      "title": "PipingBox — Crear Cuenta",
+      "description": "Crea tu cuenta de PipingBox. Gratis para trabajadores: perfil, empleos, herramientas, comunidad y preparación de certificaciones."
+    },
+    "dashboard": {
+      "title": "PipingBox — Panel"
+    },
+    "profile": {
+      "title": "PipingBox — Perfil"
+    },
+    "jobs": {
+      "title": "PipingBox — Bolsa de Empleo Industrial | Montadores, Soldadores, QA/QC",
+      "description": "Bolsa de empleo industrial para montadores de tuberías, soldadores, inspectores QA/QC, supervisores y planificadores. Empresas verificadas en Europa, EE. UU. y Oriente Medio. Postúlate en un clic."
+    },
+    "messages": {
+      "title": "PipingBox — Mensajes"
+    },
+    "community": {
+      "title": "PipingBox — Comunidad"
+    },
+    "admin": {
+      "title": "PipingBox — Administración"
+    },
+    "applications": {
+      "title": "PipingBox — Solicitudes"
+    },
+    "companyDashboard": {
+      "title": "PipingBox — Panel de Empresa"
+    },
+    "enterpriseDashboard": {
+      "title": "PipingBox — Panel Enterprise"
+    },
+    "academy": {
+      "title": "PipingBox — Academia | Preparación VCA, SCC, PRL, OSHA",
+      "description": "Cursos de preparación de certificaciones: VCA (Bélgica/Países Bajos), SCC (Alemania), PRL (España), OSHA 10/30 (EE. UU.). Hasta 6 veces más barato que la formación presencial."
+    },
+    "tools": {
+      "title": "PipingBox — Hub Técnico | Calculadoras de Tuberías, Herramientas de Fabricación, Biblioteca de Componentes",
+      "description": "Hub Técnico de PipingBox: calculadoras de tuberías, herramientas de fabricación (corte de codos, layout de ramales, fitting take-off), tablas de datos de tuberías, consulta de clase de bridas, conversor de unidades y más. Gratis, sin registro."
+    },
+    "companies": {
+      "title": "PipingBox — Empleadores Industriales Verificados",
+      "description": "Directorio de empresas industriales verificadas que contratan montadores, soldadores e ingenieros en Europa y EE. UU."
+    },
+    "pricing": {
+      "title": "PipingBox — Precios | Academia, Enterprise, Publicación de Empleos",
+      "description": "Precios de PipingBox: cursos de certificación de la Academia (VCA, SCC, OSHA), suscripciones enterprise, ofertas de empleo destacadas. Precios transparentes, sin cargos ocultos."
+    },
+    "company": {
+      "title": "PipingBox — Empresa"
+    },
+    "blog": {
+      "title": "PipingBox — Blog"
+    }
+  },
+  "checkout": {
+    "errorGeneric": "No se pudo iniciar el pago. Inténtalo de nuevo.",
+    "signInToSubscribe": "Inicia sesión para suscribirte.",
+    "signInToPurchase": "Inicia sesión para comprar créditos.",
+    "notAvailableSubscription": "Las suscripciones aún no están disponibles. Escríbenos y lo configuramos manualmente.",
+    "notAvailablePack": "Este paquete no está disponible ahora mismo."
+  },
+  "translationBanner": {
+    "text": "Está viendo PipingBox en {{language}} — traducción en beta. ¿Ha visto un error?",
+    "reportBtn": "Informar de traducción",
+    "emailBtn": "o escríbanos",
+    "dismiss": "Cerrar aviso",
+    "emailSubject": "Comentario sobre la traducción",
+    "emailBodyLanguage": "Idioma: {{language}} ({{code}})",
+    "emailBodyPage": "Página",
+    "emailBodyHint": "Pegue el texto incorrecto y cómo debería decir:"
+  },
+  "deploymentBadge": {
+    "label": "Despliegue {{environment}} · build {{build}}"
   }
 }

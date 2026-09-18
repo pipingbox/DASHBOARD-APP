@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Package, Plus, Loader2 } from 'lucide-react';
 import { fetchCatalogPrices, formatPrice, redirectToCheckout, type CatalogPrice } from '@/lib/stripe';
 
@@ -29,6 +30,7 @@ function packQuantity(productKey: string): number {
 }
 
 export function JobCreditsWidget({ creditsRemaining, planType }: JobCreditsWidgetProps) {
+  const { t } = useTranslation();
   const [packs, setPacks] = useState<CatalogPrice[] | null>(null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -54,10 +56,10 @@ export function JobCreditsWidget({ creditsRemaining, planType }: JobCreditsWidge
       setBusyKey(null);
       setError(
         reason === 'not_authenticated'
-          ? 'Sign in to purchase credits.'
+          ? t('checkout.signInToPurchase')
           : reason === 'not_available'
-            ? 'This pack is not available right now.'
-            : 'Could not start checkout. Please try again.',
+            ? t('checkout.notAvailablePack')
+            : t('checkout.errorGeneric'),
       );
     }
     // On success the browser navigates away, so no state reset is needed.

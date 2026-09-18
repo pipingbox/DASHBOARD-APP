@@ -1,16 +1,18 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase, TABLES, edgeFunctionUrl } from '@/lib/supabase';
+import { supabase, TABLES, edgeFunctionUrl, STORAGE_BUCKETS } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock, Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ONBOARDING_STATUS } from '@/lib/onboarding';
+import { ONBOARDING_STATUS, hasCompletedOnboarding } from '@/lib/onboarding';
+import { trackEvent } from '@/lib/observability';
 import { isValidImageFile, isHeicFile, validateFileSize, getSafeImageExtension, ACCEPT_IMAGES } from '@/lib/fileUploadUtils';
 
 /* ─── Constants ─── */
 const ACCOUNT_TYPES = [
-  { value: 'worker', label: 'Profesional Industrial', icon: '🔧' },
-  { value: 'company', label: 'Empresa', icon: '🏢' },
+  { value: 'worker', labelKey: 'onboarding.accountTypeWorker', icon: '🔧' },
+  { value: 'company', labelKey: 'onboarding.accountTypeCompany', icon: '🏢' },
 ] as const;
 
 const ROLES = [
@@ -41,11 +43,11 @@ const SPECIALTIES = [
 ];
 
 const AVAILABILITY_OPTIONS = [
-  { value: 'available', label: 'Disponible ahora' },
-  { value: 'in_2_weeks', label: 'Disponible en 2 semanas' },
-  { value: 'in_1_month', label: 'Disponible en 1 mes' },
-  { value: 'working', label: 'Actualmente trabajando' },
-  { value: 'not_available', label: 'No disponible' },
+  { value: 'available', labelKey: 'onboarding.availableNow' },
+  { value: 'in_2_weeks', labelKey: 'onboarding.availableIn2Weeks' },
+  { value: 'in_1_month', labelKey: 'onboarding.availableIn1Month' },
+  { value: 'working', labelKey: 'onboarding.currentlyWorking' },
+  { value: 'not_available', labelKey: 'onboarding.notAvailable' },
 ];
 
 const TOTAL_STEPS = 8;
@@ -113,6 +115,7 @@ interface OnboardingWizardProps {
 }
 
 export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
+  const { t } = useTranslation();
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
 
@@ -133,6 +136,9 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  // PB-COMPLETE-ONBOARDING-404-001: recoverable finalization failure — the
+  // wizard stays open with the draft intact and offers a retry.
+  const [completionFailed, setCompletionFailed] = useState(false);
   const [avatarUploadError, setAvatarUploadError] = useState<string | null>(null);
   const [restoredFromDraft, setRestoredFromDraft] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -142,6 +148,21 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const isMountedRef = useRef(true);
 
   const progress = Math.round((step / TOTAL_STEPS) * 100);
+
+  /* ─── PB-OBSERVABILITY-001: closed-schema onboarding funnel ─── */
+  useEffect(() => {
+    trackEvent('onboarding_started', { account_type: accountType }, { dedupeKey: 'start' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    trackEvent(
+      'onboarding_step_reached',
+      { step, account_type: accountType },
+      { dedupeKey: `step-${step}` },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   /* ─── Restore draft on mount ─── */
   useEffect(() => {
@@ -340,13 +361,13 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
 
     // Validate file type (mobile-friendly: includes HEIC/HEIF from iPhone)
     if (!isValidImageFile(file)) {
-      setAvatarUploadError('Solo se aceptan imágenes JPG, PNG, WebP o HEIC');
+      setAvatarUploadError(t('onboarding.imageError'));
       return;
     }
     // Validate file size
     const sizeError = validateFileSize(file, 5);
     if (sizeError) {
-      setAvatarUploadError(sizeError);
+      setAvatarUploadError(t('onboarding.imageError'));
       return;
     }
 
@@ -379,7 +400,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       }
     };
     reader.onerror = () => {
-      setAvatarUploadError('Error al leer el archivo. Intenta de nuevo.');
+      setAvatarUploadError(t('onboarding.imageError'));
     };
     reader.readAsDataURL(file);
   };
@@ -391,34 +412,48 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     setAvatarUploadError(null);
     try {
       const ext = getSafeImageExtension(avatarFile.name);
-      const path = `avatars/${user.id}/profile-${Date.now()}.${ext}`;
+      // PB-COMPLETE-ONBOARDING-404-001: canonical avatar bucket + owner-scoped
+      // path (first folder segment = auth.uid(), required by the storage
+      // policies). The previous 'profile_pictures' bucket does not exist, so
+      // every wizard avatar upload failed silently and profile_completion
+      // lost its 10 avatar points.
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
       const { error: uploadErr } = await supabase.storage
-        .from('profile_pictures')
+        .from(STORAGE_BUCKETS.avatars)
         .upload(path, avatarFile, { upsert: true });
 
       if (uploadErr) {
         console.error('[Onboarding] Avatar upload error:', uploadErr.message);
-        setAvatarUploadError(`Error al subir foto: ${uploadErr.message}. Puedes intentar de nuevo.`);
+        setAvatarUploadError(t('onboarding.imageError'));
         return null; // Return null but DON'T throw — form data is safe
       }
 
       const { data: urlData } = supabase.storage
-        .from('profile_pictures')
+        .from(STORAGE_BUCKETS.avatars)
         .getPublicUrl(path);
 
       return urlData.publicUrl;
     } catch (err) {
       console.error('[Onboarding] Avatar upload exception:', err);
-      setAvatarUploadError('Error de red al subir foto. Puedes intentar de nuevo desde tu perfil.');
+      setAvatarUploadError(t('onboarding.imageError'));
       return null; // Form data is safe
     }
   };
 
   /* ─── Final save and complete ─── */
+  // PB-COMPLETE-ONBOARDING-404-001: the wizard may ONLY present final success
+  // when the canonical backend finalization (complete-onboarding edge function
+  // -> pb_complete_onboarding RPC) confirms with a 2xx. On any failure (core
+  // PATCH error, missing session, non-2xx response, exception) the wizard
+  // stays open, the local draft is preserved for retry, already-saved core
+  // data is kept, and a recoverable error is shown. The previous pattern
+  // ("fire/best-effort and continue as completed") is removed: it left every
+  // user in AUTH_ONLY while the UI claimed success.
   const saveAndFinish = async () => {
-    if (!user) return;
+    if (!user || saving) return;
     setSaving(true);
     setSaveStatus('saving');
+    setCompletionFailed(false);
 
     try {
       // Upload avatar independently — failure doesn't block completion
@@ -438,40 +473,56 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         .eq('user_id', user.id);
 
       if (error) {
+        // Core data NOT saved: recoverable — stay on the wizard, keep the
+        // draft, let the user retry.
         setSaveStatus('error');
-      } else {
-        setSaveStatus('saved');
+        setCompletionFailed(true);
+        return;
       }
 
-      // Backend-controlled fields: onboarding_status, marketplace_ready, profile_completion.
-      try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const accessToken = sessionData.session?.access_token;
-        if (accessToken) {
-          await fetch(edgeFunctionUrl('complete-onboarding'), {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({ marketplace_ready: profileVisibility === 'public' }),
-          });
-        }
-      } catch {
-        // Non-blocking: core profile data is already saved.
+      // Backend-controlled fields: onboarding_status, marketplace_ready,
+      // profile_completion. A 2xx from this call is REQUIRED to consider the
+      // onboarding finalized; non-2xx must not be treated as success.
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) {
+        setSaveStatus('error');
+        setCompletionFailed(true);
+        return;
+      }
+      const completionRes = await fetch(edgeFunctionUrl('complete-onboarding'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ marketplace_ready: profileVisibility === 'public' }),
+      });
+      if (!completionRes.ok) {
+        // Canonical finalization failed: core data is already saved, but the
+        // onboarding is NOT complete. Do not clear the draft, do not emit
+        // onboarding_completed, do not navigate away — offer a retry.
+        setSaveStatus('error');
+        setCompletionFailed(true);
+        return;
       }
 
+      setSaveStatus('saved');
       clearDraftFromLocal(user.id);
       setHasUnsavedChanges(false);
 
+      // PB-OBSERVABILITY-001: emit onboarding_completed ONLY after the
+      // canonical onboarding_status confirms finalization (the RPC behind
+      // complete-onboarding is the source of truth; a failed or non-finalizing
+      // call must not emit).
+      await emitCompletedIfCanonical();
+
       await refreshProfile();
       onComplete(accountType);
-    } catch (err) {
+    } catch {
+      // Any unexpected failure keeps the wizard open with the draft intact.
       setSaveStatus('error');
-      clearDraftFromLocal(user.id);
-      setHasUnsavedChanges(false);
-      await refreshProfile();
-      onComplete(accountType);
+      setCompletionFailed(true);
     } finally {
       setSaving(false);
     }
@@ -516,6 +567,29 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     }
   };
 
+  /* ─── PB-OBSERVABILITY-001: canonical-completion-gated event ─── */
+  // onboarding_completed may only be emitted after the CANONICAL
+  // onboarding_status (set exclusively by the pb_complete_onboarding RPC
+  // behind the complete-onboarding edge function) confirms the wizard really
+  // finished: PROFILE_COMPLETED or MARKETPLACE_READY. Skipping leaves the
+  // profile in PROFILE_STARTED, which must NOT emit the event.
+  const emitCompletedIfCanonical = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from(TABLES.profiles)
+        .select('onboarding_status')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (data && hasCompletedOnboarding(data.onboarding_status)) {
+        trackEvent('onboarding_completed', { account_type: accountType }, { dedupeKey: 'completed' });
+      }
+    } catch {
+      // Observability must never break onboarding; without canonical
+      // confirmation we must not claim completion.
+    }
+  };
+
   const skipOnboarding = async () => {
     if (!user) return;
 
@@ -554,6 +628,10 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
 
     clearDraftFromLocal(user.id);
     setHasUnsavedChanges(false);
+    // Skipping leaves the canonical status in PROFILE_STARTED (the RPC only
+    // sets MARKETPLACE_READY when marketplace_ready=true), so this stays
+    // silent unless the canonical state truly finalizes.
+    await emitCompletedIfCanonical();
     await refreshProfile();
     onComplete();
     navigate('/dashboard', { replace: true });
@@ -568,19 +646,19 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         {saveStatus === 'saving' && (
           <>
             <Loader2 className="h-3 w-3 animate-spin text-zinc-400" />
-            <span className="text-zinc-400">Guardando...</span>
+            <span className="text-zinc-400">{t('common.saving')}</span>
           </>
         )}
         {saveStatus === 'saved' && (
           <>
             <Cloud className="h-3 w-3 text-emerald-400" />
-            <span className="text-emerald-400">Guardado</span>
+            <span className="text-emerald-400">{t('common.saved')}</span>
           </>
         )}
         {saveStatus === 'error' && (
           <>
             <CloudOff className="h-3 w-3 text-red-400" />
-            <span className="text-red-400">Error al guardar</span>
+            <span className="text-red-400">{t('common.saveError')}</span>
           </>
         )}
       </div>
@@ -593,14 +671,14 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         {/* Header */}
         <div className="mb-6 text-center">
           <h1 className="text-xl font-bold text-zinc-100 sm:text-2xl">
-            Configura tu perfil
+            {t('onboarding.setupProfile')}
           </h1>
           <p className="mt-1 text-xs text-zinc-500 sm:text-sm">
-            Completa lo esencial ahora. Podrás añadir CV, certificados y experiencia después.
+            {t('onboarding.setupSubtitle')}
           </p>
           {restoredFromDraft && step > 1 && (
             <p className="mt-1 text-[10px] text-emerald-400/70">
-              ✓ Progreso anterior restaurado
+              {t('onboarding.progressRestored')}
             </p>
           )}
         </div>
@@ -609,12 +687,12 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] uppercase tracking-wider text-zinc-500">
-              Paso {step} de {TOTAL_STEPS}
+              {t('onboarding.stepOf', { current: step, total: TOTAL_STEPS })}
             </span>
             <div className="flex items-center gap-3">
               {renderSaveStatus()}
               <span className="text-[10px] font-semibold text-[#f59e0b]">
-                {progress}% completado
+                {t('onboarding.completed', { percent: progress })}
               </span>
             </div>
           </div>
@@ -632,21 +710,21 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             {/* Step 1: Account Type */}
             {step === 1 && (
               <div className="space-y-4">
-                <h2 className="text-sm font-semibold text-zinc-200">¿Qué tipo de cuenta necesitas?</h2>
+                <h2 className="text-sm font-semibold text-zinc-200">{t('onboarding.accountTypeQuestion')}</h2>
                 <div className="grid grid-cols-2 gap-3">
-                  {ACCOUNT_TYPES.map((t) => (
+                  {ACCOUNT_TYPES.map((option) => (
                     <button
-                      key={t.value}
-                      onClick={() => setAccountType(t.value)}
+                      key={option.value}
+                      onClick={() => setAccountType(option.value)}
                       className={cn(
                         'flex flex-col items-center gap-2 rounded-lg border p-4 transition',
-                        accountType === t.value
+                        accountType === option.value
                           ? 'border-[#f59e0b] bg-[#f59e0b]/10 text-[#f59e0b]'
                           : 'border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600'
                       )}
                     >
-                      <span className="text-2xl">{t.icon}</span>
-                      <span className="text-xs font-medium">{t.label}</span>
+                      <span className="text-2xl">{option.icon}</span>
+                      <span className="text-xs font-medium">{t(option.labelKey)}</span>
                     </button>
                   ))}
                 </div>
@@ -656,7 +734,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             {/* Step 2: Main Role */}
             {step === 2 && (
               <div className="space-y-3">
-                <h2 className="text-sm font-semibold text-zinc-200">¿Cuál es tu rol principal?</h2>
+                <h2 className="text-sm font-semibold text-zinc-200">{t('onboarding.mainRoleQuestion')}</h2>
                 <div className="grid grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1">
                   {ROLES.map((r) => (
                     <button
@@ -669,7 +747,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                           : 'border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600'
                       )}
                     >
-                      {r}
+                      {r === 'Other' ? t('jobs.other') : r}
                     </button>
                   ))}
                 </div>
@@ -679,8 +757,8 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             {/* Step 3: Specialties */}
             {step === 3 && (
               <div className="space-y-3">
-                <h2 className="text-sm font-semibold text-zinc-200">Selecciona tus especialidades</h2>
-                <p className="text-[10px] text-zinc-500">Puedes seleccionar varias</p>
+                <h2 className="text-sm font-semibold text-zinc-200">{t('onboarding.selectSpecialties')}</h2>
+                <p className="text-[10px] text-zinc-500">{t('onboarding.selectMultiple')}</p>
                 <div className="flex flex-wrap gap-2">
                   {SPECIALTIES.map((s) => (
                     <button
@@ -704,25 +782,25 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             {/* Step 4: Location */}
             {step === 4 && (
               <div className="space-y-4">
-                <h2 className="text-sm font-semibold text-zinc-200">¿Dónde te encuentras?</h2>
+                <h2 className="text-sm font-semibold text-zinc-200">{t('onboarding.locationQuestion')}</h2>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider text-zinc-500 mb-1 block">País</label>
+                    <label className="text-[10px] uppercase tracking-wider text-zinc-500 mb-1 block">{t('onboarding.countryLabel')}</label>
                     <input
                       type="text"
                       value={country}
                       onChange={(e) => setCountry(e.target.value)}
-                      placeholder="Ej: México, España, Colombia..."
+                      placeholder={t('onboarding.countryPlaceholder')}
                       className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-[#f59e0b]/50"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] uppercase tracking-wider text-zinc-500 mb-1 block">Ciudad / Región</label>
+                    <label className="text-[10px] uppercase tracking-wider text-zinc-500 mb-1 block">{t('onboarding.cityLabel')}</label>
                     <input
                       type="text"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      placeholder="Ej: Ciudad de México, Madrid..."
+                      placeholder={t('onboarding.cityPlaceholder')}
                       className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-[#f59e0b]/50"
                     />
                   </div>
@@ -733,7 +811,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             {/* Step 5: Availability */}
             {step === 5 && (
               <div className="space-y-4">
-                <h2 className="text-sm font-semibold text-zinc-200">¿Cuál es tu disponibilidad?</h2>
+                <h2 className="text-sm font-semibold text-zinc-200">{t('onboarding.availabilityQuestion')}</h2>
                 <div className="space-y-2">
                   {AVAILABILITY_OPTIONS.map((opt) => (
                     <button
@@ -746,7 +824,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                           : 'border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600'
                       )}
                     >
-                      {opt.label}
+                      {t(opt.labelKey)}
                     </button>
                   ))}
                 </div>
@@ -756,8 +834,8 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             {/* Step 6: Travel / Relocation */}
             {step === 6 && (
               <div className="space-y-4">
-                <h2 className="text-sm font-semibold text-zinc-200">Movilidad y disponibilidad para viajar</h2>
-                <p className="text-xs text-zinc-500">Indica si estás dispuesto a viajar o reubicarte por trabajo</p>
+                <h2 className="text-sm font-semibold text-zinc-200">{t('onboarding.mobilityTitle')}</h2>
+                <p className="text-xs text-zinc-500">{t('onboarding.mobilitySubtitle')}</p>
                 <div className="space-y-3 pt-2">
                   <label className="flex items-center gap-3 cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 p-4 transition hover:border-zinc-600">
                     <input
@@ -767,8 +845,8 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                       className="h-5 w-5 rounded border-zinc-600 bg-zinc-800 text-[#f59e0b] focus:ring-[#f59e0b]"
                     />
                     <div>
-                      <span className="text-sm font-medium text-zinc-200">Dispuesto a viajar</span>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">Puedo desplazarme a otras ciudades/países por proyectos</p>
+                      <span className="text-sm font-medium text-zinc-200">{t('onboarding.willingToTravel')}</span>
+                      <p className="text-[10px] text-zinc-500 mt-0.5">{t('onboarding.willingToTravelDesc')}</p>
                     </div>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 p-4 transition hover:border-zinc-600">
@@ -779,8 +857,8 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                       className="h-5 w-5 rounded border-zinc-600 bg-zinc-800 text-[#f59e0b] focus:ring-[#f59e0b]"
                     />
                     <div>
-                      <span className="text-sm font-medium text-zinc-200">Dispuesto a reubicarse</span>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">Puedo mudarme de forma permanente por una oportunidad</p>
+                      <span className="text-sm font-medium text-zinc-200">{t('onboarding.willingToRelocate')}</span>
+                      <p className="text-[10px] text-zinc-500 mt-0.5">{t('onboarding.willingToRelocateDesc')}</p>
                     </div>
                   </label>
                 </div>
@@ -790,8 +868,8 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             {/* Step 7: Profile Visibility */}
             {step === 7 && (
               <div className="space-y-4">
-                <h2 className="text-sm font-semibold text-zinc-200">Visibilidad de tu perfil</h2>
-                <p className="text-xs text-zinc-500">Controla quién puede ver tu perfil en búsquedas</p>
+                <h2 className="text-sm font-semibold text-zinc-200">{t('onboarding.visibilityTitle')}</h2>
+                <p className="text-xs text-zinc-500">{t('onboarding.visibilitySubtitle')}</p>
                 <div className="space-y-3 pt-2">
                   <button
                     onClick={() => setProfileVisibility('public')}
@@ -805,10 +883,10 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                     <Globe className={cn('h-5 w-5 mt-0.5 shrink-0', profileVisibility === 'public' ? 'text-[#f59e0b]' : 'text-zinc-500')} />
                     <div>
                       <span className={cn('text-sm font-semibold', profileVisibility === 'public' ? 'text-[#f59e0b]' : 'text-zinc-300')}>
-                        Perfil público
+                        {t('onboarding.publicProfile')}
                       </span>
                       <p className="text-[10px] text-zinc-500 mt-0.5">
-                        Las empresas pueden encontrar tu perfil en búsquedas y contactarte directamente
+                        {t('onboarding.publicProfileDesc')}
                       </p>
                     </div>
                     {profileVisibility === 'public' && (
@@ -827,10 +905,10 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                     <Lock className={cn('h-5 w-5 mt-0.5 shrink-0', profileVisibility === 'private' ? 'text-[#f59e0b]' : 'text-zinc-500')} />
                     <div>
                       <span className={cn('text-sm font-semibold', profileVisibility === 'private' ? 'text-[#f59e0b]' : 'text-zinc-300')}>
-                        Perfil privado
+                        {t('onboarding.privateProfile')}
                       </span>
                       <p className="text-[10px] text-zinc-500 mt-0.5">
-                        Solo tú puedes ver tu perfil. Las empresas no te encontrarán en búsquedas
+                        {t('onboarding.privateProfileDesc')}
                       </p>
                     </div>
                     {profileVisibility === 'private' && (
@@ -840,7 +918,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                 </div>
                 <div className="rounded-md bg-zinc-900/50 border border-zinc-800 p-3 mt-2">
                   <p className="text-[10px] text-zinc-500">
-                    💡 <strong className="text-zinc-400">Recomendado:</strong> Perfil público para recibir ofertas de trabajo. Puedes cambiar esto en cualquier momento desde tu perfil.
+                    💡 {t('onboarding.visibilityRecommendation')}
                   </p>
                 </div>
               </div>
@@ -849,18 +927,22 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             {/* Step 8: Photo */}
             {step === 8 && (
               <div className="space-y-4">
-                <h2 className="text-sm font-semibold text-zinc-200">Foto de perfil (opcional)</h2>
-                <p className="text-xs text-zinc-500">Una foto profesional aumenta tu visibilidad</p>
+                <h2 className="text-sm font-semibold text-zinc-200">{t('onboarding.photoTitle')}</h2>
+                <p className="text-xs text-zinc-500">{t('onboarding.photoSubtitle')}</p>
                 <div className="flex flex-col items-center gap-4 pt-2">
                   <div className="relative h-28 w-28 rounded-full border-2 border-dashed border-zinc-700 bg-zinc-900 flex items-center justify-center overflow-hidden">
                     {avatarPreview ? (
-                      <img src={avatarPreview} alt="Preview" className="h-full w-full object-cover" />
+                      <img src={avatarPreview} alt={t('onboarding.photoPreviewAlt')} className="h-full w-full object-cover" />
                     ) : (
                       <Upload className="h-8 w-8 text-zinc-600" />
                     )}
                   </div>
                   <label className="cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 px-4 py-2 text-xs font-medium text-zinc-300 hover:border-zinc-600 transition active:bg-zinc-800">
-                    {avatarFile && !avatarPreview ? '📷 Foto HEIC seleccionada' : avatarPreview ? 'Cambiar foto' : 'Subir foto'}
+                    {avatarFile && !avatarPreview
+                      ? t('onboarding.heicSelected')
+                      : avatarPreview
+                        ? t('onboarding.changePhoto')
+                        : t('onboarding.uploadPhoto')}
                     <input
                       type="file"
                       accept={ACCEPT_IMAGES}
@@ -873,7 +955,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                       onClick={() => { setAvatarFile(null); setAvatarPreview(null); }}
                       className="text-xs text-zinc-500 hover:text-zinc-300"
                     >
-                      Quitar foto
+                      {t('onboarding.removePhoto')}
                     </button>
                   )}
                   {avatarUploadError && (
@@ -882,14 +964,30 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                     </div>
                   )}
                   <p className="text-[10px] text-zinc-600 text-center">
-                    Puedes omitir este paso y subir tu foto después
+                    {t('onboarding.skipPhotoHint')}
                   </p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Navigation buttons */}
+          {/* PB-COMPLETE-ONBOARDING-404-001: recoverable finalization error */}
+        {completionFailed && (
+          <div
+            role="alert"
+            data-testid="onboarding-completion-error"
+            className="mt-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4"
+          >
+            <p className="text-sm font-semibold text-red-400">
+              {t('onboarding.completionFailedTitle')}
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-zinc-400">
+              {t('onboarding.completionFailedDescription')}
+            </p>
+          </div>
+        )}
+
+        {/* Navigation buttons */}
           <div className="mt-6 flex items-center justify-between pt-4 border-t border-zinc-800">
             <div>
               {step > 1 ? (
@@ -898,7 +996,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                   className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200 transition"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Atrás
+                  {t('onboarding.back')}
                 </button>
               ) : (
                 <button
@@ -906,7 +1004,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                   className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 transition"
                 >
                   <X className="h-3 w-3" />
-                  Omitir
+                  {t('onboarding.skip')}
                 </button>
               )}
             </div>
@@ -923,16 +1021,16 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
               {saving ? (
                 <span className="flex items-center gap-2">
                   <span className="h-3 w-3 animate-spin rounded-full border-2 border-black border-t-transparent" />
-                  Guardando...
+                  {t('onboarding.saving')}
                 </span>
               ) : step === TOTAL_STEPS ? (
                 <>
-                  Finalizar
+                  {t('onboarding.finish')}
                   <Check className="h-4 w-4" />
                 </>
               ) : (
                 <>
-                  Siguiente
+                  {t('onboarding.next')}
                   <ChevronRight className="h-4 w-4" />
                 </>
               )}
@@ -946,7 +1044,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             onClick={skipOnboarding}
             className="text-[10px] text-zinc-600 hover:text-zinc-400 transition uppercase tracking-wider"
           >
-            Completar después →
+            {t('onboarding.completeLater')}
           </button>
         </div>
       </div>

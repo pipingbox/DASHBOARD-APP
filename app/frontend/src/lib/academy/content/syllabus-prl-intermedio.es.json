@@ -1,0 +1,99 @@
+[
+  {
+    "id": "m6-gestion",
+    "iconKey": "ClipboardList",
+    "officialRef": "RD 39/1997 §6",
+    "hours": "8 horas",
+    "title": "Módulo 6: Gestión de la prevención",
+    "lessons": [
+      {
+        "title": "6.1 Evaluación de riesgos",
+        "duration": "90 min",
+        "topics": [
+          "Metodología de evaluación",
+          "Identificación, estimación, valoración",
+          "Documentación",
+          "Revisiones"
+        ]
+      },
+      {
+        "title": "6.2 Planificación de la prevención",
+        "duration": "90 min",
+        "topics": [
+          "Plan de prevención",
+          "Medidas preventivas",
+          "Plazos y responsables",
+          "Seguimiento"
+        ]
+      },
+      {
+        "title": "6.3 Investigación de accidentes",
+        "duration": "60 min",
+        "topics": [
+          "Árbol de causas",
+          "Recogida de información",
+          "Análisis de causas",
+          "Medidas correctoras"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-auditorias",
+    "iconKey": "Search",
+    "officialRef": "RD 39/1997 §7",
+    "hours": "6 horas",
+    "title": "Módulo 7: Auditorías e inspecciones",
+    "lessons": [
+      {
+        "title": "7.1 Auditorías del sistema de prevención",
+        "duration": "90 min",
+        "topics": [
+          "Objeto de la auditoría",
+          "Auditoría reglamentaria",
+          "Auditoría voluntaria",
+          "Informe de auditoría"
+        ]
+      },
+      {
+        "title": "7.2 Inspecciones de seguridad",
+        "duration": "90 min",
+        "topics": [
+          "Inspecciones programadas",
+          "Inspecciones de lugares de trabajo",
+          "Inspecciones de equipos",
+          "Partes de inspección"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-cae",
+    "iconKey": "Users",
+    "officialRef": "RD 171/2004",
+    "hours": "6 horas",
+    "title": "Módulo 8: Coordinación de actividades empresariales (CAE)",
+    "lessons": [
+      {
+        "title": "8.1 Obligaciones del contratante",
+        "duration": "90 min",
+        "topics": [
+          "RD 171/2004",
+          "Verificación de la prevención del contratista",
+          "Información sobre riesgos",
+          "Coordinador de actividades"
+        ]
+      },
+      {
+        "title": "8.2 Obligaciones del contratista",
+        "duration": "90 min",
+        "topics": [
+          "Cumplimiento de normas del centro",
+          "Información a los trabajadores",
+          "Subcontratación",
+          "Libro de subcontratación (sector construcción)"
+        ]
+      }
+    ]
+  }
+]

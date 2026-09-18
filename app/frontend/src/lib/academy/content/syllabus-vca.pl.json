@@ -1,0 +1,297 @@
+[
+  {
+    "id": "m1-legal",
+    "iconKey": "Shield",
+    "officialRef": "VCA 2026 §1",
+    "title": "Moduł 1: Przepisy prawne i regulacje",
+    "lessons": [
+      {
+        "title": "1.1 Belgijskie i unijne prawo bezpieczeństwa pracy",
+        "duration": "15 min",
+        "topics": [
+          "Codex over Welzijn op het Werk (belgijski kodeks dobrostanu w pracy)",
+          "Dyrektywa ramowa UE 89/391/EWG",
+          "Prawa i obowiązki pracownika",
+          "Obowiązki pracodawcy"
+        ]
+      },
+      {
+        "title": "1.2 System VCA i certyfikacja",
+        "duration": "10 min",
+        "topics": [
+          "Czym jest VCA?",
+          "B-VCA a VOL-VCA",
+          "Okres ważności (10 lat)",
+          "Nadzór SSVV/BESACC"
+        ]
+      },
+      {
+        "title": "1.3 ARAB i CODELCO",
+        "duration": "12 min",
+        "topics": [
+          "Algemeen Reglement voor de Arbeidsbescherming (ogólny regulamin ochrony pracy)",
+          "Commissie voor Welzijn op het Werk (komisja ds. dobrostanu w pracy)",
+          "Zgłaszanie wypadków przy pracy"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m2-risk",
+    "iconKey": "AlertTriangle",
+    "officialRef": "VCA 2026 §2",
+    "title": "Moduł 2: Analiza ryzyka i działania profilaktyczne",
+    "lessons": [
+      {
+        "title": "2.1 Identyfikacja zagrożeń",
+        "duration": "20 min",
+        "topics": [
+          "Czym jest ryzyko?",
+          "Zagrożenie a ryzyko",
+          "Matryca ryzyka",
+          "Analiza bezpieczeństwa pracy (JSA)"
+        ]
+      },
+      {
+        "title": "2.2 Hierarchia środków ochronnych",
+        "duration": "15 min",
+        "topics": [
+          "Eliminacja zagrożenia",
+          "Zastąpienie czynnikiem mniej groźnym",
+          "Techniczne środki ochronne",
+          "Środki organizacyjne",
+          "Środki ochrony indywidualnej (ostatnia linia obrony)"
+        ]
+      },
+      {
+        "title": "2.3 System zezwoleń na pracę",
+        "duration": "12 min",
+        "topics": [
+          "Zezwolenie na prace gorące",
+          "Zezwolenie na wejście do przestrzeni zamkniętej",
+          "Blokowanie i oznaczanie (LOTO)",
+          "Zezwolenie na pracę na wysokości"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m3-ppe",
+    "iconKey": "HardHat",
+    "officialRef": "VCA 2026 §3",
+    "title": "Moduł 3: Środki ochrony indywidualnej",
+    "lessons": [
+      {
+        "title": "3.1 Obowiązkowe środki ochrony indywidualnej na terenie zakładu przemysłowego",
+        "duration": "10 min",
+        "topics": [
+          "Hełm ochronny (EN 397)",
+          "Okulary ochronne (EN 166)",
+          "Obuwie ochronne (EN ISO 20345)",
+          "Kamizelka ostrzegawcza (EN 20471)",
+          "Rękawice ochronne (EN 388)"
+        ]
+      },
+      {
+        "title": "3.2 Ochrona dróg oddechowych",
+        "duration": "15 min",
+        "topics": [
+          "Półmaski filtrujące FFP1/FFP2/FFP3",
+          "Półmaski i maski pełnotwarzowe",
+          "Aparaty powietrzne butlowe (SCBA) do przestrzeni zamkniętych",
+          "Dobór filtrów (A, B, E, K, P)"
+        ]
+      },
+      {
+        "title": "3.3 Ochrona słuchu i ochrona przed upadkiem z wysokości",
+        "duration": "10 min",
+        "topics": [
+          "Wkładki przeciwhałasowe a nauszniki (wskaźnik SNR)",
+          "Szelki bezpieczeństwa (EN 361)",
+          "Linki bezpieczeństwa i liny kotwiczące",
+          "Punkty kotwiczenia (EN 795)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m4-fire",
+    "iconKey": "Flame",
+    "officialRef": "VCA 2026 §4",
+    "title": "Moduł 4: Bezpieczeństwo pożarowe i ochrona przeciwwybuchowa",
+    "lessons": [
+      {
+        "title": "4.1 Trójkąt spalania i grupy pożarów",
+        "duration": "12 min",
+        "topics": [
+          "Trójkąt spalania (ciepło, materiał palny, tlen)",
+          "Grupy pożarów A/B/C/D/F",
+          "Rodzaje gaśnic (woda, piana, CO2, proszek)",
+          "Metoda PASS"
+        ]
+      },
+      {
+        "title": "4.2 Strefy ATEX",
+        "duration": "15 min",
+        "topics": [
+          "Strefy 0/1/2 (gazy)",
+          "Strefy 20/21/22 (pyły)",
+          "Kategorie urządzeń (1/2/3)",
+          "Prace gorące w strefach ATEX"
+        ]
+      },
+      {
+        "title": "4.3 Procedury ewakuacyjne",
+        "duration": "10 min",
+        "topics": [
+          "Sygnały alarmowe",
+          "Drogi ewakuacyjne",
+          "Miejsca zbiórki",
+          "Sprawdzenie obecności na miejscu zbiórki"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m5-electrical",
+    "iconKey": "Zap",
+    "officialRef": "VCA 2026 §5",
+    "title": "Moduł 5: Bezpieczeństwo elektryczne",
+    "lessons": [
+      {
+        "title": "5.1 Zagrożenia elektryczne",
+        "duration": "15 min",
+        "topics": [
+          "Porażenie prądem elektrycznym",
+          "Wyładowanie łukowe",
+          "Napięcie krokowe",
+          "Poziomy uprawnień BA4/BA5"
+        ]
+      },
+      {
+        "title": "5.2 Blokowanie i oznaczanie (LOTO)",
+        "duration": "12 min",
+        "topics": [
+          "Sześciostopniowa procedura LOTO",
+          "Odłączenie źródeł energii",
+          "Potwierdzenie braku napięcia i energii szczątkowej",
+          "Blokada grupowa"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m6-height",
+    "iconKey": "Wind",
+    "officialRef": "VCA 2026 §6",
+    "title": "Moduł 6: Praca na wysokości",
+    "lessons": [
+      {
+        "title": "6.1 Zagrożenie upadkiem i jego zapobieganie",
+        "duration": "15 min",
+        "topics": [
+          "Definicja (powyżej 2 m)",
+          "Balustrady i krawężniki",
+          "Siatki bezpieczeństwa",
+          "Systemy powstrzymywania spadania"
+        ]
+      },
+      {
+        "title": "6.2 Bezpieczeństwo rusztowań",
+        "duration": "12 min",
+        "topics": [
+          "Tabliczki rusztowaniowe (zielona/czerwona/żółta)",
+          "Wymagania dotyczące przeglądów",
+          "Klasy obciążenia",
+          "Osoba kompetentna"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-chemical",
+    "iconKey": "Droplets",
+    "officialRef": "VCA 2026 §7",
+    "title": "Moduł 7: Substancje niebezpieczne",
+    "lessons": [
+      {
+        "title": "7.1 Klasyfikacja CLP/GHS",
+        "duration": "15 min",
+        "topics": [
+          "Piktogramy ostrzegawcze",
+          "Zwroty H i zwroty P",
+          "Hasła ostrzegawcze (Niebezpieczeństwo/Uwaga)",
+          "Karty charakterystyki (SDS)"
+        ]
+      },
+      {
+        "title": "7.2 Azbest i krzemionka",
+        "duration": "12 min",
+        "topics": [
+          "Rodzaje azbestu (biały/brązowy/niebieski)",
+          "Rozporządzenie REACH",
+          "Pył krzemionkowy (RESPIRE-SILICE)",
+          "Wartości dopuszczalne narażenia"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-ergonomics",
+    "iconKey": "Eye",
+    "officialRef": "VCA 2026 §8",
+    "title": "Moduł 8: Ergonomia i ręczne prace transportowe",
+    "lessons": [
+      {
+        "title": "8.1 Techniki podnoszenia ciężarów",
+        "duration": "10 min",
+        "topics": [
+          "Prawidłowa postawa przy podnoszeniu",
+          "Podnoszenie zespołowe",
+          "Mechaniczne środki pomocnicze",
+          "Dopuszczalne masy (25 kg mężczyźni / 12,5 kg kobiety)"
+        ]
+      },
+      {
+        "title": "8.2 Praca przy monitorze i postawa ciała",
+        "duration": "8 min",
+        "topics": [
+          "Odległość od monitora",
+          "Regulacja krzesła",
+          "Przerwy (5 min na godzinę)",
+          "Zapobieganie przemęczeniu wzroku"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m9-accidents",
+    "iconKey": "ClipboardList",
+    "officialRef": "VCA 2026 §9",
+    "title": "Moduł 9: Wypadki i pierwsza pomoc",
+    "lessons": [
+      {
+        "title": "9.1 Zgłaszanie wypadków",
+        "duration": "12 min",
+        "topics": [
+          "Zgłaszanie zdarzeń potencjalnie wypadkowych",
+          "Postępowanie powypadkowe",
+          "Analiza przyczyn źródłowych",
+          "Działania korygujące"
+        ]
+      },
+      {
+        "title": "9.2 Podstawy pierwszej pomocy",
+        "duration": "15 min",
+        "topics": [
+          "Schemat DRABC",
+          "Resuscytacja krążeniowo-oddechowa (30:2)",
+          "Pozycja bezpieczna",
+          "Tamowanie krwotoku",
+          "Postępowanie przy oparzeniach",
+          "Przemywanie oczu"
+        ]
+      }
+    ]
+  }
+]

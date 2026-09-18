@@ -364,7 +364,7 @@ export default function RequestWorkers() {
               <Input
                 value={form.contact_person}
                 onChange={(e) => update('contact_person', e.target.value)}
-                placeholder="Full name"
+                placeholder={t('requestWorkers.placeholderFullName')}
                 className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:border-[#f59e0b] focus:ring-[#f59e0b]/20"
               />
               {errors.contact_person && <p className="text-xs text-red-400">{errors.contact_person}</p>}

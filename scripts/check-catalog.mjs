@@ -90,7 +90,7 @@ for (const c of publishable) {
 // instead: a key that exists in en.json only is an unfinished translation, not
 // a working fallback.
 const LOCALES_DIR = join(FRONTEND, 'src', 'i18n', 'locales');
-const LOCALES = ['en', 'es', 'nl', 'de', 'fr', 'pt', 'it'];
+const LOCALES = JSON.parse(readFileSync(join(FRONTEND, 'src', 'i18n', 'languages.json'), 'utf8')).map((l) => l.code);
 
 /** Resolve a dotted key path ("a.b.c") against a parsed locale object. */
 function resolveKey(obj, path) {

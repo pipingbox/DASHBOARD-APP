@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node --experimental-strip-types ../../scripts/route-contract-guard.ts && vite build",
     "lint": "eslint --quiet ./src",
     "preview": "vite preview",
     "postinstall": "echo 'Dependencies installed successfully'"
@@ -59,6 +59,7 @@
     "lucide-react": "^0.462.0",
     "markdown-to-jsx": "^9.7.13",
     "next-themes": "^0.3.0",
+    "posthog-js": "^1.429.4",
     "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
@@ -99,7 +100,6 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",
-    "vite-plugin-sitemap": "^0.8.2",
     "vite-prerender-plugin": "^0.5.13"
   }
 }

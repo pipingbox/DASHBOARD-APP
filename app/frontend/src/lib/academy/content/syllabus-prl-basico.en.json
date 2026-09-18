@@ -1,0 +1,241 @@
+[
+  {
+    "id": "m1-conceptos",
+    "iconKey": "Scale",
+    "officialRef": "Ley 31/1995 §1",
+    "hours": "4 hours",
+    "title": "Module 1: Basic concepts and legal framework",
+    "lessons": [
+      {
+        "title": "1.1 The concepts of work and health",
+        "duration": "45 min",
+        "topics": [
+          "Definition of work",
+          "Definition of health (WHO)",
+          "Work and health: the relationship",
+          "Work-related harm"
+        ]
+      },
+      {
+        "title": "1.2 Legal framework",
+        "duration": "60 min",
+        "topics": [
+          "Ley 31/1995 on the prevention of occupational risks (LPRL)",
+          "RD 39/1997 Regulation on Prevention Services",
+          "EU framework directives (89/391/EEC)",
+          "Duties of the employer and of the worker"
+        ]
+      },
+      {
+        "title": "1.3 Organisation of prevention",
+        "duration": "45 min",
+        "topics": [
+          "In-house and external Servicios de Prevención (prevention services)",
+          "Delegados de Prevención (prevention delegates)",
+          "Comité de Seguridad y Salud (health and safety committee)",
+          "Mutuas (occupational accident insurance bodies)"
+        ]
+      },
+      {
+        "title": "1.4 Occupational risk and harm",
+        "duration": "30 min",
+        "topics": [
+          "The concept of occupational risk",
+          "Risk factor",
+          "Harm: accident vs occupational disease",
+          "Occupational diseases (RD 1299/2006)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m2-riesgos-generales",
+    "iconKey": "AlertTriangle",
+    "officialRef": "RD 39/1997 §2",
+    "hours": "4 hours",
+    "title": "Module 2: General risks",
+    "lessons": [
+      {
+        "title": "2.1 Falls and entrapment",
+        "duration": "45 min",
+        "topics": [
+          "Falls on the same level",
+          "Falls from a height",
+          "Entrapment by machinery",
+          "Prevention in work at height"
+        ]
+      },
+      {
+        "title": "2.2 Electrical risk",
+        "duration": "45 min",
+        "topics": [
+          "Direct and indirect contact",
+          "Electrical risk zones (BA4/BA5)",
+          "Work in proximity to live parts",
+          "Damp and conductive locations"
+        ]
+      },
+      {
+        "title": "2.3 Chemical risk",
+        "duration": "45 min",
+        "topics": [
+          "Routes of entry (inhalation, skin, ingestion)",
+          "Hazardous chemical products",
+          "H and P statements (CLP)",
+          "Safety data sheets"
+        ]
+      },
+      {
+        "title": "2.4 Fire risk",
+        "duration": "45 min",
+        "topics": [
+          "The fire triangle",
+          "Classes of fire (A, B, C, D, K)",
+          "Portable fire extinguishers",
+          "Evacuation plan"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m3-sector-industrial",
+    "iconKey": "Factory",
+    "officialRef": "RD 39/1997 §3",
+    "hours": "4 hours",
+    "title": "Module 3: Risks specific to the industrial sector",
+    "lessons": [
+      {
+        "title": "3.1 Welding and oxy-fuel cutting",
+        "duration": "60 min",
+        "topics": [
+          "Risks of arc welding (SMAW, GMAW, GTAW)",
+          "Welding fumes (manganese, nickel, chromium VI)",
+          "UV/IR radiation",
+          "Oxy-fuel cutting: fire and explosion risk",
+          "Hot work permit"
+        ]
+      },
+      {
+        "title": "3.2 Work on industrial piping",
+        "duration": "60 min",
+        "topics": [
+          "Confined spaces (RD 681/2003)",
+          "Lifting of loads (cranes, hoists)",
+          "Work on pressurised systems",
+          "Lockout and tagout (LOTO)"
+        ]
+      },
+      {
+        "title": "3.3 Confined spaces",
+        "duration": "60 min",
+        "topics": [
+          "Definition and examples (tanks, pipes, pits)",
+          "Hazardous atmospheres (O2, H2S, CO, LEL)",
+          "Entry permits",
+          "Attendant and rescue team",
+          "Ventilation and gas monitoring"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m4-preventivas",
+    "iconKey": "ShieldCheck",
+    "officialRef": "RD 39/1997 §4",
+    "hours": "4 hours",
+    "title": "Module 4: Preventive measures and PPE",
+    "lessons": [
+      {
+        "title": "4.1 PPE (personal protective equipment)",
+        "duration": "60 min",
+        "topics": [
+          "Classes of PPE (category I, II, III)",
+          "Helmet, eye protection, gloves, footwear",
+          "Hearing protectors",
+          "Respirators (FFP1/2/3)",
+          "Fall-arrest harness"
+        ]
+      },
+      {
+        "title": "4.2 Safety signage",
+        "duration": "45 min",
+        "topics": [
+          "Prohibition signs (red)",
+          "Warning (yellow)",
+          "Mandatory action (blue)",
+          "Emergency escape and first aid (green)",
+          "Pipe marking (RD 485/1997)"
+        ]
+      },
+      {
+        "title": "4.3 LOTO (Lockout/Tagout)",
+        "duration": "45 min",
+        "topics": [
+          "Isolation of energy sources",
+          "Tagging",
+          "Step-by-step LOTO procedure",
+          "Application to valves and pumps"
+        ]
+      },
+      {
+        "title": "4.4 Work permits",
+        "duration": "30 min",
+        "topics": [
+          "Hot work permit",
+          "Confined space permit",
+          "Work at height permit",
+          "Electrical work permit"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "5-primeros-auxilios",
+    "iconKey": "HeartPulse",
+    "officialRef": "RD 39/1997 §5",
+    "hours": "4 hours",
+    "title": "Module 5: First aid and emergencies",
+    "lessons": [
+      {
+        "title": "5.1 CPR (cardiopulmonary resuscitation)",
+        "duration": "60 min",
+        "topics": [
+          "Chain of survival",
+          "Chest compressions (30:2)",
+          "Use of an AED (defibrillator)",
+          "Recovery position"
+        ]
+      },
+      {
+        "title": "5.2 Bleeding and wounds",
+        "duration": "45 min",
+        "topics": [
+          "External bleeding",
+          "Direct pressure",
+          "Tourniquet (when to use it)",
+          "Wounds and burns"
+        ]
+      },
+      {
+        "title": "5.3 Chemical and thermal burns",
+        "duration": "45 min",
+        "topics": [
+          "Classification of burns (first, second, third degree)",
+          "Chemical burns (emergency shower)",
+          "First aid treatment",
+          "Evacuation"
+        ]
+      },
+      {
+        "title": "5.4 Self-protection and emergency plan",
+        "duration": "30 min",
+        "topics": [
+          "Self-protection plan (RD 393/2007)",
+          "Emergency drills",
+          "Assembly points",
+          "First-response teams (EPI)"
+        ]
+      }
+    ]
+  }
+]

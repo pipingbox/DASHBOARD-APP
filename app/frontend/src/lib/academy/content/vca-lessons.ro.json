@@ -1,0 +1,1312 @@
+{
+  "1": {
+    "sections": [
+      {
+        "title": "Prezentare generală a legislației privind securitatea și sănătatea în muncă",
+        "paragraphs": [
+          "Legislația privind securitatea și sănătatea în muncă (SSM), cunoscută în Țările de Jos și sub denumirea de legislație ARBO, stabilește drepturile și obligațiile atât ale angajatorului, cât și ale lucrătorilor în domeniul securității și sănătății la locul de muncă.",
+          "Legislația se aplică în TOATE locurile unde se desfășoară activități de muncă și îi vizează în egală măsură pe angajatori și pe lucrători."
+        ],
+        "bullets": [
+          "ARBO = condiții de muncă (securitate și sănătate în muncă)",
+          "Acoperă: sănătatea, securitatea și bunăstarea la locul de muncă",
+          "Se aplică tuturor locurilor de muncă, fără excepție",
+          "Atât angajatorul, cât și lucrătorul au responsabilități"
+        ]
+      },
+      {
+        "title": "Principiile de bază ale legislației SSM",
+        "paragraphs": [
+          "Legislația se bazează pe câteva principii fundamentale care asigură securitatea completă la locul de muncă."
+        ],
+        "bullets": [
+          "Sprijin acordat de specialiști sau servicii externe (lucrători desemnați pentru prevenire)",
+          "Colaborarea între mai mulți angajatori care lucrează în același amplasament",
+          "Consultarea și colaborarea cu reprezentanții lucrătorilor",
+          "Inventarierea și evaluarea riscurilor (RI&E) este obligatorie"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Legislația SSM NU se referă la securitatea fizică a obiectivului (Security) — ci doar la sănătate, securitate în muncă și bunăstare."
+        }
+      },
+      {
+        "title": "Inspecția Muncii",
+        "paragraphs": [
+          "Inspecția Muncii (organul de control) supraveghează respectarea legislației SSM și dispune de competențe importante de sancționare."
+        ],
+        "bullets": [
+          "Poate dispune sistarea lucrărilor (oprirea activității)",
+          "Poate aplica amenzi pentru încălcarea normelor",
+          "Poate efectua controale și cercetări la sediul firmelor",
+          "Nu poate concedia lucrători — acesta este rolul angajatorului"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Organul de control poate dispune OPRIREA imediată a lucrărilor dacă există un pericol grav pentru lucrători."
+        }
+      },
+      {
+        "title": "Marcajul CE și timpul de lucru",
+        "paragraphs": [
+          "Marcajul CE arată că un produs îndeplinește cerințele europene minime. Acesta trebuie aplicat de producător sau de importator.",
+          "Legislația privind timpul de lucru stabilește durata maximă a muncii și perioadele minime de repaus, pentru a preveni punerea în pericol a securității și sănătății, și încurajează posibilitatea de a îmbina munca cu obligațiile de îngrijire a familiei."
+        ],
+        "bullets": [
+          "Marcajul CE = cerințele europene minime de securitate",
+          "Trebuie să existe pe fiecare echipament pus pe piață și utilizat",
+          "Legislația timpului de lucru protejează împotriva suprasolicitării",
+          "Susține echilibrul dintre viața profesională și cea personală"
+        ]
+      }
+    ]
+  },
+  "2": {
+    "sections": [
+      {
+        "title": "Înțelegerea riscului",
+        "paragraphs": [
+          "Riscul este definit ca fiind combinația dintre probabilitate și efect. Această formulă ne ajută să măsurăm pericolele de la locul de muncă și să le stabilim prioritatea."
+        ],
+        "bullets": [
+          "Risc = probabilitate x efect",
+          "Probabilitate mai mare SAU efect mai mare = risc mai mare",
+          "Evaluarea riscurilor ajută la ierarhizarea măsurilor de securitate",
+          "Atât situațiile periculoase, cât și acțiunile periculoase contribuie la risc"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Risc = probabilitate x efect. Aceasta este formula de bază pentru toate evaluările de risc în securitatea muncii."
+        }
+      },
+      {
+        "title": "Surse de pericol",
+        "paragraphs": [
+          "Pericolele de la locul de muncă provin din mai multe surse, printre care echipamentele de muncă, substanțele periculoase și comportamentul uman. Problemele de acasă NU sunt considerate o sursă de pericol la locul de muncă."
+        ],
+        "bullets": [
+          "Echipamentele de muncă și utilajele",
+          "Substanțele periculoase",
+          "Zgomotul și radiațiile",
+          "Metodele de lucru și procedurile",
+          "Comportamentul uman la locul de muncă"
+        ]
+      },
+      {
+        "title": "Metode de prevenire",
+        "paragraphs": [
+          "Prevenirea se poate realiza prin evitarea atât a situațiilor periculoase, CÂT ȘI a acțiunilor periculoase. Cea mai bună soluție pentru o situație periculoasă este eliminarea completă a cauzei."
+        ],
+        "bullets": [
+          "Eliminați pericolul la sursă",
+          "Aplicați măsuri de protecție colectivă",
+          "Folosiți echipament individual de protecție (EIP)",
+          "Asigurați informare și instruire"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "O situație periculoasă este aceea în care lucrarea se execută FĂRĂ respectarea condițiilor de lucru în siguranță, ceea ce poate duce la un accident."
+        }
+      },
+      {
+        "title": "RI&E și LMRA",
+        "paragraphs": [
+          "Inventarierea și evaluarea riscurilor (RI&E) parcurge trei etape: 1) identificarea pericolelor, 2) inventarierea riscurilor, 3) evaluarea riscurilor. LMRA înseamnă analiza riscurilor în ultimul moment — o verificare rapidă de securitate chiar înainte de începerea lucrării."
+        ],
+        "bullets": [
+          "RI&E: evaluarea sistematică a riscurilor de la locul de muncă",
+          "LMRA: analiza riscurilor în ultimul moment, înainte de fiecare lucrare",
+          "Planificarea lucrării stabilește metodele de lucru sigure",
+          "Ambele sunt instrumente esențiale de prevenire"
+        ]
+      }
+    ]
+  },
+  "3": {
+    "sections": [
+      {
+        "title": "Cauzele accidentelor",
+        "paragraphs": [
+          "Potrivit lui Lateiner, trei factori intervin în producerea accidentelor: cauzele de fond, eroarea umană și situațiile sau operațiunile periculoase. Cele două cauze directe sunt acțiunile periculoase și situațiile periculoase."
+        ],
+        "bullets": [
+          "Factori de fond (organizatorici, personali)",
+          "Eroarea umană (factori legați de persoană)",
+          "Situații periculoase (condițiile din mediul de lucru)",
+          "Acțiuni periculoase (factori comportamentali)"
+        ]
+      },
+      {
+        "title": "Factori legați de persoană",
+        "paragraphs": [
+          "Printre factorii legați de persoană care pot duce la incidente se numără atenția insuficientă și experiența insuficientă. Planificarea insuficientă NU este un factor legat de persoană — este un factor organizatoric."
+        ],
+        "bullets": [
+          "Atenție sau concentrare insuficientă",
+          "Experiență sau instruire insuficientă",
+          "Limitări fizice",
+          "Oboseală sau boală"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "PLANIFICAREA insuficientă este un factor organizatoric, nu un factor legat de persoană."
+        }
+      },
+      {
+        "title": "Raportarea și cercetarea evenimentelor",
+        "paragraphs": [
+          "Toate accidentele și incidentele fără accidentare trebuie consemnate. Accidentele trebuie raportate șefului direct. Firma beneficiară a lucrării răspunde de cercetarea accidentelor."
+        ],
+        "bullets": [
+          "Raportați șefului direct",
+          "Consemnați TOATE accidentele și incidentele fără accidentare",
+          "Raportul final trebuie să cuprindă: analiza, concluziile, recomandările",
+          "Cercetarea stabilește cauzele-rădăcină pentru prevenire"
+        ]
+      },
+      {
+        "title": "Măsuri de prevenire",
+        "paragraphs": [
+          "Elaborarea procedurilor de acțiune în caz de accident este o măsură de natură organizatorică. Măsurile de prevenire vizează trei direcții: mediul de lucru, organizarea și omul."
+        ],
+        "bullets": [
+          "Măsuri organizatorice: proceduri, instruire",
+          "Măsuri privind mediul de lucru: soluții tehnice de protecție",
+          "Măsuri privind omul: conștientizare, competență",
+          "Îmbunătățire continuă pe baza concluziilor cercetării"
+        ]
+      }
+    ]
+  },
+  "4": {
+    "sections": [
+      {
+        "title": "Cauzele comportamentului periculos",
+        "paragraphs": [
+          "Comportamentul periculos are cauze care pot fi identificate, printre care lipsa exemplului personal și lipsa de voință. Obiectivele bine formulate NU sunt o cauză a comportamentului periculos — dimpotrivă, ele sprijină securitatea."
+        ],
+        "bullets": [
+          "Lipsa exemplului personal (conducere slabă)",
+          "Lipsa de voință (nu se dorește lucrul în siguranță)",
+          "Incapacitatea (nu se știe cum se face)",
+          "Lipsa de conștientizare"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Obiectivele bine formulate SUSȚIN comportamentul sigur — ele nu sunt o cauză a comportamentului periculos."
+        }
+      },
+      {
+        "title": "Rolul șefului direct",
+        "paragraphs": [
+          "Șeful direct are un rol esențial pentru securitate, deoarece deține informațiile necesare despre lucrători, despre lucrare și despre condițiile concrete de execuție. Claritatea privind prioritatea lucrului în siguranță este elementul de politică cu cea mai mare influență asupra comportamentului."
+        ],
+        "bullets": [
+          "Deține informații despre lucrători, lucrare și condițiile de execuție",
+          "Dă exemplul personal de lucru în siguranță",
+          "Comunică limpede prioritățile de securitate",
+          "Supraveghează și corectează comportamentul periculos"
+        ]
+      },
+      {
+        "title": "Reguli pentru un comportament sigur",
+        "paragraphs": [
+          "Autoexigența este o regulă generală a lucrului în siguranță. Trebuie să vă gândiți atât la propria securitate, CÂT ȘI la cea a celorlalți."
+        ],
+        "bullets": [
+          "Fiți exigent cu dumneavoastră",
+          "Gândiți-vă și la securitatea celorlalți",
+          "Raportați imediat situațiile periculoase",
+          "Interveniți atunci când observați acțiuni periculoase",
+          "Păstrați igiena personală, ordinea și curățenia"
+        ]
+      },
+      {
+        "title": "Alcoolul și drogurile",
+        "paragraphs": [
+          "Alcoolul și drogurile duc la scăderea capacității de muncă sau la un comportament problematic la lucru. În cazul consumului cronic problematic, se așteaptă ca persoana să solicite ajutor specializat."
+        ],
+        "bullets": [
+          "Reduc concentrarea și capacitatea de a lua decizii",
+          "Toleranță zero la locul de muncă",
+          "Solicitați ajutor în caz de consum cronic problematic",
+          "Informați șeful direct despre orice problemă"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Alcoolul și drogurile duc la SCĂDEREA capacității de muncă sau la un comportament PROBLEMATIC. Nu lucrați niciodată sub influența acestora."
+        }
+      }
+    ]
+  },
+  "5": {
+    "sections": [
+      {
+        "title": "Obligațiile angajatorului",
+        "paragraphs": [
+          "Angajatorul are obligația de a asigura informarea și instruirea privind pericolele de la locul de muncă. Aceasta este o obligație fundamentală prevăzută de legislația SSM."
+        ],
+        "bullets": [
+          "Asigură informarea privind pericolele de la locul de muncă",
+          "Asigură instruirea și formarea profesională",
+          "Garantează condiții de muncă sigure",
+          "Realizează inventarierea și evaluarea riscurilor",
+          "Pune la dispoziție echipament individual de protecție"
+        ]
+      },
+      {
+        "title": "Obligațiile lucrătorului",
+        "paragraphs": [
+          "Lucrătorii au obligația de a raporta șefului direct sau conducerii situațiile periculoase și riscurile pentru securitate și sănătate. De asemenea, au dreptul de a întrerupe lucrul dacă apare un pericol iminent și grav."
+        ],
+        "bullets": [
+          "Raportați situațiile periculoase șefului direct",
+          "Folosiți corect echipamentul individual de protecție",
+          "Respectați instrucțiunile de securitate",
+          "Dreptul de a opri lucrul în caz de pericol iminent"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Lucrătorii au DREPTUL de a întrerupe lucrul dacă apare un pericol iminent și grav pentru persoane."
+        }
+      },
+      {
+        "title": "Comitetul pentru securitate și SCC",
+        "paragraphs": [
+          "Consultarea în cadrul comitetului pentru securitate implică reprezentanții angajatorului și pe cei ai lucrătorilor. SCC* se concentrează pe controlul direct al securității, în timp ce SCC** include și structurile de securitate."
+        ],
+        "bullets": [
+          "Comitetul pentru securitate: reprezentanți ai angajatorului + ai lucrătorilor",
+          "SCC* = controlul direct al securității",
+          "SCC** = controlul securității + structurile de securitate",
+          "Inspecțiile la locul de muncă cresc gradul de conștientizare a securității"
+        ]
+      },
+      {
+        "title": "Raporturile de muncă temporară",
+        "paragraphs": [
+          "În munca temporară există un raport tripartit între agentul de muncă temporară, firma beneficiară (utilizatorul) și lucrătorul temporar. Angajatorul de fapt (firma beneficiară) răspunde de condițiile de muncă."
+        ],
+        "bullets": [
+          "Raport tripartit: agent de muncă temporară — firmă beneficiară — lucrător",
+          "Firma beneficiară răspunde de condițiile de muncă",
+          "Agentul de muncă temporară răspunde de asigurarea pentru accidente de muncă",
+          "Obligația comună de a transmite informațiile"
+        ]
+      }
+    ]
+  },
+  "6": {
+    "sections": [
+      {
+        "title": "Reguli generale de securitate",
+        "paragraphs": [
+          "Regulile generale de securitate trebuie consemnate în scris și sunt destinate, printre alții, lucrătorilor temporari. Procedura de anunțare a unui incendiu face parte din regulile generale de securitate."
+        ],
+        "bullets": [
+          "Trebuie consemnate în scris",
+          "Destinate tuturor lucrătorilor, inclusiv personalului temporar",
+          "Cuprind procedurile de anunțare a incendiilor",
+          "Trebuie să fie înțelese de vorbitorii nativi"
+        ]
+      },
+      {
+        "title": "Reguli specifice de securitate",
+        "paragraphs": [
+          "Regulile specifice de securitate se referă la pericole concrete, precum ventilarea și intrarea în spații închise. Ele NU se referă la pauzele de masă."
+        ],
+        "bullets": [
+          "Se referă la pericole concrete",
+          "Cuprind cerințele de ventilare",
+          "Cuprind intrarea în spații închise",
+          "NU se referă la pauzele de masă"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Regulile specifice de securitate trebuie să fie înțelese de vorbitorii nativi — înțelegerea limbii este esențială pentru securitate."
+        }
+      },
+      {
+        "title": "Permisele de lucru",
+        "paragraphs": [
+          "Un permis de lucru trebuie să descrie măsurile care trebuie luate de emitent și de titularul permisului. Acesta precizează ce lucrări se execută, unde și cum — dar NU de ce."
+        ],
+        "bullets": [
+          "Descrie măsurile pentru emitent și pentru titular",
+          "Precizează ce, unde și cum",
+          "NU trebuie să precizeze de ce",
+          "Enumeră toate echipamentele individuale de protecție necesare",
+          "Stabilește măsurile care revin personalului de exploatare"
+        ]
+      },
+      {
+        "title": "Flanșe de blindare",
+        "paragraphs": [
+          "O flanșă de blindare are un rol dublu: blocarea conductelor de alimentare către recipiente, rezervoare sau instalații ȘI separarea tronsoanelor de conductă."
+        ],
+        "bullets": [
+          "Blochează conductele de alimentare",
+          "Separă tronsoanele de conductă",
+          "Element esențial al procedurilor de izolare",
+          "Face parte din pregătirea lucrului în siguranță"
+        ]
+      }
+    ]
+  },
+  "7": {
+    "sections": [
+      {
+        "title": "Membrii echipei de intervenție în caz de urgență",
+        "paragraphs": [
+          "Membrii echipei de intervenție în caz de urgență (BHV) au atribuții specifice, printre care stingerea incendiilor incipiente și limitarea pagubelor și a vătămărilor."
+        ],
+        "bullets": [
+          "Sting incendiile incipiente",
+          "Limitează pagubele și vătămările",
+          "Evacuează personalul",
+          "Acordă primul ajutor",
+          "Ghidează serviciile de urgență"
+        ]
+      },
+      {
+        "title": "Planul de urgență al firmei",
+        "paragraphs": [
+          "Planul de urgență al firmei descrie măsurile și dotările pregătite pentru situații de urgență. Scopul său este de a limita efectele posibilelor situații de urgență."
+        ],
+        "bullets": [
+          "Descrie măsurile și dotările pregătite",
+          "Limitează efectele situațiilor de urgență",
+          "Acoperă toate tipurile de situații de urgență",
+          "Trebuie exersat și actualizat periodic"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Situațiile de urgență includ: accidente, incendiu, explozie, scăpări necontrolate de substanțe, vreme severă, calamități naturale, tulburări sociale și atacuri teroriste."
+        }
+      },
+      {
+        "title": "Fazele gestionării unei urgențe",
+        "paragraphs": [
+          "Gestionarea unei urgențe are faze bine definite. Prima alarmare descrie modul în care poate fi anunțată o urgență și ce informații trebuie transmise. Atenție: nu există o fază de a doua alarmare."
+        ],
+        "bullets": [
+          "Prima alarmare: cum se anunță și ce se comunică",
+          "Intervenția: acțiunile echipei de urgență",
+          "Încheierea: declarată de persoana împuternicită",
+          "Revenirea: reluarea activității normale"
+        ]
+      },
+      {
+        "title": "Evacuarea și primul ajutor",
+        "paragraphs": [
+          "Ordinea corectă la evacuare este: 1) opriți lucrul, 2) nu folosiți ascensoarele, 3) anunțați-vă prezența la punctul de adunare. Materialele de prim ajutor trebuie să fie permanent disponibile."
+        ],
+        "bullets": [
+          "Opriți imediat lucrul",
+          "Nu folosiți ascensoarele/lifturile",
+          "Anunțați-vă prezența la punctul de adunare",
+          "Materialele de prim ajutor permanent disponibile",
+          "Sunt necesari membri instruiți ai echipei de intervenție"
+        ]
+      }
+    ]
+  },
+  "8": {
+    "sections": [
+      {
+        "title": "Identificarea substanțelor periculoase",
+        "paragraphs": [
+          "Substanțele periculoase sunt materiale care prezintă un pericol pentru sănătate și/sau pentru mediu. Ele sunt marcate cu un simbol de pericol pătrat, negru pe fond portocaliu. Frazele R de pe etichetă indică riscurile."
+        ],
+        "bullets": [
+          "Simbol de pericol: negru pe fond portocaliu",
+          "Frazele R = fraze de risc (indică pericolele)",
+          "Frazele S = fraze de securitate (măsuri de precauție)",
+          "Fișa cu date de securitate a materialului (MSDS) oferă informațiile complete"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Frazele R vă indică RISCURILE. Frazele S vă indică măsurile de SECURITATE. Cifrele din romburile de pericol merg de la 0 la 4."
+        }
+      },
+      {
+        "title": "Oxigenul și ventilația",
+        "paragraphs": [
+          "În condiții normale, oxigenul din aer este de 21%. Lipsa ventilației poate face ca concentrația de oxigen să scadă prea mult, creând pericol de asfixiere."
+        ],
+        "bullets": [
+          "Nivel normal de oxigen: 21%",
+          "Sub 19%: zonă de pericol",
+          "Lipsa ventilației reduce oxigenul",
+          "Butelii de gaz: umăr alb = oxigen"
+        ]
+      },
+      {
+        "title": "Monoxidul de carbon și azbestul",
+        "paragraphs": [
+          "Monoxidul de carbon împiedică absorbția oxigenului în sânge. Expunerea la azbest poate provoca mezoteliom. Utilizarea și prelucrarea nouă a azbestului NU sunt permise."
+        ],
+        "bullets": [
+          "CO: oxigenul nu mai este absorbit în sânge",
+          "Azbestul: provoacă mezoteliom",
+          "Se găsește în acoperișuri, placări de pereți, zidăria cuptoarelor",
+          "NU se găsește în casele construite recent",
+          "Utilizarea/prelucrarea nouă este interzisă"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Monoxidul de carbon este inodor și incolor - nu îl puteți detecta fără aparate. Împiedică absorbția oxigenului în sânge."
+        }
+      },
+      {
+        "title": "Substanțe biologice și depozitare",
+        "paragraphs": [
+          "Substanțele biologice pot fi prezente în agricultură și în solul contaminat. Vaccinările sunt o măsură de precauție. Buteliile de gaz trebuie asigurate corespunzător la depozitare."
+        ],
+        "bullets": [
+          "Agenți biologici: agricultură, sol contaminat",
+          "Vaccinările ca măsură de precauție",
+          "Butelii de gaz: asigurați-le corespunzător",
+          "Solvenți organici: inflamabili/foarte inflamabili",
+          "Scurgeri: îndepărtarea produsului deversat de către specialiști"
+        ]
+      }
+    ]
+  },
+  "9": {
+    "sections": [
+      {
+        "title": "Noțiuni fundamentale despre incendiu",
+        "paragraphs": [
+          "Incendiul necesită material combustibil, oxigen și o sursă de aprindere. Pentru un incendiu sau o explozie este nevoie de o substanță inflamabilă. Excesul de oxigen face ca substanțele inflamabile să se aprindă mai ușor."
+        ],
+        "bullets": [
+          "Materialul combustibil: materia care arde",
+          "Oxigenul: în mod normal 21% în aer",
+          "Sursa de aprindere: scânteie, flacără, căldură",
+          "Exces de oxigen = aprindere mai ușoară"
+        ]
+      },
+      {
+        "title": "Clasele de incendiu",
+        "table": {
+          "headers": [
+            "Clasa",
+            "Materiale",
+            "Exemple"
+          ],
+          "rows": [
+            [
+              "A",
+              "Materiale solide",
+              "Lemn, hârtie, plastic, textile"
+            ],
+            [
+              "B",
+              "Lichide",
+              "Benzină, ulei, alcool, vopsea"
+            ],
+            [
+              "C",
+              "Gaze",
+              "Metan, propan, butan, acetilenă"
+            ],
+            [
+              "D",
+              "Metale",
+              "Magneziu, aluminiu, sodiu"
+            ]
+          ]
+        },
+        "callout": {
+          "type": "danger",
+          "text": "Nu folosiți NICIODATĂ apă la incendiile de Clasa B (lichide)! Lichidele care ard împroașcă și plutesc pe apă, extinzând incendiul."
+        }
+      },
+      {
+        "title": "Exploziile și punctul de aprindere",
+        "paragraphs": [
+          "Explozia este un incendiu cu dezvoltare extrem de rapidă, care eliberează o undă de presiune. Limita de explozie este concentrația maximă sau minimă a unui gaz în aer la care poate avea loc o explozie. Punctul de aprindere este temperatura cea mai scăzută a unui lichid la care vaporii pot fi aprinși."
+        ],
+        "bullets": [
+          "Explozie = incendiu rapid + undă de presiune",
+          "Limita de explozie: pragurile concentrației de gaz",
+          "Punctul de aprindere: temperatura minimă de aprindere a vaporilor lichidului",
+          "Semnul Ex indică o zonă cu risc de explozie"
+        ]
+      },
+      {
+        "title": "Metode de stingere",
+        "paragraphs": [
+          "Când se depistează un incendiu, primul lucru este să îl anunțați. Păturile de incendiu blochează accesul oxigenului. Dioxidul de carbon dislocuiește oxigenul, dar poate crea o atmosferă asfixiantă și poate produce degerături. Nisipul blochează accesul oxigenului. La tratarea arsurilor, spălați cu apă cel puțin 15 minute."
+        ],
+        "bullets": [
+          "Prima acțiune: ANUNȚAȚI incendiul",
+          "Păturile de incendiu: blochează oxigenul",
+          "CO2: dislocuiește oxigenul (risc de asfixiere + degerături)",
+          "Nisipul: blochează oxigenul",
+          "Arsuri: spălați minimum 15 minute",
+          "Supravegherea lucrului cu foc deschis necesită instruire specifică"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "La tratarea arsurilor: spălați cu apă cel puțin 15 MINUTE. Nu 5, nu 10 - minimum cincisprezece minute."
+        }
+      }
+    ]
+  },
+  "10": {
+    "sections": [
+      {
+        "title": "Securitatea la uneltele de mână",
+        "paragraphs": [
+          "Dalta nu trebuie să aibă bavuri pe muchia tăietoare. Ciocanele trebuie să aibă cozile bine fixate în capul ciocanului. Când lucrați cu cuțitul, nu scoateți prea mult lama retractabilă."
+        ],
+        "bullets": [
+          "Dălți: fără bavuri pe muchia tăietoare",
+          "Ciocane: coada bine fixată în capul ciocanului",
+          "Cuțite: nu scoateți lama prea mult",
+          "Fierăstraie: lama trebuie bine întinsă",
+          "Piese mici: trebuie prinse în dispozitiv de fixare"
+        ]
+      },
+      {
+        "title": "Scule electrice și mașini",
+        "paragraphs": [
+          "Sculele electrice de mână pentru 230 volți trebuie să aibă izolație dublă. Butonul de tip om mort oprește imediat mașina la eliberarea manetei. Butonul de oprire de urgență este cea mai rapidă modalitate de a opri o mașină."
+        ],
+        "bullets": [
+          "Scule de 230 V: trebuie să aibă izolație dublă",
+          "Buton de tip om mort: oprește la eliberare",
+          "Oprire de urgență: cea mai rapidă metodă de oprire",
+          "Verificare periodică obligatorie pentru toate mașinile",
+          "Nu purtați niciodată mănuși în apropierea pieselor în rotație"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Nu purtați NICIODATĂ mănuși când lucrați la mașini cu piese în rotație - mănușa și mâna dumneavoastră pot fi trase în mașină."
+        }
+      },
+      {
+        "title": "Fierăstraie circulare și polizoare",
+        "paragraphs": [
+          "Fierăstrăul circular de masă trebuie să aibă o apărătoare de disc fixată pe un suport solid. Cuțitul divizor se folosește la fierăstrăul circular manual. Discurile abrazive trebuie să aibă marcat numele producătorului."
+        ],
+        "bullets": [
+          "Fierăstrău circular de masă: apărătoare de disc pe suport solid",
+          "Cuțit divizor: pentru fierăstrăul circular manual",
+          "Disc abraziv: trebuie să aibă marcat numele producătorului",
+          "Drujbă: necesită pantaloni antităiere și mănuși speciale",
+          "Pistol de cuie/capse: protecție împotriva declanșării nedorite"
+        ]
+      },
+      {
+        "title": "Stivuitoare și vehicule",
+        "paragraphs": [
+          "Transpaleta are o înălțime de ridicare de 20 cm. Stivuitoriștii trebuie să dețină competențe atestate ȘI să folosească centura de siguranță. Nu puteți mări contragreutatea."
+        ],
+        "bullets": [
+          "Transpaletă: înălțime de ridicare 20 cm",
+          "Stivuitor: competențe atestate + centură de siguranță obligatorie",
+          "Contragreutatea nu poate fi mărită",
+          "Fără pasageri dacă nu există un scaun special",
+          "Scule pneumatice: închideți alimentarea cu aer după utilizare"
+        ]
+      }
+    ]
+  },
+  "11": {
+    "sections": [
+      {
+        "title": "Pericole în timpul lucrărilor de demolare",
+        "paragraphs": [
+          "Lucrările de demolare presupun multiple pericole, printre care instabilitatea frontului de demolare ȘI elementele de construcție care ies în afară. Ambele sunt la fel de periculoase."
+        ],
+        "bullets": [
+          "Instabilitatea frontului de demolare",
+          "Elemente de construcție care ies în afară",
+          "Moloz și materiale care cad",
+          "Praf și substanțe periculoase",
+          "Risc de prăbușire a structurii"
+        ]
+      },
+      {
+        "title": "Măsuri de securitate",
+        "paragraphs": [
+          "În timpul lucrărilor de demolare, dispozitivul de oprire a căderii este obligatoriu. La îndepărtarea fibrelor ceramice, nu folosiți jgheab de evacuare, pentru a preveni dispersia fibrelor."
+        ],
+        "bullets": [
+          "Dispozitivul de oprire a căderii este obligatoriu",
+          "Nu folosiți jgheab de evacuare pentru fibrele ceramice",
+          "Echipament individual de protecție adecvat în permanență",
+          "Etape de demolare controlate",
+          "Zone interzise pentru persoanele din afara echipei"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "La îndepărtarea fibrelor ceramice: NU folosiți jgheab de evacuare. Astfel se previne dispersia periculoasă a fibrelor în aer."
+        }
+      },
+      {
+        "title": "Planificare și proceduri",
+        "paragraphs": [
+          "Toate lucrările de demolare necesită o planificare atentă, o evaluare a riscurilor corespunzătoare și proceduri clare pentru fiecare etapă a procesului de demolare."
+        ],
+        "bullets": [
+          "Evaluarea riscurilor înainte de începerea lucrului",
+          "Succesiune de demolare clar planificată",
+          "Proceduri de urgență stabilite",
+          "Verificări periodice ale stabilității structurii",
+          "Proceduri corespunzătoare de gestionare a deșeurilor"
+        ]
+      }
+    ]
+  },
+  "12": {
+    "sections": [
+      {
+        "title": "Securitatea la sudarea cu gaz",
+        "paragraphs": [
+          "La sudarea cu gaz folosind oxigen și acetilenă, buteliile trebuie depozitate în poziție verticală sau la un unghi de minimum 30 de grade. Întoarcerea flăcării este un risc important la sudarea cu gaz."
+        ],
+        "bullets": [
+          "Butelii de acetilenă: vertical sau la minimum 30 de grade",
+          "Întoarcerea flăcării este un risc major",
+          "Verificați racordurile pentru scăpări",
+          "Folosiți opritoare de flacără",
+          "Depozitați separat oxigenul și gazul combustibil"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Buteliile de acetilenă trebuie depozitate în poziție verticală sau la un unghi de minimum 30 de grade. Nu le culcați niciodată pe orizontală."
+        }
+      },
+      {
+        "title": "Sudarea electrică",
+        "paragraphs": [
+          "Sudarea electrică necesită protecție individuală completă și paravane de sudură pentru a proteja persoanele din apropiere de radiațiile UV și infraroșii. Arderea corneei din cauza radiației termice NU este un risc - orbirea din cauza radiației infraroșii ESTE."
+        ],
+        "bullets": [
+          "Mască de sudură, șorț, îmbrăcăminte, bocanci de protecție",
+          "Paravane de sudură pentru protecție împotriva UV/infraroșu",
+          "Risc: orbirea din cauza radiației infraroșii",
+          "Risc: afecțiuni pulmonare din cauza fumului de sudură",
+          "NU este un risc: arderea corneei din cauza radiației termice"
+        ]
+      },
+      {
+        "title": "Proceduri pentru lucrul cu foc deschis",
+        "paragraphs": [
+          "Toate operațiunile de sudare, tăiere și ardere necesită permise corespunzătoare, supraveghere contra incendiilor și măsuri de securitate pentru prevenirea incendiilor și a exploziilor."
+        ],
+        "bullets": [
+          "Este necesar permis de lucru cu foc deschis",
+          "Supraveghere contra incendiilor în timpul și după lucru",
+          "Îndepărtați materialele inflamabile din zonă",
+          "Verificați existența atmosferelor explozive",
+          "Ventilația adecvată este esențială"
+        ]
+      }
+    ]
+  },
+  "13": {
+    "sections": [
+      {
+        "title": "De ce contează săpăturile executate cu atenție",
+        "paragraphs": [
+          "Săpătura executată cu atenție este importantă pentru siguranța furnizării serviciilor de utilități. Deteriorarea rețelelor subterane poate provoca incidente grave."
+        ],
+        "bullets": [
+          "Siguranța furnizării utilităților",
+          "Conducte de gaz: risc de asfixiere în caz de deteriorare",
+          "Cabluri sub tensiune: risc de electrocutare",
+          "Conducte principale de apă: risc de inundare",
+          "Cabluri de comunicații: întreruperea serviciului"
+        ]
+      },
+      {
+        "title": "Reguli pentru săpături în siguranță",
+        "paragraphs": [
+          "Înainte de a începe săpătura, poziția cablurilor și a conductelor trebuie stabilită prin șanțuri de sondaj executate în limita a 1,5 metri. Orice poziție diferită sau orice deteriorare trebuie raportată persoanei responsabile."
+        ],
+        "bullets": [
+          "Șanțuri de sondaj la maximum 1,5 m de poziția estimată",
+          "Raportați imediat orice diferență sau deteriorare",
+          "Săpați manual în apropierea rețelelor cunoscute",
+          "Folosiți aparate de detectare a cablurilor și conductelor",
+          "Respectați instrucțiunile companiei de utilități"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Pericolul de explozie NU este un risc direct al săpăturii în sine - dar asfixierea (gaz) și electrocutarea (cabluri) SUNT riscuri directe."
+        }
+      },
+      {
+        "title": "Lucrul în săpături",
+        "paragraphs": [
+          "La lucrul în interiorul unei săpături sau în apropierea acesteia, sprijinirea eficientă a pereților și taluzarea corespunzătoare sunt esențiale pentru a preveni surparea."
+        ],
+        "bullets": [
+          "Sprijinire eficientă a pereților obligatorie",
+          "Taluzare corespunzătoare",
+          "Protecție la margine pentru lucrătorii aflați deasupra",
+          "Căi sigure de acces și de ieșire",
+          "Verificări periodice ale stabilității"
+        ]
+      }
+    ]
+  },
+  "14": {
+    "sections": [
+      {
+        "title": "Cerințe legale",
+        "paragraphs": [
+          "De la 2,5 metri înălțime, angajatorul trebuie să ia măsurile prevăzute de lege pentru a preveni riscul de cădere. Centura complexă de siguranță este măsura care reduce pericolul pentru orice persoană care lucrează pe un acoperiș plat."
+        ],
+        "bullets": [
+          "2,5 metri: măsuri legale obligatorii",
+          "Centură complexă de siguranță la lucrul pe acoperiș plat",
+          "Protecția colectivă are prioritate față de cea individuală",
+          "Evaluare de risc pentru toate lucrările la înălțime"
+        ]
+      },
+      {
+        "title": "Scări",
+        "paragraphs": [
+          "Înainte de utilizare, verificați dacă scara este așezată la un unghi de aproximativ 75 de grade. Scările se folosesc pentru executarea unor lucrări de mică amploare și pentru trecerea unei diferențe de nivel. Regula esențială este ca zona de lucru să fie la maximum o lungime de braț."
+        ],
+        "bullets": [
+          "Unghi: aproximativ 75 de grade",
+          "Se folosesc pentru lucrări de mică amploare + trecerea unei diferențe de nivel",
+          "Întindere de maximum o lungime de braț",
+          "Trei puncte de contact la urcare",
+          "Fixați scara la partea superioară sau puneți pe cineva să o țină"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Scara trebuie așezată la aproximativ 75 de grade. Prea abruptă = se răstoarnă pe spate. Prea culcată = alunecă la bază."
+        }
+      },
+      {
+        "title": "Schele",
+        "paragraphs": [
+          "Schelele mobile pe roți trebuie urcate prin interior. Persoanele aflate pe o schelă suspendată trebuie să folosească centura complexă de siguranță. Deschiderile din planșeu se acoperă de preferință cu material rezistent."
+        ],
+        "bullets": [
+          "Schelă mobilă pe roți: urcarea se face prin interior",
+          "Schelă suspendată: centura complexă de siguranță este obligatorie",
+          "Deschideri în planșeu: se acoperă cu material rezistent",
+          "Balustrade de protecție pe toate laturile deschise",
+          "Verificarea periodică a componentelor schelei"
+        ]
+      },
+      {
+        "title": "Deschideri în planșee și pereți",
+        "paragraphs": [
+          "Pericolele includ lovirea de obiecte care cad și căderea prin deschideri. Acoperirea unei deschideri mari din planșeu NU este un pericol - este o măsură de securitate."
+        ],
+        "bullets": [
+          "Căderea prin deschideri",
+          "Lovirea de obiecte care cad prin deschidere",
+          "Acoperiți deschiderile cu material rezistent",
+          "Folosiți balustrade acolo unde acoperirea nu este posibilă",
+          "Marcați clar toate deschiderile"
+        ]
+      }
+    ]
+  },
+  "15": {
+    "sections": [
+      {
+        "title": "Pericole fundamentale",
+        "paragraphs": [
+          "Un neinstruit nu are NICIODATĂ dreptul să lucreze la instalații electrice aflate sub tensiune, nici chiar cu permisiunea unei persoane competente. Cel mai mare pericol al trecerii curentului prin corp este trecerea prin inimă. Electrocutarea este provocată de utilizarea energiei electrice."
+        ],
+        "bullets": [
+          "Neinstruiții: NICIODATĂ la instalații aflate sub tensiune",
+          "Cel mai mare pericol: curentul care trece prin inimă",
+          "Lipsa legării la pământ provoacă accidente",
+          "Intensitatea și durata curentului determină gravitatea leziunii",
+          "Grosimea pielii NU influențează leziunea"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Un neinstruit nu are NICIODATĂ dreptul să lucreze la instalații electrice aflate sub tensiune - nici chiar cu permisiunea unei persoane competente."
+        }
+      },
+      {
+        "title": "Tensiuni de securitate",
+        "table": {
+          "headers": [
+            "Tip",
+            "Tensiune maximă de securitate",
+            "Aplicație"
+          ],
+          "rows": [
+            [
+              "Curent continuu",
+              "120V",
+              "Spații închise"
+            ],
+            [
+              "Curent alternativ",
+              "50V",
+              "Spații închise"
+            ],
+            [
+              "Întrerupător diferențial",
+              "30 mA",
+              "Șantiere de construcții"
+            ]
+          ]
+        },
+        "callout": {
+          "type": "info",
+          "text": "În spațiile închise: maximum 120V curent continuu sau maximum 50V curent alternativ. Tablourile de distribuție de pe șantier necesită protecție diferențială de 30 mA."
+        }
+      },
+      {
+        "title": "Electricitatea statică și scurtcircuitele",
+        "paragraphs": [
+          "Un scurtcircuit apare atunci când două elemente aflate la tensiuni diferite intră în contact direct. Pericolele electricității statice includ scânteile și deteriorarea echipamentelor electronice. La lucrul cu electricitate statică se poartă încălțăminte antistatică."
+        ],
+        "bullets": [
+          "Scurtcircuit: contact între tensiuni diferite",
+          "Electricitate statică: scântei + deteriorarea echipamentelor",
+          "Încălțăminte antistatică la lucrul cu electricitate statică",
+          "Electricitatea statică NU apare în încăperi sărace în oxigen",
+          "Tamburi de cablu: derulați-i întotdeauna complet"
+        ]
+      },
+      {
+        "title": "Securitatea cablurilor și a echipamentelor",
+        "paragraphs": [
+          "Tamburii de cablu trebuie derulați complet pentru a preveni supraîncălzirea și incendiul. Cablurile de alimentare pot fi suprasolicitate. Verificați întotdeauna vizual echipamentul înainte de utilizare și raportați deteriorările."
+        ],
+        "bullets": [
+          "Derulați complet tamburii de cablu (risc de incendiu)",
+          "Suprasolicitarea este principalul pericol al cablurilor",
+          "Verificare vizuală înainte de fiecare utilizare",
+          "Raportați deteriorările - nu folosiți echipamentul",
+          "Schelele trebuie legate la pământ"
+        ]
+      }
+    ]
+  },
+  "16": {
+    "sections": [
+      {
+        "title": "Ce este un spațiu închis?",
+        "paragraphs": [
+          "Un spațiu închis are caracteristici precum spațiu de lucru suficient, dar ventilație slabă și acces limitat. Rezervoarele de stocare, tancurile și corturile de sudură din apropierea săpăturilor adânci sunt exemple."
+        ],
+        "bullets": [
+          "Acces și ieșire limitate",
+          "Ventilație naturală slabă",
+          "Nu este proiectat pentru prezența permanentă a persoanelor",
+          "Exemple: tancuri, rezervoare, silozuri, canalizări",
+          "NU doar spații înguste, mici sau umede"
+        ]
+      },
+      {
+        "title": "Pericole și măsurători",
+        "paragraphs": [
+          "Asfixierea apare din cauza concentrației insuficiente de oxigen. Măsurătorile trebuie efectuate de o persoană competentă - nu de șeful de echipă și nici de lucrătorul care intră în spațiu."
+        ],
+        "bullets": [
+          "Asfixiere: oxigen insuficient (sub 19%)",
+          "Măsurători efectuate numai de o persoană competentă",
+          "Verificați oxigenul, gazele inflamabile și gazele toxice",
+          "Monitorizare continuă în timpul lucrului",
+          "Tensiune de securitate: 120V curent continuu în spațiile închise"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Pericol de asfixiere: este provocat de concentrația INSUFICIENTĂ de oxigen. Excesul de oxigen reprezintă un risc de incendiu, nu un risc de asfixiere."
+        }
+      },
+      {
+        "title": "Supraveghetorul de la gura de vizitare și supravegherea",
+        "paragraphs": [
+          "Supraveghetorul de la gura de vizitare este obligatoriu atât timp cât se află cineva în spațiul închis. Însoțitorul permanent trebuie să dețină competențe verificate în mod demonstrabil. Durata de staționare trebuie să fie cât mai scurtă posibil."
+        ],
+        "bullets": [
+          "Supraveghetor la gura de vizitare: obligatoriu tot timpul",
+          "Însoțitor: competențe verificate obligatorii",
+          "Staționare cât mai scurtă posibil",
+          "Alertarea serviciilor de urgență în caz de pericol",
+          "Comunicare menținută în permanență"
+        ]
+      },
+      {
+        "title": "Securitatea electrică în spațiile închise",
+        "paragraphs": [
+          "Tensiunea de securitate în spațiile închise cu pereți conductori este de 120V curent continuu. Scoateți corect echipamentele de sub tensiune și folosiți tensiuni de securitate."
+        ],
+        "bullets": [
+          "Maximum 120V curent continuu în spațiile cu pereți conductori",
+          "Maximum 50V curent alternativ",
+          "Scoateți corect de sub tensiune înainte de intrare",
+          "Folosiți unelte alimentate cu acumulator ori de câte ori este posibil",
+          "Protecția diferențială este esențială"
+        ]
+      }
+    ]
+  },
+  "17": {
+    "sections": [
+      {
+        "title": "Echipamente de ridicat",
+        "paragraphs": [
+          "Echipamentele de ridicat pot deplasa sarcini atât pe verticală, cât și pe orizontală. Exemplele includ macaralele turn și podurile rulante. Un transpalet NU este echipament de ridicat."
+        ],
+        "bullets": [
+          "Macarale turn",
+          "Poduri rulante (macarale de plafon)",
+          "Automacarale",
+          "NU transpaletele",
+          "Pot deplasa sarcini pe verticală ȘI pe orizontală"
+        ]
+      },
+      {
+        "title": "Dispozitive de prindere a sarcinii",
+        "paragraphs": [
+          "Centura complexă de ridicare a persoanelor este un dispozitiv de prindere a sarcinii. Două sufe montate pe un inel de oțel formează un dispozitiv cu două ramuri. Cablurile de oțel nu trebuie înnodate și nu se folosesc atunci când sunt puternic ruginite."
+        ],
+        "bullets": [
+          "Centura complexă de ridicare = dispozitiv de prindere a sarcinii",
+          "Dispozitiv cu două ramuri: 2 sufe pe un inel de oțel",
+          "Cabluri de oțel: nu le înnodați niciodată",
+          "Lanțuri: folosiți protecții pe muchiile ascuțite",
+          "Registrul macaralei: consemnează toate verificările"
+        ]
+      },
+      {
+        "title": "Măsuri de securitate",
+        "paragraphs": [
+          "Pericolele generale includ căderea sarcinii și răsturnarea echipamentului de ridicat. Calajele hidraulice se folosesc împreună cu echipamentele de ridicat pentru a preveni răsturnarea. Operațiunile trebuie oprite la vânt de peste forța 5."
+        ],
+        "bullets": [
+          "Pericole: căderea sarcinii, răsturnarea echipamentului",
+          "Calajele hidraulice previn răsturnarea",
+          "Opriți operațiunile la vânt de peste forța 5",
+          "Respectați instrucțiunile producătorului privind forța vântului",
+          "Nu staționați niciodată sub sarcini suspendate"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Operațiunile de ridicare trebuie oprite la vânt de peste forța 5. Verificați întotdeauna instrucțiunile producătorului macaralei pentru limitele specifice de forță a vântului."
+        }
+      }
+    ]
+  },
+  "18": {
+    "sections": [
+      {
+        "title": "Tipuri de radiații",
+        "paragraphs": [
+          "Radiația infraroșie este o radiație neionizantă. Radiația neionizantă este mai slabă decât radiația ionizantă. Diferența esențială este că radiația ionizantă poate genera ioni în țesutul corpului."
+        ],
+        "bullets": [
+          "Ionizante: raze X, raze gamma, radiații nucleare",
+          "Neionizante: infraroșii, UV, unde radio, microunde",
+          "Radiația neionizantă este MAI SLABĂ decât cea ionizantă",
+          "Radiația ionizantă generează ioni în țesut (mai periculoasă)"
+        ]
+      },
+      {
+        "title": "Măsuri de securitate",
+        "paragraphs": [
+          "Pentru radiațiile ionizante: păstrați cea mai mare distanță posibilă ȘI îngrădiți zona. Pentru radiațiile neionizante: respectați instrucțiunile aparatelor și limitele privind durata de expunere."
+        ],
+        "bullets": [
+          "Ionizante: distanță + ecranare + timp",
+          "Îngrădiți zona din jurul surselor de radiații ionizante",
+          "Neionizante: respectați instrucțiunile aparatelor",
+          "Respectați limitele privind durata de utilizare",
+          "Control medical pentru lucrătorii expuși la radiații ionizante"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Lucrătorii care folosesc surse de radiații ionizante trebuie să efectueze controale medicale. Expertul în radioprotecție supraveghează securitatea și igiena radiologică."
+        }
+      },
+      {
+        "title": "Responsabilități",
+        "paragraphs": [
+          "Supravegherea securității și igienei radiologice este sarcina expertului în radioprotecție - nu a șefului de echipă și nici a echipei de intervenție în caz de urgență."
+        ],
+        "bullets": [
+          "Expertul în radioprotecție: supraveghează securitatea și igiena",
+          "Controale medicale: obligatorii pentru lucrătorii expuși la radiații",
+          "Șeful de echipă: se asigură că regulile sunt respectate",
+          "Echipa de intervenție: gestionează incidentele radiologice"
+        ]
+      }
+    ]
+  },
+  "19": {
+    "sections": [
+      {
+        "title": "Condițiile mediului de muncă",
+        "paragraphs": [
+          "Mediul de muncă este determinat de vibrații, iluminat, temperatură și zgomot. Șeful de echipă NU determină condițiile mediului de muncă – el coordonează oamenii."
+        ],
+        "bullets": [
+          "Vibrații (mână/braț și ale întregului corp)",
+          "Nivelurile de iluminat",
+          "Temperatura și umiditatea",
+          "Nivelurile de zgomot",
+          "NU sunt determinate de șeful de echipă"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "ȘEFUL DE ECHIPĂ nu determină condițiile mediului de muncă. Ele sunt determinate de factori fizici precum vibrațiile, iluminatul și temperatura."
+        }
+      },
+      {
+        "title": "Vibrațiile și solicitarea fizică",
+        "paragraphs": [
+          "Vibrațiile fizice includ vibrațiile mână/braț provenite de la sculele mecanice și vibrațiile întregului corp provenite de la vehicule. Infecțiile pielii NU sunt cauzate de vibrații. Solicitarea fizică este influențată de poziția de lucru/postură ȘI de mișcările care trebuie executate."
+        ],
+        "bullets": [
+          "Mână/braț: de la sculele mecanice portabile",
+          "Întregul corp: de la vehicule, instalații, platforme",
+          "NU sunt cauzate: infecțiile pielii",
+          "Solicitarea fizică: postura + mișcările",
+          "Pauzele previn suprasolicitarea"
+        ]
+      },
+      {
+        "title": "Ridicarea manuală",
+        "paragraphs": [
+          "Greutatea maximă recomandată pentru ridicarea manuală este de 25 kg. Postura corectă: ridicați cu spatele drept, îndoiți genunchii și țineți sarcina cât mai aproape de corp."
+        ],
+        "bullets": [
+          "Maximum 25 kg la ridicarea manuală",
+          "Spatele drept + genunchii îndoiți",
+          "Țineți sarcina aproape de corp",
+          "Planificați ridicarea înainte de a începe",
+          "Cereți ajutor pentru sarcini grele sau greu de manevrat"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Maximul la ridicarea manuală: 25 kg. Ridicați întotdeauna cu SPATELE DREPT și GENUNCHII ÎNDOIȚI, ținând sarcina APROAPE de corp."
+        }
+      },
+      {
+        "title": "Lucrul în poziție șezând și în picioare",
+        "paragraphs": [
+          "Poziția optimă în șezut presupune o bună sprijinire a coapselor ȘI descărcarea umerilor. O regulă de bază este să asigurați o poziție optimă, dar să schimbați regulat pozițiile. Poziția în picioare NU este de preferat atunci când trebuie aplicate forțe de peste 30N."
+        ],
+        "bullets": [
+          "Bună sprijinire a coapselor pe scaun",
+          "Descărcarea umerilor (suporturi pentru brațe)",
+          "Schimbați regulat pozițiile",
+          "Poziția în picioare este de preferat la lucrările cu întindere",
+          "Poziția în picioare NU este de preferat la forțe de peste 30N"
+        ]
+      }
+    ]
+  },
+  "20": {
+    "sections": [
+      {
+        "title": "Efectele zgomotului",
+        "paragraphs": [
+          "Zgomotul excesiv de puternic crește riscul la locul de muncă, deoarece acoperă semnalele de avertizare și reduce concentrarea. Expunerea la zgomot excesiv duce la pierderea concentrării."
+        ],
+        "bullets": [
+          "Crește riscul la locul de muncă",
+          "Provoacă pierderea concentrării",
+          "Acoperă semnalele de avertizare",
+          "Poate provoca leziuni auditive permanente",
+          "Se măsoară în decibeli (dB)"
+        ]
+      },
+      {
+        "title": "Fizica sunetului",
+        "paragraphs": [
+          "Două surse de sunet egale, împreună, cresc nivelul de sunet cu 3 dB. Dublarea distanței aduce o reducere de aproximativ 6 dB(A). Înălțimea (frecvența) și intensitatea determină dacă zgomotul este nociv."
+        ],
+        "bullets": [
+          "Două surse egale: +3 dB",
+          "Distanța dublă: -6 dB(A)",
+          "Factori nocivi: înălțimea și intensitatea",
+          "Pierdere auditivă permanentă: dificultăți la convorbirile telefonice",
+          "Unitatea de măsură: decibelul (dB)"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Două surse de sunet egale = +3 dB. Distanța dublă = -6 dB(A). Acestea sunt cifrele-cheie pentru examen."
+        }
+      },
+      {
+        "title": "Ierarhia combaterii zgomotului",
+        "paragraphs": [
+          "Ordinea corectă este: 1) Reducerea la sursă, 2) Ecranarea sursei, 3) Amortizarea vibrațiilor sonore, 4) Utilizarea protecției auditive individuale. De la 80 dB(A), angajatorul trebuie să asigure control audiometric și să pună la dispoziție protecție auditivă."
+        ],
+        "bullets": [
+          "1. Reducerea la sursă",
+          "2. Ecranarea sursei",
+          "3. Amortizarea vibrațiilor sonore",
+          "4. Protecție auditivă individuală (ultima soluție)",
+          "De la 80 dB(A): control audiometric + protecție pusă la dispoziție",
+          "De la 85 dB(A): protecția auditivă este obligatorie"
+        ]
+      }
+    ]
+  },
+  "21": {
+    "sections": [
+      {
+        "title": "Cerințe generale privind echipamentul individual de protecție",
+        "paragraphs": [
+          "Tot echipamentul individual de protecție trebuie să fie testat. Căștile de protecție metalice nu trebuie purtate în industrie, deoarece pot conduce electricitatea. Echipamentul individual de protecție este ultima linie de apărare, după măsurile tehnice și organizatorice."
+        ],
+        "bullets": [
+          "Trebuie testat și certificat",
+          "Căștile metalice conduc electricitatea",
+          "Ultima linie de apărare",
+          "Trebuie să se potrivească corect",
+          "Este necesară verificarea periodică"
+        ]
+      },
+      {
+        "title": "Protecția capului și a ochilor",
+        "paragraphs": [
+          "Sistemul interior al căștii de protecție absoarbe șocurile și le distribuie pe suprafața capului. Ochelarii de protecție etanși protejează împotriva stropilor de acid. Masca de sudură protejează împotriva radiației infraroșii, în timp ce ochelarii protejează împotriva particulelor proiectate."
+        ],
+        "bullets": [
+          "Interiorul căștii: absoarbe și distribuie șocul",
+          "Pericole pentru cap: lovire + căderea obiectelor",
+          "Ochelari etanși de protecție: protecție împotriva stropilor de acid",
+          "Masca de sudură: protecție împotriva radiației infraroșii",
+          "Ochelari de protecție: protecție împotriva particulelor proiectate"
+        ]
+      },
+      {
+        "title": "Protecția respiratorie și auditivă",
+        "paragraphs": [
+          "Masca cu filtru de praf protejează la spargere și la dăltuire. O semimască de nas și gură protejează doar împotriva particulelor, nu împotriva gazelor sau a vaporilor. Aparatul de respirat autonom este necesar la concentrații mari sau necunoscute ori la mai puțin de 19% oxigen. Protecția auditivă este obligatorie peste 85 dB(A)."
+        ],
+        "bullets": [
+          "Filtru de praf: spargere și dăltuire",
+          "Semimască nas/gură: doar particule, NU gaze",
+          "Aparat autonom: concentrații mari sau oxigen scăzut",
+          "Protecție auditivă: obligatorie peste 85 dB(A)",
+          "Oxigen prea scăzut = pericol de asfixiere"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "O semimască de nas și gură protejează DOAR împotriva particulelor. NU protejează împotriva gazelor sau a vaporilor. Folosiți echipament respirator adecvat pentru pericolele chimice."
+        }
+      },
+      {
+        "title": "Protecția corpului și protecția împotriva căderii de la înălțime",
+        "paragraphs": [
+          "Îmbrăcămintea de avertizare face purtătorul vizibil. Alunecarea este un pericol pentru picioare și gambe. Echipamentele de protecție împotriva căderii care au oprit o cădere NU mai pot fi folosite din nou."
+        ],
+        "bullets": [
+          "Îmbrăcăminte de avertizare: vizibilitate",
+          "Pericol de alunecare: picioare și gambe",
+          "Protecția mâinilor: mănuși cu manșetă lungă pentru încheietură/antebraț",
+          "Protecție împotriva căderii: nu se refolosește după oprirea unei căderi",
+          "Centura complexă de siguranță: trebuie să se potrivească și să fie reglată"
+        ]
+      }
+    ]
+  },
+  "22": {
+    "sections": [
+      {
+        "title": "Categoriile de indicatoare",
+        "paragraphs": [
+          "Indicatoarele de securitate sunt clasificate după formă, culoare și semnificație. Fiecare categorie are un aspect distinct, pentru a asigura recunoașterea imediată."
+        ],
+        "table": {
+          "headers": [
+            "Tip",
+            "Formă",
+            "Culoare",
+            "Semnificație"
+          ],
+          "rows": [
+            [
+              "Obligativitate",
+              "Rotundă",
+              "Albastru + simbol alb",
+              "Trebuie făcut"
+            ],
+            [
+              "Avertizare",
+              "Triunghiulară",
+              "Galben + margine/simbol negru",
+              "Atenție, pericol"
+            ],
+            [
+              "Interdicție",
+              "Rotundă",
+              "Alb + margine roșie + bară diagonală roșie",
+              "Nu este permis"
+            ],
+            [
+              "Mijloc de salvare",
+              "Pătrată/dreptunghiulară",
+              "Verde + simbol alb",
+              "Situație sigură"
+            ],
+            [
+              "Echipament de incendiu",
+              "Pătrată/dreptunghiulară",
+              "Roșu + simbol alb",
+              "Amplasarea mijloacelor de stingere"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "Indicatoare de avertizare și de obligativitate",
+        "paragraphs": [
+          "Indicatoarele de avertizare sunt triunghiulare, galbene, cu margine neagră – ele înseamnă atenție/pericol. Indicatoarele de obligativitate sunt rotunde și albastre, cu simbol alb. Modul de realizare trebuie să fie clar pentru toți lucrătorii, indiferent de limba vorbită."
+        ],
+        "bullets": [
+          "Avertizare: triunghiular, galben, margine neagră = PERICOL",
+          "Obligativitate: rotund, albastru, simbol alb = TREBUIE FĂCUT",
+          "Realizarea trebuie să fie clară pentru TOȚI lucrătorii",
+          "Comunicare independentă de limbă",
+          "Amplasate la nivelul ochilor, acolo unde este posibil"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Indicatoarele trebuie realizate astfel încât semnificația lor să fie clară pentru TOȚI lucrătorii – indiferent de limba vorbită. De aceea se folosesc pictograme."
+        }
+      },
+      {
+        "title": "Indicatoare de interdicție și de securitate",
+        "paragraphs": [
+          "Un indicator de interdicție este circular, alb, cu margine roșie și bară diagonală roșie. Indicatoarele pentru mijloacele de salvare sunt pătrate/dreptunghiulare, verzi, cu simboluri albe. Indicatoarele pentru mijloacele de stingere a incendiilor sunt pătrate/dreptunghiulare, roșii, cu simboluri albe."
+        ],
+        "bullets": [
+          "Interdicție: cerc alb, margine roșie, bară diagonală roșie",
+          "Securitate/evacuare: dreptunghi verde, simbol alb",
+          "Echipament de incendiu: dreptunghi roșu, simbol alb",
+          "Indicatoarele de incendiu arată atât traseul, cât și amplasarea",
+          "Dungi galbene/albe: căi de circulație și zone de stivuire"
+        ]
+      },
+      {
+        "title": "Marcaje pe pardoseală",
+        "paragraphs": [
+          "Dungile galbene sau albe se folosesc pentru marcarea căilor de circulație și a zonelor de stivuire. Acestea ajută la organizarea fluxului de circulație și la delimitarea zonelor sigure la locul de muncă."
+        ],
+        "bullets": [
+          "Dungi galbene/albe: căi de circulație și zone de stivuire",
+          "Păstrați marcajele vizibile și întreținute",
+          "Nu blocați zonele marcate",
+          "Verificarea periodică a stării marcajelor"
+        ]
+      }
+    ]
+  }
+}

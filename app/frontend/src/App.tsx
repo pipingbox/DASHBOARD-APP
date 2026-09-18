@@ -2,21 +2,26 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { AuthProvider } from '@/hooks/useAuth';
 import { AdminPreviewProvider } from '@/contexts/AdminPreviewContext';
 import { ProtectedRoute, GuestRoute } from '@/components/ProtectedRoute';
 import { AppShell } from '@/components/layout/AppShell';
 import { useReferralCapture } from '@/hooks/useReferralCapture';
+import { usePageTracking } from '@/hooks/usePageTracking';
+import { initObservability } from '@/lib/observability';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useSeo } from '@/hooks/useSeo';
 import { OnboardingGate } from '@/components/OnboardingGate';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { DeploymentBadge } from '@/components/DeploymentBadge';
 import { CompanyVerificationGate } from '@/components/company/CompanyVerificationGate';
 
 import Index from './pages/Index';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import CheckEmail from './pages/CheckEmail';
+import AuthCallback from './pages/AuthCallback';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
@@ -61,6 +66,7 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import DsaContact from './pages/DsaContact';
 import Contact from './pages/Contact';
+import NotFound from './pages/NotFound';
 
 // BUG-002: Blog connected to router. Lazy-loaded for better bundle splitting.
 // Public routes (no auth) for SEO. Prerendered at build time via vite-prerender.
@@ -121,9 +127,11 @@ const AcademyModuleLegacyRedirect = () => {
 const AppRoutes = () => {
   // Capture referral codes from any page URL globally
   useReferralCapture();
+  // PB-OBSERVABILITY-001: closed-schema page tracking (no query strings)
+  usePageTracking();
   // Set dynamic page titles for browser tab
   useDocumentTitle();
-  // PB-WEB-006: canonical + hreflang + lang attribute per route
+  // PB-WEB-006: canonical + lang attribute per route (hreflang: PB-SEO-I18N-URLS-001)
   useSeo();
 
   return (
@@ -170,6 +178,15 @@ const AppRoutes = () => {
         </GuestRoute>
       }
     />
+    <Route
+      path="/check-email"
+      element={
+        <GuestRoute>
+          <CheckEmail />
+        </GuestRoute>
+      }
+    />
+    <Route path="/auth/callback" element={<AuthCallback />} />
     <Route
       path="/forgot-password"
       element={
@@ -358,12 +375,19 @@ const AppRoutes = () => {
     <Route path="/terms" element={<Terms />} />
     <Route path="/dsa" element={<DsaContact />} />
     <Route path="/contact" element={<Contact />} />
-    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    <Route path="*" element={<NotFound />} />
   </Routes>
   );
 };
 
-const App = () => (
+const App = () => {
+  // PB-OBSERVABILITY-001: init canonical observability layer (PostHog behind
+  // env config; fail-open no-op when VITE_POSTHOG_KEY is absent).
+  useEffect(() => {
+    void initObservability();
+  }, []);
+
+  return (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -375,12 +399,14 @@ const App = () => (
                 <AppRoutes />
               </ErrorBoundary>
             </BrowserRouter>
+            <DeploymentBadge />
           </TooltipProvider>
         </AdminPreviewProvider>
       </AuthProvider>
     </QueryClientProvider>
   </ErrorBoundary>
-);
+  );
+};
 
 export default App;
 export { AppRoutes };

@@ -1,0 +1,99 @@
+[
+  {
+    "id": "m6-gestion",
+    "iconKey": "ClipboardList",
+    "officialRef": "RD 39/1997 §6",
+    "hours": "8 hours",
+    "title": "Module 6: Management of prevention",
+    "lessons": [
+      {
+        "title": "6.1 Risk assessment",
+        "duration": "90 min",
+        "topics": [
+          "Assessment methodology",
+          "Hazard identification, estimation, evaluation",
+          "Documentation",
+          "Reviews"
+        ]
+      },
+      {
+        "title": "6.2 Prevention planning",
+        "duration": "90 min",
+        "topics": [
+          "Prevention plan",
+          "Preventive measures",
+          "Deadlines and responsible persons",
+          "Follow-up"
+        ]
+      },
+      {
+        "title": "6.3 Accident investigation",
+        "duration": "60 min",
+        "topics": [
+          "Cause tree analysis",
+          "Gathering information",
+          "Analysis of causes",
+          "Corrective measures"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-auditorias",
+    "iconKey": "Search",
+    "officialRef": "RD 39/1997 §7",
+    "hours": "6 hours",
+    "title": "Module 7: Audits and inspections",
+    "lessons": [
+      {
+        "title": "7.1 Audits of the prevention system",
+        "duration": "90 min",
+        "topics": [
+          "Purpose of the audit",
+          "Statutory audit",
+          "Voluntary audit",
+          "Audit report"
+        ]
+      },
+      {
+        "title": "7.2 Safety inspections",
+        "duration": "90 min",
+        "topics": [
+          "Scheduled inspections",
+          "Workplace inspections",
+          "Equipment inspections",
+          "Inspection reports"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-cae",
+    "iconKey": "Users",
+    "officialRef": "RD 171/2004",
+    "hours": "6 hours",
+    "title": "Module 8: Coordination of business activities (CAE)",
+    "lessons": [
+      {
+        "title": "8.1 Duties of the client company",
+        "duration": "90 min",
+        "topics": [
+          "RD 171/2004",
+          "Verification of the contractor's prevention arrangements",
+          "Information on risks",
+          "Activities coordinator"
+        ]
+      },
+      {
+        "title": "8.2 Duties of the contractor",
+        "duration": "90 min",
+        "topics": [
+          "Compliance with site rules",
+          "Information for workers",
+          "Subcontracting",
+          "Subcontracting register (construction sector)"
+        ]
+      }
+    ]
+  }
+]

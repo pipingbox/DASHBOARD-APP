@@ -35,6 +35,7 @@ import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useAdminFeedbackCount } from '@/hooks/useAdminFeedbackCount';
 import { PipingBoxLogo } from '@/components/PipingBoxLogo';
 import { BetaFeedbackProvider } from '@/components/beta/BetaFeedbackProvider';
+import { TranslationBetaBanner } from '@/components/beta/TranslationBetaBanner';
 
 /**
  * Navigation items for WORKER / MODERATOR views.
@@ -597,6 +598,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           </div>
         </header>
+
+        <TranslationBetaBanner />
 
         <main className="min-w-0 overflow-x-hidden p-3 sm:p-4 lg:p-8">{children}</main>
 

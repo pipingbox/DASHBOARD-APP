@@ -263,7 +263,7 @@ export function WorkDayMonthReport({
               <input
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                placeholder="Acme Piping S.L."
+                placeholder={t('workday.companyNamePlaceholder')}
                 className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-[#f59e0b] focus:outline-none"
               />
             </div>

@@ -1,0 +1,24 @@
+-- ══════════════════════════════════════════════════════════════════════════════
+-- PB-COMPLETE-ONBOARDING-404-001 — Grant mínimo para el contrato backend.
+--
+-- ROOT CAUSE del fallo del primer E2E (run 34639811020): el RPC
+-- pb_complete_onboarding ejecuta como SECURITY INVOKER desde la edge function
+-- (PostgREST con service_role), y app_worker_experiences tenía
+-- service_role=Dxtm — SIN SELECT — a diferencia de sus tablas hermanas
+-- app_worker_certifications y app_worker_documents (service_role=arwdDxtm).
+-- Resultado: "permission denied for table app_worker_experiences" → la edge
+-- function devolvía 500 → el wizard (correctamente) no completaba.
+--
+-- BUG SILENCIOSO PREEXISTENTE reparado por el mismo grant: la edge function
+-- DESPLEGADA recalculate-profiles consulta las tres tablas de counts vía REST
+-- con service_role y descarta silenciosamente las respuestas non-ok
+-- (`if (expRes.ok)`), por lo que venía calculando profile_completion SIN los
+-- +15 puntos de experiencia para todos los usuarios. Este grant restaura el
+-- conteo de experiencias en el camino canónico también.
+--
+-- ALCANCE MÍNIMO: solo SELECT, solo service_role (rol de backend; nunca
+-- anon/authenticated). No relaja RLS ni añade grants públicos.
+-- Idempotente.
+-- ══════════════════════════════════════════════════════════════════════════════
+
+GRANT SELECT ON public.app_worker_experiences TO service_role;

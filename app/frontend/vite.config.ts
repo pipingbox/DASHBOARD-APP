@@ -1,12 +1,64 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
+import fs from 'fs';
 import path from 'path';
 import { viteSourceLocator } from '@metagptx/vite-plugin-source-locator';
 import { atoms } from '@metagptx/web-sdk/plugins';
 import { vitePrerenderPlugin } from 'vite-prerender-plugin';
-import Sitemap from 'vite-plugin-sitemap';
+import { pbExplicitSitemapPlugin } from './prerender/sitemap.js';
 import { getBlogRoutes } from './prerender/blog-routes.js';
-import { getSitemapLastmod } from './prerender/blog-sitemap.js';
+
+/**
+ * PB-PWA-IDENTITY-001: give every non-production deployment its own installable
+ * identity.
+ *
+ * `site.webmanifest` declares `start_url: "/"` and `scope: "/"` — both relative
+ * — so the SAME manifest installs under whatever origin serves it. Preview and
+ * production therefore produced two installed apps with identical name, icons
+ * and identity while intentionally running different commits: an installed app
+ * could show a different version than the browser with nothing on screen
+ * explaining why, and the launcher gave no way to tell them apart.
+ *
+ * This rewrites the built manifest when VITE_APP_ENV marks a non-production
+ * deployment, replacing the marked name and overriding `id` so the browser
+ * treats it as a separate app. Production is left byte-identical: it keeps the
+ * canonical `id: "/"` declared in public/site.webmanifest, which equals the id
+ * a browser already derives implicitly from `start_url`, so apps installed
+ * before that field existed keep the exact same identity.
+ *
+ * Done at build time on purpose: the preview Worker does not set
+ * `run_worker_first`, so Cloudflare serves a matching static asset without ever
+ * invoking the Worker — an edge-side rewrite would silently never run there.
+ */
+function pbDeploymentManifestIdentity() {
+  return {
+    name: 'pb-deployment-manifest-identity',
+    apply: 'build' as const,
+    enforce: 'post' as const,
+    closeBundle() {
+      const environment = process.env.VITE_APP_ENV?.trim();
+      if (!environment || environment === 'production') return;
+
+      const manifestPath = path.resolve(__dirname, 'dist/site.webmanifest');
+      if (!fs.existsSync(manifestPath)) return;
+
+      let manifest: Record<string, unknown>;
+      try {
+        manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      } catch {
+        return;
+      }
+
+      const label = environment.charAt(0).toUpperCase() + environment.slice(1);
+      manifest.name = `PipingBox ${label} — not production`;
+      manifest.short_name = `PipingBox ${label}`;
+      // Same-origin id keeps this deployment a distinct installable app.
+      manifest.id = `/?deployment=${environment.toLowerCase()}`;
+
+      fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    },
+  };
+}
 
 function escapeHtmlAttr(str: string): string {
   return str
@@ -34,45 +86,15 @@ export default defineConfig(({ command }) => {
       }),
       react(),
       atoms(),
-      Sitemap({
-        hostname: 'https://pipingbox.com',
-        lastmod: getSitemapLastmod(),
-        readable: true,
-        // generateRobotsTxt disabled: we manage robots.txt in public/robots.txt directly
-        // so it can include Disallow directives for private routes (PB-WEB-006).
-        generateRobotsTxt: false,
-        // PB-WEB-006: all public routes approved in PB-WEB-005 (F1 + F2).
-        // vite-plugin-sitemap 0.8.2 uses dynamicRoutes, not routes.
-        // PB-SEO-101: legal/contact/certification routes added.
-        // vite-plugin-sitemap 0.8.2 builds the route list as
-        // (scan of **\/\*.html in dist) + dynamicRoutes with NO dedup, and it
-        // normalizes every route to the slash-less form. '/' and the blog
-        // pages are already emitted by the dist scan (prerendered HTML), so
-        // listing them here would duplicate <url> entries — they are covered
-        // as long as vite-prerender-plugin emits their HTML, which is
-        // load-bearing for the blog anyway.
-        // Known follow-up (not this ticket): the plugin strips trailing
-        // slashes, so sitemap URLs ('/blog') differ from the canonical
-        // trailing-slash URLs ('/blog/'), and per-route lastmod from
-        // getSitemapLastmod() never matches the normalized routes. Fixing
-        // both means replacing this plugin with explicit sitemap generation.
-        dynamicRoutes: [
-          '/tools',
-          '/academy',
-          '/jobs',
-          '/pricing',
-          '/companies',
-          '/companies/request-workers',
-          '/contact',
-          '/privacy',
-          '/terms',
-          '/dsa',
-          '/certifications',
-          '/certifications/vca',
-          '/certifications/scc',
-          '/certifications/prl',
-        ],
-      }),
+      // PB-OBSERVABILITY-PROD-ROLLOUT-001: vite-plugin-sitemap was removed.
+      // It normalized every route to the slash-less form, so blog URLs were
+      // emitted as their non-canonical variants (307 redirects). The
+      // replacement generates the sitemap from the same route sources as the
+      // router/prerenderer under a single canonical policy: '/' and blog
+      // routes keep their trailing slash, app routes never have one.
+      // Canonical route list and policy live in prerender/sitemap.js.
+      pbExplicitSitemapPlugin(),
+      pbDeploymentManifestIdentity(),
       ...(blogPrerenderRoutes.length > 0
         ? vitePrerenderPlugin({
             renderTarget: '#root',
@@ -80,6 +102,20 @@ export default defineConfig(({ command }) => {
             additionalPrerenderRoutes: blogPrerenderRoutes,
           })
         : []),
+      {
+        // PB-OBSERVABILITY-001: vite-prerender-plugin (post, above) force-sets
+        // build.sourcemap = true "for actionable error messages", which leaks
+        // `//# sourceMappingURL=` into every shipped bundle (public maps).
+        // Re-enforce 'hidden' AFTER it: maps are still generated for CI upload
+        // to PostHog (error tracking per SHA) but never publicly linked.
+        name: 'pb-enforce-hidden-sourcemaps',
+        apply: 'build',
+        enforce: 'post',
+        config(config) {
+          config.build ??= {};
+          config.build.sourcemap = 'hidden';
+        },
+      },
     ],
     resolve: {
       alias: {
@@ -98,6 +134,9 @@ export default defineConfig(({ command }) => {
       watch: { usePolling: true, interval: 600 },
     },
     build: {
+      // PB-OBSERVABILITY-001: hidden sourcemaps per build so error stacks can be
+      // resolved per SHA in PostHog error tracking without shipping public maps.
+      sourcemap: 'hidden',
       rollupOptions: {
         output: {
           manualChunks: {

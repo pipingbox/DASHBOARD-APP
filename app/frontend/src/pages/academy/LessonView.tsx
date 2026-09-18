@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   ArrowRight,
@@ -10,6 +11,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
+import { localizedLesson, type LessonContentI18n } from '@/lib/academy/lessonI18n';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Markdown from 'markdown-to-jsx';
@@ -25,6 +27,7 @@ interface Lesson {
   duration_minutes: number;
   order_index: number;
   official_ref: string | null;
+  content_i18n?: Record<string, LessonContentI18n> | null;
 }
 
 interface Course {
@@ -34,6 +37,7 @@ interface Course {
 }
 
 export default function LessonView() {
+  const { t, i18n } = useTranslation();
   const { lessonId } = useParams<{ lessonId: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -128,7 +132,7 @@ export default function LessonView() {
 
     setMarking(false);
     setProgressStatus('completed');
-    toast.success('Lesson completed!');
+    toast.success(t('academy.course.lessonCompletedToast'));
 
     // Auto-navigate to next lesson if available
     const currentIdx = allLessons.findIndex((l) => l.id === lesson.id);
@@ -149,26 +153,28 @@ export default function LessonView() {
   if (!lesson || !course) {
     return (
       <div className="text-center py-24 space-y-3">
-        <p className="text-sm text-zinc-500">Lesson not found.</p>
-        <Link to="/academy" className="text-xs text-[#f59e0b] hover:underline">← Back to Academy</Link>
+        <p className="text-sm text-zinc-500">{t('academy.course.lessonNotFound')}</p>
+        <Link to="/academy" className="text-xs text-[#f59e0b] hover:underline">← {t('academy.backToAcademy')}</Link>
       </div>
     );
   }
 
   const currentIdx = allLessons.findIndex((l) => l.id === lesson.id);
-  const prevLesson = currentIdx > 0 ? allLessons[currentIdx - 1] : null;
-  const nextLesson = currentIdx < allLessons.length - 1 ? allLessons[currentIdx + 1] : null;
+  const locLesson = localizedLesson(i18n.language, lesson);
+  const locAllLessons = allLessons.map((l) => localizedLesson(i18n.language, l));
+  const prevLesson = currentIdx > 0 ? locAllLessons[currentIdx - 1] : null;
+  const nextLesson = currentIdx < allLessons.length - 1 ? locAllLessons[currentIdx + 1] : null;
   const isCompleted = progressStatus === 'completed';
 
   return (
     <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-zinc-500">
-        <Link to="/academy" className="hover:text-zinc-300">Academy</Link>
+        <Link to="/academy" className="hover:text-zinc-300">{t('nav.academy')}</Link>
         <span>/</span>
         <Link to={`/academy/course/${course.slug}`} className="hover:text-zinc-300">{course.title}</Link>
         <span>/</span>
-        <span className="text-zinc-400">{lesson.title}</span>
+        <span className="text-zinc-400">{locLesson.title}</span>
       </div>
 
       {/* Lesson header */}
@@ -176,25 +182,25 @@ export default function LessonView() {
         <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-zinc-600">
           <span className="flex items-center gap-1">
             <BookOpen className="h-3 w-3" />
-            Lesson {currentIdx + 1} of {allLessons.length}
+            {t('academy.course.lessonOf', { current: currentIdx + 1, total: allLessons.length })}
           </span>
           <span className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
-            {lesson.duration_minutes} min
+            {t('academy.course.minutes', { count: lesson.duration_minutes })}
           </span>
           {lesson.official_ref && (
             <span className="text-[#f59e0b]">{lesson.official_ref}</span>
           )}
         </div>
-        <h1 className="text-2xl font-bold text-zinc-100">{lesson.title}</h1>
-        {lesson.description && (
-          <p className="text-sm text-zinc-400">{lesson.description}</p>
+        <h1 className="text-2xl font-bold text-zinc-100">{locLesson.title}</h1>
+        {locLesson.description && (
+          <p className="text-sm text-zinc-400">{locLesson.description}</p>
         )}
       </div>
 
       {/* Lesson content */}
       <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm p-6 min-h-[400px]">
-        {lesson.content_type === 'text' && lesson.content && (
+        {lesson.content_type === 'text' && locLesson.content && (
           <div className="prose prose-invert prose-sm max-w-none">
             <Markdown
               options={{
@@ -213,7 +219,7 @@ export default function LessonView() {
                 },
               }}
             >
-              {lesson.content}
+              {locLesson.content}
             </Markdown>
           </div>
         )}
@@ -236,17 +242,16 @@ export default function LessonView() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-sm text-zinc-400">
               <HelpCircle className="h-4 w-4 text-[#f59e0b]" />
-              Practice Quiz
+              {t('academy.course.practiceQuiz')}
             </div>
             <p className="text-sm text-zinc-500">
-              This lesson contains a practice quiz. The quiz engine will be available soon.
-              For now, review the course material and mark this lesson as complete.
+              {t('academy.course.quizComingSoon')}
             </p>
           </div>
         )}
 
-        {lesson.content_type === 'text' && !lesson.content && (
-          <p className="text-sm text-zinc-500 text-center py-12">Lesson content coming soon.</p>
+        {lesson.content_type === 'text' && !locLesson.content && (
+          <p className="text-sm text-zinc-500 text-center py-12">{t('academy.course.contentComingSoon')}</p>
         )}
       </div>
 
@@ -264,9 +269,9 @@ export default function LessonView() {
           {marking ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : isCompleted ? (
-            <><CheckCircle2 className="h-4 w-4" /> Completed</>
+            <><CheckCircle2 className="h-4 w-4" /> {t('academy.course.completed')}</>
           ) : (
-            <>Mark as Complete</>
+            <>{t('academy.course.markComplete')}</>
           )}
         </button>
 
@@ -284,7 +289,7 @@ export default function LessonView() {
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <div>
-              <p className="text-[9px] uppercase tracking-wider text-zinc-600">Previous</p>
+              <p className="text-[9px] uppercase tracking-wider text-zinc-600">{t('academy.course.previous')}</p>
               <p>{prevLesson.title}</p>
             </div>
           </Link>
@@ -298,7 +303,7 @@ export default function LessonView() {
             className="flex items-center gap-2 text-xs text-zinc-400 hover:text-[#f59e0b] transition text-right"
           >
             <div>
-              <p className="text-[9px] uppercase tracking-wider text-zinc-600">Next</p>
+              <p className="text-[9px] uppercase tracking-wider text-zinc-600">{t('academy.course.next')}</p>
               <p>{nextLesson.title}</p>
             </div>
             <ArrowRight className="h-3.5 w-3.5" />
@@ -309,8 +314,8 @@ export default function LessonView() {
             className="flex items-center gap-2 text-xs text-[#f59e0b] hover:underline"
           >
             <div className="text-right">
-              <p className="text-[9px] uppercase tracking-wider text-zinc-600">Finish</p>
-              <p>Back to course</p>
+              <p className="text-[9px] uppercase tracking-wider text-zinc-600">{t('academy.course.finish')}</p>
+              <p>{t('academy.backToCourse')}</p>
             </div>
             <CheckCircle2 className="h-3.5 w-3.5" />
           </Link>

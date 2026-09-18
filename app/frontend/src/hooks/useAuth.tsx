@@ -3,9 +3,18 @@ import type { Session, User } from '@supabase/supabase-js';
 import { supabase, TABLES } from '@/lib/supabase';
 import { getStoredReferralCode, clearStoredReferralCode, validateReferralCode } from '@/lib/referrals';
 import { notifyReferralJoined } from '@/lib/notifications';
-import { getAppBaseUrl, getAuthRedirectUrl } from '@/lib/constants';
+import { getAuthCallbackUrl } from '@/lib/constants';
+import { classifyAuthError, isNewSignupIdentity, type AuthErrorCode } from '@/lib/authFlow';
 import { ONBOARDING_STATUS } from '@/lib/onboarding';
 import { edgeFunctionUrl } from '@/lib/supabase';
+import {
+  identifyUser,
+  resetObservabilityUser,
+  trackEvent,
+  detectOrigin,
+  getCorrelationId,
+} from '@/lib/observability';
+import i18n from '@/i18n';
 
 export interface Profile {
   id: string;
@@ -45,14 +54,28 @@ interface AuthContextValue {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<{ error: string | null; errorCode: AuthErrorCode | null }>;
   signUp: (
     email: string,
     password: string,
     fullName: string,
     accountType?: 'worker' | 'company',
-  ) => Promise<{ error: string | null }>;
-  signInWithGoogle: (accountType?: 'worker' | 'company') => Promise<{ error: string | null }>;
+  ) => Promise<{
+    error: string | null;
+    errorCode: AuthErrorCode | null;
+    confirmationRequired: boolean;
+    isNewUser: boolean;
+  }>;
+  signInWithGoogle: (
+    accountType?: 'worker' | 'company',
+  ) => Promise<{ error: string | null; errorCode: AuthErrorCode | null }>;
+  resendConfirmation: (
+    email: string,
+  ) => Promise<{ error: string | null; errorCode: AuthErrorCode | null }>;
+  hasActiveSession: () => Promise<boolean>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -513,8 +536,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(next?.user ?? null);
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
         if (next?.user) await ensureProfile(next.user);
+        // PB-OBSERVABILITY-001: link anonymous session to technical user id.
+        if (next?.user) identifyUser(next.user.id);
       } else if (event === 'SIGNED_OUT') {
         setProfile(null);
+        resetObservabilityUser();
       }
     });
 
@@ -526,7 +552,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
+    const errorCode = classifyAuthError(error);
+    if (errorCode === 'email_not_confirmed') {
+      trackEvent('signin_blocked_unconfirmed', {
+        route: '/login',
+        correlation_id: getCorrelationId(),
+        provider: 'email',
+        status: 'blocked',
+        reason_code: 'email_not_confirmed',
+      });
+    }
+    return { error: error?.message ?? null, errorCode };
   };
 
   const signUp = async (email: string, password: string, fullName: string, accountType?: 'worker' | 'company') => {
@@ -542,19 +578,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch { /* ignore */ }
 
+    // PB-OBSERVABILITY-001: funnel signup_started (closed schema, origin only).
+    trackEvent(
+      'signup_started',
+      { origin: detectOrigin(), account_type: accountType || 'worker' },
+      { dedupeKey: 'signup' },
+    );
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: getAppBaseUrl(),
+        emailRedirectTo: getAuthCallbackUrl('/dashboard', i18n.language, 'confirmation'),
         data: { full_name: fullName, account_type: accountType || 'worker' },
       },
     });
-    if (error) return { error: error.message };
-    if (data.user) {
+    if (error) {
+      return {
+        error: error.message,
+        errorCode: classifyAuthError(error),
+        confirmationRequired: false,
+        isNewUser: false,
+      };
+    }
+    const confirmationRequired = !data.session;
+    const isNewUser = isNewSignupIdentity(data.user);
+    if (data.user && isNewUser) {
+      trackEvent(
+        'auth_created',
+        { origin: detectOrigin(), account_type: accountType || 'worker' },
+        { dedupeKey: `auth:${data.user.id}` },
+      );
+    }
+    if (data.user && data.session) {
       await ensureProfile(data.user, fullName);
     }
-    return { error: null };
+    if (confirmationRequired) {
+      trackEvent('signup_confirmation_required', {
+        route: '/register',
+        correlation_id: getCorrelationId(),
+        provider: 'email',
+        status: isNewUser ? 'created' : 'neutral',
+        attempt_bucket: isNewUser ? 'first' : 'retry',
+      });
+    }
+    return {
+      error: null,
+      errorCode: null,
+      confirmationRequired,
+      isNewUser,
+    };
   };
 
   const signInWithGoogle = async (accountType?: 'worker' | 'company') => {
@@ -576,14 +649,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: getAuthRedirectUrl('/dashboard'),
+        redirectTo: getAuthCallbackUrl('/dashboard', i18n.language, 'google'),
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
         },
       },
     });
-    return { error: error?.message ?? null };
+    return {
+      error: error?.message ?? null,
+      errorCode: classifyAuthError(error),
+    };
+  };
+
+  const resendConfirmation = async (email: string) => {
+    trackEvent('confirmation_resend_requested', {
+      route: window.location.pathname,
+      correlation_id: getCorrelationId(),
+      provider: 'email',
+      status: 'requested',
+    });
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: getAuthCallbackUrl('/dashboard', i18n.language, 'confirmation'),
+      },
+    });
+    const errorCode = classifyAuthError(error);
+    if (error) {
+      trackEvent('confirmation_resend_failed', {
+        route: window.location.pathname,
+        correlation_id: getCorrelationId(),
+        provider: 'email',
+        status: 'failed',
+        reason_code: errorCode === 'rate_limit' ? 'rate_limited' : 'unknown',
+      });
+      return { error: error.message, errorCode };
+    }
+    trackEvent('confirmation_resend_succeeded', {
+      route: window.location.pathname,
+      correlation_id: getCorrelationId(),
+      provider: 'email',
+      status: 'succeeded',
+    });
+    return { error: null, errorCode: null };
+  };
+
+  const hasActiveSession = async () => {
+    const { data } = await supabase.auth.getSession();
+    return Boolean(data.session);
   };
 
   const signOut = async () => {
@@ -597,7 +712,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ session, user, profile, loading, signIn, signUp, signInWithGoogle, signOut, refreshProfile }}
+      value={{
+        session,
+        user,
+        profile,
+        loading,
+        signIn,
+        signUp,
+        signInWithGoogle,
+        resendConfirmation,
+        hasActiveSession,
+        signOut,
+        refreshProfile,
+      }}
     >
       {children}
     </AuthContext.Provider>

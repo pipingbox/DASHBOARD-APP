@@ -50,10 +50,22 @@ export default function Register() {
       storeReferralCode(referralCode);
     }
 
-    const { error } = await signUp(email, password, fullName, accountType);
+    const result = await signUp(email, password, fullName, accountType);
     setLoading(false);
-    if (error) {
-      toast.error(error);
+    if (result.error) {
+      toast.error(
+        result.errorCode === 'rate_limit'
+          ? t('auth.confirmationRateLimited')
+          : t('auth.authGenericError'),
+      );
+      return;
+    }
+
+    if (result.confirmationRequired) {
+      navigate('/check-email', {
+        replace: true,
+        state: { email, isNewUser: result.isNewUser },
+      });
       return;
     }
 
@@ -69,7 +81,7 @@ export default function Register() {
     const { error } = await signInWithGoogle(accountType);
     setGoogleLoading(false);
     if (error) {
-      toast.error(error);
+      toast.error(t('auth.oauthStartError'));
     }
   };
 

@@ -73,6 +73,11 @@ jobs:
       - name: Validate i18n usage in public pages
         run: node scripts/check-i18n-usage.mjs
 
+      # PB-I18N-LAYER2-001 (D6): debt paid — strict coverage is now a
+      # production gate, not just a local check.
+      - name: i18n coverage strict guard (7 locales at 100%)
+        run: node scripts/check-i18n-coverage.mjs --strict
+
       - name: Catalog integrity guard
         run: node scripts/check-catalog.mjs
 
@@ -83,11 +88,49 @@ jobs:
         working-directory: app/frontend
         run: npm ci
 
+      # PB-OBSERVABILITY-PROD-ROLLOUT-001 (ChatGPT review): hard preflight —
+      # never allow a production build to succeed with the observability layer
+      # silently compiled as a no-op. The public project key must be present
+      # and shaped like a PostHog public key (phc_...). Values are never
+      # printed: only existence/shape booleans.
+      - name: Preflight — production observability config present
+        env:
+          VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
+          VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
+        run: |
+          set -euo pipefail
+          if [ -z "${VITE_POSTHOG_KEY:-}" ]; then
+            echo "::error::VITE_POSTHOG_KEY is missing — production build would ship with PostHog as a silent no-op. Aborting."
+            exit 1
+          fi
+          case "$VITE_POSTHOG_KEY" in
+            phc_*) echo "VITE_POSTHOG_KEY present and shaped as a public project key (value not printed).";;
+            *) echo "::error::VITE_POSTHOG_KEY is present but does not look like a public project key (expected phc_ prefix). Refusing to build."; exit 1;;
+          esac
+          if [ -n "${VITE_POSTHOG_HOST:-}" ]; then
+            case "$VITE_POSTHOG_HOST" in
+              https://*) echo "VITE_POSTHOG_HOST present with https scheme (value not printed).";;
+              *) echo "::error::VITE_POSTHOG_HOST must be an https URL."; exit 1;;
+            esac
+          else
+            echo "VITE_POSTHOG_HOST not set — code default (EU host) will be used."
+          fi
+
       - name: Deploy to Cloudflare Workers (PRODUCTION - pipingbox-app-prod)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          # PB-OBSERVABILITY-PROD-ROLLOUT-001: public PostHog project key
+          # (phc_..., project 271316; NEVER a personal/private API key here).
+          # VITE_APP_ENV is NOT set: the layer defaults environment=production.
+          # Replay/autocapture stay disabled in code; bot filter stays on
+          # (opt_out_useragent_filter is preview-only in observability.ts).
+          VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
+          VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
+          # Tag the production build with the exact deployed SHA so every
+          # event carries app_version=<SHA> (error tracking per build).
+          VITE_APP_VERSION: ${{ github.event.inputs.commit_sha }}
         run: npx wrangler deploy --env production
 
   auth-e2e:
@@ -97,7 +140,13 @@ jobs:
       contents: read
     uses: ./.github/workflows/auth-e2e.yml
     with:
-      target_url: 'https://app.pipingbox.com'
+      # PB-PWA-IDENTITY-001 housekeeping: verify the canonical origin directly.
+      # This used to target app.pipingbox.com, which only reaches production
+      # through the PB-WEB-007 301. The assertion still passed (Playwright
+      # follows the redirect), but it measured the legacy hop instead of the
+      # origin users actually land on, and it would keep passing even if the
+      # canonical origin broke while the redirect stayed healthy.
+      target_url: 'https://pipingbox.com'
       source_ref: ${{ github.event.inputs.commit_sha }}
     secrets:
       E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
@@ -110,7 +159,9 @@ jobs:
     permissions:
       contents: read
     env:
-      PREVIEW_URL: 'https://app.pipingbox.com'
+      # Same housekeeping as the auth gate above: assert the public/protected
+      # route surface on the canonical origin, not on the legacy 301 hop.
+      PREVIEW_URL: 'https://pipingbox.com'
     steps:
       - name: Checkout exact deployed app ref
         uses: actions/checkout@v4

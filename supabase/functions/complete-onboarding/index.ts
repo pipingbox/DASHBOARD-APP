@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
     // ignore
   }
 
-  const { error } = await supabase.rpc("pb_complete_onboarding", {
+  const { data, error } = await supabase.rpc("pb_complete_onboarding", {
     p_user_id: user.id,
     p_marketplace_ready: body.marketplace_ready === true,
   });
@@ -60,8 +60,10 @@ Deno.serve(async (req) => {
     );
   }
 
+  // The RPC returns the resulting canonical trio so callers (wizard, E2E) can
+  // verify the final state without a second round-trip.
   return new Response(
-    JSON.stringify({ completed: true }),
+    JSON.stringify({ completed: true, profile: data }),
     { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
   );
 });

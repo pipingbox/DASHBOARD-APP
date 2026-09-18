@@ -381,7 +381,19 @@ const SENSITIVE_COLUMNS = [
  * already there. Together, an exemption can be neither stale nor speculative:
  * it must name a file that exists at the moment the guard runs.
  */
-const ALLOWLIST = new Set(['lib/onboarding.ts']);
+// PB-OBSERVABILITY-PROD-ROLLOUT-001 — `onboarding_completed` is ALSO the name
+// of a closed-taxonomy ANALYTICS EVENT (PostHog), not a database column. The
+// observability layer emits it and the wizard fires it; neither writes it to
+// the database (the canonical column remains onboarding_status, and the guard
+// still forbids any DB write of the forbidden name in every other file).
+// These two files are allowlisted for the EVENT usage only; both exist and
+// were reviewed. The guard's integrity check below fails the build if either
+// path stops resolving to a real file.
+const ALLOWLIST = new Set([
+  'lib/onboarding.ts',
+  'lib/observability.ts',
+  'components/onboarding/OnboardingWizard.tsx',
+]);
 
 const EXTENSIONS = ['.ts', '.tsx'];
 

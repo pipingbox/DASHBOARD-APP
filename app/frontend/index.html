@@ -28,7 +28,7 @@
     <meta name="author" content="PipingBox" />
     <meta name="keywords" content="pipefitter, welder, piping, ASME B31.3, pipe calculator, elbow cut, flange rating, VCA, SCC, OSHA, industrial jobs, pipe stress, CAESAR II, NPS, schedule" />
 
-    <!-- Canonical / hreflang are managed per-route by useSeo() (PB-WEB-006).
+    <!-- Canonical is managed per-route by useSeo() (PB-WEB-006).
          This fallback covers the root shell before JS executes. -->
     <link rel="canonical" href="https://pipingbox.com/" />
 
@@ -84,7 +84,14 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-V04RD9W0J4');
+      // PB-OBSERVABILITY-001: never send query strings to GA4 — they can
+      // carry referral codes, tokens or UTM parameters.
+      gtag('config', 'G-V04RD9W0J4', {
+        page_location: window.location.origin + window.location.pathname,
+        page_referrer: document.referrer
+          ? new URL(document.referrer).origin + new URL(document.referrer).pathname
+          : '',
+      });
     </script>
   </head>
 

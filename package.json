@@ -6,7 +6,8 @@
   "scripts": {
     "build": "cd app/frontend && npm run build",
     "deploy": "wrangler deploy",
-    "deploy:dry-run": "wrangler deploy --dry-run"
+    "deploy:dry-run": "wrangler deploy --dry-run",
+    "route:guard": "node --experimental-strip-types scripts/route-contract-guard.ts"
   },
   "engines": {
     "node": "22.x"

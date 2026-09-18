@@ -62,13 +62,18 @@ const argv = process.argv.slice(2);
 const asJson = argv.includes('--json');
 
 /**
- * Locales the product PROMISES. The commercial one-pager sent to manufacturers
- * claims seven interface languages, so "seven files exist" is a contractual
- * property, not an implementation detail. Hardcoded rather than derived from
- * the directory listing on purpose: deriving it would make the guard pass
- * happily the day someone deletes a locale file.
+ * Locales the product PROMISES. Read from the canonical `languages.json`
+ * (PB-I18N-LAYER3-001) — the same list that drives the runtime selector —
+ * and NOT from the directory listing on purpose: deriving it from the files
+ * would make the guard pass happily the day someone deletes a locale file.
+ * A language listed there without a locale file is a hard failure below.
  */
-const REQUIRED_LOCALES = ['en', 'es', 'nl', 'de', 'fr', 'pt', 'it'];
+const LANGUAGES_FILE = join(REPO_ROOT, 'app', 'frontend', 'src', 'i18n', 'languages.json');
+const REQUIRED_LOCALES = JSON.parse(readFileSync(LANGUAGES_FILE, 'utf8')).map((l) => l.code);
+if (REQUIRED_LOCALES.length < 7 || new Set(REQUIRED_LOCALES).size !== REQUIRED_LOCALES.length) {
+  console.error(`✗ languages.json must list at least the 7 historical locales without duplicates (got ${REQUIRED_LOCALES.join(', ')})`);
+  process.exit(2);
+}
 
 /**
  * Namespaces whose shape is asserted against the code that consumes them.
@@ -118,151 +123,7 @@ const CONTRACTS = [
  * MAINTENANCE RULE: this list may only ever SHRINK. Delete a line when the key
  * is translated in all seven locales. Never add one.
  */
-const BASELINE_MISSING_PATHS = [
-  "academy.examBackToAcademy",
-  "academy.examCorrectAnswer",
-  "academy.examFinish",
-  "academy.examFinishConfirm",
-  "academy.examFinishConfirmNo",
-  "academy.examFinishConfirmText",
-  "academy.examFinishConfirmYes",
-  "academy.examIntroBVCA",
-  "academy.examIntroDuration",
-  "academy.examIntroFormat",
-  "academy.examIntroFormatValue",
-  "academy.examIntroPassScore",
-  "academy.examIntroQuestions",
-  "academy.examIntroRule1",
-  "academy.examIntroRule2",
-  "academy.examIntroRule3",
-  "academy.examIntroRule4",
-  "academy.examIntroRules",
-  "academy.examIntroTitle",
-  "academy.examIntroVOLVCA",
-  "academy.examNewExam",
-  "academy.examNext",
-  "academy.examNoAnswer",
-  "academy.examPrevious",
-  "academy.examQuestionOf",
-  "academy.examResultFailed",
-  "academy.examResultPassed",
-  "academy.examResultScore",
-  "academy.examResultTime",
-  "academy.examReviewAnswers",
-  "academy.examStart",
-  "academy.examTimeUp",
-  "academy.examTimeWarning",
-  "academy.examUnderstand",
-  "academy.examYourAnswer",
-  "academy.questions",
-  "landing.footer.blogLink",
-  "landing.footer.links",
-  "landing.footer.loginLink",
-  "landing.footer.registerLink",
-  "landing.footer.toolsLink",
-  "tools.additionalInfo",
-  "tools.angle",
-  "tools.backToCatalog",
-  "tools.boltSize",
-  "tools.bolted",
-  "tools.bolts.desc",
-  "tools.bolts.description",
-  "tools.bolts.diameter",
-  "tools.bolts.length",
-  "tools.bolts.name",
-  "tools.bolts.nutWidth",
-  "tools.bolts.quantity",
-  "tools.bolts.symbol",
-  "tools.bolts.threadPitch",
-  "tools.bolts.unit",
-  "tools.bolts.value",
-  "tools.categoryInspection",
-  "tools.categoryLayout",
-  "tools.categoryLibrary",
-  "tools.centerArc",
-  "tools.comingSoonData",
-  "tools.commonAngles",
-  "tools.cutAngle",
-  "tools.degrees",
-  "tools.desiredAngle",
-  "tools.discardedPart",
-  "tools.dry",
-  "tools.elbowCut.angleDeg",
-  "tools.elbowCut.arcExtrados",
-  "tools.elbowCut.arcIntrados",
-  "tools.elbowCut.arcNeutral",
-  "tools.elbowCut.cutExtrados",
-  "tools.elbowCut.cutIntrados",
-  "tools.elbowCut.cutLine",
-  "tools.elbowCut.desiredAngle",
-  "tools.elbowCut.elbowRadius",
-  "tools.elbowCut.formula",
-  "tools.elbowCut.neutralAxis",
-  "tools.elbowCut.nps",
-  "tools.elbowCut.referenceTable",
-  "tools.elbowCut.results",
-  "tools.elbowCut.schedule",
-  "tools.elbowCut.standard",
-  "tools.elbowCut.wallThickness",
-  "tools.elbowNote",
-  "tools.elbowRadius",
-  "tools.elbowType",
-  "tools.exportImage",
-  "tools.exportPdf",
-  "tools.extradosArc",
-  "tools.fittingTakeOff",
-  "tools.flangeClass",
-  "tools.flanges",
-  "tools.intradosArc",
-  "tools.longRadius",
-  "tools.lubricated",
-  "tools.numericalResults",
-  "tools.pipeDataTables",
-  "tools.pipeDim.boltDia",
-  "tools.pipeDim.boltLen",
-  "tools.pipeDim.boltSize",
-  "tools.pipeDim.bolts",
-  "tools.pipeDim.class",
-  "tools.pipeDim.dry",
-  "tools.pipeDim.lubed",
-  "tools.pipeDim.searchPlaceholder",
-  "tools.pipeDim.showInches",
-  "tools.pipeDim.tabBolt",
-  "tools.pipeDim.tabFlange",
-  "tools.pipeDim.tabPipe",
-  "tools.pipeDim.thickness",
-  "tools.pipeSize",
-  "tools.pressureDropDesc",
-  "tools.reynoldsDesc",
-  "tools.saveFavorite",
-  "tools.schedule",
-  "tools.searchSize",
-  "tools.shortRadius",
-  "tools.tabBoltTorque",
-  "tools.tabFlangeDimensions",
-  "tools.tabPipeDimensions",
-  "tools.technicalDrawing",
-  "tools.thermalExpansionDesc",
-  "tools.toggleMmIn",
-  "tools.toggleUnits",
-  "tools.torqueWarning",
-  "tools.unitConv.catDiameter",
-  "tools.unitConv.catNpsDn",
-  "tools.unitConv.dn",
-  "tools.unitConv.enterValue",
-  "tools.unitConv.nps",
-  "tools.unitConv.npsDnTable",
-  "tools.unitConv.npsDnTitle",
-  "tools.unitConv.od",
-  "tools.unitConv.searchBySize",
-  "tools.unitConv.selectCategory",
-  "tools.unitConv.swap",
-  "tools.unitConverterDesc",
-  "tools.usablePart",
-  "tools.wallThicknessCol",
-  "tools.wallThicknessDesc",
-  "tools.weight",
-];
+const BASELINE_MISSING_PATHS = [];
 
 const COVERAGE_DEBT = new Set(BASELINE_MISSING_PATHS);
 
@@ -370,6 +231,24 @@ const shapes = Object.fromEntries(
 const allPaths = new Set();
 for (const map of Object.values(shapes)) for (const p of map.keys()) allPaths.add(p);
 
+const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/;
+function pluralCategories(code) {
+  try {
+    return new Intl.PluralRules(code).resolvedOptions().pluralCategories;
+  } catch {
+    return ['one', 'other'];
+  }
+}
+// Every plural base in the reference must carry all categories the locale needs.
+for (const [code, map] of Object.entries(shapes)) {
+  for (const p of shapes.en.keys()) {
+    if (!p.endsWith('_other')) continue;
+    const base = p.slice(0, -'_other'.length);
+    for (const cat of pluralCategories(code)) allPaths.add(`${base}_${cat}`);
+  }
+  void map;
+}
+
 const missing = [];   // case 1
 const typeDrift = []; // case 2
 const empties = [];   // case 3
@@ -394,8 +273,17 @@ for (const path of [...allPaths].sort()) {
     const parent = path.includes('.') ? path.slice(0, path.lastIndexOf('.')) : null;
     const parentAlsoAbsent =
       parent !== null && absent.every((c) => shapes[c].get(parent) === undefined);
-    if (!parentAlsoAbsent && !COVERAGE_DEBT.has(path)) {
-      missing.push({ path, absent, present: [...byLocale.keys()] });
+    // PB-I18N-LAYER3-001: a CLDR plural form (`_few`, `_many`, …) is only
+    // required in the locales whose Intl.PluralRules produce that category.
+    // Absence there is a real gap (reported); absence elsewhere is expected.
+    const pluralMatch = path.match(PLURAL_SUFFIX);
+    const languageSpecificPlural =
+      pluralMatch !== null && shapes.en.has(`${path.slice(0, -pluralMatch[0].length)}_other`);
+    const absentWhereRequired = languageSpecificPlural
+      ? absent.filter((c) => pluralCategories(c).includes(pluralMatch[1]))
+      : absent;
+    if (!parentAlsoAbsent && !COVERAGE_DEBT.has(path) && absentWhereRequired.length > 0) {
+      missing.push({ path, absent: absentWhereRequired, present: [...byLocale.keys()] });
     }
   }
 
@@ -554,6 +442,32 @@ for (const { namespace, consumers } of CONTRACTS) {
   }
 }
 
+const semanticErrors = [];
+if (resolve(locales.ro, 'common.fullName') !== 'Nume complet') {
+  semanticErrors.push('ro.json "common.fullName" must be exactly "Nume complet".');
+}
+if (resolve(locales.ro, 'auth.fullNamePlaceholder') !== 'Ioana Popescu') {
+  semanticErrors.push('ro.json "auth.fullNamePlaceholder" must remain "Ioana Popescu".');
+}
+const romanianFullNamePaths = [
+  'common.fullName',
+  'profileCompleteness.items.fullName',
+  'admin.users.fullName',
+  'adminCenter.fullName',
+  'profileCard.items.fullName',
+  'requestWorkers.placeholderFullName',
+];
+
+for (const path of romanianFullNamePaths) {
+  const value = resolve(locales.ro, path);
+  if (typeof value !== 'string' || !/\bnume(?:le)?\b/iu.test(value)) {
+    semanticErrors.push(`ro.json "${path}" must use "nume" for a person's full name.`);
+  }
+  if (typeof value === 'string' && /\bnumăr(?:ul)?\b/iu.test(value)) {
+    semanticErrors.push(`ro.json "${path}" incorrectly uses "număr" (number) for a person's name.`);
+  }
+}
+
 // ─── report ──────────────────────────────────────────────────────────────────
 
 const failed =
@@ -561,6 +475,7 @@ const failed =
   typeDrift.length > 0 ||
   empties.length > 0 ||
   contractErrors.length > 0 ||
+  semanticErrors.length > 0 ||
   collisions.length > 0 ||
   staleDebt.length > 0;
 
@@ -575,6 +490,7 @@ if (asJson) {
         empties,
         collisions,
         contractErrors,
+        semanticErrors,
         staleDebt,
         ok: !failed,
       },
@@ -600,6 +516,7 @@ if (!failed) {
     const subkeys = Object.keys(resolve(locales.en, namespace) ?? {}).length;
     console.log(`  ✓ contract "${namespace}" — ${subkeys} subkeys present in all locales`);
   }
+  console.log('  ✓ Romanian full-name semantics — "nume", never "număr"');
   console.log('\n✓ i18n schema is consistent across all locales.');
   process.exit(0);
 }
@@ -667,6 +584,12 @@ if (contractErrors.length > 0) {
   console.error('');
 }
 
+if (semanticErrors.length > 0) {
+  console.error(`  SEMANTICS — language-specific meaning (${semanticErrors.length}):`);
+  for (const error of semanticErrors) console.error(`    - ${error}`);
+  console.error('');
+}
+
 if (staleDebt.length > 0) {
   console.error(`  STALE BASELINE — debt paid but exemption left behind (${staleDebt.length}):`);
   for (const path of staleDebt.slice(0, 40)) console.error(`    ${path}`);
@@ -685,6 +608,7 @@ const total =
   empties.length +
   collisions.length +
   contractErrors.length +
+  semanticErrors.length +
   staleDebt.length;
 
 console.error(`${total} problem(s). See PB-I18N-SCHEMA-001.\n`);

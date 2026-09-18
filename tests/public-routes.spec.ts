@@ -22,16 +22,21 @@ import { test, expect } from '@playwright/test';
  */
 
 const PUBLIC_ROUTES = [
+  '/',
   '/tools',
   '/academy',
   '/companies/request-workers',
-  '/jobs',        // F2 — marketplace public; apply() handles !user gracefully
-  '/companies',   // F2 — marketing/metrics page, no auth dependency
-  // PB-MARKET-PROD-001 §7.2 — legal obligation, not an acquisition choice: DSA arts. 11
-  // and 12 require the contact points to be "easily accessible" to authorities and to
-  // recipients of the service. Gating them behind login would itself be the
-  // non-compliance. Static page, no auth dependency, like /terms and /privacy.
+  '/jobs',
+  '/companies',
   '/dsa',
+  '/privacy',
+  '/terms',
+  '/contact',
+  '/certifications',
+  '/certifications/vca',
+  '/certifications/scc',
+  '/certifications/prl',
+  '/blog/',
 ];
 
 test.describe('PB-WEB-005 public surface', () => {
@@ -67,6 +72,120 @@ test.describe('PB-WEB-005 public surface', () => {
       page.getByRole('button', { name: /sign out/i }),
       'guest must never be shown Sign out',
     ).toHaveCount(0);
+  });
+});
+
+test.describe('PB-SEO-102 Worker route contract', () => {
+  test('valid public deep links stay reachable', async ({ page }) => {
+    for (const path of ['/', '/tools', '/jobs', '/companies', '/certifications/vca']) {
+      await page.goto(path);
+      await expect(page, `${path} must not be a Worker 404`).not.toHaveURL(/404|not-found/, {
+        timeout: 10_000,
+      });
+      await expect(page.locator('body')).not.toContainText('Not found', { timeout: 5000 });
+    }
+  });
+
+  test('valid auth/protected deep links are not edge-404ed', async ({ page }) => {
+    // Worker must not return 404 for valid app routes; auth enforcement is client-side.
+    for (const path of ['/dashboard', '/profile', '/applications', '/messages', '/company/jobs', '/company/settings', '/admin']) {
+      await page.goto(path);
+      await expect(page, `${path} must receive the SPA shell, not 404`).not.toHaveURL(/404|not-found/, {
+        timeout: 10_000,
+      });
+    }
+  });
+
+  test('valid dynamic shapes receive the SPA shell', async ({ page }) => {
+    for (const path of ['/blog/asme-b31-3-vs-b31-1/', '/academy/module/1', '/academy/module/22']) {
+      await page.goto(path);
+      await expect(page, `${path} must be a valid dynamic route`).not.toHaveURL(/404|not-found/, {
+        timeout: 10_000,
+      });
+    }
+  });
+
+  test('unknown routes return HTTP 404 from the Worker', async ({ request }) => {
+    for (const path of ['/this-route-definitely-does-not-exist', '/tools/does-not-exist', '/company/does-not-exist', '/academy/999', '/academy/not-a-real-route', '/random/deep/path']) {
+      const response = await request.get(path);
+      expect(response.status(), `${path} must be 404`).toBe(404);
+    }
+  });
+
+  test('unknown HTML document returns 404 + SPA shell for branded NotFound UI', async ({ page, request }) => {
+    const response = await page.goto('/this-route-does-not-exist');
+    expect(response?.status(), 'direct unknown HTML navigation must be HTTP 404').toBe(404);
+    await expect(page.getByRole('heading', { name: '404' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('link', { name: /home/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /tools/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /jobs/i })).toBeVisible();
+
+    // The response body must be the SPA shell (so React can boot), not a plain text 404.
+    // The Worker only serves the SPA shell for HTML-document requests, so the
+    // API request must explicitly send Accept: text/html (Playwright's
+    // APIRequestContext does NOT send it by default, unlike page.goto above).
+    const reqResponse = await request.get('/this-route-does-not-exist', {
+      headers: { accept: 'text/html,application/xhtml+xml' },
+    });
+    expect(reqResponse.status(), 'unknown HTML document must be HTTP 404').toBe(404);
+    const body = await reqResponse.text();
+    expect(body).toContain('id="root"');
+  });
+
+  test('missing static asset returns 404 and no SPA shell', async ({ request }) => {
+    const response = await request.get('/assets/definitely-missing-file.js');
+    expect(response.status()).toBe(404);
+    const body = await response.text();
+    expect(body).not.toContain('id="root"');
+  });
+
+  test('unknown route + query string remains 404', async ({ request }) => {
+    const response = await request.get('/no-such-route?source=test');
+    expect(response.status()).toBe(404);
+  });
+
+  test('valid route + query string remains valid', async ({ request }) => {
+    const response = await request.get('/tools?source=test');
+    expect(response.status()).toBe(200);
+  });
+
+  test('HEAD reflects GET status for valid and invalid routes', async ({ request }) => {
+    const valid = await request.head('/tools');
+    expect(valid.status()).toBe(200);
+    const invalid = await request.head('/no-such-route');
+    expect(invalid.status()).toBe(404);
+  });
+});
+
+test.describe('PB-SEO-102 useSeo noindex lifecycle', () => {
+  test('noindex is set on NotFound and removed after navigating away', async ({ page }) => {
+    await page.goto('/this-route-does-not-exist');
+    await expect(page.getByRole('heading', { name: '404' })).toBeVisible({ timeout: 10_000 });
+
+    const robotsBefore = await page.locator('meta[name="robots"]').getAttribute('content');
+    expect(robotsBefore).toContain('noindex');
+
+    await page.getByRole('link', { name: /tools/i }).click();
+    // PB-WEB-007: the app's canonical production origin is the apex
+    // (https://pipingbox.com). app.pipingbox.com is a permanent 301 alias, so
+    // when this gate runs against the app host the Worker redirects to the
+    // apex and the assertion must accept the canonical URL there. Asserting
+    // the literal path '/tools' against the app alias host would require the
+    // redirect to be reverted, contradicting the canonical-host decision.
+    await expect(page).toHaveURL(/\/tools\/?$/, { timeout: 10_000 });
+
+    const robotsAfter = await page.locator('meta[name="robots"]').count();
+    expect(robotsAfter).toBe(0);
+  });
+});
+
+test.describe('PB-SEO-102 NotFound UI', () => {
+  test('unknown client-side route renders NotFound page', async ({ page }) => {
+    await page.goto('/this-route-does-not-exist');
+    await expect(page.getByRole('heading', { name: '404' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('link', { name: /home/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /tools/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /jobs/i })).toBeVisible();
   });
 });
 
@@ -111,6 +230,59 @@ test.describe('PB-SEO-101 acquisition foundation', () => {
       'https://pipingbox.com/blog/asme-b31-3-vs-b31-1/',
     ]) {
       expect(body, `sitemap must include ${url}`).toContain(url);
+    }
+  });
+
+  // PB-OBSERVABILITY-PROD-ROLLOUT-001 regression: vite-plugin-sitemap
+  // normalized every URL to the slash-less form, so blog entries advertised
+  // their non-canonical 307-redirecting variants. The plugin was replaced by
+  // explicit generation (app/frontend/prerender/sitemap.js). This test pins
+  // the single canonical policy so router, sitemap and canonical links
+  // cannot drift apart again:
+  //   - '/' and blog routes (prerendered directories): trailing slash;
+  //   - every other app route: no trailing slash;
+  //   - no duplicate <loc> entries, canonical hostname only.
+  test('sitemap enforces the canonical trailing-slash policy', async ({
+    request,
+  }) => {
+    const response = await request.get('/sitemap.xml');
+    expect(response.status()).toBe(200);
+    const body = await response.text();
+    const locs = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+
+    expect(locs.length, 'sitemap must not be empty').toBeGreaterThan(0);
+    expect(
+      new Set(locs).size,
+      'sitemap must not contain duplicate URLs',
+    ).toBe(locs.length);
+
+    for (const loc of locs) {
+      expect(loc, `canonical hostname only: ${loc}`).toMatch(
+        /^https:\/\/pipingbox\.com(\/|$)/,
+      );
+    }
+
+    const blogLocs = locs.filter((loc) => loc.includes('/blog'));
+    expect(blogLocs, 'sitemap must cover the blog index').toContain(
+      'https://pipingbox.com/blog/',
+    );
+    for (const loc of blogLocs) {
+      expect(loc, `blog URLs keep their trailing slash: ${loc}`).toMatch(/\/$/);
+      expect(
+        locs,
+        `non-canonical slash-less variant must not coexist: ${loc}`,
+      ).not.toContain(loc.replace(/\/$/, ''));
+    }
+
+    const appLocs = locs.filter(
+      (loc) => loc !== 'https://pipingbox.com/' && !loc.includes('/blog'),
+    );
+    expect(appLocs.length, 'sitemap must cover app routes').toBeGreaterThan(0);
+    for (const loc of appLocs) {
+      expect(
+        loc,
+        `app routes never carry a trailing slash: ${loc}`,
+      ).not.toMatch(/\/$/);
     }
   });
 });

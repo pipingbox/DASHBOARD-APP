@@ -6,11 +6,14 @@ import {
   Building2,
   RotateCcw,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
   COUNTRIES,
   DISCIPLINES,
   CONTRACT_TYPES_OPTIONS,
+  optionLabelKey,
+  type OptionGroup,
 } from '@/lib/jobs/utils';
 
 interface FilterPanelProps {
@@ -42,6 +45,7 @@ export function FilterPanel({
   setSelectedContractTypes,
   clearFilters,
 }: FilterPanelProps) {
+  const { t } = useTranslation();
   if (!open) return null;
 
   return (
@@ -60,8 +64,8 @@ export function FilterPanel({
                 <SlidersHorizontal className="h-4 w-4 text-[#f59e0b]" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-zinc-100">Filter Jobs</h3>
-                <p className="text-[10px] text-zinc-500">{activeFilterCount} active filter{activeFilterCount !== 1 ? 's' : ''}</p>
+                <h3 className="text-sm font-semibold text-zinc-100">{t('jobs.filterJobs')}</h3>
+                <p className="text-[10px] text-zinc-500">{t('jobs.activeFiltersLabel', { count: activeFilterCount })}</p>
               </div>
             </div>
             <button
@@ -73,19 +77,19 @@ export function FilterPanel({
           </div>
 
           <div className="flex-1 overflow-y-auto p-5 space-y-6 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
-            <FilterGroup label="Country" options={COUNTRIES} selected={selectedCountries} onToggle={(v) => toggleFilter(selectedCountries, setSelectedCountries, v)} icon={Globe} layout="grid" />
-            <FilterGroup label="Discipline" options={DISCIPLINES} selected={selectedDisciplines} onToggle={(v) => toggleFilter(selectedDisciplines, setSelectedDisciplines, v)} icon={Briefcase} layout="grid" />
-            <FilterGroup label="Contract Type" options={CONTRACT_TYPES_OPTIONS} selected={selectedContractTypes} onToggle={(v) => toggleFilter(selectedContractTypes, setSelectedContractTypes, v)} icon={Building2} layout="grid" />
+            <FilterGroup label={t('jobs.country')} group="countries" options={COUNTRIES} selected={selectedCountries} onToggle={(v) => toggleFilter(selectedCountries, setSelectedCountries, v)} icon={Globe} layout="grid" />
+            <FilterGroup label={t('jobs.discipline')} group="disciplines" options={DISCIPLINES} selected={selectedDisciplines} onToggle={(v) => toggleFilter(selectedDisciplines, setSelectedDisciplines, v)} icon={Briefcase} layout="grid" />
+            <FilterGroup label={t('jobs.contractType')} group="contractTypes" options={CONTRACT_TYPES_OPTIONS} selected={selectedContractTypes} onToggle={(v) => toggleFilter(selectedContractTypes, setSelectedContractTypes, v)} icon={Building2} layout="grid" />
           </div>
 
           <div className="p-5 border-t border-zinc-800/80 space-y-2.5">
             <Button onClick={onClose} className="w-full bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold">
-              Show {filteredCount} Result{filteredCount !== 1 ? 's' : ''}
+              {t('jobs.showResults', { count: filteredCount })}
             </Button>
             {activeFilterCount > 0 && (
               <Button variant="outline" onClick={clearFilters} className="w-full border-zinc-700 text-zinc-400 hover:text-zinc-200 !bg-transparent hover:!bg-zinc-900">
                 <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-                Reset All Filters
+                {t('jobs.resetAllFilters')}
               </Button>
             )}
           </div>
@@ -105,7 +109,7 @@ export function FilterPanel({
           <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800/80">
             <div className="flex items-center gap-2.5">
               <SlidersHorizontal className="h-4 w-4 text-[#f59e0b]" />
-              <h3 className="text-sm font-semibold text-zinc-100">Filter Jobs</h3>
+              <h3 className="text-sm font-semibold text-zinc-100">{t('jobs.filterJobs')}</h3>
               {activeFilterCount > 0 && (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#f59e0b] text-[10px] font-bold text-black">
                   {activeFilterCount}
@@ -118,19 +122,19 @@ export function FilterPanel({
           </div>
 
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5" style={{ scrollbarWidth: 'none' }}>
-            <FilterGroup label="Country" options={COUNTRIES} selected={selectedCountries} onToggle={(v) => toggleFilter(selectedCountries, setSelectedCountries, v)} layout="chips" />
-            <FilterGroup label="Discipline" options={DISCIPLINES} selected={selectedDisciplines} onToggle={(v) => toggleFilter(selectedDisciplines, setSelectedDisciplines, v)} layout="chips" />
-            <FilterGroup label="Contract Type" options={CONTRACT_TYPES_OPTIONS} selected={selectedContractTypes} onToggle={(v) => toggleFilter(selectedContractTypes, setSelectedContractTypes, v)} layout="chips" />
+            <FilterGroup label={t('jobs.country')} group="countries" options={COUNTRIES} selected={selectedCountries} onToggle={(v) => toggleFilter(selectedCountries, setSelectedCountries, v)} layout="chips" />
+            <FilterGroup label={t('jobs.discipline')} group="disciplines" options={DISCIPLINES} selected={selectedDisciplines} onToggle={(v) => toggleFilter(selectedDisciplines, setSelectedDisciplines, v)} layout="chips" />
+            <FilterGroup label={t('jobs.contractType')} group="contractTypes" options={CONTRACT_TYPES_OPTIONS} selected={selectedContractTypes} onToggle={(v) => toggleFilter(selectedContractTypes, setSelectedContractTypes, v)} layout="chips" />
           </div>
 
           <div className="px-5 py-4 border-t border-zinc-800/80 space-y-2.5">
             <Button onClick={onClose} className="w-full bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold">
-              Show {filteredCount} Result{filteredCount !== 1 ? 's' : ''}
+              {t('jobs.showResults', { count: filteredCount })}
             </Button>
             {activeFilterCount > 0 && (
               <Button variant="outline" onClick={clearFilters} className="w-full border-zinc-700 text-zinc-400 !bg-transparent">
                 <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-                Reset All
+                {t('jobs.resetAll')}
               </Button>
             )}
           </div>
@@ -142,6 +146,7 @@ export function FilterPanel({
 
 function FilterGroup({
   label,
+  group,
   options,
   selected,
   onToggle,
@@ -149,12 +154,14 @@ function FilterGroup({
   layout,
 }: {
   label: string;
+  group: OptionGroup;
   options: string[];
   selected: string[];
   onToggle: (val: string) => void;
   icon?: React.ElementType;
   layout: 'grid' | 'chips';
 }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-3">
       <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold">{label}</label>
@@ -171,7 +178,7 @@ function FilterGroup({
               }`}
             >
               {Icon && <Icon className="h-3 w-3 shrink-0" />}
-              {opt}
+              {t(optionLabelKey(group, opt))}
             </button>
           ))}
         </div>
@@ -187,7 +194,7 @@ function FilterGroup({
                   : 'bg-zinc-900/60 border-zinc-800 text-zinc-400'
               }`}
             >
-              {opt}
+              {t(optionLabelKey(group, opt))}
             </button>
           ))}
         </div>

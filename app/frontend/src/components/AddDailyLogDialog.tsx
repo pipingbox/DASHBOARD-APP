@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Loader2, Plus } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
@@ -64,6 +65,7 @@ const initialForm: FormState = {
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
 export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(initialForm);
@@ -87,36 +89,36 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
 
   const validate = (): boolean => {
     const next: Partial<Record<keyof FormState, string>> = {};
-    if (!form.log_date) next.log_date = 'Date is required';
-    if (!form.iso.trim()) next.iso = 'ISO number is required';
+    if (!form.log_date) next.log_date = t('dailyLog.validation.dateRequired');
+    if (!form.iso.trim()) next.iso = t('dailyLog.validation.isoRequired');
 
     const welders = Number(form.welders);
     if (!form.welders || Number.isNaN(welders) || welders < 0) {
-      next.welders = 'Enter a valid welders count';
+      next.welders = t('dailyLog.validation.weldersInvalid');
     }
 
     const hn = Number(form.hours_normal);
     if (form.hours_normal === '' || Number.isNaN(hn) || hn < 0) {
-      next.hours_normal = 'Enter normal hours (0 or more)';
+      next.hours_normal = t('dailyLog.validation.normalHoursInvalid');
     } else if (hn > 24) {
-      next.hours_normal = 'Must be 24 or less';
+      next.hours_normal = t('dailyLog.validation.maxHours');
     }
 
     const he = Number(form.hours_extra);
     if (form.hours_extra !== '' && (Number.isNaN(he) || he < 0)) {
-      next.hours_extra = 'Enter valid extra hours';
+      next.hours_extra = t('dailyLog.validation.extraHoursInvalid');
     } else if (he > 24) {
-      next.hours_extra = 'Must be 24 or less';
+      next.hours_extra = t('dailyLog.validation.maxHours');
     }
 
     const rn = Number(form.normal_rate);
     if (form.normal_rate === '' || Number.isNaN(rn) || rn < 0) {
-      next.normal_rate = 'Enter a valid normal hourly rate';
+      next.normal_rate = t('dailyLog.validation.normalRateInvalid');
     }
 
     const re = Number(form.extra_rate);
     if (form.extra_rate !== '' && (Number.isNaN(re) || re < 0)) {
-      next.extra_rate = 'Enter a valid extra hourly rate';
+      next.extra_rate = t('dailyLog.validation.extraRateInvalid');
     }
 
     setErrors(next);
@@ -126,11 +128,11 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      toast.error('You must be signed in');
+      toast.error(t('workday.mustBeSignedIn'));
       return;
     }
     if (!validate()) {
-      toast.error('Please fix the highlighted fields');
+      toast.error(t('common.fixHighlightedFields'));
       return;
     }
 
@@ -153,12 +155,15 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
     setSubmitting(false);
 
     if (error) {
-      toast.error('Failed to save daily log', { description: error.message });
+      toast.error(t('dailyLog.saveFailed'), { description: error.message });
       return;
     }
 
-    toast.success('Daily log saved', {
-      description: `ISO ${form.iso.trim()} — ${formatCurrency(totalSalary, form.currency)} gross`,
+    toast.success(t('dailyLog.saved'), {
+      description: t('dailyLog.savedDescription', {
+        iso: form.iso.trim(),
+        amount: formatCurrency(totalSalary, form.currency),
+      }),
     });
     setForm(initialForm);
     setOpen(false);
@@ -179,7 +184,7 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
         {trigger ?? (
           <Button className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold">
             <Plus className="mr-2 h-4 w-4" />
-            Add Daily Log
+            {t('dailyLog.addDailyLog')}
           </Button>
         )}
       </SheetTrigger>
@@ -189,11 +194,11 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
       >
         <SheetHeader className="space-y-1">
           <p className="text-[10px] uppercase tracking-[0.25em] text-[#f59e0b]">
-            Daily Pipe Log
+            {t('dailyLog.eyebrow')}
           </p>
-          <SheetTitle className="text-zinc-100">New entry</SheetTitle>
+          <SheetTitle className="text-zinc-100">{t('dailyLog.newEntry')}</SheetTitle>
           <SheetDescription className="text-zinc-500">
-            Record ISO, welder allocation, hours and gross salary for the day.
+            {t('dailyLog.description')}
           </SheetDescription>
         </SheetHeader>
 
@@ -201,7 +206,7 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="log_date" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                Date <span className="text-[#f59e0b]">*</span>
+                {t('workday.date')} <span className="text-[#f59e0b]">*</span>
               </Label>
               <Input
                 id="log_date"
@@ -215,7 +220,7 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
 
             <div className="space-y-2">
               <Label htmlFor="currency" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                Currency
+                {t('workday.currency')}
               </Label>
               <select
                 id="currency"
@@ -234,11 +239,11 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
 
           <div className="space-y-2">
             <Label htmlFor="iso" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-              ISO number <span className="text-[#f59e0b]">*</span>
+              {t('dailyLog.isoNumber')} <span className="text-[#f59e0b]">*</span>
             </Label>
             <Input
               id="iso"
-              placeholder="e.g. ISO-PL-2041"
+              placeholder={t('dailyLog.isoPlaceholder')}
               value={form.iso}
               onChange={(e) => update('iso', e.target.value)}
               className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-[#f59e0b] font-mono"
@@ -248,14 +253,14 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
 
           <div className="space-y-2">
             <Label htmlFor="welders" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-              Welders count <span className="text-[#f59e0b]">*</span>
+              {t('dailyLog.weldersCount')} <span className="text-[#f59e0b]">*</span>
             </Label>
             <Input
               id="welders"
               type="number"
               min="0"
               step="1"
-              placeholder="e.g. 4"
+              placeholder={t('dailyLog.weldersPlaceholder')}
               value={form.welders}
               onChange={(e) => update('welders', e.target.value)}
               className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-[#f59e0b]"
@@ -265,11 +270,11 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
 
           {/* Hours */}
           <div className="border-t border-zinc-800/60 pt-5">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 mb-3">Hours</p>
+            <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 mb-3">{t('workday.hours')}</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="hours_normal" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                  Normal hours <span className="text-[#f59e0b]">*</span>
+                  {t('workday.normalHours')} <span className="text-[#f59e0b]">*</span>
                 </Label>
                 <Input
                   id="hours_normal"
@@ -289,7 +294,7 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
 
               <div className="space-y-2">
                 <Label htmlFor="hours_extra" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                  Extra hours
+                  {t('workday.extraHours')}
                 </Label>
                 <Input
                   id="hours_extra"
@@ -312,19 +317,19 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
           {/* Rates */}
           <div className="border-t border-zinc-800/60 pt-5">
             <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 mb-3">
-              Gross hourly rates
+              {t('workday.grossHourlyRates')}
             </p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="normal_rate" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                  Normal rate ({symbol}) <span className="text-[#f59e0b]">*</span>
+                  {t('workday.normalRate')} ({symbol}) <span className="text-[#f59e0b]">*</span>
                 </Label>
                 <Input
                   id="normal_rate"
                   type="number"
                   min="0"
                   step="0.01"
-                  placeholder="e.g. 25.00"
+                  placeholder={t('dailyLog.normalRatePlaceholder')}
                   value={form.normal_rate}
                   onChange={(e) => update('normal_rate', e.target.value)}
                   className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-[#f59e0b]"
@@ -336,14 +341,14 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
 
               <div className="space-y-2">
                 <Label htmlFor="extra_rate" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                  Extra rate ({symbol})
+                  {t('workday.extraRate')} ({symbol})
                 </Label>
                 <Input
                   id="extra_rate"
                   type="number"
                   min="0"
                   step="0.01"
-                  placeholder="e.g. 37.50"
+                  placeholder={t('dailyLog.extraRatePlaceholder')}
                   value={form.extra_rate}
                   onChange={(e) => update('extra_rate', e.target.value)}
                   className="bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-[#f59e0b]"
@@ -358,24 +363,24 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
           {/* Auto-calculated gross salary */}
           <div className="border border-zinc-800 bg-zinc-950/60 p-4">
             <p className="text-[10px] uppercase tracking-[0.25em] text-[#f59e0b] mb-3">
-              Gross salary (auto)
+              {t('dailyLog.grossSalaryAuto')}
             </p>
             <dl className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <dt className="text-zinc-500">Normal gross salary</dt>
+                <dt className="text-zinc-500">{t('dailyLog.normalGrossSalary')}</dt>
                 <dd className="font-mono text-zinc-100">
                   {formatCurrency(normalSalary, form.currency)}
                 </dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-zinc-500">Extra gross salary</dt>
+                <dt className="text-zinc-500">{t('dailyLog.extraGrossSalary')}</dt>
                 <dd className="font-mono text-zinc-100">
                   {formatCurrency(extraSalary, form.currency)}
                 </dd>
               </div>
               <div className="flex items-center justify-between border-t border-zinc-800 pt-2 mt-2">
                 <dt className="text-xs uppercase tracking-[0.2em] text-zinc-300">
-                  Total gross
+                  {t('dailyLog.totalGross')}
                 </dt>
                 <dd className="font-mono text-lg font-semibold text-[#f59e0b]">
                   {formatCurrency(totalSalary, form.currency)}
@@ -383,17 +388,17 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
               </div>
             </dl>
             <p className="mt-3 text-[10px] text-zinc-600">
-              Gross salary only — taxes and deductions are not calculated.
+              {t('workday.grossDisclaimer')}
             </p>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="notes" className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-              Notes
+              {t('workday.notes')}
             </Label>
             <Textarea
               id="notes"
-              placeholder="Any blockers, observations, or context for the crew…"
+              placeholder={t('dailyLog.notesPlaceholder')}
               rows={3}
               value={form.notes}
               onChange={(e) => update('notes', e.target.value)}
@@ -409,7 +414,7 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
               onClick={() => setOpen(false)}
               disabled={submitting}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               type="submit"
@@ -419,10 +424,10 @@ export function AddDailyLogDialog({ onCreated, trigger }: AddDailyLogDialogProps
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving…
+                  {t('common.saving')}
                 </>
               ) : (
-                'Save entry'
+                t('dailyLog.saveEntry')
               )}
             </Button>
           </SheetFooter>

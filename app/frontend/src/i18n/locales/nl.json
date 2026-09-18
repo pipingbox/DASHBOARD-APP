@@ -48,7 +48,11 @@
     "loadFailed": "Laden van gegevens mislukt.",
     "unexpectedError": "Er is een onverwachte fout opgetreden",
     "sending": "Verzenden...",
-    "download": "Downloaden"
+    "download": "Downloaden",
+    "saveError": "Opslaan mislukt",
+    "saved": "Opgeslagen",
+    "fixHighlightedFields": "Corrigeer de gemarkeerde velden",
+    "sessionNotFound": "Gebruikerssessie niet gevonden. Meld u opnieuw aan."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -79,7 +83,12 @@
     "viewAs": "Bekijk als",
     "previewMode": "VOORBEELDMODUS",
     "viewingAs": "Bekijken als",
-    "exitPreview": "Voorbeeld sluiten"
+    "exitPreview": "Voorbeeld sluiten",
+    "companyBilling": "Facturering / Abonnementen",
+    "companyDocumentation": "Industrieel Documentbeheer",
+    "companySection": "Bedrijf",
+    "companySettings": "Instellingen",
+    "companyWorkspace": "Bedrijfsomgeving"
   },
   "notifications": {
     "title": "Meldingen",
@@ -99,7 +108,10 @@
     "documentRequest": "Er is een document bij je aangevraagd.",
     "certificateExpiring": "Een van je certificaten verloopt binnenkort.",
     "adminAlert": "Beheerderswaarschuwing ontvangen.",
-    "feedbackResolved": "Je feedbackrapport is beoordeeld en opgelost. Bedankt voor het helpen verbeteren van PipingBox."
+    "feedbackResolved": "Je feedbackrapport is beoordeeld en opgelost. Bedankt voor het helpen verbeteren van PipingBox.",
+    "jobMatch": "Nieuwe vacaturematch",
+    "productUpdate": "Nieuwe functie beschikbaar",
+    "workforceInvitation": "Nieuwe werkmogelijkheid"
   },
   "dashboard": {
     "overview": "Overzicht",
@@ -230,7 +242,37 @@
     "passwordWeak": "Zwak — voeg meer tekens toe",
     "passwordFair": "Redelijk — ga door",
     "passwordGood": "Goed — mooi wachtwoord",
-    "passwordStrong": "Sterk — uitstekend!"
+    "passwordStrong": "Sterk — uitstekend!",
+    "registrationCompleted": "Registratie voltooid",
+    "accountCreatedTitle": "Je account is aangemaakt",
+    "accountCreatedDescription": "Bevestig je e-mailadres voordat je inlogt bij PipingBox.",
+    "checkEmailTitle": "Controleer je e-mail om door te gaan",
+    "checkEmailDescription": "Als dit adres nog op bevestiging wacht, ontvang je een link om de registratie te voltooien.",
+    "confirmationSentTo": "We hebben een bevestigingslink gestuurd naar {{email}}.",
+    "confirmationCheckSpam": "Controleer ook je map met spam of ongewenste e-mail.",
+    "waitingForConfirmation": "Wachten op bevestiging",
+    "openEmail": "Mijn e-mail openen",
+    "resendConfirmation": "Bevestigingsmail opnieuw sturen",
+    "resendCountdown": "Opnieuw sturen over {{seconds}} s",
+    "alreadyConfirmed": "Ik heb mijn e-mail bevestigd",
+    "changeEmail": "E-mailadres wijzigen",
+    "confirmationResent": "We hebben je een nieuwe bevestigingslink gestuurd.",
+    "confirmationResendNeutral": "Als het adres geldig is en op bevestiging wacht, ontvang je binnen enkele minuten een nieuwe e-mail.",
+    "confirmationRateLimited": "Wacht enkele minuten voordat je nog een e-mail aanvraagt.",
+    "confirmationSignInRequired": "Log in nadat je je e-mail hebt bevestigd.",
+    "emailUnconfirmedTitle": "E-mail niet bevestigd",
+    "emailUnconfirmedDescription": "Je e-mail is nog niet bevestigd. Controleer je inbox of vraag een nieuwe link aan.",
+    "confirmationSuccessTitle": "E-mail bevestigd",
+    "confirmationSuccessDescription": "Je e-mail is bevestigd. We gaan nu je professionele profiel voorbereiden.",
+    "oauthSuccessTitle": "Inloggen met Google geslaagd",
+    "oauthSuccessDescription": "Je Google-e-mail is geverifieerd. We gaan nu je profiel voorbereiden.",
+    "authCallbackProcessing": "Inloggen voltooien",
+    "authCallbackProcessingDesc": "Even geduld terwijl we je sessie verifiëren.",
+    "authCallbackErrorTitle": "Inloggen kon niet worden voltooid",
+    "authCallbackErrorDescription": "Deze link is mogelijk ongeldig of verlopen. Vraag een nieuwe e-mail aan of log opnieuw in.",
+    "authGenericError": "Je account kon niet worden aangemaakt. Probeer het opnieuw.",
+    "signInError": "Inloggen is niet gelukt. Controleer je gegevens en probeer het opnieuw.",
+    "oauthStartError": "Inloggen met Google kon niet worden gestart. Probeer het opnieuw."
   },
   "community": {
     "title": "PipingBox Community",
@@ -312,7 +354,36 @@
     "sortTop": "Top",
     "postedBy": "Geplaatst door {{name}} · {{time}}",
     "channel": "Kanaal",
-    "post": "Bericht"
+    "post": "Bericht",
+    "notSignedIn": "Niet aangemeld",
+    "failedToCreatePost": "Bericht aanmaken mislukt",
+    "postPublished": "Bericht gepubliceerd",
+    "createPost": {
+      "eyebrow": "Community",
+      "title": "Nieuw bericht aanmaken",
+      "description": "Deel een vraag, een tip of een verhaal van de werkvloer met de PipingBox-community.",
+      "channel": "Kanaal",
+      "postTitle": "Titel",
+      "body": "Inhoud",
+      "locationOptional": "Locatie (optioneel)",
+      "tagsOptional": "Tags (optioneel)",
+      "attachmentOptional": "URL van bijlage (optioneel)",
+      "selectChannel": "— Kies een kanaal —",
+      "titlePlaceholder": "bijv. Beste purge-opstelling voor een DSS TIG-grondlaag?",
+      "bodyPlaceholder": "Deel de details — wat u hebt geprobeerd, wat er misging, wat werkte…",
+      "locationPlaceholder": "Antwerpen, België",
+      "publish": "Bericht publiceren",
+      "publishing": "Publiceren…",
+      "mustBeSignedIn": "U moet aangemeld zijn om te posten",
+      "sessionExpired": "Uw sessie is verlopen. Meld u af en opnieuw aan en probeer het daarna nogmaals.",
+      "serverRejected": "De server heeft de invoer geweigerd. Probeer het opnieuw of neem contact op met de support.",
+      "validation": {
+        "pickChannel": "Kies een kanaal",
+        "titleMin": "De titel moet minimaal 4 tekens bevatten",
+        "titleMax": "De titel is te lang (max. 160)",
+        "bodyMin": "De inhoud moet minimaal 8 tekens bevatten"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Profiel / CV",
@@ -373,8 +444,57 @@
       "fileUploaded": "Bestand geüpload",
       "filePdfOrImage": "Upload een PDF- of afbeeldingsbestand",
       "fileUnder10": "Bestand moet kleiner zijn dan 10MB",
-      "nameIssuerRequired": "Naam en uitgever zijn verplicht"
-    }
+      "nameIssuerRequired": "Naam en uitgever zijn verplicht",
+      "viewFileDenied": "Toegang geweigerd"
+    },
+    "country": "Land",
+    "emailJobAlerts": "E-mailmeldingen",
+    "emailJobAlertsHint": "Passende vacatures per e-mail ontvangen",
+    "jobMatchingEnabled": "Vacaturematching",
+    "jobMatchingEnabledHint": "Ontvang opportuniteiten van gepubliceerde vacatures",
+    "matchReadyTitle": "Voltooi uw profiel om nauwkeurigere vacaturematches te ontvangen.",
+    "matchingPreferencesSaved": "Voorkeuren opgeslagen",
+    "matchingPreferencesTitle": "Vacature- & Matchingvoorkeuren",
+    "otpCode": "Verificatiecode",
+    "otpInvalid": "Voer de 6-cijferige code in",
+    "otpSendFailed": "Code versturen mislukt",
+    "otpSent": "Verificatiecode verstuurd",
+    "otpVerifyFailed": "Code verifiëren mislukt",
+    "phoneInvalid": "Voer een geldig telefoonnummer in",
+    "phoneNumber": "Telefoonnummer",
+    "phonePlaceholder": "612 345 678",
+    "phoneRemoved": "Telefoonnummer en toestemming verwijderd",
+    "phoneVerificationTitle": "Telefoonverificatie",
+    "phoneVerified": "Telefoonnummer geverifieerd",
+    "phoneVerifiedLabel": "Geverifieerd",
+    "removePhone": "Telefoonnummer verwijderen / toestemming intrekken",
+    "saveError": "Fout bij opslaan van profiel: ",
+    "saveMatchingPreferences": "Voorkeuren opslaan",
+    "sendOtp": "Verificatiecode versturen",
+    "sendingOtp": "Versturen...",
+    "verifyOtp": "Verifiëren",
+    "verifyPhoneFirst": "Verifieer eerst uw telefoonnummer",
+    "verifying": "Verifiëren...",
+    "whatsappJobAlerts": "WhatsApp-meldingen",
+    "whatsappJobAlertsHint": "Passende vacatures via WhatsApp ontvangen",
+    "whatsappOptIn": "WhatsApp-vacaturemeldingen",
+    "whatsappOptInHint": "PipingBox toestaan mij via WhatsApp te benaderen",
+    "workforceInvitationsEnabled": "Werkuitnodigingen",
+    "workforceInvitationsEnabledHint": "Uitnodigingen ontvangen voor door PipingBox beheerde projecten",
+    "avatarHeicNotice": "HEIC-foto gedetecteerd. De foto wordt correct geüpload, maar de voorvertoning werkt mogelijk niet in elke browser.",
+    "avatarUpdated": "Profielfoto bijgewerkt",
+    "avatarRemoved": "Profielfoto verwijderd",
+    "avatarInvalidType": "Alleen JPG-, PNG-, WebP- of HEIC-afbeeldingen worden geaccepteerd",
+    "avatarSaveFailed": "Avatar opslaan in profiel mislukt",
+    "avatarRemoveFailed": "Avatar verwijderen mislukt",
+    "avatarVisibilityFailed": "Zichtbaarheid bijwerken mislukt",
+    "avatarNowVisible": "De foto is nu zichtbaar",
+    "avatarNowHidden": "De foto is nu verborgen",
+    "avatarUploading": "Uploaden…",
+    "avatarChange": "Foto wijzigen",
+    "avatarUpload": "Foto uploaden",
+    "avatarHide": "Foto verbergen",
+    "avatarShow": "Foto tonen"
   },
   "academy": {
     "eyebrow": "Academy",
@@ -610,7 +730,223 @@
     "examYourOrder": "Uw volgorde",
     "examCorrectOrder": "Juiste volgorde",
     "examCorrectStatement": "Juist: {{answer}}",
-    "examYourStatement": "Uw antwoord: {{answer}}"
+    "examYourStatement": "Uw antwoord: {{answer}}",
+    "examIntroTitle": "VCA-oefenexamen",
+    "examIntroBVCA": "B-VCA (Basisveiligheid)",
+    "examIntroVOLVCA": "VOL-VCA (Operationeel Leidinggevenden)",
+    "examIntroQuestions": "Vragen",
+    "examIntroDuration": "Duur",
+    "examIntroPassScore": "Cijfer om te slagen",
+    "examIntroFormat": "Vorm",
+    "examIntroFormatValue": "Meerkeuze (A/B/C)",
+    "examIntroRules": "Regels",
+    "examIntroRule1": "Per vraag maar één juist antwoord",
+    "examIntroRule2": "In het officiële examen kun je niet terug (oefenmodus staat dit wel toe)",
+    "examIntroRule3": "Het examen wordt automatisch ingeleverd als de tijd om is",
+    "examIntroRule4": "Je hebt 70% nodig om te slagen",
+    "examUnderstand": "Ik begrijp de examenregels",
+    "examStart": "Examen starten",
+    "examQuestionOf": "Vraag {{current}} van {{total}}",
+    "examNext": "Volgende",
+    "examPrevious": "Vorige",
+    "examFinish": "Afronden & resultaten bekijken",
+    "examFinishConfirm": "Examen afronden?",
+    "examFinishConfirmText": "Weet je zeker dat je wilt afronden? Je hebt nog {{unanswered}} onbeantwoorde vragen.",
+    "examFinishConfirmYes": "Ja, afronden",
+    "examFinishConfirmNo": "Doorgaan met examen",
+    "examTimeUp": "Tijd is om!",
+    "examTimeWarning": "Nog 5 minuten!",
+    "examResultPassed": "GESLAAGD",
+    "examResultFailed": "GEZAKT",
+    "examResultScore": "{{correct}}/{{total}} juist ({{percentage}}%)",
+    "examResultTime": "Gebruikte tijd: {{time}}",
+    "examReviewAnswers": "Antwoorden bekijken",
+    "examNewExam": "Nieuw examen",
+    "examBackToAcademy": "Terug naar Academie",
+    "examYourAnswer": "Jouw antwoord",
+    "examCorrectAnswer": "Juiste antwoord",
+    "examNoAnswer": "Niet beantwoord",
+    "questions": "vragen",
+    "searchPlaceholder": "Cursussen zoeken...",
+    "course": {
+      "notFound": "Cursus niet gevonden.",
+      "lessonNotFound": "Les niet gevonden.",
+      "premiumPrice": "Premium · €{{price}}",
+      "free": "Gratis",
+      "lessonsCount_one": "{{count}} les",
+      "lessonsCount_other": "{{count}} lessen",
+      "estimatedHours": "{{hours}} u geschat",
+      "completedOf": "{{completed}}/{{total}} voltooid ({{pct}}%)",
+      "officialPrep": "Officiële examenvoorbereiding",
+      "progress": "Cursusvoortgang",
+      "importantLabel": "Belangrijk:",
+      "certDisclaimer": "PipingBox bereidt u voor op het examen. Het officiële certificaat wordt uitgegeven door {{certBody}} via erkende examencentra.",
+      "bookVcaExam": "Boek uw officiële VCA-examen →",
+      "content": "Cursusinhoud",
+      "noLessons": "Er zijn nog geen lessen beschikbaar.",
+      "minutes_one": "{{count}} min",
+      "minutes_other": "{{count}} min",
+      "freePreview": "Gratis voorproefje",
+      "completedTitle": "Cursus voltooid!",
+      "completedBody": "U hebt alle lessen van deze cursus voltooid.",
+      "readyForExam": "Klaar voor het officiële examen?",
+      "bookExam": "Boek uw examen →",
+      "lessonCompletedToast": "Les voltooid!",
+      "lessonOf": "Les {{current}} van {{total}}",
+      "practiceQuiz": "Oefenquiz",
+      "quizComingSoon": "Deze les bevat een oefenquiz. De quizmodule is binnenkort beschikbaar. Bekijk voorlopig het cursusmateriaal en markeer deze les als voltooid.",
+      "contentComingSoon": "Lesinhoud volgt binnenkort.",
+      "completed": "Voltooid",
+      "markComplete": "Markeren als voltooid",
+      "previous": "Vorige",
+      "next": "Volgende",
+      "finish": "Afronden"
+    },
+    "courseContent": {
+      "officialSyllabus": "Officieel lesprogramma",
+      "meta": "{{lessons}} lessen · {{minutes}} min · {{modules}} modules",
+      "moduleMeta": "{{lessons}} lessen · {{minutes}} min",
+      "oneTimePayment": "eenmalige betaling",
+      "otherLanguagesInEnglish": "overige talen volgen het Engelse lesmateriaal",
+      "legalNoticeLabel": "Juridische kennisgeving:",
+      "vca": {
+        "title": "VCA-opleiding ter voorbereiding op het examen",
+        "legalNotice": "PipingBox bereidt u voor op het VCA-examen. Het officiële VCA-certificaat wordt afgegeven door SSVV/BESACC via erkende examencentra. PipingBox is een onafhankelijke aanbieder van examenvoorbereiding en is niet verbonden aan SSVV/BESACC."
+      },
+      "simulator": {
+        "title": "VCA-examensimulator — {{count}} vragen",
+        "description": "Oefen met VCA-examenvragen in de stijl van het echte examen. Met timer, directe feedback en uitgebreide toelichting. Inbegrepen bij de opleiding.",
+        "bvca": "{{count}} vragen (B-VCA)",
+        "volvca": "{{count}} vragen (VOL-VCA)",
+        "instantScoring": "Directe uitslag"
+      },
+      "scc": {
+        "title": "SCC-opleiding ter voorbereiding op het examen",
+        "variantOperative": "Uitvoerende medewerkers",
+        "variantSupervisor": "Operationeel leidinggevende",
+        "variantSelfEmployed": "Zelfstandigen",
+        "legalNotice": "PipingBox bereidt u voor op het SCC-examen. Het officiële SCC-certificaat wordt afgegeven door SCC Stiftung (of AUVA in Oostenrijk) via erkende exameninstanties zoals TÜV of DEKRA. PipingBox is een onafhankelijke aanbieder van examenvoorbereiding en is niet verbonden aan SCC Stiftung.",
+        "simulatorTitle": "SCC-examensimulator — {{count}} vragen",
+        "simulatorDescription": "Oefen met SCC-examenvragen in de stijl van het echte examen. Met timer, directe feedback en uitgebreide toelichting. Inbegrepen bij de opleiding.",
+        "simulatorDoc016": "{{count}} vragen (Doc 016)",
+        "simulatorDoc017018": "{{count}} vragen (Doc 017/018)",
+        "simulatorInstantScoring": "Directe uitslag"
+      },
+      "prl": {
+        "titleBasico": "PRL Básico — preventie van arbeidsrisico's",
+        "titleIntermedio": "PRL Intermedio — preventie van arbeidsrisico's",
+        "officialTraining": "Officiële opleiding",
+        "hoursBadge": "{{hours}}h",
+        "meta": "{{lessons}} lessen · {{hours}}h · {{modules}} modules · Ley 31/1995",
+        "legalNotice": "PipingBox verzorgt PRL-opleidingen in overeenstemming met Ley 31/1995 de Prevención de Riesgos Laborales en RD 39/1997. PipingBox vervangt niet de interne of externe preventiedienst van de onderneming, noch haar verzekeraar voor arbeidsongevallen. Het toezicht op de naleving van de wettelijke verplichtingen is voorbehouden aan de Inspección de Trabajo y Seguridad Social.",
+        "certificationTypeLabel": "Soort certificering:",
+        "certificationTypeText": "Op basis van de gevolgde opleiding (zonder examen). Na afronding van 100% van de opleiding geeft PipingBox een",
+        "certificationTypeHighlight": "opleidingscertificaat",
+        "certificationTypeTail": "af dat voldoet aan de wettelijke PRL-opleidingsplicht voor werknemers.",
+        "certificateTeaserTitle": "Opleidingscertificaat — zonder examen",
+        "certificateTeaserDescription": "In tegenstelling tot VCA en SCC kent PRL geen officieel examen. De veiligheidsopleiding zelf is de wettelijke verplichting. Na afronding van 100% van de modules geeft PipingBox een opleidingscertificaat af dat voldoet aan de eis van Ley 31/1995 voor werknemers.",
+        "badgeCompliance": "Voldoet aan Ley 31/1995",
+        "badgeHours": "{{hours}}h opleiding",
+        "badgeDownloadable": "Certificaat te downloaden"
+      }
+    },
+    "coursePage": {
+      "tabPreparationCourse": "Voorbereidingscursus",
+      "tabBookOfficialExam": "Officieel examen boeken",
+      "scc": {
+        "tabExamAndBooking": "Examen & boeking",
+        "examInfoTitle": "SCC-examen — officiële informatie",
+        "examBodyLabel": "Exameninstantie",
+        "formatLabel": "Formaat",
+        "formatDoc016": "30 vragen, 45 min",
+        "formatDoc017018": "40 vragen, 60 min",
+        "passMarkLabel": "Slaagnorm",
+        "passMarkDoc016": "60 % (18/30)",
+        "passMarkDoc017018": "65 % (26/40)",
+        "validityLabel": "Geldigheid",
+        "validityValue": "3–5 jaar",
+        "examFeeLabel": "Examengeld (officieel)",
+        "examFeeValue": "€100–180 (te betalen aan TÜV/DEKRA)",
+        "managementFeeLabel": "PipingBox-beheerkosten",
+        "managementFeeValue": "€10 Standard / €15 Express",
+        "howBookingWorksTitle": "Hoe werkt het boeken?",
+        "bookingStep1": "U bereidt zich voor met de PipingBox-cursus.",
+        "bookingStep2": "U dient een boekingsaanvraag in (postcode, taal, datum).",
+        "bookingStep3": "PipingBox neemt binnen 24–48 uur contact met u op om de beschikbaarheid te bevestigen.",
+        "bookingStep4": "U betaalt de beheerkosten (€10/€15).",
+        "bookingStep5": "PipingBox reserveert uw examenplaats bij TÜV/DEKRA.",
+        "bookingStep6": "U neemt deel aan het examen. De exameninstantie geeft uw certificaat af.",
+        "bookingDisclaimer": "⚠️ PipingBox geeft GEEN SCC-certificaten af. PipingBox verzorgt de voorbereiding en het beheer van de boeking. Het certificaat wordt afgegeven door SCC Stiftung / AUVA via de exameninstantie.",
+        "bookingSoon": "Aanvragen voor SCC-examenboekingen in Duitsland en Oostenrijk zijn binnenkort beschikbaar.",
+        "bookingSoonPhase": "Fase 3 — Beta"
+      },
+      "prl": {
+        "variantBasicoMeta": "20 u · alle werknemers",
+        "variantIntermedioMeta": "60 u · leidinggevenden",
+        "tabTrainingCourse": "Opleiding",
+        "tabCertificateAndLegality": "Certificaat en wettelijk kader",
+        "trainingNotExamTitle": "PRL is een opleiding, geen examen",
+        "trainingNotExamP1Before": "In tegenstelling tot VCA (België/Nederland) en SCC (Duitsland/Oostenrijk), waarvoor u een officieel examen moet halen, geldt dat",
+        "trainingNotExamP1Strong": "PRL geen examen kent",
+        "trainingNotExamP1After": ". De Spaanse wettelijke verplichting (Ley 31/1995) is het volgen van de opleiding, niet het halen van een toets.",
+        "trainingNotExamP2Before": "Na afronding van 100% van de cursusmodules geeft PipingBox een",
+        "trainingNotExamP2Strong": "PRL-opleidingscertificaat",
+        "trainingNotExamP2After": "af dat voldoet aan de wettelijke verplichting voor werknemers in de industriële sector.",
+        "legalFrameworkTitle": "Wettelijk kader",
+        "mainLawLabel": "Belangrijkste wet",
+        "mainLawValue": "Ley 31/1995 de Prevención de Riesgos Laborales (Spaanse wet inzake preventie van arbeidsrisico's)",
+        "regulationLabel": "Regelgeving",
+        "regulationValue": "RD 39/1997 (Servicios de Prevención)",
+        "bodyLabel": "Autoriteit",
+        "bodyValue": "INSST (Instituto Nacional de Seguridad y Salud en el Trabajo)",
+        "verificationLabel": "Controle",
+        "verificationValue": "Inspección de Trabajo y Seguridad Social (Spaanse Arbeidsinspectie)",
+        "minDurationBasicoLabel": "Minimumduur (Básico)",
+        "minDurationBasicoValue": "20 uur",
+        "durationIntermedioLabel": "Duur (Intermedio)",
+        "durationIntermedioValue": "60 uur",
+        "comparisonTitle": "Vergelijking: PRL vs VCA vs SCC",
+        "comparisonDimension": "Aspect",
+        "comparisonPrlColumn": "PRL (ES)",
+        "comparisonVcaColumn": "VCA (BE/NL)",
+        "comparisonSccColumn": "SCC (DE/AT)",
+        "comparisonTypeRow": "Type",
+        "comparisonTypePrl": "Opleiding",
+        "comparisonTypeVca": "Examen",
+        "comparisonTypeScc": "Examen",
+        "comparisonOfficialExamRow": "Officieel examen",
+        "comparisonOfficialExamPrl": "Nee",
+        "comparisonOfficialExamVca": "Ja (40 vr./60 min)",
+        "comparisonOfficialExamScc": "Ja (30-40 vr./45-60 min)",
+        "comparisonIssuerRow": "Certificaat afgegeven door",
+        "comparisonIssuerPrl": "PipingBox (opleiding)",
+        "comparisonIssuerVca": "SSVV/BeSaCC",
+        "comparisonIssuerScc": "SCC Stiftung/AUVA",
+        "comparisonValidityRow": "Geldigheid",
+        "comparisonValidityPrl": "Periodiek (opfrissing)",
+        "comparisonValidityVca": "10 jaar",
+        "comparisonValidityScc": "3-5 jaar",
+        "comparisonPriceRow": "PipingBox-prijs",
+        "comparisonMarketRow": "Markt",
+        "comparisonMarketPrl": "~1.5M werknemers",
+        "comparisonMarketVca": "~500k examens/jaar",
+        "comparisonMarketScc": "~200k examens/jaar",
+        "notReplaceTitle": "PipingBox vervangt NIET:",
+        "notReplaceItem1": "De interne of externe preventiedienst van uw bedrijf.",
+        "notReplaceItem2": "De verzekeraar voor arbeidsongevallen (Mutua Universal, Fremap, enz.).",
+        "notReplaceItem3": "De specifieke opleiding die uw bedrijf u moet geven over uw eigen risico's.",
+        "notReplaceItem4": "De TPC (Trabajos de Prevención en Construcción) als u in de bouw werkt.",
+        "doesComplyStrong": "PipingBox voldoet WEL aan",
+        "doesComplyText": "de wettelijke verplichting van 20 uur PRL Básica-opleiding voor werknemers, overeenkomstig artikel 19 van Ley 31/1995."
+      }
+    },
+    "vcaBooking": {
+      "signInRequired": "Meld u aan om een boekingsaanvraag in te dienen",
+      "fillNameAndPostalCode": "Vul uw naam en postcode in",
+      "certificationUnavailable": "Certificering niet beschikbaar. Probeer het later opnieuw.",
+      "submitFailed": "Boekingsaanvraag indienen mislukt",
+      "submitted": "Boekingsaanvraag ingediend! PipingBox neemt binnen 24 uur contact met u op om uw examenreservering te bevestigen."
+    }
   },
   "tools": {
     "eyebrow": "Tools",
@@ -681,14 +1017,14 @@
       "standard": "Norm",
       "anyStandard": "Elke norm",
       "pressureClass": "Drukklasse",
-      "anyPressureClass": "Elke klasse",
-      "classValue": "Klasse {{value}}",
+      "anyPressureClass": "Alle klassen",
+      "classValue": "Class {{value}}",
       "clearFilters": "Filters wissen",
       "resultCount": "{{count}} van {{total}} componenten",
       "emptyTitle": "Geen componenten gevonden",
       "emptyHint": "Probeer een andere zoekterm of wis de actieve filters.",
-      "cardClasses": "Klasse {{list}}",
-      "cardBySchedule": "Rating op schedule",
+      "cardClasses": "Class {{list}}",
+      "cardBySchedule": "Aanduiding op schedule",
       "sizesDrawn": "{{count}} maten getekend"
     },
     "accessoriesLibraryDesc": "Volledige catalogus van pijpfittingen (ASME B16.9 / B16.5 / B16.34)",
@@ -778,7 +1114,7 @@
       "angleDeg": "Hoek (°)",
       "arcExtrados": "Boog buitenzijde",
       "arcIntrados": "Boog binnenzijde",
-      "arcNeutral": "Neutrale boog",
+      "arcNeutral": "Neutrale boog (C-C):",
       "cutExtrados": "Snede buitenzijde",
       "cutIntrados": "Snede binnenzijde",
       "cutLine": "Snijlijn",
@@ -793,7 +1129,52 @@
       "schedule": "Schedule",
       "standard": "Norm",
       "subtitle": "Snijposities op standaardbochten berekenen",
-      "wallThickness": "Wanddikte"
+      "wallThickness": "Wanddikte",
+      "arcCen": "Boog C-C",
+      "arcCentral": "Middenboog (neutraal)",
+      "arcExt": "Boog extrados:",
+      "arcExterior": "Buitenboog (extrados)",
+      "arcInt": "Boog intrados:",
+      "arcInterior": "Binnenboog (intrados)",
+      "cutAngleLabel": "SNijHOEK",
+      "cutDistExt": "Snijafstand extrados:",
+      "cutDistInt": "Snijafstand intrados:",
+      "cutExt": "Snede buit",
+      "cutInt": "Snede binn",
+      "cutLineLabel": "SNIJLIJN",
+      "errorZero": "Voer een hoek groter dan 0 in",
+      "fixedAnglesTable": "Tabel vaste hoeken",
+      "formulaArcs": "Booglengten",
+      "formulaCutDist": "Snijafstanden",
+      "formulaCutNote": "Afstand gemeten vanaf het uiteinde van de bocht",
+      "formulaRadius": "Boogstraal (R)",
+      "formulasTitle": "Berekeningsformules",
+      "fullElbow": "Volledige bocht, geen snede nodig",
+      "noteAngleMeasure": "De snijhoek wordt gemeten vanaf het uiteinde van de bocht",
+      "noteSmallAngle": "Gebruik bij hoeken < 30° een fysieke sjabloon voor grotere nauwkeurigheid",
+      "noteTolerance": "Snijtoleranties: ±2mm aanbevolen",
+      "notesTitle": "Referentienotities",
+      "radius": "Straal (R):",
+      "showCenter": "Midden",
+      "showCutLines": "Snede",
+      "showDimensions": "Maten",
+      "showFill": "Vulling",
+      "sliderAriaLabel": "Snijhoek van de bocht",
+      "standards": "Referentienormen",
+      "svgAriaLabel": "Bocht van 90 graden met snijlijn op {{angle}} graden",
+      "tabCalculator": "Calculator",
+      "tabFormulas": "Formules & Notities",
+      "tip1": "Markeer altijd de extrados voordat u snijdt",
+      "tip2": "Gebruik een kartonnen sjabloon voor niet-standaard hoeken",
+      "tip3": "Controleer na het snijden met een digitale hoekmeter",
+      "tip4": "Reken op 2-3mm extra voor het afschuinen",
+      "tips": "Praktische Tips",
+      "varNPS": "Nominal Pipe Size (inches)",
+      "varOD": "Buitendiameter van de pijp (mm)",
+      "varR": "Buigstraal van de bocht (mm)",
+      "varTheta": "Gewenste snijhoek (graden)",
+      "variables": "Variabelen",
+      "stdB3610Desc": "Gelaste en naadloze stalen buizen"
     },
     "pipeDim": {
       "boltDia": "Bout-Ø",
@@ -826,7 +1207,16 @@
       "name": "Eenhedenomrekener",
       "npsDnTable": "NPS ↔ DN referentietabel",
       "subtitle": "Omrekening tussen technische eenheden",
-      "to": "Naar"
+      "to": "Naar",
+      "selectCategory": "Categorie",
+      "enterValue": "Waarde invoeren",
+      "swap": "Eenheden omwisselen",
+      "npsDnTitle": "NPS / DN referentietabel",
+      "nps": "NPS (inch)",
+      "dn": "DN (mm)",
+      "od": "OD (mm)",
+      "searchBySize": "Zoeken op maat...",
+      "catNpsDn": "NPS ↔ DN"
     },
     "accessoriesLibrary.totals": "{{components}} componenten · {{drawings}} tekeningen",
     "accessoriesLibrary.searchPlaceholder": "Zoeken op naam, type, materiaal of norm…",
@@ -959,7 +1349,28 @@
       "round4": "Ronde 4",
       "round4Desc": "Ga door op 100 % van het beoogde koppel, maar in een cirkelvormig patroon met de klok mee, totdat geen enkele moer nog verder draait.",
       "round5": "Ronde 5",
-      "round5Desc": "Wacht indien de tijd het toelaat minimaal 4 uur en herhaal ronde 4 om de kortetermijnverliezen door relaxatie en inbedding te compenseren."
+      "round5Desc": "Wacht indien de tijd het toelaat minimaal 4 uur en herhaal ronde 4 om de kortetermijnverliezen door relaxatie en inbedding te compenseren.",
+      "name": "Bouten en moeren",
+      "desc": "Tapboutafmetingen volgens ANSI/ASME B16.5 per NPS en class",
+      "description": "Beschrijving",
+      "symbol": "Symbool",
+      "value": "Waarde",
+      "unit": "Eenheid",
+      "quantity": "Aantal bouten",
+      "diameter": "Boutdiameter",
+      "length": "Boutlengte",
+      "nutWidth": "Moerbreedte (AF)",
+      "threadPitch": "Draadpas (ca.)",
+      "legend": {
+        "mainDimensions": "Hoofdafmetingen",
+        "secondaryDimensions": "Secundaire afmetingen"
+      },
+      "notes": {
+        "noteLabel": "Opmerking:",
+        "noteText": "De lengtes zijn inclusief 2 zware zeskantmoeren. Voor tapeinden geldt: totale lengte = effectieve lengte + 2 × moerdikte. De getabelleerde lengtes gelden voor flenzen met verhoogd vlak (RF).",
+        "lubricationLabel": "Smering:",
+        "lubricationText": "Anti-seize smeermiddel wordt aanbevolen om vreten (galling) bij roestvast staal te voorkomen. Het gebruikte smeermiddel bepaalt de moerfactor K en daarmee het vereiste aanhaalmoment."
+      }
     },
     "prefab": {
       "common": {
@@ -1085,6 +1496,167 @@
         "clr_gt_half_od": "CLR moet groter zijn dan OD/2",
         "beta_range": "De snijhoek moet tussen 0° en {{max}}° liggen"
       }
+    },
+    "tabPipeDimensions": "Pijpafmetingen",
+    "tabFlangeDimensions": "Flensafmetingen",
+    "tabBoltTorque": "Boutaanhaalmoment",
+    "searchSize": "Zoeken op NPS of DN...",
+    "toggleUnits": "Schakelen tussen mm / inches",
+    "flangeClass": "Flens-class",
+    "weight": "Gewicht",
+    "bolted": "Geschroefd",
+    "lubricated": "Gesmeerd",
+    "dry": "Droog (ongesmeerd)",
+    "boltSize": "Boutgrootte",
+    "torqueWarning": "Waarden zijn slechts ter referentie. Volg altijd de projectspecificatie en aanbevelingen van de flensfabrikant.",
+    "schedule": "Schedule",
+    "wallThicknessCol": "WT (mm)",
+    "comingSoonData": "Gegevens voor deze class binnenkort beschikbaar",
+    "categoryLayout": "Indeling",
+    "pipeSize": "Pijpmaat (NPS)",
+    "elbowType": "Boogtype",
+    "longRadius": "Lange straal (LR)",
+    "shortRadius": "Korte straal (SR)",
+    "desiredAngle": "Gewenste hoek",
+    "degrees": "graden",
+    "centerArc": "Middelboog (neutrale lijn)",
+    "intradosArc": "Binnenboog (binnenzijde)",
+    "extradosArc": "Buitenboog (buitenzijde)",
+    "elbowRadius": "Boogstraal (R)",
+    "commonAngles": "Referentietabel veelvoorkomende hoeken",
+    "angle": "Hoek",
+    "cutAngle": "Snijhoek",
+    "discardedPart": "Afgekeurd deel",
+    "usablePart": "Bruikbaar deel",
+    "elbowNote": "Gebaseerd op ASME B16.9. Controleer afmetingen met fabrikantsgegevens.",
+    "toggleMmIn": "mm / in",
+    "backToCatalog": "Terug naar catalogus",
+    "technicalDrawing": "Technische tekening",
+    "numericalResults": "Numerieke resultaten",
+    "additionalInfo": "Aanvullende informatie",
+    "exportPdf": "PDF exporteren",
+    "exportImage": "Afbeelding exporteren",
+    "saveFavorite": "Favoriet opslaan",
+    "flanges": {
+      "name": "Flenzen",
+      "desc": "Halsflensafmetingen volgens ANSI/ASME B16.5 met SVG-tekening",
+      "description": "Beschrijving",
+      "symbol": "Symbool",
+      "value": "Waarde",
+      "unit": "Eenheid",
+      "flangeOD": "Flens buitendiameter",
+      "thickness": "Flensdikte",
+      "bcd": "Diameter boutencirkel",
+      "rfDia": "Diameter van het opgewerkte vlak",
+      "bolts": "Aantal bouten",
+      "boltDia": "Boutdiameter",
+      "pipeOD": "Pijp-OD",
+      "disclaimer": "Nominale afmetingen volgens ASME B16.5-2020. Controleer altijd met fabrikantgegevens vóór aanschaf.",
+      "results": "resultaten",
+      "subtitle": "ASME B16.5 Flensbibliotheek",
+      "tabLibrary": "Bibliotheek",
+      "tabNotes": "Notities & Referentie",
+      "ui": {
+        "classLabel": "Class {{cls}}",
+        "classHash": "Class {{cls}}#",
+        "facingSubtitle": "ASME B16.5-2020 | RF-afdichtingsvlak",
+        "svgAriaLabel": "{{type}}-flens {{nps}} Class {{cls}}",
+        "tabDimensions": "Afmetingen",
+        "tabCrossLink": "Kruisverwijzing",
+        "tabNotesShort": "Opmerkingen",
+        "toggleDimensions": "Afmetingen",
+        "toggleCenter": "Centrum",
+        "toggleHoles": "Gaten",
+        "toggleFill": "Vulling",
+        "sideView": "ZIJAANZICHT",
+        "frontView": "VOORAANZICHT",
+        "legendMainDims": "Hoofdafmetingen (OD, BCD)",
+        "legendRaisedFaceRf": "Verhoogd vlak (RF)",
+        "legendHubWeldPrep": "Hals / lasvoorbewerking",
+        "legendFilletWelds": "Hoeklassen",
+        "legendSolidBody": "Massief lichaam",
+        "legendDims": "Afmetingen (OD, BCD, T)",
+        "legendRaisedFace": "Verhoogd vlak",
+        "legendHubTaper": "Conische hals",
+        "legendSolid": "Massief",
+        "dimension": "Afmeting",
+        "dim": "Afm.",
+        "boltHoleDiameter": "Boutgatdiameter",
+        "hubLength": "Halslengte",
+        "hubLengthShort": "Hals L",
+        "holeDiaShort": "Gat Ø",
+        "weightApprox": "Gewicht (ca.)",
+        "pcs": "st.",
+        "gasket": "Pakking",
+        "type": "Type",
+        "spiralWound": "Spiraalgewonden",
+        "material": "Materiaal",
+        "bolts": "Bouten",
+        "size": "Maat",
+        "quantity": "Aantal",
+        "nut": "Moer",
+        "torque": "Aanhaalmoment",
+        "target": "Streefwaarde",
+        "perPcc1": "Volgens PCC-1",
+        "pattern": "Volgorde",
+        "starCross": "Ster (kruislings)",
+        "passes": "Aanhaalrondes",
+        "passesMinimum": "min. {{count}}",
+        "lubricant": "Smeermiddel",
+        "premiumFeature": "Premium-functie",
+        "premiumFeatureDesc": "Gedetailleerde aanhaalmomenttabellen, pakkingkeuzegids en boutlengtecalculator zijn beschikbaar in het PRO-abonnement.",
+        "standardReference": "Normreferentie",
+        "standardReferenceText": "ASME B16.5-2020 — Pipe Flanges and Flanged Fittings (NPS 1/2 t/m NPS 24)",
+        "facing": "Afdichtingsvlak",
+        "facingText": "Verhoogd vlak (RF) — 1,6 mm verhoogd, geribbelde afwerking 125-250 AARH",
+        "materialText": "ASTM A105 (koolstofstaal), A182 F304/F316 (roestvast staal), A182 F11/F22 (gelegeerd staal)",
+        "disclaimerTitle": "Disclaimer",
+        "disclaimerFull": "De afmetingen zijn nominale waarden volgens ASME B16.5. Controleer voor daadwerkelijke inkoop altijd de gegevensbladen van de fabrikant. Gewichtswaarden zijn bij benadering.",
+        "filterType": "Type",
+        "filterClass": "Class",
+        "allTypes": "Alle typen",
+        "allSizes": "Alle maten",
+        "typeWeldNeck": "Lasflens met hals (WN)",
+        "typeSlipOn": "Overschuifflens (SO)",
+        "typeBlind": "Blindflens (BL)",
+        "clickForDetails": "Klik voor details",
+        "flangeTypes": "Flenstypen",
+        "wnTitle": "WN — Lasflens met hals",
+        "wnDesc": "De conische hals zorgt voor een geleidelijke spanningsovergang. Ideaal voor hoge druk, hoge temperatuur en cyclische belasting. Stomp gelast aan de buis.",
+        "soTitle": "SO — Overschuifflens",
+        "soDesc": "De buis wordt door de flens geschoven en aan beide zijden met een hoeklas bevestigd. Lagere kosten, eenvoudiger uit te lijnen. Geschikt voor utiliteitsleidingen met lage druk.",
+        "blTitle": "BL — Blindflens",
+        "blDesc": "Massieve schijf om een buiseinde of een aansluiting van een drukvat af te sluiten. Wordt gebruikt voor beproeving, toekomstige aansluitingen of permanente afsluiting. Zonder doorgang.",
+        "pressureClasses": "Drukklassen",
+        "ratingAmbient": "Tot ca. {{bar}} bar ({{psi}} psi) bij omgevingstemperatuur",
+        "ratingsNote": "* De toelaatbare druk neemt af bij hogere temperatuur volgens ASME B16.5, tabel 2",
+        "quickReference": "Snel overzicht",
+        "refBcd": "Bolt Circle Diameter — diameter van de steekcirkel van de boutgaten",
+        "refRf": "Raised Face — 1,6 mm verhoogd afdichtingsvlak (Class 150/300)",
+        "refRtj": "Ring Type Joint — voor Class 600 en hoger",
+        "refHub": "Conische overgang tussen buis en flens (alleen WN)",
+        "standards": "Normen",
+        "stdB165": "Pipe Flanges and Flanged Fittings (NPS 1/2 - 24)",
+        "stdB1647": "Large Diameter Steel Flanges (NPS 26 - 60)",
+        "stdPcc1": "Richtlijnen voor de montage van geboute flensverbindingen in drukhoudende systemen",
+        "stdB1620": "Metalen pakkingen voor buisflenzen",
+        "matA105": "Koolstofstaal (meest gebruikt)",
+        "matF304F316": "Roestvast staal",
+        "matF11F22": "Chroom-molybdeenlegering",
+        "matLf2": "Koolstofstaal voor lage temperaturen"
+      }
+    },
+    "pressureDropDesc": "Darcy-Weisbach drukval met Swamee-Jain wrijvingsfactor",
+    "unitConverterDesc": "Omrekenen tussen imperiale en metrische leidingeenheden",
+    "wallThicknessDesc": "Vereenvoudigde wanddikteberekening volgens ASME B31.3",
+    "thermalExpansionDesc": "Warmte-uitzettingsberekening voor leidingsystemen",
+    "reynoldsDesc": "Reynolds-getal en bepaling van het stromingsregime",
+    "premiumBanner": {
+      "title": "Ontgrendel Premium-tools",
+      "description": "PDF-export, afdrukbare sjablonen, aanhaalmomentrapporten en meer.",
+      "loading": "Laden...",
+      "monthly": "Maandelijks € 4,99",
+      "annual": "Jaarlijks € 39 (bespaar 35%)"
     }
   },
   "jobs": {
@@ -1134,7 +1706,8 @@
     "postedTimes": {
       "h_ago": "{{count}} u geleden",
       "d_ago": "{{count}} d geleden",
-      "w_ago": "{{count}} w geleden"
+      "w_ago": "{{count}} w geleden",
+      "justNow": "zojuist"
     },
     "filterJobs": "Vacatures filteren",
     "activeFilterCount": "{{count}} actief filter",
@@ -1147,7 +1720,44 @@
     "priority": "Prioriteit",
     "urgentPositionsOnly": "Alleen urgente vacatures",
     "signInToApply": "Log in om te solliciteren",
-    "applicationFailed": "Sollicitatie versturen mislukt"
+    "applicationFailed": "Sollicitatie versturen mislukt",
+    "roleCount_one": "{{count}} functie",
+    "roleCount_other": "{{count}} functies",
+    "activeFiltersLabel_one": "{{count}} actief filter",
+    "activeFiltersLabel_other": "{{count}} actieve filters",
+    "mustBeLoggedIn": "U moet ingelogd zijn om te solliciteren",
+    "salaryPerYear": "{{amount}} /jaar",
+    "salaryPerMonth": "{{amount}} /maand",
+    "metrics": {
+      "companies": "Bedrijven",
+      "applications": "Sollicitaties"
+    },
+    "options": {
+      "countries": {
+        "belgium": "België",
+        "netherlands": "Nederland",
+        "germany": "Duitsland",
+        "norway": "Noorwegen",
+        "uae": "VAE",
+        "unitedKingdom": "Verenigd Koninkrijk",
+        "usa": "VS"
+      },
+      "disciplines": {
+        "pipefitter": "Pijpfitter",
+        "tigWelder": "TIG-lasser",
+        "qaqc": "QA/QC",
+        "supervisor": "Supervisor",
+        "planner": "Planner",
+        "rigger": "Rigger",
+        "offshoreTechnician": "Offshore-technicus"
+      },
+      "contractTypes": {
+        "freelance": "Freelance",
+        "employee": "Werknemer",
+        "contract": "Contract",
+        "fullTime": "Voltijds"
+      }
+    }
   },
   "companies": {
     "eyebrow": "Bedrijven",
@@ -1160,7 +1770,12 @@
     "generic": "Er ging iets mis. Probeer het opnieuw.",
     "network": "Netwerkfout. Controleer je verbinding.",
     "unauthorized": "Je hebt geen rechten voor deze actie.",
-    "notFound": "De gevraagde bron is niet gevonden."
+    "notFound": "De gevraagde bron is niet gevonden.",
+    "incidentCode": "Incidentcode",
+    "copyIncidentCode": "Incidentcode kopiëren",
+    "incidentCodeCopied": "Gekopieerd",
+    "boundaryDesc": "Er is een onverwachte fout opgetreden. Probeer deze sectie opnieuw te laden.",
+    "boundaryTitle": "Er ging iets mis"
   },
   "certAlerts": {
     "sectionLabel": "Waarschuwingen",
@@ -1198,7 +1813,8 @@
     "renewSuccess": "Certificering succesvol verlengd",
     "deleteSuccess": "Certificering verwijderd",
     "confirmDeleteTitle": "Certificering verwijderen?",
-    "confirmDeleteDescription": "Weet je zeker dat je \"{{name}}\" wilt verwijderen? Dit kan niet ongedaan worden gemaakt."
+    "confirmDeleteDescription": "Weet je zeker dat je \"{{name}}\" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "viewDenied": "Toegang geweigerd"
   },
   "certStatus": {
     "valid": "Geldig",
@@ -1255,7 +1871,17 @@
       "generateEnglish": "Professionele Engelse versie genereren",
       "generatingEnglish": "Genereren...",
       "englishGenerated": "Engelse versie gegenereerd",
-      "noOriginalText": "Schrijf eerst een beschrijving in de oorspronkelijke taal"
+      "noOriginalText": "Schrijf eerst een beschrijving in de oorspronkelijke taal",
+      "allTranslationsGenerated": "Alle vertalingen gegenereerd",
+      "generate": "Genereren",
+      "generateAll": "Alles genereren",
+      "originalText": "Originele tekst",
+      "selectLanguage": "Taal selecteren",
+      "translationGenerated": "Vertaling gegenereerd: {{lang}}",
+      "translationPlaceholder": "Vertaling ({{lang}})",
+      "translations": "Vertalingen",
+      "translationsAvailable_one": "{{count}} vertaling beschikbaar",
+      "translationsAvailable_other": "{{count}} vertalingen beschikbaar"
     },
     "documents": {
       "label": "Documenten",
@@ -1293,7 +1919,12 @@
         "medical_certificate": "Medisch certificaat",
         "reference_letter": "Referentiebrief",
         "other": "Overig"
-      }
+      },
+      "accessDenied": "Toegang geweigerd",
+      "invalidType": "Niet-ondersteund bestandstype. Geaccepteerd: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.",
+      "saveFailed": "Document opslaan mislukt: ",
+      "verified": "Geverifieerd",
+      "heicNotice": "HEIC-foto gedetecteerd. De foto wordt correct geüpload."
     },
     "cv": {
       "label": "CV / Resume",
@@ -1306,7 +1937,12 @@
       "removed": "CV verwijderd",
       "view": "Bekijken",
       "replace": "Vervangen",
-      "visibleToCompanies": "CV zichtbaar voor bedrijven"
+      "visibleToCompanies": "CV zichtbaar voor bedrijven",
+      "allowedFormats": "Alleen PDF-, DOC- en DOCX-bestanden worden geaccepteerd",
+      "saveError": "CV geüpload, maar referentie opslaan mislukt: ",
+      "visibilityError": "Zichtbaarheid bijwerken mislukt",
+      "visibilityOff": "CV is nu verborgen voor bedrijven",
+      "visibilityOn": "CV is nu zichtbaar voor bedrijven"
     },
     "aiExtraction": {
       "label": "AI Intelligentie",
@@ -1367,7 +2003,9 @@
       "prefsSaved": "Waarschuwingsvoorkeuren opgeslagen",
       "prefsSaveError": "Waarschuwingsvoorkeuren opslaan mislukt",
       "uploadComplete": "Upload voltooid",
-      "uploading": "Bezig met uploaden..."
+      "uploading": "Bezig met uploaden...",
+      "viewFileDenied": "Toegang geweigerd",
+      "saveTimedOut": "Time-out bij het opslaan. Uw certificaat is mogelijk toch opgeslagen — vernieuw de pagina om dit te controleren."
     }
   },
   "profileCompleteness": {
@@ -1447,7 +2085,8 @@
     "availableNow": "Nu beschikbaar",
     "openToOffers": "Open voor aanbiedingen",
     "notAvailable": "Niet beschikbaar",
-    "employed": "In dienst"
+    "employed": "In dienst",
+    "notWillingToTravel": "Niet beschikbaar om te reizen"
   },
   "candidateProfile": {
     "messageCandidate": "Kandidaat berichten",
@@ -1488,7 +2127,9 @@
     "cvResume": "CV / Resume",
     "applicationHistory": "Sollicitatiegeschiedenis",
     "view": "Bekijken",
-    "download": "Downloaden"
+    "download": "Downloaden",
+    "cvPreviewFailed": "Voorvertoningslink voor cv genereren mislukt",
+    "previewFailed": "Voorvertoningslink genereren mislukt"
   },
   "inviteToJob": {
     "buttonLabel": "Uitnodigen voor vacature",
@@ -1560,7 +2201,11 @@
       "elite_badge": "Elite-badge",
       "exclusive_features": "Exclusieve functies",
       "premium_perks": "Premium voordelen"
-    }
+    },
+    "codeCopied": "Code gekopieerd naar klembord",
+    "copyFailed": "Kopiëren mislukt. Probeer het opnieuw.",
+    "linkCopied": "Link gekopieerd naar klembord",
+    "shared": "Succesvol gedeeld"
   },
   "workday": {
     "eyebrow": "Dagstaat / Loonregistratie",
@@ -1626,7 +2271,9 @@
     "totalHours": "Totale uren",
     "grossSalary": "Brutoloon",
     "finalTotal": "Eindtotaal",
-    "location": "Locatie"
+    "location": "Locatie",
+    "companyName": "Bedrijfsnaam (optioneel)",
+    "companyNamePlaceholder": "Acme Piping B.V."
   },
   "ratePresets": {
     "eyebrow": "Tariefsjablonen",
@@ -1983,7 +2630,10 @@
     "approved": "Goedgekeurd",
     "active": "Actief",
     "saveProfile": "Profiel opslaan",
-    "profileSaved": "Bedrijfsprofiel opgeslagen."
+    "profileSaved": "Bedrijfsprofiel opgeslagen.",
+    "descriptionPlaceholder": "Beschrijf uw bedrijf, diensten en specialisaties (2-3 regels aanbevolen)",
+    "saveError": "Fout bij opslaan van profiel: ",
+    "saved": "Bedrijfsprofiel opgeslagen"
   },
   "companyWorkforce": {
     "eyebrow": "Bedrijf",
@@ -2004,7 +2654,9 @@
     "international": "Internationaal",
     "allPriorities": "Alle prioriteiten",
     "results": "Resultaten",
-    "staffingProgress": "Personeelsvoortgang"
+    "staffingProgress": "Personeelsvoortgang",
+    "assignedShort": "toegewezen",
+    "requestedShort": "aangevraagd"
   },
   "companyWorkerSearch": {
     "eyebrow": "Bedrijf",
@@ -2288,7 +2940,13 @@
     "saving": "Opslaan...",
     "finish": "Voltooien",
     "next": "Volgende",
-    "completeLater": "Later voltooien →"
+    "completeLater": "Later voltooien →",
+    "progressRestored": "✓ Eerdere voortgang hersteld",
+    "imageError": "Alleen JPG-, PNG-, WebP- of HEIC-afbeeldingen tot 5 MB worden geaccepteerd.",
+    "photoPreviewAlt": "Voorbeeld van de geselecteerde profielfoto",
+    "heicSelected": "📷 HEIC-foto geselecteerd",
+    "completionFailedTitle": "De configuratie kon niet worden voltooid",
+    "completionFailedDescription": "Je gegevens zijn opgeslagen, maar de laatste bevestiging is niet voltooid. Controleer je verbinding en kies opnieuw Voltooien. Als het probleem aanhoudt, kun je de configuratie later vanuit je profiel afronden."
   },
   "profileCard": {
     "profileCompleted": "Profiel voltooid",
@@ -2386,7 +3044,8 @@
       "login_account": "Inloggen / Account",
       "interface": "Interface",
       "performance": "Prestaties",
-      "other": "Overig"
+      "other": "Overig",
+      "translation": "Vertaling / formulering"
     }
   },
   "adminFeedback": {
@@ -2549,7 +3208,8 @@
         "desc": "VCA-, SCC- en PRL-voorbereidingsmateriaal en industrieel leren.",
         "cta": "Leren starten"
       }
-    }
+    },
+    "signUpFree": "Gratis registreren"
   },
   "workforcePipeline": {
     "aiMatching": {
@@ -2611,5 +3271,233 @@
       "yStrainerNoStandard": "De Y-filter valt in deze catalogus niet onder een specifieke dimensionele norm. Fabrikanten leveren hem gewoonlijk met flenseinden volgens ASME B16.5, zodat de klasse wordt bepaald door de flens van het betreffende model. Hier wordt geen klasse vermeld omdat er geen verifieerbare norm bestaat die er een definieert.",
       "noPressureClass": "Laterals worden niet aangeduid met een drukklasse. Hun capaciteit vloeit voort uit de wanddikte (schedule) en het materiaal en wordt berekend volgens de toepasselijke ontwerpcode (bijv. ASME B31.3). Verifieer de afmetingen bij de fabrikant voor de toepasselijke schedule."
     }
+  },
+  "dailyLog": {
+    "addDailyLog": "Daglogboek toevoegen",
+    "eyebrow": "Dagelijks piping-logboek",
+    "newEntry": "Nieuwe registratie",
+    "description": "Registreer de ISO, de toewijzing van lassers, de uren en het brutoloon van de dag.",
+    "isoNumber": "ISO-nummer",
+    "isoPlaceholder": "bijv. ISO-PL-2041",
+    "weldersCount": "Aantal lassers",
+    "weldersPlaceholder": "bijv. 4",
+    "normalRatePlaceholder": "bijv. 25,00",
+    "extraRatePlaceholder": "bijv. 37,50",
+    "grossSalaryAuto": "Brutoloon (automatisch)",
+    "normalGrossSalary": "Normaal brutoloon",
+    "extraGrossSalary": "Extra brutoloon",
+    "totalGross": "Totaal bruto",
+    "notesPlaceholder": "Eventuele blokkades, opmerkingen of context voor de ploeg…",
+    "saveEntry": "Registratie opslaan",
+    "saveFailed": "Daglogboek opslaan mislukt",
+    "saved": "Daglogboek opgeslagen",
+    "savedDescription": "ISO {{iso}} — {{amount}} bruto",
+    "validation": {
+      "dateRequired": "Datum is verplicht",
+      "isoRequired": "ISO-nummer is verplicht",
+      "weldersInvalid": "Voer een geldig aantal lassers in",
+      "normalHoursInvalid": "Voer de normale uren in (0 of meer)",
+      "maxHours": "Mag maximaal 24 zijn",
+      "extraHoursInvalid": "Voer een geldig aantal extra uren in",
+      "normalRateInvalid": "Voer een geldig normaal uurtarief in",
+      "extraRateInvalid": "Voer een geldig extra uurtarief in"
+    }
+  },
+  "notFound": {
+    "title": "Pagina niet gevonden — PipingBox",
+    "description": "We konden de pagina die je zocht niet vinden. Ontdek PipingBox-tools, vacatures en cursussen, of ga terug naar de startpagina.",
+    "explanation": "We konden die pagina niet vinden. Mogelijk is deze verplaatst of verwijderd.",
+    "home": "Home",
+    "tools": "Tools",
+    "jobs": "Vacatures"
+  },
+  "adminCompanyVerification": {
+    "allStatuses": "Alle statussen",
+    "approve": "Goedkeuren",
+    "fetchError": "Bedrijven laden mislukt",
+    "noCompanies": "Geen bedrijven gevonden",
+    "pending": "In behandeling",
+    "refresh": "Vernieuwen",
+    "reject": "Afwijzen",
+    "rejected": "Afgewezen",
+    "resetToPending": "Terug naar In behandeling",
+    "searchPlaceholder": "Zoek op bedrijfsnaam, contactpersoon, sector...",
+    "statusUpdated": "Bedrijfsstatus gewijzigd in {{status}}",
+    "suspend": "Opschorten",
+    "suspended": "Opgeschort",
+    "total": "Totaal",
+    "unnamed": "Naamloos bedrijf",
+    "updateError": "Status bijwerken mislukt",
+    "verified": "Geverifieerd",
+    "website": "Website"
+  },
+  "companyBilling": {
+    "description": "Beheer uw abonnement en betaalmethoden."
+  },
+  "companyDocs": {
+    "allStatuses": "Alle statussen",
+    "colDate": "Datum",
+    "colJob": "Functie",
+    "colSize": "Grootte",
+    "colStatus": "Status",
+    "colTitle": "Document",
+    "colWorker": "Werknemer",
+    "description": "Beheer, deel en volg documenten met werknemers en kandidaten.",
+    "emptyState": "Geen documenten gevonden met de geselecteerde filters.",
+    "expired": "Verlopen",
+    "infoDescription": "Deze module is ontworpen voor documentcoördinatie tussen bedrijven, aannemers en industriële werknemers. Beheer contracten, certificeringen, werkvergunningen, loonlijsten en veiligheidsdocumenten vanaf één plek.",
+    "infoTitle": "Industrieel Documentbeheer",
+    "pending": "In behandeling",
+    "requiresUpdate": "Vereist update",
+    "searchPlaceholder": "Zoek op titel, werknemer of functie...",
+    "totalDocs": "Totaal Documenten",
+    "uploadDocument": "Document uploaden",
+    "uploadFirst": "Upload eerste document"
+  },
+  "companySettings": {
+    "description": "Beheer de voorkeuren en instellingen van uw bedrijf."
+  },
+  "companyVerification": {
+    "contactSupport": "Contact opnemen met support",
+    "pendingDesc": "Het account van uw bedrijf is in afwachting van verificatie. Zodra een beheerder deze heeft goedgekeurd, krijgt u volledige toegang tot de werknemerszoekfunctie en wervingsinstrumenten.",
+    "pendingTitle": "Verificatie in behandeling",
+    "rejectedDesc": "De verificatie van uw bedrijf is afgewezen. Neem contact op met support of werk de bedrijfsgegevens bij en dien opnieuw in.",
+    "rejectedTitle": "Verificatie afgewezen",
+    "statusLabel": "Verificatiestatus",
+    "statusPending": "In beoordeling — doorgaans 1-2 werkdagen",
+    "statusRejected": "Afgewezen — werk uw profiel bij en neem contact op met support",
+    "statusSuspended": "Opgeschort — neem contact op met de beheerder",
+    "statusUnknown": "Onbekende status",
+    "stepCompanyName": "Bedrijfsnaam ingevuld in uw profiel",
+    "stepDescription": "Bedrijfsomschrijving opgegeven",
+    "stepIndustry": "Sector en land opgegeven",
+    "suspendedDesc": "Het account van uw bedrijf is opgeschort. Neem contact op met de beheerder voor meer informatie.",
+    "suspendedTitle": "Account opgeschort",
+    "updateProfile": "Bedrijfsprofiel bijwerken",
+    "whileWaiting": "Zorg er terwijl u wacht voor dat u het volgende heeft:"
+  },
+  "pricing": {
+    "eyebrow": "Voor bedrijven",
+    "popular": "Meest gekozen",
+    "subtitle": "Werknemers zijn altijd gratis. Bedrijven betalen voor wervingstools. Geen verborgen kosten.",
+    "title": "Eenvoudige, transparante prijzen",
+    "workersFree": "Werknemers zijn altijd gratis — profiel, marktplaats, tools en community."
+  },
+  "requestWorkers": {
+    "backToRequests": "Terug naar Personeelsaanvragen",
+    "companyName": "Bedrijfsnaam",
+    "contactPerson": "Contactpersoon",
+    "country": "Land",
+    "duration": "Projectduur",
+    "email": "E-mail",
+    "errors": {
+      "companyRequired": "Bedrijfsnaam is verplicht",
+      "contactRequired": "Contactpersoon is verplicht",
+      "emailInvalid": "Ongeldig e-mailadres",
+      "emailRequired": "E-mailadres is verplicht",
+      "workerTypeRequired": "Selecteer het type werknemer"
+    },
+    "eyebrow": "Personeelsoplossingen",
+    "message": "Aanvullende informatie",
+    "messagePlaceholder": "Vertel ons meer over uw projectvereisten, benodigde certificeringen of andere specifieke details...",
+    "numWorkers": "Aantal werknemers",
+    "received": "Aanvraag ontvangen",
+    "receivedDesc": "Bedankt voor uw personeelsaanvraag. Ons team beoordeelt uw vereisten en neemt binnen 24–48 uur contact met u op met een oplossing op maat.",
+    "required": "Verplichte velden",
+    "retry": "Opnieuw proberen",
+    "selectType": "Selecteer type werknemer",
+    "startDate": "Geschatte startdatum",
+    "submit": "Personeel aanvragen",
+    "submitAnother": "Nog een aanvraag indienen",
+    "submitFailed": "Indienen mislukt",
+    "submitting": "Bezig met indienen...",
+    "subtitle": "Heeft u gekwalificeerde industriële werknemers nodig voor uw project? Vul het formulier in en ons team koppelt u aan gekwalificeerde professionals uit ons wereldwijde netwerk.",
+    "success": "Personeelsaanvraag ingediend!",
+    "title": "Personeel aanvragen",
+    "workerType": "Gewenst type werknemers",
+    "placeholderFullName": "Volledige naam"
+  },
+  "pageMeta": {
+    "home": {
+      "title": "PipingBox — Industrieel Werkplatform | Tools, Vacatures, Academie",
+      "description": "Gratis engineeringtools, industriële vacatures, certificeringstraining (VCA, SCC, OSHA) en community voor pijpfitters, lassers en industriële professionals. ASME B31.3-calculators, pijpgegevenstabellen, bochtsnijcalculator."
+    },
+    "login": {
+      "title": "PipingBox — Inloggen"
+    },
+    "register": {
+      "title": "PipingBox — Account aanmaken",
+      "description": "Maak uw PipingBox-account aan. Gratis voor werknemers: profiel, vacatures, tools, community en certificeringsvoorbereiding."
+    },
+    "dashboard": {
+      "title": "PipingBox — Dashboard"
+    },
+    "profile": {
+      "title": "PipingBox — Profiel"
+    },
+    "jobs": {
+      "title": "PipingBox — Industriële Vacaturebank | Pijpfitter, Lasser, QA/QC",
+      "description": "Industriële vacaturebank voor pijpfitters, lassers, QA/QC-inspecteurs, supervisors en planners. Gecontroleerde bedrijven in Europa, de VS en het Midden-Oosten. Solliciteer met één klik."
+    },
+    "messages": {
+      "title": "PipingBox — Berichten"
+    },
+    "community": {
+      "title": "PipingBox — Community"
+    },
+    "admin": {
+      "title": "PipingBox — Beheer"
+    },
+    "applications": {
+      "title": "PipingBox — Sollicitaties"
+    },
+    "companyDashboard": {
+      "title": "PipingBox — Bedrijfsdashboard"
+    },
+    "enterpriseDashboard": {
+      "title": "PipingBox — Enterprise-dashboard"
+    },
+    "academy": {
+      "title": "PipingBox — Academie | VCA-, SCC-, PRL-, OSHA-certificeringsvoorbereiding",
+      "description": "Certificeringsvoorbereidingscursussen: VCA (België/Nederland), SCC (Duitsland), PRL (Spanje), OSHA 10/30 (VS). Tot 6x goedkoper dan klassikale training."
+    },
+    "tools": {
+      "title": "PipingBox — Technische Hub | Pijpberekeningen, Fabricagetools, Componentenbibliotheek",
+      "description": "PipingBox Technische Hub: pijpcalculators, fabricagetools (bochtsnijden, taklayout, fitting take-off), pijpgegevenstabellen, flensklasse-opzoeking, eenheidsconverter en meer. Gratis, geen inlog vereist."
+    },
+    "companies": {
+      "title": "PipingBox — Gecontroleerde Industriële Werkgevers",
+      "description": "Overzicht van gecontroleerde industriële bedrijven die pijpfitters, lassers en ingenieurs aannemen in Europa en de VS."
+    },
+    "pricing": {
+      "title": "PipingBox — Prijzen | Academie, Enterprise, Vacatureplaatsingen",
+      "description": "PipingBox-prijzen: certificeringscursussen van de Academie (VCA, SCC, OSHA), enterprise-abonnementen, uitgelichte vacatures. Transparante prijzen, geen verborgen kosten."
+    },
+    "company": {
+      "title": "PipingBox — Bedrijf"
+    },
+    "blog": {
+      "title": "PipingBox — Blog"
+    }
+  },
+  "checkout": {
+    "errorGeneric": "Afrekenen kon niet worden gestart. Probeer het opnieuw.",
+    "signInToSubscribe": "Log in om u te abonneren.",
+    "signInToPurchase": "Log in om credits te kopen.",
+    "notAvailableSubscription": "Abonnementen zijn nog niet beschikbaar. Mail ons en wij regelen het handmatig.",
+    "notAvailablePack": "Dit pakket is momenteel niet beschikbaar."
+  },
+  "translationBanner": {
+    "text": "U bekijkt PipingBox in {{language}} — bètavertaling. Een fout gezien?",
+    "reportBtn": "Vertaling melden",
+    "emailBtn": "of mail ons",
+    "dismiss": "Melding sluiten",
+    "emailSubject": "Feedback over de vertaling",
+    "emailBodyLanguage": "Taal: {{language}} ({{code}})",
+    "emailBodyPage": "Pagina",
+    "emailBodyHint": "Plak de onjuiste tekst en hoe het moet zijn:"
+  },
+  "deploymentBadge": {
+    "label": "{{environment}}-implementatie · build {{build}}"
   }
 }

@@ -14,7 +14,9 @@
 
 type LogArgs = unknown[];
 
-const isDev = import.meta.env.DEV;
+// PB-OBSERVABILITY-001: guard for non-Vite runtimes (Playwright node specs
+// import libs that depend on this logger; import.meta.env is undefined there).
+const isDev = typeof import.meta.env !== 'undefined' ? import.meta.env.DEV : false;
 
 function format(args: LogArgs): LogArgs {
   // Keep the [PipingBox] prefix only in dev to avoid noise.
