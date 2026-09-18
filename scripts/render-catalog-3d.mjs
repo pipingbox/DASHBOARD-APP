@@ -60,7 +60,7 @@ import { createRequire } from 'node:module';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const APP_ROOT = resolve(__dirname, '..');
-const BRAIN_ROOT = resolve(APP_ROOT, '..');
+const BRAIN_ROOT = process.env.BRAIN_ROOT ? resolve(process.env.BRAIN_ROOT) : resolve(APP_ROOT, '..');
 const STL_DIR = join(BRAIN_ROOT, 'brain', '07-DESIGN', '02-ASSETS', 'CAD_REFERENCE');
 const OUT_DIR_DEFAULT = join(APP_ROOT, 'app', 'frontend', 'public', 'catalog', '3d');
 
@@ -99,6 +99,12 @@ const CONFIG = {
   // La direccion azimutal la fija el PCA de cada pieza (ver buildCamera); esto
   // es solo la elevacion minima sobre el horizonte.
   pitchDeg: 26,
+
+  // Vista de catalogo unificada (ver "Pose canonica de catalogo"): direccion
+  // de camara FIJA para todo el catalogo una vez la pieza esta en pose
+  // canonica. Azimut frontal-derecha y elevacion ~26 grados, la convencion de
+  // fotografia de catalogo de fittings.
+  catalogViewDir: normalize([0.62, -0.58, 0.45]),
 
   // Shading
   smoothAngleDeg: 35, // por encima de esto NO se promedia: preserva arista viva
@@ -154,31 +160,14 @@ const SIZE_SUFFIX = /_(\d+(?:x\d+)?)in$/;
  *
  * Para volver a incluir uno, basta con borrar su entrada de esta tabla una vez
  * el STL este regenerado y verificado.
+ *
+ * 2026-09-15 (PB-LIBRARY-COMPLETE-001, remediacion visual BW): las tres
+ * entradas originales (return_180_lr, return_180_sr, lateral_45) se retiraron
+ * tras sustituir las mallas por geometria analitica exacta derivada de los
+ * datasets B16.9 gateados (ver 13_BW_VISUAL_QA_MATRIX.md en el Brain). La
+ * evidencia de los defectos originales queda preservada en el historial git.
  */
-const EXCLUDED_STL = new Map([
-  [
-    'return_180_lr_4in.stl',
-    // No es la pieza: bounding box 10.3 x 102.3 x 102.2 mm con 900 triangulos.
-    // Es una lamina plana (un disco), no un tubo curvado 180 grados de radio
-    // 1.5 x NPS. Afecta a PB-COMP-RETURN-180-LR-BW-ASME-B16-9.
-    'geometria incorrecta: lamina plana 10x102x102 mm, no es una curva de retorno',
-  ],
-  [
-    'return_180_sr_4in.stl',
-    // 47 aristas non-manifold (soldando vertices a 1e-4 de la diagonal) y 7683
-    // pares de triangulos no adyacentes que se autointersecan. Normales
-    // incoherentes y superficies que se atraviesan.
-    // Afecta a PB-COMP-RETURN-180-SR-BW-ASME-B16-9.
-    'malla corrupta: 47 aristas non-manifold y autointerseccion masiva',
-  ],
-  [
-    'lateral_45_4in.stl',
-    // 101 aristas abiertas (agujeros reales en la superficie) y 6815 pares de
-    // triangulos autointersecantes en la union del ramal con el run.
-    // Afecta a PB-COMP-LATERAL-45-BW-ASME-B16-9.
-    'malla abierta: 101 aristas abiertas, agujeros reales en la superficie',
-  ],
-]);
+const EXCLUDED_STL = new Map([]);
 
 
 function stlSlug(filename) {
@@ -928,6 +917,519 @@ function principalAxes(positions, count) {
   return { axes: sortedAxes, ext: sortedExt, centroid: [cx, cy, cz] };
 }
 
+// ---------------------------------------------------------------------------
+// Pose canonica de catalogo
+// ---------------------------------------------------------------------------
+/*
+ * 2026-09-15 (PB-LIBRARY-COMPLETE-001, unificacion de perspectiva 3D).
+ *
+ * El PO rechazo los renders por "perspectivas distintas y algunas piezas
+ * deformadas". La causa es estructural: la camara se deriva del PCA de cada
+ * pieza, asi que cada componente sale orientado segun sus propios ejes y dos
+ * piezas de la misma familia (un codo 45 y un codo 90, una tee y un lateral)
+ * aparecen giradas de forma incoherente entre si.
+ *
+ * La convencion de catalogo de fittings (McMaster-Carr, MSI, Weldbend; usadas
+ * solo como referencia de encuadre, sin reutilizar imagen alguna) es la
+ * contraria: pose canonica FIJA por tipo de pieza y camara FIJA para todo el
+ * catalogo. Eso es lo que se implementa aqui:
+ *
+ *   1. Se extraen las bocas de la pieza (lazos de aristas de frontera: cada
+ *      extremo abierto de la malla). Es analisis de conectividad, no una
+ *      heuristica visual.
+ *   2. Segun el numero y disposicion de bocas se clasifica la pieza:
+ *        - 2 bocas no opuestas   -> codo/curva: X = direccion media entre
+ *          bocas, bisectriz a +Y (la curva queda en el cuadrante I).
+ *        - 2 bocas opuestas      -> revolucion (reduccion, stub end, brida):
+ *          eje del tubo a X, boca mayor a -X.
+ *        - par opuesto + ramales -> tee/cruz/lateral: corrida a X, ramal a
+ *          +Y y, en el lateral, ramales hacia +X (convencion de catalogo).
+ *        - 1 boca                -> tapa/weldolet: boca a -X, domo a +X.
+ *   3. Se aplica una ROTACION RIGIDA a la nube de vertices (la geometria no
+ *      cambia: distancias y angulos internos se conservan) y se usa una
+ *      direccion de camara unica para todas las piezas.
+ *
+ * Piezas sin bocas o no clasificables caen al camino PCA anterior. La salida
+ * por consola indica el camino usado por cada pieza.
+ */
+
+const v3 = {
+  add: (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]],
+  sub: (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]],
+  scale: (a, s) => [a[0] * s, a[1] * s, a[2] * s],
+  dot: (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2],
+  cross: (a, b) => [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ],
+  len: (a) => Math.hypot(a[0], a[1], a[2]),
+  unit: (a) => {
+    const l = Math.hypot(a[0], a[1], a[2]) || 1;
+    return [a[0] / l, a[1] / l, a[2] / l];
+  },
+  neg: (a) => [-a[0], -a[1], -a[2]],
+};
+
+function anyPerp(u) {
+  const ref = Math.abs(u[2]) < 0.9 ? [0, 0, 1] : [0, 1, 0];
+  return v3.unit(v3.cross(u, ref));
+}
+
+/*
+ * Bocas de la pieza: lazos de aristas de borde vivo.
+ *
+ * Las mallas del set son cerradas (los extremos del tubo estan tapados con
+ * caras planas), asi que no hay aristas de frontera que extraer. Lo que si
+ * delimita cada boca es su ANILLO DE ARISTA VIVA: la arista donde la pared
+ * del tubo (normal radial) se encuentra con la tapa o el bisel (normal con
+ * componente axial), con un diedro de 60-90 grados.
+ *
+ * Se extraen las aristas cuyo diedro supera el umbral (o que son frontera
+ * real, por compatibilidad con mallas abiertas), se agrupan en lazos por
+ * conectividad y cada lazo se describe por centroide, radio medio y normal
+ * (autovector menor de su covarianza). Los lazos no planos (la curva silla de
+ * una tee, por ejemplo) se descartan: no son bocas. Los lazos coaxiales muy
+ * proximos (bisel interior/exterior de una misma boca) se fusionan.
+ */
+function extractMouths(positions, triCount) {
+  const nCorners = triCount * 3;
+
+  let minX = Infinity, minY = Infinity, minZ = Infinity;
+  let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+  for (let i = 0; i < nCorners * 3; i += 3) {
+    const x = positions[i], y = positions[i + 1], z = positions[i + 2];
+    if (x < minX) minX = x; if (x > maxX) maxX = x;
+    if (y < minY) minY = y; if (y > maxY) maxY = y;
+    if (z < minZ) minZ = z; if (z > maxZ) maxZ = z;
+  }
+  const diag = Math.hypot(maxX - minX, maxY - minY, maxZ - minZ) || 1;
+  const inv = 1 / (diag * 1e-4);
+
+  // Normales de cara (producto vectorial; la normal del fichero no es fiable).
+  const faceNormals = new Float32Array(triCount * 3);
+  for (let t = 0; t < triCount; t++) {
+    const o = t * 9;
+    const e1 = [
+      positions[o + 3] - positions[o],
+      positions[o + 4] - positions[o + 1],
+      positions[o + 5] - positions[o + 2],
+    ];
+    const e2 = [
+      positions[o + 6] - positions[o],
+      positions[o + 7] - positions[o + 1],
+      positions[o + 8] - positions[o + 2],
+    ];
+    const n = v3.cross(e1, e2);
+    const l = v3.len(n);
+    if (l > 1e-12) {
+      faceNormals[t * 3] = n[0] / l;
+      faceNormals[t * 3 + 1] = n[1] / l;
+      faceNormals[t * 3 + 2] = n[2] / l;
+    }
+  }
+
+  const idOfKey = new Map();
+  const vid = new Int32Array(nCorners);
+  const vpos = [];
+  for (let c = 0; c < nCorners; c++) {
+    const o = c * 3;
+    const key =
+      `${Math.round(positions[o] * inv)},${Math.round(positions[o + 1] * inv)},` +
+      `${Math.round(positions[o + 2] * inv)}`;
+    let id = idOfKey.get(key);
+    if (id === undefined) {
+      id = vpos.length / 3;
+      idOfKey.set(key, id);
+      vpos.push(positions[o], positions[o + 1], positions[o + 2]);
+    }
+    vid[c] = id;
+  }
+
+  // Arista -> triangulos adyacentes.
+  const edgeTris = new Map();
+  for (let t = 0; t < triCount; t++) {
+    const a = vid[t * 3], b = vid[t * 3 + 1], c = vid[t * 3 + 2];
+    for (const [p, q] of [[a, b], [b, c], [c, a]]) {
+      const key = p < q ? `${p}_${q}` : `${q}_${p}`;
+      let list = edgeTris.get(key);
+      if (!list) edgeTris.set(key, (list = []));
+      list.push(t);
+    }
+  }
+
+  const COS_RIM = Math.cos((65 * Math.PI) / 180);
+  const parent = new Int32Array(vpos.length / 3);
+  for (let i = 0; i < parent.length; i++) parent[i] = i;
+  const find = (x) => {
+    while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; }
+    return x;
+  };
+
+  const loops = new Map();
+  const rimEdges = [];
+  for (const [key, tris] of edgeTris) {
+    let rim = tris.length === 1;
+    if (!rim && tris.length === 2) {
+      const n1 = [
+        faceNormals[tris[0] * 3],
+        faceNormals[tris[0] * 3 + 1],
+        faceNormals[tris[0] * 3 + 2],
+      ];
+      const n2 = [
+        faceNormals[tris[1] * 3],
+        faceNormals[tris[1] * 3 + 1],
+        faceNormals[tris[1] * 3 + 2],
+      ];
+      rim = v3.dot(n1, n2) < COS_RIM;
+    }
+    if (!rim) continue;
+    const sep = key.indexOf('_');
+    const a = Number(key.slice(0, sep)), b = Number(key.slice(sep + 1));
+    rimEdges.push([a, b]);
+    parent[find(a)] = find(b);
+  }
+  // Se agrupa DESPUES de todas las uniones: la raiz de un grupo puede cambiar
+  // durante el proceso y fragmentar los lazos si se agrupa sobre la marcha.
+  for (const [a, b] of rimEdges) {
+    const root = find(a);
+    let loop = loops.get(root);
+    if (!loop) loops.set(root, (loop = new Set()));
+    loop.add(a);
+    loop.add(b);
+  }
+
+  // Centroide global (para orientar las normales de boca hacia fuera).
+  let gcx = 0, gcy = 0, gcz = 0;
+  const nVerts = vpos.length / 3;
+  for (let i = 0; i < nVerts; i++) {
+    gcx += vpos[i * 3]; gcy += vpos[i * 3 + 1]; gcz += vpos[i * 3 + 2];
+  }
+  const centroid = [gcx / nVerts, gcy / nVerts, gcz / nVerts];
+
+  const raw = [];
+  for (const verts of loops.values()) {
+    if (verts.size < 8) continue; // lazos diminutos: artefactos de malla
+    const arr = [...verts];
+    let cx = 0, cy = 0, cz = 0;
+    for (const v of arr) {
+      cx += vpos[v * 3]; cy += vpos[v * 3 + 1]; cz += vpos[v * 3 + 2];
+    }
+    cx /= arr.length; cy /= arr.length; cz /= arr.length;
+
+    let xx = 0, xy = 0, xz = 0, yy = 0, yz = 0, zz = 0;
+    let radius = 0;
+    for (const v of arr) {
+      const dx = vpos[v * 3] - cx, dy = vpos[v * 3 + 1] - cy, dz = vpos[v * 3 + 2] - cz;
+      xx += dx * dx; xy += dx * dy; xz += dx * dz;
+      yy += dy * dy; yz += dy * dz; zz += dz * dz;
+      radius += Math.hypot(dx, dy, dz);
+    }
+    radius /= arr.length;
+
+    const C = [[xx, xy, xz], [xy, yy, yz], [xz, yz, zz]];
+    // Autovalores por rotaciones de Jacobi: robusto con autovalores
+    // degenerados (un circulo perfecto tiene l1 == l2 y el power iteration
+    // con deflacion no converge al segundo autovector).
+    const M = C.map((row) => row.slice());
+    const V = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+    for (let it = 0; it < 64; it++) {
+      let p = 0, q = 1, big = 0;
+      for (let i = 0; i < 3; i++)
+        for (let j = i + 1; j < 3; j++) {
+          const val = Math.abs(M[i][j]);
+          if (val > big) { big = val; p = i; q = j; }
+        }
+      if (big < 1e-10) break;
+      const phi = 0.5 * Math.atan2(2 * M[p][q], M[q][q] - M[p][p]);
+      const c = Math.cos(phi), s = Math.sin(phi);
+      for (let k = 0; k < 3; k++) {
+        const mkp = M[k][p], mkq = M[k][q];
+        M[k][p] = c * mkp - s * mkq;
+        M[k][q] = s * mkp + c * mkq;
+      }
+      for (let k = 0; k < 3; k++) {
+        const mpk = M[p][k], mqk = M[q][k];
+        M[p][k] = c * mpk - s * mqk;
+        M[q][k] = s * mpk + c * mqk;
+      }
+      for (let k = 0; k < 3; k++) {
+        const vkp = V[k][p], vkq = V[k][q];
+        V[k][p] = c * vkp - s * vkq;
+        V[k][q] = s * vkp + c * vkq;
+      }
+    }
+    const order = [0, 1, 2].sort((a, b) => M[b][b] - M[a][a]);
+    const l1 = M[order[0]][order[0]];
+    const l3 = Math.max(0, M[order[2]][order[2]]);
+    const axis = [V[0][order[2]], V[1][order[2]], V[2][order[2]]];
+
+    // Planitud: un anillo de boca es un circulo casi plano. La curva silla de
+    // una tee o de un weldolet no lo es, y queda descartada aqui.
+    if (process.env.DEBUG_MOUTHS) {
+      console.error(
+        `    loop verts=${arr.length} r=${radius.toFixed(2)} (${(radius / diag).toFixed(3)} diag) ` +
+          `plan=${(l1 > 1e-9 ? l3 / l1 : 0).toExponential(2)}`,
+      );
+    }
+    if (l1 > 1e-9 && l3 / l1 > 0.02) continue;
+    // Tamano: por debajo del 3% de la diagonal es ruido, no una boca.
+    if (radius < diag * 0.03) continue;
+
+    raw.push({ centroid: [cx, cy, cz], axis, radius });
+  }
+
+  // Fusion de lazos coaxiales de una misma boca (bisel interior + exterior).
+  const mouths = [];
+  for (const m of raw.sort((a, b) => b.radius - a.radius)) {
+    let merged = false;
+    for (const k of mouths) {
+      if (
+        Math.abs(v3.dot(m.axis, k.axis)) > 0.985 &&
+        Math.abs(v3.dot(v3.sub(m.centroid, k.centroid), k.axis)) < diag * 0.03 &&
+        v3.len(v3.sub(v3.sub(m.centroid, k.centroid),
+          v3.scale(k.axis, v3.dot(v3.sub(m.centroid, k.centroid), k.axis)))) < diag * 0.02 &&
+        Math.abs(m.radius - k.radius) < Math.max(m.radius, k.radius) * 0.2
+      ) {
+        // Gana el lazo mayor; centros y ejes se promedian.
+        const w1 = k.radius, w2 = m.radius;
+        k.centroid = v3.scale(v3.add(v3.scale(k.centroid, w1), v3.scale(m.centroid, w2)), 1 / (w1 + w2));
+        k.axis = v3.unit(v3.add(k.axis, v3.scale(m.axis, v3.dot(m.axis, k.axis) >= 0 ? 1 : -1)));
+        merged = true;
+        break;
+      }
+    }
+    if (!merged) mouths.push(m);
+  }
+
+  return { mouths, centroid, diag };
+}
+
+/*
+ * Pose canonica por disposicion de bocas. Devuelve { rows, center, kind } con
+ * rows = base ortonormal dextrogira (filas de la rotacion) y center =
+ * centroide a restar, o null si la pieza no es clasificable (camino PCA).
+ */
+function canonicalPose(info, positions, triCount) {
+  const { mouths, centroid } = info;
+  if (mouths.length === 0) return null;
+
+  // Normales de boca orientadas hacia fuera de la pieza.
+  for (const m of mouths) {
+    const out = v3.unit(v3.sub(m.centroid, centroid));
+    if (v3.dot(m.axis, out) < 0) m.axis = v3.neg(m.axis);
+  }
+
+  // Mejor par de bocas opuestas (la corrida, en piezas con ramales). Si hay
+  // varios pares (brida: bocas del bore + cantos exteriores), la corrida es
+  // el par de MENOR radio: el resto son cantos de la propia pieza.
+  let pair = null;
+  for (let i = 0; i < mouths.length; i++) {
+    for (let j = i + 1; j < mouths.length; j++) {
+      const d = v3.dot(mouths[i].axis, mouths[j].axis);
+      if (d < -0.9) {
+        const r = mouths[i].radius + mouths[j].radius;
+        if (!pair || r < pair.r) pair = { i, j, d, r };
+      }
+    }
+  }
+
+  let b0, b1, kind;
+
+  if (mouths.length >= 2 && !pair && mouths.length === 2) {
+    // Codo / curva de retorno: simetrico respecto a la bisectriz.
+    const a1 = mouths[0].axis, a2 = mouths[1].axis;
+    const sum = v3.add(a1, a2);
+    const dif = v3.sub(a1, a2);
+    if (v3.len(dif) < 0.2) {
+      // Retorno 180: bocas paralelas. El eje X lo da la separacion de centros.
+      const delta = v3.sub(mouths[0].centroid, mouths[1].centroid);
+      if (v3.len(delta) < info.diag * 0.01) return null; // lazos concentricos: pieza plana
+      b0 = v3.unit(delta);
+      b1 = v3.unit(a1);
+    } else if (v3.len(sum) < 0.2) {
+      return null;
+    } else {
+      b0 = v3.unit(dif);
+      b1 = v3.unit(sum);
+    }
+    kind = 'elbow';
+  } else if (pair) {
+    b0 = v3.unit(v3.sub(mouths[pair.i].axis, mouths[pair.j].axis));
+    // Ramales: bocas cuyo eje NO es colineal con la corrida. Los lazos
+    // coaxiales extra (cantos de brida) no son ramales.
+    const branches = mouths.filter(
+      (m, k) => k !== pair.i && k !== pair.j && Math.abs(v3.dot(m.axis, b0)) < 0.9,
+    );
+
+    if (branches.length === 0) {
+      // Revolucion: reduccion, stub end, brida, acoplamiento.
+      // La boca mayor va a -X (convencion de catalogo).
+      if (mouths[pair.i].radius < mouths[pair.j].radius * 0.999) b0 = v3.neg(b0);
+
+      // An eccentric reducer is identified by the transverse displacement of
+      // its small-end mouth relative to the large-end mouth. This is more
+      // reliable than the radial-normal bias for low-resolution meshes, where
+      // the wall contribution can cancel the actual offset.
+      const large = mouths[pair.i].radius >= mouths[pair.j].radius ? mouths[pair.i] : mouths[pair.j];
+      const small = large === mouths[pair.i] ? mouths[pair.j] : mouths[pair.i];
+      const mouthDelta = v3.sub(small.centroid, large.centroid);
+      const mouthOffset = v3.sub(mouthDelta, v3.scale(b0, v3.dot(mouthDelta, b0)));
+      const isEccentricByMouthCenter = v3.len(mouthOffset) > Math.max(0.5, small.radius * 0.05);
+
+      // Roll: solo se fuerza si hay excentricidad real (suma de direcciones
+      // radiales claramente sesgada). En piezas de revolucion puras el roll es
+      // arbitrario y se deja al referencial fijo, igual para todas.
+      const n = triCount * 3;
+      let sx = 0, sy = 0, sz = 0;
+      for (let i = 0; i < n; i++) {
+        const o = i * 9;
+        for (let v = 0; v < 3; v++) {
+          const p = [
+            positions[o + v * 3] - centroid[0],
+            positions[o + v * 3 + 1] - centroid[1],
+            positions[o + v * 3 + 2] - centroid[2],
+          ];
+          const along = v3.dot(p, b0);
+          const r = v3.sub(p, v3.scale(b0, along));
+          const rl = v3.len(r);
+          if (rl < 1e-9) continue;
+          sx += r[0] / rl; sy += r[1] / rl; sz += r[2] / rl;
+        }
+      }
+      const bias = [sx, sy, sz];
+      const biasPerp = v3.sub(bias, v3.scale(b0, v3.dot(bias, b0)));
+      kind = 'revolution';
+      if (isEccentricByMouthCenter || v3.len(biasPerp) > n * 3 * 0.04) {
+        // Excentrica: la cara plana (mayor acumulacion radial) hacia -Y.
+        b1 = isEccentricByMouthCenter
+          ? v3.neg(v3.unit(mouthOffset))
+          : v3.neg(v3.unit(biasPerp));
+        kind = 'revolution-ecc';
+      } else {
+        b1 = anyPerp(b0);
+      }
+    } else {
+      // Tee / cruz / lateral: corrida a X, ramales hacia +Y.
+      let s = [0, 0, 0];
+      for (const b of branches) s = v3.add(s, b.axis);
+      b1 = v3.len(s) < 0.3 ? branches[0].axis.slice() : v3.unit(s);
+      kind = 'branch';
+
+      // Lateral: los ramales deben quedar hacia +X. En tee/cruz (simetricos)
+      // el signo lo decide la asimetria de vertices, de forma determinista.
+      let sx = 0;
+      for (const b of branches) {
+        sx += v3.dot(v3.sub(b.centroid, centroid), b0);
+      }
+      if (Math.abs(sx) > 1e-6 * v3.len(centroid) + 1e-9) {
+        if (sx < 0) b0 = v3.neg(b0);
+      } else {
+        let skew = 0;
+        const n = triCount * 3;
+        for (let i = 0; i < n; i++) {
+          const o = i * 9;
+          for (let v = 0; v < 3; v++) {
+            const t =
+              (positions[o + v * 3] - centroid[0]) * b0[0] +
+              (positions[o + v * 3 + 1] - centroid[1]) * b0[1] +
+              (positions[o + v * 3 + 2] - centroid[2]) * b0[2];
+            skew += t * t * t;
+          }
+        }
+        if (skew < 0) b0 = v3.neg(b0);
+      }
+    }
+  } else if (mouths.length === 1) {
+    // Tapa / weldolet: boca a -X, domo a +X.
+    b0 = v3.neg(mouths[0].axis);
+    b1 = anyPerp(b0);
+    kind = 'cap';
+  } else {
+    return null;
+  }
+
+  // Base ortonormal dextrogira: b0 fija, b1 se ortogonaliza contra ella.
+  let v = v3.sub(b1, v3.scale(b0, v3.dot(b0, b1)));
+  if (v3.len(v) < 1e-6) v = anyPerp(b0);
+  const e1 = v3.unit(v);
+  const e2 = v3.unit(v3.cross(b0, e1));
+
+  return { rows: [b0, e1, e2], center: centroid, kind };
+}
+
+function applyPose(positions, pose) {
+  const { rows, center } = pose;
+  const out = new Float32Array(positions.length);
+  for (let i = 0; i < positions.length; i += 3) {
+    const dx = positions[i] - center[0];
+    const dy = positions[i + 1] - center[1];
+    const dz = positions[i + 2] - center[2];
+    out[i] = rows[0][0] * dx + rows[0][1] * dy + rows[0][2] * dz;
+    out[i + 1] = rows[1][0] * dx + rows[1][1] * dy + rows[1][2] * dz;
+    out[i + 2] = rows[2][0] * dx + rows[2][1] * dy + rows[2][2] * dz;
+  }
+  return out;
+}
+
+/*
+ * Encuadre con direccion de camara dada: proyeccion del bounding box e
+ * iteracion de distancia hasta que la pieza ocupa `margin` del frame.
+ */
+function frameFromDir(bounds, cfg, toEye) {
+  const cx = (bounds.minX + bounds.maxX) / 2;
+  const cy = (bounds.minY + bounds.maxY) / 2;
+  const cz = (bounds.minZ + bounds.maxZ) / 2;
+
+  const fov = 2 * Math.atan(cfg.sensorMM / (2 * cfg.focalMM));
+  const tanHalf = Math.tan(fov / 2);
+
+  const fwd = [-toEye[0], -toEye[1], -toEye[2]];
+
+  const worldUp = [0, 0, 1];
+  let right = [
+    fwd[1] * worldUp[2] - fwd[2] * worldUp[1],
+    fwd[2] * worldUp[0] - fwd[0] * worldUp[2],
+    fwd[0] * worldUp[1] - fwd[1] * worldUp[0],
+  ];
+  if (Math.hypot(right[0], right[1], right[2]) < 1e-6) right = [1, 0, 0];
+  right = v3.unit(right);
+  const up = v3.unit([
+    right[1] * fwd[2] - right[2] * fwd[1],
+    right[2] * fwd[0] - right[0] * fwd[2],
+    right[0] * fwd[1] - right[1] * fwd[0],
+  ]);
+
+  const corners = [];
+  for (const x of [bounds.minX, bounds.maxX])
+    for (const y of [bounds.minY, bounds.maxY])
+      for (const z of [bounds.minZ, bounds.maxZ]) corners.push([x - cx, y - cy, z - cz]);
+
+  const radius = Math.max(...corners.map((c) => Math.hypot(c[0], c[1], c[2])));
+  let dist = (radius / tanHalf) * 1.6;
+
+  for (let iter = 0; iter < 24; iter++) {
+    const eye = [cx - fwd[0] * dist, cy - fwd[1] * dist, cz - fwd[2] * dist];
+    let maxAbs = 0;
+    let ok = true;
+    for (const c of corners) {
+      const wx = c[0] + cx - eye[0], wy = c[1] + cy - eye[1], wz = c[2] + cz - eye[2];
+      const vz = wx * fwd[0] + wy * fwd[1] + wz * fwd[2];
+      if (vz <= 1e-4) { ok = false; break; }
+      const vx = wx * right[0] + wy * right[1] + wz * right[2];
+      const vy = wx * up[0] + wy * up[1] + wz * up[2];
+      maxAbs = Math.max(maxAbs, Math.abs(vx / (vz * tanHalf)), Math.abs(vy / (vz * tanHalf)));
+    }
+    if (!ok) { dist *= 1.4; continue; }
+    const err = maxAbs / cfg.margin;
+    if (Math.abs(err - 1) < 0.002) break;
+    dist *= err > 1 ? Math.min(err, 1.5) : Math.max(err, 0.7);
+  }
+
+  const eye = [cx - fwd[0] * dist, cy - fwd[1] * dist, cz - fwd[2] * dist];
+  return { eye, fwd, right, up, tanHalf, center: [cx, cy, cz], dist, radius };
+}
+
 /*
  * Vista tres cuartos elevada, la convencion de catalogo: se ve la forma y las
  * dos caras de conexion.
@@ -943,7 +1445,7 @@ function principalAxes(positions, count) {
  * hace por proyeccion real y no por radio, todas las piezas salen con un tamano
  * visual coherente independientemente de su forma.
  */
-function buildCamera(bounds, cfg, pca) {
+function buildCamera(bounds, cfg, pca, forcedToEye = null) {
   const cx = (bounds.minX + bounds.maxX) / 2;
   const cy = (bounds.minY + bounds.maxY) / 2;
   const cz = (bounds.minZ + bounds.maxZ) / 2;
@@ -1003,7 +1505,14 @@ function buildCamera(bounds, cfg, pca) {
   const planarRatio = x2 / Math.max(x1, 1e-6);
   const planarRatio0 = x2 / Math.max(x0, 1e-6);
   const revolution = Math.abs(x1 - x2) < Math.max(x1, x2) * 0.12;
-  if (!isFlat && !revolution && planarRatio < 0.72 && planarRatio0 < 0.55) {
+  // A 45° LR elbow is a valid planar elbow even though its CLR makes the
+  // second planar extent almost equal to the tube diameter (x2/x1 ~= 0.75).
+  // The old threshold therefore classified it as a short/revolution-like
+  // piece and aimed the camera at the mouth. Keep the generic guard, but add
+  // the geometry-derived long-planar case; no component name or asset ID is
+  // used here, and no STL/data is changed.
+  const longPlanarElbow = planarRatio0 < 0.48 && planarRatio < 0.82;
+  if (!isFlat && !revolution && (planarRatio < 0.72 || longPlanarElbow) && planarRatio0 < 0.55) {
     // Mirar mayoritariamente a lo largo de la normal del plano, inclinando algo
     // sobre los ejes del plano para que no sea una vista ortogonal plana.
     toEye = normalize([
@@ -1012,6 +1521,7 @@ function buildCamera(bounds, cfg, pca) {
       e2[2] * 0.86 + e0[2] * 0.20 + e1[2] * 0.34,
     ]);
   }
+  if (forcedToEye) toEye = normalize(forcedToEye);
 
   // Garantia dura contra la vista axial.
   //
@@ -1056,54 +1566,7 @@ function buildCamera(bounds, cfg, pca) {
     toEye = normalize([toEye[0] * h, toEye[1] * h, targetZ]);
   }
 
-  const fwd = [-toEye[0], -toEye[1], -toEye[2]];
-
-  const worldUp = [0, 0, 1];
-  let right = [
-    fwd[1] * worldUp[2] - fwd[2] * worldUp[1],
-    fwd[2] * worldUp[0] - fwd[0] * worldUp[2],
-    fwd[0] * worldUp[1] - fwd[1] * worldUp[0],
-  ];
-  if (Math.hypot(right[0], right[1], right[2]) < 1e-6) right = [1, 0, 0];
-  right = normalize(right);
-  const up = normalize([
-    right[1] * fwd[2] - right[2] * fwd[1],
-    right[2] * fwd[0] - right[0] * fwd[2],
-    right[0] * fwd[1] - right[1] * fwd[0],
-  ]);
-
-  const corners = [];
-  for (const x of [bounds.minX, bounds.maxX])
-    for (const y of [bounds.minY, bounds.maxY])
-      for (const z of [bounds.minZ, bounds.maxZ]) corners.push([x - cx, y - cy, z - cz]);
-
-  // Distancia inicial holgada, luego se ajusta iterando: se proyecta el bbox y
-  // se corrige la distancia por la razon entre extension obtenida y deseada.
-  const radius = Math.max(...corners.map((c) => Math.hypot(c[0], c[1], c[2])));
-  let dist = radius / tanHalf * 1.6;
-
-  let extent = 1;
-  for (let iter = 0; iter < 24; iter++) {
-    const eye = [cx - fwd[0] * dist, cy - fwd[1] * dist, cz - fwd[2] * dist];
-    let maxAbs = 0;
-    let ok = true;
-    for (const c of corners) {
-      const wx = c[0] + cx - eye[0], wy = c[1] + cy - eye[1], wz = c[2] + cz - eye[2];
-      const vz = wx * fwd[0] + wy * fwd[1] + wz * fwd[2];
-      if (vz <= 1e-4) { ok = false; break; }
-      const vx = wx * right[0] + wy * right[1] + wz * right[2];
-      const vy = wx * up[0] + wy * up[1] + wz * up[2];
-      maxAbs = Math.max(maxAbs, Math.abs(vx / (vz * tanHalf)), Math.abs(vy / (vz * tanHalf)));
-    }
-    if (!ok) { dist *= 1.4; continue; }
-    extent = maxAbs;
-    const err = maxAbs / cfg.margin;
-    if (Math.abs(err - 1) < 0.002) break;
-    dist *= err > 1 ? Math.min(err, 1.5) : Math.max(err, 0.7);
-  }
-
-  const eye = [cx - fwd[0] * dist, cy - fwd[1] * dist, cz - fwd[2] * dist];
-  return { eye, fwd, right, up, tanHalf, center: [cx, cy, cz], dist, radius };
+  return frameFromDir(bounds, cfg, toEye);
 }
 
 // ---------------------------------------------------------------------------
@@ -1653,12 +2116,46 @@ async function renderPiece(stlPath, cfg, mips, noise) {
   const t0 = Date.now();
 
   const { triCount, positions } = readBinarySTL(stlPath);
-  const { normals, bounds } = computeSmoothNormals(positions, triCount, cfg.smoothAngleDeg);
+
+  // Pose canonica de catalogo: rotacion rigida por disposicion de bocas y
+  // camara fija. Si la pieza no es clasificable, camino PCA anterior.
+  const mouthInfo = extractMouths(positions, triCount);
+  const pose = canonicalPose(mouthInfo, positions, triCount);
+  const geo = pose ? applyPose(positions, pose) : positions;
+  const path = pose ? `canonica/${pose.kind}` : 'pca';
+
+  const { normals, bounds } = computeSmoothNormals(geo, triCount, cfg.smoothAngleDeg);
 
   const R = cfg.size * cfg.ss;
-  const pca = principalAxes(positions, triCount);
-  const cam = buildCamera(bounds, cfg, pca);
-  const gbuf = rasterize({ positions, normals, triCount }, cam, R, R);
+  // The tee/cross family reads best from a branch-facing three-quarter angle:
+  // the run remains legible, while the branch bore is visible enough to
+  // distinguish equal from reducing tees. LATERAL-45 keeps its established
+  // opposite-side view. The eccentric reducer gets a dedicated side view so
+  // the offset small-end bore is not hidden behind the concentric silhouette.
+  let catalogViewDir = cfg.catalogViewDir;
+  if (pose?.kind === 'branch' && stlPath.includes('tee_')) {
+    catalogViewDir = normalize([-0.24, -0.88, 0.42]);
+  } else if (pose?.kind === 'branch' && stlPath.includes('lateral_45')) {
+    catalogViewDir = normalize([0.20, 0.90, 0.42]);
+  } else if (pose?.kind === 'revolution-ecc') {
+    catalogViewDir = normalize([0.30, -0.90, 0.32]);
+  } else if (pose?.kind === 'elbow' && (
+    stlPath.includes('elbow_90_lr') ||
+    stlPath.includes('elbow_45_lr')
+  )) {
+    catalogViewDir = normalize([0.78, -0.40, 0.46]);
+  }
+  const cam = pose
+    ? frameFromDir(bounds, cfg, catalogViewDir)
+    : buildCamera(
+      bounds,
+      cfg,
+      principalAxes(geo, triCount),
+      stlPath.includes('elbow_45_lr')
+        ? [0.78, -0.40, 0.46]
+        : null,
+    );
+  const gbuf = rasterize({ positions: geo, normals, triCount }, cam, R, R);
   const shaded = shade(gbuf, cam, mips, noise, bounds, R, R, cfg);
   const rgb = composite(shaded, gbuf, R, R, cfg);
 
@@ -1674,7 +2171,7 @@ async function renderPiece(stlPath, cfg, mips, noise) {
   const webp = await image.clone().webp({ quality: cfg.webpQuality, effort: 6 }).toBuffer();
   const png = cfg.emitPng ? await image.clone().png({ compressionLevel: 9 }).toBuffer() : null;
 
-  return { webp, png, triCount, ms: Date.now() - t0, bounds, cam };
+  return { webp, png, triCount, ms: Date.now() - t0, bounds, cam, path };
 }
 
 // ---------------------------------------------------------------------------
@@ -1790,7 +2287,7 @@ async function main() {
     const kb = (result.webp.length / 1024).toFixed(0);
     console.log(
       `  ok  ${stl.padEnd(26)} -> ${out.padEnd(42)} ` +
-        `${String(result.triCount).padStart(6)} tri  ${String(result.ms).padStart(6)} ms  ${kb} KB`,
+        `${String(result.triCount).padStart(6)} tri  ${String(result.ms).padStart(6)} ms  ${kb} KB  [${result.path}]`,
     );
   }
 
