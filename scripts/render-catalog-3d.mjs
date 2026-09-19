@@ -2120,7 +2120,30 @@ async function renderPiece(stlPath, cfg, mips, noise) {
   // Pose canonica de catalogo: rotacion rigida por disposicion de bocas y
   // camara fija. Si la pieza no es clasificable, camino PCA anterior.
   const mouthInfo = extractMouths(positions, triCount);
-  const pose = canonicalPose(mouthInfo, positions, triCount);
+  let pose = canonicalPose(mouthInfo, positions, triCount);
+  // Weldolet y valvula de bola: la deteccion de bocas produce poses que
+  // ocultan el rasgo distintivo (silla / palanca). Ambas mallas se generan
+  // ya en pose canonica de catalogo (eje principal horizontal o rama a +Z),
+  // asi que se usa pose identidad y una vista dedicada.
+  if (stlPath.includes('weldolet') || stlPath.includes('valve_ball')) {
+    pose = {
+      rows: [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+      ],
+      center: mouthInfo.centroid,
+      kind: stlPath.includes('weldolet') ? 'cap' : 'manual',
+    };
+  }
+  if (process.env.RENDER_DEBUG) {
+    console.error(`DEBUG ${basename(stlPath)}: mouths=${mouthInfo.mouths.length} kind=${pose?.kind ?? 'null'}`);
+    for (const m of mouthInfo.mouths) {
+      console.error(
+        `  axis=[${m.axis.map((v) => v.toFixed(2))}] r=${m.radius.toFixed(1)} c=[${m.centroid.map((v) => v.toFixed(1))}]`,
+      );
+    }
+  }
   const geo = pose ? applyPose(positions, pose) : positions;
   const path = pose ? `canonica/${pose.kind}` : 'pca';
 
@@ -2137,6 +2160,18 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     catalogViewDir = normalize([-0.24, -0.88, 0.42]);
   } else if (pose?.kind === 'branch' && stlPath.includes('lateral_45')) {
     catalogViewDir = normalize([0.20, 0.90, 0.42]);
+  } else if (pose?.kind === 'branch' && stlPath.includes('valve_check')) {
+    // Check: el bonnet queda a +Y tras la pose; camara de ese lado para que
+    // la tapa atornillada (rasgo distintivo) sea visible.
+    catalogViewDir = normalize([0.48, 0.66, 0.42]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('valve_ball')) {
+    // Bola: malla en pose canonica (flujo a X, vastago a +Z, palanca a X).
+    // Vista tres cuartos frontal-superior: palanca horizontal sobre el cuerpo.
+    catalogViewDir = normalize([0.52, -0.62, 0.42]);
+  } else if (pose?.kind === 'cap' && stlPath.includes('weldolet')) {
+    // Weldolet: vista tres cuartos baja para que se aprecie la campana y la
+    // curva de la silla en la base, no solo la boca.
+    catalogViewDir = normalize([0.60, -0.62, 0.34]);
   } else if (pose?.kind === 'revolution-ecc') {
     catalogViewDir = normalize([0.30, -0.90, 0.32]);
   } else if (pose?.kind === 'elbow' && (
