@@ -2128,7 +2128,11 @@ async function renderPiece(stlPath, cfg, mips, noise) {
   if (
     stlPath.includes('weldolet') ||
     stlPath.includes('valve_ball') ||
-    stlPath.includes('valve_check')
+    stlPath.includes('valve_check') ||
+    stlPath.includes('elbow_90_thd') ||
+    stlPath.includes('cap_sw') ||
+    stlPath.includes('cap_thd') ||
+    stlPath.includes('bushing_thd')
   ) {
     pose = {
       rows: [
@@ -2137,7 +2141,10 @@ async function renderPiece(stlPath, cfg, mips, noise) {
         [0, 0, 1],
       ],
       center: mouthInfo.centroid,
-      kind: stlPath.includes('weldolet') ? 'cap' : 'manual',
+      kind:
+        stlPath.includes('weldolet') || stlPath.includes('cap_sw') || stlPath.includes('cap_thd')
+          ? 'cap'
+          : 'manual',
     };
   }
   if (process.env.RENDER_DEBUG) {
@@ -2168,6 +2175,11 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     // Check wafer dual-plate: malla en pose canonica (flujo a X, pasador a
     // +Z). Vista tres cuartos para leer orejas, pasador y placas en el bore.
     catalogViewDir = normalize([0.78, -0.42, 0.34]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('elbow_90_thd')) {
+    // Codo roscado B16.11: malla en pose canonica (pata 1 a -Y, pata 2 a -X,
+    // arco en plano XY). Vista frontal a la boca 1 para leer la rosca hembra,
+    // que es el rasgo que lo distingue del codo SW/BW.
+    catalogViewDir = normalize([-0.55, -0.62, 0.40]);
   } else if (pose?.kind === 'manual' && stlPath.includes('valve_ball')) {
     // Bola: malla en pose canonica (flujo a X, vastago a +Z, palanca a X).
     // Vista tres cuartos frontal-superior: palanca horizontal sobre el cuerpo.

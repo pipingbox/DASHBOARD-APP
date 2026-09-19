@@ -34,7 +34,7 @@ const APP_ROOT = resolve(__dirname, '..');
 // rather than duplicating the package in a second manifest.
 const require = createRequire(join(APP_ROOT, 'app', 'frontend', 'package.json'));
 const { parse: parseYaml } = require('yaml');
-const BRAIN_ROOT = resolve(APP_ROOT, '..');
+const BRAIN_ROOT = process.env.BRAIN_ROOT ? resolve(process.env.BRAIN_ROOT) : resolve(APP_ROOT, '..');
 const CATALOG_SRC = join(BRAIN_ROOT, 'brain', '08-CATALOG');
 const ASSET_SRC = join(BRAIN_ROOT, 'brain', '07-DESIGN', '02-ASSETS', 'APPROVED', 'BIBLIOTECA_V1');
 const OUT_DIR = join(APP_ROOT, 'app', 'frontend', 'src', 'tools', 'catalog');

@@ -4,13 +4,13 @@
   "_warning": "FICHERO GENERADO. No editar a mano: se sobrescribe.",
   "stats": {
     "components": 56,
-    "publishable": 30,
+    "publishable": 40,
     "standards": 19,
     "standardsInUse": 16,
     "dimensionSets": 70,
     "dimensionRows": 1844,
-    "drawings": 386,
-    "renders": 29
+    "drawings": 486,
+    "renders": 39
   },
   "components": [
     {
@@ -3046,9 +3046,54 @@
       "dimensionSets": [
         "PB-DIM-ASME-B16-11-CAP-SW"
       ],
-      "drawings": [],
-      "drawingStem": null,
-      "render": null,
+      "drawings": [
+        {
+          "size": "1-1-2",
+          "src": "/catalog/2d/PB-DIM-CAP-SW-NPS-1-1-2_2d.svg"
+        },
+        {
+          "size": "1-1-4",
+          "src": "/catalog/2d/PB-DIM-CAP-SW-NPS-1-1-4_2d.svg"
+        },
+        {
+          "size": "1-2",
+          "src": "/catalog/2d/PB-DIM-CAP-SW-NPS-1-2_2d.svg"
+        },
+        {
+          "size": "1-4",
+          "src": "/catalog/2d/PB-DIM-CAP-SW-NPS-1-4_2d.svg"
+        },
+        {
+          "size": "1",
+          "src": "/catalog/2d/PB-DIM-CAP-SW-NPS-1_2d.svg"
+        },
+        {
+          "size": "2-1-2",
+          "src": "/catalog/2d/PB-DIM-CAP-SW-NPS-2-1-2_2d.svg"
+        },
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-CAP-SW-NPS-2_2d.svg"
+        },
+        {
+          "size": "3-4",
+          "src": "/catalog/2d/PB-DIM-CAP-SW-NPS-3-4_2d.svg"
+        },
+        {
+          "size": "3-8",
+          "src": "/catalog/2d/PB-DIM-CAP-SW-NPS-3-8_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-CAP-SW-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-CAP-SW-NPS-4_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-CAP-SW",
+      "render": "/catalog/3d/PB-ASSET-0036_cap-sw_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -3063,7 +3108,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-TEE-SW-ASME-B16-11",
@@ -3108,9 +3153,54 @@
       "dimensionSets": [
         "PB-DIM-ASME-B16-11-TEE-SW"
       ],
-      "drawings": [],
-      "drawingStem": null,
-      "render": null,
+      "drawings": [
+        {
+          "size": "1-1-2",
+          "src": "/catalog/2d/PB-DIM-TEE-SW-NPS-1-1-2_2d.svg"
+        },
+        {
+          "size": "1-1-4",
+          "src": "/catalog/2d/PB-DIM-TEE-SW-NPS-1-1-4_2d.svg"
+        },
+        {
+          "size": "1-2",
+          "src": "/catalog/2d/PB-DIM-TEE-SW-NPS-1-2_2d.svg"
+        },
+        {
+          "size": "1-4",
+          "src": "/catalog/2d/PB-DIM-TEE-SW-NPS-1-4_2d.svg"
+        },
+        {
+          "size": "1",
+          "src": "/catalog/2d/PB-DIM-TEE-SW-NPS-1_2d.svg"
+        },
+        {
+          "size": "2-1-2",
+          "src": "/catalog/2d/PB-DIM-TEE-SW-NPS-2-1-2_2d.svg"
+        },
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-TEE-SW-NPS-2_2d.svg"
+        },
+        {
+          "size": "3-4",
+          "src": "/catalog/2d/PB-DIM-TEE-SW-NPS-3-4_2d.svg"
+        },
+        {
+          "size": "3-8",
+          "src": "/catalog/2d/PB-DIM-TEE-SW-NPS-3-8_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-TEE-SW-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-TEE-SW-NPS-4_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-TEE-SW",
+      "render": "/catalog/3d/PB-ASSET-0031_tee-sw_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -3125,7 +3215,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-FLANGE-SW-ASME-B16-5",
@@ -3236,9 +3326,54 @@
       "dimensionSets": [
         "PB-DIM-ASME-B16-11-COUPLING-SW"
       ],
-      "drawings": [],
-      "drawingStem": null,
-      "render": null,
+      "drawings": [
+        {
+          "size": "1-1-2",
+          "src": "/catalog/2d/PB-DIM-COUPLING-SW-NPS-1-1-2_2d.svg"
+        },
+        {
+          "size": "1-1-4",
+          "src": "/catalog/2d/PB-DIM-COUPLING-SW-NPS-1-1-4_2d.svg"
+        },
+        {
+          "size": "1-2",
+          "src": "/catalog/2d/PB-DIM-COUPLING-SW-NPS-1-2_2d.svg"
+        },
+        {
+          "size": "1-4",
+          "src": "/catalog/2d/PB-DIM-COUPLING-SW-NPS-1-4_2d.svg"
+        },
+        {
+          "size": "1",
+          "src": "/catalog/2d/PB-DIM-COUPLING-SW-NPS-1_2d.svg"
+        },
+        {
+          "size": "2-1-2",
+          "src": "/catalog/2d/PB-DIM-COUPLING-SW-NPS-2-1-2_2d.svg"
+        },
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-COUPLING-SW-NPS-2_2d.svg"
+        },
+        {
+          "size": "3-4",
+          "src": "/catalog/2d/PB-DIM-COUPLING-SW-NPS-3-4_2d.svg"
+        },
+        {
+          "size": "3-8",
+          "src": "/catalog/2d/PB-DIM-COUPLING-SW-NPS-3-8_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-COUPLING-SW-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-COUPLING-SW-NPS-4_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-COUPLING-SW",
+      "render": "/catalog/3d/PB-ASSET-0033_coupling-sw_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -3253,7 +3388,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-HALF-COUPLING-SW-ASME-B16-11",
@@ -3298,9 +3433,54 @@
       "dimensionSets": [
         "PB-DIM-ASME-B16-11-HALF-COUPLING-SW"
       ],
-      "drawings": [],
-      "drawingStem": null,
-      "render": null,
+      "drawings": [
+        {
+          "size": "1-1-2",
+          "src": "/catalog/2d/PB-DIM-HALF-COUPLING-SW-NPS-1-1-2_2d.svg"
+        },
+        {
+          "size": "1-1-4",
+          "src": "/catalog/2d/PB-DIM-HALF-COUPLING-SW-NPS-1-1-4_2d.svg"
+        },
+        {
+          "size": "1-2",
+          "src": "/catalog/2d/PB-DIM-HALF-COUPLING-SW-NPS-1-2_2d.svg"
+        },
+        {
+          "size": "1-4",
+          "src": "/catalog/2d/PB-DIM-HALF-COUPLING-SW-NPS-1-4_2d.svg"
+        },
+        {
+          "size": "1",
+          "src": "/catalog/2d/PB-DIM-HALF-COUPLING-SW-NPS-1_2d.svg"
+        },
+        {
+          "size": "2-1-2",
+          "src": "/catalog/2d/PB-DIM-HALF-COUPLING-SW-NPS-2-1-2_2d.svg"
+        },
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-HALF-COUPLING-SW-NPS-2_2d.svg"
+        },
+        {
+          "size": "3-4",
+          "src": "/catalog/2d/PB-DIM-HALF-COUPLING-SW-NPS-3-4_2d.svg"
+        },
+        {
+          "size": "3-8",
+          "src": "/catalog/2d/PB-DIM-HALF-COUPLING-SW-NPS-3-8_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-HALF-COUPLING-SW-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-HALF-COUPLING-SW-NPS-4_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-HALF-COUPLING-SW",
+      "render": "/catalog/3d/PB-ASSET-0034_half-coupling-sw_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -3315,7 +3495,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-UNION-SW-ASME-B16-11",
@@ -3360,9 +3540,54 @@
       "dimensionSets": [
         "PB-DIM-ASME-B16-11-UNION-SW"
       ],
-      "drawings": [],
-      "drawingStem": null,
-      "render": null,
+      "drawings": [
+        {
+          "size": "1-1-2",
+          "src": "/catalog/2d/PB-DIM-UNION-SW-NPS-1-1-2_2d.svg"
+        },
+        {
+          "size": "1-1-4",
+          "src": "/catalog/2d/PB-DIM-UNION-SW-NPS-1-1-4_2d.svg"
+        },
+        {
+          "size": "1-2",
+          "src": "/catalog/2d/PB-DIM-UNION-SW-NPS-1-2_2d.svg"
+        },
+        {
+          "size": "1-4",
+          "src": "/catalog/2d/PB-DIM-UNION-SW-NPS-1-4_2d.svg"
+        },
+        {
+          "size": "1",
+          "src": "/catalog/2d/PB-DIM-UNION-SW-NPS-1_2d.svg"
+        },
+        {
+          "size": "2-1-2",
+          "src": "/catalog/2d/PB-DIM-UNION-SW-NPS-2-1-2_2d.svg"
+        },
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-UNION-SW-NPS-2_2d.svg"
+        },
+        {
+          "size": "3-4",
+          "src": "/catalog/2d/PB-DIM-UNION-SW-NPS-3-4_2d.svg"
+        },
+        {
+          "size": "3-8",
+          "src": "/catalog/2d/PB-DIM-UNION-SW-NPS-3-8_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-UNION-SW-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-UNION-SW-NPS-4_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-UNION-SW",
+      "render": "/catalog/3d/PB-ASSET-0038_union-sw_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -3377,7 +3602,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-SOCKOLET-MSS-SP97",
@@ -4300,9 +4525,54 @@
       "dimensionSets": [
         "PB-DIM-ASME-B16-11-CAP-THD"
       ],
-      "drawings": [],
-      "drawingStem": null,
-      "render": null,
+      "drawings": [
+        {
+          "size": "1-1-2",
+          "src": "/catalog/2d/PB-DIM-CAP-THD-NPS-1-1-2_2d.svg"
+        },
+        {
+          "size": "1-1-4",
+          "src": "/catalog/2d/PB-DIM-CAP-THD-NPS-1-1-4_2d.svg"
+        },
+        {
+          "size": "1-2",
+          "src": "/catalog/2d/PB-DIM-CAP-THD-NPS-1-2_2d.svg"
+        },
+        {
+          "size": "1-4",
+          "src": "/catalog/2d/PB-DIM-CAP-THD-NPS-1-4_2d.svg"
+        },
+        {
+          "size": "1",
+          "src": "/catalog/2d/PB-DIM-CAP-THD-NPS-1_2d.svg"
+        },
+        {
+          "size": "2-1-2",
+          "src": "/catalog/2d/PB-DIM-CAP-THD-NPS-2-1-2_2d.svg"
+        },
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-CAP-THD-NPS-2_2d.svg"
+        },
+        {
+          "size": "3-4",
+          "src": "/catalog/2d/PB-DIM-CAP-THD-NPS-3-4_2d.svg"
+        },
+        {
+          "size": "3-8",
+          "src": "/catalog/2d/PB-DIM-CAP-THD-NPS-3-8_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-CAP-THD-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-CAP-THD-NPS-4_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-CAP-THD",
+      "render": "/catalog/3d/PB-ASSET-0037_cap-thd_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -4317,7 +4587,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-TEE-THD-ASME-B16-11",
@@ -4362,9 +4632,54 @@
       "dimensionSets": [
         "PB-DIM-ASME-B16-11-TEE-THD"
       ],
-      "drawings": [],
-      "drawingStem": null,
-      "render": null,
+      "drawings": [
+        {
+          "size": "1-1-2",
+          "src": "/catalog/2d/PB-DIM-TEE-THD-NPS-1-1-2_2d.svg"
+        },
+        {
+          "size": "1-1-4",
+          "src": "/catalog/2d/PB-DIM-TEE-THD-NPS-1-1-4_2d.svg"
+        },
+        {
+          "size": "1-2",
+          "src": "/catalog/2d/PB-DIM-TEE-THD-NPS-1-2_2d.svg"
+        },
+        {
+          "size": "1-4",
+          "src": "/catalog/2d/PB-DIM-TEE-THD-NPS-1-4_2d.svg"
+        },
+        {
+          "size": "1",
+          "src": "/catalog/2d/PB-DIM-TEE-THD-NPS-1_2d.svg"
+        },
+        {
+          "size": "2-1-2",
+          "src": "/catalog/2d/PB-DIM-TEE-THD-NPS-2-1-2_2d.svg"
+        },
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-TEE-THD-NPS-2_2d.svg"
+        },
+        {
+          "size": "3-4",
+          "src": "/catalog/2d/PB-DIM-TEE-THD-NPS-3-4_2d.svg"
+        },
+        {
+          "size": "3-8",
+          "src": "/catalog/2d/PB-DIM-TEE-THD-NPS-3-8_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-TEE-THD-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-TEE-THD-NPS-4_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-TEE-THD",
+      "render": "/catalog/3d/PB-ASSET-0032_tee-thd_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -4379,7 +4694,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-FLANGE-THD-ASME-B16-5",
@@ -4490,9 +4805,54 @@
       "dimensionSets": [
         "PB-DIM-ASME-B16-11-COUPLING-THD"
       ],
-      "drawings": [],
-      "drawingStem": null,
-      "render": null,
+      "drawings": [
+        {
+          "size": "1-1-2",
+          "src": "/catalog/2d/PB-DIM-COUPLING-THD-NPS-1-1-2_2d.svg"
+        },
+        {
+          "size": "1-1-4",
+          "src": "/catalog/2d/PB-DIM-COUPLING-THD-NPS-1-1-4_2d.svg"
+        },
+        {
+          "size": "1-2",
+          "src": "/catalog/2d/PB-DIM-COUPLING-THD-NPS-1-2_2d.svg"
+        },
+        {
+          "size": "1-4",
+          "src": "/catalog/2d/PB-DIM-COUPLING-THD-NPS-1-4_2d.svg"
+        },
+        {
+          "size": "1",
+          "src": "/catalog/2d/PB-DIM-COUPLING-THD-NPS-1_2d.svg"
+        },
+        {
+          "size": "2-1-2",
+          "src": "/catalog/2d/PB-DIM-COUPLING-THD-NPS-2-1-2_2d.svg"
+        },
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-COUPLING-THD-NPS-2_2d.svg"
+        },
+        {
+          "size": "3-4",
+          "src": "/catalog/2d/PB-DIM-COUPLING-THD-NPS-3-4_2d.svg"
+        },
+        {
+          "size": "3-8",
+          "src": "/catalog/2d/PB-DIM-COUPLING-THD-NPS-3-8_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-COUPLING-THD-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-COUPLING-THD-NPS-4_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-COUPLING-THD",
+      "render": "/catalog/3d/PB-ASSET-0035_coupling-thd_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -4507,7 +4867,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-BUSHING-THD-ASME-B16-11",
@@ -4552,9 +4912,14 @@
       "dimensionSets": [
         "PB-DIM-ASME-B16-11-BUSHING-THD"
       ],
-      "drawings": [],
+      "drawings": [
+        {
+          "size": null,
+          "src": "/catalog/2d/PB-DIM-BUSHING-THD-2x1-1-2_2d.svg"
+        }
+      ],
       "drawingStem": null,
-      "render": null,
+      "render": "/catalog/3d/PB-ASSET-0040_bushing-thd_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -4569,7 +4934,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-UNION-THD-ASME-B16-11",
@@ -4614,9 +4979,54 @@
       "dimensionSets": [
         "PB-DIM-ASME-B16-11-UNION-THD"
       ],
-      "drawings": [],
-      "drawingStem": null,
-      "render": null,
+      "drawings": [
+        {
+          "size": "1-1-2",
+          "src": "/catalog/2d/PB-DIM-UNION-THD-NPS-1-1-2_2d.svg"
+        },
+        {
+          "size": "1-1-4",
+          "src": "/catalog/2d/PB-DIM-UNION-THD-NPS-1-1-4_2d.svg"
+        },
+        {
+          "size": "1-2",
+          "src": "/catalog/2d/PB-DIM-UNION-THD-NPS-1-2_2d.svg"
+        },
+        {
+          "size": "1-4",
+          "src": "/catalog/2d/PB-DIM-UNION-THD-NPS-1-4_2d.svg"
+        },
+        {
+          "size": "1",
+          "src": "/catalog/2d/PB-DIM-UNION-THD-NPS-1_2d.svg"
+        },
+        {
+          "size": "2-1-2",
+          "src": "/catalog/2d/PB-DIM-UNION-THD-NPS-2-1-2_2d.svg"
+        },
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-UNION-THD-NPS-2_2d.svg"
+        },
+        {
+          "size": "3-4",
+          "src": "/catalog/2d/PB-DIM-UNION-THD-NPS-3-4_2d.svg"
+        },
+        {
+          "size": "3-8",
+          "src": "/catalog/2d/PB-DIM-UNION-THD-NPS-3-8_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-UNION-THD-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-UNION-THD-NPS-4_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-UNION-THD",
+      "render": "/catalog/3d/PB-ASSET-0039_union-thd_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -4631,7 +5041,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-THREDOLET-MSS-SP97",

@@ -28,7 +28,7 @@ import { createRequire } from 'node:module';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const APP_ROOT = resolve(__dirname, '..');
-const BRAIN_ROOT = resolve(APP_ROOT, '..');
+const BRAIN_ROOT = process.env.BRAIN_ROOT ? resolve(process.env.BRAIN_ROOT) : resolve(APP_ROOT, '..');
 const ASSET_SRC = join(BRAIN_ROOT, 'brain', '07-DESIGN', '02-ASSETS', 'APPROVED', 'BIBLIOTECA_V1');
 const CATALOG_JSON = join(APP_ROOT, 'app', 'frontend', 'src', 'tools', 'catalog', 'catalog.generated.json');
 const PUBLIC_DIR = join(APP_ROOT, 'app', 'frontend', 'public', 'catalog');
