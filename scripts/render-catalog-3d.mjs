@@ -2125,7 +2125,11 @@ async function renderPiece(stlPath, cfg, mips, noise) {
   // ocultan el rasgo distintivo (silla / palanca). Ambas mallas se generan
   // ya en pose canonica de catalogo (eje principal horizontal o rama a +Z),
   // asi que se usa pose identidad y una vista dedicada.
-  if (stlPath.includes('weldolet') || stlPath.includes('valve_ball')) {
+  if (
+    stlPath.includes('weldolet') ||
+    stlPath.includes('valve_ball') ||
+    stlPath.includes('valve_check')
+  ) {
     pose = {
       rows: [
         [1, 0, 0],
@@ -2160,10 +2164,10 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     catalogViewDir = normalize([-0.24, -0.88, 0.42]);
   } else if (pose?.kind === 'branch' && stlPath.includes('lateral_45')) {
     catalogViewDir = normalize([0.20, 0.90, 0.42]);
-  } else if (pose?.kind === 'branch' && stlPath.includes('valve_check')) {
-    // Check: el bonnet queda a +Y tras la pose; camara de ese lado para que
-    // la tapa atornillada (rasgo distintivo) sea visible.
-    catalogViewDir = normalize([0.48, 0.66, 0.42]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('valve_check')) {
+    // Check wafer dual-plate: malla en pose canonica (flujo a X, pasador a
+    // +Z). Vista tres cuartos para leer orejas, pasador y placas en el bore.
+    catalogViewDir = normalize([0.78, -0.42, 0.34]);
   } else if (pose?.kind === 'manual' && stlPath.includes('valve_ball')) {
     // Bola: malla en pose canonica (flujo a X, vastago a +Z, palanca a X).
     // Vista tres cuartos frontal-superior: palanca horizontal sobre el cuerpo.
