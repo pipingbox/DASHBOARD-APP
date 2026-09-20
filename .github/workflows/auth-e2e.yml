@@ -300,3 +300,14 @@ jobs:
           npx playwright test tests/observability-onboarding-e2e.spec.ts \
             --config=playwright.config.ts \
             --reporter=line
+
+      # PB-UI-DOM-INSERTBEFORE-001: translator-grade DOM-mutation regression.
+      # Same isolated window and QA account; the spec does its own authorized
+      # reset + exact restore, so it is safe to run right after the funnel E2E.
+      - name: Run onboarding DOM-mutation E2E — insertBefore regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/onboarding-dom-mutation.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line

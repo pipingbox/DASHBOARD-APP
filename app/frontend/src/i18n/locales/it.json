@@ -1750,7 +1750,8 @@
     "copyIncidentCode": "Copia codice incidente",
     "incidentCodeCopied": "Copiato",
     "boundaryDesc": "Si è verificato un errore imprevisto. Prova a ricaricare questa sezione.",
-    "boundaryTitle": "Si è verificato un problema"
+    "boundaryTitle": "Si è verificato un problema",
+    "updateApp": "Aggiorna applicazione"
   },
   "certAlerts": {
     "sectionLabel": "Avvisi",

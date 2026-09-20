@@ -1745,7 +1745,8 @@
     "copyIncidentCode": "Vorgangscode kopieren",
     "incidentCodeCopied": "Kopiert",
     "boundaryDesc": "Ein unerwarteter Fehler ist aufgetreten. Versuchen Sie, diesen Abschnitt neu zu laden.",
-    "boundaryTitle": "Etwas ist schiefgelaufen"
+    "boundaryTitle": "Etwas ist schiefgelaufen",
+    "updateApp": "App aktualisieren"
   },
   "certAlerts": {
     "sectionLabel": "Warnungen",

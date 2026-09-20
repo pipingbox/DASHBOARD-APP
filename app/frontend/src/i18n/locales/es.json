@@ -1750,7 +1750,8 @@
     "copyIncidentCode": "Copiar código de incidencia",
     "incidentCodeCopied": "Copiado",
     "boundaryDesc": "Ha ocurrido un error inesperado. Intenta recargar esta sección.",
-    "boundaryTitle": "Algo ha ido mal"
+    "boundaryTitle": "Algo ha ido mal",
+    "updateApp": "Actualizar aplicación"
   },
   "certAlerts": {
     "sectionLabel": "Alertas",
