@@ -8,7 +8,7 @@
     "standards": 19,
     "standardsInUse": 16,
     "dimensionSets": 70,
-    "dimensionRows": 1844,
+    "dimensionRows": 1945,
     "drawings": 486,
     "renders": 39
   },
@@ -33689,242 +33689,288 @@
       "system": "mixed",
       "selectors": [
         {
-          "key": "nps_run",
-          "label": "NPS Run",
+          "key": "outlet_size",
+          "label": "Outlet Size",
           "unit": "in",
           "type": "string"
         },
         {
-          "key": "nps_branch",
-          "label": "NPS Branch",
-          "unit": "in",
+          "key": "variant",
+          "label": "Class / Schedule / Configuration",
+          "unit": "text",
           "type": "string"
-        },
-        {
-          "key": "dn_run",
-          "label": "DN Run",
-          "unit": "mm",
-          "type": "integer"
-        },
-        {
-          "key": "dn_branch",
-          "label": "DN Branch",
-          "unit": "mm",
-          "type": "integer"
         }
       ],
       "fields": [
         {
-          "key": "od_run_in",
-          "label": "Run OD",
+          "key": "c_in",
+          "label": "C",
           "unit": "in",
           "type": "number",
           "priority": 1
         },
         {
-          "key": "od_run_mm",
-          "label": "Run OD",
+          "key": "c_mm",
+          "label": "C",
           "unit": "mm",
+          "type": "number",
+          "priority": 1
+        },
+        {
+          "key": "e_in",
+          "label": "E",
+          "unit": "in",
           "type": "number",
           "priority": 2
         },
         {
-          "key": "branch_bore_in",
-          "label": "Branch Bore",
-          "unit": "in",
-          "type": "number",
-          "priority": 3
-        },
-        {
-          "key": "branch_bore_mm",
-          "label": "Branch Bore",
+          "key": "e_mm",
+          "label": "E",
           "unit": "mm",
           "type": "number",
-          "priority": 4
-        },
-        {
-          "key": "height_in",
-          "label": "Height",
-          "unit": "in",
-          "type": "number",
-          "priority": 5
-        },
-        {
-          "key": "height_mm",
-          "label": "Height",
-          "unit": "mm",
-          "type": "number",
-          "priority": 6
-        },
-        {
-          "key": "base_width_in",
-          "label": "Base Width",
-          "unit": "in",
-          "type": "number",
-          "priority": 7
-        },
-        {
-          "key": "base_width_mm",
-          "label": "Base Width",
-          "unit": "mm",
-          "type": "number",
-          "priority": 8
+          "priority": 2
         }
       ],
       "rows": [
         {
-          "nps_run": "4",
-          "nps_branch": "2",
-          "dn_run": 100,
-          "dn_branch": 50,
-          "od_run_in": 4.5,
-          "od_run_mm": 114.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 2.75,
-          "height_mm": 69.9,
-          "base_width_in": 3,
-          "base_width_mm": 76.2
+          "outlet_size": "1/4",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 1.5,
+          "c_mm": 38.1,
+          "e_in": 1.59375,
+          "e_mm": 40.481,
+          "elbow_size": "36 - 3/4",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "2",
-          "dn_run": 150,
-          "dn_branch": 50,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3,
-          "height_mm": 76.2,
-          "base_width_in": 3.25,
-          "base_width_mm": 82.6
+          "outlet_size": "3/8",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 1.5,
+          "c_mm": 38.1,
+          "e_in": 1.59375,
+          "e_mm": 40.481,
+          "elbow_size": "36 - 3/4",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "3",
-          "dn_run": 150,
-          "dn_branch": 80,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 3.068,
-          "branch_bore_mm": 77.9,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.75,
-          "base_width_mm": 95.3
+          "outlet_size": "1/2",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 1.5,
+          "c_mm": 38.1,
+          "e_in": 1.59375,
+          "e_mm": 40.481,
+          "elbow_size": "36 - 3/4",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "4",
-          "dn_run": 150,
-          "dn_branch": 100,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.5,
-          "height_mm": 88.9,
-          "base_width_in": 4.25,
-          "base_width_mm": 108
+          "outlet_size": "3/4",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 1.71875,
+          "c_mm": 43.656,
+          "e_in": 1.875,
+          "e_mm": 47.625,
+          "elbow_size": "36 - 1",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "2",
-          "dn_run": 200,
-          "dn_branch": 50,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.5,
-          "base_width_mm": 88.9
+          "outlet_size": "1",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 2.25,
+          "c_mm": 57.15,
+          "e_in": 2.25,
+          "e_mm": 57.15,
+          "elbow_size": "36 - 2",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "4",
-          "dn_run": 200,
-          "dn_branch": 100,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.75,
-          "height_mm": 95.3,
-          "base_width_in": 4.5,
-          "base_width_mm": 114.3
+          "outlet_size": "1 1/4",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 2.875,
+          "c_mm": 73.025,
+          "e_in": 2.5,
+          "e_mm": 63.5,
+          "elbow_size": "36 - 2",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "6",
-          "dn_run": 200,
-          "dn_branch": 150,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.25,
-          "height_mm": 108,
-          "base_width_in": 5.5,
-          "base_width_mm": 139.7
+          "outlet_size": "1 1/2",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 3.125,
+          "c_mm": 79.375,
+          "e_in": 2.6875,
+          "e_mm": 68.263,
+          "elbow_size": "36 - 2",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "4",
-          "dn_run": 250,
-          "dn_branch": 100,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 4,
-          "height_mm": 101.6,
-          "base_width_in": 4.75,
-          "base_width_mm": 120.7
+          "outlet_size": "2",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 4.1875,
+          "c_mm": 106.362,
+          "e_in": 3.25,
+          "e_mm": 82.55,
+          "elbow_size": "36 - 3",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "6",
-          "dn_run": 250,
-          "dn_branch": 150,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.5,
-          "height_mm": 114.3,
-          "base_width_in": 5.75,
-          "base_width_mm": 146.1
+          "outlet_size": "2 1/2",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 4.1875,
+          "c_mm": 106.362,
+          "e_in": 3.25,
+          "e_mm": 82.55,
+          "elbow_size": "ORDER TO SPECIFIC ELBOW SIZES",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "12",
-          "nps_branch": "6",
-          "dn_run": 300,
-          "dn_branch": 150,
-          "od_run_in": 12.75,
-          "od_run_mm": 323.9,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.75,
-          "height_mm": 120.7,
-          "base_width_in": 6,
-          "base_width_mm": 152.4
+          "outlet_size": "3",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 5.0625,
+          "c_mm": 128.588,
+          "e_in": 3.875,
+          "e_mm": 98.425,
+          "elbow_size": "ORDER TO SPECIFIC ELBOW SIZES",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "12",
-          "nps_branch": "8",
-          "dn_run": 300,
-          "dn_branch": 200,
-          "od_run_in": 12.75,
-          "od_run_mm": 323.9,
-          "branch_bore_in": 7.981,
-          "branch_bore_mm": 202.7,
-          "height_in": 5,
-          "height_mm": 127,
-          "base_width_in": 6.75,
-          "base_width_mm": 171.5
+          "outlet_size": "4",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 6.625,
+          "c_mm": 168.275,
+          "e_in": 4.8125,
+          "e_mm": 122.237,
+          "elbow_size": "ORDER TO SPECIFIC ELBOW SIZES",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "6",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 9.375,
+          "c_mm": 238.125,
+          "e_in": 6.5,
+          "e_mm": 165.1,
+          "elbow_size": "ORDER TO SPECIFIC ELBOW SIZES",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "8",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 13.3125,
+          "c_mm": 338.137,
+          "e_in": 8.0625,
+          "e_mm": 204.787,
+          "elbow_size": "ORDER TO SPECIFIC ELBOW SIZES",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "10",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 17.03125,
+          "c_mm": 432.594,
+          "e_in": 10.375,
+          "e_mm": 263.525,
+          "elbow_size": "ORDER TO SPECIFIC ELBOW SIZES",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "12",
+          "variant": "BUTT-WELD STD & XS / 90° LR ELBOW",
+          "c_in": 19.625,
+          "c_mm": 498.475,
+          "e_in": 11.125,
+          "e_mm": 282.575,
+          "elbow_size": "ORDER TO SPECIFIC ELBOW SIZES",
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         }
       ]
     },
@@ -33935,242 +33981,1045 @@
       "system": "mixed",
       "selectors": [
         {
-          "key": "nps_run",
-          "label": "NPS Run",
+          "key": "outlet_size",
+          "label": "Outlet Size",
           "unit": "in",
           "type": "string"
         },
         {
-          "key": "nps_branch",
-          "label": "NPS Branch",
-          "unit": "in",
+          "key": "variant",
+          "label": "Class / Schedule / Configuration",
+          "unit": "text",
           "type": "string"
-        },
-        {
-          "key": "dn_run",
-          "label": "DN Run",
-          "unit": "mm",
-          "type": "integer"
-        },
-        {
-          "key": "dn_branch",
-          "label": "DN Branch",
-          "unit": "mm",
-          "type": "integer"
         }
       ],
       "fields": [
         {
-          "key": "od_run_in",
-          "label": "Run OD",
+          "key": "a_in",
+          "label": "A",
           "unit": "in",
           "type": "number",
           "priority": 1
         },
         {
-          "key": "od_run_mm",
-          "label": "Run OD",
+          "key": "a_mm",
+          "label": "A",
+          "unit": "mm",
+          "type": "number",
+          "priority": 1
+        },
+        {
+          "key": "b_in",
+          "label": "B",
+          "unit": "in",
+          "type": "number",
+          "priority": 2
+        },
+        {
+          "key": "b_mm",
+          "label": "B",
           "unit": "mm",
           "type": "number",
           "priority": 2
         },
         {
-          "key": "branch_bore_in",
-          "label": "Branch Bore",
+          "key": "c_in",
+          "label": "C",
           "unit": "in",
           "type": "number",
           "priority": 3
         },
         {
-          "key": "branch_bore_mm",
-          "label": "Branch Bore",
+          "key": "c_mm",
+          "label": "C",
           "unit": "mm",
+          "type": "number",
+          "priority": 3
+        },
+        {
+          "key": "e_in",
+          "label": "E",
+          "unit": "in",
           "type": "number",
           "priority": 4
         },
         {
-          "key": "height_in",
-          "label": "Height",
-          "unit": "in",
-          "type": "number",
-          "priority": 5
-        },
-        {
-          "key": "height_mm",
-          "label": "Height",
+          "key": "e_mm",
+          "label": "E",
           "unit": "mm",
           "type": "number",
-          "priority": 6
-        },
-        {
-          "key": "base_width_in",
-          "label": "Base Width",
-          "unit": "in",
-          "type": "number",
-          "priority": 7
-        },
-        {
-          "key": "base_width_mm",
-          "label": "Base Width",
-          "unit": "mm",
-          "type": "number",
-          "priority": 8
+          "priority": 4
         }
       ],
       "rows": [
         {
-          "nps_run": "4",
-          "nps_branch": "2",
-          "dn_run": 100,
-          "dn_branch": 50,
-          "od_run_in": 4.5,
-          "od_run_mm": 114.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 2.75,
-          "height_mm": 69.9,
-          "base_width_in": 3,
-          "base_width_mm": 76.2
+          "outlet_size": "1/2",
+          "variant": "BUTT-WELD SCH. 160",
+          "a_in": 1.625,
+          "a_mm": 41.275,
+          "b_in": 2.125,
+          "b_mm": 53.975,
+          "c_in": 1.1875,
+          "c_mm": 30.162,
+          "e_in": 1.90625,
+          "e_mm": 48.419,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "2",
-          "dn_run": 150,
-          "dn_branch": 50,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3,
-          "height_mm": 76.2,
-          "base_width_in": 3.25,
-          "base_width_mm": 82.6
+          "outlet_size": "3/4",
+          "variant": "BUTT-WELD SCH. 160",
+          "a_in": 1.84375,
+          "a_mm": 46.831,
+          "b_in": 2.53125,
+          "b_mm": 64.294,
+          "c_in": 1.5,
+          "c_mm": 38.1,
+          "e_in": 2.125,
+          "e_mm": 53.975,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "3",
-          "dn_run": 150,
-          "dn_branch": 80,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 3.068,
-          "branch_bore_mm": 77.9,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.75,
-          "base_width_mm": 95.3
+          "outlet_size": "1",
+          "variant": "BUTT-WELD SCH. 160",
+          "a_in": 2.15625,
+          "a_mm": 54.769,
+          "b_in": 3,
+          "b_mm": 76.2,
+          "c_in": 1.8125,
+          "c_mm": 46.037,
+          "e_in": 2.46875,
+          "e_mm": 62.706,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "4",
-          "dn_run": 150,
-          "dn_branch": 100,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.5,
-          "height_mm": 88.9,
-          "base_width_in": 4.25,
-          "base_width_mm": 108
+          "outlet_size": "1 1/4",
+          "variant": "BUTT-WELD SCH. 160",
+          "a_in": 2.65625,
+          "a_mm": 67.469,
+          "b_in": 3.71875,
+          "b_mm": 94.456,
+          "c_in": 2.375,
+          "c_mm": 60.325,
+          "e_in": 2.96875,
+          "e_mm": 75.406,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "2",
-          "dn_run": 200,
-          "dn_branch": 50,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.5,
-          "base_width_mm": 88.9
+          "outlet_size": "1 1/2",
+          "variant": "BUTT-WELD SCH. 160",
+          "a_in": 2.96875,
+          "a_mm": 75.406,
+          "b_in": 4.21875,
+          "b_mm": 107.156,
+          "c_in": 2.875,
+          "c_mm": 73.025,
+          "e_in": 3.34375,
+          "e_mm": 84.931,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "4",
-          "dn_run": 200,
-          "dn_branch": 100,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.75,
-          "height_mm": 95.3,
-          "base_width_in": 4.5,
-          "base_width_mm": 114.3
+          "outlet_size": "2",
+          "variant": "BUTT-WELD SCH. 160",
+          "a_in": 3.375,
+          "a_mm": 85.725,
+          "b_in": 4.9375,
+          "b_mm": 125.412,
+          "c_in": 3.3125,
+          "c_mm": 84.137,
+          "e_in": 3.71875,
+          "e_mm": 94.456,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "6",
-          "dn_run": 200,
-          "dn_branch": 150,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.25,
-          "height_mm": 108,
-          "base_width_in": 5.5,
-          "base_width_mm": 139.7
+          "outlet_size": "3",
+          "variant": "BUTT-WELD SCH. 160",
+          "a_in": 4.59375,
+          "a_mm": 116.681,
+          "b_in": 7.0625,
+          "b_mm": 179.387,
+          "c_in": 5,
+          "c_mm": 127,
+          "e_in": 4.9375,
+          "e_mm": 125.412,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "4",
-          "dn_run": 250,
-          "dn_branch": 100,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 4,
-          "height_mm": 101.6,
-          "base_width_in": 4.75,
-          "base_width_mm": 120.7
+          "outlet_size": "4",
+          "variant": "BUTT-WELD SCH. 160",
+          "a_in": 5.65625,
+          "a_mm": 143.669,
+          "b_in": 8.71875,
+          "b_mm": 221.456,
+          "c_in": 6.25,
+          "c_mm": 158.75,
+          "e_in": 6.03125,
+          "e_mm": 153.194,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "6",
-          "dn_run": 250,
-          "dn_branch": 150,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.5,
-          "height_mm": 114.3,
-          "base_width_in": 5.75,
-          "base_width_mm": 146.1
+          "outlet_size": "1/2",
+          "variant": "BUTT-WELD XXS",
+          "a_in": 1.5625,
+          "a_mm": 39.688,
+          "b_in": 2.03125,
+          "b_mm": 51.594,
+          "c_in": 1.0625,
+          "c_mm": 26.987,
+          "e_in": 1.875,
+          "e_mm": 47.625,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "12",
-          "nps_branch": "6",
-          "dn_run": 300,
-          "dn_branch": 150,
-          "od_run_in": 12.75,
-          "od_run_mm": 323.9,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.75,
-          "height_mm": 120.7,
-          "base_width_in": 6,
-          "base_width_mm": 152.4
+          "outlet_size": "3/4",
+          "variant": "BUTT-WELD XXS",
+          "a_in": 1.6875,
+          "a_mm": 42.862,
+          "b_in": 2.34375,
+          "b_mm": 59.531,
+          "c_in": 1.375,
+          "c_mm": 34.925,
+          "e_in": 1.96875,
+          "e_mm": 50.006,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "12",
-          "nps_branch": "8",
-          "dn_run": 300,
-          "dn_branch": 200,
-          "od_run_in": 12.75,
-          "od_run_mm": 323.9,
-          "branch_bore_in": 7.981,
-          "branch_bore_mm": 202.7,
-          "height_in": 5,
-          "height_mm": 127,
-          "base_width_in": 6.75,
-          "base_width_mm": 171.5
+          "outlet_size": "1",
+          "variant": "BUTT-WELD XXS",
+          "a_in": 2.15625,
+          "a_mm": 54.769,
+          "b_in": 2.875,
+          "b_mm": 73.025,
+          "c_in": 1.625,
+          "c_mm": 41.275,
+          "e_in": 2.5,
+          "e_mm": 63.5,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/4",
+          "variant": "BUTT-WELD XXS",
+          "a_in": 2.53125,
+          "a_mm": 64.294,
+          "b_in": 3.5625,
+          "b_mm": 90.487,
+          "c_in": 2.1875,
+          "c_mm": 55.563,
+          "e_in": 2.9375,
+          "e_mm": 74.612,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/2",
+          "variant": "BUTT-WELD XXS",
+          "a_in": 2.8125,
+          "a_mm": 71.438,
+          "b_in": 4.125,
+          "b_mm": 104.775,
+          "c_in": 2.6875,
+          "c_mm": 68.263,
+          "e_in": 3.25,
+          "e_mm": 82.55,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "2",
+          "variant": "BUTT-WELD XXS",
+          "a_in": 3.25,
+          "a_mm": 82.55,
+          "b_in": 4.78125,
+          "b_mm": 121.444,
+          "c_in": 3.1875,
+          "c_mm": 80.962,
+          "e_in": 3.625,
+          "e_mm": 92.075,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3",
+          "variant": "BUTT-WELD XXS",
+          "a_in": 4.53125,
+          "a_mm": 115.094,
+          "b_in": 6.8125,
+          "b_mm": 173.037,
+          "c_in": 4.75,
+          "c_mm": 120.65,
+          "e_in": 4.96875,
+          "e_mm": 126.206,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "4",
+          "variant": "BUTT-WELD XXS",
+          "a_in": 5.5625,
+          "a_mm": 141.287,
+          "b_in": 8.5,
+          "b_mm": 215.9,
+          "c_in": 6,
+          "c_mm": 152.4,
+          "e_in": 6,
+          "e_mm": 152.4,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1/2",
+          "variant": "BUTT-WELD STD",
+          "a_in": 1.40625,
+          "a_mm": 35.719,
+          "b_in": 1.9375,
+          "b_mm": 49.212,
+          "c_in": 1.1875,
+          "c_mm": 30.162,
+          "e_in": 1.5,
+          "e_mm": 38.1,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3/4",
+          "variant": "BUTT-WELD STD",
+          "a_in": 1.75,
+          "a_mm": 44.45,
+          "b_in": 2.40625,
+          "b_mm": 61.119,
+          "c_in": 1.625,
+          "c_mm": 41.275,
+          "e_in": 1.90625,
+          "e_mm": 48.419,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1",
+          "variant": "BUTT-WELD STD",
+          "a_in": 2.09375,
+          "a_mm": 53.181,
+          "b_in": 2.875,
+          "b_mm": 73.025,
+          "c_in": 1.875,
+          "c_mm": 47.625,
+          "e_in": 2.28125,
+          "e_mm": 57.944,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/4",
+          "variant": "BUTT-WELD STD",
+          "a_in": 2.28125,
+          "a_mm": 57.944,
+          "b_in": 3.40625,
+          "b_mm": 86.519,
+          "c_in": 2.5625,
+          "c_mm": 65.087,
+          "e_in": 2.375,
+          "e_mm": 60.325,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/2",
+          "variant": "BUTT-WELD STD",
+          "a_in": 2.59375,
+          "a_mm": 65.881,
+          "b_in": 3.78125,
+          "b_mm": 96.044,
+          "c_in": 2.8125,
+          "c_mm": 71.438,
+          "e_in": 2.6875,
+          "e_mm": 68.263,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "2",
+          "variant": "BUTT-WELD STD",
+          "a_in": 3,
+          "a_mm": 76.2,
+          "b_in": 4.5625,
+          "b_mm": 115.887,
+          "c_in": 3.5,
+          "c_mm": 88.9,
+          "e_in": 3.03125,
+          "e_mm": 76.994,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3",
+          "variant": "BUTT-WELD STD",
+          "a_in": 3.875,
+          "a_mm": 98.425,
+          "b_in": 6.4375,
+          "b_mm": 163.512,
+          "c_in": 5.1875,
+          "c_mm": 131.762,
+          "e_in": 3.78125,
+          "e_mm": 96.044,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "4",
+          "variant": "BUTT-WELD STD",
+          "a_in": 4.8125,
+          "a_mm": 122.237,
+          "b_in": 7.9375,
+          "b_mm": 201.612,
+          "c_in": 6.375,
+          "c_mm": 161.925,
+          "e_in": 4.625,
+          "e_mm": 117.475,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "6",
+          "variant": "BUTT-WELD STD",
+          "a_in": 6.71875,
+          "a_mm": 170.656,
+          "b_in": 11.3125,
+          "b_mm": 287.337,
+          "c_in": 9.625,
+          "c_mm": 244.475,
+          "e_in": 6.28125,
+          "e_mm": 159.544,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "8",
+          "variant": "BUTT-WELD STD",
+          "a_in": 8.28125,
+          "a_mm": 210.344,
+          "b_in": 14.46875,
+          "b_mm": 367.506,
+          "c_in": 12.5625,
+          "c_mm": 319.087,
+          "e_in": 7.5,
+          "e_mm": 190.5,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "10",
+          "variant": "BUTT-WELD STD",
+          "a_in": 10.1875,
+          "a_mm": 258.762,
+          "b_in": 18.21875,
+          "b_mm": 462.756,
+          "c_in": 15.5,
+          "c_mm": 393.7,
+          "e_in": 9.1875,
+          "e_mm": 233.362,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "12",
+          "variant": "BUTT-WELD STD",
+          "a_in": 11.65625,
+          "a_mm": 296.069,
+          "b_in": 20.59375,
+          "b_mm": 523.081,
+          "c_in": 18.5,
+          "c_mm": 469.9,
+          "e_in": 10.25,
+          "e_mm": 260.35,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "14",
+          "variant": "BUTT-WELD STD",
+          "a_in": 12.4375,
+          "a_mm": 315.912,
+          "b_in": 22.34375,
+          "b_mm": 567.531,
+          "c_in": 20.25,
+          "c_mm": 514.35,
+          "e_in": 10.75,
+          "e_mm": 273.05,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "16",
+          "variant": "BUTT-WELD STD",
+          "a_in": 14.03125,
+          "a_mm": 356.394,
+          "b_in": 25.59375,
+          "b_mm": 650.081,
+          "c_in": 23.1875,
+          "c_mm": 588.962,
+          "e_in": 12,
+          "e_mm": 304.8,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "18",
+          "variant": "BUTT-WELD STD",
+          "a_in": 15.9375,
+          "a_mm": 404.813,
+          "b_in": 28.59375,
+          "b_mm": 726.281,
+          "c_in": 26.125,
+          "c_mm": 663.575,
+          "e_in": 13.6875,
+          "e_mm": 347.662,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "20",
+          "variant": "BUTT-WELD STD",
+          "a_in": 17.53125,
+          "a_mm": 445.294,
+          "b_in": 31.625,
+          "b_mm": 803.275,
+          "c_in": 29.0625,
+          "c_mm": 738.188,
+          "e_in": 14.9375,
+          "e_mm": 379.412,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "24",
+          "variant": "BUTT-WELD STD",
+          "a_in": 20.875,
+          "a_mm": 530.225,
+          "b_in": 37.9375,
+          "b_mm": 963.612,
+          "c_in": 35,
+          "c_mm": 889,
+          "e_in": 17.6875,
+          "e_mm": 449.262,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "30",
+          "variant": "BUTT-WELD STD",
+          "a_in": 25.84375,
+          "a_mm": 656.431,
+          "b_in": 47.03125,
+          "b_mm": 1194.594,
+          "c_in": 43.75,
+          "c_mm": 1111.25,
+          "e_in": 21.6875,
+          "e_mm": 550.862,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1/2",
+          "variant": "BUTT-WELD XS",
+          "a_in": 1.4375,
+          "a_mm": 36.512,
+          "b_in": 2,
+          "b_mm": 50.8,
+          "c_in": 1.1875,
+          "c_mm": 30.162,
+          "e_in": 1.59375,
+          "e_mm": 40.481,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3/4",
+          "variant": "BUTT-WELD XS",
+          "a_in": 1.53125,
+          "a_mm": 38.894,
+          "b_in": 2.1875,
+          "b_mm": 55.563,
+          "c_in": 1.5625,
+          "c_mm": 39.688,
+          "e_in": 1.625,
+          "e_mm": 41.275,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1",
+          "variant": "BUTT-WELD XS",
+          "a_in": 1.84375,
+          "a_mm": 46.831,
+          "b_in": 2.75,
+          "b_mm": 69.85,
+          "c_in": 1.9375,
+          "c_mm": 49.212,
+          "e_in": 1.96875,
+          "e_mm": 50.006,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/4",
+          "variant": "BUTT-WELD XS",
+          "a_in": 2.25,
+          "a_mm": 57.15,
+          "b_in": 3.40625,
+          "b_mm": 86.519,
+          "c_in": 2.5,
+          "c_mm": 63.5,
+          "e_in": 2.375,
+          "e_mm": 60.325,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/2",
+          "variant": "BUTT-WELD XS",
+          "a_in": 2.5625,
+          "a_mm": 65.087,
+          "b_in": 3.84375,
+          "b_mm": 97.631,
+          "c_in": 2.8125,
+          "c_mm": 71.438,
+          "e_in": 2.6875,
+          "e_mm": 68.263,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "2",
+          "variant": "BUTT-WELD XS",
+          "a_in": 2.96875,
+          "a_mm": 75.406,
+          "b_in": 4.5625,
+          "b_mm": 115.887,
+          "c_in": 3.5,
+          "c_mm": 88.9,
+          "e_in": 3.03125,
+          "e_mm": 76.994,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3",
+          "variant": "BUTT-WELD XS",
+          "a_in": 3.8125,
+          "a_mm": 96.837,
+          "b_in": 6.1875,
+          "b_mm": 157.162,
+          "c_in": 4.875,
+          "c_mm": 123.825,
+          "e_in": 3.75,
+          "e_mm": 95.25,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "4",
+          "variant": "BUTT-WELD XS",
+          "a_in": 4.78125,
+          "a_mm": 121.444,
+          "b_in": 7.8125,
+          "b_mm": 198.438,
+          "c_in": 6.25,
+          "c_mm": 158.75,
+          "e_in": 4.65625,
+          "e_mm": 118.269,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "6",
+          "variant": "BUTT-WELD XS",
+          "a_in": 7.0625,
+          "a_mm": 179.387,
+          "b_in": 11.71875,
+          "b_mm": 297.656,
+          "c_in": 9.4375,
+          "c_mm": 239.712,
+          "e_in": 6.875,
+          "e_mm": 174.625,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "8",
+          "variant": "BUTT-WELD XS",
+          "a_in": 9.0625,
+          "a_mm": 230.188,
+          "b_in": 15.09375,
+          "b_mm": 383.381,
+          "c_in": 12.25,
+          "c_mm": 311.15,
+          "e_in": 8.75,
+          "e_mm": 222.25,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "10",
+          "variant": "BUTT-WELD XS",
+          "a_in": 10.46875,
+          "a_mm": 265.906,
+          "b_in": 18.5,
+          "b_mm": 469.9,
+          "c_in": 15.375,
+          "c_mm": 390.525,
+          "e_in": 9.6875,
+          "e_mm": 246.063,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "12",
+          "variant": "BUTT-WELD XS",
+          "a_in": 12.40625,
+          "a_mm": 315.119,
+          "b_in": 21.40625,
+          "b_mm": 543.719,
+          "c_in": 18.375,
+          "c_mm": 466.725,
+          "e_in": 11.4375,
+          "e_mm": 290.512,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "14",
+          "variant": "BUTT-WELD XS",
+          "a_in": 13.03125,
+          "a_mm": 330.994,
+          "b_in": 22.90625,
+          "b_mm": 581.819,
+          "c_in": 20.125,
+          "c_mm": 511.175,
+          "e_in": 11.6875,
+          "e_mm": 296.863,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "16",
+          "variant": "BUTT-WELD XS",
+          "a_in": 14.28125,
+          "a_mm": 362.744,
+          "b_in": 25.5625,
+          "b_mm": 649.287,
+          "c_in": 23.0625,
+          "c_mm": 585.788,
+          "e_in": 12.4375,
+          "e_mm": 315.912,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "18",
+          "variant": "BUTT-WELD XS",
+          "a_in": 16.25,
+          "a_mm": 412.75,
+          "b_in": 29,
+          "b_mm": 736.6,
+          "c_in": 26,
+          "c_mm": 660.4,
+          "e_in": 14.25,
+          "e_mm": 361.95,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "20",
+          "variant": "BUTT-WELD XS",
+          "a_in": 17.9375,
+          "a_mm": 455.612,
+          "b_in": 32.03125,
+          "b_mm": 813.594,
+          "c_in": 28.875,
+          "c_mm": 733.425,
+          "e_in": 15.625,
+          "e_mm": 396.875,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "24",
+          "variant": "BUTT-WELD XS",
+          "a_in": 21.46875,
+          "a_mm": 545.306,
+          "b_in": 38.4375,
+          "b_mm": 976.313,
+          "c_in": 34.8125,
+          "c_mm": 884.237,
+          "e_in": 18.625,
+          "e_mm": 473.075,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         }
       ]
     },
@@ -34181,242 +35030,338 @@
       "system": "mixed",
       "selectors": [
         {
-          "key": "nps_run",
-          "label": "NPS Run",
+          "key": "outlet_size",
+          "label": "Outlet Size",
           "unit": "in",
           "type": "string"
         },
         {
-          "key": "nps_branch",
-          "label": "NPS Branch",
-          "unit": "in",
+          "key": "variant",
+          "label": "Class / Schedule / Configuration",
+          "unit": "text",
           "type": "string"
-        },
-        {
-          "key": "dn_run",
-          "label": "DN Run",
-          "unit": "mm",
-          "type": "integer"
-        },
-        {
-          "key": "dn_branch",
-          "label": "DN Branch",
-          "unit": "mm",
-          "type": "integer"
         }
       ],
       "fields": [
         {
-          "key": "od_run_in",
-          "label": "Run OD",
+          "key": "a_in",
+          "label": "A",
           "unit": "in",
           "type": "number",
           "priority": 1
         },
         {
-          "key": "od_run_mm",
-          "label": "Run OD",
+          "key": "a_mm",
+          "label": "A",
+          "unit": "mm",
+          "type": "number",
+          "priority": 1
+        },
+        {
+          "key": "b_in",
+          "label": "B",
+          "unit": "in",
+          "type": "number",
+          "priority": 2
+        },
+        {
+          "key": "b_mm",
+          "label": "B",
           "unit": "mm",
           "type": "number",
           "priority": 2
         },
         {
-          "key": "branch_bore_in",
-          "label": "Branch Bore",
+          "key": "c_in",
+          "label": "C",
           "unit": "in",
           "type": "number",
           "priority": 3
         },
         {
-          "key": "branch_bore_mm",
-          "label": "Branch Bore",
+          "key": "c_mm",
+          "label": "C",
           "unit": "mm",
           "type": "number",
-          "priority": 4
-        },
-        {
-          "key": "height_in",
-          "label": "Height",
-          "unit": "in",
-          "type": "number",
-          "priority": 5
-        },
-        {
-          "key": "height_mm",
-          "label": "Height",
-          "unit": "mm",
-          "type": "number",
-          "priority": 6
-        },
-        {
-          "key": "base_width_in",
-          "label": "Base Width",
-          "unit": "in",
-          "type": "number",
-          "priority": 7
-        },
-        {
-          "key": "base_width_mm",
-          "label": "Base Width",
-          "unit": "mm",
-          "type": "number",
-          "priority": 8
+          "priority": 3
         }
       ],
       "rows": [
         {
-          "nps_run": "4",
-          "nps_branch": "2",
-          "dn_run": 100,
-          "dn_branch": 50,
-          "od_run_in": 4.5,
-          "od_run_mm": 114.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 2.75,
-          "height_mm": 69.9,
-          "base_width_in": 3,
-          "base_width_mm": 76.2
+          "outlet_size": "1/2",
+          "variant": "EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 1.375,
+          "b_mm": 34.925,
+          "c_in": 0.9375,
+          "c_mm": 23.813,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "2",
-          "dn_run": 150,
-          "dn_branch": 50,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3,
-          "height_mm": 76.2,
-          "base_width_in": 3.25,
-          "base_width_mm": 82.6
+          "outlet_size": "3/4",
+          "variant": "EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 1.75,
+          "b_mm": 44.45,
+          "c_in": 1.1875,
+          "c_mm": 30.162,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "3",
-          "dn_run": 150,
-          "dn_branch": 80,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 3.068,
-          "branch_bore_mm": 77.9,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.75,
-          "base_width_mm": 95.3
+          "outlet_size": "1",
+          "variant": "EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 2.125,
+          "b_mm": 53.975,
+          "c_in": 1.4375,
+          "c_mm": 36.512,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "4",
-          "dn_run": 150,
-          "dn_branch": 100,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.5,
-          "height_mm": 88.9,
-          "base_width_in": 4.25,
-          "base_width_mm": 108
+          "outlet_size": "1 1/4",
+          "variant": "EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 2.5625,
+          "b_mm": 65.087,
+          "c_in": 1.75,
+          "c_mm": 44.45,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "2",
-          "dn_run": 200,
-          "dn_branch": 50,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.5,
-          "base_width_mm": 88.9
+          "outlet_size": "1 1/2",
+          "variant": "EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 2.875,
+          "b_mm": 73.025,
+          "c_in": 2,
+          "c_mm": 50.8,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "4",
-          "dn_run": 200,
-          "dn_branch": 100,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.75,
-          "height_mm": 95.3,
-          "base_width_in": 4.5,
-          "base_width_mm": 114.3
+          "outlet_size": "2",
+          "variant": "EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 3.5,
+          "b_mm": 88.9,
+          "c_in": 2.5625,
+          "c_mm": 65.087,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "6",
-          "dn_run": 200,
-          "dn_branch": 150,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.25,
-          "height_mm": 108,
-          "base_width_in": 5.5,
-          "base_width_mm": 139.7
+          "outlet_size": "1/2",
+          "variant": "DOUBLE EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 1.375,
+          "b_mm": 34.925,
+          "c_in": 0.5625,
+          "c_mm": 14.287,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "4",
-          "dn_run": 250,
-          "dn_branch": 100,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 4,
-          "height_mm": 101.6,
-          "base_width_in": 4.75,
-          "base_width_mm": 120.7
+          "outlet_size": "3/4",
+          "variant": "DOUBLE EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 1.75,
+          "b_mm": 44.45,
+          "c_in": 0.75,
+          "c_mm": 19.05,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "6",
-          "dn_run": 250,
-          "dn_branch": 150,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.5,
-          "height_mm": 114.3,
-          "base_width_in": 5.75,
-          "base_width_mm": 146.1
+          "outlet_size": "1",
+          "variant": "DOUBLE EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 2,
+          "b_mm": 50.8,
+          "c_in": 1,
+          "c_mm": 25.4,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "12",
-          "nps_branch": "6",
-          "dn_run": 300,
-          "dn_branch": 150,
-          "od_run_in": 12.75,
-          "od_run_mm": 323.9,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.75,
-          "height_mm": 120.7,
-          "base_width_in": 6,
-          "base_width_mm": 152.4
+          "outlet_size": "1 1/4",
+          "variant": "DOUBLE EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 2.4375,
+          "b_mm": 61.912,
+          "c_in": 1.3125,
+          "c_mm": 33.337,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "12",
-          "nps_branch": "8",
-          "dn_run": 300,
-          "dn_branch": 200,
-          "od_run_in": 12.75,
-          "od_run_mm": 323.9,
-          "branch_bore_in": 7.981,
-          "branch_bore_mm": 202.7,
-          "height_in": 5,
-          "height_mm": 127,
-          "base_width_in": 6.75,
-          "base_width_mm": 171.5
+          "outlet_size": "1 1/2",
+          "variant": "DOUBLE EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 2.75,
+          "b_mm": 69.85,
+          "c_in": 1.5,
+          "c_mm": 38.1,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "2",
+          "variant": "DOUBLE EXTRA STRONG / STANDARD LENGTHS 3 1/2, 4 1/2, 5 1/2, 6 1/2",
+          "a_in": null,
+          "a_mm": null,
+          "b_in": 3.25,
+          "b_mm": 82.55,
+          "c_in": 1.6875,
+          "c_mm": 42.862,
+          "standard_lengths_in": [
+            "3.5",
+            "4.5",
+            "5.5",
+            "6.5"
+          ],
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "19",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         }
       ]
     },
@@ -34427,242 +35372,589 @@
       "system": "mixed",
       "selectors": [
         {
-          "key": "nps_run",
-          "label": "NPS Run",
+          "key": "outlet_size",
+          "label": "Outlet Size",
           "unit": "in",
           "type": "string"
         },
         {
-          "key": "nps_branch",
-          "label": "NPS Branch",
-          "unit": "in",
+          "key": "variant",
+          "label": "Class / Schedule / Configuration",
+          "unit": "text",
           "type": "string"
-        },
-        {
-          "key": "dn_run",
-          "label": "DN Run",
-          "unit": "mm",
-          "type": "integer"
-        },
-        {
-          "key": "dn_branch",
-          "label": "DN Branch",
-          "unit": "mm",
-          "type": "integer"
         }
       ],
       "fields": [
         {
-          "key": "od_run_in",
-          "label": "Run OD",
+          "key": "a_in",
+          "label": "A",
           "unit": "in",
           "type": "number",
           "priority": 1
         },
         {
-          "key": "od_run_mm",
-          "label": "Run OD",
+          "key": "a_mm",
+          "label": "A",
+          "unit": "mm",
+          "type": "number",
+          "priority": 1
+        },
+        {
+          "key": "b_in",
+          "label": "B",
+          "unit": "in",
+          "type": "number",
+          "priority": 2
+        },
+        {
+          "key": "b_mm",
+          "label": "B",
           "unit": "mm",
           "type": "number",
           "priority": 2
         },
         {
-          "key": "branch_bore_in",
-          "label": "Branch Bore",
+          "key": "c_in",
+          "label": "C",
           "unit": "in",
           "type": "number",
           "priority": 3
         },
         {
-          "key": "branch_bore_mm",
-          "label": "Branch Bore",
+          "key": "c_mm",
+          "label": "C",
           "unit": "mm",
+          "type": "number",
+          "priority": 3
+        },
+        {
+          "key": "d_in",
+          "label": "D",
+          "unit": "in",
           "type": "number",
           "priority": 4
         },
         {
-          "key": "height_in",
-          "label": "Height",
-          "unit": "in",
-          "type": "number",
-          "priority": 5
-        },
-        {
-          "key": "height_mm",
-          "label": "Height",
+          "key": "d_mm",
+          "label": "D",
           "unit": "mm",
           "type": "number",
-          "priority": 6
-        },
-        {
-          "key": "base_width_in",
-          "label": "Base Width",
-          "unit": "in",
-          "type": "number",
-          "priority": 7
-        },
-        {
-          "key": "base_width_mm",
-          "label": "Base Width",
-          "unit": "mm",
-          "type": "number",
-          "priority": 8
+          "priority": 4
         }
       ],
       "rows": [
         {
-          "nps_run": "4",
-          "nps_branch": "2",
-          "dn_run": 100,
-          "dn_branch": 50,
-          "od_run_in": 4.5,
-          "od_run_mm": 114.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 2.75,
-          "height_mm": 69.9,
-          "base_width_in": 3,
-          "base_width_mm": 76.2
+          "outlet_size": "1/8",
+          "variant": "CLASS 3000",
+          "a_in": 0.75,
+          "a_mm": 19.05,
+          "b_in": 1,
+          "b_mm": 25.4,
+          "c_in": 0.625,
+          "c_mm": 15.875,
+          "d_in": 0.3125,
+          "d_mm": 7.938,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "2",
-          "dn_run": 150,
-          "dn_branch": 50,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3,
-          "height_mm": 76.2,
-          "base_width_in": 3.25,
-          "base_width_mm": 82.6
+          "outlet_size": "1/4",
+          "variant": "CLASS 3000",
+          "a_in": 0.75,
+          "a_mm": 19.05,
+          "b_in": 1,
+          "b_mm": 25.4,
+          "c_in": 0.625,
+          "c_mm": 15.875,
+          "d_in": 0.3125,
+          "d_mm": 7.938,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "3",
-          "dn_run": 150,
-          "dn_branch": 80,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 3.068,
-          "branch_bore_mm": 77.9,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.75,
-          "base_width_mm": 95.3
+          "outlet_size": "3/8",
+          "variant": "CLASS 3000",
+          "a_in": 0.8125,
+          "a_mm": 20.637,
+          "b_in": 1.25,
+          "b_mm": 31.75,
+          "c_in": 0.75,
+          "c_mm": 19.05,
+          "d_in": 0.4375,
+          "d_mm": 11.112,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "4",
-          "dn_run": 150,
-          "dn_branch": 100,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.5,
-          "height_mm": 88.9,
-          "base_width_in": 4.25,
-          "base_width_mm": 108
+          "outlet_size": "1/2",
+          "variant": "CLASS 3000",
+          "a_in": 1,
+          "a_mm": 25.4,
+          "b_in": 1.4375,
+          "b_mm": 36.512,
+          "c_in": 0.9375,
+          "c_mm": 23.813,
+          "d_in": 0.5625,
+          "d_mm": 14.287,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "2",
-          "dn_run": 200,
-          "dn_branch": 50,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.5,
-          "base_width_mm": 88.9
+          "outlet_size": "3/4",
+          "variant": "CLASS 3000",
+          "a_in": 1.0625,
+          "a_mm": 26.987,
+          "b_in": 1.75,
+          "b_mm": 44.45,
+          "c_in": 1.1875,
+          "c_mm": 30.162,
+          "d_in": 0.5625,
+          "d_mm": 14.287,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "4",
-          "dn_run": 200,
-          "dn_branch": 100,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.75,
-          "height_mm": 95.3,
-          "base_width_in": 4.5,
-          "base_width_mm": 114.3
+          "outlet_size": "1",
+          "variant": "CLASS 3000",
+          "a_in": 1.3125,
+          "a_mm": 33.337,
+          "b_in": 2.125,
+          "b_mm": 53.975,
+          "c_in": 1.4375,
+          "c_mm": 36.512,
+          "d_in": 0.8125,
+          "d_mm": 20.637,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "6",
-          "dn_run": 200,
-          "dn_branch": 150,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.25,
-          "height_mm": 108,
-          "base_width_in": 5.5,
-          "base_width_mm": 139.7
+          "outlet_size": "1 1/4",
+          "variant": "CLASS 3000",
+          "a_in": 1.3125,
+          "a_mm": 33.337,
+          "b_in": 2.5625,
+          "b_mm": 65.087,
+          "c_in": 1.75,
+          "c_mm": 44.45,
+          "d_in": 0.75,
+          "d_mm": 19.05,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "4",
-          "dn_run": 250,
-          "dn_branch": 100,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 4,
-          "height_mm": 101.6,
-          "base_width_in": 4.75,
-          "base_width_mm": 120.7
+          "outlet_size": "1 1/2",
+          "variant": "CLASS 3000",
+          "a_in": 1.375,
+          "a_mm": 34.925,
+          "b_in": 2.875,
+          "b_mm": 73.025,
+          "c_in": 2,
+          "c_mm": 50.8,
+          "d_in": 0.75,
+          "d_mm": 19.05,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "6",
-          "dn_run": 250,
-          "dn_branch": 150,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.5,
-          "height_mm": 114.3,
-          "base_width_in": 5.75,
-          "base_width_mm": 146.1
+          "outlet_size": "2",
+          "variant": "CLASS 3000",
+          "a_in": 1.5,
+          "a_mm": 38.1,
+          "b_in": 3.5,
+          "b_mm": 88.9,
+          "c_in": 2.5625,
+          "c_mm": 65.087,
+          "d_in": 0.8125,
+          "d_mm": 20.637,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "12",
-          "nps_branch": "6",
-          "dn_run": 300,
-          "dn_branch": 150,
-          "od_run_in": 12.75,
-          "od_run_mm": 323.9,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.75,
-          "height_mm": 120.7,
-          "base_width_in": 6,
-          "base_width_mm": 152.4
+          "outlet_size": "2 1/2",
+          "variant": "CLASS 3000",
+          "a_in": 1.8125,
+          "a_mm": 46.037,
+          "b_in": 4.0625,
+          "b_mm": 103.188,
+          "c_in": 3,
+          "c_mm": 76.2,
+          "d_in": 0.75,
+          "d_mm": 19.05,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "12",
-          "nps_branch": "8",
-          "dn_run": 300,
-          "dn_branch": 200,
-          "od_run_in": 12.75,
-          "od_run_mm": 323.9,
-          "branch_bore_in": 7.981,
-          "branch_bore_mm": 202.7,
-          "height_in": 5,
-          "height_mm": 127,
-          "base_width_in": 6.75,
-          "base_width_mm": 171.5
+          "outlet_size": "3",
+          "variant": "CLASS 3000",
+          "a_in": 2,
+          "a_mm": 50.8,
+          "b_in": 4.8125,
+          "b_mm": 122.237,
+          "c_in": 3.6875,
+          "c_mm": 93.662,
+          "d_in": 0.9375,
+          "d_mm": 23.813,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3 1/2",
+          "variant": "CLASS 3000",
+          "a_in": 2.125,
+          "a_mm": 53.975,
+          "b_in": 5.375,
+          "b_mm": 136.525,
+          "c_in": 4,
+          "c_mm": 101.6,
+          "d_in": 1,
+          "d_mm": 25.4,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "4",
+          "variant": "CLASS 3000",
+          "a_in": 2.25,
+          "a_mm": 57.15,
+          "b_in": 6,
+          "b_mm": 152.4,
+          "c_in": 4.75,
+          "c_mm": 120.65,
+          "d_in": 1.0625,
+          "d_mm": 26.987,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "5",
+          "variant": "CLASS 3000",
+          "a_in": 2.625,
+          "a_mm": 66.675,
+          "b_in": 7,
+          "b_mm": 177.8,
+          "c_in": 5.5625,
+          "c_mm": 141.287,
+          "d_in": 1.375,
+          "d_mm": 34.925,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "6",
+          "variant": "CLASS 3000",
+          "a_in": 2.75,
+          "a_mm": 69.85,
+          "b_in": 8.625,
+          "b_mm": 219.075,
+          "c_in": 6.6875,
+          "c_mm": 169.862,
+          "d_in": 1.4375,
+          "d_mm": 36.512,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1/2",
+          "variant": "CLASS 6000",
+          "a_in": 1.25,
+          "a_mm": 31.75,
+          "b_in": 1.75,
+          "b_mm": 44.45,
+          "c_in": 0.75,
+          "c_mm": 19.05,
+          "d_in": 0.875,
+          "d_mm": 22.225,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3/4",
+          "variant": "CLASS 6000",
+          "a_in": 1.4375,
+          "a_mm": 36.512,
+          "b_in": 2,
+          "b_mm": 50.8,
+          "c_in": 1,
+          "c_mm": 25.4,
+          "d_in": 0.875,
+          "d_mm": 22.225,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1",
+          "variant": "CLASS 6000",
+          "a_in": 1.5625,
+          "a_mm": 39.688,
+          "b_in": 2.4375,
+          "b_mm": 61.912,
+          "c_in": 1.3125,
+          "c_mm": 33.337,
+          "d_in": 0.9375,
+          "d_mm": 23.813,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/4",
+          "variant": "CLASS 6000",
+          "a_in": 1.625,
+          "a_mm": 41.275,
+          "b_in": 2.75,
+          "b_mm": 69.85,
+          "c_in": 1.5,
+          "c_mm": 38.1,
+          "d_in": 0.8125,
+          "d_mm": 20.637,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/2",
+          "variant": "CLASS 6000",
+          "a_in": 1.6875,
+          "a_mm": 42.862,
+          "b_in": 3.25,
+          "b_mm": 82.55,
+          "c_in": 1.9375,
+          "c_mm": 49.212,
+          "d_in": 0.875,
+          "d_mm": 22.225,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "2",
+          "variant": "CLASS 6000",
+          "a_in": 2.0625,
+          "a_mm": 52.387,
+          "b_in": 4.0625,
+          "b_mm": 103.188,
+          "c_in": 2.75,
+          "c_mm": 69.85,
+          "d_in": 1.1875,
+          "d_mm": 30.162,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1/2",
+          "variant": "CLASS 9000",
+          "a_in": 1.25,
+          "a_mm": 31.75,
+          "b_in": 1.6875,
+          "b_mm": 42.862,
+          "c_in": 0.75,
+          "c_mm": 19.05,
+          "d_in": 0.8125,
+          "d_mm": 20.637,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3/4",
+          "variant": "CLASS 9000",
+          "a_in": 1.4375,
+          "a_mm": 36.512,
+          "b_in": 1.9375,
+          "b_mm": 49.212,
+          "c_in": 0.9375,
+          "c_mm": 23.813,
+          "d_in": 0.875,
+          "d_mm": 22.225,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1",
+          "variant": "CLASS 9000",
+          "a_in": 1.5625,
+          "a_mm": 39.688,
+          "b_in": 2.5625,
+          "b_mm": 65.087,
+          "c_in": 1.1875,
+          "c_mm": 30.162,
+          "d_in": 0.9375,
+          "d_mm": 23.813,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/4",
+          "variant": "CLASS 9000",
+          "a_in": 1.625,
+          "a_mm": 41.275,
+          "b_in": 2.6875,
+          "b_mm": 68.263,
+          "c_in": 1.5,
+          "c_mm": 38.1,
+          "d_in": 0.8125,
+          "d_mm": 20.637,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/2",
+          "variant": "CLASS 9000",
+          "a_in": 1.6875,
+          "a_mm": 42.862,
+          "b_in": 3.25,
+          "b_mm": 82.55,
+          "c_in": 1.9375,
+          "c_mm": 49.212,
+          "d_in": 0.9375,
+          "d_mm": 23.813,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "2",
+          "variant": "CLASS 9000",
+          "a_in": 2.0625,
+          "a_mm": 52.387,
+          "b_in": 4.0625,
+          "b_mm": 103.188,
+          "c_in": 2.75,
+          "c_mm": 69.85,
+          "d_in": 1.25,
+          "d_mm": 31.75,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "13",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         }
       ]
     },
@@ -34673,242 +35965,467 @@
       "system": "mixed",
       "selectors": [
         {
-          "key": "nps_run",
-          "label": "NPS Run",
+          "key": "outlet_size",
+          "label": "Outlet Size",
           "unit": "in",
           "type": "string"
         },
         {
-          "key": "nps_branch",
-          "label": "NPS Branch",
-          "unit": "in",
+          "key": "variant",
+          "label": "Class / Schedule / Configuration",
+          "unit": "text",
           "type": "string"
-        },
-        {
-          "key": "dn_run",
-          "label": "DN Run",
-          "unit": "mm",
-          "type": "integer"
-        },
-        {
-          "key": "dn_branch",
-          "label": "DN Branch",
-          "unit": "mm",
-          "type": "integer"
         }
       ],
       "fields": [
         {
-          "key": "od_run_in",
-          "label": "Run OD",
+          "key": "a_in",
+          "label": "A",
           "unit": "in",
           "type": "number",
           "priority": 1
         },
         {
-          "key": "od_run_mm",
-          "label": "Run OD",
+          "key": "a_mm",
+          "label": "A",
+          "unit": "mm",
+          "type": "number",
+          "priority": 1
+        },
+        {
+          "key": "b_in",
+          "label": "B",
+          "unit": "in",
+          "type": "number",
+          "priority": 2
+        },
+        {
+          "key": "b_mm",
+          "label": "B",
           "unit": "mm",
           "type": "number",
           "priority": 2
         },
         {
-          "key": "branch_bore_in",
-          "label": "Branch Bore",
+          "key": "c_in",
+          "label": "C",
           "unit": "in",
           "type": "number",
           "priority": 3
         },
         {
-          "key": "branch_bore_mm",
-          "label": "Branch Bore",
+          "key": "c_mm",
+          "label": "C",
           "unit": "mm",
+          "type": "number",
+          "priority": 3
+        },
+        {
+          "key": "d_in",
+          "label": "D",
+          "unit": "in",
           "type": "number",
           "priority": 4
         },
         {
-          "key": "height_in",
-          "label": "Height",
-          "unit": "in",
-          "type": "number",
-          "priority": 5
-        },
-        {
-          "key": "height_mm",
-          "label": "Height",
+          "key": "d_mm",
+          "label": "D",
           "unit": "mm",
           "type": "number",
-          "priority": 6
-        },
-        {
-          "key": "base_width_in",
-          "label": "Base Width",
-          "unit": "in",
-          "type": "number",
-          "priority": 7
-        },
-        {
-          "key": "base_width_mm",
-          "label": "Base Width",
-          "unit": "mm",
-          "type": "number",
-          "priority": 8
+          "priority": 4
         }
       ],
       "rows": [
         {
-          "nps_run": "4",
-          "nps_branch": "2",
-          "dn_run": 100,
-          "dn_branch": 50,
-          "od_run_in": 4.5,
-          "od_run_mm": 114.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 2.75,
-          "height_mm": 69.9,
-          "base_width_in": 3,
-          "base_width_mm": 76.2
+          "outlet_size": "1/8",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 0.75,
+          "a_mm": 19.05,
+          "b_in": 1,
+          "b_mm": 25.4,
+          "c_in": 0.625,
+          "c_mm": 15.875,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "2",
-          "dn_run": 150,
-          "dn_branch": 50,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3,
-          "height_mm": 76.2,
-          "base_width_in": 3.25,
-          "base_width_mm": 82.6
+          "outlet_size": "1/4",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 0.75,
+          "a_mm": 19.05,
+          "b_in": 1,
+          "b_mm": 25.4,
+          "c_in": 0.625,
+          "c_mm": 15.875,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "3",
-          "dn_run": 150,
-          "dn_branch": 80,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 3.068,
-          "branch_bore_mm": 77.9,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.75,
-          "base_width_mm": 95.3
+          "outlet_size": "3/8",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 0.8125,
+          "a_mm": 20.637,
+          "b_in": 1.25,
+          "b_mm": 31.75,
+          "c_in": 0.75,
+          "c_mm": 19.05,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "4",
-          "dn_run": 150,
-          "dn_branch": 100,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.5,
-          "height_mm": 88.9,
-          "base_width_in": 4.25,
-          "base_width_mm": 108
+          "outlet_size": "1/2",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 1,
+          "a_mm": 25.4,
+          "b_in": 1.4375,
+          "b_mm": 36.512,
+          "c_in": 0.9375,
+          "c_mm": 23.813,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "2",
-          "dn_run": 200,
-          "dn_branch": 50,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.5,
-          "base_width_mm": 88.9
+          "outlet_size": "3/4",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 1.0625,
+          "a_mm": 26.987,
+          "b_in": 1.75,
+          "b_mm": 44.45,
+          "c_in": 1.1875,
+          "c_mm": 30.162,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "4",
-          "dn_run": 200,
-          "dn_branch": 100,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.75,
-          "height_mm": 95.3,
-          "base_width_in": 4.5,
-          "base_width_mm": 114.3
+          "outlet_size": "1",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 1.3125,
+          "a_mm": 33.337,
+          "b_in": 2.125,
+          "b_mm": 53.975,
+          "c_in": 1.4375,
+          "c_mm": 36.512,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "6",
-          "dn_run": 200,
-          "dn_branch": 150,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.25,
-          "height_mm": 108,
-          "base_width_in": 5.5,
-          "base_width_mm": 139.7
+          "outlet_size": "1 1/4",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 1.3125,
+          "a_mm": 33.337,
+          "b_in": 2.5625,
+          "b_mm": 65.087,
+          "c_in": 1.75,
+          "c_mm": 44.45,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "4",
-          "dn_run": 250,
-          "dn_branch": 100,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 4,
-          "height_mm": 101.6,
-          "base_width_in": 4.75,
-          "base_width_mm": 120.7
+          "outlet_size": "1 1/2",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 1.375,
+          "a_mm": 34.925,
+          "b_in": 2.4375,
+          "b_mm": 61.912,
+          "c_in": 2,
+          "c_mm": 50.8,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "6",
-          "dn_run": 250,
-          "dn_branch": 150,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.5,
-          "height_mm": 114.3,
-          "base_width_in": 5.75,
-          "base_width_mm": 146.1
+          "outlet_size": "2",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 1.5,
+          "a_mm": 38.1,
+          "b_in": 3.5,
+          "b_mm": 88.9,
+          "c_in": 2.5625,
+          "c_mm": 65.087,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "12",
-          "nps_branch": "6",
-          "dn_run": 300,
-          "dn_branch": 150,
-          "od_run_in": 12.75,
-          "od_run_mm": 323.9,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.75,
-          "height_mm": 120.7,
-          "base_width_in": 6,
-          "base_width_mm": 152.4
+          "outlet_size": "2 1/2",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 1.8125,
+          "a_mm": 46.037,
+          "b_in": 4.0625,
+          "b_mm": 103.188,
+          "c_in": 3,
+          "c_mm": 76.2,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "12",
-          "nps_branch": "8",
-          "dn_run": 300,
-          "dn_branch": 200,
-          "od_run_in": 12.75,
-          "od_run_mm": 323.9,
-          "branch_bore_in": 7.981,
-          "branch_bore_mm": 202.7,
-          "height_in": 5,
-          "height_mm": 127,
-          "base_width_in": 6.75,
-          "base_width_mm": 171.5
+          "outlet_size": "3",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 2,
+          "a_mm": 50.8,
+          "b_in": 4.8125,
+          "b_mm": 122.237,
+          "c_in": 3.6875,
+          "c_mm": 93.662,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3 1/2",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 2.125,
+          "a_mm": 53.975,
+          "b_in": 5.25,
+          "b_mm": 133.35,
+          "c_in": 4,
+          "c_mm": 101.6,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "4",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 2.25,
+          "a_mm": 57.15,
+          "b_in": 6,
+          "b_mm": 152.4,
+          "c_in": 4.75,
+          "c_mm": 120.65,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "5",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 2.625,
+          "a_mm": 66.675,
+          "b_in": 7.3125,
+          "b_mm": 185.737,
+          "c_in": 5.5625,
+          "c_mm": 141.287,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "6",
+          "variant": "CLASS 3000 NPT",
+          "a_in": 2.75,
+          "a_mm": 69.85,
+          "b_in": 8.625,
+          "b_mm": 219.075,
+          "c_in": 6.6875,
+          "c_mm": 169.862,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1/4",
+          "variant": "CLASS 6000 NPT",
+          "a_in": 1.125,
+          "a_mm": 28.575,
+          "b_in": 1.375,
+          "b_mm": 34.925,
+          "c_in": 0.5625,
+          "c_mm": 14.287,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3/8",
+          "variant": "CLASS 6000 NPT",
+          "a_in": 1.125,
+          "a_mm": 28.575,
+          "b_in": 1.375,
+          "b_mm": 34.925,
+          "c_in": 0.5625,
+          "c_mm": 14.287,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1/2",
+          "variant": "CLASS 6000 NPT",
+          "a_in": 1.25,
+          "a_mm": 31.75,
+          "b_in": 1.75,
+          "b_mm": 44.45,
+          "c_in": 0.75,
+          "c_mm": 19.05,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3/4",
+          "variant": "CLASS 6000 NPT",
+          "a_in": 1.4375,
+          "a_mm": 36.512,
+          "b_in": 2,
+          "b_mm": 50.8,
+          "c_in": 1,
+          "c_mm": 25.4,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1",
+          "variant": "CLASS 6000 NPT",
+          "a_in": 1.5625,
+          "a_mm": 39.688,
+          "b_in": 2.4375,
+          "b_mm": 61.912,
+          "c_in": 1.3125,
+          "c_mm": 33.337,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/4",
+          "variant": "CLASS 6000 NPT",
+          "a_in": 1.625,
+          "a_mm": 41.275,
+          "b_in": 2.75,
+          "b_mm": 69.85,
+          "c_in": 1.5,
+          "c_mm": 38.1,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/2",
+          "variant": "CLASS 6000 NPT",
+          "a_in": 1.6875,
+          "a_mm": 42.862,
+          "b_in": 3.25,
+          "b_mm": 82.55,
+          "c_in": 1.9375,
+          "c_mm": 49.212,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "2",
+          "variant": "CLASS 6000 NPT",
+          "a_in": 2.0625,
+          "a_mm": 52.387,
+          "b_in": 4.0625,
+          "b_mm": 103.188,
+          "c_in": 2.75,
+          "c_mm": 69.85,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "14",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         }
       ]
     },
@@ -34919,256 +36436,836 @@
       "system": "mixed",
       "selectors": [
         {
-          "key": "nps_run",
-          "label": "NPS Run",
+          "key": "outlet_size",
+          "label": "Outlet Size",
           "unit": "in",
           "type": "string"
         },
         {
-          "key": "nps_branch",
-          "label": "NPS Branch",
-          "unit": "in",
+          "key": "variant",
+          "label": "Class / Schedule / Configuration",
+          "unit": "text",
           "type": "string"
-        },
-        {
-          "key": "dn_run",
-          "label": "DN Run",
-          "unit": "mm",
-          "type": "integer"
-        },
-        {
-          "key": "dn_branch",
-          "label": "DN Branch",
-          "unit": "mm",
-          "type": "integer"
         }
       ],
       "fields": [
         {
-          "key": "od_run_in",
-          "label": "Od Run",
+          "key": "a_in",
+          "label": "A",
           "unit": "in",
           "type": "number",
           "priority": 1
         },
         {
-          "key": "od_run_mm",
-          "label": "Od Run",
+          "key": "a_mm",
+          "label": "A",
+          "unit": "mm",
+          "type": "number",
+          "priority": 1
+        },
+        {
+          "key": "b_in",
+          "label": "B",
+          "unit": "in",
+          "type": "number",
+          "priority": 2
+        },
+        {
+          "key": "b_mm",
+          "label": "B",
           "unit": "mm",
           "type": "number",
           "priority": 2
         },
         {
-          "key": "branch_bore_in",
-          "label": "Branch Bore",
+          "key": "c_in",
+          "label": "C",
           "unit": "in",
           "type": "number",
           "priority": 3
         },
         {
-          "key": "branch_bore_mm",
-          "label": "Branch Bore",
+          "key": "c_mm",
+          "label": "C",
           "unit": "mm",
+          "type": "number",
+          "priority": 3
+        },
+        {
+          "key": "d_in",
+          "label": "D",
+          "unit": "in",
           "type": "number",
           "priority": 4
         },
         {
-          "key": "height_in",
-          "label": "Height",
-          "unit": "in",
-          "type": "number",
-          "priority": 5
-        },
-        {
-          "key": "height_mm",
-          "label": "Height",
+          "key": "d_mm",
+          "label": "D",
           "unit": "mm",
           "type": "number",
-          "priority": 6
-        },
-        {
-          "key": "base_width_in",
-          "label": "Base Width",
-          "unit": "in",
-          "type": "integer",
-          "priority": 7
-        },
-        {
-          "key": "base_width_mm",
-          "label": "Base Width",
-          "unit": "mm",
-          "type": "number",
-          "priority": 8
+          "priority": 4
         }
       ],
       "rows": [
         {
-          "nps_run": "4",
-          "nps_branch": "2",
-          "dn_run": 100,
-          "dn_branch": 50,
-          "od_run_in": 4.5,
-          "od_run_mm": 114.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 2.75,
-          "height_mm": 69.9,
-          "base_width_in": 3,
-          "base_width_mm": 76.2
+          "outlet_size": "1/2",
+          "variant": "BUTT-WELD STD",
+          "a_in": 0.75,
+          "a_mm": 19.05,
+          "b_in": 1.375,
+          "b_mm": 34.925,
+          "c_in": 0.9375,
+          "c_mm": 23.813,
+          "d_in": 0.625,
+          "d_mm": 15.875,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "4",
-          "nps_branch": "3",
-          "dn_run": 100,
-          "dn_branch": 80,
-          "od_run_in": 4.5,
-          "od_run_mm": 114.3,
-          "branch_bore_in": 3.068,
-          "branch_bore_mm": 77.9,
-          "height_in": 2.75,
-          "height_mm": 69.9,
-          "base_width_in": 3.5,
-          "base_width_mm": 88.9
+          "outlet_size": "3/4",
+          "variant": "BUTT-WELD STD",
+          "a_in": 0.875,
+          "a_mm": 22.225,
+          "b_in": 1.625,
+          "b_mm": 41.275,
+          "c_in": 1.1875,
+          "c_mm": 30.162,
+          "d_in": 0.8125,
+          "d_mm": 20.637,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "2",
-          "dn_run": 150,
-          "dn_branch": 50,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3,
-          "height_mm": 76.2,
-          "base_width_in": 3.25,
-          "base_width_mm": 82.6
+          "outlet_size": "1",
+          "variant": "BUTT-WELD STD",
+          "a_in": 1.0625,
+          "a_mm": 26.987,
+          "b_in": 2.125,
+          "b_mm": 53.975,
+          "c_in": 1.4375,
+          "c_mm": 36.512,
+          "d_in": 1.03125,
+          "d_mm": 26.194,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "3",
-          "dn_run": 150,
-          "dn_branch": 80,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 3.068,
-          "branch_bore_mm": 77.9,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.75,
-          "base_width_mm": 95.3
+          "outlet_size": "1 1/4",
+          "variant": "BUTT-WELD STD",
+          "a_in": 1.25,
+          "a_mm": 31.75,
+          "b_in": 2.375,
+          "b_mm": 60.325,
+          "c_in": 1.75,
+          "c_mm": 44.45,
+          "d_in": 1.375,
+          "d_mm": 34.925,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "6",
-          "nps_branch": "4",
-          "dn_run": 150,
-          "dn_branch": 100,
-          "od_run_in": 6.625,
-          "od_run_mm": 168.3,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.5,
-          "height_mm": 88.9,
-          "base_width_in": 4.25,
-          "base_width_mm": 108
+          "outlet_size": "1 1/2",
+          "variant": "BUTT-WELD STD",
+          "a_in": 1.3125,
+          "a_mm": 33.337,
+          "b_in": 2.875,
+          "b_mm": 73.025,
+          "c_in": 2,
+          "c_mm": 50.8,
+          "d_in": 1.625,
+          "d_mm": 41.275,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "2",
-          "dn_run": 200,
-          "dn_branch": 50,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 2.067,
-          "branch_bore_mm": 52.5,
-          "height_in": 3.25,
-          "height_mm": 82.6,
-          "base_width_in": 3.5,
-          "base_width_mm": 88.9
+          "outlet_size": "2",
+          "variant": "BUTT-WELD STD",
+          "a_in": 1.5,
+          "a_mm": 38.1,
+          "b_in": 3.5,
+          "b_mm": 88.9,
+          "c_in": 2.5625,
+          "c_mm": 65.087,
+          "d_in": 2.0625,
+          "d_mm": 52.387,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "3",
-          "dn_run": 200,
-          "dn_branch": 80,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 3.068,
-          "branch_bore_mm": 77.9,
-          "height_in": 3.5,
-          "height_mm": 88.9,
-          "base_width_in": 4,
-          "base_width_mm": 101.6
+          "outlet_size": "2 1/2",
+          "variant": "BUTT-WELD STD",
+          "a_in": 1.625,
+          "a_mm": 41.275,
+          "b_in": 4.0625,
+          "b_mm": 103.188,
+          "c_in": 3,
+          "c_mm": 76.2,
+          "d_in": 2.4375,
+          "d_mm": 61.912,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "4",
-          "dn_run": 200,
-          "dn_branch": 100,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 3.75,
-          "height_mm": 95.3,
-          "base_width_in": 4.5,
-          "base_width_mm": 114.3
+          "outlet_size": "3",
+          "variant": "BUTT-WELD STD",
+          "a_in": 1.75,
+          "a_mm": 44.45,
+          "b_in": 4.8125,
+          "b_mm": 122.237,
+          "c_in": 3.6875,
+          "c_mm": 93.662,
+          "d_in": 3.0625,
+          "d_mm": 77.787,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "8",
-          "nps_branch": "6",
-          "dn_run": 200,
-          "dn_branch": 150,
-          "od_run_in": 8.625,
-          "od_run_mm": 219.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.25,
-          "height_mm": 108,
-          "base_width_in": 5.5,
-          "base_width_mm": 139.7
+          "outlet_size": "3 1/2",
+          "variant": "BUTT-WELD STD",
+          "a_in": 2,
+          "a_mm": 50.8,
+          "b_in": 5.375,
+          "b_mm": 136.525,
+          "c_in": 3.875,
+          "c_mm": 98.425,
+          "d_in": 3.5625,
+          "d_mm": 90.487,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "4",
-          "dn_run": 250,
-          "dn_branch": 100,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 4.026,
-          "branch_bore_mm": 102.3,
-          "height_in": 4,
-          "height_mm": 101.6,
-          "base_width_in": 4.75,
-          "base_width_mm": 120.7
+          "outlet_size": "4",
+          "variant": "BUTT-WELD STD",
+          "a_in": 2,
+          "a_mm": 50.8,
+          "b_in": 6,
+          "b_mm": 152.4,
+          "c_in": 4.75,
+          "c_mm": 120.65,
+          "d_in": 4,
+          "d_mm": 101.6,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "10",
-          "nps_branch": "6",
-          "dn_run": 250,
-          "dn_branch": 150,
-          "od_run_in": 10.75,
-          "od_run_mm": 273.1,
-          "branch_bore_in": 6.065,
-          "branch_bore_mm": 154.1,
-          "height_in": 4.5,
-          "height_mm": 114.3,
-          "base_width_in": 5.75,
-          "base_width_mm": 146.1
+          "outlet_size": "5",
+          "variant": "BUTT-WELD STD",
+          "a_in": 2.25,
+          "a_mm": 57.15,
+          "b_in": 7.125,
+          "b_mm": 180.975,
+          "c_in": 5.5625,
+          "c_mm": 141.287,
+          "d_in": 5.0625,
+          "d_mm": 128.588,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         },
         {
-          "nps_run": "12",
-          "nps_branch": "8",
-          "dn_run": 300,
-          "dn_branch": 200,
-          "od_run_in": 12.75,
-          "od_run_mm": 323.9,
-          "branch_bore_in": 7.981,
-          "branch_bore_mm": 202.7,
-          "height_in": 5,
-          "height_mm": 127,
-          "base_width_in": 6.75,
-          "base_width_mm": 171.5
+          "outlet_size": "6",
+          "variant": "BUTT-WELD STD",
+          "a_in": 2.375,
+          "a_mm": 60.325,
+          "b_in": 7.75,
+          "b_mm": 196.85,
+          "c_in": 6.6875,
+          "c_mm": 169.862,
+          "d_in": 6.0625,
+          "d_mm": 153.987,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "8",
+          "variant": "BUTT-WELD STD",
+          "a_in": 2.75,
+          "a_mm": 69.85,
+          "b_in": 10.375,
+          "b_mm": 263.525,
+          "c_in": 8.6875,
+          "c_mm": 220.662,
+          "d_in": 7.9375,
+          "d_mm": 201.612,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "10",
+          "variant": "BUTT-WELD STD",
+          "a_in": 3.0625,
+          "a_mm": 77.787,
+          "b_in": 13,
+          "b_mm": 330.2,
+          "c_in": 10.8125,
+          "c_mm": 274.637,
+          "d_in": 10,
+          "d_mm": 254,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "12",
+          "variant": "BUTT-WELD STD",
+          "a_in": 3.375,
+          "a_mm": 85.725,
+          "b_in": 15.25,
+          "b_mm": 387.35,
+          "c_in": 12.8125,
+          "c_mm": 325.438,
+          "d_in": 12,
+          "d_mm": 304.8,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "14",
+          "variant": "BUTT-WELD STD",
+          "a_in": 3.5,
+          "a_mm": 88.9,
+          "b_in": 16.5,
+          "b_mm": 419.1,
+          "c_in": 14.0625,
+          "c_mm": 357.188,
+          "d_in": 13.25,
+          "d_mm": 336.55,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "16",
+          "variant": "BUTT-WELD STD",
+          "a_in": 3.6875,
+          "a_mm": 93.662,
+          "b_in": 18.875,
+          "b_mm": 479.425,
+          "c_in": 16.0625,
+          "c_mm": 407.987,
+          "d_in": 15.25,
+          "d_mm": 387.35,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "18",
+          "variant": "BUTT-WELD STD",
+          "a_in": 4.0625,
+          "a_mm": 103.188,
+          "b_in": 20.75,
+          "b_mm": 527.05,
+          "c_in": 18.625,
+          "c_mm": 473.075,
+          "d_in": 17.25,
+          "d_mm": 438.15,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "20",
+          "variant": "BUTT-WELD STD",
+          "a_in": 4.625,
+          "a_mm": 117.475,
+          "b_in": 23.0625,
+          "b_mm": 585.788,
+          "c_in": 20.0625,
+          "c_mm": 509.587,
+          "d_in": 19.25,
+          "d_mm": 488.95,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "24",
+          "variant": "BUTT-WELD STD",
+          "a_in": 5.375,
+          "a_mm": 136.525,
+          "b_in": 27.875,
+          "b_mm": 708.025,
+          "c_in": 25.125,
+          "c_mm": 638.175,
+          "d_in": 23.25,
+          "d_mm": 590.55,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "17",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1/2",
+          "variant": "BUTT-WELD XS",
+          "a_in": 0.75,
+          "a_mm": 19.05,
+          "b_in": 1.375,
+          "b_mm": 34.925,
+          "c_in": 0.9375,
+          "c_mm": 23.813,
+          "d_in": 0.625,
+          "d_mm": 15.875,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3/4",
+          "variant": "BUTT-WELD XS",
+          "a_in": 0.875,
+          "a_mm": 22.225,
+          "b_in": 1.625,
+          "b_mm": 41.275,
+          "c_in": 1.1875,
+          "c_mm": 30.162,
+          "d_in": 0.8125,
+          "d_mm": 20.637,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1",
+          "variant": "BUTT-WELD XS",
+          "a_in": 1.0625,
+          "a_mm": 26.987,
+          "b_in": 2.125,
+          "b_mm": 53.975,
+          "c_in": 1.4375,
+          "c_mm": 36.512,
+          "d_in": 1.03125,
+          "d_mm": 26.194,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/4",
+          "variant": "BUTT-WELD XS",
+          "a_in": 1.25,
+          "a_mm": 31.75,
+          "b_in": 2.375,
+          "b_mm": 60.325,
+          "c_in": 1.75,
+          "c_mm": 44.45,
+          "d_in": 1.375,
+          "d_mm": 34.925,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "1 1/2",
+          "variant": "BUTT-WELD XS",
+          "a_in": 1.3125,
+          "a_mm": 33.337,
+          "b_in": 2.875,
+          "b_mm": 73.025,
+          "c_in": 2,
+          "c_mm": 50.8,
+          "d_in": 1.625,
+          "d_mm": 41.275,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "2",
+          "variant": "BUTT-WELD XS",
+          "a_in": 1.5,
+          "a_mm": 38.1,
+          "b_in": 3.5,
+          "b_mm": 88.9,
+          "c_in": 2.5625,
+          "c_mm": 65.087,
+          "d_in": 2.0625,
+          "d_mm": 52.387,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "2 1/2",
+          "variant": "BUTT-WELD XS",
+          "a_in": 1.625,
+          "a_mm": 41.275,
+          "b_in": 4.0625,
+          "b_mm": 103.188,
+          "c_in": 3,
+          "c_mm": 76.2,
+          "d_in": 2.4375,
+          "d_mm": 61.912,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3",
+          "variant": "BUTT-WELD XS",
+          "a_in": 1.75,
+          "a_mm": 44.45,
+          "b_in": 4.8125,
+          "b_mm": 122.237,
+          "c_in": 3.6875,
+          "c_mm": 93.662,
+          "d_in": 3.0625,
+          "d_mm": 77.787,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "3 1/2",
+          "variant": "BUTT-WELD XS",
+          "a_in": 2,
+          "a_mm": 50.8,
+          "b_in": 5.375,
+          "b_mm": 136.525,
+          "c_in": 3.875,
+          "c_mm": 98.425,
+          "d_in": 3.5625,
+          "d_mm": 90.487,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "4",
+          "variant": "BUTT-WELD XS",
+          "a_in": 2,
+          "a_mm": 50.8,
+          "b_in": 6,
+          "b_mm": 152.4,
+          "c_in": 4.75,
+          "c_mm": 120.65,
+          "d_in": 4,
+          "d_mm": 101.6,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "5",
+          "variant": "BUTT-WELD XS",
+          "a_in": 2.25,
+          "a_mm": 57.15,
+          "b_in": 7.125,
+          "b_mm": 180.975,
+          "c_in": 5.5625,
+          "c_mm": 141.287,
+          "d_in": 5.0625,
+          "d_mm": 128.588,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "6",
+          "variant": "BUTT-WELD XS",
+          "a_in": 3.0625,
+          "a_mm": 77.787,
+          "b_in": 8.3125,
+          "b_mm": 211.137,
+          "c_in": 6.6875,
+          "c_mm": 169.862,
+          "d_in": 6.0625,
+          "d_mm": 153.987,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "8",
+          "variant": "BUTT-WELD XS",
+          "a_in": 3.875,
+          "a_mm": 98.425,
+          "b_in": 10.625,
+          "b_mm": 269.875,
+          "c_in": 8.6875,
+          "c_mm": 220.662,
+          "d_in": 7.625,
+          "d_mm": 193.675,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "10",
+          "variant": "BUTT-WELD XS",
+          "a_in": 3.5,
+          "a_mm": 88.9,
+          "b_in": 13.125,
+          "b_mm": 333.375,
+          "c_in": 10.4375,
+          "c_mm": 265.113,
+          "d_in": 9.75,
+          "d_mm": 247.65,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "12",
+          "variant": "BUTT-WELD XS",
+          "a_in": 3.9375,
+          "a_mm": 100.012,
+          "b_in": 15.1875,
+          "b_mm": 385.762,
+          "c_in": 13,
+          "c_mm": 330.2,
+          "d_in": 11.75,
+          "d_mm": 298.45,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "14",
+          "variant": "BUTT-WELD XS",
+          "a_in": 4.125,
+          "a_mm": 104.775,
+          "b_in": 16,
+          "b_mm": 406.4,
+          "c_in": 13,
+          "c_mm": 330.2,
+          "d_in": 13,
+          "d_mm": 330.2,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "16",
+          "variant": "BUTT-WELD XS",
+          "a_in": 4.4375,
+          "a_mm": 112.712,
+          "b_in": 18.25,
+          "b_mm": 463.55,
+          "c_in": 15,
+          "c_mm": 381,
+          "d_in": 15,
+          "d_mm": 381,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "18",
+          "variant": "BUTT-WELD XS",
+          "a_in": 4.6875,
+          "a_mm": 119.063,
+          "b_in": 20.375,
+          "b_mm": 517.525,
+          "c_in": 17,
+          "c_mm": 431.8,
+          "d_in": 17,
+          "d_mm": 431.8,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "20",
+          "variant": "BUTT-WELD XS",
+          "a_in": 5,
+          "a_mm": 127,
+          "b_in": 22.625,
+          "b_mm": 574.675,
+          "c_in": 19,
+          "c_mm": 482.6,
+          "d_in": 19,
+          "d_mm": 482.6,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
+        },
+        {
+          "outlet_size": "24",
+          "variant": "BUTT-WELD XS",
+          "a_in": 5.5,
+          "a_mm": 139.7,
+          "b_in": 28.75,
+          "b_mm": 730.25,
+          "c_in": 25.125,
+          "c_mm": 638.175,
+          "d_in": 23,
+          "d_mm": 584.2,
+          "provenance": {
+            "primary": "Bonney Forge Branch Connections catalog BC_min.pdf, 2020",
+            "primary_pdf_page": "18",
+            "cross_check": "Wermac O’let dimensions pages, transcription cross-check only",
+            "cross_check_status": "corroboration_of_transcription_not_independent_source",
+            "status": "CROSS_REFERENCE"
+          }
         }
       ]
     },
