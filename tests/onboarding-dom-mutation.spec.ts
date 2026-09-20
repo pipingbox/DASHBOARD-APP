@@ -108,6 +108,19 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 onboarding under translator-grade DOM 
       'the disposable account must be in the internal qa* test namespace on pipingbox.com',
     ).toMatch(/^qa[^@]*@pipingbox\.com$/i);
 
+    // Language determinism: the wizard copy is localized; the runner's
+    // navigator.language is NOT a stable input (the funnel spec once passed
+    // on an environment where the browser resolved Spanish and failed when
+    // it resolved English). Pin the same scenario as the production
+    // incidents: Spanish UI.
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('pipingbox_language', 'es');
+      } catch {
+        /* storage unavailable */
+      }
+    });
+
     // PostHog wire capture (gzip batches).
     const payloads: Buffer[] = [];
     page.on('request', (req) => {
