@@ -1036,19 +1036,25 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                   : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
               )}
             >
+              {/*
+                PB-UI-DOM-INSERTBEFORE-001: every label lives in a <span> so
+                the saving/next/finish swap deletes ELEMENT fibers. A bare
+                text fiber detached by auto-translate makes removeChild throw
+                NotFoundError on the finish click (same incident class).
+              */}
               {saving ? (
                 <span className="flex items-center gap-2">
                   <span className="h-3 w-3 animate-spin rounded-full border-2 border-black border-t-transparent" />
-                  {t('onboarding.saving')}
+                  <span>{t('onboarding.saving')}</span>
                 </span>
               ) : step === TOTAL_STEPS ? (
                 <>
-                  {t('onboarding.finish')}
+                  <span>{t('onboarding.finish')}</span>
                   <Check className="h-4 w-4" />
                 </>
               ) : (
                 <>
-                  {t('onboarding.next')}
+                  <span>{t('onboarding.next')}</span>
                   <ChevronRight className="h-4 w-4" />
                 </>
               )}
