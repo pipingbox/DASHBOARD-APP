@@ -1755,7 +1755,8 @@
     "copyIncidentCode": "Kopiuj kod incydentu",
     "incidentCodeCopied": "Skopiowano",
     "boundaryDesc": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie załadować tę sekcję.",
-    "boundaryTitle": "Coś poszło nie tak"
+    "boundaryTitle": "Coś poszło nie tak",
+    "updateApp": "Zaktualizuj aplikację"
   },
   "certAlerts": {
     "sectionLabel": "Powiadomienia",

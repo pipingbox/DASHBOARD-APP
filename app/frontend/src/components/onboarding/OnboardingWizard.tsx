@@ -772,7 +772,13 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                       )}
                     >
                       {specialties.includes(s) && <Check className="inline h-3 w-3 mr-1" />}
-                      {s}
+                      {/*
+                        PB-UI-DOM-INSERTBEFORE-001: the Check insertion must be
+                        anchored at an ELEMENT, never at a bare text node —
+                        auto-translate detaches text nodes and insertBefore
+                        then throws NotFoundError.
+                      */}
+                      <span>{s}</span>
                     </button>
                   ))}
                 </div>
@@ -990,8 +996,19 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         {/* Navigation buttons */}
           <div className="mt-6 flex items-center justify-between pt-4 border-t border-zinc-800">
             <div>
+              {/*
+                PB-UI-DOM-INSERTBEFORE-001: both branches render a <button> at
+                the same position, so React reconciles them as ONE fiber and
+                swaps the lucide icon (X <-> ChevronLeft) with insertBefore
+                anchored at the adjacent text node. Browser auto-translate
+                detaches that text node (font-wrap) and the commit throws
+                NotFoundError. Distinct keys force a full unmount/mount
+                (element-level removeChild/appendChild), which external DOM
+                mutation cannot break.
+              */}
               {step > 1 ? (
                 <button
+                  key="back"
                   onClick={prevStep}
                   className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200 transition"
                 >
@@ -1000,6 +1017,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                 </button>
               ) : (
                 <button
+                  key="skip"
                   onClick={skipOnboarding}
                   className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 transition"
                 >

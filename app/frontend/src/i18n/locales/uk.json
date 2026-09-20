@@ -1755,7 +1755,8 @@
     "copyIncidentCode": "Копіювати код інциденту",
     "incidentCodeCopied": "Скопійовано",
     "boundaryDesc": "Сталася неочікувана помилка. Спробуйте перезавантажити цей розділ.",
-    "boundaryTitle": "Щось пішло не так"
+    "boundaryTitle": "Щось пішло не так",
+    "updateApp": "Оновити застосунок"
   },
   "certAlerts": {
     "sectionLabel": "Сповіщення",

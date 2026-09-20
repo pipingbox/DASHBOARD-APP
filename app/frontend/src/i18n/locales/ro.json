@@ -1750,7 +1750,8 @@
     "copyIncidentCode": "Copiază codul incidentului",
     "incidentCodeCopied": "Copiat",
     "boundaryDesc": "A apărut o eroare neașteptată. Încercați să reîncărcați această secțiune.",
-    "boundaryTitle": "Ceva nu a funcționat"
+    "boundaryTitle": "Ceva nu a funcționat",
+    "updateApp": "Actualizează aplicația"
   },
   "certAlerts": {
     "sectionLabel": "Alerte",

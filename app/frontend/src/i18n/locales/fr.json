@@ -1750,7 +1750,8 @@
     "copyIncidentCode": "Copier le code d'incident",
     "incidentCodeCopied": "Copié",
     "boundaryDesc": "Une erreur inattendue s'est produite. Essayez de recharger cette section.",
-    "boundaryTitle": "Une erreur est survenue"
+    "boundaryTitle": "Une erreur est survenue",
+    "updateApp": "Mettre à jour l'application"
   },
   "certAlerts": {
     "sectionLabel": "Alertes",

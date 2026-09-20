@@ -1745,7 +1745,8 @@
     "copyIncidentCode": "Копирай кода на инцидента",
     "incidentCodeCopied": "Копирано",
     "boundaryDesc": "Възникна неочаквана грешка. Опитайте да презаредите тази секция.",
-    "boundaryTitle": "Нещо се обърка"
+    "boundaryTitle": "Нещо се обърка",
+    "updateApp": "Актуализирай приложението"
   },
   "certAlerts": {
     "sectionLabel": "Известия",

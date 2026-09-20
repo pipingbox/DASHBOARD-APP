@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 280" width="100%" height="auto" role="img" aria-label="Stud bolt 5/8"-11 UNC-2A, 2" — Class 400 — RF">
+    <rect width="760" height="280" fill="#0E1117" rx="6" />
+    <defs>
+      <marker id="arrL" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6" fill="none" stroke="#FF8C00" stroke-width="1"/></marker>
+      <marker id="arrR" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#FF8C00" stroke-width="1"/></marker>
+      <marker id="arrLB" markerWidth="5" markerHeight="5" refX="0" refY="2.5" orient="auto"><path d="M5,0 L0,2.5 L5,5" fill="none" stroke="#3EA6FF" stroke-width="0.8"/></marker>
+      <marker id="arrRB" markerWidth="5" markerHeight="5" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5" fill="none" stroke="#3EA6FF" stroke-width="0.8"/></marker>
+    </defs>
+
+    <rect x="300.44" y="-6.182291666666657" width="70.72" height="292.3645833333333" fill="#27272a" stroke="#A3A9B3" stroke-width="1.5" rx="2" />
+    <text x="335.8" y="144" fill="#71717a" font-size="9" text-anchor="middle">FLANGE</text>
+
+    <rect x="371.16" y="5.817708333333343" width="17.68" height="268.3645833333333" fill="#22d3ee15" stroke="#22d3ee" stroke-width="1" />
+    <text x="380" y="-0.1822916666666572" fill="#22d3ee" font-size="8" text-anchor="middle">GASKET</text>
+
+    <rect x="388.84" y="-6.182291666666657" width="70.72" height="292.3645833333333" fill="#27272a" stroke="#A3A9B3" stroke-width="1.5" rx="2" />
+    <text x="424.2" y="144" fill="#71717a" font-size="9" text-anchor="middle">FLANGE</text>
+
+    <rect x="159" y="107.5150462962963" width="442" height="64.9699074074074" fill="#1a2030" stroke="#FF8C00" stroke-width="1.2" />
+
+    <line x1="163.72694444444446" y1="107.5150462962963" x2="160.41808333333336" y2="172.4849537037037" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" /><line x1="173.18083333333334" y1="107.5150462962963" x2="169.87197222222224" y2="172.4849537037037" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" /><line x1="182.63472222222222" y1="107.5150462962963" x2="179.32586111111112" y2="172.4849537037037" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" />
+    <line x1="577.3652777777778" y1="107.5150462962963" x2="574.0564166666667" y2="172.4849537037037" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" /><line x1="586.8191666666667" y1="107.5150462962963" x2="583.5103055555555" y2="172.4849537037037" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" /><line x1="596.2730555555555" y1="107.5150462962963" x2="592.9641944444444" y2="172.4849537037037" stroke="#3EA6FF" stroke-width="0.7" opacity="0.85" />
+
+    <polygon points="198.4116666666667,109.30555555555556 286.81166666666667,109.30555555555556 297.8616666666667,140 286.81166666666667,170.69444444444446 198.4116666666667,170.69444444444446 187.36166666666668,140" fill="#232A36" stroke="#FF8C00" stroke-width="1.5" />
+    <line x1="214.98666666666668" y1="119.53703703703704" x2="270.2366666666667" y2="119.53703703703704" stroke="#3f3f46" stroke-width="0.5" />
+    <line x1="214.98666666666668" y1="160.46296296296296" x2="270.2366666666667" y2="160.46296296296296" stroke="#3f3f46" stroke-width="0.5" />
+
+    <polygon points="473.18833333333333,109.30555555555556 561.5883333333334,109.30555555555556 572.6383333333333,140 561.5883333333334,170.69444444444446 473.18833333333333,170.69444444444446 462.1383333333333,140" fill="#232A36" stroke="#FF8C00" stroke-width="1.5" />
+    <line x1="489.7633333333333" y1="119.53703703703704" x2="545.0133333333333" y2="119.53703703703704" stroke="#3f3f46" stroke-width="0.5" />
+    <line x1="489.7633333333333" y1="160.46296296296296" x2="545.0133333333333" y2="160.46296296296296" stroke="#3f3f46" stroke-width="0.5" />
+
+    <line x1="159" y1="304.18229166666663" x2="601" y2="304.18229166666663" stroke="#FF8C00" stroke-width="1.2" marker-start="url(#arrL)" marker-end="url(#arrR)" />
+    <text x="380" y="318.18229166666663" fill="#FF8C00" font-size="11" text-anchor="middle" font-weight="bold">L = 4.252" (108 mm)</text>
+
+    <line x1="159" y1="328.18229166666663" x2="187.36166666666668" y2="328.18229166666663" stroke="#FF8C00" stroke-width="1" marker-start="url(#arrL)" marker-end="url(#arrR)" />
+    <text x="173.18083333333334" y="338.18229166666663" fill="#FF8C00" font-size="9" text-anchor="middle">e₁ ≥ 3P (6.9 mm)</text>
+
+    <line x1="572.6383333333333" y1="328.18229166666663" x2="601" y2="328.18229166666663" stroke="#FF8C00" stroke-width="1" marker-start="url(#arrL)" marker-end="url(#arrR)" />
+    <text x="586.8191666666667" y="338.18229166666663" fill="#FF8C00" font-size="9" text-anchor="middle">e₂ ≥ 3P (6.9 mm)</text>
+
+    <text x="380" y="79.5150462962963" fill="#3EA6FF" font-size="10" text-anchor="middle">TPI = 11 · P = 2.309 mm</text>
+    <line x1="375.27510185185184" y1="85.5150462962963" x2="384.72489814814816" y2="85.5150462962963" stroke="#3EA6FF" stroke-width="0.8" marker-start="url(#arrLB)" marker-end="url(#arrRB)" />
+
+    <line x1="380" y1="97.5150462962963" x2="380" y2="176.4849537037037" stroke="#3EA6FF" stroke-width="0.8" stroke-dasharray="3 2" />
+    <text x="386" y="93.5150462962963" fill="#3EA6FF" font-size="10" text-anchor="start">Ø5/8" (15.875 mm)</text>
+
+    <line x1="181.36166666666668" y1="101.30555555555556" x2="303.8616666666667" y2="101.30555555555556" stroke="#3EA6FF" stroke-width="0.8" marker-start="url(#arrLB)" marker-end="url(#arrRB)" />
+    <text x="242.61166666666668" y="95.30555555555556" fill="#3EA6FF" font-size="9" text-anchor="middle">AF 27.0 mm</text>
+
+    <line x1="584.6383333333333" y1="109.30555555555556" x2="584.6383333333333" y2="170.69444444444446" stroke="#3EA6FF" stroke-width="0.8" marker-start="url(#arrLB)" marker-end="url(#arrRB)" />
+    <text x="590.6383333333333" y="143" fill="#3EA6FF" font-size="9" text-anchor="start">H 15.0 mm</text>
+
+    <text x="750" y="18" fill="#A3A9B3" font-size="9" text-anchor="end">2" — Class 400 — RF</text>
+  </svg>

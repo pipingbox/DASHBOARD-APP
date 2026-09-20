@@ -1745,7 +1745,8 @@
     "copyIncidentCode": "Copy incident code",
     "incidentCodeCopied": "Copied",
     "boundaryDesc": "An unexpected error occurred. Try reloading this section.",
-    "boundaryTitle": "Something went wrong"
+    "boundaryTitle": "Something went wrong",
+    "updateApp": "Update app"
   },
   "certAlerts": {
     "sectionLabel": "Alerts",
