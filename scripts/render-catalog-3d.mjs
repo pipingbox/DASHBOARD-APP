@@ -2132,7 +2132,12 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     stlPath.includes('elbow_90_thd') ||
     stlPath.includes('cap_sw') ||
     stlPath.includes('cap_thd') ||
-    stlPath.includes('bushing_thd')
+    stlPath.includes('bushing_thd') ||
+    stlPath.includes('sockolet') ||
+    stlPath.includes('thredolet') ||
+    stlPath.includes('latrolet') ||
+    stlPath.includes('elbolet') ||
+    stlPath.includes('nipolet')
   ) {
     pose = {
       rows: [
@@ -2184,6 +2189,20 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     // Bola: malla en pose canonica (flujo a X, vastago a +Z, palanca a X).
     // Vista tres cuartos frontal-superior: palanca horizontal sobre el cuerpo.
     catalogViewDir = normalize([0.52, -0.62, 0.42]);
+  } else if (pose?.kind === 'manual' && (
+    stlPath.includes('sockolet') ||
+    stlPath.includes('thredolet') ||
+    stlPath.includes('latrolet') ||
+    stlPath.includes('elbolet') ||
+    stlPath.includes('nipolet')
+  )) {
+    // Olets are generated in their documented reference orientation. Avoid
+    // PCA reorientation: the outlet configuration (socket, NPT rings,
+    // 45-degree branch, elbow saddle, or extended nipple) is the semantic
+    // feature the catalog view must preserve.
+    catalogViewDir = stlPath.includes('latrolet')
+      ? normalize([0.78, 0.18, 0.46])
+      : normalize([0.52, -0.64, 0.48]);
   } else if (pose?.kind === 'cap' && stlPath.includes('weldolet')) {
     // Weldolet: vista tres cuartos baja para que se aprecie la campana y la
     // curva de la silla en la base, no solo la boca.

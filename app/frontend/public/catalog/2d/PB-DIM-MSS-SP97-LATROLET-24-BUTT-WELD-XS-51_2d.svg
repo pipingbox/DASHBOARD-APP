@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+<title>LATROLET — 24 — BUTT-WELD XS</title>
+<desc>Technical reference drawing generated from the canonical PIDM dataset. Source: Bonney Forge BC_min.pdf, PDF p.18. Status: CROSS_REFERENCE.</desc>
+<style>
+  .title{font:700 28px Arial;fill:#172033}.subtitle{font:16px Arial;fill:#4b5563}
+  .label{font:14px Arial;fill:#243044}.value{font:14px Arial;font-weight:700;fill:#111827}
+  .dim{font:13px Arial;fill:#172033}.line{stroke:#172033;stroke-width:3;fill:#d9e0e7}
+  .bore{stroke:#d4572f;stroke-width:2;fill:none}.center{stroke:#53657d;stroke-width:1;stroke-dasharray:8 5}
+</style>
+<rect width="1200" height="800" fill="#fff"/>
+<text x="45" y="48" class="title">LATROLET</text>
+<text x="45" y="76" class="subtitle">24 — BUTT-WELD XS — all dimensions shown in inch / mm twins</text>
+<g transform="translate(250 205)">
+  <path class="line" d="M40 220 Q80 80 220 80 L340 80 Q470 80 510 220 L455 220 Q425 135 340 135 L220 135 Q125 135 95 220 Z"/>
+  <path class="line" d="M220 85 L220 20 L340 20 L340 85 Z"/>
+  <path class="bore" d="M235 85 L235 36 L325 36 L325 85"/>
+  <line class="center" x1="0" y1="220" x2="550" y2="220"/>
+  <line class="center" x1="280" y1="0" x2="280" y2="260"/>
+  <text x="270" y="285" class="dim">schematic profile — not to scale</text>
+</g>
+<rect x="430" y="385" width="700" height="209" fill="#f3f5f7" stroke="#c7d0da"/>
+<text x="470" y="420" class="label">DIMENSIONAL DATA</text>
+<text x="470" y="455" class="label">Outlet size</text><text x="735" y="455" class="value">24</text><text x="470" y="479" class="label">Configuration</text><text x="735" y="479" class="value">BUTT-WELD XS</text><text x="470" y="503" class="label">A</text><text x="735" y="503" class="value">21.469 in  |  545.306 mm</text><text x="470" y="527" class="label">B</text><text x="735" y="527" class="value">38.438 in  |  976.313 mm</text><text x="470" y="551" class="label">C</text><text x="735" y="551" class="value">34.813 in  |  884.237 mm</text><text x="470" y="575" class="label">E</text><text x="735" y="575" class="value">18.625 in  |  473.075 mm</text>
+<text x="45" y="755" class="subtitle">MSS SP-97 family | Provenance: CROSS_REFERENCE | Source: Bonney Forge BC_min.pdf, PDF p.18</text>
+</svg>

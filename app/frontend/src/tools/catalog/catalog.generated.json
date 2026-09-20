@@ -4,13 +4,13 @@
   "_warning": "FICHERO GENERADO. No editar a mano: se sobrescribe.",
   "stats": {
     "components": 56,
-    "publishable": 40,
+    "publishable": 45,
     "standards": 19,
     "standardsInUse": 16,
     "dimensionSets": 70,
     "dimensionRows": 1945,
-    "drawings": 486,
-    "renders": 39
+    "drawings": 491,
+    "renders": 44
   },
   "components": [
     {
@@ -1715,9 +1715,14 @@
       "dimensionSets": [
         "PB-DIM-MSS-SP97-ELBOLET"
       ],
-      "drawings": [],
+      "drawings": [
+        {
+          "size": null,
+          "src": "/catalog/2d/PB-DIM-MSS-SP97-ELBOLET-2-BUTT-WELD-STD-XS-90-LR-ELBOW-8_2d.svg"
+        }
+      ],
       "drawingStem": null,
-      "render": null,
+      "render": "/catalog/3d/PB-ASSET-0044_elbolet_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -1732,7 +1737,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-GASKET-SW-ASME-B16-20",
@@ -2432,9 +2437,14 @@
       "dimensionSets": [
         "PB-DIM-MSS-SP97-LATROLET"
       ],
-      "drawings": [],
+      "drawings": [
+        {
+          "size": null,
+          "src": "/catalog/2d/PB-DIM-MSS-SP97-LATROLET-24-BUTT-WELD-XS-51_2d.svg"
+        }
+      ],
       "drawingStem": null,
-      "render": null,
+      "render": "/catalog/3d/PB-ASSET-0043_latrolet_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -2449,7 +2459,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-NIPOLET-MSS-SP97",
@@ -2492,9 +2502,14 @@
       "dimensionSets": [
         "PB-DIM-MSS-SP97-NIPOLET"
       ],
-      "drawings": [],
+      "drawings": [
+        {
+          "size": null,
+          "src": "/catalog/2d/PB-DIM-MSS-SP97-NIPOLET-2-DOUBLE-EXTRA-STRONG-STANDARD-LENGTHS-3-1-2-4-1-2-5-1-2-6-1-2-12_2d.svg"
+        }
+      ],
       "drawingStem": null,
-      "render": null,
+      "render": "/catalog/3d/PB-ASSET-0045_nipolet_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -2509,7 +2524,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-REDUCER-CONC-BW-ASME-B16-9",
@@ -3645,9 +3660,14 @@
       "dimensionSets": [
         "PB-DIM-MSS-SP97-SOCKOLET"
       ],
-      "drawings": [],
+      "drawings": [
+        {
+          "size": null,
+          "src": "/catalog/2d/PB-DIM-MSS-SP97-SOCKOLET-2-CLASS-9000-27_2d.svg"
+        }
+      ],
       "drawingStem": null,
-      "render": null,
+      "render": "/catalog/3d/PB-ASSET-0041_sockolet_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -3662,7 +3682,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-SPADE-ASME-B16-48",
@@ -5084,9 +5104,14 @@
       "dimensionSets": [
         "PB-DIM-MSS-SP97-THREDOLET"
       ],
-      "drawings": [],
+      "drawings": [
+        {
+          "size": null,
+          "src": "/catalog/2d/PB-DIM-MSS-SP97-THREDOLET-2-CLASS-6000-NPT-23_2d.svg"
+        }
+      ],
       "drawingStem": null,
-      "render": null,
+      "render": "/catalog/3d/PB-ASSET-0042_thredolet_3d.webp",
       "fabricationNotes": [
         "Verify vendor dimensions."
       ],
@@ -5101,7 +5126,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-VALVE-BALL-API-608",
