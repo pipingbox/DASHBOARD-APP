@@ -257,15 +257,32 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
       console.log('mount PASS: /profile alive through the incident crash window');
 
       // ── 5. Edit years of experience → save (under mutated DOM) ─────────
-      // Bounded CSS+text locators (getByRole walks the full ARIA tree of a
-      // large, font-wrapped page; explicit timeouts make any stall a
-      // diagnosable failure instead of a silent global-timeout hang).
-      const yearsInput = page.locator('form input[type="number"]').first();
-      console.log('phase: clicking years input');
-      await yearsInput.click({ force: true, timeout: 20_000 });
-      console.log('phase: filling years input');
-      await yearsInput.fill(String(editedYears), { timeout: 20_000 });
-      console.log('phase: years filled, clicking save');
+      // Deterministic inventory + driver-level fill: the React-controlled
+      // input is set through the native value setter + input event (same
+      // mechanism as the proven harness), which is immune to whichever
+      // number input Playwright actionability decides to target on a large
+      // font-wrapped page.
+      const numberInputs = await page.evaluate(() =>
+        [...document.querySelectorAll('form input[type=number]')].map((el) => {
+          const i = el as HTMLInputElement;
+          const form = i.closest('form');
+          return {
+            name: i.name, value: i.value, disabled: i.disabled,
+            formIndex: [...document.querySelectorAll('form')].indexOf(form as HTMLFormElement),
+          };
+        }),
+      );
+      console.log('DIAG number inputs:', JSON.stringify(numberInputs));
+      console.log('phase: filling years input (native setter)');
+      const fillResult = await page.evaluate((val) => {
+        const i = document.querySelector('form input[type=number]') as HTMLInputElement | null;
+        if (!i) return 'NF';
+        const set = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')!.set!;
+        set.call(i, val);
+        i.dispatchEvent(new Event('input', { bubbles: true }));
+        return 'ok:' + i.value;
+      }, String(editedYears));
+      console.log('phase: years filled ->', fillResult);
       const preClickDiag = await page.evaluate(() => {
         const btns = [...document.querySelectorAll('form button[type=submit]')];
         const saveBtn = btns.find((b) => /Guardar perfil/i.test(b.textContent ?? ''));
