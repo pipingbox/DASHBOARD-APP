@@ -578,7 +578,8 @@ export function CertificationsSection() {
         {loading ? (
           <div className="flex items-center gap-2 text-sm text-zinc-500">
             <Loader2 className="h-4 w-4 animate-spin" />
-            {t('common.loading')}
+            {/* PB-UI-DOM-INSERTBEFORE-001: span anchor — see WorkExperienceSection */}
+            <span>{t('common.loading')}</span>
           </div>
         ) : items.length === 0 ? (
           <div className="border border-dashed border-zinc-800 bg-zinc-950 p-8 text-center">
@@ -904,9 +905,11 @@ export function CertificationsSection() {
                     ) : (
                       <Upload className="h-4 w-4" />
                     )}
-                    {uploading
-                      ? `${t('common.loading')} ${uploadProgress}%`
-                      : t('workerProfile.certifications.uploadFile')}
+                    <span>
+                      {uploading
+                        ? `${t('common.loading')} ${uploadProgress}%`
+                        : t('workerProfile.certifications.uploadFile')}
+                    </span>
                   </label>
                   {uploading && (
                     <div className="w-full space-y-1">

@@ -311,3 +311,13 @@ jobs:
           npx playwright test tests/onboarding-dom-mutation.spec.ts \
             --config=playwright.config.ts \
             --reporter=line
+
+      # PB-UI-DOM-INSERTBEFORE-001 (/profile): mount + edit/save regression
+      # for the real-device NO-GO (PB-ERR-JYAHES et al.). Same window/account.
+      - name: Run profile DOM-mutation E2E — mount + edit/save regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/profile-dom-mutation.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
