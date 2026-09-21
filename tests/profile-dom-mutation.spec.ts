@@ -251,18 +251,21 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
       console.log('mount PASS: /profile alive through the incident crash window');
 
       // ── 5. Edit years of experience → save (under mutated DOM) ─────────
-      const yearsInput = page.locator('input[type="number"]').first();
+      // Bounded CSS+text locators (getByRole walks the full ARIA tree of a
+      // large, font-wrapped page; explicit timeouts make any stall a
+      // diagnosable failure instead of a silent global-timeout hang).
+      const yearsInput = page.locator('form input[type="number"]').first();
       console.log('phase: clicking years input');
-      await yearsInput.click({ force: true });
+      await yearsInput.click({ force: true, timeout: 20_000 });
       console.log('phase: filling years input');
-      await yearsInput.fill(String(editedYears));
+      await yearsInput.fill(String(editedYears), { timeout: 20_000 });
       console.log('phase: years filled, clicking save');
 
       // The save-status banner swap + button label swap must not crash.
       await page
-        .getByRole('button', { name: /Guardar perfil/i })
+        .locator('form button[type="submit"]', { hasText: /Guardar perfil/i })
         .first()
-        .click({ force: true });
+        .click({ force: true, timeout: 20_000 });
       console.log('phase: save clicked, waiting for saved status');
 
       await expect(
