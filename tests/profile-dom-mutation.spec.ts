@@ -182,7 +182,7 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
     const profileUrl = `${restCtx.base}/rest/v1/${PROFILES_TABLE}?select=*&user_id=eq.${identifiedId}`;
 
     const readProfile = async (): Promise<Record<string, unknown>> => {
-      const res = await fetch(profileUrl, { headers: restHeaders });
+      const res = await fetch(profileUrl, { headers: restHeaders, signal: AbortSignal.timeout(15_000) });
       expect(res.ok, `profile fetch failed: HTTP ${res.status}`).toBeTruthy();
       const rows = (await res.json()) as Record<string, unknown>[];
       expect(rows.length, 'QA account must have exactly one profile row').toBe(1);
@@ -194,6 +194,7 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
         method: 'POST',
         headers: { Authorization: restCtx.authorization, 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: identifiedId }),
+        signal: AbortSignal.timeout(20_000),
       });
       expect(res.ok, `recalculate-profiles failed: HTTP ${res.status}`).toBeTruthy();
     };
@@ -251,23 +252,30 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
 
       // ── 5. Edit years of experience → save (under mutated DOM) ─────────
       const yearsInput = page.locator('input[type="number"]').first();
+      console.log('phase: clicking years input');
       await yearsInput.click({ force: true });
+      console.log('phase: filling years input');
       await yearsInput.fill(String(editedYears));
+      console.log('phase: years filled, clicking save');
 
       // The save-status banner swap + button label swap must not crash.
       await page
         .getByRole('button', { name: /Guardar perfil/i })
         .first()
         .click({ force: true });
+      console.log('phase: save clicked, waiting for saved status');
 
       await expect(
         page.getByText(/Guardado/i).first(),
         'save status must reach the canonical "saved" state (no false success)',
       ).toBeVisible({ timeout: 15_000 });
+      console.log('phase: saved status visible');
       expect(await boundaryVisible(), 'save under mutated DOM must not crash').toBe(false);
 
       // ── 6. Canonical state: DB must hold the edited value ──────────────
+      console.log('phase: reading canonical profile from DB');
       const afterSave = await readProfile();
+      console.log('phase: canonical profile read');
       expect(
         Number(afterSave.years_experience),
         'canonical state: years_experience must be persisted in DB',
@@ -275,7 +283,9 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
       console.log(`save PASS: canonical years_experience=${editedYears} confirmed in DB`);
 
       // ── 7. Reload → persistence from DB (source of truth) ─────────────
+      console.log('phase: reloading page');
       await page.reload({ waitUntil: 'networkidle' });
+      console.log('phase: reloaded');
       await page.waitForTimeout(2500);
       const mutatedAfterReload = await page.evaluate(TRANSLATE_SIM);
       console.log(`translate-sim after reload: ${mutatedAfterReload} nodes font-wrapped`);
@@ -313,6 +323,7 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
           method: 'PATCH',
           headers: { ...restHeaders, Prefer: 'return=representation' },
           body: JSON.stringify(restoreBody),
+          signal: AbortSignal.timeout(15_000),
         });
         expect(restoreRes.ok, `restore PATCH failed: HTTP ${restoreRes.status}`).toBeTruthy();
         expect(((await restoreRes.json()) as unknown[]).length, 'restore must affect exactly one row').toBe(1);
