@@ -266,6 +266,23 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
       console.log('phase: filling years input');
       await yearsInput.fill(String(editedYears), { timeout: 20_000 });
       console.log('phase: years filled, clicking save');
+      const preClickDiag = await page.evaluate(() => {
+        const btns = [...document.querySelectorAll('form button[type=submit]')];
+        const saveBtn = btns.find((b) => /Guardar perfil/i.test(b.textContent ?? ''));
+        const form = document.querySelector('form');
+        const years = document.querySelector('form input[type=number]');
+        const invalid = form
+          ? [...form.querySelectorAll('input,textarea,select')].filter((el) => !(el as HTMLInputElement).checkValidity() && !(el as HTMLInputElement).disabled).map((el) => (el as HTMLInputElement).name + ':' + (el as HTMLInputElement).type + ':' + String((el as HTMLInputElement).value).slice(0, 20))
+          : [];
+        return {
+          btnFound: !!saveBtn,
+          btnDisabled: saveBtn?.disabled ?? null,
+          yearsValue: (years as HTMLInputElement | null)?.value ?? null,
+          formValid: form?.checkValidity() ?? null,
+          invalid,
+        };
+      });
+      console.log('DIAG pre-click:', JSON.stringify(preClickDiag));
 
       // The save-status banner swap + button label swap must not crash.
       await page
