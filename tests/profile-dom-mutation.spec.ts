@@ -94,6 +94,12 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
       }
     });
 
+    const browserErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') browserErrors.push(msg.text().slice(0, 300));
+    });
+    page.on('pageerror', (err) => browserErrors.push('pageerror: ' + String(err).slice(0, 300)));
+
     const payloads: Buffer[] = [];
     page.on('request', (req) => {
       if (req.url().includes('posthog.com') && req.method() === 'POST') {
@@ -268,10 +274,28 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
         .click({ force: true, timeout: 20_000 });
       console.log('phase: save clicked, waiting for saved status');
 
-      await expect(
-        page.getByText(/Guardado/i).first(),
-        'save status must reach the canonical "saved" state (no false success)',
-      ).toBeVisible({ timeout: 15_000 });
+      try {
+        await expect(
+          page.getByText(/Guardado/i).first(),
+          'save status must reach the canonical "saved" state (no false success)',
+        ).toBeVisible({ timeout: 15_000 });
+      } catch (err) {
+        // Diagnostics: what did the status region actually show? Did the
+        // upsert error out (saveError) or did submit never fire?
+        const statusText = await page
+          .evaluate(() => {
+            const form = document.querySelector('form');
+            const footer = form
+              ? [...form.querySelectorAll('button[type=submit]')].map((b) => b.closest('div')?.textContent?.replace(/\s+/g, ' ').trim().slice(0, 200)).join(' | ')
+              : 'NO FORM';
+            const errEls = [...document.querySelectorAll('.text-red-400, .text-red-500')].map((e) => e.textContent?.replace(/\s+/g, ' ').trim().slice(0, 120)).filter(Boolean).join(' | ');
+            return { footer, errEls };
+          })
+          .catch(() => ({ footer: 'eval failed', errEls: '' }));
+        console.log('DIAG status region:', JSON.stringify(statusText));
+        console.log('DIAG browser errors:', JSON.stringify(browserErrors.slice(0, 8)));
+        throw err;
+      }
       console.log('phase: saved status visible');
       expect(await boundaryVisible(), 'save under mutated DOM must not crash').toBe(false);
 
