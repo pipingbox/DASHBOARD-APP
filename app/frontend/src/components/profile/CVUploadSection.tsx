@@ -345,9 +345,11 @@ export function CVUploadSection() {
             ) : (
               <Upload className="h-5 w-5" />
             )}
-            {uploading
-              ? t('common.loading')
-              : t('workerProfile.cv.uploadPdf')}
+            <span>
+              {uploading
+                ? t('common.loading')
+                : t('workerProfile.cv.uploadPdf')}
+            </span>
             <input
               ref={fileInputRef}
               type="file"

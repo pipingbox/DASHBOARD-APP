@@ -294,7 +294,7 @@ export function AvailabilityMobilitySection() {
           className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
         >
           {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {saving ? t('common.saving') : t('availability.save')}
+          <span>{saving ? t('common.saving') : t('availability.save')}</span>
         </Button>
       </div>
     </div>

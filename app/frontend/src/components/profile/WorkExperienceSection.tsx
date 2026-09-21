@@ -399,7 +399,8 @@ export function WorkExperienceSection() {
         {loading ? (
           <div className="flex items-center gap-2 text-sm text-zinc-500">
             <Loader2 className="h-4 w-4 animate-spin" />
-            {t('common.loading')}
+            {/* PB-UI-DOM-INSERTBEFORE-001: span anchor — auto-translate detaches bare text and the loading→content swap then throws NotFoundError removeChild */}
+            <span>{t('common.loading')}</span>
           </div>
         ) : items.length === 0 ? (
           <div className="border border-dashed border-zinc-800 bg-zinc-950 p-8 text-center">
@@ -680,7 +681,7 @@ export function WorkExperienceSection() {
                   ) : (
                     <Sparkles className="h-3 w-3" />
                   )}
-                  {t('workerProfile.experience.generateAll')}
+                  <span>{t('workerProfile.experience.generateAll')}</span>
                 </Button>
               </div>
 
@@ -866,11 +867,13 @@ export function WorkExperienceSection() {
                 {saving ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
-                {saving
-                  ? t('common.saving')
-                  : editing
-                    ? t('common.update')
-                    : t('common.create')}
+                <span>
+                  {saving
+                    ? t('common.saving')
+                    : editing
+                      ? t('common.update')
+                      : t('common.create')}
+                </span>
               </Button>
             </div>
           </form>
@@ -908,7 +911,7 @@ export function WorkExperienceSection() {
               className="bg-red-600 text-white hover:bg-red-700"
             >
               {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {t('common.delete')}
+              <span>{t('common.delete')}</span>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

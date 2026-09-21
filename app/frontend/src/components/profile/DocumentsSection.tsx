@@ -541,9 +541,11 @@ export function DocumentsSection() {
                   ) : (
                     <Upload className="h-4 w-4" />
                   )}
-                  {uploading
-                    ? t('workerProfile.documents.uploading', { defaultValue: 'Uploading...' })
-                    : t('workerProfile.documents.uploadFile', { defaultValue: 'Click to upload file' })}
+                  <span>
+                    {uploading
+                      ? t('workerProfile.documents.uploading', { defaultValue: 'Uploading...' })
+                      : t('workerProfile.documents.uploadFile', { defaultValue: 'Click to upload file' })}
+                  </span>
                   <input
                     ref={fileInputRef}
                     type="file"

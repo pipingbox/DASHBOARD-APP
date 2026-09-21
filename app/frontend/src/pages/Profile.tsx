@@ -402,7 +402,7 @@ export default function Profile() {
               ) : (
                 <FileDown className="mr-2 h-4 w-4" />
               )}
-              {generating ? t('profile.generatingCV') : t('profile.generateCV')}
+              <span>{generating ? t('profile.generatingCV') : t('profile.generateCV')}</span>
             </Button>
           </div>
         </div>
