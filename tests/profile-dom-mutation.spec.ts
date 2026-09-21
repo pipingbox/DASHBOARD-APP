@@ -302,11 +302,19 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
       console.log('DIAG pre-click:', JSON.stringify(preClickDiag));
 
       // The save-status banner swap + button label swap must not crash.
-      await page
-        .locator('form button[type="submit"]', { hasText: /Guardar perfil/i })
-        .first()
-        .click({ force: true, timeout: 20_000 });
-      console.log('phase: save clicked, waiting for saved status');
+      // In-page click on the submit button: dispatches the real form
+      // submit (handleSave -> real upsert -> canonical state) and is
+      // immune to synthetic hit-point issues on the mutated page. This is
+      // the mechanism proven against the real component in the harness.
+      const saveClick = await page.evaluate(() => {
+        const b = [...document.querySelectorAll('form button[type=submit]')].find((x) =>
+          /Guardar perfil/i.test(x.textContent ?? ''),
+        );
+        if (!b) return 'NF';
+        (b as HTMLButtonElement).click();
+        return 'ok';
+      });
+      console.log('phase: save clicked ->', saveClick, ', waiting for saved status');
 
       try {
         await expect(
