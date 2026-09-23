@@ -9,9 +9,11 @@ import {
   Loader2,
   BookOpen,
   HelpCircle,
+  Lock,
 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
 import { localizedLesson, type LessonContentI18n } from '@/lib/academy/lessonI18n';
+import { hasCourseEntitlement } from '@/lib/academy/entitlement';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import Markdown from 'markdown-to-jsx';
@@ -27,6 +29,7 @@ interface Lesson {
   duration_minutes: number;
   order_index: number;
   official_ref: string | null;
+  is_free_preview: boolean;
   content_i18n?: Record<string, LessonContentI18n> | null;
 }
 
@@ -34,12 +37,13 @@ interface Course {
   id: string;
   title: string;
   slug: string;
+  is_premium: boolean;
 }
 
 export default function LessonView() {
   const { t, i18n } = useTranslation();
   const { lessonId } = useParams<{ lessonId: string }>();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [course, setCourse] = useState<Course | null>(null);
@@ -47,6 +51,8 @@ export default function LessonView() {
   const [progressStatus, setProgressStatus] = useState<string>('not_started');
   const [marking, setMarking] = useState(false);
   const [loading, setLoading] = useState(true);
+  // PB-MARKET-ACCESS-001: fail-closed until entitlement is resolved.
+  const [courseAccess, setCourseAccess] = useState(false);
 
   const fetchLesson = useCallback(async () => {
     if (!lessonId) return;
@@ -68,10 +74,22 @@ export default function LessonView() {
     // Fetch course
     const { data: courseData } = await supabase
       .from(TABLES.academyCourses)
-      .select('id, title, slug')
+      .select('id, title, slug, is_premium')
       .eq('id', lessonData.course_id)
       .single();
     setCourse(courseData as Course);
+
+    // PB-MARKET-ACCESS-001: direct lesson URLs are gated too. A premium
+    // lesson requires an entitlement (paid order / admin); free-preview
+    // lessons stay open to everyone, including anonymous visitors.
+    const access = courseData
+      ? lessonData.is_free_preview ||
+        (await hasCourseEntitlement(
+          { userId: user?.id ?? null, role: profile?.role ?? null },
+          { slug: courseData.slug, is_premium: courseData.is_premium },
+        ))
+      : false;
+    setCourseAccess(access);
 
     // Fetch all lessons in course (for prev/next navigation)
     const { data: lessonsData } = await supabase
@@ -93,7 +111,7 @@ export default function LessonView() {
     }
 
     setLoading(false);
-  }, [lessonId, user]);
+  }, [lessonId, user, profile]);
 
   useEffect(() => {
     fetchLesson();
@@ -155,6 +173,51 @@ export default function LessonView() {
       <div className="text-center py-24 space-y-3">
         <p className="text-sm text-zinc-500">{t('academy.course.lessonNotFound')}</p>
         <Link to="/academy" className="text-xs text-[#f59e0b] hover:underline">← {t('academy.backToAcademy')}</Link>
+      </div>
+    );
+  }
+
+  // PB-MARKET-ACCESS-001: blocked screen for premium lessons without
+  // entitlement. Rendered BEFORE any lesson content. English fallback
+  // matches the PremiumGate precedent.
+  if (!courseAccess) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 text-xs text-zinc-500">
+          <Link to="/academy" className="hover:text-zinc-300">{t('nav.academy')}</Link>
+          <span>/</span>
+          <Link to={`/academy/course/${course.slug}`} className="hover:text-zinc-300">{course.title}</Link>
+        </div>
+        <div className="border border-[#f59e0b]/30 bg-[#f59e0b]/5 rounded-sm p-8 text-center space-y-4">
+          <Lock className="h-10 w-10 text-[#f59e0b] mx-auto" />
+          <h1 className="text-lg font-bold text-zinc-100">Premium Course</h1>
+          <p className="text-xs text-zinc-500 max-w-md mx-auto">
+            {t('academy.course.freePreview')}
+          </p>
+          <div className="flex items-center justify-center gap-3 pt-1">
+            {!user ? (
+              <Link
+                to="/login"
+                className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold px-4 py-2 rounded-sm text-xs transition"
+              >
+                {t('common.signIn')}
+              </Link>
+            ) : (
+              <a
+                href="mailto:hello@pipingbox.com?subject=Premium%20Course%20Access"
+                className="text-xs text-zinc-400 hover:text-zinc-200 underline"
+              >
+                hello@pipingbox.com
+              </a>
+            )}
+            <Link
+              to={`/academy/course/${course.slug}`}
+              className="text-xs text-[#f59e0b] hover:underline"
+            >
+              ← {course.title}
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }

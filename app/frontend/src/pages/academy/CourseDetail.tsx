@@ -19,6 +19,7 @@ import {
 import { supabase, TABLES } from '@/lib/supabase';
 import { localizedCourse } from '@/lib/academy/courseI18n';
 import { localizedLesson, type LessonContentI18n } from '@/lib/academy/lessonI18n';
+import { hasCourseEntitlement } from '@/lib/academy/entitlement';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
@@ -64,11 +65,14 @@ const CONTENT_ICONS: Record<string, React.ElementType> = {
 export default function CourseDetail() {
   const { t, i18n } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [course, setCourse] = useState<Course | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [progress, setProgress] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  // PB-MARKET-ACCESS-001: entitlement resolved from canonical sources only.
+  // Default false (fail-closed) until proven otherwise.
+  const [courseAccess, setCourseAccess] = useState(false);
 
   const fetchCourse = useCallback(async () => {
     if (!slug) return;
@@ -86,6 +90,14 @@ export default function CourseDetail() {
     }
 
     setCourse(courseData as Course);
+
+    // PB-MARKET-ACCESS-001: resolve entitlement from canonical sources
+    // (paid order / admin). Non-premium short-circuits to true inside.
+    const access = await hasCourseEntitlement(
+      { userId: user?.id ?? null, role: profile?.role ?? null },
+      { slug: courseData.slug, is_premium: courseData.is_premium },
+    );
+    setCourseAccess(access);
 
     const { data: lessonsData } = await supabase
       .from(TABLES.academyLessons)
@@ -111,7 +123,7 @@ export default function CourseDetail() {
     }
 
     setLoading(false);
-  }, [slug, user]);
+  }, [slug, user, profile]);
 
   useEffect(() => {
     fetchCourse();
@@ -238,6 +250,35 @@ export default function CourseDetail() {
         )}
       </div>
 
+      {/* PB-MARKET-ACCESS-001: purchase notice — premium course without entitlement.
+          Reuses existing i18n keys; English fallback matches PremiumGate precedent. */}
+      {course.is_premium && !courseAccess && (
+        <div className="border border-[#f59e0b]/30 bg-[#f59e0b]/5 rounded-sm p-4 flex items-center gap-3">
+          <Lock className="h-5 w-5 text-[#f59e0b] shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-zinc-200">
+              {t('academy.course.premiumPrice', { price: course.price_eur })}
+            </p>
+            <p className="text-[11px] text-zinc-500">{t('academy.course.freePreview')}</p>
+          </div>
+          {!user ? (
+            <Link
+              to="/login"
+              className="shrink-0 bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold px-4 py-2 rounded-sm text-xs transition"
+            >
+              {t('common.signIn')}
+            </Link>
+          ) : (
+            <a
+              href="mailto:hello@pipingbox.com?subject=Premium%20Course%20Access"
+              className="shrink-0 text-xs text-zinc-400 hover:text-zinc-200 underline"
+            >
+              hello@pipingbox.com
+            </a>
+          )}
+        </div>
+      )}
+
       {/* Lessons list */}
       <div className="space-y-2">
         <h2 className="text-sm font-semibold text-zinc-200">{t('academy.course.content')}</h2>
@@ -253,7 +294,7 @@ export default function CourseDetail() {
               const Icon = CONTENT_ICONS[lesson.content_type] ?? FileText;
               const lessonStatus = progress[lesson.id] ?? 'not_started';
               const isCompleted = lessonStatus === 'completed';
-              const isLocked = course.is_premium && !lesson.is_free_preview && !user;
+              const isLocked = course.is_premium && !lesson.is_free_preview && !courseAccess;
 
               return (
                 <Link
