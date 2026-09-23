@@ -697,6 +697,87 @@ Deno.serve(async (req) => {
               // Real money or a test-mode run. Transcribed from the event.
               livemode: event.livemode,
             });
+
+            // -----------------------------------------------------------
+            // PB-MARKET-TAX-ENGINE-001 (DEC-69) — persist the tax result.
+            //
+            // PIPINGBOX is the source of truth for tax RESULTS: whatever the
+            // provider determined is persisted here with our own product
+            // classification snapshot. A determination is recorded ONLY when
+            // the provider actually ran (automatic_tax complete): while it is
+            // disabled there is NO result to persist, and writing a zero-tax
+            // row would fabricate "no obligation" (NON_EU ≠ TAX_FREE).
+            // -----------------------------------------------------------
+            try {
+              const automaticTaxRan =
+                (session as { automatic_tax?: { status?: string } }).automatic_tax
+                  ?.status === "complete";
+
+              if (automaticTaxRan) {
+                const productKey = (metadata.product_keys || "").split(",")[0] || null;
+
+                // Our classification snapshot from the catalog (the row may be
+                // reclassified later; the transaction keeps what was true then).
+                let productTaxCategory: string | null = null;
+                if (productKey) {
+                  const { data: priceRow } = await supabase
+                    .from("app_stripe_prices")
+                    .select("tax_category")
+                    .eq("product_key", productKey)
+                    .maybeSingle();
+                  productTaxCategory = priceRow?.tax_category ?? null;
+                }
+
+                const supplier = await resolveInvoiceSupplier();
+
+                const { error: taxErr } = await supabase
+                  .from("app_tax_determinations")
+                  .insert({
+                    order_id: attribution.id,
+                    legal_entity_id: supplier.legal_entity_id ?? null,
+                    provider: "stripe_tax",
+                    provider_reference: session.id,
+                    jurisdiction:
+                      customerDetails?.address?.country ??
+                      charge?.billing_details?.address?.country ??
+                      null,
+                    tax_type: null,
+                    tax_rate: null,
+                    taxable_amount_cents: session.amount_subtotal ?? null,
+                    tax_amount_cents: session.total_details?.amount_tax ?? null,
+                    currency: (session.currency || "eur").toUpperCase(),
+                    product_tax_category: productTaxCategory,
+                    customer_country: customerDetails?.address?.country ?? null,
+                    customer_region: customerDetails?.address?.state ?? null,
+                    // THREE-STATE: never defaulted.
+                    buyer_is_business: null,
+                    customer_tax_id_status: buyerTaxId ? "PROVIDED" : "NOT_PROVIDED",
+                    // Only positive evidence may ever set reverse_charge true;
+                    // no code path produces it yet, and vat_determination_status
+                    // stays UNDETERMINED (the coherence constraint in 013 makes
+                    // true + UNDETERMINED unrepresentable).
+                    reverse_charge: false,
+                    reverse_charge_status: "UNDETERMINED",
+                    determined_at:
+                      toIso(event.created) ?? new Date().toISOString(),
+                    provider_config_version: null,
+                    evidence: {
+                      source: "checkout.session.completed",
+                      automatic_tax_status: "complete",
+                    },
+                    livemode: event.livemode,
+                  });
+                if (taxErr) {
+                  console.error("stripe-webhook: tax determination insert failed", taxErr);
+                }
+              }
+            } catch (taxCaptureErr) {
+              console.error(
+                "stripe-webhook: tax determination capture failed for session",
+                session.id,
+                taxCaptureErr,
+              );
+            }
           } catch (captureErr) {
             console.error(
               "stripe-webhook: SALE capture failed for session",
