@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   BookOpen,
@@ -17,6 +17,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { ACADEMY_CONTENT_LANGUAGES, getVcaQuestionsSync, useSyllabus } from '@/lib/academy/content';
+import { getNetPriceCents, formatNetPriceEur, EXCL_VAT_NOTE } from '@/lib/academy/pricing';
 
 /* ─── VCA Course Content (Official Syllabus) ───
  * Based on official VCA/BESACC/SSVV syllabus.
@@ -51,6 +52,18 @@ export function VCACourseContent() {
   const { t } = useTranslation();
   const [expandedModule, setExpandedModule] = useState<string | null>('m1-legal');
   const modules = useSyllabus('vca');
+  // PB-MARKET-PRICING-001: catalog-driven net price, never a hardcoded literal.
+  const [netPrice, setNetPrice] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getNetPriceCents('vca_course_bvca').then((cents) => {
+      if (!cancelled && cents != null) setNetPrice(formatNetPriceEur(cents));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const totalLessons = modules.reduce((sum, m) => sum + m.lessons.length, 0);
   const totalMinutes = modules.reduce(
@@ -83,8 +96,10 @@ export function VCACourseContent() {
             </p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-[#f59e0b]">€59.90</p>
-            <p className="text-[10px] text-zinc-600">{t('academy.courseContent.oneTimePayment')}</p>
+            <p className="text-2xl font-bold text-[#f59e0b]">{netPrice ?? ''}</p>
+            <p className="text-[10px] text-zinc-600">
+              {netPrice ? `${t('academy.courseContent.oneTimePayment')} · ${EXCL_VAT_NOTE}` : ''}
+            </p>
           </div>
         </div>
 

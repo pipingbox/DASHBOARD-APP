@@ -38,8 +38,11 @@ export interface PremiumStatus {
   referralLevel?: number;
 }
 
-export const PREMIUM_PRICE_MONTHLY = 4.99; // EUR
-export const PREMIUM_PRICE_YEARLY = 39.00; // EUR
+// PB-MARKET-PRICING-001: price constants REMOVED as a price source. The single
+// source of truth is the app_stripe_prices catalog (tax_behavior='exclusive',
+// net amounts) resolved via src/lib/academy/pricing.ts. Do not reintroduce
+// price literals here — they were one of the three divergent price sources.
+
 export const PREMIUM_FEATURES = [
   { key: 'pdf_export', label: 'PDF Export', description: 'Export flange dimension sheets, torque reports, and templates as PDF' },
   { key: 'printable_templates', label: 'Printable Templates (1:1)', description: 'Print branch templates and elbow cut patterns at true 1:1 scale' },
