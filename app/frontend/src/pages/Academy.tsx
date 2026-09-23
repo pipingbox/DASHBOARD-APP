@@ -19,6 +19,7 @@ import { AcademyIntro } from '@/components/academy/AcademyIntro';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { localizedCourse } from '@/lib/academy/courseI18n';
+import { getCourseNetPriceEur } from '@/lib/academy/pricing';
 
 interface Course {
   id: string;
@@ -51,6 +52,8 @@ export default function Academy() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
+  // PB-MARKET-PRICING-001: course id -> net price label (catalog-driven).
+  const [priceLabels, setPriceLabels] = useState<Record<string, string>>({});
   const [progress, setProgress] = useState<ProgressMap>({});
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -94,7 +97,20 @@ export default function Academy() {
     if (error) {
       console.error('[Academy] Error fetching courses:', error);
     }
-    setCourses((data as Course[]) ?? []);
+    const loaded = (data as Course[]) ?? [];
+    setCourses(loaded);
+
+    // PB-MARKET-PRICING-001: resolve displayed prices from the catalog
+    // (single source of truth); price_eur is a display cache only.
+    const resolved: Record<string, string> = {};
+    for (const c of loaded) {
+      if (!c.is_premium) continue;
+      const eur = await getCourseNetPriceEur(c.slug, c.price_eur);
+      if (eur != null) {
+        resolved[c.id] = `€${Number.isInteger(eur) ? eur : eur.toFixed(2)}`;
+      }
+    }
+    setPriceLabels(resolved);
     setLoading(false);
   }, []);
 
@@ -267,7 +283,9 @@ export default function Academy() {
                   {/* Price */}
                   {course.is_premium && (
                     <div className="absolute top-2 right-2">
-                      <span className="text-sm font-bold text-[#f59e0b]">€{course.price_eur}</span>
+                      <span className="text-sm font-bold text-[#f59e0b]">
+                        {priceLabels[course.id] ?? `€${course.price_eur}`}
+                      </span>
                     </div>
                   )}
 

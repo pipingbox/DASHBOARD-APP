@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   CheckCircle2,
@@ -16,6 +16,7 @@ import {
   Award,
 } from 'lucide-react';
 import { ACADEMY_CONTENT_LANGUAGES, useSyllabus } from '@/lib/academy/content';
+import { getNetPriceCents, formatNetPriceEur, EXCL_VAT_NOTE } from '@/lib/academy/pricing';
 
 /* ─── PRL Course Content (Official Syllabus) ───
  * Based on Ley 31/1995 de Prevención de Riesgos Laborales + RD 39/1997.
@@ -70,7 +71,19 @@ export function PRLCourseContent({ variant = 'Básico' }: PRLCourseContentProps)
     0,
   );
   const totalHours = (totalMinutes / 60).toFixed(1);
-  const price = variant === 'Básico' ? '€29.90' : '€89.90';
+  // PB-MARKET-PRICING-001: catalog-driven net price, never a hardcoded literal.
+  const productKey = variant === 'Básico' ? 'prl_course_basico' : 'prl_course_intermedio';
+  const [price, setPrice] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getNetPriceCents(productKey).then((cents) => {
+      if (!cancelled && cents != null) setPrice(formatNetPriceEur(cents));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [productKey]);
 
   return (
     <div className="space-y-6">
@@ -103,8 +116,10 @@ export function PRLCourseContent({ variant = 'Básico' }: PRLCourseContentProps)
             </p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-[#f59e0b]">{price}</p>
-            <p className="text-[10px] text-zinc-600">{t('academy.courseContent.oneTimePayment')}</p>
+            <p className="text-2xl font-bold text-[#f59e0b]">{price ?? ''}</p>
+            <p className="text-[10px] text-zinc-600">
+              {price ? `${t('academy.courseContent.oneTimePayment')} · ${EXCL_VAT_NOTE}` : ''}
+            </p>
           </div>
         </div>
 

@@ -20,6 +20,7 @@ import { supabase, TABLES } from '@/lib/supabase';
 import { localizedCourse } from '@/lib/academy/courseI18n';
 import { localizedLesson, type LessonContentI18n } from '@/lib/academy/lessonI18n';
 import { hasCourseEntitlement } from '@/lib/academy/entitlement';
+import { getCourseNetPriceEur } from '@/lib/academy/pricing';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
@@ -73,6 +74,9 @@ export default function CourseDetail() {
   // PB-MARKET-ACCESS-001: entitlement resolved from canonical sources only.
   // Default false (fail-closed) until proven otherwise.
   const [courseAccess, setCourseAccess] = useState(false);
+  // PB-MARKET-PRICING-001: net price with catalog priority; price_eur is a
+  // display cache only.
+  const [netPriceEur, setNetPriceEur] = useState<number | null>(null);
 
   const fetchCourse = useCallback(async () => {
     if (!slug) return;
@@ -98,6 +102,11 @@ export default function CourseDetail() {
       { slug: courseData.slug, is_premium: courseData.is_premium },
     );
     setCourseAccess(access);
+
+    // PB-MARKET-PRICING-001: resolve the display price from the catalog
+    // (single source of truth) with the course column as display cache.
+    const netEur = await getCourseNetPriceEur(courseData.slug, courseData.price_eur);
+    setNetPriceEur(netEur);
 
     const { data: lessonsData } = await supabase
       .from(TABLES.academyLessons)
@@ -184,7 +193,7 @@ export default function CourseDetail() {
               {course.is_premium ? (
                 <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] uppercase tracking-wider bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/20 rounded-sm">
                   <Lock className="h-3 w-3" />
-                  {t('academy.course.premiumPrice', { price: course.price_eur })}
+                  {t('academy.course.premiumPrice', { price: netPriceEur ?? course.price_eur })}
                 </span>
               ) : (
                 <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20 rounded-sm">
@@ -257,7 +266,7 @@ export default function CourseDetail() {
           <Lock className="h-5 w-5 text-[#f59e0b] shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-zinc-200">
-              {t('academy.course.premiumPrice', { price: course.price_eur })}
+              {t('academy.course.premiumPrice', { price: netPriceEur ?? course.price_eur })}
             </p>
             <p className="text-[11px] text-zinc-500">{t('academy.course.freePreview')}</p>
           </div>
