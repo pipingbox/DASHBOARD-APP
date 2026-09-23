@@ -123,6 +123,7 @@ export const SPA_ROUTE_CONTRACT: RouteRule[] = [
   { pattern: '/messages', visibility: 'PROTECTED', kind: 'EXACT' },
   { pattern: '/content-drafts', visibility: 'PROTECTED', kind: 'EXACT' },
   { pattern: '/community', visibility: 'PROTECTED', kind: 'EXACT' },
+  { pattern: '/instructor', visibility: 'PROTECTED', kind: 'EXACT', note: 'PB-MARKET-INSTRUCTOR-UI-001: instructor dashboard (sales/settlements/documents)' },
 
   // ─── COMPANY exact routes ──────────────────────────────────────────────────
   { pattern: '/company-dashboard', visibility: 'COMPANY', kind: 'EXACT' },

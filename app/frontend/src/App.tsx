@@ -43,6 +43,7 @@ import CommunityPost from './pages/CommunityPost';
 import Companies from './pages/Companies';
 import RequestWorkers from './pages/RequestWorkers';
 import Profile from './pages/Profile';
+import InstructorDashboard from './pages/InstructorDashboard';
 import PublicWorkerProfile from './pages/PublicWorkerProfile';
 import Admin from './pages/Admin';
 import Applications from './pages/Applications';
@@ -299,6 +300,13 @@ const AppRoutes = () => {
     <Route
       path="/academy/course/:slug"
       element={withShellRoles(<CourseDetail />, ['admin', 'worker', 'company'])}
+    />
+    {/* PB-MARKET-INSTRUCTOR-UI-001 (T8): instructor dashboard — sales,
+        adjustments, settlements, next payout, self-billing documents and
+        fiscal data. No student PII (instructor-safe view). */}
+    <Route
+      path="/instructor"
+      element={withShellRoles(<InstructorDashboard />, ['admin', 'worker', 'company'])}
     />
     <Route
       path="/academy/lesson/:lessonId"
