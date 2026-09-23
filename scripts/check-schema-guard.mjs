@@ -110,22 +110,25 @@ const FORBIDDEN = [
   {
     name: 'instructor_share',
     reason:
-      'is a derived value and must not exist. app_marketplace_revenue_events stores only ' +
-      'observed facts; any share depends on the Net Course Revenue definition, which is ' +
-      'blocked by PB-MARKET-TAX-001.',
+      'is a derived value and must not exist ON THE REVENUE EVENT LOG. ' +
+      'app_marketplace_revenue_events stores only observed facts. The canonical, ' +
+      'PO-approved home for the computed share is the FROZEN settlement row ' +
+      '(app_settlements.instructor_share_cents, sql/014, PB-MARKET-NCR-LEDGER-001): ' +
+      'matched word-boundaried below, so "instructor_share_cents" passes and any ' +
+      'parallel/derived reimplementation (instructor_share, instructorShare) still fails.',
   },
   {
     name: 'instructor_earnings',
     reason:
-      'is a derived value. Compute it from app_marketplace_revenue_events once the Net ' +
-      'Course Revenue definition is settled (PB-MARKET-TAX-001); never store it.',
+      'is a derived value. The canonical computation is the settlement freeze ' +
+      '(PB-MARKET-NCR-LEDGER-001); never store it on the event log.',
   },
   {
     name: 'instructor_balance',
     reason:
       'Instructor Balance is a DERIVED concept and is deliberately not a table or a column. ' +
       'A stored balance is a cached derivation that drifts; derive it from the append-only ' +
-      'event log instead. Blocked by PB-MARKET-TAX-001.',
+      'ledger (app_instructor_ledger_entries, sql/014) instead.',
   },
   {
     name: 'platform_fee',
@@ -446,6 +449,16 @@ if (allowlistErrors.length > 0) {
 
 const violations = [];
 
+// PB-MARKET-NCR-LEDGER-001 (PO 2026-09-23, T7): the matcher is DELIBERATELY
+// amended from substring to WORD-BOUNDARY matching, scoped to exactly the
+// canonical implementation the PO approved and nothing else. The forbidden
+// names stay forbidden as identifiers (a derived `instructor_share` column or
+// variable still fails), but the canonical FROZEN settlement columns
+// (`instructor_share_cents`, `platform_share_cents`, `payable_cents` on
+// app_settlements / app_self_billing_invoices, sql/014) are legal because a
+// word-boundary match does not fire on their longer names. This is the
+// "enmienda deliberada" the PO required: the guard is NOT removed, and any
+// parallel implementation using the bare forbidden names still fails.
 for (const file of walk(SRC)) {
   const rel = relative(SRC, file).split('\\').join('/');
   if (ALLOWLIST.has(rel)) continue;
@@ -453,7 +466,7 @@ for (const file of walk(SRC)) {
   const lines = readFileSync(file, 'utf8').split('\n');
   lines.forEach((line, i) => {
     for (const { name, reason } of FORBIDDEN) {
-      if (line.includes(name)) {
+      if (new RegExp(`\\b${name}\\b`).test(line)) {
         violations.push({ file: rel, line: i + 1, name, reason, text: line.trim() });
       }
     }
