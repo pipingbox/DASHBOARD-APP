@@ -1,4 +1,5 @@
 import { supabase, TABLES } from '@/lib/supabase';
+import { SUPPLY_CONSENT_VERSION } from '@/lib/academy/consent';
 
 /**
  * Stripe checkout helpers (PB-STRIPE-001 Fase 5).
@@ -49,7 +50,7 @@ export async function fetchCatalogPrices(prefix?: string): Promise<CatalogPrice[
 
 export type CheckoutResult =
   | { ok: true; url: string }
-  | { ok: false; reason: 'not_authenticated' | 'not_available' | 'failed' };
+  | { ok: false; reason: 'not_authenticated' | 'not_available' | 'consent_required' | 'failed' };
 
 /**
  * Start a Stripe Checkout session and hand back the URL to redirect to.
@@ -57,10 +58,17 @@ export type CheckoutResult =
  * Only product_key travels to the server. The amount is resolved server-side
  * in the create-checkout Edge Function — a client that could send its own
  * price could buy a EUR 399 pack for a cent.
+ *
+ * PB-MARKET-CONSENT-001: for immediate-supply digital content (recorded
+ * courses), pass `supplyConsent: true` only after the buyer ticks the (never
+ * pre-ticked) consent checkbox. The server re-checks the catalog flag and
+ * refuses the session without it — this parameter is the UX half of a
+ * server-enforced rule, not the enforcement.
  */
 export async function startCheckout(
   productKeys: string | string[],
   metadata?: Record<string, string>,
+  options?: { supplyConsent?: boolean },
 ): Promise<CheckoutResult> {
   const keys = Array.isArray(productKeys) ? productKeys : [productKeys];
 
@@ -70,12 +78,21 @@ export async function startCheckout(
   }
 
   const { data, error } = await supabase.functions.invoke('create-checkout', {
-    body: { product_keys: keys, metadata },
+    body: {
+      product_keys: keys,
+      metadata,
+      ...(options?.supplyConsent
+        ? { consent: { text_version: SUPPLY_CONSENT_VERSION, accepted: true } }
+        : {}),
+    },
   });
 
   if (error) {
     console.error('startCheckout failed', error);
     return { ok: false, reason: 'failed' };
+  }
+  if (data?.error === 'supply_consent_required') {
+    return { ok: false, reason: 'consent_required' };
   }
   if (!data?.url) {
     // create-checkout returns 409 product_not_available when the product has no
@@ -90,8 +107,9 @@ export async function startCheckout(
 export async function redirectToCheckout(
   productKeys: string | string[],
   metadata?: Record<string, string>,
+  options?: { supplyConsent?: boolean },
 ): Promise<Exclude<CheckoutResult, { ok: true }>['reason'] | null> {
-  const result = await startCheckout(productKeys, metadata);
+  const result = await startCheckout(productKeys, metadata, options);
   if (result.ok) {
     window.location.href = result.url;
     return null;

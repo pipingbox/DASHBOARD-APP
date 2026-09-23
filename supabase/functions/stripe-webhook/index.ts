@@ -522,6 +522,80 @@ Deno.serve(async (req) => {
 
           if (error) throw error;
 
+          // PB-MARKET-CONSENT-001 — close the evidence chain:
+          // consent -> session -> paid order -> SUPPLY START.
+          //
+          // The withdrawal-right clock runs from the START OF SUPPLY, which
+          // for a recorded course is the moment the entitlement opens — right
+          // here, when the order turns paid. Recorded as an append-only fact;
+          // the unique partial index on app_supply_events makes a webhook
+          // retry a no-op rather than a second "supply began".
+          //
+          // Wrapped in its own try: access is already granted above and a
+          // telemetry failure must not undo it (same rule as revenue events).
+          try {
+            const consentId = metadata.consent_id ?? null;
+            const paidOrderIds = (updated ?? []).map((o: { id: string }) => o.id);
+
+            if (paidOrderIds.length > 0) {
+              if (consentId) {
+                // Link the consent to the order it unlocked. A one-time
+                // linkage update on a service-owned row: the consent FACT
+                // (text, hash, timestamp) is never touched.
+                const { error: linkErr } = await supabase
+                  .from("app_consent_evidence")
+                  .update({ order_id: paidOrderIds[0] })
+                  .eq("id", consentId)
+                  .is("order_id", null);
+                if (linkErr) {
+                  console.error("stripe-webhook: consent order link failed", linkErr);
+                }
+              }
+
+              const occurredAt = toIso(event.created) ?? new Date().toISOString();
+              const supplyRows = paidOrderIds.map((orderId: string) => ({
+                order_id: orderId,
+                user_id: userId,
+                consent_id: consentId,
+                event_type: "SUPPLY_STARTED",
+                occurred_at: occurredAt,
+                // The durable confirmation the buyer keeps is the Stripe
+                // receipt for the session plus their own readable evidence
+                // rows (owner SELECT on app_consent_evidence /
+                // app_supply_events). The session id identifies that receipt.
+                durable_confirmation_ref: session.id,
+                evidence: { source: "checkout.session.completed" },
+              }));
+
+              // Plain insert, not an upsert: the one-start-per-order index is
+              // PARTIAL (WHERE event_type = 'SUPPLY_STARTED'), and PostgREST
+              // cannot target a partial index as an upsert arbiter. A webhook
+              // retry hits 23505, which is the idempotency guarantee working,
+              // so it is logged at info level and is not an error.
+              for (const row of supplyRows) {
+                const { error: supplyErr } = await supabase
+                  .from("app_supply_events")
+                  .insert(row);
+                if (supplyErr) {
+                  if (supplyErr.code === "23505") {
+                    console.log(
+                      "stripe-webhook: supply start already recorded (retry), order=",
+                      row.order_id,
+                    );
+                  } else {
+                    console.error("stripe-webhook: supply event insert failed", supplyErr);
+                  }
+                }
+              }
+            }
+          } catch (consentChainErr) {
+            console.error(
+              "stripe-webhook: consent/supply chain failed for session",
+              session.id,
+              consentChainErr,
+            );
+          }
+
           // Recovery path: create-checkout logs and continues if its pending
           // insert fails, so the rows may not exist. Rebuild them from metadata
           // rather than lose a paid order.

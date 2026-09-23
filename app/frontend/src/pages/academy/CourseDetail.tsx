@@ -19,8 +19,10 @@ import {
 import { supabase, TABLES } from '@/lib/supabase';
 import { localizedCourse } from '@/lib/academy/courseI18n';
 import { localizedLesson, type LessonContentI18n } from '@/lib/academy/lessonI18n';
-import { hasCourseEntitlement } from '@/lib/academy/entitlement';
+import { hasCourseEntitlement, courseProductKeys } from '@/lib/academy/entitlement';
 import { getCourseNetPriceEur } from '@/lib/academy/pricing';
+import { redirectToCheckout } from '@/lib/stripe';
+import { SupplyConsentCheckbox } from '@/components/academy/SupplyConsentCheckbox';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
@@ -77,6 +79,12 @@ export default function CourseDetail() {
   // PB-MARKET-PRICING-001: net price with catalog priority; price_eur is a
   // display cache only.
   const [netPriceEur, setNetPriceEur] = useState<number | null>(null);
+  // PB-MARKET-CONSENT-001: immediate-supply consent, NEVER pre-ticked, and the
+  // in-flight checkout state. The server re-checks the catalog flag, so this
+  // state is the UX half of a server-enforced rule.
+  const [supplyConsent, setSupplyConsent] = useState(false);
+  const [checkoutBusy, setCheckoutBusy] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   const fetchCourse = useCallback(async () => {
     if (!slug) return;
@@ -141,6 +149,35 @@ export default function CourseDetail() {
   const completedCount = Object.values(progress).filter((s) => s === 'completed').length;
   const totalLessons = lessons.length;
   const pct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+
+  // PB-MARKET-CONSENT-001: the consent checkbox gates the CTA client-side;
+  // create-checkout enforces the same rule server-side from the catalog flag.
+  const handleBuy = async () => {
+    if (!course) return;
+    const keys = courseProductKeys(course.slug);
+    if (keys.length === 0) {
+      setCheckoutError(t('checkout.errorGeneric'));
+      return;
+    }
+    if (!supplyConsent) {
+      setCheckoutError(t('checkout.consentRequired', 'Please tick the consent checkbox to continue.'));
+      return;
+    }
+    setCheckoutBusy(true);
+    setCheckoutError(null);
+    const reason = await redirectToCheckout(keys, undefined, { supplyConsent: true });
+    if (reason) {
+      setCheckoutBusy(false);
+      setCheckoutError(
+        reason === 'consent_required'
+          ? t('checkout.consentRequired', 'Please tick the consent checkbox to continue.')
+          : reason === 'not_available'
+            ? t('checkout.notAvailablePack')
+            : t('checkout.errorGeneric'),
+      );
+    }
+    // null → the browser is already navigating to Stripe.
+  };
 
   if (loading) {
     return (
@@ -260,30 +297,49 @@ export default function CourseDetail() {
       </div>
 
       {/* PB-MARKET-ACCESS-001: purchase notice — premium course without entitlement.
-          Reuses existing i18n keys; English fallback matches PremiumGate precedent. */}
+          PB-MARKET-CONSENT-001: the (never pre-ticked) immediate-supply consent
+          checkbox gates the buy CTA; the server enforces the same rule from the
+          catalog flag, so this is the UX half, not the enforcement. */}
       {course.is_premium && !courseAccess && (
-        <div className="border border-[#f59e0b]/30 bg-[#f59e0b]/5 rounded-sm p-4 flex items-center gap-3">
-          <Lock className="h-5 w-5 text-[#f59e0b] shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-zinc-200">
-              {t('academy.course.premiumPrice', { price: netPriceEur ?? course.price_eur })}
-            </p>
-            <p className="text-[11px] text-zinc-500">{t('academy.course.freePreview')}</p>
+        <div className="border border-[#f59e0b]/30 bg-[#f59e0b]/5 rounded-sm p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <Lock className="h-5 w-5 text-[#f59e0b] shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-zinc-200">
+                {t('academy.course.premiumPrice', { price: netPriceEur ?? course.price_eur })}
+              </p>
+              <p className="text-[11px] text-zinc-500">{t('academy.course.freePreview')}</p>
+            </div>
           </div>
           {!user ? (
             <Link
               to="/login"
-              className="shrink-0 bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold px-4 py-2 rounded-sm text-xs transition"
+              className="inline-block bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold px-4 py-2 rounded-sm text-xs transition"
             >
               {t('common.signIn')}
             </Link>
           ) : (
-            <a
-              href="mailto:hello@pipingbox.com?subject=Premium%20Course%20Access"
-              className="shrink-0 text-xs text-zinc-400 hover:text-zinc-200 underline"
-            >
-              hello@pipingbox.com
-            </a>
+            <div className="space-y-2" data-testid="course-purchase-box">
+              <SupplyConsentCheckbox
+                checked={supplyConsent}
+                onChange={setSupplyConsent}
+                disabled={checkoutBusy}
+              />
+              <button
+                type="button"
+                onClick={handleBuy}
+                disabled={checkoutBusy || !supplyConsent}
+                className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold px-4 py-2 rounded-sm text-xs transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {checkoutBusy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                {checkoutBusy
+                  ? t('checkout.redirecting', 'Redirecting to checkout…')
+                  : t('academy.course.buyNow', 'Buy course')}
+              </button>
+              {checkoutError && (
+                <p className="text-[10px] text-red-400">{checkoutError}</p>
+              )}
+            </div>
           )}
         </div>
       )}
