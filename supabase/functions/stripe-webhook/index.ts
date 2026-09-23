@@ -356,6 +356,68 @@ async function fetchChargeForIntent(
   }
 }
 
+// =============================================================================
+// PB-MARKET-NCR-LEDGER-001 (T7, PO GO 2026-09-23) — instructor ledger writes
+// =============================================================================
+
+/** T+30 settlement window (DEC-66), in days. */
+const SETTLEMENT_WINDOW_DAYS = 30;
+
+interface LedgerEntryInput {
+  instructorId: string;
+  orderId: string | null;
+  entryType: "SALE_CREDIT" | "REFUND_DEBIT" | "CHARGEBACK_DEBIT";
+  amountCents: number;
+  currency: string;
+  occurredAt: string;
+  livemode: boolean | null;
+}
+
+/**
+ * Append one instructor-ledger entry for a sale/refund/chargeback that has an
+ * instructor attribution. NEVER throws (same rule as recordRevenueEvent:
+ * telemetry must not break payment processing).
+ *
+ * SALE_CREDIT rows start PENDING with available_at = occurred_at + T+30; the
+ * settlement runner matures them. REFUND/CHARGEBACK debits carry a NEGATIVE
+ * amount and are AVAILABLE immediately: post-payout reversals are compensated
+ * OFFSET-first against future settlements, RECOVERABLE when no future
+ * balance suffices (PO, section 5). The OFFSET/RECOVERABLE rows themselves
+ * are produced by the settlement runner from these debits — the webhook only
+ * records the observed reversal.
+ */
+async function recordLedgerEntry(input: LedgerEntryInput): Promise<void> {
+  try {
+    const occurred = new Date(input.occurredAt);
+    const availableAt =
+      input.entryType === "SALE_CREDIT"
+        ? new Date(occurred.getTime() + SETTLEMENT_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString()
+        : input.occurredAt;
+
+    const { error } = await supabase.from("app_instructor_ledger_entries").insert({
+      instructor_id: input.instructorId,
+      order_id: input.orderId,
+      entry_type: input.entryType,
+      // Debits are available for offset immediately; credits wait T+30.
+      status: input.entryType === "SALE_CREDIT" ? "PENDING" : "AVAILABLE",
+      amount_cents: input.amountCents,
+      currency: input.currency,
+      occurred_at: input.occurredAt,
+      available_at: availableAt,
+      livemode: input.livemode,
+    });
+    if (error) {
+      console.error(
+        "stripe-webhook: ledger entry insert failed, type=",
+        input.entryType,
+        error,
+      );
+    }
+  } catch (err) {
+    console.error("stripe-webhook: ledger entry insert threw, type=", input.entryType, err);
+  }
+}
+
 /**
  * Discount facts applied to a checkout session.
  *
@@ -698,6 +760,21 @@ Deno.serve(async (req) => {
               livemode: event.livemode,
             });
 
+            // PB-MARKET-NCR-LEDGER-001: instructor ledger credit (T+30 PENDING).
+            // Only when the sale has an instructor attribution — PipingBox
+            // Originals have no instructor and settle with no one.
+            if (attribution.instructor_id) {
+              await recordLedgerEntry({
+                instructorId: attribution.instructor_id,
+                orderId: attribution.id,
+                entryType: "SALE_CREDIT",
+                amountCents: session.amount_total ?? 0,
+                currency: (session.currency || "eur").toUpperCase(),
+                occurredAt: toIso(event.created) ?? new Date().toISOString(),
+                livemode: event.livemode,
+              });
+            }
+
             // -----------------------------------------------------------
             // PB-MARKET-TAX-ENGINE-001 (DEC-69) — persist the tax result.
             //
@@ -1024,6 +1101,22 @@ Deno.serve(async (req) => {
               // Real money or a test-mode run. Transcribed from the event.
               livemode: event.livemode,
             });
+
+            // PB-MARKET-NCR-LEDGER-001: instructor ledger debit. Negative
+            // amount (money leaving), AVAILABLE immediately — post-payout
+            // reversals are compensated OFFSET-first against future
+            // settlements by the settlement runner (PO, section 5).
+            if (attribution.instructor_id && refundedCents > 0) {
+              await recordLedgerEntry({
+                instructorId: attribution.instructor_id,
+                orderId: attribution.id,
+                entryType: "REFUND_DEBIT",
+                amountCents: -refundedCents,
+                currency: (charge.currency || "eur").toUpperCase(),
+                occurredAt: toIso(event.created) ?? new Date().toISOString(),
+                livemode: event.livemode,
+              });
+            }
           } catch (captureErr) {
             console.error("stripe-webhook: refund capture failed for", charge.id, captureErr);
           }
@@ -1103,6 +1196,23 @@ Deno.serve(async (req) => {
             // Real money or a test-mode run. Transcribed from the event.
             livemode: event.livemode,
           });
+
+          // PB-MARKET-NCR-LEDGER-001: instructor ledger debit on dispute open.
+          // The funds are withdrawn pending outcome; the debit is AVAILABLE
+          // immediately and compensated OFFSET-first by the settlement runner.
+          // If the dispute is later WON, charge.dispute.closed records the
+          // reversal and the runner nets it out — nothing here is edited.
+          if (attribution.instructor_id && (dispute.amount ?? 0) > 0) {
+            await recordLedgerEntry({
+              instructorId: attribution.instructor_id,
+              orderId: attribution.id,
+              entryType: "CHARGEBACK_DEBIT",
+              amountCents: -(dispute.amount ?? 0),
+              currency: (dispute.currency || "eur").toUpperCase(),
+              occurredAt: toIso(event.created) ?? new Date().toISOString(),
+              livemode: event.livemode,
+            });
+          }
         } catch (captureErr) {
           console.error("stripe-webhook: dispute capture failed for", dispute.id, captureErr);
         }
