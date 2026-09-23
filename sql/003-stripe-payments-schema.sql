@@ -184,6 +184,10 @@ CREATE TABLE IF NOT EXISTS app_invoices (
   customer_name      TEXT,
   customer_vat_id    TEXT,                   -- B2B only
   customer_country   TEXT,                   -- ISO 3166-1 alpha-2
+  -- NOTE (PB-CORP-LEGAL-ENTITY-001 / 007-legal-entities.sql): the default below
+  -- is REMOVED by 007. 'PIPINGBOX OU' is an entity that does not exist. The
+  -- webhook resolves the supplier from the active LegalEntity (brand fallback
+  -- 'PIPINGBOX'). Kept here only as historical record of what 003 shipped.
   supplier_name      TEXT NOT NULL DEFAULT 'PIPINGBOX OU',
   supplier_vat_id    TEXT,                   -- NULL until incorporation
   amount_cents       INT NOT NULL,

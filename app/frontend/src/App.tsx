@@ -64,6 +64,7 @@ import {
 import PricingPage from './pages/PricingPage';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
+import LegalNotice from './pages/LegalNotice';
 import DsaContact from './pages/DsaContact';
 import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
@@ -387,6 +388,7 @@ const AppRoutes = () => {
     />
     <Route path="/privacy" element={<Privacy />} />
     <Route path="/terms" element={<Terms />} />
+    <Route path="/legal" element={<LegalNotice />} />
     <Route path="/dsa" element={<DsaContact />} />
     <Route path="/contact" element={<Contact />} />
     <Route path="*" element={<NotFound />} />

@@ -616,6 +616,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               {t('footer.terms', { defaultValue: 'Terms of Service' })}
             </Link>
             <span>·</span>
+            <Link to="/legal" className="hover:text-zinc-400 transition">
+              {t('footer.legal', { defaultValue: 'Legal Notice' })}
+            </Link>
+            <span>·</span>
             <Link to="/dsa" className="hover:text-zinc-400 transition">
               {t('footer.dsa', { defaultValue: 'DSA Contact Points' })}
             </Link>
