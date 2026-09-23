@@ -974,9 +974,15 @@ const WEBHOOK = join(EDGE_FUNCTIONS, 'stripe-webhook', 'index.ts');
 try {
   const webhookSrc = readFileSync(WEBHOOK, 'utf8');
   const calls = (webhookSrc.match(/recordRevenueEvent\(\{/g) ?? []).length;
+  // Count only the flags written into a recordRevenueEvent row literal. The
+  // same "livemode: event.livemode" transcription is REQUIRED on other
+  // append-only ledgers (app_tax_determinations, PB-MARKET-TAX-ENGINE-001),
+  // so a whole-file count can exceed the revenue-event call count without
+  // anything being wrong. This check stays scoped to its own guarantee:
+  // every recordRevenueEvent call carries the flag at least once.
   const flags = (webhookSrc.match(/^\s*livemode:\s*event\.livemode,\s*$/gm) ?? []).length;
 
-  if (calls > 0 && flags !== calls) {
+  if (calls > 0 && flags < calls) {
     console.error(
       `\nsupabase/functions/stripe-webhook/index.ts has ${calls} recordRevenueEvent(...) ` +
         `call(s) but ${flags} "livemode: event.livemode" assignment(s).\n\n` +

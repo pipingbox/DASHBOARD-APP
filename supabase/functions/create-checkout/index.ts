@@ -34,6 +34,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { hashConsentText, resolveConsentText } from "../_shared/consent-texts.ts";
+import { getTaxProvider } from "../_shared/tax/stripe-tax.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -73,7 +74,6 @@ Deno.serve(async (req) => {
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
   const appBaseUrl = Deno.env.get("APP_BASE_URL") || "https://pipingbox.com";
-  const automaticTax = Deno.env.get("STRIPE_AUTOMATIC_TAX") === "true";
 
   if (!stripeSecretKey) {
     console.error("create-checkout: STRIPE_SECRET_KEY is not set");
@@ -84,6 +84,11 @@ Deno.serve(async (req) => {
     apiVersion: "2024-06-20",
     httpClient: Stripe.createFetchHttpClient(),
   });
+
+  // DEC-69: checkout core speaks to the TaxProvider interface. The env flag,
+  // the provider choice and the meaning of the session config all live behind
+  // the adapter — this file never decides what "automatic tax" is.
+  const taxProvider = getTaxProvider(stripe);
 
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false },
@@ -295,18 +300,14 @@ Deno.serve(async (req) => {
         success_url: `${appBaseUrl}/dashboard?purchase=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${appBaseUrl}/dashboard?purchase=canceled`,
         allow_promotion_codes: true,
-        // Stripe Tax is off by default. Enabling it requires Stripe Tax to be
-        // activated on the account and an origin address configured, neither of
-        // which exists before PIPINGBOX OU. Turning it on prematurely makes
-        // every session creation fail. Flip STRIPE_AUTOMATIC_TAX=true once the
-        // OU is registered for VAT/OSS (SPEC §7).
-        ...(automaticTax
-          ? {
-              automatic_tax: { enabled: true },
-              // Required by Stripe when automatic_tax runs against an existing
-              // customer: the address must be resolvable.
-              ...(existingCustomerId ? { customer_update: { address: "auto" as const } } : {}),
-            }
+        // DEC-69: the tax session config comes from the TaxProvider adapter.
+        // While the provider is disabled (no active registrations) this is an
+        // empty object and the session carries no tax logic at all.
+        ...taxProvider.checkoutTaxConfig(),
+        // Required by the provider when tax runs against an existing customer:
+        // the address must be resolvable.
+        ...(taxProvider.isEnabled() && existingCustomerId
+          ? { customer_update: { address: "auto" as const } }
           : {}),
       },
       {
