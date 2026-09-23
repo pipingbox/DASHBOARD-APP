@@ -59,8 +59,12 @@
 -- guards for constraints, drop policy if exists before every create policy.
 -- Safe to re-run.
 --
--- STATUS: NOT APPLIED. This file has never been executed against any database.
--- It must be run against Supabase by the operator. See section 7.
+-- STATUS: CONFLICTING SOURCES (PB-OPS-SQLSTATE-001, 2026-09-23). This header
+-- previously said NOT APPLIED, but the Brain ticket INDEX (v4.65.0, 2026-08-27)
+-- records it as APPLIED to the canonical project (mwdauubztjxkbrefirbg). Treat
+-- as UNVERIFIED until the runbook in scripts/verify-sql-state.md is executed
+-- against the database. This header is NOT evidence of application state.
+-- It must be run/verified against Supabase by the operator. See section 7.
 -- =============================================================================
 
 
