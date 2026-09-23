@@ -95,7 +95,13 @@
 -- inherently idempotent. Safe to re-run any number of times. Verified by
 -- running this file twice in succession against a scratch database.
 --
--- STATUS: NOT APPLIED. Tested against a local PostgreSQL 16.4 with the stub
+-- STATUS: NOT APPLIED (uncontested) — PB-OPS-SQLSTATE-001 (2026-09-23): treat
+-- as UNVERIFIED until the runbook in scripts/verify-sql-state.md is executed
+-- against the database. CRITICAL: the deployed webhook writes `livemode` on
+-- every revenue-event insert; deploying/operating it without this migration
+-- means every insert fails SILENTLY (the webhook swallows the error by design).
+-- Apply and verify BEFORE any webhook deploy that writes livemode.
+-- Tested against a local PostgreSQL 16.4 with the stub
 -- fixtures in sql/test-fixtures/ (004 -> 005 -> 006, then 006 again). It must
 -- be applied to Supabase by the operator. See section 4.
 -- =============================================================================
