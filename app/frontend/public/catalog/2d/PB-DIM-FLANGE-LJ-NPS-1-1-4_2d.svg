@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs><style>
+    .profile{stroke:#1a1a1a;stroke-width:2;fill:#e2e5e8}
+    .bore{stroke:#555;stroke-width:1;fill:none;stroke-dasharray:4 2}
+    .bore-solid{stroke:#555;stroke-width:1.6;fill:none}
+    .thread{stroke:#8a5a00;stroke-width:1.1;fill:none}
+    .radius{stroke:#0b6b8a;stroke-width:1.6;fill:none}
+    .centerline{stroke:#999;stroke-width:.8;stroke-dasharray:8 4;fill:none}
+    .dim-line{stroke:#c62828;stroke-width:.9;fill:none}
+    .dim-ext{stroke:#c62828;stroke-width:.5;stroke-dasharray:2 2}
+    .dim-text{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#c62828;text-anchor:middle}
+    .dim-sub{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#c62828;text-anchor:middle}
+    .title{font-family:'Segoe UI',Arial,sans-serif;font-size:18px;font-weight:600;fill:#1a1a1a}
+    .subtitle{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#555}
+    .std-ref{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#888}
+    .note{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888}
+    .label{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#999;text-anchor:middle}
+    .tbl-hdr{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;fill:#1a1a1a;font-weight:600;text-anchor:middle}
+    .tbl-key{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#555;text-anchor:start}
+    .tbl-val{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888;text-anchor:end}
+  </style>
+  <marker id="as" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  <marker id="ae" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  </defs>
+  <rect width="800" height="700" fill="#fafafa"/>
+  <text x="40" y="40" class="title">Lap Joint Flange</text>
+  <text x="40" y="60" class="subtitle">NPS 1-1/4 (DN 32) — Class 150 — Lap Joint (use with stub end)</text>
+  <text x="40" y="78" class="std-ref">ASME B16.5-2020 | LJ</text>
+  <rect x="272.78617710583154" y="200" width="27.21382289416847" height="200" class="profile"/>
+  <circle cx="286.3930885529158" cy="224.4060475161987" r="13.498920086393088" fill="white" stroke="#1a1a1a" stroke-width="1"/>
+  <circle cx="286.3930885529158" cy="375.59395248380133" r="13.498920086393088" fill="white" stroke="#1a1a1a" stroke-width="1"/>
+  <path d="M 272.78617710583154 250.10799136069113 L 257.04103671706264 250.10799136069113 L 257.04103671706264 349.89200863930887 L 272.78617710583154 349.89200863930887 Z" class="profile"/>
+  <path d="M 257.04103671706264 262.85097192224623 A 8.207343412526999 8.207343412526999 0 0 1 248.83369330453564 254.64362850971924" class="radius"/>
+  <path d="M 257.04103671706264 337.14902807775377 A 8.207343412526999 8.207343412526999 0 0 0 248.83369330453564 345.35637149028076" class="radius"/>
+  <line x1="173.79697624190067" y1="300" x2="330" y2="300" class="centerline"/>
+  <text x="168.79697624190067" y="304" class="label" text-anchor="end">CL</text>
+  
+  <line x1="355" y1="200" x2="355" y2="400" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="363" y="295" class="dim-text" text-anchor="start">D</text>
+  <text x="363" y="310" class="dim-sub" text-anchor="start">4.630" | 117.600 mm</text>
+  <line x1="300" y1="200" x2="362" y2="200" class="dim-ext"/><line x1="300" y1="400" x2="362" y2="400" class="dim-ext"/>
+  
+  <line x1="272.78617710583154" y1="435" x2="300" y2="435" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="286.39308855291574" y="429" class="dim-text">T</text>
+  <text x="286.39308855291574" y="451" class="dim-sub">0.630" | 16.000 mm</text>
+  
+  <line x1="237.79697624190067" y1="470" x2="272.78617710583154" y2="470" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="255.2915766738661" y="464" class="dim-text">Hub L</text>
+  <text x="255.2915766738661" y="486" class="dim-sub">0.810" | 20.570 mm</text>
+  <text x="242.78617710583154" y="270" class="dim-sub" text-anchor="end">R 0.190" | 4.830 mm</text>
+  <rect x="530" y="120" width="240" height="232" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
+  <text x="650" y="140" class="tbl-hdr">NPS 1-1/4 — Key Data</text>
+  <line x1="545" y1="148" x2="755" y2="148" stroke="#eee" stroke-width=".5"/>
+  <text x="550" y="165" class="tbl-key">NPS / DN</text><text x="750" y="165" class="tbl-val">1-1/4 / 32</text>
+  <text x="550" y="182" class="tbl-key">Class</text><text x="750" y="182" class="tbl-val">150</text>
+  <text x="550" y="199" class="tbl-key">D (flange OD)</text><text x="750" y="199" class="tbl-val">4.630" | 117.600 mm</text>
+  <text x="550" y="216" class="tbl-key">BCD</text><text x="750" y="216" class="tbl-val">3.500" | 88.900 mm</text>
+  <text x="550" y="233" class="tbl-key">T (thickness)</text><text x="750" y="233" class="tbl-val">0.630" | 16.000 mm</text>
+  <text x="550" y="250" class="tbl-key">Hub length</text><text x="750" y="250" class="tbl-val">0.810" | 20.570 mm</text>
+  <text x="550" y="267" class="tbl-key">Bore</text><text x="750" y="267" class="tbl-val">1.720" | 43.690 mm</text>
+  <text x="550" y="284" class="tbl-key">Corner radius</text><text x="750" y="284" class="tbl-val">0.190" | 4.830 mm</text>
+  <text x="550" y="301" class="tbl-key">Bolts</text><text x="750" y="301" class="tbl-val">4 x 0.5"</text>
+  <text x="550" y="318" class="tbl-key">Hole dia</text><text x="750" y="318" class="tbl-val">0.625" | 15.880 mm</text>
+  <text x="550" y="335" class="tbl-key">Weight (approx)</text><text x="750" y="335" class="tbl-val">2.4 lb | 1.1 kg</text>
+  <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
+  <text x="40" y="648" class="note">Lap Joint Flange per ASME B16.5, Class 150. Source: ferrobend manufacturer table (primary) + wermac drilling/thickness cross-check. CROSS_REFERENCE.</text>
+  <text x="40" y="663" class="note">Used with a stub end (separate component). No raised face; bore corner radius seats the stub end.</text>
+  <text x="40" y="678" class="note">All dims in inches and mm. Weights are approximate.</text>
+  <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
+</svg>

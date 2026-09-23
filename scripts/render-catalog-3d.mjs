@@ -2137,7 +2137,8 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     stlPath.includes('thredolet') ||
     stlPath.includes('latrolet') ||
     stlPath.includes('elbolet') ||
-    stlPath.includes('nipolet')
+    stlPath.includes('nipolet') ||
+    stlPath.includes('flange_')
   ) {
     pose = {
       rows: [
@@ -2203,6 +2204,12 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     catalogViewDir = stlPath.includes('latrolet')
       ? normalize([0.78, 0.18, 0.46])
       : normalize([0.52, -0.64, 0.48]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('flange_')) {
+    // Bridas B16.5: mallas generadas con eje de brida a +Z y cara RF hacia
+    // +Z. Vista tres cuartos frontal-superior: se leen la cara con los
+    // agujeros de pernos, el raised face y el perfil del hub detras, que es
+    // lo que distingue WN/SO/BL/LJ/THD/SW sin leer el nombre.
+    catalogViewDir = normalize([0.55, -0.60, 0.50]);
   } else if (pose?.kind === 'cap' && stlPath.includes('weldolet')) {
     // Weldolet: vista tres cuartos baja para que se aprecie la campana y la
     // curva de la silla en la base, no solo la boca.
