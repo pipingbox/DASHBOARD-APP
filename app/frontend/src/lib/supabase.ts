@@ -88,6 +88,7 @@ export const TABLES = {
   // Stripe / monetization (PB-STRIPE-001 Fase 2, DEC-30)
   // Client access is read-only; all writes happen in Edge Functions via service_role.
   stripePrices: 'app_stripe_prices',
+  legalEntities: 'app_legal_entities',
   orders: 'app_orders',
   subscriptions: 'app_subscriptions',
   stripeEvents: 'app_stripe_events',

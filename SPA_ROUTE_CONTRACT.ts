@@ -68,6 +68,7 @@ export const SPA_ROUTE_CONTRACT: RouteRule[] = [
   { pattern: '/academy/prl-course', visibility: 'PUBLIC', kind: 'EXACT' },
   { pattern: '/privacy', visibility: 'PUBLIC', kind: 'EXACT' },
   { pattern: '/terms', visibility: 'PUBLIC', kind: 'EXACT' },
+  { pattern: '/legal', visibility: 'PUBLIC', kind: 'EXACT' },
   { pattern: '/dsa', visibility: 'PUBLIC', kind: 'EXACT' },
   { pattern: '/contact', visibility: 'PUBLIC', kind: 'EXACT' },
 

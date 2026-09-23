@@ -158,6 +158,38 @@ interface RevenueEventRow {
 }
 
 /**
+ * PB-CORP-LEGAL-ENTITY-001: resolve the invoice supplier fields from the
+ * active LegalEntity. NEVER hardcodes a legal person — 'PIPINGBOX OU' does
+ * not exist and the 003 schema DEFAULT for supplier_name is removed by
+ * 007-legal-entities.sql. Until an entity is activated (real fiscal data
+ * loaded by the PO), the honest issuer is the brand itself with no VAT id.
+ */
+async function resolveInvoiceSupplier(): Promise<{
+  supplier_name: string;
+  supplier_vat_id: string | null;
+  legal_entity_id?: string;
+}> {
+  try {
+    const { data } = await supabase
+      .from("app_legal_entities")
+      .select("id, legal_name, vat_number, trading_name")
+      .eq("is_active", true)
+      .limit(1);
+    const entity = data?.[0];
+    if (entity) {
+      return {
+        supplier_name: entity.legal_name,
+        supplier_vat_id: entity.vat_number ?? null,
+        legal_entity_id: entity.id,
+      };
+    }
+  } catch (err) {
+    console.error("stripe-webhook: legal entity lookup failed", err);
+  }
+  return { supplier_name: "PIPINGBOX", supplier_vat_id: null };
+}
+
+/**
  * Insert one revenue event. NEVER throws.
  *
  * Telemetry must not be able to break payment processing: an instructor's
@@ -710,6 +742,9 @@ Deno.serve(async (req) => {
               customer_country_evidence: countryEvidence,
               currency: (invoice.currency || "eur").toUpperCase(),
               pdf_url: invoice.invoice_pdf,
+              // PB-CORP-LEGAL-ENTITY-001: supplier resolved from the active
+              // LegalEntity — never a hardcoded legal person.
+              ...(await resolveInvoiceSupplier()),
             },
             { onConflict: "stripe_invoice_id" },
           );
