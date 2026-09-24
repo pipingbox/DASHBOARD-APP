@@ -1630,6 +1630,78 @@
       "loading": "Chargement...",
       "monthly": "Mensuel 4,99 €",
       "annual": "Annuel 39 € (économisez 35 %)"
+    },
+    "landing": {
+      "shared": {
+        "methodology": "Méthodologie",
+        "assumptions": "Hypothèses et limites",
+        "example": "Exemple pratique",
+        "relatedTools": "Outils associés",
+        "openInCatalog": "Ouvrir dans le catalogue d'outils",
+        "ctaTitle": "Gardez tous vos calculs au même endroit",
+        "ctaBody": "Créez un compte PipingBox gratuit pour retrouver vos outils sur n'importe quel appareil et accéder à l'ensemble complet des outils industriels.",
+        "ctaButton": "Créer un compte gratuit"
+      },
+      "flangeDimensions": {
+        "title": "Calculateur de dimensions de brides (ASME B16.5)",
+        "description": "Consultez les dimensions des brides à collet soudé, à emboûtement, pleines, à collerette filetées et à souder à embrochage selon ASME B16.5. Filtrez par NPS et classe de pression et lisez diamètre extérieur, épaisseur, cercle de boulons et nombre de trous.",
+        "intro": "Toute vérification de bride — d'une liste de boulons à une cote face à face — commence par la même question : quelles sont les dimensions ASME B16.5 pour ce diamètre et cette classe ? Ce calculateur met la table de brides complète sur un seul écran. Choisissez un NPS et une classe de pression et les brides correspondantes sont filtrées instantanément, prêtes à être confrontées à votre isométrique ou à votre réquisition de matériaux.",
+        "m1": "Les dimensions suivent les tables ASME B16.5 pour le NPS et la classe de pression sélectionnés, y compris diamètre extérieur, épaisseur de bride et alésage.",
+        "m2": "Les données de boulonnage — diamètre du cercle de boulons, nombre de trous et diamètre des trous — correspondent aux gabarits de la norme, de sorte que goujons et écrous peuvent être spécifiés à partir du même résultat.",
+        "m3": "Tous les types de bride de la bibliothèque (WN, SO, BL, LJ, TH, SW) sont affichés côte à côte pour le même diamètre et la même classe, afin de comparer directement le type de face approprié.",
+        "a1": "Les valeurs sont les dimensions tabulées de la norme dans les unités affichées par l'outil ; les tolérances de fabrication ne sont pas appliquées.",
+        "a2": "La recherche couvre la plage de NPS et de classes implémentée dans la bibliothèque de brides PipingBox ; les dimensions hors de cette plage doivent être vérifiées directement dans la norme.",
+        "a3": "Les pressions/températures admissibles dépendent du groupe de matériaux ASME B16.5 et ne font pas partie de cette recherche dimensionnelle.",
+        "example": "Sélectionnez un NPS et la classe 150 : la table conserve chaque type de bride disponible dans ce diamètre. Le cercle de boulons et le nombre de trous de la même ligne sont ce dont le calculateur de goujons a besoin, si bien que le boulonnage complet peut être commandé sans quitter la page."
+      },
+      "studBolts": {
+        "title": "Calculateur de goujons et écrous (ASME B16.5)",
+        "description": "Déterminez le diamètre et la longueur des goujons ainsi que les paires d'écrous pour les brides ASME B16.5. Sélectionnez le diamètre et la classe de la bride pour obtenir le boulonnage correspondant.",
+        "intro": "La liste de boulons est l'endroit où la dimension de la bride et les achats se rencontrent : un goujon de mauvaise longueur bloque un spool entier. Ce calculateur résout les goujons et écrous d'un assemblage bridé ASME B16.5 à partir du diamètre et de la classe de la bride, y compris le diamètre et la longueur qu'exige le gabarit de la norme.",
+        "m1": "Le diamètre du goujon suit le gabarit de boulonnage ASME B16.5 pour chaque combinaison de NPS et de classe de pression.",
+        "m2": "La longueur tient compte des épaisseurs de brides, du joint et des écrous, avec la saillie requise par les dimensions de boulonnage de la norme.",
+        "m3": "Les paires d'écrous compatibles et les grades de matériaux courants sont sélectionnés en même temps que le goujon, pour spécifier le boulonnage en une seule ligne.",
+        "a1": "Les longueurs calculées correspondent à la base dimensionnelle de la norme ; confirmez-les toujours auprès de la spécification applicable du projet.",
+        "a2": "L'outil couvre la plage de brides implémentée dans la bibliothèque PipingBox ; le boulonnage des dimensions hors plage doit être vérifié séparément.",
+        "a3": "Le type et l'épaisseur du joint peuvent modifier la longueur requise ; vérifiez la spécification de votre assemblage.",
+        "example": "Saisissez le NPS et la classe de la bride de l'assemblage : le résultat donne le diamètre et la longueur du goujon avec sa paire d'écrous. Combinez-le avec le calculateur de dimensions de brides pour produire une ligne bride-boulonnage complète pour la réquisition de matériaux."
+      },
+      "pipeDimensions": {
+        "title": "Calculateur de dimensions de tubes (ASME B36.10M / B36.19M)",
+        "description": "Diamètre extérieur, épaisseur de paroi et poids linéique pour les tubes en acier au carbone et inoxydable selon ASME B36.10M et B36.19M. Sélectionnez NPS/DN et schedule pour lire la ligne complète de dimensions.",
+        "intro": "Le tube se commande par NPS et schedule, mais les plans, les calculs et les commandes ont besoin de chiffres réels : diamètre extérieur, épaisseur de paroi, poids au mètre. Ce calculateur lit la ligne complète de dimensions dans les tables ASME B36.10M / B36.19M pour toute combinaison de diamètre et de schedule, avec la désignation DN à côté.",
+        "m1": "Les diamètres extérieurs et épaisseurs de paroi suivent ASME B36.10M pour les tubes en acier et ASME B36.19M pour l'inox.",
+        "m2": "Tous les schedules de la plage de la norme — de SCH 5S à XXS, y compris STD et XS — sont sélectionnables pour chaque diamètre.",
+        "m3": "Le poids au mètre découle du diamètre extérieur et de l'épaisseur de paroi du schedule choisi ; la désignation DN est affichée à côté du NPS.",
+        "a1": "Les dimensions sont des valeurs à bout droit ; la préparation des extrémités (chanfrein, filetage, gorge) n'est pas incluse.",
+        "a2": "Les tolérances de fabrication sur l'épaisseur et le diamètre ne sont pas appliquées aux valeurs tabulées.",
+        "a3": "Le poids est la valeur théorique en acier utilisée par les tables de la norme ; les surépaisseurs propres au projet ne sont pas incluses.",
+        "example": "Choisissez un NPS et un schedule : la ligne affiche le diamètre extérieur, l'épaisseur de paroi et le poids au mètre avec l'équivalent DN. La même ligne pour SCH 40 et XS montre d'un coup d'œil quels schedules une vérification d'épaisseur doit couvrir."
+      },
+      "elbowCut": {
+        "title": "Calculateur de coupe de coudes (traces de coupe sur tube)",
+        "description": "Calculez les traces et angles de coupe sur des raccords normalisés pour fabriquer des déviations non standard. Saisissez la géométrie requise et obtenez les traces de la coupe.",
+        "intro": "Toutes les déviations d'un spool préfabriqué ne sortent pas du catalogue : les offsets de chantier, les évitements et les départs fabriqués imposent souvent de couper un coude normalisé. Ce calculateur traduit la géométrie requise en traces de coupe concrètes sur le raccord, pour tracer et marquer la fabrication sans tâtonnement.",
+        "m1": "Le traçage est calculé à partir de la géométrie normalisée du coude (rayon long et court selon ASME B16.9) et de l'angle de déviation saisi.",
+        "m2": "Les positions et angles de coupe sont déduits des rotations et plans de coupe qu'exige la déviation fabriquée.",
+        "m3": "Le résultat s'exprime en cotes de traçage directement transposables sur le raccord avant la coupe.",
+        "a1": "Le calcul suppose une géométrie de raccord idéale telle que tabulée par la norme ; les dimensions réelles varient dans les tolérances de fabrication.",
+        "a2": "L'amincissement de paroi à la coupe et la préparation du joint sont des décisions de fabrication hors du résultat géométrique.",
+        "a3": "Vérifiez toujours le raccord marqué par un ajustement à blanc avant le soudage final.",
+        "example": "Saisissez l'angle et l'offset dont le spool a besoin : le calculateur renvoie les traces de coupe du coude. Reportez les traces sur le raccord, coupez, puis contrôlez la déviation obtenue avec les mêmes valeurs avant le pointage."
+      },
+      "branchLayout": {
+        "title": "Calculateur de traçage de départs (intersections tube-antenne)",
+        "description": "Calculez le développement d'intersection d'un départ sur un collecteur : profil de coupe et coordonnées de traçage à partir des dimensions du collecteur et du départ.",
+        "intro": "Tout départ fabriqué commence par le même problème : la courbe d'intersection entre le tube de départ et le collecteur n'est pas un cercle, il faut la développer. Ce calculateur résout le traçage de l'intersection à partir des dimensions du collecteur et du départ, pour que le profil de coupe et les coordonnées de marquage sortent prêts pour l'atelier.",
+        "m1": "L'intersection est calculée à partir des diamètres extérieurs du collecteur et du départ, avec l'angle de départ saisi.",
+        "m2": "Le profil de coupe développé et les coordonnées de traçage suivent la construction géométrique de la courbe d'intersection.",
+        "m3": "Les résultats sont donnés en cotes de traçage directement transposables sur le tube de départ.",
+        "a1": "Le traçage suppose une géométrie cylindrique idéale des deux tubes ; l'ovalisation dans les tolérances n'est pas prise en compte.",
+        "a2": "Le renfort du départ (règles de remplacement de section) est une vérification de conception hors de cet outil géométrique.",
+        "a3": "Les jeux d'ajustement et la préparation de soudage sont des décisions de fabrication à vérifier sur le tube marqué.",
+        "example": "Saisissez les diamètres du collecteur et du départ avec l'angle de départ : le calculateur renvoie le profil de coupe et les coordonnées de traçage du départ. Marquez le tube, coupez et faites un essai à blanc sur le collecteur avant de souder."
+      }
     }
   },
   "jobs": {

@@ -1630,6 +1630,78 @@
         "clr_gt_half_od": "CLR trebuie să fie mai mare decât OD/2",
         "beta_range": "Unghiul de tăiere trebuie să fie între 0° și {{max}}°"
       }
+    },
+    "landing": {
+      "shared": {
+        "methodology": "Metodologie",
+        "assumptions": "Ipoteze și limite",
+        "example": "Exemplu de calcul",
+        "relatedTools": "Instrumente conexe",
+        "openInCatalog": "Deschide în catalogul de instrumente",
+        "ctaTitle": "Păstrează-ți calculele într-un singur loc",
+        "ctaBody": "Creează un cont PipingBox gratuit pentru a reveni la instrumentele folosite de pe orice dispozitiv și pentru a accesa setul complet de instrumente industriale.",
+        "ctaButton": "Creează un cont gratuit"
+      },
+      "flangeDimensions": {
+        "title": "Calculator pentru dimensiuni flanșe (ASME B16.5)",
+        "description": "Verifică dimensiunile flanselor cu gât pentru sudare, culisante, oarbe, cu inel rotativ, filetate și cu mufă pentru sudare conform ASME B16.5. Filtrează după NPS și clasa de presiune și citește diametrul exterior, grosimea, cercul șuruburilor și numărul de șuruburi.",
+        "intro": "Orice verificare a unei flanșe — de la lista de bulonare la o dimensiune între fețe — începe de la aceeași întrebare: care sunt dimensiunile ASME B16.5 pentru acest diametru și această clasă? Acest calculator aduce întreaga tabelă de flanșe pe un singur ecran. Alege un NPS și o clasă de presiune, iar flanșele corespunzătoare se filtrează instant, gata de verificat contra izometricului sau a cererii de materiale.",
+        "m1": "Dimensiunile urmează tabelele ASME B16.5 pentru NPS-ul și clasa de presiune selectate, inclusiv diametrul exterior, grosimea flanșei și alezajul.",
+        "m2": "Datele de bulonare — diametrul cercului șuruburilor, numărul de găuri și diametrul găurilor — corespund schemele de bulonare ale normei, astfel încât tijoile și piulițele pot fi specificate din același rezultat.",
+        "m3": "Fiecare tip de flanșă din bibliotecă (WN, SO, BL, LJ, TH, SW) este afișat alături pentru același diametru și clasă, astfel încât execuțiile pot fi comparate direct.",
+        "a1": "Valorile sunt dimensiunile tabelate ale normei în unitățile afișate de instrument; toleranțele de fabricație nu se aplică.",
+        "a2": "Căutarea acoperă gama de NPS și clase implementată în biblioteca de flanșe PipingBox; dimensiunile în afara acestei game trebuie verificate direct în normă.",
+        "a3": "Clasele presiune-temperatură depind de grupa de material ASME B16.5 și nu fac parte din această căutare dimensională.",
+        "example": "Selectează un NPS și clasa 150: tabelă păstrează toate tipurile de flanșe disponibile la acel diametru. Cercul șuruburilor și numărul de găuri din aceeași linie sunt exact cele de care are nevoie calculatorul de tijo, astfel încât întreaga bulonare poate fi comandată fără să părăsești pagina."
+      },
+      "studBolts": {
+        "title": "Calculator pentru tijo și piulițe (ASME B16.5)",
+        "description": "Determină diametrul, lungimea tijei și perechile de piulițe pentru flanșe ASME B16.5. Selectează diametrul și clasa flanșei pentru a obține bulonarea potrivită pentru îmbinare.",
+        "intro": "Lista de bulonare este locul unde dimensiunea flanșei întâlnește achizițiile: o lungime greșită a tijei blochează un întreg tronson. Acest calculator determină tijoile și piulițele pentru o îmbinare flanșată ASME B16.5 pe baza diametrului și clasei flanșei, inclusiv diametrul și lungimea cerute de schema de bulonare a normei.",
+        "m1": "Diametrul tijei urmează schema de bulonare ASME B16.5 pentru fiecare combinație de NPS și clasă de presiune.",
+        "m2": "Lungimea ia în calcul grosimea flanselor, garnitura și piulițele împreună cu ieșirea cerută de dimensiunile de bulonare ale normei.",
+        "m3": "Perechile de piulițe compatibile și materialele uzuale sunt selectate împreună cu tijă, astfel încât bulonarea poate fi specificată ca o singură poziție.",
+        "a1": "Lungimile calculate corespund bazei dimensionale a normei; confirmă-le întotdeauna cu specificația aplicabilă a proiectului.",
+        "a2": "Instrumentul acoperă gama de flanșe implementată în biblioteca PipingBox; bulonarea pentru dimensiuni în afara gamei trebuie verificată separat.",
+        "a3": "Tipul și grosimea garniturii pot schimba lungimea necesară; verifică cu specificația îmbinării.",
+        "example": "Introdu NPS-ul și clasa flanșei îmbinării: rezultatul dă diametrul și lungimea tijei împreună cu perechea de piulițe. Combină-l cu calculatorul de dimensiuni al flanselor pentru a obține o poziție completă de flanșă-bolonare pentru cererea de materiale."
+      },
+      "pipeDimensions": {
+        "title": "Calculator pentru dimensiuni țevi (ASME B36.10M / B36.19M)",
+        "description": "Diametru exterior, grosime de perete și masă liniară pentru țevi din oțel carbon și inoxidabil conform ASME B36.10M și ASME B36.19M. Selectează NPS/DN și schedule pentru a citi linia completă de dimensiuni.",
+        "intro": "Țevile se comandă după NPS și schedule, dar desenele, calculele și comenzile au nevoie de numere reale: diametru exterior, grosime de perete, masă pe metru. Acest calculator citește linia completă de dimensiuni din tabelele ASME B36.10M / B36.19M pentru orice combinație de diametru și schedule, cu desemnarea DN alături.",
+        "m1": "Diametrele exterioare și grosimile de perete urmează ASME B36.10M pentru țevi din oțel și ASME B36.19M pentru țevi din oțel inoxidabil.",
+        "m2": "Toate schedule-urile din gama normei — de la SCH 5S la XXS, inclusiv STD și XS — pot fi selectate pentru fiecare diametru.",
+        "m3": "Masa pe metru rezultă din diametrul exterior și grosimea de perete a schedule-ului selectat, iar desemnarea DN este afișată lângă NPS.",
+        "a1": "Dimensiunile sunt valori pentru capete drepte; pregătirea capetelor (teșire, filet, canelură) nu este inclusă.",
+        "a2": "Toleranțele de laminare ale grosimii de perete și diametrului nu se aplică valorilor tabelate.",
+        "a3": "Masa este valoarea teoretică de oțel folosită în tabelele normei; alocațiile specifice proiectului nu sunt incluse.",
+        "example": "Alege un NPS și un schedule: linia arată diametrul exterior, grosimea de perete și masa pe metru împreună cu echivalentul DN. Citirea aceleiași linii pentru SCH 40 și XS arată dintr-o privire ce schedule trebuie să acopere verificarea grosimii."
+      },
+      "elbowCut": {
+        "title": "Calculator pentru tăiere coturi (linii de tăiere pe țeavă)",
+        "description": "Calculează liniile și unghiurile de tăiere pe fittinguri standard pentru a executa coturi nestandard. Introdu geometria cotului necesară și obține liniile de tăiere.",
+        "intro": "Nu fiecare cot într-un tronson prefabbricat vine dintr-un fitting de catalog: ocolirile și ramificațiile executate adesea înseamnă tăierea unui cot standard. Acest calculator transformă geometria necesară în linii de tăiere concrete pe fitting, astfel încât execuția poate fi trasată și marcată fără încercări repetate.",
+        "m1": "Desfășurarea se calculează din geometria cotului standard (rază lungă și scurtă conform ASME B16.9) și unghiul de cot introdus.",
+        "m2": "Pozițiile și unghiurile de tăiere sunt derivate pentru rotația și planele de tăiere cerute de cotul executat.",
+        "m3": "Rezultatul este exprimat ca dimensiuni de trasare pe care le poți transfera direct pe fitting înainte de tăiere.",
+        "a1": "Calculul presupune o geometrie ideală a fittingului, așa cum este tabelată de normă; dimensiunile reale variază în limitele toleranțelor de fabricație.",
+        "a2": "Subțierea peretelui la tăiere și pregătirea rostului de sudare sunt decizii de execuție dincolo de rezultatul geometric.",
+        "a3": "Verifică întotdeauna fittingul marcat printr-o ajustare de probă înainte de sudura finală.",
+        "example": "Introdu unghiul și decalajul de care are nevoie tronsonul: calculatorul returnează liniile de tăiere pentru cot. Transferă semnele pe fitting, taie și verifică cotul rezultat cu aceleași valori înainte de sudura în puncte."
+      },
+      "branchLayout": {
+        "title": "Calculator pentru ramificații (desfășurarea intersecției ramificației)",
+        "description": "Calculează desfășurarea intersecției unei ramificații pe conducta principală: profilul de tăiere și coordonatele de trasare din dimensiunile conductei principale și ale ramificației.",
+        "intro": "Fiecare ramificație executată începe de la aceeași problemă: curba de intersecție dintre țeava ramificației și conducta principală nu este un cerc — trebuie dezvoltată. Acest calculator calculează desfășurarea ramificației din dimensiunile conductei principale și ale ramificației, astfel încât profilul de tăiere și coordonatele de trasare ies gata pentru atelier.",
+        "m1": "Intersecția se calculează din diametrul exterior al conductei principale și diametrul exterior al ramificației, cu unghiul de ramificație introdus.",
+        "m2": "Profilul de tăiere desfășurat și coordonatele de trasare urmează construcția geometrică a curbei de intersecție.",
+        "m3": "Rezultatele sunt date ca dimensiuni de trasare care pot fi transferate direct pe țeava ramificației.",
+        "a1": "Desfășurarea presupune o geometrie cilindrică ideală pentru ambele țevi; ovalitatea în limitele toleranțelor nu este luată în calcul.",
+        "a2": "Consolidarea îmbinării de ramificație (regulile de înlocuire a ariei) este o verificare de proiectare dincolo de acest instrument geometric.",
+        "a3": "Jocurile de ajustare și pregătirea sudurii sunt decizii de execuție care trebuie verificate pe țeava marcată.",
+        "example": "Introdu dimensiunile conductei principale și ale ramificației împreună cu unghiul: calculatorul returnează profilul de tăiere și coordonatele de trasare ale ramificației. Marchează țeava, taie și fă o ajustare de probă pe conducta principală înainte de sudare."
+      }
     }
   },
   "jobs": {

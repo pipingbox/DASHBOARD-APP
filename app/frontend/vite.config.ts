@@ -6,7 +6,9 @@ import { viteSourceLocator } from '@metagptx/vite-plugin-source-locator';
 import { atoms } from '@metagptx/web-sdk/plugins';
 import { vitePrerenderPlugin } from 'vite-prerender-plugin';
 import { pbExplicitSitemapPlugin } from './prerender/sitemap.js';
+import { pbPrerenderHeadDedupePlugin } from './prerender/head-dedupe.js';
 import { getBlogRoutes } from './prerender/blog-routes.js';
+import { getToolLandingPrerenderRoutes } from './prerender/tool-landings.js';
 
 /**
  * PB-PWA-IDENTITY-001: give every non-production deployment its own installable
@@ -77,7 +79,13 @@ process.env.VITE_APP_LOGO_URL ??= '/assets/logos/logo-icon.png';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
-  const blogPrerenderRoutes = command === 'build' ? getBlogRoutes() : [];
+  // PB-SEO-103: blog routes + SEO tool landing routes share one prerender
+  // pipeline. The dispatcher (prerender/public.js) routes each URL to the
+  // blog prerender or the ToolLandingPage renderer.
+  const prerenderRoutes =
+    command === 'build'
+      ? [...getBlogRoutes(), ...getToolLandingPrerenderRoutes()]
+      : [];
 
   return {
     plugins: [
@@ -94,12 +102,16 @@ export default defineConfig(({ command }) => {
       // routes keep their trailing slash, app routes never have one.
       // Canonical route list and policy live in prerender/sitemap.js.
       pbExplicitSitemapPlugin(),
+      // PB-SEO-103: strip template-inherited canonical/description/og/twitter
+      // tags from prerendered pages so each serves exactly one (its own)
+      // canonical. Fixes the duplicate-canonical defect for blog posts too.
+      pbPrerenderHeadDedupePlugin(),
       pbDeploymentManifestIdentity(),
-      ...(blogPrerenderRoutes.length > 0
+      ...(prerenderRoutes.length > 0
         ? vitePrerenderPlugin({
             renderTarget: '#root',
-            prerenderScript: path.resolve(__dirname, 'prerender/blog.js'),
-            additionalPrerenderRoutes: blogPrerenderRoutes,
+            prerenderScript: path.resolve(__dirname, 'prerender/public.js'),
+            additionalPrerenderRoutes: prerenderRoutes,
           })
         : []),
       {

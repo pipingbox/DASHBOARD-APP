@@ -1633,6 +1633,78 @@
         "clr_gt_half_od": "CLR musi być większy niż OD/2",
         "beta_range": "Kąt cięcia musi mieścić się w zakresie od 0° do {{max}}°"
       }
+    },
+    "landing": {
+      "shared": {
+        "methodology": "Metodyka",
+        "assumptions": "Założenia i ograniczenia",
+        "example": "Przykład obliczeniowy",
+        "relatedTools": "Powiązane narzędzia",
+        "openInCatalog": "Otwórz w katalogu narzędzi",
+        "ctaTitle": "Zbierz swoje obliczenia w jednym miejscu",
+        "ctaBody": "Utwórz darmowe konto PipingBox, aby wracać do używanych narzędzi z dowolnego urządzenia i korzystać z pełnego zestawu narzędzi przemysłowych.",
+        "ctaButton": "Utwórz darmowe konto"
+      },
+      "flangeDimensions": {
+        "title": "Kalkulator wymiarów kołnierzy (ASME B16.5)",
+        "description": "Sprawdź wymiary kołnierzy z szyją do przyspawania, nasuwanych, ślepych, swobodnych, gwintowanych i z gniazdem do przyspawania zgodnie z ASME B16.5. Filtruj po NPS i klasie ciśnienia i odczytaj średnicę zewnętrzną, grubość, rozstaw otworów oraz liczbę śrub.",
+        "intro": "Każda kontrola kołnierza — od zestawienia śrubowego po wymiar międzypleteżowy — zaczyna się od tego samego pytania: jakie są wymiary wg ASME B16.5 dla tej średnicy i klasy? Ten kalkulator zbiera całą tabelę kołnierzy na jednym ekranie. Wybierz NPS i klasę ciśnienia, a pasujące kołnierze są natychmiast filtrowane, gotowe do porównania z izometrią lub zapotrzebowaniem materiałowym.",
+        "m1": "Wymiary są zgodne z tabelami ASME B16.5 dla wybranego NPS i klasy ciśnienia, łącznie ze średnicą zewnętrzną, grubością kołnierza i otworem.",
+        "m2": "Dane śrubowe — średnica rozstawu otworów, liczba otworów i średnica otworów — odpowiadają schematom śrubowym normy, więc szpilki i nakrętki można określić z tego samego wyniku.",
+        "m3": "Każdy typ kołnierza w bibliotece (WN, SO, BL, LJ, TH, SW) jest pokazany obok siebie dla tej samej średnicy i klasy, dzięki czemu można bezpośrednio porównać odpowiednie wykonania.",
+        "a1": "Wartości to tabelaryczne wymiary normy w jednostkach pokazanych przez narzędzie; tolerancje produkcyjne nie są uwzględniane.",
+        "a2": "Wyszukiwanie obejmuje zakres NPS i klas zaimplementowany w bibliotece kołnierzy PipingBox; wymiary poza tym zakresem należy sprawdzić bezpośrednio w normie.",
+        "a3": "Nominały ciśnienie-temperatura zależą od grupy materiałowej ASME B16.5 i nie są częścią tego wyszukiwania wymiarowego.",
+        "example": "Wybierz NPS i klasę 150: tabela zachowuje wszystkie typy kołnierzy dostępne w tej średnicy. Rozstaw otworów i ich liczba z tego samego wiersza to dokładnie to, czego potrzebuje kalkulator szpilek, więc pełne skręcenie można zamówić bez opuszczania strony."
+      },
+      "studBolts": {
+        "title": "Kalkulator szpilek i nakrętek (ASME B16.5)",
+        "description": "Określ średnicę, długość szpilki i pary nakrętek dla kołnierzy ASME B16.5. Wybierz średnicę i klasę kołnierza, aby uzyskać skręcenie dla twojego połączenia.",
+        "intro": "Zestawienie śrubowe to miejsce, gdzie wymiar kołnierza spotyka się z zakupami: zła długość szpilki wstrzymuje cały odcinek rurociągu. Ten kalkulator określa szpilki i nakrętki dla połączenia kołnierzowego ASME B16.5 na podstawie średnicy i klasy kołnierza, łącznie ze średnicą i długością wymaganą przez schemat śrubowy normy.",
+        "m1": "Średnica szpilki jest zgodna ze schematem śrubowym ASME B16.5 dla każdej kombinacji NPS i klasy ciśnienia.",
+        "m2": "Długość uwzględnia grubości kołnierzy, uszczelkę i nakrętki wraz z wystającą częścią wymaganą przez wymiary śrubowe normy.",
+        "m3": "Kompatybilne pary nakrętek i typowe gatunki materiałów są dobierane razem ze szpilką, więc skręcenie można określić jako jedną pozycję.",
+        "a1": "Obliczone długości odpowiadają podstawie wymiarowej normy; zawsze potwierdź je z obowiązującą specyfikacją projektu.",
+        "a2": "Narzędzie obejmuje zakres kołnierzy zaimplementowany w bibliotece PipingBox; skręcenie dla wymiarów poza tym zakresem należy sprawdzić osobno.",
+        "a3": "Typ i grubość uszczelki mogą zmienić wymaganą długość; zweryfikuj ze specyfikacją połączenia.",
+        "example": "Wprowadź NPS i klasę kołnierza połączenia: wynik podaje średnicę i długość szpilki wraz z parą nakrętek. Połącz go z kalkulatorem wymiarów kołnierzy, aby uzyskać kompletną pozycję kołnierzowo-śrubową do zapotrzebowania materiałowego."
+      },
+      "pipeDimensions": {
+        "title": "Kalkulator wymiarów rur (ASME B36.10M / B36.19M)",
+        "description": "Średnica zewnętrzna, grubość ścianki i masa liniowa rur ze stali węglowej i nierdzewnej wg ASME B36.10M i B36.19M. Wybierz NPS/DN i schedule, aby odczytać pełny wiersz wymiarów.",
+        "intro": "Rury zamówisz po NPS i schedule, ale rysunki, obliczenia i zamówienia wymagają rzeczywistych liczb: średnicy zewnętrznej, grubości ścianki, masy na metr. Ten kalkulator odczytuje pełny wiersz z tabel ASME B36.10M / B36.19M dla dowolnej kombinacji średnicy i schedule, wraz z oznaczeniem DN.",
+        "m1": "Średnice zewnętrzne i grubości ścianek są zgodne z ASME B36.10M dla rur stalowych i ASME B36.19M dla rur ze stali nierdzewnej.",
+        "m2": "Wszystkie schedule w zakresie normy — od SCH 5S do XXS, łącznie z STD i XS — są dostępne dla każdej średnicy.",
+        "m3": "Masa na metr wynika ze średnicy zewnętrznej i grubości ścianki wybranego schedule, a oznaczenie DN jest pokazane obok NPS.",
+        "a1": "Wymiary dotyczą końców prostych; przygotowanie końcówek (fazowanie, gwint, rowek) nie jest uwzględnione.",
+        "a2": "Tolerancje walcowania grubości ścianki i średnicy nie są uwzględniane w wartościach tabelarycznych.",
+        "a3": "Masa to teoretyczna wartość stalowa stosowana w tabelach normy; dodatki specyficzne dla projektu nie są uwzględnione.",
+        "example": "Wybierz NPS i schedule: wiersz pokazuje średnicę zewnętrzną, grubość ścianki i masę na metr wraz z odpowiednikiem DN. Odczytanie tego samego wiersza dla SCH 40 i XS od razu pokazuje, które schedule musi objąć kontrola grubości."
+      },
+      "elbowCut": {
+        "title": "Kalkulator cięcia kolanka (linie cięcia na rurze)",
+        "description": "Oblicz linie cięcia i kąty na standardowych kształtkach, aby wykonać niestandardowe skręty. Wprowadź wymaganą geometrię skrętu i otrzymaj linie cięcia.",
+        "intro": "Nie każdy skrót prefabrykowanego odcinka pochodzi z kształtki katalogowej: polowe omijania i wykonywane odejścia często wymagają cięcia standardowego kolanka. Ten kalkulator przetwarza wymaganą geometrię na konkretne linie cięcia na kształtce, dzięki czemu obróbkę można rozmieścić i oznaczyć bez prób i błędów.",
+        "m1": "Rozwinięcie jest obliczane z geometrii standardowego kolanka (długi i krótki promień wg ASME B16.9) oraz wprowadzonego kąta skrętu.",
+        "m2": "Pozycje i kąty cięcia są wyznaczane dla obrotu i płaszczyzn cięcia wymaganych przez wykonywany skręt.",
+        "m3": "Wynik jest wyrażony jako wymiary do trasowania, które można przenieść bezpośrednio na kształtkę przed cięciem.",
+        "a1": "Obliczenie zakłada idealną geometrię kształtki zgodnie z tabelami normy; rzeczywiste wymiary kształtek mieszczą się w tolerancjach produkcyjnych.",
+        "a2": "Ścieńczenie ścianki przy cięciu i przygotowanie szczeliny spawalniczej to decyzje warsztatowe wykraczające poza wynik geometryczny.",
+        "a3": "Zawsze sprawdź oznaczoną kształtkę na sucho przed ostatecznym spawaniem.",
+        "example": "Wprowadź kąt i przesunięcie wymagane przez odcinek: kalkulator zwraca linie cięcia kolanka. Przenieś znaczniki na kształtkę, przetnij i sprawdź uzyskany skręt tymi samymi wartościami przed przyspawaniem punktowym."
+      },
+      "branchLayout": {
+        "title": "Kalkulator odejść (rozwinięcie przecięcia rur)",
+        "description": "Oblicz rozwinięcie przecięcia odejścia na rurze głównej: profil cięcia i współrzędne trasowania z wymiarów rury głównej i odejścia.",
+        "intro": "Każde wykonywane odejście zaczyna się od tego samego problemu: linia przecięcia między rurą odejściową a rurą główną nie jest okręgiem — trzeba ją rozwinąć. Ten kalkulator oblicza rozwinięcie odejścia z wymiarów rury głównej i odejścia, dzięki czemu profil cięcia i współrzędne trasowania wychodzą gotowe dla warsztatu.",
+        "m1": "Przecięcie jest obliczane ze średnicy zewnętrznej rury głównej i średnicy zewnętrznej odejścia wraz z wprowadzonym kątem odejścia.",
+        "m2": "Rozwinięty profil cięcia i współrzędne trasowania wynikają z konstrukcji geometrycznej krzywej przecięcia.",
+        "m3": "Wyniki są podane jako wymiary do trasowania, które można przenieść bezpośrednio na rurę odejściową.",
+        "a1": "Rozwinięcie zakłada idealną geometrię walcową obu rur; owalność w granicach tolerancji nie jest uwzględniana.",
+        "a2": "Wzmocnienie połączenia (zasady zastępowania powierzchni) to obliczenie konstrukcyjne wykraczające poza to narzędzie geometryczne.",
+        "a3": "Szczeliny montażowe i przygotowanie spawania to decyzje warsztatowe, które należy zweryfikować na oznaczonej rurze.",
+        "example": "Wprowadź wymiary rury głównej i odejścia wraz z kątem odejścia: kalkulator zwraca profil cięcia i współrzędne trasowania odejścia. Wytrasuj rurę, przetnij i dopasuj na sucho na rurze głównej przed spawaniem."
+      }
     }
   },
   "jobs": {

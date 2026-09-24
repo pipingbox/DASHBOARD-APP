@@ -949,6 +949,78 @@
     }
   },
   "tools": {
+    "landing": {
+      "shared": {
+        "methodology": "Methodology",
+        "assumptions": "Assumptions and limits",
+        "example": "Worked example",
+        "relatedTools": "Related tools",
+        "openInCatalog": "Open in the tools catalog",
+        "ctaTitle": "Keep your calculations in one place",
+        "ctaBody": "Create a free PipingBox account to revisit your tool usage from any device and access the full industrial toolset.",
+        "ctaButton": "Create a free account"
+      },
+      "flangeDimensions": {
+        "title": "Flange Dimensions Calculator (ASME B16.5)",
+        "description": "Look up welding neck, slip-on, blind, lap joint, threaded and socket weld flange dimensions per ASME B16.5. Filter by NPS and pressure class and read outside diameter, thickness, bolt circle and bolt count.",
+        "intro": "Every flange check — from a bolting list to a face-to-face dimension — starts with the same question: what are the ASME B16.5 dimensions for this size and class? This calculator puts the full flange table on one screen. Pick an NPS and a pressure class and the matching flanges are filtered instantly, ready to check against your isometric or material requisition.",
+        "m1": "Dimensions follow the ASME B16.5 tables for the selected NPS and pressure class, including outside diameter, flange thickness and bore.",
+        "m2": "Bolting data — bolt circle diameter, number of holes and hole diameter — matches the standard's bolting patterns, so stud bolts and nuts can be specified from the same result.",
+        "m3": "Every flange type in the library (WN, SO, BL, LJ, TH, SW) is shown side by side for the same size and class, so the right facing type can be compared directly.",
+        "a1": "Values are the tabulated dimensions of the standard in the units shown by the tool; manufacturing tolerances are not applied.",
+        "a2": "The lookup covers the NPS and class range implemented in the PipingBox flange library; sizes outside that range must be checked directly against the standard.",
+        "a3": "Pressure-temperature ratings depend on the ASME B16.5 material group and are not part of this dimensional lookup.",
+        "example": "Select an NPS and class 150: the table keeps every flange type available in that size. The bolt circle and hole count from the same row are what the stud-bolt calculator needs, so the full bolting can be ordered without leaving the page."
+      },
+      "studBolts": {
+        "title": "Stud Bolt and Nut Calculator (ASME B16.5)",
+        "description": "Determine stud bolt diameter, length and nut pairs for ASME B16.5 flanges. Select flange size and class to get the matching bolting for your joint.",
+        "intro": "A bolting list is where flange dimension and procurement meet: the wrong stud length holds up a whole spool. This calculator resolves the stud bolts and nuts for an ASME B16.5 flanged joint from the flange size and class, including the diameter and length the standard's pattern requires.",
+        "m1": "Stud diameter follows the ASME B16.5 bolting pattern for each combination of NPS and pressure class.",
+        "m2": "Length accounts for the flange thicknesses, gasket and nuts with the protrusion required by the standard's bolting dimensions.",
+        "m3": "Compatible nut pairs and common material grades are selected together with the stud, so the bolting can be specified as one line item.",
+        "a1": "Calculated lengths correspond to the standard's dimensional basis; always confirm against the governing specification of the project.",
+        "a2": "The tool covers the flange range implemented in the PipingBox library; bolting for sizes outside that range must be checked separately.",
+        "a3": "Gasket type and thickness can change the required length; verify against your joint specification.",
+        "example": "Enter the flange NPS and class of the joint: the result gives the stud diameter and length with its nut pair. Combine it with the flange dimensions calculator to produce a complete flange-bolting line for the material requisition."
+      },
+      "pipeDimensions": {
+        "title": "Pipe Dimensions Calculator (ASME B36.10M / B36.19M)",
+        "description": "Outside diameter, wall thickness and linear weight for carbon and stainless steel pipe per ASME B36.10M and B36.19M. Select NPS/DN and schedule to read the full dimension row.",
+        "intro": "Pipe is ordered by NPS and schedule, but drawings, calculations and orders need real numbers: outside diameter, wall thickness, weight per metre. This calculator reads the full dimension row from the ASME B36.10M / B36.19M tables for any size and schedule combination, with the DN designation alongside.",
+        "m1": "Outside diameters and wall thicknesses follow ASME B36.10M for wrought steel pipe and ASME B36.19M for stainless steel pipe.",
+        "m2": "All schedules in the standard's range — from SCH 5S to XXS, including STD and XS — are selectable for each size.",
+        "m3": "Weight per metre is derived from the outside diameter and wall thickness of the selected schedule, and the DN designation is shown next to the NPS.",
+        "a1": "Dimensions are plain-end values; end preparation (bevel, thread, groove) is not included.",
+        "a2": "Mill tolerances on wall thickness and diameter are not applied to the tabulated values.",
+        "a3": "Weight is the theoretical steel value used for the standard's tables; project-specific allowances are not included.",
+        "example": "Pick an NPS and a schedule: the row shows the outside diameter, wall thickness and weight per metre with the DN equivalent. Reading the same row for SCH 40 and XS shows at a glance which schedule a wall-thickness check has to cover."
+      },
+      "elbowCut": {
+        "title": "Elbow Cut Calculator (Pipe Cutting Marks)",
+        "description": "Calculate cutting marks and angles on standard fittings to fabricate non-standard turns. Enter the required turn geometry and get the marks for the cut.",
+        "intro": "Not every turn in a prefabricated spool comes from a catalogue fitting: field offsets, dodges and fabricated branches often mean cutting a standard elbow. This calculator turns the required geometry into concrete cutting marks on the fitting, so the fabrication can be laid out and marked without trial and error.",
+        "m1": "The layout is computed from the standard elbow geometry (long and short radius per ASME B16.9) and the turn angle you enter.",
+        "m2": "Cut positions and angles are derived for the rotation and cut planes required by the fabricated turn.",
+        "m3": "The result is expressed as marking dimensions you can transfer directly to the fitting before cutting.",
+        "a1": "The calculation assumes ideal fitting geometry as tabulated by the standard; actual fitting dimensions vary within manufacturing tolerances.",
+        "a2": "Wall thinning at the cut and weld gap preparation are fabrication decisions outside the geometric result.",
+        "a3": "Always verify the marked fitting with a trial fit-up before the final weld.",
+        "example": "Enter the angle and offset the spool needs: the calculator returns the cut marks for the elbow. Transfer the marks to the fitting, cut, and check the resulting turn with the same values before tack-welding."
+      },
+      "branchLayout": {
+        "title": "Branch Layout Calculator (Pipe Branch Intersections)",
+        "description": "Compute the intersection layout for a pipe branch on a header: cut profile and marking coordinates from header and branch dimensions.",
+        "intro": "Every fabricated branch starts with the same problem: the intersection curve between the branch pipe and the header is not a circle, it has to be developed. This calculator computes the branch intersection layout from the header and branch dimensions, so the cut profile and marking coordinates come out ready for the shop.",
+        "m1": "The intersection is computed from the header outside diameter and the branch outside diameter with the branch angle you enter.",
+        "m2": "The developed cut profile and marking coordinates follow the geometric construction of the intersection curve.",
+        "m3": "Results are given as marking dimensions that can be transferred directly to the branch pipe.",
+        "a1": "The layout assumes ideal cylindrical geometry for both pipes; out-of-roundness within tolerances is not considered.",
+        "a2": "Reinforcement of the branch connection (area replacement rules) is a design check outside this geometric tool.",
+        "a3": "Fit-up gaps and weld preparation are fabrication decisions that must be verified on the marked pipe.",
+        "example": "Enter the header and branch sizes with the branch angle: the calculator returns the cut profile and marking coordinates for the branch. Mark the pipe, cut, and trial-fit on the header before welding."
+      }
+    },
     "eyebrow": "Tools",
     "title": "Engineering calculators & utilities",
     "description": "Fast, focused tools you can use in daily piping work. Your inputs are stored in your history.",

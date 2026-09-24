@@ -1630,6 +1630,78 @@
       "loading": "Caricamento...",
       "monthly": "Mensile 4,99 €",
       "annual": "Annuale 39 € (risparmia il 35%)"
+    },
+    "landing": {
+      "shared": {
+        "methodology": "Metodologia",
+        "assumptions": "Ipotesi e limiti",
+        "example": "Esempio pratico",
+        "relatedTools": "Strumenti correlati",
+        "openInCatalog": "Apri nel catalogo strumenti",
+        "ctaTitle": "Tutti i tuoi calcoli in un unico posto",
+        "ctaBody": "Crea un account PipingBox gratuito per ritrovare i tuoi strumenti da qualsiasi dispositivo e accedere al set completo di strumenti industriali.",
+        "ctaButton": "Crea un account gratuito"
+      },
+      "flangeDimensions": {
+        "title": "Calcolatore di dimensioni flange (ASME B16.5)",
+        "description": "Consulta le dimensioni di flange a collo saldato, scorrevoli, cieche, libere, filettate e a saldare a foro conforme ASME B16.5. Filtra per NPS e classe di pressione e leggi diametro esterno, spessore, cerchio bulloni e numero di fori.",
+        "intro": "Ogni verifica di flangia — da una lista bulloni a una quota interasse — parte dalla stessa domanda: quali sono le dimensioni ASME B16.5 per quel diametro e quella classe? Questo calcolatore mette la tabella flangi completa su un'unica schermata. Scegli un NPS e una classe di pressione e le flange corrispondenti vengono filtrate all'istante, pronte per il confronto con l'isometrica o la distinta materiali.",
+        "m1": "Le dimensioni seguono le tabelle ASME B16.5 per l'NPS e la classe di pressione selezionati, compresi diametro esterno, spessore flangia e diametro foro.",
+        "m2": "I dati di bullonatura — diametro del cerchio bulloni, numero e diametro dei fori — corrispondono agli schemi della norma, così tiranti e dadi possono essere specificati dallo stesso risultato.",
+        "m3": "Tutti i tipi di flangia della libreria (WN, SO, BL, LJ, TH, SW) sono mostrati fianco a fianco per lo stesso diametro e classe, per confrontare direttamente la faccia più adatta.",
+        "a1": "I valori sono le dimensioni tabellate della norma nelle unità mostrate dallo strumento; le tolleranze di fabbricazione non sono applicate.",
+        "a2": "La copertura comprende l'intervallo di NPS e classi implementato nella libreria flange di PipingBox; i diametri fuori intervallo vanno verificati direttamente sulla norma.",
+        "a3": "Le classi pressione-temperatura dipendono dal gruppo materiale ASME B16.5 e non fanno parte di questa consultazione dimensionale.",
+        "example": "Seleziona un NPS e classe 150: la tabella mantiene ogni tipo di flangia disponibile in quel diametro. Cerchio bulloni e numero di fori della stessa riga sono ciò che serve al calcolatore di tiranti, così l'intera bullonatura si può ordinare senza lasciare la pagina."
+      },
+      "studBolts": {
+        "title": "Calcolatore di tiranti e dadi (ASME B16.5)",
+        "description": "Determina diametro e lunghezza dei tiranti e i coppie di dadi per flange ASME B16.5. Seleziona diametro e classe della flangia per ottenere la bullonatura della tua giunzione.",
+        "intro": "La lista bulloni è dove dimensione flangia e approvvigionamento si incontrano: un tirante con lunghezza sbagliata blocca un'intera spola. Questo calcolatore risolve tiranti e dadi di una giunzione flangiata ASME B16.5 a partire da diametro e classe della flangia, compreso il diametro e la lunghezza richiesti dallo schema della norma.",
+        "m1": "Il diametro del tirante segue lo schema di bullonatura ASME B16.5 per ogni combinazione di NPS e classe di pressione.",
+        "m2": "La lunghezza considera gli spessori delle flange, la guarnizione e i dadi con la sporgenza richiesta dalle quote di bullonatura della norma.",
+        "m3": "Coppie di dadi compatibili e gradi di materiale usuali sono selezionati insieme al tirante, così la bullonatura si può specificare come un'unica voce.",
+        "a1": "Le lunghezze calcolate corrispondono alla base dimensionale della norma; confermale sempre con la specifica applicabile del progetto.",
+        "a2": "Lo strumento copre l'intervallo di flange implementato nella libreria PipingBox; la bullonatura per diametri fuori intervallo va verificata a parte.",
+        "a3": "Tipo e spessore della guarnizione possono modificare la lunghezza richiesta; verifica con la specifica della tua giunzione.",
+        "example": "Inserisci NPS e classe della flangia della giunzione: il risultato fornisce diametro e lunghezza del tirante con la sua coppia di dadi. Combinato con il calcolatore di dimensioni flange produce una riga completa flangia-bullonatura per la distinta materiali."
+      },
+      "pipeDimensions": {
+        "title": "Calcolatore di dimensioni tubi (ASME B36.10M / B36.19M)",
+        "description": "Diametro esterno, spessore e peso lineare per tubi in acciaio al carbonio e inox conforme ASME B36.10M e B36.19M. Seleziona NPS/DN e schedule per leggere la riga completa di dimensioni.",
+        "intro": "Il tubo si ordina per NPS e schedule, ma disegni, calcoli e ordini richiedono numeri reali: diametro esterno, spessore, peso al metro. Questo calcolatore legge la riga completa di dimensioni dalle tabelle ASME B36.10M / B36.19M per qualsiasi combinazione di diametro e schedule, con la designazione DN a fianco.",
+        "m1": "I diametri esterni e gli spessori seguono ASME B36.10M per tubi in acciaio e ASME B36.19M per tubi inossidabili.",
+        "m2": "Tutti gli schedule dell'intervallo della norma — da SCH 5S a XXS, compresi STD e XS — sono selezionabili per ogni diametro.",
+        "m3": "Il peso al metro deriva dal diametro esterno e dallo spessore dello schedule selezionato, e la designazione DN è mostrata accanto all'NPS.",
+        "a1": "Le dimensioni sono valori con estremità piane; la preparazione delle estremità (smusso, filettatura, scanalatura) non è inclusa.",
+        "a2": "Le tolleranze di laminazione su spessore e diametro non sono applicate ai valori tabellati.",
+        "a3": "Il peso è il valore teorico in acciaio usato dalle tabelle della norma; eventuali sovraspessori di progetto non sono inclusi.",
+        "example": "Scegli un NPS e uno schedule: la riga mostra diametro esterno, spessore e peso al metro con l'equivalente DN. La stessa riga per SCH 40 e XS mostra a colpo d'occhio quali schedule deve coprire una verifica di spessore."
+      },
+      "elbowCut": {
+        "title": "Calcolatore di taglio curve (segni di taglio su tubo)",
+        "description": "Calcola segni e angoli di taglio su raccordi normalizzati per fabbricare deviazioni non standard. Inserisci la geometria richiesta e ottieni i segni per il taglio.",
+        "intro": "Non ogni deviazione di una spola prefabbricata proviene da un raccordo di catalogo: offset di campo, schivate e derivazioni fabbricate spesso richiedono di tagliare una curva normalizzata. Questo calcolatore traduce la geometria richiesta in segni di taglio concreti sul raccordo, per tracciare e marcare la fabbricazione senza tentativi.",
+        "m1": "Il tracciato è calcolato dalla geometria normalizzata della curva (raggio lungo e corto conforme ASME B16.9) e dall'angolo di deviazione inserito.",
+        "m2": "Le posizioni e gli angoli di taglio sono derivati dalle rotazioni e dai piani di taglio richiesti dalla deviazione fabbricata.",
+        "m3": "Il risultato è espresso in quote di marcatura trasferibili direttamente sul raccordo prima del taglio.",
+        "a1": "Il calcolo assume una geometria ideale del raccordo come tabulata dalla norma; le dimensioni reali variano entro le tolleranze di fabbricazione.",
+        "a2": "L'assottigliamento della parete al taglio e la preparazione del giunto sono decisioni di fabbricazione estranee al risultato geometrico.",
+        "a3": "Verifica sempre il raccordo marcato con una prova di accoppiamento prima della saldatura finale.",
+        "example": "Inserisci l'angolo e l'offset richiesti dalla spola: il calcolatore restituisce i segni di taglio per la curva. Trasferisci i segni, taglia e verifica la deviazione risultante con gli stessi valori prima del puntamento."
+      },
+      "branchLayout": {
+        "title": "Calcolatore di tracciato derivazioni (intersezioni tubo-derivazione)",
+        "description": "Calcola lo sviluppo dell'intersezione di una derivazione su un collettore: profilo di taglio e coordinate di marcatura dalle dimensioni di collettore e derivazione.",
+        "intro": "Ogni derivazione fabbricata parte dallo stesso problema: la curva di intersezione tra il tubo della derivazione e il collettore non è una circonferenza, va sviluppata. Questo calcolatore risolve il tracciato dell'intersezione dalle dimensioni di collettore e derivazione, così profilo di taglio e coordinate di marcatura escono pronti per l'officina.",
+        "m1": "L'intersezione è calcolata dai diametri esterni di collettore e derivazione, con l'angolo di derivazione inserito.",
+        "m2": "Il profilo di taglio sviluppato e le coordinate di marcatura seguono la costruzione geometrica della curva di intersezione.",
+        "m3": "I risultati sono forniti come quote di marcatura trasferibili direttamente sul tubo della derivazione.",
+        "a1": "Il tracciato assume una geometria cilindrica ideale di entrambi i tubi; l'ovalizzazione entro le tolleranze non è considerata.",
+        "a2": "Il rinforzo della derivazione (regole di sostituzione di area) è una verifica di progetto estranea a questo strumento geometrico.",
+        "a3": "I giochi di accoppiamento e la preparazione della saldatura sono decisioni di fabbricazione da verificare sul tubo marcato.",
+        "example": "Inserisci i diametri di collettore e derivazione con l'angolo di derivazione: il calcolatore restituisce profilo di taglio e coordinate di marcatura della derivazione. Marca il tubo, taglia ed esegui una prova di accoppiamento sul collettore prima di saldare."
+      }
     }
   },
   "jobs": {

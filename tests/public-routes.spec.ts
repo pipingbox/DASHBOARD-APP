@@ -286,3 +286,105 @@ test.describe('PB-SEO-101 acquisition foundation', () => {
     }
   });
 });
+
+test.describe('PB-SEO-103 tool landing pages', () => {
+  // Prerendered, indexable acquisition pages for REAL tools only
+  // (src/lib/tool-landings.ts is the single registry consumed by router,
+  // SPA_ROUTE_CONTRACT, prerender and sitemap).
+  const TOOL_LANDING_SLUGS = [
+    'flange-dimensions',
+    'stud-bolts',
+    'pipe-dimensions',
+    'elbow-cut',
+    'branch-layout',
+  ];
+
+  test('every tool landing serves prerendered crawlable HTML at /tools/<slug>', async ({
+    request,
+  }) => {
+    for (const slug of TOOL_LANDING_SLUGS) {
+      // maxRedirects: 0 pins the no-redirect contract: the canonical URL
+      // (no trailing slash) must be served directly, not via a 301/307.
+      const response = await request.get(`/tools/${slug}`, { maxRedirects: 0 });
+      expect(response.status(), `/tools/${slug} must be a direct 200`).toBe(200);
+
+      const body = await response.text();
+      // Prerendered content, not the empty SPA shell: H1 and intro copy are
+      // present in the server-delivered HTML.
+      expect(body, `/tools/${slug} must contain an <h1>`).toMatch(/<h1[^>]*>/);
+      expect(
+        body,
+        `/tools/${slug} must ship real copy, not a thin placeholder`,
+      ).toContain('ASME');
+      // Exactly one canonical link pointing at the canonical host + slug.
+      const canonicals = body.match(/<link rel="canonical" href="[^"]+"/g) ?? [];
+      expect(
+        canonicals.length,
+        `/tools/${slug} must have exactly one canonical`,
+      ).toBe(1);
+      expect(
+        canonicals[0],
+        `/tools/${slug} canonical must be the apex URL without trailing slash`,
+      ).toBe(`<link rel="canonical" href="https://pipingbox.com/tools/${slug}"`);
+      // Unique metadata per PO SEO output requirements.
+      expect(body).toMatch(/<meta name="description" content="[^"]+"/);
+      // Public acquisition page: must never carry noindex.
+      expect(body).not.toMatch(/<meta name="robots"[^>]*noindex/);
+    }
+  });
+
+  test('unknown tool slug stays a Worker 404 (no soft-200 landing)', async ({
+    request,
+  }) => {
+    // /tools/does-not-exist is structurally valid as /tools/:slug, but the
+    // slug is not in the registry, so the Worker must reject it before the
+    // SPA shell is served. This pins the registry as the single truth: a
+    // removed tool landing cannot linger as an indexable 200.
+    const response = await request.get('/tools/does-not-exist');
+    expect(response.status()).toBe(404);
+    const body = await response.text();
+    expect(body).not.toContain('id="root"');
+  });
+
+  test('tool landing renders in-app with resolved i18n and catalog deep link', async ({
+    page,
+  }) => {
+    await page.goto('/tools/stud-bolts');
+
+    // The "Beta Version" modal renders as an aria-modal dialog which makes the
+    // rest of the page aria-hidden; dismiss it first (same as PB-WEB-005).
+    const continueButton = page.getByRole('button', { name: /continue/i });
+    if (await continueButton.isVisible({ timeout: 5_000 }).catch(() => false)) {
+      await continueButton.click();
+    }
+
+    await expect(
+      page.getByRole('heading', {
+        name: /Stud Bolt and Nut Calculator/i,
+      }),
+      'landing must render its H1',
+    ).toBeVisible({ timeout: 10_000 });
+
+    // No unresolved i18n keys may leak into the rendered page.
+    const bodyText = await page.locator('body').innerText();
+    expect(bodyText).not.toMatch(/tools\.landing\./);
+
+    // The interactive catalog deep link (/tools?t=<toolKey>) must be offered.
+    await expect(page.locator('a[href="/tools?t=bolts-nuts"]')).toBeVisible();
+
+    // Related landing links keep crawlable internal linking between pages.
+    await expect(page.locator('a[href="/tools/flange-dimensions"]')).toBeVisible();
+  });
+
+  test('sitemap includes the five tool landing URLs', async ({ request }) => {
+    const response = await request.get('/sitemap.xml');
+    expect(response.status()).toBe(200);
+    const body = await response.text();
+    for (const slug of TOOL_LANDING_SLUGS) {
+      expect(
+        body,
+        `sitemap must include https://pipingbox.com/tools/${slug}`,
+      ).toContain(`https://pipingbox.com/tools/${slug}`);
+    }
+  });
+});

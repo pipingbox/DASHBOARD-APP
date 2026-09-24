@@ -1627,6 +1627,78 @@
       "loading": "Laden...",
       "monthly": "Maandelijks € 4,99",
       "annual": "Jaarlijks € 39 (bespaar 35%)"
+    },
+    "landing": {
+      "shared": {
+        "methodology": "Methodiek",
+        "assumptions": "Aannames en grenzen",
+        "example": "Praktijkvoorbeeld",
+        "relatedTools": "Gerelateerde tools",
+        "openInCatalog": "Openen in de toolcatalogus",
+        "ctaTitle": "Bewaar al je berekeningen op één plek",
+        "ctaBody": "Maak een gratis PipingBox-account om je tools op elk apparaat weer te gebruiken en de volledige industriële toolset te benutten.",
+        "ctaButton": "Gratis account aanmaken"
+      },
+      "flangeDimensions": {
+        "title": "Flensafmetingen calculator (ASME B16.5)",
+        "description": "Bekijk afmetingen van welding neck-, slip-on-, blind-, lap joint-, threaded- en socket weld-flenzen volgens ASME B16.5. Filter op NPS en drukklasse en lees buitendiameter, dikte, boutcirkel en aantal gaten.",
+        "intro": "Elke flenscontrole — van een boutlijst tot een face-to-face-maat — begint met dezelfde vraag: wat zijn de ASME B16.5-afmetingen voor deze maat en klasse? Deze calculator zet de volledige flenztabel op één scherm. Kies een NPS en een drukklasse en de bijbehorende flenzen worden direct gefilterd, klaar om af te zetten tegen je isometrie of materiaalbestelling.",
+        "m1": "De afmetingen volgen de ASME B16.5-tabellen voor de geselecteerde NPS en drukklasse, inclusief buitendiameter, flensdikte en binnendiameter.",
+        "m2": "De boutgegevens — diameter van de boutcirkel, aantal gaten en gatdiameter — volgen de boutpatronen van de norm, zodat studbolts en moeren uit hetzelfde resultaat gespecificeerd kunnen worden.",
+        "m3": "Alle flenstypen uit de bibliotheek (WN, SO, BL, LJ, TH, SW) worden naast elkaar getoond voor dezelfde maat en klasse, zodat het juiste flensvlak direct vergeleken kan worden.",
+        "a1": "De waarden zijn de getabuleerde afmetingen van de norm in de eenheden die de tool toont; fabricagetoleranties zijn niet toegepast.",
+        "a2": "De dekking omvat het NPS- en klassebereik van de PipingBox-flensbibliotheek; maten daarbuiten moet je rechtstreeks in de norm controleren.",
+        "a3": "Druk-temperatuurratings hangen af van de ASME B16.5-materiaalgroep en maken geen deel uit van deze dimensionele opzoeking.",
+        "example": "Selecteer een NPS en klasse 150: de tabel houdt elk flenstype in die maat. De boutcirkel en het aantal gaten uit dezelfde rij zijn wat de studbolt-calculator nodig heeft, zodat de volledige bevestiging besteld kan worden zonder de pagina te verlaten."
+      },
+      "studBolts": {
+        "title": "Studbolt- en moercalculator (ASME B16.5)",
+        "description": "Bepaal studboltdiameter, -lengte en moerparen voor ASME B16.5-flenzen. Kies flensmaat en -klasse voor de bijbehorende bevestiging van je verbinding.",
+        "intro": "Een boutlijst is waar flensafmeting en inkoop elkaar ontmoeten: één verkeerde boutlengte houdt een hele spool tegen. Deze calculator bepaalt de studbolts en moeren voor een ASME B16.5-flensverbinding uit de flensmaat en -klasse, inclusief de diameter en lengte die het patroon van de norm vereist.",
+        "m1": "De boltdiameter volgt het ASME B16.5-boutpatroon voor elke combinatie van NPS en drukklasse.",
+        "m2": "De lengte houdt rekening met de flensdikten, de pakking en de moeren, met de uittrede die de boutafmetingen van de norm voorschrijven.",
+        "m3": "Passende moerparen en gebruikelijke materiaalgraden worden samen met de bolt gekozen, zodat de bevestiging als één post gespecificeerd kan worden.",
+        "a1": "Berekende lengtes volgen de dimensionele basis van de norm; controleer ze altijd tegen de geldende projectspecificatie.",
+        "a2": "De tool dekt het flensbereik van de PipingBox-bibliotheek; bevestiging voor maten daarbuiten moet je apart controleren.",
+        "a3": "Pakkingtype en -dikte kunnen de vereiste lengte veranderen; verifieer dit tegen de specificatie van je verbinding.",
+        "example": "Voer de NPS en klasse van de flens in: het resultaat geeft de boltdiameter en -lengte met het moerpaar. Combineer het met de flensafmetingen-calculator voor een complete flens-bevestigingsregel op de materiaalbestelling."
+      },
+      "pipeDimensions": {
+        "title": "Buisafmetingen calculator (ASME B36.10M / B36.19M)",
+        "description": "Buitendiameter, wanddikte en lineair gewicht voor koolstof- en roestvaststalen buis volgens ASME B36.10M en B36.19M. Kies NPS/DN en schedule en lees de volledige afmetingenrij.",
+        "intro": "Buis wordt besteld op NPS en schedule, maar tekeningen, berekeningen en orders hebben echte getallen nodig: buitendiameter, wanddikte, gewicht per meter. Deze calculator leest de volledige afmetingenrij uit de ASME B36.10M / B36.19M-tabellen voor elke combinatie van maat en schedule, met de DN-aanduiding ernaast.",
+        "m1": "Buitendiameters en wanddiktes volgen ASME B36.10M voor smeedstalen buis en ASME B36.19M voor roestvaststalen buis.",
+        "m2": "Alle schedules uit het bereik van de norm — van SCH 5S tot XXS, inclusief STD en XS — zijn per maat te kiezen.",
+        "m3": "Het gewicht per meter volgt uit de buitendiameter en wanddikte van de gekozen schedule; de DN-aanduiding staat naast de NPS.",
+        "a1": "De afmetingen zijn vlakke-eindwaarden; eindaforing (afschuining, schroefdraad, groef) is niet inbegrepen.",
+        "a2": "Fabriekstoleranties op wanddikte en diameter zijn niet toegepast op de getabuleerde waarden.",
+        "a3": "Het gewicht is de theoretische staalwaarde uit de tabellen van de norm; projectspecifieke toeslagen zijn niet inbegrepen.",
+        "example": "Kies een NPS en een schedule: de rij toont buitendiameter, wanddikte en gewicht per meter met het DN-equivalent. Dezelfde rij voor SCH 40 en XS laat in één oogopslag zien welke schedules een wanddiktecontrole moet afdekken."
+      },
+      "elbowCut": {
+        "title": "Boogsnijcalculator (snijmerken op buis)",
+        "description": "Bereken snijmerken en hoeken op standaard fittingen om niet-standaard bochten te fabriceren. Voer de benodigde geometrie in en krijg de merken voor de snede.",
+        "intro": "Niet elke bocht in een geprefabriceerde spool komt uit een catalogus: veld-offsets, ontwijkingen en gefabriceerde aftakkingen betekenen vaak dat een standaard boog gekapt moet worden. Deze calculator zet de benodigde geometrie om in concrete snijmerken op de fitting, zodat de fabricage uitgezet en gemerkt kan worden zonder tasten.",
+        "m1": "De uitzetting wordt berekend vanuit de standaard booggeometrie (lange en korte straal volgens ASME B16.9) en de door jou ingevoerde booghoek.",
+        "m2": "Snijposities en hoeken worden afgeleid voor de rotaties en snijvlakken die de gefabriceerde bocht vereist.",
+        "m3": "Het resultaat wordt gegeven als merkdiameters die je direct op de fitting kunt overzetten vóór het snijden.",
+        "a1": "De berekening gaat uit van ideale fittinggeometrie zoals de norm die tabellegt; werkelijke maten variëren binnen fabricagetoleranties.",
+        "a2": "Wandvermindering bij de snede en lasvoorbereiding zijn fabricagebeslissingen buiten het geometrische resultaat.",
+        "a3": "Controleer de gemerkte fitting altijd met een proefpassing vóór de definitieve las.",
+        "example": "Voer de hoek en offset in die de spool nodig heeft: de calculator geeft de snijmerken voor de boog. Zet de merken over op de fitting, snij, en controleer de resulterende bocht met dezelfde waarden vóór het hechtlassen."
+      },
+      "branchLayout": {
+        "title": "Aftakkingscalculator (buis-takintersecties)",
+        "description": "Bereken de intersectie-uitzetting van een tak op een header: snijprofiel en meriscoördinaten uit header- en takafmetingen.",
+        "intro": "Elke gefabriceerde aftakking begint met hetzelfde probleem: de intersectiekromme tussen de takbuis en de header is geen cirkel en moet ontwikkeld worden. Deze calculator bepaalt de aftak-intersectie uit de header- en takafmetingen, zodat het snijprofiel en de meriscoördinaten kant-en-klaar voor de werkplaats uitkomen.",
+        "m1": "De intersectie wordt berekend uit de buitendiameter van header en tak, met de door jou ingevoerde takhoek.",
+        "m2": "Het ontwikkelde snijprofiel en de meriscoördinaten volgen de geometrische constructie van de intersectiekromme.",
+        "m3": "Resultaten worden gegeven als merkdiameters die direct op de takbuis overgezet kunnen worden.",
+        "a1": "De uitzetting gaat uit van ideale cilindrische geometrie van beide buizen; ovaliteit binnen toleranties wordt niet meegenomen.",
+        "a2": "Versterking van de aftakking (oppervlaktevervangingsregels) is een ontwerpcontrole buiten deze geometrische tool.",
+        "a3": "Passingspelen en lasvoorbereiding zijn fabricagebeslissingen die op de gemerkte buis gecontroleerd moeten worden.",
+        "example": "Voer header- en takmaat in met de takhoek: de calculator geeft het snijprofiel en de meriscoördinaten van de tak. Markeer de buis, snij en doe een proefpassing op de header vóór het lassen."
+      }
     }
   },
   "jobs": {

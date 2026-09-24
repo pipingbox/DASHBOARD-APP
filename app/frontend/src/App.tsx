@@ -72,6 +72,9 @@ import NotFound from './pages/NotFound';
 // Public routes (no auth) for SEO. Prerendered at build time via vite-prerender.
 const BlogIndexPage = lazy(() => import('./pages/blog/BlogIndexPage'));
 const BlogPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
+// PB-SEO-103: public tool landing pages (/tools/:slug). Lazy-loaded and
+// prerendered at build time (prerender/public.js) for crawlable acquisition HTML.
+const ToolLandingPage = lazy(() => import('./pages/ToolLandingPage'));
 
 const queryClient = new QueryClient();
 
@@ -319,6 +322,17 @@ const AppRoutes = () => {
     <Route
       path="/tools"
       element={withPublicShell(<Tools />)}
+    />
+    {/* PB-SEO-103: prerendered public tool landing pages for acquisition. */}
+    <Route
+      path="/tools/:slug"
+      element={
+        withPublicShell(
+          <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a]" />}>
+            <ToolLandingPage />
+          </Suspense>,
+        )
+      }
     />
     {/* PB-WEB-005 F2: /jobs public. DEC-54 requires marketplace routes open without auth.
         The apply() action already handles !user gracefully (toast "Sign in to apply"). */}
