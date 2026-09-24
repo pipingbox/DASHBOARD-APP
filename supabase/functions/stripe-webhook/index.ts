@@ -366,6 +366,10 @@ const SETTLEMENT_WINDOW_DAYS = 30;
 interface LedgerEntryInput {
   instructorId: string;
   orderId: string | null;
+  courseId: string | null;
+  // PO 2026-09-24, section 2 — 1:1 traceability: the ORIGINAL payment
+  // reference (payment intent / charge id) the entry refers to.
+  stripePaymentReference: string | null;
   entryType: "SALE_CREDIT" | "REFUND_DEBIT" | "CHARGEBACK_DEBIT";
   amountCents: number;
   currency: string;
@@ -377,6 +381,12 @@ interface LedgerEntryInput {
  * Append one instructor-ledger entry for a sale/refund/chargeback that has an
  * instructor attribution. NEVER throws (same rule as recordRevenueEvent:
  * telemetry must not break payment processing).
+ *
+ * 1:1 TRACEABILITY (PO 2026-09-24, section 2): every row carries the ORIGINAL
+ * order, payment, revenue event, course and instructor it refers to, so an
+ * April chargeback links to its January sale without touching the (immutable)
+ * January settlement. The revenue-event link is best-effort: the latest
+ * matching event for the order is attached when found.
  *
  * SALE_CREDIT rows start PENDING with available_at = occurred_at + T+30; the
  * settlement runner matures them. REFUND/CHARGEBACK debits carry a NEGATIVE
@@ -394,9 +404,28 @@ async function recordLedgerEntry(input: LedgerEntryInput): Promise<void> {
         ? new Date(occurred.getTime() + SETTLEMENT_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString()
         : input.occurredAt;
 
+    // Best-effort link to the revenue event for this order (the SALE event
+    // for credits; the REFUND/CHARGEBACK event for debits — the latest one
+    // wins, which is the event this entry refers to). Absence is honest:
+    // "not linked", never "nothing happened".
+    let revenueEventId: string | null = null;
+    if (input.orderId) {
+      const { data: revEvent } = await supabase
+        .from("app_marketplace_revenue_events")
+        .select("id")
+        .eq("order_id", input.orderId)
+        .order("occurred_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      revenueEventId = revEvent?.id ?? null;
+    }
+
     const { error } = await supabase.from("app_instructor_ledger_entries").insert({
       instructor_id: input.instructorId,
       order_id: input.orderId,
+      revenue_event_id: revenueEventId,
+      course_id: input.courseId,
+      stripe_payment_reference: input.stripePaymentReference,
       entry_type: input.entryType,
       // Debits are available for offset immediately; credits wait T+30.
       status: input.entryType === "SALE_CREDIT" ? "PENDING" : "AVAILABLE",
@@ -767,6 +796,9 @@ Deno.serve(async (req) => {
               await recordLedgerEntry({
                 instructorId: attribution.instructor_id,
                 orderId: attribution.id,
+                courseId: attribution.course_id,
+                stripePaymentReference:
+                  (session.payment_intent as string | null) ?? session.id,
                 entryType: "SALE_CREDIT",
                 amountCents: session.amount_total ?? 0,
                 currency: (session.currency || "eur").toUpperCase(),
@@ -1110,6 +1142,10 @@ Deno.serve(async (req) => {
               await recordLedgerEntry({
                 instructorId: attribution.instructor_id,
                 orderId: attribution.id,
+                courseId: attribution.course_id,
+                // The ORIGINAL payment the refund reverses.
+                stripePaymentReference:
+                  (charge.payment_intent as string | null) ?? charge.id,
                 entryType: "REFUND_DEBIT",
                 amountCents: -refundedCents,
                 currency: (charge.currency || "eur").toUpperCase(),
@@ -1206,6 +1242,10 @@ Deno.serve(async (req) => {
             await recordLedgerEntry({
               instructorId: attribution.instructor_id,
               orderId: attribution.id,
+              courseId: attribution.course_id,
+              // The ORIGINAL payment under dispute.
+              stripePaymentReference:
+                (dispute.payment_intent as string | null) ?? dispute.id,
               entryType: "CHARGEBACK_DEBIT",
               amountCents: -(dispute.amount ?? 0),
               currency: (dispute.currency || "eur").toUpperCase(),

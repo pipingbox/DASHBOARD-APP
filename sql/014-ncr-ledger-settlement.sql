@@ -89,6 +89,17 @@ CREATE TABLE IF NOT EXISTS app_instructor_ledger_entries (
   order_id          UUID REFERENCES app_orders(id) ON DELETE RESTRICT,
   revenue_event_id  UUID REFERENCES app_marketplace_revenue_events(id) ON DELETE RESTRICT,
   offsets_entry_id  UUID REFERENCES app_instructor_ledger_entries(id) ON DELETE RESTRICT,
+  -- PO 2026-09-24, section 2 — 1:1 TRACEABILITY: every REFUND /
+  -- PARTIAL_REFUND / CHARGEBACK / REVERSAL keeps an explicit link to the
+  -- ORIGINAL sale it refers to. instructor_id is the row owner; with
+  -- course_id + stripe_payment_reference the full chain closes:
+  --   original order (order_id) · original payment (stripe_payment_reference)
+  --   original revenue event (revenue_event_id) · original course (course_id)
+  --   original instructor (instructor_id) · amount affected (amount_cents)
+  -- A closed settlement is NEVER modified retroactively: the April debit
+  -- links to the January sale; the January settlement stays immutable.
+  course_id             UUID REFERENCES app_academy_courses(id) ON DELETE SET NULL,
+  stripe_payment_reference TEXT,
   -- SALE_CREDIT: instructor-side credit from a sale (split applied at
   --   settlement, NOT here — this row carries the sale's gross facts only).
   -- REFUND_DEBIT / CHARGEBACK_DEBIT: post-sale reversals.
@@ -255,39 +266,56 @@ COMMENT ON TABLE app_self_billing_invoices IS
 
 
 -- =============================================================================
--- 5. INVOICE NUMBERING per LegalEntity
+-- 5. INVOICE NUMBERING — PO LOCKED 2026-09-24, section 1
 -- =============================================================================
+-- Format: SB-{LEGAL_ENTITY_COUNTRY}-{YYYY}-{NNNNNN}
+--   Phase 1:  SB-BE-2026-000001, SB-BE-2026-000002, ...
+--   Future:   SB-EE-2027-000001 (new series per LegalEntity)
+-- Rules: atomic sequence; unique per LegalEntity + YEAR; strictly
+-- consecutive; numbers are NEVER reused; historical invoices are immutable;
+-- the BE -> EE cut-over starts the new entity's own series. The 'SB' bare
+-- fallback is FORBIDDEN in real documents (test/dev only, and only when no
+-- LegalEntity is active — which the settlement runner already refuses).
 
 CREATE TABLE IF NOT EXISTS app_invoice_sequences (
-  legal_entity_id UUID PRIMARY KEY REFERENCES app_legal_entities(id) ON DELETE RESTRICT,
-  next_value      BIGINT NOT NULL DEFAULT 1
+  legal_entity_id UUID NOT NULL REFERENCES app_legal_entities(id) ON DELETE RESTRICT,
+  year            INT  NOT NULL,
+  next_value      BIGINT NOT NULL DEFAULT 1,
+  PRIMARY KEY (legal_entity_id, year)
 );
 
--- Atomic per-issuer numbering. The prefix comes from the entity's
--- invoice_prefix (007); 'SB' is the fallback while no entity is active.
+-- Atomic per-issuer, per-YEAR numbering. The country segment is the entity's
+-- jurisdiction (007: 'BE' / 'EE'). Raises when the entity does not exist: a
+-- real document must never carry an invented country, and the runner never
+-- issues a settlement without an active entity.
 CREATE OR REPLACE FUNCTION app_next_self_billing_number(p_legal_entity_id UUID)
 RETURNS TEXT
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  v_prefix TEXT;
-  v_value  BIGINT;
+  v_country TEXT;
+  v_year    INT := extract(year from now())::int;
+  v_value   BIGINT;
 BEGIN
-  INSERT INTO app_invoice_sequences (legal_entity_id, next_value)
-  VALUES (p_legal_entity_id, 2)
-  ON CONFLICT (legal_entity_id)
+  SELECT jurisdiction INTO v_country
+    FROM app_legal_entities WHERE id = p_legal_entity_id;
+
+  IF v_country IS NULL THEN
+    RAISE EXCEPTION 'legal entity % not found: self-billing numbering requires a real LegalEntity (no fallback in real documents)', p_legal_entity_id;
+  END IF;
+
+  INSERT INTO app_invoice_sequences (legal_entity_id, year, next_value)
+  VALUES (p_legal_entity_id, v_year, 2)
+  ON CONFLICT (legal_entity_id, year)
   DO UPDATE SET next_value = app_invoice_sequences.next_value + 1
   RETURNING next_value - 1 INTO v_value;
 
-  SELECT COALESCE(invoice_prefix, 'SB') INTO v_prefix
-    FROM app_legal_entities WHERE id = p_legal_entity_id;
-
-  RETURN COALESCE(v_prefix, 'SB') || '-' || to_char(now(), 'YYYY') || '-' || lpad(v_value::text, 6, '0');
+  RETURN 'SB-' || v_country || '-' || v_year::text || '-' || lpad(v_value::text, 6, '0');
 END;
 $$;
 
 COMMENT ON FUNCTION app_next_self_billing_number(UUID) IS
-  'PB-MARKET-NCR-LEDGER-001: atomic self-billing invoice numbering per LegalEntity issuer. Prefix from the entity (007); SB fallback while none is active.';
+  'PB-MARKET-NCR-LEDGER-001 (PO LOCKED 2026-09-24): atomic self-billing numbering SB-{COUNTRY}-{YYYY}-{NNNNNN}, unique and consecutive per LegalEntity + year. Country from the entity jurisdiction; series restarts with a new entity (BE -> EE). No bare-SB fallback in real documents.';
 
 
 -- =============================================================================
@@ -358,10 +386,25 @@ GRANT SELECT ON app_invoice_sequences TO authenticated;
 --   SELECT app_net_revenue_cents(12100, 2100, 0, 0, 0, 300);
 --   EXPECT: 9700  (gross 121.00 − VAT 21.00 − fees 3.00).
 --
+--   -- Numbering (PO LOCKED 2026-09-24). Activate the BE entity first, then:
+--   SELECT app_next_self_billing_number(
+--     (SELECT id FROM app_legal_entities WHERE entity_key = 'BE_SOLE_PROPRIETOR'));
+--   Run TWICE. EXPECT: SB-BE-2026-000001 then SB-BE-2026-000002
+--   (year = current year). A second entity would start its own series.
+--
 --   SELECT cmd FROM pg_policies
 --   WHERE tablename IN ('app_instructor_ledger_entries','app_settlements',
 --                       'app_self_billing_invoices','app_invoice_sequences');
 --   EXPECT: SELECT policies only.
+--
+--   -- 1:1 traceability probe: after a refund in staging, the debit entry
+--   -- must carry the ORIGINAL sale's order/payment/revenue-event/course:
+--   SELECT entry_type, order_id, stripe_payment_reference, revenue_event_id,
+--          course_id, amount_cents
+--     FROM app_instructor_ledger_entries
+--    WHERE entry_type IN ('REFUND_DEBIT','CHARGEBACK_DEBIT');
+--   EXPECT: every debit row has order_id + payment reference populated and a
+--   NEGATIVE amount; the referenced settlement (if any) is untouched.
 --
 --   -- Snapshot immutability probe (must FAIL with insufficient_privilege
 --   -- for any non-service role):
