@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, Paperclip, X, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
@@ -18,10 +19,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
+import { feedbackResult } from '@/lib/feedbackResult';
 import {
   FEEDBACK_CATEGORIES,
+  ALLOWED_IMAGE_TYPES,
+  MAX_FILE_SIZE,
   FeedbackCategory,
-  collectTechnicalData,
   uploadScreenshot,
   submitFeedbackReport,
 } from '@/lib/betaFeedback';
@@ -44,6 +47,9 @@ export function BetaFeedbackModal({
 
   const [category, setCategory] = useState<FeedbackCategory>(initialCategory);
   const [description, setDescription] = useState('');
+  const [visibleText, setVisibleText] = useState('');
+  const [suggestedText, setSuggestedText] = useState('');
+  const [screenshotFailed, setScreenshotFailed] = useState(false);
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -57,6 +63,12 @@ export function BetaFeedbackModal({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type) || file.size > MAX_FILE_SIZE || file.size === 0) {
+        setSubmitError(t('betaFeedback.modal.invalidImage'));
+        e.target.value = '';
+        return;
+      }
+      setSubmitError(null);
       setScreenshot(file);
       const reader = new FileReader();
       reader.onload = () => setScreenshotPreview(reader.result as string);
@@ -71,38 +83,41 @@ export function BetaFeedbackModal({
   };
 
   const handleSubmit = async () => {
-    if (!description.trim()) return;
+    if (category === 'translation' ? !visibleText.trim() || !suggestedText.trim() : !description.trim()) return;
     setSubmitting(true);
     setSubmitError(null);
+    setScreenshotFailed(false);
 
     try {
-      const techData = collectTechnicalData();
       let screenshotUrl: string | undefined;
-
-      if (screenshot) {
-        const url = await uploadScreenshot(screenshot, user?.id);
-        if (url) screenshotUrl = url;
-        // If screenshot upload fails, continue without it
+      let uploadFailed = false;
+      if (screenshot && user) {
+        try {
+          const url = await uploadScreenshot(screenshot);
+          if (url) screenshotUrl = url;
+          else uploadFailed = true;
+        } catch {
+          uploadFailed = true;
+        }
       }
 
       const result = await submitFeedbackReport({
-        user_id: user?.id,
-        user_email: user?.email,
         category,
-        description: description.trim(),
+        description: category === 'translation' ? undefined : description.trim(),
+        visible_text: category === 'translation' ? visibleText.trim() : undefined,
+        suggested_text: category === 'translation' ? suggestedText.trim() : undefined,
         screenshot_url: screenshotUrl,
-        ...techData,
       });
 
-      if (result.success) {
+      const outcome = feedbackResult(result.success, uploadFailed);
+      if (outcome !== 'error') {
+        setScreenshotFailed(outcome === 'savedWithoutImage');
         setSubmitted(true);
-        setTimeout(() => {
+        if (outcome === 'success') setTimeout(() => {
           resetForm();
           onOpenChange(false);
         }, 2500);
       } else {
-        console.error('[BETA_FEEDBACK] Submission failed:', result.error);
-        // Show error state but don't close modal so user can retry
         setSubmitError(result.error || t('betaFeedback.modal.submitError'));
       }
     } catch (err) {
@@ -116,6 +131,9 @@ export function BetaFeedbackModal({
   const resetForm = () => {
     setCategory(initialCategory);
     setDescription('');
+    setVisibleText('');
+    setSuggestedText('');
+    setScreenshotFailed(false);
     setScreenshot(null);
     setScreenshotPreview(null);
     setSubmitted(false);
@@ -146,8 +164,9 @@ export function BetaFeedbackModal({
               {t('betaFeedback.modal.successMessage')}
             </p>
             <p className="animate-[feedbackFadeUp_0.4s_ease-out_0.5s_both] text-xs text-zinc-500">
-              {t('betaFeedback.modal.successSubtext', 'Gracias por ayudarnos a mejorar.')}
+              {screenshotFailed ? t('betaFeedback.modal.savedWithoutImage') : t('betaFeedback.modal.successSubtext')}
             </p>
+            {screenshotFailed && <Button variant="outline" onClick={() => handleClose(false)}>{t('betaFeedback.modal.closeBtn')}</Button>}
           </div>
         </DialogContent>
       </Dialog>
@@ -183,21 +202,21 @@ export function BetaFeedbackModal({
             </Select>
           </div>
 
-          {/* Description */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-300">
-              {t('betaFeedback.modal.descriptionLabel')}
-            </label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t('betaFeedback.modal.descriptionPlaceholder')}
-              className="min-h-[100px] resize-none border-zinc-800 bg-zinc-900 text-zinc-200 placeholder:text-zinc-600"
-            />
-          </div>
+          {category === 'translation' ? (
+            <div className="space-y-3">
+              <label htmlFor="feedback-visible" className="block text-sm font-medium text-zinc-300">{t('betaFeedback.modal.visibleLabel')}</label>
+              <Input id="feedback-visible" value={visibleText} maxLength={500} onChange={(event) => setVisibleText(event.target.value)} className="border-zinc-800 bg-zinc-900 text-zinc-200" />
+              <label htmlFor="feedback-suggested" className="block text-sm font-medium text-zinc-300">{t('betaFeedback.modal.suggestedLabel')}</label>
+              <Input id="feedback-suggested" value={suggestedText} maxLength={500} onChange={(event) => setSuggestedText(event.target.value)} className="border-zinc-800 bg-zinc-900 text-zinc-200" />
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <label htmlFor="feedback-description" className="text-sm font-medium text-zinc-300">{t('betaFeedback.modal.descriptionLabel')}</label>
+              <Textarea id="feedback-description" value={description} maxLength={2000} onChange={(event) => setDescription(event.target.value)} placeholder={t('betaFeedback.modal.descriptionPlaceholder')} className="min-h-[100px] resize-none border-zinc-800 bg-zinc-900 text-zinc-200 placeholder:text-zinc-600" />
+            </div>
+          )}
 
-          {/* Screenshot */}
-          <div className="space-y-1.5">
+          {user && <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-300">
               {t('betaFeedback.modal.screenshotLabel')}
             </label>
@@ -205,10 +224,12 @@ export function BetaFeedbackModal({
               <div className="relative inline-block">
                 <img
                   src={screenshotPreview}
-                  alt="Screenshot preview"
+                  alt={t('betaFeedback.modal.imagePreview')}
                   className="h-24 rounded-md border border-zinc-800 object-cover"
                 />
                 <button
+                  type="button"
+                  aria-label={t('betaFeedback.modal.removeImage')}
                   onClick={removeScreenshot}
                   className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white"
                 >
@@ -230,11 +251,11 @@ export function BetaFeedbackModal({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               onChange={handleFileChange}
               className="hidden"
             />
-          </div>
+          </div>}
         </div>
 
         {submitError && (
@@ -253,7 +274,7 @@ export function BetaFeedbackModal({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!description.trim() || submitting}
+            disabled={(category === 'translation' ? !visibleText.trim() || !suggestedText.trim() : !description.trim()) || submitting}
             className="bg-amber-500 text-black hover:bg-amber-400 disabled:opacity-50"
           >
             {submitting ? (

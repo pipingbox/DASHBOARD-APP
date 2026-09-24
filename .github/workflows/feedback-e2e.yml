@@ -1,0 +1,32 @@
+name: Feedback E2E Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Exact app SHA to test
+        required: true
+        type: string
+
+jobs:
+  feedback:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+      - name: Verify SHA and run anonymous/authenticated gate
+        env:
+          EXPECTED_SHA: ${{ inputs.source_ref }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          case "$E2E_TEST_EMAIL" in qa.e2e*) ;; *) exit 1 ;; esac
+          npm ci
+          node --test tests/beta-feedback-live.test.mjs
