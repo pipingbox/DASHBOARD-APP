@@ -3,12 +3,12 @@
   "_source": "PIPINGBOX-BRAIN/brain/08-CATALOG",
   "_warning": "FICHERO GENERADO. No editar a mano: se sobrescribe.",
   "stats": {
-    "components": 56,
+    "components": 57,
     "publishable": 53,
-    "standards": 19,
+    "standards": 20,
     "standardsInUse": 16,
-    "dimensionSets": 70,
-    "dimensionRows": 1934,
+    "dimensionSets": 71,
+    "dimensionRows": 1943,
     "drawings": 628,
     "renders": 52
   },
@@ -5991,6 +5991,66 @@
       "publishable": true
     },
     {
+      "id": "PB-COMP-VALVE-BUTTERFLY-API-609",
+      "slug": "valve-butterfly-api-609",
+      "name": "Válvula de Mariposa API 609 Category A",
+      "shortName": "Válvula de Mariposa API 609",
+      "description": "Butterfly valve with a dedicated API 609 Category A dimensional dataset. Geometry and visual asset remain in WP5 build until reference and visual gates pass.",
+      "status": "draft",
+      "version": "0.1",
+      "category": "valves",
+      "family": "valve",
+      "type": "butterfly",
+      "tags": [
+        "valve",
+        "butterfly",
+        "wafer",
+        "api609"
+      ],
+      "connectionTypes": [
+        "WAFER"
+      ],
+      "materials": [
+        "carbon_steel",
+        "stainless_steel",
+        "ductile_iron"
+      ],
+      "pressureRatings": [
+        "150"
+      ],
+      "ratingBasis": null,
+      "ratingNote": "API 609 Category A dimensional reference; pressure class and vendor construction must be verified for the selected product.",
+      "ratingNoteKey": null,
+      "standards": [
+        {
+          "standardId": "PB-STD-API-609",
+          "role": "dimensions",
+          "note": "Category A face-to-face reference only."
+        }
+      ],
+      "dimensionSets": [
+        "PB-DIM-API-609-BUTTERFLY-CAT-A"
+      ],
+      "drawings": [],
+      "drawingStem": null,
+      "render": null,
+      "fabricationNotes": [
+        "Dedicated butterfly geometry required; do not substitute a ball-valve mesh."
+      ],
+      "compatibleWith": [
+        {
+          "target": "pipe",
+          "relation": "joins_to",
+          "conditions": {
+            "connection": "WAFER",
+            "nominal_size_match": true
+          }
+        }
+      ],
+      "referenceCompatibility": null,
+      "publishable": false
+    },
+    {
       "id": "PB-COMP-VALVE-CHECK-API-594",
       "slug": "valve-check-api-594",
       "name": "Válvula de Retención (Check Valve) API 594 Class 150",
@@ -6276,6 +6336,24 @@
       ],
       "applicableFamilies": [
         "valve_ball"
+      ]
+    },
+    "PB-STD-API-609": {
+      "id": "PB-STD-API-609",
+      "organization": "API",
+      "code": "609",
+      "title": "Butterfly Valves: Double-flanged, Lug- and Wafer-type",
+      "edition": "2016",
+      "status": "active",
+      "scope": "Vendor-neutral dimensional and functional reference for metallic butterfly valves. Category A face-to-face values are recorded as engineering reference; verify the licensed standard edition for production design.",
+      "roles": [
+        "design",
+        "dimensions",
+        "testing",
+        "materials"
+      ],
+      "applicableFamilies": [
+        "valve_butterfly"
       ]
     },
     "PB-STD-ASME-B1-20-1": {
@@ -41558,8 +41636,8 @@
           "nps": "2",
           "dn": 50,
           "class": 150,
-          "face_to_face_in": 1.69,
-          "face_to_face_mm": 42.9,
+          "face_to_face_in": 2.36,
+          "face_to_face_mm": 60,
           "od_body_in": 5.75,
           "od_body_mm": 146.1,
           "weight_kg": 5,
@@ -41569,8 +41647,8 @@
           "nps": "3",
           "dn": 80,
           "class": 150,
-          "face_to_face_in": 2.06,
-          "face_to_face_mm": 52.3,
+          "face_to_face_in": 2.64,
+          "face_to_face_mm": 67,
           "od_body_in": 7.25,
           "od_body_mm": 184.2,
           "weight_kg": 10,
@@ -41580,8 +41658,8 @@
           "nps": "4",
           "dn": 100,
           "class": 150,
-          "face_to_face_in": 3.25,
-          "face_to_face_mm": 82.6,
+          "face_to_face_in": 2.88,
+          "face_to_face_mm": 73,
           "od_body_in": 8.5,
           "od_body_mm": 215.9,
           "weight_kg": 18,
@@ -41591,8 +41669,8 @@
           "nps": "6",
           "dn": 150,
           "class": 150,
-          "face_to_face_in": 3.5,
-          "face_to_face_mm": 88.9,
+          "face_to_face_in": 2.88,
+          "face_to_face_mm": 73,
           "od_body_in": 10.75,
           "od_body_mm": 273.1,
           "weight_kg": 32,
@@ -41602,8 +41680,8 @@
           "nps": "8",
           "dn": 200,
           "class": 150,
-          "face_to_face_in": 4,
-          "face_to_face_mm": 101.6,
+          "face_to_face_in": 3.86,
+          "face_to_face_mm": 98,
           "od_body_in": 13,
           "od_body_mm": 330.2,
           "weight_kg": 52,
@@ -41613,8 +41691,8 @@
           "nps": "10",
           "dn": 250,
           "class": 150,
-          "face_to_face_in": 4.5,
-          "face_to_face_mm": 114.3,
+          "face_to_face_in": 5,
+          "face_to_face_mm": 127,
           "od_body_in": 15.5,
           "od_body_mm": 393.7,
           "weight_kg": 80,
@@ -41624,8 +41702,8 @@
           "nps": "12",
           "dn": 300,
           "class": 150,
-          "face_to_face_in": 5,
-          "face_to_face_mm": 127,
+          "face_to_face_in": 5.75,
+          "face_to_face_mm": 146,
           "od_body_in": 18.5,
           "od_body_mm": 469.9,
           "weight_kg": 115,
@@ -41738,8 +41816,8 @@
           "nps": "4",
           "dn": 100,
           "class": 150,
-          "face_to_face_in": 9.5,
-          "face_to_face_mm": 241.3,
+          "face_to_face_in": 9,
+          "face_to_face_mm": 229,
           "center_to_top_in": 15,
           "center_to_top_mm": 381,
           "handwheel_dia_in": 10,
@@ -41750,8 +41828,8 @@
           "nps": "6",
           "dn": 150,
           "class": 150,
-          "face_to_face_in": 11.5,
-          "face_to_face_mm": 292.1,
+          "face_to_face_in": 10.5,
+          "face_to_face_mm": 267,
           "center_to_top_in": 18,
           "center_to_top_mm": 457.2,
           "handwheel_dia_in": 12,
@@ -41762,8 +41840,8 @@
           "nps": "8",
           "dn": 200,
           "class": 150,
-          "face_to_face_in": 13,
-          "face_to_face_mm": 330.2,
+          "face_to_face_in": 11.5,
+          "face_to_face_mm": 292,
           "center_to_top_in": 22,
           "center_to_top_mm": 558.8,
           "handwheel_dia_in": 14,
@@ -41774,8 +41852,8 @@
           "nps": "10",
           "dn": 250,
           "class": 150,
-          "face_to_face_in": 15,
-          "face_to_face_mm": 381,
+          "face_to_face_in": 13,
+          "face_to_face_mm": 330,
           "center_to_top_in": 26,
           "center_to_top_mm": 660.4,
           "handwheel_dia_in": 16,
@@ -41786,8 +41864,8 @@
           "nps": "12",
           "dn": 300,
           "class": 150,
-          "face_to_face_in": 17,
-          "face_to_face_mm": 431.8,
+          "face_to_face_in": 14,
+          "face_to_face_mm": 356,
           "center_to_top_in": 30,
           "center_to_top_mm": 762,
           "handwheel_dia_in": 18,
@@ -41884,8 +41962,8 @@
           "nps": "2",
           "dn": 50,
           "class": 150,
-          "face_to_face_in": 8.5,
-          "face_to_face_mm": 215.9,
+          "face_to_face_in": 8,
+          "face_to_face_mm": 203,
           "center_to_top_in": 10,
           "center_to_top_mm": 254,
           "handwheel_dia_in": 7,
@@ -41897,8 +41975,8 @@
           "nps": "3",
           "dn": 80,
           "class": 150,
-          "face_to_face_in": 9,
-          "face_to_face_mm": 228.6,
+          "face_to_face_in": 9.5,
+          "face_to_face_mm": 241,
           "center_to_top_in": 12,
           "center_to_top_mm": 304.8,
           "handwheel_dia_in": 9,
@@ -41910,8 +41988,8 @@
           "nps": "4",
           "dn": 100,
           "class": 150,
-          "face_to_face_in": 10.5,
-          "face_to_face_mm": 266.7,
+          "face_to_face_in": 11.5,
+          "face_to_face_mm": 292,
           "center_to_top_in": 14.5,
           "center_to_top_mm": 368.3,
           "handwheel_dia_in": 10,
@@ -41923,8 +42001,8 @@
           "nps": "6",
           "dn": 150,
           "class": 150,
-          "face_to_face_in": 13,
-          "face_to_face_mm": 330.2,
+          "face_to_face_in": 14,
+          "face_to_face_mm": 356,
           "center_to_top_in": 18.5,
           "center_to_top_mm": 469.9,
           "handwheel_dia_in": 12,
@@ -41936,8 +42014,8 @@
           "nps": "8",
           "dn": 200,
           "class": 150,
-          "face_to_face_in": 15,
-          "face_to_face_mm": 381,
+          "face_to_face_in": 19.5,
+          "face_to_face_mm": 495,
           "center_to_top_in": 23,
           "center_to_top_mm": 584.2,
           "handwheel_dia_in": 14,
@@ -41949,8 +42027,8 @@
           "nps": "10",
           "dn": 250,
           "class": 150,
-          "face_to_face_in": 17.5,
-          "face_to_face_mm": 444.5,
+          "face_to_face_in": 24.5,
+          "face_to_face_mm": 622,
           "center_to_top_in": 27,
           "center_to_top_mm": 685.8,
           "handwheel_dia_in": 16,
@@ -41962,8 +42040,8 @@
           "nps": "12",
           "dn": 300,
           "class": 150,
-          "face_to_face_in": 20,
-          "face_to_face_mm": 508,
+          "face_to_face_in": 27.5,
+          "face_to_face_mm": 698,
           "center_to_top_in": 31,
           "center_to_top_mm": 787.4,
           "handwheel_dia_in": 18,
@@ -42078,8 +42156,8 @@
           "nps": "4",
           "dn": 100,
           "class": 150,
-          "face_to_face_in": 8.5,
-          "face_to_face_mm": 215.9,
+          "face_to_face_in": 8,
+          "face_to_face_mm": 203,
           "center_to_top_in": 6.5,
           "center_to_top_mm": 165.1,
           "lever_length_in": 10,
@@ -42090,8 +42168,8 @@
           "nps": "6",
           "dn": 150,
           "class": 150,
-          "face_to_face_in": 11.5,
-          "face_to_face_mm": 292.1,
+          "face_to_face_in": 9,
+          "face_to_face_mm": 229,
           "center_to_top_in": 8.5,
           "center_to_top_mm": 215.9,
           "lever_length_in": 13,
@@ -42102,8 +42180,8 @@
           "nps": "8",
           "dn": 200,
           "class": 150,
-          "face_to_face_in": 13,
-          "face_to_face_mm": 330.2,
+          "face_to_face_in": 10.5,
+          "face_to_face_mm": 267,
           "center_to_top_in": 10.5,
           "center_to_top_mm": 266.7,
           "lever_length_in": 16,
@@ -42114,8 +42192,8 @@
           "nps": "10",
           "dn": 250,
           "class": 150,
-          "face_to_face_in": 15,
-          "face_to_face_mm": 381,
+          "face_to_face_in": 11.5,
+          "face_to_face_mm": 292,
           "center_to_top_in": 12.5,
           "center_to_top_mm": 317.5,
           "lever_length_in": 18,
@@ -42126,13 +42204,120 @@
           "nps": "12",
           "dn": 300,
           "class": 150,
-          "face_to_face_in": 17,
-          "face_to_face_mm": 431.8,
+          "face_to_face_in": 13,
+          "face_to_face_mm": 330,
           "center_to_top_in": 14.5,
           "center_to_top_mm": 368.3,
           "lever_length_in": 20,
           "lever_length_mm": 508,
           "weight_kg": 240
+        }
+      ]
+    },
+    "PB-DIM-API-609-BUTTERFLY-CAT-A": {
+      "id": "PB-DIM-API-609-BUTTERFLY-CAT-A",
+      "componentId": "PB-COMP-VALVE-BUTTERFLY-API-609",
+      "standardId": "PB-STD-API-609",
+      "system": "mixed",
+      "selectors": [
+        {
+          "key": "nps",
+          "label": "Nominal Pipe Size",
+          "unit": "in",
+          "type": "string"
+        },
+        {
+          "key": "dn",
+          "label": "Diametre Nominal",
+          "unit": "mm",
+          "type": "integer"
+        },
+        {
+          "key": "category",
+          "label": "API 609 Category",
+          "unit": "dimensionless",
+          "type": "string"
+        }
+      ],
+      "fields": [
+        {
+          "key": "face_to_face_in",
+          "label": "Face To Face",
+          "unit": "in",
+          "type": "number",
+          "priority": 1
+        },
+        {
+          "key": "face_to_face_mm",
+          "label": "Face To Face",
+          "unit": "mm",
+          "type": "integer",
+          "priority": 2
+        }
+      ],
+      "rows": [
+        {
+          "nps": "2",
+          "dn": 50,
+          "category": "A",
+          "face_to_face_in": 1.69,
+          "face_to_face_mm": 43
+        },
+        {
+          "nps": "2.5",
+          "dn": 65,
+          "category": "A",
+          "face_to_face_in": 1.81,
+          "face_to_face_mm": 46
+        },
+        {
+          "nps": "3",
+          "dn": 80,
+          "category": "A",
+          "face_to_face_in": 1.81,
+          "face_to_face_mm": 46
+        },
+        {
+          "nps": "4",
+          "dn": 100,
+          "category": "A",
+          "face_to_face_in": 2.05,
+          "face_to_face_mm": 52
+        },
+        {
+          "nps": "5",
+          "dn": 125,
+          "category": "A",
+          "face_to_face_in": 2.2,
+          "face_to_face_mm": 56
+        },
+        {
+          "nps": "6",
+          "dn": 150,
+          "category": "A",
+          "face_to_face_in": 2.2,
+          "face_to_face_mm": 56
+        },
+        {
+          "nps": "8",
+          "dn": 200,
+          "category": "A",
+          "face_to_face_in": 2.36,
+          "face_to_face_mm": 60
+        },
+        {
+          "nps": "10",
+          "dn": 250,
+          "category": "A",
+          "face_to_face_in": 2.68,
+          "face_to_face_mm": 68
+        },
+        {
+          "nps": "12",
+          "dn": 300,
+          "category": "A",
+          "face_to_face_in": 3.07,
+          "face_to_face_mm": 78
         }
       ]
     },
