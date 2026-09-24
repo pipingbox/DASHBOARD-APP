@@ -14,6 +14,8 @@
  * Keep it in sync with App.tsx. A CI guard checks for drift.
  */
 
+import { TOOL_LANDING_SLUGS } from './app/frontend/src/lib/tool-landings.ts';
+
 export type RouteVisibility =
   | 'PUBLIC'    // indexable, accessible without session
   | 'GUEST'     // only for non-authenticated users (login/register)
@@ -46,6 +48,17 @@ const LEGACY_MODULE_IDS = /^([1-9]|1[0-9]|2[0-2])$/;
 // restrictive enough to block random invalid paths.
 const SLUG_RE = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/i;
 const UUID_OR_SHORTID_RE = /^[a-zA-Z0-9_-]{8,128}$/;
+
+/**
+ * PB-SEO-103: known SEO tool-landing slugs (canonical registry lives in
+ * app/frontend/src/lib/tool-landings.ts). A `.html` suffix is accepted so the
+ * static-assets layer can 301 the file variant to the clean URL instead of
+ * hitting the unknown-route 404 branch.
+ */
+function isToolLandingSlug(slug: string): boolean {
+  const clean = slug.endsWith('.html') ? slug.slice(0, -5) : slug;
+  return TOOL_LANDING_SLUGS.includes(clean);
+}
 
 export const SPA_ROUTE_CONTRACT: RouteRule[] = [
   // ─── PUBLIC exact routes ───────────────────────────────────────────────────
@@ -85,6 +98,13 @@ export const SPA_ROUTE_CONTRACT: RouteRule[] = [
     kind: 'DYNAMIC',
     validate: (_path, params) => UUID_OR_SHORTID_RE.test(params.id ?? ''),
     note: 'public worker profile; resource existence not validated at edge',
+  },
+  {
+    pattern: '/tools/:slug',
+    visibility: 'PUBLIC',
+    kind: 'DYNAMIC',
+    validate: (_path, params) => isToolLandingSlug(params.slug ?? ''),
+    note: 'PB-SEO-103: tool landing, prerendered .html for known slugs; unknown slug 404',
   },
 
   // ─── GUEST routes ──────────────────────────────────────────────────────────

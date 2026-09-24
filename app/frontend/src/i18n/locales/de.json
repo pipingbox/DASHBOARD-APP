@@ -1627,6 +1627,78 @@
       "loading": "Wird geladen...",
       "monthly": "Monatlich 4,99 €",
       "annual": "Jährlich 39 € (35 % sparen)"
+    },
+    "landing": {
+      "shared": {
+        "methodology": "Methodik",
+        "assumptions": "Annahmen und Grenzen",
+        "example": "Rechenbeispiel",
+        "relatedTools": "Verwandte Werkzeuge",
+        "openInCatalog": "Im Werkzeugkatalog öffnen",
+        "ctaTitle": "Alle Berechnungen an einem Ort",
+        "ctaBody": "Erstellen Sie ein kostenloses PipingBox-Konto, um Ihre Werkzeugnutzung von jedem Gerät aus fortzusetzen und auf den vollständigen industriellen Werkzeugsatz zuzugreifen.",
+        "ctaButton": "Kostenloses Konto erstellen"
+      },
+      "flangeDimensions": {
+        "title": "Flanschmaße-Rechner (ASME B16.5)",
+        "description": "Schlagen Sie Maße von Vorschweißbunden, losen Bunden, Blindbunden, Losflanschen, Gewinde- und Sockelschweißbunden nach ASME B16.5 nach. Filtern Sie nach NPS und Druckklasse und lesen Sie Außendurchmesser, Dicke, Schraubenkreisdurchmesser und Lochanzahl.",
+        "intro": "Jede Flanschprüfung — von der Schraubenliste bis zur Stirnfläche-Maß — beginnt mit derselben Frage: Welche ASME B16.5-Maße gelten für diese Nennweite und Klasse? Dieser Rechner bringt die komplette Flanschtabelle auf einen Bildschirm. Wählen Sie NPS und Druckklasse, und die passenden Flansche werden sofort gefiltert — bereit für den Abgleich mit Ihrer Isometrie oder Materialanforderung.",
+        "m1": "Die Maße folgen den ASME B16.5-Tabellen für die gewählte NPS und Druckklasse, einschließlich Außendurchmesser, Flanschdicke und Bohrung.",
+        "m2": "Die Schraubendaten — Schraubenkreisdurchmesser, Lochanzahl und Lochdurchmesser — entsprechen den Schraubenbildern der Norm, sodass Distanzbolzen und Muttern aus demselben Ergebnis spezifiziert werden können.",
+        "m3": "Alle Flanschtypen der Bibliothek (WN, SO, BL, LJ, TH, SW) werden für dieselbe Nennweite und Klasse nebeneinander angezeigt, um die richtige Dichtfläche direkt zu vergleichen.",
+        "a1": "Die Werte sind die tabellierten Maße der Norm in den vom Werkzeug angezeigten Einheiten; Fertigungstoleranzen sind nicht berücksichtigt.",
+        "a2": "Die Abdeckung umfasst den NPS- und Klassenbereich der PipingBox-Flanschenbibliothek; Maße außerhalb dieses Bereichs sind direkt in der Norm zu prüfen.",
+        "a3": "Druck-Temperatur-Kennwerte hängen von der ASME B16.5-Werkstoffgruppe ab und sind nicht Teil dieser Maßnachschlage.",
+        "example": "Wählen Sie eine NPS und Klasse 150: Die Tabelle behält jeden verfügbaren Flanschtyp dieser Nennweite. Schraubenkreis und Lochanzahl derselben Zeile sind genau das, was der Distanzbolzen-Rechner benötigt — die komplette Verschraubung kann also bestellt werden, ohne die Seite zu verlassen."
+      },
+      "studBolts": {
+        "title": "Distanzbolzen- und Muttern-Rechner (ASME B16.5)",
+        "description": "Bestimmen Sie Durchmesser und Länge von Distanzbolzen sowie Mutternpaare für ASME B16.5-Flansche. Wählen Sie Flanschnennweite und -klasse für die passende Verschraubung Ihrer Verbindung.",
+        "intro": "Die Schraubenliste ist dort, wo Flanschmaß und Beschaffung aufeinandertreffen: Ein falscher Bolzenmaß hält einen ganzen Spool auf. Dieser Rechner ermittelt die Distanzbolzen und Muttern für eine ASME B16.5-Flanschverbindung aus Nennweite und Klasse — einschließlich des Durchmessers und der Länge, die das Schraubenbild der Norm verlangt.",
+        "m1": "Der Bolzendurchmesser folgt dem ASME B16.5-Schraubenbild für jede Kombination aus NPS und Druckklasse.",
+        "m2": "Die Länge berücksichtigt die Flanschnicken, die Dichtung und die Muttern einschließlich des Überstands, den die Schraubenmaße der Norm vorschreiben.",
+        "m3": "Passende Mutternpaare und übliche Werkstoffgüten werden zusammen mit dem Bolzen gewählt, damit die Verschraubung als eine Position spezifiziert werden kann.",
+        "a1": "Berechnete Längen entsprechen der dimensionellen Grundlage der Norm; bestätigen Sie sie immer gegen die maßgebliche Projektspezifikation.",
+        "a2": "Das Werkzeug deckt den Flanschbereich der PipingBox-Bibliothek ab; Verschraubung für Maße außerhalb dieses Bereichs ist separat zu prüfen.",
+        "a3": "Dichtungsart und -dicke können die erforderliche Länge ändern; prüfen Sie dies gegen Ihre Verbindungsspezifikation.",
+        "example": "Geben Sie NPS und Klasse des Flansches ein: Das Ergebnis liefert Bolzendurchmesser und -länge mit dem Mutternpaar. Kombinieren Sie es mit dem Flanschmaße-Rechner für eine vollständige Flansch-Verschraubungsposition in der Materialanforderung."
+      },
+      "pipeDimensions": {
+        "title": "Rohrmaße-Rechner (ASME B36.10M / B36.19M)",
+        "description": "Außendurchmesser, Wanddicke und Metergewicht für unlegierte und nichtrostende Stahlrohre nach ASME B36.10M und B36.19M. Wählen Sie NPS/DN und Schedule und lesen Sie die komplette Maßzeile.",
+        "intro": "Rohr wird nach NPS und Schedule bestellt, aber Zeichnungen, Berechnungen und Bestellungen brauchen echte Zahlen: Außendurchmesser, Wanddicke, Gewicht pro Meter. Dieser Rechner liest die komplette Maßzeile aus den ASME B36.10M / B36.19M-Tabellen für jede Kombination aus Nennweite und Schedule — mit der DN-Bezeichnung daneben.",
+        "m1": "Außendurchmesser und Wanddicken folgen ASME B36.10M für geschweißte Stahlrohre und ASME B36.19M für nichtrostende Rohre.",
+        "m2": "Alle Schedules des Normbereichs — von SCH 5S bis XXS, einschließlich STD und XS — sind je Nennweite wählbar.",
+        "m3": "Das Metergewicht ergibt sich aus Außendurchmesser und Wanddicke des gewählten Schedules; die DN-Bezeichnung steht neben der NPS.",
+        "a1": "Die Maße sind Werte mit glatten Enden; Endenvorbereitung (Fase, Gewinde, Rille) ist nicht enthalten.",
+        "a2": "Walzwerkstoleranzen für Wanddicke und Durchmesser sind auf die tabellierten Werte nicht angewendet.",
+        "a3": "Das Gewicht ist der theoretische Stahlwert der Normtabellen; projektspezifische Zuschläge sind nicht enthalten.",
+        "example": "Wählen Sie NPS und Schedule: Die Zeile zeigt Außendurchmesser, Wanddicke und Metergewicht mit der DN-Entsprechung. Dieselbe Zeile für SCH 40 und XS zeigt auf einen Blick, welche Schedules eine Wanddickenprüfung abdecken muss."
+      },
+      "elbowCut": {
+        "title": "Bogen-Schnittrechner (Schnittmarken am Rohr)",
+        "description": "Berechnen Sie Schnittmarken und Winkel an genormten Formstücken, um nicht genormte Umlenkungen zu fertigen. Geben Sie die erforderliche Geometrie ein und erhalten Sie die Marken für den Schnitt.",
+        "intro": "Nicht jede Umlenkung in einer vorgefertigten Spool stammt aus dem Katalog: Feld-Offsets, Ausweichungen und gefertigte Abzweigungen bedeuten oft, ein genormter Bogen muss zerschnitten werden. Dieser Rechner überführt die erforderliche Geometrie in konkrete Schnittmarken am Formstück, damit die Fertigung ohne Probieren ausgerichtet und markiert werden kann.",
+        "m1": "Die Abwicklung wird aus der genormten Bogengeometrie (Lang- und Kurzradius nach ASME B16.9) und dem von Ihnen eingegebenen Umlenkwinkel berechnet.",
+        "m2": "Schnittpositionen und -winkel werden für die Drehungen und Schnittebenen abgeleitet, die die gefertigte Umlenkung erfordert.",
+        "m3": "Das Ergebnis wird als Anmaßwerte ausgedrückt, die Sie vor dem Schneiden direkt auf das Formstück übertragen können.",
+        "a1": "Die Berechnung setzt ideale Formstückgeometrie gemäß Normtabelle voraus; tatsächliche Maße variieren innerhalb der Fertigungstoleranzen.",
+        "a2": "Wandverjüngung am Schnitt und Schweißnahtvorbereitung sind Fertigungsentscheidungen außerhalb des geometrischen Ergebnisses.",
+        "a3": "Prüfen Sie das markierte Formstück immer mit einer Probepassung vor der Endschweißung.",
+        "example": "Geben Sie Winkel und Offset ein, die die Spool braucht: Der Rechner liefert die Schnittmarken für den Bogen. Übertragen Sie die Marken, schneiden Sie und prüfen Sie die entstandene Umlenkung mit denselben Werten vor dem Heften."
+      },
+      "branchLayout": {
+        "title": "Abzweig-Rechner (Rohr-Abzweig-Durchdringungen)",
+        "description": "Berechnen Sie die Durchdringungsabwicklung eines Abzweigs am Sammler: Schnittprofil und Anmaßkoordinaten aus Sammler- und Abzweigmaßen.",
+        "intro": "Jeder gefertigte Abzweig beginnt mit demselben Problem: Die Durchdringungskurve zwischen Abzweigrohr und Sammler ist kein Kreis — sie muss abgewickelt werden. Dieser Rechner ermittelt die Abzweigdurchdringung aus den Maßen von Sammler und Abzweig, sodass Schnittprofil und Anmaßkoordinaten fertigungsbereit vorliegen.",
+        "m1": "Die Durchdringung wird aus den Außendurchmessern von Sammler und Abzweig mit dem von Ihnen eingegebenen Abzweigwinkel berechnet.",
+        "m2": "Das abgewickelte Schnittprofil und die Anmaßkoordinaten folgen der geometrischen Konstruktion der Durchdringungskurve.",
+        "m3": "Ergebnisse werden als Anmaßwerte angegeben, die direkt auf das Abzweigrohr übertragen werden können.",
+        "a1": "Die Abwicklung setzt ideale zylindrische Geometrie beider Rohre voraus; Ovalität innerhalb der Toleranzen bleibt unberücksichtigt.",
+        "a2": "Die Verstärkung des Abzweigs (Flächenersatzregeln) ist eine Nachweisaufgabe außerhalb dieses geometrischen Werkzeugs.",
+        "a3": "Passspiele und Schweißnahtvorbereitung sind Fertigungsentscheidungen, die am markierten Rohr geprüft werden müssen.",
+        "example": "Geben Sie Sammler- und Abzweigmaß mit dem Abzweigwinkel ein: Der Rechner liefert Schnittprofil und Anmaßkoordinaten des Abzweigs. Markieren Sie das Rohr, schneiden Sie und setzen Sie den Abzweig probeweise auf den Sammler, bevor Sie schweißen."
+      }
     }
   },
   "jobs": {

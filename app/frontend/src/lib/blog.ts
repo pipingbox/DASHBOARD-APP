@@ -187,7 +187,12 @@ function getBlogRoute(slug: string) {
 
 function getSiteDomainUrl() {
   const configuredUrl = import.meta.env.VITE_SITE_URL?.trim();
-  return configuredUrl ? configuredUrl.replace(/\/+$/, '') : undefined;
+  // PB-SEO-103: VITE_SITE_URL is not configured in any deploy workflow, so
+  // getAbsoluteUrl() silently returned undefined and blog posts were
+  // prerendered without og:url (and, since the canonical fix, without a
+  // canonical link). The canonical production host is fixed by policy; use it
+  // as the fallback instead of dropping the URL entirely.
+  return configuredUrl ? configuredUrl.replace(/\/+$/, '') : 'https://pipingbox.com';
 }
 
 function getSiteName() {

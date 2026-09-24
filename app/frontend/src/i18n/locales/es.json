@@ -1630,6 +1630,78 @@
       "loading": "Cargando...",
       "monthly": "Mensual 4,99 €",
       "annual": "Anual 39 € (ahorra un 35 %)"
+    },
+    "landing": {
+      "shared": {
+        "methodology": "Metodología",
+        "assumptions": "Supuestos y límites",
+        "example": "Ejemplo práctico",
+        "relatedTools": "Herramientas relacionadas",
+        "openInCatalog": "Abrir en el catálogo de herramientas",
+        "ctaTitle": "Ten todos tus cálculos en un solo lugar",
+        "ctaBody": "Crea una cuenta gratuita de PipingBox para volver a tus cálculos desde cualquier dispositivo y acceder al juego completo de herramientas industriales.",
+        "ctaButton": "Crear una cuenta gratuita"
+      },
+      "flangeDimensions": {
+        "title": "Calculadora de dimensiones de bridas (ASME B16.5)",
+        "description": "Consulta las dimensiones de bridas welding neck, slip-on, blind, lap joint, threaded y socket weld según ASME B16.5. Filtra por NPS y clase de presión y lee diámetro exterior, espesor, círculo de pernos y número de taladros.",
+        "intro": "Toda verificación de bridas —de una lista de pernos a una dimensión cara a cara— empieza con la misma pregunta: ¿cuáles son las dimensiones ASME B16.5 para ese tamaño y clase? Esta calculadora pone la tabla completa de bridas en una sola pantalla. Elige un NPS y una clase de presión y las bridas correspondientes se filtran al instante, listas para contrastar con tu isométrico o tu requerimiento de materiales.",
+        "m1": "Las dimensiones siguen las tablas ASME B16.5 para el NPS y la clase de presión seleccionados, incluyendo diámetro exterior, espesor de brida y diámetro interior.",
+        "m2": "Los datos de pernos —diámetro del círculo de pernos, número de taladros y diámetro de taladro— corresponden a los patrones de la norma, de modo que los espárragos y tuercas se pueden especificar desde el mismo resultado.",
+        "m3": "Todos los tipos de brida de la librería (WN, SO, BL, LJ, TH, SW) se muestran lado a lado para el mismo tamaño y clase, para comparar directamente el tipo de cara adecuado.",
+        "a1": "Los valores son las dimensiones tabuladas de la norma en las unidades mostradas por la herramienta; no se aplican tolerancias de fabricación.",
+        "a2": "La consulta cubre el rango de NPS y clases implementado en la librería de bridas de PipingBox; los tamaños fuera de ese rango deben verificarse directamente contra la norma.",
+        "a3": "Las ratings presión-temperatura dependen del grupo de material ASME B16.5 y no forman parte de esta consulta dimensional.",
+        "example": "Selecciona un NPS y clase 150: la tabla mantiene todos los tipos de brida disponibles en ese tamaño. El círculo de pernos y el número de taladros de la misma fila son lo que necesita la calculadora de espárragos, de modo que el pernado completo se puede pedir sin salir de la página."
+      },
+      "studBolts": {
+        "title": "Calculadora de espárragos y tuercas (ASME B16.5)",
+        "description": "Determina el diámetro y longitud de espárrago y los pares de tuercas para bridas ASME B16.5. Selecciona tamaño de brida y clase para obtener el pernado correspondiente a tu junta.",
+        "intro": "La lista de pernos es donde la dimensión de brida y la compra se encuentran: un espárrago con longitud incorrecta detiene un spool entero. Esta calculadora resuelve los espárragos y tuercas para una junta bridada ASME B16.5 a partir del tamaño y clase de brida, incluidos el diámetro y la longitud que exige el patrón de la norma.",
+        "m1": "El diámetro del espárrago sigue el patrón de pernado ASME B16.5 para cada combinación de NPS y clase de presión.",
+        "m2": "La longitud considera los espesores de brida, la junta y las tuercas con la protrusión que requieren las dimensiones de pernado de la norma.",
+        "m3": "Los pares de tuercas compatibles y los grados de material habituales se seleccionan junto con el espárrago, para especificar el pernado como una sola línea de materiales.",
+        "a1": "Las longitudes calculadas corresponden a la base dimensional de la norma; confírmalo siempre contra la especificación aplicable del proyecto.",
+        "a2": "La herramienta cubre el rango de bridas implementado en la librería de PipingBox; el pernado de tamaños fuera de ese rango debe verificarse aparte.",
+        "a3": "El tipo y espesor de la junta pueden cambiar la longitud requerida; verifícalo contra la especificación de tu junta.",
+        "example": "Introduce el NPS y la clase de la brida de la junta: el resultado da el diámetro y longitud de espárrago con su par de tuercas. Combínalo con la calculadora de dimensiones de bridas para producir una línea completa brida-pernado para el requerimiento de materiales."
+      },
+      "pipeDimensions": {
+        "title": "Calculadora de dimensiones de tubería (ASME B36.10M / B36.19M)",
+        "description": "Diámetro exterior, espesor de pared y peso lineal para tubería de acero al carbono e inoxidable según ASME B36.10M y B36.19M. Selecciona NPS/DN y schedule para leer la fila completa de dimensiones.",
+        "intro": "La tubería se pide por NPS y schedule, pero los planos, cálculos y órdenes necesitan números reales: diámetro exterior, espesor de pared, peso por metro. Esta calculadora lee la fila completa de dimensiones de las tablas ASME B36.10M / B36.19M para cualquier combinación de tamaño y schedule, con la designación DN al lado.",
+        "m1": "Los diámetros exteriores y espesores de pared siguen ASME B36.10M para tubería de acero forjado y ASME B36.19M para tubería inoxidable.",
+        "m2": "Todos los schedules del rango de la norma —de SCH 5S a XXS, incluyendo STD y XS— son seleccionables para cada tamaño.",
+        "m3": "El peso por metro se deriva del diámetro exterior y el espesor de pared del schedule seleccionado, y la designación DN se muestra junto al NPS.",
+        "a1": "Las dimensiones son valores de extremo plano; la preparación de extremos (bisel, rosca, ranura) no está incluida.",
+        "a2": "Las tolerancias de fábrica de espesor y diámetro no se aplican a los valores tabulados.",
+        "a3": "El peso es el valor teórico de acero usado en las tablas de la norma; no se incluyen sobrecalcules específicos de proyecto.",
+        "example": "Elige un NPS y un schedule: la fila muestra el diámetro exterior, el espesor de pared y el peso por metro con el equivalente DN. Leyendo la misma fila para SCH 40 y XS se ve de un vistazo qué schedules debe cubrir una verificación de espesor."
+      },
+      "elbowCut": {
+        "title": "Calculadora de corte de codos (marcas de corte en tubería)",
+        "description": "Calcula marcas y ángulos de corte sobre accesorios estándar para fabricar giros no estándar. Introduce la geometría del giro requerido y obtén las marcas para el corte.",
+        "intro": "No todos los giros de un spool prefabricado salen de un accesorio de catálogo: los offsets de campo, las evasiones y las derivaciones fabricadas suelen exigir cortar un codo estándar. Esta calculadora convierte la geometría requerida en marcas de corte concretas sobre el accesorio, para poder trazar y marcar la fabricación sin prueba y error.",
+        "m1": "El trazado se calcula a partir de la geometría estándar del codo (radio largo y corto según ASME B16.9) y el ángulo de giro que introduzcas.",
+        "m2": "Las posiciones y ángulos de corte se derivan para las rotaciones y planos de corte que exige el giro fabricado.",
+        "m3": "El resultado se expresa como dimensiones de marcado que puedes trasladar directamente al accesorio antes de cortar.",
+        "a1": "El cálculo asume geometría ideal del accesorio según la tabula la norma; las dimensiones reales varían dentro de tolerancias de fabricación.",
+        "a2": "El adelgazamiento de pared en el corte y la preparación de junta son decisiones de fabricación fuera del resultado geométrico.",
+        "a3": "Verifica siempre el accesorio marcado con un ajuste de prueba antes de la soldadura final.",
+        "example": "Introduce el ángulo y el offset que necesita el spool: la calculadora devuelve las marcas de corte para el codo. Traslada las marcas al accesorio, corta y comprueba el giro resultante con los mismos valores antes del punteado."
+      },
+      "branchLayout": {
+        "title": "Calculadora de trazado de derivaciones (intersecciones rama-ramal)",
+        "description": "Calcula el trazado de intersección de un ramal sobre un header: perfil de corte y coordenadas de marcado a partir de las dimensiones del header y del ramal.",
+        "intro": "Toda derivación fabricada empieza con el mismo problema: la curva de intersección entre el ramal y el header no es una circunferencia, hay que desarrollarla. Esta calculadora resuelve el trazado de la intersección a partir de las dimensiones del header y del ramal, de modo que el perfil de corte y las coordenadas de marcado salen listos para taller.",
+        "m1": "La intersección se calcula a partir del diámetro exterior del header y del ramal con el ángulo de derivación que introduzcas.",
+        "m2": "El perfil de corte desarrollado y las coordenadas de marcado siguen la construcción geométrica de la curva de intersección.",
+        "m3": "Los resultados se dan como dimensiones de marcado que se pueden trasladar directamente al tubo del ramal.",
+        "a1": "El trazado asume geometría cilíndrica ideal en ambos tubos; la ovalización dentro de tolerancias no se considera.",
+        "a2": "El refuerzo de la derivación (reglas de área de reemplazo) es una verificación de diseño fuera de esta herramienta geométrica.",
+        "a3": "Las holguras de ajuste y la preparación de soldadura son decisiones de fabricación que deben verificarse sobre el tubo marcado.",
+        "example": "Introduce los diámetros del header y del ramal con el ángulo de derivación: la calculadora devuelve el perfil de corte y las coordenadas de marcado del ramal. Marca el tubo, corta y haz un ajuste de prueba sobre el header antes de soldar."
+      }
     }
   },
   "jobs": {

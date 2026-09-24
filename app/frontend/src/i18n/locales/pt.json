@@ -1630,6 +1630,78 @@
       "loading": "A carregar...",
       "monthly": "Mensal 4,99 €",
       "annual": "Anual 39 € (poupe 35%)"
+    },
+    "landing": {
+      "shared": {
+        "methodology": "Metodologia",
+        "assumptions": "Pressupostos e limites",
+        "example": "Exemplo prático",
+        "relatedTools": "Ferramentas relacionadas",
+        "openInCatalog": "Abrir no catálogo de ferramentas",
+        "ctaTitle": "Mantenha seus cálculos em um só lugar",
+        "ctaBody": "Crie uma conta gratuita do PipingBox para retornar aos seus cálculos em qualquer dispositivo e acessar o conjunto completo de ferramentas industriais.",
+        "ctaButton": "Criar conta gratuita"
+      },
+      "flangeDimensions": {
+        "title": "Calculadora de dimensões de flanges (ASME B16.5)",
+        "description": "Consulte dimensões de flanges de pescoço para solda, sobrepostos, cegos, de volta, rosqueados e de encaixe para solda conforme ASME B16.5. Filtre por NPS e classe de pressão e leia diâmetro externo, espessura, círculo de parafusos e quantidade de furos.",
+        "intro": "Toda verificação de flange — de uma lista de parafusos a uma dimensão face a face — começa com a mesma pergunta: quais são as dimensões ASME B16.5 para esse diâmetro e classe? Esta calculadora coloca a tabela completa de flanges em uma única tela. Escolha um NPS e uma classe de pressão e os flanges correspondentes são filtrados instantaneamente, prontos para conferir com sua isométrica ou requisição de materiais.",
+        "m1": "As dimensões seguem as tabelas ASME B16.5 para o NPS e a classe de pressão selecionados, incluindo diâmetro externo, espessura do flange e diâmetro interno.",
+        "m2": "Os dados de parafusos — diâmetro do círculo de parafusos, quantidade e diâmetro dos furos — seguem os padrões da norma, permitindo especificar espáragos e porcas a partir do mesmo resultado.",
+        "m3": "Todos os tipos de flange da biblioteca (WN, SO, BL, LJ, TH, SW) são exibidos lado a lado para o mesmo diâmetro e classe, permitindo comparar diretamente o tipo de face adequado.",
+        "a1": "Os valores são as dimensões tabeladas da norma nas unidades exibidas pela ferramenta; tolerâncias de fabricação não são aplicadas.",
+        "a2": "A consulta cobre a faixa de NPS e classes implementada na biblioteca de flanges do PipingBox; diâmetros fora dessa faixa devem ser verificados diretamente na norma.",
+        "a3": "As classes pressão-temperatura dependem do grupo de material ASME B16.5 e não fazem parte desta consulta dimensional.",
+        "example": "Selecione um NPS e classe 150: a tabela mantém todos os tipos de flange disponíveis nesse diâmetro. O círculo de parafusos e a quantidade de furos da mesma linha são o que a calculadora de espáragos precisa — o aperto completo pode ser pedido sem sair da página."
+      },
+      "studBolts": {
+        "title": "Calculadora de espáragos e porcas (ASME B16.5)",
+        "description": "Determine diâmetro e comprimento de espárago e os pares de porcas para flanges ASME B16.5. Selecione o diâmetro e a classe do flange para obter o aperto correspondente à sua junta.",
+        "intro": "A lista de parafusos é onde a dimensão do flange e o suprimento se encontram: um espárago com comprimento errado paralisa um spool inteiro. Esta calculadora resolve os espáragos e porcas de uma junta flangeada ASME B16.5 a partir do diâmetro e classe do flange, incluindo o diâmetro e o comprimento exigidos pelo padrão da norma.",
+        "m1": "O diâmetro do espárago segue o padrão de aperto ASME B16.5 para cada combinação de NPS e classe de pressão.",
+        "m2": "O comprimento considera as espessuras dos flanges, a junta e as porcas com a saliência exigida pelas dimensões de aperto da norma.",
+        "m3": "Pares de porcas compatíveis e graus de material usuais são selecionados junto com o espárago, permitindo especificar o aperto como um único item.",
+        "a1": "Os comprimentos calculados correspondem à base dimensional da norma; confirme sempre contra a especificação aplicável do projeto.",
+        "a2": "A ferramenta cobre a faixa de flanges implementada na biblioteca do PipingBox; o aperto de diâmetros fora dessa faixa deve ser verificado separadamente.",
+        "a3": "O tipo e a espessura da junta podem alterar o comprimento necessário; verifique contra a especificação da sua junta.",
+        "example": "Informe o NPS e a classe do flange da junta: o resultado fornece o diâmetro e o comprimento do espárago com seu par de porcas. Combine com a calculadora de dimensões de flanges para gerar uma linha completa flange-aperto na requisição de materiais."
+      },
+      "pipeDimensions": {
+        "title": "Calculadora de dimensões de tubos (ASME B36.10M / B36.19M)",
+        "description": "Diâmetro externo, espessura de parede e peso linear para tubos de aço carbono e inoxidável conforme ASME B36.10M e B36.19M. Selecione NPS/DN e schedule para ler a linha completa de dimensões.",
+        "intro": "O tubo é pedido por NPS e schedule, mas desenhos, cálculos e pedidos precisam de números reais: diâmetro externo, espessura de parede, peso por metro. Esta calculadora lê a linha completa de dimensões das tabelas ASME B36.10M / B36.19M para qualquer combinação de diâmetro e schedule, com a designação DN ao lado.",
+        "m1": "Os diâmetros externos e espessuras de parede seguem ASME B36.10M para tubos de aço e ASME B36.19M para tubos inoxidáveis.",
+        "m2": "Todos os schedules da faixa da norma — de SCH 5S a XXS, incluindo STD e XS — são selecionáveis para cada diâmetro.",
+        "m3": "O peso por metro deriva do diâmetro externo e da espessura de parede do schedule selecionado, e a designação DN aparece ao lado do NPS.",
+        "a1": "As dimensões são valores de topo plano; o preparo de extremidades (chanfro, rosca, ranhura) não está incluído.",
+        "a2": "As tolerâncias de fábrica de espessura e diâmetro não são aplicadas aos valores tabelados.",
+        "a3": "O peso é o valor teórico de aço usado nas tabelas da norma; sobretaxas específicas de projeto não estão incluídas.",
+        "example": "Escolha um NPS e um schedule: a linha mostra o diâmetro externo, a espessura de parede e o peso por metro com o equivalente DN. A mesma linha para SCH 40 e XS mostra de relance quais schedules uma verificação de espessura precisa cobrir."
+      },
+      "elbowCut": {
+        "title": "Calculadora de corte de curvas (marcas de corte em tubo)",
+        "description": "Calcule marcas e ângulos de corte em conexões padronizadas para fabricar desvios fora de padrão. Informe a geometria exigida e obtenha as marcas para o corte.",
+        "intro": "Nem todo desvio de um spool pré-fabricado sai de uma conexão de catálogo: offsets de campo, desvios e derivações fabricadas costumam exigir cortar uma curva padronizada. Esta calculadora converte a geometria exigida em marcas de corte concretas na conexão, para traçar e marcar a fabricação sem tentativa e erro.",
+        "m1": "O traçado é calculado a partir da geometria padronizada da curva (raio longo e curto conforme ASME B16.9) e do ângulo de desvio informado.",
+        "m2": "As posições e os ângulos de corte são derivados das rotações e planos de corte exigidos pelo desvio fabricado.",
+        "m3": "O resultado é expresso em cotas de marcação que você transfere diretamente para a conexão antes de cortar.",
+        "a1": "O cálculo assume geometria ideal da conexão conforme tabelada pela norma; as dimensões reais variam dentro das tolerâncias de fabricação.",
+        "a2": "A afinamento de parede no corte e o preparo da junta são decisões de fabricação fora do resultado geométrico.",
+        "a3": "Verifique sempre a conexão marcada com um ajuste de prova antes da soldagem final.",
+        "example": "Informe o ângulo e o offset que o spool precisa: a calculadora devolve as marcas de corte para a curva. Transfira as marcas, corte e confira o desvio resultante com os mesmos valores antes do ponteamento."
+      },
+      "branchLayout": {
+        "title": "Calculadora de traçado de derivações (interseções ramal-coletor)",
+        "description": "Calcule o traçado de interseção de um ramal em um coletor: perfil de corte e coordenadas de marcação a partir das dimensões do coletor e do ramal.",
+        "intro": "Toda derivação fabricada começa com o mesmo problema: a curva de interseção entre o tubo do ramal e o coletor não é um círculo — precisa ser desenvolvida. Esta calculadora resolve o traçado da interseção a partir das dimensões do coletor e do ramal, para que o perfil de corte e as coordenadas de marcação saiam prontos para a oficina.",
+        "m1": "A interseção é calculada a partir do diâmetro externo do coletor e do ramal, com o ângulo de derivação informado.",
+        "m2": "O perfil de corte desenvolvido e as coordenadas de marcação seguem a construção geométrica da curva de interseção.",
+        "m3": "Os resultados são fornecidos como cotas de marcação transferíveis diretamente para o tubo do ramal.",
+        "a1": "O traçado assume geometria cilíndrica ideal em ambos os tubos; a ovalização dentro das tolerâncias não é considerada.",
+        "a2": "A reforço da derivação (regras de área de reposição) é uma verificação de projeto fora desta ferramenta geométrica.",
+        "a3": "Folgas de ajuste e preparação de solda são decisões de fabricação que devem ser verificadas no tubo marcado.",
+        "example": "Informe os diâmetros do coletor e do ramal com o ângulo de derivação: a calculadora devolve o perfil de corte e as coordenadas de marcação do ramal. Marque o tubo, corte e faça um ajuste de prova no coletor antes de soldar."
+      }
     }
   },
   "jobs": {
