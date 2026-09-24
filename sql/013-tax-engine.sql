@@ -97,14 +97,21 @@ COMMENT ON COLUMN app_stripe_prices.stripe_tax_code IS
   'Provider-side tax code (Stripe Tax txcd_*) as data. NULL = not mapped in the provider yet. Kept as data so the TaxProvider adapter stays swappable.';
 
 -- -----------------------------------------------------------------------------
--- STAGING MAPPING (PO GO 2026-09-24, section 3) — real Stripe Tax product
--- tax codes, one per category, NO generic catch-all. Every code below was
--- verified against the authoritative list (docs.stripe.com/tax/tax-codes):
+-- STAGING MAPPING — PO LOCKED 2026-09-24 (final correction): real Stripe Tax
+-- product tax codes, one per category, NO generic catch-all. Codes and
+-- descriptions per the PO decision, verified against the authoritative list
+-- (docs.stripe.com/tax/tax-codes):
 --
---   RECORDED_DIGITAL_COURSE  txcd_10402000
---     "Digital Audio Visual Works - streamed - non subscription - with
---      limited rights" — course video streamed from the platform, access tied
---      to the account (no permanent download). Exactly our delivery form.
+--   RECORDED_DIGITAL_COURSE  txcd_20060158
+--     "On demand Online Courses – pre-recorded audio or audio visual content
+--      (streamed)" — online on-demand course with pre-recorded audiovisual
+--      content consumed via streaming inside PIPINGBOX.
+--
+--   EXAM_PREPARATION         txcd_20060358   [PO CORRECTION 2026-09-24]
+--     "On demand Online Courses – written material content" — the current
+--     exam-prep/VCA product contains NO video: text, written content and
+--     documents/images consulted inside the platform. LOCKED for the current
+--     product version. NOT classified as audiovisual.
 --
 --   PREMIUM_SUBSCRIPTION     txcd_10103000
 --     "Software as a service (SaaS) - personal use" — premium_tools_* are
@@ -118,12 +125,6 @@ COMMENT ON COLUMN app_stripe_prices.stripe_tax_code IS
 --     "Software as a service (SaaS) - business use" — b2b_* subscriptions to
 --     the platform (professional / enterprise tiers) are B2B SaaS.
 --
---   EXAM_PREPARATION         txcd_10402000
---     Recorded prep course = same streamed-video delivery form as
---     RECORDED_DIGITAL_COURSE. (If a prep product ships as downloadable
---     permanent material instead, txcd_10302000 "Digital Books - downloaded -
---     permanent rights" is the candidate — decision deferred to the PO.)
---
 --   EXAM_INTERMEDIATION      txcd_20030000
 --     "General - Services" — booking/sitting an exam on the buyer's behalf is
 --     a human-provided service, not an electronic supply. No exam-specific
@@ -136,12 +137,35 @@ COMMENT ON COLUMN app_stripe_prices.stripe_tax_code IS
 -- DELIBERATELY NOT MAPPED: txcd_10000000 ("General - Electronically Supplied
 -- Services") as a blanket code — the PO forbids a single generic tax code.
 --
--- These values are STAGING-only until the PO reviews the mapping table; they
--- do not activate any tax regime by themselves (the TaxProvider adapter stays
+-- FUTURE CLASSIFICATION RULE (PO 2026-09-24, LOCKED with the mapping):
+--   The tax code follows the REAL product, not its Academy membership.
+--   EXAM_PREPARATION is re-evaluated ONLY when the product's main nature
+--   changes materially:
+--     - predominantly text/documents            -> keep txcd_20060358
+--     - predominantly pre-recorded video/audio
+--       via streaming                           -> re-evaluate to txcd_20060158
+--     - audiovisual with permanent download
+--       rights                                 -> re-evaluate to the specific
+--                                                corresponding code
+--   Adding one or more COMPLEMENTARY videos does NOT trigger a tax-code
+--   change. Only a material change of the product's principal nature does.
+--
+-- PERSISTENCE (PO): PIPINGBOX always keeps internally tax_category,
+-- stripe_tax_code, provider, tax determination/result, jurisdiction,
+-- applicable tax, and historical mapping version where necessary. Stripe Tax
+-- stays an external provider behind the TaxProvider adapter; PIPINGBOX
+-- remains source of truth for orders, invoices, tax evidence, ledger and
+-- history.
+--
+-- These values are STAGING-only (no production activation): they do not
+-- switch on any tax regime by themselves (the TaxProvider adapter stays
 -- inert until STRIPE_AUTOMATIC_TAX=true AND real registrations exist).
 -- -----------------------------------------------------------------------------
-UPDATE app_stripe_prices SET stripe_tax_code = 'txcd_10402000'
-  WHERE tax_category IN ('RECORDED_DIGITAL_COURSE', 'EXAM_PREPARATION')
+UPDATE app_stripe_prices SET stripe_tax_code = 'txcd_20060158'
+  WHERE tax_category = 'RECORDED_DIGITAL_COURSE'
+    AND stripe_tax_code IS NULL;
+UPDATE app_stripe_prices SET stripe_tax_code = 'txcd_20060358'
+  WHERE tax_category = 'EXAM_PREPARATION'
     AND stripe_tax_code IS NULL;
 UPDATE app_stripe_prices SET stripe_tax_code = 'txcd_10103000'
   WHERE tax_category = 'PREMIUM_SUBSCRIPTION'
