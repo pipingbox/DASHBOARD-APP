@@ -96,6 +96,66 @@ COMMENT ON COLUMN app_stripe_prices.tax_category IS
 COMMENT ON COLUMN app_stripe_prices.stripe_tax_code IS
   'Provider-side tax code (Stripe Tax txcd_*) as data. NULL = not mapped in the provider yet. Kept as data so the TaxProvider adapter stays swappable.';
 
+-- -----------------------------------------------------------------------------
+-- STAGING MAPPING (PO GO 2026-09-24, section 3) — real Stripe Tax product
+-- tax codes, one per category, NO generic catch-all. Every code below was
+-- verified against the authoritative list (docs.stripe.com/tax/tax-codes):
+--
+--   RECORDED_DIGITAL_COURSE  txcd_10402000
+--     "Digital Audio Visual Works - streamed - non subscription - with
+--      limited rights" — course video streamed from the platform, access tied
+--      to the account (no permanent download). Exactly our delivery form.
+--
+--   PREMIUM_SUBSCRIPTION     txcd_10103000
+--     "Software as a service (SaaS) - personal use" — premium_tools_* are
+--     worker-facing (B2C) subscriptions to hosted tools; nothing downloaded.
+--
+--   SAAS_TOOLS               txcd_10103001
+--     "Software as a service (SaaS) - business use" — the same hosted tools
+--     sold to companies.
+--
+--   B2B_ENTERPRISE_SERVICE   txcd_10103001
+--     "Software as a service (SaaS) - business use" — b2b_* subscriptions to
+--     the platform (professional / enterprise tiers) are B2B SaaS.
+--
+--   EXAM_PREPARATION         txcd_10402000
+--     Recorded prep course = same streamed-video delivery form as
+--     RECORDED_DIGITAL_COURSE. (If a prep product ships as downloadable
+--     permanent material instead, txcd_10302000 "Digital Books - downloaded -
+--     permanent rights" is the candidate — decision deferred to the PO.)
+--
+--   EXAM_INTERMEDIATION      txcd_20030000
+--     "General - Services" — booking/sitting an exam on the buyer's behalf is
+--     a human-provided service, not an electronic supply. No exam-specific
+--     code exists in the Stripe list.
+--
+--   RECRUITMENT_SERVICE      txcd_20040006
+--     "Employment Services" — services matching employees to employers.
+--     job_credit* packs are exactly that.
+--
+-- DELIBERATELY NOT MAPPED: txcd_10000000 ("General - Electronically Supplied
+-- Services") as a blanket code — the PO forbids a single generic tax code.
+--
+-- These values are STAGING-only until the PO reviews the mapping table; they
+-- do not activate any tax regime by themselves (the TaxProvider adapter stays
+-- inert until STRIPE_AUTOMATIC_TAX=true AND real registrations exist).
+-- -----------------------------------------------------------------------------
+UPDATE app_stripe_prices SET stripe_tax_code = 'txcd_10402000'
+  WHERE tax_category IN ('RECORDED_DIGITAL_COURSE', 'EXAM_PREPARATION')
+    AND stripe_tax_code IS NULL;
+UPDATE app_stripe_prices SET stripe_tax_code = 'txcd_10103000'
+  WHERE tax_category = 'PREMIUM_SUBSCRIPTION'
+    AND stripe_tax_code IS NULL;
+UPDATE app_stripe_prices SET stripe_tax_code = 'txcd_10103001'
+  WHERE tax_category IN ('SAAS_TOOLS', 'B2B_ENTERPRISE_SERVICE')
+    AND stripe_tax_code IS NULL;
+UPDATE app_stripe_prices SET stripe_tax_code = 'txcd_20030000'
+  WHERE tax_category = 'EXAM_INTERMEDIATION'
+    AND stripe_tax_code IS NULL;
+UPDATE app_stripe_prices SET stripe_tax_code = 'txcd_20040006'
+  WHERE tax_category = 'RECRUITMENT_SERVICE'
+    AND stripe_tax_code IS NULL;
+
 
 -- =============================================================================
 -- 2. app_tax_determinations — APPEND-ONLY tax results per transaction

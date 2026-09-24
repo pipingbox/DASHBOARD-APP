@@ -186,12 +186,10 @@ Deno.serve(async (req) => {
       // is computed from the period totals via the canonical formula, then
       // split once (DEC-65). Entry amounts carry the sale-side facts.
       const credits = entries.filter((e) => e.entry_type === "SALE_CREDIT");
-      const offsets = entries.filter((e) => e.entry_type === "OFFSET");
       if (credits.length === 0) continue;
 
       const currency = credits[0].currency;
       const grossCents = credits.reduce((s, e) => s + Number(e.amount_cents), 0);
-      const offsetCents = Math.abs(offsets.reduce((s, e) => s + Number(e.amount_cents), 0));
 
       // Tax/discount/fee facts for these sales come from the revenue events
       // attached to the same orders. Read them; the canonical formula
@@ -231,12 +229,34 @@ Deno.serve(async (req) => {
       const splitPct = TIER_SPLIT_PCT[instructor.revenue_share_tier ?? "STANDARD"] ?? 70;
       const instructorShareCents = Math.round((Number(netRevenueCents) * splitPct) / 100);
       const platformShareCents = Number(netRevenueCents) - instructorShareCents;
-      const payableCents = instructorShareCents - offsetCents;
 
+      // -------------------------------------------------------------------------
+      // OFFSET-FIRST (PO 2026-09-24, section 2): AVAILABLE debits
+      // (REFUND_DEBIT / CHARGEBACK_DEBIT) are compensated against this
+      // settlement's instructor share, up to its full amount. The remainder,
+      // if any, becomes a RECOVERABLE contractual amount (data — collected
+      // out of band). Debits keep their 1:1 links to the original sale;
+      // compensating them is a LIFECYCLE move (ADJUSTED), never an edit.
+      // -------------------------------------------------------------------------
+      const debitEntries = entries.filter(
+        (e) => e.entry_type === "REFUND_DEBIT" || e.entry_type === "CHARGEBACK_DEBIT",
+      );
+      const debitTotalCents = Math.abs(
+        debitEntries.reduce((s, e) => s + Number(e.amount_cents), 0),
+      );
+      const offsetAppliedCents = Math.min(debitTotalCents, instructorShareCents);
+      const recoverableCents = debitTotalCents - offsetAppliedCents;
+      const payableCents = instructorShareCents - offsetAppliedCents;
+
+      if (payableCents <= 0 && recoverableCents <= 0) {
+        // No credits worth settling (should not happen: credits.length > 0 is
+        // checked above) — guard anyway, entries stay AVAILABLE.
+        continue;
+      }
       if (payableCents <= 0) {
-        // Nothing payable this cycle (offsets ate the share). Entries stay
-        // AVAILABLE for the next run; no settlement with a non-positive
-        // payable is ever created.
+        // Offsets ate the whole share; nothing payable this cycle. The debits
+        // stay AVAILABLE and the share is not frozen into a zero settlement —
+        // the credits remain for a future cycle where offsets may be smaller.
         continue;
       }
 
@@ -261,7 +281,7 @@ Deno.serve(async (req) => {
           instructor_share_pct: splitPct,
           instructor_share_cents: instructorShareCents,
           platform_share_cents: platformShareCents,
-          offset_applied_cents: offsetCents,
+          offset_applied_cents: offsetAppliedCents,
           payable_cents: payableCents,
           instructor_snapshot: instructorSnapshot,
           issuer_snapshot: issuerSnapshot,
@@ -278,16 +298,51 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Mark entries SCHEDULED under this settlement (lifecycle move only).
-      const entryIds = entries.map((e) => e.id);
+      // Mark credit entries SCHEDULED under this settlement (lifecycle move
+      // only). Debits consumed by the offset move to ADJUSTED, keeping their
+      // original links; a RECOVERABLE row records any uncompensated remainder.
+      const creditIds = credits.map((e) => e.id);
       const { error: linkErr } = await supabase
         .from("app_instructor_ledger_entries")
         .update({ status: "SCHEDULED", settlement_id: settlement.id })
-        .in("id", entryIds);
+        .in("id", creditIds);
       if (linkErr) {
         console.error("settlement-run: entry link failed", linkErr);
         report.errors.push(`instructor ${instructorId}: entry link failed`);
         continue;
+      }
+
+      if (debitEntries.length > 0) {
+        const { error: debitErr } = await supabase
+          .from("app_instructor_ledger_entries")
+          .update({ status: "ADJUSTED", settlement_id: settlement.id })
+          .in("id", debitEntries.map((e) => e.id));
+        if (debitErr) {
+          console.error("settlement-run: debit adjust failed", debitErr);
+          report.errors.push(`instructor ${instructorId}: debit adjust failed`);
+        }
+
+        if (recoverableCents > 0) {
+          // Uncompensated remainder: contractual debt, tracked as data and
+          // collected out of band (PO: no rolling reserve in MVP).
+          const { error: recErr } = await supabase
+            .from("app_instructor_ledger_entries")
+            .insert({
+              instructor_id: instructorId,
+              settlement_id: settlement.id,
+              entry_type: "RECOVERABLE",
+              status: "AVAILABLE",
+              amount_cents: -recoverableCents,
+              currency,
+              occurred_at: now,
+              note: "uncompensated post-payout reversal remainder",
+              livemode: credits[0].livemode,
+            });
+          if (recErr) {
+            console.error("settlement-run: recoverable insert failed", recErr);
+            report.errors.push(`instructor ${instructorId}: recoverable insert failed`);
+          }
+        }
       }
 
       // Self-billing invoice (DRAFT) with atomic per-issuer numbering.
