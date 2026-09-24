@@ -385,6 +385,28 @@ test.describe('Render (HTML + plain text)', () => {
     expect(() => renderReportHtml(d)).not.toThrow();
     expect(() => renderReportText(d)).not.toThrow();
   });
+
+  test('rendered report never mentions the email provider (source section: PostHog/Supabase/Stripe only)', () => {
+    // Regression: the email is rendered BEFORE being sent, so a "Proveedor de
+    // correo" row always showed NO DISPONIBLE even on successful delivery.
+    // Per PO instruction the line is removed entirely — receipt of the email
+    // itself proves the channel; the provider name must not be shown either.
+    const d = baseReport();
+    const html = renderReportHtml(d);
+    const text = renderReportText(d);
+    expect(html).not.toContain('Proveedor de correo');
+    expect(text).not.toContain('Correo:');
+    expect(text).not.toContain('Proveedor');
+    expect(html).not.toContain('SMTP');
+    expect(text).not.toContain('SMTP');
+    // The three data sources remain reported in both renders.
+    expect(html).toContain('PostHog');
+    expect(html).toContain('Supabase');
+    expect(html).toContain('Stripe');
+    expect(text).toContain('PostHog:');
+    expect(text).toContain('Supabase:');
+    expect(text).toContain('Stripe:');
+  });
 });
 
 test.describe('Idempotency & fail-closed logic (pure invariants)', () => {

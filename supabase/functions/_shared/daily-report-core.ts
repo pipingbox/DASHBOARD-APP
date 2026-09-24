@@ -573,7 +573,6 @@ export function renderReportHtml(d: ReportData): string {
     ${row("PostHog", srcBadge(d.sources.posthog))}
     ${row("Supabase", srcBadge(d.sources.supabase))}
     ${row("Stripe", srcBadge(d.sources.stripe))}
-    ${row("Proveedor de correo", srcBadge(d.sources.email))}
   </table>
 
   <div style="margin-top:24px;padding-top:16px;border-top:1px solid #27272a;font-size:11px;color:#52525b;">
@@ -620,7 +619,10 @@ export function renderReportText(d: ReportData): string {
   });
   lines.push("");
   lines.push("9. ESTADO DE LAS FUENTES");
-  lines.push(`  PostHog: ${d.sources.posthog ? "OK" : "NO DISPONIBLE"} | Supabase: ${d.sources.supabase ? "OK" : "NO DISPONIBLE"} | Stripe: ${d.sources.stripe ? "OK" : "NO DISPONIBLE"} | Correo: ${d.sources.email ? "OK" : "NO DISPONIBLE"}`);
+  // El canal de correo queda acreditado por la propia recepción de este
+  // informe; no se lista el proveedor (nombre no determinable con seguridad
+  // y estado siempre contradictorio al renderizar antes del envío).
+  lines.push(`  PostHog: ${d.sources.posthog ? "OK" : "NO DISPONIBLE"} | Supabase: ${d.sources.supabase ? "OK" : "NO DISPONIBLE"} | Stripe: ${d.sources.stripe ? "OK" : "NO DISPONIBLE"}`);
   return lines.join("\n");
 }
 
