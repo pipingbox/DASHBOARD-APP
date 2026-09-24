@@ -21,38 +21,38 @@
   </defs>
   <rect width="800" height="700" fill="#fafafa"/>
   <text x="40" y="40" class="title">Spiral Wound Gasket — Type CGI</text>
-  <text x="40" y="60" class="subtitle">NPS 5 (DN 125) — Class 150</text>
+  <text x="40" y="60" class="subtitle">NPS 1-1/2 (DN 40) — Class 150</text>
   <text x="40" y="78" class="std-ref">ASME B16.20-2017 | Inner ring + sealing element + centering ring</text>
   <circle cx="330" cy="320" r="160" fill="#d0d5da" stroke="#1a1a1a" stroke-width="2"/>
-  <circle cx="330" cy="320" r="144.4794311833418" fill="#e8b04b" stroke="#1a1a1a" stroke-width="1.5"/>
-  <circle cx="330" cy="320" r="131.01066531234127" class="winding"/>
-  <circle cx="330" cy="320" r="135.5002539360081" class="winding"/>
-  <circle cx="330" cy="320" r="139.98984255967497" class="winding"/>
-  <circle cx="330" cy="320" r="126.52107668867444" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="1.5"/>
-  <circle cx="330" cy="320" r="107.10005078720164" fill="#fafafa" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="330" cy="320" r="130.197904540163" fill="#e8b04b" stroke="#1a1a1a" stroke-width="1.5"/>
+  <circle cx="330" cy="320" r="108.12572759022119" class="winding"/>
+  <circle cx="330" cy="320" r="115.48311990686847" class="winding"/>
+  <circle cx="330" cy="320" r="122.84051222351573" class="winding"/>
+  <circle cx="330" cy="320" r="100.76833527357392" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="1.5"/>
+  <circle cx="330" cy="320" r="82.88707799767171" fill="#fafafa" stroke="#1a1a1a" stroke-width="2"/>
   <text x="330" y="324" class="label">d1</text>
-  <text x="194.4997460639919" y="314" class="label" fill="#7a5410">winding</text>
+  <text x="214.51688009313153" y="314" class="label" fill="#7a5410">winding</text>
   <line x1="130" y1="320" x2="530" y2="320" class="centerline"/>
   <line x1="330" y1="130" x2="330" y2="510" class="centerline"/>
   <line x1="170" y1="520" x2="490" y2="520" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
   <text x="330" y="513" class="dim-text">d4</text>
-  <text x="330" y="535" class="dim-sub">7.75" | 196.9 mm</text>
+  <text x="330" y="535" class="dim-sub">3.38" | 85.9 mm</text>
   <line x1="170" y1="490" x2="170" y2="525" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
   <line x1="490" y1="490" x2="490" y2="525" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="185.5205688166582" y1="480.47943118334183" x2="474.47943118334183" y2="480.47943118334183" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="330" y="473.47943118334183" class="dim-text">d3</text>
-  <text x="330" y="495.47943118334183" class="dim-sub">7" | 177.8 mm</text>
-  <line x1="185.5205688166582" y1="450.47943118334183" x2="185.5205688166582" y2="485.47943118334183" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="474.47943118334183" y1="450.47943118334183" x2="474.47943118334183" y2="485.47943118334183" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="222.89994921279836" y1="192.89994921279836" x2="437.10005078720167" y2="192.89994921279836" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="330" y="185.89994921279836" class="dim-text">d1</text>
-  <text x="330" y="207.89994921279836" class="dim-sub">5.19" | 131.8 mm</text>
-  <line x1="222.89994921279836" y1="162.89994921279836" x2="222.89994921279836" y2="197.89994921279836" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="437.10005078720167" y1="162.89994921279836" x2="437.10005078720167" y2="197.89994921279836" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <text x="330" y="340" class="dim-sub">d2 6.13" | 155.7 mm</text>
+  <line x1="199.802095459837" y1="466.197904540163" x2="460.197904540163" y2="466.197904540163" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="330" y="459.197904540163" class="dim-text">d3</text>
+  <text x="330" y="481.197904540163" class="dim-sub">2.75" | 69.9 mm</text>
+  <line x1="199.802095459837" y1="436.197904540163" x2="199.802095459837" y2="471.197904540163" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="460.197904540163" y1="436.197904540163" x2="460.197904540163" y2="471.197904540163" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="247.11292200232828" y1="217.11292200232828" x2="412.8870779976717" y2="217.11292200232828" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="330" y="210.11292200232828" class="dim-text">d1</text>
+  <text x="330" y="232.11292200232828" class="dim-sub">1.75" | 44.5 mm</text>
+  <line x1="247.11292200232828" y1="187.11292200232828" x2="247.11292200232828" y2="222.11292200232828" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="412.8870779976717" y1="187.11292200232828" x2="412.8870779976717" y2="222.11292200232828" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <text x="330" y="340" class="dim-sub">d2 2.13" | 54.1 mm</text>
   <rect x="540" y="60" width="230" height="157" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
-  <text x="655" y="80" class="tbl-hdr">NPS 5 — Key Data</text>
-  <line x1="555" y1="88" x2="755" y2="88" stroke="#eee" stroke-width=".5"/><text x="560" y="105" class="tbl-key">NPS / DN</text><text x="750" y="105" class="tbl-val">5 / 125</text><text x="560" y="122" class="tbl-key">Class</text><text x="750" y="122" class="tbl-val">150</text><text x="560" y="139" class="tbl-key">d1 inner ring ID</text><text x="750" y="139" class="tbl-val">5.19" | 131.8 mm</text><text x="560" y="156" class="tbl-key">d2 sealing ID</text><text x="750" y="156" class="tbl-val">6.13" | 155.7 mm</text><text x="560" y="173" class="tbl-key">d3 sealing OD</text><text x="750" y="173" class="tbl-val">7" | 177.8 mm</text><text x="560" y="190" class="tbl-key">d4 centering OD</text><text x="750" y="190" class="tbl-val">7.75" | 196.9 mm</text><text x="560" y="207" class="tbl-key">t sealing</text><text x="750" y="207" class="tbl-val">0.175" | 4.45 mm</text>
+  <text x="655" y="80" class="tbl-hdr">NPS 1-1/2 — Key Data</text>
+  <line x1="555" y1="88" x2="755" y2="88" stroke="#eee" stroke-width=".5"/><text x="560" y="105" class="tbl-key">NPS / DN</text><text x="750" y="105" class="tbl-val">1-1/2 / 40</text><text x="560" y="122" class="tbl-key">Class</text><text x="750" y="122" class="tbl-val">150</text><text x="560" y="139" class="tbl-key">d1 inner ring ID</text><text x="750" y="139" class="tbl-val">1.75" | 44.5 mm</text><text x="560" y="156" class="tbl-key">d2 sealing ID</text><text x="750" y="156" class="tbl-val">2.13" | 54.1 mm</text><text x="560" y="173" class="tbl-key">d3 sealing OD</text><text x="750" y="173" class="tbl-val">2.75" | 69.9 mm</text><text x="560" y="190" class="tbl-key">d4 centering OD</text><text x="750" y="190" class="tbl-val">3.38" | 85.9 mm</text><text x="560" y="207" class="tbl-key">t sealing</text><text x="750" y="207" class="tbl-val">0.175" | 4.45 mm</text>
   <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
   <text x="40" y="648" class="note">Type CGI per ASME B16.20: sealing element (winding, amber) + inner ring + outer centering ring.</text>
   <text x="40" y="663" class="note">Rings drawn as concentric bands (visual simplification; no certified winding microgeometry claim).</text>

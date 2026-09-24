@@ -2138,7 +2138,12 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     stlPath.includes('latrolet') ||
     stlPath.includes('elbolet') ||
     stlPath.includes('nipolet') ||
-    stlPath.includes('flange_')
+    stlPath.includes('flange_') ||
+    stlPath.includes('spectacle_blind') ||
+    stlPath.includes('spade_') ||
+    stlPath.includes('spacer_') ||
+    stlPath.includes('gasket_sw') ||
+    stlPath.includes('gasket_rj')
   ) {
     pose = {
       rows: [
@@ -2209,6 +2214,24 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     // +Z. Vista tres cuartos frontal-superior: se leen la cara con los
     // agujeros de pernos, el raised face y el perfil del hub detras, que es
     // lo que distingue WN/SO/BL/LJ/THD/SW sin leer el nombre.
+    catalogViewDir = normalize([0.55, -0.60, 0.50]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('spectacle_blind')) {
+    // Spectacle blind: figura-8 en plano XY. Vista tres cuartos frontal-
+    // superior que lee a la vez el disco ciego, el anillo abierto y el web
+    // (rasgo semantico). CAMERA_ONLY fix PO: la geometria no se toca.
+    catalogViewDir = normalize([0.38, -0.52, 0.62]);
+  } else if (pose?.kind === 'manual' && (
+    stlPath.includes('spade_') || stlPath.includes('spacer_')
+  )) {
+    // Spade / ring spacer: disco o anillo en plano XY con el handle a +Y.
+    // Vista tres cuartos frontal-superior: handle legible, bore del spacer
+    // inequivoco, y la pieza llena el frame.
+    catalogViewDir = normalize([0.32, -0.52, 0.62]);
+  } else if (pose?.kind === 'manual' && (
+    stlPath.includes('gasket_sw') || stlPath.includes('gasket_rj')
+  )) {
+    // Gaskets: axisimetricas en Z. Vista tres cuartos frontal-superior (como
+    // bridas): lee los anillos concentricos del CGI o la seccion del RTJ.
     catalogViewDir = normalize([0.55, -0.60, 0.50]);
   } else if (pose?.kind === 'cap' && stlPath.includes('weldolet')) {
     // Weldolet: vista tres cuartos baja para que se aprecie la campana y la

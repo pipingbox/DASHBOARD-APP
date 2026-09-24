@@ -1,7 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
   <defs><style>
     .profile{stroke:#1a1a1a;stroke-width:2;fill:#e2e5e8}
-    .bore{stroke:#555;stroke-width:1;fill:none;stroke-dasharray:4 2}
+    .profile2{stroke:#1a1a1a;stroke-width:1.6;fill:#d0d5da}
+    .winding{stroke:#555;stroke-width:1;fill:none}
     .centerline{stroke:#999;stroke-width:.8;stroke-dasharray:8 4;fill:none}
     .dim-line{stroke:#c62828;stroke-width:.9;fill:none}
     .dim-text{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#c62828;text-anchor:middle}
@@ -10,7 +11,7 @@
     .subtitle{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#555}
     .std-ref{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#888}
     .note{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888}
-    .label{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#999;text-anchor:middle}
+    .label{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#666;text-anchor:middle}
     .tbl-hdr{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;fill:#1a1a1a;font-weight:600;text-anchor:middle}
     .tbl-key{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#555;text-anchor:start}
     .tbl-val{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888;text-anchor:end}
@@ -19,60 +20,42 @@
   <marker id="ae" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
   </defs>
   <rect width="800" height="700" fill="#fafafa"/>
-  <text x="40" y="40" class="title">Spiral Wound Gasket</text>
-  <text x="40" y="60" class="subtitle">NPS 4 (DN 100) — Class 150 — With Centering Ring</text>
-  <text x="40" y="78" class="std-ref">ASME B16.20-2017 | Type CGI (inner + centering ring)</text>
-  <circle cx="320" cy="310" r="94" fill="#d8dce0" stroke="#1a1a1a" stroke-width="1.5"/>
-  <circle cx="320" cy="310" r="82" fill="#b8bfc6" stroke="#1a1a1a" stroke-width="2"/>
-  <circle cx="320" cy="310" r="60" fill="none" stroke="#9aa0a6" stroke-width=".4"/>
-  <circle cx="320" cy="310" r="63" fill="none" stroke="#9aa0a6" stroke-width=".4"/>
-  <circle cx="320" cy="310" r="67" fill="none" stroke="#9aa0a6" stroke-width=".4"/>
-  <circle cx="320" cy="310" r="71" fill="none" stroke="#9aa0a6" stroke-width=".4"/>
-  <circle cx="320" cy="310" r="75" fill="none" stroke="#9aa0a6" stroke-width=".4"/>
-  <circle cx="320" cy="310" r="79" fill="none" stroke="#9aa0a6" stroke-width=".4"/>
-  <circle cx="320" cy="310" r="60" fill="#fafafa" stroke="#1a1a1a" stroke-width="1.5"/>
-  <line x1="200" y1="310" x2="440" y2="310" class="centerline"/>
-  <line x1="320" y1="190" x2="320" y2="430" class="centerline"/>
-  <text x="444" y="314" class="label" text-anchor="start">CL</text>
-  <line x1="260.5" y1="444.5" x2="379.5" y2="444.5" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="320" y="437.5" class="dim-text">ID</text>
-  <text x="320" y="459.5" class="dim-sub">4.250" | 107.9 mm</text>
-  <line x1="260.5" y1="374.5" x2="260.5" y2="449.5" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="379.5" y1="374.5" x2="379.5" y2="449.5" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="237.68" y1="479.5" x2="402.32" y2="479.5" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="320" y="472.5" class="dim-text">OD</text>
-  <text x="320" y="494.5" class="dim-sub">5.880" | 149.4 mm</text>
-  <line x1="237.68" y1="397.32" x2="237.68" y2="484.5" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="402.32" y1="397.32" x2="402.32" y2="484.5" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="225.5" y1="185.5" x2="414.5" y2="185.5" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="320" y="178.5" class="dim-text">CR OD</text>
-  <text x="320" y="200.5" class="dim-sub">6.750" | 171.5 mm</text>
-  <line x1="225.5" y1="210.5" x2="225.5" y2="180.5" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="414.5" y1="210.5" x2="414.5" y2="180.5" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <rect x="600" y="480" width="60" height="8" rx="1" fill="#b8bfc6" stroke="#1a1a1a" stroke-width="1.5"/>
-  <text x="630" y="472" class="dim-text">T</text>
-  <text x="630" y="503" class="dim-sub">0.175" | 4.4 mm</text>
-  <text x="630" y="458" class="label">Section</text>
-  <rect x="530" y="120" width="240" height="169" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
-  <text x="650" y="140" class="tbl-hdr">NPS 4 — Key Data</text>
-  <line x1="545" y1="148" x2="755" y2="148" stroke="#eee" stroke-width=".5"/>
-  <text x="550" y="165" class="tbl-key">NPS / DN</text>
-  <text x="750" y="165" class="tbl-val">4 / 100</text>
-  <text x="550" y="182" class="tbl-key">Class</text>
-  <text x="750" y="182" class="tbl-val">150</text>
-  <text x="550" y="199" class="tbl-key">ID</text>
-  <text x="750" y="199" class="tbl-val">4.250" | 107.9 mm</text>
-  <text x="550" y="216" class="tbl-key">OD (wound)</text>
-  <text x="750" y="216" class="tbl-val">5.880" | 149.4 mm</text>
-  <text x="550" y="233" class="tbl-key">CR OD</text>
-  <text x="750" y="233" class="tbl-val">6.750" | 171.5 mm</text>
-  <text x="550" y="250" class="tbl-key">T</text>
-  <text x="750" y="250" class="tbl-val">0.175" | 4.4 mm</text>
-  <text x="550" y="267" class="tbl-key">Filler</text>
-  <text x="750" y="267" class="tbl-val">Flexible Graphite</text>
+  <text x="40" y="40" class="title">Spiral Wound Gasket — Type CGI</text>
+  <text x="40" y="60" class="subtitle">NPS 4 (DN 100) — Class 150</text>
+  <text x="40" y="78" class="std-ref">ASME B16.20-2017 | Inner ring + sealing element + centering ring</text>
+  <circle cx="330" cy="320" r="160" fill="#d0d5da" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="330" cy="320" r="136.75057208237985" fill="#e8b04b" stroke="#1a1a1a" stroke-width="1.5"/>
+  <circle cx="330" cy="320" r="121.37299771167048" class="winding"/>
+  <circle cx="330" cy="320" r="126.49885583524026" class="winding"/>
+  <circle cx="330" cy="320" r="131.62471395881005" class="winding"/>
+  <circle cx="330" cy="320" r="116.24713958810068" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="1.5"/>
+  <circle cx="330" cy="320" r="97.39130434782608" fill="#fafafa" stroke="#1a1a1a" stroke-width="2"/>
+  <text x="330" y="324" class="label">d1</text>
+  <text x="203.50114416475975" y="314" class="label" fill="#7a5410">winding</text>
+  <line x1="130" y1="320" x2="530" y2="320" class="centerline"/>
+  <line x1="330" y1="130" x2="330" y2="510" class="centerline"/>
+  <line x1="170" y1="520" x2="490" y2="520" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="330" y="513" class="dim-text">d4</text>
+  <text x="330" y="535" class="dim-sub">6.88" | 174.8 mm</text>
+  <line x1="170" y1="490" x2="170" y2="525" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="490" y1="490" x2="490" y2="525" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="193.24942791762015" y1="472.75057208237985" x2="466.75057208237985" y2="472.75057208237985" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="330" y="465.75057208237985" class="dim-text">d3</text>
+  <text x="330" y="487.75057208237985" class="dim-sub">5.88" | 149.4 mm</text>
+  <line x1="193.24942791762015" y1="442.75057208237985" x2="193.24942791762015" y2="477.75057208237985" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="466.75057208237985" y1="442.75057208237985" x2="466.75057208237985" y2="477.75057208237985" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="232.60869565217394" y1="202.60869565217394" x2="427.39130434782606" y2="202.60869565217394" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="330" y="195.60869565217394" class="dim-text">d1</text>
+  <text x="330" y="217.60869565217394" class="dim-sub">4.19" | 106.4 mm</text>
+  <line x1="232.60869565217394" y1="172.60869565217394" x2="232.60869565217394" y2="207.60869565217394" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="427.39130434782606" y1="172.60869565217394" x2="427.39130434782606" y2="207.60869565217394" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <text x="330" y="340" class="dim-sub">d2 5" | 127 mm</text>
+  <rect x="540" y="60" width="230" height="157" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
+  <text x="655" y="80" class="tbl-hdr">NPS 4 — Key Data</text>
+  <line x1="555" y1="88" x2="755" y2="88" stroke="#eee" stroke-width=".5"/><text x="560" y="105" class="tbl-key">NPS / DN</text><text x="750" y="105" class="tbl-val">4 / 100</text><text x="560" y="122" class="tbl-key">Class</text><text x="750" y="122" class="tbl-val">150</text><text x="560" y="139" class="tbl-key">d1 inner ring ID</text><text x="750" y="139" class="tbl-val">4.19" | 106.4 mm</text><text x="560" y="156" class="tbl-key">d2 sealing ID</text><text x="750" y="156" class="tbl-val">5" | 127 mm</text><text x="560" y="173" class="tbl-key">d3 sealing OD</text><text x="750" y="173" class="tbl-val">5.88" | 149.4 mm</text><text x="560" y="190" class="tbl-key">d4 centering OD</text><text x="750" y="190" class="tbl-val">6.88" | 174.8 mm</text><text x="560" y="207" class="tbl-key">t sealing</text><text x="750" y="207" class="tbl-val">0.175" | 4.45 mm</text>
   <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
-  <text x="40" y="648" class="note">Spiral Wound Gasket per ASME B16.20-2017, Class 150.</text>
-  <text x="40" y="663" class="note">Type CGI: centering ring + inner ring. Filler: flexible graphite.</text>
-  <text x="40" y="678" class="note">ID/OD = wound element. CR OD = centering ring OD. All dims in inches and mm.</text>
+  <text x="40" y="648" class="note">Type CGI per ASME B16.20: sealing element (winding, amber) + inner ring + outer centering ring.</text>
+  <text x="40" y="663" class="note">Rings drawn as concentric bands (visual simplification; no certified winding microgeometry claim).</text>
+  <text x="40" y="678" class="note">All dimensions from PB-DIM-ASME-B16-20-GASKET-SW (rebuilt WP4 data gate).</text>
   <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
 </svg>
