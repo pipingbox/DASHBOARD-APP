@@ -16,6 +16,9 @@ import {
   reportSubject,
   sanitizeText,
   sanitizeError,
+  scanForPii,
+  isBrusselsDailyTick,
+  evaluateProductionGate,
   hogqlTraffic,
   hogqlRoutes,
   hogqlFunnelSignup,
@@ -107,6 +110,61 @@ test.describe('Brussels day window (CET/CEST)', () => {
   });
 });
 
+test.describe('Brussels daily tick (cron `5 * * * *` → only 00:05 sends)', () => {
+  // The hourly cron fires at :05 every hour; only the Brussels 00:05 tick may
+  // send the production report (tolerance window = the whole 00:xx hour).
+  test('00:05 Brussels in winter (CET) is the daily tick', () => {
+    // 2026-01-15 00:05 Brussels (CET, UTC+1) = 2026-01-14 23:05 UTC.
+    expect(isBrusselsDailyTick(new Date('2026-01-14T23:05:00.000Z'))).toBe(true);
+  });
+
+  test('00:05 Brussels in summer (CEST) is the daily tick', () => {
+    // 2026-07-15 00:05 Brussels (CEST, UTC+2) = 2026-07-14 22:05 UTC.
+    expect(isBrusselsDailyTick(new Date('2026-07-14T22:05:00.000Z'))).toBe(true);
+  });
+
+  test('13:05 Brussels is NOT the daily tick (hourly cron noise)', () => {
+    // 2026-01-15 13:05 Brussels (CET) = 12:05 UTC.
+    expect(isBrusselsDailyTick(new Date('2026-01-15T12:05:00.000Z'))).toBe(false);
+  });
+
+  test('01:05 Brussels is NOT the daily tick', () => {
+    // 2026-07-15 01:05 Brussels (CEST) = 2026-07-14 23:05 UTC.
+    expect(isBrusselsDailyTick(new Date('2026-07-14T23:05:00.000Z'))).toBe(false);
+  });
+
+  test('DST transition days keep the 00:05 tick correct', () => {
+    // 2026-03-29 00:05 Brussels was still CET (UTC+1) = 2026-03-28 23:05 UTC.
+    expect(isBrusselsDailyTick(new Date('2026-03-28T23:05:00.000Z'))).toBe(true);
+    // 2026-10-25 00:05 Brussels was still CEST (UTC+2) = 2026-10-24 22:05 UTC.
+    expect(isBrusselsDailyTick(new Date('2026-10-24T22:05:00.000Z'))).toBe(true);
+  });
+});
+
+test.describe('Production gate (PO activation flag + tick + auth mode)', () => {
+  test('test mode always runs and never consumes the production report_date', () => {
+    expect(evaluateProductionGate({ isTest: true, enabled: false, authMode: 'cron', isDailyTick: false }))
+      .toEqual({ action: 'run' });
+  });
+
+  test('production send is skipped while DAILY_REPORT_ENABLED is not set by the PO', () => {
+    expect(evaluateProductionGate({ isTest: false, enabled: false, authMode: 'admin', isDailyTick: true }))
+      .toEqual({ action: 'skip', reason: 'production_disabled' });
+  });
+
+  test('cron only sends at the Brussels 00:05 tick', () => {
+    expect(evaluateProductionGate({ isTest: false, enabled: true, authMode: 'cron', isDailyTick: true }))
+      .toEqual({ action: 'run' });
+    expect(evaluateProductionGate({ isTest: false, enabled: true, authMode: 'cron', isDailyTick: false }))
+      .toEqual({ action: 'skip', reason: 'outside_brussels_daily_tick' });
+  });
+
+  test('admin (service_role) can retry manually once the PO enabled the flag', () => {
+    expect(evaluateProductionGate({ isTest: false, enabled: true, authMode: 'admin', isDailyTick: false }))
+      .toEqual({ action: 'run' });
+  });
+});
+
 test.describe('HogQL query construction', () => {
   const queries = [
     ['traffic', hogqlTraffic()],
@@ -184,6 +242,30 @@ test.describe('PII / secret sanitization', () => {
     expect(out).not.toContain(fakePhx);
     expect(out).not.toContain('bob@corp.io');
     expect(out.length).toBeLessThanOrEqual(300);
+  });
+
+  test('scanForPii detects emails, tokens and prefixed phones', () => {
+    const fakeStripe = ['sk', 'live', 'FAKE0000000000000000'].join('_');
+    const scan = scanForPii(`hola b@x.io y +32 470 12 34 56 con ${fakeStripe}`);
+    expect(scan.emails).toBe(1);
+    expect(scan.phones).toBe(1);
+    expect(scan.tokens).toBe(1);
+  });
+
+  test('scanForPii has no false positives from ISO dates or amounts', () => {
+    expect(scanForPii('2026-09-11T22:00:00.000Z total 1234.56 EUR').phones).toBe(0);
+    expect(scanForPii('2026-09-11T22:00:00.000Z total 1234.56 EUR').emails).toBe(0);
+  });
+
+  test('scanForPii of a rendered report comes back completely clean', () => {
+    const d = baseReport({
+      metrics: baseMetrics({
+        errors: [{ errorName: 'TypeError', incidentCode: 'PB-ERR-000001', route: '/jobs', occurrences: 2 }],
+        totalErrors: 2,
+      }),
+    });
+    const scan = scanForPii(`${renderReportHtml(d)}\n${renderReportText(d)}`);
+    expect(scan).toEqual({ emails: 0, phones: 0, tokens: 0 });
   });
 
   // 6b. Rendered email contains no PII even when metrics carry none.
@@ -346,13 +428,27 @@ test.describe('Secrets hygiene', () => {
   // 17. No secrets in logs/build: the core module references secrets only by
   // env var NAME, never embeds a value.
   test('core module does not embed any secret value or personal key', async () => {
-    const src = await import('node:fs/promises').then((fs) =>
-      fs.readFile(new URL('../supabase/functions/_shared/daily-report-core.ts', import.meta.url), 'utf8'),
+    const fs = await import('node:fs/promises');
+    const src = await fs.readFile(new URL('../supabase/functions/_shared/daily-report-core.ts', import.meta.url), 'utf8');
+    expect(src).not.toMatch(/phx_[A-Za-z0-9]/);
+    expect(src).not.toMatch(/phc_[A-Za-z0-9]/);
+    expect(src).not.toMatch(/sk_live_[A-Za-z0-9]/);
+    expect(src).not.toMatch(/sk_test_[A-Za-z0-9]/);
+    expect(src).not.toMatch(/whsec_[A-Za-z0-9]/);
+  });
+
+  test('handler embeds no secret value (only env var names)', async () => {
+    const fs = await import('node:fs/promises');
+    const src = await fs.readFile(
+      new URL('../supabase/functions/daily-intelligence-report/index.ts', import.meta.url),
+      'utf8',
     );
     expect(src).not.toMatch(/phx_[A-Za-z0-9]/);
     expect(src).not.toMatch(/phc_[A-Za-z0-9]/);
     expect(src).not.toMatch(/sk_live_[A-Za-z0-9]/);
     expect(src).not.toMatch(/sk_test_[A-Za-z0-9]/);
     expect(src).not.toMatch(/whsec_[A-Za-z0-9]/);
+    // The cron key is only ever read from Vault at runtime, never a literal.
+    expect(src).not.toMatch(/X-Cron-Key: [A-Za-z0-9]/);
   });
 });

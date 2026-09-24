@@ -81,6 +81,61 @@ export function getPreviousBrusselsDayWindow(now: Date): ReportWindow {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
+// Tick diario productivo (cron `5 * * * *` → hora local Brussels 00:05)
+// ──────────────────────────────────────────────────────────────────────────
+
+/** Hora/minuto del muro de reloj Brussels en un instante UTC dado. */
+export function brusselsTimeParts(utcDate: Date): { hour: number; minute: number } {
+  const dtf = new Intl.DateTimeFormat("en-US", {
+    timeZone: BRUSSELS_TZ,
+    hour: "2-digit", minute: "2-digit",
+    hour12: false,
+  });
+  const parts = dtf.formatToParts(utcDate);
+  const hour = Number(parts.find((p) => p.type === "hour")?.value ?? "0");
+  const minute = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
+  return { hour: hour === 24 ? 0 : hour, minute };
+}
+
+/**
+ * El cron dispara cada hora a :05 (UTC y Brussels comparten offsets en horas
+ * exactas). El envío productivo SOLO procede en la hora local Brussels 00:05;
+ * se admite toda la hora 00:00–00:59 como ventana de tolerancia por retardos.
+ * CET/CEST correcto vía Intl (sin tablas manuales).
+ */
+export function isBrusselsDailyTick(now: Date): boolean {
+  return brusselsTimeParts(now).hour === 0;
+}
+
+export type ReportAuthMode = "admin" | "cron";
+
+export interface ProductionGateInput {
+  isTest: boolean;
+  /** `DAILY_REPORT_ENABLED === "true"` — la activa el PO tras aprobar la prueba. */
+  enabled: boolean;
+  authMode: ReportAuthMode;
+  isDailyTick: boolean;
+}
+
+export type ProductionGateDecision =
+  | { action: "run" }
+  | { action: "skip"; reason: "production_disabled" | "outside_brussels_daily_tick" };
+
+/**
+ * Decide si procede el envío:
+ *   - test: siempre corre (sin claim ni consumo del report_date productivo);
+ *   - envío productivo desactivado (flag del PO): skip;
+ *   - cron fuera de la hora Brussels 00:xx: skip (tick diario 00:05);
+ *   - admin (service_role, flag activo): reintento manual permitido.
+ */
+export function evaluateProductionGate(i: ProductionGateInput): ProductionGateDecision {
+  if (i.isTest) return { action: "run" };
+  if (!i.enabled) return { action: "skip", reason: "production_disabled" };
+  if (i.authMode === "cron" && !i.isDailyTick) return { action: "skip", reason: "outside_brussels_daily_tick" };
+  return { action: "run" };
+}
+
+// ──────────────────────────────────────────────────────────────────────────
 // Consultas HogQL (todas filtran environment='production')
 // ──────────────────────────────────────────────────────────────────────────
 
@@ -367,6 +422,33 @@ export function sanitizeText(input: string): string {
 export function sanitizeError(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err ?? "unknown_error");
   return sanitizeText(msg).slice(0, 300);
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Escaneo PII del contenido renderizado (verificación del correo de prueba)
+// ──────────────────────────────────────────────────────────────────────────
+
+export interface PiiScan {
+  emails: number;
+  phones: number;
+  tokens: number;
+}
+
+/**
+ * Escanea un texto ya renderizado en busca de PII/secretos que NO deberían
+ * estar. El patrón de teléfono es estricto (requiere prefijo "+") para no
+ * dar falsos positivos con fechas ISO o importes.
+ */
+export function scanForPii(text: string): PiiScan {
+  const t = String(text ?? "");
+  const emailRe = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+  const phoneRe = /\+\d[\d\s().-]{7,}\d/g;
+  const tokenRe = /(phc_|phx_|sk_live|sk_test|whsec_)[A-Za-z0-9_-]+/g;
+  return {
+    emails: (t.match(emailRe) || []).length,
+    phones: (t.match(phoneRe) || []).length,
+    tokens: (t.match(tokenRe) || []).length,
+  };
 }
 
 // ──────────────────────────────────────────────────────────────────────────

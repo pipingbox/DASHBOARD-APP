@@ -1,12 +1,30 @@
 // Edge Function: daily-intelligence-report
 // PB-PDI-004 — genera y envía el informe "PipingBox Daily Intelligence".
 //
-// Invocación diaria por pg_cron + pg_net (ver README.md). También admite
-// disparo manual autenticado (service_role). Idempotente por report_date.
+// INVOCACIÓN
+//   - pg_cron `5 * * * *` (tick horario) + pg_net con cabecera `X-Cron-Key`.
+//     El valor de esa clave vive en Supabase Vault (secreto
+//     `daily-intelligence-cron-key`, generado DENTRO de la base de datos):
+//     nunca aparece en SQL, código, logs ni respuestas. El envío productivo
+//     SOLO procede cuando la hora local Europe/Brussels es 00:05 (ventana
+//     00:00–00:59); el resto de ticks horarios se saltan sin efecto.
+//   - Manual/admin: `Authorization: Bearer SUPABASE_SERVICE_ROLE_KEY`
+//     (preflight, prueba y reintentos).
+//
+// ACTIVACIÓN DEL ENVÍO DIARIO
+//   - Todo envío productivo exige el secreto `DAILY_REPORT_ENABLED="true"`
+//     (lo activa el PO tras aprobar el correo de prueba). Hasta entonces el
+//     cron existe pero cada tick se salta sin claim ni correo.
+//
+// PRUEBA {"test":true}
+//   - Envía a support@pipingbox.com con asunto "[TEST] ..." y NO escribe en
+//     app_daily_intelligence_runs: no consume ni bloquea el report_date
+//     productivo del día.
 //
 // SEGURIDAD
-//   - verify_jwt = false; autenticación por Authorization: Bearer SERVICE_ROLE_KEY
-//     (comprobada abajo). Nadie más puede disparar el informe.
+//   - verify_jwt = false (el cron no porta JWT); la función autentica por sí
+//     misma: Bearer service_role o X-Cron-Key validado contra Vault vía RPC
+//     SECURITY DEFINER `app_verify_daily_report_cron_key` (solo service_role).
 //   - Logs sin secretos ni PII (sanitizeError/sanitizeText).
 //   - Fail-closed: si una fuente crítica falla, el informe es PARTIAL/FAILED y
 //     nunca se marca SENT falsamente.
@@ -15,12 +33,16 @@ import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supa
 import { createEmailProvider } from "../_shared/email-provider.ts";
 import {
   getPreviousBrusselsDayWindow,
+  brusselsWallToUtc,
+  isBrusselsDailyTick,
+  evaluateProductionGate,
   buildRecommendations,
   renderReportHtml,
   renderReportText,
   reportSubject,
   sanitizeError,
   sanitizeText,
+  scanForPii,
   hogqlTraffic,
   hogqlRoutes,
   hogqlFunnelSignup,
@@ -34,7 +56,7 @@ import {
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-key",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -45,6 +67,10 @@ function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
     p,
     new Promise<T>((_, rej) => setTimeout(() => rej(new Error(`${label}_timeout`)), ms)),
   ]);
+}
+
+function json(obj: Record<string, unknown>, status = 200): Response {
+  return new Response(JSON.stringify(obj), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 }
 
 // ── PostHog query (HogQL) ─────────────────────────────────────────────────
@@ -64,8 +90,8 @@ async function hogql(query: string, start: string, end: string): Promise<unknown
     "posthog",
   );
   if (!res.ok) throw new Error(`posthog_http_${res.status}`);
-  const json = await res.json();
-  return (json?.results ?? []) as unknown[][];
+  const json2 = await res.json();
+  return (json2?.results ?? []) as unknown[][];
 }
 
 const num = (v: unknown) => Number(v ?? 0) || 0;
@@ -254,125 +280,215 @@ async function finalizeRun(
     .eq("report_date", reportDate);
 }
 
+/** Ventana del día natural indicado (YYYY-MM-DD Brussels). */
+function windowForReportDate(date: string) {
+  const [y, mo, d] = date.split("-").map(Number);
+  const anchor = brusselsWallToUtc(y, mo, d, 12, 0, 0);
+  return getPreviousBrusselsDayWindow(new Date(anchor.getTime() + 24 * 3600 * 1000));
+}
+
+// ── Pipeline compartido: recolectar → renderizar → enviar ────────────────
+async function generateAndSend(
+  supabase: SupabaseClient,
+  window: { reportDate: string; startUtc: string; endUtc: string },
+  isTest: boolean,
+  correlationId: string,
+): Promise<{
+  ok: boolean;
+  status: "SENT" | "SENT_TEST" | "PARTIAL" | "FAILED";
+  sources: SourceStatus;
+  sendError: string | null;
+  verification?: Record<string, unknown>;
+}> {
+  const sources: SourceStatus = { posthog: false, supabase: false, stripe: false, email: false };
+  let executionStatus: "SUCCESS" | "PARTIAL" | "FAILED" = "SUCCESS";
+  let sendError: string | null = null;
+
+  const { metrics, routes } = await collectMetrics(supabase, window.startUtc, window.endUtc, sources);
+
+  // Ninguna fuente de datos disponible → informe no fiable → FAILED, no enviar.
+  if (!sources.posthog && !sources.supabase && !sources.stripe) {
+    return { ok: false, status: "FAILED", sources, sendError: "all_data_sources_unavailable" };
+  }
+  // Alguna fuente caída → PARTIAL (aún se envía, marcado claramente).
+  if (!sources.posthog || !sources.supabase || !sources.stripe) executionStatus = "PARTIAL";
+
+  const recommendations = buildRecommendations(metrics);
+  const generatedAt = new Date().toISOString();
+  const recipient = Deno.env.get("DAILY_REPORT_RECIPIENT") || "support@pipingbox.com";
+  const data = {
+    window, generatedAt, metrics, recommendations, sources, routes,
+    executionStatus, isTest,
+    avgSessionNote: "No disponible (requiere instrumentación de duración de sesión)",
+  };
+
+  const html = renderReportHtml(data);
+  const text = renderReportText(data);
+
+  const provider = createEmailProvider();
+  if (!provider.isConfigured()) {
+    return { ok: false, status: "FAILED", sources, sendError: "email_provider_not_configured" };
+  }
+  try {
+    await withTimeout(
+      provider.send({
+        to: recipient,
+        subject: reportSubject(window.reportDate, isTest),
+        html,
+        text,
+      }),
+      SOURCE_TIMEOUT_MS,
+      "email",
+    );
+    sources.email = true;
+  } catch (e) {
+    return { ok: false, status: "FAILED", sources, sendError: sanitizeError(e) };
+  }
+
+  // Verificación del contenido (secciones/recomendaciones/PII) para evidencia.
+  const pii = scanForPii(`${html}\n${text}`);
+  const verification = {
+    sections: 9,
+    recommendations: recommendations.length,
+    recommendation_priorities: recommendations.map((r) => r.priority),
+    html_chars: html.length,
+    text_chars: text.length,
+    pii_scan: pii,
+    pii_clean: pii.emails === 0 && pii.phones === 0 && pii.tokens === 0,
+    subject: reportSubject(window.reportDate, isTest),
+    recipient_domain: "pipingbox.com",
+  };
+  void correlationId;
+
+  const status = executionStatus === "SUCCESS" ? (isTest ? "SENT_TEST" : "SENT") : "PARTIAL";
+  return { ok: true, status, sources, sendError, verification };
+}
+
 // ── Handler ───────────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const correlationId = crypto.randomUUID();
   const log = (obj: Record<string, unknown>) => console.log(JSON.stringify({ correlationId, ...obj }));
 
-  // Autenticación: solo service_role.
-  const auth = req.headers.get("Authorization") || "";
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-  if (!serviceKey || auth !== `Bearer ${serviceKey}`) {
-    return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-  }
-
-  let isTest = false;
-  let forcedDate: string | null = null;
+  // Body opcional: {test, preflight, report_date}.
+  let body: Record<string, unknown> = {};
   try {
-    const body = await req.json().catch(() => ({}));
-    isTest = body?.test === true;
-    forcedDate = typeof body?.report_date === "string" ? body.report_date : null;
-  } catch { /* body opcional */ }
+    body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  } catch { /* sin body */ }
+  const isTest = body?.test === true;
+  const isPreflight = body?.preflight === true;
+  const rawDate = typeof body?.report_date === "string" ? body.report_date : null;
+  const forcedDate = rawDate && /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : null;
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
   const supabase = createClient(supabaseUrl, serviceKey);
 
-  const window = getPreviousBrusselsDayWindow(new Date());
-  if (forcedDate) window.reportDate = forcedDate;
+  // ── Autenticación: admin (Bearer service_role) o cron (X-Cron-Key ↔ Vault).
+  let authMode: "admin" | "cron" | null = null;
+  const auth = req.headers.get("Authorization") || "";
+  if (serviceKey && auth === `Bearer ${serviceKey}`) {
+    authMode = "admin";
+  } else {
+    const cronKey = req.headers.get("X-Cron-Key") || "";
+    if (cronKey) {
+      try {
+        const { data } = await supabase.rpc("app_verify_daily_report_cron_key", { p_candidate: cronKey });
+        if (data === true) authMode = "cron";
+      } catch (e) {
+        console.error(JSON.stringify({ correlationId, action: "cron_key_verify_error", error: sanitizeError(e) }));
+      }
+    }
+  }
+  if (!authMode) {
+    return json({ error: "unauthorized" }, 401);
+  }
+  if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
+  // ── Preflight: presencia de configuración por NOMBRE, sin valores.
+  if (isPreflight) {
+    const has = (n: string) => (Deno.env.get(n) || "").length > 0;
+    const config: Record<string, boolean | string> = {
+      SUPABASE_URL: !!supabaseUrl,
+      SUPABASE_SERVICE_ROLE_KEY: !!serviceKey,
+      POSTHOG_PERSONAL_API_KEY: has("POSTHOG_PERSONAL_API_KEY"),
+      SMTP_HOST: has("SMTP_HOST"),
+      SMTP_USER: has("SMTP_USER"),
+      SMTP_PASSWORD: has("SMTP_PASSWORD"),
+      SMTP_PORT: has("SMTP_PORT") ? true : "587 (default)",
+      SMTP_SECURE: has("SMTP_SECURE") ? true : "true (default)",
+      SMTP_FROM: has("SMTP_FROM") ? true : "noreply@pipingbox.com (default)",
+      POSTHOG_PROJECT_ID: has("POSTHOG_PROJECT_ID") ? true : "271316 (default)",
+      POSTHOG_HOST: has("POSTHOG_HOST") ? true : "https://eu.i.posthog.com (default)",
+      DAILY_REPORT_RECIPIENT: has("DAILY_REPORT_RECIPIENT") ? true : "support@pipingbox.com (default)",
+      DAILY_REPORT_ENABLED: Deno.env.get("DAILY_REPORT_ENABLED") === "true",
+    };
+    const missing = Object.entries(config).filter(([, v]) => v === false).map(([k]) => k);
+    log({ action: "preflight", auth_mode: authMode, missing_required_secrets: missing });
+    return json({ ok: true, action: "preflight", auth_mode: authMode, missing_required_secrets: missing, config });
+  }
+
+  // ── Gate de producción: activación por el PO + tick diario Brussels 00:05.
+  const enabled = Deno.env.get("DAILY_REPORT_ENABLED") === "true";
+  const gate = evaluateProductionGate({ isTest, enabled, authMode, isDailyTick: isBrusselsDailyTick(new Date()) });
+  if (gate.action === "skip") {
+    log({ action: "skip", reason: gate.reason, auth_mode: authMode });
+    return json({ ok: true, skipped: gate.reason, auth_mode: authMode, correlation_id: correlationId });
+  }
+
+  const window = forcedDate ? windowForReportDate(forcedDate) : getPreviousBrusselsDayWindow(new Date());
+
+  // ── Prueba: envío marcado [TEST]; NO consume el report_date productivo.
+  if (isTest) {
+    try {
+      const r = await generateAndSend(supabase, window, true, correlationId);
+      log({ action: "test_report", report_date: window.reportDate, status: r.status, sources: r.sources });
+      return json({
+        ok: r.ok, status: r.status, report_date: window.reportDate, test: true,
+        correlation_id: correlationId, sources: r.sources,
+        error: r.sendError ?? undefined, verification: r.verification,
+      });
+    } catch (e) {
+      const err = sanitizeError(e);
+      log({ action: "test_report_exception", error: err });
+      return json({ ok: false, status: "FAILED", reason: err, test: true, correlation_id: correlationId });
+    }
+  }
+
+  // ── Producción: claim idempotente → pipeline → finalize fail-closed.
   const { claimed, alreadySent } = await claimRun(supabase, window.reportDate, correlationId);
   if (alreadySent) {
     log({ action: "skip_already_sent", report_date: window.reportDate });
-    return new Response(JSON.stringify({ ok: true, skipped: "already_sent", report_date: window.reportDate }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return json({ ok: true, skipped: "already_sent", report_date: window.reportDate, correlation_id: correlationId });
   }
   if (!claimed) {
     log({ action: "skip_claim_contended", report_date: window.reportDate });
-    return new Response(JSON.stringify({ ok: true, skipped: "claim_contended", report_date: window.reportDate }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return json({ ok: true, skipped: "claim_contended", report_date: window.reportDate, correlation_id: correlationId });
   }
 
-  const sources: SourceStatus = { posthog: false, supabase: false, stripe: false, email: false };
-  let executionStatus: "SUCCESS" | "PARTIAL" | "FAILED" = "SUCCESS";
-  let sendError: string | null = null;
-
   try {
-    const { metrics, routes } = await collectMetrics(supabase, window.startUtc, window.endUtc, sources);
-
-    // Ninguna fuente de datos disponible → informe no fiable → FAILED, no enviar.
-    if (!sources.posthog && !sources.supabase && !sources.stripe) {
-      executionStatus = "FAILED";
-      await finalizeRun(supabase, window.reportDate, {
-        status: "FAILED", posthog_ok: false, supabase_ok: false, stripe_ok: false,
-        error_sanitized: "all_data_sources_unavailable",
-      });
-      log({ action: "failed_all_sources", report_date: window.reportDate });
-      return new Response(JSON.stringify({ ok: false, status: "FAILED", reason: "all_data_sources_unavailable" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    // Alguna fuente caída → PARTIAL (aún se envía, marcado claramente).
-    if (!sources.posthog || !sources.supabase || !sources.stripe) executionStatus = "PARTIAL";
-
-    const recommendations = buildRecommendations(metrics);
-    const generatedAt = new Date().toISOString();
-    const recipient = Deno.env.get("DAILY_REPORT_RECIPIENT") || "support@pipingbox.com";
-    const data = {
-      window, generatedAt, metrics, recommendations, sources, routes,
-      executionStatus, isTest,
-      avgSessionNote: "No disponible (requiere instrumentación de duración de sesión)",
-    };
-
-    const provider = createEmailProvider();
-    if (!provider.isConfigured()) {
-      sources.email = false;
-      executionStatus = "PARTIAL";
-      sendError = "email_provider_not_configured";
-    } else {
-      try {
-        await withTimeout(
-          provider.send({
-            to: recipient,
-            subject: reportSubject(window.reportDate, isTest),
-            html: renderReportHtml(data),
-            text: renderReportText(data),
-          }),
-          SOURCE_TIMEOUT_MS,
-          "email",
-        );
-        sources.email = true;
-      } catch (e) {
-        sources.email = false;
-        sendError = sanitizeError(e);
-        executionStatus = "PARTIAL";
-      }
-    }
-
-    // Fail-closed: solo SENT si el correo salió y ninguna fuente crítica falló.
-    const sent = sources.email;
-    const finalStatus = !sources.email ? "FAILED" : executionStatus === "SUCCESS" ? "SENT" : "PARTIAL";
-
+    const r = await generateAndSend(supabase, window, false, correlationId);
+    // Fail-closed: solo SENT/PARTIAL si el correo salió; si no, FAILED.
+    const finalStatus = !r.sources.email ? "FAILED" : r.status;
     await finalizeRun(supabase, window.reportDate, {
       status: finalStatus,
-      posthog_ok: sources.posthog,
-      supabase_ok: sources.supabase,
-      stripe_ok: sources.stripe,
-      email_ok: sources.email,
-      sent_at: sent ? generatedAt : null,
-      error_sanitized: sendError,
+      posthog_ok: r.sources.posthog,
+      supabase_ok: r.sources.supabase,
+      stripe_ok: r.sources.stripe,
+      email_ok: r.sources.email,
+      sent_at: r.sources.email ? new Date().toISOString() : null,
+      error_sanitized: r.sendError,
     });
-
-    log({ action: "report_done", report_date: window.reportDate, status: finalStatus, sources });
-    return new Response(
-      JSON.stringify({ ok: sources.email, status: finalStatus, report_date: window.reportDate, sources, test: isTest }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    log({ action: "report_done", report_date: window.reportDate, status: finalStatus, sources: r.sources });
+    return json({
+      ok: r.ok, status: finalStatus, report_date: window.reportDate,
+      correlation_id: correlationId, sources: r.sources,
+      error: r.sendError ?? undefined,
+    });
   } catch (e) {
     const err = sanitizeError(e);
-    await finalizeRun(supabase, window.reportDate, {
-      status: "FAILED",
-      posthog_ok: sources.posthog, supabase_ok: sources.supabase, stripe_ok: sources.stripe, email_ok: sources.email,
-      error_sanitized: err,
-    });
+    await finalizeRun(supabase, window.reportDate, { status: "FAILED", error_sanitized: err });
     console.error(JSON.stringify({ correlationId, action: "report_exception", error: err }));
-    return new Response(JSON.stringify({ ok: false, status: "FAILED", error: err }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return json({ ok: false, status: "FAILED", error: err, correlation_id: correlationId });
   }
 });
