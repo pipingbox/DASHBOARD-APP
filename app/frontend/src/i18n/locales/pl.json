@@ -494,7 +494,35 @@
     "avatarChange": "Zmień zdjęcie",
     "avatarUpload": "Prześlij zdjęcie",
     "avatarHide": "Ukryj zdjęcie",
-    "avatarShow": "Pokaż zdjęcie"
+    "avatarShow": "Pokaż zdjęcie",
+    "matchReadyHint": "Uzupełnij brakujące pola profilu, aby poprawić swoją gotowość do pracy.",
+    "matchReadyAddExperience": "Dodaj doświadczenie zawodowe",
+    "matchReadyGap": {
+      "cohort": "Ukończ onboarding pracownika",
+      "full_name": "Dodaj swoje pełne imię i nazwisko",
+      "title": "Dodaj swoje stanowisko lub zawód",
+      "location": "Dodaj swoją lokalizację",
+      "years_experience": "Dodaj swoje lata doświadczenia",
+      "bio": "Dodaj profesjonalne podsumowanie",
+      "skills": "Dodaj co najmniej jedną umiejętność",
+      "experience": "Dodaj uporządkowane doświadczenie zawodowe",
+      "availability": "Ustaw swoją dostępność",
+      "visibility": "Ustaw profil jako publiczny"
+    },
+    "matchReadyUnlocks": {
+      "complete": "Ukończone",
+      "workforceReady": "Gotowy do pracy",
+      "matchable": "Dopasowywalny"
+    },
+    "quickExperience": {
+      "title": "Dodaj doświadczenie zawodowe",
+      "saved": "Doświadczenie dodane — Twoja historia zawodowa może być teraz oceniana przez firmy.",
+      "savedToast": "Doświadczenie dodane — Twoja historia zawodowa może być teraz oceniana przez firmy.",
+      "moreDetails": "Dodaj więcej szczegółów (opcjonalnie)",
+      "addAnother": "Dodaj kolejne doświadczenie",
+      "addDetails": "Dodaj szczegóły",
+      "save": "Zapisz doświadczenie"
+    }
   },
   "academy": {
     "eyebrow": "Akademia",

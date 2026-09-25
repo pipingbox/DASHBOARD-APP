@@ -494,7 +494,35 @@
     "avatarChange": "Schimbați fotografia",
     "avatarUpload": "Încărcați o fotografie",
     "avatarHide": "Ascundeți fotografia",
-    "avatarShow": "Afișați fotografia"
+    "avatarShow": "Afișați fotografia",
+    "matchReadyHint": "Completează câmpurile lipsă ale profilului pentru a-ți îmbunătăți pregătirea pentru joburi.",
+    "matchReadyAddExperience": "Adaugă experiență de muncă",
+    "matchReadyGap": {
+      "cohort": "Finalizează onboardingul de lucrător",
+      "full_name": "Adaugă numele complet",
+      "title": "Adaugă funcția sau meseria ta",
+      "location": "Adaugă locația ta",
+      "years_experience": "Adaugă anii de experiență",
+      "bio": "Adaugă un rezumat profesional",
+      "skills": "Adaugă cel puțin o competență",
+      "experience": "Adaugă experiență de muncă structurată",
+      "availability": "Setează disponibilitatea ta",
+      "visibility": "Fă-ți profilul public"
+    },
+    "matchReadyUnlocks": {
+      "complete": "Complet",
+      "workforceReady": "Pregătit pentru muncă",
+      "matchable": "Potrivibil"
+    },
+    "quickExperience": {
+      "title": "Adaugă experiență de muncă",
+      "saved": "Experiență adăugată — istoricul tău de lucru poate fi acum evaluat de companii.",
+      "savedToast": "Experiență adăugată — istoricul tău de lucru poate fi acum evaluat de companii.",
+      "moreDetails": "Adaugă mai multe detalii (opțional)",
+      "addAnother": "Adaugă altă experiență",
+      "addDetails": "Adaugă detalii",
+      "save": "Salvează experiența"
+    }
   },
   "academy": {
     "eyebrow": "Academie",
