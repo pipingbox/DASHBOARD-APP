@@ -240,12 +240,22 @@ async function claimRun(
   reportDate: string,
   correlationId: string,
 ): Promise<{ claimed: boolean; alreadySent: boolean }> {
+  const logErr = (op: string, error: unknown) =>
+    console.error(JSON.stringify({
+      correlationId, action: "claim_db_error", op,
+      error: sanitizeError((error as { message?: string })?.message ?? error),
+    }));
+
   // Si ya existe un SENT para este día, no reenviar.
-  const { data: existing } = await supabase
+  const { data: existing, error: selectError } = await supabase
     .from("app_daily_intelligence_runs")
     .select("status, attempts")
     .eq("report_date", reportDate)
     .maybeSingle();
+  if (selectError) {
+    logErr("select", selectError);
+    return { claimed: false, alreadySent: false };
+  }
   if (existing?.status === "SENT") return { claimed: false, alreadySent: true };
 
   if (!existing) {
@@ -256,7 +266,10 @@ async function claimRun(
       correlation_id: correlationId,
     });
     // UNIQUE(report_date): otro proceso ganó el claim.
-    if (error) return { claimed: false, alreadySent: false };
+    if (error) {
+      logErr("insert", error);
+      return { claimed: false, alreadySent: false };
+    }
     return { claimed: true, alreadySent: false };
   }
 
@@ -266,6 +279,7 @@ async function claimRun(
     .update({ status: "GENERATING", attempts: (existing.attempts ?? 0) + 1, correlation_id: correlationId, updated_at: new Date().toISOString() })
     .eq("report_date", reportDate)
     .neq("status", "SENT");
+  if (error) logErr("update", error);
   return { claimed: !error, alreadySent: false };
 }
 
