@@ -2246,11 +2246,12 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     catalogViewDir = normalize([0.62, -0.55, 0.42]);
   } else if (pose?.kind === 'manual' && stlPath.includes('coupling_grooved')) {
     // Grooved couplings (rigid + flex): eje de tuberia a Z, bolt pads a +-X.
-    // Vista tres cuartos baja, casi de frente a los pads: se leen las dos
-    // semicarcasas, los bolt pads con sus tuercas (angulados en el rigid,
-    // rectos en el flex) y el gap central con la gasket en el flex. Una vista
-    // cenital esconderia los pads y haria las dos piezas indistinguibles.
-    catalogViewDir = normalize([0.64, -0.60, 0.20]);
+    // Vista dominada por +X, casi frontal a los bolt pads: el rasgo que
+    // diferencia los dos tipos es la cara de los pads (en cuña en el rigid /
+    // Style 07, recta en el flex / Style 77) con los track-bolts y tuercas
+    // sobresaliendo hacia la camara. Con la vista tres cuartos anterior los
+    // dos couplings eran indistinguibles (feedback PO 2026-09-25).
+    catalogViewDir = normalize([0.80, -0.40, 0.24]);
   } else if (pose?.kind === 'cap' && stlPath.includes('weldolet')) {
     // Weldolet: vista tres cuartos baja para que se aprecie la campana y la
     // curva de la silla en la base, no solo la boca.
