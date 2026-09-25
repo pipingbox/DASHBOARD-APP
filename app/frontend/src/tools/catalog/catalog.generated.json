@@ -5758,7 +5758,7 @@
       "ratingBasis": "pressure_class",
       "ratingNote": "Classes per API 608 for metallic ball valves. Flanged and butt weld ends in Class 150, 300 and 600; socket weld and threaded ends add Class 800, which is not a class listed in ASME B16.34. Verify against the current edition of the standard.",
       "ratingNoteKey": "catalog.ratingNote.api608BallValve",
-      "guideKey": "catalog.valveGuide.ball",
+      "guideKey": "catalog.guide.valve.ball",
       "standards": [
         {
           "standardId": "PB-STD-API-608",
@@ -5862,7 +5862,7 @@
       "ratingBasis": "pressure_class",
       "ratingNote": "Classes per API 600 for bolted bonnet gate valves, flanged or butt weld ends. The classes coincide with the ASME B16.5 / B16.34 flange classes. Verify against the current edition of the standard.",
       "ratingNoteKey": "catalog.ratingNote.api600GateValve",
-      "guideKey": "catalog.valveGuide.gate",
+      "guideKey": "catalog.guide.valve.gate",
       "standards": [
         {
           "standardId": "PB-STD-API-600",
@@ -5965,7 +5965,7 @@
       "ratingBasis": "pressure_class",
       "ratingNote": "Classes per API 602 for compact valves NPS 4 and smaller. Class 800 is not a class listed in ASME B16.34: it is an intermediate class in widespread use for threaded and welded ends, and does not exist in a flanged version. The available class depends on the end type. Verify against the current edition of the standard.",
       "ratingNoteKey": "catalog.ratingNote.api602CompactValve",
-      "guideKey": "catalog.valveGuide.globe",
+      "guideKey": "catalog.guide.valve.globe",
       "standards": [
         {
           "standardId": "PB-STD-API-602",
@@ -6063,7 +6063,7 @@
       "ratingBasis": "not_applicable",
       "ratingNote": "API 609 Category A dimensional reference; pressure class and vendor construction must be verified for the selected product.",
       "ratingNoteKey": "catalog.ratingNote.api609ButterflyValve",
-      "guideKey": "catalog.valveGuide.butterfly",
+      "guideKey": "catalog.guide.valve.butterfly",
       "standards": [
         {
           "standardId": "PB-STD-API-609",
@@ -6165,7 +6165,7 @@
       "ratingBasis": "pressure_class",
       "ratingNote": "Classes per API 594 for wafer, lug, flanged and butt weld check valves. Class 150, 300, 600, 900, 1500 and 2500 correspond to ASME B16.34; API 594 additionally admits Class 125 and 250 of ASME B16.1 (cast iron), not included here because this record declares steel flanged ends. Verify against the current edition of the standard.",
       "ratingNoteKey": "catalog.ratingNote.api594CheckValve",
-      "guideKey": "catalog.valveGuide.check",
+      "guideKey": "catalog.guide.valve.check",
       "standards": [
         {
           "standardId": "PB-STD-API-594",

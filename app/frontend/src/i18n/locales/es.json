@@ -3255,46 +3255,48 @@
       "yStrainerNoStandard": "El filtro en Y no está cubierto por una norma dimensional específica en este catálogo. Los fabricantes lo suministran habitualmente con extremos bridados según ASME B16.5, por lo que la clase la fija la brida del modelo concreto. Aquí no se lista ninguna clase porque no existe una norma verificable que la defina.",
       "noPressureClass": "Los laterales no se designan por clase de presión. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula según el código de diseño aplicable (p. ej. ASME B31.3). Verifique las dimensiones con el fabricante para el schedule aplicable."
     },
-    "valveGuide": {
-      "gate": {
-        "whatIs": "Válvula de movimiento lineal que aísla el flujo mediante una compuerta que se desliza transversalmente. Diseñada para servicio totalmente abierta o totalmente cerrada, no para regulación.",
-        "types": "Cuña maciza, cuña flexible, cuña bipartida; vástago ascendente o no ascendente; compuerta de cuchillo para lodos; cuña expansiva para oleoductos.",
-        "whenToUse": "Aislamiento abierto/cerrado en líneas de líquido donde importa un paso recto sin turbulencia: agua, aceite, gas y vapor dentro de la clase de presión.",
-        "whenNotToUse": "Servicio de regulación: una compuerta parcialmente abierta vibra, se erosiona y puede dañarse. Usa mejor una válvula de globo o mariposa.",
-        "installation": "Instala con el vástago vertical cuando sea posible, respeta la dirección de flujo solo si está marcada, y ciérrala por completo antes de presurizar la línea.",
-        "commonError": "Usar la compuerta para regular caudal a mano: los asientos se erosionan y la válvula deja de sellar."
-      },
-      "globe": {
-        "whatIs": "Válvula lineal cuyo obturador cierra sobre un asiento perpendicular al flujo. Más pérdida de carga que una compuerta o bola, pero excelente control de regulación.",
-        "types": "Cuerpos rectos (Z), en ángulo y en Y; bonete atornillado o sellado a presión; obturadores de disco, tapón o aguja.",
-        "whenToUse": "Regulación y operación frecuente: agua de refrigeración, fuelóleo, venteos y drenajes de vapor, dosificación química.",
-        "whenNotToUse": "Aislamiento de baja pérdida de carga en grandes líneas: el paso tortuoso desperdicia energía. Una compuerta, bola o mariposa es más económica.",
-        "installation": "Respeta la flecha de flujo del cuerpo —instalada al revés destruye el obturador— y deja espacio para el recorrido del vástago y el volante.",
-        "commonError": "Invertir el sentido del flujo: la válvula sigue cerrando, pero obturador y asiento se desgastan rápido y se pierde el control."
-      },
-      "check": {
-        "whatIs": "Válvula de accionamiento automático que permite el flujo en un solo sentido y cierra sola para impedir el retorno, protegiendo bombas y equipos del golpe de ariete.",
-        "types": "De clapeta (swing), de pistón (silenciosa), wafer de doble clapeta, de bola, de disco inclinado y de tobera.",
-        "whenToUse": "Descarga de bombas para evitar el giro inverso, salida de compresores y cualquier línea donde el retorno vacíe o dañe el sistema.",
-        "whenNotToUse": "Flujo pulsante con baja velocidad (aleteo y desgaste) o líneas que exijan estanqueidad total en sentido inverso: usa una válvula de cierre.",
-        "installation": "Las wafer de doble clapeta se montan entre bridas con el eje de bisagra horizontal; respeta la flecha y comprueba que los espárragos no rocen el cuerpo.",
-        "commonError": "Montar la doble clapeta con el eje de bisagra vertical: las placas no caen libres y azotan con el flujo inverso."
-      },
-      "ball": {
-        "whatIs": "Válvula de cuarto de vuelta con una bola perforada que gira hasta alinear su taladro con el flujo. Accionamiento rápido, cierre estanco y paso pleno sin obstrucciones.",
-        "types": "Bola flotante o con muñones (trunnion); paso pleno o reducido; cuerpo de una, dos o tres piezas; asiento blando o metálico; entrada superior.",
-        "whenToUse": "Cierre estanco y accionamiento rápido en líquidos, gases y lodos (asiento metálico); líneas que requieren paso de rascadores (pigging) con paso pleno.",
-        "whenNotToUse": "Regulación fina: la bola entreabierta cavita y se erosiona. Y temperaturas por encima del límite del asiento blando.",
-        "installation": "Confirma el sentido de flujo en modelos con muñones o venteo, soporta los cuerpos pesados de forma independiente y acciona con la línea despresurizada.",
-        "commonError": "Pedir paso reducido cuando el rascado (pigging) o las sondas exigen paso pleno."
-      },
-      "butterfly": {
-        "whatIs": "Válvula de cuarto de vuelta que regula o aísla el flujo con un disco circular que gira sobre un eje atravesado en la corriente. Compacta, ligera y de baja pérdida de carga.",
-        "types": "Concéntrica (asiento elastomérico, servicio general), doble excéntrica (alta prestación) y triple excéntrica (asiento metálico, cierre total). Montaje: wafer (entre bridas), lug, bridada o ranurada.",
-        "whenToUse": "Grandes líneas donde una bola o compuerta sería demasiado pesada o cara; regulación; agua, climatización, aire, gases y químicos suaves dentro del asiento.",
-        "whenNotToUse": "Cierre con alta pérdida de presión por encima de la clase del asiento, lodos abrasivos (salvo asiento metálico) o servicio que exija paso pleno.",
-        "installation": "La wafer se empareda entre bridas: comprueba que el disco no roce con el tubo ni con los espárragos y centra el asiento sobre la junta antes de apretar.",
-        "commonError": "Instalar una wafer contra un interior de tubo excesivo o bridas desalineadas: el disco se atasca."
+    "guide": {
+      "valve": {
+        "gate": {
+          "whatIs": "Válvula de movimiento lineal que aísla el flujo mediante una compuerta que se desliza transversalmente. Diseñada para servicio totalmente abierta o totalmente cerrada, no para regulación.",
+          "types": "Cuña maciza, cuña flexible, cuña bipartida; vástago ascendente o no ascendente; compuerta de cuchillo para lodos; cuña expansiva para oleoductos.",
+          "whenToUse": "Aislamiento abierto/cerrado en líneas de líquido donde importa un paso recto sin turbulencia: agua, aceite, gas y vapor dentro de la clase de presión.",
+          "whenNotToUse": "Servicio de regulación: una compuerta parcialmente abierta vibra, se erosiona y puede dañarse. Usa mejor una válvula de globo o mariposa.",
+          "installation": "Instala con el vástago vertical cuando sea posible, respeta la dirección de flujo solo si está marcada, y ciérrala por completo antes de presurizar la línea.",
+          "commonError": "Usar la compuerta para regular caudal a mano: los asientos se erosionan y la válvula deja de sellar."
+        },
+        "globe": {
+          "whatIs": "Válvula lineal cuyo obturador cierra sobre un asiento perpendicular al flujo. Más pérdida de carga que una compuerta o bola, pero excelente control de regulación.",
+          "types": "Cuerpos rectos (Z), en ángulo y en Y; bonete atornillado o sellado a presión; obturadores de disco, tapón o aguja.",
+          "whenToUse": "Regulación y operación frecuente: agua de refrigeración, fuelóleo, venteos y drenajes de vapor, dosificación química.",
+          "whenNotToUse": "Aislamiento de baja pérdida de carga en grandes líneas: el paso tortuoso desperdicia energía. Una compuerta, bola o mariposa es más económica.",
+          "installation": "Respeta la flecha de flujo del cuerpo —instalada al revés destruye el obturador— y deja espacio para el recorrido del vástago y el volante.",
+          "commonError": "Invertir el sentido del flujo: la válvula sigue cerrando, pero obturador y asiento se desgastan rápido y se pierde el control."
+        },
+        "check": {
+          "whatIs": "Válvula de accionamiento automático que permite el flujo en un solo sentido y cierra sola para impedir el retorno, protegiendo bombas y equipos del golpe de ariete.",
+          "types": "De clapeta (swing), de pistón (silenciosa), wafer de doble clapeta, de bola, de disco inclinado y de tobera.",
+          "whenToUse": "Descarga de bombas para evitar el giro inverso, salida de compresores y cualquier línea donde el retorno vacíe o dañe el sistema.",
+          "whenNotToUse": "Flujo pulsante con baja velocidad (aleteo y desgaste) o líneas que exijan estanqueidad total en sentido inverso: usa una válvula de cierre.",
+          "installation": "Las wafer de doble clapeta se montan entre bridas con el eje de bisagra horizontal; respeta la flecha y comprueba que los espárragos no rocen el cuerpo.",
+          "commonError": "Montar la doble clapeta con el eje de bisagra vertical: las placas no caen libres y azotan con el flujo inverso."
+        },
+        "ball": {
+          "whatIs": "Válvula de cuarto de vuelta con una bola perforada que gira hasta alinear su taladro con el flujo. Accionamiento rápido, cierre estanco y paso pleno sin obstrucciones.",
+          "types": "Bola flotante o con muñones (trunnion); paso pleno o reducido; cuerpo de una, dos o tres piezas; asiento blando o metálico; entrada superior.",
+          "whenToUse": "Cierre estanco y accionamiento rápido en líquidos, gases y lodos (asiento metálico); líneas que requieren paso de rascadores (pigging) con paso pleno.",
+          "whenNotToUse": "Regulación fina: la bola entreabierta cavita y se erosiona. Y temperaturas por encima del límite del asiento blando.",
+          "installation": "Confirma el sentido de flujo en modelos con muñones o venteo, soporta los cuerpos pesados de forma independiente y acciona con la línea despresurizada.",
+          "commonError": "Pedir paso reducido cuando el rascado (pigging) o las sondas exigen paso pleno."
+        },
+        "butterfly": {
+          "whatIs": "Válvula de cuarto de vuelta que regula o aísla el flujo con un disco circular que gira sobre un eje atravesado en la corriente. Compacta, ligera y de baja pérdida de carga.",
+          "types": "Concéntrica (asiento elastomérico, servicio general), doble excéntrica (alta prestación) y triple excéntrica (asiento metálico, cierre total). Montaje: wafer (entre bridas), lug, bridada o ranurada.",
+          "whenToUse": "Grandes líneas donde una bola o compuerta sería demasiado pesada o cara; regulación; agua, climatización, aire, gases y químicos suaves dentro del asiento.",
+          "whenNotToUse": "Cierre con alta pérdida de presión por encima de la clase del asiento, lodos abrasivos (salvo asiento metálico) o servicio que exija paso pleno.",
+          "installation": "La wafer se empareda entre bridas: comprueba que el disco no roce con el tubo ni con los espárragos y centra el asiento sobre la junta antes de apretar.",
+          "commonError": "Instalar una wafer contra un interior de tubo excesivo o bridas desalineadas: el disco se atasca."
+        }
       }
     }
   },

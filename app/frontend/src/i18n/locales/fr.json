@@ -3255,46 +3255,48 @@
       "yStrainerNoStandard": "Le filtre en Y n'est couvert par aucune norme dimensionnelle spécifique dans ce catalogue. Les fabricants le fournissent couramment avec des extrémités à brides selon ASME B16.5, de sorte que la classe est fixée par la bride du modèle concerné. Aucune classe n'est listée ici car il n'existe pas de norme vérifiable qui en définisse une.",
       "noPressureClass": "Les dérivations (latérales) ne sont pas désignées par classe de pression. Leur capacité dépend de l’épaisseur de paroi (schedule) et du matériau, et se calcule selon le code de conception applicable (p. ex. ASME B31.3). Vérifiez les dimensions auprès du fabricant pour le schedule applicable."
     },
-    "valveGuide": {
-      "gate": {
-        "whatIs": "Vanne à obturateur coulissant qui isole le débit au moyen d'un disque se déplaçant perpendiculairement à l'écoulement. Conçue pour être entièrement ouverte ou fermée, pas pour réguler.",
-        "types": "Clapet plein, flexible ou en deux pièces ; tige montante ou non montante ; vanne à guillotine pour boues ; clapet expansif pour pipelines.",
-        "whenToUse": "Isolement tout-ou-rien sur les lignes de liquide où un passage droit sans turbulence compte : eau, huile, gaz et vapeur dans la limite de classe.",
-        "whenNotToUse": "Service de régulation : un obturateur entrouvert vibre, s'érode et peut se bloquer. Privilégier une vanne à soupape ou un papillon.",
-        "installation": "Installer la tige verticale si possible, respecter le sens de flux s'il est gravé, et fermer complètement avant l'épreuve de pression.",
-        "commonError": "Utiliser la vanne pour régler le débit à la main : les sièges s'érodent et la vanne ne scelle plus."
-      },
-      "globe": {
-        "whatIs": "Vanne linéaire dont l'obturateur ferme sur un siège perpendiculaire au flux. Plus de perte de charge qu'une vanne de garde ou à boisseau, mais excellente pour la régulation.",
-        "types": "Corps droit (Z), en angle et en Y ; chapeau boulonné ou scellé en pression ; obturateur disque, tulipe ou aiguille.",
-        "whenToUse": "Régulation et manœuvres fréquentes : eau de refroidissement, fuel, purges et évents de vapeur, dosage chimique.",
-        "whenNotToUse": "Isolation à faible perte de charge sur grandes lignes : le chemin tortueux gaspille de l'énergie. Une vanne de garde, à boisseau ou papillon coûte moins cher.",
-        "installation": "Respecter la flèche de flux coulée sur le corps — montée à l'envers, elle détruit l'obturateur — et dégager la course de tige et le volant.",
-        "commonError": "Inverser le sens du flux : la vanne ferme encore, mais obturateur et siège s'usent vite et la régulation se perd."
-      },
-      "check": {
-        "whatIs": "Vanne automatique qui n'autorise l'écoulement que dans un sens et se referme seule pour empêcher le retour, protégeant pompes et équipements du coup de bélier.",
-        "types": "À battant (swing), à piston (silencieux), à double battant wafer, à bille, à disque incliné et à tuyère.",
-        "whenToUse": "Refoulement de pompes pour éviter la rotation inverse, sortie de compresseurs, et toute ligne où un retour viderait ou endommagerait le système.",
-        "whenNotToUse": "Écoulement pulsé à faible vitesse (battement et usure) ou lignes exigeant une étanchéité totale au retour : prévoir une vanne d'isolement.",
-        "installation": "Les modèles wafer se montent entre brides avec l'axe de charnière horizontal ; respecter la flèche et vérifier que les goujons ne touchent pas le corps.",
-        "commonError": "Monter un double battant avec l'axe vertical : les plaques ne retombent pas librement et claquennent au retour."
-      },
-      "ball": {
-        "whatIs": "Vanne à quart de tour dont la boule percée tourne pour aligner son alésage avec le flux. Manœuvre rapide, fermeture étanche et passage plein sans obstacle.",
-        "types": "Boule flottante ou à trunnion ; passage plein ou réduit ; corps en une, deux ou trois pièces ; siège souple ou métallique ; entrée par le haut.",
-        "whenToUse": "Fermeture étanche et manœuvre rapide sur liquides, gaz et boues (siège métallique) ; lignes à racler (pigging) en passage plein.",
-        "whenNotToUse": "Réglage fin — la boule entrouverte cavite et s'érode — et températures au-delà de la limite du siège souple.",
-        "installation": "Vérifier le sens de flux sur les modèles à trunnion ou à purge, soutenir les corps lourds indépendamment de la tuyauterie et manœuvrer ligne dépressurisée.",
-        "commonError": "Commander un passage réduit alors que le raclage ou les sondes exigent le passage plein."
-      },
-      "butterfly": {
-        "whatIs": "Vanne à quart de tour qui règle ou isole le débit avec un disque circulaire pivotant sur un axe traversant l'écoulement. Compacte, légère et à faible perte de charge.",
-        "types": "Concentrique (siège élastomère, service général), double excentrée (haute performance) et triple excentrée (siège métallique, étanchéité totale). Montage : wafer (entre brides), à oreillons (lug), à brides ou à bouts rainurés.",
-        "whenToUse": "Grandes lignes où une boule ou une vanne de garde serait trop lourde ou trop chère ; régulation ; eau, CVC, air, gaz et chimiques modérés dans la limite du siège.",
-        "whenNotToUse": "Fermeture sous fort différentiel de pression au-delà de la classe du siège, boues abrasives (sauf siège métallique) ou service exigeant le passage plein.",
-        "installation": "Le modèle wafer se place entre brides : vérifier que le disque ne frotte ni le tube ni les goujons, et centrer le siège sur le joint avant le serrage.",
-        "commonError": "Installer un wafer sur un alésage de tube trop grand ou des brides désalignées : le disque se coince."
+    "guide": {
+      "valve": {
+        "gate": {
+          "whatIs": "Vanne à obturateur coulissant qui isole le débit au moyen d'un disque se déplaçant perpendiculairement à l'écoulement. Conçue pour être entièrement ouverte ou fermée, pas pour réguler.",
+          "types": "Clapet plein, flexible ou en deux pièces ; tige montante ou non montante ; vanne à guillotine pour boues ; clapet expansif pour pipelines.",
+          "whenToUse": "Isolement tout-ou-rien sur les lignes de liquide où un passage droit sans turbulence compte : eau, huile, gaz et vapeur dans la limite de classe.",
+          "whenNotToUse": "Service de régulation : un obturateur entrouvert vibre, s'érode et peut se bloquer. Privilégier une vanne à soupape ou un papillon.",
+          "installation": "Installer la tige verticale si possible, respecter le sens de flux s'il est gravé, et fermer complètement avant l'épreuve de pression.",
+          "commonError": "Utiliser la vanne pour régler le débit à la main : les sièges s'érodent et la vanne ne scelle plus."
+        },
+        "globe": {
+          "whatIs": "Vanne linéaire dont l'obturateur ferme sur un siège perpendiculaire au flux. Plus de perte de charge qu'une vanne de garde ou à boisseau, mais excellente pour la régulation.",
+          "types": "Corps droit (Z), en angle et en Y ; chapeau boulonné ou scellé en pression ; obturateur disque, tulipe ou aiguille.",
+          "whenToUse": "Régulation et manœuvres fréquentes : eau de refroidissement, fuel, purges et évents de vapeur, dosage chimique.",
+          "whenNotToUse": "Isolation à faible perte de charge sur grandes lignes : le chemin tortueux gaspille de l'énergie. Une vanne de garde, à boisseau ou papillon coûte moins cher.",
+          "installation": "Respecter la flèche de flux coulée sur le corps — montée à l'envers, elle détruit l'obturateur — et dégager la course de tige et le volant.",
+          "commonError": "Inverser le sens du flux : la vanne ferme encore, mais obturateur et siège s'usent vite et la régulation se perd."
+        },
+        "check": {
+          "whatIs": "Vanne automatique qui n'autorise l'écoulement que dans un sens et se referme seule pour empêcher le retour, protégeant pompes et équipements du coup de bélier.",
+          "types": "À battant (swing), à piston (silencieux), à double battant wafer, à bille, à disque incliné et à tuyère.",
+          "whenToUse": "Refoulement de pompes pour éviter la rotation inverse, sortie de compresseurs, et toute ligne où un retour viderait ou endommagerait le système.",
+          "whenNotToUse": "Écoulement pulsé à faible vitesse (battement et usure) ou lignes exigeant une étanchéité totale au retour : prévoir une vanne d'isolement.",
+          "installation": "Les modèles wafer se montent entre brides avec l'axe de charnière horizontal ; respecter la flèche et vérifier que les goujons ne touchent pas le corps.",
+          "commonError": "Monter un double battant avec l'axe vertical : les plaques ne retombent pas librement et claquennent au retour."
+        },
+        "ball": {
+          "whatIs": "Vanne à quart de tour dont la boule percée tourne pour aligner son alésage avec le flux. Manœuvre rapide, fermeture étanche et passage plein sans obstacle.",
+          "types": "Boule flottante ou à trunnion ; passage plein ou réduit ; corps en une, deux ou trois pièces ; siège souple ou métallique ; entrée par le haut.",
+          "whenToUse": "Fermeture étanche et manœuvre rapide sur liquides, gaz et boues (siège métallique) ; lignes à racler (pigging) en passage plein.",
+          "whenNotToUse": "Réglage fin — la boule entrouverte cavite et s'érode — et températures au-delà de la limite du siège souple.",
+          "installation": "Vérifier le sens de flux sur les modèles à trunnion ou à purge, soutenir les corps lourds indépendamment de la tuyauterie et manœuvrer ligne dépressurisée.",
+          "commonError": "Commander un passage réduit alors que le raclage ou les sondes exigent le passage plein."
+        },
+        "butterfly": {
+          "whatIs": "Vanne à quart de tour qui règle ou isole le débit avec un disque circulaire pivotant sur un axe traversant l'écoulement. Compacte, légère et à faible perte de charge.",
+          "types": "Concentrique (siège élastomère, service général), double excentrée (haute performance) et triple excentrée (siège métallique, étanchéité totale). Montage : wafer (entre brides), à oreillons (lug), à brides ou à bouts rainurés.",
+          "whenToUse": "Grandes lignes où une boule ou une vanne de garde serait trop lourde ou trop chère ; régulation ; eau, CVC, air, gaz et chimiques modérés dans la limite du siège.",
+          "whenNotToUse": "Fermeture sous fort différentiel de pression au-delà de la classe du siège, boues abrasives (sauf siège métallique) ou service exigeant le passage plein.",
+          "installation": "Le modèle wafer se place entre brides : vérifier que le disque ne frotte ni le tube ni les goujons, et centrer le siège sur le joint avant le serrage.",
+          "commonError": "Installer un wafer sur un alésage de tube trop grand ou des brides désalignées : le disque se coince."
+        }
       }
     }
   },

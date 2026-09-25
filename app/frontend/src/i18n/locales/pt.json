@@ -3255,46 +3255,48 @@
       "yStrainerNoStandard": "O filtro em Y não está coberto por uma norma dimensional específica neste catálogo. Os fabricantes fornecem-no habitualmente com extremidades flangeadas segundo ASME B16.5, pelo que a classe é fixada pelo flange do modelo concreto. Aqui não se lista qualquer classe porque não existe uma norma verificável que a defina.",
       "noPressureClass": "As derivações (laterais) não são designadas por classe de pressão. A sua capacidade deriva da espessura de parede (schedule) e do material, e é calculada de acordo com o código de dimensionamento aplicável (p. ex. ASME B31.3). Verifique as dimensões com o fabricante para o schedule aplicável."
     },
-    "valveGuide": {
-      "gate": {
-        "whatIs": "Válvula de movimento linear que isola o fluxo com uma gaveta deslizante transversal à corrente. Projetada para serviço totalmente aberta ou fechada, não para regulagem.",
-        "types": "Cunha maciça, flexível ou bipartida; haste ascendente ou não ascendente; gaveta de faca para lamas; cunha expansível para dutos.",
-        "whenToUse": "Isolamento abre-fecha em linhas de líquido onde importa passagem reta sem turbulência: água, óleo, gás e vapor dentro da classe.",
-        "whenNotToUse": "Serviço de regulagem: uma gaveta parcialmente aberta vibra, sofre erosão e pode travar. Prefira uma globo ou borboleta.",
-        "installation": "Instale com a haste vertical quando possível, respeite o sentido de fluxo apenas se marcado e feche totalmente antes de pressurizar a linha.",
-        "commonError": "Usar a gaveta para regular vazão manualmente: as sedes erodem e a válvula deixa de vedar."
-      },
-      "globe": {
-        "whatIs": "Válvula linear cujo obturador fecha sobre uma sede perpendicular ao fluxo. Mais perda de carga que gaveta ou esfera, porém excelente controle de regulagem.",
-        "types": "Corpos retos (Z), em ângulo e em Y; castelo aparafusado ou selado por pressão; obturadores de disco, plugue ou agulha.",
-        "whenToUse": "Regulagem e operação frequente: água de resfriamento, óleo combustível, respiros e drenos de vapor, dosagem química.",
-        "whenNotToUse": "Isolamento de baixa perda de carga em grandes linhas: o caminho tortuoso desperdiça energia. Gaveta, esfera ou borboleta custa menos.",
-        "installation": "Respeite a seta de fluxo do corpo — invertida, destrói o obturador — e deixe espaço para o curso da haste e o volante.",
-        "commonError": "Inverter o sentido do fluxo: a válvula ainda fecha, mas obturador e sede desgastam rápido e o controle se perde."
-      },
-      "check": {
-        "whatIs": "Válvula automática que permite o fluxo em um único sentido e fecha sozinha para impedir o retorno, protegendo bombas e equipamentos do golpe de aríete.",
-        "types": "Portinhola (swing), pistão (silenciosa), wafer de portinholas duplas, esfera, disco inclinado e bocal.",
-        "whenToUse": "Descarga de bombas para evitar giro reverso, saída de compressores e qualquer linha onde o retorno esvaziaria ou danificaria o sistema.",
-        "whenNotToUse": "Fluxo pulsante em baixa velocidade (tremulação e desgaste) ou linhas que exijam vedação total no retorno: use uma válvula de bloqueio.",
-        "installation": "As wafer montam entre flanges com o pino da dobradiça horizontal; respeite a seta e confira que os parafusos não toquem o corpo.",
-        "commonError": "Montar a dupla portinhola com o pino vertical: as placas não caem livres e batem no retorno."
-      },
-      "ball": {
-        "whatIs": "Válvula de quarto de volta com esfera furada que gira até alinhar a perfuração com o fluxo. Operação rápida, fechamento estanque e passagem plena sem obstruções.",
-        "types": "Esfera flutuante ou com munhão (trunnion); passagem plena ou reduzida; corpo de uma, duas ou três peças; sede macia ou metálica; entrada superior.",
-        "whenToUse": "Fechamento estanque e manobra rápida em líquidos, gases e lamas (sede metálica); linhas que exigem pigging em passagem plena.",
-        "whenNotToUse": "Regulagem fina — a esfera entreaberta cavita e erode — e temperaturas acima do limite da sede macia.",
-        "installation": "Confirme o sentido de fluxo em modelos com munhão ou vent, apoie corpos pesados de forma independente e acione com a linha despressurizada.",
-        "commonError": "Pedir passagem reduzida quando pigging ou sondas exigem passagem plena."
-      },
-      "butterfly": {
-        "whatIs": "Válvula de quarto de volta que regula ou isola o fluxo com um disco circular girando sobre um eixo atravessado na corrente. Compacta, leve e de baixa perda de carga.",
-        "types": "Concêntrica (sede elastomérica, serviço geral), dupla excêntrica (alta performance) e tripla excêntrica (sede metálica, vedação total). Montagem: wafer (entre flanges), lug, flangeada ou com extremidade ranhurada.",
-        "whenToUse": "Grandes linhas onde esfera ou gaveta seria pesada ou cara demais; regulagem; água, HVAC, ar, gases e químicos leves dentro da sede.",
-        "whenNotToUse": "Bloqueio com alto ΔP acima da classe da sede, lamas abrasivas (salvo sede metálica) ou serviço que exija passagem plena.",
-        "installation": "A wafer vai sanduíche entre flanges: verifique que o disco não raspe o tubo nem os chumbadores e centralize a sede na junta antes de apertar.",
-        "commonError": "Instalar uma wafer contra diâmetro interno de tubo excessivo ou flanges desalinhadas: o disco trava."
+    "guide": {
+      "valve": {
+        "gate": {
+          "whatIs": "Válvula de movimento linear que isola o fluxo com uma gaveta deslizante transversal à corrente. Projetada para serviço totalmente aberta ou fechada, não para regulagem.",
+          "types": "Cunha maciça, flexível ou bipartida; haste ascendente ou não ascendente; gaveta de faca para lamas; cunha expansível para dutos.",
+          "whenToUse": "Isolamento abre-fecha em linhas de líquido onde importa passagem reta sem turbulência: água, óleo, gás e vapor dentro da classe.",
+          "whenNotToUse": "Serviço de regulagem: uma gaveta parcialmente aberta vibra, sofre erosão e pode travar. Prefira uma globo ou borboleta.",
+          "installation": "Instale com a haste vertical quando possível, respeite o sentido de fluxo apenas se marcado e feche totalmente antes de pressurizar a linha.",
+          "commonError": "Usar a gaveta para regular vazão manualmente: as sedes erodem e a válvula deixa de vedar."
+        },
+        "globe": {
+          "whatIs": "Válvula linear cujo obturador fecha sobre uma sede perpendicular ao fluxo. Mais perda de carga que gaveta ou esfera, porém excelente controle de regulagem.",
+          "types": "Corpos retos (Z), em ângulo e em Y; castelo aparafusado ou selado por pressão; obturadores de disco, plugue ou agulha.",
+          "whenToUse": "Regulagem e operação frequente: água de resfriamento, óleo combustível, respiros e drenos de vapor, dosagem química.",
+          "whenNotToUse": "Isolamento de baixa perda de carga em grandes linhas: o caminho tortuoso desperdiça energia. Gaveta, esfera ou borboleta custa menos.",
+          "installation": "Respeite a seta de fluxo do corpo — invertida, destrói o obturador — e deixe espaço para o curso da haste e o volante.",
+          "commonError": "Inverter o sentido do fluxo: a válvula ainda fecha, mas obturador e sede desgastam rápido e o controle se perde."
+        },
+        "check": {
+          "whatIs": "Válvula automática que permite o fluxo em um único sentido e fecha sozinha para impedir o retorno, protegendo bombas e equipamentos do golpe de aríete.",
+          "types": "Portinhola (swing), pistão (silenciosa), wafer de portinholas duplas, esfera, disco inclinado e bocal.",
+          "whenToUse": "Descarga de bombas para evitar giro reverso, saída de compressores e qualquer linha onde o retorno esvaziaria ou danificaria o sistema.",
+          "whenNotToUse": "Fluxo pulsante em baixa velocidade (tremulação e desgaste) ou linhas que exijam vedação total no retorno: use uma válvula de bloqueio.",
+          "installation": "As wafer montam entre flanges com o pino da dobradiça horizontal; respeite a seta e confira que os parafusos não toquem o corpo.",
+          "commonError": "Montar a dupla portinhola com o pino vertical: as placas não caem livres e batem no retorno."
+        },
+        "ball": {
+          "whatIs": "Válvula de quarto de volta com esfera furada que gira até alinhar a perfuração com o fluxo. Operação rápida, fechamento estanque e passagem plena sem obstruções.",
+          "types": "Esfera flutuante ou com munhão (trunnion); passagem plena ou reduzida; corpo de uma, duas ou três peças; sede macia ou metálica; entrada superior.",
+          "whenToUse": "Fechamento estanque e manobra rápida em líquidos, gases e lamas (sede metálica); linhas que exigem pigging em passagem plena.",
+          "whenNotToUse": "Regulagem fina — a esfera entreaberta cavita e erode — e temperaturas acima do limite da sede macia.",
+          "installation": "Confirme o sentido de fluxo em modelos com munhão ou vent, apoie corpos pesados de forma independente e acione com a linha despressurizada.",
+          "commonError": "Pedir passagem reduzida quando pigging ou sondas exigem passagem plena."
+        },
+        "butterfly": {
+          "whatIs": "Válvula de quarto de volta que regula ou isola o fluxo com um disco circular girando sobre um eixo atravessado na corrente. Compacta, leve e de baixa perda de carga.",
+          "types": "Concêntrica (sede elastomérica, serviço geral), dupla excêntrica (alta performance) e tripla excêntrica (sede metálica, vedação total). Montagem: wafer (entre flanges), lug, flangeada ou com extremidade ranhurada.",
+          "whenToUse": "Grandes linhas onde esfera ou gaveta seria pesada ou cara demais; regulagem; água, HVAC, ar, gases e químicos leves dentro da sede.",
+          "whenNotToUse": "Bloqueio com alto ΔP acima da classe da sede, lamas abrasivas (salvo sede metálica) ou serviço que exija passagem plena.",
+          "installation": "A wafer vai sanduíche entre flanges: verifique que o disco não raspe o tubo nem os chumbadores e centralize a sede na junta antes de apertar.",
+          "commonError": "Instalar uma wafer contra diâmetro interno de tubo excessivo ou flanges desalinhadas: o disco trava."
+        }
       }
     }
   },
