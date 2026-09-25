@@ -20,7 +20,7 @@
   </defs>
   <rect width="800" height="700" fill="#fafafa"/>
   <text x="40" y="40" class="title">Stud Bolt + 2 Hex Nuts</text>
-  <text x="40" y="60" class="subtitle">For NPS 2-1/2 (DN 65) Flange — Class 150</text>
+  <text x="40" y="60" class="subtitle">For NPS 3-1/2 (DN 90) Flange — Class 150</text>
   <text x="40" y="78" class="std-ref">ASME B16.5 App.2 | ASTM A193 B7 + A194 2H</text>
   <rect x="348" y="291" width="105" height="19" class="profile"/>
   <line x1="351" y1="292" x2="351" y2="308" stroke="#aaa" stroke-width=".4"/>
@@ -60,10 +60,10 @@
   <text x="510.0625" y="295" class="dim-text" text-anchor="start">AF</text>
   <text x="510.0625" y="310" class="dim-sub" text-anchor="start">1.063" | 27.0 mm</text>
   <rect x="530" y="120" width="240" height="169" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
-  <text x="650" y="140" class="tbl-hdr">NPS 2-1/2 — Key Data</text>
+  <text x="650" y="140" class="tbl-hdr">NPS 3-1/2 — Key Data</text>
   <line x1="545" y1="148" x2="755" y2="148" stroke="#eee" stroke-width=".5"/>
   <text x="550" y="165" class="tbl-key">For flange NPS</text>
-  <text x="750" y="165" class="tbl-val">2-1/2 / DN 65</text>
+  <text x="750" y="165" class="tbl-val">3-1/2 / DN 90</text>
   <text x="550" y="182" class="tbl-key">Class</text>
   <text x="750" y="182" class="tbl-val">150</text>
   <text x="550" y="199" class="tbl-key">Bolt dia.</text>
@@ -73,7 +73,7 @@
   <text x="550" y="233" class="tbl-key">Nut AF</text>
   <text x="750" y="233" class="tbl-val">1.063" | 27.0 mm</text>
   <text x="550" y="250" class="tbl-key">Quantity</text>
-  <text x="750" y="250" class="tbl-val">4 per joint</text>
+  <text x="750" y="250" class="tbl-val">8 per joint</text>
   <text x="550" y="267" class="tbl-key">Material</text>
   <text x="750" y="267" class="tbl-val">A193 B7 / A194 2H</text>
   <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>

@@ -3297,6 +3297,34 @@
           "installation": "La wafer se empareda entre bridas: comprueba que el disco no roce con el tubo ni con los espárragos y centra el asiento sobre la junta antes de apretar.",
           "commonError": "Instalar una wafer contra un interior de tubo excesivo o bridas desalineadas: el disco se atasca."
         }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Barra roscada con dos tuercas hexagonales pesadas que aprieta una unión bridada. Se selecciona por la norma de brida, el NPS y la clase; no tiene clase de presión propia.",
+          "types": "Espárragos de rosca continua con dos tuercas (patrón habitual en uniones bridadas ASME B16.5), además de variantes de extremo corto y doble extremo; grados habituales ASTM A193 B7 con tuercas A194 2H, inoxidable y baja temperatura.",
+          "whenToUse": "Montaje de uniones empaquetadas atornilladas: pares de bridas, válvulas bridadas y boquillas de equipo que deban montarse y desmontarse posteriormente.",
+          "whenNotToUse": "No es un elemento de fijación estructural ni es intercambiable con otro grado o longitud; no reutilizar espárragos estirados, corroídos o con la rosca dañada en servicio a presión.",
+          "installation": "Roscas limpias, lubricante según especificación del proyecto, junta centrada, tuercas apretadas a mano y después en patrón de estrella o cruz en varias pasadas para cargar la junta uniformemente. El par de apriete viene del procedimiento de la unión: material, lubricante, junta y brida lo modifican, por lo que no existe un valor universal.",
+          "commonError": "Apretar una tuerca por completo antes que las demás: la brida se ladea, la junta queda aplastada por un lado y la unión fuga."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Carcasa de dos segmentos que abraza los extremos ranurados del tubo con una junta activada por la presión, bloqueando el movimiento angular y axial de la unión.",
+          "types": "Acoplamientos rígidos estándar para servicio general, además de variantes reductoras y de alta presión; el perfil de ranura difiere entre tubo roll-grooved y cut-grooved.",
+          "whenToUse": "Líneas ranuradas que deben comportarse como una unión soldada o bridada: columnas, salas de máquinas y tramos rectos largos donde el movimiento se absorbe en otro punto.",
+          "whenNotToUse": "Cuando la unión deba absorber deflexión, expansión o vibración: usar acoplamientos flexibles. Nunca mezclar extremos roll-grooved y cut-grooved.",
+          "installation": "Extremos de tubo a escuadra y limpios; ranura según la norma o los datos del fabricante; junta lubricada y asentada; chavetas de la carcasa encajadas en ambas ranuras; pernos apretados alternativamente hasta un contacto uniforme de las almohadillas.",
+          "commonError": "Suponer que una unión rígida significa que el sistema no necesita compensación de dilatación: los acoplamientos rígidos restringen el movimiento, por lo que la dilatación térmica debe absorberse en otro lugar."
+        },
+        "flexible": {
+          "whatIs": "Acoplamiento ranurado cuya chaveta de carcasa es deliberadamente más estrecha que el canal de la ranura, permitiendo una deflexión angular controlada y movimiento axial en cada unión.",
+          "types": "Acoplamientos flexibles estándar; la deflexión admisible por unión depende del tamaño y la declara el fabricante.",
+          "whenToUse": "Líneas que deben absorber vibración, asentamiento, movimiento sísmico o dilatación y contracción térmica sin tensionar anclajes y equipos.",
+          "whenNotToUse": "Cuando el tubo debe quedar rígidamente posicionado, como en soportes de válvulas o derivaciones: una unión flexible se moverá. Tampoco sustituye universalmente a una junta de expansión sin calcular el movimiento total.",
+          "installation": "Mismos requisitos de calidad de ranura que el acoplamiento rígido; verificar la separación entre extremos de tubo especificada por el fabricante, mantener el acoplamiento centrado sobre la unión y apretar los pernos alternativamente.",
+          "commonError": "Esperar que un solo acoplamiento flexible absorba un movimiento grande: la capacidad por unión es pequeña y se suma a lo largo de varias uniones, así que nunca asumir el valor — tomarlo del fabricante."
+        }
       }
     }
   },

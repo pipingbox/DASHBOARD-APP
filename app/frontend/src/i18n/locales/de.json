@@ -3291,6 +3291,34 @@
           "installation": "Wafer-Ausführungen zwischen Flansche einsetzen: Scheibe darf Rohr und Schrauben nicht berühren; Dichtung vor dem Anziehen zentrieren.",
           "commonError": "Wafer-Klappe bei zu großem Rohrinnendurchmesser oder nicht fluchtenden Flanschen eingebaut: die Scheibe klemmt."
         }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Gewindestange mit zwei schweren Sechskantmuttern, die eine Flanschverbindung verspannt. Die Auswahl erfolgt über Flanschnorm, NPS und Klasse; der Bolzen selbst trägt keine Druckklasse.",
+          "types": "Durchgehend gewindete Stehbolzen mit zwei Muttern (übliches Muster bei ASME-B16.5-Flanschverbindungen) sowie Einsteck- und Doppelendbolzen; übliche Güten ASTM A193 B7 mit A194-2H-Muttern, Edelstahl und Tieftemperaturgüten.",
+          "whenToUse": "Montage abgedichteter Schraubverbindungen: Flanschpaare, Flanscharmaturen und Gerätestutzen, die montiert und später wieder demontiert werden müssen.",
+          "whenNotToUse": "Kein Konstruktionsbefestiger und nicht gegen andere Güten oder Längen austauschbar; gedehnte, korrodierte oder gewindebeschädigte Bolzen im Druckdienst nicht wiederverwenden.",
+          "installation": "Saubere Gewinde, Gleitmittel nach Projektspezifikation, Dichtung zentriert, Muttern von Hand aufsetzen, dann im Stern- oder Kreuzmuster in mehreren Durchgängen anziehen, damit die Dichtung gleichmäßig belastet wird. Das Drehmoment kommt aus der Verbindungsvorschrift: Werkstoff, Gleitmittel, Dichtung und Flansch verändern es — ein Universalwert existiert nicht.",
+          "commonError": "Eine Mutter vollständig vor den anderen anziehen: der Flansch verkantet, die Dichtung wird einseitig gequetscht und die Verbindung leckt."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Zweiteiliges Gehäuse, das sich mit einer druckaktivierten Dichtung über gerillte Rohrenden spannt und die Verbindung gegen Winkel- und Axialbewegung sperrt.",
+          "types": "Standard-Starrkupplungen für den allgemeinen Dienst sowie Reduzier- und Hochdruckvarianten; das Rillenprofil unterscheidet sich bei roll- und geschnitten gerillten Rohren.",
+          "whenToUse": "Gerillte Leitungen, die sich wie eine Schweiß- oder Flanschverbindung verhalten sollen: Steigleitungen, Technikräume und lange gerade Strecken, bei denen Bewegung anderweitig aufgenommen wird.",
+          "whenNotToUse": "Wenn die Verbindung Durchbiegung, Dehnung oder Vibration aufnehmen muss: flexible Kupplungen verwenden. Roll- und geschnitten gerillte Enden niemals mischen.",
+          "installation": "Rechtwinklige, saubere Rohrenden; Rille nach Norm oder Herstellerangaben; Dichtung geschmiert und sitzend; Gehäusenasen in beiden Rillen eingerastet; Schrauben abwechselnd bis zum gleichmäßigen Kontakt der Laschen anziehen.",
+          "commonError": "Anzunehmen, eine starre Verbindung mache eine Dehnungskompensation überflüssig: Starrkupplungen sperren Bewegung, thermische Ausdehnung muss also anderweitig aufgenommen werden."
+        },
+        "flexible": {
+          "whatIs": "Rillenkupplung, deren Gehäusenase bewusst schmaler als der Rillenkanal ist und so kontrollierte Winkelauslenkung und Axialbewegung an jeder Verbindung zulässt.",
+          "types": "Standard-Flexkupplungen; die zulässige Auslenkung pro Verbindung ist größenabhängig und vom Hersteller deklariert.",
+          "whenToUse": "Leitungen, die Vibration, Setzung, seismische Bewegung oder thermische Ausdehnung und Kontraktion ohne Belastung von Verankerungen und Geräten aufnehmen müssen.",
+          "whenNotToUse": "Wo das Rohr starr positioniert bleiben muss, etwa an Armaturen- oder Abzweigabstützungen: eine flexible Verbindung bewegt sich. Auch kein universeller Ersatz für einen Kompensator ohne Berechnung der Gesamtbewegung.",
+          "installation": "Gleiche Rillenqualität wie bei der Starrkupplung; den vom Hersteller angegebenen Rohrendabstand prüfen, die Kupplung über der Verbindung zentrieren und die Schrauben abwechselnd anziehen.",
+          "commonError": "Zu erwarten, dass eine einzige Flexkupplung eine große Bewegung aufnimmt: der Wert pro Verbindung ist klein und summiert sich über mehrere Verbindungen — nie annehmen, sondern vom Hersteller nehmen."
+        }
       }
     }
   },

@@ -3291,6 +3291,34 @@
           "installation": "Wafer-uitvoeringen zitten tussen flenzen: controleer dat de schijf de buis of doorloopbouten niet raakt en centreer de zitting op de pakking vóór het aandraaien.",
           "commonError": "Een waferklep monteren tegen een te grote binnendiameter of scheefstaande flenzen: de schijf klemt."
         }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Draadstang met twee zware zeskantmoeren die een flensverbinding aanklemt. De keuze volgt uit de flensnorm, NPS en klasse; de bout heeft zelf geen drukklasse.",
+          "types": "Doorlopend draadeinden met twee moeren (het gebruikelijke patroon bij ASME B16.5-flensverbindingen), plus varianten met kort uiteinde en dubbel uiteinde; gangbare kwaliteiten ASTM A193 B7 met A194 2H-moeren, RVS en lage-temperatuurkwaliteiten.",
+          "whenToUse": "Montage van afgedichte boutverbindingen: flensparen, geflensde afsluiters en apparatuuraansluitingen die gemonteerd en later weer gedemonteerd moeten worden.",
+          "whenNotToUse": "Het is geen constructieve bevestiging en niet verwisselbaar met een andere kwaliteit of lengte; gebruik uitgerekte, gecorrodeerde of aan de draad beschadigde bouten niet opnieuw in drukdienst.",
+          "installation": "Schone draad, smeermiddel volgens projectspecificatie, pakking gecentreerd, moeren met de hand aandraaien en daarna in ster- of kruispatroon in meerdere gangen vastzetten zodat de pakking gelijkmatig belast wordt. Het aanhaalmoment komt uit de verbindingsprocedure: materiaal, smeermiddel, pakking en flens veranderen het — een universele waarde bestaat niet.",
+          "commonError": "Eén moer volledig vóór de andere aandraaien: de flens kantelt, de pakking wordt aan één kant platgedrukt en de verbinding lekt."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Tweedelige behuizing die zich met een drukgeactiveerde pakking over groefvormige buisuiteinden klemt en de verbinding tegen hoek- en axiale beweging vergrendelt.",
+          "types": "Standaard starre koppelingen voor algemeen gebruik, plus verloop- en hogedrukvarianten; het groefprofiel verschilt tussen roll-grooved en cut-grooved buis.",
+          "whenToUse": "Gegroefde leidingen die zich als een las- of flensverbinding moeten gedragen: standleidingen, technische ruimtes en lange rechte trajecten waar beweging elders wordt opgevangen.",
+          "whenNotToUse": "Wanneer de verbinding doorbuiging, expansie of trilling moet opnemen: gebruik flexibele koppelingen. Meng roll-grooved en cut-grooved uiteinden nooit.",
+          "installation": "Haakse, schone buisuiteinden; groef volgens de norm of fabrieksgegevens; pakking gesmeerd en op zijn plaats; behuizingsnokken in beide groeven; bouten afwisselend aandraaien tot gelijkmatig contact van de lippen.",
+          "commonError": "Aannemen dat een starre verbinding expansievoorzieningen overbodig maakt: starre koppelingen beperken beweging, dus thermische uitzetting moet elders worden opgevangen."
+        },
+        "flexible": {
+          "whatIs": "Groefkoppeling waarvan de behuizingsnok bewust smaller is dan het groefkanaal, waardoor gecontroleerde hoekdoorbuiging en axiale beweging per verbinding mogelijk is.",
+          "types": "Standaard flexibele koppelingen; de toegestane doorbuiging per verbinding is maatafhankelijk en wordt door de fabrikant opgegeven.",
+          "whenToUse": "Leidingen die trilling, zetting, seismische beweging of thermische uitzetting en krimp moeten opvangen zonder ankers en apparatuur te belasten.",
+          "whenNotToUse": "Waar de buis star gepositioneerd moet blijven, zoals bij afsluiter- of aftaksteunen: een flexibele verbinding zal bewegen. Ook geen universele vervanging van een expansievoorziening zonder berekening van de totale beweging.",
+          "installation": "Dezelfde groefkwaliteitseisen als bij de starre koppeling; controleer de door de fabrikant opgegeven afstand tussen de buisuiteinden, houd de koppeling gecentreerd over de verbinding en draai de bouten afwisselend aan.",
+          "commonError": "Verwachten dat één flexibele koppeling een grote beweging opneemt: de capaciteit per verbinding is klein en telt op over meerdere verbindingen — neem de waarde nooit aan, haal hem bij de fabrikant."
+        }
       }
     }
   },

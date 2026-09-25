@@ -3291,6 +3291,34 @@
           "installation": "Wafer valves are sandwiched between flanges: verify the disc does not foul the pipe bore or the flange studs, and center the seat on the gasket face before torquing.",
           "commonError": "Installing a wafer valve against an oversized pipe bore or misaligned flanges: the disc binds."
         }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "A threaded rod with two heavy hex nuts that clamps a flanged joint together. It is selected by the flange standard, NPS and class, and carries no pressure class of its own.",
+          "types": "Continuous-thread stud bolts with two nuts (the usual ASME B16.5 flanged-joint pattern), plus tap-end and double-end studs; common grades are ASTM A193 B7 with A194 2H nuts, stainless and low-temperature grades.",
+          "whenToUse": "Assembly of gasketed bolted joints: flange pairs, flanged valves and equipment nozzles that must be made up and later disassembled.",
+          "whenNotToUse": "It is not a structural fastener and not interchangeable with a different grade or length; do not reuse stretched, corroded or thread-damaged studs in pressure service.",
+          "installation": "Clean threads, lubricant per project specification, gasket centered, nuts run up by hand, then tightened in a star or cross pattern in several passes so the gasket loads evenly. Torque comes from the joint procedure: material, lubricant, gasket and flange all change it, so no universal value exists.",
+          "commonError": "Tightening one nut fully before the others: the flange cocks, the gasket is crushed on one side and the joint leaks."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "A two-segment housing that clamps over grooved pipe ends with a pressure-responsive gasket, locking the joint against angular and axial movement.",
+          "types": "Standard rigid couplings for general service, plus reducing and high-pressure variants; the groove profile differs between roll-grooved and cut-grooved pipe.",
+          "whenToUse": "Grooved lines that should behave like a welded or flanged joint: risers, mechanical rooms and long straight runs where movement is accommodated elsewhere.",
+          "whenNotToUse": "Where the joint must absorb deflection, expansion or vibration: use flexible couplings instead. Never mix roll-grooved and cut-grooved ends.",
+          "installation": "Square, clean pipe ends; groove per the standard or manufacturer data; gasket lubricated and seated; housing keys engaged in both grooves; bolts tightened alternately to even pad contact.",
+          "commonError": "Assuming a rigid joint means the system needs no expansion provision: rigid couplings restrain movement, so thermal growth must be absorbed elsewhere."
+        },
+        "flexible": {
+          "whatIs": "A grooved coupling whose housing key is deliberately narrower than the groove channel, allowing controlled angular deflection and axial movement at each joint.",
+          "types": "Standard flexible couplings; the allowable deflection per joint is size-dependent and is declared by the manufacturer.",
+          "whenToUse": "Lines that must absorb vibration, settlement, seismic movement or thermal expansion and contraction without stressing anchors and equipment.",
+          "whenNotToUse": "Where the pipe must stay rigidly positioned, such as at valve or branch supports: a flexible joint will move. It is also not a universal expansion-joint replacement without calculating the total movement.",
+          "installation": "Same groove quality requirements as the rigid coupling; verify the pipe-end gap specified by the manufacturer, keep the coupling centered over the joint and tighten the bolts alternately.",
+          "commonError": "Expecting one flexible coupling to absorb a large movement: the per-joint allowance is small and adds up along several joints, so never assume the value — take it from the manufacturer."
+        }
       }
     }
   },

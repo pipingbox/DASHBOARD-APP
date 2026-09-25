@@ -3297,6 +3297,34 @@
           "installation": "Le modèle wafer se place entre brides : vérifier que le disque ne frotte ni le tube ni les goujons, et centrer le siège sur le joint avant le serrage.",
           "commonError": "Installer un wafer sur un alésage de tube trop grand ou des brides désalignées : le disque se coince."
         }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Tige filetée avec deux écrous hexagonaux lourds qui serre un assemblage à brides. Elle se choisit par la norme de bride, le NPS et la classe ; elle ne possède pas de classe de pression propre.",
+          "types": "Goujons à filetage continu avec deux écrous (schéma habituel des assemblages ASME B16.5), ainsi que des variantes à bout court et double extrémité ; nuances courantes ASTM A193 B7 avec écrous A194 2H, inox et basses températures.",
+          "whenToUse": "Montage d’assemblages boulonnés à joint : paires de brides, vannes à brides et piquages d’équipement devant être montés puis démontés.",
+          "whenNotToUse": "Ce n’est ni une fixation structurelle ni une pièce interchangeable avec un autre grade ou une autre longueur ; ne pas réutiliser des goujons étirés, corrodés ou au filetage endommagé en service sous pression.",
+          "installation": "Filetages propres, lubrifiant selon la spécification du projet, joint centré, écrous vissés à la main puis serrés en étoile ou en croix en plusieurs passes pour charger le joint uniformément. Le couple vient de la procédure de l’assemblage : matériau, lubrifiant, joint et bride le modifient — il n’existe pas de valeur universelle.",
+          "commonError": "Serrer un écrou complètement avant les autres : la bride se met de travers, le joint est écrasé d’un côté et l’assemblage fuit."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Corps en deux segments qui se bride sur des extrémités de tube rainurées avec un joint activé par la pression, bloquant tout mouvement angulaire et axial de l’assemblage.",
+          "types": "Accouplements rigides standard pour service général, plus variantes réduites et haute pression ; le profil de rainure diffère entre tube roll-grooved et cut-grooved.",
+          "whenToUse": "Lignes rainurées devant se comporter comme un assemblage soudé ou bridé : colonnes montantes, locaux techniques et longues portions droites où le mouvement est repris ailleurs.",
+          "whenNotToUse": "Lorsque l’assemblage doit absorber une déflexion, une dilatation ou des vibrations : utiliser des accouplements flexibles. Ne jamais mélanger des extrémités roll-grooved et cut-grooved.",
+          "installation": "Extrémités d’équerre et propres ; rainure conforme à la norme ou aux données du fabricant ; joint lubrifié et en place ; clavettes du corps engagées dans les deux rainures ; boulons serrés en alternance jusqu’au contact uniforme des patins.",
+          "commonError": "Croire qu’un assemblage rigide dispense de toute reprise de dilatation : les accouplements rigides bloquent le mouvement, la dilatation thermique doit donc être absorbée ailleurs."
+        },
+        "flexible": {
+          "whatIs": "Accouplement rainuré dont la clavette du corps est volontairement plus étroite que le canal de rainure, autorisant une déflexion angulaire contrôlée et un mouvement axial à chaque assemblage.",
+          "types": "Accouplements flexibles standard ; la déflexion admissible par assemblage dépend du diamètre et est déclarée par le fabricant.",
+          "whenToUse": "Lignes devant absorber vibrations, tassement, mouvement sismique ou dilatation et contraction thermiques sans contraindre ancrages et équipements.",
+          "whenNotToUse": "Lorsque le tube doit rester rigidement positionné, par exemple aux supports de vannes ou de dérivations : un assemblage flexible bougera. Ce n’est pas non plus un remplaçant universel d’un compensateur sans calcul du mouvement total.",
+          "installation": "Mêmes exigences de qualité de rainure que l’accouplement rigide ; vérifier l’écart entre extrémités de tube spécifié par le fabricant, centrer l’accouplement sur l’assemblage et serrer les boulons en alternance.",
+          "commonError": "Attendre d’un seul accouplement flexible qu’il absorbe un grand mouvement : la capacité par assemblage est faible et s’additionne sur plusieurs assemblages — ne jamais supposer la valeur, la prendre auprès du fabricant."
+        }
       }
     }
   },

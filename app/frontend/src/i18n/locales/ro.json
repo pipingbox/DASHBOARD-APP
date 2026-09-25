@@ -3328,6 +3328,34 @@
           "installation": "Versiunea wafer se strânge între flanșe: verificați că discul nu freacă tubul sau șuruburile și centrați sedeul pe garnitură înainte de strângere.",
           "commonError": "Montarea wafer pe un interior de tub prea mare sau flanșe dezaliniate: discul se blochează."
         }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Tijă filetată cu două piulițe hexagonale grele care strânge un îmbinare cu flanșe. Se alege după standardul flanșei, NPS și clasă; nu are o clasă de presiune proprie.",
+          "types": "Prezoane cu filet continuu cu două piulițe (schema obișnuită a îmbinărilor ASME B16.5), plus variante cu capăt scurt și dublu capăt; grade uzuale ASTM A193 B7 cu piulițe A194 2H, inox și pentru temperaturi joase.",
+          "whenToUse": "Montarea îmbinărilor cu șuruburi și garnitură: perechi de flanșe, robineți cu flanșe și racorduri de echipament care trebuie montate și ulterior demontate.",
+          "whenNotToUse": "Nu este un element de fixare structural și nu este interschimbabil cu alt grad sau altă lungime; nu reutilizați prezoane alungite, corodate sau cu filet deteriorat în serviciu sub presiune.",
+          "installation": "Filete curate, lubrifiant conform specificației de proiect, garnitură centrată, piulițe înșurubate manual și apoi strânse în stea sau cruce în mai multe treceri pentru încărcarea uniformă a garniturii. Cuplul provine din procedura îmbinării: materialul, lubrifiantul, garnitura și flanșa îl modifică — nu există o valoare universală.",
+          "commonError": "Strângerea completă a unei piulițe înaintea celorlalte: flanșa se înclină, garnitura este strivită pe o parte și îmbinarea prezintă scurgeri."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Carcasă din două segmente care se fixează peste capetele canelate ale țevii cu o garnitură activată de presiune, blocând mișcarea unghiulară și axială a îmbinării.",
+          "types": "Cuplaje rigide standard pentru serviciu general, plus variante reductorii și de înaltă presiune; profilul canelurii diferă între țeava roll-grooved și cut-grooved.",
+          "whenToUse": "Linii canelate care trebuie să se comporte ca o îmbinare sudată sau cu flanșe: coloane, săli de mașini și tronsoane lungi drepte unde mișcarea este preluată în altă parte.",
+          "whenNotToUse": "Când îmbinarea trebuie să absoarbă deflexiune, dilatare sau vibrații: folosiți cuplaje flexibile. Nu amestecați niciodată capete roll-grooved și cut-grooved.",
+          "installation": "Capete de țeavă drepte și curate; canelură conform standardului sau datelor producătorului; garnitură lubrifiată și așezată; penele carcasei angrenate în ambele caneluri; șuruburile strânse alternativ până la contactul uniform al plăcuțelor.",
+          "commonError": "Presupunerea că o îmbinare rigidă elimină nevoia de compensare a dilatării: cuplajele rigide blochează mișcarea, deci dilatarea termică trebuie absorbită în altă parte."
+        },
+        "flexible": {
+          "whatIs": "Cuplaj canelat a cărui pană de carcasă este intenționat mai îngustă decât canalul canelurii, permițând deflexiune unghiulară controlată și mișcare axială la fiecare îmbinare.",
+          "types": "Cuplaje flexibile standard; deflexiunea admisibilă pe îmbinare depinde de dimensiune și este declarată de producător.",
+          "whenToUse": "Linii care trebuie să absoarbă vibrații, tasări, mișcări seismice sau dilatare și contracție termică fără a solicita ancorajele și echipamentele.",
+          "whenNotToUse": "Unde țeava trebuie să rămână rigid poziționată, cum ar fi la suporturile de robineți sau ramificații: o îmbinare flexibilă se va mișca. De asemenea, nu înlocuiește universal un compensator fără calculul mișcării totale.",
+          "installation": "Aceleași cerințe de calitate a canelurii ca la cuplajul rigid; verificați distanța dintre capetele țevii specificată de producător, mențineți cuplajul centrat pe îmbinare și strângeți șuruburile alternativ.",
+          "commonError": "Așteptarea ca un singur cuplaj flexibil să absoarbă o mișcare mare: capacitatea pe îmbinare este mică și se adună de-a lungul mai multor îmbinări — nu presupuneți niciodată valoarea, luați-o de la producător."
+        }
       }
     }
   },

@@ -3297,6 +3297,34 @@
           "installation": "La wafer si incassa tra flange: verificare che il disco non tocchi tubo né tiranti e centrare la sede sulla guarnizione prima del serraggio.",
           "commonError": "Installare una wafer contro un interno tubo eccessivo o flange disassate: il disco si blocca."
         }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Barra filettata con due dadi esagonali pesanti che serra un giunto flangiato. Si sceglie in base alla norma della flangia, al NPS e alla classe; non ha una classe di pressione propria.",
+          "types": "Viti prigioniere a filetto continuo con due dadi (schema abituale dei giunti ASME B16.5), oltre a varianti a estremità corta e doppia; gradi comuni ASTM A193 B7 con dadi A194 2H, inox e basse temperature.",
+          "whenToUse": "Montaggio di giunti bullonati con guarnizione: coppie di flange, valvole flangiate e bocchelli di apparecchiature da montare e smontare successivamente.",
+          "whenNotToUse": "Non è un fissaggio strutturale né è intercambiabile con altro grado o lunghezza; non riutilizzare tiranti allungati, corrosi o con filetto danneggiato in servizio a pressione.",
+          "installation": "Filetti puliti, lubrificante secondo specifica di progetto, guarnizione centrata, dadi avvitati a mano e poi serrati a stella o a croce in più passate per caricare uniformemente la guarnizione. La coppia viene dalla procedura del giunto: materiale, lubrificante, guarnizione e flangia la modificano — non esiste un valore universale.",
+          "commonError": "Serrare un dado completamente prima degli altri: la flangia si inclina, la guarnizione viene schiacciata da un lato e il giunto perde."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Corpo in due segmenti che si serra sulle estremità scanalate del tubo con guarnizione attivata dalla pressione, bloccando il movimento angolare e assiale del giunto.",
+          "types": "Giunti rigidi standard per servizio generale, oltre a varianti ridotte e alta pressione; il profilo della scanalatura differisce tra tubo roll-grooved e cut-grooved.",
+          "whenToUse": "Linee scanalate che devono comportarsi come un giunto saldato o flangiato: colonne montanti, locali tecnici e lunghi tratti rettilinei dove il movimento è assorbito altrove.",
+          "whenNotToUse": "Quando il giunto deve assorbire deflessione, dilatazione o vibrazioni: usare giunti flessibili. Non mescolare mai estremità roll-grooved e cut-grooved.",
+          "installation": "Estremità del tubo squadrate e pulite; scanalatura secondo la norma o i dati del costruttore; guarnizione lubrificata e in sede; chiavette del corpo impegnate in entrambe le scanalature; bulloni serrati alternativamente fino al contatto uniforme delle piastre.",
+          "commonError": "Supporre che un giunto rigido dispensi dalla compensazione della dilatazione: i giunti rigidi bloccano il movimento, quindi la dilatazione termica deve essere assorbita altrove."
+        },
+        "flexible": {
+          "whatIs": "Giunto scanalato la cui chiavetta del corpo è volutamente più stretta del canale della scanalatura, consentendo deflessione angolare controllata e movimento assiale a ogni giunto.",
+          "types": "Giunti flessibili standard; la deflessione ammissibile per giunto dipende dal diametro ed è dichiarata dal costruttore.",
+          "whenToUse": "Linee che devono assorbire vibrazioni, cedimenti, movimento sismico o dilatazione e contrazione termica senza sollecitare ancoraggi e apparecchiature.",
+          "whenNotToUse": "Dove il tubo deve restare rigidamente posizionato, ad esempio ai supporti di valvole o derivazioni: un giunto flessibile si muoverà. Non sostituisce universalmente un compensatore senza calcolare il movimento totale.",
+          "installation": "Stessi requisiti di qualità della scanalatura del giunto rigido; verificare la distanza tra le estremità del tubo specificata dal costruttore, tenere il giunto centrato sulla connessione e serrare i bulloni alternativamente.",
+          "commonError": "Aspettarsi che un solo giunto flessibile assorba un grande movimento: la capacità per giunto è piccola e si somma lungo più giunti — non assumere mai il valore, prenderlo dal costruttore."
+        }
       }
     }
   },

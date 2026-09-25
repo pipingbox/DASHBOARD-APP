@@ -3334,6 +3334,34 @@
           "installation": "Wersja wafer wpina się między kołnierze: sprawdź, czy tarcza nie ociera o rurę ani o śruby, i wycentruj gniazdo na uszczelce przed dokręceniem.",
           "commonError": "Montaż wafer przy zbyt dużym wewnętrznym świetle rury lub niezcentrowanych kołnierzach: tarcza się zakleszcza."
         }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Pręt gwintowany z dwiema ciężkimi nakrętkami sześciokątnymi, zaciskający złącze kołnierzowe. Dobiera się go według normy kołnierza, NPS i klasy; sam nie posiada klasy ciśnieniowej.",
+          "types": "Szpilki z gwintem ciągłym z dwiema nakrętkami (typowy schemat złączy ASME B16.5), a także warianty z krótkim końcem i dwustronne; typowe gatunki ASTM A193 B7 z nakrętkami A194 2H, stal nierdzewna i gatunki niskotemperaturowe.",
+          "whenToUse": "Montaż uszczelnionych złączy śrubowych: par kołnierzy, zaworów kołnierzowych i króćców aparatury, które trzeba zmontować, a później zdemontować.",
+          "whenNotToUse": "To nie jest łącznik konstrukcyjny ani element zamienny z innym gatunkiem lub długością; nie używać ponownie szpilek wydłużonych, skorodowanych lub z uszkodzonym gwintem w służbie ciśnieniowej.",
+          "installation": "Czyste gwinty, smar według specyfikacji projektu, wyśrodkowana uszczelka, nakrętki dokręcone ręcznie, a następnie w gwiazdę lub na krzyż w kilku przejściach, aby uszczelka obciążyła się równomiernie. Moment pochodzi z procedury złącza: materiał, smar, uszczelka i kołnierz go zmieniają — nie istnieje wartość uniwersalna.",
+          "commonError": "Dokręcenie jednej nakrętki do końca przed innymi: kołnierz się przekrzywia, uszczelka jest zgnieciona z jednej strony i złącze przecieka."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Dwusegmentowa obudowa zaciskająca się na rowkowanych końcach rur z uszczelką aktywowaną ciśnieniem, blokująca ruch kątowy i osiowy złącza.",
+          "types": "Standardowe sprzęgła sztywne do zastosowań ogólnych oraz warianty redukcyjne i wysokociśnieniowe; profil rowka różni się między rurą roll-grooved a cut-grooved.",
+          "whenToUse": "Linie rowkowane, które mają zachowywać się jak złącze spawane lub kołnierzowe: piony, pomieszczenia techniczne i długie proste odcinki, gdzie ruch jest przejmowany gdzie indziej.",
+          "whenNotToUse": "Gdy złącze ma pochłaniać ugięcie, rozszerzalność lub drgania: zastosować sprzęgła elastyczne. Nigdy nie mieszać końców roll-grooved i cut-grooved.",
+          "installation": "Proste, czyste końce rur; rowek według normy lub danych producenta; uszczelka nasmarowana i osadzona; wpusty obudowy w obu rowkach; śruby dokręcane naprzemiennie do równomiernego styku łap.",
+          "commonError": "Zakładanie, że sztywne złącze zwalnia z kompensacji rozszerzalności: sprzęgła sztywne blokują ruch, więc rozszerzalność cieplną trzeba przejąć gdzie indziej."
+        },
+        "flexible": {
+          "whatIs": "Sprzęgło rowkowane, którego wpust obudowy jest celowo węższy niż kanał rowka, umożliwiając kontrolowane ugięcie kątowe i ruch osiowy na każdym złączu.",
+          "types": "Standardowe sprzęgła elastyczne; dopuszczalne ugięcie na złącze zależy od średnicy i jest deklarowane przez producenta.",
+          "whenToUse": "Linie, które muszą pochłaniać drgania, osiadanie, ruchy sejsmiczne lub rozszerzalność i kurczenie cieplne bez obciążania zakotwień i aparatury.",
+          "whenNotToUse": "Tam, gdzie rura ma pozostać sztywnie ustawiona, np. przy podporach zaworów lub odgałęzień: złącze elastyczne się przemieści. Nie zastępuje też uniwersalnie kompensatora bez obliczenia całkowitego ruchu.",
+          "installation": "Te same wymagania jakości rowka co przy sprzęgle sztywnym; sprawdzić określoną przez producenta szczelinę między końcami rur, utrzymać sprzęgło wyśrodkowane na złączu i dokręcać śruby naprzemiennie.",
+          "commonError": "Oczekiwanie, że jedno sprzęgło elastyczne pochłonie duży ruch: zdolność na złącze jest mała i sumuje się wzdłuż kilku złączy — nigdy nie zakładać wartości, lecz pobrać ją od producenta."
+        }
       }
     }
   },

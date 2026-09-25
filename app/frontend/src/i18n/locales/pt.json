@@ -3297,6 +3297,34 @@
           "installation": "A wafer vai sanduíche entre flanges: verifique que o disco não raspe o tubo nem os chumbadores e centralize a sede na junta antes de apertar.",
           "commonError": "Instalar uma wafer contra diâmetro interno de tubo excessivo ou flanges desalinhadas: o disco trava."
         }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Haste roscada com duas porcas sextavadas pesadas que aperta uma junta flangeada. É selecionada pela norma da flange, pelo NPS e pela classe; não possui classe de pressão própria.",
+          "types": "Prisioneiros de rosca contínua com duas porcas (padrão habitual das juntas ASME B16.5), além de variantes de extremidade curta e dupla; graus comuns ASTM A193 B7 com porcas A194 2H, inox e baixa temperatura.",
+          "whenToUse": "Montagem de juntas aparafusadas com gaxeta: pares de flanges, válvulas flangeadas e bocais de equipamento que devam ser montados e posteriormente desmontados.",
+          "whenNotToUse": "Não é um fixador estrutural nem é intercambiável com outro grau ou comprimento; não reutilizar prisioneiros alongados, corroídos ou com a rosca danificada em serviço sob pressão.",
+          "installation": "Roscas limpas, lubrificante conforme especificação do projeto, junta centrada, porcas apertadas à mão e depois em padrão de estrela ou cruz em várias passagens para carregar a junta uniformemente. O torque vem do procedimento da junta: material, lubrificante, gaxeta e flange o alteram — não existe um valor universal.",
+          "commonError": "Apertar uma porca completamente antes das outras: a flange empena, a gaxeta fica esmagada de um lado e a junta vaza."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Carcaça de dois segmentos que se fixa sobre extremidades ranhuradas do tubo com uma gaxeta ativada pela pressão, bloqueando o movimento angular e axial da junta.",
+          "types": "Acoplamentos rígidos padrão para serviço geral, além de variantes redutoras e de alta pressão; o perfil da ranhura difere entre tubo roll-grooved e cut-grooved.",
+          "whenToUse": "Linhas ranhuradas que devem comportar-se como uma junta soldada ou flangeada: colunas, casas de máquinas e longos trechos retos onde o movimento é absorvido noutro ponto.",
+          "whenNotToUse": "Quando a junta deve absorver deflexão, expansão ou vibração: usar acoplamentos flexíveis. Nunca misturar extremidades roll-grooved e cut-grooved.",
+          "installation": "Extremidades do tubo esquadrejadas e limpas; ranhura conforme a norma ou os dados do fabricante; gaxeta lubrificada e assentada; chavetas da carcaça encaixadas em ambas as ranhuras; parafusos apertados alternadamente até ao contacto uniforme das sapatas.",
+          "commonError": "Supor que uma junta rígida dispensa compensação de dilatação: os acoplamentos rígidos restringem o movimento, pelo que a dilatação térmica deve ser absorvida noutro local."
+        },
+        "flexible": {
+          "whatIs": "Acoplamento ranhurado cuja chaveta da carcaça é deliberadamente mais estreita que o canal da ranhura, permitindo deflexão angular controlada e movimento axial em cada junta.",
+          "types": "Acoplamentos flexíveis padrão; a deflexão admissível por junta depende do diâmetro e é declarada pelo fabricante.",
+          "whenToUse": "Linhas que devem absorver vibração, assentamento, movimento sísmico ou dilatação e contração térmicas sem esforçar ancoragens e equipamentos.",
+          "whenNotToUse": "Onde o tubo deve permanecer rigidamente posicionado, como em apoios de válvulas ou derivações: uma junta flexível irá mover-se. Também não substitui universalmente uma junta de expansão sem cálculo do movimento total.",
+          "installation": "Os mesmos requisitos de qualidade da ranhura do acoplamento rígido; verificar a folga entre extremidades do tubo especificada pelo fabricante, manter o acoplamento centrado sobre a junta e apertar os parafusos alternadamente.",
+          "commonError": "Esperar que um único acoplamento flexível absorva um grande movimento: a capacidade por junta é pequena e acumula-se ao longo de várias juntas — nunca assumir o valor, obtê-lo do fabricante."
+        }
       }
     }
   },

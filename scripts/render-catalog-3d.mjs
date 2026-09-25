@@ -2144,7 +2144,9 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     stlPath.includes('spade_') ||
     stlPath.includes('spacer_') ||
     stlPath.includes('gasket_sw') ||
-    stlPath.includes('gasket_rj')
+    stlPath.includes('gasket_rj') ||
+    stlPath.includes('stud_bolt') ||
+    stlPath.includes('coupling_grooved')
   ) {
     pose = {
       rows: [
@@ -2237,6 +2239,18 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     // Gaskets: axisimetricas en Z. Vista tres cuartos frontal-superior (como
     // bridas): lee los anillos concentricos del CGI o la seccion del RTJ.
     catalogViewDir = normalize([0.55, -0.60, 0.50]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('stud_bolt')) {
+    // Stud bolt: eje del esparrago a Z con tuerca abajo y arriba. Vista tres
+    // cuartos frontal: se lee la rosca a lo largo de todo el cuerpo y las dos
+    // tuercas heavy-hex, que es el rasgo semantico (stud + 2 nuts).
+    catalogViewDir = normalize([0.62, -0.55, 0.42]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('coupling_grooved')) {
+    // Grooved couplings (rigid + flex): eje de tuberia a Z, bolt pads a +-X.
+    // Vista tres cuartos baja, casi de frente a los pads: se leen las dos
+    // semicarcasas, los bolt pads con sus tuercas (angulados en el rigid,
+    // rectos en el flex) y el gap central con la gasket en el flex. Una vista
+    // cenital esconderia los pads y haria las dos piezas indistinguibles.
+    catalogViewDir = normalize([0.64, -0.60, 0.20]);
   } else if (pose?.kind === 'cap' && stlPath.includes('weldolet')) {
     // Weldolet: vista tres cuartos baja para que se aprecie la campana y la
     // curva de la silla en la base, no solo la boca.
