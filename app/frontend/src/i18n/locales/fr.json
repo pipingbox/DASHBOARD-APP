@@ -414,6 +414,35 @@
     "certifications": "Certifications",
     "addCertification": "Ajouter une certification",
     "noCertifications": "Aucune certification ajoutée.",
+    "matchReadyTitle": "Complétez votre profil pour recevoir des offres plus pertinentes.",
+    "matchReadyHint": "Complétez les informations manquantes pour améliorer votre préparation professionnelle.",
+    "matchReadyAddExperience": "Ajouter une expérience",
+    "matchReadyGap": {
+      "cohort": "Terminer l’onboarding travailleur",
+      "full_name": "Ajouter votre nom complet",
+      "title": "Ajouter votre poste ou métier",
+      "location": "Ajouter votre localisation",
+      "years_experience": "Ajouter vos années d’expérience",
+      "bio": "Ajouter un résumé professionnel",
+      "skills": "Ajouter au moins une compétence",
+      "experience": "Ajouter une expérience professionnelle structurée",
+      "availability": "Indiquer votre disponibilité",
+      "visibility": "Rendre votre profil public"
+    },
+    "matchReadyUnlocks": {
+      "complete": "Complet",
+      "workforceReady": "Prêt pour les missions",
+      "matchable": "Disponible au matching"
+    },
+    "quickExperience": {
+      "title": "Ajouter une expérience professionnelle",
+      "saved": "Expérience ajoutée — les entreprises peuvent maintenant évaluer votre parcours.",
+      "savedToast": "Expérience ajoutée — les entreprises peuvent maintenant évaluer votre parcours.",
+      "moreDetails": "Ajouter plus de détails (facultatif)",
+      "addAnother": "Ajouter une autre expérience",
+      "addDetails": "Ajouter des détails",
+      "save": "Enregistrer l’expérience"
+    },
     "certificationDialog": {
       "addTitle": "Ajouter une certification",
       "editTitle": "Modifier la certification",

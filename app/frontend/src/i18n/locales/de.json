@@ -414,6 +414,35 @@
     "certifications": "Zertifikate",
     "addCertification": "Zertifikat hinzufügen",
     "noCertifications": "Noch keine Zertifikate hinterlegt.",
+    "matchReadyTitle": "Vervollständige dein Profil für passendere Stellenangebote.",
+    "matchReadyHint": "Ergänze die fehlenden Profildaten, um deine Einsatzbereitschaft zu verbessern.",
+    "matchReadyAddExperience": "Berufserfahrung hinzufügen",
+    "matchReadyGap": {
+      "cohort": "Worker-Onboarding abschließen",
+      "full_name": "Vollständigen Namen hinzufügen",
+      "title": "Position oder Beruf hinzufügen",
+      "location": "Standort hinzufügen",
+      "years_experience": "Berufsjahre hinzufügen",
+      "bio": "Berufliche Zusammenfassung hinzufügen",
+      "skills": "Mindestens eine Fähigkeit hinzufügen",
+      "experience": "Strukturierte Berufserfahrung hinzufügen",
+      "availability": "Verfügbarkeit festlegen",
+      "visibility": "Profil öffentlich machen"
+    },
+    "matchReadyUnlocks": {
+      "complete": "Vollständig",
+      "workforceReady": "Einsatzbereit",
+      "matchable": "Vermittelbar"
+    },
+    "quickExperience": {
+      "title": "Berufserfahrung hinzufügen",
+      "saved": "Berufserfahrung hinzugefügt — Unternehmen können deinen Werdegang jetzt bewerten.",
+      "savedToast": "Berufserfahrung hinzugefügt — Unternehmen können deinen Werdegang jetzt bewerten.",
+      "moreDetails": "Weitere Details hinzufügen (optional)",
+      "addAnother": "Weitere Berufserfahrung hinzufügen",
+      "addDetails": "Details hinzufügen",
+      "save": "Berufserfahrung speichern"
+    },
     "certificationDialog": {
       "addTitle": "Zertifikat hinzufügen",
       "editTitle": "Zertifikat bearbeiten",

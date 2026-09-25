@@ -26,6 +26,7 @@ import { ProfileCompleteness } from '@/components/profile/ProfileCompleteness';
 import { generateCV } from '@/lib/generateCV';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import type { Certification } from '@/lib/certifications';
+import type { WorkExperience } from '@/lib/workerProfile';
 
 /**
  * Profile page — strict DB-as-source-of-truth approach.
@@ -56,6 +57,7 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [experienceToEdit, setExperienceToEdit] = useState<WorkExperience | null>(null);
 
   const isMountedRef = useRef(true);
 
@@ -286,7 +288,7 @@ export default function Profile() {
 
       <CertExpiryWarnings />
 
-      <MatchReadyBanner />
+      <MatchReadyBanner onAddExperienceDetails={setExperienceToEdit} />
 
       {/* Basic Professional Info */}
       <form onSubmit={save} className="grid gap-6 lg:grid-cols-3">
@@ -480,7 +482,10 @@ export default function Profile() {
       <CVUploadSection />
 
       {/* Work Experience */}
-      <WorkExperienceSection />
+      <WorkExperienceSection
+        experienceToEdit={experienceToEdit}
+        onEditHandled={() => setExperienceToEdit(null)}
+      />
 
       {/* Certifications */}
       <CertificationsSection />

@@ -414,6 +414,35 @@
     "certifications": "Certificazioni",
     "addCertification": "Aggiungi certificazione",
     "noCertifications": "Nessuna certificazione aggiunta.",
+    "matchReadyTitle": "Completa il profilo per ricevere opportunità più pertinenti.",
+    "matchReadyHint": "Completa i dati mancanti per migliorare la tua preparazione professionale.",
+    "matchReadyAddExperience": "Aggiungi esperienza lavorativa",
+    "matchReadyGap": {
+      "cohort": "Completa l’onboarding del lavoratore",
+      "full_name": "Aggiungi il nome completo",
+      "title": "Aggiungi il ruolo o mestiere",
+      "location": "Aggiungi la località",
+      "years_experience": "Aggiungi gli anni di esperienza",
+      "bio": "Aggiungi un riepilogo professionale",
+      "skills": "Aggiungi almeno una competenza",
+      "experience": "Aggiungi esperienza lavorativa strutturata",
+      "availability": "Imposta la disponibilità",
+      "visibility": "Rendi pubblico il profilo"
+    },
+    "matchReadyUnlocks": {
+      "complete": "Completo",
+      "workforceReady": "Pronto per le opportunità",
+      "matchable": "Abbinabile"
+    },
+    "quickExperience": {
+      "title": "Aggiungi esperienza lavorativa",
+      "saved": "Esperienza aggiunta — le aziende possono ora valutare il tuo percorso.",
+      "savedToast": "Esperienza aggiunta — le aziende possono ora valutare il tuo percorso.",
+      "moreDetails": "Aggiungi altri dettagli (facoltativo)",
+      "addAnother": "Aggiungi un’altra esperienza",
+      "addDetails": "Aggiungi dettagli",
+      "save": "Salva esperienza"
+    },
     "certificationDialog": {
       "addTitle": "Aggiungi certificazione",
       "editTitle": "Modifica certificazione",
