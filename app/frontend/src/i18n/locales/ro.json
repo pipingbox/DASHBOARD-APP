@@ -1463,6 +1463,13 @@
       "pressureRatings": "Clase de presiune",
       "drawingCaption": "Desen tehnic — {{size}}",
       "fabricationNotes": "Note de fabricație",
+      "guideTitle": "Ghid de utilizare",
+      "guideWhatIs": "Ce este",
+      "guideTypes": "Tipuri și construcții",
+      "guideWhenToUse": "Când se folosește",
+      "guideWhenNotToUse": "Când NU se folosește",
+      "guideInstallation": "Sfaturi de instalare",
+      "guideCommonError": "Eroare frecventă",
       "noDimensions": "Nu există date dimensionale disponibile pentru această componentă.",
       "rowCount": "{{count}} rânduri",
       "noStandards": "Nu există standarde referențiate pentru această componentă.",
@@ -3278,6 +3285,48 @@
       "api609ButterflyValve": "API 609 Categoria A (robinete fluture concentrici) definește dimensiunea față în față publicată aici; nu este o clasă de presiune. Presiunea nominală și construcția robinetului trebuie verificate în documentația producătorului produsului selectat.",
       "yStrainerNoStandard": "Filtrul tip Y nu este acoperit de un standard dimensional specific în acest catalog. Producătorii îl livrează în mod obișnuit cu capete cu flanșe conform ASME B16.5, astfel încât clasa este stabilită de flanșa modelului respectiv. Nu este listată nicio clasă aici, deoarece nu există un standard verificabil care să o definească.",
       "noPressureClass": "Lateralele nu sunt desemnate prin clasă de presiune. Capacitatea lor derivă din grosimea peretelui (schedule) și din material și se calculează conform codului de proiectare aplicabil (de ex. ASME B31.3). Verificați dimensiunile cu producătorul pentru schedule-ul aplicabil."
+    },
+    "valveGuide": {
+      "gate": {
+        "whatIs": "Supapă liniară care izolează curgerea printr-un sertar culisant transversal pe flux. Proiectată pentru poziție complet deschis sau complet închis, nu pentru reglaj.",
+        "types": "Clin masiv, flexibil sau în două bucăți; tijă ascendentă sau neascendentă; vană cu cuțit pentru nămoluri; clin expandabil pentru conducte.",
+        "whenToUse": "Izolare deschis-închis pe linii de lichid unde contează un pasaj drept, fără turbulență: apă, ulei, gaz și abur în limita clasei.",
+        "whenNotToUse": "Serviciu de reglaj: un sertar parțial deschis vibrează, se erozează și se poate bloca. Folosiți o vană globe sau fluture.",
+        "installation": "Montați tija vertical când este posibil, respectați sensul de curgere doar dacă este marcat și închideți complet înainte de presurizare.",
+        "commonError": "Folosirea sertarului pentru reglarea manuală a debitului: sediile se erozează și vana nu mai etanșează."
+      },
+      "globe": {
+        "whatIs": "Supapă liniară al cărei organ de închidere cade pe un sediu perpendicular pe flux. Pierdere de sarcină mai mare decât la sertar sau bilă, dar control excelent de reglaj.",
+        "types": "Corp drept (Z), în unghi și în Y; capac șurubat sau etanșat la presiune; disc, con sau ac.",
+        "whenToUse": "Reglaj și operare frecventă: apă de răcire, păcură, evacuări și purje de abur, dozare chimică.",
+        "whenNotToUse": "Izolare cu pierdere mică de sarcină pe linii mari: traseul sinuos consumă energie. Sertarul, bila sau fluturele sunt mai ieftine.",
+        "installation": "Respectați săgeata de curgere de pe corp — montată invers distruge organul de închidere — și lăsați spațiu pentru cursa tije și roata.",
+        "commonError": "Inversarea sensului de curgere: vana închide încă, dar discul și sediul se uzează rapid și reglajul se pierde."
+      },
+      "check": {
+        "whatIs": "Supapă automată care permite curgerea într-un singur sens și se închide singură pentru a opri returul, protejând pompele și echipamentele de lovitura de berbec.",
+        "types": "Cu clapetă (swing), cu piston (silencioasă), wafer cu dublă clapetă, cu bilă, cu disc înclinat și cu duză.",
+        "whenToUse": "După pompe contra rotirii inverse, la ieșirea compresoarelor și oriunde returul ar goli sau deteriora sistemul.",
+        "whenNotToUse": "Debit pulsatoriu cu viteză mică (fluturare și uzură) sau linii care cer etanșeitate totală la retur: alegeți o vană de închidere.",
+        "installation": "Modelele wafer se montează între flanșe cu pintenul balamalei orizontal; respectați săgeata și verificați că șuruburile nu ating corpul.",
+        "commonError": "Montarea dublei clapete cu pinten vertical: plăcile nu cad liber și trântesc la retur."
+      },
+      "ball": {
+        "whatIs": "Supapă la sfert de tură cu o bilă găurită care se rotește până găura se aliniază cu fluxul. Operare rapidă, închidere etanșă și pasaj plin, neobstrucționat.",
+        "types": "Bilă flotantă sau pe pivot (trunnion); pasaj plin sau redus; corp din una, două sau trei piese; sediu moale sau metalic; intrare superioară.",
+        "whenToUse": "Închidere etanșă și comutare rapidă pe lichide, gaze și nămoluri (sediu metalic); linii care necesită raclare (pigging) cu pasaj plin.",
+        "whenNotToUse": "Reglaj fin — bila semi-deschisă cavitează și se erozează — și temperaturi peste limita sediului moale.",
+        "installation": "Verificați sensul de curgere la modelele cu pivot sau cu aerisire, sprijiniți corpurile grele independent de conductă și manevrați la linie depresurizată.",
+        "commonError": "Comandarea pasajului redus când raclarea sau sondele cer pasaj plin."
+      },
+      "butterfly": {
+        "whatIs": "Supapă la sfert de tură care reglează sau izolează curgerea cu un disc circular rotativ pe un ax prin flux. Compactă, ușoară și cu pierdere mică de sarcină.",
+        "types": "Concentrică (sedeu elastomer, serviciu general), dublu excentrică (performanță ridicată) și triplu excentrică (sedeu metalic, etanșare totală). Montaj: wafer (între flanșe), lug, flanșat sau cu capete canelate.",
+        "whenToUse": "Linii mari unde o bilă sau un sertar ar fi prea grele sau scumpe; reglaj; apă, HVAC, aer, gaze și chimicale ușoare în limita sedeului.",
+        "whenNotToUse": "Închidere la diferență de presiune ridicată peste clasa sedeului, nămoluri abrazive (în afara sedeului metalic) sau servicii care cer pasaj plin.",
+        "installation": "Versiunea wafer se strânge între flanșe: verificați că discul nu freacă tubul sau șuruburile și centrați sedeul pe garnitură înainte de strângere.",
+        "commonError": "Montarea wafer pe un interior de tub prea mare sau flanșe dezaliniate: discul se blochează."
+      }
     }
   },
   "notFound": {

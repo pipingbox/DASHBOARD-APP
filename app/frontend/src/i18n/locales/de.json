@@ -1219,6 +1219,13 @@
       "pressureRatings": "Druckstufen",
       "drawingCaption": "Technische Zeichnung — {{size}}",
       "fabricationNotes": "Fertigungshinweise",
+      "guideTitle": "Anwendungsleitfaden",
+      "guideWhatIs": "Was sie ist",
+      "guideTypes": "Bauarten und Ausführungen",
+      "guideWhenToUse": "Wann einsetzen",
+      "guideWhenNotToUse": "Wann NICHT einsetzen",
+      "guideInstallation": "Einbautipps",
+      "guideCommonError": "Häufigster Fehler",
       "noDimensions": "Für diese Komponente sind keine Maßangaben verfügbar.",
       "rowCount": "{{count}} Zeilen",
       "noStandards": "Für diese Komponente sind keine Normen hinterlegt.",
@@ -3241,6 +3248,48 @@
       "api609ButterflyValve": "API 609 Kategorie A (zentrische Absperrklappen) definiert das hier veröffentlichte Baulängenmaß; es ist keine Druckstufe. Druckstufe und Bauausführung sind anhand der Herstellerdokumentation des gewählten Produkts zu prüfen.",
       "yStrainerNoStandard": "Der Y-Schmutzfänger wird in diesem Katalog von keiner spezifischen Maßnorm erfasst. Hersteller liefern ihn üblicherweise mit Flanschenden nach ASME B16.5, sodass die Klasse durch den Flansch des jeweiligen Modells bestimmt wird. Hier wird keine Klasse aufgeführt, da es keine nachprüfbare Norm gibt, die eine solche festlegt.",
       "noPressureClass": "Abzweigstücke (Laterals) werden nicht nach Druckklasse bezeichnet. Ihre Belastbarkeit ergibt sich aus der Wandstärke (Schedule) und dem Werkstoff und wird nach dem anwendbaren Auslegungscode (z. B. ASME B31.3) berechnet. Maße für den jeweiligen Schedule beim Hersteller verifizieren."
+    },
+    "valveGuide": {
+      "gate": {
+        "whatIs": "Ein lineares Absperrschieber, der den Durchfluss mit einem quer zur Strömung bewegten Schieber unterbricht. Für voll geöffnet oder voll geschlossen, nicht zum Drosseln.",
+        "types": "Keilschieber (massiv, flexibel, zweiteilig), mit steigender oder nicht steigender Spindel; Messerschieber für Schlämme; Expanding-Gate für Pipelines.",
+        "whenToUse": "Open-Close-Absperrung in Flüssigkeitsleitungen mit geradem, turbulenzarmem Durchgang: Wasser, Öl, Gas und Dampf innerhalb der Druckstufe.",
+        "whenNotToUse": "Drosselbetrieb: ein halb geöffneter Schieber vibriert, erodiert und kann beschädigt werden. Globe-Ventil oder Absperrklappe einsetzen.",
+        "installation": "Spindel möglichst senkrecht einbauen, Durchflussrichtung nur bei Markierung beachten, vor der Druckprobe vollständig schließen.",
+        "commonError": "Den Schieber zum manuellen Regeln verwenden: die Dichtflächen erodieren und der Schieber wird undicht."
+      },
+      "globe": {
+        "whatIs": "Ein lineares Ventil, dessen Kegel senkrecht zur Strömung auf einen Sitz schließt. Höherer Druckverlust als Schieber oder Kugelhahn, aber ausgezeichnete Regelgüte.",
+        "types": "Geradsitz (Z), Winkel- und Y-Form; Deckel geschraubt oder druckdicht; Teller-, Kegel- oder Nadelabdichtung.",
+        "whenToUse": "Drosseln und häufige Betätigung: Kühlwasser, Schweröl, Dampfab- und -entlüftung, Chemiedosierung.",
+        "whenNotToUse": "Absperrung mit niedrigem Druckverlust in großen Leitungen: der verwinkelte Weg kostet Energie. Schieber, Kugelhahn oder Klappe sind günstiger.",
+        "installation": "Durchflusspfeil am Gehäuse beachten — verkehrter Einbau zerstört die Armatur — und Platz für Hub und Handrad einplanen.",
+        "commonError": "Durchflussrichtung umkehren: das Ventil schließt zwar, aber Kegel und Sitz verschleißen rasch, die Regelgüte geht verloren."
+      },
+      "check": {
+        "whatIs": "Eine selbsttätige Armatur, die den Durchfluss nur in einer Richtung zulässt und selbsttätig schließt — schützt Pumpen und Anlagen vor Rückströmung und Druckstößen.",
+        "types": "Rückschlagklappe (Swing), Kolben (Silent), Zweiplatten-Wafer, Kugel, Schwenkscheibe und Düsenrückschlagventil.",
+        "whenToUse": "Hinter Pumpen gegen Rücklauf, an Kompressorabgängen und überall, wo Rückströmung die Anlage entleeren oder beschädigen würde.",
+        "whenNotToUse": "Pulsierender Betrieb mit niedriger Geschwindigkeit (Flattern und Verschleiß) sowie Leitungen mit dichtem Rückschlussbedarf: Absperrarmatur wählen.",
+        "installation": "Zweiplatten-Wafer zwischen Flansche mit waagerechtem Scharnierbolzen einbauen; Durchflusspfeil beachten, Schrauben auf Freigängigkeit zum Gehäuse prüfen.",
+        "commonError": "Scharnierbolzen senkrecht eingebaut: die Platten fallen nicht frei und schlagen bei Rückströmung zu."
+      },
+      "ball": {
+        "whatIs": "Ein Vierteldreh-Hahn mit gebohrter Kugel, deren Bohrung beim Öffnen in Strömungsrichtung geschwenkt wird. Schnelle Betätigung, dichte Absperre, freier Durchgang.",
+        "types": "Schwimmende oder gelagerte Kugel (Trunnion); Voll- oder Reduzierdurchgang; ein-, zwei- oder dreiteiliges Gehäuse; Weich- oder Metallsitz; Top-Entry.",
+        "whenToUse": "Dichte Absperre und schnelles Schalten in Flüssigkeiten, Gasen und Schlämmen (Metallsitz); Leitungen, die gereinigt werden müssen (Pigging, VollDurchgang).",
+        "whenNotToUse": "Feindosieren — die halb offene Kugel kaviert und erodiert — sowie Temperaturen über der Grenze des Weichsitzes.",
+        "installation": "Durchflussrichtung bei Trunnion- und Entlüftungsventilen prüfen, schwere Gehäuse getrennt abstützen und nur bei druckloser Leitung betätigen.",
+        "commonError": "Reduzierdurchgang bestellt, obwohl Pigging oder Sonden vollen Durchgang erfordern."
+      },
+      "butterfly": {
+        "whatIs": "Eine Vierteldreh-Absperrklappe, die mit einer kreisförmigen Scheibe auf einer durchgehenden Welle drosselt oder sperrt. Kompakt, leicht, mit geringem Druckverlust.",
+        "types": "Konzentrisch (Weichdichtung, Standardbetrieb), doppelt exzentrisch (High-Performance), dreifach exzentrisch (Metalldichtung, blasendicht). Bauart: Wafer (zwischen Flanschen), Lug, Flansch oder Rillenende.",
+        "whenToUse": "Große Nennweiten, in denen Kugelhahn oder Schieber zu schwer oder zu teuer wären; Drosselbetrieb; Wasser, HVAC, Luft, Gase und milde Chemikalien innerhalb der Sitzqualifikation.",
+        "whenNotToUse": "Absperrung mit hohem Differenzdruck über der Sitzklasse, abrasive Schlämme (außer Metallsitz) oder Dienste mit vollem Durchgang.",
+        "installation": "Wafer-Ausführungen zwischen Flansche einsetzen: Scheibe darf Rohr und Schrauben nicht berühren; Dichtung vor dem Anziehen zentrieren.",
+        "commonError": "Wafer-Klappe bei zu großem Rohrinnendurchmesser oder nicht fluchtenden Flanschen eingebaut: die Scheibe klemmt."
+      }
     }
   },
   "dailyLog": {

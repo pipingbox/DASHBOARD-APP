@@ -1463,6 +1463,13 @@
       "pressureRatings": "Classi di pressione",
       "drawingCaption": "Disegno tecnico — {{size}}",
       "fabricationNotes": "Note di fabbricazione",
+      "guideTitle": "Guida all'uso",
+      "guideWhatIs": "Che cos'è",
+      "guideTypes": "Tipi e costruzioni",
+      "guideWhenToUse": "Quando usarla",
+      "guideWhenNotToUse": "Quando NON usarla",
+      "guideInstallation": "Consigli di installazione",
+      "guideCommonError": "Errore frequente",
       "noDimensions": "Nessun dato dimensionale disponibile per questo componente.",
       "rowCount": "{{count}} righe",
       "noStandards": "Nessuna norma referenziata per questo componente.",
@@ -3247,6 +3254,48 @@
       "api609ButterflyValve": "La API 609 Categoria A (valvole a farfalla concentriche) definisce la dimensione faccia a faccia qui pubblicata; non è una classe di pressione. La pressione nominale e la costruzione della valvola devono essere verificate nella documentazione del produttore del prodotto selezionato.",
       "yStrainerNoStandard": "Il filtro a Y non è coperto da una norma dimensionale specifica in questo catalogo. I fabbricanti lo forniscono abitualmente con estremità flangiate secondo ASME B16.5, per cui la classe è fissata dalla flangia del modello specifico. Qui non è elencata alcuna classe perché non esiste una norma verificabile che la definisca.",
       "noPressureClass": "I raccordi laterali non sono designati per classe di pressione. La loro capacità deriva dallo spessore di parete (schedule) e dal materiale, e si calcola secondo il codice di progetto applicabile (ad es. ASME B31.3). Verificare le dimensioni con il fabbricante per lo schedule applicabile."
+    },
+    "valveGuide": {
+      "gate": {
+        "whatIs": "Valvola lineare che isola il flusso mediante un otturatore che scorre trasversalmente al flusso. Progettata per servizio completamente aperta o chiusa, non per la regolazione.",
+        "types": "Cuneo pieno, flessibile o in due pezzi; stelo ascendente o non ascendente; saracinesca a ghigliottina per fanghi; cuneo espandibile per pipeline.",
+        "whenToUse": "Isolamento aperto/chiuso in linee di liquido dove conta un passaggio rettilineo senza turbolenza: acqua, olio, gas e vapore entro la classe.",
+        "whenNotToUse": "Servizio di regolazione: un otturatore semiaperto vibra, si erode e può rovinarsi. Meglio una valvola a globo o a farfalla.",
+        "installation": "Installare con lo stelo verticale quando possibile, rispettare il verso di flusso solo se marcato e chiudere completamente prima di pressurizzare la linea.",
+        "commonError": "Usare la saracinesca per regolare la portata a mano: le sedi si erodono e la valvola non sigilla più."
+      },
+      "globe": {
+        "whatIs": "Valvola lineare il cui otturatore chiude su una sede perpendicolare al flusso. Perdite di carico maggiori rispetto a saracinesca o sfera, ma ottimo controllo di regolazione.",
+        "types": "Corpo a Z (retto), ad angolo e a Y; cappello bullonato o a tenuta di pressione; otturatore a disco, a tappo o ad ago.",
+        "whenToUse": "Regolazione e manovre frequenti: acqua di raffreddamento, olio combustibile, sfiati e scarichi di vapore, dosaggio chimico.",
+        "whenNotToUse": "Isolamento a bassa perdita di carico su grandi linee: il percorso tortuoso spreca energia. Saracinesca, sfera o farfalla costano meno.",
+        "installation": "Rispettare la freccia di flusso fusa sul corpo — montata al contrario distrugge l'otturatore — e lasciare spazio alla corsa dello stelo e al volantino.",
+        "commonError": "Invertire il senso del flusso: la valvola chiude ancora, ma otturatore e sede si usurano in fretta e la regolazione si perde."
+      },
+      "check": {
+        "whatIs": "Valvola automatica che consente il flusso in un solo senso e si richiude da sola per impedire il ritorno, proteggendo pompe e apparecchiature dal colpo d'ariete.",
+        "types": "A battente (swing), a pistone (silenziosa), wafer a doppio battente, a sfera, a disco inclinato e a ugello.",
+        "whenToUse": "Mandata delle pompe per evitare il controgiro, scarico dei compressori e ogni linea dove il ritorno svuoterebbe o danneggerebbe l'impianto.",
+        "whenNotToUse": "Flusso pulsante a bassa velocità (sfarfallio e usura) o linee che richiedono tenuta totale al ritorno: usare una valvola di chiusura.",
+        "installation": "Le wafer a doppio battente si montano tra flange con il perno della cerniera orizzontale; rispettare la freccia e controllare che i bulloni non tocchino il corpo.",
+        "commonError": "Montare il doppio battente con il perno verticale: le piastre non ricadono libere e sbattono al ritorno."
+      },
+      "ball": {
+        "whatIs": "Valvola a quarto di giro con una sfera forata che ruota fino ad allineare il foro con il flusso. Manovra rapida, chiusura stagna e passaggio pieno senza ostacoli.",
+        "types": "Sfera galleggiante o a trunnion; passaggio pieno o ridotto; corpo monoblocco, due o tre pezzi; sede morbida o metallica; entrata dall'alto.",
+        "whenToUse": "Chiusura stagna e manovra rapida su liquidi, gas e fanghi (sede metallica); linee da passare con raschiatori (pigging) in passaggio pieno.",
+        "whenNotToUse": "Regolazione fine — la sfera semiaperta cava e si erode — e temperature oltre il limite della sede morbida.",
+        "installation": "Verificare il verso di flusso sui modelli a trunnion o con sfiato, sostenere i corpi pesanti indipendentemente dalla tubazione e manovrare a linea depressurizzata.",
+        "commonError": "Ordinare passaggio ridotto quando il pigging o le sonde richiedono il passaggio pieno."
+      },
+      "butterfly": {
+        "whatIs": "Valvola a quarto di giro che regola o isola il flusso con un disco circolare rotante su un albero attraversante la corrente. Compatta, leggera e a bassa perdita di carico.",
+        "types": "Concentrica (sede elastomerica, servizio generale), doppia eccentrica (alte prestazioni) e tripla eccentrica (sede metallica, tenuta totale). Montaggio: wafer (tra flange), a orecchioni (lug), flangiata o con estremità scanalate.",
+        "whenToUse": "Grandi linee dove una sfera o una saracinesca sarebbe troppo pesante o costosa; regolazione; acqua, HVAC, aria, gas e chimici moderati entro la sede.",
+        "whenNotToUse": "Chiusura con alto ΔP oltre la classe della sede, fanghi abrasivi (salvo sede metallica) o servizi che richiedono passaggio pieno.",
+        "installation": "La wafer si incassa tra flange: verificare che il disco non tocchi tubo né tiranti e centrare la sede sulla guarnizione prima del serraggio.",
+        "commonError": "Installare una wafer contro un interno tubo eccessivo o flange disassate: il disco si blocca."
+      }
     }
   },
   "dailyLog": {

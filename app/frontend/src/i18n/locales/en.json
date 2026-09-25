@@ -1460,6 +1460,13 @@
       "pressureRatings": "Pressure ratings",
       "drawingCaption": "Technical drawing — {{size}}",
       "fabricationNotes": "Fabrication notes",
+      "guideTitle": "Usage guide",
+      "guideWhatIs": "What it is",
+      "guideTypes": "Types and designs",
+      "guideWhenToUse": "When to use it",
+      "guideWhenNotToUse": "When NOT to use it",
+      "guideInstallation": "Installation tips",
+      "guideCommonError": "Common error",
       "noDimensions": "No dimensional data available for this component.",
       "rowCount": "{{count}} rows",
       "noStandards": "No standards referenced for this component.",
@@ -3241,6 +3248,48 @@
       "api609ButterflyValve": "API 609 Category A (concentric butterfly valves) defines the face-to-face dimension published here; it is not a pressure class. The pressure rating and construction of the valve must be verified against the manufacturer documentation for the selected product.",
       "yStrainerNoStandard": "The Y-strainer is not covered by a specific dimensional standard in this catalogue. Manufacturers commonly supply it with flanged ends to ASME B16.5, so the class is set by the flange of the particular model. No class is listed here because there is no verifiable standard that defines one.",
       "noPressureClass": "Laterals are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). Verify dimensions with the manufacturer for the applicable schedule."
+    },
+    "valveGuide": {
+      "gate": {
+        "whatIs": "A linear-motion valve that isolates flow by sliding a gate across the flow path. Designed for fully open or fully closed service, not for throttling.",
+        "types": "Solid wedge, flexible wedge, split wedge; rising stem or non-rising stem; knife gate for slurries; expanding gate for pipeline service.",
+        "whenToUse": "On-off isolation in liquid lines where a straight-through, low-turbulence bore matters: water, oil, gas and steam within the class rating.",
+        "whenNotToUse": "Throttling service: a partially open gate vibrates, erodes and can be damaged. Use a globe or butterfly valve instead.",
+        "installation": "Install with the stem vertical where possible, respect the flow direction only when marked, and close fully before pressure-testing the line.",
+        "commonError": "Using the gate valve for manual flow regulation: the seats erode and the valve stops sealing."
+      },
+      "globe": {
+        "whatIs": "A linear-motion valve whose plug closes onto a seat perpendicular to the flow. Higher pressure drop than a gate or ball valve, but excellent throttling control.",
+        "types": "Straight (Z), angle and Y-pattern bodies; bolted bonnet or pressure-seal; disc, plug or needle trims.",
+        "whenToUse": "Throttling and frequent operation: cooling water, fuel oil, steam vents and drains, chemical dosing.",
+        "whenNotToUse": "Low-pressure-drop isolation in large lines: the tortuous path wastes energy. A gate, ball or butterfly valve is cheaper.",
+        "installation": "Respect the flow arrow cast on the body — installed backwards it destroys the trim — and leave clearance for stem travel and handwheel removal.",
+        "commonError": "Reversing the flow direction: the valve still closes, but the plug and seat wear out quickly and control is lost."
+      },
+      "check": {
+        "whatIs": "A self-acting valve that allows flow in one direction only and closes automatically to prevent reverse flow, protecting pumps and equipment from backflow and water hammer.",
+        "types": "Swing, piston (silent), dual-plate wafer, ball, tilting-disc and nozzle check valves.",
+        "whenToUse": "Downstream of pumps to prevent reverse rotation, at compressor discharge, and wherever reverse flow would drain or damage a system.",
+        "whenNotToUse": "Pulsating flow at low velocity (flutter and wear), or lines needing leak-tight reverse sealing: consider a shut-off valve instead.",
+        "installation": "Dual-plate wafer valves mount between flanges with the hinge pin horizontal; respect the cast flow arrow and check the flange bolts clear the body.",
+        "commonError": "Mounting a dual-plate wafer check with the hinge pin vertical: the plates do not fall freely and slam on reverse flow."
+      },
+      "ball": {
+        "whatIs": "A quarter-turn valve with a bored ball that rotates to align the bore with the flow. Fast operation, tight shut-off and a full uninterrupted bore.",
+        "types": "Floating ball vs trunnion-mounted; full bore vs reduced bore; one-piece, two-piece, three-piece bodies; soft seat vs metal seat; top-entry.",
+        "whenToUse": "Tight shut-off and fast open-close in liquid, gas and slurry (metal-seat) service; lines that need pigging (full bore).",
+        "whenNotToUse": "Precise throttling: the partially open ball cavitates and erodes. And temperatures beyond the soft-seat rating.",
+        "installation": "Confirm the flow direction on trunnion and vent valves, support heavy bodies independently of the pipe, and actuate with the line depressurized.",
+        "commonError": "Ordering a reduced bore where pigging or instrument probes require a full-bore passage."
+      },
+      "butterfly": {
+        "whatIs": "A quarter-turn valve that regulates or isolates flow with a circular disc rotating on a shaft through the flow stream. Compact, lightweight and low pressure drop.",
+        "types": "Concentric (resilient seat, general service), double offset (high-performance), triple offset (metal seat, tight shut-off). Mounting: wafer (between flanges), lug, flanged or grooved ends.",
+        "whenToUse": "Large lines where a ball or gate valve would be too heavy or expensive; throttling service; water, HVAC, air, gases and mild chemicals within the seat rating.",
+        "whenNotToUse": "Shut-off with high pressure drop beyond the seat class, abrasive slurries (unless metal-seated), or service requiring a full bore.",
+        "installation": "Wafer valves are sandwiched between flanges: verify the disc does not foul the pipe bore or the flange studs, and center the seat on the gasket face before torquing.",
+        "commonError": "Installing a wafer valve against an oversized pipe bore or misaligned flanges: the disc binds."
+      }
     }
   },
   "dailyLog": {

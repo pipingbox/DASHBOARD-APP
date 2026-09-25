@@ -1219,6 +1219,13 @@
       "pressureRatings": "Drukklassen",
       "drawingCaption": "Technische tekening — {{size}}",
       "fabricationNotes": "Fabricagenotities",
+      "guideTitle": "Gebruikersgids",
+      "guideWhatIs": "Wat het is",
+      "guideTypes": "Types en uitvoeringen",
+      "guideWhenToUse": "Wanneer gebruiken",
+      "guideWhenNotToUse": "Wanneer NIET gebruiken",
+      "guideInstallation": "Montagetips",
+      "guideCommonError": "Veelgemaakte fout",
       "noDimensions": "Geen maatgegevens beschikbaar voor dit component.",
       "rowCount": "{{count}} rijen",
       "noStandards": "Geen normen vermeld voor dit component.",
@@ -3241,6 +3248,48 @@
       "api609ButterflyValve": "API 609 Categorie A (centrische vlinderkleppen) definieert de hier gepubliceerde face-to-face maat; het is geen drukklasse. De drukklasse en constructie van de klep moeten worden geverifieerd aan de hand van de fabrikantdocumentatie van het geselecteerde product.",
       "yStrainerNoStandard": "De Y-filter valt in deze catalogus niet onder een specifieke dimensionele norm. Fabrikanten leveren hem gewoonlijk met flenseinden volgens ASME B16.5, zodat de klasse wordt bepaald door de flens van het betreffende model. Hier wordt geen klasse vermeld omdat er geen verifieerbare norm bestaat die er een definieert.",
       "noPressureClass": "Laterals worden niet aangeduid met een drukklasse. Hun capaciteit vloeit voort uit de wanddikte (schedule) en het materiaal en wordt berekend volgens de toepasselijke ontwerpcode (bijv. ASME B31.3). Verifieer de afmetingen bij de fabrikant voor de toepasselijke schedule."
+    },
+    "valveGuide": {
+      "gate": {
+        "whatIs": "Lineaire afsluiter die de stroom isoleert met een schuif die dwars op de stroom beweegt. Bedoeld voor volledig open of dicht, niet voor regelen.",
+        "types": "Massieve, flexibele of tweedelige wig; stijgende of niet-stijgende as; mesafsluiter voor slurries; uitschuifbare wig voor pijpleidingen.",
+        "whenToUse": "Open-dicht isolatie in vloeistofleidingen waar een recht, turbulentie-arm passage telt: water, olie, gas en stoom binnen de klasse.",
+        "whenNotToUse": "Regeldienst: een half geopende schuif trilt, erodeert en kan beschadigen. Kies een regelventiel of vlinderklep.",
+        "installation": "Installeer de as waar mogelijk verticaal, let alleen op de stroomrichting als deze gemarkeerd is, en sluit volledig vóór de drukproef.",
+        "commonError": "De afsluiter handmatig gebruiken om debiet te regelen: de zittingen eroderen en de kraan sluit niet meer."
+      },
+      "globe": {
+        "whatIs": "Lineaire klep waarvan het sluitstuk loodrecht op de stroom tegen een zitting sluit. Meer drukverlies dan een schuif of kogelkraan, maar uitstekend regelgedrag.",
+        "types": "Rechte (Z), hoek- en Y-uitvoering; gebolde of drukdichte deksel; schijf-, kegel- of naaldsluitstuk.",
+        "whenToUse": "Regelen en frequent bedienen: koelwater, zware olie, stoomaf- en -ontluchting, chemische dosering.",
+        "whenNotToUse": "Isolatie met laag drukverlies in grote leidingen: de kronkelige weg verspilt energie. Schuif, kogel of vlinder is goedkoper.",
+        "installation": "Respecteer de stroompijl op het huis — verkeerd gemonteerd vernietigt het sluitstuk — en houd ruimte vrij voor asloop en handwiel.",
+        "commonError": "De stroomrichting omkeren: de klep sluit nog wel, maar sluitstuk en zitting slijten snel en de regeling gaat verloren."
+      },
+      "check": {
+        "whatIs": "Zelfwerkende klep die de stroom slechts in één richting toelaat en vanzelf sluit om terugstroming te voorkomen; beschermt pompen en apparatuur tegen drukslagen.",
+        "types": "Zwaaiklep, zuiger (stille), wafer dubbelzwaai, kogel, kantelschijf en mondstuk-terugslagklep.",
+        "whenToUse": "Achter pompen tegen terugloop, aan compressorafvoeren en overal waar terugstroming het systeem zou leeglopen of beschadigen.",
+        "whenNotToUse": "Pulserende stroom bij lage snelheid (fladderen en slijtage) of leidingen die dichtheid bij terugloop eisen: kies een afsluiter.",
+        "installation": "Wafer-uitvoeringen monteren tussen flenzen met de scharnierpen horizontaal; respecteer de pijl en controleer dat de bouten het huis niet raken.",
+        "commonError": "De dubbelzwaaiklep met verticale scharnierpen monteren: de platen vallen niet vrij en slaan dicht bij terugloop."
+      },
+      "ball": {
+        "whatIs": "Kwartslagkraan met een geboorde kogel die draait tot de boring met de stroom uitlijnt. Snelle bediening, dichte afsluiting en een volle, vrije doorgang.",
+        "types": "Zwevende of vastgelagerde (trunnion) kogel; volle of gereduceerde boring; één-, twee- of driedelig huis; zachte of metalen zitting; top-entry.",
+        "whenToUse": "Dichte afsluiting en snel schakelen in vloeistoffen, gassen en slurries (metalen zitting); leidingen die gepigd moeten worden (volle boring).",
+        "whenNotToUse": "Fijn regelen — de half geopende kogel caviteert en erodeert — en temperaturen boven de grens van de zachte zitting.",
+        "installation": "Controleer de stroomrichting bij trunnion- en ontluchtingskranen, steun zware huizen onafhankelijk van de leiding en bedien bij drukloze leiding.",
+        "commonError": "Gereduceerde boring bestellen terwijl pigging of sondes een volle boring vereisen."
+      },
+      "butterfly": {
+        "whatIs": "Kwartslagklep die de stroom regelt of isoleert met een ronde schijf die draait om een as door de stroom. Compact, licht en met laag drukverlies.",
+        "types": "Concentrisch (elastomeer zitting, algemene dienst), dubbel excentrisch (high-performance) en drievoudig excentrisch (metalen zitting, blaasdicht). Montage: wafer (tussen flenzen), lug, geflanseerd of gegroefd.",
+        "whenToUse": "Grote leidingen waar een kogel- of schuifkraan te zwaar of te duur zou zijn; regelen; water, HVAC, lucht, gassen en milde chemicaliën binnen de zittingsklasse.",
+        "whenNotToUse": "Afsluiting onder hoog drukverschil boven de zittingsklasse, abrasieve slurries (behalve metalen zitting) of dienst die volle doorgang eist.",
+        "installation": "Wafer-uitvoeringen zitten tussen flenzen: controleer dat de schijf de buis of doorloopbouten niet raakt en centreer de zitting op de pakking vóór het aandraaien.",
+        "commonError": "Een waferklep monteren tegen een te grote binnendiameter of scheefstaande flenzen: de schijf klemt."
+      }
     }
   },
   "dailyLog": {

@@ -1466,6 +1466,13 @@
       "pressureRatings": "Klasy ciśnieniowe",
       "drawingCaption": "Rysunek techniczny — {{size}}",
       "fabricationNotes": "Uwagi wykonawcze",
+      "guideTitle": "Przewodnik stosowania",
+      "guideWhatIs": "Czym jest",
+      "guideTypes": "Typy i konstrukcje",
+      "guideWhenToUse": "Kiedy stosować",
+      "guideWhenNotToUse": "Kiedy NIE stosować",
+      "guideInstallation": "Wskazówki montażowe",
+      "guideCommonError": "Częsty błąd",
       "noDimensions": "Brak danych wymiarowych dla tego komponentu.",
       "rowCount": "{{count}} wierszy",
       "noStandards": "Brak norm przywołanych dla tego komponentu.",
@@ -3284,6 +3291,48 @@
       "api609ButterflyValve": "API 609 Kategoria A (koncentryczne zawory motylkowe) definiuje opublikowany tutaj wymiar face-to-face; nie jest to klasa ciśnieniowa. Ciśnienie znamionowe i konstrukcję zaworu należy zweryfikować w dokumentacji producenta wybranego produktu.",
       "yStrainerNoStandard": "Filtr siatkowy typu Y nie jest objęty w tym katalogu żadną konkretną normą wymiarową. Producenci zwykle dostarczają go z końcówkami kołnierzowymi wg ASME B16.5, więc klasę określa kołnierz danego modelu. Nie podano tu klasy, ponieważ nie istnieje weryfikowalna norma, która by ją definiowała.",
       "noPressureClass": "Trójniki boczne (laterals) nie są oznaczane klasą ciśnienia. Ich wytrzymałość wynika z grubości ścianki (schedule) i materiału oraz jest obliczana zgodnie z właściwym kodeksem projektowym (np. ASME B31.3). Wymiary należy zweryfikować z producentem dla danego schedule."
+    },
+    "valveGuide": {
+      "gate": {
+        "whatIs": "Zawór liniowy izolujący przepływ zasuwą przesuwającą się w poprzek strumienia. Przeznaczony do pracy w pełni otwarty lub zamknięty, nie do regulacji.",
+        "types": "Klin masywny, elastyczny lub dwudzielny; trzpień wznoszący lub niewznoszący; zasuwa nożowa do szlamów; klin rozprężny do rurociągów.",
+        "whenToUse": "Odcinanie w liniach cieczy, gdzie liczy się prosty przepływ bez turbulencji: woda, olej, gaz i para w granicach klasy.",
+        "whenNotToUse": "Praca regulacyjna: częściowo otwarta zasuwa wibruje, ulega erozji i może się zablokować. Użyj zaworu globusowego lub motylkowego.",
+        "installation": "Instaluj trzpień pionowo, jeśli to możliwe; kierunek przepływu uwzględniaj tylko przy oznaczeniu; przed próbą ciśnieniową całkowicie zamknij.",
+        "commonError": "Ręczna regulacja przepływu zasuwą: gniazda erodują i zawór przestaje szczelić."
+      },
+      "globe": {
+        "whatIs": "Zawór liniowy, którego zamknięcie dociska się do gniazda prostopadłego do przepływu. Większe straty ciśnienia niż zasuwa lub kulowy, ale znakomita regulacja.",
+        "types": "Korpus prosty (Z), kątowy i typu Y; pokrywa śrubowa lub ciśnieniowa; zamknięcie talerzykowe, stożkowe lub iglicowe.",
+        "whenToUse": "Regulacja i częsta praca: woda chłodząca, olej opałowy, odpowietrzenia i spusty pary, dozowanie chemikaliów.",
+        "whenNotToUse": "Odcinanie o niskich stratach ciśnienia w dużych liniach: kręta droga marnuje energię. Zasuwa, kulowy lub motylkowy są tańsze.",
+        "installation": "Przestrzegaj strzałki przepływu na korpusie — odwrotnie zamontowany niszczy uszczelnienie — i zostaw miejsce na skok trzpienia i koło zamachowe.",
+        "commonError": "Odwrócenie kierunku przepływu: zawór nadal zamyka, ale grzybek i gniazdo szybko się zużywają, a regulacja znika."
+      },
+      "check": {
+        "whatIs": "Zawór samoczynny, który przepuszcza medium tylko w jednym kierunku i sam się zamyka, chroniąc pompy i urządzenia przed uderzeniem hydraulicznym.",
+        "types": "Klapowy (swing), tłoczkowy (cichy), kołnierzowy dwupłytowy (wafer), kulkowy, z odchyloną tarczą i dyszowy.",
+        "whenToUse": "Za pompami przeciw cofce, na tłoczniach sprężarek i wszędzie tam, gdzie cofnięty przepływ opróżniłby lub uszkodził instalację.",
+        "whenNotToUse": "Przepływ pulsujący przy niskiej prędkości (trzepotanie i zużycie) oraz linie wymagające szczelności przy cofce: wybierz zawór odcinowy.",
+        "installation": "Zawory wafer montuje się między kołnierze z osią zawiasów poziomo; przestrzegaj strzałki i sprawdź, czy śruby nie dotykają korpusu.",
+        "commonError": "Montaż dwupłytowego z pionową osią zawiasów: płyty nie opadają swobodnie i trzaskają przy cofce."
+      },
+      "ball": {
+        "whatIs": "Zawór ćwierćobrotowy z przelotową kulą, która obraca się, aż otwór zestroji się z przepływem. Szybka praca, szczelne zamknięcie i pełny nieprzerwany przelot.",
+        "types": "Kula pływająca lub podparta (trunnion); przelot pełny lub zredukowany; korpus jedno-, dwu- lub trzyczęściowy; gniazdo miękkie lub metalowe; górny montaż.",
+        "whenToUse": "Szczelne odcinanie i szybka praca w cieczach, gazach i szlamach (gniazdo metalowe); linie wymagające przetaczania zgarniaczy (pigging) z pełnym przelotem.",
+        "whenNotToUse": "Dokładna regulacja — półotwarta kula kawituje i eroduje — oraz temperatury powyżej granicy gniazda miękkiego.",
+        "installation": "Sprawdź kierunek przepływu w wersjach trunnion i odpowietrzanych, ciężkie korpusy podpieraj niezależnie od rurociągu i obsługuj przy odciśnieniu.",
+        "commonError": "Zamówienie przełotu zredukowanego, gdy pigging lub sondy wymagają pełnego."
+      },
+      "butterfly": {
+        "whatIs": "Zawór ćwierćobrotowy regulujący lub odcinający przepływ okrągłą tarczą obracającą się na osi przechodzącej przez strumień. Kompaktowy, lekki i o niskich stratach ciśnienia.",
+        "types": "Koncentryczny (gniazdo elastomerowe, praca ogólna), podwójnie ekscentryczny (wysoka wydajność) i potrójnie ekscentryczny (gniazdo metalowe, pełna szczelność). Montaż: wafer (między kołnierze), lug, kołnierzowy lub rowkowany.",
+        "whenToUse": "Duże średnice, w których kulowy lub zasuwa byłyby zbyt ciężkie lub drogie; regulacja; woda, HVAC, powietrze, gazy i łagodne chemikalia w granicach gniazda.",
+        "whenNotToUse": "Odcinanie przy wysokim ΔP powyżej klasy gniazda, abrazyjne szlamy (poza gniazdem metalowym) lub praca wymagająca pełnego przełotu.",
+        "installation": "Wersja wafer wpina się między kołnierze: sprawdź, czy tarcza nie ociera o rurę ani o śruby, i wycentruj gniazdo na uszczelce przed dokręceniem.",
+        "commonError": "Montaż wafer przy zbyt dużym wewnętrznym świetle rury lub niezcentrowanych kołnierzach: tarcza się zakleszcza."
+      }
     }
   },
   "notFound": {

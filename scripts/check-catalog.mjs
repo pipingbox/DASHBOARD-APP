@@ -129,6 +129,35 @@ for (const key of [...ratingNoteKeys].sort()) {
   }
 }
 
+/* ── 4b. every guide_key must resolve in all locales (usage guide) ───────── */
+
+// Same contract as rating_note_key: the guide is practical, non-normative
+// content, but if it exists it must exist in every language. A guide key that
+// resolves to an object (missing leaf field) is also an unfinished translation.
+const GUIDE_FIELDS = ['whatIs', 'types', 'whenToUse', 'whenNotToUse', 'installation', 'commonError'];
+const guideKeys = new Set();
+for (const c of publishable) {
+  if (c.guideKey) guideKeys.add(c.guideKey);
+}
+let guideChecked = 0;
+for (const key of [...guideKeys].sort()) {
+  for (const code of LOCALES) {
+    if (!locales[code]) continue;
+    const section = resolveKey(locales[code], key);
+    if (section == null || typeof section !== 'object') {
+      errors.push(`${code}.json: falta la guia de uso ${key}`);
+      continue;
+    }
+    for (const field of GUIDE_FIELDS) {
+      guideChecked++;
+      const value = section[field];
+      if (typeof value !== 'string' || !value.trim()) {
+        errors.push(`${code}.json: guia ${key} incompleta, falta ${field}`);
+      }
+    }
+  }
+}
+
 /* ── 5. the library must not be silently empty ───────────────────────────── */
 
 // A generator bug that emitted zero components would otherwise pass every
@@ -152,6 +181,7 @@ if (errors.length) {
 console.log(
   `✓ catalogo integro: ${publishable.length} componentes publicables, ` +
   `${checked} assets verificados, ${Object.keys(catalog.standards).length} normativas, ` +
-  `${ratingNoteKeys.size} claves rating_note x ${LOCALES.length} idiomas (${i18nChecked} traducciones)` +
+  `${ratingNoteKeys.size} claves rating_note x ${LOCALES.length} idiomas (${i18nChecked} traducciones), ` +
+  `${guideKeys.size} guias de uso (${guideChecked} campos verificados)` +
   (withoutRender ? ` (${withoutRender} sin render 3D)` : ''),
 );
