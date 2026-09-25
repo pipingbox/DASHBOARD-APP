@@ -4,13 +4,13 @@
   "_warning": "FICHERO GENERADO. No editar a mano: se sobrescribe.",
   "stats": {
     "components": 57,
-    "publishable": 53,
+    "publishable": 54,
     "standards": 20,
-    "standardsInUse": 16,
+    "standardsInUse": 17,
     "dimensionSets": 71,
     "dimensionRows": 1943,
-    "drawings": 628,
-    "renders": 52
+    "drawings": 637,
+    "renders": 53
   },
   "components": [
     {
@@ -4329,12 +4329,7 @@
         {
           "standardId": "PB-STD-ASME-B16-9",
           "role": "dimensions",
-          "note": "Per ASME standard."
-        },
-        {
-          "standardId": "PB-STD-ASME-B16-9",
-          "role": "dimensions",
-          "note": "Per MSS standard."
+          "note": "Dimensions per ASME B16.9; pattern also listed in MSS SP-43 (see quality.sources)."
         }
       ],
       "dimensionSets": [
@@ -4445,12 +4440,7 @@
         {
           "standardId": "PB-STD-ASME-B16-9",
           "role": "dimensions",
-          "note": "Per ASME standard."
-        },
-        {
-          "standardId": "PB-STD-ASME-B16-9",
-          "role": "dimensions",
-          "note": "Per MSS standard."
+          "note": "Dimensions per ASME B16.9; pattern also listed in MSS SP-43 (see quality.sources)."
         }
       ],
       "dimensionSets": [
@@ -5690,7 +5680,7 @@
       "name": "Válvula de Bola (Ball Valve) API 608 Class 150",
       "shortName": "Válvula de Bola (Ball Valve) API 608 Cla",
       "description": "Ball valve per API 608, Class 150, flanged ends. Quarter-turn lever operated. Full-bore design for minimal pressure drop and pigging capability. Suitable for on/off isolation and some throttling applications.",
-      "status": "draft",
+      "status": "approved",
       "version": "0.1",
       "category": "valves",
       "family": "valve",
@@ -5791,7 +5781,7 @@
       "name": "Válvula de Compuerta (Gate Valve) API 600 Class 150",
       "shortName": "Válvula de Compuerta (Gate Valve) API 60",
       "description": "Gate valve per API 600, Class 150, flanged ends. Full-bore design for minimal pressure drop. Handwheel operated. Suitable for on/off isolation service; not recommended for throttling.",
-      "status": "draft",
+      "status": "approved",
       "version": "0.1",
       "category": "valves",
       "family": "valve",
@@ -5894,7 +5884,7 @@
       "name": "Válvula de Globo (Globe Valve) API 602 Class 150",
       "shortName": "Válvula de Globo (Globe Valve) API 602 C",
       "description": "Globe valve per API 602, Class 150, flanged ends, bolted bonnet. Designed for throttling and flow regulation. Handwheel operated. Higher pressure drop than gate valves due to tortuous flow path.",
-      "status": "draft",
+      "status": "approved",
       "version": "0.1",
       "category": "valves",
       "family": "valve",
@@ -5995,8 +5985,8 @@
       "slug": "valve-butterfly-api-609",
       "name": "Válvula de Mariposa API 609 Category A",
       "shortName": "Válvula de Mariposa API 609",
-      "description": "Butterfly valve with a dedicated API 609 Category A dimensional dataset. Geometry and visual asset remain in WP5 build until reference and visual gates pass.",
-      "status": "draft",
+      "description": "Butterfly valve with a dedicated API 609 Category A dimensional dataset. Reference, data, 2D, geometry and visual gates passed in WP5.",
+      "status": "approved",
       "version": "0.1",
       "category": "valves",
       "family": "valve",
@@ -6015,12 +6005,10 @@
         "stainless_steel",
         "ductile_iron"
       ],
-      "pressureRatings": [
-        "150"
-      ],
-      "ratingBasis": null,
+      "pressureRatings": [],
+      "ratingBasis": "not_applicable",
       "ratingNote": "API 609 Category A dimensional reference; pressure class and vendor construction must be verified for the selected product.",
-      "ratingNoteKey": null,
+      "ratingNoteKey": "catalog.ratingNote.api609ButterflyValve",
       "standards": [
         {
           "standardId": "PB-STD-API-609",
@@ -6031,9 +6019,46 @@
       "dimensionSets": [
         "PB-DIM-API-609-BUTTERFLY-CAT-A"
       ],
-      "drawings": [],
-      "drawingStem": null,
-      "render": null,
+      "drawings": [
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-VALVE-BUTTERFLY-NPS-2_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-VALVE-BUTTERFLY-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-VALVE-BUTTERFLY-NPS-4_2d.svg"
+        },
+        {
+          "size": "5",
+          "src": "/catalog/2d/PB-DIM-VALVE-BUTTERFLY-NPS-5_2d.svg"
+        },
+        {
+          "size": "6",
+          "src": "/catalog/2d/PB-DIM-VALVE-BUTTERFLY-NPS-6_2d.svg"
+        },
+        {
+          "size": "8",
+          "src": "/catalog/2d/PB-DIM-VALVE-BUTTERFLY-NPS-8_2d.svg"
+        },
+        {
+          "size": "10",
+          "src": "/catalog/2d/PB-DIM-VALVE-BUTTERFLY-NPS-10_2d.svg"
+        },
+        {
+          "size": "12",
+          "src": "/catalog/2d/PB-DIM-VALVE-BUTTERFLY-NPS-12_2d.svg"
+        },
+        {
+          "size": "21-2",
+          "src": "/catalog/2d/PB-DIM-VALVE-BUTTERFLY-NPS-21-2_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-VALVE-BUTTERFLY",
+      "render": "/catalog/3d/PB-ASSET-0054_valve-butterfly_3d.webp",
       "fabricationNotes": [
         "Dedicated butterfly geometry required; do not substitute a ball-valve mesh."
       ],
@@ -6048,7 +6073,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-VALVE-CHECK-API-594",
@@ -6056,7 +6081,7 @@
       "name": "Válvula de Retención (Check Valve) API 594 Class 150",
       "shortName": "Válvula de Retención (Check Valve) API 5",
       "description": "Wafer dual-plate check valve per API 594, Class 150. Compact design installed between flanges. Spring-loaded dual plates for fast closure and low pressure drop. Prevents backflow in horizontal and vertical (upward flow) installations.",
-      "status": "draft",
+      "status": "approved",
       "version": "0.1",
       "category": "valves",
       "family": "valve",
