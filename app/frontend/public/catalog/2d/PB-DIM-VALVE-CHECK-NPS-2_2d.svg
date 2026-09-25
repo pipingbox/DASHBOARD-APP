@@ -22,27 +22,33 @@
   </defs>
   <rect width="800" height="700" fill="#fafafa"/>
   <text x="40" y="40" class="title">Check Valve</text>
-  <text x="40" y="60" class="subtitle">NPS 2 (DN 50) — Class 150 — Flanged Ends</text>
+  <text x="40" y="60" class="subtitle">NPS 2 (DN 50) — Class 150 — Wafer Ends</text>
   <text x="40" y="78" class="std-ref">API 594 | Check Valve</text>
   <rect x="328.76" y="350.884" width="42.48" height="38.232" rx="8" class="profile"/>
-  <rect x="316.76" y="345.1492" width="12" height="49.7016" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="1.5"/>
-  <rect x="371.24" y="345.1492" width="12" height="49.7016" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="1.5"/>
-  <line x1="316.76" y1="370" x2="383.24" y2="370" class="bore"/>
+  <line x1="350" y1="353.94256" x2="350" y2="386.05744" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="338.9552" y1="370" x2="350" y2="353.94256" stroke="#8a9096" stroke-width="1.6"/>
+  <line x1="361.0448" y1="370" x2="350" y2="353.94256" stroke="#8a9096" stroke-width="1.6"/>
+  <line x1="328.76" y1="370" x2="371.24" y2="370" class="bore"/>
   <line x1="286.76" y1="370" x2="413.24" y2="370" class="centerline"/>
   <text x="281.76" y="374" class="label" text-anchor="end">CL</text>
-  <line x1="316.76" y1="399.116" x2="316.76" y2="434.116" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="383.24" y1="399.116" x2="383.24" y2="434.116" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="316.76" y1="429.116" x2="383.24" y2="429.116" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <line x1="328.76" y1="399.116" x2="328.76" y2="434.116" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="371.24" y1="399.116" x2="371.24" y2="434.116" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="328.76" y1="429.116" x2="371.24" y2="429.116" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
   <text x="350" y="422.116" class="dim-text">F-to-F</text>
   <text x="350" y="444.116" class="dim-sub">2.36" | 60 mm</text>
-  <line x1="316.76" y1="399.116" x2="316.76" y2="434.116" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="383.24" y1="399.116" x2="383.24" y2="434.116" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="328.76" y1="399.116" x2="328.76" y2="434.116" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="371.24" y1="399.116" x2="371.24" y2="434.116" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="314.76" y1="350.884" x2="288.76" y2="350.884" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="314.76" y1="389.116" x2="288.76" y2="389.116" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="293.76" y1="350.884" x2="293.76" y2="389.116" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="284.76" y="366" class="dim-text" text-anchor="end">OD body</text>
+  <text x="284.76" y="384" class="dim-sub" text-anchor="end">5.75" | 146.1 mm</text>
   <rect x="540" y="100" width="230" height="157" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
   <text x="655" y="120" class="tbl-hdr">NPS 2 — Key Data</text>
-  <line x1="555" y1="128" x2="755" y2="128" stroke="#eee" stroke-width=".5"/><text x="560" y="145" class="tbl-key">NPS / DN</text><text x="750" y="145" class="tbl-val">2 / 50</text><text x="560" y="162" class="tbl-key">Class</text><text x="750" y="162" class="tbl-val">150</text><text x="560" y="179" class="tbl-key">F-to-F</text><text x="750" y="179" class="tbl-val">2.36" | 60 mm</text><text x="560" y="196" class="tbl-key">OD body</text><text x="750" y="196" class="tbl-val">5.75" | 146.1 mm</text><text x="560" y="213" class="tbl-key">Weight</text><text x="750" y="213" class="tbl-val">5 kg</text><text x="560" y="230" class="tbl-key">Standard</text><text x="750" y="230" class="tbl-val">API 594</text><text x="560" y="247" class="tbl-key">End type</text><text x="750" y="247" class="tbl-val">Flanged RF</text>
+  <line x1="555" y1="128" x2="755" y2="128" stroke="#eee" stroke-width=".5"/><text x="560" y="145" class="tbl-key">NPS / DN</text><text x="750" y="145" class="tbl-val">2 / 50</text><text x="560" y="162" class="tbl-key">Class</text><text x="750" y="162" class="tbl-val">150</text><text x="560" y="179" class="tbl-key">F-to-F</text><text x="750" y="179" class="tbl-val">2.36" | 60 mm</text><text x="560" y="196" class="tbl-key">OD body</text><text x="750" y="196" class="tbl-val">5.75" | 146.1 mm</text><text x="560" y="213" class="tbl-key">Weight</text><text x="750" y="213" class="tbl-val">5 kg</text><text x="560" y="230" class="tbl-key">Standard</text><text x="750" y="230" class="tbl-val">API 594</text><text x="560" y="247" class="tbl-key">End type</text><text x="750" y="247" class="tbl-val">Wafer (between flanges)</text>
   <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
-  <text x="40" y="648" class="note">Check Valve per API 594, Class 150, Flanged RF ends.</text>
-  <text x="40" y="663" class="note">F-to-F = face-to-face. H = center of bore to top of operator. Weight is approximate.</text>
-  <text x="40" y="678" class="note">All dimensions from canonical dataset only; no inherited values retained.</text>
+  <text x="40" y="648" class="note">Check Valve per API 594, Class 150, wafer body — installed BETWEEN flanges; no integral flanges.</text>
+  <text x="40" y="663" class="note">OD body must fit within the bolt circle of the mating ASME B16.5 Class 150 flanges.</text>
+  <text x="40" y="678" class="note">Dual-plate arrangement shown schematically; internals are not dimensioned. Weight is approximate.</text>
   <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
 </svg>
