@@ -1,0 +1,9 @@
+{
+  "name": "pb-pdi-004-recovery-mailer",
+  "private": true,
+  "description": "TEST-only SMTP sender for the PB-PDI-004 recovery email (existing one.com SMTP provider).",
+  "type": "module",
+  "dependencies": {
+    "nodemailer": "^7.0.0"
+  }
+}
