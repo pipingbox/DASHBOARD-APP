@@ -76,7 +76,13 @@ function json(obj: Record<string, unknown>, status = 200): Response {
 
 /** Log estructurado sin PII ni secretos. */
 function log(fields: Record<string, unknown>): void {
-  console.log(JSON.stringify({ ts: new Date().toISOString(), ...fields }));
+  const allowed = ["template", "provider_status", "message_id", "audit_copy_sent", "status"];
+  const safeFields = Object.fromEntries(
+    allowed
+      .filter((key) => fields[key] !== undefined)
+      .map((key) => [key, fields[key]]),
+  );
+  console.log(JSON.stringify({ ts: new Date().toISOString(), ...safeFields }));
 }
 
 /** Compara dos strings en tiempo constante (SHA-256 + XOR byte a byte). */
