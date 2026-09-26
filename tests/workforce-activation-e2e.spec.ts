@@ -41,7 +41,10 @@ const IGNORED_DIFF_COLUMNS = new Set(['updated_at']);
 
 // Spanish UI strings (the spec pins pipingbox_language=es, as the other specs).
 const TXT = {
-  bannerTitle: /Completa tu perfil para recibir ofertas/i,
+  // NOTE: es.json has a DUPLICATE matchReadyTitle key (lines 417/484); the
+  // effective copy is the later one ("coincidencias de empleo"). Match the
+  // common prefix so the test is immune to the deduplication either way.
+  bannerTitle: /Completa tu perfil para recibir/i,
   gapBio: /Añade un resumen profesional/i,
   gapExperience: /Añade experiencia laboral estructurada/i,
   quickCta: 'Añadir experiencia laboral',
