@@ -53,6 +53,10 @@ const TXT = {
   editTitle: /Editar Experiencia Laboral/i,
   update: /Actualizar/i,
   incident: /Código de incidencia|Incident code/i,
+  deleteBtn: 'Eliminar',
+  confirmDeleteTitle: /¿Eliminar experiencia\?/i,
+  deletedToast: /Experiencia eliminada/i,
+  errorToast: /Ocurrió un error inesperado/i,
 };
 
 interface RestCtx {
@@ -532,6 +536,7 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 — real E2E on preview (scenarios A�
       console.log('scenario B PASS: quick ↔ full compatibility, pre-existing translations preserved');
 
       // ── 9. Scenario F — existing user keeps a working profile ──────────
+      // (Runs BEFORE the delete phase: the fixture must still be present.)
       console.log('phase F: profile with existing rows stays functional');
       await gotoProfile();
       await expect(page.getByText(fixturePosition).first(), 'existing rows must still render').toBeVisible({
@@ -539,6 +544,111 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 — real E2E on preview (scenarios A�
       });
       await expect(page.locator('input[type="number"]').first(), 'base profile form must still work').toBeVisible();
       console.log('scenario F PASS: no profile regression with WFA sections present');
+
+      // ── 9b. Scenario G — DELETE failure paths + real delete + readiness ─
+      // PO GO 2026-09-26 §5: prove the optimistic-delete protection WITHOUT
+      // rewriting it (code review says it restores previousItems on failure
+      // and only toasts success in the ok branch — this is the reproduction
+      // test, not a modification).
+      const deleteBtnInCard = page
+        .locator('div', { hasText: fixturePosition })
+        .filter({ has: page.getByTitle(TXT.deleteBtn, { exact: true }) })
+        .last()
+        .getByTitle(TXT.deleteBtn, { exact: true })
+        .first();
+
+      // G1 — 200 with NO deleted row (RLS-block shape): service layer must
+      // reject (.select('id').single() errors on empty) → row restored, error
+      // toast, NO success toast, DB row intact.
+      console.log('phase G1: DELETE answered 200 with no row must be treated as failure');
+      await page.route('**/rest/v1/app_worker_experiences*', (route) => {
+        if (route.request().method() === 'DELETE') {
+          return route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
+        }
+        return route.continue();
+      });
+      await deleteBtnInCard.click({ timeout: 10_000 });
+      const confirmDialog = page.getByRole('alertdialog');
+      await expect(confirmDialog.getByText(TXT.confirmDeleteTitle)).toBeVisible({ timeout: 10_000 });
+      await confirmDialog.getByRole('button', { name: TXT.deleteBtn, exact: true }).click({ timeout: 10_000 });
+      await expect(
+        page.locator('[data-sonner-toast][data-type="error"]').first(),
+        'a no-row delete must surface an error toast',
+      ).toBeVisible({ timeout: 15_000 });
+      await expect(
+        page.locator('[data-sonner-toast][data-type="success"]'),
+        'a no-row delete must NOT show the success toast',
+      ).toHaveCount(0);
+      await expect(
+        page.getByText(fixturePosition).first(),
+        'the row must be RESTORED in the UI after a no-row delete',
+      ).toBeVisible({ timeout: 10_000 });
+      expect(
+        (await listOwnExperiences()).filter((r) => String(r.id) === String(fixture!.id)).length,
+        'the DB row must still exist after a no-row delete',
+      ).toBe(1);
+      console.log('scenario G1 PASS: no-row delete → error toast, row restored, DB intact');
+
+      // G2 — network failure (request aborted): catch branch → restore + error.
+      console.log('phase G2: DELETE network failure must restore the row');
+      await page.route('**/rest/v1/app_worker_experiences*', (route) => {
+        if (route.request().method() === 'DELETE') return route.abort();
+        return route.continue();
+      });
+      await deleteBtnInCard.click({ timeout: 10_000 });
+      const confirmDialog2 = page.getByRole('alertdialog');
+      await expect(confirmDialog2.getByText(TXT.confirmDeleteTitle)).toBeVisible({ timeout: 10_000 });
+      await confirmDialog2.getByRole('button', { name: TXT.deleteBtn, exact: true }).click({ timeout: 10_000 });
+      await expect(
+        page.getByText(fixturePosition).first(),
+        'the row must be RESTORED after a network-failed delete',
+      ).toBeVisible({ timeout: 15_000 });
+      expect(
+        (await listOwnExperiences()).filter((r) => String(r.id) === String(fixture!.id)).length,
+        'the DB row must still exist after a network-failed delete',
+      ).toBe(1);
+      console.log('scenario G2 PASS: network-failed delete → row restored, DB intact');
+      await page.unroute('**/rest/v1/app_worker_experiences*');
+
+      // G3 — REAL delete via UI (F-1 grant now applied): success toast, row
+      // gone from UI AND DB, still gone after reload, and deleting the last
+      // qualifying experience must revoke readiness (gap reappears) WITHOUT
+      // any change to the canonical predicate.
+      console.log('phase G3: real delete via UI must remove the row and revoke readiness');
+      await deleteBtnInCard.click({ timeout: 10_000 });
+      const confirmDialog3 = page.getByRole('alertdialog');
+      await expect(confirmDialog3.getByText(TXT.confirmDeleteTitle)).toBeVisible({ timeout: 10_000 });
+      await confirmDialog3.getByRole('button', { name: TXT.deleteBtn, exact: true }).click({ timeout: 10_000 });
+      await expect(
+        page.locator('[data-sonner-toast][data-type="success"]').first(),
+        'a real delete must show the success toast',
+      ).toBeVisible({ timeout: 15_000 });
+      await expect(
+        page.getByText(fixturePosition).first(),
+        'the row must disappear from the UI after a real delete',
+      ).toHaveCount(0);
+      for (let i = 0; i < 10; i++) {
+        if ((await listOwnExperiences()).filter((r) => String(r.id) === String(fixture!.id)).length === 0) break;
+        await page.waitForTimeout(1000);
+      }
+      expect(
+        (await listOwnExperiences()).filter((r) => String(r.id) === String(fixture!.id)).length,
+        'the row must be REALLY gone from the DB (F-1 grant working)',
+      ).toBe(0);
+
+      await gotoProfile();
+      await expect(
+        page.getByText(fixturePosition).first(),
+        'the row must still be absent after a reload',
+      ).toHaveCount(0);
+      await expect(
+        page.getByText(TXT.gapExperience).first(),
+        'deleting the LAST qualifying experience must re-open the experience gap',
+      ).toBeVisible({ timeout: 20_000 });
+      expect((await dbReadiness()).ready, 'readiness must be revoked after losing the only qualifying experience').toBe(false);
+      console.log('scenario G3 PASS: real delete removes row (UI+DB+reload) and revokes readiness');
+      // The fixture was consumed by G3 — nothing left to dispose for it.
+      fixtureIds.length = 0;
 
       console.log('DIAG browser errors (tail):', JSON.stringify(browserErrors.slice(0, 8)));
     } finally {

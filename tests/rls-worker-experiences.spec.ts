@@ -240,12 +240,13 @@ test.describe('app_worker_experiences — owner controls and spoof attempts (QA 
   });
 });
 
-test.describe('app_worker_experiences — cross-user isolation (QA A vs QA B)', () => {
+test.describe('app_worker_experiences — cross-user isolation (QA A vs QA B, both directions)', () => {
   test(
-    'BLOCKED-MISSING-SECRET: cross-user isolation requires E2E_TEST_EMAIL_B / E2E_TEST_PASSWORD_B',
+    'cross-user isolation B→A and A→B (requires E2E_TEST_EMAIL_B / E2E_TEST_PASSWORD_B)',
     // This test must never pass vacuously. With the second identity present it
-    // executes the real isolation checks; without them it FAILS LOUDLY so the
-    // gap is visible in every run instead of hiding as a skip.
+    // executes the real isolation checks IN BOTH DIRECTIONS; without them it
+    // FAILS LOUDLY so the gap is visible in every run instead of hiding as a
+    // skip (PO GO 2026-09-26 §3–4: no skips that hide missing credentials).
     async () => {
       test.skip(!hasAnonConfig, 'Requires VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
       expect(
@@ -261,72 +262,129 @@ test.describe('app_worker_experiences — cross-user isolation (QA A vs QA B)', 
         const b = await login(api, EMAIL_B, PASSWORD_B);
         expect(b.userId, 'identity B must be a DIFFERENT user').not.toBe(a.userId);
 
-        const headersA = () => ({
+        const mkHeaders = (token: string) => ({
           apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${a.token}`,
-          'Content-Type': 'application/json',
-        });
-        const headersB = () => ({
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${b.token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         });
 
-        // A creates a fixture (positive control).
-        const create = await api.post(`/rest/v1/${TABLE}`, {
-          headers: { ...headersA(), Prefer: 'return=representation' },
-          data: { user_id: a.userId, position: FIXTURE_MARKER, company_name: 'QA RLS cross-user' },
-        });
-        expect(create.status()).toBeLessThan(400);
-        const fixture = ((await create.json()) as Array<{ id: string }>)[0];
-        expect(fixture?.id).toBeTruthy();
+        // Both identities must be NORMAL users (PO §3: ninguna identidad es
+        // administradora). Each principal reads their OWN profile row.
+        const assertNonAdmin = async (userId: string, token: string, label: string) => {
+          const res = await api.get(`/rest/v1/app_14da0f1941_profiles?user_id=eq.${userId}&select=role,account_type`, {
+            headers: mkHeaders(token),
+          });
+          expect(res.status(), `${label} must be able to read their own profile`).toBe(200);
+          const rows = (await res.json()) as Array<{ role?: string; account_type?: string }>;
+          expect(rows.length, `${label} must have a profile row`).toBe(1);
+          expect(rows[0].account_type, `${label} must NOT be an admin account`).not.toBe('admin');
+          expect(rows[0].role, `${label} must NOT have the admin role`).not.toBe('admin');
+        };
+        await assertNonAdmin(a.userId, a.token, 'QA-A');
+        await assertNonAdmin(b.userId, b.token, 'QA-B');
 
-        try {
-          // B cannot read A's private row (visibility contract: at minimum B
-          // must not be able to WRITE it; read is asserted per the approved
-          // visibility contract — adjust only with an explicit contract change).
-          const readB = await api.get(`/rest/v1/${TABLE}?id=eq.${fixture.id}&select=id`, { headers: headersB() });
-          if (!isGenuineDenial(readB.status())) {
-            expect(readB.status()).toBe(200);
-            const rows = (await readB.json()) as unknown[];
-            expect(rows.length, 'B must not see A’s experience row').toBe(0);
-          }
+        /**
+         * One-directional isolation check: `other` must not be able to read,
+         * modify or delete a row owned by `owner`. The owner verifies their
+         * own row's integrity before and after every forbidden attempt.
+         * Fixture is created by the owner and deleted by the owner (exact id).
+         */
+        const assertIsolation = async (
+          owner: { token: string; userId: string; label: string },
+          other: { token: string; userId: string; label: string },
+        ) => {
+          const ownerH = () => mkHeaders(owner.token);
+          const otherH = () => mkHeaders(other.token);
 
-          // B cannot UPDATE A's row — verified before/after by the owner.
-          const updB = await api.patch(`/rest/v1/${TABLE}?id=eq.${fixture.id}`, {
-            headers: { ...headersB(), Prefer: 'return=representation' },
-            data: { company_name: 'TAMPERED-BY-B' },
+          // Owner creates a fixture (positive control for the owner side).
+          const create = await api.post(`/rest/v1/${TABLE}`, {
+            headers: { ...ownerH(), Prefer: 'return=representation' },
+            data: { user_id: owner.userId, position: FIXTURE_MARKER, company_name: 'QA RLS cross-user' },
           });
-          if (!isGenuineDenial(updB.status())) {
-            expect(updB.status(), 'B UPDATE must be denied or affect zero rows').toBe(200);
-            const changed = (await updB.json()) as unknown[];
-            expect(changed.length, 'B UPDATE must affect zero rows').toBe(0);
-          }
-          const afterUpd = await api.get(`/rest/v1/${TABLE}?id=eq.${fixture.id}&select=company_name`, {
-            headers: headersA(),
-          });
-          const ownerRow = ((await afterUpd.json()) as Array<{ company_name: string }>)[0];
-          expect(ownerRow?.company_name, 'owner state must be unchanged after B’s attempt').toBe(
-            'QA RLS cross-user',
-          );
+          expect(create.status(), `${owner.label} must be able to create their own fixture`).toBeLessThan(400);
+          const fixture = ((await create.json()) as Array<{ id: string }>)[0];
+          expect(fixture?.id).toBeTruthy();
 
-          // B cannot DELETE A's row — owner re-read confirms.
-          const delB = await api.delete(`/rest/v1/${TABLE}?id=eq.${fixture.id}`, {
-            headers: { ...headersB(), Prefer: 'return=representation' },
-          });
-          if (!isGenuineDenial(delB.status())) {
-            expect(delB.status()).toBe(200);
-            const deleted = (await delB.json()) as unknown[];
-            expect(deleted.length, 'B DELETE must affect zero rows').toBe(0);
+          try {
+            // Other cannot READ the owner's row (approved visibility contract).
+            const readOther = await api.get(`/rest/v1/${TABLE}?id=eq.${fixture.id}&select=id`, {
+              headers: otherH(),
+            });
+            if (!isGenuineDenial(readOther.status())) {
+              expect(readOther.status()).toBe(200);
+              const rows = (await readOther.json()) as unknown[];
+              expect(rows.length, `${other.label} must not see ${owner.label}’s experience row`).toBe(0);
+            }
+
+            // Other cannot UPDATE the owner's row — verified after by the owner.
+            const updOther = await api.patch(`/rest/v1/${TABLE}?id=eq.${fixture.id}`, {
+              headers: { ...otherH(), Prefer: 'return=representation' },
+              data: { company_name: `TAMPERED-BY-${other.label}` },
+            });
+            if (!isGenuineDenial(updOther.status())) {
+              expect(updOther.status(), 'cross UPDATE must be denied or affect zero rows').toBe(200);
+              const changed = (await updOther.json()) as unknown[];
+              expect(changed.length, 'cross UPDATE must affect zero rows').toBe(0);
+            }
+            const afterUpd = await api.get(`/rest/v1/${TABLE}?id=eq.${fixture.id}&select=company_name`, {
+              headers: ownerH(),
+            });
+            const ownerRow = ((await afterUpd.json()) as Array<{ company_name: string }>)[0];
+            expect(ownerRow?.company_name, 'owner state must be unchanged after the cross attempt').toBe(
+              'QA RLS cross-user',
+            );
+
+            // Other cannot DELETE the owner's row — owner re-read confirms.
+            const delOther = await api.delete(`/rest/v1/${TABLE}?id=eq.${fixture.id}`, {
+              headers: { ...otherH(), Prefer: 'return=representation' },
+            });
+            if (!isGenuineDenial(delOther.status())) {
+              expect(delOther.status()).toBe(200);
+              const deleted = (await delOther.json()) as unknown[];
+              expect(deleted.length, 'cross DELETE must affect zero rows').toBe(0);
+            }
+            const stillThere = await api.get(`/rest/v1/${TABLE}?id=eq.${fixture.id}&select=id`, {
+              headers: ownerH(),
+            });
+            expect(
+              ((await stillThere.json()) as unknown[]).length,
+              `${owner.label}’s row must survive ${other.label}’s delete attempt`,
+            ).toBe(1);
+
+            // Other cannot INSERT a row attributed to the owner.
+            const spoof = await api.post(`/rest/v1/${TABLE}`, {
+              headers: { ...otherH(), Prefer: 'return=representation' },
+              data: { user_id: owner.userId, position: FIXTURE_MARKER, company_name: 'spoof cross insert' },
+            });
+            if (!isGenuineDenial(spoof.status()) && spoof.status() < 400) {
+              const rows = (await spoof.json()) as Array<{ id?: string; user_id?: string }>;
+              expect(rows?.[0]?.user_id, 'a spoofed cross insert must never store the owner id').not.toBe(owner.userId);
+              if (rows?.[0]?.id) {
+                await api.delete(`/rest/v1/${TABLE}?id=eq.${rows[0].id}`, { headers: otherH() });
+              }
+            }
+          } finally {
+            // Owner-scoped cleanup of the exact fixture (F-1 grant makes this
+            // a REAL delete; a failure is logged, not swallowed).
+            const cleanup = await api.delete(`/rest/v1/${TABLE}?id=eq.${fixture.id}`, { headers: ownerH() });
+            if (!cleanup.ok()) {
+              console.error(
+                `[rls-worker-experiences] cleanup failed for ${fixture.id} (${owner.label}): HTTP ${cleanup.status()}`,
+              );
+            }
           }
-          const stillThere = await api.get(`/rest/v1/${TABLE}?id=eq.${fixture.id}&select=id`, {
-            headers: headersA(),
-          });
-          expect(((await stillThere.json()) as unknown[]).length, 'A’s row must survive B’s delete attempt').toBe(1);
-        } finally {
-          // Owner-scoped cleanup of the exact fixture.
-          await api.delete(`/rest/v1/${TABLE}?id=eq.${fixture.id}`, { headers: headersA() });
-        }
+        };
+
+        // Direction 1: B tries against A's row.
+        await assertIsolation(
+          { token: a.token, userId: a.userId, label: 'QA-A' },
+          { token: b.token, userId: b.userId, label: 'QA-B' },
+        );
+        // Direction 2 (PO §4: "Verificar el sentido inverso A sobre B").
+        await assertIsolation(
+          { token: b.token, userId: b.userId, label: 'QA-B' },
+          { token: a.token, userId: a.userId, label: 'QA-A' },
+        );
       } finally {
         await api.dispose();
       }

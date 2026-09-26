@@ -1,0 +1,52 @@
+-- ══════════════════════════════════════════════════════════════════════════════
+-- sql/012 — F-1: GRANT DELETE (owner) en app_worker_experiences — APLICADO
+--
+-- ESTADO: **APPLIED** (2026-09-26, migración rastreada
+-- `pb_f1_grant_delete_worker_experiences`, idempotency key
+-- `pb-f1-grant-delete-worker-experiences-20260926`, canal Management API como
+-- postgres sobre el proyecto `mwdauubztjxkbrefirbg`).
+--
+-- CONTENIDO EXACTO APLICADO (1 sentencia):
+--   GRANT DELETE ON public.app_worker_experiences TO authenticated;
+--   SHA-256 (contenido exacto, sin newline final):
+--     a5dbf2479b4bf047815558349f0f45a15dc18e225f1616344ad4d1bd791bbc7c
+--     (verificar: printf '%s' "GRANT DELETE ON public.app_worker_experiences TO authenticated;" | sha256sum)
+--
+-- DIAGNÓSTICO CORREGIDO (preflight 2026-09-26, consultas pg_class/pg_policy):
+--   La v1 de este fichero hipotetizaba "falta GRANT y/o policy RLS FOR DELETE"
+--   e incluía una CREATE POLICY DO-block. El estado real verificado
+--   inmediatamente antes de la ejecución:
+--     - RLS ACTIVADO (pg_class.relrowsecurity = true).
+--     - ACL previo: {postgres=arwdDxtm, anon=m, authenticated=arwm,
+--       service_role=rDxtm} → authenticated tenía SELECT(r)+INSERT(a)+UPDATE(w)
+--       pero NO DELETE(d); anon sin privilegios de datos.
+--     - 3 políticas FOR ALL ya existentes, NINGUNA nueva necesaria:
+--         "authenticated users full access experiences" (auth.uid() = user_id)
+--         "experiences_owner_all"                          (auth.uid() = user_id)
+--         "experiences_admin_all"                          (app_is_admin())
+--       Las políticas FOR ALL cubren DELETE: solo faltaba el GRANT.
+--     - Ninguna política abre acceso indebidamente (owner-only + admin-only).
+--   Por tanto la corrección autorizada fue EXCLUSIVAMENTE el GRANT DELETE:
+--   sin políticas nuevas (el DO-block de la v1 quedó DESestimado), sin tocar
+--   anon, sin SECURITY DEFINER, sin modificar ownership. Las políticas y el RLS
+--   preexistentes quedan intactos.
+--
+-- VERIFICACIÓN POST-APLICACIÓN (2026-09-26):
+--   ACL posterior: {postgres=arwdDxtm, anon=m, authenticated=arwdm,
+--   service_role=rDxtm} → único delta = "d" añadido a authenticated. anon y
+--   service_role sin cambios; políticas sin cambios (3 FOR ALL).
+--   Verificación funcional (usuarios normales, sin service_role): pack B1 en
+--   CI — tests/rls-worker-experiences.spec.ts debe pasar completo, incluido
+--   owner DELETE real + aislamiento A/B bidireccional.
+--
+-- ROLLBACK (reverte EXCLUSIVAMENTE el permiso añadido por esta operación):
+--   REVOKE DELETE ON public.app_worker_experiences FROM authenticated;
+--   No borra ni modifica políticas preexistentes.
+--
+-- NOTA DE GOBERNANZA: preview y producción comparten esta base de datos; este
+-- permiso ES un cambio en la base de producción aunque el SHA del frontend
+-- público no cambie. La cuestión sql/ vs supabase/migrations sigue documentada
+-- como deuda de gobernabilidad separada (no resuelta aquí).
+-- ══════════════════════════════════════════════════════════════════════════════
+
+GRANT DELETE ON public.app_worker_experiences TO authenticated;

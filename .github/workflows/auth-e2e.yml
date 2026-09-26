@@ -378,8 +378,11 @@ jobs:
       PREVIEW_URL: ${{ inputs.target_url }}
       E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
       E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
-      E2E_TEST_EMAIL_B: ${{ secrets.E2E_TEST_EMAIL_B }}
-      E2E_TEST_PASSWORD_B: ${{ secrets.E2E_TEST_PASSWORD_B }}
+      # QA B reuses the existing second worker identity already configured for
+      # broker-e2e (PO GO 2026-09-26 §3: reuse a suitable QA account if one
+      # already exists — no new secrets, no password resets).
+      E2E_TEST_EMAIL_B: ${{ secrets.E2E_SECOND_WORKER_EMAIL }}
+      E2E_TEST_PASSWORD_B: ${{ secrets.E2E_SECOND_WORKER_PASSWORD }}
       EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
       VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
       VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
@@ -402,7 +405,7 @@ jobs:
             if [ -z "${!v:-}" ]; then echo "::error::$v is not configured as a GitHub Secret."; exit 1; fi
           done
           if [ -z "${E2E_TEST_EMAIL_B:-}" ] || [ -z "${E2E_TEST_PASSWORD_B:-}" ]; then
-            echo "::warning::E2E_TEST_EMAIL_B / E2E_TEST_PASSWORD_B are NOT configured — the cross-user RLS isolation test will FAIL LOUDLY (B3 stays HOLD until they exist)."
+            echo "::warning::E2E_SECOND_WORKER_EMAIL / E2E_SECOND_WORKER_PASSWORD (mapped to the _B env) are NOT configured — the cross-user RLS isolation test will FAIL LOUDLY (B3 stays HOLD until they exist)."
           fi
 
       - name: Checkout exact tested app ref
