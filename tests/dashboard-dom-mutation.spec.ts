@@ -108,6 +108,43 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /dashboard invitation action under tra
       }
     });
 
+    // Present the emulated Android Chrome as a non-bot browser to PostHog.
+    // Production keeps PostHog's user-agent filter ON (the opt-out is
+    // preview-only by design), and posthog-js classifies automated browsers
+    // as bots through THREE signals — userAgent string, userAgentData.brands
+    // (which still reports "HeadlessChrome" under device emulation), and
+    // navigator.webdriver — silently dropping every event. The Pixel 5
+    // emulation already provides a real mobile Chrome UA string; these two
+    // overrides fix the remaining signals so the wire assertions measure the
+    // real production pipeline (ingestion of the incident-event class),
+    // not bot filtering. Verified against the served production bundle.
+    await page.addInitScript(() => {
+      try {
+        Object.defineProperty(navigator, 'webdriver', { get: () => false });
+        const uad = (
+          navigator as Navigator & {
+            userAgentData?: { brands?: Array<{ brand: string; version: string }> };
+          }
+        ).userAgentData;
+        if (uad && Array.isArray(uad.brands)) {
+          const proto = Object.getPrototypeOf(uad);
+          const desc = Object.getOwnPropertyDescriptor(proto, 'brands');
+          if (desc && desc.configurable) {
+            // Prototype-level override (instance-level fails: the brands
+            // getter lives on NavigatorUAData.prototype).
+            Object.defineProperty(proto, 'brands', {
+              get: () => [
+                { brand: 'Chromium', version: '151' },
+                { brand: 'Not=A?Brand', version: '99' },
+              ],
+            });
+          }
+        }
+      } catch {
+        /* best-effort shim; wire assertions will surface any failure */
+      }
+    });
+
     const browserErrors: string[] = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') browserErrors.push(msg.text().slice(0, 300));
