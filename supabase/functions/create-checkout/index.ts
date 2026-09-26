@@ -25,6 +25,9 @@
 //   EUR 399 pack for EUR 0.01.
 //
 // Environment variables required:
+//   - MONETIZATION_ENABLED       (REQUIRED kill switch — must be exactly "true"
+//                                 or the function refuses to create any session
+//                                 with 403 monetization_disabled. Fail-closed.)
 //   - SUPABASE_URL
 //   - SUPABASE_SERVICE_ROLE_KEY
 //   - STRIPE_SECRET_KEY          (sk_test_... in test mode)
@@ -35,6 +38,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { hashConsentText, resolveConsentText } from "../_shared/consent-texts.ts";
 import { getTaxProvider } from "../_shared/tax/stripe-tax.ts";
+import { isMonetizationEnabled } from "../_shared/monetization.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -68,6 +72,16 @@ Deno.serve(async (req) => {
   }
   if (req.method !== "POST") {
     return json({ error: "method_not_allowed" }, 405);
+  }
+
+  // Monetization kill switch (Stream A containment, PO GO 2026-09-26 §6).
+  // Fail CLOSED before any auth, DB or Stripe work: unless the environment
+  // explicitly enables monetization, no checkout session is ever created —
+  // independently of what the app_stripe_prices catalog contains. Checked
+  // first so a dormant store cannot produce sessions, orders or consent rows
+  // as a side effect of the code merely being present.
+  if (!isMonetizationEnabled(Deno.env.get("MONETIZATION_ENABLED"))) {
+    return json({ error: "monetization_disabled" }, 403);
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
