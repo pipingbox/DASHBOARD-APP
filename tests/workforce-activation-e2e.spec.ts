@@ -282,7 +282,7 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 — real E2E on preview (scenarios A�
     };
 
     const gotoProfile = async () => {
-      await page.goto('/profile');
+      await page.goto('/profile', { timeout: 30_000 });
       await page.locator('#root').first().waitFor({ state: 'attached', timeout: 15_000 });
       await expect(
         page.locator('input[type="number"]').first(),
@@ -464,9 +464,19 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 — real E2E on preview (scenarios A�
 
       // ── 7. Scenario A — persistence after reload ───────────────────────
       console.log('phase A: reload must re-render the experience from the DB');
-      await dialog.getByRole('button', { name: /cerrar|close/i }).click().catch(() => undefined);
+      // Bounded, deterministic dialog teardown: the saved screen offers BOTH
+      // "Cerrar" (common.close) and the dialog X ("Close") — a regex would hit
+      // strict mode, and an unmatched click with the default action timeout
+      // (0 = unbounded) can stall the rest of the test.
+      await dialog
+        .getByRole('button', { name: 'Cerrar', exact: true })
+        .click({ timeout: 5_000 })
+        .catch(() => undefined);
       await page.keyboard.press('Escape').catch(() => undefined);
+      await expect(dialog).toBeHidden({ timeout: 5_000 }).catch(() => undefined);
+      console.log('phase A: dialog closed, reloading /profile');
       await gotoProfile();
+      console.log('phase A: /profile reloaded, checking rendered fixture');
       await expect(
         page.getByText(fixturePosition).first(),
         'the experience must be rendered from the DB after reload',
