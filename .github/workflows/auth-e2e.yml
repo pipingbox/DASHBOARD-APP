@@ -61,13 +61,23 @@ on:
         required: false
         default: false
         type: boolean
+      run_dashboard_e2e:
+        description: 'Run ONLY the PB-PDI-004 /dashboard DOM-mutation smoke (dashboard-dom-mutation, Android Chrome emulation) in an isolated window — the 7/7 auth gate and the other onboarding specs are skipped for this dispatch'
+        required: false
+        default: false
+        type: boolean
+      expected_env:
+        description: 'Expected PostHog environment of the target deployment (preview|production); the SHA-locked specs assert it in pre-flight'
+        required: false
+        default: 'preview'
+        type: string
 
 jobs:
   auth-e2e:
     name: Auth E2E — require 7/7 PASS
     # Gate 6: the onboarding E2E needs a truly isolated window (same QA
     # account, same preview Worker) — skip the auth gate for that dispatch.
-    if: ${{ inputs.run_onboarding_e2e != true && inputs.run_wfa_e2e != true }}
+    if: ${{ inputs.run_onboarding_e2e != true && inputs.run_wfa_e2e != true && inputs.run_dashboard_e2e != true }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -244,7 +254,7 @@ jobs:
 
   onboarding-e2e:
     name: PB-OBSERVABILITY-001 onboarding E2E (preview, SHA-locked, isolated window)
-    if: ${{ inputs.run_onboarding_e2e == true }}
+    if: ${{ inputs.run_onboarding_e2e == true || inputs.run_dashboard_e2e == true }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -261,6 +271,7 @@ jobs:
       E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
       E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
       EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
+      EXPECTED_ENV: ${{ inputs.expected_env }}
 
     steps:
       - name: Require expected_sha and exclusive dispatch mode
@@ -268,11 +279,19 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${EXPECTED_APP_VERSION:-}" ]; then
-            echo "::error::expected_sha is required when run_onboarding_e2e=true (the served build must be traceable to the tested SHA)."
+            echo "::error::expected_sha is required when run_onboarding_e2e/run_dashboard_e2e=true (the served build must be traceable to the tested SHA)."
             exit 1
           fi
           if [ "${{ inputs.run_identity_e2e }}" = "true" ]; then
-            echo "::error::run_onboarding_e2e and run_identity_e2e are mutually exclusive (same QA account, isolated window required)."
+            echo "::error::run_onboarding_e2e/run_dashboard_e2e and run_identity_e2e are mutually exclusive (same QA account, isolated window required)."
+            exit 1
+          fi
+          if [ "${{ inputs.run_wfa_e2e }}" = "true" ]; then
+            echo "::error::run_onboarding_e2e/run_dashboard_e2e and run_wfa_e2e are mutually exclusive (same QA account, isolated window required)."
+            exit 1
+          fi
+          if [ "${EXPECTED_ENV:-preview}" != "preview" ] && [ "${EXPECTED_ENV:-preview}" != "production" ]; then
+            echo "::error::expected_env must be 'preview' or 'production' (got ${EXPECTED_ENV})."
             exit 1
           fi
 
@@ -299,6 +318,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run onboarding E2E — SHA pre-flight, snapshot, funnel, restore
+        if: ${{ inputs.run_dashboard_e2e != true }}
         shell: bash
         run: |
           set -euo pipefail
@@ -310,6 +330,7 @@ jobs:
       # Same isolated window and QA account; the spec does its own authorized
       # reset + exact restore, so it is safe to run right after the funnel E2E.
       - name: Run onboarding DOM-mutation E2E — insertBefore regression
+        if: ${{ inputs.run_dashboard_e2e != true }}
         shell: bash
         run: |
           set -euo pipefail
@@ -320,6 +341,7 @@ jobs:
       # PB-UI-DOM-INSERTBEFORE-001 (/profile): mount + edit/save regression
       # for the real-device NO-GO (PB-ERR-JYAHES et al.). Same window/account.
       - name: Run profile DOM-mutation E2E — mount + edit/save regression
+        if: ${{ inputs.run_dashboard_e2e != true }}
         shell: bash
         run: |
           set -euo pipefail

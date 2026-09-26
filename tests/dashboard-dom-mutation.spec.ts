@@ -1,5 +1,17 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, devices } from '@playwright/test';
 import { gunzipSync } from 'node:zlib';
+
+// PB-PDI-004 production smoke: Android Chrome (the incident environment —
+// Mobile/Android/Chrome, browser language es-US). Device emulation also
+// presents a real mobile Chrome user agent, which matters in production:
+// the PostHog user-agent bot filter is ON there (opt-out is preview-only),
+// and a bare HeadlessChrome UA would be filtered — breaking the wire
+// assertions without any real defect.
+test.use({ ...devices['Pixel 5'], locale: 'es-ES' });
+
+// Expected deployment environment (preview|production); CI passes
+// EXPECTED_ENV, defaulting to preview like the rest of the SHA-locked specs.
+const expectedEnv = process.env.EXPECTED_ENV ?? 'preview';
 
 /**
  * PB-UI-DOM-INSERTBEFORE-001 / PB-PDI-004 — /dashboard pending-invitation
@@ -178,7 +190,7 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /dashboard invitation action under tra
     ).toBeGreaterThan(0);
     for (const e of preFlight) {
       const p = (e.properties ?? {}) as Record<string, unknown>;
-      expect(String(p.environment), 'served environment must be preview').toBe('preview');
+      expect(String(p.environment), `served environment must be ${expectedEnv}`).toBe(expectedEnv);
       if (expectedVersion) {
         expect(
           String(p.app_version),
