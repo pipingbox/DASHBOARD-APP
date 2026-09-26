@@ -1,15 +1,20 @@
-Hola {{NAME}},
+Hola Edward:
 
-Hemos detectado y corregido un problema que, en algunos navegadores móviles, podía impedir que tu panel de PipingBox se mostrara correctamente.
+Hemos detectado que el 25 de septiembre se produjeron varios errores técnicos cuando intentaste acceder a tu panel de PipingBox.
 
-Tu cuenta y toda la información que habías guardado siguen disponibles: no se ha perdido ningún dato.
+Lamentamos las molestias. Tu cuenta se creó correctamente y la información que ya habías introducido continúa guardada.
 
-Ya puedes volver a tu perfil y continuar donde lo dejaste:
+Hemos corregido el problema detectado. Cuando puedas, vuelve a iniciar sesión y revisa tu perfil para completar los datos que falten, especialmente tu experiencia laboral, cualificaciones, certificados y disponibilidad. Esta información nos permitirá identificar mejor las oportunidades profesionales que encajen contigo.
 
-VOLVER A MI PERFIL
+VOLVER A MI PERFIL:
 https://pipingbox.com/profile
 
-¿Necesitas ayuda? Responde a este correo o escribe a support@pipingbox.com.
+Si vuelve a aparecer algún error, responde directamente a este correo enviándonos una captura de pantalla o el código de incidencia que aparezca. Lo revisaremos personalmente.
 
---
-Has recibido este correo porque tienes una cuenta en PipingBox.
+Gracias por ayudarnos a mejorar PipingBox.
+
+Un saludo,
+
+Equipo PipingBox
+support@pipingbox.com
+https://pipingbox.com

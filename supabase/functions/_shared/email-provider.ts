@@ -9,10 +9,28 @@ export interface EmailMessage {
   subject: string;
   text?: string;
   html?: string;
+  /** Display name del From (la dirección sigue siendo SMTP_FROM). */
+  fromName?: string;
+  /** Cabecera Reply-To. */
+  replyTo?: string;
+  /**
+   * Copia oculta (auditoría). Nodemailer la incluye en el ENVELOPE SMTP de la
+   * MISMA transacción y NO emite cabecera Bcc en el mensaje visible.
+   */
+  bcc?: string;
+}
+
+export interface EmailSendResult {
+  messageId?: string;
+  provider: string;
+  /** Nº de destinatarios aceptados por el proveedor (To + BCC). Sin direcciones. */
+  accepted?: number;
+  /** Nº de destinatarios rechazados por el proveedor. Sin direcciones. */
+  rejected?: number;
 }
 
 export interface EmailProvider {
-  send(message: EmailMessage): Promise<{ messageId?: string; provider: string }>;
+  send(message: EmailMessage): Promise<EmailSendResult>;
   isConfigured(): boolean;
 }
 
@@ -35,15 +53,22 @@ class SmtpEmailProvider implements EmailProvider {
     return true;
   }
 
-  async send(message: EmailMessage): Promise<{ messageId?: string; provider: string }> {
+  async send(message: EmailMessage): Promise<EmailSendResult> {
     const result = await this.transporter.sendMail({
-      from: this.from,
+      from: message.fromName ? { name: message.fromName, address: this.from } : this.from,
       to: message.to,
+      bcc: message.bcc,
+      replyTo: message.replyTo,
       subject: message.subject,
       text: message.text,
       html: message.html,
     });
-    return { messageId: result.messageId, provider: this.providerName };
+    return {
+      messageId: result.messageId,
+      provider: this.providerName,
+      accepted: Array.isArray(result.accepted) ? result.accepted.length : undefined,
+      rejected: Array.isArray(result.rejected) ? result.rejected.length : undefined,
+    };
   }
 }
 
@@ -52,7 +77,7 @@ class NoopEmailProvider implements EmailProvider {
     return false;
   }
 
-  async send(): Promise<{ messageId?: string; provider: string }> {
+  async send(): Promise<EmailSendResult> {
     throw new Error("email_provider_not_configured");
   }
 }

@@ -1,4 +1,37 @@
-<!DOCTYPE html>
+// _shared/recovery-email-template.ts
+// PB-PDI-004 / PB-UI-DOM-INSERTBEFORE-001 — plantilla del correo de
+// recuperación (cuenta afectada por los errores de renderizado del 25/09,
+// corregidos y desplegados en producción).
+//
+// COPY EXACTO APROBADO POR EL PO (2026-09-26). No modificar el texto sin un
+// nuevo GO del PO. Sin UUIDs, correlation IDs, códigos PB-ERR, analítica,
+// dispositivo ni referencias al seguimiento.
+//
+// Diseño: responsive (tabla anidada 600px máx.), negro/blanco/naranja
+// PipingBox, logotipo canónico y botón VOLVER A MI PERFIL.
+
+export const RECOVERY_EMAIL_SUBJECT = "Hemos corregido un problema en tu cuenta de PipingBox";
+export const RECOVERY_EMAIL_TEST_SUBJECT_PREFIX = "[TEST] ";
+export const RECOVERY_EMAIL_TEMPLATE_ID = "recovery_v1";
+
+/** Asunto final: con prefijo [TEST] en modo prueba. */
+export function recoverySubject(isTest: boolean): string {
+  return isTest ? RECOVERY_EMAIL_TEST_SUBJECT_PREFIX + RECOVERY_EMAIL_SUBJECT : RECOVERY_EMAIL_SUBJECT;
+}
+
+function esc(s: string): string {
+  return s
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+/** HTML responsive con el copy exacto aprobado. {{NAME}} = solo nombre de pila. */
+export function renderRecoveryEmailHtml(name: string): string {
+  const n = esc(name);
+  return `<!DOCTYPE html>
 <html lang="es" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8" />
@@ -28,7 +61,7 @@
           <tr>
             <td style="background-color:#ffffff; padding:32px 28px 8px 28px;">
               <h1 style="margin:0 0 16px 0; font-family:Arial,Helvetica,sans-serif; font-size:22px; line-height:28px; color:#09090b; font-weight:bold;">
-                Hola Edward:
+                Hola ${n}:
               </h1>
               <p style="margin:0 0 16px 0; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:23px; color:#27272a;">
                 Hemos detectado que el 25 de septiembre se produjeron varios errores t&eacute;cnicos cuando intentaste acceder a tu panel de PipingBox.
@@ -98,4 +131,30 @@
     </tr>
   </table>
 </body>
-</html>
+</html>`;
+}
+
+/** Texto plano equivalente (copy exacto). */
+export function renderRecoveryEmailText(name: string): string {
+  return `Hola ${name}:
+
+Hemos detectado que el 25 de septiembre se produjeron varios errores técnicos cuando intentaste acceder a tu panel de PipingBox.
+
+Lamentamos las molestias. Tu cuenta se creó correctamente y la información que ya habías introducido continúa guardada.
+
+Hemos corregido el problema detectado. Cuando puedas, vuelve a iniciar sesión y revisa tu perfil para completar los datos que falten, especialmente tu experiencia laboral, cualificaciones, certificados y disponibilidad. Esta información nos permitirá identificar mejor las oportunidades profesionales que encajen contigo.
+
+VOLVER A MI PERFIL:
+https://pipingbox.com/profile
+
+Si vuelve a aparecer algún error, responde directamente a este correo enviándonos una captura de pantalla o el código de incidencia que aparezca. Lo revisaremos personalmente.
+
+Gracias por ayudarnos a mejorar PipingBox.
+
+Un saludo,
+
+Equipo PipingBox
+support@pipingbox.com
+https://pipingbox.com
+`;
+}
