@@ -107,6 +107,23 @@ function check(name, ok, detail = '') {
   const fixture = await api('app_14da0f1941_workforce_assignments?id=eq.86bfc261-7515-48ad-b182-4bea15819d29&select=id,status,notes', a.token);
   check('assignments: fixture QA conservado (admin-readable)', fixture.status === 200 && fixture.json?.length === 1, `rows=${fixture.json?.length}`);
 
+  // ── CREATE-CHECKOUT: kill switch de monetización (Stream A, v2 bundle) ──
+  // POST con sesión QA válida y MONETIZATION_ENABLED desactivado debe devolver
+  // HTTP 403 {"error":"monetization_disabled"} DESDE el handler. Un 401 del
+  // gateway o un 503/BOOT_ERROR NO demuestran que el guard funciona.
+  const ccRes = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, Authorization: `Bearer ${a.token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ product_key: 'vca_course_bvca' }),
+  });
+  let ccJson = null;
+  try { ccJson = await ccRes.json(); } catch {}
+  check(
+    'create-checkout: QA POST con monetización desactivada → 403 monetization_disabled',
+    ccRes.status === 403 && ccJson?.error === 'monetization_disabled',
+    `status=${ccRes.status} error=${ccJson?.error}`
+  );
+
   const failed = results.filter(r => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} PASS`);
   if (failed.length > 0) process.exit(1);
