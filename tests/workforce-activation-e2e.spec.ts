@@ -348,6 +348,22 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 â€” real E2E on preview (scenarios Aâ€
       patchedProfileColumns.add('bio');
 
       await gotoProfile();
+      const pageTextDiag = await page.locator('#root').innerText().catch(() => 'innerText failed');
+      console.log('DIAG /profile text (scenario D):', pageTextDiag.replace(/\s+/g, ' ').slice(0, 1500));
+      const dbDiag = await dbReadiness();
+      console.log(
+        'DIAG DB input (scenario D):',
+        JSON.stringify({
+          role: dbDiag.input.role,
+          bio_len: (dbDiag.input.bio ?? '').length,
+          skills: dbDiag.input.skills,
+          availability_status: dbDiag.input.availability_status,
+          profile_visibility: dbDiag.input.profile_visibility,
+          cv_visible: dbDiag.input.cv_visible,
+          qualifying: dbDiag.input.qualifying_experience_count,
+          ready: dbDiag.ready,
+        }),
+      );
       await expect(page.getByText(TXT.bannerTitle), 'banner must appear for an incomplete profile').toBeVisible({
         timeout: 20_000,
       });
