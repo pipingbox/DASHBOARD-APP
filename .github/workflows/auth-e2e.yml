@@ -436,6 +436,11 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
+      # Frontend deps for hook-importing unit suites (workforceReadinessEvents
+      # imports react); root npm ci alone cannot resolve them.
+      - name: Install frontend dependencies (unit suite imports)
+        run: npm ci --prefix app/frontend
+
       # Pure WFA unit/architecture suites (no network): canonical predicates,
       # D18 event taxonomy, Quick Capture architecture, WFA-002 journey
       # presentation mapping. Previously local-only; now a CI gate.
