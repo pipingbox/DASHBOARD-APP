@@ -209,7 +209,7 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /dashboard invitation action under tra
       const id = decodeAll().find((e) => e.event === '$identify');
       if (id) {
         const p = (id.properties ?? {}) as Record<string, unknown>;
-        identifiedId = String(p.$identified_id ?? e.distinct_id ?? p.distinct_id ?? '');
+        identifiedId = String(p.$identified_id ?? id.distinct_id ?? p.distinct_id ?? '');
       }
     }
     expect(identifiedId, 'exactly one $identify must flush after login').toMatch(
