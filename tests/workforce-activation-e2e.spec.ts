@@ -427,10 +427,17 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 — real E2E on preview (scenarios A�
         timeout: 20_000,
       });
       await expect(page.getByText(TXT.gapBio), 'the exact gap (bio) must be shown').toBeVisible();
-      await expect(
-        page.getByRole('button', { name: TXT.quickCta }),
-        'quick-capture CTA must NOT appear while a COMPLETE-level gap (bio) exists',
-      ).toHaveCount(0);
+      // WFA-002: the journey gives EVERY gap a direct action (PO GO), so the
+      // experience action may coexist with a COMPLETE-level gap — the WFA-001
+      // priority rule now means ORDER: the COMPLETE-level gap must be the
+      // FIRST journey action (the user is guided to core profile first).
+      const journeyOrder = await page
+        .locator('[data-testid^="journey-item-"]')
+        .evaluateAll((els) => els.map((el) => el.getAttribute('data-testid') ?? ''));
+      expect(
+        journeyOrder[0],
+        'the COMPLETE-level gap (bio) must be the FIRST journey action while it exists (activation priority)',
+      ).toBe('journey-item-bio');
       expect((await dbReadiness()).ready, 'incomplete user must NOT be workforce ready').toBe(false);
       console.log('scenario D PASS: incomplete user → no readiness, correct actionable gap');
 
