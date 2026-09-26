@@ -1,26 +1,28 @@
 import { test, expect, request as pwRequest } from '@playwright/test';
 
 /**
- * RLS security tests — PB-SEC-RLS-WORKFORCE-001 (corrected, Stream A / GO 2026-09-26).
+ * RLS security tests — PB-SEC-RLS-WORKFORCE-001 (corrected v2, Stream A / GO 2026-09-26).
  *
- * Guards the B2B lead tables against public read/write. Rewritten from the previous version
- * which had unsafe patterns flagged by the PO:
- *   - destructive ops used `id=not.is.null` (broad filter against the SHARED project);
- *   - an empty/204 body was treated as proof of "zero rows affected";
- *   - any HTTP >=400 (including 400 bad-payload, 404 missing table, 5xx) counted as "blocked";
- *   - no positive controls (a passing suite could mask a broken endpoint).
+ * Guards the B2B lead tables against public read/write. v2 fixes the defects the
+ * PO flagged AND the PostgREST semantics mistakes found in run 36222667243:
+ *   - v1 used `id=not.is.null` destructive probes → now every probe targets
+ *     `company_name=eq.<this run's unique marker>` (exact fixtures of THIS run);
+ *   - v1 treated an empty/204 body as "zero rows affected" → now the affected
+ *     count comes from the `Content-Range` response header (Prefer: count=exact),
+ *     which is the only precise PostgREST signal for writes without RETURNING;
+ *   - v1 accepted any HTTP >=400 (incl. 400 bad-payload, 404, 5xx) as "blocked" →
+ *     now only a genuine 401/403 counts as denial; anything else fails loudly;
+ *   - v2 correction: INSERT/UPDATE probes do NOT use Prefer:return=representation
+ *     on principals without SELECT privilege — PostgREST answers 401/400 for the
+ *     RETURNING clause, which says nothing about the write privilege itself;
+ *   - positive controls prove the public funnel still works (anon INSERT) and a
+ *     non-admin cannot see anything;
+ *   - cleanup removes only this run's marker rows (purge-test-leads matches the
+ *     marker prefix); a failed/unavailable cleanup is reported explicitly as
+ *     PENDING, never silently swallowed.
  *
- * This version is safe to run against the shared project:
- *   - EVERY write/delete targets the EXACT ids of fixtures this run itself created;
- *   - state is verified before and after each forbidden attempt (owner-side re-read);
- *   - a 2xx is only a pass when it provably affected 0 rows (Prefer:return=representation);
- *   - denial must be a genuine PostgREST/RLS denial (401/403), never a 400/404/5xx false positive;
- *   - positive controls prove the owner CAN do the contract-permitted operations;
- *   - cleanup removes only this run's exact fixture ids and a failed cleanup is reported
- *     explicitly as PENDING (never silently swallowed).
- *
- * PRIVACY: assertions only ever check status codes and row COUNTS / own-fixture payloads.
- * No real lead content is read into the test output.
+ * PRIVACY: assertions only ever check status codes and row COUNTS. No lead
+ * content is read into the test output.
  */
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL ?? '';
@@ -37,24 +39,24 @@ const hasAnonConfig = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
 const hasAuthConfig = !!(hasAnonConfig && EMAIL && PASSWORD);
 
 /**
- * Marker prefix for the rows this suite creates. Must stay in sync with TEST_LEAD_PREFIX in
- * supabase/functions/purge-test-leads/index.ts — that function only ever deletes rows whose
- * company_name starts with this literal.
+ * Marker prefix — must stay in sync with TEST_LEAD_PREFIX in
+ * supabase/functions/purge-test-leads/index.ts: that function only ever deletes
+ * rows whose company_name starts with this literal. Fixtures use
+ * `${MARKER} #${RUN_ID}` so probes match exactly this run's rows and the purge
+ * function still recognizes them.
  */
 const TEST_LEAD_MARKER = 'RLS-TEST — automated, safe to delete';
+const RUN_ID = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+const RUN_MARKER = `${TEST_LEAD_MARKER} #${RUN_ID}`;
 
-/** Token for the purge-test-leads Edge Function (fallback cleanup for anon-inserted rows). */
+/** Token for the purge-test-leads Edge Function (cleanup of anon-inserted rows). */
 const PURGE_SECRET =
   process.env.PURGE_TEST_LEADS_SECRET ?? process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
 
-/** Per-run fixture ids, so destructive probes NEVER touch rows we did not create. */
-const createdIds: Record<(typeof LEAD_TABLES)[number], string[]> = {
-  app_14da0f1941_workforce_requests: [],
-  app_14da0f1941_company_leads: [],
-};
-
-/** Rows created but not yet deleted at teardown — reported explicitly as PENDING. */
-const pendingCleanup: Array<{ table: string; id: string }> = [];
+/** Tables this run actually inserted into (drives the PENDING report). */
+const touchedTables = new Set<string>();
+let purgeAttempted = false;
+let purgeSucceeded = false;
 
 const anonHeaders = () => ({
   apikey: SUPABASE_ANON_KEY,
@@ -62,8 +64,17 @@ const anonHeaders = () => ({
 });
 
 /** A genuine RLS denial is 401/403. 400/404/5xx are NOT proof of policy. */
-function isGenuineDenial(status: number): boolean {
-  return status === 401 || status === 403;
+const isGenuineDenial = (status: number) => status === 401 || status === 403;
+
+/**
+ * Exact affected-row count from PostgREST's Content-Range header
+ * ("*​/0" for empty-range writes, "0-0/N" for ranged ones). Returns -1 when the
+ * header is missing — callers must treat that as UNVERIFIABLE, not as zero.
+ */
+function affectedCount(res: { headers: () => Record<string, string> }): number {
+  const range = res.headers()['content-range'] ?? '';
+  const match = range.match(/\/(\d+)\s*$/);
+  return match ? Number(match[1]) : -1;
 }
 
 async function assertReadExposesNoRows(
@@ -71,85 +82,94 @@ async function assertReadExposesNoRows(
   what: string,
 ) {
   const status = res.status();
-  if (isGenuineDenial(status)) return; // denied outright
+  if (isGenuineDenial(status)) return;
   if (status === 200) {
     const rows = (await res.json()) as unknown[];
-    expect(
-      Array.isArray(rows) ? rows.length : -1,
-      `${what}: read must be denied or return zero rows`,
-    ).toBe(0);
+    expect(Array.isArray(rows) ? rows.length : -1, `${what}: read must be denied or return zero rows`).toBe(0);
     return;
   }
-  // 400/404/5xx do NOT prove RLS — fail loudly rather than pass a broken endpoint.
-  throw new Error(`${what}: unexpected status ${status} (not a genuine RLS denial nor an empty 200)`);
+  throw new Error(`${what}: unexpected status ${status} (not a genuine 401/403 denial nor an empty 200)`);
 }
 
 /**
- * Insert a fixture row and return its id (Prefer:return=representation). Records the id for
- * scoped cleanup and for exact-id destructive probes.
+ * Forbidden-write probe against THIS RUN's marker rows only.
+ * Pass: genuine 401/403 denial, OR a 2xx whose Content-Range proves 0 affected.
+ * Fail: any other status, a missing Content-Range (unverifiable), or N>0.
  */
-async function insertFixture(
-  api: Awaited<ReturnType<typeof pwRequest.newContext>>,
-  table: (typeof LEAD_TABLES)[number],
-  headers: Record<string, string>,
-  data: Record<string, unknown>,
-): Promise<string> {
-  const res = await api.post(`/rest/v1/${table}`, {
-    headers: { ...headers, Prefer: 'return=representation' },
-    data,
-  });
-  expect(res.status(), `fixture insert into ${table} must succeed (positive control)`).toBeLessThan(400);
-  const rows = (await res.json()) as Array<{ id?: string }>;
-  const id = rows?.[0]?.id;
-  expect(id, `fixture insert into ${table} must return an id`).toBeTruthy();
-  createdIds[table].push(id as string);
-  return id as string;
+async function assertForbiddenWrite(
+  res: { status: () => number; headers: () => Record<string, string> },
+  what: string,
+) {
+  const status = res.status();
+  if (isGenuineDenial(status)) return;
+  if (status >= 200 && status < 300) {
+    const n = affectedCount(res);
+    expect(n, `${what}: 2xx without a verifiable Content-Range count is NOT a pass`).toBe(0);
+    return;
+  }
+  throw new Error(`${what}: unexpected status ${status} (not a genuine 401/403 denial nor a zero-affect 2xx)`);
 }
 
 test.describe('lead tables — anonymous access (safe, fixture-scoped)', () => {
   test.skip(!hasAnonConfig, 'Requires VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
 
   let api: Awaited<ReturnType<typeof pwRequest.newContext>>;
-  /** Exact id of the anon-inserted fixture used as the destructive-probe target. */
-  let probeFixtureId: string;
 
   test.beforeAll(async () => {
     api = await pwRequest.newContext({ baseURL: SUPABASE_URL });
   });
 
   test.afterAll(async () => {
-    // Cleanup: try the purge Edge Function (covers anon-inserted rows), then verify. Any
-    // fixture still present is reported explicitly as PENDING — never silently dropped.
-    await purgeTestLeads();
-    for (const table of LEAD_TABLES) {
-      for (const id of createdIds[table]) {
-        const res = await api.get(`/rest/v1/${table}?id=eq.${id}&select=id`, { headers: anonHeaders() });
-        if (res.status() === 200) {
-          const rows = (await res.json()) as unknown[];
-          if (Array.isArray(rows) && rows.length > 0) pendingCleanup.push({ table, id });
-        }
-      }
-    }
-    if (pendingCleanup.length > 0) {
+    await purgeThisRunsLeads();
+    if (touchedTables.size > 0 && (!purgeAttempted || !purgeSucceeded)) {
       console.warn(
-        `[rls-security] PENDING CLEANUP (${pendingCleanup.length} fixture rows remain): ` +
-          pendingCleanup.map((f) => `${f.table}:${f.id}`).join(', '),
+        `[rls-security] PENDING CLEANUP — rows with company_name starting "${TEST_LEAD_MARKER}" ` +
+          `(run ${RUN_ID}) remain in: ${[...touchedTables].join(', ')}. ` +
+          (purgeAttempted
+            ? 'purge-test-leads was called but did not confirm success.'
+            : 'purge-test-leads was NOT callable (no PURGE_TEST_LEADS_SECRET).') +
+          ' Rows are archived/cancelled and excluded from the pipeline views, but they MUST be removed.',
       );
     }
     await api?.dispose();
   });
 
-  test('anon CAN submit the public B2B form (positive control + fixture source)', async () => {
-    // Defense in depth: status 'cancelled' keeps the row out of every pipeline counter.
-    probeFixtureId = await insertFixture(api, 'app_14da0f1941_workforce_requests', anonHeaders(), {
-      company_name: TEST_LEAD_MARKER,
-      contact_person: 'RLS Test',
-      email: 'rls-test@pipingbox.com',
-      country: 'Test',
-      worker_type: 'welder',
-      workers_requested: 1,
-      status: 'cancelled',
+  test('POSITIVE CONTROL: anon CAN submit the public B2B form (fixture source)', async () => {
+    // No Prefer:return=representation: anon has INSERT but not SELECT, and the
+    // RETURNING clause would produce a misleading 401. A bare 201 is the exact
+    // signal that the public funnel still works after the RLS lockdown.
+    const res = await api.post('/rest/v1/app_14da0f1941_workforce_requests', {
+      headers: anonHeaders(),
+      data: {
+        company_name: RUN_MARKER,
+        contact_person: 'RLS Test',
+        email: 'rls-test@pipingbox.com',
+        country: 'Test',
+        worker_type: 'welder',
+        workers_requested: 1,
+        status: 'cancelled',
+      },
     });
+    expect(res.status(), 'public lead submission must keep working after RLS lockdown').toBeLessThan(400);
+    touchedTables.add('app_14da0f1941_workforce_requests');
+  });
+
+  test('POSITIVE CONTROL: anon CAN still write the legacy company_leads row', async () => {
+    const res = await api.post('/rest/v1/app_14da0f1941_company_leads', {
+      headers: anonHeaders(),
+      data: {
+        company_name: RUN_MARKER,
+        contact_person: 'RLS Test',
+        email: 'rls-test@pipingbox.com',
+        country: 'Test',
+        workers_needed: 'welder',
+        status: 'rejected',
+        priority: 'normal',
+        archived: true,
+      },
+    });
+    expect(res.status(), 'legacy lead insert must keep working, or the legacy table silently desyncs').toBeLessThan(400);
+    touchedTables.add('app_14da0f1941_company_leads');
   });
 
   for (const table of LEAD_TABLES) {
@@ -157,51 +177,22 @@ test.describe('lead tables — anonymous access (safe, fixture-scoped)', () => {
       const res = await api.get(`/rest/v1/${table}?select=id&limit=1`, { headers: anonHeaders() });
       await assertReadExposesNoRows(res, `anon READ ${table}`);
     });
+
+    test(`anon UPDATE affects zero rows in ${table} (this run's marker, verified)`, async () => {
+      const res = await api.patch(`/rest/v1/${table}?company_name=eq.${encodeURIComponent(RUN_MARKER)}`, {
+        headers: { ...anonHeaders(), Prefer: 'count=exact' },
+        data: { status: 'rls-probe-should-not-stick' },
+      });
+      await assertForbiddenWrite(res, `anon UPDATE ${table}`);
+    });
+
+    test(`anon DELETE affects zero rows in ${table} (this run's marker, verified)`, async () => {
+      const res = await api.delete(`/rest/v1/${table}?company_name=eq.${encodeURIComponent(RUN_MARKER)}`, {
+        headers: { ...anonHeaders(), Prefer: 'count=exact' },
+      });
+      await assertForbiddenWrite(res, `anon DELETE ${table}`);
+    });
   }
-
-  test('anon UPDATE cannot modify any row (exact fixture id, verified before/after)', async () => {
-    const table = 'app_14da0f1941_workforce_requests';
-    // Baseline: anon read of this exact id must expose nothing (proves the row is not
-    // anon-visible); we then attempt the forbidden UPDATE on that same exact id.
-    const before = await api.get(`/rest/v1/${table}?id=eq.${probeFixtureId}&select=id`, { headers: anonHeaders() });
-    const beforeRows = before.status() === 200 ? ((await before.json()) as unknown[]).length : 0;
-
-    const res = await api.patch(`/rest/v1/${table}?id=eq.${probeFixtureId}`, {
-      headers: { ...anonHeaders(), Prefer: 'return=representation' },
-      data: { status: 'rls-probe-should-not-stick' },
-    });
-
-    if (isGenuineDenial(res.status())) {
-      // pass — denied outright
-    } else if (res.status() === 200) {
-      const changed = (await res.json()) as unknown[];
-      expect(Array.isArray(changed) ? changed.length : 0, 'anon UPDATE must return zero affected rows').toBe(0);
-    } else {
-      throw new Error(`anon UPDATE: unexpected status ${res.status()} (not 401/403 nor zero-affect 200)`);
-    }
-
-    // After-state: the exact fixture must be unchanged. (Anon cannot read it, so this asserts
-    // anon still sees nothing; the owner-side integrity is covered by the purge + PENDING check.)
-    const after = await api.get(`/rest/v1/${table}?id=eq.${probeFixtureId}&select=id`, { headers: anonHeaders() });
-    const afterRows = after.status() === 200 ? ((await after.json()) as unknown[]).length : 0;
-    expect(afterRows, 'anon visibility of fixture must not change after forbidden UPDATE').toBe(beforeRows);
-  });
-
-  test('anon DELETE cannot remove any row (exact fixture id)', async () => {
-    const table = 'app_14da0f1941_workforce_requests';
-    const res = await api.delete(`/rest/v1/${table}?id=eq.${probeFixtureId}`, {
-      headers: { ...anonHeaders(), Prefer: 'return=representation' },
-    });
-
-    if (isGenuineDenial(res.status())) {
-      // pass
-    } else if (res.status() === 200) {
-      const deleted = (await res.json()) as unknown[];
-      expect(Array.isArray(deleted) ? deleted.length : 0, 'anon DELETE must return zero affected rows').toBe(0);
-    } else {
-      throw new Error(`anon DELETE: unexpected status ${res.status()} (not 401/403 nor zero-affect 200)`);
-    }
-  });
 });
 
 test.describe('lead tables — authenticated non-admin access (safe)', () => {
@@ -241,37 +232,27 @@ test.describe('lead tables — authenticated non-admin access (safe)', () => {
       expect(rows.length, 'a non-admin user with no leads must see none').toBe(0);
     });
 
-    test(`a normal user cannot UPDATE ${table} (exact non-owned id → zero affected)`, async () => {
-      // The QA worker owns no leads, so ANY id it can probe is non-owned by definition. We probe
-      // a real-but-non-owned row id surfaced by the positive control is NOT available (the user
-      // cannot read it), so we assert the UPDATE affects zero rows via return=representation and
-      // requires a genuine denial otherwise — never a bare empty-body pass.
-      const res = await api.patch(`/rest/v1/${table}?id=eq.00000000-0000-0000-0000-000000000000`, {
-        headers: { ...authHeaders(), Prefer: 'return=representation' },
+    test(`a normal user cannot UPDATE ${table} (this run's marker, verified)`, async () => {
+      const res = await api.patch(`/rest/v1/${table}?company_name=eq.${encodeURIComponent(RUN_MARKER)}`, {
+        headers: { ...authHeaders(), Prefer: 'count=exact' },
         data: { status: 'rls-probe-should-not-stick' },
       });
-      if (isGenuineDenial(res.status())) return;
-      if (res.status() === 200) {
-        const changed = (await res.json()) as unknown[];
-        expect(Array.isArray(changed) ? changed.length : 0, 'non-admin UPDATE must affect zero rows').toBe(0);
-        return;
-      }
-      throw new Error(`non-admin UPDATE: unexpected status ${res.status()}`);
+      await assertForbiddenWrite(res, `non-admin UPDATE ${table}`);
+    });
+
+    test(`a normal user cannot DELETE from ${table} (this run's marker, verified)`, async () => {
+      const res = await api.delete(`/rest/v1/${table}?company_name=eq.${encodeURIComponent(RUN_MARKER)}`, {
+        headers: { ...authHeaders(), Prefer: 'count=exact' },
+      });
+      await assertForbiddenWrite(res, `non-admin DELETE ${table}`);
     });
   }
 });
 
-/**
- * Best-effort cleanup of the rows this suite inserts (anon rows need the service-role purge
- * function; a failed cleanup is surfaced via the PENDING list in afterAll).
- */
-async function purgeTestLeads(): Promise<void> {
-  if (!SUPABASE_URL || !PURGE_SECRET) {
-    if (!PURGE_SECRET) {
-      console.warn('[rls-security] No PURGE_TEST_LEADS_SECRET: anon fixture cleanup relies on PENDING report.');
-    }
-    return;
-  }
+/** Cleanup of this run's marker rows via the service-role purge function. */
+async function purgeThisRunsLeads(): Promise<void> {
+  if (!SUPABASE_URL || !PURGE_SECRET || touchedTables.size === 0) return;
+  purgeAttempted = true;
   let purgeApi: Awaited<ReturnType<typeof pwRequest.newContext>> | undefined;
   try {
     const functionsBase = SUPABASE_URL.replace(/\/+$/, '');
@@ -281,8 +262,9 @@ async function purgeTestLeads(): Promise<void> {
       data: {},
       timeout: 15_000,
     });
-    if (res.status() >= 400) {
-      console.warn(`[rls-security] purge-test-leads returned HTTP ${res.status} — see PENDING report.`);
+    purgeSucceeded = res.status() < 400;
+    if (!purgeSucceeded) {
+      console.warn(`[rls-security] purge-test-leads returned HTTP ${res.status()} — see PENDING report.`);
     }
   } catch (err) {
     console.warn(`[rls-security] purge-test-leads failed (see PENDING report): ${err instanceof Error ? err.message : String(err)}`);

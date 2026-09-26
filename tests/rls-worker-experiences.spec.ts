@@ -81,8 +81,10 @@ test.describe('app_worker_experiences — anonymous access', () => {
   });
 
   test('anon cannot INSERT an experience row', async () => {
+    // No Prefer:return=representation: the RETURNING clause would 401 over the
+    // missing SELECT privilege and say nothing about the INSERT privilege itself.
     const res = await api.post(`/rest/v1/${TABLE}`, {
-      headers: { ...anonHeaders(), Prefer: 'return=representation' },
+      headers: anonHeaders(),
       data: { user_id: FOREIGN_USER, position: FIXTURE_MARKER, company_name: 'anon probe' },
     });
     expect(
@@ -125,10 +127,27 @@ test.describe('app_worker_experiences — owner controls and spoof attempts (QA 
       const res = await api
         .delete(`/rest/v1/${TABLE}?id=eq.${fixtureId}`, { headers: authHeaders() })
         .catch(() => null);
-      if (!res || !res.ok()) pendingCleanup.push(fixtureId);
+      if (!res || !res.ok()) {
+        pendingCleanup.push(fixtureId);
+        console.error(
+          `[rls-worker-experiences] F-1: afterAll owner DELETE returned HTTP ${res ? res.status() : 'network-error'}`,
+        );
+      }
     }
     if (pendingCleanup.length > 0) {
-      console.warn(`[rls-worker-experiences] PENDING CLEANUP: ${pendingCleanup.join(', ')}`);
+      // Keep the DERIVED profile columns coherent with the leftover rows so
+      // specs sharing this QA account are not polluted by stale derived state.
+      await api
+        .post('/functions/v1/recalculate-profiles', {
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          data: { user_id: userId },
+          timeout: 20_000,
+        })
+        .catch(() => null);
+      console.warn(
+        `[rls-worker-experiences] PENDING CLEANUP (F-1 owner-DELETE gap): ${pendingCleanup.join(', ')}. ` +
+          `Rows are marked "${FIXTURE_MARKER}" on the disposable QA account; derived columns recalculated.`,
+      );
     }
     await api?.dispose();
   });
@@ -196,7 +215,15 @@ test.describe('app_worker_experiences — owner controls and spoof attempts (QA 
 
   test('POSITIVE CONTROL: owner can DELETE their own row', async () => {
     const res = await api.delete(`/rest/v1/${TABLE}?id=eq.${fixtureId}`, { headers: authHeaders() });
-    expect(res.ok(), 'owner delete must succeed (positive control)').toBeTruthy();
+    if (!res.ok()) {
+      // F-1 (B3 blocker): the UI exposes a delete affordance; if the owner
+      // cannot actually delete, the optimistic UI removal is a FALSE SUCCESS.
+      console.error(
+        `[rls-worker-experiences] F-1: owner DELETE returned HTTP ${res.status()} — ` +
+          `body: ${(await res.text()).slice(0, 300)}`,
+      );
+    }
+    expect(res.ok(), 'owner delete must succeed (positive control) — see F-1').toBeTruthy();
     const gone = await readFixture();
     expect(gone, 'the fixture must be gone after the owner delete').toBeNull();
     fixtureId = ''; // already cleaned
