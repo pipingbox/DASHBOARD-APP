@@ -1,0 +1,15 @@
+Hola {{NAME}},
+
+Hemos detectado y corregido un problema que, en algunos navegadores móviles, podía impedir que tu panel de PipingBox se mostrara correctamente.
+
+Tu cuenta y toda la información que habías guardado siguen disponibles: no se ha perdido ningún dato.
+
+Ya puedes volver a tu perfil y continuar donde lo dejaste:
+
+VOLVER A MI PERFIL
+https://pipingbox.com/profile
+
+¿Necesitas ayuda? Responde a este correo o escribe a support@pipingbox.com.
+
+--
+Has recibido este correo porque tienes una cuenta en PipingBox.
