@@ -3247,7 +3247,8 @@
       "api602CompactValve": "Klassen nach API 602 für Kompaktarmaturen NPS 4 und kleiner. Klasse 800 ist in ASME B16.34 nicht als Klasse gelistet: sie ist eine weit verbreitete Zwischenklasse für Gewinde- und Schweissenden und existiert nicht in Flanschausführung. Die verfügbare Klasse hängt von der Endenausführung ab. Gegen die aktuelle Ausgabe der Norm prüfen.",
       "api609ButterflyValve": "API 609 Kategorie A (zentrische Absperrklappen) definiert das hier veröffentlichte Baulängenmaß; es ist keine Druckstufe. Druckstufe und Bauausführung sind anhand der Herstellerdokumentation des gewählten Produkts zu prüfen.",
       "yStrainerNoStandard": "Der Y-Schmutzfänger wird in diesem Katalog von keiner spezifischen Maßnorm erfasst. Hersteller liefern ihn üblicherweise mit Flanschenden nach ASME B16.5, sodass die Klasse durch den Flansch des jeweiligen Modells bestimmt wird. Hier wird keine Klasse aufgeführt, da es keine nachprüfbare Norm gibt, die eine solche festlegt.",
-      "noPressureClass": "Abzweigstücke (Laterals) werden nicht nach Druckklasse bezeichnet. Ihre Belastbarkeit ergibt sich aus der Wandstärke (Schedule) und dem Werkstoff und wird nach dem anwendbaren Auslegungscode (z. B. ASME B31.3) berechnet. Maße für den jeweiligen Schedule beim Hersteller verifizieren."
+      "noPressureClass": "Abzweigstücke (Laterals) werden nicht nach Druckklasse bezeichnet. Ihre Belastbarkeit ergibt sich aus der Wandstärke (Schedule) und dem Werkstoff und wird nach dem anwendbaren Auslegungscode (z. B. ASME B31.3) berechnet. Maße für den jeweiligen Schedule beim Hersteller verifizieren.",
+      "b36_19mPipe": "ASME B36.19M normt nur Abmessungen und schedules; Druckklassen werden nicht definiert. Der zulässige Druck des Rohres ergibt sich aus der Wanddicke und dem Werkstoff und wird nach dem anzuwendenden Auslegungscode (z. B. ASME B31.3) berechnet."
     },
     "guide": {
       "valve": {
@@ -3318,6 +3319,24 @@
           "whenNotToUse": "Wo das Rohr starr positioniert bleiben muss, etwa an Armaturen- oder Abzweigabstützungen: eine flexible Verbindung bewegt sich. Auch kein universeller Ersatz für einen Kompensator ohne Berechnung der Gesamtbewegung.",
           "installation": "Gleiche Rillenqualität wie bei der Starrkupplung; den vom Hersteller angegebenen Rohrendabstand prüfen, die Kupplung über der Verbindung zentrieren und die Schrauben abwechselnd anziehen.",
           "commonError": "Zu erwarten, dass eine einzige Flexkupplung eine große Bewegung aufnimmt: der Wert pro Verbindung ist klein und summiert sich über mehrere Verbindungen — nie annehmen, sondern vom Hersteller nehmen."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Stahlrohr, dessen Maße ASME B36.10M folgen: fester Außendurchmesser je NPS und eine durch den Schedule definierte Wanddicke. NPS ist eine Größenbezeichnung, nicht die tatsächliche Bohrung.",
+          "types": "Schedules von SCH 10 bis SCH 160 und XXS sowie die klassischen STD/XS-Bezeichnungen (die in kleinen Größen mit SCH 40/80 übereinstimmen). Nahtlos oder geschweißt, aus Kohlenstoff- und legiertem Stahl.",
+          "whenToUse": "Allgemeine Prozess-, Versorgungs- und Konstruktionsrohrleitungen aus Kohlenstoff- oder legiertem Stahl, bei denen Druckklasse und Wanddicke durch die Rohrleitungsklasse oder Spezifikation festgelegt sind.",
+          "whenNotToUse": "Korrosiver Dienst mit Edelstahlerfordernis: B36.19M-Rohr verwenden. Auch nicht annehmen, dass zwei Rohre gleichen NPS die gleiche Bohrung haben: der ID ändert sich mit dem Schedule, der OD nicht.",
+          "installation": "Schedule, Güte und Charge bzw. Abnahmezeugnis vor dem Zuschnitt gegen die Leitungsliste prüfen; Enden nach WPS für Stumpfschweißung anschrägen; Fittings und Flansche werden über denselben NPS bestellt und der OD passt, Wandübergänge erfordern eine Anfasung oder passenden Schedule.",
+          "commonError": "Rohr nach „NPS = Durchmesser\" bestellen: NPS 4 ist nirgends 4 Zoll — der OD beträgt 4.500\" und die Bohrung hängt vom Schedule ab. Den Schedule jedes Mal prüfen."
+        },
+        "stainless": {
+          "whatIs": "Edelstahlrohr nach ASME B36.19M: gleicher OD wie B36.10M beim gleichen NPS, aber Wanddicken nach den Schedules mit S-Suffix (5S, 10S, 40S, 80S).",
+          "types": "Schedules 5S/10S für dünnwandigen Dienst und 40S/80S, die bis NPS 10 mit SCH 40/80 aus B36.10M übereinstimmen; größere Größen verwenden eigene gelistete Wände. Austenitische Güten wie 304/304L und 316/316L sind am häufigsten.",
+          "whenToUse": "Korrosiver, sanitärer oder reiner Dienst — Chemie, Lebensmittel, Pharma, Wasseraufbereitung — wo Kohlenstoffstahl korrodieren oder das Medium verunreinigen würde.",
+          "whenNotToUse": "Nicht allein über den OD austauschen: eine 10S-Wand ist deutlich dünner als STD gleichen NPS, Drucktragfähigkeit und Schweißnahtvorbereitung unterscheiden sich. Den S-Schedule prüfen, nicht den B36.10M-Namen.",
+          "installation": "Während Lagerung und Fertigung von Kohlenstoffstahl trennen, um Eisenkontamination zu vermeiden; dedizierte Werkzeuge verwenden; Güte und Schedule gegen die Leitungsklasse prüfen; das Innere zum Schweißen wie spezifiziert spülen.",
+          "commonError": "Anzunehmen, 40S und STD seien bei großem NPS austauschbar: sie stimmen nur bis NPS 10 überein; darüber unterscheiden sich die gelisteten Wände, und NPS 22/30 haben gar kein 40S."
         }
       }
     }

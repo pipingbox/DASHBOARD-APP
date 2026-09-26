@@ -3253,7 +3253,8 @@
       "api602CompactValve": "Classi secondo API 602 per valvole compatte NPS 4 e inferiori. La Classe 800 non è una classe elencata in ASME B16.34: è una classe intermedia di uso diffuso per estremità filettate e saldate, e non esiste in versione flangiata. La classe disponibile dipende dal tipo di estremità. Verificare rispetto all'edizione vigente della norma.",
       "api609ButterflyValve": "La API 609 Categoria A (valvole a farfalla concentriche) definisce la dimensione faccia a faccia qui pubblicata; non è una classe di pressione. La pressione nominale e la costruzione della valvola devono essere verificate nella documentazione del produttore del prodotto selezionato.",
       "yStrainerNoStandard": "Il filtro a Y non è coperto da una norma dimensionale specifica in questo catalogo. I fabbricanti lo forniscono abitualmente con estremità flangiate secondo ASME B16.5, per cui la classe è fissata dalla flangia del modello specifico. Qui non è elencata alcuna classe perché non esiste una norma verificabile che la definisca.",
-      "noPressureClass": "I raccordi laterali non sono designati per classe di pressione. La loro capacità deriva dallo spessore di parete (schedule) e dal materiale, e si calcola secondo il codice di progetto applicabile (ad es. ASME B31.3). Verificare le dimensioni con il fabbricante per lo schedule applicabile."
+      "noPressureClass": "I raccordi laterali non sono designati per classe di pressione. La loro capacità deriva dallo spessore di parete (schedule) e dal materiale, e si calcola secondo il codice di progetto applicabile (ad es. ASME B31.3). Verificare le dimensioni con il fabbricante per lo schedule applicabile.",
+      "b36_19mPipe": "La ASME B36.19M normalizza solo dimensioni e schedule; non definisce classi di pressione. La pressione ammissibile del tubo deriva dallo spessore di parete e dal materiale, e si calcola secondo il codice di progettazione applicabile (p. es. ASME B31.3)."
     },
     "guide": {
       "valve": {
@@ -3324,6 +3325,24 @@
           "whenNotToUse": "Dove il tubo deve restare rigidamente posizionato, ad esempio ai supporti di valvole o derivazioni: un giunto flessibile si muoverà. Non sostituisce universalmente un compensatore senza calcolare il movimento totale.",
           "installation": "Stessi requisiti di qualità della scanalatura del giunto rigido; verificare la distanza tra le estremità del tubo specificata dal costruttore, tenere il giunto centrato sulla connessione e serrare i bulloni alternativamente.",
           "commonError": "Aspettarsi che un solo giunto flessibile assorba un grande movimento: la capacità per giunto è piccola e si somma lungo più giunti — non assumere mai il valore, prenderlo dal costruttore."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Tubo in acciaio le cui dimensioni seguono ASME B36.10M: diametro esterno fisso per NPS e spessore definito dallo schedule. NPS è una designazione di taglia, non il foro reale.",
+          "types": "Schedule da SCH 10 a SCH 160 e XXS, oltre alle designazioni classiche STD/XS (che coincidono con SCH 40/80 nelle taglie piccole). Fabbricazione senza saldatura o saldata, in acciaio al carbonio e legato.",
+          "whenToUse": "Tubazioni di processo, servizi e strutture in acciaio al carbonio o legato dove classe di pressione e spessore sono fissati dalla classe di linea o dalla specifica di tubazione.",
+          "whenNotToUse": "Servizio corrosivo che richiede inox: usare tubo B36.19M. Non assumere inoltre che due tubi dello stesso NPS abbiano lo stesso foro: l’ID cambia con lo schedule mentre l’OD resta fisso.",
+          "installation": "Verificare schedule, grado e colata o certificato contro la line list prima del taglio; smussare le estremità secondo il WPS per saldatura di testa; raccordi e flange si ordinano con lo stesso NPS e l’OD corrisponde, le transizioni di spessore richiedono uno smusso o uno schedule compatibile.",
+          "commonError": "Ordinare il tubo come \"NPS = diametro\": NPS 4 non misura 4 pollici da nessuna parte — l’OD è 4.500\" e il foro dipende dallo schedule. Controllare sempre lo schedule."
+        },
+        "stainless": {
+          "whatIs": "Tubo in acciaio inossidabile dimensionato secondo ASME B36.19M: stesso OD di B36.10M per lo stesso NPS, ma spessori definiti dagli schedule con suffisso S (5S, 10S, 40S, 80S).",
+          "types": "Schedule 5S/10S per parete leggera e 40S/80S che coincidono con SCH 40/80 di B36.10M fino a NPS 10; le taglie maggiori usano i propri spessori elencati. I gradi austenitici 304/304L e 316/316L sono i più comuni.",
+          "whenToUse": "Servizio corrosivo, sanitario o pulito — chimica, alimentare, farmaceutico, trattamento acque — dove l’acciaio al carbonio si corroderebbe o contaminerebbe il fluido.",
+          "whenNotToUse": "Non sostituire solo per OD: una parete 10S è molto più sottile di STD dello stesso NPS, quindi portata in pressione e preparazione della saldatura differiscono. Controllare lo schedule S, non il nome dello schedule B36.10M.",
+          "installation": "Separare dall’acciaio al carbonio in magazzino e in officina per evitare contaminazione ferrosa; utensili dedicati; verificare grado e schedule contro la classe di linea; spurgare l’interno per la saldatura come da specifica.",
+          "commonError": "Supporre che 40S e STD siano intercambiabili a grande NPS: coincidono solo fino a NPS 10; oltre, gli spessori elencati differiscono, e NPS 22/30 non hanno affatto il 40S."
         }
       }
     }

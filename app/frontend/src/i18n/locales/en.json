@@ -3247,7 +3247,8 @@
       "api602CompactValve": "Classes per API 602 for compact valves NPS 4 and smaller. Class 800 is not a class listed in ASME B16.34: it is an intermediate class in widespread use for threaded and welded ends, and does not exist in a flanged version. The available class depends on the end type. Verify against the current edition of the standard.",
       "api609ButterflyValve": "API 609 Category A (concentric butterfly valves) defines the face-to-face dimension published here; it is not a pressure class. The pressure rating and construction of the valve must be verified against the manufacturer documentation for the selected product.",
       "yStrainerNoStandard": "The Y-strainer is not covered by a specific dimensional standard in this catalogue. Manufacturers commonly supply it with flanged ends to ASME B16.5, so the class is set by the flange of the particular model. No class is listed here because there is no verifiable standard that defines one.",
-      "noPressureClass": "Laterals are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). Verify dimensions with the manufacturer for the applicable schedule."
+      "noPressureClass": "Laterals are not designated by pressure class. Their capacity derives from the wall thickness (schedule) and the material, and is calculated according to the applicable design code (e.g. ASME B31.3). Verify dimensions with the manufacturer for the applicable schedule.",
+      "b36_19mPipe": "ASME B36.19M standardises dimensions and schedules only; it does not define pressure classes. The allowable pressure of the pipe derives from the wall thickness and the material, and is calculated according to the applicable design code (e.g. ASME B31.3)."
     },
     "guide": {
       "valve": {
@@ -3318,6 +3319,24 @@
           "whenNotToUse": "Where the pipe must stay rigidly positioned, such as at valve or branch supports: a flexible joint will move. It is also not a universal expansion-joint replacement without calculating the total movement.",
           "installation": "Same groove quality requirements as the rigid coupling; verify the pipe-end gap specified by the manufacturer, keep the coupling centered over the joint and tighten the bolts alternately.",
           "commonError": "Expecting one flexible coupling to absorb a large movement: the per-joint allowance is small and adds up along several joints, so never assume the value — take it from the manufacturer."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Wrought steel pipe whose dimensions follow ASME B36.10M: a fixed outside diameter per NPS and a wall thickness defined by the schedule. NPS is a size designation, not the actual bore.",
+          "types": "Schedules from SCH 10 to SCH 160 and XXS, plus the legacy STD/XS designations (which coincide with SCH 40/80 in the smaller sizes). Seamless or welded manufacturing, in carbon and alloy steel.",
+          "whenToUse": "General process, utility and structural piping in carbon or alloy steel where pressure class and wall thickness are set by the line class or piping specification.",
+          "whenNotToUse": "Corrosive service requiring stainless: use B36.19M pipe. Also do not assume two pipes of the same NPS share the same bore: ID changes with schedule even though OD does not.",
+          "installation": "Verify schedule, grade and heat or MTC against the line list before cutting; bevel ends per the WPS for butt welding; remember that fittings and flanges are ordered by the same NPS and the OD matches, while wall transitions need a taper or a matching schedule.",
+          "commonError": "Ordering pipe by \"NPS = diameter\": NPS 4 is not 4 inches anywhere — OD is 4.500\" and the bore depends on the schedule. Check the schedule every time."
+        },
+        "stainless": {
+          "whatIs": "Stainless steel pipe dimensioned per ASME B36.19M: same OD as B36.10M for the same NPS, but wall thicknesses defined by the S-suffixed schedules (5S, 10S, 40S, 80S).",
+          "types": "Schedules 5S/10S for light-wall service and 40S/80S which match SCH 40/80 of B36.10M up to NPS 10; larger sizes use their own listed walls. Austenitic grades such as 304/304L and 316/316L are the most common.",
+          "whenToUse": "Corrosive, sanitary or clean service — chemical, food, pharma, water treatment — where carbon steel would corrode or contaminate the fluid.",
+          "whenNotToUse": "Do not substitute by OD alone: a 10S wall is much thinner than STD of the same NPS, so pressure capacity and weld preparation differ. Check the S-schedule, not the B36.10M schedule name.",
+          "installation": "Segregate from carbon steel during storage and fabrication to avoid iron contamination; use dedicated tools; verify grade and schedule against the line class; purge the bore for welding as specified.",
+          "commonError": "Assuming 40S and STD are interchangeable at large NPS: they coincide only up to NPS 10; above that the listed walls differ, and NPS 22/30 have no 40S at all."
         }
       }
     }

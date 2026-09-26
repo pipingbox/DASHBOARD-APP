@@ -3284,7 +3284,8 @@
       "api602CompactValve": "Clase conform API 602 pentru robinete compacte NPS 4 și mai mici. Class 800 nu este o clasă listată în ASME B16.34: este o clasă intermediară utilizată pe scară largă pentru capete filetate și sudate și nu există în variantă cu flanșe. Clasa disponibilă depinde de tipul capetelor. Verificați în raport cu ediția curentă a standardului.",
       "api609ButterflyValve": "API 609 Categoria A (robinete fluture concentrici) definește dimensiunea față în față publicată aici; nu este o clasă de presiune. Presiunea nominală și construcția robinetului trebuie verificate în documentația producătorului produsului selectat.",
       "yStrainerNoStandard": "Filtrul tip Y nu este acoperit de un standard dimensional specific în acest catalog. Producătorii îl livrează în mod obișnuit cu capete cu flanșe conform ASME B16.5, astfel încât clasa este stabilită de flanșa modelului respectiv. Nu este listată nicio clasă aici, deoarece nu există un standard verificabil care să o definească.",
-      "noPressureClass": "Lateralele nu sunt desemnate prin clasă de presiune. Capacitatea lor derivă din grosimea peretelui (schedule) și din material și se calculează conform codului de proiectare aplicabil (de ex. ASME B31.3). Verificați dimensiunile cu producătorul pentru schedule-ul aplicabil."
+      "noPressureClass": "Lateralele nu sunt desemnate prin clasă de presiune. Capacitatea lor derivă din grosimea peretelui (schedule) și din material și se calculează conform codului de proiectare aplicabil (de ex. ASME B31.3). Verificați dimensiunile cu producătorul pentru schedule-ul aplicabil.",
+      "b36_19mPipe": "ASME B36.19M standardizează doar dimensiunile și schedule-urile; nu definește clase de presiune. Presiunea admisibilă a țevii derivă din grosimea peretelui și din material și se calculează conform codului de proiectare aplicabil (de ex. ASME B31.3)."
     },
     "guide": {
       "valve": {
@@ -3355,6 +3356,24 @@
           "whenNotToUse": "Unde țeava trebuie să rămână rigid poziționată, cum ar fi la suporturile de robineți sau ramificații: o îmbinare flexibilă se va mișca. De asemenea, nu înlocuiește universal un compensator fără calculul mișcării totale.",
           "installation": "Aceleași cerințe de calitate a canelurii ca la cuplajul rigid; verificați distanța dintre capetele țevii specificată de producător, mențineți cuplajul centrat pe îmbinare și strângeți șuruburile alternativ.",
           "commonError": "Așteptarea ca un singur cuplaj flexibil să absoarbă o mișcare mare: capacitatea pe îmbinare este mică și se adună de-a lungul mai multor îmbinări — nu presupuneți niciodată valoarea, luați-o de la producător."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Teavă din oțel ale cărei dimensiuni urmează ASME B36.10M: diametru exterior fix pe NPS și grosime de perete definită de schedule. NPS este o desemnare de dimensiune, nu alezajul real.",
+          "types": "Schedule de la SCH 10 la SCH 160 și XXS, plus desemnările clasice STD/XS (care coincid cu SCH 40/80 la dimensiunile mici). Fabricație fără sudură sau sudată, din oțel carbon și aliat.",
+          "whenToUse": "Conducte generale de proces, utilități și structuri din oțel carbon sau aliat, unde clasa de presiune și grosimea peretelui sunt stabilite de clasa liniei sau specificația de conducte.",
+          "whenNotToUse": "Serviciu corosiv care necesită inox: folosiți teava B36.19M. De asemenea, nu presupuneți că două țevi cu același NPS au același alezaj: ID se schimbă cu schedule, OD nu.",
+          "installation": "Verificați schedule, gradul și lotul sau certificatul față de lista de linii înainte de debitare; teșiți capetele conform WPS pentru sudura cap la cap; fitingurile și flanșele se comandă pe același NPS și OD corespunde, tranzițiile de grosime necesită o teșitură sau un schedule compatibil.",
+          "commonError": "Comandarea țevii după „NPS = diametru\": NPS 4 nu măsoară 4 inch nicăieri — OD este 4.500\" și alezajul depinde de schedule. Verificați schedule de fiecare dată."
+        },
+        "stainless": {
+          "whatIs": "Teavă din oțel inoxidabil dimensionată conform ASME B36.19M: același OD ca B36.10M pentru același NPS, dar grosimi definite de schedule cu sufix S (5S, 10S, 40S, 80S).",
+          "types": "Schedule 5S/10S pentru perete subțire și 40S/80S care coincid cu SCH 40/80 din B36.10M până la NPS 10; dimensiunile mari folosesc propriile pereti listați. Gradele austenitice 304/304L și 316/316L sunt cele mai comune.",
+          "whenToUse": "Serviciu corosiv, sanitar sau curat — chimie, alimentar, farma, tratarea apei — unde oțelul carbon s-ar coroda sau ar contamina fluidul.",
+          "whenNotToUse": "Nu substituiți doar după OD: un perete 10S este mult mai subțire decât STD la același NPS, deci capacitatea de presiune și pregătirea sudurii diferă. Verificați schedule S, nu numele schedule B36.10M.",
+          "installation": "Separați de oțelul carbon în timpul depozitării și fabricației pentru a evita contaminarea cu fier; scule dedicate; verificați gradul și schedule față de clasa liniei; purjați interiorul pentru sudură conform specificației.",
+          "commonError": "Presupunerea că 40S și STD sunt interschimbabile la NPS mare: coincid doar până la NPS 10; peste aceasta, pereții listați diferă, iar NPS 22/30 nu au deloc 40S."
         }
       }
     }

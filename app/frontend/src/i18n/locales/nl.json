@@ -3247,7 +3247,8 @@
       "api602CompactValve": "Klassen volgens API 602 voor compacte afsluiters NPS 4 en kleiner. Klasse 800 is geen in ASME B16.34 opgenomen klasse: het is een veel gebruikte tussenklasse voor draad- en lasuiteinden en bestaat niet in flensuitvoering. De beschikbare klasse hangt af van het type uiteinde. Controleer tegen de geldende uitgave van de norm.",
       "api609ButterflyValve": "API 609 Categorie A (centrische vlinderkleppen) definieert de hier gepubliceerde face-to-face maat; het is geen drukklasse. De drukklasse en constructie van de klep moeten worden geverifieerd aan de hand van de fabrikantdocumentatie van het geselecteerde product.",
       "yStrainerNoStandard": "De Y-filter valt in deze catalogus niet onder een specifieke dimensionele norm. Fabrikanten leveren hem gewoonlijk met flenseinden volgens ASME B16.5, zodat de klasse wordt bepaald door de flens van het betreffende model. Hier wordt geen klasse vermeld omdat er geen verifieerbare norm bestaat die er een definieert.",
-      "noPressureClass": "Laterals worden niet aangeduid met een drukklasse. Hun capaciteit vloeit voort uit de wanddikte (schedule) en het materiaal en wordt berekend volgens de toepasselijke ontwerpcode (bijv. ASME B31.3). Verifieer de afmetingen bij de fabrikant voor de toepasselijke schedule."
+      "noPressureClass": "Laterals worden niet aangeduid met een drukklasse. Hun capaciteit vloeit voort uit de wanddikte (schedule) en het materiaal en wordt berekend volgens de toepasselijke ontwerpcode (bijv. ASME B31.3). Verifieer de afmetingen bij de fabrikant voor de toepasselijke schedule.",
+      "b36_19mPipe": "ASME B36.19M normaliseert uitsluitend afmetingen en schedules; de norm definieert geen drukklassen. De toelaatbare druk van de buis volgt uit de wanddikte en het materiaal, en wordt berekend volgens de toepasselijke ontwerpcode (bijv. ASME B31.3)."
     },
     "guide": {
       "valve": {
@@ -3318,6 +3319,24 @@
           "whenNotToUse": "Waar de buis star gepositioneerd moet blijven, zoals bij afsluiter- of aftaksteunen: een flexibele verbinding zal bewegen. Ook geen universele vervanging van een expansievoorziening zonder berekening van de totale beweging.",
           "installation": "Dezelfde groefkwaliteitseisen als bij de starre koppeling; controleer de door de fabrikant opgegeven afstand tussen de buisuiteinden, houd de koppeling gecentreerd over de verbinding en draai de bouten afwisselend aan.",
           "commonError": "Verwachten dat één flexibele koppeling een grote beweging opneemt: de capaciteit per verbinding is klein en telt op over meerdere verbindingen — neem de waarde nooit aan, haal hem bij de fabrikant."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Stalen buis waarvan de afmetingen ASME B36.10M volgen: een vaste buitendiameter per NPS en een wanddikte bepaald door het schedule. NPS is een maataanduiding, niet de werkelijke boring.",
+          "types": "Schedules van SCH 10 tot SCH 160 en XXS, plus de klassieke STD/XS-aanduidingen (die in kleinere maten samenvallen met SCH 40/80). Naadloos of gelast, in koolstof- en gelegeerd staal.",
+          "whenToUse": "Algemene proces-, utility- en constructieleidingen in koolstof- of gelegeerd staal waar drukklasse en wanddikte door de lijnklasse of leidingspecificatie worden bepaald.",
+          "whenNotToUse": "Corrosieve dienst die RVS vereist: gebruik B36.19M-buis. Ga er ook niet van uit dat twee buizen met dezelfde NPS dezelfde boring hebben: de ID verandert met het schedule, de OD niet.",
+          "installation": "Controleer schedule, kwaliteit en charge of certificaat tegen de lijnlijst vóór het zagen; afschuining volgens de WPS voor stuiklassen; fittings en flenzen worden op dezelfde NPS besteld en de OD past, wandovergangen vereisen een afschuining of passend schedule.",
+          "commonError": "Buis bestellen als \"NPS = diameter\": NPS 4 is nergens 4 inch — de OD is 4.500\" en de boring hangt af van het schedule. Controleer het schedule elke keer."
+        },
+        "stainless": {
+          "whatIs": "Roestvrijstalen buis gedimensioneerd volgens ASME B36.19M: dezelfde OD als B36.10M bij dezelfde NPS, maar wanddiktes volgens de schedules met S-suffix (5S, 10S, 40S, 80S).",
+          "types": "Schedules 5S/10S voor dunne wand en 40S/80S die tot NPS 10 overeenkomen met SCH 40/80 van B36.10M; grotere maten gebruiken eigen vermelde wanden. Austenitische kwaliteiten zoals 304/304L en 316/316L komen het meest voor.",
+          "whenToUse": "Corrosieve, sanitaire of schone dienst — chemie, voeding, farma, waterbehandeling — waar koolstofstaal zou corroderen of het medium zou verontreinigen.",
+          "whenNotToUse": "Niet alleen op OD vervangen: een 10S-wand is veel dunner dan STD van dezelfde NPS, dus drukcapaciteit en lasvoorbereiding verschillen. Controleer het S-schedule, niet de B36.10M-schedulenaam.",
+          "installation": "Gescheiden houden van koolstofstaal tijdens opslag en fabricage om ijzerbesmetting te voorkomen; speciaal gereedschap gebruiken; kwaliteit en schedule tegen de lijnklasse controleren; de binnenkant voor het lassen spoelen zoals gespecificeerd.",
+          "commonError": "Aannemen dat 40S en STD bij grote NPS verwisselbaar zijn: ze komen alleen overeen tot NPS 10; daarboven verschillen de vermelde wanden, en NPS 22/30 hebben helemaal geen 40S."
         }
       }
     }

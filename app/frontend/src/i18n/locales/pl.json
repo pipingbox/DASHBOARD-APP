@@ -3290,7 +3290,8 @@
       "api602CompactValve": "Klasy wg API 602 dla zaworów kompaktowych NPS 4 i mniejszych. Class 800 nie jest klasą wymienioną w ASME B16.34: to klasa pośrednia, powszechnie stosowana dla końcówek gwintowanych i spawanych, która nie występuje w wersji kołnierzowej. Dostępna klasa zależy od typu końcówek. Zweryfikuj z aktualnym wydaniem normy.",
       "api609ButterflyValve": "API 609 Kategoria A (koncentryczne zawory motylkowe) definiuje opublikowany tutaj wymiar face-to-face; nie jest to klasa ciśnieniowa. Ciśnienie znamionowe i konstrukcję zaworu należy zweryfikować w dokumentacji producenta wybranego produktu.",
       "yStrainerNoStandard": "Filtr siatkowy typu Y nie jest objęty w tym katalogu żadną konkretną normą wymiarową. Producenci zwykle dostarczają go z końcówkami kołnierzowymi wg ASME B16.5, więc klasę określa kołnierz danego modelu. Nie podano tu klasy, ponieważ nie istnieje weryfikowalna norma, która by ją definiowała.",
-      "noPressureClass": "Trójniki boczne (laterals) nie są oznaczane klasą ciśnienia. Ich wytrzymałość wynika z grubości ścianki (schedule) i materiału oraz jest obliczana zgodnie z właściwym kodeksem projektowym (np. ASME B31.3). Wymiary należy zweryfikować z producentem dla danego schedule."
+      "noPressureClass": "Trójniki boczne (laterals) nie są oznaczane klasą ciśnienia. Ich wytrzymałość wynika z grubości ścianki (schedule) i materiału oraz jest obliczana zgodnie z właściwym kodeksem projektowym (np. ASME B31.3). Wymiary należy zweryfikować z producentem dla danego schedule.",
+      "b36_19mPipe": "ASME B36.19M normalizuje wyłącznie wymiary i schedule; nie definiuje klas ciśnienia. Ciśnienie dopuszczalne rury wynika z grubości ścianki i materiału i jest obliczane zgodnie z obowiązującym kodem projektowym (np. ASME B31.3)."
     },
     "guide": {
       "valve": {
@@ -3361,6 +3362,24 @@
           "whenNotToUse": "Tam, gdzie rura ma pozostać sztywnie ustawiona, np. przy podporach zaworów lub odgałęzień: złącze elastyczne się przemieści. Nie zastępuje też uniwersalnie kompensatora bez obliczenia całkowitego ruchu.",
           "installation": "Te same wymagania jakości rowka co przy sprzęgle sztywnym; sprawdzić określoną przez producenta szczelinę między końcami rur, utrzymać sprzęgło wyśrodkowane na złączu i dokręcać śruby naprzemiennie.",
           "commonError": "Oczekiwanie, że jedno sprzęgło elastyczne pochłonie duży ruch: zdolność na złącze jest mała i sumuje się wzdłuż kilku złączy — nigdy nie zakładać wartości, lecz pobrać ją od producenta."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Rura stalowa o wymiarach wg ASME B36.10M: stała średnica zewnętrzna dla danego NPS i grubość ścianki określona przez schedule. NPS to oznaczenie rozmiaru, a nie rzeczywisty otwór.",
+          "types": "Schedule od SCH 10 do SCH 160 i XXS oraz klasyczne oznaczenia STD/XS (pokrywające się z SCH 40/80 w mniejszych rozmiarach). Produkcja bez szwu lub spawana, stal węglowa i stopowa.",
+          "whenToUse": "Ogólne rurociągi procesowe, mediów i konstrukcyjne ze stali węglowej lub stopowej, gdzie klasę ciśnienia i grubość ścianki określa klasa linii lub specyfikacja.",
+          "whenNotToUse": "Służba korozyjna wymagająca stali nierdzewnej: zastosować rurę B36.19M. Nie zakładać też, że dwie rury tego samego NPS mają ten sam otwór: ID zmienia się ze schedule, OD nie.",
+          "installation": "Przed cięciem sprawdzić schedule, gatunek i wydział lub certyfikat z listą linii; fazować końce wg WPS do spoin doczołowych; kształtki i kołnierze zamawia się po tym samym NPS i OD pasuje, a przejścia grubości wymagają sfazowania lub zgodnego schedule.",
+          "commonError": "Zamawianie rury jako \"NPS = średnica\": NPS 4 nie ma nigdzie 4 cali — OD wynosi 4.500\", a otwór zależy od schedule. Sprawdzać schedule za każdym razem."
+        },
+        "stainless": {
+          "whatIs": "Rura ze stali nierdzewnej wymiarowana wg ASME B36.19M: to samo OD co B36.10M dla tego samego NPS, ale grubości ścianek wg schedule z przyrostkiem S (5S, 10S, 40S, 80S).",
+          "types": "Schedule 5S/10S do cienkich ścianek oraz 40S/80S pokrywające się z SCH 40/80 z B36.10M do NPS 10; większe rozmiary mają własne wymienione ścianki. Najczęstsze są gatunki austenityczne 304/304L i 316/316L.",
+          "whenToUse": "Służba korozyjna, sanitarna lub czysta — chemia, żywność, farma, uzdatnianie wody — gdzie stal węglowa korodowałaby lub zanieczyszczała medium.",
+          "whenNotToUse": "Nie zastępować tylko po OD: ścianka 10S jest znacznie cieńsza niż STD tego samego NPS, więc wytrzymałość ciśnieniowa i przygotowanie spoiny się różnią. Sprawdzać schedule S, nie nazwę schedule B36.10M.",
+          "installation": "Oddzielać od stali węglowej podczas składowania i obróbki, aby uniknąć skażenia żelazem; używać dedykowanych narzędzi; sprawdzać gatunek i schedule z klasą linii; przed spawaniem przemywać wnętrze zgodnie ze specyfikacją.",
+          "commonError": "Zakładanie, że 40S i STD są zamienne przy dużym NPS: pokrywają się tylko do NPS 10; powyżej wymienione ścianki się różnią, a NPS 22/30 w ogóle nie mają 40S."
         }
       }
     }

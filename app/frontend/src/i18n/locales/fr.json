@@ -3253,7 +3253,8 @@
       "api602CompactValve": "Classes selon API 602 pour robinets compacts NPS 4 et inférieurs. La Classe 800 n'est pas une classe listée dans ASME B16.34 : c'est une classe intermédiaire d'usage répandu pour les extrémités taraudées et soudées, et elle n'existe pas en version à brides. La classe disponible dépend du type d'extrémité. Vérifier par rapport à l'édition en vigueur de la norme.",
       "api609ButterflyValve": "L'API 609 Catégorie A (vannes papillon concentriques) définit la dimension face à face publiée ici ; ce n'est pas une classe de pression. La pression nominale et la construction de la vanne doivent être vérifiées dans la documentation du fabricant du produit sélectionné.",
       "yStrainerNoStandard": "Le filtre en Y n'est couvert par aucune norme dimensionnelle spécifique dans ce catalogue. Les fabricants le fournissent couramment avec des extrémités à brides selon ASME B16.5, de sorte que la classe est fixée par la bride du modèle concerné. Aucune classe n'est listée ici car il n'existe pas de norme vérifiable qui en définisse une.",
-      "noPressureClass": "Les dérivations (latérales) ne sont pas désignées par classe de pression. Leur capacité dépend de l’épaisseur de paroi (schedule) et du matériau, et se calcule selon le code de conception applicable (p. ex. ASME B31.3). Vérifiez les dimensions auprès du fabricant pour le schedule applicable."
+      "noPressureClass": "Les dérivations (latérales) ne sont pas désignées par classe de pression. Leur capacité dépend de l’épaisseur de paroi (schedule) et du matériau, et se calcule selon le code de conception applicable (p. ex. ASME B31.3). Vérifiez les dimensions auprès du fabricant pour le schedule applicable.",
+      "b36_19mPipe": "ASME B36.19M ne normalise que les dimensions et les schedules ; elle ne définit pas de classes de pression. La pression admissible du tube découle de l'épaisseur de paroi et du matériau, et se calcule selon le code de conception applicable (p. ex. ASME B31.3)."
     },
     "guide": {
       "valve": {
@@ -3324,6 +3325,24 @@
           "whenNotToUse": "Lorsque le tube doit rester rigidement positionné, par exemple aux supports de vannes ou de dérivations : un assemblage flexible bougera. Ce n’est pas non plus un remplaçant universel d’un compensateur sans calcul du mouvement total.",
           "installation": "Mêmes exigences de qualité de rainure que l’accouplement rigide ; vérifier l’écart entre extrémités de tube spécifié par le fabricant, centrer l’accouplement sur l’assemblage et serrer les boulons en alternance.",
           "commonError": "Attendre d’un seul accouplement flexible qu’il absorbe un grand mouvement : la capacité par assemblage est faible et s’additionne sur plusieurs assemblages — ne jamais supposer la valeur, la prendre auprès du fabricant."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Tube en acier dont les dimensions suivent ASME B36.10M : diamètre extérieur fixe par NPS et épaisseur définie par le schedule. NPS est une désignation de taille, pas l’alésage réel.",
+          "types": "Schedules de SCH 10 à SCH 160 et XXS, plus les désignations classiques STD/XS (qui coïncident avec SCH 40/80 dans les petites tailles). Fabrication sans soudure ou soudée, en acier au carbone et allié.",
+          "whenToUse": "Tuyauteries de procédé, utilités et structures en acier au carbone ou allié où la classe de pression et l’épaisseur sont fixées par la classe de ligne ou la spécification de tuyauterie.",
+          "whenNotToUse": "Service corrosif exigeant l’inox : utiliser le tube B36.19M. Ne pas supposer non plus que deux tubes du même NPS partagent le même alésage : l’ID change avec le schedule alors que l’OD reste fixe.",
+          "installation": "Vérifier schedule, nuance et coulée ou certificat contre la liste de lignes avant coupe ; chanfreiner les extrémités selon le WPS pour soudage bout à bout ; les accessoires et brides se commandent au même NPS et l’OD correspond, les transitions d’épaisseur demandent un biseau ou un schedule compatible.",
+          "commonError": "Commander le tube par « NPS = diamètre » : NPS 4 ne mesure 4 pouces nulle part — l’OD vaut 4.500\" et l’alésage dépend du schedule. Vérifier le schedule à chaque fois."
+        },
+        "stainless": {
+          "whatIs": "Tube en acier inoxydable dimensionné selon ASME B36.19M : même OD que B36.10M pour le même NPS, mais épaisseurs définies par les schedules à suffixe S (5S, 10S, 40S, 80S).",
+          "types": "Schedules 5S/10S pour paroi légère et 40S/80S qui coïncident avec SCH 40/80 de B36.10M jusqu’à NPS 10 ; les grandes tailles utilisent leurs propres parois listées. Les nuances austénitiques 304/304L et 316/316L sont les plus courantes.",
+          "whenToUse": "Service corrosif, sanitaire ou propre — chimie, agroalimentaire, pharma, traitement de l’eau — où l’acier au carbone se corroderait ou contaminerait le fluide.",
+          "whenNotToUse": "Ne pas substituer sur le seul OD : une paroi 10S est bien plus mince que STD du même NPS, donc la tenue en pression et la préparation de soudure diffèrent. Vérifier le schedule S, pas le nom du schedule B36.10M.",
+          "installation": "Séparer de l’acier au carbone pendant stockage et fabrication pour éviter la contamination ferreuse ; outillage dédié ; vérifier nuance et schedule contre la classe de ligne ; purger l’intérieur pour le soudage comme spécifié.",
+          "commonError": "Supposer que 40S et STD sont interchangeables en grand NPS : ils ne coïncident que jusqu’à NPS 10 ; au-delà les parois listées diffèrent, et NPS 22/30 n’ont même pas de 40S."
         }
       }
     }

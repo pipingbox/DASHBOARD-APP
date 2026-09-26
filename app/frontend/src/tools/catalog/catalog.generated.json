@@ -4,12 +4,12 @@
   "_warning": "FICHERO GENERADO. No editar a mano: se sobrescribe.",
   "stats": {
     "components": 57,
-    "publishable": 54,
+    "publishable": 56,
     "standards": 20,
-    "standardsInUse": 17,
+    "standardsInUse": 19,
     "dimensionSets": 71,
     "dimensionRows": 1943,
-    "drawings": 643,
+    "drawings": 691,
     "renders": 54
   },
   "components": [
@@ -3278,7 +3278,7 @@
       "ratingBasis": "wall_thickness",
       "ratingNote": "ASME B36.10M standardises dimensions and schedules only; it does not define pressure classes. The allowable pressure of the pipe derives from the wall thickness and the material, and is calculated according to the applicable design code (e.g. ASME B31.3).",
       "ratingNoteKey": "catalog.ratingNote.b36_10mPipe",
-      "guideKey": null,
+      "guideKey": "catalog.guide.pipe.seamless",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B36-10M",
@@ -3289,8 +3289,101 @@
       "dimensionSets": [
         "PB-DIM-ASME-B36-10M-PIPE"
       ],
-      "drawings": [],
-      "drawingStem": null,
+      "drawings": [
+        {
+          "size": "1-2",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-1-2_2d.svg"
+        },
+        {
+          "size": "1-4",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-1-4_2d.svg"
+        },
+        {
+          "size": "1-8",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-1-8_2d.svg"
+        },
+        {
+          "size": "1",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-1_2d.svg"
+        },
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-2_2d.svg"
+        },
+        {
+          "size": "3-4",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-3-4_2d.svg"
+        },
+        {
+          "size": "3-8",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-3-8_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-4_2d.svg"
+        },
+        {
+          "size": "5",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-5_2d.svg"
+        },
+        {
+          "size": "6",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-6_2d.svg"
+        },
+        {
+          "size": "8",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-8_2d.svg"
+        },
+        {
+          "size": "10",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-10_2d.svg"
+        },
+        {
+          "size": "11-2",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-11-2_2d.svg"
+        },
+        {
+          "size": "11-4",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-11-4_2d.svg"
+        },
+        {
+          "size": "12",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-12_2d.svg"
+        },
+        {
+          "size": "14",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-14_2d.svg"
+        },
+        {
+          "size": "16",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-16_2d.svg"
+        },
+        {
+          "size": "18",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-18_2d.svg"
+        },
+        {
+          "size": "20",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-20_2d.svg"
+        },
+        {
+          "size": "21-2",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-21-2_2d.svg"
+        },
+        {
+          "size": "24",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-24_2d.svg"
+        },
+        {
+          "size": "31-2",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-10M-NPS-31-2_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-PIPE-B36-10M",
       "render": null,
       "fabricationNotes": [
         "Verify actual wall thickness against nominal."
@@ -3306,7 +3399,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-FLANGE-SO-ASME-B16-5",
@@ -4326,8 +4419,8 @@
       "pressureRatings": [],
       "ratingBasis": "wall_thickness",
       "ratingNote": "ASME B36.19M standardises dimensions and schedules only; it does not define pressure classes. The allowable pressure of the pipe derives from the wall thickness and the material, and is calculated according to the applicable design code (e.g. ASME B31.3).",
-      "ratingNoteKey": null,
-      "guideKey": null,
+      "ratingNoteKey": "catalog.ratingNote.b36_19mPipe",
+      "guideKey": "catalog.guide.pipe.stainless",
       "standards": [
         {
           "standardId": "PB-STD-ASME-B36-19M",
@@ -4338,8 +4431,109 @@
       "dimensionSets": [
         "PB-DIM-ASME-B36-19M-PIPE"
       ],
-      "drawings": [],
-      "drawingStem": null,
+      "drawings": [
+        {
+          "size": "1-2",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-1-2_2d.svg"
+        },
+        {
+          "size": "1-4",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-1-4_2d.svg"
+        },
+        {
+          "size": "1-8",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-1-8_2d.svg"
+        },
+        {
+          "size": "1",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-1_2d.svg"
+        },
+        {
+          "size": "2",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-2_2d.svg"
+        },
+        {
+          "size": "3-4",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-3-4_2d.svg"
+        },
+        {
+          "size": "3-8",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-3-8_2d.svg"
+        },
+        {
+          "size": "3",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-3_2d.svg"
+        },
+        {
+          "size": "4",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-4_2d.svg"
+        },
+        {
+          "size": "5",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-5_2d.svg"
+        },
+        {
+          "size": "6",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-6_2d.svg"
+        },
+        {
+          "size": "8",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-8_2d.svg"
+        },
+        {
+          "size": "10",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-10_2d.svg"
+        },
+        {
+          "size": "11-2",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-11-2_2d.svg"
+        },
+        {
+          "size": "11-4",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-11-4_2d.svg"
+        },
+        {
+          "size": "12",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-12_2d.svg"
+        },
+        {
+          "size": "14",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-14_2d.svg"
+        },
+        {
+          "size": "16",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-16_2d.svg"
+        },
+        {
+          "size": "18",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-18_2d.svg"
+        },
+        {
+          "size": "20",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-20_2d.svg"
+        },
+        {
+          "size": "21-2",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-21-2_2d.svg"
+        },
+        {
+          "size": "22",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-22_2d.svg"
+        },
+        {
+          "size": "24",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-24_2d.svg"
+        },
+        {
+          "size": "30",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-30_2d.svg"
+        },
+        {
+          "size": "31-2",
+          "src": "/catalog/2d/PB-DIM-PIPE-B36-19M-NPS-31-2_2d.svg"
+        }
+      ],
+      "drawingStem": "PB-DIM-PIPE-B36-19M",
       "render": null,
       "fabricationNotes": [
         "Verify actual wall thickness against nominal.",
@@ -4356,7 +4550,7 @@
         }
       ],
       "referenceCompatibility": null,
-      "publishable": false
+      "publishable": true
     },
     {
       "id": "PB-COMP-STUB-END-A-ASME-B16-9",
