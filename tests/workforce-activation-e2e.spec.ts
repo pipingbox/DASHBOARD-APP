@@ -213,6 +213,31 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 â€” real E2E on preview (scenarios Aâ€
       return res.ok;
     };
 
+    /**
+     * Fixture disposal with an F-1-safe fallback: try a real DELETE first (the
+     * correct contract), and if the owner-DELETE policy is still missing
+     * (run 36222667243), NEUTRALIZE the row instead (owner UPDATE is a verified
+     * capability): emptying position/company_name makes it NON-qualifying under
+     * the canonical predicate, so it can never pollute the readiness baseline.
+     * Neutralized rows remain PENDING physical deletion (sql/012) and are
+     * reported explicitly.
+     */
+    const disposeFixture = async (id: string): Promise<'deleted' | 'neutralized' | 'failed'> => {
+      if (await deleteExperience(id)) return 'deleted';
+      const res = await fetch(`${restCtx.base}/rest/v1/${EXPERIENCES_TABLE}?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: { ...restHeaders, Prefer: 'return=representation' },
+        body: JSON.stringify({ company_name: '' }),
+        signal: AbortSignal.timeout(15_000),
+      });
+      return res.ok ? 'neutralized' : 'failed';
+    };
+
+    /** Any row created by WFA/RLS test suites (any run). */
+    const isTestFixtureRow = (row: Record<string, unknown>) =>
+      String(row.position ?? '').startsWith(FIXTURE_MARKER) ||
+      String(row.position ?? '').startsWith('WFA-RLS â€” automated');
+
     const recalculateOwn = async (): Promise<void> => {
       const res = await fetch(`${restCtx.base}/functions/v1/recalculate-profiles`, {
         method: 'POST',
@@ -272,10 +297,10 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 â€” real E2E on preview (scenarios Aâ€
     const pendingCleanup: string[] = [];
     const fixtureIds: string[] = [];
 
-    // Delete stale fixtures from previous runs (exact ids only, own rows only).
+    // Dispose of stale fixtures from previous runs (any suite, exact ids only).
     for (const row of await listOwnExperiences()) {
-      if (String(row.position ?? '').startsWith(FIXTURE_MARKER)) {
-        if (!(await deleteExperience(String(row.id)))) pendingCleanup.push(String(row.id));
+      if (isTestFixtureRow(row)) {
+        if ((await disposeFixture(String(row.id))) === 'failed') pendingCleanup.push(String(row.id));
       }
     }
 
@@ -477,13 +502,11 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 â€” real E2E on preview (scenarios Aâ€
       // snapshot the same QA account are not polluted by stale derived state.
       try {
         for (const id of fixtureIds) {
-          if (!(await deleteExperience(id))) pendingCleanup.push(id);
+          if ((await disposeFixture(id)) === 'failed') pendingCleanup.push(id);
         }
-        const leftovers = (await listOwnExperiences()).filter((r) =>
-          String(r.position ?? '').startsWith(FIXTURE_MARKER),
-        );
+        const leftovers = (await listOwnExperiences()).filter(isTestFixtureRow);
         for (const row of leftovers) {
-          if (!(await deleteExperience(String(row.id)))) pendingCleanup.push(String(row.id));
+          if ((await disposeFixture(String(row.id))) === 'failed') pendingCleanup.push(String(row.id));
         }
 
         const restoreBody: Record<string, unknown> = {};

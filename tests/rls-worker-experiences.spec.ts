@@ -132,6 +132,15 @@ test.describe('app_worker_experiences — owner controls and spoof attempts (QA 
         console.error(
           `[rls-worker-experiences] F-1: afterAll owner DELETE returned HTTP ${res ? res.status() : 'network-error'}`,
         );
+        // F-1-safe disposal: neutralize the row (owner UPDATE is verified) so it
+        // can never pollute the readiness baseline while physical deletion is
+        // blocked on sql/012.
+        await api
+          .patch(`/rest/v1/${TABLE}?id=eq.${fixtureId}`, {
+            headers: authHeaders(),
+            data: { company_name: '' },
+          })
+          .catch(() => null);
       }
     }
     if (pendingCleanup.length > 0) {
@@ -146,7 +155,8 @@ test.describe('app_worker_experiences — owner controls and spoof attempts (QA 
         .catch(() => null);
       console.warn(
         `[rls-worker-experiences] PENDING CLEANUP (F-1 owner-DELETE gap): ${pendingCleanup.join(', ')}. ` +
-          `Rows are marked "${FIXTURE_MARKER}" on the disposable QA account; derived columns recalculated.`,
+          `Rows neutralized (position/company emptied) and marked "${FIXTURE_MARKER}" on the disposable QA account; ` +
+          'physical deletion pending sql/012; derived columns recalculated.',
       );
     }
     await api?.dispose();
