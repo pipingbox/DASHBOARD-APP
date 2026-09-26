@@ -104,8 +104,13 @@ function check(name, ok, detail = '') {
   check('assignments: anon NO lee', anonReadAssign.status >= 400 || (anonReadAssign.status === 200 && anonReadAssign.json?.length === 0), `status=${anonReadAssign.status}`);
 
   // ── Fixture conservado ──
+  // La fila fixture QA (86bfc261…) sigue existiendo en la tabla — su conservación
+  // se verificó con conexión admin al aplicar pb_sec_rls_assignments_001 (ver
+  // RUNBOOK-A5-SECURITY-P0.md) — pero para un usuario NORMAL debe ser INVISIBLE,
+  // exactamente igual que cualquier otra fila bajo la política admin-only.
+  // Esperar rows=1 con sesión QA normal sería esperar que RLS está rota.
   const fixture = await api('app_14da0f1941_workforce_assignments?id=eq.86bfc261-7515-48ad-b182-4bea15819d29&select=id,status,notes', a.token);
-  check('assignments: fixture QA conservado (admin-readable)', fixture.status === 200 && fixture.json?.length === 1, `rows=${fixture.json?.length}`);
+  check('assignments: fixture QA invisible para usuario normal (política admin-only)', fixture.status === 200 && fixture.json?.length === 0, `rows=${fixture.json?.length}`);
 
   // ── CREATE-CHECKOUT: kill switch de monetización (Stream A, v2 bundle) ──
   // POST con sesión QA válida y MONETIZATION_ENABLED desactivado debe devolver
