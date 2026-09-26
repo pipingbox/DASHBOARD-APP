@@ -179,6 +179,11 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
     await page.getByRole('button', { name: /sign in|iniciar sesi/i }).click();
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
 
+    expect(rest, 'Supabase REST context must have been captured').toBeTruthy();
+    const restCtx = rest!;
+
+    // identifiedId: prefer PostHog $identify (preview); in production PostHog
+    // drops the HeadlessChrome user-agent, so fall back to the Supabase JWT sub.
     let identifiedId = '';
     for (let i = 0; i < 10 && !identifiedId; i++) {
       await page.waitForTimeout(1000);
@@ -192,11 +197,15 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
       const p = (e.properties ?? {}) as Record<string, unknown>;
       return String(e.distinct_id ?? p.distinct_id ?? '');
     }
-    expect(identifiedId, 'exactly one $identify must flush after login').toMatch(UUID_RE);
+    if (!identifiedId) {
+      try {
+        const jwt = restCtx.authorization.replace(/^Bearer\s+/i, '');
+        const payload = JSON.parse(Buffer.from(jwt.split('.')[1], 'base64url').toString('utf8'));
+        if (UUID_RE.test(String(payload.sub ?? ''))) identifiedId = String(payload.sub);
+      } catch { /* fall through */ }
+    }
+    expect(identifiedId, 'identifiedId must resolve from $identify (preview) or the Supabase JWT sub (production)').toMatch(UUID_RE);
     expect(identifiedId).not.toContain('@');
-
-    expect(rest, 'Supabase REST context must have been captured').toBeTruthy();
-    const restCtx = rest!;
     const restHeaders = {
       apikey: restCtx.apiKey,
       Authorization: restCtx.authorization,

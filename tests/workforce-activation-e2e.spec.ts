@@ -169,6 +169,13 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 â€” real E2E on preview (scenarios Aâ€
     await page.getByRole('button', { name: /sign in|iniciar sesi/i }).click();
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
 
+    expect(rest, 'Supabase REST context must have been captured').toBeTruthy();
+    const restCtx = rest!;
+
+    // userId: prefer the PostHog $identify event (reliable in preview). In
+    // production PostHog drops the HeadlessChrome user-agent, so fall back to
+    // the `sub` claim of the captured Supabase access token (JWT) â€” same
+    // authenticated identity, independent of the analytics pipeline.
     let userId = '';
     const distinctIdOf = (e: Record<string, unknown>): string => {
       const p = (e.properties ?? {}) as Record<string, unknown>;
@@ -183,10 +190,14 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 â€” real E2E on preview (scenarios Aâ€
         if (!UUID_RE.test(userId)) userId = '';
       }
     }
-    expect(userId, 'exactly one $identify must flush after login').toMatch(UUID_RE);
-
-    expect(rest, 'Supabase REST context must have been captured').toBeTruthy();
-    const restCtx = rest!;
+    if (!userId) {
+      try {
+        const jwt = restCtx.authorization.replace(/^Bearer\s+/i, '');
+        const payload = JSON.parse(Buffer.from(jwt.split('.')[1], 'base64url').toString('utf8'));
+        if (UUID_RE.test(String(payload.sub ?? ''))) userId = String(payload.sub);
+      } catch { /* fall through to the assertion below */ }
+    }
+    expect(userId, 'userId must resolve from $identify (preview) or the Supabase JWT sub (production)').toMatch(UUID_RE);
     const restHeaders = {
       apikey: restCtx.apiKey,
       Authorization: restCtx.authorization,
