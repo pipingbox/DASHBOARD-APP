@@ -387,6 +387,13 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 â€” real E2E on preview (scenarios Aâ€
       await expect(page.getByText(TXT.gapExperience), 'experience gap must be the remaining gap').toBeVisible({
         timeout: 20_000,
       });
+      // DIAG: dump every button on the page so a missing CTA is explainable.
+      const buttonNames = await page
+        .getByRole('button')
+        .evaluateAll((els) => els.map((el) => (el.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 80)));
+      console.log('DIAG buttons on /profile (E1):', JSON.stringify(buttonNames));
+      const e1Text = await page.locator('#root').innerText().catch(() => '');
+      console.log('DIAG /profile text (E1):', e1Text.replace(/\s+/g, ' ').slice(0, 1200));
       const quickCta = page.getByRole('button', { name: TXT.quickCta });
       await expect(quickCta, 'quick-capture CTA must be offered for the experience gap').toBeVisible();
       await quickCta.click();
