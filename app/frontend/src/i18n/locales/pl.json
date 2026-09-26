@@ -514,6 +514,44 @@
       "workforceReady": "Gotowy do pracy",
       "matchable": "Dopasowywalny"
     },
+    "journey": {
+      "title": "Uzupełnij profil, aby odblokować gotowość do pracy",
+      "subtitle": "Każdy element to prawdziwe wymaganie. Jego uzupełnienie natychmiast aktualizuje Twój status.",
+      "unlocks": "Odblokowuje",
+      "current": {
+        "full_name": "Brak imienia",
+        "title": "Brak zawodu",
+        "location": "Brak lokalizacji",
+        "years_experience": "Nie podano",
+        "bio": "Brak lub za krótkie",
+        "skills": "Brak umiejętności",
+        "experience": "Brak kwalifikującego doświadczenia",
+        "availability": "Nie określono",
+        "visibility": "Niewidoczny dla firm"
+      },
+      "required": {
+        "full_name": "Twoje pełne imię i nazwisko",
+        "title": "Twoje stanowisko lub fach",
+        "location": "Twoje miejsce pracy",
+        "years_experience": "Twoje lata doświadczenia",
+        "bio": "Krótkie bio zawodowe (min. 10 znaków)",
+        "skills": "Przynajmniej jedna umiejętność",
+        "experience": "Jedno doświadczenie ze stanowiskiem i firmą",
+        "availability": "Wybierz swoją dostępność",
+        "visibility": "Publiczny profil"
+      },
+      "action": {
+        "full_name": "Dodaj imię",
+        "title": "Dodaj zawód",
+        "location": "Dodaj lokalizację",
+        "years_experience": "Dodaj lata",
+        "bio": "Napisz bio",
+        "skills": "Dodaj umiejętności",
+        "experience": "Dodaj doświadczenie",
+        "availability": "Ustaw dostępność",
+        "visibility": "Uczyń widocznym"
+      }
+    },
     "quickExperience": {
       "title": "Dodaj doświadczenie zawodowe",
       "saved": "Doświadczenie dodane — Twoja historia zawodowa może być teraz oceniana przez firmy.",
@@ -2097,6 +2135,7 @@
     "complete": "Twój profil jest kompletny! Rekruterzy widzą Twoją pełną tożsamość zawodową.",
     "missingItems": "Do zrobienia",
     "completedItems": "Ukończone",
+    "optional": "Opcjonalne",
     "badgeLabel": "ukończono",
     "status": {
       "incomplete": "Profil niekompletny",

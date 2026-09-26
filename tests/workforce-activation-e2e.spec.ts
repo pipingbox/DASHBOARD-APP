@@ -41,13 +41,17 @@ const IGNORED_DIFF_COLUMNS = new Set(['updated_at']);
 
 // Spanish UI strings (the spec pins pipingbox_language=es, as the other specs).
 const TXT = {
-  // NOTE: es.json has a DUPLICATE matchReadyTitle key (lines 417/484); the
-  // effective copy is the later one ("coincidencias de empleo"). Match the
-  // common prefix so the test is immune to the deduplication either way.
-  bannerTitle: /Completa tu perfil para recibir/i,
+  // NOTE: es.json has a DUPLICATE matchReadyTitle key (lines 417/484); WFA-002
+  // evolved the banner into the completion journey, whose canonical title is
+  // `profile.journey.title`. Match the common prefix so the test is immune to
+  // the legacy key either way.
+  bannerTitle: /Completa tu perfil/i,
   gapBio: /Añade un resumen profesional/i,
   gapExperience: /Añade experiencia laboral estructurada/i,
-  quickCta: 'Añadir experiencia laboral',
+  // WFA-002: the journey item action for the experience gap (es copy
+  // `profile.journey.action.experience`) — the banner no longer has a
+  // separate Quick Capture button.
+  quickCta: 'Añadir experiencia',
   dialogSaved: /Experiencia añadida/i,
   saveExperience: /Guardar experiencia/i,
   editTitle: /Editar Experiencia Laboral/i,

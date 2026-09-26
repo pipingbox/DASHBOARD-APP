@@ -434,6 +434,44 @@
       "workforceReady": "Preparado para oportunidades",
       "matchable": "Disponible para matching"
     },
+    "journey": {
+      "title": "Completa tu perfil para desbloquear tu preparación profesional",
+      "subtitle": "Cada elemento es un requisito real. Completarlo actualiza tu estado al momento.",
+      "unlocks": "Desbloquea",
+      "current": {
+        "full_name": "Sin nombre",
+        "title": "Sin profesión",
+        "location": "Sin ubicación",
+        "years_experience": "Sin indicar",
+        "bio": "Falta o es demasiado corta",
+        "skills": "Sin competencias",
+        "experience": "Sin experiencia laboral válida",
+        "availability": "Sin especificar",
+        "visibility": "No visible para empresas"
+      },
+      "required": {
+        "full_name": "Tu nombre completo",
+        "title": "Tu puesto u oficio",
+        "location": "Tu ubicación de trabajo",
+        "years_experience": "Tus años de experiencia",
+        "bio": "Una breve bio profesional (mín. 10 caracteres)",
+        "skills": "Al menos una competencia",
+        "experience": "Una experiencia con puesto y empresa",
+        "availability": "Elige tu disponibilidad",
+        "visibility": "Un perfil público"
+      },
+      "action": {
+        "full_name": "Añadir nombre",
+        "title": "Añadir profesión",
+        "location": "Añadir ubicación",
+        "years_experience": "Añadir años",
+        "bio": "Escribir bio",
+        "skills": "Añadir competencias",
+        "experience": "Añadir experiencia",
+        "availability": "Indicar disponibilidad",
+        "visibility": "Hacer visible"
+      }
+    },
     "quickExperience": {
       "title": "Añadir experiencia laboral",
       "saved": "Experiencia añadida — las empresas ya pueden evaluar tu trayectoria profesional.",
@@ -2092,6 +2130,7 @@
     "complete": "¡Tu perfil está completo! Los reclutadores pueden ver tu identidad profesional completa.",
     "missingItems": "Pendiente",
     "completedItems": "Completado",
+    "optional": "Opcional",
     "badgeLabel": "completo",
     "status": {
       "incomplete": "Perfil incompleto",

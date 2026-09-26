@@ -31,6 +31,15 @@ interface CompletenessItem {
   icon: React.ReactNode;
 }
 
+/**
+ * WFA-002: fields that are NOT canonical workforce-readiness requirements
+ * (single source of truth: @/lib/workforceReadiness.ts). They contribute to
+ * the cosmetic completeness percentage but must never be implied as
+ * readiness blockers — the completion journey (MatchReadyBanner) is the one
+ * canonical readiness surface.
+ */
+const OPTIONAL_FOR_READINESS = new Set(['photo', 'company', 'cv', 'certification', 'documents']);
+
 export function ProfileCompleteness() {
   const { t } = useTranslation();
   const { user, profile } = useAuth();
@@ -225,6 +234,11 @@ export function ProfileCompleteness() {
                 {item.icon}
                 {t(`profileCompleteness.items.${item.key}`)}
               </span>
+              {OPTIONAL_FOR_READINESS.has(item.key) && (
+                <span className="ml-auto text-[9px] uppercase tracking-[0.15em] text-zinc-600 border border-zinc-800 px-1.5 py-0.5">
+                  {t('profileCompleteness.optional', 'Optional')}
+                </span>
+              )}
             </div>
           ))}
         </div>

@@ -434,6 +434,44 @@
       "workforceReady": "Workforce Ready",
       "matchable": "Matchable"
     },
+    "journey": {
+      "title": "Complete your profile to unlock workforce readiness",
+      "subtitle": "Each item below is a real requirement. Completing it updates your status immediately.",
+      "unlocks": "Unlocks",
+      "current": {
+        "full_name": "No name set",
+        "title": "No profession set",
+        "location": "No location set",
+        "years_experience": "Not set",
+        "bio": "Missing or too short",
+        "skills": "No skills added",
+        "experience": "No qualifying work experience",
+        "availability": "Not specified",
+        "visibility": "Not visible to companies"
+      },
+      "required": {
+        "full_name": "Your full name",
+        "title": "Your position or trade",
+        "location": "Your work location",
+        "years_experience": "Your years of experience",
+        "bio": "A short professional bio (min. 10 characters)",
+        "skills": "At least one skill",
+        "experience": "One experience with position and company",
+        "availability": "Choose your availability",
+        "visibility": "A public profile"
+      },
+      "action": {
+        "full_name": "Add name",
+        "title": "Add profession",
+        "location": "Add location",
+        "years_experience": "Add years",
+        "bio": "Write bio",
+        "skills": "Add skills",
+        "experience": "Add experience",
+        "availability": "Set availability",
+        "visibility": "Make visible"
+      }
+    },
     "quickExperience": {
       "title": "Add work experience",
       "saved": "Experience added — your work history can now be evaluated by companies.",
@@ -2086,6 +2124,7 @@
     "complete": "Your profile is complete! Recruiters can see your full professional identity.",
     "missingItems": "To do",
     "completedItems": "Completed",
+    "optional": "Optional",
     "badgeLabel": "complete",
     "status": {
       "incomplete": "Profile incomplete",

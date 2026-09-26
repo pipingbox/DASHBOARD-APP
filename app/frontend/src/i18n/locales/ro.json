@@ -514,6 +514,44 @@
       "workforceReady": "Pregătit pentru muncă",
       "matchable": "Potrivibil"
     },
+    "journey": {
+      "title": "Completează-ți profilul pentru a debloca pregătirea profesională",
+      "subtitle": "Fiecare element este o cerință reală. Completarea lui îți actualizează imediat statutul.",
+      "unlocks": "Deblochează",
+      "current": {
+        "full_name": "Fără nume",
+        "title": "Fără profesie",
+        "location": "Fără locație",
+        "years_experience": "Necompletat",
+        "bio": "Lipsește sau prea scurtă",
+        "skills": "Fără competențe",
+        "experience": "Fără experiență calificantă",
+        "availability": "Nespecificată",
+        "visibility": "Invizibil pentru companii"
+      },
+      "required": {
+        "full_name": "Numele tău complet",
+        "title": "Funcția sau meseria ta",
+        "location": "Locația ta de muncă",
+        "years_experience": "Anii tăi de experiență",
+        "bio": "O bio profesională scurtă (min. 10 caractere)",
+        "skills": "Cel puțin o competență",
+        "experience": "O experiență cu funcție și companie",
+        "availability": "Alege disponibilitatea ta",
+        "visibility": "Un profil public"
+      },
+      "action": {
+        "full_name": "Adaugă numele",
+        "title": "Adaugă profesia",
+        "location": "Adaugă locația",
+        "years_experience": "Adaugă anii",
+        "bio": "Scrie bio",
+        "skills": "Adaugă competențe",
+        "experience": "Adaugă experiență",
+        "availability": "Setează disponibilitatea",
+        "visibility": "Fă-l vizibil"
+      }
+    },
     "quickExperience": {
       "title": "Adaugă experiență de muncă",
       "saved": "Experiență adăugată — istoricul tău de lucru poate fi acum evaluat de companii.",
@@ -2091,6 +2129,7 @@
     "complete": "Profilul dumneavoastră este complet! Recrutorii vă pot vedea identitatea profesională completă.",
     "missingItems": "De făcut",
     "completedItems": "Finalizate",
+    "optional": "Opțional",
     "badgeLabel": "complet",
     "status": {
       "incomplete": "Profil incomplet",

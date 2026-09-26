@@ -132,7 +132,7 @@ export function AvailabilityMobilitySection() {
   }
 
   return (
-    <div className="border border-zinc-800/80 bg-[#0d0d0d] p-6 space-y-6">
+    <div id="profile-section-availability" className="border border-zinc-800/80 bg-[#0d0d0d] p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-zinc-100">

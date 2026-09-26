@@ -434,6 +434,44 @@
       "workforceReady": "Einsatzbereit",
       "matchable": "Vermittelbar"
     },
+    "journey": {
+      "title": "Vervollständige dein Profil, um die Einsatzbereitschaft freizuschalten",
+      "subtitle": "Jeder Punkt ist eine echte Anforderung. Seine Erledigung aktualisiert deinen Status sofort.",
+      "unlocks": "Schaltet frei",
+      "current": {
+        "full_name": "Kein Name",
+        "title": "Kein Beruf",
+        "location": "Kein Standort",
+        "years_experience": "Nicht angegeben",
+        "bio": "Fehlt oder zu kurz",
+        "skills": "Keine Fähigkeiten",
+        "experience": "Keine qualifizierende Berufserfahrung",
+        "availability": "Nicht angegeben",
+        "visibility": "Für Firmen nicht sichtbar"
+      },
+      "required": {
+        "full_name": "Dein vollständiger Name",
+        "title": "Deine Position oder dein Handwerk",
+        "location": "Dein Arbeitsort",
+        "years_experience": "Deine Berufsjahre",
+        "bio": "Eine kurze Berufsbio (mind. 10 Zeichen)",
+        "skills": "Mindestens eine Fähigkeit",
+        "experience": "Eine Erfahrung mit Position und Firma",
+        "availability": "Wähle deine Verfügbarkeit",
+        "visibility": "Ein öffentliches Profil"
+      },
+      "action": {
+        "full_name": "Name hinzufügen",
+        "title": "Beruf hinzufügen",
+        "location": "Standort hinzufügen",
+        "years_experience": "Jahre hinzufügen",
+        "bio": "Bio schreiben",
+        "skills": "Fähigkeiten hinzufügen",
+        "experience": "Erfahrung hinzufügen",
+        "availability": "Verfügbarkeit angeben",
+        "visibility": "Sichtbar machen"
+      }
+    },
     "quickExperience": {
       "title": "Berufserfahrung hinzufügen",
       "saved": "Berufserfahrung hinzugefügt — Unternehmen können deinen Werdegang jetzt bewerten.",
@@ -2086,6 +2124,7 @@
     "complete": "Ihr Profil ist vollständig! Recruiter können Ihre vollständige berufliche Identität sehen.",
     "missingItems": "Zu erledigen",
     "completedItems": "Erledigt",
+    "optional": "Optional",
     "badgeLabel": "vollständig",
     "status": {
       "incomplete": "Profil unvollständig",

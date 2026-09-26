@@ -434,6 +434,44 @@
       "workforceReady": "Pronto per le opportunità",
       "matchable": "Abbinabile"
     },
+    "journey": {
+      "title": "Completa il tuo profilo per sbloccare la prontezza professionale",
+      "subtitle": "Ogni elemento è un requisito reale. Completarlo aggiorna subito il tuo stato.",
+      "unlocks": "Sblocca",
+      "current": {
+        "full_name": "Nessun nome",
+        "title": "Nessuna professione",
+        "location": "Nessuna località",
+        "years_experience": "Non indicato",
+        "bio": "Mancante o troppo corta",
+        "skills": "Nessuna competenza",
+        "experience": "Nessuna esperienza qualificante",
+        "availability": "Non specificata",
+        "visibility": "Non visibile alle aziende"
+      },
+      "required": {
+        "full_name": "Il tuo nome completo",
+        "title": "Il tuo ruolo o mestiere",
+        "location": "Il tuo luogo di lavoro",
+        "years_experience": "I tuoi anni di esperienza",
+        "bio": "Una breve bio professionale (min. 10 caratteri)",
+        "skills": "Almeno una competenza",
+        "experience": "Un'esperienza con ruolo e azienda",
+        "availability": "Scegli la tua disponibilità",
+        "visibility": "Un profilo pubblico"
+      },
+      "action": {
+        "full_name": "Aggiungi nome",
+        "title": "Aggiungi professione",
+        "location": "Aggiungi località",
+        "years_experience": "Aggiungi anni",
+        "bio": "Scrivi la bio",
+        "skills": "Aggiungi competenze",
+        "experience": "Aggiungi esperienza",
+        "availability": "Imposta disponibilità",
+        "visibility": "Rendi visibile"
+      }
+    },
     "quickExperience": {
       "title": "Aggiungi esperienza lavorativa",
       "saved": "Esperienza aggiunta — le aziende possono ora valutare il tuo percorso.",
@@ -2092,6 +2130,7 @@
     "complete": "Il Suo profilo è completo! I recruiter possono vedere la Sua identità professionale completa.",
     "missingItems": "Da fare",
     "completedItems": "Completati",
+    "optional": "Opzionale",
     "badgeLabel": "completo",
     "status": {
       "incomplete": "Profilo incompleto",

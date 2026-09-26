@@ -436,6 +436,21 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
+      # Pure WFA unit/architecture suites (no network): canonical predicates,
+      # D18 event taxonomy, Quick Capture architecture, WFA-002 journey
+      # presentation mapping. Previously local-only; now a CI gate.
+      - name: WFA unit suites (readiness, events, arch, quick capture, journey)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/workforce-readiness.spec.ts \
+            tests/workforce-readiness-events.spec.ts \
+            tests/match-ready-arch.spec.ts \
+            tests/quick-experience-capture.spec.ts \
+            tests/completion-journey.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
       # Stream A: monetization kill-switch containment (pure, no network).
       - name: Monetization kill-switch guard (fail-closed matrix + wiring)
         shell: bash
@@ -475,6 +490,17 @@ jobs:
         run: |
           set -euo pipefail
           npx playwright test tests/workforce-activation-e2e.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      # WFA-002 completion journey E2E: canonical-gap rendering, deep-links,
+      # post-action feedback, GA4 emission. Bounded bio mutation, exact restore.
+      - name: Completion journey E2E (WFA-002) — gaps, deep-links, feedback
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          npx playwright test tests/completion-journey-e2e.spec.ts \
             --config=playwright.config.ts \
             --reporter=line
 

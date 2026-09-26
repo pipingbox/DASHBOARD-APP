@@ -434,6 +434,44 @@
       "workforceReady": "Preparado para oportunidades",
       "matchable": "Disponível para matching"
     },
+    "journey": {
+      "title": "Complete o seu perfil para desbloquear a prontidão profissional",
+      "subtitle": "Cada item é um requisito real. Completá-lo atualiza o seu estado imediatamente.",
+      "unlocks": "Desbloqueia",
+      "current": {
+        "full_name": "Sem nome",
+        "title": "Sem profissão",
+        "location": "Sem localização",
+        "years_experience": "Não indicado",
+        "bio": "Em falta ou demasiado curta",
+        "skills": "Sem competências",
+        "experience": "Sem experiência qualificante",
+        "availability": "Não especificada",
+        "visibility": "Invisível para empresas"
+      },
+      "required": {
+        "full_name": "O seu nome completo",
+        "title": "O seu cargo ou ofício",
+        "location": "A sua localização de trabalho",
+        "years_experience": "Os seus anos de experiência",
+        "bio": "Uma breve bio profissional (mín. 10 caracteres)",
+        "skills": "Pelo menos uma competência",
+        "experience": "Uma experiência com cargo e empresa",
+        "availability": "Escolha a sua disponibilidade",
+        "visibility": "Um perfil público"
+      },
+      "action": {
+        "full_name": "Adicionar nome",
+        "title": "Adicionar profissão",
+        "location": "Adicionar localização",
+        "years_experience": "Adicionar anos",
+        "bio": "Escrever bio",
+        "skills": "Adicionar competências",
+        "experience": "Adicionar experiência",
+        "availability": "Definir disponibilidade",
+        "visibility": "Tornar visível"
+      }
+    },
     "quickExperience": {
       "title": "Adicionar experiência profissional",
       "saved": "Experiência adicionada — as empresas já podem avaliar o seu percurso.",
@@ -2092,6 +2130,7 @@
     "complete": "O seu perfil está completo! Os recrutadores podem ver a sua identidade profissional completa.",
     "missingItems": "Pendente",
     "completedItems": "Completado",
+    "optional": "Opcional",
     "badgeLabel": "completo",
     "status": {
       "incomplete": "Perfil incompleto",

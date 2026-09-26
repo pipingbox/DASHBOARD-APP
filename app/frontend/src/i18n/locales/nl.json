@@ -434,6 +434,44 @@
       "workforceReady": "Inzetbaar",
       "matchable": "Matchbaar"
     },
+    "journey": {
+      "title": "Voltooi je profiel om je inzetbaarheid te ontgrendelen",
+      "subtitle": "Elk item is een echte vereiste. Voltooien werkt je status direct bij.",
+      "unlocks": "Ontgrendelt",
+      "current": {
+        "full_name": "Geen naam",
+        "title": "Geen beroep",
+        "location": "Geen locatie",
+        "years_experience": "Niet ingevuld",
+        "bio": "Ontbreekt of te kort",
+        "skills": "Geen vaardigheden",
+        "experience": "Geen kwalificerende ervaring",
+        "availability": "Niet opgegeven",
+        "visibility": "Niet zichtbaar voor bedrijven"
+      },
+      "required": {
+        "full_name": "Je volledige naam",
+        "title": "Je functie of vak",
+        "location": "Je werklocatie",
+        "years_experience": "Je jaren ervaring",
+        "bio": "Een korte professionele bio (min. 10 tekens)",
+        "skills": "Minstens één vaardigheid",
+        "experience": "Eén ervaring met functie en bedrijf",
+        "availability": "Kies je beschikbaarheid",
+        "visibility": "Een openbaar profiel"
+      },
+      "action": {
+        "full_name": "Naam toevoegen",
+        "title": "Beroep toevoegen",
+        "location": "Locatie toevoegen",
+        "years_experience": "Jaren toevoegen",
+        "bio": "Bio schrijven",
+        "skills": "Vaardigheden toevoegen",
+        "experience": "Ervaring toevoegen",
+        "availability": "Beschikbaarheid instellen",
+        "visibility": "Zichtbaar maken"
+      }
+    },
     "quickExperience": {
       "title": "Werkervaring toevoegen",
       "saved": "Werkervaring toegevoegd — bedrijven kunnen je loopbaan nu beoordelen.",
@@ -2086,6 +2124,7 @@
     "complete": "Je profiel is compleet! Recruiters kunnen je volledige professionele identiteit zien.",
     "missingItems": "Te doen",
     "completedItems": "Voltooid",
+    "optional": "Optioneel",
     "badgeLabel": "compleet",
     "status": {
       "incomplete": "Profiel onvolledig",

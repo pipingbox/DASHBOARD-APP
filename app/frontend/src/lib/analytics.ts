@@ -28,6 +28,10 @@ export const WORKFORCE_EVENT_NAMES = [
   'profile_complete_reached',
   'workforce_ready_reached',
   'matchable_reached',
+  // WFA-002 completion journey (view/navigation events; remediation
+  // completion is covered by the transition events above — no parallel naming).
+  'completion_journey_viewed',
+  'completion_gap_selected',
 ] as const;
 
 export type WorkforceEventName = (typeof WORKFORCE_EVENT_NAMES)[number];
@@ -36,7 +40,11 @@ export type WorkforceEventName = (typeof WORKFORCE_EVENT_NAMES)[number];
 export const WORKFORCE_PARAM_KEYS = ['field', 'status'] as const;
 export type WorkforceParamKey = (typeof WORKFORCE_PARAM_KEYS)[number];
 
-/** Allowed `field` values (core COMPLETE fields — no free-form strings). */
+/**
+ * Allowed `field` values — core COMPLETE fields plus the non-field canonical
+ * gap keys (WFA-002 journey deep-links reuse the same closed `field` param;
+ * no free-form strings).
+ */
 export const WORKFORCE_FIELD_VALUES = [
   'full_name',
   'title',
@@ -44,6 +52,9 @@ export const WORKFORCE_FIELD_VALUES = [
   'years_experience',
   'bio',
   'skills',
+  'experience',
+  'availability',
+  'visibility',
 ] as const;
 export type WorkforceFieldValue = (typeof WORKFORCE_FIELD_VALUES)[number];
 
