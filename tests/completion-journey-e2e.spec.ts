@@ -115,12 +115,17 @@ test.describe('PB-WORKFORCE-ACTIVATION WFA-002 — completion journey E2E (snaps
       });
 
     /** GA4 emission read from the local dataLayer (works even when the GA
-     *  endpoint is unreachable; proves the event fired, PII-free). */
+     *  endpoint is unreachable; proves the event fired, PII-free).
+     *  NOTE: gtag pushes `arguments` objects (array-like, NOT Array), so
+     *  Array.isArray filters must not be used here. */
     const gaEvents = async (): Promise<{ name: string; params: Record<string, unknown> }[]> =>
       page.evaluate(() => {
         const dl = (window as unknown as { dataLayer?: unknown[] }).dataLayer ?? [];
         return dl
-          .filter((e): e is unknown[] => Array.isArray(e) && e[0] === 'event')
+          .filter(
+            (e): e is { 0: unknown; 1: unknown; 2?: unknown } =>
+              typeof e === 'object' && e !== null && (e as Record<number, unknown>)[0] === 'event',
+          )
           .map((e) => ({
             name: String(e[1]),
             params: (typeof e[2] === 'object' && e[2] !== null ? e[2] : {}) as Record<string, unknown>,

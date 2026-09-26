@@ -43,9 +43,10 @@ const IGNORED_DIFF_COLUMNS = new Set(['updated_at']);
 const TXT = {
   // NOTE: es.json has a DUPLICATE matchReadyTitle key (lines 417/484); WFA-002
   // evolved the banner into the completion journey, whose canonical title is
-  // `profile.journey.title`. Match the common prefix so the test is immune to
-  // the legacy key either way.
-  bannerTitle: /Completa tu perfil/i,
+  // `profile.journey.title`. The regex must NOT widen beyond "para desbloquear":
+  // ProfileCompleteness renders "Completa tu perfil para destacar…" (strict
+  // mode violation with /Completa tu perfil/i).
+  bannerTitle: /Completa tu perfil para desbloquear/i,
   gapBio: /Añade un resumen profesional/i,
   gapExperience: /Añade experiencia laboral estructurada/i,
   // WFA-002: the journey item action for the experience gap (es copy
