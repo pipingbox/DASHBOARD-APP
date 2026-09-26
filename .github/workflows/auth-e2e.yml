@@ -383,6 +383,11 @@ jobs:
       # already exists — no new secrets, no password resets).
       E2E_TEST_EMAIL_B: ${{ secrets.E2E_SECOND_WORKER_EMAIL }}
       E2E_TEST_PASSWORD_B: ${{ secrets.E2E_SECOND_WORKER_PASSWORD }}
+      # QA admin identity (already configured for broker-e2e) for the P0
+      # positive controls + anti-spoof on audit_logs. Never used to prove a
+      # normal user's permissions; never grants admin to QA A/B.
+      E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
       EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
       VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
       VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
