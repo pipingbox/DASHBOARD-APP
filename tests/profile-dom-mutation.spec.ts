@@ -140,6 +140,7 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
     await page.waitForTimeout(4500);
 
     const expectedVersion = process.env.EXPECTED_APP_VERSION ?? '';
+    const expectedEnv = process.env.EXPECTED_ENV ?? 'preview';
     const preFlight = decodeAll();
     expect(
       preFlight.length,
@@ -147,7 +148,7 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
     ).toBeGreaterThan(0);
     for (const e of preFlight) {
       const p = (e.properties ?? {}) as Record<string, unknown>;
-      expect(String(p.environment), 'served environment must be preview').toBe('preview');
+      expect(String(p.environment), `served environment must be ${expectedEnv}`).toBe(expectedEnv);
       if (expectedVersion) {
         expect(
           String(p.app_version),

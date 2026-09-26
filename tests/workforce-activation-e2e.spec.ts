@@ -137,11 +137,12 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 â€” real E2E on preview (scenarios Aâ€
     await page.waitForTimeout(4500);
 
     const expectedVersion = process.env.EXPECTED_APP_VERSION ?? '';
+    const expectedEnv = process.env.EXPECTED_ENV ?? 'preview';
     const preFlight = decodeAll();
     expect(preFlight.length, 'pre-flight requires at least one flushed event from /login').toBeGreaterThan(0);
     for (const e of preFlight) {
       const p = (e.properties ?? {}) as Record<string, unknown>;
-      expect(String(p.environment), 'served environment must be preview').toBe('preview');
+      expect(String(p.environment), `served environment must be ${expectedEnv}`).toBe(expectedEnv);
       if (expectedVersion) {
         expect(String(p.app_version), 'ABORT: served app_version != expected SHA').toBe(expectedVersion);
       }
