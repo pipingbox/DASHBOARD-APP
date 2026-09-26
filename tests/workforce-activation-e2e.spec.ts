@@ -49,10 +49,6 @@ const TXT = {
   bannerTitle: /Completa tu perfil para desbloquear/i,
   gapBio: /Añade un resumen profesional/i,
   gapExperience: /Añade experiencia laboral estructurada/i,
-  // WFA-002: the journey item action for the experience gap (es copy
-  // `profile.journey.action.experience`) — the banner no longer has a
-  // separate Quick Capture button.
-  quickCta: 'Añadir experiencia',
   dialogSaved: /Experiencia añadida/i,
   saveExperience: /Guardar experiencia/i,
   editTitle: /Editar Experiencia Laboral/i,
@@ -457,7 +453,9 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 — real E2E on preview (scenarios A�
       console.log('DIAG buttons on /profile (E1):', JSON.stringify(buttonNames));
       const e1Text = await page.locator('#root').innerText().catch(() => '');
       console.log('DIAG /profile text (E1):', e1Text.replace(/\s+/g, ' ').slice(0, 1200));
-      const quickCta = page.getByRole('button', { name: TXT.quickCta });
+      // The journey action testid is unambiguous; the Full section renders a
+      // second button with the same accessible name (strict-mode violation).
+      const quickCta = page.locator('[data-testid="journey-action-experience"]');
       await expect(quickCta, 'quick-capture CTA must be offered for the experience gap').toBeVisible();
       await quickCta.click();
       const dialog = page.getByRole('dialog');
