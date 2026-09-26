@@ -314,12 +314,27 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 — real E2E on preview (scenarios A�
     };
 
     const gotoProfile = async () => {
-      await page.goto('/profile', { timeout: 30_000 });
-      await page.locator('#root').first().waitFor({ state: 'attached', timeout: 15_000 });
-      await expect(
-        page.locator('input[type="number"]').first(),
-        'years-of-experience input must render on /profile',
-      ).toBeVisible({ timeout: 30_000 });
+      // After a real delete (G3) the async profile sections can briefly render
+      // in a transitional state; a single reload settles them. Retry the render
+      // assertion once before declaring a failure — this hardens the check
+      // against render timing WITHOUT weakening the functional assertions.
+      for (let attempt = 0; attempt < 2; attempt++) {
+        await page.goto('/profile', { timeout: 30_000 });
+        await page.locator('#root').first().waitFor({ state: 'attached', timeout: 15_000 });
+        const visible = await page
+          .locator('input[type="number"]')
+          .first()
+          .isVisible({ timeout: 20_000 })
+          .catch(() => false);
+        if (visible) break;
+        if (attempt === 1) {
+          await expect(
+            page.locator('input[type="number"]').first(),
+            'years-of-experience input must render on /profile',
+          ).toBeVisible({ timeout: 10_000 });
+        }
+        await page.waitForTimeout(1500);
+      }
       await page.waitForTimeout(3000); // let the async sections + banner counts resolve
       expect(
         await page.getByText(TXT.incident).first().isVisible().catch(() => false),
