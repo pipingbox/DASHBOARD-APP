@@ -414,7 +414,7 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 â€” real E2E on preview (scenarios Aâ€
         'no success may be shown when the required company is missing',
       ).toHaveCount(0);
       expect(
-        (await listOwnExperiences()).filter((r) => String(r.position ?? '').startsWith(FIXTURE_MARKER)).length,
+        (await listOwnExperiences()).filter((r) => String(r.position ?? '') === fixturePosition).length,
         'no row may be created without the required company',
       ).toBe(0);
       console.log('scenario E1 PASS: required-field refusal creates no row, shows no success');
@@ -433,7 +433,7 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 â€” real E2E on preview (scenarios Aâ€
         'a failed save must NEVER show the success state',
       ).toHaveCount(0);
       expect(
-        (await listOwnExperiences()).filter((r) => String(r.position ?? '').startsWith(FIXTURE_MARKER)).length,
+        (await listOwnExperiences()).filter((r) => String(r.position ?? '') === fixturePosition).length,
         'a failed save must not create a row',
       ).toBe(0);
       expect((await dbReadiness()).ready, 'a failed save must NOT grant readiness').toBe(false);
