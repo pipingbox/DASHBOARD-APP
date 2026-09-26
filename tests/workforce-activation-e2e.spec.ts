@@ -557,13 +557,24 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 — real E2E on preview (scenarios A�
         .getByTitle(TXT.deleteBtn, { exact: true })
         .first();
 
-      // G1 — 200 with NO deleted row (RLS-block shape): service layer must
-      // reject (.select('id').single() errors on empty) → row restored, error
-      // toast, NO success toast, DB row intact.
-      console.log('phase G1: DELETE answered 200 with no row must be treated as failure');
+      // G1 — RLS-blocked DELETE shape (406 PGRST116, 0 rows with
+      // Accept: vnd.pgrst.object): the real server behavior when a DELETE
+      // affects zero rows under .select('id').single(). A 200+[] mock would be
+      // WRONG — an empty array is truthy, so the service would treat it as
+      // success. The faithful 406 must be treated as failure by the app.
+      console.log('phase G1: RLS-shaped (406 PGRST116) delete must be treated as failure');
       await page.route('**/rest/v1/app_worker_experiences*', (route) => {
         if (route.request().method() === 'DELETE') {
-          return route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
+          return route.fulfill({
+            status: 406,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              code: 'PGRST116',
+              message: 'JSON object requested, multiple (or no) rows returned',
+              details: 'Results contain 0 rows',
+              hint: null,
+            }),
+          });
         }
         return route.continue();
       });
