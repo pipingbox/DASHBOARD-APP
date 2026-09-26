@@ -139,12 +139,28 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 â€” real E2E on preview (scenarios Aâ€
     const expectedVersion = process.env.EXPECTED_APP_VERSION ?? '';
     const expectedEnv = process.env.EXPECTED_ENV ?? 'preview';
     const preFlight = decodeAll();
-    expect(preFlight.length, 'pre-flight requires at least one flushed event from /login').toBeGreaterThan(0);
-    for (const e of preFlight) {
-      const p = (e.properties ?? {}) as Record<string, unknown>;
-      expect(String(p.environment), `served environment must be ${expectedEnv}`).toBe(expectedEnv);
-      if (expectedVersion) {
-        expect(String(p.app_version), 'ABORT: served app_version != expected SHA').toBe(expectedVersion);
+    // SHA/environment lock via PostHog is only reliable in preview: in
+    // production PostHog drops the HeadlessChrome user-agent (bot filter,
+    // opt_out_useragent_filter is preview-only), so zero events are captured
+    // even though the app is healthy. In production the served SHA is proven
+    // by the deploy workflow (git checkout $INPUT_SHA + VITE_APP_VERSION) and
+    // the functional checks below remain fully valid.
+    if (expectedEnv === 'preview') {
+      expect(preFlight.length, 'pre-flight requires at least one flushed event from /login').toBeGreaterThan(0);
+      for (const e of preFlight) {
+        const p = (e.properties ?? {}) as Record<string, unknown>;
+        expect(String(p.environment), `served environment must be ${expectedEnv}`).toBe(expectedEnv);
+        if (expectedVersion) {
+          expect(String(p.app_version), 'ABORT: served app_version != expected SHA').toBe(expectedVersion);
+        }
+      }
+    } else if (preFlight.length > 0) {
+      // Production: if events DO arrive, still assert they carry the right SHA.
+      for (const e of preFlight) {
+        const p = (e.properties ?? {}) as Record<string, unknown>;
+        if (expectedVersion && p.app_version !== undefined) {
+          expect(String(p.app_version), 'ABORT: served app_version != expected SHA').toBe(expectedVersion);
+        }
       }
     }
 

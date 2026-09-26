@@ -142,18 +142,34 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
     const expectedVersion = process.env.EXPECTED_APP_VERSION ?? '';
     const expectedEnv = process.env.EXPECTED_ENV ?? 'preview';
     const preFlight = decodeAll();
-    expect(
-      preFlight.length,
-      'pre-flight requires at least one flushed event from the login page',
-    ).toBeGreaterThan(0);
-    for (const e of preFlight) {
-      const p = (e.properties ?? {}) as Record<string, unknown>;
-      expect(String(p.environment), `served environment must be ${expectedEnv}`).toBe(expectedEnv);
-      if (expectedVersion) {
-        expect(
-          String(p.app_version),
-          'ABORT: served app_version does not match the expected SHA',
-        ).toBe(expectedVersion);
+    // SHA/environment lock via PostHog is only reliable in preview (production
+    // drops the HeadlessChrome user-agent via the bot filter). In production the
+    // served SHA is proven by the deploy workflow; the DOM-mutation regression
+    // checks below remain fully valid.
+    if (expectedEnv === 'preview') {
+      expect(
+        preFlight.length,
+        'pre-flight requires at least one flushed event from the login page',
+      ).toBeGreaterThan(0);
+      for (const e of preFlight) {
+        const p = (e.properties ?? {}) as Record<string, unknown>;
+        expect(String(p.environment), `served environment must be ${expectedEnv}`).toBe(expectedEnv);
+        if (expectedVersion) {
+          expect(
+            String(p.app_version),
+            'ABORT: served app_version does not match the expected SHA',
+          ).toBe(expectedVersion);
+        }
+      }
+    } else if (preFlight.length > 0 && expectedVersion) {
+      for (const e of preFlight) {
+        const p = (e.properties ?? {}) as Record<string, unknown>;
+        if (p.app_version !== undefined) {
+          expect(
+            String(p.app_version),
+            'ABORT: served app_version does not match the expected SHA',
+          ).toBe(expectedVersion);
+        }
       }
     }
 
