@@ -78,6 +78,10 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 — real E2E on preview (scenarios A�
     await page.addInitScript(() => {
       try {
         localStorage.setItem('pipingbox_language', 'es');
+        // BetaNoticePopup renders a modal (inert background) on first visit;
+        // a returning user has dismissed it — keep the a11y tree clean for
+        // getByRole assertions.
+        localStorage.setItem('pipingbox_beta_dismissed', 'true');
       } catch {
         /* storage unavailable */
       }
