@@ -321,3 +321,15 @@ jobs:
           npx playwright test tests/profile-dom-mutation.spec.ts \
             --config=playwright.config.ts \
             --reporter=line
+
+      # PB-UI-DOM-INSERTBEFORE-001 (/dashboard, PB-PDI-004): pending-
+      # invitation Accept action under translator mutation — the production
+      # 8x app_error loop (PB-ERR-WDNH8A et al., build cccf0d0). Hermetic:
+      # synthetic invitation intercepted at PostgREST level, ZERO DB writes.
+      - name: Run dashboard DOM-mutation E2E — invitation action regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/dashboard-dom-mutation.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line

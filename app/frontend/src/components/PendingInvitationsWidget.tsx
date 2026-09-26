@@ -185,13 +185,20 @@ export function PendingInvitationsWidget() {
                   disabled={actionLoading === inv.id}
                   className="bg-[#f59e0b] text-black font-medium hover:bg-[#d97706] h-8 text-xs"
                 >
+                  {/*
+                    PB-UI-DOM-INSERTBEFORE-001: keyed element swap + span-wrapped
+                    label. Chrome Translate wraps bare text nodes in <font>,
+                    disconnecting them; if React deletes/anchors against a bare
+                    text fiber the removeChild/insertBefore throws NotFoundError
+                    (PB-PDI-004: 8 app_error on /dashboard, build cccf0d0).
+                  */}
                   {actionLoading === inv.id ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <Loader2 key="loading" className="h-3 w-3 animate-spin" />
                   ) : (
-                    <>
+                    <span key="label" className="inline-flex items-center">
                       <Check className="mr-1 h-3 w-3" />
-                      {t('pendingInvitations.accept')}
-                    </>
+                      <span>{t('pendingInvitations.accept')}</span>
+                    </span>
                   )}
                 </Button>
                 <Button
@@ -202,7 +209,7 @@ export function PendingInvitationsWidget() {
                   className="!bg-transparent border-zinc-700 text-zinc-400 hover:text-zinc-200 hover:border-zinc-500 h-8 text-xs"
                 >
                   <X className="mr-1 h-3 w-3" />
-                  {t('pendingInvitations.decline')}
+                  <span>{t('pendingInvitations.decline')}</span>
                 </Button>
               </div>
             </div>
