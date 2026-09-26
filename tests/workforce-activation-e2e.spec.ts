@@ -496,18 +496,26 @@ test.describe('PB-WORKFORCE-ACTIVATION B1 — real E2E on preview (scenarios A�
       });
 
       await gotoProfile();
-      const card = page.locator('div', { hasText: fixturePosition }).last();
-      await card.getByTitle(/Editar|Edit/i).first().click();
+      // The card is the INNERMOST div containing BOTH the position text and
+      // the edit affordance (title=common.edit → "Editar"). A bare
+      // hasText().last() can land on the description wrapper, which does not
+      // contain the button — and an unmatched click is unbounded by default.
+      const card = page
+        .locator('div', { hasText: fixturePosition })
+        .filter({ has: page.getByTitle('Editar', { exact: true }) })
+        .last();
+      await card.getByTitle('Editar', { exact: true }).first().click({ timeout: 10_000 });
       const editDialog = page.getByRole('dialog');
       await expect(editDialog.getByText(TXT.editTitle), 'full editor must open').toBeVisible({ timeout: 15_000 });
 
       const originalTextarea = editDialog.locator('textarea').first();
       await expect(originalTextarea, 'full editor must show the existing original description').toHaveValue(
         'WFA-E2E descripción original',
+        { timeout: 10_000 },
       );
       // Edit the original description through the FULL flow, then save.
       await originalTextarea.fill('WFA-E2E descripción editada en flujo completo');
-      await editDialog.getByRole('button', { name: TXT.update }).click();
+      await editDialog.getByRole('button', { name: TXT.update }).click({ timeout: 10_000 });
       await expect(editDialog, 'editor must close after a successful save').toBeHidden({ timeout: 15_000 });
 
       const afterFullEdit = (await listOwnExperiences()).find((r) => String(r.id) === String(fixture!.id));
