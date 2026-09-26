@@ -481,3 +481,14 @@ jobs:
           npx playwright test tests/profile-dom-mutation.spec.ts \
             --config=playwright.config.ts \
             --reporter=line
+
+      # P0 security verification (AUDITLOG / INTERNAL-DATA / ASSIGNMENTS) with
+      # QA identities — no service_role. Separates PUBLIC/anon/authenticated
+      # from backend roles; proves denials for normal users, not the absence
+      # of service_role access.
+      - name: P0 security permissions verification (QA identities, no service_role)
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          node tests/verify-p0-permissions.mjs
