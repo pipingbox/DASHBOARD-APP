@@ -34,7 +34,7 @@ const APP_ROOT = resolve(__dirname, '..');
 // rather than duplicating the package in a second manifest.
 const require = createRequire(join(APP_ROOT, 'app', 'frontend', 'package.json'));
 const { parse: parseYaml } = require('yaml');
-const BRAIN_ROOT = resolve(APP_ROOT, '..');
+const BRAIN_ROOT = process.env.BRAIN_ROOT ? resolve(process.env.BRAIN_ROOT) : resolve(APP_ROOT, '..');
 const CATALOG_SRC = join(BRAIN_ROOT, 'brain', '08-CATALOG');
 const ASSET_SRC = join(BRAIN_ROOT, 'brain', '07-DESIGN', '02-ASSETS', 'APPROVED', 'BIBLIOTECA_V1');
 const OUT_DIR = join(APP_ROOT, 'app', 'frontend', 'src', 'tools', 'catalog');
@@ -296,6 +296,10 @@ for (const file of componentFiles) {
   const ratingNote = tech.rating_note ?? null;
   const ratingNoteKey = tech.rating_note_key ?? null;
   if (ratingNote && !ratingNoteKey) warn(`${y.id} tiene rating_note sin rating_note_key`);
+  // Usage guide (PB-LIBRARY-COMPLETE-001 WP5): practical, non-normative content
+  // ("what it is / types / when to use / installation / common error") stored
+  // once per component family in the locales, referenced here by i18n key.
+  const guideKey = tech.guide_key ?? null;
 
   // --- Level 1 REFERENTIAL brand mentions (PB-PARTNER-CATALOG-001) ----------
   // Trademark names cited under art. 14(1)(c) EUTMR to indicate intended
@@ -350,6 +354,7 @@ for (const file of componentFiles) {
     ratingBasis,
     ratingNote,
     ratingNoteKey,
+    guideKey,
     standards: componentStandards,
     dimensionSets: dims,
     drawings,

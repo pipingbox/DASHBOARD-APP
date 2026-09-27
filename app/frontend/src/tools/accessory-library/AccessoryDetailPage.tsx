@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
+  BookOpen,
   ChevronDown,
   ChevronRight,
   Download,
@@ -517,6 +518,71 @@ function ReferenceCompatibilityBlock({ data }: { data: CatalogReferenceCompatibi
 }
 
 /* ─────────────────────────────────────────────
+   Usage guide (PB-LIBRARY-COMPLETE-001 WP5)
+   ───────────────────────────────────────────── */
+
+/**
+ * Practical, NON-NORMATIVE usage guide ("what it is / types / when to use /
+ * installation / common error"). Content lives once per family in the locales
+ * (`catalog.valveGuide.*`), referenced by the component's `guideKey`.
+ *
+ * Visual contract: deliberately zinc-only and darker than the fabrication
+ * notes card, with a dashed separator — a reader must never mistake this
+ * educational prose for standard-derived data. Collapsed by default so the
+ * "modo obra" ficha stays scannable.
+ */
+function UsageGuideBlock({ guideKey }: { guideKey: string }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+
+  const sections: Array<{ field: string; labelKey: string; defaultLabel: string; warn?: boolean }> = [
+    { field: 'whatIs', labelKey: 'tools.accessoryDetail.guideWhatIs', defaultLabel: 'What it is' },
+    { field: 'types', labelKey: 'tools.accessoryDetail.guideTypes', defaultLabel: 'Types and designs' },
+    { field: 'whenToUse', labelKey: 'tools.accessoryDetail.guideWhenToUse', defaultLabel: 'When to use it' },
+    { field: 'whenNotToUse', labelKey: 'tools.accessoryDetail.guideWhenNotToUse', defaultLabel: 'When NOT to use it', warn: true },
+    { field: 'installation', labelKey: 'tools.accessoryDetail.guideInstallation', defaultLabel: 'Installation tips' },
+    { field: 'commonError', labelKey: 'tools.accessoryDetail.guideCommonError', defaultLabel: 'Common error', warn: true },
+  ];
+
+  return (
+    <div className="rounded-lg border border-zinc-800/60 bg-[#0a0a0a]">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between px-4 py-3 text-left"
+      >
+        <span className="flex items-center gap-2 text-xs font-medium text-zinc-300">
+          <BookOpen className="h-3.5 w-3.5 text-zinc-400" />
+          {t('tools.accessoryDetail.guideTitle', { defaultValue: 'Usage guide' })}
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="rounded border border-zinc-700/60 bg-zinc-500/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-zinc-500">
+            {t('tools.accessoryDetail.referenceCompatibilityBadge', { defaultValue: 'No normativo' })}
+          </span>
+          <ChevronDown
+            className={`h-4 w-4 text-zinc-500 transition-transform ${open ? 'rotate-180' : ''}`}
+          />
+        </span>
+      </button>
+      {open && (
+        <dl className="space-y-3 border-t border-zinc-800/60 px-4 py-3">
+          {sections.map(({ field, labelKey, defaultLabel, warn }) => (
+            <div key={field}>
+              <dt className="mb-1 flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-zinc-500">
+                {warn && <AlertTriangle className="h-3 w-3 text-amber-500/70" />}
+                {t(labelKey, { defaultValue: defaultLabel })}
+              </dt>
+              <dd className="text-xs leading-relaxed text-zinc-400">
+                {t(`${guideKey}.${field}`)}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
    Tab: Vista Rápida
    ───────────────────────────────────────────── */
 
@@ -720,6 +786,9 @@ function VistaRapidaTab({
           )}
         </div>
       )}
+
+      {/* Practical usage guide — educational, non-normative, collapsible. */}
+      {component.guideKey && <UsageGuideBlock guideKey={component.guideKey} />}
 
       {/* Level 1 referential mention. Repeated here because "Modo Obra" has no
           Compatibilidades tab, and the disclaimer must travel with the brands

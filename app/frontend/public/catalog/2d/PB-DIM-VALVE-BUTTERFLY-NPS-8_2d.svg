@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs><style>
+    .profile{stroke:#1a1a1a;stroke-width:2;fill:#e2e5e8}
+    .profile2{stroke:#1a1a1a;stroke-width:1.6;fill:#d0d5da}
+    .winding{stroke:#555;stroke-width:1;fill:none}
+    .centerline{stroke:#999;stroke-width:.8;stroke-dasharray:8 4;fill:none}
+    .dim-line{stroke:#c62828;stroke-width:.9;fill:none}
+    .dim-text{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#c62828;text-anchor:middle}
+    .dim-sub{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#c62828;text-anchor:middle}
+    .title{font-family:'Segoe UI',Arial,sans-serif;font-size:18px;font-weight:600;fill:#1a1a1a}
+    .subtitle{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#555}
+    .std-ref{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#888}
+    .note{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888}
+    .label{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#666;text-anchor:middle}
+    .tbl-hdr{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;fill:#1a1a1a;font-weight:600;text-anchor:middle}
+    .tbl-key{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#555;text-anchor:start}
+    .tbl-val{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888;text-anchor:end}
+    .bore{stroke:#1a1a1a;stroke-width:1.2;stroke-dasharray:3 3;fill:none}
+  </style>
+  <marker id="as" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  <marker id="ae" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  </defs>
+  <rect width="800" height="700" fill="#fafafa"/>
+  <text x="40" y="40" class="title">Butterfly Valve</text>
+  <text x="40" y="60" class="subtitle">NPS 8 (DN 200) — API 609 Category A — Wafer</text>
+  <text x="40" y="78" class="std-ref">API 609 | Butterfly Valve</text>
+  <rect x="328.76" y="318.16" width="42.48" height="103.67999999999999" rx="6" class="profile"/>
+  <line x1="328.76" y1="370" x2="371.24" y2="370" class="bore"/>
+  <rect x="345.3272" y="326.4544" width="9.3456" height="87.09119999999999" rx="3" class="profile2"/>
+  <line x1="350" y1="284.16" x2="350" y2="326.4544" stroke="#1a1a1a" stroke-width="2.5"/>
+  <rect x="341" y="272.16" width="18" height="14" rx="3" fill="#d0d5da" stroke="#1a1a1a" stroke-width="1.5"/>
+  <line x1="288.76" y1="370" x2="411.24" y2="370" class="centerline"/>
+  <text x="283.76" y="374" class="label" text-anchor="end">CL</text>
+  <line x1="350" y1="433.84" x2="350" y2="266.16" class="centerline"/>
+  <line x1="328.76" y1="431.84" x2="328.76" y2="466.84" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="371.24" y1="431.84" x2="371.24" y2="466.84" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="328.76" y1="461.84" x2="371.24" y2="461.84" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="350" y="454.84" class="dim-text">F-to-F</text>
+  <text x="350" y="476.84" class="dim-sub">2.36" | 60 mm</text>
+  <line x1="328.76" y1="431.84" x2="328.76" y2="466.84" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="371.24" y1="431.84" x2="371.24" y2="466.84" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <rect x="540" y="100" width="230" height="123" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
+  <text x="655" y="120" class="tbl-hdr">NPS 8 — Key Data</text>
+  <line x1="555" y1="128" x2="755" y2="128" stroke="#eee" stroke-width=".5"/><text x="560" y="145" class="tbl-key">NPS / DN</text><text x="750" y="145" class="tbl-val">8 / 200</text><text x="560" y="162" class="tbl-key">Category</text><text x="750" y="162" class="tbl-val">A (concentric)</text><text x="560" y="179" class="tbl-key">F-to-F</text><text x="750" y="179" class="tbl-val">2.36" | 60 mm</text><text x="560" y="196" class="tbl-key">Standard</text><text x="750" y="196" class="tbl-val">API 609</text><text x="560" y="213" class="tbl-key">End type</text><text x="750" y="213" class="tbl-val">Wafer (between flanges)</text>
+  <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
+  <text x="40" y="648" class="note">Butterfly valve per API 609, Category A (concentric), wafer body.</text>
+  <text x="40" y="663" class="note">F-to-F is the only dimension published in the canonical dataset for this component.</text>
+  <text x="40" y="678" class="note">Disc, stem, lug and body diameters are NOT dimensioned (not inferred); body outline is schematic.</text>
+  <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
+</svg>

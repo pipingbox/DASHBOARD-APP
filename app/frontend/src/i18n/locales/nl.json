@@ -414,7 +414,7 @@
     "certifications": "Certificeringen",
     "addCertification": "Certificering toevoegen",
     "noCertifications": "Nog geen certificeringen toegevoegd.",
-    "matchReadyTitle": "Voltooi je profiel voor nauwkeurigere vacatures.",
+    "matchReadyTitle": "Voltooi uw profiel om nauwkeurigere vacaturematches te ontvangen.",
     "matchReadyHint": "Vul de ontbrekende profielgegevens in om je inzetbaarheid te verbeteren.",
     "matchReadyAddExperience": "Werkervaring toevoegen",
     "matchReadyGap": {
@@ -519,7 +519,6 @@
     "emailJobAlertsHint": "Passende vacatures per e-mail ontvangen",
     "jobMatchingEnabled": "Vacaturematching",
     "jobMatchingEnabledHint": "Ontvang opportuniteiten van gepubliceerde vacatures",
-    "matchReadyTitle": "Voltooi uw profiel om nauwkeurigere vacaturematches te ontvangen.",
     "matchingPreferencesSaved": "Voorkeuren opgeslagen",
     "matchingPreferencesTitle": "Vacature- & Matchingvoorkeuren",
     "otpCode": "Verificatiecode",
@@ -1320,7 +1319,14 @@
       "modeFieldHint": "(vereenvoudigd)",
       "modeEngineeringHint": "(volledig)",
       "viewFullDatasheet": "Volledig gegevensblad bekijken (engineeringmodus)",
-      "breadcrumbLibrary": "Bibliotheek"
+      "breadcrumbLibrary": "Bibliotheek",
+      "guideTitle": "Gebruikersgids",
+      "guideWhatIs": "Wat het is",
+      "guideTypes": "Types en uitvoeringen",
+      "guideWhenToUse": "Wanneer gebruiken",
+      "guideWhenNotToUse": "Wanneer NIET gebruiken",
+      "guideInstallation": "Montagetips",
+      "guideCommonError": "Veelgemaakte fout"
     },
     "bolts": {
       "starPatternAria": "Schema van de stervormige aanhaalvolgorde",
@@ -3380,7 +3386,99 @@
       "api600GateValve": "Klassen volgens API 600 voor schuifafsluiters met gebout bonnet, flens- of butt weld einden. De klassen komen overeen met de flensklassen van ASME B16.5 / B16.34. Verifieer tegen de vigerende uitgave van de norm.",
       "api602CompactValve": "Klassen volgens API 602 voor compacte afsluiters NPS 4 en kleiner. Klasse 800 is geen in ASME B16.34 opgenomen klasse: het is een veel gebruikte tussenklasse voor draad- en lasuiteinden en bestaat niet in flensuitvoering. De beschikbare klasse hangt af van het type uiteinde. Controleer tegen de geldende uitgave van de norm.",
       "yStrainerNoStandard": "De Y-filter valt in deze catalogus niet onder een specifieke dimensionele norm. Fabrikanten leveren hem gewoonlijk met flenseinden volgens ASME B16.5, zodat de klasse wordt bepaald door de flens van het betreffende model. Hier wordt geen klasse vermeld omdat er geen verifieerbare norm bestaat die er een definieert.",
-      "noPressureClass": "Laterals worden niet aangeduid met een drukklasse. Hun capaciteit vloeit voort uit de wanddikte (schedule) en het materiaal en wordt berekend volgens de toepasselijke ontwerpcode (bijv. ASME B31.3). Verifieer de afmetingen bij de fabrikant voor de toepasselijke schedule."
+      "noPressureClass": "Laterals worden niet aangeduid met een drukklasse. Hun capaciteit vloeit voort uit de wanddikte (schedule) en het materiaal en wordt berekend volgens de toepasselijke ontwerpcode (bijv. ASME B31.3). Verifieer de afmetingen bij de fabrikant voor de toepasselijke schedule.",
+      "api609ButterflyValve": "API 609 Categorie A (centrische vlinderkleppen) definieert de hier gepubliceerde face-to-face maat; het is geen drukklasse. De drukklasse en constructie van de klep moeten worden geverifieerd aan de hand van de fabrikantdocumentatie van het geselecteerde product.",
+      "b36_19mPipe": "ASME B36.19M normaliseert uitsluitend afmetingen en schedules; de norm definieert geen drukklassen. De toelaatbare druk van de buis volgt uit de wanddikte en het materiaal, en wordt berekend volgens de toepasselijke ontwerpcode (bijv. ASME B31.3)."
+    },
+    "guide": {
+      "valve": {
+        "gate": {
+          "whatIs": "Lineaire afsluiter die de stroom isoleert met een schuif die dwars op de stroom beweegt. Bedoeld voor volledig open of dicht, niet voor regelen.",
+          "types": "Massieve, flexibele of tweedelige wig; stijgende of niet-stijgende as; mesafsluiter voor slurries; uitschuifbare wig voor pijpleidingen.",
+          "whenToUse": "Open-dicht isolatie in vloeistofleidingen waar een recht, turbulentie-arm passage telt: water, olie, gas en stoom binnen de klasse.",
+          "whenNotToUse": "Regeldienst: een half geopende schuif trilt, erodeert en kan beschadigen. Kies een regelventiel of vlinderklep.",
+          "installation": "Installeer de as waar mogelijk verticaal, let alleen op de stroomrichting als deze gemarkeerd is, en sluit volledig vóór de drukproef.",
+          "commonError": "De afsluiter handmatig gebruiken om debiet te regelen: de zittingen eroderen en de kraan sluit niet meer."
+        },
+        "globe": {
+          "whatIs": "Lineaire klep waarvan het sluitstuk loodrecht op de stroom tegen een zitting sluit. Meer drukverlies dan een schuif of kogelkraan, maar uitstekend regelgedrag.",
+          "types": "Rechte (Z), hoek- en Y-uitvoering; gebolde of drukdichte deksel; schijf-, kegel- of naaldsluitstuk.",
+          "whenToUse": "Regelen en frequent bedienen: koelwater, zware olie, stoomaf- en -ontluchting, chemische dosering.",
+          "whenNotToUse": "Isolatie met laag drukverlies in grote leidingen: de kronkelige weg verspilt energie. Schuif, kogel of vlinder is goedkoper.",
+          "installation": "Respecteer de stroompijl op het huis — verkeerd gemonteerd vernietigt het sluitstuk — en houd ruimte vrij voor asloop en handwiel.",
+          "commonError": "De stroomrichting omkeren: de klep sluit nog wel, maar sluitstuk en zitting slijten snel en de regeling gaat verloren."
+        },
+        "check": {
+          "whatIs": "Zelfwerkende klep die de stroom slechts in één richting toelaat en vanzelf sluit om terugstroming te voorkomen; beschermt pompen en apparatuur tegen drukslagen.",
+          "types": "Zwaaiklep, zuiger (stille), wafer dubbelzwaai, kogel, kantelschijf en mondstuk-terugslagklep.",
+          "whenToUse": "Achter pompen tegen terugloop, aan compressorafvoeren en overal waar terugstroming het systeem zou leeglopen of beschadigen.",
+          "whenNotToUse": "Pulserende stroom bij lage snelheid (fladderen en slijtage) of leidingen die dichtheid bij terugloop eisen: kies een afsluiter.",
+          "installation": "Wafer-uitvoeringen monteren tussen flenzen met de scharnierpen horizontaal; respecteer de pijl en controleer dat de bouten het huis niet raken.",
+          "commonError": "De dubbelzwaaiklep met verticale scharnierpen monteren: de platen vallen niet vrij en slaan dicht bij terugloop."
+        },
+        "ball": {
+          "whatIs": "Kwartslagkraan met een geboorde kogel die draait tot de boring met de stroom uitlijnt. Snelle bediening, dichte afsluiting en een volle, vrije doorgang.",
+          "types": "Zwevende of vastgelagerde (trunnion) kogel; volle of gereduceerde boring; één-, twee- of driedelig huis; zachte of metalen zitting; top-entry.",
+          "whenToUse": "Dichte afsluiting en snel schakelen in vloeistoffen, gassen en slurries (metalen zitting); leidingen die gepigd moeten worden (volle boring).",
+          "whenNotToUse": "Fijn regelen — de half geopende kogel caviteert en erodeert — en temperaturen boven de grens van de zachte zitting.",
+          "installation": "Controleer de stroomrichting bij trunnion- en ontluchtingskranen, steun zware huizen onafhankelijk van de leiding en bedien bij drukloze leiding.",
+          "commonError": "Gereduceerde boring bestellen terwijl pigging of sondes een volle boring vereisen."
+        },
+        "butterfly": {
+          "whatIs": "Kwartslagklep die de stroom regelt of isoleert met een ronde schijf die draait om een as door de stroom. Compact, licht en met laag drukverlies.",
+          "types": "Concentrisch (elastomeer zitting, algemene dienst), dubbel excentrisch (high-performance) en drievoudig excentrisch (metalen zitting, blaasdicht). Montage: wafer (tussen flenzen), lug, geflanseerd of gegroefd.",
+          "whenToUse": "Grote leidingen waar een kogel- of schuifkraan te zwaar of te duur zou zijn; regelen; water, HVAC, lucht, gassen en milde chemicaliën binnen de zittingsklasse.",
+          "whenNotToUse": "Afsluiting onder hoog drukverschil boven de zittingsklasse, abrasieve slurries (behalve metalen zitting) of dienst die volle doorgang eist.",
+          "installation": "Wafer-uitvoeringen zitten tussen flenzen: controleer dat de schijf de buis of doorloopbouten niet raakt en centreer de zitting op de pakking vóór het aandraaien.",
+          "commonError": "Een waferklep monteren tegen een te grote binnendiameter of scheefstaande flenzen: de schijf klemt."
+        }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Draadstang met twee zware zeskantmoeren die een flensverbinding aanklemt. De keuze volgt uit de flensnorm, NPS en klasse; de bout heeft zelf geen drukklasse.",
+          "types": "Doorlopend draadeinden met twee moeren (het gebruikelijke patroon bij ASME B16.5-flensverbindingen), plus varianten met kort uiteinde en dubbel uiteinde; gangbare kwaliteiten ASTM A193 B7 met A194 2H-moeren, RVS en lage-temperatuurkwaliteiten.",
+          "whenToUse": "Montage van afgedichte boutverbindingen: flensparen, geflensde afsluiters en apparatuuraansluitingen die gemonteerd en later weer gedemonteerd moeten worden.",
+          "whenNotToUse": "Het is geen constructieve bevestiging en niet verwisselbaar met een andere kwaliteit of lengte; gebruik uitgerekte, gecorrodeerde of aan de draad beschadigde bouten niet opnieuw in drukdienst.",
+          "installation": "Schone draad, smeermiddel volgens projectspecificatie, pakking gecentreerd, moeren met de hand aandraaien en daarna in ster- of kruispatroon in meerdere gangen vastzetten zodat de pakking gelijkmatig belast wordt. Het aanhaalmoment komt uit de verbindingsprocedure: materiaal, smeermiddel, pakking en flens veranderen het — een universele waarde bestaat niet.",
+          "commonError": "Eén moer volledig vóór de andere aandraaien: de flens kantelt, de pakking wordt aan één kant platgedrukt en de verbinding lekt."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Tweedelige behuizing die zich met een drukgeactiveerde pakking over groefvormige buisuiteinden klemt en de verbinding tegen hoek- en axiale beweging vergrendelt.",
+          "types": "Standaard starre koppelingen voor algemeen gebruik, plus verloop- en hogedrukvarianten; het groefprofiel verschilt tussen roll-grooved en cut-grooved buis.",
+          "whenToUse": "Gegroefde leidingen die zich als een las- of flensverbinding moeten gedragen: standleidingen, technische ruimtes en lange rechte trajecten waar beweging elders wordt opgevangen.",
+          "whenNotToUse": "Wanneer de verbinding doorbuiging, expansie of trilling moet opnemen: gebruik flexibele koppelingen. Meng roll-grooved en cut-grooved uiteinden nooit.",
+          "installation": "Haakse, schone buisuiteinden; groef volgens de norm of fabrieksgegevens; pakking gesmeerd en op zijn plaats; behuizingsnokken in beide groeven; bouten afwisselend aandraaien tot gelijkmatig contact van de lippen.",
+          "commonError": "Aannemen dat een starre verbinding expansievoorzieningen overbodig maakt: starre koppelingen beperken beweging, dus thermische uitzetting moet elders worden opgevangen."
+        },
+        "flexible": {
+          "whatIs": "Groefkoppeling waarvan de behuizingsnok bewust smaller is dan het groefkanaal, waardoor gecontroleerde hoekdoorbuiging en axiale beweging per verbinding mogelijk is.",
+          "types": "Standaard flexibele koppelingen; de toegestane doorbuiging per verbinding is maatafhankelijk en wordt door de fabrikant opgegeven.",
+          "whenToUse": "Leidingen die trilling, zetting, seismische beweging of thermische uitzetting en krimp moeten opvangen zonder ankers en apparatuur te belasten.",
+          "whenNotToUse": "Waar de buis star gepositioneerd moet blijven, zoals bij afsluiter- of aftaksteunen: een flexibele verbinding zal bewegen. Ook geen universele vervanging van een expansievoorziening zonder berekening van de totale beweging.",
+          "installation": "Dezelfde groefkwaliteitseisen als bij de starre koppeling; controleer de door de fabrikant opgegeven afstand tussen de buisuiteinden, houd de koppeling gecentreerd over de verbinding en draai de bouten afwisselend aan.",
+          "commonError": "Verwachten dat één flexibele koppeling een grote beweging opneemt: de capaciteit per verbinding is klein en telt op over meerdere verbindingen — neem de waarde nooit aan, haal hem bij de fabrikant."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Stalen buis waarvan de afmetingen ASME B36.10M volgen: een vaste buitendiameter per NPS en een wanddikte bepaald door het schedule. NPS is een maataanduiding, niet de werkelijke boring.",
+          "types": "Schedules van SCH 10 tot SCH 160 en XXS, plus de klassieke STD/XS-aanduidingen (die in kleinere maten samenvallen met SCH 40/80). Naadloos of gelast, in koolstof- en gelegeerd staal.",
+          "whenToUse": "Algemene proces-, utility- en constructieleidingen in koolstof- of gelegeerd staal waar drukklasse en wanddikte door de lijnklasse of leidingspecificatie worden bepaald.",
+          "whenNotToUse": "Corrosieve dienst die RVS vereist: gebruik B36.19M-buis. Ga er ook niet van uit dat twee buizen met dezelfde NPS dezelfde boring hebben: de ID verandert met het schedule, de OD niet.",
+          "installation": "Controleer schedule, kwaliteit en charge of certificaat tegen de lijnlijst vóór het zagen; afschuining volgens de WPS voor stuiklassen; fittings en flenzen worden op dezelfde NPS besteld en de OD past, wandovergangen vereisen een afschuining of passend schedule.",
+          "commonError": "Buis bestellen als \"NPS = diameter\": NPS 4 is nergens 4 inch — de OD is 4.500\" en de boring hangt af van het schedule. Controleer het schedule elke keer."
+        },
+        "stainless": {
+          "whatIs": "Roestvrijstalen buis gedimensioneerd volgens ASME B36.19M: dezelfde OD als B36.10M bij dezelfde NPS, maar wanddiktes volgens de schedules met S-suffix (5S, 10S, 40S, 80S).",
+          "types": "Schedules 5S/10S voor dunne wand en 40S/80S die tot NPS 10 overeenkomen met SCH 40/80 van B36.10M; grotere maten gebruiken eigen vermelde wanden. Austenitische kwaliteiten zoals 304/304L en 316/316L komen het meest voor.",
+          "whenToUse": "Corrosieve, sanitaire of schone dienst — chemie, voeding, farma, waterbehandeling — waar koolstofstaal zou corroderen of het medium zou verontreinigen.",
+          "whenNotToUse": "Niet alleen op OD vervangen: een 10S-wand is veel dunner dan STD van dezelfde NPS, dus drukcapaciteit en lasvoorbereiding verschillen. Controleer het S-schedule, niet de B36.10M-schedulenaam.",
+          "installation": "Gescheiden houden van koolstofstaal tijdens opslag en fabricage om ijzerbesmetting te voorkomen; speciaal gereedschap gebruiken; kwaliteit en schedule tegen de lijnklasse controleren; de binnenkant voor het lassen spoelen zoals gespecificeerd.",
+          "commonError": "Aannemen dat 40S en STD bij grote NPS verwisselbaar zijn: ze komen alleen overeen tot NPS 10; daarboven verschillen de vermelde wanden, en NPS 22/30 hebben helemaal geen 40S."
+        }
+      }
     }
   },
   "dailyLog": {

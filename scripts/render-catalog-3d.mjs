@@ -2120,7 +2120,55 @@ async function renderPiece(stlPath, cfg, mips, noise) {
   // Pose canonica de catalogo: rotacion rigida por disposicion de bocas y
   // camara fija. Si la pieza no es clasificable, camino PCA anterior.
   const mouthInfo = extractMouths(positions, triCount);
-  const pose = canonicalPose(mouthInfo, positions, triCount);
+  let pose = canonicalPose(mouthInfo, positions, triCount);
+  // Weldolet y valvula de bola: la deteccion de bocas produce poses que
+  // ocultan el rasgo distintivo (silla / palanca). Ambas mallas se generan
+  // ya en pose canonica de catalogo (eje principal horizontal o rama a +Z),
+  // asi que se usa pose identidad y una vista dedicada.
+  if (
+    stlPath.includes('weldolet') ||
+    stlPath.includes('valve_ball') ||
+    stlPath.includes('valve_check') ||
+    stlPath.includes('valve_butterfly') ||
+    stlPath.includes('elbow_90_thd') ||
+    stlPath.includes('cap_sw') ||
+    stlPath.includes('cap_thd') ||
+    stlPath.includes('bushing_thd') ||
+    stlPath.includes('sockolet') ||
+    stlPath.includes('thredolet') ||
+    stlPath.includes('latrolet') ||
+    stlPath.includes('elbolet') ||
+    stlPath.includes('nipolet') ||
+    stlPath.includes('flange_') ||
+    stlPath.includes('spectacle_blind') ||
+    stlPath.includes('spade_') ||
+    stlPath.includes('spacer_') ||
+    stlPath.includes('gasket_sw') ||
+    stlPath.includes('gasket_rj') ||
+    stlPath.includes('stud_bolt') ||
+    stlPath.includes('coupling_grooved')
+  ) {
+    pose = {
+      rows: [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+      ],
+      center: mouthInfo.centroid,
+      kind:
+        stlPath.includes('weldolet') || stlPath.includes('cap_sw') || stlPath.includes('cap_thd')
+          ? 'cap'
+          : 'manual',
+    };
+  }
+  if (process.env.RENDER_DEBUG) {
+    console.error(`DEBUG ${basename(stlPath)}: mouths=${mouthInfo.mouths.length} kind=${pose?.kind ?? 'null'}`);
+    for (const m of mouthInfo.mouths) {
+      console.error(
+        `  axis=[${m.axis.map((v) => v.toFixed(2))}] r=${m.radius.toFixed(1)} c=[${m.centroid.map((v) => v.toFixed(1))}]`,
+      );
+    }
+  }
   const geo = pose ? applyPose(positions, pose) : positions;
   const path = pose ? `canonica/${pose.kind}` : 'pca';
 
@@ -2137,6 +2185,77 @@ async function renderPiece(stlPath, cfg, mips, noise) {
     catalogViewDir = normalize([-0.24, -0.88, 0.42]);
   } else if (pose?.kind === 'branch' && stlPath.includes('lateral_45')) {
     catalogViewDir = normalize([0.20, 0.90, 0.42]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('valve_check')) {
+    // Check wafer dual-plate: elevated three-quarter view so the two
+    // slightly-open plates and the hinge pin read inside the wafer body.
+    catalogViewDir = normalize([0.55, -0.45, 0.55]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('elbow_90_thd')) {
+    // Codo roscado B16.11: malla en pose canonica (pata 1 a -Y, pata 2 a -X,
+    // arco en plano XY). Vista frontal a la boca 1 para leer la rosca hembra,
+    // que es el rasgo que lo distingue del codo SW/BW.
+    catalogViewDir = normalize([-0.55, -0.62, 0.40]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('valve_butterfly')) {
+    // Wafer butterfly: front three-quarter view showing wafer body, disc and stem.
+    catalogViewDir = normalize([0.48, -0.62, 0.55]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('valve_ball')) {
+    // Bola: malla en pose canonica (flujo a X, vastago a +Z, palanca a X).
+    // Vista tres cuartos frontal-superior: palanca horizontal sobre el cuerpo.
+    catalogViewDir = normalize([0.52, -0.62, 0.42]);
+  } else if (pose?.kind === 'manual' && (
+    stlPath.includes('sockolet') ||
+    stlPath.includes('thredolet') ||
+    stlPath.includes('latrolet') ||
+    stlPath.includes('elbolet') ||
+    stlPath.includes('nipolet')
+  )) {
+    // Olets are generated in their documented reference orientation. Avoid
+    // PCA reorientation: the outlet configuration (socket, NPT rings,
+    // 45-degree branch, elbow saddle, or extended nipple) is the semantic
+    // feature the catalog view must preserve.
+    catalogViewDir = stlPath.includes('latrolet')
+      ? normalize([0.78, 0.18, 0.46])
+      : normalize([0.52, -0.64, 0.48]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('flange_')) {
+    // Bridas B16.5: mallas generadas con eje de brida a +Z y cara RF hacia
+    // +Z. Vista tres cuartos frontal-superior: se leen la cara con los
+    // agujeros de pernos, el raised face y el perfil del hub detras, que es
+    // lo que distingue WN/SO/BL/LJ/THD/SW sin leer el nombre.
+    catalogViewDir = normalize([0.55, -0.60, 0.50]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('spectacle_blind')) {
+    // Spectacle blind: figura-8 en plano XY. Vista tres cuartos frontal-
+    // superior que lee a la vez el disco ciego, el anillo abierto y el web
+    // (rasgo semantico). CAMERA_ONLY fix PO: la geometria no se toca.
+    catalogViewDir = normalize([0.38, -0.52, 0.62]);
+  } else if (pose?.kind === 'manual' && (
+    stlPath.includes('spade_') || stlPath.includes('spacer_')
+  )) {
+    // Spade / ring spacer: disco o anillo en plano XY con el handle a +Y.
+    // Vista tres cuartos frontal-superior: handle legible, bore del spacer
+    // inequivoco, y la pieza llena el frame.
+    catalogViewDir = normalize([0.32, -0.52, 0.62]);
+  } else if (pose?.kind === 'manual' && (
+    stlPath.includes('gasket_sw') || stlPath.includes('gasket_rj')
+  )) {
+    // Gaskets: axisimetricas en Z. Vista tres cuartos frontal-superior (como
+    // bridas): lee los anillos concentricos del CGI o la seccion del RTJ.
+    catalogViewDir = normalize([0.55, -0.60, 0.50]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('stud_bolt')) {
+    // Stud bolt: eje del esparrago a Z con tuerca abajo y arriba. Vista tres
+    // cuartos frontal: se lee la rosca a lo largo de todo el cuerpo y las dos
+    // tuercas heavy-hex, que es el rasgo semantico (stud + 2 nuts).
+    catalogViewDir = normalize([0.62, -0.55, 0.42]);
+  } else if (pose?.kind === 'manual' && stlPath.includes('coupling_grooved')) {
+    // Grooved couplings (rigid + flex): eje de tuberia a Z, bolt pads a +-X.
+    // Vista dominada por +X, casi frontal a los bolt pads: el rasgo que
+    // diferencia los dos tipos es la cara de los pads (en cuña en el rigid /
+    // Style 07, recta en el flex / Style 77) con los track-bolts y tuercas
+    // sobresaliendo hacia la camara. Con la vista tres cuartos anterior los
+    // dos couplings eran indistinguibles (feedback PO 2026-09-25).
+    catalogViewDir = normalize([0.80, -0.40, 0.24]);
+  } else if (pose?.kind === 'cap' && stlPath.includes('weldolet')) {
+    // Weldolet: vista tres cuartos baja para que se aprecie la campana y la
+    // curva de la silla en la base, no solo la boca.
+    catalogViewDir = normalize([0.60, -0.62, 0.34]);
   } else if (pose?.kind === 'revolution-ecc') {
     catalogViewDir = normalize([0.30, -0.90, 0.32]);
   } else if (pose?.kind === 'elbow' && (

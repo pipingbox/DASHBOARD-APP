@@ -414,7 +414,7 @@
     "certifications": "Certificaciones",
     "addCertification": "Añadir certificación",
     "noCertifications": "Aún no se han añadido certificaciones.",
-    "matchReadyTitle": "Completa tu perfil para recibir ofertas de trabajo más precisas.",
+    "matchReadyTitle": "Completa tu perfil para recibir coincidencias de empleo más precisas.",
     "matchReadyHint": "Completa los datos que faltan para mejorar tu preparación laboral.",
     "matchReadyAddExperience": "Añadir experiencia laboral",
     "matchReadyGap": {
@@ -519,7 +519,6 @@
     "emailJobAlertsHint": "Enviar oportunidades coincidentes por email",
     "jobMatchingEnabled": "Matching de empleo",
     "jobMatchingEnabledHint": "Recibir oportunidades de empleos publicados",
-    "matchReadyTitle": "Completa tu perfil para recibir coincidencias de empleo más precisas.",
     "matchingPreferencesSaved": "Preferencias guardadas",
     "matchingPreferencesTitle": "Preferencias de Empleo y Matching",
     "otpCode": "Código de verificación",
@@ -1564,7 +1563,14 @@
       "modeFieldHint": "(simplificado)",
       "modeEngineeringHint": "(completo)",
       "viewFullDatasheet": "Ver ficha completa (modo ingeniería)",
-      "breadcrumbLibrary": "Biblioteca"
+      "breadcrumbLibrary": "Biblioteca",
+      "guideTitle": "Guía de uso",
+      "guideWhatIs": "Qué es",
+      "guideTypes": "Tipos y diseños",
+      "guideWhenToUse": "Cuándo usarla",
+      "guideWhenNotToUse": "Cuándo NO usarla",
+      "guideInstallation": "Consejos de instalación",
+      "guideCommonError": "Error frecuente"
     },
     "prefab": {
       "common": {
@@ -3386,7 +3392,99 @@
       "api600GateValve": "Clases según API 600 para válvulas de compuerta de bonete atornillado, extremos bridados o a tope. Las clases coinciden con las de brida ASME B16.5 / B16.34. Verificar contra la edición vigente de la norma.",
       "api602CompactValve": "Clases según API 602 para válvulas compactas NPS 4 y menores. La Clase 800 no es una clase listada en ASME B16.34: es una clase intermedia de uso extendido para extremos roscados y soldados, y no existe en versión bridada. La clase disponible depende del tipo de extremo. Verificar contra la edición vigente de la norma.",
       "yStrainerNoStandard": "El filtro en Y no está cubierto por una norma dimensional específica en este catálogo. Los fabricantes lo suministran habitualmente con extremos bridados según ASME B16.5, por lo que la clase la fija la brida del modelo concreto. Aquí no se lista ninguna clase porque no existe una norma verificable que la defina.",
-      "noPressureClass": "Los laterales no se designan por clase de presión. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula según el código de diseño aplicable (p. ej. ASME B31.3). Verifique las dimensiones con el fabricante para el schedule aplicable."
+      "noPressureClass": "Los laterales no se designan por clase de presión. Su capacidad deriva del espesor de pared (schedule) y del material, y se calcula según el código de diseño aplicable (p. ej. ASME B31.3). Verifique las dimensiones con el fabricante para el schedule aplicable.",
+      "api609ButterflyValve": "API 609 Categoría A (válvulas de mariposa concéntricas) define la dimensión cara a cara publicada aquí; no es una clase de presión. La presión nominal y la construcción de la válvula deben verificarse contra la documentación del fabricante del producto seleccionado.",
+      "b36_19mPipe": "ASME B36.19M solo normaliza dimensiones y schedules; no define clases de presión. La presión admisible del tubo deriva del espesor de pared y del material, y se calcula según el código de diseño aplicable (p. ej. ASME B31.3)."
+    },
+    "guide": {
+      "valve": {
+        "gate": {
+          "whatIs": "Válvula de movimiento lineal que aísla el flujo mediante una compuerta que se desliza transversalmente. Diseñada para servicio totalmente abierta o totalmente cerrada, no para regulación.",
+          "types": "Cuña maciza, cuña flexible, cuña bipartida; vástago ascendente o no ascendente; compuerta de cuchillo para lodos; cuña expansiva para oleoductos.",
+          "whenToUse": "Aislamiento abierto/cerrado en líneas de líquido donde importa un paso recto sin turbulencia: agua, aceite, gas y vapor dentro de la clase de presión.",
+          "whenNotToUse": "Servicio de regulación: una compuerta parcialmente abierta vibra, se erosiona y puede dañarse. Usa mejor una válvula de globo o mariposa.",
+          "installation": "Instala con el vástago vertical cuando sea posible, respeta la dirección de flujo solo si está marcada, y ciérrala por completo antes de presurizar la línea.",
+          "commonError": "Usar la compuerta para regular caudal a mano: los asientos se erosionan y la válvula deja de sellar."
+        },
+        "globe": {
+          "whatIs": "Válvula lineal cuyo obturador cierra sobre un asiento perpendicular al flujo. Más pérdida de carga que una compuerta o bola, pero excelente control de regulación.",
+          "types": "Cuerpos rectos (Z), en ángulo y en Y; bonete atornillado o sellado a presión; obturadores de disco, tapón o aguja.",
+          "whenToUse": "Regulación y operación frecuente: agua de refrigeración, fuelóleo, venteos y drenajes de vapor, dosificación química.",
+          "whenNotToUse": "Aislamiento de baja pérdida de carga en grandes líneas: el paso tortuoso desperdicia energía. Una compuerta, bola o mariposa es más económica.",
+          "installation": "Respeta la flecha de flujo del cuerpo —instalada al revés destruye el obturador— y deja espacio para el recorrido del vástago y el volante.",
+          "commonError": "Invertir el sentido del flujo: la válvula sigue cerrando, pero obturador y asiento se desgastan rápido y se pierde el control."
+        },
+        "check": {
+          "whatIs": "Válvula de accionamiento automático que permite el flujo en un solo sentido y cierra sola para impedir el retorno, protegiendo bombas y equipos del golpe de ariete.",
+          "types": "De clapeta (swing), de pistón (silenciosa), wafer de doble clapeta, de bola, de disco inclinado y de tobera.",
+          "whenToUse": "Descarga de bombas para evitar el giro inverso, salida de compresores y cualquier línea donde el retorno vacíe o dañe el sistema.",
+          "whenNotToUse": "Flujo pulsante con baja velocidad (aleteo y desgaste) o líneas que exijan estanqueidad total en sentido inverso: usa una válvula de cierre.",
+          "installation": "Las wafer de doble clapeta se montan entre bridas con el eje de bisagra horizontal; respeta la flecha y comprueba que los espárragos no rocen el cuerpo.",
+          "commonError": "Montar la doble clapeta con el eje de bisagra vertical: las placas no caen libres y azotan con el flujo inverso."
+        },
+        "ball": {
+          "whatIs": "Válvula de cuarto de vuelta con una bola perforada que gira hasta alinear su taladro con el flujo. Accionamiento rápido, cierre estanco y paso pleno sin obstrucciones.",
+          "types": "Bola flotante o con muñones (trunnion); paso pleno o reducido; cuerpo de una, dos o tres piezas; asiento blando o metálico; entrada superior.",
+          "whenToUse": "Cierre estanco y accionamiento rápido en líquidos, gases y lodos (asiento metálico); líneas que requieren paso de rascadores (pigging) con paso pleno.",
+          "whenNotToUse": "Regulación fina: la bola entreabierta cavita y se erosiona. Y temperaturas por encima del límite del asiento blando.",
+          "installation": "Confirma el sentido de flujo en modelos con muñones o venteo, soporta los cuerpos pesados de forma independiente y acciona con la línea despresurizada.",
+          "commonError": "Pedir paso reducido cuando el rascado (pigging) o las sondas exigen paso pleno."
+        },
+        "butterfly": {
+          "whatIs": "Válvula de cuarto de vuelta que regula o aísla el flujo con un disco circular que gira sobre un eje atravesado en la corriente. Compacta, ligera y de baja pérdida de carga.",
+          "types": "Concéntrica (asiento elastomérico, servicio general), doble excéntrica (alta prestación) y triple excéntrica (asiento metálico, cierre total). Montaje: wafer (entre bridas), lug, bridada o ranurada.",
+          "whenToUse": "Grandes líneas donde una bola o compuerta sería demasiado pesada o cara; regulación; agua, climatización, aire, gases y químicos suaves dentro del asiento.",
+          "whenNotToUse": "Cierre con alta pérdida de presión por encima de la clase del asiento, lodos abrasivos (salvo asiento metálico) o servicio que exija paso pleno.",
+          "installation": "La wafer se empareda entre bridas: comprueba que el disco no roce con el tubo ni con los espárragos y centra el asiento sobre la junta antes de apretar.",
+          "commonError": "Instalar una wafer contra un interior de tubo excesivo o bridas desalineadas: el disco se atasca."
+        }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Barra roscada con dos tuercas hexagonales pesadas que aprieta una unión bridada. Se selecciona por la norma de brida, el NPS y la clase; no tiene clase de presión propia.",
+          "types": "Espárragos de rosca continua con dos tuercas (patrón habitual en uniones bridadas ASME B16.5), además de variantes de extremo corto y doble extremo; grados habituales ASTM A193 B7 con tuercas A194 2H, inoxidable y baja temperatura.",
+          "whenToUse": "Montaje de uniones empaquetadas atornilladas: pares de bridas, válvulas bridadas y boquillas de equipo que deban montarse y desmontarse posteriormente.",
+          "whenNotToUse": "No es un elemento de fijación estructural ni es intercambiable con otro grado o longitud; no reutilizar espárragos estirados, corroídos o con la rosca dañada en servicio a presión.",
+          "installation": "Roscas limpias, lubricante según especificación del proyecto, junta centrada, tuercas apretadas a mano y después en patrón de estrella o cruz en varias pasadas para cargar la junta uniformemente. El par de apriete viene del procedimiento de la unión: material, lubricante, junta y brida lo modifican, por lo que no existe un valor universal.",
+          "commonError": "Apretar una tuerca por completo antes que las demás: la brida se ladea, la junta queda aplastada por un lado y la unión fuga."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Carcasa de dos segmentos que abraza los extremos ranurados del tubo con una junta activada por la presión, bloqueando el movimiento angular y axial de la unión.",
+          "types": "Acoplamientos rígidos estándar para servicio general, además de variantes reductoras y de alta presión; el perfil de ranura difiere entre tubo roll-grooved y cut-grooved.",
+          "whenToUse": "Líneas ranuradas que deben comportarse como una unión soldada o bridada: columnas, salas de máquinas y tramos rectos largos donde el movimiento se absorbe en otro punto.",
+          "whenNotToUse": "Cuando la unión deba absorber deflexión, expansión o vibración: usar acoplamientos flexibles. Nunca mezclar extremos roll-grooved y cut-grooved.",
+          "installation": "Extremos de tubo a escuadra y limpios; ranura según la norma o los datos del fabricante; junta lubricada y asentada; chavetas de la carcasa encajadas en ambas ranuras; pernos apretados alternativamente hasta un contacto uniforme de las almohadillas.",
+          "commonError": "Suponer que una unión rígida significa que el sistema no necesita compensación de dilatación: los acoplamientos rígidos restringen el movimiento, por lo que la dilatación térmica debe absorberse en otro lugar."
+        },
+        "flexible": {
+          "whatIs": "Acoplamiento ranurado cuya chaveta de carcasa es deliberadamente más estrecha que el canal de la ranura, permitiendo una deflexión angular controlada y movimiento axial en cada unión.",
+          "types": "Acoplamientos flexibles estándar; la deflexión admisible por unión depende del tamaño y la declara el fabricante.",
+          "whenToUse": "Líneas que deben absorber vibración, asentamiento, movimiento sísmico o dilatación y contracción térmica sin tensionar anclajes y equipos.",
+          "whenNotToUse": "Cuando el tubo debe quedar rígidamente posicionado, como en soportes de válvulas o derivaciones: una unión flexible se moverá. Tampoco sustituye universalmente a una junta de expansión sin calcular el movimiento total.",
+          "installation": "Mismos requisitos de calidad de ranura que el acoplamiento rígido; verificar la separación entre extremos de tubo especificada por el fabricante, mantener el acoplamiento centrado sobre la unión y apretar los pernos alternativamente.",
+          "commonError": "Esperar que un solo acoplamiento flexible absorba un movimiento grande: la capacidad por unión es pequeña y se suma a lo largo de varias uniones, así que nunca asumir el valor — tomarlo del fabricante."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Tubo de acero cuyas dimensiones siguen ASME B36.10M: un diámetro exterior fijo por NPS y un espesor definido por el schedule. NPS es una designación de tamaño, no el diámetro interior real.",
+          "types": "Schedules de SCH 10 a SCH 160 y XXS, además de las designaciones clásicas STD/XS (que coinciden con SCH 40/80 en los tamaños pequeños). Fabricación sin soldadura o soldada, en acero al carbono y aleado.",
+          "whenToUse": "Tuberías de proceso, servicios y estructuras en acero al carbono o aleado donde la clase de presión y el espesor los fija la clase de línea o la especificación de tuberías.",
+          "whenNotToUse": "Servicio corrosivo que requiera inoxidable: usar tubo B36.19M. Tampoco asumir que dos tubos del mismo NPS comparten el interior: el ID cambia con el schedule aunque el OD no.",
+          "installation": "Verificar schedule, grado y colada o certificado contra la lista de líneas antes de cortar; biselar extremos según el WPS para soldadura a tope; recordar que accesorios y bridas se piden por el mismo NPS y el OD coincide, mientras que las transiciones de espesor requieren chaflán o schedule compatible.",
+          "commonError": "Pedir tubo por \"NPS = diámetro\": NPS 4 no mide 4 pulgadas en ninguna parte — el OD es 4.500\" y el interior depende del schedule. Comprobar el schedule siempre."
+        },
+        "stainless": {
+          "whatIs": "Tubo de acero inoxidable dimensionado según ASME B36.19M: mismo OD que B36.10M para el mismo NPS, pero espesores definidos por los schedules con sufijo S (5S, 10S, 40S, 80S).",
+          "types": "Schedules 5S/10S para servicio de pared ligera y 40S/80S que coinciden con SCH 40/80 de B36.10M hasta NPS 10; los tamaños mayores usan sus propios espesores listados. Los grados austeníticos 304/304L y 316/316L son los más habituales.",
+          "whenToUse": "Servicio corrosivo, sanitario o limpio — química, alimentación, farma, tratamiento de agua — donde el acero al carbono se corroería o contaminaría el fluido.",
+          "whenNotToUse": "No sustituir solo por OD: una pared 10S es mucho más delgada que STD del mismo NPS, por lo que la capacidad de presión y la preparación de soldadura difieren. Comprobar el schedule S, no el nombre del schedule B36.10M.",
+          "installation": "Segregar del acero al carbono durante almacenamiento y fabricación para evitar contaminación por hierro; usar herramientas dedicadas; verificar grado y schedule contra la clase de línea; purgar el interior para soldar según especificación.",
+          "commonError": "Asumir que 40S y STD son intercambiables en NPS grande: solo coinciden hasta NPS 10; por encima los espesores listados difieren, y NPS 22/30 ni siquiera tienen 40S."
+        }
+      }
     }
   },
   "dailyLog": {

@@ -414,7 +414,7 @@
     "certifications": "Certificazioni",
     "addCertification": "Aggiungi certificazione",
     "noCertifications": "Nessuna certificazione aggiunta.",
-    "matchReadyTitle": "Completa il profilo per ricevere opportunità più pertinenti.",
+    "matchReadyTitle": "Completa il tuo profilo per ricevere corrispondenze di lavoro più precise.",
     "matchReadyHint": "Completa i dati mancanti per migliorare la tua preparazione professionale.",
     "matchReadyAddExperience": "Aggiungi esperienza lavorativa",
     "matchReadyGap": {
@@ -519,7 +519,6 @@
     "emailJobAlertsHint": "Ricevi le opportunità corrispondenti via email",
     "jobMatchingEnabled": "Matching lavoro",
     "jobMatchingEnabledHint": "Ricevi opportunità da lavori pubblicati",
-    "matchReadyTitle": "Completa il tuo profilo per ricevere corrispondenze di lavoro più precise.",
     "matchingPreferencesSaved": "Preferenze salvate",
     "matchingPreferencesTitle": "Preferenze di Lavoro e Matching",
     "otpCode": "Codice di verifica",
@@ -1564,7 +1563,14 @@
       "modeFieldHint": "(semplificata)",
       "modeEngineeringHint": "(completa)",
       "viewFullDatasheet": "Vedi scheda completa (modalità ingegneria)",
-      "breadcrumbLibrary": "Libreria"
+      "breadcrumbLibrary": "Libreria",
+      "guideTitle": "Guida all'uso",
+      "guideWhatIs": "Che cos'è",
+      "guideTypes": "Tipi e costruzioni",
+      "guideWhenToUse": "Quando usarla",
+      "guideWhenNotToUse": "Quando NON usarla",
+      "guideInstallation": "Consigli di installazione",
+      "guideCommonError": "Errore frequente"
     },
     "prefab": {
       "common": {
@@ -3386,7 +3392,99 @@
       "api600GateValve": "Classi secondo API 600 per valvole a saracinesca con cappello imbullonato, estremità flangiate o butt weld. Le classi coincidono con le classi di flangia ASME B16.5 / B16.34. Verificare rispetto all'edizione vigente della norma.",
       "api602CompactValve": "Classi secondo API 602 per valvole compatte NPS 4 e inferiori. La Classe 800 non è una classe elencata in ASME B16.34: è una classe intermedia di uso diffuso per estremità filettate e saldate, e non esiste in versione flangiata. La classe disponibile dipende dal tipo di estremità. Verificare rispetto all'edizione vigente della norma.",
       "yStrainerNoStandard": "Il filtro a Y non è coperto da una norma dimensionale specifica in questo catalogo. I fabbricanti lo forniscono abitualmente con estremità flangiate secondo ASME B16.5, per cui la classe è fissata dalla flangia del modello specifico. Qui non è elencata alcuna classe perché non esiste una norma verificabile che la definisca.",
-      "noPressureClass": "I raccordi laterali non sono designati per classe di pressione. La loro capacità deriva dallo spessore di parete (schedule) e dal materiale, e si calcola secondo il codice di progetto applicabile (ad es. ASME B31.3). Verificare le dimensioni con il fabbricante per lo schedule applicabile."
+      "noPressureClass": "I raccordi laterali non sono designati per classe di pressione. La loro capacità deriva dallo spessore di parete (schedule) e dal materiale, e si calcola secondo il codice di progetto applicabile (ad es. ASME B31.3). Verificare le dimensioni con il fabbricante per lo schedule applicabile.",
+      "api609ButterflyValve": "La API 609 Categoria A (valvole a farfalla concentriche) definisce la dimensione faccia a faccia qui pubblicata; non è una classe di pressione. La pressione nominale e la costruzione della valvola devono essere verificate nella documentazione del produttore del prodotto selezionato.",
+      "b36_19mPipe": "La ASME B36.19M normalizza solo dimensioni e schedule; non definisce classi di pressione. La pressione ammissibile del tubo deriva dallo spessore di parete e dal materiale, e si calcola secondo il codice di progettazione applicabile (p. es. ASME B31.3)."
+    },
+    "guide": {
+      "valve": {
+        "gate": {
+          "whatIs": "Valvola lineare che isola il flusso mediante un otturatore che scorre trasversalmente al flusso. Progettata per servizio completamente aperta o chiusa, non per la regolazione.",
+          "types": "Cuneo pieno, flessibile o in due pezzi; stelo ascendente o non ascendente; saracinesca a ghigliottina per fanghi; cuneo espandibile per pipeline.",
+          "whenToUse": "Isolamento aperto/chiuso in linee di liquido dove conta un passaggio rettilineo senza turbolenza: acqua, olio, gas e vapore entro la classe.",
+          "whenNotToUse": "Servizio di regolazione: un otturatore semiaperto vibra, si erode e può rovinarsi. Meglio una valvola a globo o a farfalla.",
+          "installation": "Installare con lo stelo verticale quando possibile, rispettare il verso di flusso solo se marcato e chiudere completamente prima di pressurizzare la linea.",
+          "commonError": "Usare la saracinesca per regolare la portata a mano: le sedi si erodono e la valvola non sigilla più."
+        },
+        "globe": {
+          "whatIs": "Valvola lineare il cui otturatore chiude su una sede perpendicolare al flusso. Perdite di carico maggiori rispetto a saracinesca o sfera, ma ottimo controllo di regolazione.",
+          "types": "Corpo a Z (retto), ad angolo e a Y; cappello bullonato o a tenuta di pressione; otturatore a disco, a tappo o ad ago.",
+          "whenToUse": "Regolazione e manovre frequenti: acqua di raffreddamento, olio combustibile, sfiati e scarichi di vapore, dosaggio chimico.",
+          "whenNotToUse": "Isolamento a bassa perdita di carico su grandi linee: il percorso tortuoso spreca energia. Saracinesca, sfera o farfalla costano meno.",
+          "installation": "Rispettare la freccia di flusso fusa sul corpo — montata al contrario distrugge l'otturatore — e lasciare spazio alla corsa dello stelo e al volantino.",
+          "commonError": "Invertire il senso del flusso: la valvola chiude ancora, ma otturatore e sede si usurano in fretta e la regolazione si perde."
+        },
+        "check": {
+          "whatIs": "Valvola automatica che consente il flusso in un solo senso e si richiude da sola per impedire il ritorno, proteggendo pompe e apparecchiature dal colpo d'ariete.",
+          "types": "A battente (swing), a pistone (silenziosa), wafer a doppio battente, a sfera, a disco inclinato e a ugello.",
+          "whenToUse": "Mandata delle pompe per evitare il controgiro, scarico dei compressori e ogni linea dove il ritorno svuoterebbe o danneggerebbe l'impianto.",
+          "whenNotToUse": "Flusso pulsante a bassa velocità (sfarfallio e usura) o linee che richiedono tenuta totale al ritorno: usare una valvola di chiusura.",
+          "installation": "Le wafer a doppio battente si montano tra flange con il perno della cerniera orizzontale; rispettare la freccia e controllare che i bulloni non tocchino il corpo.",
+          "commonError": "Montare il doppio battente con il perno verticale: le piastre non ricadono libere e sbattono al ritorno."
+        },
+        "ball": {
+          "whatIs": "Valvola a quarto di giro con una sfera forata che ruota fino ad allineare il foro con il flusso. Manovra rapida, chiusura stagna e passaggio pieno senza ostacoli.",
+          "types": "Sfera galleggiante o a trunnion; passaggio pieno o ridotto; corpo monoblocco, due o tre pezzi; sede morbida o metallica; entrata dall'alto.",
+          "whenToUse": "Chiusura stagna e manovra rapida su liquidi, gas e fanghi (sede metallica); linee da passare con raschiatori (pigging) in passaggio pieno.",
+          "whenNotToUse": "Regolazione fine — la sfera semiaperta cava e si erode — e temperature oltre il limite della sede morbida.",
+          "installation": "Verificare il verso di flusso sui modelli a trunnion o con sfiato, sostenere i corpi pesanti indipendentemente dalla tubazione e manovrare a linea depressurizzata.",
+          "commonError": "Ordinare passaggio ridotto quando il pigging o le sonde richiedono il passaggio pieno."
+        },
+        "butterfly": {
+          "whatIs": "Valvola a quarto di giro che regola o isola il flusso con un disco circolare rotante su un albero attraversante la corrente. Compatta, leggera e a bassa perdita di carico.",
+          "types": "Concentrica (sede elastomerica, servizio generale), doppia eccentrica (alte prestazioni) e tripla eccentrica (sede metallica, tenuta totale). Montaggio: wafer (tra flange), a orecchioni (lug), flangiata o con estremità scanalate.",
+          "whenToUse": "Grandi linee dove una sfera o una saracinesca sarebbe troppo pesante o costosa; regolazione; acqua, HVAC, aria, gas e chimici moderati entro la sede.",
+          "whenNotToUse": "Chiusura con alto ΔP oltre la classe della sede, fanghi abrasivi (salvo sede metallica) o servizi che richiedono passaggio pieno.",
+          "installation": "La wafer si incassa tra flange: verificare che il disco non tocchi tubo né tiranti e centrare la sede sulla guarnizione prima del serraggio.",
+          "commonError": "Installare una wafer contro un interno tubo eccessivo o flange disassate: il disco si blocca."
+        }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Barra filettata con due dadi esagonali pesanti che serra un giunto flangiato. Si sceglie in base alla norma della flangia, al NPS e alla classe; non ha una classe di pressione propria.",
+          "types": "Viti prigioniere a filetto continuo con due dadi (schema abituale dei giunti ASME B16.5), oltre a varianti a estremità corta e doppia; gradi comuni ASTM A193 B7 con dadi A194 2H, inox e basse temperature.",
+          "whenToUse": "Montaggio di giunti bullonati con guarnizione: coppie di flange, valvole flangiate e bocchelli di apparecchiature da montare e smontare successivamente.",
+          "whenNotToUse": "Non è un fissaggio strutturale né è intercambiabile con altro grado o lunghezza; non riutilizzare tiranti allungati, corrosi o con filetto danneggiato in servizio a pressione.",
+          "installation": "Filetti puliti, lubrificante secondo specifica di progetto, guarnizione centrata, dadi avvitati a mano e poi serrati a stella o a croce in più passate per caricare uniformemente la guarnizione. La coppia viene dalla procedura del giunto: materiale, lubrificante, guarnizione e flangia la modificano — non esiste un valore universale.",
+          "commonError": "Serrare un dado completamente prima degli altri: la flangia si inclina, la guarnizione viene schiacciata da un lato e il giunto perde."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Corpo in due segmenti che si serra sulle estremità scanalate del tubo con guarnizione attivata dalla pressione, bloccando il movimento angolare e assiale del giunto.",
+          "types": "Giunti rigidi standard per servizio generale, oltre a varianti ridotte e alta pressione; il profilo della scanalatura differisce tra tubo roll-grooved e cut-grooved.",
+          "whenToUse": "Linee scanalate che devono comportarsi come un giunto saldato o flangiato: colonne montanti, locali tecnici e lunghi tratti rettilinei dove il movimento è assorbito altrove.",
+          "whenNotToUse": "Quando il giunto deve assorbire deflessione, dilatazione o vibrazioni: usare giunti flessibili. Non mescolare mai estremità roll-grooved e cut-grooved.",
+          "installation": "Estremità del tubo squadrate e pulite; scanalatura secondo la norma o i dati del costruttore; guarnizione lubrificata e in sede; chiavette del corpo impegnate in entrambe le scanalature; bulloni serrati alternativamente fino al contatto uniforme delle piastre.",
+          "commonError": "Supporre che un giunto rigido dispensi dalla compensazione della dilatazione: i giunti rigidi bloccano il movimento, quindi la dilatazione termica deve essere assorbita altrove."
+        },
+        "flexible": {
+          "whatIs": "Giunto scanalato la cui chiavetta del corpo è volutamente più stretta del canale della scanalatura, consentendo deflessione angolare controllata e movimento assiale a ogni giunto.",
+          "types": "Giunti flessibili standard; la deflessione ammissibile per giunto dipende dal diametro ed è dichiarata dal costruttore.",
+          "whenToUse": "Linee che devono assorbire vibrazioni, cedimenti, movimento sismico o dilatazione e contrazione termica senza sollecitare ancoraggi e apparecchiature.",
+          "whenNotToUse": "Dove il tubo deve restare rigidamente posizionato, ad esempio ai supporti di valvole o derivazioni: un giunto flessibile si muoverà. Non sostituisce universalmente un compensatore senza calcolare il movimento totale.",
+          "installation": "Stessi requisiti di qualità della scanalatura del giunto rigido; verificare la distanza tra le estremità del tubo specificata dal costruttore, tenere il giunto centrato sulla connessione e serrare i bulloni alternativamente.",
+          "commonError": "Aspettarsi che un solo giunto flessibile assorba un grande movimento: la capacità per giunto è piccola e si somma lungo più giunti — non assumere mai il valore, prenderlo dal costruttore."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Tubo in acciaio le cui dimensioni seguono ASME B36.10M: diametro esterno fisso per NPS e spessore definito dallo schedule. NPS è una designazione di taglia, non il foro reale.",
+          "types": "Schedule da SCH 10 a SCH 160 e XXS, oltre alle designazioni classiche STD/XS (che coincidono con SCH 40/80 nelle taglie piccole). Fabbricazione senza saldatura o saldata, in acciaio al carbonio e legato.",
+          "whenToUse": "Tubazioni di processo, servizi e strutture in acciaio al carbonio o legato dove classe di pressione e spessore sono fissati dalla classe di linea o dalla specifica di tubazione.",
+          "whenNotToUse": "Servizio corrosivo che richiede inox: usare tubo B36.19M. Non assumere inoltre che due tubi dello stesso NPS abbiano lo stesso foro: l’ID cambia con lo schedule mentre l’OD resta fisso.",
+          "installation": "Verificare schedule, grado e colata o certificato contro la line list prima del taglio; smussare le estremità secondo il WPS per saldatura di testa; raccordi e flange si ordinano con lo stesso NPS e l’OD corrisponde, le transizioni di spessore richiedono uno smusso o uno schedule compatibile.",
+          "commonError": "Ordinare il tubo come \"NPS = diametro\": NPS 4 non misura 4 pollici da nessuna parte — l’OD è 4.500\" e il foro dipende dallo schedule. Controllare sempre lo schedule."
+        },
+        "stainless": {
+          "whatIs": "Tubo in acciaio inossidabile dimensionato secondo ASME B36.19M: stesso OD di B36.10M per lo stesso NPS, ma spessori definiti dagli schedule con suffisso S (5S, 10S, 40S, 80S).",
+          "types": "Schedule 5S/10S per parete leggera e 40S/80S che coincidono con SCH 40/80 di B36.10M fino a NPS 10; le taglie maggiori usano i propri spessori elencati. I gradi austenitici 304/304L e 316/316L sono i più comuni.",
+          "whenToUse": "Servizio corrosivo, sanitario o pulito — chimica, alimentare, farmaceutico, trattamento acque — dove l’acciaio al carbonio si corroderebbe o contaminerebbe il fluido.",
+          "whenNotToUse": "Non sostituire solo per OD: una parete 10S è molto più sottile di STD dello stesso NPS, quindi portata in pressione e preparazione della saldatura differiscono. Controllare lo schedule S, non il nome dello schedule B36.10M.",
+          "installation": "Separare dall’acciaio al carbonio in magazzino e in officina per evitare contaminazione ferrosa; utensili dedicati; verificare grado e schedule contro la classe di linea; spurgare l’interno per la saldatura come da specifica.",
+          "commonError": "Supporre che 40S e STD siano intercambiabili a grande NPS: coincidono solo fino a NPS 10; oltre, gli spessori elencati differiscono, e NPS 22/30 non hanno affatto il 40S."
+        }
+      }
     }
   },
   "dailyLog": {

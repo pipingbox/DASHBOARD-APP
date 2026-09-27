@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs><style>
+    .profile{stroke:#1a1a1a;stroke-width:2;fill:#e2e5e8}
+    .bore{stroke:#555;stroke-width:1;fill:none;stroke-dasharray:4 2}
+    .centerline{stroke:#999;stroke-width:.8;stroke-dasharray:8 4;fill:none}
+    .dim-line{stroke:#c62828;stroke-width:.9;fill:none}
+    .dim-text{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#c62828;text-anchor:middle}
+    .dim-sub{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#c62828;text-anchor:middle}
+    .title{font-family:'Segoe UI',Arial,sans-serif;font-size:18px;font-weight:600;fill:#1a1a1a}
+    .subtitle{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#555}
+    .std-ref{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#888}
+    .note{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888}
+    .label{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#999;text-anchor:middle}
+    .tbl-hdr{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;fill:#1a1a1a;font-weight:600;text-anchor:middle}
+    .tbl-key{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#555;text-anchor:start}
+    .tbl-val{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888;text-anchor:end}
+  </style>
+  <marker id="as" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  <marker id="ae" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  </defs>
+  <rect width="800" height="700" fill="#fafafa"/>
+  <text x="40" y="40" class="title">Pipe — Cross Section</text>
+  <text x="40" y="60" class="subtitle">NPS 3/8 (DN 10) — Section at SCH 40S</text>
+  <text x="40" y="78" class="std-ref">ASME B36.19M-2018</text>
+  <path d="M 309.75 330 a 20.25 20.25 0 1 0 40.5 0 a 20.25 20.25 0 1 0 -40.5 0 Z M 315.21 330 a 14.79 14.79 0 1 0 29.58 0 a 14.79 14.79 0 1 0 -29.58 0 Z" fill-rule="evenodd" class="profile"/>
+  <circle cx="330" cy="330" r="14.8" fill="#fafafa" stroke="#1a1a1a" stroke-width="1.5"/>
+  <line x1="280" y1="330" x2="380" y2="330" class="centerline"/>
+  <line x1="330" y1="280" x2="330" y2="380" class="centerline"/>
+  <text x="274" y="334" class="label" text-anchor="end">CL</text>
+  <line x1="309.75" y1="362.25" x2="309.75" y2="400.25" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="350.25" y1="362.25" x2="350.25" y2="400.25" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="309.75" y1="395.25" x2="350.25" y2="395.25" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="330" y="388.25" class="dim-text">OD</text>
+  <text x="330" y="410.25" class="dim-sub">0.675" | 17.10 mm</text>
+  <line x1="320" y1="340" x2="316" y2="344" stroke="#c62828" stroke-width="1.4" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="306" y="318" class="dim-text" text-anchor="end">WT</text>
+  <text x="306" y="332.31891231902756" class="dim-sub" text-anchor="end">0.091" | 2.31 mm</text>
+  <line x1="330" y1="323" x2="330" y2="252" stroke="#c62828" stroke-width=".6"/>
+  <circle cx="330" cy="323" r="2" fill="#c62828"/>
+  <text x="330" y="246" class="dim-text">ID</text>
+  <text x="330" y="262" class="dim-sub">0.493" | 12.48 mm</text>
+  <rect x="520" y="130" width="250" height="152" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
+  <text x="645" y="150" class="tbl-hdr">NPS 3/8 — Key Data</text>
+  <line x1="535" y1="158" x2="755" y2="158" stroke="#eee" stroke-width=".5"/>
+  <text x="540" y="175" class="tbl-key">NPS / DN</text>
+  <text x="750" y="175" class="tbl-val">3/8 / DN 10</text>
+  <text x="540" y="192" class="tbl-key">Section schedule</text>
+  <text x="750" y="192" class="tbl-val">40S</text>
+  <text x="540" y="209" class="tbl-key">Outside diameter</text>
+  <text x="750" y="209" class="tbl-val">0.675" | 17.10 mm</text>
+  <text x="540" y="226" class="tbl-key">Wall thickness</text>
+  <text x="750" y="226" class="tbl-val">0.091" | 2.31 mm</text>
+  <text x="540" y="243" class="tbl-key">Inside diameter</text>
+  <text x="750" y="243" class="tbl-val">0.493" | 12.48 mm</text>
+  <text x="540" y="260" class="tbl-key">Weight</text>
+  <text x="750" y="260" class="tbl-val">0.84 kg/m</text>
+  <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
+  <text x="40" y="648" class="note">ASME B36.19M-2018. OD is identical for every schedule of this NPS; WT/ID/weight shown for the section schedule only.</text>
+  <text x="40" y="663" class="note">Other schedules for this NPS: see the dimensional table. No 3D render: pipes are 2D-only in V1 (3D rescoped to V1.1).</text>
+  <text x="40" y="678" class="note">All dims in inches and mm. ID = OD - 2 x WT.</text>
+  <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
+</svg>

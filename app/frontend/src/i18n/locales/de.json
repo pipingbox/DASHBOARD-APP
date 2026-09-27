@@ -414,7 +414,7 @@
     "certifications": "Zertifikate",
     "addCertification": "Zertifikat hinzufügen",
     "noCertifications": "Noch keine Zertifikate hinterlegt.",
-    "matchReadyTitle": "Vervollständige dein Profil für passendere Stellenangebote.",
+    "matchReadyTitle": "Vervollständigen Sie Ihr Profil für genauere Stellenübereinstimmungen.",
     "matchReadyHint": "Ergänze die fehlenden Profildaten, um deine Einsatzbereitschaft zu verbessern.",
     "matchReadyAddExperience": "Berufserfahrung hinzufügen",
     "matchReadyGap": {
@@ -519,7 +519,6 @@
     "emailJobAlertsHint": "Passende Stellenangebote per E-Mail erhalten",
     "jobMatchingEnabled": "Stellen-Matching",
     "jobMatchingEnabledHint": "Angebote zu veröffentlichten Stellen erhalten",
-    "matchReadyTitle": "Vervollständigen Sie Ihr Profil für genauere Stellenübereinstimmungen.",
     "matchingPreferencesSaved": "Einstellungen gespeichert",
     "matchingPreferencesTitle": "Stellen- & Matching-Einstellungen",
     "otpCode": "Bestätigungscode",
@@ -1320,7 +1319,14 @@
       "modeFieldHint": "(vereinfacht)",
       "modeEngineeringHint": "(vollständig)",
       "viewFullDatasheet": "Vollständiges Datenblatt anzeigen (Engineering-Modus)",
-      "breadcrumbLibrary": "Bibliothek"
+      "breadcrumbLibrary": "Bibliothek",
+      "guideTitle": "Anwendungsleitfaden",
+      "guideWhatIs": "Was sie ist",
+      "guideTypes": "Bauarten und Ausführungen",
+      "guideWhenToUse": "Wann einsetzen",
+      "guideWhenNotToUse": "Wann NICHT einsetzen",
+      "guideInstallation": "Einbautipps",
+      "guideCommonError": "Häufigster Fehler"
     },
     "bolts": {
       "starPatternAria": "Diagramm der sternförmigen Anzugsreihenfolge",
@@ -3380,7 +3386,99 @@
       "api600GateValve": "Klassen nach API 600 für Absperrschieber mit geschraubtem Oberteil, Flansch- oder butt weld Enden. Die Klassen stimmen mit den Flanschklassen nach ASME B16.5 / B16.34 überein. Gegen die gültige Ausgabe der Norm prüfen.",
       "api602CompactValve": "Klassen nach API 602 für Kompaktarmaturen NPS 4 und kleiner. Klasse 800 ist in ASME B16.34 nicht als Klasse gelistet: sie ist eine weit verbreitete Zwischenklasse für Gewinde- und Schweissenden und existiert nicht in Flanschausführung. Die verfügbare Klasse hängt von der Endenausführung ab. Gegen die aktuelle Ausgabe der Norm prüfen.",
       "yStrainerNoStandard": "Der Y-Schmutzfänger wird in diesem Katalog von keiner spezifischen Maßnorm erfasst. Hersteller liefern ihn üblicherweise mit Flanschenden nach ASME B16.5, sodass die Klasse durch den Flansch des jeweiligen Modells bestimmt wird. Hier wird keine Klasse aufgeführt, da es keine nachprüfbare Norm gibt, die eine solche festlegt.",
-      "noPressureClass": "Abzweigstücke (Laterals) werden nicht nach Druckklasse bezeichnet. Ihre Belastbarkeit ergibt sich aus der Wandstärke (Schedule) und dem Werkstoff und wird nach dem anwendbaren Auslegungscode (z. B. ASME B31.3) berechnet. Maße für den jeweiligen Schedule beim Hersteller verifizieren."
+      "noPressureClass": "Abzweigstücke (Laterals) werden nicht nach Druckklasse bezeichnet. Ihre Belastbarkeit ergibt sich aus der Wandstärke (Schedule) und dem Werkstoff und wird nach dem anwendbaren Auslegungscode (z. B. ASME B31.3) berechnet. Maße für den jeweiligen Schedule beim Hersteller verifizieren.",
+      "api609ButterflyValve": "API 609 Kategorie A (zentrische Absperrklappen) definiert das hier veröffentlichte Baulängenmaß; es ist keine Druckstufe. Druckstufe und Bauausführung sind anhand der Herstellerdokumentation des gewählten Produkts zu prüfen.",
+      "b36_19mPipe": "ASME B36.19M normt nur Abmessungen und schedules; Druckklassen werden nicht definiert. Der zulässige Druck des Rohres ergibt sich aus der Wanddicke und dem Werkstoff und wird nach dem anzuwendenden Auslegungscode (z. B. ASME B31.3) berechnet."
+    },
+    "guide": {
+      "valve": {
+        "gate": {
+          "whatIs": "Ein lineares Absperrschieber, der den Durchfluss mit einem quer zur Strömung bewegten Schieber unterbricht. Für voll geöffnet oder voll geschlossen, nicht zum Drosseln.",
+          "types": "Keilschieber (massiv, flexibel, zweiteilig), mit steigender oder nicht steigender Spindel; Messerschieber für Schlämme; Expanding-Gate für Pipelines.",
+          "whenToUse": "Open-Close-Absperrung in Flüssigkeitsleitungen mit geradem, turbulenzarmem Durchgang: Wasser, Öl, Gas und Dampf innerhalb der Druckstufe.",
+          "whenNotToUse": "Drosselbetrieb: ein halb geöffneter Schieber vibriert, erodiert und kann beschädigt werden. Globe-Ventil oder Absperrklappe einsetzen.",
+          "installation": "Spindel möglichst senkrecht einbauen, Durchflussrichtung nur bei Markierung beachten, vor der Druckprobe vollständig schließen.",
+          "commonError": "Den Schieber zum manuellen Regeln verwenden: die Dichtflächen erodieren und der Schieber wird undicht."
+        },
+        "globe": {
+          "whatIs": "Ein lineares Ventil, dessen Kegel senkrecht zur Strömung auf einen Sitz schließt. Höherer Druckverlust als Schieber oder Kugelhahn, aber ausgezeichnete Regelgüte.",
+          "types": "Geradsitz (Z), Winkel- und Y-Form; Deckel geschraubt oder druckdicht; Teller-, Kegel- oder Nadelabdichtung.",
+          "whenToUse": "Drosseln und häufige Betätigung: Kühlwasser, Schweröl, Dampfab- und -entlüftung, Chemiedosierung.",
+          "whenNotToUse": "Absperrung mit niedrigem Druckverlust in großen Leitungen: der verwinkelte Weg kostet Energie. Schieber, Kugelhahn oder Klappe sind günstiger.",
+          "installation": "Durchflusspfeil am Gehäuse beachten — verkehrter Einbau zerstört die Armatur — und Platz für Hub und Handrad einplanen.",
+          "commonError": "Durchflussrichtung umkehren: das Ventil schließt zwar, aber Kegel und Sitz verschleißen rasch, die Regelgüte geht verloren."
+        },
+        "check": {
+          "whatIs": "Eine selbsttätige Armatur, die den Durchfluss nur in einer Richtung zulässt und selbsttätig schließt — schützt Pumpen und Anlagen vor Rückströmung und Druckstößen.",
+          "types": "Rückschlagklappe (Swing), Kolben (Silent), Zweiplatten-Wafer, Kugel, Schwenkscheibe und Düsenrückschlagventil.",
+          "whenToUse": "Hinter Pumpen gegen Rücklauf, an Kompressorabgängen und überall, wo Rückströmung die Anlage entleeren oder beschädigen würde.",
+          "whenNotToUse": "Pulsierender Betrieb mit niedriger Geschwindigkeit (Flattern und Verschleiß) sowie Leitungen mit dichtem Rückschlussbedarf: Absperrarmatur wählen.",
+          "installation": "Zweiplatten-Wafer zwischen Flansche mit waagerechtem Scharnierbolzen einbauen; Durchflusspfeil beachten, Schrauben auf Freigängigkeit zum Gehäuse prüfen.",
+          "commonError": "Scharnierbolzen senkrecht eingebaut: die Platten fallen nicht frei und schlagen bei Rückströmung zu."
+        },
+        "ball": {
+          "whatIs": "Ein Vierteldreh-Hahn mit gebohrter Kugel, deren Bohrung beim Öffnen in Strömungsrichtung geschwenkt wird. Schnelle Betätigung, dichte Absperre, freier Durchgang.",
+          "types": "Schwimmende oder gelagerte Kugel (Trunnion); Voll- oder Reduzierdurchgang; ein-, zwei- oder dreiteiliges Gehäuse; Weich- oder Metallsitz; Top-Entry.",
+          "whenToUse": "Dichte Absperre und schnelles Schalten in Flüssigkeiten, Gasen und Schlämmen (Metallsitz); Leitungen, die gereinigt werden müssen (Pigging, VollDurchgang).",
+          "whenNotToUse": "Feindosieren — die halb offene Kugel kaviert und erodiert — sowie Temperaturen über der Grenze des Weichsitzes.",
+          "installation": "Durchflussrichtung bei Trunnion- und Entlüftungsventilen prüfen, schwere Gehäuse getrennt abstützen und nur bei druckloser Leitung betätigen.",
+          "commonError": "Reduzierdurchgang bestellt, obwohl Pigging oder Sonden vollen Durchgang erfordern."
+        },
+        "butterfly": {
+          "whatIs": "Eine Vierteldreh-Absperrklappe, die mit einer kreisförmigen Scheibe auf einer durchgehenden Welle drosselt oder sperrt. Kompakt, leicht, mit geringem Druckverlust.",
+          "types": "Konzentrisch (Weichdichtung, Standardbetrieb), doppelt exzentrisch (High-Performance), dreifach exzentrisch (Metalldichtung, blasendicht). Bauart: Wafer (zwischen Flanschen), Lug, Flansch oder Rillenende.",
+          "whenToUse": "Große Nennweiten, in denen Kugelhahn oder Schieber zu schwer oder zu teuer wären; Drosselbetrieb; Wasser, HVAC, Luft, Gase und milde Chemikalien innerhalb der Sitzqualifikation.",
+          "whenNotToUse": "Absperrung mit hohem Differenzdruck über der Sitzklasse, abrasive Schlämme (außer Metallsitz) oder Dienste mit vollem Durchgang.",
+          "installation": "Wafer-Ausführungen zwischen Flansche einsetzen: Scheibe darf Rohr und Schrauben nicht berühren; Dichtung vor dem Anziehen zentrieren.",
+          "commonError": "Wafer-Klappe bei zu großem Rohrinnendurchmesser oder nicht fluchtenden Flanschen eingebaut: die Scheibe klemmt."
+        }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Gewindestange mit zwei schweren Sechskantmuttern, die eine Flanschverbindung verspannt. Die Auswahl erfolgt über Flanschnorm, NPS und Klasse; der Bolzen selbst trägt keine Druckklasse.",
+          "types": "Durchgehend gewindete Stehbolzen mit zwei Muttern (übliches Muster bei ASME-B16.5-Flanschverbindungen) sowie Einsteck- und Doppelendbolzen; übliche Güten ASTM A193 B7 mit A194-2H-Muttern, Edelstahl und Tieftemperaturgüten.",
+          "whenToUse": "Montage abgedichteter Schraubverbindungen: Flanschpaare, Flanscharmaturen und Gerätestutzen, die montiert und später wieder demontiert werden müssen.",
+          "whenNotToUse": "Kein Konstruktionsbefestiger und nicht gegen andere Güten oder Längen austauschbar; gedehnte, korrodierte oder gewindebeschädigte Bolzen im Druckdienst nicht wiederverwenden.",
+          "installation": "Saubere Gewinde, Gleitmittel nach Projektspezifikation, Dichtung zentriert, Muttern von Hand aufsetzen, dann im Stern- oder Kreuzmuster in mehreren Durchgängen anziehen, damit die Dichtung gleichmäßig belastet wird. Das Drehmoment kommt aus der Verbindungsvorschrift: Werkstoff, Gleitmittel, Dichtung und Flansch verändern es — ein Universalwert existiert nicht.",
+          "commonError": "Eine Mutter vollständig vor den anderen anziehen: der Flansch verkantet, die Dichtung wird einseitig gequetscht und die Verbindung leckt."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Zweiteiliges Gehäuse, das sich mit einer druckaktivierten Dichtung über gerillte Rohrenden spannt und die Verbindung gegen Winkel- und Axialbewegung sperrt.",
+          "types": "Standard-Starrkupplungen für den allgemeinen Dienst sowie Reduzier- und Hochdruckvarianten; das Rillenprofil unterscheidet sich bei roll- und geschnitten gerillten Rohren.",
+          "whenToUse": "Gerillte Leitungen, die sich wie eine Schweiß- oder Flanschverbindung verhalten sollen: Steigleitungen, Technikräume und lange gerade Strecken, bei denen Bewegung anderweitig aufgenommen wird.",
+          "whenNotToUse": "Wenn die Verbindung Durchbiegung, Dehnung oder Vibration aufnehmen muss: flexible Kupplungen verwenden. Roll- und geschnitten gerillte Enden niemals mischen.",
+          "installation": "Rechtwinklige, saubere Rohrenden; Rille nach Norm oder Herstellerangaben; Dichtung geschmiert und sitzend; Gehäusenasen in beiden Rillen eingerastet; Schrauben abwechselnd bis zum gleichmäßigen Kontakt der Laschen anziehen.",
+          "commonError": "Anzunehmen, eine starre Verbindung mache eine Dehnungskompensation überflüssig: Starrkupplungen sperren Bewegung, thermische Ausdehnung muss also anderweitig aufgenommen werden."
+        },
+        "flexible": {
+          "whatIs": "Rillenkupplung, deren Gehäusenase bewusst schmaler als der Rillenkanal ist und so kontrollierte Winkelauslenkung und Axialbewegung an jeder Verbindung zulässt.",
+          "types": "Standard-Flexkupplungen; die zulässige Auslenkung pro Verbindung ist größenabhängig und vom Hersteller deklariert.",
+          "whenToUse": "Leitungen, die Vibration, Setzung, seismische Bewegung oder thermische Ausdehnung und Kontraktion ohne Belastung von Verankerungen und Geräten aufnehmen müssen.",
+          "whenNotToUse": "Wo das Rohr starr positioniert bleiben muss, etwa an Armaturen- oder Abzweigabstützungen: eine flexible Verbindung bewegt sich. Auch kein universeller Ersatz für einen Kompensator ohne Berechnung der Gesamtbewegung.",
+          "installation": "Gleiche Rillenqualität wie bei der Starrkupplung; den vom Hersteller angegebenen Rohrendabstand prüfen, die Kupplung über der Verbindung zentrieren und die Schrauben abwechselnd anziehen.",
+          "commonError": "Zu erwarten, dass eine einzige Flexkupplung eine große Bewegung aufnimmt: der Wert pro Verbindung ist klein und summiert sich über mehrere Verbindungen — nie annehmen, sondern vom Hersteller nehmen."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Stahlrohr, dessen Maße ASME B36.10M folgen: fester Außendurchmesser je NPS und eine durch den Schedule definierte Wanddicke. NPS ist eine Größenbezeichnung, nicht die tatsächliche Bohrung.",
+          "types": "Schedules von SCH 10 bis SCH 160 und XXS sowie die klassischen STD/XS-Bezeichnungen (die in kleinen Größen mit SCH 40/80 übereinstimmen). Nahtlos oder geschweißt, aus Kohlenstoff- und legiertem Stahl.",
+          "whenToUse": "Allgemeine Prozess-, Versorgungs- und Konstruktionsrohrleitungen aus Kohlenstoff- oder legiertem Stahl, bei denen Druckklasse und Wanddicke durch die Rohrleitungsklasse oder Spezifikation festgelegt sind.",
+          "whenNotToUse": "Korrosiver Dienst mit Edelstahlerfordernis: B36.19M-Rohr verwenden. Auch nicht annehmen, dass zwei Rohre gleichen NPS die gleiche Bohrung haben: der ID ändert sich mit dem Schedule, der OD nicht.",
+          "installation": "Schedule, Güte und Charge bzw. Abnahmezeugnis vor dem Zuschnitt gegen die Leitungsliste prüfen; Enden nach WPS für Stumpfschweißung anschrägen; Fittings und Flansche werden über denselben NPS bestellt und der OD passt, Wandübergänge erfordern eine Anfasung oder passenden Schedule.",
+          "commonError": "Rohr nach „NPS = Durchmesser\" bestellen: NPS 4 ist nirgends 4 Zoll — der OD beträgt 4.500\" und die Bohrung hängt vom Schedule ab. Den Schedule jedes Mal prüfen."
+        },
+        "stainless": {
+          "whatIs": "Edelstahlrohr nach ASME B36.19M: gleicher OD wie B36.10M beim gleichen NPS, aber Wanddicken nach den Schedules mit S-Suffix (5S, 10S, 40S, 80S).",
+          "types": "Schedules 5S/10S für dünnwandigen Dienst und 40S/80S, die bis NPS 10 mit SCH 40/80 aus B36.10M übereinstimmen; größere Größen verwenden eigene gelistete Wände. Austenitische Güten wie 304/304L und 316/316L sind am häufigsten.",
+          "whenToUse": "Korrosiver, sanitärer oder reiner Dienst — Chemie, Lebensmittel, Pharma, Wasseraufbereitung — wo Kohlenstoffstahl korrodieren oder das Medium verunreinigen würde.",
+          "whenNotToUse": "Nicht allein über den OD austauschen: eine 10S-Wand ist deutlich dünner als STD gleichen NPS, Drucktragfähigkeit und Schweißnahtvorbereitung unterscheiden sich. Den S-Schedule prüfen, nicht den B36.10M-Namen.",
+          "installation": "Während Lagerung und Fertigung von Kohlenstoffstahl trennen, um Eisenkontamination zu vermeiden; dedizierte Werkzeuge verwenden; Güte und Schedule gegen die Leitungsklasse prüfen; das Innere zum Schweißen wie spezifiziert spülen.",
+          "commonError": "Anzunehmen, 40S und STD seien bei großem NPS austauschbar: sie stimmen nur bis NPS 10 überein; darüber unterscheiden sich die gelisteten Wände, und NPS 22/30 haben gar kein 40S."
+        }
+      }
     }
   },
   "dailyLog": {

@@ -1563,7 +1563,14 @@
       "modeFieldHint": "(simplificat)",
       "modeEngineeringHint": "(complet)",
       "viewFullDatasheet": "Vizualizați fișa tehnică completă (Mod inginerie)",
-      "breadcrumbLibrary": "Bibliotecă"
+      "breadcrumbLibrary": "Bibliotecă",
+      "guideTitle": "Ghid de utilizare",
+      "guideWhatIs": "Ce este",
+      "guideTypes": "Tipuri și construcții",
+      "guideWhenToUse": "Când se folosește",
+      "guideWhenNotToUse": "Când NU se folosește",
+      "guideInstallation": "Sfaturi de instalare",
+      "guideCommonError": "Eroare frecventă"
     },
     "premiumBanner": {
       "title": "Deblocați instrumentele Premium",
@@ -3416,7 +3423,99 @@
       "api600GateValve": "Clase conform API 600 pentru robinete cu sertar cu capac prins cu șuruburi, cu capete cu flanșe sau cu sudură cap la cap. Clasele coincid cu clasele de flanșe ASME B16.5 / B16.34. Verificați în raport cu ediția curentă a standardului.",
       "api602CompactValve": "Clase conform API 602 pentru robinete compacte NPS 4 și mai mici. Class 800 nu este o clasă listată în ASME B16.34: este o clasă intermediară utilizată pe scară largă pentru capete filetate și sudate și nu există în variantă cu flanșe. Clasa disponibilă depinde de tipul capetelor. Verificați în raport cu ediția curentă a standardului.",
       "yStrainerNoStandard": "Filtrul tip Y nu este acoperit de un standard dimensional specific în acest catalog. Producătorii îl livrează în mod obișnuit cu capete cu flanșe conform ASME B16.5, astfel încât clasa este stabilită de flanșa modelului respectiv. Nu este listată nicio clasă aici, deoarece nu există un standard verificabil care să o definească.",
-      "noPressureClass": "Lateralele nu sunt desemnate prin clasă de presiune. Capacitatea lor derivă din grosimea peretelui (schedule) și din material și se calculează conform codului de proiectare aplicabil (de ex. ASME B31.3). Verificați dimensiunile cu producătorul pentru schedule-ul aplicabil."
+      "noPressureClass": "Lateralele nu sunt desemnate prin clasă de presiune. Capacitatea lor derivă din grosimea peretelui (schedule) și din material și se calculează conform codului de proiectare aplicabil (de ex. ASME B31.3). Verificați dimensiunile cu producătorul pentru schedule-ul aplicabil.",
+      "api609ButterflyValve": "API 609 Categoria A (robinete fluture concentrici) definește dimensiunea față în față publicată aici; nu este o clasă de presiune. Presiunea nominală și construcția robinetului trebuie verificate în documentația producătorului produsului selectat.",
+      "b36_19mPipe": "ASME B36.19M standardizează doar dimensiunile și schedule-urile; nu definește clase de presiune. Presiunea admisibilă a țevii derivă din grosimea peretelui și din material și se calculează conform codului de proiectare aplicabil (de ex. ASME B31.3)."
+    },
+    "guide": {
+      "valve": {
+        "gate": {
+          "whatIs": "Supapă liniară care izolează curgerea printr-un sertar culisant transversal pe flux. Proiectată pentru poziție complet deschis sau complet închis, nu pentru reglaj.",
+          "types": "Clin masiv, flexibil sau în două bucăți; tijă ascendentă sau neascendentă; vană cu cuțit pentru nămoluri; clin expandabil pentru conducte.",
+          "whenToUse": "Izolare deschis-închis pe linii de lichid unde contează un pasaj drept, fără turbulență: apă, ulei, gaz și abur în limita clasei.",
+          "whenNotToUse": "Serviciu de reglaj: un sertar parțial deschis vibrează, se erozează și se poate bloca. Folosiți o vană globe sau fluture.",
+          "installation": "Montați tija vertical când este posibil, respectați sensul de curgere doar dacă este marcat și închideți complet înainte de presurizare.",
+          "commonError": "Folosirea sertarului pentru reglarea manuală a debitului: sediile se erozează și vana nu mai etanșează."
+        },
+        "globe": {
+          "whatIs": "Supapă liniară al cărei organ de închidere cade pe un sediu perpendicular pe flux. Pierdere de sarcină mai mare decât la sertar sau bilă, dar control excelent de reglaj.",
+          "types": "Corp drept (Z), în unghi și în Y; capac șurubat sau etanșat la presiune; disc, con sau ac.",
+          "whenToUse": "Reglaj și operare frecventă: apă de răcire, păcură, evacuări și purje de abur, dozare chimică.",
+          "whenNotToUse": "Izolare cu pierdere mică de sarcină pe linii mari: traseul sinuos consumă energie. Sertarul, bila sau fluturele sunt mai ieftine.",
+          "installation": "Respectați săgeata de curgere de pe corp — montată invers distruge organul de închidere — și lăsați spațiu pentru cursa tije și roata.",
+          "commonError": "Inversarea sensului de curgere: vana închide încă, dar discul și sediul se uzează rapid și reglajul se pierde."
+        },
+        "check": {
+          "whatIs": "Supapă automată care permite curgerea într-un singur sens și se închide singură pentru a opri returul, protejând pompele și echipamentele de lovitura de berbec.",
+          "types": "Cu clapetă (swing), cu piston (silencioasă), wafer cu dublă clapetă, cu bilă, cu disc înclinat și cu duză.",
+          "whenToUse": "După pompe contra rotirii inverse, la ieșirea compresoarelor și oriunde returul ar goli sau deteriora sistemul.",
+          "whenNotToUse": "Debit pulsatoriu cu viteză mică (fluturare și uzură) sau linii care cer etanșeitate totală la retur: alegeți o vană de închidere.",
+          "installation": "Modelele wafer se montează între flanșe cu pintenul balamalei orizontal; respectați săgeata și verificați că șuruburile nu ating corpul.",
+          "commonError": "Montarea dublei clapete cu pinten vertical: plăcile nu cad liber și trântesc la retur."
+        },
+        "ball": {
+          "whatIs": "Supapă la sfert de tură cu o bilă găurită care se rotește până găura se aliniază cu fluxul. Operare rapidă, închidere etanșă și pasaj plin, neobstrucționat.",
+          "types": "Bilă flotantă sau pe pivot (trunnion); pasaj plin sau redus; corp din una, două sau trei piese; sediu moale sau metalic; intrare superioară.",
+          "whenToUse": "Închidere etanșă și comutare rapidă pe lichide, gaze și nămoluri (sediu metalic); linii care necesită raclare (pigging) cu pasaj plin.",
+          "whenNotToUse": "Reglaj fin — bila semi-deschisă cavitează și se erozează — și temperaturi peste limita sediului moale.",
+          "installation": "Verificați sensul de curgere la modelele cu pivot sau cu aerisire, sprijiniți corpurile grele independent de conductă și manevrați la linie depresurizată.",
+          "commonError": "Comandarea pasajului redus când raclarea sau sondele cer pasaj plin."
+        },
+        "butterfly": {
+          "whatIs": "Supapă la sfert de tură care reglează sau izolează curgerea cu un disc circular rotativ pe un ax prin flux. Compactă, ușoară și cu pierdere mică de sarcină.",
+          "types": "Concentrică (sedeu elastomer, serviciu general), dublu excentrică (performanță ridicată) și triplu excentrică (sedeu metalic, etanșare totală). Montaj: wafer (între flanșe), lug, flanșat sau cu capete canelate.",
+          "whenToUse": "Linii mari unde o bilă sau un sertar ar fi prea grele sau scumpe; reglaj; apă, HVAC, aer, gaze și chimicale ușoare în limita sedeului.",
+          "whenNotToUse": "Închidere la diferență de presiune ridicată peste clasa sedeului, nămoluri abrazive (în afara sedeului metalic) sau servicii care cer pasaj plin.",
+          "installation": "Versiunea wafer se strânge între flanșe: verificați că discul nu freacă tubul sau șuruburile și centrați sedeul pe garnitură înainte de strângere.",
+          "commonError": "Montarea wafer pe un interior de tub prea mare sau flanșe dezaliniate: discul se blochează."
+        }
+      },
+      "bolting": {
+        "studBolt": {
+          "whatIs": "Tijă filetată cu două piulițe hexagonale grele care strânge un îmbinare cu flanșe. Se alege după standardul flanșei, NPS și clasă; nu are o clasă de presiune proprie.",
+          "types": "Prezoane cu filet continuu cu două piulițe (schema obișnuită a îmbinărilor ASME B16.5), plus variante cu capăt scurt și dublu capăt; grade uzuale ASTM A193 B7 cu piulițe A194 2H, inox și pentru temperaturi joase.",
+          "whenToUse": "Montarea îmbinărilor cu șuruburi și garnitură: perechi de flanșe, robineți cu flanșe și racorduri de echipament care trebuie montate și ulterior demontate.",
+          "whenNotToUse": "Nu este un element de fixare structural și nu este interschimbabil cu alt grad sau altă lungime; nu reutilizați prezoane alungite, corodate sau cu filet deteriorat în serviciu sub presiune.",
+          "installation": "Filete curate, lubrifiant conform specificației de proiect, garnitură centrată, piulițe înșurubate manual și apoi strânse în stea sau cruce în mai multe treceri pentru încărcarea uniformă a garniturii. Cuplul provine din procedura îmbinării: materialul, lubrifiantul, garnitura și flanșa îl modifică — nu există o valoare universală.",
+          "commonError": "Strângerea completă a unei piulițe înaintea celorlalte: flanșa se înclină, garnitura este strivită pe o parte și îmbinarea prezintă scurgeri."
+        }
+      },
+      "grooved": {
+        "rigid": {
+          "whatIs": "Carcasă din două segmente care se fixează peste capetele canelate ale țevii cu o garnitură activată de presiune, blocând mișcarea unghiulară și axială a îmbinării.",
+          "types": "Cuplaje rigide standard pentru serviciu general, plus variante reductorii și de înaltă presiune; profilul canelurii diferă între țeava roll-grooved și cut-grooved.",
+          "whenToUse": "Linii canelate care trebuie să se comporte ca o îmbinare sudată sau cu flanșe: coloane, săli de mașini și tronsoane lungi drepte unde mișcarea este preluată în altă parte.",
+          "whenNotToUse": "Când îmbinarea trebuie să absoarbă deflexiune, dilatare sau vibrații: folosiți cuplaje flexibile. Nu amestecați niciodată capete roll-grooved și cut-grooved.",
+          "installation": "Capete de țeavă drepte și curate; canelură conform standardului sau datelor producătorului; garnitură lubrifiată și așezată; penele carcasei angrenate în ambele caneluri; șuruburile strânse alternativ până la contactul uniform al plăcuțelor.",
+          "commonError": "Presupunerea că o îmbinare rigidă elimină nevoia de compensare a dilatării: cuplajele rigide blochează mișcarea, deci dilatarea termică trebuie absorbită în altă parte."
+        },
+        "flexible": {
+          "whatIs": "Cuplaj canelat a cărui pană de carcasă este intenționat mai îngustă decât canalul canelurii, permițând deflexiune unghiulară controlată și mișcare axială la fiecare îmbinare.",
+          "types": "Cuplaje flexibile standard; deflexiunea admisibilă pe îmbinare depinde de dimensiune și este declarată de producător.",
+          "whenToUse": "Linii care trebuie să absoarbă vibrații, tasări, mișcări seismice sau dilatare și contracție termică fără a solicita ancorajele și echipamentele.",
+          "whenNotToUse": "Unde țeava trebuie să rămână rigid poziționată, cum ar fi la suporturile de robineți sau ramificații: o îmbinare flexibilă se va mișca. De asemenea, nu înlocuiește universal un compensator fără calculul mișcării totale.",
+          "installation": "Aceleași cerințe de calitate a canelurii ca la cuplajul rigid; verificați distanța dintre capetele țevii specificată de producător, mențineți cuplajul centrat pe îmbinare și strângeți șuruburile alternativ.",
+          "commonError": "Așteptarea ca un singur cuplaj flexibil să absoarbă o mișcare mare: capacitatea pe îmbinare este mică și se adună de-a lungul mai multor îmbinări — nu presupuneți niciodată valoarea, luați-o de la producător."
+        }
+      },
+      "pipe": {
+        "seamless": {
+          "whatIs": "Teavă din oțel ale cărei dimensiuni urmează ASME B36.10M: diametru exterior fix pe NPS și grosime de perete definită de schedule. NPS este o desemnare de dimensiune, nu alezajul real.",
+          "types": "Schedule de la SCH 10 la SCH 160 și XXS, plus desemnările clasice STD/XS (care coincid cu SCH 40/80 la dimensiunile mici). Fabricație fără sudură sau sudată, din oțel carbon și aliat.",
+          "whenToUse": "Conducte generale de proces, utilități și structuri din oțel carbon sau aliat, unde clasa de presiune și grosimea peretelui sunt stabilite de clasa liniei sau specificația de conducte.",
+          "whenNotToUse": "Serviciu corosiv care necesită inox: folosiți teava B36.19M. De asemenea, nu presupuneți că două țevi cu același NPS au același alezaj: ID se schimbă cu schedule, OD nu.",
+          "installation": "Verificați schedule, gradul și lotul sau certificatul față de lista de linii înainte de debitare; teșiți capetele conform WPS pentru sudura cap la cap; fitingurile și flanșele se comandă pe același NPS și OD corespunde, tranzițiile de grosime necesită o teșitură sau un schedule compatibil.",
+          "commonError": "Comandarea țevii după „NPS = diametru\": NPS 4 nu măsoară 4 inch nicăieri — OD este 4.500\" și alezajul depinde de schedule. Verificați schedule de fiecare dată."
+        },
+        "stainless": {
+          "whatIs": "Teavă din oțel inoxidabil dimensionată conform ASME B36.19M: același OD ca B36.10M pentru același NPS, dar grosimi definite de schedule cu sufix S (5S, 10S, 40S, 80S).",
+          "types": "Schedule 5S/10S pentru perete subțire și 40S/80S care coincid cu SCH 40/80 din B36.10M până la NPS 10; dimensiunile mari folosesc propriile pereti listați. Gradele austenitice 304/304L și 316/316L sunt cele mai comune.",
+          "whenToUse": "Serviciu corosiv, sanitar sau curat — chimie, alimentar, farma, tratarea apei — unde oțelul carbon s-ar coroda sau ar contamina fluidul.",
+          "whenNotToUse": "Nu substituiți doar după OD: un perete 10S este mult mai subțire decât STD la același NPS, deci capacitatea de presiune și pregătirea sudurii diferă. Verificați schedule S, nu numele schedule B36.10M.",
+          "installation": "Separați de oțelul carbon în timpul depozitării și fabricației pentru a evita contaminarea cu fier; scule dedicate; verificați gradul și schedule față de clasa liniei; purjați interiorul pentru sudură conform specificației.",
+          "commonError": "Presupunerea că 40S și STD sunt interschimbabile la NPS mare: coincid doar până la NPS 10; peste aceasta, pereții listați diferă, iar NPS 22/30 nu au deloc 40S."
+        }
+      }
     }
   },
   "notFound": {
