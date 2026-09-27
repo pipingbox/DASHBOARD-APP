@@ -509,6 +509,19 @@ jobs:
             --config=playwright.config.ts \
             --reporter=line
 
+      # PB-LIBRARY-COMPLETE-001 — Library V1 browser E2E (public route, no QA
+      # account needed): catalog, search/filters, detail/deep-link, broken
+      # asset → access_error, back navigation, PostHog closed-payload
+      # analytics intercepted at the request layer, PII-free assertion.
+      - name: Library V1 E2E (catalog, search, detail, analytics, PII-free)
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          npx playwright test tests/library-e2e.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
       # PB-UI-DOM-INSERTBEFORE-001 (/profile): regression on the final candidate.
       - name: Profile DOM-mutation regression (insertBefore) on the WFA candidate
         shell: bash
