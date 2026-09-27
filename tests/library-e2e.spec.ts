@@ -150,6 +150,33 @@ test.describe('Library V1 E2E (PB-LIBRARY-COMPLETE-001)', () => {
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
     });
 
+    // posthog-js bot detection also checks navigator.webdriver and
+    // userAgentData.brands — Playwright sets webdriver=true regardless of the
+    // UA string. Neutralize both signals BEFORE app scripts run so the
+    // production build (opt_out_useragent_filter=false) emits; the route
+    // interception still fulfills locally, so nothing reaches the production
+    // project.
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript(() => {
+        Object.defineProperty(navigator, 'webdriver', { get: () => false });
+        try {
+          Object.defineProperty(navigator, 'userAgentData', {
+            get: () => ({
+              brands: [
+                { brand: 'Chromium', version: '126' },
+                { brand: 'Google Chrome', version: '126' },
+                { brand: 'Not-A.Brand', version: '99' },
+              ],
+              mobile: false,
+              platform: 'Windows',
+            }),
+          });
+        } catch {
+          // userAgentData may be absent — UA string + webdriver patch suffice.
+        }
+      });
+    });
+
     test('L7: a broken asset does NOT appear as success — access error is emitted', async ({ page }) => {
       const sink: CapturedEvent[] = [];
       await collectPostHogEvents(page, sink);
