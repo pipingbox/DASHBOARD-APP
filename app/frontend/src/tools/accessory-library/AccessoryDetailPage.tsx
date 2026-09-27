@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { trackEvent, LIBRARY_COMPONENT_ID_RE } from '@/lib/observability';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
@@ -78,16 +79,40 @@ function displayValue(v: string | number | null | undefined): string {
  * panel — paper laid on the dark UI, which is also the professional convention.
  * The SVGs are never recoloured or inverted.
  */
+function trackLibraryResource(
+  componentId: string,
+  resourceType: 'preview_2d' | 'preview_3d' | 'download_2d' | 'download_3d',
+) {
+  if (LIBRARY_COMPONENT_ID_RE.test(componentId)) {
+    trackEvent('library_resource_action', { component_id: componentId, resource_type: resourceType });
+  }
+}
+
+function trackLibraryAccessError(
+  componentId: string,
+  resourceType: 'preview_2d' | 'preview_3d',
+) {
+  if (LIBRARY_COMPONENT_ID_RE.test(componentId)) {
+    trackEvent('library_access_error', {
+      component_id: componentId,
+      resource_type: resourceType,
+      reason_code: 'asset_load_failed',
+    });
+  }
+}
+
 function DrawingSheet({
   src,
   alt,
   caption,
   className = '',
+  onImgError,
 }: {
   src: string;
   alt: string;
   caption?: string;
   className?: string;
+  onImgError?: () => void;
 }) {
   return (
     <figure className={`overflow-hidden rounded-lg border border-zinc-700/60 bg-[#f4f5f6] shadow-lg shadow-black/40 ${className}`}>
@@ -95,6 +120,7 @@ function DrawingSheet({
         src={src}
         alt={alt}
         loading="lazy"
+        onError={onImgError}
         className="h-full w-full bg-[#f4f5f6] object-contain p-2"
       />
       {caption && (
@@ -362,10 +388,12 @@ function SizeSelector({
   drawings,
   selectedSize,
   setSelectedSize,
+  componentId,
 }: {
   drawings: CatalogDrawing[];
   selectedSize: string | null;
   setSelectedSize: (v: string | null) => void;
+  componentId: string;
 }) {
   const { t } = useTranslation();
   if (drawings.length === 0) return null;
@@ -379,7 +407,10 @@ function SizeSelector({
       {/* Mobile: native select keeps long size lists usable. */}
       <select
         value={selectedSize ?? ''}
-        onChange={(e) => setSelectedSize(e.target.value)}
+        onChange={(e) => {
+          setSelectedSize(e.target.value);
+          trackLibraryResource(componentId, 'preview_2d');
+        }}
         className="w-full rounded-md border border-zinc-800 bg-[#111] px-3 py-2 text-xs text-zinc-300 sm:hidden"
       >
         {drawings.map((d) => (
@@ -394,7 +425,10 @@ function SizeSelector({
         {drawings.map((d) => (
           <button
             key={d.src}
-            onClick={() => setSelectedSize(d.size)}
+            onClick={() => {
+              setSelectedSize(d.size);
+              trackLibraryResource(componentId, 'preview_2d');
+            }}
             className={`rounded-md border px-2.5 py-1 font-mono text-[11px] transition-all ${
               d.size === selectedSize
                 ? 'border-amber-500/40 bg-amber-500/10 text-amber-500'
@@ -617,6 +651,7 @@ function VistaRapidaTab({
               src={component.render}
               alt={component.name}
               loading="lazy"
+              onError={() => trackLibraryAccessError(component.id, 'preview_3d')}
               className="h-full w-full object-contain"
             />
           ) : (
@@ -743,6 +778,7 @@ function VistaRapidaTab({
             drawings={drawings}
             selectedSize={selectedSize}
             setSelectedSize={setSelectedSize}
+            componentId={component.id}
           />
           {activeDrawing && (
             <DrawingSheet
@@ -752,6 +788,7 @@ function VistaRapidaTab({
                 defaultValue: 'Technical drawing — {{size}}',
                 size: formatSize(activeDrawing.size),
               })}
+              onImgError={() => trackLibraryAccessError(component.id, 'preview_2d')}
             />
           )}
         </div>
@@ -849,6 +886,7 @@ function DimensionesTab({
             defaultValue: 'Technical drawing — {{size}}',
             size: formatSize(activeDrawing.size),
           })}
+          onImgError={() => trackLibraryAccessError(component.id, 'preview_2d')}
         />
       )}
 
@@ -1184,6 +1222,9 @@ function DescargasTab({
             <a
               href={dl.href}
               download
+              onClick={() =>
+                trackLibraryResource(component.id, dl.format === 'SVG' ? 'download_2d' : 'download_3d')
+              }
               className="shrink-0 rounded-md border border-zinc-800 px-3 py-1.5 text-[11px] text-zinc-400 transition-colors hover:border-amber-500/30 hover:text-amber-500"
             >
               {t('common.download', { defaultValue: 'Descargar' })}

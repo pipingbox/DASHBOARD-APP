@@ -681,3 +681,130 @@ test.describe('queue and identity', () => {
     ]);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PB-LIBRARY-COMPLETE-001 — Library V1 usage analytics (Stream B).
+// Closed taxonomy: catalog IDs / closed enums / counts only — never user
+// free text, never filenames.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('library analytics (PB-LIBRARY-COMPLETE-001)', () => {
+  test('the seven Library events are part of the closed OBS_EVENT_NAMES taxonomy', () => {
+    for (const name of [
+      'library_viewed',
+      'library_search_performed',
+      'library_filter_selected',
+      'library_item_opened',
+      'library_resource_action',
+      'library_empty_result',
+      'library_access_error',
+    ]) {
+      expect(OBS_EVENT_NAMES).toContain(name);
+    }
+  });
+
+  test('library_search_performed keeps only query_length + counts — free text is dropped', () => {
+    const props = buildEventProps('library_search_performed', {
+      query_length: 12,
+      results_count: 3,
+      query: 'John Doe welding near Madrid', // must never leave the app
+      component_id: 'PB-COMP-ELBOW-90-LR-B16-9', // not allowed on this event
+    });
+    expect(props).toEqual({ query_length: 12, results_count: 3 });
+    expect(JSON.stringify(props)).not.toContain('John Doe');
+  });
+
+  test('library_filter_selected enforces the closed filter_type enum', () => {
+    expect(buildEventProps('library_filter_selected', {
+      filter_type: 'family', filter_value: 'flanges', results_count: 8,
+    })).toEqual({ filter_type: 'family', filter_value: 'flanges', results_count: 8 });
+    // Out-of-enum filter types are dropped, not emitted.
+    expect(buildEventProps('library_filter_selected', {
+      filter_type: 'price_range', filter_value: 'cheap',
+    })).toEqual({ filter_value: 'cheap' });
+  });
+
+  test('library_item_opened drops component ids that are not closed PB-COMP-* ids', () => {
+    expect(buildEventProps('library_item_opened', {
+      component_id: 'PB-COMP-GASKET-SW-B16-20',
+    })).toEqual({ component_id: 'PB-COMP-GASKET-SW-B16-20' });
+    // A filename / user text is not a valid catalog id → dropped.
+    const bad = buildEventProps('library_item_opened', {
+      component_id: 'curriculum-juan-perez.pdf',
+    });
+    expect(bad).not.toHaveProperty('component_id');
+  });
+
+  test('library_resource_action enforces the closed resource_type enum', () => {
+    expect(buildEventProps('library_resource_action', {
+      component_id: 'PB-COMP-VALVE-BUTTERFLY-API609',
+      resource_type: 'download_2d',
+    })).toEqual({ component_id: 'PB-COMP-VALVE-BUTTERFLY-API609', resource_type: 'download_2d' });
+    const bad = buildEventProps('library_resource_action', {
+      component_id: 'PB-COMP-VALVE-BUTTERFLY-API609',
+      resource_type: 'purchase_invoice_pdf',
+    });
+    expect(bad).toEqual({ component_id: 'PB-COMP-VALVE-BUTTERFLY-API609' });
+  });
+
+  test('the before_send recursive sanitizer keeps closed Library props (gate-3 interaction)', () => {
+    // Regression: property NAMES must not match the URL/query key patterns of
+    // sanitizePostHogProperty — `component_id` must survive before_send.
+    const event = {
+      event: 'library_access_error',
+      properties: {
+        component_id: 'PB-COMP-ELBOW-90-LR-BW-ASME-B16-9',
+        resource_type: 'preview_2d',
+        reason_code: 'asset_load_failed',
+      },
+    };
+    const out = sanitizePostHogEvent(event);
+    expect(out).not.toBeNull();
+    expect(out?.properties?.component_id).toBe('PB-COMP-ELBOW-90-LR-BW-ASME-B16-9');
+    expect(out?.properties?.resource_type).toBe('preview_2d');
+    expect(out?.properties?.reason_code).toBe('asset_load_failed');
+  });
+
+  test('library_access_error keeps ≥32-char catalog ids (long-token regression)', () => {
+    // 33 chars: matched LONG_TOKEN_RE and was redacted before validation.
+    expect(buildEventProps('library_access_error', {
+      component_id: 'PB-COMP-ELBOW-90-LR-BW-ASME-B16-9',
+      resource_type: 'preview_2d',
+      reason_code: 'asset_load_failed',
+    })).toEqual({
+      component_id: 'PB-COMP-ELBOW-90-LR-BW-ASME-B16-9',
+      resource_type: 'preview_2d',
+      reason_code: 'asset_load_failed',
+    });
+  });
+
+  test('library_access_error accepts asset_load_failed as a closed reason_code', () => {
+    expect(buildEventProps('library_access_error', {
+      component_id: 'PB-COMP-PIPE-SCH40-B36-10M',
+      resource_type: 'preview_2d',
+      reason_code: 'asset_load_failed',
+    })).toEqual({
+      component_id: 'PB-COMP-PIPE-SCH40-B36-10M',
+      resource_type: 'preview_2d',
+      reason_code: 'asset_load_failed',
+    });
+  });
+
+  test('tracked Library events travel through PostHog with environment + app_version, PII-free', async () => {
+    __resetObservabilityForTests();
+    const { client, captured } = makeClient();
+    await initObservability({ injectedClient: client });
+    trackEvent('library_search_performed', {
+      query_length: 7,
+      results_count: 0,
+      query: 'someone@example.com flange',
+    });
+    expect(captured).toHaveLength(1);
+    expect(captured[0].event).toBe('library_search_performed');
+    expect(captured[0].properties).toMatchObject({ query_length: 7, results_count: 0 });
+    expect(captured[0].properties).toHaveProperty('environment');
+    expect(captured[0].properties).toHaveProperty('app_version');
+    expect(JSON.stringify(captured[0].properties)).not.toContain('someone@example.com');
+    __resetObservabilityForTests();
+  });
+});

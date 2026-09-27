@@ -44,6 +44,14 @@ export const OBS_EVENT_NAMES = [
   'referral_link_opened',
   'referral_captured',
   'app_error',
+  // PB-LIBRARY-COMPLETE-001 — Library V1 usage (Stream B).
+  'library_viewed',
+  'library_search_performed',
+  'library_filter_selected',
+  'library_item_opened',
+  'library_resource_action',
+  'library_empty_result',
+  'library_access_error',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -102,6 +110,15 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
     'attempt_bucket',
   ],
   onboarding_started: ['account_type'],
+  // PB-LIBRARY-COMPLETE-001 — Library V1 usage (Stream B). All values are
+  // catalog IDs / closed enums / counts — never user free text.
+  library_viewed: ['results_count'],
+  library_search_performed: ['query_length', 'results_count'],
+  library_filter_selected: ['filter_type', 'filter_value', 'results_count'],
+  library_item_opened: ['component_id', 'component_family'],
+  library_resource_action: ['component_id', 'resource_type'],
+  library_empty_result: ['query_length', 'filter_count'],
+  library_access_error: ['component_id', 'resource_type', 'reason_code'],
   onboarding_step_reached: ['step', 'account_type'],
   onboarding_completed: ['account_type'],
   referral_link_opened: ['origin', 'route'],
@@ -125,6 +142,14 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
 
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;
 export type ObsOrigin = (typeof OBS_ORIGINS)[number];
+
+/** PB-LIBRARY-COMPLETE-001 — closed enums for Library analytics props. */
+export const LIBRARY_FILTER_TYPES = ['family', 'connection_type', 'standard', 'pressure_class'] as const;
+export type LibraryFilterType = (typeof LIBRARY_FILTER_TYPES)[number];
+export const LIBRARY_RESOURCE_TYPES = ['preview_2d', 'preview_3d', 'download_2d', 'download_3d'] as const;
+export type LibraryResourceType = (typeof LIBRARY_RESOURCE_TYPES)[number];
+/** `PB-COMP-*` internal catalog id — never a filename or user text. */
+export const LIBRARY_COMPONENT_ID_RE = /^PB-COMP-[A-Z0-9-]+$/;
 
 /**
  * SDK-internal event names allowed through `before_send` even though they sit
@@ -154,6 +179,8 @@ const AUTH_REASON_CODES = [
   'rate_limited',
   'invalid_callback',
   'unknown',
+  // PB-LIBRARY-COMPLETE-001 — Library asset access failures.
+  'asset_load_failed',
 ] as const;
 const AUTH_ATTEMPT_BUCKETS = ['first', 'retry'] as const;
 
@@ -257,6 +284,16 @@ const PASSTHROUGH_VALUE_KEYS = new Set([
   'app_version',
   '$browser_version',
   '$lib_version',
+  // PB-LIBRARY-COMPLETE-001 — closed Library props. Values are validated
+  // against closed enums / the PB-COMP-* id pattern by buildEventProps before
+  // this stage, and catalog ids match the long-token regex by shape (they are
+  // OUR taxonomy, not credentials) — passthrough keeps them intact.
+  'component_id',
+  'component_family',
+  'filter_type',
+  'filter_value',
+  'resource_type',
+  'reason_code',
 ]);
 
 const ABSOLUTE_URL_RE = /https?:\/\/[^\s"'<>\\]+/gi;
@@ -641,6 +678,14 @@ export function buildEventProps(
     const raw = props[key];
     if (raw === undefined || raw === null) continue;
     if (typeof raw === 'string') {
+      // PB-LIBRARY-COMPLETE-001 — closed catalog ids (PB-COMP-*) are validated
+      // against the id pattern and kept RAW. sanitizeValue would redact ids
+      // ≥32 chars as "long tokens" before validation could accept them; they
+      // are our taxonomy by construction, never credentials or PII.
+      if (key === 'component_id' || key === 'component_family') {
+        if (LIBRARY_COMPONENT_ID_RE.test(raw)) out[key] = raw;
+        continue;
+      }
       out[key] = sanitizeValue(raw);
     } else if (typeof raw === 'number' || typeof raw === 'boolean') {
       out[key] = raw;
@@ -649,6 +694,21 @@ export function buildEventProps(
   }
   // Closed enums: drop values outside the approved sets.
   if ('origin' in out && !OBS_ORIGINS.includes(out.origin as ObsOrigin)) delete out.origin;
+  if ('filter_type' in out && !LIBRARY_FILTER_TYPES.includes(out.filter_type as LibraryFilterType)) {
+    delete out.filter_type;
+  }
+  if ('resource_type' in out && !LIBRARY_RESOURCE_TYPES.includes(out.resource_type as LibraryResourceType)) {
+    delete out.resource_type;
+  }
+  if ('component_id' in out && !LIBRARY_COMPONENT_ID_RE.test(String(out.component_id))) {
+    delete out.component_id;
+  }
+  if ('component_family' in out && !LIBRARY_COMPONENT_ID_RE.test(String(out.component_family))) {
+    delete out.component_family;
+  }
+  if ('query_length' in out && typeof out.query_length === 'number' && (out.query_length < 0 || out.query_length > 500)) {
+    delete out.query_length;
+  }
   if ('account_type' in out && !ACCOUNT_TYPES.includes(out.account_type as never)) {
     delete out.account_type;
   }
