@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -6,6 +6,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { SCHEDULE_WT } from '@/tools/data/elbowData';
+import {
+  computeBranchIntersection,
+  BETA_MIN_DEG,
+  BETA_MAX_DEG,
+  type BranchIntersectionResult,
+} from '@/tools/branch/branchIntersectionGeometry';
+import { buildBranchTemplate } from '@/tools/branch/branchTemplateSvg';
 
 /* ─── NPS pipe data (OD in mm) ─── */
 const NPS_OPTIONS: { label: string; od: number }[] = [
@@ -19,28 +26,7 @@ const NPS_OPTIONS: { label: string; od: number }[] = [
 ];
 
 const SCHEDULES = ['10', '40', '80', '160'];
-
-/* ─── Intersection profile computation ─── */
-function computeIntersection(dHeader: number, dBranch: number, angleDeg: number, divisions: number) {
-  const rHeader = dHeader / 2;
-  const rBranch = dBranch / 2;
-  const angleRad = (angleDeg * Math.PI) / 180;
-  const tanAngle = Math.tan(angleRad);
-  const points: { i: number; angleDeg: number; x: number; y: number; h: number }[] = [];
-
-  for (let i = 0; i <= divisions; i++) {
-    const theta = (i * 2 * Math.PI) / divisions;
-    const thetaDeg = (i * 360) / divisions;
-    const x = rBranch * Math.cos(theta);
-    const y = rBranch * Math.sin(theta);
-    const term1 = tanAngle !== 0 ? x / tanAngle : 0;
-    const term2 = Math.sqrt(Math.max(0, rHeader * rHeader - y * y));
-    const term3 = Math.sqrt(Math.max(0, rHeader * rHeader - rBranch * rBranch * Math.sin(theta) * Math.sin(theta)));
-    const h = term1 + term2 - term3;
-    points.push({ i, angleDeg: thetaDeg, x, y, h });
-  }
-  return points;
-}
+const DIVISION_PRESETS = [12, 16, 24, 36, 48];
 
 /* ───────────────────────────────────────────────────────────────────────────
    ASME B31.3 §304.3.3 — Reinforcement of welded branch connections
@@ -235,11 +221,12 @@ function getWT(npsLabel: string, schedule: string): number {
   return SCHEDULE_WT[npsLabel]?.[schedule] ?? 0;
 }
 
+type FabricationMode = 'template' | 'marking';
+
 /* ─── Component ─── */
 export default function BranchLayoutTool() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const svgRef = useRef<SVGSVGElement>(null);
 
   const [headerNPS, setHeaderNPS] = useState('6"');
   const [branchNPS, setBranchNPS] = useState('3"');
@@ -247,6 +234,9 @@ export default function BranchLayoutTool() {
   const [branchSch, setBranchSch] = useState('40');
   const [angle, setAngle] = useState(90);
   const [divisions, setDivisions] = useState<number>(24);
+  const [mode, setMode] = useState<FabricationMode>('template');
+  const [refLength, setRefLength] = useState<number>(200);
+  const [engOpen, setEngOpen] = useState(false);
 
   /* ── ASME B31.3 design inputs ── */
   const [pressure, setPressure] = useState<number>(5);          // P (MPa)
@@ -266,23 +256,33 @@ export default function BranchLayoutTool() {
   const branchOD = NPS_OPTIONS.find(o => o.label === branchNPS)?.od ?? 88.9;
   const headerWT = getWT(headerNPS, headerSch);
   const branchWT = getWT(branchNPS, branchSch);
+  const branchID = branchOD - 2 * branchWT;
 
   const headerSchOptions = getSchedulesForNPS(headerNPS);
   const branchSchOptions = getSchedulesForNPS(branchNPS);
-
-  const isValid = headerOD > branchOD && headerWT > 0 && branchWT > 0 && angle >= 15 && angle <= 90;
 
   const designInputsValid =
     pressure > 0 && allowableStress > 0 && qualityFactor > 0 && weldStrengthFactor > 0 &&
     corrosion >= 0 && millTolerancePct >= 0 && millTolerancePct < 100;
 
-  const points = useMemo(() => {
-    if (!isValid) return [];
-    return computeIntersection(headerOD, branchOD, angle, divisions);
-  }, [headerOD, branchOD, angle, divisions, isValid]);
+  /* ── Canonical fabrication geometry: ONE engine result feeds the branch
+        table, the development preview, the header picaje and the print
+        template. No presentation component computes geometry on its own. ── */
+  const geometry: BranchIntersectionResult = useMemo(() => {
+    return computeBranchIntersection({
+      headerOuterRadius: headerOD / 2,
+      branchOuterDiameter: branchOD,
+      branchInnerDiameter: branchWT > 0 ? branchID : -1,
+      betaDeg: angle,
+      divisions,
+      referenceLength: mode === 'marking' ? refLength : undefined,
+    });
+  }, [headerOD, branchOD, branchID, branchWT, angle, divisions, mode, refLength]);
+
+  const geometryValid = geometry.valid && headerWT > 0 && branchWT > 0;
 
   const reinforcement = useMemo(() => {
-    if (!isValid || !designInputsValid) return null;
+    if (!geometryValid || !designInputsValid) return null;
     return calcReinforcement({
       headerOD, headerWT, branchOD, branchWT, angleDeg: angle,
       pressure, allowableStress, qualityFactor, weldStrengthFactor,
@@ -290,67 +290,115 @@ export default function BranchLayoutTool() {
       weldLegBranch, weldLegPad, padThickness, padOD,
     });
   }, [
-    headerOD, headerWT, branchOD, branchWT, angle, isValid, designInputsValid,
+    geometryValid, designInputsValid,
+    headerOD, headerWT, branchOD, branchWT, angle,
     pressure, allowableStress, qualityFactor, weldStrengthFactor, coefficientY,
     corrosion, millTolerancePct, weldLegBranch, weldLegPad, padThickness, padOD,
   ]);
 
-  const perimeter = useMemo(() => branchOD * Math.PI, [branchOD]);
-
   const handleSave = async () => {
-    if (!user || points.length === 0) return;
+    if (!user || !geometryValid) return;
     await supabase.from(TABLES.toolUsage).insert({
       user_id: user.id,
       tool_name: 'Branch Connection Calculator',
       tool_category: 'Fabrication',
       input_data: {
-        headerNPS, branchNPS, headerSch, branchSch, angle, divisions,
+        headerNPS, branchNPS, headerSch, branchSch, angle, divisions, mode,
+        referenceLength: mode === 'marking' ? refLength : null,
         pressure, allowableStress, qualityFactor, weldStrengthFactor,
         coefficientY, corrosion, millTolerancePct,
         weldLegBranch, weldLegPad, padThickness, padOD,
       },
-      output_data: { reinforcement, perimeter: perimeter.toFixed(2) },
+      output_data: {
+        reinforcement,
+        circumference: geometry.developedCircumference.toFixed(3),
+        stationSpacing: geometry.stationSpacing.toFixed(3),
+      },
     });
     toast.success(t('tools.calculationSaved'));
   };
 
+  /* ── Physical 1:1 print: deterministic mm SVG tiles, never scale-to-fit ── */
   const handlePrint = () => {
-    if (!svgRef.current) return;
-    const svgEl = svgRef.current;
-    const svgData = new XMLSerializer().serializeToString(svgEl);
+    if (!geometryValid) return;
+    const template = buildBranchTemplate(geometry, {
+      ordinate: mode === 'marking' ? 'fromEnd' : 'relative',
+      meta: {
+        headerLabel: `${headerNPS} Sch ${headerSch} (OD ${headerOD} mm)`,
+        branchLabel: `${branchNPS} Sch ${branchSch} (OD ${branchOD} mm)`,
+        betaDeg: angle,
+        titleLabel: t('tools.branchLayout.flatPattern'),
+        seamLabel: t('tools.branchLayout.seam', { defaultValue: 'Seam' }),
+        pageLabel: t('tools.branchLayout.page', { defaultValue: 'Page' }),
+        overlapLabel: t('tools.branchLayout.overlap', { defaultValue: 'Overlap' }),
+        wrapNoteLabel: t('tools.branchLayout.wrapNote', { defaultValue: 'Wrap the template around the branch OD. Align the seam line with station 1.' }),
+        calibrationNote: t('tools.branchLayout.calibrationNote', { defaultValue: 'After printing, verify the 100 mm bar with a ruler before marking the pipe.' }),
+        printAtActualSize: 'PRINT AT 100% / ACTUAL SIZE',
+        generatedLabel: `PIPINGBOX · ${new Date().toISOString().slice(0, 10)}`,
+      },
+    });
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
-    printWindow.document.write(`
-      <html><head><title>Branch Connection Template - 1:1</title>
-      <style>@page{size:landscape;margin:10mm}body{margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#fff}svg{max-width:100%;height:auto}.info{font-family:monospace;font-size:11px;margin:10px;color:#333}</style>
-      </head><body>
-      <div class="info">Header: ${headerNPS} Sch ${headerSch} (OD ${headerOD}mm, WT ${headerWT}mm) | Branch: ${branchNPS} Sch ${branchSch} (OD ${branchOD}mm, WT ${branchWT}mm) | Angle: ${angle}°</div>
-      ${svgData}
-      </body></html>
+    const sheets = template.tiles
+      .map(tile => `<div class="sheet">${tile.svg}</div>`)
+      .join('');
+    printWindow.document.write(`<!DOCTYPE html>
+      <html><head><title>PIPINGBOX Branch Template 1:1</title>
+      <style>
+        @page { size: A4 landscape; margin: 10mm; }
+        html, body { margin: 0; padding: 0; background: #fff; }
+        .sheet { page-break-after: always; }
+        .sheet:last-child { page-break-after: auto; }
+        svg { display: block; }
+      </style>
+      </head><body>${sheets}</body></html>
     `);
     printWindow.document.close();
     setTimeout(() => { printWindow.print(); }, 500);
   };
 
-  // SVG dimensions for flat pattern
+  // Screen preview dimensions (NOT a fabrication artifact — preview only)
   const svgWidth = 700;
   const svgHeight = 320;
   const padding = 50;
   const plotW = svgWidth - padding * 2;
   const plotH = svgHeight - padding * 2;
 
-  const maxH = points.length > 0 ? Math.max(...points.map(p => p.h)) : 1;
-  const minH = points.length > 0 ? Math.min(...points.map(p => p.h)) : 0;
-  const hRange = maxH - minH || 1;
+  const ordinateOf = (i: number): number =>
+    mode === 'marking'
+      ? (geometry.stations[i]?.markFromEnd ?? 0)
+      : (geometry.stations[i]?.relativeOrdinate ?? 0);
+
+  const ordValues = geometryValid ? geometry.stations.map((_, i) => ordinateOf(i)) : [];
+  const maxOrd = ordValues.length > 0 ? Math.max(...ordValues) : 1;
+  const minOrd = ordValues.length > 0 ? Math.min(...ordValues) : 0;
+  const ordRange = maxOrd - minOrd || 1;
 
   const pathD = useMemo(() => {
-    if (points.length === 0) return '';
-    return points.map((p, idx) => {
-      const px = padding + (idx / divisions) * plotW;
-      const py = padding + plotH - ((p.h - minH) / hRange) * plotH;
+    if (!geometryValid) return '';
+    return geometry.stations.map((st, idx) => {
+      const px = padding + (st.arcPosition / geometry.developedCircumference) * plotW;
+      const py = padding + plotH - ((ordinateOf(idx) - minOrd) / ordRange) * plotH;
       return `${idx === 0 ? 'M' : 'L'}${px.toFixed(1)},${py.toFixed(1)}`;
     }).join(' ');
-  }, [points, divisions, plotW, plotH, minH, hRange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geometry, geometryValid, plotW, plotH, minOrd, ordRange, mode]);
+
+  const geometryErrorText = (() => {
+    if (geometryValid || geometry.errors.length === 0) return null;
+    const code = geometry.errors[0].code;
+    if (code === 'REFERENCE_RADIUS_EXCEEDS_HEADER') {
+      return t('tools.branchLayout.errorBranchTooLarge', {
+        defaultValue: 'The branch contact radius exceeds the header radius: this connection cannot be fabricated on this header.',
+      });
+    }
+    if (code === 'REFERENCE_LENGTH_TOO_SHORT') {
+      return t('tools.branchLayout.errorLengthTooShort', {
+        defaultValue: 'Reference length L must be greater than the maximum cut ordinate for this connection.',
+      });
+    }
+    return t('tools.branchLayout.errorInvalidParams');
+  })();
 
   return (
     <div className="space-y-6">
@@ -363,763 +411,795 @@ export default function BranchLayoutTool() {
         <p className="mt-1 text-xs text-zinc-500">{t('tools.branchLayout.description')}</p>
       </div>
 
-      {/* Input Section */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {/* Header Pipe */}
-        <div className="space-y-3 rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
-            {t('tools.branchLayout.headerPipe')}
-          </p>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">{t('tools.branchLayout.npsSize')}</Label>
-            <select
-              value={headerNPS}
-              onChange={(e) => setHeaderNPS(e.target.value)}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
-            >
-              {NPS_OPTIONS.map(o => <option key={o.label} value={o.label}>{o.label} (OD {o.od} mm)</option>)}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">{t('tools.branchLayout.schedule')}</Label>
-            <select
-              value={headerSch}
-              onChange={(e) => setHeaderSch(e.target.value)}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
-            >
-              {headerSchOptions.map(s => <option key={s} value={s}>Sch {s} (WT {getWT(headerNPS, s)} mm)</option>)}
-            </select>
-          </div>
-          <div className="flex items-center justify-between text-xs text-zinc-500 pt-1">
-            <span>OD: <span className="text-zinc-200">{headerOD} mm</span></span>
-            <span>WT: <span className="text-zinc-200">{headerWT} mm</span></span>
-            <span>ID: <span className="text-zinc-200">{(headerOD - 2 * headerWT).toFixed(1)} mm</span></span>
-          </div>
-        </div>
+      {/* ═══ FABRICATION ═══ */}
+      <div className="space-y-4">
+        <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-medium border-b border-zinc-800 pb-2">
+          {t('tools.branchLayout.fabrication', { defaultValue: 'Fabrication' })}
+        </p>
 
-        {/* Branch Pipe */}
-        <div className="space-y-3 rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
-            {t('tools.branchLayout.branchPipe')}
-          </p>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">{t('tools.branchLayout.npsSize')}</Label>
-            <select
-              value={branchNPS}
-              onChange={(e) => setBranchNPS(e.target.value)}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
-            >
-              {NPS_OPTIONS.filter(o => o.od < headerOD).map(o => (
-                <option key={o.label} value={o.label}>{o.label} (OD {o.od} mm)</option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">{t('tools.branchLayout.schedule')}</Label>
-            <select
-              value={branchSch}
-              onChange={(e) => setBranchSch(e.target.value)}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
-            >
-              {branchSchOptions.map(s => <option key={s} value={s}>Sch {s} (WT {getWT(branchNPS, s)} mm)</option>)}
-            </select>
-          </div>
-          <div className="flex items-center justify-between text-xs text-zinc-500 pt-1">
-            <span>OD: <span className="text-zinc-200">{branchOD} mm</span></span>
-            <span>WT: <span className="text-zinc-200">{branchWT} mm</span></span>
-            <span>ID: <span className="text-zinc-200">{(branchOD - 2 * branchWT).toFixed(1)} mm</span></span>
-          </div>
-        </div>
-
-        {/* Parameters */}
-        <div className="space-y-3 rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
-            {t('tools.branchLayout.parameters')}
-          </p>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">{t('tools.branchLayout.angle')} (15°–90°)</Label>
-            <div className="flex items-center gap-3">
-              <input
-                type="range"
-                min={15} max={90} step={1}
-                value={angle}
-                onChange={(e) => setAngle(Number(e.target.value))}
-                className="flex-1 accent-[#f59e0b]"
-              />
-              <span className="w-12 text-right text-sm font-mono text-[#f59e0b]">{angle}°</span>
+        {/* Input Section */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Header Pipe */}
+          <div className="space-y-3 rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
+              {t('tools.branchLayout.headerPipe')}
+            </p>
+            <div className="space-y-2">
+              <Label className="text-xs text-zinc-500">{t('tools.branchLayout.npsSize')}</Label>
+              <select
+                value={headerNPS}
+                onChange={(e) => setHeaderNPS(e.target.value)}
+                className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
+              >
+                {NPS_OPTIONS.map(o => <option key={o.label} value={o.label}>{o.label} (OD {o.od} mm)</option>)}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-zinc-500">{t('tools.branchLayout.schedule')}</Label>
+              <select
+                value={headerSch}
+                onChange={(e) => setHeaderSch(e.target.value)}
+                className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
+              >
+                {headerSchOptions.map(s => <option key={s} value={s}>Sch {s} (WT {getWT(headerNPS, s)} mm)</option>)}
+              </select>
+            </div>
+            <div className="flex items-center justify-between text-xs text-zinc-500 pt-1">
+              <span>OD: <span className="text-zinc-200">{headerOD} mm</span></span>
+              <span>WT: <span className="text-zinc-200">{headerWT} mm</span></span>
+              <span>ID: <span className="text-zinc-200">{(headerOD - 2 * headerWT).toFixed(1)} mm</span></span>
             </div>
           </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">{t('tools.branchLayout.divisions')}</Label>
-            <select
-              value={divisions}
-              onChange={(e) => setDivisions(Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
-            >
-              <option value={12}>12</option>
-              <option value={24}>24</option>
-              <option value={36}>36</option>
-              <option value={48}>48</option>
-            </select>
-          </div>
-          <div className="pt-2 text-xs text-zinc-500">
-            {t('tools.branchLayout.perimeterAxis')}: <span className="text-zinc-200 font-mono">{perimeter.toFixed(1)} mm</span>
-          </div>
-        </div>
-      </div>
 
-      {/* ── ASME B31.3 Design Inputs ── */}
-      <div className="space-y-4 rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
-            {t('tools.branchLayout.designInputs', { defaultValue: 'Design Inputs (ASME B31.3)' })}
-          </p>
-          <span className="text-[9px] text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded">§304.1.2 / §304.3.3</span>
-        </div>
-
-        {/* Material reference selector + allowable stress */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">
-              {t('tools.branchLayout.materialReference', { defaultValue: 'Material reference (optional)' })}
-            </Label>
-            <select
-              defaultValue=""
-              onChange={(e) => {
-                const ref = ALLOWABLE_STRESS_REFS.find(m => m.id === e.target.value);
-                if (ref) setAllowableStress(ref.s);
-              }}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
-            >
-              <option value="">
-                {t('tools.branchLayout.materialManual', { defaultValue: 'Enter S manually…' })}
-              </option>
-              {ALLOWABLE_STRESS_REFS.map(m => (
-                <option key={m.id} value={m.id}>{m.material} — {m.s} MPa</option>
-              ))}
-            </select>
-            <p className="text-[10px] text-zinc-600 leading-relaxed">
-              {ALLOWABLE_STRESS_REFS.map(m => `${m.material}: ${m.s} MPa @ ${m.basis}`).join(' · ')}
+          {/* Branch Pipe — equal nominal sizes allowed (PO D2); the engine validates fabricability */}
+          <div className="space-y-3 rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
+              {t('tools.branchLayout.branchPipe')}
             </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">
-              S — {t('tools.branchLayout.allowableStress', { defaultValue: 'Basic allowable stress' })} (MPa)
-            </Label>
-            <input
-              type="number" min={0} step={0.1}
-              value={allowableStress}
-              onChange={(e) => setAllowableStress(Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
-            />
-          </div>
-        </div>
-
-        {/* Prominent allowable-stress warning */}
-        <div className="border-l-2 border-[#f59e0b] bg-[#f59e0b]/5 p-3">
-          <p className="text-[11px] text-[#f59e0b] leading-relaxed">
-            {t('tools.branchLayout.allowableStressWarning', {
-              defaultValue:
-                'S varies strongly with design temperature. The listed values are reference points at their stated temperature basis only. You must take S from ASME B31.3 Table A-1 of the applicable code edition for the actual design temperature and material condition.',
-            })}
-          </p>
-        </div>
-
-        {/* Numeric design parameters */}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">
-              P — {t('tools.branchLayout.designPressure', { defaultValue: 'Design pressure' })} (MPa)
-            </Label>
-            <input
-              type="number" min={0} step={0.1}
-              value={pressure}
-              onChange={(e) => setPressure(Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">
-              E — {t('tools.branchLayout.qualityFactor', { defaultValue: 'Weld joint quality factor' })}
-            </Label>
-            <input
-              type="number" min={0} max={1} step={0.01}
-              value={qualityFactor}
-              onChange={(e) => setQualityFactor(Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">
-              W — {t('tools.branchLayout.weldStrengthFactor', { defaultValue: 'Weld strength reduction factor' })}
-            </Label>
-            <input
-              type="number" min={0} max={1} step={0.01}
-              value={weldStrengthFactor}
-              onChange={(e) => setWeldStrengthFactor(Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">
-              Y — {t('tools.branchLayout.coefficientY', { defaultValue: 'Coefficient Y (Table 304.1.1)' })}
-            </Label>
-            <input
-              type="number" min={0} max={1} step={0.01}
-              value={coefficientY}
-              onChange={(e) => setCoefficientY(Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">
-              c — {t('tools.branchLayout.corrosionAllowance', { defaultValue: 'Corrosion / erosion allowance' })} (mm)
-            </Label>
-            <input
-              type="number" min={0} step={0.1}
-              value={corrosion}
-              onChange={(e) => setCorrosion(Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">
-              {t('tools.branchLayout.millTolerance', { defaultValue: 'Mill tolerance' })} (%)
-            </Label>
-            <input
-              type="number" min={0} max={99} step={0.5}
-              value={millTolerancePct}
-              onChange={(e) => setMillTolerancePct(Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">
-              {t('tools.branchLayout.weldLegBranch', { defaultValue: 'Branch fillet weld leg' })} (mm)
-            </Label>
-            <input
-              type="number" min={0} step={0.5}
-              value={weldLegBranch}
-              onChange={(e) => setWeldLegBranch(Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs text-zinc-500">
-              {t('tools.branchLayout.weldLegPad', { defaultValue: 'Pad fillet weld leg' })} (mm)
-            </Label>
-            <input
-              type="number" min={0} step={0.5}
-              value={weldLegPad}
-              onChange={(e) => setWeldLegPad(Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
-            />
-          </div>
-        </div>
-
-        {/* Existing pad, if any */}
-        <div className="border-t border-zinc-800/60 pt-3">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
-            {t('tools.branchLayout.existingPad', { defaultValue: 'Existing reinforcing pad (leave 0 if none)' })}
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label className="text-xs text-zinc-500">
-                Tr — {t('tools.branchLayout.padThickness')} (mm)
-              </Label>
-              <input
-                type="number" min={0} step={0.5}
-                value={padThickness}
-                onChange={(e) => setPadThickness(Number(e.target.value))}
-                className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
-              />
+              <Label className="text-xs text-zinc-500">{t('tools.branchLayout.npsSize')}</Label>
+              <select
+                value={branchNPS}
+                onChange={(e) => setBranchNPS(e.target.value)}
+                className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
+              >
+                {NPS_OPTIONS.filter(o => o.od <= headerOD).map(o => (
+                  <option key={o.label} value={o.label}>{o.label} (OD {o.od} mm)</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-zinc-500">{t('tools.branchLayout.schedule')}</Label>
+              <select
+                value={branchSch}
+                onChange={(e) => setBranchSch(e.target.value)}
+                className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
+              >
+                {branchSchOptions.map(s => <option key={s} value={s}>Sch {s} (WT {getWT(branchNPS, s)} mm)</option>)}
+              </select>
+            </div>
+            <div className="flex items-center justify-between text-xs text-zinc-500 pt-1">
+              <span>OD: <span className="text-zinc-200">{branchOD} mm</span></span>
+              <span>WT: <span className="text-zinc-200">{branchWT} mm</span></span>
+              <span>ID: <span className="text-zinc-200">{branchID.toFixed(1)} mm</span></span>
+            </div>
+          </div>
+
+          {/* Parameters */}
+          <div className="space-y-3 rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
+              {t('tools.branchLayout.parameters')}
+            </p>
+            <div className="space-y-2">
+              <Label className="text-xs text-zinc-500">{t('tools.branchLayout.angle')} ({BETA_MIN_DEG}°–{BETA_MAX_DEG}°)</Label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min={BETA_MIN_DEG} max={BETA_MAX_DEG} step={1}
+                  value={angle}
+                  onChange={(e) => setAngle(Number(e.target.value))}
+                  className="flex-1 accent-[#f59e0b]"
+                />
+                <span className="w-12 text-right text-sm font-mono text-[#f59e0b]">{angle}°</span>
+              </div>
             </div>
             <div className="space-y-2">
               <Label className="text-xs text-zinc-500">
-                {t('tools.branchLayout.padOD')} (mm)
+                {t('tools.branchLayout.markingDivisions', { defaultValue: 'Marking divisions around branch circumference' })}
               </Label>
-              <input
-                type="number" min={0} step={1}
-                value={padOD}
-                onChange={(e) => setPadOD(Number(e.target.value))}
-                className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
-              />
+              <select
+                value={divisions}
+                onChange={(e) => setDivisions(Number(e.target.value))}
+                className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
+              >
+                {DIVISION_PRESETS.map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Design input validation error */}
-      {isValid && !designInputsValid && (
-        <div className="border-l-2 border-red-500 bg-red-500/5 p-4">
-          <p className="text-sm text-red-400">
-            {t('tools.branchLayout.errorDesignInputs', {
-              defaultValue: 'Enter a positive design pressure P, allowable stress S, and factors E and W greater than zero.',
-            })}
-          </p>
-        </div>
-      )}
-
-      {!isValid && headerOD > 0 && branchOD > 0 && (
-        <div className="border-l-2 border-red-500 bg-red-500/5 p-4">
-          <p className="text-sm text-red-400">
-            {headerOD <= branchOD
-              ? t('tools.branchLayout.errorHeaderSmaller')
-              : t('tools.branchLayout.errorInvalidParams')}
-          </p>
-        </div>
-      )}
-
-      {isValid && reinforcement && (
-        <>
-          {/* Results Panel */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {/* d1 — effective material removed */}
-            <div className="rounded-lg border border-[#f59e0b]/30 bg-[#f59e0b]/5 p-4 text-center">
-              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
-                {t('tools.branchLayout.d1Label', { defaultValue: 'd1 — Material Removed' })}
-              </p>
-              <p className="mt-1 text-2xl font-bold text-[#f59e0b] font-mono">{reinforcement.d1.toFixed(1)}</p>
-              <p className="text-[10px] text-zinc-500">mm</p>
-            </div>
-            {/* A1 — required */}
-            <div className="rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4 text-center">
-              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
-                {t('tools.branchLayout.a1Required', { defaultValue: 'A1 — Required Area' })}
-              </p>
-              <p className="mt-1 text-2xl font-bold text-zinc-100 font-mono">{reinforcement.a1.toFixed(1)}</p>
-              <p className="text-[10px] text-zinc-500">mm²</p>
-            </div>
-            {/* Available */}
-            <div className="rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4 text-center">
-              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
-                {t('tools.branchLayout.availableArea', { defaultValue: 'Available Area' })}
-              </p>
-              <p className="mt-1 text-2xl font-bold text-zinc-100 font-mono">{reinforcement.aAvailable.toFixed(1)}</p>
-              <p className="text-[10px] text-zinc-500">mm² (A2 + A3 + A4)</p>
-            </div>
-            {/* Acceptance */}
-            <div className={`rounded-lg border p-4 text-center ${reinforcement.adequate ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-red-500/40 bg-red-500/5'}`}>
-              <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
-                {t('tools.branchLayout.acceptance', { defaultValue: 'Acceptance (A2+A3+A4 ≥ A1)' })}
-              </p>
-              <p className={`mt-1 text-lg font-bold ${reinforcement.adequate ? 'text-emerald-400' : 'text-red-400'}`}>
-                {reinforcement.adequate
-                  ? t('tools.branchLayout.acceptancePass', { defaultValue: 'ADEQUATE' })
-                  : t('tools.branchLayout.acceptanceFail', { defaultValue: 'PAD REQUIRED' })}
-              </p>
-              {!reinforcement.adequate && (
-                <p className="text-[10px] text-zinc-400 mt-1">
-                  {t('tools.branchLayout.deficit', { defaultValue: 'Deficit' })}: {reinforcement.deficit.toFixed(1)} mm²
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Full audit breakdown (ASME B31.3 §304.3.3) */}
-          <div className="rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
-                {t('tools.branchLayout.reinforcementCalc')}
-              </p>
-              <span className="text-[9px] text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded">ASME B31.3 §304.3.3</span>
-            </div>
-
-            {/* Thicknesses */}
-            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
-              {t('tools.branchLayout.thicknesses', { defaultValue: 'Pressure design thicknesses (§304.1.2)' })}
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="space-y-1 pt-1 text-xs text-zinc-500">
               <div>
-                <span className="text-zinc-500">t<sub>r</sub> ({t('tools.branchLayout.header', { defaultValue: 'header' })}):</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.tr.toFixed(2)} mm</span>
+                {t('tools.branchLayout.perimeterAxis')}: <span className="text-zinc-200 font-mono">{geometryValid ? geometry.developedCircumference.toFixed(3) : (branchOD * Math.PI).toFixed(3)} mm</span>
               </div>
-              <div>
-                <span className="text-zinc-500">t<sub>b</sub> ({t('tools.branchLayout.branch', { defaultValue: 'branch' })}):</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.tb.toFixed(2)} mm</span>
-              </div>
-              <div>
-                <span className="text-zinc-500">T<sub>h,min</sub>:</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.thMin.toFixed(2)} mm</span>
-              </div>
-              <div>
-                <span className="text-zinc-500">T<sub>b,min</sub>:</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.tbMin.toFixed(2)} mm</span>
-              </div>
-            </div>
-
-            {/* Zone geometry */}
-            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mt-4 mb-2">
-              {t('tools.branchLayout.zoneGeometry', { defaultValue: 'Reinforcement zone' })}
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div>
-                <span className="text-zinc-500">d<sub>1</sub>:</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.d1.toFixed(2)} mm</span>
-              </div>
-              <div>
-                <span className="text-zinc-500">d<sub>2</sub> ({t('tools.branchLayout.halfWidth', { defaultValue: 'half-width' })}):</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.d2.toFixed(2)} mm</span>
-              </div>
-              <div>
-                <span className="text-zinc-500">L<sub>4</sub> ({t('tools.branchLayout.zoneHeight', { defaultValue: 'height' })}):</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.l4.toFixed(2)} mm</span>
-              </div>
-              <div>
-                <span className="text-zinc-500">sin β:</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.sinBeta.toFixed(3)}</span>
-              </div>
-            </div>
-
-            {/* Areas */}
-            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mt-4 mb-2">
-              {t('tools.branchLayout.areaBreakdown', { defaultValue: 'Area breakdown' })}
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div>
-                <span className="text-zinc-500">A<sub>1</sub> ({t('tools.branchLayout.required', { defaultValue: 'required' })}):</span>
-                <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.a1.toFixed(2)} mm²</span>
-              </div>
-              <div>
-                <span className="text-zinc-500">A<sub>2</sub> ({t('tools.branchLayout.headerExcess', { defaultValue: 'header excess' })}):</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.a2.toFixed(2)} mm²</span>
-              </div>
-              <div>
-                <span className="text-zinc-500">A<sub>3</sub> ({t('tools.branchLayout.branchExcess', { defaultValue: 'branch excess' })}):</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.a3.toFixed(2)} mm²</span>
-              </div>
-              <div>
-                <span className="text-zinc-500">A<sub>4</sub> ({t('tools.branchLayout.weldsAndPad', { defaultValue: 'welds + pad' })}):</span>
-                <span className="ml-1 text-zinc-200 font-mono">{reinforcement.a4.toFixed(2)} mm²</span>
-              </div>
-            </div>
-
-            {/* Formulae shown for audit */}
-            <div className="mt-3 pt-3 border-t border-zinc-800/60 text-[10px] text-zinc-600 font-mono leading-relaxed space-y-0.5">
-              <p>t = P·D / (2·(S·E·W + P·Y))</p>
-              <p>d1 = [Db − 2·(Tb − c)] / sin β</p>
-              <p>A1 = tr · d1 · (2 − sin β)</p>
-              <p>A2 = (2·d2 − d1) · (Th,min − tr − c)</p>
-              <p>A3 = 2·L4 · (Tb,min − tb − c) / sin β</p>
-            </div>
-
-            {/* Pad sizing for the deficit */}
-            {!reinforcement.adequate && (
-              <div className="mt-3 pt-3 border-t border-zinc-800/60">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
-                  {t('tools.branchLayout.padSizing', { defaultValue: 'Pad sizing for the deficit' })}
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div>
-                    <span className="text-zinc-500">{t('tools.branchLayout.requiredPadArea', { defaultValue: 'Required pad area' })}:</span>
-                    <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadArea.toFixed(2)} mm²</span>
-                  </div>
-                  <div>
-                    <span className="text-zinc-500">{t('tools.branchLayout.padThickness')}:</span>
-                    <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadThickness.toFixed(2)} mm</span>
-                  </div>
-                  <div>
-                    <span className="text-zinc-500">{t('tools.branchLayout.padOD')}:</span>
-                    <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadOD.toFixed(1)} mm</span>
-                  </div>
-                  <div>
-                    <span className="text-zinc-500">{t('tools.branchLayout.padWidth')}:</span>
-                    <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadWidth.toFixed(1)} mm</span>
-                  </div>
+              {geometryValid && (
+                <div>
+                  {t('tools.branchLayout.stationStep', { defaultValue: 'Station step' })}:{' '}
+                  <span className="text-zinc-200 font-mono">{geometry.angularStepDeg.toFixed(1)}° · {geometry.stationSpacing.toFixed(3)} mm</span>
                 </div>
-                {reinforcement.padWidthLimited && (
-                  <p className="mt-2 text-[11px] text-red-400 leading-relaxed">
-                    {t('tools.branchLayout.padLimitWarning', {
-                      defaultValue:
-                        'The pad needed exceeds the header wall thickness or the d2 width limit. Reconsider the design: use a heavier header, a thicker branch, or an integrally reinforced fitting.',
-                    })}
-                  </p>
-                )}
+              )}
+              <div className="text-[10px] text-zinc-600">
+                {t('tools.branchLayout.stationsInfo', {
+                  defaultValue: '{{n}} divisions → {{m}} boundary lines (the 360° station repeats the 0° seam)',
+                  n: divisions,
+                  m: divisions + 1,
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mode: template (no L) vs marking from end (optional L) */}
+        <div className="rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium mb-3">
+            {t('tools.branchLayout.mode', { defaultValue: 'Template mode' })}
+          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            <label className="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer">
+              <input
+                type="radio"
+                name="fab-mode"
+                checked={mode === 'template'}
+                onChange={() => setMode('template')}
+                className="accent-[#f59e0b]"
+              />
+              {t('tools.branchLayout.modeTemplate', { defaultValue: 'Relative template (no length required)' })}
+            </label>
+            <label className="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer">
+              <input
+                type="radio"
+                name="fab-mode"
+                checked={mode === 'marking'}
+                onChange={() => setMode('marking')}
+                className="accent-[#f59e0b]"
+              />
+              {t('tools.branchLayout.modeMarking', { defaultValue: 'Marking from pipe end' })}
+            </label>
+            {mode === 'marking' && (
+              <div className="flex items-center gap-2">
+                <Label className="text-xs text-zinc-500 whitespace-nowrap">
+                  L — {t('tools.branchLayout.referenceLength', { defaultValue: 'Reference length' })} (mm)
+                </Label>
+                <input
+                  type="number" min={0} step={1}
+                  value={refLength}
+                  onChange={(e) => setRefLength(Number(e.target.value))}
+                  className="w-24 rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                />
               </div>
             )}
           </div>
-
-          {/* Verification disclaimer */}
-          <div className="border-l-2 border-[#f59e0b] bg-[#f59e0b]/5 p-4">
-            <p className="text-[11px] text-[#f59e0b] leading-relaxed">
-              {t('tools.branchLayout.verificationDisclaimer', {
-                defaultValue:
-                  'This result is an aid only and must be verified against the governing edition of ASME B31.3 and the project engineering specification before fabrication. Area replacement per §304.3.3 does not cover external loads, fatigue, or the §304.3.2 limitations on branch connections.',
+          {mode === 'marking' && (
+            <p className="mt-2 text-[10px] text-zinc-600">
+              {t('tools.branchLayout.referenceLengthFrom', {
+                defaultValue: 'L is measured from the square-cut straight end of the branch pipe.',
               })}
             </p>
-          </div>
-
-          {/* Cross-Section SVG */}
-          <div className="border border-zinc-800/80 bg-zinc-950 p-4">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3">
-              {t('tools.branchLayout.crossSection')}
-            </p>
-            <svg width="400" height="260" viewBox="0 0 400 260" className="mx-auto">
-              {/* Header pipe cross-section */}
-              <rect x="40" y="140" width="320" height={Math.max(20, headerWT * 2)} rx="2"
-                fill="none" stroke="#666" strokeWidth="1.5" />
-              <rect x="40" y={140 + Math.max(20, headerWT * 2)} width="320" height="4"
-                fill="#333" stroke="none" />
-              {/* Header wall fill */}
-              <rect x="40" y="140" width="320" height={Math.min(headerWT * 0.8, 15)} rx="1"
-                fill="#444" stroke="none" opacity="0.5" />
-
-              {/* Hole in header */}
-              {(() => {
-                const holeW = Math.min(reinforcement.d1 * 0.8, 120);
-                const cx = 200;
-                return (
-                  <g>
-                    <rect x={cx - holeW / 2} y="135" width={holeW} height={Math.max(20, headerWT * 2) + 10}
-                      fill="#0a0a0a" stroke="#f59e0b" strokeWidth="1" strokeDasharray="3,2" />
-                    {/* Dimension line for hole */}
-                    <line x1={cx - holeW / 2} y1="125" x2={cx + holeW / 2} y2="125" stroke="#f59e0b" strokeWidth="0.8" />
-                    <line x1={cx - holeW / 2} y1="122" x2={cx - holeW / 2} y2="128" stroke="#f59e0b" strokeWidth="0.8" />
-                    <line x1={cx + holeW / 2} y1="122" x2={cx + holeW / 2} y2="128" stroke="#f59e0b" strokeWidth="0.8" />
-                    <text x={cx} y="121" textAnchor="middle" fill="#f59e0b" fontSize="9">
-                      Ø{reinforcement.d1.toFixed(1)}
-                    </text>
-                  </g>
-                );
-              })()}
-
-              {/* Branch pipe */}
-              {(() => {
-                const bw = Math.min(branchOD * 0.5, 60);
-                const cx = 200;
-                const angleRad = ((90 - angle) * Math.PI) / 180;
-                const dx = Math.sin(angleRad) * 80;
-                return (
-                  <g>
-                    <line x1={cx - bw / 2 + dx} y1="30" x2={cx - bw / 2} y2="140" stroke="#f59e0b" strokeWidth="1.5" />
-                    <line x1={cx + bw / 2 + dx} y1="30" x2={cx + bw / 2} y2="140" stroke="#f59e0b" strokeWidth="1.5" />
-                    <ellipse cx={cx + dx / 2} cy="30" rx={bw / 2} ry={bw / 6} fill="none" stroke="#f59e0b" strokeWidth="1.5" />
-                    {/* Angle arc */}
-                    {angle < 90 && (
-                      <path
-                        d={`M ${cx + 40} 140 A 40 40 0 0 0 ${cx + 40 * Math.cos(angleRad)} ${140 - 40 * Math.sin(angleRad)}`}
-                        fill="none" stroke="#999" strokeWidth="0.8" strokeDasharray="2,2"
-                      />
-                    )}
-                    <text x={cx + 50} y="138" fill="#999" fontSize="8">{angle}°</text>
-                  </g>
-                );
-              })()}
-
-              {/* Reinforcement pad */}
-              {reinforcement.padRequired && (() => {
-                const padW = Math.min(reinforcement.reqPadOD * 0.6, 140);
-                const padH = Math.min(reinforcement.reqPadThickness * 1.5, 12);
-                const cx = 200;
-                return (
-                  <g>
-                    <rect x={cx - padW / 2} y={140 - padH} width={padW} height={padH} rx="1"
-                      fill="#f59e0b" fillOpacity="0.15" stroke="#f59e0b" strokeWidth="1" strokeDasharray="4,2" />
-                    <text x={cx + padW / 2 + 5} y={140 - padH / 2 + 3} fill="#f59e0b" fontSize="8">
-                      PAD {reinforcement.reqPadThickness}mm
-                    </text>
-                  </g>
-                );
-              })()}
-
-              {/* Labels */}
-              <text x="20" y="155" fill="#666" fontSize="8" textAnchor="middle">
-                {headerNPS}
-              </text>
-              <text x="200" y="250" fill="#666" fontSize="9" textAnchor="middle">
-                {t('tools.branchLayout.headerPipe')}: {headerNPS} Sch {headerSch}
-              </text>
-              <text x="200" y="20" fill="#f59e0b" fontSize="9" textAnchor="middle">
-                {t('tools.branchLayout.branchPipe')}: {branchNPS} Sch {branchSch}
-              </text>
-            </svg>
-          </div>
-
-          {/* Flat Pattern SVG (Saddle Profile) */}
-          <div className="border border-zinc-800/80 bg-zinc-950 p-4 overflow-x-auto">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-                {t('tools.branchLayout.flatPattern')}
-              </p>
-              <span className="text-[9px] text-zinc-600">{t('tools.branchLayout.saddleProfile')}</span>
-            </div>
-            <svg ref={svgRef} width={svgWidth} height={svgHeight} viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-              className="w-full max-w-[700px]" style={{ background: '#0a0a0a' }}>
-              {/* Grid lines */}
-              {Array.from({ length: 5 }).map((_, i) => {
-                const yPos = padding + (i / 4) * plotH;
-                const val = (maxH - (i / 4) * hRange).toFixed(1);
-                return (
-                  <g key={`grid-h-${i}`}>
-                    <line x1={padding} y1={yPos} x2={svgWidth - padding} y2={yPos} stroke="#222" strokeWidth="0.5" strokeDasharray="4,4" />
-                    <text x={padding - 8} y={yPos + 4} textAnchor="end" fill="#555" fontSize="9">{val}</text>
-                  </g>
-                );
-              })}
-              {/* Vertical grid at key angles */}
-              {[0, 90, 180, 270, 360].map((deg) => {
-                const xPos = padding + (deg / 360) * plotW;
-                return (
-                  <g key={`grid-v-${deg}`}>
-                    <line x1={xPos} y1={padding} x2={xPos} y2={svgHeight - padding} stroke="#222" strokeWidth="0.5" strokeDasharray="4,4" />
-                    <text x={xPos} y={svgHeight - padding + 15} textAnchor="middle" fill="#555" fontSize="9">{deg}°</text>
-                  </g>
-                );
-              })}
-
-              {/* Filled area under curve */}
-              {pathD && (
-                <path
-                  d={`${pathD} L${(padding + plotW).toFixed(1)},${(padding + plotH).toFixed(1)} L${padding},${(padding + plotH).toFixed(1)} Z`}
-                  fill="#f59e0b" fillOpacity="0.08" stroke="none"
-                />
-              )}
-
-              {/* Cut line path */}
-              <path d={pathD} fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-
-              {/* Division points */}
-              {points.map((p, idx) => {
-                const px = padding + (idx / divisions) * plotW;
-                const py = padding + plotH - ((p.h - minH) / hRange) * plotH;
-                return <circle key={idx} cx={px} cy={py} r="2" fill="#f59e0b" opacity="0.7" />;
-              })}
-
-              {/* Min/Max markers */}
-              {points.length > 0 && (() => {
-                const maxPt = points.reduce((a, b) => a.h > b.h ? a : b);
-                const minPt = points.reduce((a, b) => a.h < b.h ? a : b);
-                const maxPx = padding + (maxPt.i / divisions) * plotW;
-                const maxPy = padding + plotH - ((maxPt.h - minH) / hRange) * plotH;
-                const minPx = padding + (minPt.i / divisions) * plotW;
-                const minPy = padding + plotH - ((minPt.h - minH) / hRange) * plotH;
-                return (
-                  <>
-                    <circle cx={maxPx} cy={maxPy} r="4" fill="none" stroke="#f59e0b" strokeWidth="1.5" />
-                    <text x={maxPx} y={maxPy - 8} textAnchor="middle" fill="#f59e0b" fontSize="8">
-                      max {maxPt.h.toFixed(1)}
-                    </text>
-                    <circle cx={minPx} cy={minPy} r="4" fill="none" stroke="#22c55e" strokeWidth="1.5" />
-                    <text x={minPx} y={minPy + 14} textAnchor="middle" fill="#22c55e" fontSize="8">
-                      min {minPt.h.toFixed(1)}
-                    </text>
-                  </>
-                );
-              })()}
-
-              {/* Axes labels */}
-              <text x={svgWidth / 2} y={svgHeight - 5} textAnchor="middle" fill="#888" fontSize="10">
-                {t('tools.branchLayout.perimeterAxis')} ({perimeter.toFixed(1)} mm)
-              </text>
-              <text x={14} y={svgHeight / 2} textAnchor="middle" fill="#888" fontSize="10" transform={`rotate(-90,14,${svgHeight / 2})`}>
-                h (mm)
-              </text>
-
-              {/* Title block */}
-              <text x={svgWidth - padding} y={padding - 10} textAnchor="end" fill="#666" fontSize="9">
-                {headerNPS} × {branchNPS} @ {angle}°
-              </text>
-            </svg>
-          </div>
-
-          {/* Isometric 3D Preview */}
-          <div className="border border-zinc-800/80 bg-zinc-950 p-4">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
-              {t('tools.branchLayout.isometricView')}
-            </p>
-            <svg width="300" height="220" viewBox="0 0 300 220" className="mx-auto">
-              {/* Header pipe (horizontal) */}
-              <ellipse cx="150" cy="160" rx="100" ry="22" fill="none" stroke="#555" strokeWidth="1.5" />
-              <line x1="50" y1="160" x2="50" y2="125" stroke="#555" strokeWidth="1.5" />
-              <line x1="250" y1="160" x2="250" y2="125" stroke="#555" strokeWidth="1.5" />
-              <ellipse cx="150" cy="125" rx="100" ry="22" fill="none" stroke="#777" strokeWidth="1.5" />
-              {/* Center line header */}
-              <line x1="30" y1="142" x2="270" y2="142" stroke="#333" strokeWidth="0.5" strokeDasharray="8,4" />
-
-              {/* Branch pipe */}
-              {(() => {
-                const angleRad = ((90 - angle) * Math.PI) / 180;
-                const bw = 30;
-                const topY = 25;
-                const botY = 125;
-                const dx = Math.sin(angleRad) * (botY - topY);
-                return (
-                  <g>
-                    <line x1={150 - bw / 2 + dx} y1={topY} x2={150 - bw / 2} y2={botY} stroke="#f59e0b" strokeWidth="1.5" />
-                    <line x1={150 + bw / 2 + dx} y1={topY} x2={150 + bw / 2} y2={botY} stroke="#f59e0b" strokeWidth="1.5" />
-                    <ellipse cx={150 + dx / 2} cy={topY} rx={bw / 2} ry={bw / 5} fill="none" stroke="#f59e0b" strokeWidth="1.5" />
-                    {/* Intersection ellipse */}
-                    <ellipse cx="150" cy={botY + 5} rx={bw / 2} ry={12} fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="3,2" />
-                  </g>
-                );
-              })()}
-
-              {/* Reinforcement pad ring */}
-              {reinforcement.padRequired && (
-                <ellipse cx="150" cy="128" rx="45" ry="14" fill="none" stroke="#f59e0b" strokeWidth="1" strokeDasharray="4,3" opacity="0.6" />
-              )}
-
-              {/* Labels */}
-              <text x="260" y="145" fill="#555" fontSize="9">Ø{headerOD}</text>
-              <text x="185" y="60" fill="#f59e0b" fontSize="9">Ø{branchOD}</text>
-              <text x="150" y="210" textAnchor="middle" fill="#666" fontSize="8">{angle}°</text>
-              {reinforcement.padRequired && (
-                <text x="200" y="120" fill="#f59e0b" fontSize="7" opacity="0.7">PAD</text>
-              )}
-            </svg>
-          </div>
-
-          {/* Dimension Table */}
-          <div className="border border-zinc-800/80 bg-zinc-950 p-4 overflow-x-auto">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
-              {t('tools.branchLayout.dimensionTable')}
-            </p>
-            <div className="max-h-[300px] overflow-y-auto">
-              <table className="w-full text-xs">
-                <thead className="sticky top-0 bg-zinc-950">
-                  <tr className="border-b border-zinc-800">
-                    <th className="py-1.5 px-2 text-left text-zinc-400">#</th>
-                    <th className="py-1.5 px-2 text-left text-zinc-400">{t('tools.branchLayout.angleDeg')}</th>
-                    <th className="py-1.5 px-2 text-left text-zinc-400">h (mm)</th>
-                    <th className="py-1.5 px-2 text-left text-zinc-400">{t('tools.branchLayout.distFromRef')}</th>
-                    <th className="py-1.5 px-2 text-left text-zinc-400">{t('tools.branchLayout.arcLength')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {points.map((p) => (
-                    <tr key={p.i} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
-                      <td className="py-1 px-2 text-zinc-500">{p.i}</td>
-                      <td className="py-1 px-2 text-zinc-300">{p.angleDeg.toFixed(1)}°</td>
-                      <td className="py-1 px-2 text-[#f59e0b] font-mono">{p.h.toFixed(2)}</td>
-                      <td className="py-1 px-2 text-zinc-300 font-mono">{(p.h - minH).toFixed(2)}</td>
-                      <td className="py-1 px-2 text-zinc-400 font-mono">{((p.i / divisions) * perimeter).toFixed(1)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={handlePrint} className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold">
-              {t('tools.branchLayout.print1to1')}
-            </Button>
-            <Button onClick={handleSave} variant="outline" className="border-zinc-700 !bg-transparent hover:!bg-zinc-900">
-              {t('tools.branchLayout.saveCalc')}
-            </Button>
-          </div>
-
-          {/* Reference note */}
-          <p className="text-[10px] text-zinc-600 leading-relaxed">
-            {t('tools.branchLayout.referenceNoteB313', {
-              defaultValue:
-                'Reinforcement per ASME B31.3 §304.3.3 using the pressure design thickness of §304.1.2. Mill tolerance is applied to the as-supplied wall (Th,min, Tb,min), not treated as a required thickness. Cut-template geometry is independent of the reinforcement check.',
+          )}
+          <p className="mt-2 text-[10px] text-zinc-600">
+            {t('tools.branchLayout.contactConvention', {
+              defaultValue: 'Contact profile: branch ID. Template wrap / station spacing: branch OD. (Initial reference convention — not a universal fabrication rule.)',
             })}
           </p>
-        </>
-      )}
+        </div>
+
+        {/* Geometry errors (explicit failure, never clamped-looking output) */}
+        {!geometryValid && geometryErrorText && (
+          <div className="border-l-2 border-red-500 bg-red-500/5 p-4">
+            <p className="text-sm text-red-400">{geometryErrorText}</p>
+          </div>
+        )}
+
+        {geometryValid && (
+          <>
+            {/* Flat Pattern preview (screen preview — not the 1:1 artifact) */}
+            <div className="border border-zinc-800/80 bg-zinc-950 p-4 overflow-x-auto">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+                  {t('tools.branchLayout.flatPattern')}
+                </p>
+                <span className="text-[9px] text-zinc-600">
+                  {t('tools.branchLayout.previewNotToScale', { defaultValue: 'Screen preview — not to scale. Use Print for the physical 1:1 template.' })}
+                </span>
+              </div>
+              <svg width={svgWidth} height={svgHeight} viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+                className="w-full max-w-[700px]" style={{ background: '#0a0a0a' }}>
+                {/* Grid lines */}
+                {Array.from({ length: 5 }).map((_, i) => {
+                  const yPos = padding + (i / 4) * plotH;
+                  const val = (maxOrd - (i / 4) * ordRange).toFixed(1);
+                  return (
+                    <g key={`grid-h-${i}`}>
+                      <line x1={padding} y1={yPos} x2={svgWidth - padding} y2={yPos} stroke="#222" strokeWidth="0.5" strokeDasharray="4,4" />
+                      <text x={padding - 8} y={yPos + 4} textAnchor="end" fill="#555" fontSize="9">{val}</text>
+                    </g>
+                  );
+                })}
+                {[0, 90, 180, 270, 360].map((deg) => {
+                  const xPos = padding + (deg / 360) * plotW;
+                  return (
+                    <g key={`grid-v-${deg}`}>
+                      <line x1={xPos} y1={padding} x2={xPos} y2={svgHeight - padding} stroke="#222" strokeWidth="0.5" strokeDasharray="4,4" />
+                      <text x={xPos} y={svgHeight - padding + 15} textAnchor="middle" fill="#555" fontSize="9">{deg}°</text>
+                    </g>
+                  );
+                })}
+
+                {pathD && (
+                  <path
+                    d={`${pathD} L${(padding + plotW).toFixed(1)},${(padding + plotH).toFixed(1)} L${padding},${(padding + plotH).toFixed(1)} Z`}
+                    fill="#f59e0b" fillOpacity="0.08" stroke="none"
+                  />
+                )}
+                <path d={pathD} fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+
+                {geometry.stations.map((st, idx) => {
+                  const px = padding + (st.arcPosition / geometry.developedCircumference) * plotW;
+                  const py = padding + plotH - ((ordinateOf(idx) - minOrd) / ordRange) * plotH;
+                  return <circle key={idx} cx={px} cy={py} r="2" fill="#f59e0b" opacity="0.7" />;
+                })}
+
+                <text x={svgWidth / 2} y={svgHeight - 5} textAnchor="middle" fill="#888" fontSize="10">
+                  {t('tools.branchLayout.perimeterAxis')} ({geometry.developedCircumference.toFixed(1)} mm)
+                </text>
+                <text x={14} y={svgHeight / 2} textAnchor="middle" fill="#888" fontSize="10" transform={`rotate(-90,14,${svgHeight / 2})`}>
+                  {mode === 'marking' ? 'L − s (mm)' : 's − s min (mm)'}
+                </text>
+                <text x={svgWidth - padding} y={padding - 10} textAnchor="end" fill="#666" fontSize="9">
+                  {headerNPS} × {branchNPS} @ {angle}°
+                </text>
+              </svg>
+            </div>
+
+            {/* Branch cut dimension table */}
+            <div className="border border-zinc-800/80 bg-zinc-950 p-4 overflow-x-auto">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                {t('tools.branchLayout.dimensionTable')}
+              </p>
+              <div className="max-h-[300px] overflow-y-auto">
+                <table className="w-full text-xs">
+                  <thead className="sticky top-0 bg-zinc-950">
+                    <tr className="border-b border-zinc-800">
+                      <th className="py-1.5 px-2 text-left text-zinc-400">#</th>
+                      <th className="py-1.5 px-2 text-left text-zinc-400">{t('tools.branchLayout.angleDeg')}</th>
+                      <th className="py-1.5 px-2 text-left text-zinc-400">{t('tools.branchLayout.arcLength')}</th>
+                      <th className="py-1.5 px-2 text-left text-zinc-400">{t('tools.branchLayout.cutOrdinate', { defaultValue: 'Cut ordinate s (mm)' })}</th>
+                      {mode === 'template' ? (
+                        <th className="py-1.5 px-2 text-left text-zinc-400">{t('tools.branchLayout.relOrdinate', { defaultValue: 'Rel. ordinate (mm)' })}</th>
+                      ) : (
+                        <th className="py-1.5 px-2 text-left text-zinc-400">{t('tools.branchLayout.markFromEnd', { defaultValue: 'Mark from end (mm)' })}</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {geometry.stations.map((st) => (
+                      <tr key={st.index} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
+                        <td className="py-1 px-2 text-zinc-500">{st.index + 1}</td>
+                        <td className="py-1 px-2 text-zinc-300">{st.thetaDeg.toFixed(1)}°</td>
+                        <td className="py-1 px-2 text-zinc-400 font-mono">{st.arcPosition.toFixed(3)}</td>
+                        <td className="py-1 px-2 text-[#f59e0b] font-mono">{st.cutOrdinate.toFixed(2)}</td>
+                        <td className="py-1 px-2 text-zinc-300 font-mono">
+                          {mode === 'template' ? st.relativeOrdinate.toFixed(2) : st.markFromEnd!.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Header picaje (hole marking) — same canonical stations */}
+            <div className="border border-zinc-800/80 bg-zinc-950 p-4 overflow-x-auto">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+                  {t('tools.branchLayout.headerPicaje', { defaultValue: 'Header hole marking (picaje)' })}
+                </p>
+                <span className="text-[9px] text-zinc-600">Ø{headerOD}</span>
+              </div>
+              {/* Original convention diagram: true hole shape from the canonical stations.
+                  X = developed arc on the header circumference; Y = axial. */}
+              <svg width="420" height="240" viewBox="0 0 420 240" className="mx-auto mb-3">
+                {(() => {
+                  const xs = geometry.stations.map(s => s.picajeX);
+                  const ys = geometry.stations.map(s => s.picajeY);
+                  const xMax = Math.max(...xs.map(Math.abs)) || 1;
+                  const yMax = Math.max(...ys.map(Math.abs)) || 1;
+                  const cx = 210, cy = 120;
+                  const sx = 150 / xMax, sy = 80 / yMax;
+                  const pts = geometry.stations.map(s => `${(cx + s.picajeX * sx).toFixed(1)},${(cy - s.picajeY * sy).toFixed(1)}`).join(' ');
+                  return (
+                    <g>
+                      <rect x="20" y="30" width="380" height="180" fill="none" stroke="#2a2a2a" strokeWidth="1" rx="4" />
+                      <line x1="20" y1={cy} x2="400" y2={cy} stroke="#333" strokeWidth="0.6" strokeDasharray="6,4" />
+                      <line x1={cx} y1="30" x2={cx} y2="210" stroke="#333" strokeWidth="0.6" strokeDasharray="6,4" />
+                      <polygon points={pts} fill="#f59e0b" fillOpacity="0.07" stroke="#f59e0b" strokeWidth="1.6" />
+                      <circle cx={cx} cy={cy} r="2.5" fill="#f59e0b" />
+                      <text x={cx + 5} y={cy - 5} fill="#f59e0b" fontSize="8">(0,0)</text>
+                      <text x="392" y={cy - 6} fill="#888" fontSize="9" textAnchor="end">X — {t('tools.branchLayout.picajeAxisX', { defaultValue: 'arc on header' })}</text>
+                      <text x={cx + 6} y="40" fill="#888" fontSize="9">Y — {t('tools.branchLayout.picajeAxisY', { defaultValue: 'header axis' })}</text>
+                      <circle cx={cx + xs[0] * sx} cy={cy - ys[0] * sy} r="3.5" fill="none" stroke="#22c55e" strokeWidth="1.2" />
+                      <text x={cx + xs[0] * sx + 6} y={cy - ys[0] * sy + 3} fill="#22c55e" fontSize="8">1</text>
+                    </g>
+                  );
+                })()}
+              </svg>
+              <p className="text-[10px] text-zinc-600 leading-relaxed mb-3">
+                {t('tools.branchLayout.picajeNote', {
+                  defaultValue: 'Origin (0,0): projection of the axis intersection on the header surface. X follows the header circumference (developed arc, real curved mm); Y runs along the header axis. Station 1 matches the template seam.',
+                })}
+              </p>
+              <div className="max-h-[260px] overflow-y-auto">
+                <table className="w-full text-xs">
+                  <thead className="sticky top-0 bg-zinc-950">
+                    <tr className="border-b border-zinc-800">
+                      <th className="py-1.5 px-2 text-left text-zinc-400">#</th>
+                      <th className="py-1.5 px-2 text-left text-zinc-400">{t('tools.branchLayout.angleDeg')}</th>
+                      <th className="py-1.5 px-2 text-left text-zinc-400">X (mm)</th>
+                      <th className="py-1.5 px-2 text-left text-zinc-400">Y (mm)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {geometry.stations.map((st) => (
+                      <tr key={st.index} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
+                        <td className="py-1 px-2 text-zinc-500">{st.index + 1}</td>
+                        <td className="py-1 px-2 text-zinc-300">{st.thetaDeg.toFixed(1)}°</td>
+                        <td className="py-1 px-2 text-zinc-300 font-mono">{st.picajeX.toFixed(1)}</td>
+                        <td className="py-1 px-2 text-[#f59e0b] font-mono">{st.picajeY.toFixed(1)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Isometric 3D Preview */}
+            <div className="border border-zinc-800/80 bg-zinc-950 p-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                {t('tools.branchLayout.isometricView')}
+              </p>
+              <svg width="300" height="220" viewBox="0 0 300 220" className="mx-auto">
+                <ellipse cx="150" cy="160" rx="100" ry="22" fill="none" stroke="#555" strokeWidth="1.5" />
+                <line x1="50" y1="160" x2="50" y2="125" stroke="#555" strokeWidth="1.5" />
+                <line x1="250" y1="160" x2="250" y2="125" stroke="#555" strokeWidth="1.5" />
+                <ellipse cx="150" cy="125" rx="100" ry="22" fill="none" stroke="#777" strokeWidth="1.5" />
+                <line x1="30" y1="142" x2="270" y2="142" stroke="#333" strokeWidth="0.5" strokeDasharray="8,4" />
+                {(() => {
+                  const angleRad = ((90 - angle) * Math.PI) / 180;
+                  const bw = 30;
+                  const topY = 25;
+                  const botY = 125;
+                  const dx = Math.sin(angleRad) * (botY - topY);
+                  return (
+                    <g>
+                      <line x1={150 - bw / 2 + dx} y1={topY} x2={150 - bw / 2} y2={botY} stroke="#f59e0b" strokeWidth="1.5" />
+                      <line x1={150 + bw / 2 + dx} y1={topY} x2={150 + bw / 2} y2={botY} stroke="#f59e0b" strokeWidth="1.5" />
+                      <ellipse cx={150 + dx / 2} cy={topY} rx={bw / 2} ry={bw / 5} fill="none" stroke="#f59e0b" strokeWidth="1.5" />
+                      <ellipse cx="150" cy={botY + 5} rx={bw / 2} ry={12} fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="3,2" />
+                    </g>
+                  );
+                })()}
+                {reinforcement?.padRequired && (
+                  <ellipse cx="150" cy="128" rx="45" ry="14" fill="none" stroke="#f59e0b" strokeWidth="1" strokeDasharray="4,3" opacity="0.6" />
+                )}
+                <text x="260" y="145" fill="#555" fontSize="9">Ø{headerOD}</text>
+                <text x="185" y="60" fill="#f59e0b" fontSize="9">Ø{branchOD}</text>
+                <text x="150" y="210" textAnchor="middle" fill="#666" fontSize="8">{angle}°</text>
+                {reinforcement?.padRequired && (
+                  <text x="200" y="120" fill="#f59e0b" fontSize="7" opacity="0.7">PAD</text>
+                )}
+              </svg>
+            </div>
+
+            {/* Fabrication actions */}
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={handlePrint} className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold">
+                {t('tools.branchLayout.print1to1')}
+              </Button>
+              <Button onClick={handleSave} variant="outline" className="border-zinc-700 !bg-transparent hover:!bg-zinc-900">
+                {t('tools.branchLayout.saveCalc')}
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* ═══ ENGINEERING — ASME B31.3 (collapsible; calculation layer unchanged) ═══ */}
+      <div className="space-y-4">
+        <button
+          type="button"
+          onClick={() => setEngOpen(o => !o)}
+          className="w-full flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-medium border-b border-zinc-800 pb-2 hover:text-zinc-200 transition-colors"
+        >
+          <span>{t('tools.branchLayout.engineering', { defaultValue: 'Engineering — ASME B31.3 reinforcement' })}</span>
+          <span className="text-zinc-500 normal-case tracking-normal">{engOpen ? '−' : '+'}</span>
+        </button>
+
+        {engOpen && (
+          <>
+            {/* ── ASME B31.3 Design Inputs ── */}
+            <div className="space-y-4 rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
+                  {t('tools.branchLayout.designInputs', { defaultValue: 'Design Inputs (ASME B31.3)' })}
+                </p>
+                <span className="text-[9px] text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded">§304.1.2 / §304.3.3</span>
+              </div>
+
+              {/* Material reference selector + allowable stress */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500">
+                    {t('tools.branchLayout.materialReference', { defaultValue: 'Material reference (optional)' })}
+                  </Label>
+                  <select
+                    defaultValue=""
+                    onChange={(e) => {
+                      const ref = ALLOWABLE_STRESS_REFS.find(m => m.id === e.target.value);
+                      if (ref) setAllowableStress(ref.s);
+                    }}
+                    className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
+                  >
+                    <option value="">
+                      {t('tools.branchLayout.materialManual', { defaultValue: 'Enter S manually…' })}
+                    </option>
+                    {ALLOWABLE_STRESS_REFS.map(m => (
+                      <option key={m.id} value={m.id}>{m.material} — {m.s} MPa</option>
+                    ))}
+                  </select>
+                  <p className="text-[10px] text-zinc-600 leading-relaxed">
+                    {ALLOWABLE_STRESS_REFS.map(m => `${m.material}: ${m.s} MPa @ ${m.basis}`).join(' · ')}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500">
+                    S — {t('tools.branchLayout.allowableStress', { defaultValue: 'Basic allowable stress' })} (MPa)
+                  </Label>
+                  <input
+                    type="number" min={0} step={0.1}
+                    value={allowableStress}
+                    onChange={(e) => setAllowableStress(Number(e.target.value))}
+                    className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                  />
+                </div>
+              </div>
+
+              {/* Prominent allowable-stress warning */}
+              <div className="border-l-2 border-[#f59e0b] bg-[#f59e0b]/5 p-3">
+                <p className="text-[11px] text-[#f59e0b] leading-relaxed">
+                  {t('tools.branchLayout.allowableStressWarning', {
+                    defaultValue:
+                      'S varies strongly with design temperature. The listed values are reference points at their stated temperature basis only. You must take S from ASME B31.3 Table A-1 of the applicable code edition for the actual design temperature and material condition.',
+                  })}
+                </p>
+              </div>
+
+              {/* Numeric design parameters */}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500">
+                    P — {t('tools.branchLayout.designPressure', { defaultValue: 'Design pressure' })} (MPa)
+                  </Label>
+                  <input
+                    type="number" min={0} step={0.1}
+                    value={pressure}
+                    onChange={(e) => setPressure(Number(e.target.value))}
+                    className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500">
+                    E — {t('tools.branchLayout.qualityFactor', { defaultValue: 'Weld joint quality factor' })}
+                  </Label>
+                  <input
+                    type="number" min={0} max={1} step={0.01}
+                    value={qualityFactor}
+                    onChange={(e) => setQualityFactor(Number(e.target.value))}
+                    className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500">
+                    W — {t('tools.branchLayout.weldStrengthFactor', { defaultValue: 'Weld strength reduction factor' })}
+                  </Label>
+                  <input
+                    type="number" min={0} max={1} step={0.01}
+                    value={weldStrengthFactor}
+                    onChange={(e) => setWeldStrengthFactor(Number(e.target.value))}
+                    className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500">
+                    Y — {t('tools.branchLayout.coefficientY', { defaultValue: 'Coefficient Y (Table 304.1.1)' })}
+                  </Label>
+                  <input
+                    type="number" min={0} max={1} step={0.01}
+                    value={coefficientY}
+                    onChange={(e) => setCoefficientY(Number(e.target.value))}
+                    className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500">
+                    c — {t('tools.branchLayout.corrosionAllowance', { defaultValue: 'Corrosion / erosion allowance' })} (mm)
+                  </Label>
+                  <input
+                    type="number" min={0} step={0.1}
+                    value={corrosion}
+                    onChange={(e) => setCorrosion(Number(e.target.value))}
+                    className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500">
+                    {t('tools.branchLayout.millTolerance', { defaultValue: 'Mill tolerance' })} (%)
+                  </Label>
+                  <input
+                    type="number" min={0} max={99} step={0.5}
+                    value={millTolerancePct}
+                    onChange={(e) => setMillTolerancePct(Number(e.target.value))}
+                    className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500">
+                    {t('tools.branchLayout.weldLegBranch', { defaultValue: 'Branch fillet weld leg' })} (mm)
+                  </Label>
+                  <input
+                    type="number" min={0} step={0.5}
+                    value={weldLegBranch}
+                    onChange={(e) => setWeldLegBranch(Number(e.target.value))}
+                    className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500">
+                    {t('tools.branchLayout.weldLegPad', { defaultValue: 'Pad fillet weld leg' })} (mm)
+                  </Label>
+                  <input
+                    type="number" min={0} step={0.5}
+                    value={weldLegPad}
+                    onChange={(e) => setWeldLegPad(Number(e.target.value))}
+                    className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                  />
+                </div>
+              </div>
+
+              {/* Existing pad, if any */}
+              <div className="border-t border-zinc-800/60 pt-3">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                  {t('tools.branchLayout.existingPad', { defaultValue: 'Existing reinforcing pad (leave 0 if none)' })}
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="text-xs text-zinc-500">
+                      Tr — {t('tools.branchLayout.padThickness')} (mm)
+                    </Label>
+                    <input
+                      type="number" min={0} step={0.5}
+                      value={padThickness}
+                      onChange={(e) => setPadThickness(Number(e.target.value))}
+                      className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-zinc-500">
+                      {t('tools.branchLayout.padOD')} (mm)
+                    </Label>
+                    <input
+                      type="number" min={0} step={1}
+                      value={padOD}
+                      onChange={(e) => setPadOD(Number(e.target.value))}
+                      className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-mono focus:ring-1 focus:ring-[#f59e0b]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Design input validation error */}
+            {geometryValid && !designInputsValid && (
+              <div className="border-l-2 border-red-500 bg-red-500/5 p-4">
+                <p className="text-sm text-red-400">
+                  {t('tools.branchLayout.errorDesignInputs', {
+                    defaultValue: 'Enter a positive design pressure P, allowable stress S, and factors E and W greater than zero.',
+                  })}
+                </p>
+              </div>
+            )}
+
+            {geometryValid && reinforcement && (
+              <>
+                {/* Results Panel */}
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="rounded-lg border border-[#f59e0b]/30 bg-[#f59e0b]/5 p-4 text-center">
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
+                      {t('tools.branchLayout.d1Label', { defaultValue: 'd1 — Material Removed' })}
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-[#f59e0b] font-mono">{reinforcement.d1.toFixed(1)}</p>
+                    <p className="text-[10px] text-zinc-500">mm</p>
+                  </div>
+                  <div className="rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4 text-center">
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
+                      {t('tools.branchLayout.a1Required', { defaultValue: 'A1 — Required Area' })}
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-zinc-100 font-mono">{reinforcement.a1.toFixed(1)}</p>
+                    <p className="text-[10px] text-zinc-500">mm²</p>
+                  </div>
+                  <div className="rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4 text-center">
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
+                      {t('tools.branchLayout.availableArea', { defaultValue: 'Available Area' })}
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-zinc-100 font-mono">{reinforcement.aAvailable.toFixed(1)}</p>
+                    <p className="text-[10px] text-zinc-500">mm² (A2 + A3 + A4)</p>
+                  </div>
+                  <div className={`rounded-lg border p-4 text-center ${reinforcement.adequate ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-red-500/40 bg-red-500/5'}`}>
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-400">
+                      {t('tools.branchLayout.acceptance', { defaultValue: 'Acceptance (A2+A3+A4 ≥ A1)' })}
+                    </p>
+                    <p className={`mt-1 text-lg font-bold ${reinforcement.adequate ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {reinforcement.adequate
+                        ? t('tools.branchLayout.acceptancePass', { defaultValue: 'ADEQUATE' })
+                        : t('tools.branchLayout.acceptanceFail', { defaultValue: 'PAD REQUIRED' })}
+                    </p>
+                    {!reinforcement.adequate && (
+                      <p className="text-[10px] text-zinc-400 mt-1">
+                        {t('tools.branchLayout.deficit', { defaultValue: 'Deficit' })}: {reinforcement.deficit.toFixed(1)} mm²
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Full audit breakdown (ASME B31.3 §304.3.3) */}
+                <div className="rounded-lg border border-zinc-800/60 bg-zinc-900/40 p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
+                      {t('tools.branchLayout.reinforcementCalc')}
+                    </p>
+                    <span className="text-[9px] text-zinc-600 bg-zinc-800 px-2 py-0.5 rounded">ASME B31.3 §304.3.3</span>
+                  </div>
+
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                    {t('tools.branchLayout.thicknesses', { defaultValue: 'Pressure design thicknesses (§304.1.2)' })}
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div>
+                      <span className="text-zinc-500">t<sub>r</sub> ({t('tools.branchLayout.header', { defaultValue: 'header' })}):</span>
+                      <span className="ml-1 text-zinc-200 font-mono">{reinforcement.tr.toFixed(2)} mm</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">t<sub>b</sub> ({t('tools.branchLayout.branch', { defaultValue: 'branch' })}):</span>
+                      <span className="ml-1 text-zinc-200 font-mono">{reinforcement.tb.toFixed(2)} mm</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">T<sub>h,min</sub>:</span>
+                      <span className="ml-1 text-zinc-200 font-mono">{reinforcement.thMin.toFixed(2)} mm</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">T<sub>b,min</sub>:</span>
+                      <span className="ml-1 text-zinc-200 font-mono">{reinforcement.tbMin.toFixed(2)} mm</span>
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mt-4 mb-2">
+                    {t('tools.branchLayout.zoneGeometry', { defaultValue: 'Reinforcement zone' })}
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div>
+                      <span className="text-zinc-500">d<sub>1</sub>:</span>
+                      <span className="ml-1 text-zinc-200 font-mono">{reinforcement.d1.toFixed(2)} mm</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">d<sub>2</sub> ({t('tools.branchLayout.halfWidth', { defaultValue: 'half-width' })}):</span>
+                      <span className="ml-1 text-zinc-200 font-mono">{reinforcement.d2.toFixed(2)} mm</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">L<sub>4</sub> ({t('tools.branchLayout.zoneHeight', { defaultValue: 'height' })}):</span>
+                      <span className="ml-1 text-zinc-200 font-mono">{reinforcement.l4.toFixed(2)} mm</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">sin β:</span>
+                      <span className="ml-1 text-zinc-200 font-mono">{reinforcement.sinBeta.toFixed(3)}</span>
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mt-4 mb-2">
+                    {t('tools.branchLayout.areaBreakdown', { defaultValue: 'Area breakdown' })}
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div>
+                      <span className="text-zinc-500">A<sub>1</sub> ({t('tools.branchLayout.required', { defaultValue: 'required' })}):</span>
+                      <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.a1.toFixed(2)} mm²</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">A<sub>2</sub> ({t('tools.branchLayout.headerExcess', { defaultValue: 'header excess' })}):</span>
+                      <span className="ml-1 text-zinc-200 font-mono">{reinforcement.a2.toFixed(2)} mm²</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">A<sub>3</sub> ({t('tools.branchLayout.branchExcess', { defaultValue: 'branch excess' })}):</span>
+                      <span className="ml-1 text-zinc-200 font-mono">{reinforcement.a3.toFixed(2)} mm²</span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">A<sub>4</sub> ({t('tools.branchLayout.weldsAndPad', { defaultValue: 'welds + pad' })}):</span>
+                      <span className="ml-1 text-zinc-200 font-mono">{reinforcement.a4.toFixed(2)} mm²</span>
+                    </div>
+                  </div>
+
+                  {/* Formulae shown for audit */}
+                  <div className="mt-3 pt-3 border-t border-zinc-800/60 text-[10px] text-zinc-600 font-mono leading-relaxed space-y-0.5">
+                    <p>t = P·D / (2·(S·E·W + P·Y))</p>
+                    <p>d1 = [Db − 2·(Tb − c)] / sin β</p>
+                    <p>A1 = tr · d1 · (2 − sin β)</p>
+                    <p>A2 = (2·d2 − d1) · (Th,min − tr − c)</p>
+                    <p>A3 = 2·L4 · (Tb,min − tb − c) / sin β</p>
+                  </div>
+
+                  {/* Pad sizing for the deficit */}
+                  {!reinforcement.adequate && (
+                    <div className="mt-3 pt-3 border-t border-zinc-800/60">
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                        {t('tools.branchLayout.padSizing', { defaultValue: 'Pad sizing for the deficit' })}
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                        <div>
+                          <span className="text-zinc-500">{t('tools.branchLayout.requiredPadArea', { defaultValue: 'Required pad area' })}:</span>
+                          <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadArea.toFixed(2)} mm²</span>
+                        </div>
+                        <div>
+                          <span className="text-zinc-500">{t('tools.branchLayout.padThickness')}:</span>
+                          <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadThickness.toFixed(2)} mm</span>
+                        </div>
+                        <div>
+                          <span className="text-zinc-500">{t('tools.branchLayout.padOD')}:</span>
+                          <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadOD.toFixed(1)} mm</span>
+                        </div>
+                        <div>
+                          <span className="text-zinc-500">{t('tools.branchLayout.padWidth')}:</span>
+                          <span className="ml-1 text-[#f59e0b] font-mono">{reinforcement.reqPadWidth.toFixed(1)} mm</span>
+                        </div>
+                      </div>
+                      {reinforcement.padWidthLimited && (
+                        <p className="mt-2 text-[11px] text-red-400 leading-relaxed">
+                          {t('tools.branchLayout.padLimitWarning', {
+                            defaultValue:
+                              'The pad needed exceeds the header wall thickness or the d2 width limit. Reconsider the design: use a heavier header, a thicker branch, or an integrally reinforced fitting.',
+                          })}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Verification disclaimer */}
+                <div className="border-l-2 border-[#f59e0b] bg-[#f59e0b]/5 p-4">
+                  <p className="text-[11px] text-[#f59e0b] leading-relaxed">
+                    {t('tools.branchLayout.verificationDisclaimer', {
+                      defaultValue:
+                        'This result is an aid only and must be verified against the governing edition of ASME B31.3 and the project engineering specification before fabrication. Area replacement per §304.3.3 does not cover external loads, fatigue, or the §304.3.2 limitations on branch connections.',
+                    })}
+                  </p>
+                </div>
+
+                {/* Reference note */}
+                <p className="text-[10px] text-zinc-600 leading-relaxed">
+                  {t('tools.branchLayout.referenceNoteB313', {
+                    defaultValue:
+                      'Reinforcement per ASME B31.3 §304.3.3 using the pressure design thickness of §304.1.2. Mill tolerance is applied to the as-supplied wall (Th,min, Tb,min), not treated as a required thickness. Cut-template geometry is independent of the reinforcement check.',
+                  })}
+                </p>
+              </>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
