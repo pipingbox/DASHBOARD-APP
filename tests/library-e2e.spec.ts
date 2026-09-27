@@ -140,120 +140,131 @@ test.describe('Library V1 E2E (PB-LIBRARY-COMPLETE-001)', () => {
     await expect(page.getByRole('heading', { name: /Válvula de Mariposa API 609/ }).first()).toBeVisible();
   });
 
-  test('L7: a broken asset does NOT appear as success — access error is emitted', async ({ page }) => {
-    const sink: CapturedEvent[] = [];
-    await collectPostHogEvents(page, sink);
-    // Break every catalog drawing asset for this run only.
-    await page.route('**/catalog/2d/**', (route) => route.fulfill({ status: 404, body: 'gone' }));
-    await openLibrary(page);
-    await page.getByText(TXT.knownItem).first().click();
-    // Wait for the broken-img handler first, then for the PostHog batch flush.
-    await page.waitForTimeout(1500);
-    await waitForPostHogFlush(page);
-    // The app never renders a broken image as a successful sheet.
-    const accessErrors = libraryEvents(sink).filter((e) => e.event === 'library_access_error');
-    expect(accessErrors.length, 'library_access_error must fire for the broken drawing').toBeGreaterThan(0);
-    expect(accessErrors[0].properties?.component_id).toBe(TXT.knownItemId);
-    expect(accessErrors[0].properties?.reason_code).toBe('asset_load_failed');
-  });
+  // Production ships opt_out_useragent_filter=false: posthog-js drops events
+  // from HeadlessChrome client-side (GO §5). A non-bot UA lets the client
+  // emit; the PostHog route interception fulfills locally, so no QA event is
+  // ever delivered to the production project.
+  test.describe('analytics emission (non-bot UA — bot filter satisfied)', () => {
+    test.use({
+      userAgent:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+    });
 
-  test('L8: back navigation returns to a usable catalog', async ({ page }) => {
-    await openLibrary(page);
-    await page.getByText(TXT.knownItem).first().click();
-    await expect(page).toHaveURL(/c=PB-COMP/);
-    await page.goBack();
-    await expect(page.getByRole('heading', { name: TXT.title }).first()).toBeVisible();
-    await expect(page.getByText(TXT.knownItem).first()).toBeVisible();
-    // Catalog still interactive after back.
-    await page.getByPlaceholder(TXT.searchPlaceholder).fill('mariposa');
-    await expect(page.getByText(/Válvula de Mariposa API 609/).first()).toBeVisible();
-  });
+    test('L7: a broken asset does NOT appear as success — access error is emitted', async ({ page }) => {
+      const sink: CapturedEvent[] = [];
+      await collectPostHogEvents(page, sink);
+      // Break every catalog drawing asset for this run only.
+      await page.route('**/catalog/2d/**', (route) => route.fulfill({ status: 404, body: 'gone' }));
+      await openLibrary(page);
+      await page.getByText(TXT.knownItem).first().click();
+      // Wait for the broken-img handler first, then for the PostHog batch flush.
+      await page.waitForTimeout(1500);
+      await waitForPostHogFlush(page);
+      // The app never renders a broken image as a successful sheet.
+      const accessErrors = libraryEvents(sink).filter((e) => e.event === 'library_access_error');
+      expect(accessErrors.length, 'library_access_error must fire for the broken drawing').toBeGreaterThan(0);
+      expect(accessErrors[0].properties?.component_id).toBe(TXT.knownItemId);
+      expect(accessErrors[0].properties?.reason_code).toBe('asset_load_failed');
+    });
 
-  test('L9+L10: usage analytics fire with closed payloads and no PII', async ({ page }) => {
-    const sink: CapturedEvent[] = [];
-    await collectPostHogEvents(page, sink);
-    await openLibrary(page);
-    await page.waitForTimeout(400);
+    test('L8: back navigation returns to a usable catalog', async ({ page }) => {
+      await openLibrary(page);
+      await page.getByText(TXT.knownItem).first().click();
+      await expect(page).toHaveURL(/c=PB-COMP/);
+      await page.goBack();
+      await expect(page.getByRole('heading', { name: TXT.title }).first()).toBeVisible();
+      await expect(page.getByText(TXT.knownItem).first()).toBeVisible();
+      // Catalog still interactive after back.
+      await page.getByPlaceholder(TXT.searchPlaceholder).fill('mariposa');
+      await expect(page.getByText(/Válvula de Mariposa API 609/).first()).toBeVisible();
+    });
 
-    // 1) search (with a PII-shaped term) — debounced emission, length only
-    await page.getByPlaceholder(TXT.searchPlaceholder).fill('ana.garcia@empresa.com brida');
-    await page.waitForTimeout(1200);
+    test('L9+L10: usage analytics fire with closed payloads and no PII', async ({ page }) => {
+      const sink: CapturedEvent[] = [];
+      await collectPostHogEvents(page, sink);
+      await openLibrary(page);
+      await page.waitForTimeout(400);
 
-    // 2) empty-result query (asserted via library_empty_result)
-    await page.getByPlaceholder(TXT.searchPlaceholder).fill('zzz-no-existe-zzz');
-    await page.waitForTimeout(1200);
+      // 1) search (with a PII-shaped term) — debounced emission, length only
+      await page.getByPlaceholder(TXT.searchPlaceholder).fill('ana.garcia@empresa.com brida');
+      await page.waitForTimeout(1200);
 
-    // 3) clear + family chip → filter_selected with closed enum
-    await page.getByRole('button', { name: TXT.clearFilters }).first().click();
-    await page.getByRole('button', { name: /^Gaskets/ }).click();
-    await page.waitForTimeout(300);
+      // 2) empty-result query (asserted via library_empty_result)
+      await page.getByPlaceholder(TXT.searchPlaceholder).fill('zzz-no-existe-zzz');
+      await page.waitForTimeout(1200);
 
-    // 4) clear + open item → item_opened with closed PB-COMP id
-    await page.getByRole('button', { name: TXT.clearFilters }).first().click();
-    await page.getByText(TXT.knownItem).first().click();
-    await page.waitForTimeout(300);
+      // 3) clear + family chip → filter_selected with closed enum
+      await page.getByRole('button', { name: TXT.clearFilters }).first().click();
+      await page.getByRole('button', { name: /^Gaskets/ }).click();
+      await page.waitForTimeout(300);
 
-    // 5) explicit 2D preview switch (size tab) → resource_action preview_2d
-    const sizeButtons = page.locator('button.font-mono');
-    if ((await sizeButtons.count()) > 1) {
-      await sizeButtons.nth(1).click();
-      await page.waitForTimeout(200);
-    }
+      // 4) clear + open item → item_opened with closed PB-COMP id
+      await page.getByRole('button', { name: TXT.clearFilters }).first().click();
+      await page.getByText(TXT.knownItem).first().click();
+      await page.waitForTimeout(300);
 
-    // 6) download → resource_action download_2d/download_3d.
-    // The detail opens in field mode ("Modo obra") with a single tab; the
-    // Downloads tab lives in engineering mode.
-    await page.getByRole('button', { name: /Ver ficha completa/i }).click();
-    await page.getByRole('button', { name: /^Descargas$/ }).click();
-    const dlLink = page.locator('a[download]').first();
-    await expect(dlLink).toBeVisible();
-    await dlLink.click();
-    await page.waitForTimeout(300);
+      // 5) explicit 2D preview switch (size tab) → resource_action preview_2d
+      const sizeButtons = page.locator('button.font-mono');
+      if ((await sizeButtons.count()) > 1) {
+        await sizeButtons.nth(1).click();
+        await page.waitForTimeout(200);
+      }
 
-    // posthog-js batches captures — wait for the flush, then assert everything.
-    await waitForPostHogFlush(page);
-    const events = libraryEvents(sink);
-    const names = events.map((e) => e.event);
-    for (const required of [
-      'library_viewed',
-      'library_search_performed',
-      'library_empty_result',
-      'library_filter_selected',
-      'library_item_opened',
-    ]) {
-      expect(names, `missing ${required}`).toContain(required);
-    }
+      // 6) download → resource_action download_2d/download_3d.
+      // The detail opens in field mode ("Modo obra") with a single tab; the
+      // Downloads tab lives in engineering mode.
+      await page.getByRole('button', { name: /Ver ficha completa/i }).click();
+      await page.getByRole('button', { name: /^Descargas$/ }).click();
+      const dlLink = page.locator('a[download]').first();
+      await expect(dlLink).toBeVisible();
+      await dlLink.click();
+      await page.waitForTimeout(300);
 
-    const viewed = events.find((e) => e.event === 'library_viewed');
-    expect(viewed?.properties?.results_count).toBe(56);
-    expect(Object.keys(viewed?.properties ?? {})).toEqual(
-      expect.arrayContaining(['results_count', 'environment', 'app_version']),
-    );
+      // posthog-js batches captures — wait for the flush, then assert everything.
+      await waitForPostHogFlush(page);
+      const events = libraryEvents(sink);
+      const names = events.map((e) => e.event);
+      for (const required of [
+        'library_viewed',
+        'library_search_performed',
+        'library_empty_result',
+        'library_filter_selected',
+        'library_item_opened',
+      ]) {
+        expect(names, `missing ${required}`).toContain(required);
+      }
 
-    const searches = events.filter((e) => e.event === 'library_search_performed');
-    const piiSearch = searches.find((e) => e.properties?.query_length === 28);
-    expect(piiSearch, 'search event carries only the query length').toBeTruthy();
-    expect(JSON.stringify(piiSearch?.properties)).not.toContain('ana.garcia@empresa.com');
-    expect(JSON.stringify(piiSearch?.properties)).not.toContain('brida');
+      const viewed = events.find((e) => e.event === 'library_viewed');
+      expect(viewed?.properties?.results_count).toBe(56);
+      expect(Object.keys(viewed?.properties ?? {})).toEqual(
+        expect.arrayContaining(['results_count', 'environment', 'app_version']),
+      );
 
-    const filters = events.filter((e) => e.event === 'library_filter_selected');
-    expect(filters[0]?.properties?.filter_type).toBe('family');
-    expect(filters[0]?.properties?.filter_value).toBe('gaskets');
+      const searches = events.filter((e) => e.event === 'library_search_performed');
+      const piiSearch = searches.find((e) => e.properties?.query_length === 28);
+      expect(piiSearch, 'search event carries only the query length').toBeTruthy();
+      expect(JSON.stringify(piiSearch?.properties)).not.toContain('ana.garcia@empresa.com');
+      expect(JSON.stringify(piiSearch?.properties)).not.toContain('brida');
 
-    const opened = events.filter((e) => e.event === 'library_item_opened');
-    expect(opened[0]?.properties?.component_id).toBe(TXT.knownItemId);
+      const filters = events.filter((e) => e.event === 'library_filter_selected');
+      expect(filters[0]?.properties?.filter_type).toBe('family');
+      expect(filters[0]?.properties?.filter_value).toBe('gaskets');
 
-    const actions = events.filter((e) => e.event === 'library_resource_action');
-    const actionTypes = actions.map((e) => e.properties?.resource_type);
-    expect(actionTypes).toContain('preview_2d');
-    expect(actionTypes.some((t) => t === 'download_2d' || t === 'download_3d')).toBe(true);
+      const opened = events.filter((e) => e.event === 'library_item_opened');
+      expect(opened[0]?.properties?.component_id).toBe(TXT.knownItemId);
 
-    // L10 — global PII assertion across EVERY library payload captured.
-    for (const ev of events) {
-      const json = JSON.stringify(ev.properties ?? {});
-      expect(json).not.toMatch(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
-      expect(json).not.toContain('ana.garcia');
-    }
+      const actions = events.filter((e) => e.event === 'library_resource_action');
+      const actionTypes = actions.map((e) => e.properties?.resource_type);
+      expect(actionTypes).toContain('preview_2d');
+      expect(actionTypes.some((t) => t === 'download_2d' || t === 'download_3d')).toBe(true);
+
+      // L10 — global PII assertion across EVERY library payload captured.
+      for (const ev of events) {
+        const json = JSON.stringify(ev.properties ?? {});
+        expect(json).not.toMatch(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+        expect(json).not.toContain('ana.garcia');
+      }
+    });
   });
 
   test('L11: public route without auth and no privileged URLs in the DOM', async ({ page }) => {
