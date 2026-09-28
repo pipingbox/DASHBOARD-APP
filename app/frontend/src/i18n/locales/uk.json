@@ -1913,7 +1913,9 @@
     "included": "Включено",
     "notIncluded": "Не включено",
     "contractLabel": "Контракт",
-    "applyHint": "Ваш професійний профіль додається до вашої заявки."
+    "applyHint": "Ваш професійний профіль додається до вашої заявки.",
+    "saturdaysOptionalShort": "Суботи необов’язкові",
+    "saturdaysMandatoryShort": "Суботи обов’язкові"
   },
   "companies": {
     "eyebrow": "Компанії",

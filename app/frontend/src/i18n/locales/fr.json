@@ -1907,7 +1907,9 @@
     "notIncluded": "Non inclus",
     "contractLabel": "Contrat",
     "applyHint": "Votre profil professionnel reste joint à votre candidature.",
-    "vacancies_many": "{{count}} postes"
+    "vacancies_many": "{{count}} postes",
+    "saturdaysOptionalShort": "Samedis optionnels",
+    "saturdaysMandatoryShort": "Samedis obligatoires"
   },
   "companies": {
     "eyebrow": "Entreprises",

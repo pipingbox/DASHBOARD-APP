@@ -1907,7 +1907,9 @@
     "notIncluded": "Neinclus",
     "contractLabel": "Contract",
     "applyHint": "Profilul tău profesional rămâne atașat candidaturii tale.",
-    "vacancies_few": "{{count}} posturi"
+    "vacancies_few": "{{count}} posturi",
+    "saturdaysOptionalShort": "Sâmbete opționale",
+    "saturdaysMandatoryShort": "Sâmbete obligatorii"
   },
   "companies": {
     "eyebrow": "Companii",

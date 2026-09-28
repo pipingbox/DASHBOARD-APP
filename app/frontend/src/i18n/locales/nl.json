@@ -1901,7 +1901,9 @@
     "included": "Inbegrepen",
     "notIncluded": "Niet inbegrepen",
     "contractLabel": "Contract",
-    "applyHint": "Uw professionele profiel blijft gekoppeld aan uw sollicitatie."
+    "applyHint": "Uw professionele profiel blijft gekoppeld aan uw sollicitatie.",
+    "saturdaysOptionalShort": "Zaterdagen optioneel",
+    "saturdaysMandatoryShort": "Zaterdagen verplicht"
   },
   "companies": {
     "eyebrow": "Bedrijven",
