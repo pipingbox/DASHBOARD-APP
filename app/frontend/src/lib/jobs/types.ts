@@ -56,6 +56,9 @@ export interface Job {
   transport_included?: boolean | null;
   period?: string | null;
   summary?: string | null;
+  /* PB-JOBS-PILOT-003 — explicit salary mode + trade for admin/analytics. */
+  salary_mode?: 'from' | 'fixed' | 'range' | null;
+  discipline?: string | null;
   /** Joined translations (listing/detail pages fetch them separately). */
   translations?: JobTranslation[];
 }

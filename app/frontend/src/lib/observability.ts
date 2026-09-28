@@ -52,6 +52,13 @@ export const OBS_EVENT_NAMES = [
   'library_resource_action',
   'library_empty_result',
   'library_access_error',
+  // PB-JOBS-PILOT-003 — Jobs funnel (§14–§15). Only stages with a real
+  // product state are instrumented: view → start → submit. Later stages
+  // (candidate_reviewed/forwarded/selected) have no workflow yet and are
+  // documented as a PRODUCT GAP, not invented here.
+  'job_viewed',
+  'apply_started',
+  'apply_submitted',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -119,6 +126,12 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   library_resource_action: ['component_id', 'resource_type'],
   library_empty_result: ['query_length', 'filter_count'],
   library_access_error: ['component_id', 'resource_type', 'reason_code'],
+  // PB-JOBS-PILOT-003 — Jobs funnel. job_id is a technical UUID (validated
+  // against JOB_ID_RE, kept raw like component_id); country/trade are closed
+  // job metadata, never candidate data. NO candidate identity anywhere.
+  job_viewed: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade'],
+  apply_started: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade'],
+  apply_submitted: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade'],
   onboarding_step_reached: ['step', 'account_type'],
   onboarding_completed: ['account_type'],
   referral_link_opened: ['origin', 'route'],
@@ -150,6 +163,10 @@ export const LIBRARY_RESOURCE_TYPES = ['preview_2d', 'preview_3d', 'download_2d'
 export type LibraryResourceType = (typeof LIBRARY_RESOURCE_TYPES)[number];
 /** `PB-COMP-*` internal catalog id — never a filename or user text. */
 export const LIBRARY_COMPONENT_ID_RE = /^PB-COMP-[A-Z0-9-]+$/;
+
+/** PB-JOBS-PILOT-003 — technical job UUID for funnel events. Raw passthrough
+ *  like component_id: it is OUR taxonomy (a DB primary key), never PII. */
+export const JOB_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * SDK-internal event names allowed through `before_send` even though they sit
@@ -294,6 +311,8 @@ const PASSTHROUGH_VALUE_KEYS = new Set([
   'filter_value',
   'resource_type',
   'reason_code',
+  // PB-JOBS-PILOT-003 — job UUID (validated against JOB_ID_RE upstream).
+  'job_id',
 ]);
 
 const ABSOLUTE_URL_RE = /https?:\/\/[^\s"'<>\\]+/gi;
@@ -686,6 +705,12 @@ export function buildEventProps(
         if (LIBRARY_COMPONENT_ID_RE.test(raw)) out[key] = raw;
         continue;
       }
+      // PB-JOBS-PILOT-003 — job UUIDs are kept raw (technical id, our
+      // taxonomy); sanitizeValue would redact them as "long tokens".
+      if (key === 'job_id') {
+        if (JOB_ID_RE.test(raw)) out[key] = raw;
+        continue;
+      }
       out[key] = sanitizeValue(raw);
     } else if (typeof raw === 'number' || typeof raw === 'boolean') {
       out[key] = raw;
@@ -705,6 +730,9 @@ export function buildEventProps(
   }
   if ('component_family' in out && !LIBRARY_COMPONENT_ID_RE.test(String(out.component_family))) {
     delete out.component_family;
+  }
+  if ('job_id' in out && !JOB_ID_RE.test(String(out.job_id))) {
+    delete out.job_id;
   }
   if ('query_length' in out && typeof out.query_length === 'number' && (out.query_length < 0 || out.query_length > 500)) {
     delete out.query_length;

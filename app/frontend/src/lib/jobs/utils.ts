@@ -89,6 +89,45 @@ export interface FormattedSalary {
   period: 'year' | 'month';
 }
 
+/**
+ * Explicit structured salary label (PB-JOBS-PILOT-003 §2).
+ *
+ * Used ONLY when the job carries the explicit structured metadata
+ * (salary_period + salary_mode) written by the admin job editor — the
+ * replacement for the legacy formatSalary "amount < 10000 = monthly"
+ * heuristic. Returns null when either field is absent so callers can fall
+ * back to the legacy rendering for un-migrated rows.
+ *
+ * Modes: from (≥ min), fixed (exact min), range (min–max).
+ */
+export function structuredSalaryLabel(
+  job: Pick<Job, 'salary_min' | 'salary_max' | 'currency' | 'salary_period' | 'salary_mode'>,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string | null {
+  const period = job.salary_period;
+  const mode = job.salary_mode;
+  if (!period || !mode) return null;
+  if (!['hour', 'day', 'month', 'year'].includes(period)) return null;
+  if (!['from', 'fixed', 'range'].includes(mode)) return null;
+  if (job.salary_min == null && job.salary_max == null) return null;
+
+  const symbol = currencySymbol(job.currency);
+  const min = job.salary_min != null ? `${symbol}${job.salary_min.toLocaleString()}` : null;
+  const max = job.salary_max != null ? `${symbol}${job.salary_max.toLocaleString()}` : null;
+  const periodKey = { hour: 'Hourly', day: 'Daily', month: 'Monthly', year: 'Yearly' }[
+    period as 'hour' | 'day' | 'month' | 'year'
+  ];
+
+  if (mode === 'range' && min && max) {
+    return t(`jobs.salaryRange${periodKey}`, { min, max });
+  }
+  if (mode === 'fixed') {
+    return t(`jobs.salaryFixed${periodKey}`, { amount: min ?? max });
+  }
+  // 'from' — a minimum, never a guaranteed final rate.
+  return t(`jobs.salaryFrom${periodKey}`, { amount: min ?? max });
+}
+
 export function formatSalary(job: Job): FormattedSalary | null {
   if (!job.salary_min && !job.salary_max) return null;
   const min = job.salary_min ?? 0;
