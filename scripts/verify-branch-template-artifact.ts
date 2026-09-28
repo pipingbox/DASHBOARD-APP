@@ -1,6 +1,11 @@
-/* Genera el artefacto físico 1:1 del caso de referencia y verifica sus dimensiones en mm. */
+/* H-001 print delta — writes the current physical artifacts to /tmp:
+   cut template (SVG + PDF), picaje template (SVG + PDF) for the 3" reference
+   case, and prints their physical dimensions. Diagnostic only; the real
+   gates live in scripts/test-branch-geometry.ts. */
 import { computeBranchIntersection } from '../app/frontend/src/tools/branch/branchIntersectionGeometry.ts';
 import { buildBranchTemplate } from '../app/frontend/src/tools/branch/branchTemplateSvg.ts';
+import { buildPicajeTemplate } from '../app/frontend/src/tools/branch/branchPicajeTemplateSvg.ts';
+import { svgPagesToPdf } from '../app/frontend/src/tools/branch/svgMmToPdf.ts';
 import { writeFileSync } from 'node:fs';
 
 const input = {
@@ -9,58 +14,56 @@ const input = {
   branchInnerDiameter: 77.92,
   betaDeg: 90,
   divisions: 24,
+  referenceLength: 200,
 };
 
 const result = computeBranchIntersection(input);
 if (!result.valid) throw new Error('invalid: ' + JSON.stringify(result.errors));
 
-const tpl = buildBranchTemplate(result, {
-  ordinate: 'relative',
+const generatedLabel = 'PIPINGBOX · H-001 · reference case';
+
+const cut = buildBranchTemplate(result, {
+  ordinate: 'fromEnd',
   meta: {
-    headerLabel: '6" (OD 168.3 mm)',
-    branchLabel: '3" (OD 88.9 mm)',
+    headerLabel: '6" Sch 40 (OD 168.3 mm)',
+    branchLabel: '3" Sch 40 (OD 88.9 mm)',
     betaDeg: 90,
-    titleLabel: 'Saddle cut template 1:1',
+    titleLabel: 'Branch cut template 1:1 (development)',
     seamLabel: 'Seam',
     pageLabel: 'Page',
     overlapLabel: 'Overlap',
     wrapNoteLabel: 'Wrap the template around the branch OD. Align the seam line with station 1.',
     calibrationNote: 'After printing, verify the 100 mm bar with a ruler before marking the pipe.',
     printAtActualSize: 'PRINT AT 100% / ACTUAL SIZE',
-    generatedLabel: 'Generated 2026-09-27 · H-001-I5 · Contact: branch ID · Wrap: branch OD',
+    generatedLabel,
   },
 });
 
-console.log('tiles:', tpl.tiles.length);
-tpl.tiles.forEach((t, i) => {
-  const m = t.svg.match(/^<svg[^>]*width="([\d.]+)mm"[^>]*height="([\d.]+)mm"/);
-  console.log(`tile ${i + 1}: width=${m?.[1]}mm height=${m?.[2]}mm viewBox=${t.svg.match(/viewBox="([^"]+)"/)?.[1]}`);
-  writeFileSync(`/tmp/branch-template-tile-${i + 1}.svg`, t.svg);
+const picaje = buildPicajeTemplate(result, {
+  meta: {
+    headerLabel: '6" Sch 40 (OD 168.3 mm)',
+    branchRefLabel: '3" (ID 77.92 mm)',
+    betaDeg: 90,
+    titleLabel: 'Header picaje template 1:1 — opening',
+    originLabel: 'Origin (0,0)',
+    xAxisLabel: 'arc on header',
+    yAxisLabel: 'header axis',
+    openingNote: 'Line = nominal opening (reference: branch ID). No bevel or cutting allowance in V1.',
+    wrapNote: 'X = developed circumferential distance on the header surface (wrap direction). Y = axial distance along the header. Align X = 0 with the reference generatrix.',
+    calibrationNote: 'After printing, verify the 100 mm bar with a ruler before marking the pipe.',
+    printAtActualSize: 'PRINT AT 100% / ACTUAL SIZE',
+    pageLabel: 'Page',
+    overlapLabel: 'Overlap',
+    generatedLabel,
+  },
 });
 
-// Verificaciones físicas
-const dev = result.developedCircumference;
-const step = result.stationSpacing;
-console.log('developed circumference:', dev.toFixed(3), 'mm (expect 279.287)');
-console.log('station spacing:', step.toFixed(3), 'mm (expect 11.637)');
+console.log(`cut: ${cut.tiles.length} page(s), tiled=${cut.tiled}, circumference=${cut.circumferenceMm.toFixed(3)} mm`);
+cut.tiles.forEach((t, i) => writeFileSync(`/tmp/h001-cut-${i + 1}.svg`, t.svg));
+writeFileSync('/tmp/h001-cut.pdf', svgPagesToPdf(cut.tiles.map(t => ({ svg: t.svg, widthMm: t.widthMm, heightMm: t.heightMm }))));
 
-const all = tpl.tiles.map(t => t.svg).join('\n');
-const calib = all.match(/calibration[^]*?100 mm/);
-console.log('calibration bar present:', /100\s*mm/.test(all));
-console.log('PRINT AT 100% present:', /100%|Actual Size|ACTUAL SIZE/i.test(all));
-console.log('no max-width:', !/max-width/.test(all));
-console.log('page numbers:', (all.match(/Page\s+\d+\s*\/\s*\d+|P[aá]g/gi) || []).length > 0 || /page/i.test(all));
-console.log('overlap marks:', /overlap|solape/i.test(all));
-console.log('seam:', /seam/i.test(all));
+console.log(`picaje: ${picaje.tiles.length} page(s), tiled=${picaje.tiled}, X range ${picaje.xMin.toFixed(3)}..${picaje.xMax.toFixed(3)} (${picaje.widthMm.toFixed(3)} mm), Y range ${picaje.yMin.toFixed(3)}..${picaje.yMax.toFixed(3)} (${picaje.heightMm.toFixed(3)} mm)`);
+picaje.tiles.forEach((t, i) => writeFileSync(`/tmp/h001-picaje-${i + 1}.svg`, t.svg));
+writeFileSync('/tmp/h001-picaje.pdf', svgPagesToPdf(picaje.tiles.map(t => ({ svg: t.svg, widthMm: t.widthMm, heightMm: t.heightMm }))));
 
-// Distancia física entre estaciones en el SVG: x de líneas de estación consecutivas
-const xs = [...tpl.tiles[0].svg.matchAll(/data-station="(\d+)"[^>]*x1="([\d.]+)"/g)].map(m => [+m[1], +m[2]]);
-if (xs.length >= 2) {
-  xs.sort((a, b) => a[0] - b[0]);
-  const d = xs[1][1] - xs[0][1];
-  console.log('SVG station delta x:', d.toFixed(3), 'mm (expect 11.637)');
-} else {
-  // fallback: buscar líneas verticales de estación por patrón alternativo
-  const lines = [...tpl.tiles[0].svg.matchAll(/<line[^>]*class="station"[^>]*>/g)];
-  console.log('station lines found (fallback):', lines.length);
-}
+console.log('artifacts: /tmp/h001-cut-{1..n}.svg, /tmp/h001-cut.pdf, /tmp/h001-picaje-{1..n}.svg, /tmp/h001-picaje.pdf');

@@ -1107,7 +1107,7 @@
       "crossSection": "Cross Section View",
       "flatPattern": "Saddle Cut Template (Flat Pattern)",
       "saddleProfile": "Development Pattern",
-      "isometricView": "Isometric 3D View",
+      "isometricView": "Schematic isometric view",
       "dimensionTable": "Cut Dimensions Table",
       "angleDeg": "Angle (°)",
       "distFromRef": "Dist. from ref.",
@@ -1186,7 +1186,14 @@
       "wrapNote": "Wrap the template around the branch OD. Align the seam line with station 1.",
       "calibrationNote": "After printing, verify the 100 mm bar with a ruler before marking the pipe.",
       "closure360": "360° closure = P1",
-      "isometricNote": "Set-on: the branch rests on the header OD. The amber curve is the cut saddle from the calculation engine."
+      "isometricNote": "Set-on: the branch rests on the header OD. The amber curve is the cut saddle from the calculation engine.",
+      "printPicaje1to1": "Print picaje template 1:1",
+      "picajeTemplateTitle": "Header picaje template 1:1 — opening",
+      "picajeOrigin": "Origin (0,0)",
+      "picajeOpeningNote": "Line = nominal opening (reference: branch ID). No bevel or cutting allowance in V1.",
+      "picajeWrapNote": "X = developed circumferential distance on the header surface (wrap direction). Y = axial distance along the header. Align X = 0 with the reference generatrix.",
+      "picajeDims": "Opening: {w} mm (X) × {h} mm (Y)",
+      "pdfDownloaded": "PDF downloaded — print at 100% / Actual Size, no fit-to-page"
     },
     "unitConv": {
       "name": "Unit Converter",

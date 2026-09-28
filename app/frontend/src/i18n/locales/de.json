@@ -1055,7 +1055,7 @@
       "crossSection": "Querschnittsansicht",
       "flatPattern": "Schnittschablone (Abwicklung)",
       "saddleProfile": "Entwicklungsmuster",
-      "isometricView": "Isometrische 3D-Ansicht",
+      "isometricView": "Schematische isometrische Ansicht",
       "dimensionTable": "Schnittmaßtabelle",
       "angleDeg": "Winkel (°)",
       "distFromRef": "Abst. von Ref.",
@@ -1134,7 +1134,14 @@
       "wrapNote": "Die Schablone um den Abzweig-AD wickeln. Die Nahtlinie mit Punkt 1 ausrichten.",
       "calibrationNote": "Nach dem Drucken die 100-mm-Referenz mit einem Lineal prüfen, bevor das Rohr markiert wird.",
       "closure360": "360°-ABSCHLUSS = P1",
-      "isometricNote": "Set-on: der Abzweig ruht auf dem Außendurchmesser des Sammlers. Die amberfarbene Kurve ist die Schnittsattel-Kurve der Berechnungs-Engine."
+      "isometricNote": "Set-on: der Abzweig ruht auf dem Außendurchmesser des Sammlers. Die amberfarbene Kurve ist die Schnittsattel-Kurve der Berechnungs-Engine.",
+      "printPicaje1to1": "Picaje-Schablone 1:1 drucken",
+      "picajeTemplateTitle": "Picaje-Schablone des Sammlers 1:1 — Öffnung",
+      "picajeOrigin": "Nullpunkt (0,0)",
+      "picajeOpeningNote": "Linie = Nennöffnung (Referenz: Abzweig-ID). Keine Fase und keinen Schnittpauschbetrag in V1.",
+      "picajeWrapNote": "X = abgewickelter Umfangsabstand auf der Sammleroberfläche (Wickelrichtung). Y = Axialabstand entlang des Sammlers. X = 0 auf die Bezugsmantellinie ausrichten.",
+      "picajeDims": "Öffnung: {w} mm (X) × {h} mm (Y)",
+      "pdfDownloaded": "PDF heruntergeladen — mit 100 % / Originalgröße drucken, nicht an Seite anpassen"
     },
     "categoryFabrication": "Fertigung",
     "elbowCut": {

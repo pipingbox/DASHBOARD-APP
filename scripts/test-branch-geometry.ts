@@ -31,9 +31,16 @@ import {
   templatePoint,
 } from '../app/frontend/src/tools/branch/branchTemplateSvg.ts';
 import {
+  buildPicajeTemplate,
+} from '../app/frontend/src/tools/branch/branchPicajeTemplateSvg.ts';
+import {
   buildBranchIsometric,
   projectStation,
 } from '../app/frontend/src/tools/branch/branchIsometricSvg.ts';
+import {
+  svgPagesToPdf,
+  pdfLatin1Safe,
+} from '../app/frontend/src/tools/branch/svgMmToPdf.ts';
 
 let passed = 0;
 let failed = 0;
@@ -261,13 +268,14 @@ for (const N of [12, 16, 24, 36, 48]) {
   check('BETA_MIN_DEG = 15', BETA_MIN_DEG === 15);
 }
 
-/* ── 1:1 template artifact (PO D3 + §7) — table = print identity ── */
+/* ── 1:1 CUT template artifact (PO D3 + §7 + final delta §1/§2/§3/§4/§9) ── */
 {
   const META = {
     headerLabel: '6" Sch 40', branchLabel: '3" Sch 40', betaDeg: 90,
-    titleLabel: 'Branch template', seamLabel: 'Seam', pageLabel: 'Page',
-    overlapLabel: 'Overlap', wrapNoteLabel: 'Wrap around branch OD',
-    calibrationNote: 'Verify the 100 mm bar after printing',
+    titleLabel: 'Branch cut template 1:1 (development)', seamLabel: 'Seam',
+    pageLabel: 'Page', overlapLabel: 'Overlap',
+    wrapNoteLabel: 'Wrap the template around the branch OD. Align the seam line with station 1.',
+    calibrationNote: 'After printing, verify the 100 mm bar with a ruler before marking the pipe.',
     printAtActualSize: 'PRINT AT 100% / ACTUAL SIZE', generatedLabel: 'test',
   };
   // templatePoint = canonical identity: x is the physical arc position, y the table ordinate.
@@ -280,17 +288,17 @@ for (const N of [12, 16, 24, 36, 48]) {
   const tpl = buildBranchTemplate(g1, { ordinate: 'fromEnd', meta: META });
   check('circumference physical = π·88.9', Math.abs(tpl.circumferenceMm - 279.287) < 0.001,
     `${tpl.circumferenceMm}`);
-  check('reference case tiles A4 landscape (279.287 mm useful)', tpl.tiles.length === 2 && tpl.tiled);
-  check('tiles never scale: widths sum covers content', tpl.tiles.every(t => t.widthMm > 0));
+  /* PO §1: the 3" reference (279.288 mm useful) must fit ONE full A4
+     landscape page at true 1:1 — never scaled, never a forced second page. */
+  check('3" reference: ONE A4 page at true 1:1', tpl.tiles.length === 1 && !tpl.tiled,
+    `${tpl.tiles.length} tiles`);
+  check('page is full A4 landscape (297 × 210 mm)',
+    tpl.tiles[0].widthMm === 297 && tpl.tiles[0].heightMm === 210);
   check('every tile carries 100 mm calibration bar', tpl.tiles.every(t => t.svg.includes('100 mm')));
   check('every tile states PRINT AT 100% / ACTUAL SIZE', tpl.tiles.every(t => t.svg.includes('PRINT AT 100% / ACTUAL SIZE')));
   check('every tile numbered', tpl.tiles.every((t, i) => t.svg.includes(`Page ${i + 1}/${tpl.tiles.length}`)));
-  check('overlap marked on non-final tiles', tpl.tiles.slice(0, -1).every(t => t.svg.includes('Overlap')));
   check('physical svg units are mm', tpl.tiles.every(t => /width="[\d.]+mm"/.test(t.svg)));
   check('no auto scale-to-fit attribute', tpl.tiles.every(t => !t.svg.includes('max-width')));
-  // Tiling invariant: consecutive tiles advance by usableWidth − overlap exactly.
-  check('tile step = usable − overlap', Math.abs(tpl.tiles[1].originX - (277 - 15 - 10)) < 1e-9,
-    `originX[1]=${tpl.tiles[1].originX}`);
   // §7 data block: physical data + station positions + closure never a false 25th division.
   check('data block includes angular step', tpl.tiles[0].svg.includes('Δθ = 15°'));
   check('data block includes linear step', tpl.tiles[0].svg.includes('Δs = 11.637 mm'));
@@ -298,16 +306,182 @@ for (const N of [12, 16, 24, 36, 48]) {
   check('station arc positions printed (P2 = 11.637)', tpl.tiles[0].svg.includes('>11.637<'));
   check('closure labelled ≡1, never 25', tpl.tiles.some(t => t.svg.includes('>≡1<')) &&
     tpl.tiles.every(t => !t.svg.includes('>25<')));
-  // Large pipe (24" OD → 1913 mm development) tiles deterministically.
+  /* §4/§9: 24 real divisions with physical spacing 11.637 mm measured on the
+     artifact itself (station generator lines carry data-station). */
+  {
+    const xs = [...tpl.tiles[0].svg.matchAll(/<line data-station="(\d+)"[^>]*x1="([\d.]+)"/g)]
+      .map(m => [+m[1], +m[2]] as [number, number]).sort((a, b) => a[0] - b[0]);
+    check('artifact has 25 station lines (24 + closure)', xs.length === 25, `${xs.length}`);
+    const delta = xs[1][1] - xs[0][1];
+    check('artifact station spacing = 11.637 mm (physical)', Math.abs(delta - 11.637) < 0.001, `${delta}`);
+    check('artifact first station at pad + border (7 mm)', Math.abs(xs[0][1] - 7) < 0.001, `${xs[0][1]}`);
+  }
+  /* §3: print header legibility — no two text rows may collide vertically
+     (same-row texts must instead be horizontally separated). */
+  {
+    for (const t of tpl.tiles) {
+      const texts = [...t.svg.matchAll(/<text x="([\d.]+)" y="([\d.]+)" font-size="([\d.]+)"([^>]*)>([^<]*)</g)]
+        .map(m => ({ x: +m[1], y: +m[2], fs: +m[3], attrs: m[4], s: m[5] }));
+      let overlap = false;
+      const detail: string[] = [];
+      for (let i = 0; i < texts.length && !overlap; i++) {
+        for (let j = i + 1; j < texts.length && !overlap; j++) {
+          const a = texts[i], b = texts[j];
+          const dy = Math.abs(a.y - b.y);
+          const fsMax = Math.max(a.fs, b.fs);
+          if (dy >= 0.75 * fsMax) continue; // clearly different rows
+          // Same visual row: horizontal intervals must not overlap.
+          const w = (t: typeof a) => t.s.length * 0.6 * t.fs;
+          const ax0 = a.attrs.includes('text-anchor="middle"') ? a.x - w(a) / 2
+            : a.attrs.includes('text-anchor="end"') ? a.x - w(a) : a.x;
+          const bx0 = b.attrs.includes('text-anchor="middle"') ? b.x - w(b) / 2
+            : b.attrs.includes('text-anchor="end"') ? b.x - w(b) : b.x;
+          if (ax0 < bx0 + w(b) && bx0 < ax0 + w(a)) {
+            overlap = true;
+            detail.push(`"${a.s}" vs "${b.s}" (y ${a.y}/${b.y})`);
+          }
+        }
+      }
+      check('print header has no overlapping text', !overlap, detail.join('; '));
+    }
+  }
+
+  /* Tiled case: 24" branch development (π·609.6 ≈ 1915.02 mm) must tile
+     deterministically without ever scaling the geometry. */
   const big = computeBranchIntersection({
     headerOuterRadius: 914.4 / 2, branchOuterDiameter: 609.6, branchInnerDiameter: 590.6,
     betaDeg: 60, divisions: 48,
   });
   const tplBig = buildBranchTemplate(big, { ordinate: 'relative', meta: META });
-  check('24" development tiled', tplBig.tiled && tplBig.tiles.length === Math.ceil((1913.238 + 20 - 277) / 262) + 1,
-    `${tplBig.tiles.length} tiles for ${tplBig.circumferenceMm.toFixed(1)} mm`);
-  check('all big tiles physical + calibrated', tplBig.tiles.every(t =>
-    t.svg.includes('100 mm') && /width="[\d.]+mm"/.test(t.svg)));
+  const expPages = Math.max(1, Math.ceil((Math.PI * 609.6 + 4 - 287) / (287 - 15)) + 1);
+  check('24" development tiled deterministically', tplBig.tiled && tplBig.tiles.length === expPages,
+    `${tplBig.tiles.length} tiles (expected ${expPages})`);
+  check('all big tiles full A4 physical + calibrated', tplBig.tiles.every(t =>
+    t.svg.includes('100 mm') && /width="297mm"/.test(t.svg)));
+  check('overlap marked on non-final tiles', tplBig.tiles.slice(0, -1).every(t => t.svg.includes('Overlap 15 mm')));
+  check('tile step = usable − overlap', Math.abs(tplBig.tiles[1].originX - (287 - 15 - 2)) < 1e-9,
+    `originX[1]=${tplBig.tiles[1].originX}`);
+  // One-page vs tiled never scales: station spacing identical in both modes.
+  {
+    const xs = [...tplBig.tiles[0].svg.matchAll(/<line data-station="(\d+)"[^>]*x1="([\d.]+)"/g)]
+      .map(m => [+m[1], +m[2]] as [number, number]).sort((a, b) => a[0] - b[0]);
+    const delta = xs[1][1] - xs[0][1];
+    const expect = Math.PI * 609.6 / 48;
+    check('tiled artifact keeps true 1:1 spacing', Math.abs(delta - expect) < 0.001,
+      `${delta} vs ${expect.toFixed(3)}`);
+  }
+
+  /* ── §2: deterministic physical PDF (no browser print scaling) ── */
+  const pdfBytes = svgPagesToPdf(tpl.tiles.map(t => ({ svg: t.svg, widthMm: t.widthMm, heightMm: t.heightMm })));
+  const pdf = Buffer.from(pdfBytes).toString('latin1');
+  check('PDF header', pdf.startsWith('%PDF-1.4'));
+  check('PDF MediaBox = physical A4 landscape pt', pdf.includes('/MediaBox [0 0 841.89 595.276]'));
+  check('PDF single page for 3" reference', pdf.includes('/Count 1'));
+  check('PDF contains print instruction', pdf.includes('PRINT AT'));
+  check('PDF contains calibration bar label', pdf.includes('100 mm'));
+  check('PDF xref table valid', pdf.includes('xref') && pdf.trimEnd().endsWith('%%EOF'));
+  const pdf2 = svgPagesToPdf(tpl.tiles.map(t => ({ svg: t.svg, widthMm: t.widthMm, heightMm: t.heightMm })));
+  check('PDF is byte-deterministic', pdfBytes.length === pdf2.length &&
+    pdfBytes.every((v, i) => v === pdf2[i]));
+  const pdfBig = svgPagesToPdf(tplBig.tiles.map(t => ({ svg: t.svg, widthMm: t.widthMm, heightMm: t.heightMm })));
+  const pdfBigStr = Buffer.from(pdfBig).toString('latin1');
+  check('tiled PDF has one MediaBox per page',
+    (pdfBigStr.match(/\/MediaBox/g) || []).length === expPages);
+  check('pdfLatin1Safe flags non-Latin-1 strings',
+    pdfLatin1Safe('Branch cut template') && !pdfLatin1Safe('Шаблон'));
+}
+
+/* ── PICAJE template artifact (PO §5/§6/§7) ── */
+{
+  const META = {
+    headerLabel: '6" Sch 40 (OD 168.3 mm)', branchRefLabel: '3" (ID 77.92 mm)', betaDeg: 90,
+    titleLabel: 'Header picaje template 1:1 — opening', originLabel: 'Origin (0,0)',
+    xAxisLabel: 'arc on header', yAxisLabel: 'header axis',
+    openingNote: 'Line = nominal opening (reference: branch ID). No bevel or cutting allowance in V1.',
+    wrapNote: 'X = developed circumferential distance on the header surface (wrap direction). Y = axial distance along the header. Align X = 0 with the reference generatrix.',
+    calibrationNote: 'After printing, verify the 100 mm bar with a ruler before marking the pipe.',
+    printAtActualSize: 'PRINT AT 100% / ACTUAL SIZE', pageLabel: 'Page', overlapLabel: 'Overlap',
+    generatedLabel: 'test',
+  };
+  const pj = buildPicajeTemplate(g1, { meta: META });
+  /* §7: PICAJE TABLE = SCREEN DIAGRAM = 1:1 TEMPLATE (same canonical X/Y). */
+  check('picaje physical dims (90°): 81.012 × 77.92 mm',
+    Math.abs(pj.widthMm - 81.012) < 0.05 && Math.abs(pj.heightMm - 77.92) < 0.05,
+    `${pj.widthMm} × ${pj.heightMm}`);
+  check('picaje 90° fits ONE A4 page', pj.tiles.length === 1 && !pj.tiled);
+  {
+    // Inverse-map the artifact polygon back to data coordinates and compare
+    // with the canonical stations (table = template identity).
+    const poly = pj.tiles[0].svg.match(/<polygon points="([^"]+)" fill="none" stroke="#000000"/);
+    check('picaje artifact has opening contour', !!poly);
+    if (poly) {
+      const pts = poly[1].trim().split(/\s+/).map(p => p.split(',').map(Number) as [number, number]);
+      check('picaje contour has N+1 points (closure)', pts.length === REF.N + 1, `${pts.length}`);
+      const xMin = pj.xMin, yMax = pj.yMax;
+      let ok = true;
+      const bad: string[] = [];
+      for (let i = 0; i <= REF.N; i++) {
+        const Xdata = pts[i][0] - 5 - 2 + xMin;   // page x → data X
+        const Ydata = yMax + 2 - (pts[i][1] - 50); // page y → data Y
+        if (Math.abs(Xdata - g1.stations[i].picajeX) > 0.002 || Math.abs(Ydata - g1.stations[i].picajeY) > 0.002) {
+          ok = false;
+          bad.push(`i=${i}: (${Xdata.toFixed(2)},${Ydata.toFixed(2)}) vs (${g1.stations[i].picajeX.toFixed(2)},${g1.stations[i].picajeY.toFixed(2)})`);
+        }
+      }
+      check('picaje template coordinates = table coordinates', ok, bad.slice(0, 3).join('; '));
+    }
+  }
+  check('picaje artifact labels origin', pj.tiles[0].svg.includes('Origin (0,0)'));
+  check('picaje artifact labels axes', pj.tiles[0].svg.includes('X — arc on header') && pj.tiles[0].svg.includes('Y — header axis'));
+  check('picaje artifact labels X/Y extremes', pj.tiles[0].svg.includes('Xmin = ') && pj.tiles[0].svg.includes('Xmax = ') && pj.tiles[0].svg.includes('Ymin = ') && pj.tiles[0].svg.includes('Ymax = '));
+  check('picaje artifact labels stations P1..PN', pj.tiles[0].svg.includes('>P1<') && pj.tiles[0].svg.includes(`>P${REF.N}<`));
+  check('picaje artifact has NO P25', !pj.tiles[0].svg.includes('>P25<'));
+  check('picaje artifact carries calibration + instruction',
+    pj.tiles[0].svg.includes('100 mm') && pj.tiles[0].svg.includes('PRINT AT 100% / ACTUAL SIZE'));
+  check('picaje artifact states branch-ID reference', pj.tiles[0].svg.includes('ID 77.92 mm'));
+  check('picaje artifact physical mm', /width="297mm"/.test(pj.tiles[0].svg));
+  // Header legibility on the picaje artifact too.
+  {
+    const texts = [...pj.tiles[0].svg.matchAll(/<text x="([\d.]+)" y="([\d.]+)" font-size="([\d.]+)"([^>]*)>([^<]*)</g)]
+      .map(m => ({ x: +m[1], y: +m[2], fs: +m[3], attrs: m[4], s: m[5] }));
+    let overlap = false;
+    const detail: string[] = [];
+    for (let i = 0; i < texts.length && !overlap; i++) {
+      for (let j = i + 1; j < texts.length && !overlap; j++) {
+        const a = texts[i], b = texts[j];
+        if (Math.abs(a.y - b.y) >= 0.75 * Math.max(a.fs, b.fs)) continue;
+        const w = (t: typeof a) => t.s.length * 0.6 * t.fs;
+        const ax0 = a.attrs.includes('text-anchor="middle"') ? a.x - w(a) / 2
+          : a.attrs.includes('text-anchor="end"') ? a.x - w(a) : a.x;
+        const bx0 = b.attrs.includes('text-anchor="middle"') ? b.x - w(b) / 2
+          : b.attrs.includes('text-anchor="end"') ? b.x - w(b) : b.x;
+        if (ax0 < bx0 + w(b) && bx0 < ax0 + w(a)) { overlap = true; detail.push(`"${a.s}" vs "${b.s}" (y ${a.y}/${b.y})`); }
+      }
+    }
+    check('picaje print header has no overlapping text', !overlap, detail.join('; '));
+    const offPage = texts.filter(t => t.x < 4 || t.x > 293);
+    check('picaje text within page bounds', offPage.length === 0, offPage.map(t => t.s).join(','));
+  }
+  // 45° picaje (taller opening: Y ±55.1) still one A4 page.
+  const pj45 = buildPicajeTemplate(g2, { meta: { ...META, betaDeg: 45 } });
+  check('picaje 45° dims (81.012 × 110.196 mm)',
+    Math.abs(pj45.widthMm - 81.012) < 0.05 && Math.abs(pj45.heightMm - 110.196) < 0.05,
+    `${pj45.widthMm} × ${pj45.heightMm}`);
+  check('picaje 45° fits ONE A4 page', pj45.tiles.length === 1 && !pj45.tiled);
+  // Equal-size case tiles in Y when the opening is taller than the window.
+  const eq = computeBranchIntersection({
+    headerOuterRadius: 168.3 / 2, branchOuterDiameter: 168.3, branchInnerDiameter: 154.08,
+    betaDeg: 90, divisions: 24,
+  });
+  const pjEq = buildPicajeTemplate(eq, { meta: META });
+  check('picaje equal-size tiles deterministically', pjEq.tiled && pjEq.tiles.length > 1,
+    `${pjEq.tiles.length} tiles`);
+  // Deterministic PDF for the picaje artifact.
+  const pjPdf = svgPagesToPdf(pj.tiles.map(t => ({ svg: t.svg, widthMm: t.widthMm, heightMm: t.heightMm })));
+  const pjStr = Buffer.from(pjPdf).toString('latin1');
+  check('picaje PDF single page + physical A4',
+    pjStr.includes('/Count 1') && pjStr.includes('/MediaBox [0 0 841.89 595.276]'));
+  check('picaje PDF contains contour + stations', pjStr.includes('P1') && pjStr.includes('100 mm'));
 }
 
 /* ── Isometric tube-on-tube view (PO §9/§12) ── */

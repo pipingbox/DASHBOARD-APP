@@ -1058,7 +1058,7 @@
       "crossSection": "Vue en Coupe",
       "flatPattern": "Gabarit de Coupe (Développement)",
       "saddleProfile": "Patron de Développement",
-      "isometricView": "Vue Isométrique 3D",
+      "isometricView": "Vue isométrique schématique",
       "dimensionTable": "Tableau des Cotes de Coupe",
       "angleDeg": "Angle (°)",
       "distFromRef": "Dist. depuis réf.",
@@ -1137,7 +1137,14 @@
       "wrapNote": "Enroulez le gabarit autour du DE du piquage. Alignez la ligne de couture avec le point 1.",
       "calibrationNote": "Après impression, vérifiez la jauge de 100 mm avec une règle avant de marquer le tube.",
       "closure360": "FERMETURE 360° = P1",
-      "isometricNote": "Set-on : le piquage repose sur le OD du collecteur. La courbe ambre est la selle de coupe du moteur de calcul."
+      "isometricNote": "Set-on : le piquage repose sur le OD du collecteur. La courbe ambre est la selle de coupe du moteur de calcul.",
+      "printPicaje1to1": "Imprimer le gabarit de traçage 1:1",
+      "picajeTemplateTitle": "Gabarit de traçage du collecteur 1:1 — ouverture",
+      "picajeOrigin": "Origine (0,0)",
+      "picajeOpeningNote": "Ligne = ouverture nominale (référence : ID du piquage). Pas de chanfrein ni de surépaisseur de coupe en V1.",
+      "picajeWrapNote": "X = distance circonférentielle développée sur la surface du collecteur (sens d’enroulement). Y = distance axiale le long du collecteur. Aligner X = 0 sur la génératrice de référence.",
+      "picajeDims": "Ouverture : {w} mm (X) × {h} mm (Y)",
+      "pdfDownloaded": "PDF téléchargé — imprimez à 100 % / taille réelle, sans ajustement à la page"
     },
     "categoryFabrication": "Fabrication",
     "elbowCut": {

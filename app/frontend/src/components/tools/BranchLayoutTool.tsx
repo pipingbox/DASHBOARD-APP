@@ -13,7 +13,9 @@ import {
   type BranchIntersectionResult,
 } from '@/tools/branch/branchIntersectionGeometry';
 import { buildBranchTemplate } from '@/tools/branch/branchTemplateSvg';
+import { buildPicajeTemplate } from '@/tools/branch/branchPicajeTemplateSvg';
 import { buildBranchIsometric } from '@/tools/branch/branchIsometricSvg';
+import { svgPagesToPdf, pdfLatin1Safe } from '@/tools/branch/svgMmToPdf';
 
 /* ─── NPS pipe data (OD in mm) ─── */
 const NPS_OPTIONS: { label: string; od: number }[] = [
@@ -288,6 +290,12 @@ export default function BranchLayoutTool() {
     return buildBranchIsometric(geometry, { width: 480, height: 300 });
   }, [geometry, geometryValid]);
 
+  /* ── Picaje physical extents (from the canonical stations; screen only) ── */
+  const picajeXs = geometryValid ? geometry.stations.map(s => s.picajeX) : [];
+  const picajeYs = geometryValid ? geometry.stations.map(s => s.picajeY) : [];
+  const picajeXRange = picajeXs.length ? Math.max(...picajeXs) - Math.min(...picajeXs) : 0;
+  const picajeYRange = picajeYs.length ? Math.max(...picajeYs) - Math.min(...picajeYs) : 0;
+
   const reinforcement = useMemo(() => {
     if (!geometryValid || !designInputsValid) return null;
     return calcReinforcement({
@@ -325,43 +333,96 @@ export default function BranchLayoutTool() {
     toast.success(t('tools.calculationSaved'));
   };
 
-  /* ── Physical 1:1 print: deterministic mm SVG tiles, never scale-to-fit ── */
-  const handlePrint = () => {
+  /* ── Deterministic physical PDF artifacts (H-001 final delta, PO §2/§6).
+        A4 landscape pages in physical mm; no browser window.print() scaling
+        and no mobile fit-to-page. Byte-deterministic (no timestamps). ── */
+  const pdfMetaSafe = (m: Record<string, unknown>) =>
+    Object.values(m).every(v => typeof v !== 'string' || pdfLatin1Safe(v));
+
+  /* English fallback for locales that cannot be encoded in PDF Latin-1
+     (bg/uk/pl/ro) — keeps the physical artifact legible in every locale. */
+  const PDF_EN = {
+    flatPattern: 'Branch cut template 1:1 (development)',
+    picajeTitle: 'Header picaje template 1:1 (opening)',
+    seam: 'Seam', page: 'Page', overlap: 'Overlap', origin: 'Origin (0,0)',
+    xAxis: 'arc on header', yAxis: 'header axis',
+    wrapNote: 'Wrap the template around the branch OD. Align the seam line with station 1.',
+    calibrationNote: 'After printing, verify the 100 mm bar with a ruler before marking the pipe.',
+    openingNote: 'Line = nominal opening (reference: branch ID). No bevel or cutting allowance in V1.',
+    picajeWrap: 'X = developed circumferential distance on the header surface (wrap direction). Y = axial distance along the header. Align X = 0 with the reference generatrix.',
+  } as const;
+
+  const generatedLabel = 'PIPINGBOX · H-001 · deterministic physical artifact';
+
+  const cutMeta = () => {
+    const m = {
+      headerLabel: `${headerNPS} Sch ${headerSch} (OD ${headerOD} mm)`,
+      branchLabel: `${branchNPS} Sch ${branchSch} (OD ${branchOD} mm)`,
+      betaDeg: angle,
+      titleLabel: t('tools.branchLayout.flatPattern'),
+      seamLabel: t('tools.branchLayout.seam', { defaultValue: 'Seam' }),
+      pageLabel: t('tools.branchLayout.page', { defaultValue: 'Page' }),
+      overlapLabel: t('tools.branchLayout.overlap', { defaultValue: 'Overlap' }),
+      wrapNoteLabel: t('tools.branchLayout.wrapNote', { defaultValue: 'Wrap the template around the branch OD. Align the seam line with station 1.' }),
+      calibrationNote: t('tools.branchLayout.calibrationNote', { defaultValue: 'After printing, verify the 100 mm bar with a ruler before marking the pipe.' }),
+      printAtActualSize: 'PRINT AT 100% / ACTUAL SIZE',
+      generatedLabel,
+    };
+    return pdfMetaSafe(m) ? m : { ...m, titleLabel: PDF_EN.flatPattern, seamLabel: PDF_EN.seam, pageLabel: PDF_EN.page, overlapLabel: PDF_EN.overlap, wrapNoteLabel: PDF_EN.wrapNote, calibrationNote: PDF_EN.calibrationNote };
+  };
+
+  const picajeMeta = () => {
+    const m = {
+      headerLabel: `${headerNPS} Sch ${headerSch} (OD ${headerOD} mm)`,
+      branchRefLabel: `${branchNPS} (ID ${branchID} mm)`,
+      betaDeg: angle,
+      titleLabel: t('tools.branchLayout.picajeTemplateTitle', { defaultValue: 'Header picaje template 1:1 — opening' }),
+      originLabel: t('tools.branchLayout.picajeOrigin', { defaultValue: 'Origin (0,0)' }),
+      xAxisLabel: t('tools.branchLayout.picajeAxisX', { defaultValue: 'arc on header' }),
+      yAxisLabel: t('tools.branchLayout.picajeAxisY', { defaultValue: 'header axis' }),
+      openingNote: t('tools.branchLayout.picajeOpeningNote', { defaultValue: 'Line = nominal opening (reference: branch ID). No bevel or cutting allowance in V1.' }),
+      wrapNote: t('tools.branchLayout.picajeWrapNote', { defaultValue: 'X = developed circumferential distance on the header surface (wrap direction). Y = axial distance along the header. Align X = 0 with the reference generatrix.' }),
+      calibrationNote: t('tools.branchLayout.calibrationNote', { defaultValue: 'After printing, verify the 100 mm bar with a ruler before marking the pipe.' }),
+      printAtActualSize: 'PRINT AT 100% / ACTUAL SIZE',
+      pageLabel: t('tools.branchLayout.page', { defaultValue: 'Page' }),
+      overlapLabel: t('tools.branchLayout.overlap', { defaultValue: 'Overlap' }),
+      generatedLabel,
+    };
+    return pdfMetaSafe(m) ? m : { ...m, titleLabel: PDF_EN.picajeTitle, originLabel: PDF_EN.origin, xAxisLabel: PDF_EN.xAxis, yAxisLabel: PDF_EN.yAxis, openingNote: PDF_EN.openingNote, wrapNote: PDF_EN.picajeWrap, calibrationNote: PDF_EN.calibrationNote, pageLabel: PDF_EN.page, overlapLabel: PDF_EN.overlap };
+  };
+
+  const downloadPdf = (bytes: Uint8Array, filename: string) => {
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    toast.success(t('tools.branchLayout.pdfDownloaded'));
+  };
+
+  const slug = (s: string) => String(s).replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+
+  /** CUT template: one A4 page at 1:1 when it fits; tiled with additive overlap otherwise. */
+  const handleDownloadCutPdf = () => {
     if (!geometryValid) return;
-    const template = buildBranchTemplate(geometry, {
+    const tpl = buildBranchTemplate(geometry, {
       ordinate: mode === 'marking' ? 'fromEnd' : 'relative',
-      meta: {
-        headerLabel: `${headerNPS} Sch ${headerSch} (OD ${headerOD} mm)`,
-        branchLabel: `${branchNPS} Sch ${branchSch} (OD ${branchOD} mm)`,
-        betaDeg: angle,
-        titleLabel: t('tools.branchLayout.flatPattern'),
-        seamLabel: t('tools.branchLayout.seam', { defaultValue: 'Seam' }),
-        pageLabel: t('tools.branchLayout.page', { defaultValue: 'Page' }),
-        overlapLabel: t('tools.branchLayout.overlap', { defaultValue: 'Overlap' }),
-        wrapNoteLabel: t('tools.branchLayout.wrapNote', { defaultValue: 'Wrap the template around the branch OD. Align the seam line with station 1.' }),
-        calibrationNote: t('tools.branchLayout.calibrationNote', { defaultValue: 'After printing, verify the 100 mm bar with a ruler before marking the pipe.' }),
-        printAtActualSize: 'PRINT AT 100% / ACTUAL SIZE',
-        generatedLabel: `PIPINGBOX · ${new Date().toISOString().slice(0, 10)}`,
-      },
+      meta: cutMeta(),
     });
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-    const sheets = template.tiles
-      .map(tile => `<div class="sheet">${tile.svg}</div>`)
-      .join('');
-    printWindow.document.write(`<!DOCTYPE html>
-      <html><head><title>PIPINGBOX Branch Template 1:1</title>
-      <style>
-        @page { size: A4 landscape; margin: 10mm; }
-        html, body { margin: 0; padding: 0; background: #fff; }
-        .sheet { page-break-after: always; }
-        .sheet:last-child { page-break-after: auto; }
-        svg { display: block; }
-      </style>
-      </head><body>${sheets}</body></html>
-    `);
-    printWindow.document.close();
-    setTimeout(() => { printWindow.print(); }, 500);
+    const bytes = svgPagesToPdf(tpl.tiles.map(t => ({ svg: t.svg, widthMm: t.widthMm, heightMm: t.heightMm })));
+    downloadPdf(bytes, `pipingbox-plantilla-corte-${slug(String(headerNPS))}x${slug(String(branchNPS))}-${angle}deg.pdf`);
+  };
+
+  /** PICAJE template: physical flat development of the local header surface. */
+  const handleDownloadPicajePdf = () => {
+    if (!geometryValid) return;
+    const tpl = buildPicajeTemplate(geometry, { meta: picajeMeta() });
+    const bytes = svgPagesToPdf(tpl.tiles.map(t => ({ svg: t.svg, widthMm: t.widthMm, heightMm: t.heightMm })));
+    downloadPdf(bytes, `pipingbox-plantilla-picaje-${slug(String(headerNPS))}x${slug(String(branchNPS))}-${angle}deg.pdf`);
   };
 
   // Screen preview dimensions (NOT a fabrication artifact — preview only)
@@ -742,33 +803,71 @@ export default function BranchLayoutTool() {
                 </p>
                 <span className="text-[9px] text-zinc-600">Ø{headerOD}</span>
               </div>
-              {/* Original convention diagram: true hole shape from the canonical stations.
-                  X = developed arc on the header circumference; Y = axial. */}
-              <svg width="420" height="240" viewBox="0 0 420 240" className="mx-auto mb-3">
+              {/* Fabrication picaje diagram: canonical X/Y stations + dimensions.
+                  X = developed circumferential distance on the header surface;
+                  Y = axial distance along the header (see note below). */}
+              <svg width="420" height="260" viewBox="0 0 420 260" className="mx-auto mb-3">
                 {(() => {
-                  const xs = geometry.stations.map(s => s.picajeX);
-                  const ys = geometry.stations.map(s => s.picajeY);
-                  const xMax = Math.max(...xs.map(Math.abs)) || 1;
-                  const yMax = Math.max(...ys.map(Math.abs)) || 1;
-                  const cx = 210, cy = 120;
-                  const sx = 150 / xMax, sy = 80 / yMax;
-                  const pts = geometry.stations.map(s => `${(cx + s.picajeX * sx).toFixed(1)},${(cy - s.picajeY * sy).toFixed(1)}`).join(' ');
+                  const st = geometry.stations;
+                  const xs = st.map(s => s.picajeX);
+                  const ys = st.map(s => s.picajeY);
+                  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+                  const yMin = Math.min(...ys), yMax = Math.max(...ys);
+                  const cx = 210, cy = 128;
+                  const sx = 150 / (xMax || 1), sy = 82 / (yMax || 1);
+                  const PX = (x: number) => cx + x * sx;
+                  const PY = (y: number) => cy - y * sy;
+                  const pts = st.map(s => `${PX(s.picajeX).toFixed(1)},${PY(s.picajeY).toFixed(1)}`).join(' ');
+                  const cen = { x: (xMin + xMax) / 2, y: (yMin + yMax) / 2 };
+                  const labelStep = Math.max(1, Math.ceil(divisions / 16));
+                  const lbl = (i: number): [number, number] => {
+                    const dx = st[i].picajeX - cen.x, dy = st[i].picajeY - cen.y;
+                    const L = Math.hypot(dx, dy) || 1;
+                    return [PX(st[i].picajeX + (dx / L) * 6), PY(st[i].picajeY + (dy / L) * 6)];
+                  };
                   return (
                     <g>
-                      <rect x="20" y="30" width="380" height="180" fill="none" stroke="#2a2a2a" strokeWidth="1" rx="4" />
+                      <rect x="20" y="26" width="380" height="196" fill="none" stroke="#2a2a2a" strokeWidth="1" rx="4" />
+                      {/* Centerlines: X = 0 (reference generatrix) and Y = 0 (branch-axis plane) */}
                       <line x1="20" y1={cy} x2="400" y2={cy} stroke="#333" strokeWidth="0.6" strokeDasharray="6,4" />
-                      <line x1={cx} y1="30" x2={cx} y2="210" stroke="#333" strokeWidth="0.6" strokeDasharray="6,4" />
+                      <line x1={cx} y1="26" x2={cx} y2="222" stroke="#333" strokeWidth="0.6" strokeDasharray="6,4" />
+                      {/* Helper lines at X/Y extremes */}
+                      <line x1={PX(xMin)} y1={PY(yMax)} x2={PX(xMin)} y2={PY(yMin)} stroke="#333" strokeWidth="0.4" strokeDasharray="3,3" opacity="0.5" />
+                      <line x1={PX(xMax)} y1={PY(yMax)} x2={PX(xMax)} y2={PY(yMin)} stroke="#333" strokeWidth="0.4" strokeDasharray="3,3" opacity="0.5" />
+                      <line x1={PX(xMin)} y1={PY(yMax)} x2={PX(xMax)} y2={PY(yMax)} stroke="#333" strokeWidth="0.4" strokeDasharray="3,3" opacity="0.5" />
+                      <line x1={PX(xMin)} y1={PY(yMin)} x2={PX(xMax)} y2={PY(yMin)} stroke="#333" strokeWidth="0.4" strokeDasharray="3,3" opacity="0.5" />
+                      {/* Opening contour (canonical stations) */}
                       <polygon points={pts} fill="#f59e0b" fillOpacity="0.07" stroke="#f59e0b" strokeWidth="1.6" />
+                      {/* Origin (0,0) */}
                       <circle cx={cx} cy={cy} r="2.5" fill="#f59e0b" />
                       <text x={cx + 5} y={cy - 5} fill="#f59e0b" fontSize="8">(0,0)</text>
+                      {/* Stations P1..PN (closure IS P1) */}
+                      {st.slice(0, divisions).map((s, i) => (
+                        <g key={`picaje-st-${i}`}>
+                          <circle cx={PX(s.picajeX)} cy={PY(s.picajeY)} r={i === 0 ? 3.5 : 2.2} fill="none" stroke={i === 0 ? '#22c55e' : '#f59e0b'} strokeWidth={i === 0 ? 1.2 : 0.9} />
+                          {i % labelStep === 0 && (() => {
+                            const [lx, ly] = lbl(i);
+                            return <text x={lx} y={ly + 2.5} fill="#a1a1aa" fontSize="7.5" textAnchor="middle">{i + 1}</text>;
+                          })()}
+                        </g>
+                      ))}
+                      {/* Axis direction arrows + labels */}
+                      <polygon points={`400,${cy} 394,${cy - 2.5} 394,${cy + 2.5}`} fill="#888" />
+                      <polygon points={`${cx},24 ${cx - 2.5},30 ${cx + 2.5},30`} fill="#888" />
                       <text x="392" y={cy - 6} fill="#888" fontSize="9" textAnchor="end">X — {t('tools.branchLayout.picajeAxisX', { defaultValue: 'arc on header' })}</text>
-                      <text x={cx + 6} y="40" fill="#888" fontSize="9">Y — {t('tools.branchLayout.picajeAxisY', { defaultValue: 'header axis' })}</text>
-                      <circle cx={cx + xs[0] * sx} cy={cy - ys[0] * sy} r="3.5" fill="none" stroke="#22c55e" strokeWidth="1.2" />
-                      <text x={cx + xs[0] * sx + 6} y={cy - ys[0] * sy + 3} fill="#22c55e" fontSize="8">1</text>
+                      <text x={cx + 6} y="36" fill="#888" fontSize="9">Y — {t('tools.branchLayout.picajeAxisY', { defaultValue: 'header axis' })}</text>
+                      {/* Min/max annotations */}
+                      <text x={PX(xMin)} y="236" fill="#888" fontSize="8" textAnchor="middle">Xmin {xMin.toFixed(1)}</text>
+                      <text x={PX(xMax)} y="236" fill="#888" fontSize="8" textAnchor="middle">Xmax {xMax.toFixed(1)}</text>
+                      <text x="26" y={PY(yMax) + 3} fill="#888" fontSize="8" textAnchor="middle">Ymax {yMax.toFixed(1)}</text>
+                      <text x="26" y={PY(yMin) + 3} fill="#888" fontSize="8" textAnchor="middle">Ymin {yMin.toFixed(1)}</text>
                     </g>
                   );
                 })()}
               </svg>
+              <p className="text-[10px] text-zinc-500 font-mono mb-2">
+                {t('tools.branchLayout.picajeDims', { w: picajeXRange.toFixed(1), h: picajeYRange.toFixed(1) })}
+              </p>
               <p className="text-[10px] text-zinc-600 leading-relaxed mb-3">
                 {t('tools.branchLayout.picajeNote', {
                   defaultValue: 'Origin (0,0): projection of the axis intersection on the header surface. X follows the header circumference (developed arc, real curved mm); Y runs along the header axis. Station 1 matches the template seam.',
@@ -822,8 +921,11 @@ export default function BranchLayoutTool() {
 
             {/* Fabrication actions */}
             <div className="flex flex-wrap gap-3">
-              <Button onClick={handlePrint} className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold">
+              <Button onClick={handleDownloadCutPdf} className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold">
                 {t('tools.branchLayout.print1to1')}
+              </Button>
+              <Button onClick={handleDownloadPicajePdf} className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold">
+                {t('tools.branchLayout.printPicaje1to1')}
               </Button>
               <Button onClick={handleSave} variant="outline" className="border-zinc-700 !bg-transparent hover:!bg-zinc-900">
                 {t('tools.branchLayout.saveCalc')}

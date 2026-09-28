@@ -1110,7 +1110,7 @@
       "crossSection": "Vista in sezione",
       "flatPattern": "Dima di taglio a sella (sviluppo in piano)",
       "saddleProfile": "Sviluppo del profilo",
-      "isometricView": "Vista isometrica 3D",
+      "isometricView": "Vista isometrica schematica",
       "dimensionTable": "Tabella delle quote di taglio",
       "angleDeg": "Angolo (°)",
       "distFromRef": "Dist. dal rif.",
@@ -1189,7 +1189,14 @@
       "wrapNote": "Avvolgere la sagoma attorno all'OD della derivazione. Allineare la linea di cucitura con il punto 1.",
       "calibrationNote": "Dopo la stampa, verificare la barra di 100 mm con un righello prima di marcare il tubo.",
       "closure360": "CHIUSURA 360° = P1",
-      "isometricNote": "Set-on: il ramo poggia sull'OD del collettore. La curva ambra è la sella di taglio del motore di calcolo."
+      "isometricNote": "Set-on: il ramo poggia sull'OD del collettore. La curva ambra è la sella di taglio del motore di calcolo.",
+      "printPicaje1to1": "Stampa template di piccaggio 1:1",
+      "picajeTemplateTitle": "Template di piccaggio del collettore 1:1 — apertura",
+      "picajeOrigin": "Origine (0,0)",
+      "picajeOpeningNote": "Linea = apertura nominale (riferimento: ID del ramo). Nessuna smussatura né sovrametallo di taglio in V1.",
+      "picajeWrapNote": "X = distanza circonferenziale sviluppata sulla superficie del collettore (direzione di avvolgimento). Y = distanza assiale lungo il collettore. Allineare X = 0 con la generatrice di riferimento.",
+      "picajeDims": "Apertura: {w} mm (X) × {h} mm (Y)",
+      "pdfDownloaded": "PDF scaricato — stampare al 100% / dimensione reale, senza adattare alla pagina"
     },
     "unitConv": {
       "name": "Convertitore di unità",

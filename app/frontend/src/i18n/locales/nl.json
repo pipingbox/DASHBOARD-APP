@@ -1055,7 +1055,7 @@
       "crossSection": "Dwarsdoorsnede",
       "flatPattern": "Snijsjabloon (Afwikkeling)",
       "saddleProfile": "Ontwikkelingspatroon",
-      "isometricView": "Isometrisch 3D Aanzicht",
+      "isometricView": "Schematische isometrische weergave",
       "dimensionTable": "Snijtabel met Maten",
       "angleDeg": "Hoek (°)",
       "distFromRef": "Afst. vanaf ref.",
@@ -1134,7 +1134,14 @@
       "wrapNote": "Wikkel het sjabloon rond de OD van de vertakking. Lijn de naadlijn uit met punt 1.",
       "calibrationNote": "Controleer na het afdrukken de 100 mm-lat met een liniaal voordat u de buis markeert.",
       "closure360": "360°-SLUITING = P1",
-      "isometricNote": "Set-on: de tak rust op de OD van de collector. De amberkleurige kromme is de snijzadel-kromme van de rekenmotor."
+      "isometricNote": "Set-on: de tak rust op de OD van de collector. De amberkleurige kromme is de snijzadel-kromme van de rekenmotor.",
+      "printPicaje1to1": "Picaje-sjabloon 1:1 afdrukken",
+      "picajeTemplateTitle": "Picaje-sjabloon van de collector 1:1 — opening",
+      "picajeOrigin": "Oorsprong (0,0)",
+      "picajeOpeningNote": "Lijn = nominale opening (referentie: ID van de tak). Geen afschuining of snijtoeslag in V1.",
+      "picajeWrapNote": "X = ontwikkelde omtrekafstand op het collectoroppervlak (wikkelrichting). Y = axiale afstand langs de collector. X = 0 op de referentie-lijn uitlijnen.",
+      "picajeDims": "Opening: {w} mm (X) × {h} mm (Y)",
+      "pdfDownloaded": "PDF gedownload — print op 100% / werkelijke grootte, niet aanpassen aan pagina"
     },
     "categoryFabrication": "Fabricage",
     "elbowCut": {

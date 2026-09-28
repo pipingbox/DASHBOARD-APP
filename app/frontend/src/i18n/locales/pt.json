@@ -1058,7 +1058,7 @@
       "crossSection": "Vista em Corte",
       "flatPattern": "Gabarito de Corte (Desenvolvimento)",
       "saddleProfile": "Padrão de Desenvolvimento",
-      "isometricView": "Vista Isométrica 3D",
+      "isometricView": "Vista isométrica esquemática",
       "dimensionTable": "Tabela de Cotas de Corte",
       "angleDeg": "Ângulo (°)",
       "distFromRef": "Dist. desde ref.",
@@ -1137,7 +1137,14 @@
       "wrapNote": "Enrole o gabarito em torno do OD do ramal. Alinhe a linha de costura com o ponto 1.",
       "calibrationNote": "Após imprimir, verifique a barra de 100 mm com uma régua antes de marcar o tubo.",
       "closure360": "FECHO 360° = P1",
-      "isometricNote": "Set-on: o ramal apoia-se sobre o OD do coletor. A curva âmbar é a sela de corte do motor de cálculo."
+      "isometricNote": "Set-on: o ramal apoia-se sobre o OD do coletor. A curva âmbar é a sela de corte do motor de cálculo.",
+      "printPicaje1to1": "Imprimir gabarito de picagem 1:1",
+      "picajeTemplateTitle": "Gabarito de picagem do coletor 1:1 — abertura",
+      "picajeOrigin": "Origem (0,0)",
+      "picajeOpeningNote": "Linha = abertura nominal (referência: ID do ramal). Sem chanfro nem folga de corte na V1.",
+      "picajeWrapNote": "X = distância circunferencial desenvolvida na superfície do coletor (direção de envolvimento). Y = distância axial ao longo do coletor. Alinhar X = 0 com a geratriz de referência.",
+      "picajeDims": "Abertura: {w} mm (X) × {h} mm (Y)",
+      "pdfDownloaded": "PDF baixado — imprima a 100% / tamanho real, sem ajustar à página"
     },
     "categoryFabrication": "Fabricação",
     "elbowCut": {

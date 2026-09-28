@@ -1110,7 +1110,7 @@
       "crossSection": "Vedere în secțiune transversală",
       "flatPattern": "Șablon de tăiere șa (desfășurată plană)",
       "saddleProfile": "Desfășurată",
-      "isometricView": "Vedere izometrică 3D",
+      "isometricView": "Vedere izometrică schematică",
       "dimensionTable": "Tabel dimensiuni de tăiere",
       "angleDeg": "Unghi (°)",
       "distFromRef": "Dist. de la ref.",
@@ -1189,7 +1189,14 @@
       "wrapNote": "Înfășurați șablonul în jurul OD-ului ramificației. Aliniați linia cusăturii cu punctul 1.",
       "calibrationNote": "După printare, verificați bara de 100 mm cu o riglă înainte de a marca țeava.",
       "closure360": "ÎNCHIDERE 360° = P1",
-      "isometricNote": "Set-on: ramura se sprijină pe OD-ul colectorului. Curba amber este șaua de tăiere a motorului de calcul."
+      "isometricNote": "Set-on: ramura se sprijină pe OD-ul colectorului. Curba amber este șaua de tăiere a motorului de calcul.",
+      "printPicaje1to1": "Tipărește șablonul de picaj 1:1",
+      "picajeTemplateTitle": "Șablon de picaj al colectorului 1:1 — deschidere",
+      "picajeOrigin": "Origine (0,0)",
+      "picajeOpeningNote": "Linia = deschidere nominală (referință: ID-ul ramurii). Fără tesire și fără adaos de tăiere în V1.",
+      "picajeWrapNote": "X = distanța circumferentială dezvoltată pe suprafața colectorului (direcția de înfășurare). Y = distanța axială de-a lungul colectorului. Aliniați X = 0 cu generatoarea de referință.",
+      "picajeDims": "Deschidere: {w} mm (X) × {h} mm (Y)",
+      "pdfDownloaded": "PDF descărcat — tipăriți la 100% / dimensiune reală, fără ajustare la pagină"
     },
     "unitConv": {
       "name": "Convertor de unități",
