@@ -5,8 +5,8 @@
   "stats": {
     "components": 57,
     "publishable": 56,
-    "standards": 20,
-    "standardsInUse": 19,
+    "standards": 22,
+    "standardsInUse": 20,
     "dimensionSets": 71,
     "dimensionRows": 1943,
     "drawings": 691,
@@ -6150,13 +6150,13 @@
       "publishable": true
     },
     {
-      "id": "PB-COMP-VALVE-GLOBE-API-602",
-      "slug": "valve-globe-api-602",
-      "name": "Válvula de Globo (Globe Valve) API 602 Class 150",
-      "shortName": "Válvula de Globo (Globe Valve) API 602 C",
-      "description": "Globe valve per API 602, Class 150, flanged ends, bolted bonnet. Designed for throttling and flow regulation. Handwheel operated. Higher pressure drop than gate valves due to tortuous flow path.",
+      "id": "PB-COMP-VALVE-GLOBE-API-623",
+      "slug": "valve-globe-api-623",
+      "name": "Válvula de Globo (Globe Valve) API 623 Class 150",
+      "shortName": "Válvula de Globo (Globe Valve) API 623 C",
+      "description": "Cast steel globe valve per API 623, Class 150, flanged RF ends (ASME B16.5), bolted bonnet, OS&Y rising stem, handwheel operated. Designed for throttling and flow regulation. Higher pressure drop than gate valves due to tortuous flow path.",
       "status": "approved",
-      "version": "0.1",
+      "version": "0.2",
       "category": "valves",
       "family": "valve",
       "type": "globe",
@@ -6174,35 +6174,36 @@
         "alloy_steel"
       ],
       "pressureRatings": [
-        "150",
-        "300",
-        "600",
-        "800",
-        "1500"
+        "150"
       ],
       "ratingBasis": "pressure_class",
-      "ratingNote": "Classes per API 602 for compact valves NPS 4 and smaller. Class 800 is not a class listed in ASME B16.34: it is an intermediate class in widespread use for threaded and welded ends, and does not exist in a flanged version. The available class depends on the end type. Verify against the current edition of the standard.",
-      "ratingNoteKey": "catalog.ratingNote.api602CompactValve",
+      "ratingNote": "Cast steel globe valve designed per API 623 within the ASME B16.34 pressure-temperature framework. Face-to-face dimensions are normative per ASME B16.10; flanged ends per ASME B16.5. Height (H), handwheel diameter and weight shown in the dimensional table are manufacturer-specific values (source: Neway, API 623 Class 150 cast steel globe) and are NOT defined by API 623, ASME B16.10 or ASME B16.5. Verify against the current edition of the standards.",
+      "ratingNoteKey": "catalog.ratingNote.api623Globe",
       "guideKey": "catalog.guide.valve.globe",
       "standards": [
         {
-          "standardId": "PB-STD-API-602",
-          "role": "dimensions",
-          "note": "Per API standard."
+          "standardId": "PB-STD-API-623",
+          "role": "design",
+          "note": "Valve design standard (cast steel globe, bolted bonnet)."
+        },
+        {
+          "standardId": "PB-STD-ASME-B16-34",
+          "role": "pressure_temperature_ratings",
+          "note": "General valve design / pressure-temperature framework."
         },
         {
           "standardId": "PB-STD-ASME-B16-10",
           "role": "dimensions",
-          "note": "Per ASME standard."
+          "note": "Face-to-face dimensional authority."
         },
         {
           "standardId": "PB-STD-ASME-B16-5",
           "role": "dimensions",
-          "note": "Per ASME standard."
+          "note": "Flanged-end dimensional/interface authority."
         }
       ],
       "dimensionSets": [
-        "PB-DIM-API-602-VALVE-GLOBE"
+        "PB-DIM-API-623-VALVE-GLOBE"
       ],
       "drawings": [
         {
@@ -6656,6 +6657,25 @@
         "valve_butterfly"
       ]
     },
+    "PB-STD-API-623": {
+      "id": "PB-STD-API-623",
+      "organization": "API",
+      "code": "623",
+      "title": "Steel Globe Valves — Flanged and Butt-welding Ends, Bolted Bonnets",
+      "edition": "2013",
+      "status": "active",
+      "scope": "This standard specifies the requirements for a heavy-duty series of bolted bonnet steel globe valves for petroleum refinery and related applications where corrosion, erosion and other service conditions would indicate the need for full port openings, heavy wall sections and large stem diameters. Covers sizes NPS 2 through NPS 24 in ASME Classes 150, 300, 600, 900, 1500 and 2500, with flanged and butt-welding ends.",
+      "roles": [
+        "design",
+        "dimensions",
+        "pressure_temperature_ratings",
+        "testing",
+        "materials"
+      ],
+      "applicableFamilies": [
+        "valve_globe"
+      ]
+    },
     "PB-STD-ASME-B1-20-1": {
       "id": "PB-STD-ASME-B1-20-1",
       "organization": "ASME",
@@ -6768,6 +6788,29 @@
         "cross_BW",
         "return_BW",
         "flange_WN"
+      ]
+    },
+    "PB-STD-ASME-B16-34": {
+      "id": "PB-STD-ASME-B16-34",
+      "organization": "ASME",
+      "code": "B16.34",
+      "title": "Valves — Flanged, Threaded and Welding End",
+      "edition": "2020",
+      "status": "active",
+      "scope": "This Standard covers pressure-temperature ratings, dimensions, tolerances, materials, nondestructive examination requirements, testing, and marking for cast, forged, and fabricated flanged, threaded, and welding end, and wafer or flangeless valves of steel, nickel-base alloys, and other alloys.",
+      "roles": [
+        "design",
+        "pressure_temperature_ratings",
+        "dimensions",
+        "testing",
+        "materials"
+      ],
+      "applicableFamilies": [
+        "valve_globe",
+        "valve_gate",
+        "valve_check",
+        "valve_ball",
+        "valve_butterfly"
       ]
     },
     "PB-STD-ASME-B16-48": {
@@ -42174,183 +42217,6 @@
         }
       ]
     },
-    "PB-DIM-API-602-VALVE-GLOBE": {
-      "id": "PB-DIM-API-602-VALVE-GLOBE",
-      "componentId": "PB-COMP-VALVE-GLOBE-API-602",
-      "standardId": "PB-STD-API-602",
-      "system": "mixed",
-      "selectors": [
-        {
-          "key": "nps",
-          "label": "Nominal Pipe Size",
-          "unit": "in",
-          "type": "string"
-        },
-        {
-          "key": "dn",
-          "label": "Diametre Nominal",
-          "unit": "mm",
-          "type": "integer"
-        },
-        {
-          "key": "class",
-          "label": "Pressure Class",
-          "unit": "dimensionless",
-          "type": "integer"
-        }
-      ],
-      "fields": [
-        {
-          "key": "face_to_face_in",
-          "label": "Face To Face",
-          "unit": "in",
-          "type": "number",
-          "priority": 1
-        },
-        {
-          "key": "face_to_face_mm",
-          "label": "Face To Face",
-          "unit": "mm",
-          "type": "number",
-          "priority": 2
-        },
-        {
-          "key": "center_to_top_in",
-          "label": "Center To Top",
-          "unit": "in",
-          "type": "integer",
-          "priority": 3
-        },
-        {
-          "key": "center_to_top_mm",
-          "label": "Center To Top",
-          "unit": "mm",
-          "type": "integer",
-          "priority": 4
-        },
-        {
-          "key": "handwheel_dia_in",
-          "label": "Handwheel Dia",
-          "unit": "in",
-          "type": "integer",
-          "priority": 5
-        },
-        {
-          "key": "handwheel_dia_mm",
-          "label": "Handwheel Dia",
-          "unit": "mm",
-          "type": "integer",
-          "priority": 6
-        },
-        {
-          "key": "weight_kg",
-          "label": "Weight",
-          "unit": "kg",
-          "type": "integer",
-          "priority": 7
-        },
-        {
-          "key": "bonnet_style",
-          "label": "Bonnet Style",
-          "unit": null,
-          "type": "string",
-          "priority": 8
-        }
-      ],
-      "rows": [
-        {
-          "nps": "2",
-          "dn": 50,
-          "class": 150,
-          "face_to_face_in": 8,
-          "face_to_face_mm": 203,
-          "center_to_top_in": 10,
-          "center_to_top_mm": 254,
-          "handwheel_dia_in": 7,
-          "handwheel_dia_mm": 178,
-          "weight_kg": 22,
-          "bonnet_style": "bolted"
-        },
-        {
-          "nps": "3",
-          "dn": 80,
-          "class": 150,
-          "face_to_face_in": 9.5,
-          "face_to_face_mm": 241,
-          "center_to_top_in": 12,
-          "center_to_top_mm": 304.8,
-          "handwheel_dia_in": 9,
-          "handwheel_dia_mm": 228.6,
-          "weight_kg": 38,
-          "bonnet_style": "bolted"
-        },
-        {
-          "nps": "4",
-          "dn": 100,
-          "class": 150,
-          "face_to_face_in": 11.5,
-          "face_to_face_mm": 292,
-          "center_to_top_in": 14.5,
-          "center_to_top_mm": 368.3,
-          "handwheel_dia_in": 10,
-          "handwheel_dia_mm": 254,
-          "weight_kg": 55,
-          "bonnet_style": "bolted"
-        },
-        {
-          "nps": "6",
-          "dn": 150,
-          "class": 150,
-          "face_to_face_in": 14,
-          "face_to_face_mm": 356,
-          "center_to_top_in": 18.5,
-          "center_to_top_mm": 469.9,
-          "handwheel_dia_in": 12,
-          "handwheel_dia_mm": 304.8,
-          "weight_kg": 100,
-          "bonnet_style": "bolted"
-        },
-        {
-          "nps": "8",
-          "dn": 200,
-          "class": 150,
-          "face_to_face_in": 19.5,
-          "face_to_face_mm": 495,
-          "center_to_top_in": 23,
-          "center_to_top_mm": 584.2,
-          "handwheel_dia_in": 14,
-          "handwheel_dia_mm": 355.6,
-          "weight_kg": 160,
-          "bonnet_style": "bolted"
-        },
-        {
-          "nps": "10",
-          "dn": 250,
-          "class": 150,
-          "face_to_face_in": 24.5,
-          "face_to_face_mm": 622,
-          "center_to_top_in": 27,
-          "center_to_top_mm": 685.8,
-          "handwheel_dia_in": 16,
-          "handwheel_dia_mm": 406.4,
-          "weight_kg": 250,
-          "bonnet_style": "bolted"
-        },
-        {
-          "nps": "12",
-          "dn": 300,
-          "class": 150,
-          "face_to_face_in": 27.5,
-          "face_to_face_mm": 698,
-          "center_to_top_in": 31,
-          "center_to_top_mm": 787.4,
-          "handwheel_dia_in": 18,
-          "handwheel_dia_mm": 457.2,
-          "weight_kg": 360,
-          "bonnet_style": "bolted"
-        }
-      ]
-    },
     "PB-DIM-API-608-VALVE-BALL": {
       "id": "PB-DIM-API-608-VALVE-BALL",
       "componentId": "PB-COMP-VALVE-BALL-API-608",
@@ -42618,6 +42484,183 @@
           "category": "A",
           "face_to_face_in": 3.07,
           "face_to_face_mm": 78
+        }
+      ]
+    },
+    "PB-DIM-API-623-VALVE-GLOBE": {
+      "id": "PB-DIM-API-623-VALVE-GLOBE",
+      "componentId": "PB-COMP-VALVE-GLOBE-API-623",
+      "standardId": "PB-STD-API-623",
+      "system": "mixed",
+      "selectors": [
+        {
+          "key": "nps",
+          "label": "Nominal Pipe Size",
+          "unit": "in",
+          "type": "string"
+        },
+        {
+          "key": "dn",
+          "label": "Diametre Nominal",
+          "unit": "mm",
+          "type": "integer"
+        },
+        {
+          "key": "class",
+          "label": "Pressure Class",
+          "unit": "dimensionless",
+          "type": "integer"
+        }
+      ],
+      "fields": [
+        {
+          "key": "face_to_face_in",
+          "label": "Face To Face",
+          "unit": "in",
+          "type": "number",
+          "priority": 1
+        },
+        {
+          "key": "face_to_face_mm",
+          "label": "Face To Face",
+          "unit": "mm",
+          "type": "number",
+          "priority": 2
+        },
+        {
+          "key": "center_to_top_in",
+          "label": "Center To Top",
+          "unit": "in",
+          "type": "integer",
+          "priority": 3
+        },
+        {
+          "key": "center_to_top_mm",
+          "label": "Center To Top",
+          "unit": "mm",
+          "type": "integer",
+          "priority": 4
+        },
+        {
+          "key": "handwheel_dia_in",
+          "label": "Handwheel Dia",
+          "unit": "in",
+          "type": "integer",
+          "priority": 5
+        },
+        {
+          "key": "handwheel_dia_mm",
+          "label": "Handwheel Dia",
+          "unit": "mm",
+          "type": "integer",
+          "priority": 6
+        },
+        {
+          "key": "weight_kg",
+          "label": "Weight",
+          "unit": "kg",
+          "type": "integer",
+          "priority": 7
+        },
+        {
+          "key": "bonnet_style",
+          "label": "Bonnet Style",
+          "unit": null,
+          "type": "string",
+          "priority": 8
+        }
+      ],
+      "rows": [
+        {
+          "nps": "2",
+          "dn": 50,
+          "class": 150,
+          "face_to_face_in": 8,
+          "face_to_face_mm": 203,
+          "center_to_top_in": 13,
+          "center_to_top_mm": 338,
+          "handwheel_dia_in": 8,
+          "handwheel_dia_mm": 200,
+          "weight_kg": 16,
+          "bonnet_style": "bolted"
+        },
+        {
+          "nps": "3",
+          "dn": 80,
+          "class": 150,
+          "face_to_face_in": 9.5,
+          "face_to_face_mm": 241,
+          "center_to_top_in": 16,
+          "center_to_top_mm": 396,
+          "handwheel_dia_in": 10,
+          "handwheel_dia_mm": 250,
+          "weight_kg": 29,
+          "bonnet_style": "bolted"
+        },
+        {
+          "nps": "4",
+          "dn": 100,
+          "class": 150,
+          "face_to_face_in": 11.5,
+          "face_to_face_mm": 292,
+          "center_to_top_in": 19,
+          "center_to_top_mm": 476,
+          "handwheel_dia_in": 12,
+          "handwheel_dia_mm": 300,
+          "weight_kg": 40,
+          "bonnet_style": "bolted"
+        },
+        {
+          "nps": "6",
+          "dn": 150,
+          "class": 150,
+          "face_to_face_in": 16,
+          "face_to_face_mm": 406,
+          "center_to_top_in": 21,
+          "center_to_top_mm": 524,
+          "handwheel_dia_in": 14,
+          "handwheel_dia_mm": 350,
+          "weight_kg": 87,
+          "bonnet_style": "bolted"
+        },
+        {
+          "nps": "8",
+          "dn": 200,
+          "class": 150,
+          "face_to_face_in": 19.5,
+          "face_to_face_mm": 495,
+          "center_to_top_in": 23,
+          "center_to_top_mm": 588,
+          "handwheel_dia_in": 16,
+          "handwheel_dia_mm": 400,
+          "weight_kg": 132,
+          "bonnet_style": "bolted"
+        },
+        {
+          "nps": "10",
+          "dn": 250,
+          "class": 150,
+          "face_to_face_in": 24.5,
+          "face_to_face_mm": 622,
+          "center_to_top_in": 29,
+          "center_to_top_mm": 738,
+          "handwheel_dia_in": 20,
+          "handwheel_dia_mm": 500,
+          "weight_kg": 264,
+          "bonnet_style": "bolted"
+        },
+        {
+          "nps": "12",
+          "dn": 300,
+          "class": 150,
+          "face_to_face_in": 27.5,
+          "face_to_face_mm": 698,
+          "center_to_top_in": 34,
+          "center_to_top_mm": 862,
+          "handwheel_dia_in": 22,
+          "handwheel_dia_mm": 560,
+          "weight_kg": 447,
+          "bonnet_style": "bolted"
         }
       ]
     },
@@ -43499,8 +43542,8 @@
     },
     "PB-DIM-VALVE-GLOBE-CLASS300-600": {
       "id": "PB-DIM-VALVE-GLOBE-CLASS300-600",
-      "componentId": "PB-COMP-VALVE-GLOBE-API-602",
-      "standardId": "PB-STD-API-602",
+      "componentId": "PB-COMP-VALVE-GLOBE-API-623",
+      "standardId": "PB-STD-API-623",
       "system": "mixed",
       "selectors": [
         {

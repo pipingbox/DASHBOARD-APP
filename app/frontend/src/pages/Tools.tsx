@@ -53,19 +53,19 @@ interface ToolDef {
 }
 
 const TOOLS: ToolDef[] = [
-  { key: 'bolts-nuts', nameKey: 'tools.bolts.name', descKey: 'tools.bolts.desc', icon: Wrench, categoryKey: 'tools.categoryFabrication', implemented: true },
-  { key: 'flanges', nameKey: 'tools.flanges.name', descKey: 'tools.flanges.desc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
+  { key: 'branch-layout', nameKey: 'tools.branchLayout.name', descKey: 'tools.branchLayout.subtitle', icon: GitBranch, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'elbow-cut', nameKey: 'tools.elbowCut.name', descKey: 'tools.elbowCut.subtitle', icon: Scissors, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'pipe-offset', nameKey: 'tools.prefab.offset.title', descKey: 'tools.prefab.offset.tabWithElbows', icon: MoveDiagonal, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'accessories-library', nameKey: 'tools.accessoriesLibrary.title', descKey: 'tools.accessoriesLibraryDesc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
+  { key: 'bolts-nuts', nameKey: 'tools.bolts.name', descKey: 'tools.bolts.desc', icon: Wrench, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'flanges', nameKey: 'tools.flanges.name', descKey: 'tools.flanges.desc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'mitered-elbow', nameKey: 'tools.prefab.miteredElbow.title', descKey: 'tools.prefab.miteredElbow.noteGeometry', icon: Shapes, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'pipe-comb', nameKey: 'tools.prefab.pipeComb.title', descKey: 'tools.prefab.pipeComb.noteGeometry', icon: AlignJustify, categoryKey: 'tools.categoryFabrication', implemented: true },
-  { key: 'branch-layout', nameKey: 'tools.branchLayout.name', descKey: 'tools.branchLayout.subtitle', icon: GitBranch, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'pipe-dimensions', nameKey: 'tools.pipeDim.name', descKey: 'tools.pipeDim.subtitle', icon: Table2, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'pressure-drop', nameKey: 'tools.pressureDrop.name', descKey: 'tools.pressureDrop.subtitle', icon: Gauge, categoryKey: 'tools.categoryHydraulics', implemented: true },
   { key: 'unit-converter', nameKey: 'tools.unitConverter', descKey: 'tools.unitConverterDesc', icon: Calculator, categoryKey: 'tools.categoryUtility', implemented: true },
   { key: 'wall-thickness', nameKey: 'tools.wallThickness', descKey: 'tools.wallThicknessDesc', icon: Ruler, categoryKey: 'tools.categoryDesign', implemented: true },
   { key: 'color-lookup', nameKey: 'tools.colorLookup', descKey: 'tools.colorLookupDesc', icon: Paintbrush, categoryKey: 'tools.categoryReference', implemented: true },
-  { key: 'accessories-library', nameKey: 'tools.accessoriesLibrary.title', descKey: 'tools.accessoriesLibraryDesc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'thermal-expansion', nameKey: 'tools.thermalExpansion', descKey: 'tools.thermalExpansionDesc', icon: Thermometer, categoryKey: 'tools.categoryStress', implemented: false },
   { key: 'reynolds', nameKey: 'tools.reynolds', descKey: 'tools.reynoldsDesc', icon: Beaker, categoryKey: 'tools.categoryHydraulics', implemented: false },
 ];
