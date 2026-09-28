@@ -808,3 +808,98 @@ test.describe('library analytics (PB-LIBRARY-COMPLETE-001)', () => {
     __resetObservabilityForTests();
   });
 });
+
+// ---------------------------------------------------------------------------
+// PB-JOBS-PILOT-003 §14–§16, §31 — Jobs funnel events
+// ---------------------------------------------------------------------------
+
+test.describe('Jobs funnel events (PB-JOBS-PILOT-003)', () => {
+  const JOB_ID = 'c15f2a9c-5f3d-4c98-b2b5-febf38ca6ee8';
+
+  test('job_viewed keeps a UUID job_id raw (long-token regression)', () => {
+    // job_id is 36 chars: LONG_TOKEN_RE would redact it without the
+    // JOB_ID_RE passthrough — same class of bug as component_id.
+    expect(buildEventProps('job_viewed', {
+      job_id: JOB_ID,
+      source_language: 'en',
+      rendered_locale: 'es',
+      country: 'Belgium',
+      trade: 'Pipefitting',
+    })).toEqual({
+      job_id: JOB_ID,
+      source_language: 'en',
+      rendered_locale: 'es',
+      country: 'Belgium',
+      trade: 'Pipefitting',
+    });
+  });
+
+  test('job_viewed drops a non-UUID job_id (never raw user text)', () => {
+    const props = buildEventProps('job_viewed', { job_id: 'not-a-uuid; DROP TABLE' });
+    expect(props?.job_id).toBeUndefined();
+  });
+
+  test('apply_started / apply_submitted share the funnel allowlist', () => {
+    for (const name of ['apply_started', 'apply_submitted'] as const) {
+      const props = buildEventProps(name, {
+        job_id: JOB_ID,
+        source_language: 'en',
+        rendered_locale: 'nl',
+        country: 'Belgium',
+        trade: 'Pipefitting',
+      });
+      expect(props).toEqual({
+        job_id: JOB_ID,
+        source_language: 'en',
+        rendered_locale: 'nl',
+        country: 'Belgium',
+        trade: 'Pipefitting',
+      });
+    }
+  });
+
+  test('candidate identity never survives a funnel event (§16 anti-PII)', () => {
+    // Even if a caller mistakenly passes candidate data, the allowlist drops
+    // unknown keys — no email/name/phone/user_id can ever travel.
+    const props = buildEventProps('apply_submitted', {
+      job_id: JOB_ID,
+      candidate_email: 'joao.silva@example.com',
+      candidate_name: 'João Silva',
+      phone: '+32 470 12 34 56',
+      user_id: '96a4d6eb-fb0d-407b-91e6-ccc51c0f3ae2',
+    });
+    expect(props).toEqual({ job_id: JOB_ID });
+  });
+
+  test('funnel events travel through PostHog PII-free with environment + app_version', async () => {
+    __resetObservabilityForTests();
+    const { client, captured } = makeClient();
+    await initObservability({ injectedClient: client });
+    trackEvent('apply_submitted', {
+      job_id: JOB_ID,
+      source_language: 'en',
+      rendered_locale: 'es',
+      country: 'Belgium',
+      trade: 'Pipefitting',
+    });
+    expect(captured).toHaveLength(1);
+    expect(captured[0].event).toBe('apply_submitted');
+    expect(captured[0].properties).toMatchObject({ job_id: JOB_ID, rendered_locale: 'es' });
+    expect(captured[0].properties).toHaveProperty('environment');
+    expect(captured[0].properties).toHaveProperty('app_version');
+    const raw = JSON.stringify(captured[0].properties);
+    expect(raw).not.toContain('@');
+    expect(raw).not.toContain('96a4d6eb');
+    __resetObservabilityForTests();
+  });
+
+  test('job_viewed dedupes by job id (no double-count on re-render)', async () => {
+    __resetObservabilityForTests();
+    const { client, captured } = makeClient();
+    await initObservability({ injectedClient: client });
+    trackEvent('job_viewed', { job_id: JOB_ID }, { dedupeKey: JOB_ID });
+    trackEvent('job_viewed', { job_id: JOB_ID }, { dedupeKey: JOB_ID });
+    expect(captured.filter((c) => c.event === 'job_viewed')).toHaveLength(1);
+    __resetObservabilityForTests();
+  });
+});
