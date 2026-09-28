@@ -2730,7 +2730,9 @@
     "statusUpdateFailed": "Failed to update status",
     "justNow": "Just now",
     "more": "+{{count}} more",
-    "loadFailed": "Failed to load candidates"
+    "loadFailed": "Failed to load candidates",
+    "sentToClient": "Sent to client",
+    "withdrawn": "Withdrawn"
   },
   "companyJobs": {
     "eyebrow": "Company",
@@ -3847,5 +3849,12 @@
     "uk": "Ukrainian",
     "pl": "Polish",
     "bg": "Bulgarian"
+  },
+  "applicationHistory": {
+    "title": "Application history",
+    "loading": "Loading history...",
+    "empty": "No history yet.",
+    "transition": "{{from}} → {{to}}",
+    "created": "Created as {{status}}"
   }
 }

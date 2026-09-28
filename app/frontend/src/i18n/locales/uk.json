@@ -2775,7 +2775,9 @@
     "statusUpdateFailed": "Не вдалося оновити статус",
     "justNow": "Щойно",
     "more": "+{{count}} ще",
-    "loadFailed": "Не вдалося завантажити кандидатів"
+    "loadFailed": "Не вдалося завантажити кандидатів",
+    "sentToClient": "Надіслано клієнту",
+    "withdrawn": "Відкликана"
   },
   "companyJobs": {
     "eyebrow": "Компанія",
@@ -3861,5 +3863,12 @@
     "uk": "українська",
     "pl": "польська",
     "bg": "болгарська"
+  },
+  "applicationHistory": {
+    "title": "Історія заявки",
+    "loading": "Завантаження...",
+    "empty": "Історії немає.",
+    "transition": "{{from}} → {{to}}",
+    "created": "Створено як {{status}}"
   }
 }

@@ -40,6 +40,7 @@ import type { WorkExperience, WorkerCertification, WorkerDocument } from '@/lib/
 import { normalizeExperience, normalizeCertification, normalizeDocument, getExperienceDescriptionByLanguage, LANGUAGE_NAMES } from '@/lib/workerProfile';
 import { useTranslation } from 'react-i18next';
 import { InviteToJobModal } from '@/components/InviteToJobModal';
+import { ApplicationHistory } from '@/components/ApplicationHistory';
 import { isPrimaryAdmin } from '@/lib/admin';
 
 // TD-02: moved to lib/admin.ts (reads VITE_PRIMARY_ADMIN_EMAIL env var).
@@ -47,10 +48,12 @@ import { isPrimaryAdmin } from '@/lib/admin';
 const STATUS_OPTIONS = [
   'applied',
   'reviewed',
-  'interview',
   'shortlisted',
-  'rejected',
+  'sent_to_client',
+  'interview',
   'hired',
+  'rejected',
+  'withdrawn',
 ] as const;
 
 type ApplicationStatus = (typeof STATUS_OPTIONS)[number];
@@ -435,13 +438,16 @@ export default function CandidateProfile() {
 
   const updateApplicationStatus = async (applicationId: string, newStatus: ApplicationStatus) => {
     setUpdatingId(applicationId);
-    const { error } = await supabase
-      .from(TABLES.jobApplications)
-      .update({ status: newStatus })
-      .eq('id', applicationId);
+    // PB-JOBS-ATS-001 §3: transactional RPC — status + audit event atomically,
+    // idempotent on retries, authorized server-side.
+    const { data, error } = await supabase.rpc('app_update_application_status', {
+      p_application_id: applicationId,
+      p_new_status: newStatus,
+    });
 
-    if (error) {
-      toast.error(t('candidateProfile.statusUpdateFailed'), { description: error.message });
+    if (error || (data && (data as { ok?: boolean }).ok === false)) {
+      const msg = error?.message ?? (data as { error?: string })?.error ?? 'unknown';
+      toast.error(t('candidateProfile.statusUpdateFailed'), { description: msg });
     } else {
       toast.success(`Status updated to "${newStatus}"`);
       setApplications((prev) =>
@@ -455,10 +461,12 @@ export default function CandidateProfile() {
     const config: Record<string, { label: string; classes: string }> = {
       applied: { label: 'Applied', classes: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30' },
       reviewed: { label: 'Reviewed', classes: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
-      interview: { label: 'Interview', classes: 'bg-purple-500/10 text-purple-400 border-purple-500/30' },
       shortlisted: { label: 'Shortlisted', classes: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
-      rejected: { label: 'Rejected', classes: 'bg-red-500/10 text-red-400 border-red-500/30' },
+      sent_to_client: { label: 'Sent to client', classes: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' },
+      interview: { label: 'Interview', classes: 'bg-purple-500/10 text-purple-400 border-purple-500/30' },
       hired: { label: 'Hired', classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
+      rejected: { label: 'Rejected', classes: 'bg-red-500/10 text-red-400 border-red-500/30' },
+      withdrawn: { label: 'Withdrawn', classes: 'bg-zinc-700/10 text-zinc-500 border-zinc-700/30' },
     };
     const c = config[status] || config.applied;
     return (
@@ -1250,6 +1258,12 @@ export default function CandidateProfile() {
                     })}
                   </div>
                 )}
+
+                {/* PB-JOBS-ATS-001 §3: audit history (internal notes visible
+                    to recruitment/company/admin viewers only). */}
+                <div className="mt-3 pt-3 border-t border-zinc-800/50">
+                  <ApplicationHistory applicationId={app.id} showInternalNotes={canUpdateStatus} />
+                </div>
               </div>
             ))}
           </div>
