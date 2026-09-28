@@ -195,7 +195,7 @@ Los candidatos deben crear o completar su perfil profesional en PIPINGBOX antes 
 • Capacidad de trabajar de forma segura e independiente
 • Alojamiento gestionado por el propio candidato
 • Transporte gestionado por el propio candidato hasta/desde el sitio de trabajo
-• Perfil profesional completado en PIPINGBOX', 'en', 'd7858e26', 'machine')
+• Perfil profesional completado en PIPINGBOX', 'en', 'd02e73a0', 'machine')
 ON CONFLICT (job_id, language) DO UPDATE SET
   title = EXCLUDED.title, summary = EXCLUDED.summary, description = EXCLUDED.description,
   requirements = EXCLUDED.requirements, source_content_hash = EXCLUDED.source_content_hash,
@@ -232,7 +232,7 @@ Kandidaten dienen vóór hun sollicitatie hun professionele profiel op PIPINGBOX
 • Zelfstandig en veilig kunnen werken
 • Eigen regeling van logies
 • Eigen regeling van vervoer naar/van de werf
-• Volledig professioneel profiel op PIPINGBOX', 'en', 'd7858e26', 'machine')
+• Volledig professioneel profiel op PIPINGBOX', 'en', 'd02e73a0', 'machine')
 ON CONFLICT (job_id, language) DO UPDATE SET
   title = EXCLUDED.title, summary = EXCLUDED.summary, description = EXCLUDED.description,
   requirements = EXCLUDED.requirements, source_content_hash = EXCLUDED.source_content_hash,
@@ -270,7 +270,7 @@ Les candidats doivent créer ou compléter leur profil professionnel sur PIPINGB
 • Capacité à travailler en toute sécurité et de manière autonome
 • Logement organisé par le candidat
 • Transport organisé par le candidat vers/depuis le site
-• Profil professionnel complété sur PIPINGBOX', 'en', 'd7858e26', 'machine')
+• Profil professionnel complété sur PIPINGBOX', 'en', 'd02e73a0', 'machine')
 ON CONFLICT (job_id, language) DO UPDATE SET
   title = EXCLUDED.title, summary = EXCLUDED.summary, description = EXCLUDED.description,
   requirements = EXCLUDED.requirements, source_content_hash = EXCLUDED.source_content_hash,
@@ -308,7 +308,7 @@ Os candidatos devem criar ou completar o seu perfil profissional na PIPINGBOX an
 • Capacidade de trabalhar de forma segura e independente
 • Alojamento organizado pelo próprio candidato
 • Transporte organizado pelo próprio candidato até/departir do local de trabalho
-• Perfil profissional completo na PIPINGBOX', 'en', 'd7858e26', 'machine')
+• Perfil profissional completo na PIPINGBOX', 'en', 'd02e73a0', 'machine')
 ON CONFLICT (job_id, language) DO UPDATE SET
   title = EXCLUDED.title, summary = EXCLUDED.summary, description = EXCLUDED.description,
   requirements = EXCLUDED.requirements, source_content_hash = EXCLUDED.source_content_hash,
@@ -345,7 +345,7 @@ Los candidatos deben completar su perfil profesional en PIPINGBOX antes de postu
 • Capacidad de trabajar de forma segura e independiente
 • Alojamiento gestionado por el propio candidato
 • Transporte gestionado por el propio candidato hasta/desde el sitio de trabajo
-• Perfil profesional completado en PIPINGBOX', 'en', 'f8f9c4db', 'machine')
+• Perfil profesional completado en PIPINGBOX', 'en', '317716e4', 'machine')
 ON CONFLICT (job_id, language) DO UPDATE SET
   title = EXCLUDED.title, summary = EXCLUDED.summary, description = EXCLUDED.description,
   requirements = EXCLUDED.requirements, source_content_hash = EXCLUDED.source_content_hash,
@@ -382,7 +382,7 @@ Kandidaten dienen hun professionele profiel op PIPINGBOX te completeren voordat 
 • Zelfstandig en veilig kunnen werken
 • Eigen regeling van logies
 • Eigen regeling van vervoer naar/van de werf
-• Volledig professioneel profiel op PIPINGBOX', 'en', 'f8f9c4db', 'machine')
+• Volledig professioneel profiel op PIPINGBOX', 'en', '317716e4', 'machine')
 ON CONFLICT (job_id, language) DO UPDATE SET
   title = EXCLUDED.title, summary = EXCLUDED.summary, description = EXCLUDED.description,
   requirements = EXCLUDED.requirements, source_content_hash = EXCLUDED.source_content_hash,
@@ -419,7 +419,7 @@ Les candidats doivent compléter leur profil professionnel PIPINGBOX avant de po
 • Capacité à travailler en toute sécurité et de manière autonome
 • Logement organisé par le candidat
 • Transport organisé par le candidat vers/depuis le site
-• Profil professionnel complété sur PIPINGBOX', 'en', 'f8f9c4db', 'machine')
+• Profil professionnel complété sur PIPINGBOX', 'en', '317716e4', 'machine')
 ON CONFLICT (job_id, language) DO UPDATE SET
   title = EXCLUDED.title, summary = EXCLUDED.summary, description = EXCLUDED.description,
   requirements = EXCLUDED.requirements, source_content_hash = EXCLUDED.source_content_hash,
@@ -456,7 +456,7 @@ Os candidatos devem completar o seu perfil profissional na PIPINGBOX antes de ca
 • Capacidade de trabalhar de forma segura e independente
 • Alojamento organizado pelo próprio candidato
 • Transporte organizado pelo próprio candidato até/departir do local de trabalho
-• Perfil profissional completo na PIPINGBOX', 'en', 'f8f9c4db', 'machine')
+• Perfil profissional completo na PIPINGBOX', 'en', '317716e4', 'machine')
 ON CONFLICT (job_id, language) DO UPDATE SET
   title = EXCLUDED.title, summary = EXCLUDED.summary, description = EXCLUDED.description,
   requirements = EXCLUDED.requirements, source_content_hash = EXCLUDED.source_content_hash,
