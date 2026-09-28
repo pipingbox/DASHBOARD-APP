@@ -15,12 +15,14 @@ import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import type { Job, JobTranslation } from '@/lib/jobs/types';
+import { trackEvent } from '@/lib/observability';
 import {
   getJobTranslation,
   formatPostedTime,
   getContractTypeLabel,
   optionLabelKey,
   currencySymbol,
+  structuredSalaryLabel,
 } from '@/lib/jobs/utils';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -88,6 +90,20 @@ export default function JobDetail() {
       if (trs) jobRow = { ...jobRow, translations: trs as JobTranslation[] };
       setJob(jobRow);
 
+      // Funnel step 1 (PB-JOBS-PILOT-003 §15): a legitimate detail view.
+      // Dedupe by job id so re-renders / locale switches never double-count.
+      trackEvent(
+        'job_viewed',
+        {
+          job_id: jobRow.id,
+          source_language: jobRow.source_language ?? 'en',
+          rendered_locale: i18n.language.slice(0, 2),
+          country: jobRow.country ?? undefined,
+          trade: jobRow.discipline ?? jobRow.category ?? undefined,
+        },
+        { dedupeKey: jobRow.id },
+      );
+
       // Duplicate-protection state.
       if (user) {
         const { data: authData } = await supabase.auth.getUser();
@@ -139,6 +155,18 @@ export default function JobDetail() {
       return;
     }
 
+    // Funnel step 2 (PB-JOBS-PILOT-003 §15): an authenticated candidate
+    // genuinely starts the application workflow. Deduped per job so a
+    // double-click never inflates the start count.
+    const funnelProps = {
+      job_id: job.id,
+      source_language: job.source_language ?? 'en',
+      rendered_locale: i18n.language.slice(0, 2),
+      country: job.country ?? undefined,
+      trade: job.discipline ?? job.category ?? undefined,
+    };
+    trackEvent('apply_started', funnelProps, { dedupeKey: job.id });
+
     // Applications are keyed on the ORIGINAL title/company (unique constraint)
     // so translations can never fragment the duplicate-protection boundary.
     const applicationPayload: Record<string, unknown> = {
@@ -156,6 +184,7 @@ export default function JobDetail() {
     setApplying(false);
 
     if (error) {
+      // Failed/duplicate attempts must NOT count as a conversion (§31).
       if (error.message.includes('duplicate') || error.code === '23505') {
         toast.info(t('jobs.alreadyApplied'));
         setApplied(true);
@@ -164,6 +193,9 @@ export default function JobDetail() {
       }
       return;
     }
+
+    // Funnel step 3: the application was successfully persisted.
+    trackEvent('apply_submitted', funnelProps, { dedupeKey: job.id });
 
     // Recruitment notification (jobs@pipingbox.com). Loud on failure, never
     // blocks the application — same contract as the lead alert flow.
@@ -218,13 +250,18 @@ export default function JobDetail() {
     : job.job_type;
 
   const conditions: { label: string; value: string }[] = [];
-  if (job.salary_period === 'hour' && job.salary_min) {
-    conditions.push({
-      label: t('jobs.salaryLabel'),
-      value: t('jobs.salaryFromHourly', {
-        amount: `${currencySymbol(job.currency)}${job.salary_min.toLocaleString()}`,
-      }),
-    });
+  // Salary precedence mirrors JobCard (PB-JOBS-PILOT-003 §2): explicit
+  // structured metadata first, legacy hourly wording as fallback.
+  const structuredSalary = structuredSalaryLabel(job, t);
+  const legacyHourly =
+    !structuredSalary && job.salary_period === 'hour' && job.salary_min
+      ? t('jobs.salaryFromHourly', {
+          amount: `${currencySymbol(job.currency)}${job.salary_min.toLocaleString()}`,
+        })
+      : null;
+  const salaryValue = structuredSalary ?? legacyHourly;
+  if (salaryValue) {
+    conditions.push({ label: t('jobs.salaryLabel'), value: salaryValue });
   }
   if (job.vacancies) {
     conditions.push({ label: t('jobs.vacanciesLabel'), value: t('jobs.vacancies', { count: job.vacancies }) });

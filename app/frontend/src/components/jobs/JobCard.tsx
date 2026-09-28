@@ -18,6 +18,7 @@ import {
   jobDisplayTitle,
   jobDisplaySummary,
   currencySymbol,
+  structuredSalaryLabel,
 } from '@/lib/jobs/utils';
 
 interface JobCardProps {
@@ -55,21 +56,25 @@ export function JobCard({ job, applied, applying, onApply }: JobCardProps) {
       : countryRaw
     : null;
 
-  // Structured hourly salary: "From €25 gross/hour".
+  // Salary precedence (PB-JOBS-PILOT-003 §2): explicit structured metadata
+  // (salary_mode + salary_period) → legacy hourly wording → legacy heuristic.
+  const structuredSalary = structuredSalaryLabel(job, t);
   const hourlySalary =
-    job.salary_period === 'hour' && job.salary_min
+    !structuredSalary && job.salary_period === 'hour' && job.salary_min
       ? t('jobs.salaryFromHourly', {
           amount: `${currencySymbol(job.currency)}${job.salary_min.toLocaleString()}`,
         })
       : null;
-  const legacySalary = hourlySalary
-    ? null
-    : (() => {
-        const salary = formatSalary(job);
-        return salary
-          ? t(salary.period === 'year' ? 'jobs.salaryPerYear' : 'jobs.salaryPerMonth', { amount: salary.amount })
-          : null;
-      })();
+  const legacySalary =
+    structuredSalary || hourlySalary
+      ? null
+      : (() => {
+          const salary = formatSalary(job);
+          return salary
+            ? t(salary.period === 'year' ? 'jobs.salaryPerYear' : 'jobs.salaryPerMonth', { amount: salary.amount })
+            : null;
+        })();
+  const salaryLabel = structuredSalary ?? hourlySalary ?? legacySalary;
 
   const badges: string[] = [];
   if (job.vca_required) badges.push(t('jobs.vcaRequired'));
@@ -116,8 +121,8 @@ export function JobCard({ job, applied, applying, onApply }: JobCardProps) {
           )}
         </div>
 
-        {(hourlySalary || legacySalary) && (
-          <p className="text-sm font-medium text-[#f59e0b]">{hourlySalary ?? legacySalary}</p>
+        {salaryLabel && (
+          <p className="text-sm font-medium text-[#f59e0b]">{salaryLabel}</p>
         )}
 
         {displaySummary && (

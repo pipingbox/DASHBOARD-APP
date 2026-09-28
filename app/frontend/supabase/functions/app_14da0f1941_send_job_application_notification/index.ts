@@ -1,4 +1,5 @@
 // PB-JOBS-PILOT-FOLLOWUP-002 — Jobs operational email routing.
+// PB-JOBS-PILOT-003 §18–§25 — recruitment-oriented information hierarchy.
 //
 // Sends the recruitment notification for a new job application to the
 // canonical Jobs operational mailbox (jobs@pipingbox.com). Deployed with
@@ -17,6 +18,9 @@
 //   back to the candidate's browser. SMTP acceptance evidence is returned
 //   as a boolean only.
 // - Logs carry no addresses (the canonical recipient is public by design).
+// - The "View candidate" CTA links to the AUTHENTICATED admin/recruitment
+//   route /candidate/<user_id> — authorization still applies, no public
+//   PII exposure (§21).
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import nodemailer from "npm:nodemailer";
@@ -29,6 +33,20 @@ const corsHeaders = {
 
 const CANONICAL_JOBS_MAILBOX = "jobs@pipingbox.com";
 const REPLAY_WINDOW_MS = 15 * 60 * 1000;
+// Production app origin (src/lib/constants.ts PRODUCTION_URL). The candidate
+// route is role-gated (admin / jobs_moderator / company) — the link is safe
+// to send to the internal mailbox only.
+const APP_BASE_URL = "https://pipingbox.com";
+
+/** Escape user-controlled content before HTML interpolation (email injection). */
+function esc(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 serve(async (req: Request) => {
   const requestId = crypto.randomUUID();
@@ -100,11 +118,37 @@ serve(async (req: Request) => {
     }
 
     // Candidate profile (internal email content only — never analytics).
+    // Recruitment hierarchy (§20): name → trade → experience → availability →
+    // VCA → completion. Missing data is shown as absent, never fabricated.
     const { data: profile } = await supabase
       .from("app_14da0f1941_profiles")
-      .select("full_name, username, role, profile_completion, country")
+      .select(
+        "full_name, username, role, profile_completion, country, title, years_experience, availability_status",
+      )
       .eq("user_id", userId)
       .maybeSingle();
+
+    // VCA status from the canonical certifications table. We report only
+    // what the record proves: a VCA row exists, and whether its expiry is
+    // in the future. No inference beyond the stored data (§20).
+    const { data: vcaCerts } = await supabase
+      .from("app_worker_certifications")
+      .select("certification_name, expiry_date")
+      .eq("user_id", userId)
+      .ilike("certification_name", "%vca%")
+      .order("expiry_date", { ascending: false, nullsFirst: false })
+      .limit(1);
+    const vcaCert = vcaCerts?.[0];
+    let vcaStatus: string | null = null;
+    if (vcaCert) {
+      if (!vcaCert.expiry_date) {
+        vcaStatus = "On record (no expiry date)";
+      } else {
+        vcaStatus = new Date(vcaCert.expiry_date).getTime() >= Date.now()
+          ? `Valid until ${new Date(vcaCert.expiry_date).toISOString().split("T")[0]}`
+          : `Expired ${new Date(vcaCert.expiry_date).toISOString().split("T")[0]}`;
+      }
+    }
 
     // SMTP setup (project-level secrets, same provider as the lead alert).
     const smtpHost = Deno.env.get("SMTP_HOST");
@@ -131,10 +175,36 @@ serve(async (req: Request) => {
       auth: { user: smtpUser, pass: smtpPassword },
     });
 
-    const candidateLine = profile?.full_name || "(profile incomplete)";
+    const candidateName = profile?.full_name?.trim() || null;
+    const candidateLine = candidateName ?? "(profile incomplete)";
     const candidateEmail = userData.user.email ?? "(no email on record)";
     const profileCompletion = profile?.profile_completion ?? 0;
-    const candidateId = userId;
+    const candidateUrl = `${APP_BASE_URL}/candidate/${userId}`;
+
+    const rows: Array<[string, string]> = [
+      ["Job", esc(job.title)],
+      ["Company / Project", esc(job.company)],
+      ["Country", esc(job.country ?? job.location ?? "—")],
+      ["Candidate", esc(candidateLine)],
+      ["Candidate email", esc(candidateEmail)],
+    ];
+    if (profile?.title) rows.push(["Profession / Trade", esc(profile.title)]);
+    if (profile?.years_experience != null) {
+      rows.push(["Experience", `${profile.years_experience} years`]);
+    }
+    if (profile?.availability_status) {
+      rows.push(["Availability", esc(profile.availability_status)]);
+    }
+    rows.push(["VCA", vcaStatus ? esc(vcaStatus) : "Not on record"]);
+    rows.push(["Profile completion", `${profileCompletion}%`]);
+    rows.push(["Application status", esc(application.status ?? "applied")]);
+
+    const tableRows = rows
+      .map(
+        ([label, value], i) =>
+          `<tr><td style="padding: 8px 0; color: #71717a; width: 170px; vertical-align: top;">${label}</td><td style="padding: 8px 0; color: #fafafa;${i === 3 ? " font-weight: 600;" : ""}">${value}</td></tr>`,
+      )
+      .join("");
 
     const adminHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #0a0a0a; color: #e4e4e7; border: 1px solid #27272a;">
@@ -143,16 +213,13 @@ serve(async (req: Request) => {
           <p style="margin: 4px 0 0; font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 0.1em;">PipingBox Jobs Pipeline</p>
         </div>
         <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-          <tr><td style="padding: 8px 0; color: #71717a; width: 160px;">Job</td><td style="padding: 8px 0; color: #fafafa; font-weight: 600;">${job.title}</td></tr>
-          <tr><td style="padding: 8px 0; color: #71717a;">Company / Project</td><td style="padding: 8px 0; color: #fafafa;">${job.company}</td></tr>
-          <tr><td style="padding: 8px 0; color: #71717a;">Country</td><td style="padding: 8px 0; color: #fafafa;">${job.country ?? job.location ?? "—"}</td></tr>
-          <tr><td style="padding: 8px 0; color: #71717a;">Candidate</td><td style="padding: 8px 0; color: #fafafa; font-weight: 600;">${candidateLine}</td></tr>
-          <tr><td style="padding: 8px 0; color: #71717a;">Candidate email</td><td style="padding: 8px 0; color: #fafafa;"><a href="mailto:${candidateEmail}" style="color: #f59e0b;">${candidateEmail}</a></td></tr>
-          <tr><td style="padding: 8px 0; color: #71717a;">Profile completion</td><td style="padding: 8px 0; color: #fafafa;">${profileCompletion}%</td></tr>
-          <tr><td style="padding: 8px 0; color: #71717a;">Application status</td><td style="padding: 8px 0; color: #fafafa;">${application.status ?? "applied"}</td></tr>
+          ${tableRows}
         </table>
-        <p style="margin-top: 20px; font-size: 13px; color: #a1a1aa;">
-          Review the candidate in the PIPINGBOX dashboard (admin &gt; candidates, or the job's applications view) — candidate id <code style="color:#f59e0b;">${candidateId}</code>.
+        <div style="margin-top: 28px; text-align: center;">
+          <a href="${candidateUrl}" style="display: inline-block; background: #f59e0b; color: #000000; font-size: 14px; font-weight: 700; text-decoration: none; padding: 12px 32px; border-radius: 4px;">View candidate</a>
+        </div>
+        <p style="margin-top: 20px; font-size: 12px; color: #52525b; text-align: center;">
+          Requires a PIPINGBOX admin/recruitment sign-in. Candidate id <code style="color:#71717a;">${userId}</code>
         </p>
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #27272a; font-size: 11px; color: #52525b;">
           PipingBox Jobs Pipeline · ${new Date().toISOString().split("T")[0]}
@@ -160,11 +227,15 @@ serve(async (req: Request) => {
       </div>
     `;
 
+    const subject = candidateName
+      ? `New application — ${candidateName} — ${job.title}`
+      : `New application — ${job.title}`;
+
     const info = await transporter.sendMail({
       from: smtpFrom,
       to: alertTo,
       ...(alertBcc ? { bcc: alertBcc } : {}),
-      subject: `New application — ${job.title}`,
+      subject,
       html: adminHtml,
     });
 
