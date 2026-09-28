@@ -347,15 +347,22 @@ for (const N of [12, 16, 24, 36, 48]) {
   }
 
   /* Tiled case: 24" branch development (π·609.6 ≈ 1915.02 mm) must tile
-     deterministically without ever scaling the geometry. */
+     deterministically without ever scaling the geometry. Since
+     PB-BRANCH-CUT-TILING-Y-001 the grid is X+Y: pagesX from the development
+     width, pagesY from the ordinate range vs the 102 mm A4 curve window. */
   const big = computeBranchIntersection({
     headerOuterRadius: 914.4 / 2, branchOuterDiameter: 609.6, branchInnerDiameter: 590.6,
     betaDeg: 60, divisions: 48,
   });
   const tplBig = buildBranchTemplate(big, { ordinate: 'relative', meta: META });
-  const expPages = Math.max(1, Math.ceil((Math.PI * 609.6 + 4 - 287) / (287 - 15)) + 1);
-  check('24" development tiled deterministically', tplBig.tiled && tplBig.tiles.length === expPages,
-    `${tplBig.tiles.length} tiles (expected ${expPages})`);
+  const expPagesX = Math.max(1, Math.ceil((Math.PI * 609.6 + 4 - 287) / (287 - 15)) + 1);
+  const expPagesY = Math.max(1, Math.ceil((tplBig.ordinateRangeMm + 4 - 102) / (102 - 15)) + 1);
+  const expPages = expPagesX * expPagesY;
+  check('24" development tiled deterministically (X+Y)', tplBig.tiled
+    && tplBig.pagesX === expPagesX && tplBig.pagesY === expPagesY && tplBig.tiles.length === expPages,
+    `${tplBig.tiles.length} tiles (expected ${expPages} = ${expPagesX}×${expPagesY})`);
+  check('24" profile exceeds A4 curve window → vertical tiling', expPagesY > 1,
+    `pagesY=${expPagesY}`);
   check('all big tiles full A4 physical + calibrated', tplBig.tiles.every(t =>
     t.svg.includes('100 mm') && /width="297mm"/.test(t.svg)));
   check('overlap marked on non-final tiles', tplBig.tiles.slice(0, -1).every(t => t.svg.includes('Overlap 15 mm')));

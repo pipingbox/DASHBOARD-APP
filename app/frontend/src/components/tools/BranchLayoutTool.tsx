@@ -14,6 +14,8 @@ import {
 } from '@/tools/branch/branchIntersectionGeometry';
 import { buildBranchTemplate } from '@/tools/branch/branchTemplateSvg';
 import { buildPicajeTemplate } from '@/tools/branch/branchPicajeTemplateSvg';
+import { PDF_PAGE_FORMATS, DEFAULT_PDF_PAGE_FORMAT_ID } from '@/tools/branch/pdfPageFormat';
+import type { PdfPageFormatId } from '@/tools/branch/pdfPageFormat';
 import { buildBranchIsometric } from '@/tools/branch/branchIsometricSvg';
 import { svgPagesToPdf, pdfLatin1Safe } from '@/tools/branch/svgMmToPdf';
 
@@ -239,6 +241,7 @@ export default function BranchLayoutTool() {
   const [divisions, setDivisions] = useState<number>(24);
   const [mode, setMode] = useState<FabricationMode>('template');
   const [refLength, setRefLength] = useState<number>(200);
+  const [pdfFormat, setPdfFormat] = useState<PdfPageFormatId>(DEFAULT_PDF_PAGE_FORMAT_ID);
   const [engOpen, setEngOpen] = useState(false);
 
   /* ── ASME B31.3 design inputs ── */
@@ -406,23 +409,24 @@ export default function BranchLayoutTool() {
 
   const slug = (s: string) => String(s).replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
 
-  /** CUT template: one A4 page at 1:1 when it fits; tiled with additive overlap otherwise. */
+  /** CUT template: one physical page at 1:1 when it fits; tiled with additive overlap otherwise. */
   const handleDownloadCutPdf = () => {
     if (!geometryValid) return;
     const tpl = buildBranchTemplate(geometry, {
+      format: pdfFormat,
       ordinate: mode === 'marking' ? 'fromEnd' : 'relative',
       meta: cutMeta(),
     });
     const bytes = svgPagesToPdf(tpl.tiles.map(t => ({ svg: t.svg, widthMm: t.widthMm, heightMm: t.heightMm })));
-    downloadPdf(bytes, `pipingbox-plantilla-corte-${slug(String(headerNPS))}x${slug(String(branchNPS))}-${angle}deg.pdf`);
+    downloadPdf(bytes, `pipingbox-plantilla-corte-${slug(String(headerNPS))}x${slug(String(branchNPS))}-${angle}deg-${pdfFormat.toLowerCase()}.pdf`);
   };
 
   /** PICAJE template: physical flat development of the local header surface. */
   const handleDownloadPicajePdf = () => {
     if (!geometryValid) return;
-    const tpl = buildPicajeTemplate(geometry, { meta: picajeMeta() });
+    const tpl = buildPicajeTemplate(geometry, { format: pdfFormat, meta: picajeMeta() });
     const bytes = svgPagesToPdf(tpl.tiles.map(t => ({ svg: t.svg, widthMm: t.widthMm, heightMm: t.heightMm })));
-    downloadPdf(bytes, `pipingbox-plantilla-picaje-${slug(String(headerNPS))}x${slug(String(branchNPS))}-${angle}deg.pdf`);
+    downloadPdf(bytes, `pipingbox-plantilla-picaje-${slug(String(headerNPS))}x${slug(String(branchNPS))}-${angle}deg-${pdfFormat.toLowerCase()}.pdf`);
   };
 
   // Screen preview dimensions (NOT a fabrication artifact — preview only)
@@ -920,7 +924,22 @@ export default function BranchLayoutTool() {
             </div>
 
             {/* Fabrication actions */}
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="pdf-format-select" className="text-xs text-zinc-500 whitespace-nowrap">
+                  {t('tools.branchLayout.printFormat', { defaultValue: 'Print format' })}
+                </Label>
+                <select
+                  id="pdf-format-select"
+                  value={pdfFormat}
+                  onChange={(e) => setPdfFormat(e.target.value as PdfPageFormatId)}
+                  className="rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-[#f59e0b]"
+                >
+                  {PDF_PAGE_FORMATS.map(f => (
+                    <option key={f.id} value={f.id}>{f.id} · {f.widthMm} × {f.heightMm} mm</option>
+                  ))}
+                </select>
+              </div>
               <Button onClick={handleDownloadCutPdf} className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold">
                 {t('tools.branchLayout.print1to1')}
               </Button>

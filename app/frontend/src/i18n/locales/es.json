@@ -1258,6 +1258,7 @@
       "closure360": "CIERRE 360° = P1",
       "isometricNote": "Set-on: el ramal se apoya sobre el OD del colector. La curva ámbar es la silla de corte del motor de cálculo.",
       "printPicaje1to1": "Imprimir plantilla de picaje 1:1",
+      "printFormat": "Formato de impresión",
       "picajeTemplateTitle": "Plantilla de picaje del colector 1:1 — abertura",
       "picajeOrigin": "Origen (0,0)",
       "picajeOpeningNote": "Línea = abertura nominal (referencia: ID del ramal). Sin chaflán ni allowance de corte en V1.",

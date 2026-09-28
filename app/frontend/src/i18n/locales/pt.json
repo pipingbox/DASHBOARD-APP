@@ -1206,6 +1206,7 @@
       "closure360": "FECHO 360° = P1",
       "isometricNote": "Set-on: o ramal apoia-se sobre o OD do coletor. A curva âmbar é a sela de corte do motor de cálculo.",
       "printPicaje1to1": "Imprimir gabarito de picagem 1:1",
+      "printFormat": "Formato de impressão",
       "picajeTemplateTitle": "Gabarito de picagem do coletor 1:1 — abertura",
       "picajeOrigin": "Origem (0,0)",
       "picajeOpeningNote": "Linha = abertura nominal (referência: ID do ramal). Sem chanfro nem folga de corte na V1.",

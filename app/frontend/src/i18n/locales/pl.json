@@ -1261,6 +1261,7 @@
       "closure360": "ZAMKNIĘCIE 360° = P1",
       "isometricNote": "Set-on: odgałęzienie opiera się na OD kolektora. Bursztynowa krzywa to siodło cięcia z silnika obliczeniowego.",
       "printPicaje1to1": "Drukuj szablon picaje 1:1",
+      "printFormat": "Format wydruku",
       "picajeTemplateTitle": "Szablon picaje kolektora 1:1 — otwór",
       "picajeOrigin": "Początek (0,0)",
       "picajeOpeningNote": "Linia = otwór nominalny (odniesienie: ID odgałęzienia). Bez fazy i naddatku na cięcie w V1.",

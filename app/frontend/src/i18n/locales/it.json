@@ -1258,6 +1258,7 @@
       "closure360": "CHIUSURA 360° = P1",
       "isometricNote": "Set-on: il ramo poggia sull'OD del collettore. La curva ambra è la sella di taglio del motore di calcolo.",
       "printPicaje1to1": "Stampa template di piccaggio 1:1",
+      "printFormat": "Formato di stampa",
       "picajeTemplateTitle": "Template di piccaggio del collettore 1:1 — apertura",
       "picajeOrigin": "Origine (0,0)",
       "picajeOpeningNote": "Linea = apertura nominale (riferimento: ID del ramo). Nessuna smussatura né sovrametallo di taglio in V1.",
