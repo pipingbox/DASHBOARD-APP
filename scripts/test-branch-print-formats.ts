@@ -27,6 +27,7 @@ import {
   pdfFormatUsableWidthMm,
   DEFAULT_PDF_PAGE_FORMAT_ID,
 } from '../app/frontend/src/tools/branch/pdfPageFormat.ts';
+import { formatMm } from '../app/frontend/src/tools/branch/formatMm.ts';
 
 let passed = 0;
 let failed = 0;
@@ -346,7 +347,6 @@ const bigGeo = computeBranchIntersection(BIG);
 }
 
 /* ═══ 8. Never scale-to-fit: A4 usable width is respected, not exceeded ═══ */
-
 {
   const tpl = buildBranchTemplate(bigGeo, { format: 'A4', ordinate: 'relative', meta: cutMeta() });
   check('big cut A4: content per page ≤ usable width (287)',
@@ -366,6 +366,55 @@ const bigGeo = computeBranchIntersection(BIG);
     if (!inside) break;
   }
   check('big cut A4: every station line inside the 5 mm printable border', inside, detail);
+}
+
+/* ═══ 9. Clean numeric labels in PDF artifacts (PB-BRANCH-PDF-NUMERIC-FORMAT-001) ═══ */
+
+{
+  /* Helper unit checks: derived dimensions carry binary noise; labels must not. */
+  check('formatMm: 102.25999999999999 → "102.26"', formatMm(102.25999999999999) === '102.26', formatMm(102.25999999999999));
+  check('formatMm: 77.92 → "77.92"', formatMm(77.92) === '77.92', formatMm(77.92));
+  check('formatMm: 168.3 → "168.3" (no 168.30)', formatMm(168.3) === '168.3', formatMm(168.3));
+  check('formatMm: 88.9 → "88.9"', formatMm(88.9) === '88.9', formatMm(88.9));
+  check('formatMm: 508 → "508"', formatMm(508.0) === '508', formatMm(508.0));
+  check('formatMm: 590.5400000000001 → "590.54"', formatMm(590.5400000000001) === '590.54', formatMm(590.5400000000001));
+
+  /* Regression case: 4" Sch 40 header × 4" Sch 40 branch × 90° × N=24.
+     branchID = 114.3 − 2·6.02 = 102.25999999999999 raw — the picaje header
+     must read exactly `4" (ID 102.26 mm)`. */
+  const geo44 = computeBranchIntersection({
+    headerOuterRadius: 114.3 / 2,
+    branchOuterDiameter: 114.3,
+    branchInnerDiameter: 114.3 - 2 * 6.02,
+    betaDeg: 90,
+    divisions: 24,
+  });
+  const meta44 = picajeMeta();
+  meta44.headerLabel = '4" Sch 40 (OD 114.3 mm)';
+  meta44.branchRefLabel = `4" (ID ${formatMm(114.3 - 2 * 6.02)} mm)`;
+  const pj44 = buildPicajeTemplate(geo44, { format: 'A4', meta: meta44 });
+  const svg44 = pj44.tiles[0].svg;
+  check('picaje 4"×4" header: exactly `4" (ID 102.26 mm)`',
+    svg44.includes('4" (ID 102.26 mm)'), svg44.match(/ID [^m]*mm/)?.[0] ?? 'ID label not found');
+
+  /* No long floating-point strings anywhere in any artifact (labels or values). */
+  const LONG_FLOAT = /\d+\.\d{5,}/;
+  const allSvgs = [
+    ...refCutByFormat.get('A4')!.tiles.map(t => t.svg),
+    ...refCutByFormat.get('A0')!.tiles.map(t => t.svg),
+    ...refPicajeByFormat.get('A4')!.tiles.map(t => t.svg),
+    ...refPicajeByFormat.get('A0')!.tiles.map(t => t.svg),
+    svg44,
+  ];
+  check('no floating-point noise strings in any template SVG',
+    allSvgs.every(s => !LONG_FLOAT.test(s)));
+
+  /* 6"×3" reference keeps its exact labels (ID 77.92, OD 168.3). */
+  const refSvg = refPicajeByFormat.get('A4')!.tiles[0].svg;
+  check('picaje 6"×3" reference label keeps ID 77.92',
+    refSvg.includes('3" (ID 77.92 mm)'));
+  check('cut 6"×3" reference label keeps OD 168.3 (not 168.30)',
+    refCutByFormat.get('A4')!.tiles[0].svg.includes('6" Sch 40 (OD 168.3 mm)'));
 }
 
 /* ═══ Report ═══ */

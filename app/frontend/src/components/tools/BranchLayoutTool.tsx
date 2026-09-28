@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { SCHEDULE_WT } from '@/tools/data/elbowData';
+import { formatMm } from '@/tools/branch/formatMm';
 import {
   computeBranchIntersection,
   BETA_MIN_DEG,
@@ -359,8 +360,8 @@ export default function BranchLayoutTool() {
 
   const cutMeta = () => {
     const m = {
-      headerLabel: `${headerNPS} Sch ${headerSch} (OD ${headerOD} mm)`,
-      branchLabel: `${branchNPS} Sch ${branchSch} (OD ${branchOD} mm)`,
+      headerLabel: `${headerNPS} Sch ${headerSch} (OD ${formatMm(headerOD)} mm)`,
+      branchLabel: `${branchNPS} Sch ${branchSch} (OD ${formatMm(branchOD)} mm)`,
       betaDeg: angle,
       titleLabel: t('tools.branchLayout.flatPattern'),
       seamLabel: t('tools.branchLayout.seam', { defaultValue: 'Seam' }),
@@ -376,8 +377,8 @@ export default function BranchLayoutTool() {
 
   const picajeMeta = () => {
     const m = {
-      headerLabel: `${headerNPS} Sch ${headerSch} (OD ${headerOD} mm)`,
-      branchRefLabel: `${branchNPS} (ID ${branchID} mm)`,
+      headerLabel: `${headerNPS} Sch ${headerSch} (OD ${formatMm(headerOD)} mm)`,
+      branchRefLabel: `${branchNPS} (ID ${formatMm(branchID)} mm)`,
       betaDeg: angle,
       titleLabel: t('tools.branchLayout.picajeTemplateTitle', { defaultValue: 'Header picaje template 1:1 — opening' }),
       originLabel: t('tools.branchLayout.picajeOrigin', { defaultValue: 'Origin (0,0)' }),
