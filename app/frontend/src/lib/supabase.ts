@@ -28,6 +28,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 export const TABLES = {
   profiles: 'app_14da0f1941_profiles',
   jobs: 'app_14da0f1941_jobs',
+  jobTranslations: 'app_14da0f1941_job_translations',
   jobApplications: 'app_14da0f1941_job_applications',
   toolUsage: 'app_14da0f1941_tool_usage',
   dailyLogs: 'app_14da0f1941_daily_logs',

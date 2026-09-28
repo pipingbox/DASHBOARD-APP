@@ -1,4 +1,74 @@
-import type { Job } from './types';
+import type { Job, JobTranslation } from './types';
+
+/**
+ * FNV-1a over the source-language content fields — the translation staleness
+ * key (PB-JOBS-PILOT-FOLLOWUP-002). MUST stay byte-identical to the seed
+ * algorithm in sql/016-jobs-localization.sql.
+ */
+export function hashJobSourceContent(
+  job: Pick<Job, 'title' | 'summary' | 'description' | 'requirements'>,
+): string {
+  const src = [
+    job.title ?? '',
+    job.summary ?? '',
+    job.description ?? '',
+    job.requirements ?? '',
+  ].join('|');
+  let h = 0x811c9dc5;
+  for (let i = 0; i < src.length; i++) {
+    h ^= src.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
+}
+
+export interface ResolvedJobTranslation {
+  translation: JobTranslation;
+  isStale: boolean;
+}
+
+/**
+ * Resolve the reader-locale translation for a job.
+ *
+ * Contract (PB-JOBS-PILOT-FOLLOWUP-002 §5–§7, §10, §12):
+ * - source language === reader locale → null (show the original, no label);
+ * - no translation for the locale → null (fallback to the original);
+ * - translation whose source_content_hash no longer matches the current
+ *   source content → stale → null (fallback to the original, never serve a
+ *   silently outdated translation).
+ */
+export function getJobTranslation(
+  job: Pick<Job, 'title' | 'summary' | 'description' | 'requirements' | 'source_language' | 'translations'>,
+  locale: string | null | undefined,
+): ResolvedJobTranslation | null {
+  if (!locale) return null;
+  const lang = locale.slice(0, 2);
+  if (!job.source_language || lang === job.source_language.slice(0, 2)) return null;
+  const tr = job.translations?.find((x) => x.language.slice(0, 2) === lang);
+  if (!tr) return null;
+  const isStale = tr.source_content_hash !== hashJobSourceContent(job);
+  return { translation: tr, isStale };
+}
+
+/** Reader-locale display title: translated when fresh, original otherwise. */
+export function jobDisplayTitle(
+  job: Pick<Job, 'title' | 'summary' | 'description' | 'requirements' | 'source_language' | 'translations'>,
+  locale: string | null | undefined,
+): string {
+  const resolved = getJobTranslation(job, locale);
+  if (resolved && !resolved.isStale) return resolved.translation.title;
+  return job.title;
+}
+
+/** Reader-locale display summary: translated when fresh, original otherwise. */
+export function jobDisplaySummary(
+  job: Pick<Job, 'title' | 'summary' | 'description' | 'requirements' | 'source_language' | 'translations'>,
+  locale: string | null | undefined,
+): string | null {
+  const resolved = getJobTranslation(job, locale);
+  if (resolved && !resolved.isStale) return resolved.translation.summary ?? job.summary ?? null;
+  return job.summary ?? null;
+}
 
 export interface FormattedSalary {
   amount: string;

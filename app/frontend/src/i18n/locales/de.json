@@ -1872,7 +1872,36 @@
         "contract": "Vertrag",
         "fullTime": "Vollzeit"
       }
-    }
+    },
+    "viewJob": "Stelle ansehen",
+    "vacancies_one": "{{count}} Stelle",
+    "vacancies_other": "{{count}} Stellen",
+    "vacanciesLabel": "Stellen",
+    "vcaRequired": "VCA erforderlich",
+    "vcaMandatory": "Erforderlich",
+    "hoursPerDay": "{{hours}} Std./Tag",
+    "saturdays": "Samstage",
+    "saturdaysOptional": "Optional",
+    "saturdaysMandatory": "Verpflichtend",
+    "salaryFromHourly": "Ab {{amount}} brutto/Stunde",
+    "salaryLabel": "Gehalt",
+    "translatedFrom": "Aus dem {{language}} übersetzt",
+    "viewOriginal": "Original auf {{language}} ansehen",
+    "jobNotFound": "Stelle nicht gefunden",
+    "jobNotFoundDescription": "Diese Stelle existiert nicht oder ist nicht mehr verfügbar.",
+    "backToJobs": "Zurück zu den Stellen",
+    "conditions": "Bedingungen",
+    "jobDescription": "Beschreibung",
+    "candidateProfile": "Kandidatenprofil",
+    "schedule": "Zeitplan",
+    "workingDay": "Arbeitszeit",
+    "period": "Zeitraum",
+    "accommodation": "Unterkunft",
+    "transport": "Transport",
+    "included": "Inklusive",
+    "notIncluded": "Nicht inklusive",
+    "contractLabel": "Vertrag",
+    "applyHint": "Ihr professionelles Profil bleibt mit Ihrer Bewerbung verknüpft."
   },
   "companies": {
     "eyebrow": "Unternehmen",
@@ -3708,5 +3737,18 @@
   },
   "deploymentBadge": {
     "label": "{{environment}}-Deployment · Build {{build}}"
+  },
+  "languageNames": {
+    "en": "Englisch",
+    "es": "Spanisch",
+    "nl": "Niederländisch",
+    "fr": "Französisch",
+    "de": "Deutsch",
+    "pt": "Portugiesisch",
+    "it": "Italienisch",
+    "ro": "Rumänisch",
+    "uk": "Ukrainisch",
+    "pl": "Polnisch",
+    "bg": "Bulgarisch"
   }
 }

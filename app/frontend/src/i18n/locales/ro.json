@@ -1877,7 +1877,37 @@
       }
     },
     "roleCount_few": "{{count}} posturi",
-    "activeFiltersLabel_few": "{{count}} filtre active"
+    "activeFiltersLabel_few": "{{count}} filtre active",
+    "viewJob": "Vezi postul",
+    "vacancies_one": "{{count}} post",
+    "vacancies_other": "{{count}} posturi",
+    "vacanciesLabel": "Posturi",
+    "vcaRequired": "VCA obligatoriu",
+    "vcaMandatory": "Obligatoriu",
+    "hoursPerDay": "{{hours}} h/zi",
+    "saturdays": "Sâmbete",
+    "saturdaysOptional": "Opționale",
+    "saturdaysMandatory": "Obligatorii",
+    "salaryFromHourly": "De la {{amount}} brut/oră",
+    "salaryLabel": "Salariu",
+    "translatedFrom": "Tradus din {{language}}",
+    "viewOriginal": "Vezi originalul în {{language}}",
+    "jobNotFound": "Postul nu a fost găsit",
+    "jobNotFoundDescription": "Acest post nu există sau nu mai este disponibil.",
+    "backToJobs": "Înapoi la posturi",
+    "conditions": "Condiții",
+    "jobDescription": "Descriere",
+    "candidateProfile": "Profilul candidatului",
+    "schedule": "Program",
+    "workingDay": "Zi de lucru",
+    "period": "Perioadă",
+    "accommodation": "Cazare",
+    "transport": "Transport",
+    "included": "Inclus",
+    "notIncluded": "Neinclus",
+    "contractLabel": "Contract",
+    "applyHint": "Profilul tău profesional rămâne atașat candidaturii tale.",
+    "vacancies_few": "{{count}} posturi"
   },
   "companies": {
     "eyebrow": "Companii",
@@ -3714,5 +3744,18 @@
   },
   "deploymentBadge": {
     "label": "Implementare {{environment}} · build {{build}}"
+  },
+  "languageNames": {
+    "en": "engleză",
+    "es": "spaniolă",
+    "nl": "neerlandeză",
+    "fr": "franceză",
+    "de": "germană",
+    "pt": "portugheză",
+    "it": "italiană",
+    "ro": "română",
+    "uk": "ucraineană",
+    "pl": "poloneză",
+    "bg": "bulgară"
   }
 }

@@ -101,6 +101,13 @@ export const SPA_ROUTE_CONTRACT: RouteRule[] = [
     note: 'public worker profile; resource existence not validated at edge',
   },
   {
+    pattern: '/jobs/:id',
+    visibility: 'PUBLIC',
+    kind: 'DYNAMIC',
+    validate: (_path, params) => UUID_OR_SHORTID_RE.test(params.id ?? ''),
+    note: 'PB-JOBS-PILOT-FOLLOWUP-002: public job detail; RLS keeps non-open jobs private',
+  },
+  {
     pattern: '/tools/:slug',
     visibility: 'PUBLIC',
     kind: 'DYNAMIC',
