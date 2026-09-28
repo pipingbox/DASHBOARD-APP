@@ -22,7 +22,7 @@ import {
   getContractTypeLabel,
   optionLabelKey,
 } from '@/lib/jobs/utils';
-import type { Job, FilterTag } from '@/lib/jobs/types';
+import type { Job, FilterTag, JobTranslation } from '@/lib/jobs/types';
 
 export default function Jobs() {
   const { t } = useTranslation();
@@ -39,7 +39,7 @@ export default function Jobs() {
   const [selectedContractTypes, setSelectedContractTypes] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch DB jobs + user applications
+  // Fetch DB jobs + translations + user applications
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -50,7 +50,27 @@ export default function Jobs() {
         .order('created_at', { ascending: false });
       if (!mounted) return;
       if (error) console.warn('Jobs fetch:', error.message);
-      setDbJobs((data as Job[]) ?? []);
+
+      let jobs = (data as Job[]) ?? [];
+
+      // PB-JOBS-PILOT-FOLLOWUP-002: attach localized content (public read is
+      // RLS-gated on the parent job being open — same boundary as jobs).
+      if (jobs.length > 0) {
+        const { data: trs } = await supabase
+          .from(TABLES.jobTranslations)
+          .select('*')
+          .in('job_id', jobs.map((j) => j.id));
+        if (trs) {
+          const byJob = new Map<string, JobTranslation[]>();
+          for (const tr of trs as JobTranslation[]) {
+            const list = byJob.get(tr.job_id) ?? [];
+            list.push(tr);
+            byJob.set(tr.job_id, list);
+          }
+          jobs = jobs.map((j) => ({ ...j, translations: byJob.get(j.id) ?? [] }));
+        }
+      }
+      setDbJobs(jobs);
 
       if (user) {
         const { data: authData } = await supabase.auth.getUser();
@@ -99,7 +119,7 @@ export default function Jobs() {
       );
     }
     if (selectedCountries.length > 0) {
-      result = result.filter((j) => selectedCountries.includes(getCountry(j.location)));
+      result = result.filter((j) => selectedCountries.includes(getCountry(j.country ?? j.location)));
     }
     if (selectedDisciplines.length > 0) {
       result = result.filter((j) => selectedDisciplines.includes(DISCIPLINE_MAP[j.category ?? ''] ?? 'Other'));
@@ -180,6 +200,20 @@ export default function Jobs() {
         toast.error(t('jobs.applicationFailed'), { description: error.message });
       }
       return;
+    }
+
+    // PB-JOBS-PILOT-FOLLOWUP-002: fire the recruitment email notification
+    // (jobs@pipingbox.com). The application IS stored regardless of the email
+    // outcome — mirror of the PB-LEADFORM-001 lesson: be loud, never block.
+    const { data: mailData, error: mailErr } = await supabase.functions.invoke(
+      'app_14da0f1941_send_job_application_notification',
+      { body: { job_id: job.id } },
+    );
+    if (mailErr || (mailData && mailData.emailsSent === false)) {
+      console.error(
+        '[Jobs] APPLICATION EMAIL NOT SENT — application stored, notification lost:',
+        mailErr?.message ?? mailData?.reason ?? 'unknown',
+      );
     }
 
     toast.success(t('jobs.applicationSubmitted'));

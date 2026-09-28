@@ -1872,7 +1872,36 @@
         "contract": "Договор",
         "fullTime": "Пълно работно време"
       }
-    }
+    },
+    "viewJob": "Виж обявата",
+    "vacancies_one": "{{count}} позиция",
+    "vacancies_other": "{{count}} позиции",
+    "vacanciesLabel": "Позиции",
+    "vcaRequired": "Изисква се VCA",
+    "vcaMandatory": "Задължително",
+    "hoursPerDay": "{{hours}} ч./ден",
+    "saturdays": "Съботи",
+    "saturdaysOptional": "По избор",
+    "saturdaysMandatory": "Задължителни",
+    "salaryFromHourly": "От {{amount}} брутто/час",
+    "salaryLabel": "Заплащане",
+    "translatedFrom": "Преведено от {{language}}",
+    "viewOriginal": "Виж оригинала на {{language}}",
+    "jobNotFound": "Обявата не е намерена",
+    "jobNotFoundDescription": "Тази обява не съществува или вече не е налична.",
+    "backToJobs": "Обратно към обявите",
+    "conditions": "Условия",
+    "jobDescription": "Описание",
+    "candidateProfile": "Профил на кандидата",
+    "schedule": "График",
+    "workingDay": "Работен ден",
+    "period": "Период",
+    "accommodation": "Настаняване",
+    "transport": "Транспорт",
+    "included": "Включено",
+    "notIncluded": "Не е включено",
+    "contractLabel": "Договор",
+    "applyHint": "Вашият професионален профил остава прикачен към вашата кандидатура."
   },
   "companies": {
     "eyebrow": "Компании",
@@ -3708,5 +3737,18 @@
   },
   "deploymentBadge": {
     "label": "Внедряване {{environment}} · build {{build}}"
+  },
+  "languageNames": {
+    "en": "английски",
+    "es": "испански",
+    "nl": "нидерландски",
+    "fr": "френски",
+    "de": "немски",
+    "pt": "португалски",
+    "it": "италиански",
+    "ro": "румънски",
+    "uk": "украински",
+    "pl": "полски",
+    "bg": "български"
   }
 }

@@ -1882,7 +1882,38 @@
     "roleCount_few": "{{count}} вакансії",
     "roleCount_many": "{{count}} вакансій",
     "activeFiltersLabel_few": "{{count}} активні фільтри",
-    "activeFiltersLabel_many": "{{count}} активних фільтрів"
+    "activeFiltersLabel_many": "{{count}} активних фільтрів",
+    "viewJob": "Переглянути вакансію",
+    "vacancies_one": "{{count}} вакансія",
+    "vacancies_few": "{{count}} вакансії",
+    "vacancies_many": "{{count}} вакансій",
+    "vacancies_other": "{{count}} вакансій",
+    "vacanciesLabel": "Вакансії",
+    "vcaRequired": "Потрібен VCA",
+    "vcaMandatory": "Обов'язково",
+    "hoursPerDay": "{{hours}} год/день",
+    "saturdays": "Суботи",
+    "saturdaysOptional": "Необов’язкові",
+    "saturdaysMandatory": "Обов'язкові",
+    "salaryFromHourly": "Від {{amount}} брутто/годину",
+    "salaryLabel": "Зарплата",
+    "translatedFrom": "Переклад з {{language}}",
+    "viewOriginal": "Переглянути оригінал {{language}}",
+    "jobNotFound": "Вакансію не знайдено",
+    "jobNotFoundDescription": "Ця вакансія не існує або більше недоступна.",
+    "backToJobs": "Назад до вакансій",
+    "conditions": "Умови",
+    "jobDescription": "Опис",
+    "candidateProfile": "Профіль кандидата",
+    "schedule": "Графік",
+    "workingDay": "Робочий день",
+    "period": "Період",
+    "accommodation": "Проживання",
+    "transport": "Транспорт",
+    "included": "Включено",
+    "notIncluded": "Не включено",
+    "contractLabel": "Контракт",
+    "applyHint": "Ваш професійний профіль додається до вашої заявки."
   },
   "companies": {
     "eyebrow": "Компанії",
@@ -3720,5 +3751,18 @@
   },
   "deploymentBadge": {
     "label": "Розгортання {{environment}} · build {{build}}"
+  },
+  "languageNames": {
+    "en": "англійська",
+    "es": "іспанська",
+    "nl": "нідерландська",
+    "fr": "французька",
+    "de": "німецька",
+    "pt": "португальська",
+    "it": "італійська",
+    "ro": "румунська",
+    "uk": "українська",
+    "pl": "польська",
+    "bg": "болгарська"
   }
 }

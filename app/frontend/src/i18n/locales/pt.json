@@ -1877,7 +1877,37 @@
       }
     },
     "roleCount_many": "{{count}} vagas",
-    "activeFiltersLabel_many": "{{count}} filtros ativos"
+    "activeFiltersLabel_many": "{{count}} filtros ativos",
+    "viewJob": "Ver oferta",
+    "vacancies_one": "{{count}} vaga",
+    "vacancies_other": "{{count}} vagas",
+    "vacanciesLabel": "Vagas",
+    "vcaRequired": "VCA obrigatório",
+    "vcaMandatory": "Obrigatório",
+    "hoursPerDay": "{{hours}} h/dia",
+    "saturdays": "Sábados",
+    "saturdaysOptional": "Opcionais",
+    "saturdaysMandatory": "Obrigatórios",
+    "salaryFromHourly": "A partir de {{amount}} brutos/hora",
+    "salaryLabel": "Salário",
+    "translatedFrom": "Traduzido do {{language}}",
+    "viewOriginal": "Ver original em {{language}}",
+    "jobNotFound": "Oferta não encontrada",
+    "jobNotFoundDescription": "Esta oferta não existe ou já não está disponível.",
+    "backToJobs": "Voltar às ofertas",
+    "conditions": "Condições",
+    "jobDescription": "Descrição",
+    "candidateProfile": "Perfil do candidato",
+    "schedule": "Horário",
+    "workingDay": "Jornada",
+    "period": "Período",
+    "accommodation": "Alojamento",
+    "transport": "Transporte",
+    "included": "Incluído",
+    "notIncluded": "Não incluído",
+    "contractLabel": "Contrato",
+    "applyHint": "O seu perfil profissional fica anexado à sua candidatura.",
+    "vacancies_many": "{{count}} vagas"
   },
   "companies": {
     "eyebrow": "Companies",
@@ -3714,5 +3744,18 @@
   },
   "deploymentBadge": {
     "label": "Implantação {{environment}} · build {{build}}"
+  },
+  "languageNames": {
+    "en": "inglês",
+    "es": "espanhol",
+    "nl": "neerlandês",
+    "fr": "francês",
+    "de": "alemão",
+    "pt": "português",
+    "it": "italiano",
+    "ro": "romeno",
+    "uk": "ucraniano",
+    "pl": "polaco",
+    "bg": "búlgaro"
   }
 }

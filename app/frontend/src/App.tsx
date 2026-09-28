@@ -37,6 +37,7 @@ import AcademyModule from './pages/AcademyModule';
 import AcademyExam from './pages/AcademyExam';
 import Tools from './pages/Tools';
 import Jobs from './pages/Jobs';
+import JobDetail from './pages/JobDetail';
 import Community from './pages/Community';
 import CommunityChannel from './pages/CommunityChannel';
 import CommunityPost from './pages/CommunityPost';
@@ -348,6 +349,12 @@ const AppRoutes = () => {
     <Route
       path="/jobs"
       element={withPublicShell(<Jobs />)}
+    />
+    {/* PB-JOBS-PILOT-FOLLOWUP-002: public job detail. Same open boundary as
+        /jobs — anon and authenticated readers; RLS keeps non-open jobs private. */}
+    <Route
+      path="/jobs/:id"
+      element={withPublicShell(<JobDetail />)}
     />
     <Route
       path="/community"

@@ -1872,7 +1872,36 @@
         "contract": "Contract",
         "fullTime": "Voltijds"
       }
-    }
+    },
+    "viewJob": "Vacature bekijken",
+    "vacancies_one": "{{count}} vacature",
+    "vacancies_other": "{{count}} vacatures",
+    "vacanciesLabel": "Vacatures",
+    "vcaRequired": "VCA verplicht",
+    "vcaMandatory": "Verplicht",
+    "hoursPerDay": "{{hours}} u/dag",
+    "saturdays": "Zaterdagen",
+    "saturdaysOptional": "Optioneel",
+    "saturdaysMandatory": "Verplicht",
+    "salaryFromHourly": "Vanaf {{amount}} bruto/uur",
+    "salaryLabel": "Salaris",
+    "translatedFrom": "Vertaald uit het {{language}}",
+    "viewOriginal": "Origineel bekijken in het {{language}}",
+    "jobNotFound": "Vacature niet gevonden",
+    "jobNotFoundDescription": "Deze vacature bestaat niet of is niet langer beschikbaar.",
+    "backToJobs": "Terug naar vacatures",
+    "conditions": "Voorwaarden",
+    "jobDescription": "Omschrijving",
+    "candidateProfile": "Kandidaatprofiel",
+    "schedule": "Schema",
+    "workingDay": "Werktijd",
+    "period": "Periode",
+    "accommodation": "Logies",
+    "transport": "Vervoer",
+    "included": "Inbegrepen",
+    "notIncluded": "Niet inbegrepen",
+    "contractLabel": "Contract",
+    "applyHint": "Uw professionele profiel blijft gekoppeld aan uw sollicitatie."
   },
   "companies": {
     "eyebrow": "Bedrijven",
@@ -3708,5 +3737,18 @@
   },
   "deploymentBadge": {
     "label": "{{environment}}-implementatie · build {{build}}"
+  },
+  "languageNames": {
+    "en": "Engels",
+    "es": "Spaans",
+    "nl": "Nederlands",
+    "fr": "Frans",
+    "de": "Duits",
+    "pt": "Portugees",
+    "it": "Italiaans",
+    "ro": "Roemeens",
+    "uk": "Oekraïens",
+    "pl": "Pools",
+    "bg": "Bulgaars"
   }
 }

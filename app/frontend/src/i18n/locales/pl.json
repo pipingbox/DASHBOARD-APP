@@ -1882,7 +1882,38 @@
     "roleCount_few": "{{count}} stanowiska",
     "roleCount_many": "{{count}} stanowisk",
     "activeFiltersLabel_few": "{{count}} aktywne filtry",
-    "activeFiltersLabel_many": "{{count}} aktywnych filtrów"
+    "activeFiltersLabel_many": "{{count}} aktywnych filtrów",
+    "viewJob": "Zobacz ofertę",
+    "vacancies_one": "{{count}} wakat",
+    "vacancies_few": "{{count}} wakaty",
+    "vacancies_many": "{{count}} wakatów",
+    "vacancies_other": "{{count}} wakatów",
+    "vacanciesLabel": "Wakaty",
+    "vcaRequired": "VCA wymagane",
+    "vcaMandatory": "Wymagane",
+    "hoursPerDay": "{{hours}} godz./dzień",
+    "saturdays": "Soboty",
+    "saturdaysOptional": "Opcjonalne",
+    "saturdaysMandatory": "Obowiązkowe",
+    "salaryFromHourly": "Od {{amount}} brutto/godzinę",
+    "salaryLabel": "Wynagrodzenie",
+    "translatedFrom": "Przetłumaczono z języka {{language}}",
+    "viewOriginal": "Zobacz oryginał w języku {{language}}",
+    "jobNotFound": "Nie znaleziono oferty",
+    "jobNotFoundDescription": "Ta oferta nie istnieje lub nie jest już dostępna.",
+    "backToJobs": "Powrót do ofert",
+    "conditions": "Warunki",
+    "jobDescription": "Opis",
+    "candidateProfile": "Profil kandydata",
+    "schedule": "Harmonogram",
+    "workingDay": "Dzień pracy",
+    "period": "Okres",
+    "accommodation": "Zakwaterowanie",
+    "transport": "Transport",
+    "included": "Wliczone",
+    "notIncluded": "Niewliczone",
+    "contractLabel": "Umowa",
+    "applyHint": "Twój profesjonalny profil pozostaje dołączony do aplikacji."
   },
   "companies": {
     "eyebrow": "Firmy",
@@ -3720,5 +3751,18 @@
   },
   "deploymentBadge": {
     "label": "Wdrożenie {{environment}} · build {{build}}"
+  },
+  "languageNames": {
+    "en": "angielski",
+    "es": "hiszpański",
+    "nl": "niderlandzki",
+    "fr": "francuski",
+    "de": "niemiecki",
+    "pt": "portugalski",
+    "it": "włoski",
+    "ro": "rumuński",
+    "uk": "ukraiński",
+    "pl": "polski",
+    "bg": "bułgarski"
   }
 }

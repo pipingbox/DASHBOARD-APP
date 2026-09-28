@@ -97,7 +97,7 @@ test.describe('PB-SEO-102 Worker route contract', () => {
   });
 
   test('valid dynamic shapes receive the SPA shell', async ({ page }) => {
-    for (const path of ['/blog/asme-b31-3-vs-b31-1/', '/academy/module/1', '/academy/module/22']) {
+    for (const path of ['/blog/asme-b31-3-vs-b31-1/', '/academy/module/1', '/academy/module/22', '/jobs/00000000-0000-4000-8000-000000000000']) {
       await page.goto(path);
       await expect(page, `${path} must be a valid dynamic route`).not.toHaveURL(/404|not-found/, {
         timeout: 10_000,
