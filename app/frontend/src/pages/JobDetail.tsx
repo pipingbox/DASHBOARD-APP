@@ -20,6 +20,7 @@ import {
   formatPostedTime,
   getContractTypeLabel,
   optionLabelKey,
+  currencySymbol,
 } from '@/lib/jobs/utils';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -221,7 +222,7 @@ export default function JobDetail() {
     conditions.push({
       label: t('jobs.salaryLabel'),
       value: t('jobs.salaryFromHourly', {
-        amount: `${job.currency ?? '€'}${job.salary_min.toLocaleString()}`,
+        amount: `${currencySymbol(job.currency)}${job.salary_min.toLocaleString()}`,
       }),
     });
   }

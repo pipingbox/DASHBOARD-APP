@@ -70,6 +70,20 @@ export function jobDisplaySummary(
   return job.summary ?? null;
 }
 
+/** Currency code → display symbol for compact salary rendering. */
+export function currencySymbol(code: string | null | undefined): string {
+  switch ((code ?? 'EUR').toUpperCase()) {
+    case 'EUR':
+      return '€';
+    case 'USD':
+      return '$';
+    case 'GBP':
+      return '£';
+    default:
+      return (code ?? '€').toUpperCase();
+  }
+}
+
 export interface FormattedSalary {
   amount: string;
   period: 'year' | 'month';

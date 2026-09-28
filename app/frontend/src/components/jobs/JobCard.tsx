@@ -17,6 +17,7 @@ import {
   getJobTranslation,
   jobDisplayTitle,
   jobDisplaySummary,
+  currencySymbol,
 } from '@/lib/jobs/utils';
 
 interface JobCardProps {
@@ -58,7 +59,7 @@ export function JobCard({ job, applied, applying, onApply }: JobCardProps) {
   const hourlySalary =
     job.salary_period === 'hour' && job.salary_min
       ? t('jobs.salaryFromHourly', {
-          amount: `${job.currency ?? '€'}${job.salary_min.toLocaleString()}`,
+          amount: `${currencySymbol(job.currency)}${job.salary_min.toLocaleString()}`,
         })
       : null;
   const legacySalary = hourlySalary
@@ -73,8 +74,8 @@ export function JobCard({ job, applied, applying, onApply }: JobCardProps) {
   const badges: string[] = [];
   if (job.vca_required) badges.push(t('jobs.vcaRequired'));
   if (job.hours_per_day) badges.push(t('jobs.hoursPerDay', { hours: job.hours_per_day }));
-  if (job.saturdays === 'optional') badges.push(t('jobs.saturdaysOptional'));
-  if (job.saturdays === 'mandatory') badges.push(t('jobs.saturdaysMandatory'));
+  if (job.saturdays === 'optional') badges.push(t('jobs.saturdaysOptionalShort'));
+  if (job.saturdays === 'mandatory') badges.push(t('jobs.saturdaysMandatoryShort'));
 
   return (
     <div className="group relative border border-zinc-800/80 bg-[#0d0d0d] p-4 md:p-5 rounded-sm hover:border-[#f59e0b]/40 transition-all duration-300 hover:shadow-lg hover:shadow-[#f59e0b]/5">

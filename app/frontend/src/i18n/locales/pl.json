@@ -1913,7 +1913,9 @@
     "included": "Wliczone",
     "notIncluded": "Niewliczone",
     "contractLabel": "Umowa",
-    "applyHint": "Twój profesjonalny profil pozostaje dołączony do aplikacji."
+    "applyHint": "Twój profesjonalny profil pozostaje dołączony do aplikacji.",
+    "saturdaysOptionalShort": "Soboty opcjonalne",
+    "saturdaysMandatoryShort": "Soboty obowiązkowe"
   },
   "companies": {
     "eyebrow": "Firmy",

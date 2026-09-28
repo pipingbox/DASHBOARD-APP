@@ -1901,7 +1901,9 @@
     "included": "Included",
     "notIncluded": "Not included",
     "contractLabel": "Contract",
-    "applyHint": "Your professional profile stays attached to your application."
+    "applyHint": "Your professional profile stays attached to your application.",
+    "saturdaysOptionalShort": "Saturdays optional",
+    "saturdaysMandatoryShort": "Saturdays mandatory"
   },
   "companies": {
     "eyebrow": "Companies",

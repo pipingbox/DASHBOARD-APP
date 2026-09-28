@@ -1901,7 +1901,9 @@
     "included": "Inklusive",
     "notIncluded": "Nicht inklusive",
     "contractLabel": "Vertrag",
-    "applyHint": "Ihr professionelles Profil bleibt mit Ihrer Bewerbung verknüpft."
+    "applyHint": "Ihr professionelles Profil bleibt mit Ihrer Bewerbung verknüpft.",
+    "saturdaysOptionalShort": "Samstage optional",
+    "saturdaysMandatoryShort": "Samstage verpflichtend"
   },
   "companies": {
     "eyebrow": "Unternehmen",
