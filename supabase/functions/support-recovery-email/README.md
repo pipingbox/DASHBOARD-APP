@@ -58,6 +58,17 @@ Solo se admiten dos flags cerrados:
   dos aceptados (To + BCC), el estado es `PARTIAL` con `audit_copy_sent=false`
   y se reporta al PO; nunca se afirma una copia de auditoría no confirmada.
 
+## Plantillas cerradas (server-side)
+
+La selección de plantilla es un secreto (`RECOVERY_EMAIL_TEMPLATE`), nunca un
+parámetro de la petición (`template`/`template_id` en el body → `400`). Un
+valor desconocido produce fail-closed (500), sin fallback silencioso.
+
+| ID | Idioma | Finalidad | Botón |
+|---|---|---|---|
+| `recovery_v1` (default) | es | Recuperación tras errores de renderizado (PB-PDI-004) | VOLVER A MI PERFIL → /profile |
+| `confirmation_ro_v1` | ro | Cuenta con email sin confirmar: cómo reenviar y usar el último correo de confirmación | CONFIRMĂ CONTUL → /login |
+
 ## Secretos (solo por nombre)
 
 | Variable | Requerida | Descripción |
@@ -68,6 +79,7 @@ Solo se admiten dos flags cerrados:
 | `PO_GO` | No | `1` = segundo GO del PO (modo PRODUCTION) |
 | `PROD_SHA_VERIFIED` | No | `1` = SHA productivo verificado |
 | `RECOVERY_RECIPIENT` / `RECOVERY_RECIPIENT_NAME` | No | Destinatario real, resuelto server-side, solo para PRODUCTION |
+| `RECOVERY_EMAIL_TEMPLATE` | No | Plantilla cerrada activa (ver tabla superior) |
 
 ## Despliegue
 

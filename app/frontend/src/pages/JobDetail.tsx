@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import type { Job, JobTranslation } from '@/lib/jobs/types';
 import { trackEvent } from '@/lib/observability';
+import { getAttribution, readUtmFromLocation, rememberAttribution } from '@/lib/jobs/attribution';
 import {
   getJobTranslation,
   formatPostedTime,
@@ -81,6 +82,11 @@ export default function JobDetail() {
         return;
       }
       let jobRow = data as Job;
+
+      // PB-JOBS-ATS-001 §8: remember the last attributed entry for this
+      // user+job so apply() can stamp it on the application.
+      const utm = readUtmFromLocation(window.location.search);
+      if (utm && user?.id) rememberAttribution(user.id, jobRow.id, utm);
 
       // Localized content (public read mirrors the job's open boundary).
       const { data: trs } = await supabase
@@ -179,6 +185,11 @@ export default function JobDetail() {
       job_id: job.id,
     };
     if (job.company_user_id) applicationPayload.company_user_id = job.company_user_id;
+
+    // PB-JOBS-ATS-001 §8: stamp the last attributed entry (if any) on the
+    // application. No attribution → columns stay NULL ("unknown").
+    const attribution = getAttribution(authData.user.id, job.id);
+    if (attribution) Object.assign(applicationPayload, attribution);
 
     const { error } = await supabase.from(TABLES.jobApplications).insert(applicationPayload);
     setApplying(false);

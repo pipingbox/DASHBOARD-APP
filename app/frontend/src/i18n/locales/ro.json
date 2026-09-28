@@ -2769,7 +2769,9 @@
     "statusUpdateFailed": "Actualizarea stării a eșuat",
     "justNow": "Chiar acum",
     "more": "+{{count}} în plus",
-    "loadFailed": "Încărcarea candidaților a eșuat"
+    "loadFailed": "Încărcarea candidaților a eșuat",
+    "sentToClient": "Trimis clientului",
+    "withdrawn": "Retrasă"
   },
   "companyJobs": {
     "eyebrow": "Companie",
@@ -3855,5 +3857,12 @@
     "uk": "ucraineană",
     "pl": "poloneză",
     "bg": "bulgară"
+  },
+  "applicationHistory": {
+    "title": "Istoric candidatură",
+    "loading": "Se încarcă...",
+    "empty": "Fără istoric.",
+    "transition": "{{from}} → {{to}}",
+    "created": "Creată ca {{status}}"
   }
 }

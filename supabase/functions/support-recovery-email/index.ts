@@ -53,6 +53,12 @@ import {
   renderRecoveryEmailHtml,
   renderRecoveryEmailText,
 } from "../_shared/recovery-email-template.ts";
+import {
+  CONFIRMATION_RO_TEMPLATE_ID,
+  confirmationRoSubject,
+  renderConfirmationRoHtml,
+  renderConfirmationRoText,
+} from "../_shared/confirmation-email-template.ts";
 
 // ── Constantes server-side (nunca aceptadas desde la petición) ────────────
 const TEST_RECIPIENT = "support@pipingbox.com";
@@ -61,10 +67,24 @@ const AUDIT_BCC = "info@pipingbox.com"; // copia de auditoría obligatoria (PO)
 const FROM_DISPLAY_NAME = "PipingBox";
 const REPLY_TO = "support@pipingbox.com";
 
+// Plantillas cerradas: la selección es server-side (secreto
+// RECOVERY_EMAIL_TEMPLATE). Valores desconocidos → fail-closed (500), nunca
+// un fallback silencioso que enviaría la plantilla equivocada.
+type ClosedTemplateId = typeof RECOVERY_EMAIL_TEMPLATE_ID | typeof CONFIRMATION_RO_TEMPLATE_ID;
+const KNOWN_TEMPLATES: ClosedTemplateId[] = [RECOVERY_EMAIL_TEMPLATE_ID, CONFIRMATION_RO_TEMPLATE_ID];
+
+function resolveTemplate(): { id: ClosedTemplateId } | { error: string } {
+  const raw = Deno.env.get("RECOVERY_EMAIL_TEMPLATE") || "";
+  if (raw === "") return { id: RECOVERY_EMAIL_TEMPLATE_ID };
+  const found = KNOWN_TEMPLATES.find((t) => t === raw);
+  if (!found) return { error: "unknown_template" };
+  return { id: found };
+}
+
 // Guarda: campos de mensaje que JAMÁS se aceptan desde el body.
 const FORBIDDEN_BODY_FIELDS = [
   "to", "cc", "bcc", "from", "reply_to", "replyTo", "subject", "html", "text",
-  "name", "recipient", "recipients", "reply_to_address",
+  "name", "recipient", "recipients", "reply_to_address", "template", "template_id",
 ];
 
 function json(obj: Record<string, unknown>, status = 200): Response {
@@ -177,6 +197,17 @@ Deno.serve(async (req: Request) => {
   const isPreflight = body.preflight === true;
   const mode = body.mode === "PRODUCTION" ? "PRODUCTION" : "TEST";
 
+  // ── Resolución de plantilla (server-side, fail-closed) ──────────────────
+  const templateSel = resolveTemplate();
+  if (templateSel.error) {
+    if (isPreflight) {
+      return json({ ok: false, action: "preflight", error: "unknown_template", reason: "RECOVERY_EMAIL_TEMPLATE must be a known closed template id" }, 200);
+    }
+    log({ action: "send", template: "unknown", mode, status: "FAILED", provider_status: "template_misconfigured", audit_copy_sent: false });
+    return json({ ok: false, status: "FAILED", reason: "unknown_template", mode, audit_copy_sent: false, correlation_id: correlationId }, 500);
+  }
+  const templateId = templateSel.id;
+
   // ── Preflight: presencia de configuración por NOMBRE, sin valores ───────
   if (isPreflight) {
     const has = (n: string) => (Deno.env.get(n) || "").length > 0;
@@ -192,6 +223,7 @@ Deno.serve(async (req: Request) => {
       PO_GO: Deno.env.get("PO_GO") === "1",
       PROD_SHA_VERIFIED: Deno.env.get("PROD_SHA_VERIFIED") === "1",
       RECOVERY_RECIPIENT: has("RECOVERY_RECIPIENT"),
+      active_template: templateId,
     };
     const missing = Object.entries(config).filter(([, v]) => v === false).map(([k]) => k);
     log({ action: "preflight", correlation_id: correlationId, auth_mode: authPath, missing_required_secrets: missing });
@@ -220,24 +252,34 @@ Deno.serve(async (req: Request) => {
     recipientName = Deno.env.get("RECOVERY_RECIPIENT_NAME") || "";
   }
 
-  const subject = recoverySubject(mode === "TEST");
+  const isTest = mode === "TEST";
+  const baseSubject = templateId === CONFIRMATION_RO_TEMPLATE_ID
+    ? confirmationRoSubject()
+    : recoverySubject(false);
+  const subject = isTest ? `[TEST] ${baseSubject}` : baseSubject;
 
   // ── Envío: misma transacción SMTP para To y BCC de auditoría ────────────
   const provider = createEmailProvider();
   if (!provider.isConfigured()) {
     log({
-      action: "send", correlation_id: correlationId, template: RECOVERY_EMAIL_TEMPLATE_ID, mode,
+      action: "send", correlation_id: correlationId, template: templateId, mode,
       status: "FAILED", provider_status: "not_configured", audit_copy_sent: false,
     });
     return json({ ok: false, status: "FAILED", reason: "email_provider_not_configured", mode, correlation_id: correlationId }, 503);
   }
 
   try {
+    const html = templateId === CONFIRMATION_RO_TEMPLATE_ID
+      ? renderConfirmationRoHtml(recipientName)
+      : renderRecoveryEmailHtml(recipientName);
+    const text = templateId === CONFIRMATION_RO_TEMPLATE_ID
+      ? renderConfirmationRoText(recipientName)
+      : renderRecoveryEmailText(recipientName);
     const r = await provider.send({
       to: recipient,
       subject,
-      html: renderRecoveryEmailHtml(recipientName),
-      text: renderRecoveryEmailText(recipientName),
+      html,
+      text,
       fromName: FROM_DISPLAY_NAME,
       replyTo: REPLY_TO,
       bcc: AUDIT_BCC, // envelope de la MISMA transacción; sin cabecera Bcc visible
@@ -248,10 +290,10 @@ Deno.serve(async (req: Request) => {
     // Fail-closed: copia de auditoría confirmada solo con 0 rechazos y los
     // dos destinatarios (To + BCC) aceptados por el proveedor.
     const auditCopySent = rejectedCount === 0 && acceptedCount >= 2;
-    const status = auditCopySent ? (mode === "TEST" ? "SENT_TEST" : "SENT") : "PARTIAL";
+    const status = auditCopySent ? (isTest ? "SENT_TEST" : "SENT") : "PARTIAL";
 
     log({
-      action: "send", correlation_id: correlationId, template: RECOVERY_EMAIL_TEMPLATE_ID, mode,
+      action: "send", correlation_id: correlationId, template: templateId, mode,
       status, provider: r.provider, provider_status: `accepted=${acceptedCount},rejected=${rejectedCount}`,
       message_id: sanitizeMessageId(r.messageId), audit_copy_sent: auditCopySent,
     });
@@ -260,8 +302,8 @@ Deno.serve(async (req: Request) => {
       ok: status !== "PARTIAL",
       status,
       mode,
-      template: RECOVERY_EMAIL_TEMPLATE_ID,
-      subject_prefix: mode === "TEST" ? "[TEST]" : "",
+      template: templateId,
+      subject_prefix: isTest ? "[TEST]" : "",
       message_id: sanitizeMessageId(r.messageId),
       accepted_recipients: acceptedCount,
       rejected_recipients: rejectedCount,
@@ -272,7 +314,7 @@ Deno.serve(async (req: Request) => {
     });
   } catch (e) {
     log({
-      action: "send_exception", correlation_id: correlationId, template: RECOVERY_EMAIL_TEMPLATE_ID, mode,
+      action: "send_exception", correlation_id: correlationId, template: templateId, mode,
       status: "FAILED", provider_status: "error", error: sanitizeError(e), audit_copy_sent: false,
     });
     return json({ ok: false, status: "FAILED", reason: sanitizeError(e), mode, audit_copy_sent: false, correlation_id: correlationId }, 502);

@@ -2731,7 +2731,9 @@
     "statusUpdateFailed": "Statusaktualisierung fehlgeschlagen",
     "justNow": "Gerade eben",
     "more": "+{{count}} mehr",
-    "loadFailed": "Kandidaten konnten nicht geladen werden"
+    "loadFailed": "Kandidaten konnten nicht geladen werden",
+    "sentToClient": "An Kunden gesendet",
+    "withdrawn": "Zurückgezogen"
   },
   "companyJobs": {
     "eyebrow": "Unternehmen",
@@ -3848,5 +3850,12 @@
     "uk": "Ukrainisch",
     "pl": "Polnisch",
     "bg": "Bulgarisch"
+  },
+  "applicationHistory": {
+    "title": "Bewerbungsverlauf",
+    "loading": "Laden...",
+    "empty": "Noch kein Verlauf.",
+    "transition": "{{from}} → {{to}}",
+    "created": "Erstellt als {{status}}"
   }
 }

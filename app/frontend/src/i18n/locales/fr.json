@@ -2738,7 +2738,9 @@
     "statusUpdateFailed": "Échec de la mise à jour du statut",
     "justNow": "À l'instant",
     "more": "+{{count}} de plus",
-    "loadFailed": "Impossible de charger les candidats"
+    "loadFailed": "Impossible de charger les candidats",
+    "sentToClient": "Envoyé au client",
+    "withdrawn": "Retirée"
   },
   "companyJobs": {
     "eyebrow": "Entreprise",
@@ -3855,5 +3857,12 @@
     "uk": "ukrainien",
     "pl": "polonais",
     "bg": "bulgare"
+  },
+  "applicationHistory": {
+    "title": "Historique de candidature",
+    "loading": "Chargement...",
+    "empty": "Aucun historique.",
+    "transition": "{{from}} → {{to}}",
+    "created": "Créée comme {{status}}"
   }
 }

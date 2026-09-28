@@ -1,0 +1,25 @@
+Bună, Florin,
+
+Am verificat contul tău PipingBox. Contul a fost creat corect, însă adresa de e-mail nu a fost încă confirmată. Din acest motiv, atunci când încerci să te autentifici, aplicația te redirecționează înapoi la pagina de conectare.
+
+Pentru a finaliza înregistrarea, te rugăm să urmezi acești pași:
+
+1. Accesează https://pipingbox.com/login
+2. Selectează opțiunea „Retrimite e-mailul de confirmare”.
+3. Verifică mesajele primite la această adresă de e-mail.
+4. Dacă nu găsești mesajul, verifică și folderul Spam sau Mesaje nedorite.
+5. Deschide numai cel mai recent e-mail trimis de PipingBox.
+6. Apasă pe butonul sau linkul de confirmare.
+7. Revino la PipingBox și autentifică-te din nou.
+
+Linkurile de confirmare mai vechi pot fi expirate, de aceea este important să folosești ultimul mesaj primit.
+
+CONFIRMĂ CONTUL:
+https://pipingbox.com/login
+
+Dacă problema continuă după confirmarea adresei, răspunde direct la acest e-mail și te vom ajuta.
+
+Cu stimă,
+
+Echipa PipingBox
+https://pipingbox.com

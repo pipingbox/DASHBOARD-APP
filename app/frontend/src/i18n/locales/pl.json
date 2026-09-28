@@ -2776,7 +2776,9 @@
     "statusUpdateFailed": "Nie udało się zaktualizować statusu",
     "justNow": "Przed chwilą",
     "more": "+{{count}} więcej",
-    "loadFailed": "Nie udało się załadować kandydatów"
+    "loadFailed": "Nie udało się załadować kandydatów",
+    "sentToClient": "Wysłano do klienta",
+    "withdrawn": "Wycofana"
   },
   "companyJobs": {
     "eyebrow": "Firma",
@@ -3862,5 +3864,12 @@
     "uk": "ukraiński",
     "pl": "polski",
     "bg": "bułgarski"
+  },
+  "applicationHistory": {
+    "title": "Historia aplikacji",
+    "loading": "Ładowanie...",
+    "empty": "Brak historii.",
+    "transition": "{{from}} → {{to}}",
+    "created": "Utworzono jako {{status}}"
   }
 }
