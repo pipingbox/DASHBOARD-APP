@@ -100,6 +100,10 @@ CREATE TABLE IF NOT EXISTS app_14da0f1941_job_translations (
 
 CREATE INDEX IF NOT EXISTS idx_job_translations_job_id ON app_14da0f1941_job_translations(job_id);
 
+-- API roles need explicit SELECT grants (RLS controls rows; grants control access).
+-- Required because this table is created outside Supabase's default-privilege path.
+GRANT SELECT ON app_14da0f1941_job_translations TO anon, authenticated;
+
 ALTER TABLE app_14da0f1941_job_translations ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS job_translations_public_read ON app_14da0f1941_job_translations;
