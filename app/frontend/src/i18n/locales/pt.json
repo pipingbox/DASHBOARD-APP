@@ -1120,7 +1120,7 @@
       "modeMarking": "Marcação a partir da extremidade do tubo",
       "referenceLength": "Comprimento de referência",
       "referenceLengthFrom": "L é medido a partir da extremidade reta cortada a esquadro do tubo do ramal.",
-      "contactConvention": "Perfil de contacto: ID do ramal. Desenvolvimento do gabarito / passo entre pontos: OD do ramal. (Convenção de referência inicial — não é uma regra de fabricação universal.)",
+      "contactConvention": "SET-ON (ramal apoiado sobre o coletor): corte do ramal sobre o OD do ramal contra o OD do coletor. Picagem do coletor: ID do ramal. Desenvolvimento do gabarito e passo entre pontos: OD do ramal.",
       "errorBranchTooLarge": "O raio de contacto do ramal excede o raio do coletor: esta ligação não é fabricável neste coletor.",
       "errorLengthTooShort": "O comprimento de referência L deve ser maior que a ordenada de corte máxima desta ligação.",
       "previewNotToScale": "Pré-visualização — fora de escala. Use Imprimir para o gabarito físico 1:1.",
@@ -1135,7 +1135,9 @@
       "page": "Página",
       "overlap": "Sobreposição",
       "wrapNote": "Enrole o gabarito em torno do OD do ramal. Alinhe a linha de costura com o ponto 1.",
-      "calibrationNote": "Após imprimir, verifique a barra de 100 mm com uma régua antes de marcar o tubo."
+      "calibrationNote": "Após imprimir, verifique a barra de 100 mm com uma régua antes de marcar o tubo.",
+      "closure360": "FECHO 360° = P1",
+      "isometricNote": "Set-on: o ramal apoia-se sobre o OD do coletor. A curva âmbar é a sela de corte do motor de cálculo."
     },
     "categoryFabrication": "Fabricação",
     "elbowCut": {

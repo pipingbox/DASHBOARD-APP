@@ -13,6 +13,7 @@ import {
   type BranchIntersectionResult,
 } from '@/tools/branch/branchIntersectionGeometry';
 import { buildBranchTemplate } from '@/tools/branch/branchTemplateSvg';
+import { buildBranchIsometric } from '@/tools/branch/branchIsometricSvg';
 
 /* ─── NPS pipe data (OD in mm) ─── */
 const NPS_OPTIONS: { label: string; od: number }[] = [
@@ -280,6 +281,12 @@ export default function BranchLayoutTool() {
   }, [headerOD, branchOD, branchID, branchWT, angle, divisions, mode, refLength]);
 
   const geometryValid = geometry.valid && headerWT > 0 && branchWT > 0;
+
+  /* ── Isometric tube-on-tube view (pure module; canonical stations only) ── */
+  const isometric = useMemo(() => {
+    if (!geometryValid) return null;
+    return buildBranchIsometric(geometry, { width: 480, height: 300 });
+  }, [geometry, geometryValid]);
 
   const reinforcement = useMemo(() => {
     if (!geometryValid || !designInputsValid) return null;
@@ -585,7 +592,7 @@ export default function BranchLayoutTool() {
           )}
           <p className="mt-2 text-[10px] text-zinc-600">
             {t('tools.branchLayout.contactConvention', {
-              defaultValue: 'Contact profile: branch ID. Template wrap / station spacing: branch OD. (Initial reference convention — not a universal fabrication rule.)',
+              defaultValue: 'SET-ON (branch resting on the header): branch cut on branch OD against header OD. Header hole (picaje): branch ID. Template wrap and station spacing: branch OD.',
             })}
           </p>
         </div>
@@ -611,7 +618,7 @@ export default function BranchLayoutTool() {
               </div>
               <svg width={svgWidth} height={svgHeight} viewBox={`0 0 ${svgWidth} ${svgHeight}`}
                 className="w-full max-w-[700px]" style={{ background: '#0a0a0a' }}>
-                {/* Grid lines */}
+                {/* Ordinate grid lines */}
                 {Array.from({ length: 5 }).map((_, i) => {
                   const yPos = padding + (i / 4) * plotH;
                   const val = (maxOrd - (i / 4) * ordRange).toFixed(1);
@@ -622,15 +629,43 @@ export default function BranchLayoutTool() {
                     </g>
                   );
                 })}
-                {[0, 90, 180, 270, 360].map((deg) => {
-                  const xPos = padding + (deg / 360) * plotW;
+
+                {/* Marking lines (generatrices) at EVERY canonical station —
+                    SCREEN = TABLE = PRINT: same arcPosition feeds all three. */}
+                {geometry.stations.map((st, idx) => {
+                  const xPos = padding + (st.arcPosition / geometry.developedCircumference) * plotW;
+                  const isSeam = idx === 0 || idx === geometry.stations.length - 1;
+                  const showNumber = divisions <= 36 || idx % 2 === 0 || isSeam;
                   return (
-                    <g key={`grid-v-${deg}`}>
-                      <line x1={xPos} y1={padding} x2={xPos} y2={svgHeight - padding} stroke="#222" strokeWidth="0.5" strokeDasharray="4,4" />
-                      <text x={xPos} y={svgHeight - padding + 15} textAnchor="middle" fill="#555" fontSize="9">{deg}°</text>
+                    <g key={`station-line-${idx}`}>
+                      <line
+                        x1={xPos} y1={padding} x2={xPos} y2={svgHeight - padding}
+                        stroke={isSeam ? '#22c55e' : '#333'}
+                        strokeWidth={isSeam ? 1.2 : 0.6}
+                        strokeDasharray={isSeam ? '6,3' : '3,3'}
+                        opacity={isSeam ? 0.9 : 0.7}
+                      />
+                      {showNumber && (
+                        <text
+                          x={xPos} y={svgHeight - padding + 14} textAnchor="middle"
+                          fill={isSeam ? '#22c55e' : '#777'} fontSize="8"
+                          fontFamily="monospace"
+                        >
+                          {idx === geometry.stations.length - 1 ? '≡1' : idx + 1}
+                        </text>
+                      )}
+                      {st.thetaDeg % 90 === 0 && (
+                        <text x={xPos} y={svgHeight - padding + 26} textAnchor="middle" fill="#555" fontSize="8">
+                          {st.thetaDeg}°
+                        </text>
+                      )}
                     </g>
                   );
                 })}
+                {/* Seam identification */}
+                <text x={padding + 3} y={padding - 8} fill="#22c55e" fontSize="9" fontFamily="monospace">
+                  {t('tools.branchLayout.seam', { defaultValue: 'Seam' })} 0° / 360°
+                </text>
 
                 {pathD && (
                   <path
@@ -643,7 +678,7 @@ export default function BranchLayoutTool() {
                 {geometry.stations.map((st, idx) => {
                   const px = padding + (st.arcPosition / geometry.developedCircumference) * plotW;
                   const py = padding + plotH - ((ordinateOf(idx) - minOrd) / ordRange) * plotH;
-                  return <circle key={idx} cx={px} cy={py} r="2" fill="#f59e0b" opacity="0.7" />;
+                  return <circle key={`pt-${idx}`} cx={px} cy={py} r="2" fill="#f59e0b" opacity="0.7" />;
                 })}
 
                 <text x={svgWidth / 2} y={svgHeight - 5} textAnchor="middle" fill="#888" fontSize="10">
@@ -680,8 +715,12 @@ export default function BranchLayoutTool() {
                   </thead>
                   <tbody>
                     {geometry.stations.map((st) => (
-                      <tr key={st.index} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
-                        <td className="py-1 px-2 text-zinc-500">{st.index + 1}</td>
+                      <tr key={st.index} className={`border-b border-zinc-800/50 hover:bg-zinc-800/30 ${st.index === geometry.stations.length - 1 ? 'border-t-2 border-t-zinc-700' : ''}`}>
+                        <td className="py-1 px-2 text-zinc-500 whitespace-nowrap">
+                          {st.index === geometry.stations.length - 1
+                            ? t('tools.branchLayout.closure360', { defaultValue: '360° closure = P1' })
+                            : st.index + 1}
+                        </td>
                         <td className="py-1 px-2 text-zinc-300">{st.thetaDeg.toFixed(1)}°</td>
                         <td className="py-1 px-2 text-zinc-400 font-mono">{st.arcPosition.toFixed(3)}</td>
                         <td className="py-1 px-2 text-[#f59e0b] font-mono">{st.cutOrdinate.toFixed(2)}</td>
@@ -747,8 +786,12 @@ export default function BranchLayoutTool() {
                   </thead>
                   <tbody>
                     {geometry.stations.map((st) => (
-                      <tr key={st.index} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
-                        <td className="py-1 px-2 text-zinc-500">{st.index + 1}</td>
+                      <tr key={st.index} className={`border-b border-zinc-800/50 hover:bg-zinc-800/30 ${st.index === geometry.stations.length - 1 ? 'border-t-2 border-t-zinc-700' : ''}`}>
+                        <td className="py-1 px-2 text-zinc-500 whitespace-nowrap">
+                          {st.index === geometry.stations.length - 1
+                            ? t('tools.branchLayout.closure360', { defaultValue: '360° closure = P1' })
+                            : st.index + 1}
+                        </td>
                         <td className="py-1 px-2 text-zinc-300">{st.thetaDeg.toFixed(1)}°</td>
                         <td className="py-1 px-2 text-zinc-300 font-mono">{st.picajeX.toFixed(1)}</td>
                         <td className="py-1 px-2 text-[#f59e0b] font-mono">{st.picajeY.toFixed(1)}</td>
@@ -759,42 +802,22 @@ export default function BranchLayoutTool() {
               </div>
             </div>
 
-            {/* Isometric 3D Preview */}
+            {/* Isometric view — tube grafted onto a tube (canonical stations only; no PAD here) */}
             <div className="border border-zinc-800/80 bg-zinc-950 p-4">
               <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
                 {t('tools.branchLayout.isometricView')}
               </p>
-              <svg width="300" height="220" viewBox="0 0 300 220" className="mx-auto">
-                <ellipse cx="150" cy="160" rx="100" ry="22" fill="none" stroke="#555" strokeWidth="1.5" />
-                <line x1="50" y1="160" x2="50" y2="125" stroke="#555" strokeWidth="1.5" />
-                <line x1="250" y1="160" x2="250" y2="125" stroke="#555" strokeWidth="1.5" />
-                <ellipse cx="150" cy="125" rx="100" ry="22" fill="none" stroke="#777" strokeWidth="1.5" />
-                <line x1="30" y1="142" x2="270" y2="142" stroke="#333" strokeWidth="0.5" strokeDasharray="8,4" />
-                {(() => {
-                  const angleRad = ((90 - angle) * Math.PI) / 180;
-                  const bw = 30;
-                  const topY = 25;
-                  const botY = 125;
-                  const dx = Math.sin(angleRad) * (botY - topY);
-                  return (
-                    <g>
-                      <line x1={150 - bw / 2 + dx} y1={topY} x2={150 - bw / 2} y2={botY} stroke="#f59e0b" strokeWidth="1.5" />
-                      <line x1={150 + bw / 2 + dx} y1={topY} x2={150 + bw / 2} y2={botY} stroke="#f59e0b" strokeWidth="1.5" />
-                      <ellipse cx={150 + dx / 2} cy={topY} rx={bw / 2} ry={bw / 5} fill="none" stroke="#f59e0b" strokeWidth="1.5" />
-                      <ellipse cx="150" cy={botY + 5} rx={bw / 2} ry={12} fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="3,2" />
-                    </g>
-                  );
-                })()}
-                {reinforcement?.padRequired && (
-                  <ellipse cx="150" cy="128" rx="45" ry="14" fill="none" stroke="#f59e0b" strokeWidth="1" strokeDasharray="4,3" opacity="0.6" />
-                )}
-                <text x="260" y="145" fill="#555" fontSize="9">Ø{headerOD}</text>
-                <text x="185" y="60" fill="#f59e0b" fontSize="9">Ø{branchOD}</text>
-                <text x="150" y="210" textAnchor="middle" fill="#666" fontSize="8">{angle}°</text>
-                {reinforcement?.padRequired && (
-                  <text x="200" y="120" fill="#f59e0b" fontSize="7" opacity="0.7">PAD</text>
-                )}
-              </svg>
+              {isometric && (
+                <div
+                  className="mx-auto max-w-[480px]"
+                  dangerouslySetInnerHTML={{ __html: isometric.svg }}
+                />
+              )}
+              <p className="mt-2 text-[10px] text-zinc-600 text-center">
+                {t('tools.branchLayout.isometricNote', {
+                  defaultValue: 'Set-on: the branch rests on the header OD. The amber curve is the cut saddle from the calculation engine.',
+                })}
+              </p>
             </div>
 
             {/* Fabrication actions */}

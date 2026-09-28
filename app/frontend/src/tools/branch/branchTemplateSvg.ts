@@ -66,7 +66,7 @@ export interface BranchTemplateResult {
 const MARGIN_LEFT = 10;
 const MARGIN_RIGHT = 10;
 const MARGIN_TOP = 32;
-const MARGIN_BOTTOM = 26;
+const MARGIN_BOTTOM = 34;
 
 /** Canonical template coordinates: (x, y) in mm for station i. Shared by SVG and tests. */
 export function templatePoint(result: BranchIntersectionResult, index: number, ordinate: TemplateOrdinate): [number, number] {
@@ -123,15 +123,18 @@ export function buildBranchTemplate(
       return `${X(ax)},${Y(ord)}`;
     }).join(' ');
     parts.push(`<polyline points="${pts}" fill="none" stroke="#000000" stroke-width="0.6"/>`);
-    // Station lines + numbers.
+    // Station lines + numbers + physical arc positions (PO §7: the user must
+    // be able to mark the pipe without computing the circumference).
     for (let i = 0; i < result.stations.length; i++) {
       const st = result.stations[i];
       const x = X(st.arcPosition);
       if (st.arcPosition + MARGIN_LEFT < originC - 1e-9 || st.arcPosition + MARGIN_LEFT > originC + w + 1e-9) continue;
       const ord = ys[i];
+      const isClosure = i === result.stations.length - 1;
       parts.push(`<line x1="${x}" y1="${Y(ord)}" x2="${x}" y2="${fmt(h - MARGIN_BOTTOM + 6)}" stroke="#888888" stroke-width="0.2" stroke-dasharray="2,1.5"/>`);
-      parts.push(`<text x="${x}" y="${fmt(h - MARGIN_BOTTOM + 12)}" font-size="3.2" text-anchor="middle" fill="#000000" font-family="monospace">${i + 1}</text>`);
-      parts.push(`<text x="${x}" y="${fmt(h - MARGIN_BOTTOM + 17)}" font-size="2.6" text-anchor="middle" fill="#444444" font-family="monospace">${fmt(st.thetaDeg)}°</text>`);
+      parts.push(`<text x="${x}" y="${fmt(h - MARGIN_BOTTOM + 12)}" font-size="3.2" text-anchor="middle" fill="#000000" font-family="monospace">${isClosure ? '≡1' : i + 1}</text>`);
+      parts.push(`<text x="${x}" y="${fmt(h - MARGIN_BOTTOM + 17.5)}" font-size="2.6" text-anchor="middle" fill="#222222" font-family="monospace">${fmt(st.arcPosition)}</text>`);
+      parts.push(`<text x="${x}" y="${fmt(h - MARGIN_BOTTOM + 23)}" font-size="2.6" text-anchor="middle" fill="#444444" font-family="monospace">${fmt(st.thetaDeg)}°</text>`);
     }
     // Seam line at development 0 (first tile) and at C (last tile).
     if (isFirst) {
@@ -150,7 +153,7 @@ export function buildBranchTemplate(
     parts.push(`<text x="${MARGIN_LEFT + 50}" y="${fmt(cbY - 2.5)}" font-size="3" text-anchor="middle" fill="#000000" font-family="monospace">100 mm</text>`);
     // Title block.
     parts.push(`<text x="${MARGIN_LEFT}" y="8" font-size="3.6" fill="#000000" font-family="monospace">${escapeXml(meta.titleLabel)} — ${escapeXml(meta.headerLabel)} × ${escapeXml(meta.branchLabel)} @ ${fmt(meta.betaDeg)}°</text>`);
-    parts.push(`<text x="${MARGIN_LEFT}" y="13" font-size="3" fill="#222222" font-family="monospace">π·OD = ${fmt(C)} mm · N = ${result.resolved.divisions} · Δ = ${fmt(result.stationSpacing)} mm · ${escapeXml(meta.generatedLabel)}</text>`);
+    parts.push(`<text x="${MARGIN_LEFT}" y="13" font-size="3" fill="#222222" font-family="monospace">π·OD = ${fmt(C)} mm · N = ${result.resolved.divisions} · Δθ = ${fmt(result.angularStepDeg)}° · Δs = ${fmt(result.stationSpacing)} mm · ${escapeXml(meta.generatedLabel)}</text>`);
     parts.push(`<text x="${MARGIN_LEFT}" y="18" font-size="3.4" font-weight="bold" fill="#000000" font-family="monospace">${escapeXml(meta.printAtActualSize)}</text>`);
     parts.push(`<text x="${MARGIN_LEFT}" y="23" font-size="2.8" fill="#222222" font-family="monospace">${escapeXml(meta.calibrationNote)}</text>`);
     parts.push(`<text x="${MARGIN_LEFT}" y="28" font-size="2.8" fill="#222222" font-family="monospace">${escapeXml(meta.wrapNoteLabel)}</text>`);

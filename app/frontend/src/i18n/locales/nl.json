@@ -1117,7 +1117,7 @@
       "modeMarking": "Markering vanaf buiseinde",
       "referenceLength": "Referentielengte",
       "referenceLengthFrom": "L wordt gemeten vanaf het haaks afgezaagde rechte uiteinde van de vertakkingsbuis.",
-      "contactConvention": "Contactprofiel: ID van de vertakking. Sjabloonontwikkeling / puntstap: OD van de vertakking. (Initiële referentieconventie — geen universele fabricageregel.)",
+      "contactConvention": "SET-ON (tak steunend op de collector): snede van de tak op de OD van de tak tegen de OD van de collector. Picaje (uitslag) van de collector: ID van de tak. Ontwikkeling van het sjabloon en puntafstand: OD van de tak.",
       "errorBranchTooLarge": "De contactradius van de vertakking overschrijdt de radius van de header: deze verbinding is op deze header niet fabriceerbaar.",
       "errorLengthTooShort": "De referentielengte L moet groter zijn dan de maximale snijordinaat van deze verbinding.",
       "previewNotToScale": "Schermvoorbeeld — niet op schaal. Gebruik Afdrukken voor het fysieke 1:1-sjabloon.",
@@ -1132,7 +1132,9 @@
       "page": "Pagina",
       "overlap": "Overlapping",
       "wrapNote": "Wikkel het sjabloon rond de OD van de vertakking. Lijn de naadlijn uit met punt 1.",
-      "calibrationNote": "Controleer na het afdrukken de 100 mm-lat met een liniaal voordat u de buis markeert."
+      "calibrationNote": "Controleer na het afdrukken de 100 mm-lat met een liniaal voordat u de buis markeert.",
+      "closure360": "360°-SLUITING = P1",
+      "isometricNote": "Set-on: de tak rust op de OD van de collector. De amberkleurige kromme is de snijzadel-kromme van de rekenmotor."
     },
     "categoryFabrication": "Fabricage",
     "elbowCut": {

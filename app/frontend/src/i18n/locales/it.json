@@ -1172,7 +1172,7 @@
       "modeMarking": "Marcatura dall'estremità del tubo",
       "referenceLength": "Lunghezza di riferimento",
       "referenceLengthFrom": "L si misura dall'estremità diritta tagliata a squadro del tubo di derivazione.",
-      "contactConvention": "Profilo di contatto: ID della derivazione. Sviluppo sagoma / passo punti: OD della derivazione. (Convenzione di riferimento iniziale — non una regola di fabbricazione universale.)",
+      "contactConvention": "SET-ON (ramo appoggiato sul collettore): taglio del ramo sull'OD del ramo contro l'OD del collettore. Piccaggio del collettore: ID del ramo. Sviluppo del template e passo tra punti: OD del ramo.",
       "errorBranchTooLarge": "Il raggio di contatto della derivazione supera il raggio del collettore: questa connessione non è fabbricabile su questo collettore.",
       "errorLengthTooShort": "La lunghezza di riferimento L deve essere maggiore dell'ordinata di taglio massima di questa connessione.",
       "previewNotToScale": "Anteprima — fuori scala. Usare Stampa per la sagoma fisica 1:1.",
@@ -1187,7 +1187,9 @@
       "page": "Pagina",
       "overlap": "Sovrapposizione",
       "wrapNote": "Avvolgere la sagoma attorno all'OD della derivazione. Allineare la linea di cucitura con il punto 1.",
-      "calibrationNote": "Dopo la stampa, verificare la barra di 100 mm con un righello prima di marcare il tubo."
+      "calibrationNote": "Dopo la stampa, verificare la barra di 100 mm con un righello prima di marcare il tubo.",
+      "closure360": "CHIUSURA 360° = P1",
+      "isometricNote": "Set-on: il ramo poggia sull'OD del collettore. La curva ambra è la sella di taglio del motore di calcolo."
     },
     "unitConv": {
       "name": "Convertitore di unità",

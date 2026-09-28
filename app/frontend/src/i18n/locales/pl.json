@@ -1175,7 +1175,7 @@
       "modeMarking": "Znakowanie od końca rury",
       "referenceLength": "Długość odniesienia",
       "referenceLengthFrom": "L mierzy się od prostego końca rury króćca ciętego pod kątem prostym.",
-      "contactConvention": "Profil styku: ID króćca. Rozwinięcie szablonu / krok punktów: OD króćca. (Początkowa konwencja odniesienia — nie uniwersalna reguła wykonawcza.)",
+      "contactConvention": "SET-ON (odgałęzienie oparte na kolektorze): cięcie odgałęzienia po OD odgałęzienia względem OD kolektora. Trasowanie otworu kolektora (picaje): ID odgałęzienia. Rozwinięcie szablonu i krok między punktami: OD odgałęzienia.",
       "errorBranchTooLarge": "Promień styku króćca przekracza promień kolektora: tego połączenia nie można wykonać na tym kolektorze.",
       "errorLengthTooShort": "Długość odniesienia L musi być większa niż maksymalna rzędna cięcia tego połączenia.",
       "previewNotToScale": "Podgląd ekranowy — bez skali. Użyj Drukuj dla fizycznego szablonu 1:1.",
@@ -1190,7 +1190,9 @@
       "page": "Strona",
       "overlap": "Zakładka",
       "wrapNote": "Owiń szablon wokół OD króćca. Wyrównaj linię szwu z punktem 1.",
-      "calibrationNote": "Po wydrukowaniu sprawdź podziałkę 100 mm linijką przed znakowaniem rury."
+      "calibrationNote": "Po wydrukowaniu sprawdź podziałkę 100 mm linijką przed znakowaniem rury.",
+      "closure360": "ZAMKNIĘCIE 360° = P1",
+      "isometricNote": "Set-on: odgałęzienie opiera się na OD kolektora. Bursztynowa krzywa to siodło cięcia z silnika obliczeniowego."
     },
     "unitConv": {
       "name": "Konwerter jednostek",

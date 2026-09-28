@@ -1120,7 +1120,7 @@
       "modeMarking": "Marquage depuis l'extrémité du tube",
       "referenceLength": "Longueur de référence",
       "referenceLengthFrom": "L se mesure depuis l'extrémité droite coupée à équerre du tube de piquage.",
-      "contactConvention": "Profil de contact : DI du piquage. Développement du gabarit / pas entre points : DE du piquage. (Convention de référence initiale — pas une règle de fabrication universelle.)",
+      "contactConvention": "SET-ON (piquage posé sur le collecteur) : coupe du piquage sur le OD du piquage contre le OD du collecteur. Traçage du collecteur (picaje) : ID du piquage. Développé du gabarit et pas entre points : OD du piquage.",
       "errorBranchTooLarge": "Le rayon de contact du piquage dépasse le rayon du collecteur : cette connexion n'est pas fabricable sur ce collecteur.",
       "errorLengthTooShort": "La longueur de référence L doit être supérieure à l'ordonnée de coupe maximale de cette connexion.",
       "previewNotToScale": "Aperçu écran — hors échelle. Utilisez Imprimer pour le gabarit physique 1:1.",
@@ -1135,7 +1135,9 @@
       "page": "Page",
       "overlap": "Recouvrement",
       "wrapNote": "Enroulez le gabarit autour du DE du piquage. Alignez la ligne de couture avec le point 1.",
-      "calibrationNote": "Après impression, vérifiez la jauge de 100 mm avec une règle avant de marquer le tube."
+      "calibrationNote": "Après impression, vérifiez la jauge de 100 mm avec une règle avant de marquer le tube.",
+      "closure360": "FERMETURE 360° = P1",
+      "isometricNote": "Set-on : le piquage repose sur le OD du collecteur. La courbe ambre est la selle de coupe du moteur de calcul."
     },
     "categoryFabrication": "Fabrication",
     "elbowCut": {

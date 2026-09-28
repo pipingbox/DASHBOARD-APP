@@ -1117,7 +1117,7 @@
       "modeMarking": "Markierung vom Rohrende",
       "referenceLength": "Referenzlänge",
       "referenceLengthFrom": "L wird vom rechtwinklig geschnittenen geraden Ende des Abzweigrohrs gemessen.",
-      "contactConvention": "Kontaktprofil: Abzweig-ID. Schablonenabwicklung / Punktschritt: Abzweig-AD. (Anfängliche Referenzkonvention — keine universelle Fertigungsregel.)",
+      "contactConvention": "SET-ON (Abzweig aufliegend auf dem Sammler): Abzweigschnitt auf Abzweig-Außendurchmesser gegen Sammler-Außendurchmesser. Sammler-Anriss (Picaje): Abzweig-Innendurchmesser. Abwicklung der Schablone und Punkt Abstand: Abzweig-Außendurchmesser.",
       "errorBranchTooLarge": "Der Kontaktradius des Abzweigs überschreitet den Sammelrohrradius: Diese Verbindung ist auf diesem Sammelrohr nicht fertigbar.",
       "errorLengthTooShort": "Die Referenzlänge L muss größer sein als die maximale Schnittordinate dieser Verbindung.",
       "previewNotToScale": "Bildschirmvorschau — nicht maßstäblich. Für die physische 1:1-Schablone Drucken verwenden.",
@@ -1132,7 +1132,9 @@
       "page": "Seite",
       "overlap": "Überlappung",
       "wrapNote": "Die Schablone um den Abzweig-AD wickeln. Die Nahtlinie mit Punkt 1 ausrichten.",
-      "calibrationNote": "Nach dem Drucken die 100-mm-Referenz mit einem Lineal prüfen, bevor das Rohr markiert wird."
+      "calibrationNote": "Nach dem Drucken die 100-mm-Referenz mit einem Lineal prüfen, bevor das Rohr markiert wird.",
+      "closure360": "360°-ABSCHLUSS = P1",
+      "isometricNote": "Set-on: der Abzweig ruht auf dem Außendurchmesser des Sammlers. Die amberfarbene Kurve ist die Schnittsattel-Kurve der Berechnungs-Engine."
     },
     "categoryFabrication": "Fertigung",
     "elbowCut": {

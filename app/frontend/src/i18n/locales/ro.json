@@ -1172,7 +1172,7 @@
       "modeMarking": "Marcare de la capătul țevii",
       "referenceLength": "Lungime de referință",
       "referenceLengthFrom": "L se măsoară de la capătul drept tăiat în echer al țevii ramificației.",
-      "contactConvention": "Profil de contact: ID ramificație. Desfășurarea șablonului / pasul punctelor: OD ramificație. (Convenție de referință inițială — nu o regulă universală de fabricație.)",
+      "contactConvention": "SET-ON (ramură sprijinită pe colector): tăierea ramurii pe OD-ul ramurii contra OD-ului colectorului. Picajul colectorului: ID-ul ramurii. Dezvoltarea șablonului și pasul dintre puncte: OD-ul ramurii.",
       "errorBranchTooLarge": "Raza de contact a ramificației depășește raza colectorului: această conexiune nu este fabricabilă pe acest colector.",
       "errorLengthTooShort": "Lungimea de referință L trebuie să fie mai mare decât ordonata de tăiere maximă a acestei conexiuni.",
       "previewNotToScale": "Previzualizare — fără scară. Utilizați Printare pentru șablonul fizic 1:1.",
@@ -1187,7 +1187,9 @@
       "page": "Pagină",
       "overlap": "Suprapunere",
       "wrapNote": "Înfășurați șablonul în jurul OD-ului ramificației. Aliniați linia cusăturii cu punctul 1.",
-      "calibrationNote": "După printare, verificați bara de 100 mm cu o riglă înainte de a marca țeava."
+      "calibrationNote": "După printare, verificați bara de 100 mm cu o riglă înainte de a marca țeava.",
+      "closure360": "ÎNCHIDERE 360° = P1",
+      "isometricNote": "Set-on: ramura se sprijină pe OD-ul colectorului. Curba amber este șaua de tăiere a motorului de calcul."
     },
     "unitConv": {
       "name": "Convertor de unități",
