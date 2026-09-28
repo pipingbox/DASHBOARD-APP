@@ -120,13 +120,20 @@ serve(async (req: Request) => {
     // Candidate profile (internal email content only — never analytics).
     // Recruitment hierarchy (§20): name → trade → experience → availability →
     // VCA → completion. Missing data is shown as absent, never fabricated.
-    const { data: profile } = await supabase
+    // NOTE: profiles has no `country` column (its location text field serves
+    // that purpose); selecting a nonexistent column fails the whole query and
+    // silently nulls the profile — the root cause of "(profile incomplete)"
+    // in FOLLOWUP-002. The select list is verified against the live schema.
+    const { data: profile, error: profileError } = await supabase
       .from("app_14da0f1941_profiles")
       .select(
-        "full_name, username, role, profile_completion, country, title, years_experience, availability_status",
+        "full_name, username, role, profile_completion, location, title, years_experience, availability_status",
       )
       .eq("user_id", userId)
       .maybeSingle();
+    if (profileError) {
+      console.log(JSON.stringify({ requestId, warning: "profile_query_failed", code: profileError.code }));
+    }
 
     // VCA status from the canonical certifications table. We report only
     // what the record proves: a VCA row exists, and whether its expiry is
