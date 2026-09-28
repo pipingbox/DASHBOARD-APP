@@ -1,5 +1,6 @@
 /* ───────────────────────────────────────────────────────────────────────────
-   Physical 1:1 header PICAJE template generator (H-001 final delta, PO §5–§7).
+   Physical 1:1 header PICAJE template generator (H-001 final delta, PO §5–§7;
+   PB-BRANCH-PRINT-FORMATS-001: parametric ISO page format).
 
    A physical flat development of the LOCAL header surface around the
    opening, built exclusively from the canonical BranchIntersectionResult
@@ -12,22 +13,19 @@
 
    The line represents the NOMINAL opening using the approved branch-ID
    reference (headerHoleReferenceRadius). No bevel, root-gap or cutting
-   allowance logic in H-001 V1.
+   allowance logic in V1.
 
-   Same A4 page model as the cut template: full 297 × 210 mm pages, 5 mm
-   safe printable border, 2 mm internal pad, additive-overlap tiling in X
-   (and Y for very tall openings), never scale-to-fit. Station numbers are
-   P1..PN only — the 360° closure IS P1 and is never presented as P(N+1).
+   Page model comes from the shared pdfPageFormat source of truth (landscape
+   ISO A4–A0): full physical pages, 5 mm safe printable border, 2 mm internal
+   pad, additive-overlap tiling in X (and Y for very tall openings), never
+   scale-to-fit. Station numbers are P1..PN only — the 360° closure IS P1
+   and is never presented as P(N+1).
    ─────────────────────────────────────────────────────────────────────────── */
 
 import type { BranchIntersectionResult } from './branchIntersectionGeometry';
 import type { TemplateTile } from './branchTemplateSvg';
-
-/* A4 landscape page geometry (mm) — keep in sync with branchTemplateSvg.ts.
-   Duplicated (not imported) so the module keeps only type-only imports,
-   which Node --experimental-strip-types erases at runtime. */
-const PAGE_W = 297;
-const PAGE_H = 210;
+import { getPdfPageFormat, pdfFormatUsableWidthMm } from './pdfPageFormat.ts';
+import type { PdfPageFormatId } from './pdfPageFormat.ts';
 
 export interface PicajeTemplateMeta {
   /** e.g. '6" Sch 40 (OD 168.3 mm)' */
@@ -49,9 +47,11 @@ export interface PicajeTemplateMeta {
 }
 
 export interface PicajeTemplateOptions {
-  /** Usable printable width — mm. Default 287 (A4 landscape, 5 mm printer margin). */
+  /** Physical page format (shared source of truth). Default A4 landscape. */
+  format?: PdfPageFormatId;
+  /** Explicit usable printable width override — mm. Default: format width − 2 × safe margin. */
   usableWidthMm?: number;
-  /** Usable content height below the title block — mm. Default 120. */
+  /** Explicit usable content height override — mm. Default: content window derived from the page. */
   usableHeightMm?: number;
   /** Fixed additive overlap between tiles — mm. Default 15. */
   overlapMm?: number;
@@ -71,12 +71,13 @@ export interface PicajeTemplateResult {
   heightMm: number;
 }
 
-const M = 5;            // safe printable border
 const PAD = 2;          // internal content pad
 const TITLE_ROWS = [9, 15, 21, 27, 32.5, 37.5, 42.5];
 const CONTENT_TOP = 50; // content area starts below the title block
-const CALIB_Y = 180;
-const CONTENT_BOTTOM = 170; // above the calibration zone
+/** Bottom band reserved for calibration — mm (A4: calibration at 180). */
+const BOTTOM_BAND = 30;
+/** Space between the content bottom and the calibration zone — mm. */
+const CONTENT_BOTTOM_MARGIN = 40;
 const MARK_X_LEFT = 14;
 
 const fmt = (v: number) => Number(v.toFixed(3));
@@ -86,8 +87,15 @@ export function buildPicajeTemplate(
   result: BranchIntersectionResult,
   options: PicajeTemplateOptions,
 ): PicajeTemplateResult {
-  const usableW = options.usableWidthMm ?? 287;
-  const usableH = options.usableHeightMm ?? 120;
+  const page = getPdfPageFormat(options.format);
+  const PAGE_W = page.widthMm;
+  const PAGE_H = page.heightMm;
+  const M = page.safeMarginMm;
+  const RIGHT_X = PAGE_W - 6.5;
+  const CONTENT_BOTTOM = PAGE_H - CONTENT_BOTTOM_MARGIN; // A4: 170
+  const CALIB_Y = PAGE_H - BOTTOM_BAND;                  // A4: 180
+  const usableW = options.usableWidthMm ?? pdfFormatUsableWidthMm(page);
+  const usableH = options.usableHeightMm ?? (CONTENT_BOTTOM - CONTENT_TOP); // A4: 120
   const overlap = options.overlapMm ?? 15;
   const { meta } = options;
 
@@ -146,9 +154,9 @@ export function buildPicajeTemplate(
       parts.push(text(M + PAD, TITLE_ROWS[4], 2.7, meta.openingNote, 'start', '#222222'));
       parts.push(text(M + PAD, TITLE_ROWS[5], 2.7, meta.wrapNote, 'start', '#222222'));
       parts.push(text(M + PAD, TITLE_ROWS[6], 2.5, meta.generatedLabel, 'start', '#444444'));
-      parts.push(text(290.5, TITLE_ROWS[0], 3.4, `${meta.pageLabel} ${pageIdx + 1}/${pageCount}`, 'end', '#000000'));
+      parts.push(text(RIGHT_X, TITLE_ROWS[0], 3.4, `${meta.pageLabel} ${pageIdx + 1}/${pageCount}`, 'end', '#000000'));
       if (!isLastX) {
-        parts.push(text(290.5, TITLE_ROWS[1], 2.7, `${meta.overlapLabel} ${fmt(overlap)} mm`, 'end', '#222222'));
+        parts.push(text(RIGHT_X, TITLE_ROWS[1], 2.7, `${meta.overlapLabel} ${fmt(overlap)} mm`, 'end', '#222222'));
       }
 
       /* ── Centerlines: X = 0 (reference generatrix) and Y = 0 (axis plane) ── */

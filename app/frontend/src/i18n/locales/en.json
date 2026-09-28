@@ -1327,6 +1327,7 @@
       "closure360": "360° closure = P1",
       "isometricNote": "Set-on: the branch rests on the header OD. The amber curve is the cut saddle from the calculation engine.",
       "printPicaje1to1": "Print picaje template 1:1",
+      "printFormat": "Print format",
       "picajeTemplateTitle": "Header picaje template 1:1 — opening",
       "picajeOrigin": "Origin (0,0)",
       "picajeOpeningNote": "Line = nominal opening (reference: branch ID). No bevel or cutting allowance in V1.",

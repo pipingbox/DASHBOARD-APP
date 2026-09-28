@@ -1206,6 +1206,7 @@
       "closure360": "FERMETURE 360° = P1",
       "isometricNote": "Set-on : le piquage repose sur le OD du collecteur. La courbe ambre est la selle de coupe du moteur de calcul.",
       "printPicaje1to1": "Imprimer le gabarit de traçage 1:1",
+      "printFormat": "Format d'impression",
       "picajeTemplateTitle": "Gabarit de traçage du collecteur 1:1 — ouverture",
       "picajeOrigin": "Origine (0,0)",
       "picajeOpeningNote": "Ligne = ouverture nominale (référence : ID du piquage). Pas de chanfrein ni de surépaisseur de coupe en V1.",

@@ -1203,6 +1203,7 @@
       "closure360": "360°-SLUITING = P1",
       "isometricNote": "Set-on: de tak rust op de OD van de collector. De amberkleurige kromme is de snijzadel-kromme van de rekenmotor.",
       "printPicaje1to1": "Picaje-sjabloon 1:1 afdrukken",
+      "printFormat": "Afdrukformaat",
       "picajeTemplateTitle": "Picaje-sjabloon van de collector 1:1 — opening",
       "picajeOrigin": "Oorsprong (0,0)",
       "picajeOpeningNote": "Lijn = nominale opening (referentie: ID van de tak). Geen afschuining of snijtoeslag in V1.",
