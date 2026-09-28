@@ -43,10 +43,12 @@ interface Application {
 const STATUS_OPTIONS = [
   'applied',
   'reviewed',
-  'interview',
   'shortlisted',
-  'rejected',
+  'sent_to_client',
+  'interview',
   'hired',
+  'rejected',
+  'withdrawn',
 ] as const;
 
 type ApplicationStatus = (typeof STATUS_OPTIONS)[number];
@@ -57,10 +59,12 @@ function CandidateStatusBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; classes: string; icon: React.ElementType }> = {
     applied: { label: t('companyCandidates.applied'), classes: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30', icon: AlertCircle },
     reviewed: { label: t('companyCandidates.reviewed'), classes: 'bg-blue-500/10 text-blue-400 border-blue-500/30', icon: Eye },
-    interview: { label: t('companyCandidates.interview'), classes: 'bg-purple-500/10 text-purple-400 border-purple-500/30', icon: Clock },
     shortlisted: { label: t('companyCandidates.shortlisted'), classes: 'bg-amber-500/10 text-amber-400 border-amber-500/30', icon: Star },
-    rejected: { label: t('companyCandidates.rejected'), classes: 'bg-red-500/10 text-red-400 border-red-500/30', icon: XCircle },
+    sent_to_client: { label: t('companyCandidates.sentToClient'), classes: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30', icon: UserCheck },
+    interview: { label: t('companyCandidates.interview'), classes: 'bg-purple-500/10 text-purple-400 border-purple-500/30', icon: Clock },
     hired: { label: t('companyCandidates.hired'), classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30', icon: CheckCircle2 },
+    rejected: { label: t('companyCandidates.rejected'), classes: 'bg-red-500/10 text-red-400 border-red-500/30', icon: XCircle },
+    withdrawn: { label: t('companyCandidates.withdrawn'), classes: 'bg-zinc-700/10 text-zinc-500 border-zinc-700/30', icon: XCircle },
   };
   const c = config[status] || config.applied;
   const Icon = c.icon;
@@ -191,13 +195,16 @@ export default function CompanyCandidates() {
 
   const updateStatus = async (applicationId: string, newStatus: ApplicationStatus) => {
     setUpdatingId(applicationId);
-    const { error } = await supabase
-      .from(TABLES.jobApplications)
-      .update({ status: newStatus })
-      .eq('id', applicationId);
+    // PB-JOBS-ATS-001 §3: transactional RPC — updates status + inserts audit
+    // event atomically, idempotent on retries, authorized server-side.
+    const { data, error } = await supabase.rpc('app_update_application_status', {
+      p_application_id: applicationId,
+      p_new_status: newStatus,
+    });
 
-    if (error) {
-      toast.error(t('companyCandidates.statusUpdateFailed'), { description: error.message });
+    if (error || (data && (data as { ok?: boolean }).ok === false)) {
+      const msg = error?.message ?? (data as { error?: string })?.error ?? 'unknown';
+      toast.error(t('companyCandidates.statusUpdateFailed'), { description: msg });
     } else {
       toast.success(t('companyCandidates.statusUpdated'));
       setApplications((prev) =>

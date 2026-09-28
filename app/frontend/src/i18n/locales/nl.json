@@ -2730,7 +2730,9 @@
     "statusUpdateFailed": "Status bijwerken mislukt",
     "justNow": "Zojuist",
     "more": "+{{count}} meer",
-    "loadFailed": "Kandidaten laden mislukt"
+    "loadFailed": "Kandidaten laden mislukt",
+    "sentToClient": "Naar klant verzonden",
+    "withdrawn": "Ingetrokken"
   },
   "companyJobs": {
     "eyebrow": "Bedrijf",
@@ -3847,5 +3849,12 @@
     "uk": "Oekraïens",
     "pl": "Pools",
     "bg": "Bulgaars"
+  },
+  "applicationHistory": {
+    "title": "Sollicitatiegeschiedenis",
+    "loading": "Laden...",
+    "empty": "Nog geen geschiedenis.",
+    "transition": "{{from}} → {{to}}",
+    "created": "Aangemaakt als {{status}}"
   }
 }

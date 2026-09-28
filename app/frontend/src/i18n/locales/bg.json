@@ -2761,7 +2761,9 @@
     "statusUpdateFailed": "Статусът не беше обновен",
     "justNow": "Току-що",
     "more": "+{{count}} още",
-    "loadFailed": "Кандидатите не бяха заредени"
+    "loadFailed": "Кандидатите не бяха заредени",
+    "sentToClient": "Изпратена на клиент",
+    "withdrawn": "Оттеглена"
   },
   "companyJobs": {
     "eyebrow": "Компания",
@@ -3847,5 +3849,12 @@
     "uk": "украински",
     "pl": "полски",
     "bg": "български"
+  },
+  "applicationHistory": {
+    "title": "История на кандидатурата",
+    "loading": "Зареждане...",
+    "empty": "Няма история.",
+    "transition": "{{from}} → {{to}}",
+    "created": "Създадена като {{status}}"
   }
 }
