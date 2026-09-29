@@ -45,6 +45,8 @@ interface WorkerProfile {
   notice_period: string | null;
   role: string | null;
   created_at: string;
+  /** Real profiles column (selected via `select('*')`); guaranteed by the MARKETPLACE_MIN server filter. */
+  profile_completion: number | null;
 }
 
 interface WorkerWithCounts extends WorkerProfile {
@@ -271,7 +273,7 @@ export default function CompanyWorkersSearch() {
         certificationCount: certCounts[p.user_id] || 0,
         documentCount: docCounts[p.user_id] || 0,
         certificationNames: certNames[p.user_id] || [],
-        completenessPercent: (p as Record<string, unknown>).profile_completion as number ?? 0,
+        completenessPercent: p.profile_completion ?? 0,
       }));
 
       // Skills keyword fallback: if keyword filter is set, also match skills array client-side
