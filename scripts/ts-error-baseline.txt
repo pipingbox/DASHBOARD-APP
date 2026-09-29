@@ -1,6 +1,6 @@
 # PB-INFRA-TS-GATE-001 — TypeScript diagnostic baseline (versioned, multiplicity-aware).
 # Format: app/frontend/<path>|<TScode>|<normalized message>|<expected count>  (no line/col by design).
-# 10 diagnostics across 8 fingerprints. This file may ONLY shrink
+# 9 diagnostics across 7 fingerprints. This file may ONLY shrink
 # (--prune-baseline) — adding fingerprints or raising counts requires a ticket + PO review.
 app/frontend/src/components/InviteToJobModal.tsx|TS2353|Object literal may only specify known properties, and 'postTitle' does not exist in type 'CreateNotificationArgs'.|1
 app/frontend/src/components/admin/AdminWorkforceRequestDetail.tsx|TS2339|Property 'location' does not exist on type 'WorkforceRequestRow'.|1
@@ -8,5 +8,4 @@ app/frontend/src/pages/CommunityChannel.tsx|TS2339|Property 'display_name' does 
 app/frontend/src/pages/CommunityChannel.tsx|TS2353|Object literal may only specify known properties, and 'postId' does not exist in type 'CreateNotificationArgs'.|1
 app/frontend/src/pages/CommunityPost.tsx|TS2339|Property 'display_name' does not exist on type 'Profile'.|2
 app/frontend/src/pages/CommunityPost.tsx|TS2353|Object literal may only specify known properties, and 'postId' does not exist in type 'CreateNotificationArgs'.|2
-app/frontend/src/pages/company/CompanyWorkforceRequests.tsx|TS2345|Argument of type '(row: Record<string, unknown>) => { documentation_progress: Record<string, boolean>; workers_assigned: number; workers_requested: number; coverage_percentage: number; priority: string; status: string; }' is not assignable to parameter of type '(value: GenericStringError, index: number, array: GenericStringError[]) => { documentation_progress: Record<string, boolean>; ... 4 more ...; status: string; }'. Types of parameters 'row' and 'value' are incompatible. Type 'GenericStringError' is not assignable to type 'Record<string, unknown>'. Index signature for type 'string' is missing in type '{ error: true; } & String'.|1
 app/frontend/src/tools/accessory-library/AccessoryDetailPage.tsx|TS2741|Property 'componentId' is missing in type '{ drawings: CatalogDrawing[]; selectedSize: string; setSelectedSize: (v: string) => void; }' but required in type '{ drawings: CatalogDrawing[]; selectedSize: string; setSelectedSize: (v: string) => void; componentId: string; }'.|1
