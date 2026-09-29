@@ -186,6 +186,8 @@ export interface WorkerCertification {
   storage_bucket?: string | null;
   /** Resolved storage path from backfill (client-only). */
   storage_path?: string | null;
+  /** Resolved signed URL (client-only, not persisted). */
+  storageUrl?: string;
 }
 
 /** Helper to normalize certification data from DB (handles column name variations) */

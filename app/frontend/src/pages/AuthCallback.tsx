@@ -26,11 +26,7 @@ export default function AuthCallback() {
       let sessionResult = await supabase.auth.getSession();
 
       if (!sessionResult.data.session && code) {
-        const exchangeResult = await supabase.auth.exchangeCodeForSession(code);
-        sessionResult = {
-          data: { session: exchangeResult.data.session },
-          error: exchangeResult.error,
-        };
+        sessionResult = await supabase.auth.exchangeCodeForSession(code);
       }
 
       const cleanParams = new URLSearchParams();
