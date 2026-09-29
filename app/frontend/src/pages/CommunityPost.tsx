@@ -98,7 +98,7 @@ export default function CommunityPost() {
 
     const { data: authorData } = await supabase
       .from(TABLES.profiles)
-      .select('id, display_name, title, avatar_url')
+      .select('id, full_name, title, avatar_url')
       .eq('id', (postData as Post).user_id)
       .maybeSingle();
 
@@ -146,7 +146,7 @@ export default function CommunityPost() {
     if (commenterIds.length > 0) {
       const { data: profData } = await supabase
         .from(TABLES.profiles)
-        .select('id, display_name, title, avatar_url')
+        .select('id, full_name, title, avatar_url')
         .in('id', commenterIds);
       (profData as AuthorSummary[] | null)?.forEach((p) => authorsMap.set(p.id, p));
     }
@@ -192,7 +192,7 @@ export default function CommunityPost() {
           postId: post.id,
           postTitle: post.title,
           postChannelSlug: channelSlug ?? null,
-          actorName: profile?.display_name ?? null,
+          actorName: profile?.full_name ?? null,
         });
       }
     }
@@ -314,7 +314,7 @@ export default function CommunityPost() {
       commentId: (newComment as { id: string } | null)?.id,
       postTitle: post.title,
       postChannelSlug: channelSlug ?? null,
-      actorName: profile?.display_name ?? null,
+      actorName: profile?.full_name ?? null,
     });
     setCommentBody('');
     await load();
@@ -386,7 +386,7 @@ export default function CommunityPost() {
         eyebrow={`#${channel.slug} · ${t('community.post')}`}
         title={post.title}
         description={t('community.postedBy', {
-          name: post.author?.display_name || t('common.anonymous'),
+          name: post.author?.full_name || t('common.anonymous'),
           time: formatRelativeTime(post.created_at),
         })}
       />
@@ -397,7 +397,7 @@ export default function CommunityPost() {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-500">
               <span className="font-medium text-zinc-200">
-                {post.author?.display_name || t('common.anonymous')}
+                {post.author?.full_name || t('common.anonymous')}
               </span>
               {post.author?.title && (
                 <>
@@ -626,7 +626,7 @@ export default function CommunityPost() {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-500">
                       <span className="font-medium text-zinc-200">
-                        {c.author?.display_name || t('common.anonymous')}
+                        {c.author?.full_name || t('common.anonymous')}
                       </span>
                       {c.author?.title && (
                         <>
@@ -679,7 +679,7 @@ function Avatar({
     return (
       <img
         src={author.avatar_url}
-        alt={author.display_name || t('common.anonymous')}
+        alt={author.full_name || t('common.anonymous')}
         className={`${cls} object-cover bg-zinc-900`}
       />
     );
@@ -688,7 +688,7 @@ function Avatar({
     <div
       className={`${cls} flex items-center justify-center bg-zinc-900 font-semibold text-[#f59e0b] uppercase`}
     >
-      {initialsFrom(author?.display_name)}
+      {initialsFrom(author?.full_name)}
     </div>
   );
 }
