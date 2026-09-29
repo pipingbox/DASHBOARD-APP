@@ -45,6 +45,29 @@ interface WorkforceRequest {
   created_at: string;
 }
 
+/**
+ * Row shape returned by the COMPANY_REQUEST_COLUMNS allow-list select.
+ * Nullable-except-id/created_at: the public insert path always writes the
+ * rest, but there is no in-repo DDL proving NOT NULL constraints, so the
+ * defensive normalization below keeps handling nulls exactly as before.
+ */
+interface CompanyRequestRow {
+  id: string;
+  company_name: string | null;
+  contact_person: string | null;
+  country: string | null;
+  worker_type: string | null;
+  workers_requested: number | null;
+  workers_assigned: number | null;
+  coverage_percentage: number | null;
+  estimated_start_date: string | null;
+  project_duration: string | null;
+  priority: string | null;
+  status: string | null;
+  documentation_progress: Record<string, boolean> | null;
+  created_at: string;
+}
+
 export default function CompanyWorkforceRequests() {
   const { t } = useTranslation();
   const [requests, setRequests] = useState<WorkforceRequest[]>([]);
@@ -63,20 +86,21 @@ export default function CompanyWorkforceRequests() {
         const { data, error } = await supabase
           .from(TABLES.workforceRequests)
           .select(COMPANY_REQUEST_COLUMNS)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .returns<CompanyRequestRow[]>();
 
         if (error) {
           console.error('[CompanyWorkforce] Fetch error:', error);
         }
         // Normalize data - ensure documentation_progress is always an object
-        const normalized = (data || []).map((row: Record<string, unknown>) => ({
+        const normalized = (data || []).map((row) => ({
           ...row,
           documentation_progress: normalizeDocumentationProgress(row.documentation_progress),
-          workers_assigned: (row.workers_assigned as number) ?? 0,
-          workers_requested: (row.workers_requested as number) ?? 1,
-          coverage_percentage: (row.coverage_percentage as number) ?? 0,
-          priority: (row.priority as string) || 'normal',
-          status: (row.status as string) || 'new',
+          workers_assigned: row.workers_assigned ?? 0,
+          workers_requested: row.workers_requested ?? 1,
+          coverage_percentage: row.coverage_percentage ?? 0,
+          priority: row.priority || 'normal',
+          status: row.status || 'new',
         })) as WorkforceRequest[];
         setRequests(normalized);
       } catch (err) {
