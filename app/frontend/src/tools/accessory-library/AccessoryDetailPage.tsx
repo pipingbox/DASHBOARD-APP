@@ -875,6 +875,7 @@ function DimensionesTab({
         drawings={drawings}
         selectedSize={selectedSize}
         setSelectedSize={setSelectedSize}
+        componentId={component.id}
       />
 
       {/* The selected size's real drawing, on its proper light ground. */}
