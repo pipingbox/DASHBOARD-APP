@@ -28,8 +28,11 @@ export type JourneyTarget =
   | { kind: 'section'; elementId: string }
   | { kind: 'quick_capture' };
 
+/** Canonical gap keys that have an in-journey remediation (all except 'cohort'). */
+export type RemediableGapKey = Exclude<ReadinessGap['key'], 'cohort'>;
+
 export interface JourneyItem {
-  key: ReadinessGap['key'];
+  key: RemediableGapKey;
   unlocks: ReadinessGap['unlocks'];
   /** i18n key suffixes under `profile.journey.*`. */
   target: JourneyTarget;
@@ -39,7 +42,7 @@ export interface JourneyItem {
  * Deterministic mapping from canonical gap key to remediation target.
  * The anchor ids must exist in `Profile.tsx` / the corresponding section.
  */
-const JOURNEY_TARGETS: Record<Exclude<ReadinessGap['key'], 'cohort'>, JourneyTarget> = {
+const JOURNEY_TARGETS: Record<RemediableGapKey, JourneyTarget> = {
   full_name: { kind: 'field', elementId: 'profile-field-full_name' },
   title: { kind: 'field', elementId: 'profile-field-title' },
   location: { kind: 'field', elementId: 'profile-field-location' },
@@ -58,11 +61,11 @@ const JOURNEY_TARGETS: Record<Exclude<ReadinessGap['key'], 'cohort'>, JourneyTar
  */
 export function toJourneyItems(gaps: ReadonlyArray<ReadinessGap>): JourneyItem[] {
   return gaps
-    .filter((g) => g.key !== 'cohort')
+    .filter((g): g is ReadinessGap & { key: RemediableGapKey } => g.key !== 'cohort')
     .map((g) => ({
       key: g.key,
       unlocks: g.unlocks,
-      target: JOURNEY_TARGETS[g.key as Exclude<ReadinessGap['key'], 'cohort'>],
+      target: JOURNEY_TARGETS[g.key],
     }));
 }
 
