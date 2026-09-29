@@ -104,7 +104,7 @@ export function ExperienceQuickCapture({
     try {
       const result = await insertWorkerExperience(user.id, buildInput());
 
-      if (!result.ok) {
+      if ('error' in result) {
         // Recoverable error: form values are kept so the user can retry.
         toast.error(t(result.error, result.error));
         return;

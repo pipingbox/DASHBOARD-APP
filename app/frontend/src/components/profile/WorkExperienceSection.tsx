@@ -86,7 +86,7 @@ export function WorkExperienceSection({
     setLoading(true);
     try {
       const result = await loadWorkerExperiences(user.id);
-      if (!result.ok) {
+      if ('error' in result) {
         toast.error(result.error);
       } else {
         setItems(result.data);
@@ -167,7 +167,7 @@ export function WorkExperienceSection({
     );
     try {
       const result = await setWorkerExperienceVisibility(exp.id, user.id, newVal);
-      if (!result.ok) {
+      if ('error' in result) {
         toast.error(result.error);
         setItems(previousItems);
       }
@@ -208,7 +208,7 @@ export function WorkExperienceSection({
         ? await updateWorkerExperience(editing.id, user.id, input)
         : await insertWorkerExperience(user.id, input);
 
-      if (!result.ok) {
+      if ('error' in result) {
         toast.error(t(result.error, result.error));
         return;
       }
@@ -237,7 +237,7 @@ export function WorkExperienceSection({
     setItems((prev) => prev.filter((i) => i.id !== deleteTarget.id));
     try {
       const result = await deleteWorkerExperience(deleteTarget.id, user.id);
-      if (!result.ok) {
+      if ('error' in result) {
         toast.error(result.error);
         setItems(previousItems);
       } else {

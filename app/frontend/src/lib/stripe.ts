@@ -110,7 +110,7 @@ export async function redirectToCheckout(
   options?: { supplyConsent?: boolean },
 ): Promise<Exclude<CheckoutResult, { ok: true }>['reason'] | null> {
   const result = await startCheckout(productKeys, metadata, options);
-  if (result.ok) {
+  if (!('reason' in result)) {
     window.location.href = result.url;
     return null;
   }
