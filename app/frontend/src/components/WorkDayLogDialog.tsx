@@ -144,12 +144,16 @@ export function WorkDayLogDialog({
       setAutoFilled(false);
       setForm(makeInitial(initialDate));
       if (user) {
-        supabase
-          .from(TABLES.workDayLogs)
-          .select('*')
-          .eq('user_id', user.id)
-          .order('log_date', { ascending: false })
-          .limit(1)
+        // Fire-and-forget auto-fill; Promise.resolve() only adapts the
+        // PostgREST PromiseLike builder to a real Promise so `.catch` exists.
+        Promise.resolve(
+          supabase
+            .from(TABLES.workDayLogs)
+            .select('*')
+            .eq('user_id', user.id)
+            .order('log_date', { ascending: false })
+            .limit(1)
+        )
           .then(({ data }) => {
             const last = data?.[0] as WorkDayLog | undefined;
             if (!last) return;
