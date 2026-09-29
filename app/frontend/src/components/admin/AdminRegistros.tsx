@@ -102,6 +102,13 @@ interface RegistroUser {
   has_cv: boolean;
   /** Admin visibility: canonical onboarding_status (see lib/onboarding.ts) */
   onboarding_status: string | null;
+  /**
+   * Admin visibility: profile visibility setting. Optional because the
+   * construction paths (edge function + profiles fallback) do not populate
+   * it, so it stays undefined at runtime — kept that way to preserve the
+   * exact cv_visible fallback behavior.
+   */
+  profile_visibility?: string | null;
 }
 
 type OnboardingStatus = 'AUTH_ONLY' | 'PROFILE_STARTED' | 'PROFILE_COMPLETED' | 'MARKETPLACE_READY';
@@ -136,7 +143,7 @@ function computeOnboardingStatus(user: RegistroUser): OnboardingStatus {
   const hasBasicInfo = !!(user.full_name && user.position);
 
   // MARKETPLACE_READY: minimum useful fields + profile_visibility = public (cv_visible = true)
-  const pVisibility = (user as Record<string, unknown>).profile_visibility as string | undefined;
+  const pVisibility = user.profile_visibility ?? undefined;
   const isPublic = pVisibility ? pVisibility === 'public' : user.cv_visible === true;
   if (completion >= COMPLETION_THRESHOLDS.ALMOST_READY && isPublic) return 'MARKETPLACE_READY';
   if (completion >= COMPLETION_THRESHOLDS.GOOD_START || (hasBasicInfo && user.bio)) return 'PROFILE_COMPLETED';

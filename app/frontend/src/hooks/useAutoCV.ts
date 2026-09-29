@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, type Profile } from '@/hooks/useAuth';
 import { generateCV, mapCertificationRowsForCv } from '@/lib/generateCV';
 import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -27,7 +27,16 @@ const WATCHED_FIELDS = [
 
 type WatchedField = (typeof WATCHED_FIELDS)[number];
 
-function getProfileSignature(profile: Record<string, unknown>): string {
+/**
+ * Minimal structural contract actually read by getProfileSignature: the
+ * watched fields that exist on Profile, plus `languages`, which is watched
+ * for future profile data but is not part of Profile yet.
+ */
+type ProfileSignatureInput = Pick<Profile, Exclude<WatchedField, 'languages'>> & {
+  languages?: unknown;
+};
+
+function getProfileSignature(profile: ProfileSignatureInput): string {
   // Create a simple hash of the watched fields to detect changes
   const parts = WATCHED_FIELDS.map((f) => String(profile[f] ?? ''));
   return parts.join('|');
@@ -74,7 +83,7 @@ export function useAutoCV() {
       // This hook tracks staleness and notifies the user when an update is available.
 
       // Store the signature in localStorage to track staleness across sessions
-      const signature = getProfileSignature(profile as Record<string, unknown>);
+      const signature = getProfileSignature(profile);
       localStorage.setItem('pipingbox_cv_signature', signature);
       localStorage.setItem('pipingbox_cv_last_generated', new Date().toISOString());
       lastSignature.current = signature;
@@ -89,7 +98,7 @@ export function useAutoCV() {
   useEffect(() => {
     if (!profile) return;
 
-    const currentSignature = getProfileSignature(profile as Record<string, unknown>);
+    const currentSignature = getProfileSignature(profile);
     const storedSignature = localStorage.getItem('pipingbox_cv_signature');
     const lastGenerated = localStorage.getItem('pipingbox_cv_last_generated');
 
