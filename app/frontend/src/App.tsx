@@ -14,11 +14,14 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useSeo } from '@/hooks/useSeo';
 import { OnboardingGate } from '@/components/OnboardingGate';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { DeploymentBadge } from '@/components/DeploymentBadge';
 import { CompanyVerificationGate } from '@/components/company/CompanyVerificationGate';
 
 import Index from './pages/Index';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import CheckEmail from './pages/CheckEmail';
+import AuthCallback from './pages/AuthCallback';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
@@ -34,12 +37,14 @@ import AcademyModule from './pages/AcademyModule';
 import AcademyExam from './pages/AcademyExam';
 import Tools from './pages/Tools';
 import Jobs from './pages/Jobs';
+import JobDetail from './pages/JobDetail';
 import Community from './pages/Community';
 import CommunityChannel from './pages/CommunityChannel';
 import CommunityPost from './pages/CommunityPost';
 import Companies from './pages/Companies';
 import RequestWorkers from './pages/RequestWorkers';
 import Profile from './pages/Profile';
+import InstructorDashboard from './pages/InstructorDashboard';
 import PublicWorkerProfile from './pages/PublicWorkerProfile';
 import Admin from './pages/Admin';
 import Applications from './pages/Applications';
@@ -61,6 +66,7 @@ import {
 import PricingPage from './pages/PricingPage';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
+import LegalNotice from './pages/LegalNotice';
 import DsaContact from './pages/DsaContact';
 import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
@@ -69,6 +75,9 @@ import NotFound from './pages/NotFound';
 // Public routes (no auth) for SEO. Prerendered at build time via vite-prerender.
 const BlogIndexPage = lazy(() => import('./pages/blog/BlogIndexPage'));
 const BlogPostPage = lazy(() => import('./pages/blog/BlogPostPage'));
+// PB-SEO-103: public tool landing pages (/tools/:slug). Lazy-loaded and
+// prerendered at build time (prerender/public.js) for crawlable acquisition HTML.
+const ToolLandingPage = lazy(() => import('./pages/ToolLandingPage'));
 
 const queryClient = new QueryClient();
 
@@ -175,6 +184,15 @@ const AppRoutes = () => {
         </GuestRoute>
       }
     />
+    <Route
+      path="/check-email"
+      element={
+        <GuestRoute>
+          <CheckEmail />
+        </GuestRoute>
+      }
+    />
+    <Route path="/auth/callback" element={<AuthCallback />} />
     <Route
       path="/forgot-password"
       element={
@@ -284,6 +302,13 @@ const AppRoutes = () => {
       path="/academy/course/:slug"
       element={withShellRoles(<CourseDetail />, ['admin', 'worker', 'company'])}
     />
+    {/* PB-MARKET-INSTRUCTOR-UI-001 (T8): instructor dashboard — sales,
+        adjustments, settlements, next payout, self-billing documents and
+        fiscal data. No student PII (instructor-safe view). */}
+    <Route
+      path="/instructor"
+      element={withShellRoles(<InstructorDashboard />, ['admin', 'worker', 'company'])}
+    />
     <Route
       path="/academy/lesson/:lessonId"
       element={withShellRoles(<LessonView />, ['admin', 'worker', 'company'])}
@@ -308,11 +333,28 @@ const AppRoutes = () => {
       path="/tools"
       element={withPublicShell(<Tools />)}
     />
+    {/* PB-SEO-103: prerendered public tool landing pages for acquisition. */}
+    <Route
+      path="/tools/:slug"
+      element={
+        withPublicShell(
+          <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a]" />}>
+            <ToolLandingPage />
+          </Suspense>,
+        )
+      }
+    />
     {/* PB-WEB-005 F2: /jobs public. DEC-54 requires marketplace routes open without auth.
         The apply() action already handles !user gracefully (toast "Sign in to apply"). */}
     <Route
       path="/jobs"
       element={withPublicShell(<Jobs />)}
+    />
+    {/* PB-JOBS-PILOT-FOLLOWUP-002: public job detail. Same open boundary as
+        /jobs — anon and authenticated readers; RLS keeps non-open jobs private. */}
+    <Route
+      path="/jobs/:id"
+      element={withPublicShell(<JobDetail />)}
     />
     <Route
       path="/community"
@@ -361,6 +403,7 @@ const AppRoutes = () => {
     />
     <Route path="/privacy" element={<Privacy />} />
     <Route path="/terms" element={<Terms />} />
+    <Route path="/legal" element={<LegalNotice />} />
     <Route path="/dsa" element={<DsaContact />} />
     <Route path="/contact" element={<Contact />} />
     <Route path="*" element={<NotFound />} />
@@ -387,6 +430,7 @@ const App = () => {
                 <AppRoutes />
               </ErrorBoundary>
             </BrowserRouter>
+            <DeploymentBadge />
           </TooltipProvider>
         </AdminPreviewProvider>
       </AuthProvider>

@@ -1,0 +1,99 @@
+[
+  {
+    "id": "m6-gestion",
+    "iconKey": "ClipboardList",
+    "officialRef": "RD 39/1997 §6",
+    "hours": "8 godzin",
+    "title": "Moduł 6: Zarządzanie prewencją",
+    "lessons": [
+      {
+        "title": "6.1 Ocena ryzyka",
+        "duration": "90 min",
+        "topics": [
+          "Metodyka oceny ryzyka",
+          "Identyfikacja, szacowanie, wartościowanie",
+          "Dokumentacja",
+          "Przeglądy i aktualizacje"
+        ]
+      },
+      {
+        "title": "6.2 Planowanie działań prewencyjnych",
+        "duration": "90 min",
+        "topics": [
+          "Plan prewencji",
+          "Środki profilaktyczne",
+          "Terminy i osoby odpowiedzialne",
+          "Monitorowanie realizacji"
+        ]
+      },
+      {
+        "title": "6.3 Postępowanie wyjaśniające po wypadku",
+        "duration": "60 min",
+        "topics": [
+          "Drzewo przyczyn",
+          "Gromadzenie informacji",
+          "Analiza przyczyn",
+          "Działania korygujące"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-auditorias",
+    "iconKey": "Search",
+    "officialRef": "RD 39/1997 §7",
+    "hours": "6 godzin",
+    "title": "Moduł 7: Audyty i kontrole",
+    "lessons": [
+      {
+        "title": "7.1 Audyty systemu zarządzania prewencją",
+        "duration": "90 min",
+        "topics": [
+          "Przedmiot audytu",
+          "Audyt obowiązkowy",
+          "Audyt dobrowolny",
+          "Raport z audytu"
+        ]
+      },
+      {
+        "title": "7.2 Kontrole stanu bezpieczeństwa",
+        "duration": "90 min",
+        "topics": [
+          "Kontrole planowane",
+          "Kontrole miejsc pracy",
+          "Kontrole wyposażenia i urządzeń",
+          "Protokoły kontroli"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-cae",
+    "iconKey": "Users",
+    "officialRef": "RD 171/2004",
+    "hours": "6 godzin",
+    "title": "Moduł 8: Koordynacja działań przedsiębiorstw (CAE)",
+    "lessons": [
+      {
+        "title": "8.1 Obowiązki zamawiającego",
+        "duration": "90 min",
+        "topics": [
+          "RD 171/2004",
+          "Weryfikacja działań prewencyjnych wykonawcy",
+          "Informacja o zagrożeniach",
+          "Koordynator działań"
+        ]
+      },
+      {
+        "title": "8.2 Obowiązki wykonawcy",
+        "duration": "90 min",
+        "topics": [
+          "Przestrzeganie zasad obowiązujących w zakładzie",
+          "Informowanie pracowników",
+          "Podwykonawstwo",
+          "Rejestr podwykonawstwa (branża budowlana)"
+        ]
+      }
+    ]
+  }
+]

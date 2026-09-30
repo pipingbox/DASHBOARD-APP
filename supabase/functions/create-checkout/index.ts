@@ -25,6 +25,9 @@
 //   EUR 399 pack for EUR 0.01.
 //
 // Environment variables required:
+//   - MONETIZATION_ENABLED       (REQUIRED kill switch — must be exactly "true"
+//                                 or the function refuses to create any session
+//                                 with 403 monetization_disabled. Fail-closed.)
 //   - SUPABASE_URL
 //   - SUPABASE_SERVICE_ROLE_KEY
 //   - STRIPE_SECRET_KEY          (sk_test_... in test mode)
@@ -33,6 +36,9 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import { hashConsentText, resolveConsentText } from "../_shared/consent-texts.ts";
+import { getTaxProvider } from "../_shared/tax/stripe-tax.ts";
+import { isMonetizationEnabled } from "../_shared/monetization.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -48,6 +54,9 @@ interface StripePriceRow {
   billing_type: "recurring" | "one_time";
   interval: "month" | "year" | null;
   is_active: boolean;
+  // PB-MARKET-CONSENT-001: catalog fact — true for immediate-supply digital
+  // content (recorded courses). Read server-side; the client cannot unset it.
+  requires_supply_consent: boolean;
 }
 
 function json(body: unknown, status = 200) {
@@ -65,11 +74,20 @@ Deno.serve(async (req) => {
     return json({ error: "method_not_allowed" }, 405);
   }
 
+  // Monetization kill switch (Stream A containment, PO GO 2026-09-26 §6).
+  // Fail CLOSED before any auth, DB or Stripe work: unless the environment
+  // explicitly enables monetization, no checkout session is ever created —
+  // independently of what the app_stripe_prices catalog contains. Checked
+  // first so a dormant store cannot produce sessions, orders or consent rows
+  // as a side effect of the code merely being present.
+  if (!isMonetizationEnabled(Deno.env.get("MONETIZATION_ENABLED"))) {
+    return json({ error: "monetization_disabled" }, 403);
+  }
+
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
   const appBaseUrl = Deno.env.get("APP_BASE_URL") || "https://pipingbox.com";
-  const automaticTax = Deno.env.get("STRIPE_AUTOMATIC_TAX") === "true";
 
   if (!stripeSecretKey) {
     console.error("create-checkout: STRIPE_SECRET_KEY is not set");
@@ -80,6 +98,11 @@ Deno.serve(async (req) => {
     apiVersion: "2024-06-20",
     httpClient: Stripe.createFetchHttpClient(),
   });
+
+  // DEC-69: checkout core speaks to the TaxProvider interface. The env flag,
+  // the provider choice and the meaning of the session config all live behind
+  // the adapter — this file never decides what "automatic tax" is.
+  const taxProvider = getTaxProvider(stripe);
 
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false },
@@ -103,7 +126,16 @@ Deno.serve(async (req) => {
   // ---------------------------------------------------------------------------
   // 2. Parse and normalize the requested products
   // ---------------------------------------------------------------------------
-  let body: { product_key?: string; product_keys?: string[]; metadata?: Record<string, string> };
+  let body: {
+    product_key?: string;
+    product_keys?: string[];
+    metadata?: Record<string, string>;
+    // PB-MARKET-CONSENT-001: the client sends only the VERSION KEY of the
+    // wording it displayed and an explicit acceptance flag. The text itself
+    // is resolved from the server-side registry — a client cannot mint
+    // evidence for a wording nobody approved.
+    consent?: { text_version?: string; accepted?: boolean };
+  };
   try {
     body = await req.json();
   } catch {
@@ -134,7 +166,7 @@ Deno.serve(async (req) => {
   // ---------------------------------------------------------------------------
   const { data: priceRows, error: priceError } = await supabase
     .from("app_stripe_prices")
-    .select("product_key, stripe_price_id, amount_cents, currency, billing_type, interval, is_active")
+    .select("product_key, stripe_price_id, amount_cents, currency, billing_type, interval, is_active, requires_supply_consent")
     .in("product_key", requestedKeys);
 
   if (priceError) {
@@ -170,6 +202,68 @@ Deno.serve(async (req) => {
   const mode: "payment" | "subscription" = hasRecurring ? "subscription" : "payment";
 
   // ---------------------------------------------------------------------------
+  // 3b. PB-MARKET-CONSENT-001 — withdrawal-right consent for digital content
+  // ---------------------------------------------------------------------------
+  // A product flagged requires_supply_consent (recorded digital courses) may
+  // not be sold without a recorded IMMEDIATE_SUPPLY_DIGITAL_CONTENT consent.
+  // Fail CLOSED: any doubt (missing consent, unknown version, DB error)
+  // refuses the session — access without evidence is the defect this exists
+  // to prevent, and the buyer can simply retry.
+  const needsConsent = prices.some((p) => p.requires_supply_consent);
+  let consentId: string | null = null;
+
+  if (needsConsent) {
+    const versionKey = body.consent?.text_version ?? "";
+    const accepted = body.consent?.accepted === true;
+    const consentText = resolveConsentText(versionKey);
+
+    if (!accepted || !consentText) {
+      return json({ error: "supply_consent_required" }, 412);
+    }
+
+    // The LegalEntity whose terms are accepted: the ACTIVE seller of record.
+    // Nullable — no entity is active yet (007); the fact is recorded either
+    // way and the row never asserts an entity that did not perform the sale.
+    let legalEntityId: string | null = null;
+    try {
+      const { data: entity } = await supabase
+        .from("app_legal_entities")
+        .select("id")
+        .eq("is_active", true)
+        .limit(1)
+        .maybeSingle();
+      legalEntityId = entity?.id ?? null;
+    } catch (err) {
+      console.error("create-checkout: legal entity lookup failed", err);
+      return json({ error: "consent_record_failed" }, 500);
+    }
+
+    const forwardedFor = req.headers.get("x-forwarded-for");
+    const ipAddress = forwardedFor?.split(",")[0]?.trim() || null;
+
+    const { data: consentRow, error: consentError } = await supabase
+      .from("app_consent_evidence")
+      .insert({
+        user_id: user.id,
+        legal_entity_id: legalEntityId,
+        consent_type: consentText.consentType,
+        text_version: consentText.version,
+        text_hash: await hashConsentText(consentText.text),
+        text_snapshot: consentText.text,
+        ip_address: ipAddress,
+        user_agent: req.headers.get("user-agent"),
+      })
+      .select("id")
+      .single();
+
+    if (consentError || !consentRow) {
+      console.error("create-checkout: consent evidence insert failed", consentError);
+      return json({ error: "consent_record_failed" }, 500);
+    }
+    consentId = consentRow.id;
+  }
+
+  // ---------------------------------------------------------------------------
   // 4. Reuse the Stripe customer if this user already has one
   // ---------------------------------------------------------------------------
   const { data: existingSub } = await supabase
@@ -192,6 +286,9 @@ Deno.serve(async (req) => {
     ...(body.metadata || {}),
     user_id: user.id,
     product_keys: requestedKeys.join(","),
+    // PB-MARKET-CONSENT-001: lets the webhook link the recorded consent to the
+    // paid order and timestamp the start of supply against it.
+    ...(consentId ? { consent_id: consentId } : {}),
   };
 
   let session;
@@ -217,18 +314,14 @@ Deno.serve(async (req) => {
         success_url: `${appBaseUrl}/dashboard?purchase=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${appBaseUrl}/dashboard?purchase=canceled`,
         allow_promotion_codes: true,
-        // Stripe Tax is off by default. Enabling it requires Stripe Tax to be
-        // activated on the account and an origin address configured, neither of
-        // which exists before PIPINGBOX OU. Turning it on prematurely makes
-        // every session creation fail. Flip STRIPE_AUTOMATIC_TAX=true once the
-        // OU is registered for VAT/OSS (SPEC §7).
-        ...(automaticTax
-          ? {
-              automatic_tax: { enabled: true },
-              // Required by Stripe when automatic_tax runs against an existing
-              // customer: the address must be resolvable.
-              ...(existingCustomerId ? { customer_update: { address: "auto" as const } } : {}),
-            }
+        // DEC-69: the tax session config comes from the TaxProvider adapter.
+        // While the provider is disabled (no active registrations) this is an
+        // empty object and the session carries no tax logic at all.
+        ...taxProvider.checkoutTaxConfig(),
+        // Required by the provider when tax runs against an existing customer:
+        // the address must be resolvable.
+        ...(taxProvider.isEnabled() && existingCustomerId
+          ? { customer_update: { address: "auto" as const } }
           : {}),
       },
       {
@@ -270,6 +363,21 @@ Deno.serve(async (req) => {
         session.id,
         orderError,
       );
+    }
+
+    // PB-MARKET-CONSENT-001: stamp the consent row with the session id so the
+    // evidence chain (consent -> session -> paid order -> supply start) is
+    // traversable in both directions. Best-effort: the webhook also carries
+    // consent_id in session metadata, so a failure here loses a convenience
+    // link, not the evidence.
+    if (consentId) {
+      const { error: linkError } = await supabase
+        .from("app_consent_evidence")
+        .update({ stripe_checkout_session_id: session.id })
+        .eq("id", consentId);
+      if (linkError) {
+        console.error("create-checkout: consent session link failed", linkError);
+      }
     }
   }
 

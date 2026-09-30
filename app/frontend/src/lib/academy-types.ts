@@ -77,3 +77,15 @@ export interface ModuleContent {
   isBVCA: boolean;
   isVOLVCA: boolean;
 }
+
+export interface LessonSection {
+  title: string;
+  paragraphs?: string[];
+  bullets?: string[];
+  table?: { headers: string[]; rows: string[][] };
+  callout?: { type: 'info' | 'warning' | 'danger'; text: string };
+}
+
+export interface LessonContent {
+  sections: LessonSection[];
+}

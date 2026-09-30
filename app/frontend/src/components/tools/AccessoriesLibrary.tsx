@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Library, ChevronRight, Search, X, SearchX } from 'lucide-react';
 import AccessoryDetailPage from '@/tools/accessory-library/AccessoryDetailPage';
+import { trackEvent, LIBRARY_COMPONENT_ID_RE } from '@/lib/observability';
 import {
   components as allPublishable,
   families,
@@ -84,6 +85,90 @@ export default function AccessoriesLibrary() {
     setPressureClass(null);
   };
 
+  // ── PB-LIBRARY-COMPLETE-001 — usage analytics (closed taxonomy, no PII) ──
+  const viewedRef = useRef(false);
+  const lastSearchEmittedRef = useRef('');
+  const resultsCount = results.length;
+
+  // library_viewed — once per Library mount, with the rendered catalog size.
+  useEffect(() => {
+    if (viewedRef.current) return;
+    viewedRef.current = true;
+    trackEvent('library_viewed', { results_count: allPublishable.length });
+  }, []);
+
+  // library_search_performed — debounced, deduped per committed query; the
+  // payload carries only the LENGTH of the query, never the free text
+  // (search terms may contain PII). library_empty_result on zero matches.
+  const activeFilterCount =
+    Number(Boolean(family)) +
+    Number(Boolean(connection)) +
+    Number(Boolean(standardId)) +
+    Number(Boolean(pressureClass));
+  useEffect(() => {
+    if (!query) {
+      lastSearchEmittedRef.current = '';
+      return;
+    }
+    if (query === lastSearchEmittedRef.current) return;
+    const handle = window.setTimeout(() => {
+      if (query === lastSearchEmittedRef.current) return;
+      lastSearchEmittedRef.current = query;
+      trackEvent('library_search_performed', {
+        query_length: query.length,
+        results_count: resultsCount,
+      });
+      if (resultsCount === 0) {
+        trackEvent('library_empty_result', {
+          query_length: query.length,
+          filter_count: activeFilterCount,
+        });
+      }
+    }, 600);
+    return () => window.clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refs guard dedupe; state snapshots are read at fire time
+  }, [query, resultsCount, activeFilterCount]);
+
+  const trackFilter = (
+    filterType: 'family' | 'connection_type' | 'standard' | 'pressure_class',
+    filterValue: string | null,
+  ) => {
+    if (!filterValue) return;
+    // results_count reflects the state BEFORE this selection renders; it is a
+    // coarse scope signal, not a funnel metric.
+    trackEvent('library_filter_selected', {
+      filter_type: filterType,
+      filter_value: filterValue,
+      results_count: resultsCount,
+    });
+  };
+
+  const selectFamily = (key: string | null) => {
+    setFamily(key);
+    trackFilter('family', key);
+  };
+  const selectConnection = (key: string | null) => {
+    setConnection(key);
+    trackFilter('connection_type', key);
+  };
+  const selectStandard = (key: string | null) => {
+    setStandardId(key);
+    trackFilter('standard', key);
+  };
+  const selectPressureClass = (key: string | null) => {
+    setPressureClass(key);
+    trackFilter('pressure_class', key);
+  };
+
+  const openComponent = (id: string) => {
+    setSelectedAccessory(id);
+    // Closed PB-COMP-* id only — cards come from the typed catalog, never
+    // from user input, but keep the guard explicit for future sources.
+    if (LIBRARY_COMPONENT_ID_RE.test(id)) {
+      trackEvent('library_item_opened', { component_id: id });
+    }
+  };
+
   if (selectedAccessory) {
     return (
       <AccessoryDetailPage
@@ -143,7 +228,7 @@ export default function AccessoriesLibrary() {
       {/* Family filter chips — real derived counts */}
       <div className="flex flex-wrap gap-2">
         <button
-          onClick={() => setFamily(null)}
+          onClick={() => selectFamily(null)}
           className={`rounded-full border px-3 py-1.5 text-xs transition-all ${
             family === null
               ? 'border-amber-500/40 bg-amber-500/10 text-amber-500'
@@ -156,7 +241,7 @@ export default function AccessoriesLibrary() {
         {familyList.map((fam) => (
           <button
             key={fam.key}
-            onClick={() => setFamily(fam.key === family ? null : fam.key)}
+            onClick={() => selectFamily(fam.key === family ? null : fam.key)}
             className={`rounded-full border px-3 py-1.5 text-xs transition-all ${
               family === fam.key
                 ? 'border-amber-500/40 bg-amber-500/10 text-amber-500'
@@ -177,7 +262,7 @@ export default function AccessoriesLibrary() {
           </label>
           <select
             value={connection ?? ''}
-            onChange={(e) => setConnection(e.target.value || null)}
+            onChange={(e) => selectConnection(e.target.value || null)}
             className="min-w-[140px] rounded-md border border-zinc-800 bg-[#111] px-3 py-2 text-xs text-zinc-300 focus:border-amber-500/40 focus:outline-none"
           >
             <option value="">
@@ -197,7 +282,7 @@ export default function AccessoriesLibrary() {
           </label>
           <select
             value={standardId ?? ''}
-            onChange={(e) => setStandardId(e.target.value || null)}
+            onChange={(e) => selectStandard(e.target.value || null)}
             className="min-w-[180px] rounded-md border border-zinc-800 bg-[#111] px-3 py-2 text-xs text-zinc-300 focus:border-amber-500/40 focus:outline-none"
           >
             <option value="">
@@ -217,17 +302,17 @@ export default function AccessoriesLibrary() {
           </label>
           <select
             value={pressureClass ?? ''}
-            onChange={(e) => setPressureClass(e.target.value || null)}
+            onChange={(e) => selectPressureClass(e.target.value || null)}
             className="min-w-[140px] rounded-md border border-zinc-800 bg-[#111] px-3 py-2 text-xs text-zinc-300 focus:border-amber-500/40 focus:outline-none"
           >
             <option value="">
               {t('tools.accessoriesLibrary.anyPressureClass', { defaultValue: 'Any class' })}
             </option>
-            {pressureClassList.map((cls) => (
-              <option key={cls} value={cls}>
+            {pressureClassList.map((pc) => (
+              <option key={pc} value={pc}>
                 {t('tools.accessoriesLibrary.classValue', {
                   defaultValue: 'Class {{value}}',
-                  value: cls,
+                  value: pc,
                 })}
               </option>
             ))}
@@ -254,18 +339,16 @@ export default function AccessoriesLibrary() {
         })}
       </p>
 
-      {/* Results grid */}
+      {/* Grid */}
       {results.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-800 bg-[#0d0d0d] px-6 py-14 text-center">
-          <div className="mb-3 rounded-full bg-zinc-800/50 p-3">
-            <SearchX className="h-6 w-6 text-zinc-600" />
-          </div>
-          <p className="text-sm text-zinc-300">
+        <div className="rounded-lg border border-dashed border-zinc-800 bg-[#0a0a0a] px-4 py-12 text-center">
+          <SearchX className="mx-auto h-8 w-8 text-zinc-700" />
+          <p className="mt-3 text-sm text-zinc-400">
             {t('tools.accessoriesLibrary.emptyTitle', { defaultValue: 'No components match' })}
           </p>
-          <p className="mt-1 max-w-sm text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-zinc-600">
             {t('tools.accessoriesLibrary.emptyHint', {
-              defaultValue: 'Try a different search term or clear the active filters.',
+              defaultValue: 'Try another search term or clear the active filters.',
             })}
           </p>
           {hasFilters && (
@@ -278,117 +361,74 @@ export default function AccessoriesLibrary() {
           )}
         </div>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {results.map((component) => (
-            <ComponentCard
-              key={component.id}
-              component={component}
-              // The routing defect: previously every entry opened the same
-              // hardcoded elbow. Each card now opens its own component.
-              onSelect={() => setSelectedAccessory(component.id)}
-            />
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {results.map((comp) => (
+            <button
+              key={comp.id}
+              onClick={() => openComponent(comp.id)}
+              className="group rounded-lg border border-zinc-800/80 bg-[#111] p-4 text-left transition-all hover:border-amber-500/30 hover:bg-[#151515]"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-zinc-100 group-hover:text-amber-500">
+                    {comp.shortName || comp.name}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-zinc-500">
+                    {titleCase(comp.family)}
+                    {comp.type ? ` · ${titleCase(comp.type)}` : ''}
+                  </p>
+                </div>
+                <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-zinc-700 transition-colors group-hover:text-amber-500" />
+              </div>
+
+              {/* Render thumbnail — 3D asset as-is on dark ground. */}
+              {comp.render && (
+                <div className="mt-3 flex h-28 items-center justify-center overflow-hidden rounded-md border border-zinc-800/60 bg-[#151515]">
+                  <img
+                    src={comp.render}
+                    alt={comp.name}
+                    loading="lazy"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              )}
+
+              <div className="mt-3 space-y-1.5 text-[11px] text-zinc-500">
+                {comp.connectionTypes.length > 0 && (
+                  <p className="truncate">
+                    <span className="text-zinc-600">
+                      {t('tools.accessoriesLibrary.connection', { defaultValue: 'Connection' })}:{' '}
+                    </span>
+                    {comp.connectionTypes.map(titleCase).join(', ')}
+                  </p>
+                )}
+                {comp.standards.length > 0 && (
+                  <p className="truncate">
+                    <span className="text-zinc-600">
+                      {t('tools.accessoriesLibrary.standard', { defaultValue: 'Standard' })}:{' '}
+                    </span>
+                    {standardCodes(comp).join(' · ')}
+                  </p>
+                )}
+                {comp.pressureRatings.length > 0 && (
+                  <p className="truncate">
+                    {t('tools.accessoriesLibrary.cardClasses', {
+                      defaultValue: 'Class {{list}}',
+                      list: comp.pressureRatings.join(', '),
+                    })}
+                  </p>
+                )}
+                <p>
+                  {t('tools.accessoriesLibrary.sizesDrawn', {
+                    defaultValue: '{{count}} sizes drawn',
+                    count: comp.drawings.length,
+                  })}
+                </p>
+              </div>
+            </button>
           ))}
         </div>
       )}
     </div>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   Result card
-   ───────────────────────────────────────────── */
-
-function ComponentCard({
-  component,
-  onSelect,
-}: {
-  component: CatalogComponent;
-  onSelect: () => void;
-}) {
-  const { t } = useTranslation();
-  const codes = standardCodes(component);
-
-  return (
-    <button
-      onClick={onSelect}
-      className="group flex flex-col overflow-hidden rounded-lg border border-zinc-800/80 bg-[#0d0d0d] text-left transition-all hover:border-amber-500/30 hover:bg-[#111]"
-    >
-      {/* 3D render — the asset has a #303131 studio background baked in, so the
-          frame uses the same tone and the render reads as one continuous
-          surface instead of a lighter box on a darker card. */}
-      <div className="flex aspect-[4/3] items-center justify-center overflow-hidden bg-[#303131]">
-        {component.render ? (
-          <img
-            src={component.render}
-            alt={component.name}
-            loading="lazy"
-            className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <span className="text-xs text-zinc-600">—</span>
-        )}
-      </div>
-
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <div className="flex items-start justify-between gap-2">
-          <p className="text-sm font-medium leading-snug text-zinc-100">{component.name}</p>
-          <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-zinc-600 transition-colors group-hover:text-amber-500" />
-        </div>
-
-        {component.type && (
-          <p className="text-xs text-zinc-500">{titleCase(component.type)}</p>
-        )}
-
-        {/* Connection types */}
-        {component.connectionTypes.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {component.connectionTypes.map((conn) => (
-              <span
-                key={conn}
-                className="rounded border border-zinc-800/60 bg-[#0a0a0a] px-1.5 py-0.5 text-[10px] text-zinc-400"
-              >
-                {titleCase(conn)}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Standard codes */}
-        {codes.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {codes.map((code) => (
-              <span
-                key={code}
-                className="rounded border border-amber-500/20 bg-amber-500/5 px-1.5 py-0.5 font-mono text-[10px] text-amber-500/90"
-              >
-                {code}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Pressure classes, or the reason there are none. */}
-        <p className="text-[11px] text-zinc-500">
-          {component.pressureRatings.length > 0
-            ? t('tools.accessoriesLibrary.cardClasses', {
-                defaultValue: 'Class {{list}}',
-                list: component.pressureRatings.join(' · '),
-              })
-            : component.ratingBasis === 'wall_thickness'
-              ? t('tools.accessoriesLibrary.cardBySchedule', {
-                  defaultValue: 'Rating by schedule',
-                })
-              : ''}
-        </p>
-
-        {/* Number of sizes actually drawn */}
-        <p className="mt-auto pt-1 text-[11px] text-zinc-500">
-          {t('tools.accessoriesLibrary.sizesDrawn', {
-            defaultValue: '{{count}} sizes drawn',
-            count: component.drawings.length,
-          })}
-        </p>
-      </div>
-    </button>
   );
 }

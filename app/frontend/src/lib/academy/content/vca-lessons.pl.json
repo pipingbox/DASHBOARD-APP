@@ -1,0 +1,1312 @@
+{
+  "1": {
+    "sections": [
+      {
+        "title": "Przegląd przepisów o bezpieczeństwie i higienie pracy",
+        "paragraphs": [
+          "Przepisy dotyczące bezpieczeństwa i higieny pracy (BHP), znane w Holandii również jako przepisy ARBO, określają prawa i obowiązki zarówno pracodawców, jak i pracowników w zakresie bezpieczeństwa i zdrowia na stanowisku pracy.",
+          "Przepisy obowiązują we WSZYSTKICH miejscach, w których wykonywana jest praca, i dotyczą w równym stopniu pracodawców oraz pracowników."
+        ],
+        "bullets": [
+          "ARBO = warunki pracy (bezpieczeństwo i higiena pracy)",
+          "Zakres: zdrowie, bezpieczeństwo i dobrostan pracownika",
+          "Obowiązują w każdym miejscu pracy bez wyjątku",
+          "Obowiązki ciążą zarówno na pracodawcy, jak i na pracowniku"
+        ]
+      },
+      {
+        "title": "Podstawowe zasady przepisów BHP",
+        "paragraphs": [
+          "Przepisy opierają się na kilku podstawowych założeniach, które zapewniają kompleksowe bezpieczeństwo w miejscu pracy."
+        ],
+        "bullets": [
+          "Wsparcie ze strony specjalistów lub służb (pracowników służby prewencji)",
+          "Współpraca pomiędzy kilkoma pracodawcami na jednym obiekcie",
+          "Konsultacje i współpraca z przedstawicielami pracowników",
+          "Inwentaryzacja i ocena ryzyka (RI&E) jest obowiązkowa"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Przepisy BHP NIE dotyczą ochrony obiektu (Security) — obejmują wyłącznie zdrowie, bezpieczeństwo i dobrostan pracownika."
+        }
+      },
+      {
+        "title": "Inspekcja pracy",
+        "paragraphs": [
+          "Inspekcja pracy (służba kontrolna) nadzoruje przestrzeganie przepisów BHP i posiada szerokie uprawnienia egzekucyjne."
+        ],
+        "bullets": [
+          "Może wydać zakaz wykonywania pracy (wstrzymanie robót)",
+          "Może nakładać kary pieniężne za naruszenia",
+          "Może prowadzić kontrole i dochodzenia w firmach",
+          "Nie może zwalniać pracowników — to należy do pracodawcy"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Służba kontrolna może natychmiast WSTRZYMAĆ pracę, jeżeli występuje poważne zagrożenie dla pracowników."
+        }
+      },
+      {
+        "title": "Oznakowanie CE i czas pracy",
+        "paragraphs": [
+          "Oznakowanie CE wskazuje, że wyrób spełnia minimalne wymagania europejskie. Musi zostać naniesione przez producenta lub importera.",
+          "Przepisy o czasie pracy określają maksymalny czas pracy i minimalny czas odpoczynku, aby nie dopuścić do zagrożenia bezpieczeństwa i zdrowia, a także wspierają możliwość łączenia pracy z obowiązkami opiekuńczymi."
+        ],
+        "bullets": [
+          "Oznakowanie CE = minimalne europejskie wymagania bezpieczeństwa",
+          "Musi znajdować się na każdym urządzeniu wprowadzanym do obrotu i użytkowanym",
+          "Przepisy o czasie pracy chronią przed przepracowaniem",
+          "Wspierają równowagę między pracą a życiem prywatnym"
+        ]
+      }
+    ]
+  },
+  "2": {
+    "sections": [
+      {
+        "title": "Czym jest ryzyko",
+        "paragraphs": [
+          "Ryzyko definiuje się jako połączenie prawdopodobieństwa i skutku. Ten wzór pozwala oszacować zagrożenia w miejscu pracy i ustalić ich kolejność ważności."
+        ],
+        "bullets": [
+          "Ryzyko = prawdopodobieństwo x skutek",
+          "Większe prawdopodobieństwo LUB większy skutek = wyższe ryzyko",
+          "Ocena ryzyka pomaga ustalić priorytety środków bezpieczeństwa",
+          "Na ryzyko wpływają zarówno stany niebezpieczne, jak i niebezpieczne zachowania"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Ryzyko = prawdopodobieństwo x skutek. To podstawowy wzór stosowany we wszystkich ocenach ryzyka w bezpieczeństwie pracy."
+        }
+      },
+      {
+        "title": "Źródła zagrożeń",
+        "paragraphs": [
+          "Zagrożenia w miejscu pracy pochodzą z wielu źródeł, w tym z urządzeń, substancji i zachowania ludzi. Problemy domowe NIE są traktowane jako źródło zagrożenia w miejscu pracy."
+        ],
+        "bullets": [
+          "Urządzenia i maszyny",
+          "Substancje niebezpieczne",
+          "Hałas i promieniowanie",
+          "Metody pracy i procedury",
+          "Zachowanie człowieka w pracy"
+        ]
+      },
+      {
+        "title": "Metody profilaktyki",
+        "paragraphs": [
+          "Profilaktykę można prowadzić, zapobiegając zarówno stanom niebezpiecznym, JAK I niebezpiecznym zachowaniom. Najlepszym sposobem postępowania ze stanem niebezpiecznym jest całkowite usunięcie jego przyczyny."
+        ],
+        "bullets": [
+          "Usunąć zagrożenie u źródła",
+          "Stosować środki ochrony zbiorowej",
+          "Stosować środki ochrony indywidualnej (ŚOI)",
+          "Zapewnić informację i szkolenie"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Stan niebezpieczny to sytuacja, w której praca jest wykonywana BEZ spełnienia warunków bezpiecznej pracy, co może doprowadzić do wypadku."
+        }
+      },
+      {
+        "title": "RI&E i LMRA",
+        "paragraphs": [
+          "Inwentaryzacja i ocena ryzyka (RI&E) obejmuje trzy etapy: 1) identyfikację zagrożeń, 2) sporządzenie wykazu ryzyk, 3) ocenę ryzyk. LMRA oznacza analizę ryzyka wykonywaną w ostatniej chwili — szybką kontrolę bezpieczeństwa przed rozpoczęciem pracy."
+        ],
+        "bullets": [
+          "RI&E: systematyczna ocena ryzyka na stanowisku pracy",
+          "LMRA: analiza ryzyka w ostatniej chwili przed każdym zadaniem",
+          "Planowanie pracy określa bezpieczne metody wykonania",
+          "Oba narzędzia są niezbędne w profilaktyce"
+        ]
+      }
+    ]
+  },
+  "3": {
+    "sections": [
+      {
+        "title": "Przyczyny wypadków",
+        "paragraphs": [
+          "Według Lateinera w wypadkach odgrywają rolę trzy czynniki: uwarunkowania podstawowe, błąd człowieka oraz stany i działania niebezpieczne. Dwiema bezpośrednimi przyczynami są niebezpieczne zachowania i stany niebezpieczne."
+        ],
+        "bullets": [
+          "Czynniki podstawowe (organizacyjne, osobowe)",
+          "Błąd człowieka (czynniki związane z osobą)",
+          "Stany niebezpieczne (warunki otoczenia)",
+          "Niebezpieczne zachowania (czynniki behawioralne)"
+        ]
+      },
+      {
+        "title": "Czynniki związane z osobą",
+        "paragraphs": [
+          "Do czynników związanych z osobą, które mogą prowadzić do zdarzeń, należą niedostateczna uwaga i niedostateczne doświadczenie. Niedostateczne planowanie NIE jest czynnikiem osobowym — jest czynnikiem organizacyjnym."
+        ],
+        "bullets": [
+          "Niedostateczna uwaga lub koncentracja",
+          "Niedostateczne doświadczenie lub przeszkolenie",
+          "Ograniczenia fizyczne",
+          "Zmęczenie lub choroba"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Niedostateczne PLANOWANIE jest czynnikiem organizacyjnym, a nie czynnikiem związanym z osobą."
+        }
+      },
+      {
+        "title": "Zgłaszanie i badanie zdarzeń",
+        "paragraphs": [
+          "Wszystkie wypadki i zdarzenia potencjalnie wypadkowe muszą być rejestrowane. Wypadki należy zgłaszać bezpośredniemu przełożonemu. Za badanie wypadków odpowiada firma korzystająca z pracy (pracodawca użytkownik)."
+        ],
+        "bullets": [
+          "Zgłaszać bezpośredniemu przełożonemu",
+          "Rejestrować WSZYSTKIE wypadki i zdarzenia potencjalnie wypadkowe",
+          "Raport końcowy musi zawierać: analizę, wnioski, zalecenia",
+          "Badanie ustala przyczyny źródłowe na potrzeby profilaktyki"
+        ]
+      },
+      {
+        "title": "Środki profilaktyczne",
+        "paragraphs": [
+          "Opracowanie procedur postępowania w razie wypadku jest środkiem z zakresu organizacji. Środki profilaktyczne obejmują trzy obszary: otoczenie, organizację i człowieka."
+        ],
+        "bullets": [
+          "Środki organizacyjne: procedury, szkolenia",
+          "Środki dotyczące otoczenia: rozwiązania techniczne",
+          "Środki dotyczące człowieka: świadomość, kompetencje",
+          "Ciągłe doskonalenie na podstawie ustaleń z badania zdarzeń"
+        ]
+      }
+    ]
+  },
+  "4": {
+    "sections": [
+      {
+        "title": "Przyczyny niebezpiecznych zachowań",
+        "paragraphs": [
+          "Niebezpieczne zachowania mają rozpoznawalne przyczyny, w tym brak dawania dobrego przykładu oraz niechęć. Dobrze sformułowane cele NIE są przyczyną niebezpiecznych zachowań — wręcz przeciwnie, sprzyjają bezpieczeństwu."
+        ],
+        "bullets": [
+          "Brak dawania dobrego przykładu (słabe przywództwo)",
+          "Niechęć (brak woli bezpiecznej pracy)",
+          "Nieumiejętność (brak wiedzy, jak wykonać pracę)",
+          "Brak świadomości zagrożeń"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Dobrze sformułowane cele SPRZYJAJĄ bezpiecznym zachowaniom — nie są przyczyną niebezpiecznych zachowań."
+        }
+      },
+      {
+        "title": "Rola przełożonego",
+        "paragraphs": [
+          "Przełożony ma kluczowe znaczenie dla bezpieczeństwa, ponieważ posiada niezbędne informacje o pracownikach, o pracy i o warunkach jej wykonywania. Jasność co do priorytetu bezpiecznej pracy jest tym elementem polityki, który najsilniej wpływa na zachowanie."
+        ],
+        "bullets": [
+          "Posiada informacje o pracownikach, pracy i warunkach jej wykonywania",
+          "Daje przykład bezpiecznej pracy",
+          "Zapewnia jasność co do priorytetów bezpieczeństwa",
+          "Nadzoruje i koryguje niebezpieczne zachowania"
+        ]
+      },
+      {
+        "title": "Zasady bezpiecznego zachowania",
+        "paragraphs": [
+          "Krytyczne podejście do samego siebie jest ogólną zasadą bezpiecznej pracy. Należy myśleć zarówno o własnym bezpieczeństwie, JAK I o bezpieczeństwie innych osób."
+        ],
+        "bullets": [
+          "Podchodź krytycznie do siebie samego",
+          "Myśl także o bezpieczeństwie innych",
+          "Natychmiast zgłaszaj stany niebezpieczne",
+          "Reaguj, gdy widzisz niebezpieczne działania",
+          "Dbaj o higienę osobistą, porządek i czystość"
+        ]
+      },
+      {
+        "title": "Alkohol i narkotyki",
+        "paragraphs": [
+          "Alkohol i narkotyki powodują obniżoną lub zaburzoną zdolność do pracy. W przypadku przewlekłego, problemowego używania oczekuje się szukania pomocy."
+        ],
+        "bullets": [
+          "Powodują obniżenie koncentracji i zdolności oceny sytuacji",
+          "Zerowa tolerancja w miejscu pracy",
+          "Szukaj pomocy w przypadku przewlekłego, problemowego używania",
+          "Informuj przełożonego o wszelkich problemach"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Alkohol i narkotyki powodują OBNIŻONĄ lub ZABURZONĄ zdolność do pracy. Nigdy nie pracuj pod ich wpływem."
+        }
+      }
+    ]
+  },
+  "5": {
+    "sections": [
+      {
+        "title": "Obowiązki pracodawcy",
+        "paragraphs": [
+          "Pracodawca musi zapewnić informację i instruktaż dotyczące zagrożeń występujących w pracy. Jest to podstawowy obowiązek wynikający z przepisów BHP."
+        ],
+        "bullets": [
+          "Informować o zagrożeniach w miejscu pracy",
+          "Zapewniać instruktaż i szkolenia",
+          "Zapewniać bezpieczne warunki pracy",
+          "Przeprowadzać inwentaryzację i ocenę ryzyka",
+          "Zapewniać środki ochrony indywidualnej"
+        ]
+      },
+      {
+        "title": "Obowiązki pracownika",
+        "paragraphs": [
+          "Pracownik musi zgłaszać kierownikowi lub przełożonemu sytuacje niebezpieczne oraz zagrożenia dla bezpieczeństwa i zdrowia. Ma również prawo przerwać pracę, jeżeli wystąpi bezpośrednie i poważne niebezpieczeństwo."
+        ],
+        "bullets": [
+          "Zgłaszać sytuacje niebezpieczne przełożonemu",
+          "Prawidłowo stosować środki ochrony indywidualnej",
+          "Przestrzegać instrukcji bezpieczeństwa",
+          "Prawo do wstrzymania pracy w razie bezpośredniego zagrożenia"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Pracownicy mają PRAWO przerwać pracę, jeżeli wystąpi bezpośrednie i poważne niebezpieczeństwo dla ludzi."
+        }
+      },
+      {
+        "title": "Rada pracownicza i SCC",
+        "paragraphs": [
+          "W konsultacjach rady pracowniczej uczestniczą przedstawiciele pracodawcy i pracowników. SCC* koncentruje się na bezpośrednim nadzorze nad bezpieczeństwem, natomiast SCC** obejmuje dodatkowo struktury bezpieczeństwa."
+        ],
+        "bullets": [
+          "Rada pracownicza: przedstawiciele pracodawcy + pracowników",
+          "SCC* = bezpośredni nadzór nad bezpieczeństwem",
+          "SCC** = nadzór nad bezpieczeństwem + struktury bezpieczeństwa",
+          "Kontrole stanowisk pracy zwiększają świadomość bezpieczeństwa"
+        ]
+      },
+      {
+        "title": "Tymczasowe stosunki pracy",
+        "paragraphs": [
+          "W pracy tymczasowej występuje trójstronna relacja pomiędzy agencją pracy tymczasowej, firmą korzystającą z pracy (pracodawcą użytkownikiem) i pracownikiem tymczasowym. Za warunki pracy odpowiada faktyczny pracodawca, czyli pracodawca użytkownik."
+        ],
+        "bullets": [
+          "Relacja trójstronna: agencja — pracodawca użytkownik — pracownik",
+          "Pracodawca użytkownik odpowiada za warunki pracy",
+          "Agencja odpowiada za ubezpieczenie od wypadków przy pracy",
+          "Wspólny obowiązek przekazywania informacji"
+        ]
+      }
+    ]
+  },
+  "6": {
+    "sections": [
+      {
+        "title": "Ogólne zasady bezpieczeństwa",
+        "paragraphs": [
+          "Ogólne zasady bezpieczeństwa muszą być utrwalone w formie pisemnej i są przeznaczone między innymi dla pracowników tymczasowych. Procedura zgłaszania pożaru należy do ogólnych zasad bezpieczeństwa."
+        ],
+        "bullets": [
+          "Muszą być utrwalone w formie pisemnej",
+          "Przeznaczone dla wszystkich pracowników, w tym personelu tymczasowego",
+          "Obejmują procedury zgłaszania pożaru",
+          "Powinny być zrozumiałe w języku ojczystym pracownika"
+        ]
+      },
+      {
+        "title": "Szczegółowe zasady bezpieczeństwa",
+        "paragraphs": [
+          "Szczegółowe zasady bezpieczeństwa dotyczą konkretnych zagrożeń, takich jak wentylacja i wchodzenie do przestrzeni zamkniętych. NIE dotyczą one przerw na posiłek."
+        ],
+        "bullets": [
+          "Dotyczą konkretnych zagrożeń",
+          "Obejmują wymagania dotyczące wentylacji",
+          "Obejmują wchodzenie do przestrzeni zamkniętych",
+          "NIE obejmują przerw na posiłek"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Szczegółowe zasady bezpieczeństwa powinny być zrozumiałe w języku ojczystym pracownika — rozumienie języka jest kluczowe dla bezpieczeństwa."
+        }
+      },
+      {
+        "title": "Zezwolenia na pracę",
+        "paragraphs": [
+          "Zezwolenie na pracę musi opisywać środki, jakie mają podjąć wystawiający zezwolenie oraz jego posiadacz. Określa ono, jakie prace będą wykonywane, gdzie i w jaki sposób — ale NIE dlaczego."
+        ],
+        "bullets": [
+          "Opisuje środki dla wystawiającego i posiadacza zezwolenia",
+          "Określa co, gdzie i w jaki sposób",
+          "NIE musi określać, dlaczego",
+          "Wymienia wszystkie wymagane środki ochrony indywidualnej",
+          "Określa środki po stronie personelu eksploatacyjnego"
+        ]
+      },
+      {
+        "title": "Kołnierze zaślepiające",
+        "paragraphs": [
+          "Kołnierz zaślepiający ma podwójne zastosowanie: odcięcie linii zasilających zbiorniki, aparaty lub instalacje ORAZ rozdzielenie odcinków rurociągu."
+        ],
+        "bullets": [
+          "Odcinanie linii zasilających",
+          "Rozdzielanie odcinków rurociągu",
+          "Kluczowy element procedur odcięcia i izolacji",
+          "Część przygotowania bezpiecznej pracy"
+        ]
+      }
+    ]
+  },
+  "7": {
+    "sections": [
+      {
+        "title": "Pracownicy zakładowej służby ratowniczej",
+        "paragraphs": [
+          "Pracownicy zakładowej służby ratowniczej (BHV) mają określone zadania, w tym gaszenie pożarów w zarodku oraz ograniczanie szkód i obrażeń."
+        ],
+        "bullets": [
+          "Gaszenie pożarów w zarodku",
+          "Ograniczanie szkód i obrażeń",
+          "Ewakuacja pracowników",
+          "Udzielanie pierwszej pomocy",
+          "Kierowanie służbami ratunkowymi"
+        ]
+      },
+      {
+        "title": "Zakładowy plan awaryjny",
+        "paragraphs": [
+          "Zakładowy plan awaryjny opisuje środki i rozwiązania przygotowane na sytuacje awaryjne. Jego celem jest ograniczenie skutków możliwych sytuacji awaryjnych."
+        ],
+        "bullets": [
+          "Opisuje przygotowane środki i rozwiązania",
+          "Ogranicza skutki sytuacji awaryjnych",
+          "Obejmuje wszystkie rodzaje sytuacji awaryjnych",
+          "Musi być regularnie ćwiczony i aktualizowany"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Do sytuacji awaryjnych należą: wypadki, pożar, wybuch, niekontrolowane uwolnienie substancji, gwałtowne zjawiska atmosferyczne, klęski żywiołowe, niepokoje społeczne oraz ataki terrorystyczne."
+        }
+      },
+      {
+        "title": "Etapy działań w sytuacji awaryjnej",
+        "paragraphs": [
+          "Działania w sytuacji awaryjnej mają określone etapy. Pierwszy alarm opisuje, w jaki sposób można zgłosić sytuację awaryjną i jakie informacje należy przekazać. Uwaga: nie istnieje etap drugiego alarmu."
+        ],
+        "bullets": [
+          "Pierwszy alarm: jak zgłaszać i co przekazać",
+          "Reagowanie: działania zespołu ratowniczego",
+          "Zakończenie: ogłaszane przez osobę upoważnioną",
+          "Przywrócenie: powrót do normalnej pracy"
+        ]
+      },
+      {
+        "title": "Ewakuacja i pierwsza pomoc",
+        "paragraphs": [
+          "Prawidłowa kolejność ewakuacji jest następująca: 1) przerwać pracę, 2) nie korzystać z wind, 3) zgłosić swoją obecność w miejscu zbiórki. Sprzęt pierwszej pomocy musi być zawsze dostępny."
+        ],
+        "bullets": [
+          "Natychmiast przerwać pracę",
+          "Nie korzystać z wind ani podnośników osobowych",
+          "Zgłosić obecność w miejscu zbiórki",
+          "Sprzęt pierwszej pomocy zawsze dostępny",
+          "Wymagani przeszkoleni członkowie służby ratowniczej"
+        ]
+      }
+    ]
+  },
+  "8": {
+    "sections": [
+      {
+        "title": "Rozpoznawanie substancji niebezpiecznych",
+        "paragraphs": [
+          "Substancje niebezpieczne to materiały stanowiące zagrożenie dla zdrowia i/lub środowiska. Oznacza się je kwadratowym znakiem ostrzegawczym, czarnym na pomarańczowym tle. Zwroty R na etykietach wskazują zagrożenia."
+        ],
+        "bullets": [
+          "Znak ostrzegawczy: czarny na pomarańczowym tle",
+          "Zwroty R = zwroty wskazujące rodzaj zagrożenia (określają zagrożenia)",
+          "Zwroty S = zwroty określające warunki bezpiecznego stosowania (środki ostrożności)",
+          "Karta charakterystyki substancji niebezpiecznej (MSDS) zawiera pełne informacje"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Zwroty R informują o ZAGROŻENIACH. Zwroty S informują o środkach BEZPIECZEŃSTWA. Liczby na rombie zagrożeń mieszczą się w zakresie od 0 do 4."
+        }
+      },
+      {
+        "title": "Tlen i wentylacja",
+        "paragraphs": [
+          "W normalnych warunkach zawartość tlenu w powietrzu wynosi 21%. Brak wentylacji może spowodować zbyt niskie stężenie tlenu, co tworzy zagrożenie uduszeniem."
+        ],
+        "bullets": [
+          "Normalny poziom tlenu: 21%",
+          "Poniżej 19%: strefa zagrożenia",
+          "Brak wentylacji obniża zawartość tlenu",
+          "Butle gazowe: biały naczółek = tlen"
+        ]
+      },
+      {
+        "title": "Tlenek węgla i azbest",
+        "paragraphs": [
+          "Tlenek węgla uniemożliwia wchłanianie tlenu do krwi. Narażenie na azbest może powodować międzybłoniaka opłucnej. Nowe zastosowanie i obróbka azbestu są NIEDOZWOLONE."
+        ],
+        "bullets": [
+          "CO: tlen nie jest już wchłaniany do krwi",
+          "Azbest: powoduje międzybłoniaka opłucnej",
+          "Występuje w pokryciach dachowych, okładzinach ścian, wymurówce pieców",
+          "NIE występuje w nowo wybudowanych domach",
+          "Nowe zastosowanie i obróbka są zabronione"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Tlenek węgla jest bezwonny i bezbarwny – nie można go wykryć bez przyrządów pomiarowych. Uniemożliwia wchłanianie tlenu do krwi."
+        }
+      },
+      {
+        "title": "Czynniki biologiczne i magazynowanie",
+        "paragraphs": [
+          "Czynniki biologiczne mogą występować w rolnictwie oraz w skażonej glebie. Szczepienia są środkiem zapobiegawczym. Butle gazowe muszą być prawidłowo zabezpieczone podczas magazynowania."
+        ],
+        "bullets": [
+          "Czynniki biologiczne: rolnictwo, skażona gleba",
+          "Szczepienia jako środek zapobiegawczy",
+          "Butle gazowe: prawidłowo zabezpieczyć",
+          "Rozpuszczalniki organiczne: łatwopalne / wysoce łatwopalne",
+          "Wycieki: profesjonalne usunięcie rozlanego produktu"
+        ]
+      }
+    ]
+  },
+  "9": {
+    "sections": [
+      {
+        "title": "Podstawy procesu spalania",
+        "paragraphs": [
+          "Do powstania pożaru potrzebny jest materiał palny, tlen oraz źródło zapłonu. Substancja palna jest niezbędna do pożaru lub wybuchu. Nadmiar tlenu ułatwia zapłon substancji palnych."
+        ],
+        "bullets": [
+          "Materiał palny: substancja, która się spala",
+          "Tlen: zwykle 21% w powietrzu",
+          "Źródło zapłonu: iskra, płomień, ciepło",
+          "Nadmiar tlenu = łatwiejszy zapłon"
+        ]
+      },
+      {
+        "title": "Grupy pożarów",
+        "table": {
+          "headers": [
+            "Grupa",
+            "Materiały",
+            "Przykłady"
+          ],
+          "rows": [
+            [
+              "A",
+              "Materiały stałe",
+              "Drewno, papier, tworzywa sztuczne, tekstylia"
+            ],
+            [
+              "B",
+              "Ciecze",
+              "Benzyna, olej, alkohol, farba"
+            ],
+            [
+              "C",
+              "Gazy",
+              "Metan, propan, butan, acetylen"
+            ],
+            [
+              "D",
+              "Metale",
+              "Magnez, aluminium, sód"
+            ]
+          ]
+        },
+        "callout": {
+          "type": "danger",
+          "text": "NIGDY nie gasić wodą pożarów grupy B (cieczy)! Palące się ciecze rozpryskują się i pływają po powierzchni wody, rozprzestrzeniając pożar."
+        }
+      },
+      {
+        "title": "Wybuchy i temperatura zapłonu",
+        "paragraphs": [
+          "Wybuch to bardzo szybko rozwijający się pożar, który uwalnia falę ciśnienia. Granica wybuchowości to najwyższe lub najniższe stężenie gazu w powietrzu, przy którym może dojść do wybuchu. Temperatura zapłonu to najniższa temperatura cieczy, przy której możliwy jest zapłon jej par."
+        ],
+        "bullets": [
+          "Wybuch = gwałtowny pożar + fala ciśnienia",
+          "Granica wybuchowości: graniczne stężenia gazu",
+          "Temperatura zapłonu: najniższa temperatura zapłonu par cieczy",
+          "Znak Ex oznacza strefę zagrożenia wybuchem"
+        ]
+      },
+      {
+        "title": "Metody gaszenia",
+        "paragraphs": [
+          "Po wykryciu pożaru należy go najpierw zgłosić. Koce gaśnicze odcinają dostęp tlenu. Dwutlenek węgla wypiera tlen, ale może wytworzyć atmosferę duszącą i powodować odmrożenia. Piasek odcina dostęp tlenu. Przy opatrywaniu oparzeń należy chłodzić wodą co najmniej 15 minut."
+        ],
+        "bullets": [
+          "Pierwsza czynność: ZGŁOSIĆ pożar",
+          "Koce gaśnicze: odcinają dostęp tlenu",
+          "CO2: wypiera tlen (ryzyko uduszenia + odmrożenia)",
+          "Piasek: odcina dostęp tlenu",
+          "Oparzenia: chłodzić minimum 15 minut",
+          "Nadzór przy pracach gorących wymaga specjalnego szkolenia"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Przy opatrywaniu oparzeń: chłodzić wodą przez co najmniej 15 MINUT. Nie 5, nie 10 – minimum piętnaście minut."
+        }
+      }
+    ]
+  },
+  "10": {
+    "sections": [
+      {
+        "title": "Bezpieczeństwo przy narzędziach ręcznych",
+        "paragraphs": [
+          "Przecinaki nie mogą mieć zadziorów na krawędzi skrawającej. Młotki muszą mieć trzonek pewnie zaklinowany w obuchu. Podczas pracy nożem nie należy wysuwać wymiennego ostrza zbyt daleko."
+        ],
+        "bullets": [
+          "Przecinaki: brak zadziorów na krawędzi skrawającej",
+          "Młotki: trzonek pewnie zaklinowany w obuchu",
+          "Noże: nie wysuwać ostrza zbyt daleko",
+          "Piły: brzeszczot musi być dobrze naprężony",
+          "Małe elementy obrabiane: muszą być zamocowane w uchwycie"
+        ]
+      },
+      {
+        "title": "Elektronarzędzia i maszyny",
+        "paragraphs": [
+          "Ręczne narzędzia elektryczne na 230 V muszą mieć podwójną izolację. Wyłącznik czuwakowy natychmiast zatrzymuje maszynę po zwolnieniu uchwytu. Wyłącznik awaryjny zapewnia najszybszy sposób zatrzymania maszyny."
+        ],
+        "bullets": [
+          "Narzędzia 230 V: muszą mieć podwójną izolację",
+          "Wyłącznik czuwakowy: zatrzymuje po zwolnieniu",
+          "Wyłącznik awaryjny: najszybszy sposób zatrzymania",
+          "Dla wszystkich maszyn wymagane okresowe przeglądy",
+          "Nigdy nie zakładać rękawic przy częściach wirujących"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "NIGDY nie zakładać rękawic przy pracy z maszynami mającymi części wirujące – rękawica wraz z ręką może zostać wciągnięta w maszynę."
+        }
+      },
+      {
+        "title": "Pilarki tarczowe i szlifierki",
+        "paragraphs": [
+          "Stołowa pilarka tarczowa musi mieć osłonę tarczy zamocowaną na solidnej podstawie. Klin rozdzielczy stosuje się w ręcznej pilarce tarczowej. Tarcze szlifierskie muszą mieć oznaczoną nazwę producenta."
+        ],
+        "bullets": [
+          "Stołowa pilarka tarczowa: osłona tarczy na solidnej podstawie",
+          "Klin rozdzielczy: do ręcznej pilarki tarczowej",
+          "Tarcza szlifierska: musi mieć nazwę producenta",
+          "Pilarka łańcuchowa: wymaga specjalnych spodni i rękawic z wkładką przeciwprzecięciową",
+          "Gwoździarka/zszywacz: zabezpieczenie przed niezamierzonym wystrzeleniem"
+        ]
+      },
+      {
+        "title": "Wózki widłowe i pojazdy",
+        "paragraphs": [
+          "Wózek paletowy ma wysokość podnoszenia 20 cm. Operatorzy wózków widłowych muszą mieć potwierdzone egzaminem kwalifikacje ORAZ używać pasa bezpieczeństwa. Nie wolno zwiększać masy przeciwwagi."
+        ],
+        "bullets": [
+          "Wózek paletowy: wysokość podnoszenia 20 cm",
+          "Wózek widłowy: wymagane potwierdzone kwalifikacje + pas bezpieczeństwa",
+          "Nie wolno zwiększać masy przeciwwagi",
+          "Zakaz przewożenia osób bez specjalnego siedziska",
+          "Narzędzia pneumatyczne: po zakończeniu pracy odciąć dopływ powietrza"
+        ]
+      }
+    ]
+  },
+  "11": {
+    "sections": [
+      {
+        "title": "Zagrożenia podczas prac rozbiórkowych",
+        "paragraphs": [
+          "Prace rozbiórkowe wiążą się z wieloma zagrożeniami, w tym z niestabilnością czoła rozbiórki ORAZ wystającymi elementami konstrukcji. Oba są jednakowo niebezpieczne."
+        ],
+        "bullets": [
+          "Niestabilność czoła rozbiórki",
+          "Wystające elementy konstrukcji",
+          "Spadający gruz i materiały",
+          "Pyły i substancje niebezpieczne",
+          "Ryzyko zawalenia się konstrukcji"
+        ]
+      },
+      {
+        "title": "Środki bezpieczeństwa",
+        "paragraphs": [
+          "Podczas prac rozbiórkowych stosowanie urządzenia chroniącego przed upadkiem z wysokości jest obowiązkowe. Przy usuwaniu włókien ceramicznych nie należy używać zsypu, aby zapobiec rozprzestrzenianiu się włókien."
+        ],
+        "bullets": [
+          "Urządzenie chroniące przed upadkiem z wysokości jest obowiązkowe",
+          "Nie używać zsypu do włókien ceramicznych",
+          "Odpowiednie środki ochrony indywidualnej przez cały czas",
+          "Kontrolowana kolejność prac rozbiórkowych",
+          "Strefy zamknięte dla osób postronnych"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Przy usuwaniu włókien ceramicznych: NIE używać zsypu. Zapobiega to niebezpiecznemu rozprzestrzenianiu się włókien w powietrzu."
+        }
+      },
+      {
+        "title": "Planowanie i procedury",
+        "paragraphs": [
+          "Wszystkie prace rozbiórkowe wymagają starannego planowania, prawidłowej oceny ryzyka oraz jasnych procedur dla każdego etapu procesu rozbiórki."
+        ],
+        "bullets": [
+          "Ocena ryzyka przed rozpoczęciem prac",
+          "Zaplanowana jasna kolejność rozbiórki",
+          "Wdrożone procedury awaryjne",
+          "Regularne kontrole stabilności konstrukcji",
+          "Prawidłowe procedury postępowania z odpadami"
+        ]
+      }
+    ]
+  },
+  "12": {
+    "sections": [
+      {
+        "title": "Bezpieczeństwo przy spawaniu gazowym",
+        "paragraphs": [
+          "Przy spawaniu gazowym tlenem i acetylenem butle muszą być przechowywane w pozycji pionowej lub pod kątem co najmniej 30 stopni. Cofnięcie płomienia jest istotnym zagrożeniem przy spawaniu gazowym."
+        ],
+        "bullets": [
+          "Butle z acetylenem: pionowo lub pod kątem minimum 30 stopni",
+          "Cofnięcie płomienia jest poważnym zagrożeniem",
+          "Sprawdzić szczelność połączeń",
+          "Stosować bezpieczniki przeciwcofnięciowe",
+          "Przechowywać tlen i gaz palny oddzielnie"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Butle z acetylenem muszą być przechowywane w pozycji pionowej lub pod kątem co najmniej 30 stopni. Nigdy nie kłaść ich poziomo."
+        }
+      },
+      {
+        "title": "Spawanie elektryczne",
+        "paragraphs": [
+          "Spawanie elektryczne wymaga pełnej ochrony indywidualnej oraz kurtyn spawalniczych chroniących osoby znajdujące się w pobliżu przed promieniowaniem ultrafioletowym i podczerwonym. Poparzenie rogówki wskutek promieniowania cieplnego NIE jest zagrożeniem – natomiast olśnienie promieniowaniem podczerwonym JEST."
+        ],
+        "bullets": [
+          "Przyłbica spawalnicza, fartuch, odzież ochronna, obuwie ochronne",
+          "Kurtyny spawalnicze chroniące przed promieniowaniem UV i podczerwonym",
+          "Zagrożenie: olśnienie promieniowaniem podczerwonym",
+          "Zagrożenie: dolegliwości płucne od dymów spawalniczych",
+          "NIE jest zagrożeniem: poparzenie rogówki od promieniowania cieplnego"
+        ]
+      },
+      {
+        "title": "Procedury prac gorących",
+        "paragraphs": [
+          "Wszystkie prace spawalnicze, cięcie i wypalanie wymagają odpowiednich pozwoleń, nadzoru przeciwpożarowego oraz środków bezpieczeństwa zapobiegających pożarom i wybuchom."
+        ],
+        "bullets": [
+          "Wymagane pozwolenie na prace gorące",
+          "Nadzór przeciwpożarowy w czasie prac i po ich zakończeniu",
+          "Usunąć materiały palne ze strefy prac",
+          "Sprawdzić obecność atmosfery wybuchowej",
+          "Niezbędna odpowiednia wentylacja"
+        ]
+      }
+    ]
+  },
+  "13": {
+    "sections": [
+      {
+        "title": "Dlaczego ostrożne prowadzenie robót ziemnych jest tak ważne",
+        "paragraphs": [
+          "Ostrożne prowadzenie robót ziemnych ma istotne znaczenie dla ciągłości dostaw realizowanych przez przedsiębiorstwa sieciowe. Uszkodzenie uzbrojenia podziemnego może doprowadzić do poważnych zdarzeń."
+        ],
+        "bullets": [
+          "Ciągłość dostaw mediów",
+          "Gazociągi: ryzyko uduszenia w przypadku uszkodzenia",
+          "Kable pod napięciem: ryzyko porażenia prądem",
+          "Magistrale wodociągowe: ryzyko zalania",
+          "Kable telekomunikacyjne: przerwanie łączności"
+        ]
+      },
+      {
+        "title": "Zasady bezpiecznego wykonywania wykopów",
+        "paragraphs": [
+          "Przed rozpoczęciem wykopu położenie kabli i rurociągów należy ustalić za pomocą wykopów kontrolnych w promieniu 1,5 metra. Każde odstępstwo od zakładanego położenia oraz każde uszkodzenie należy zgłosić osobie kierującej pracami."
+        ],
+        "bullets": [
+          "Wykopy kontrolne w promieniu 1,5 m od zakładanego położenia",
+          "Natychmiastowe zgłaszanie rozbieżności i uszkodzeń",
+          "Kopanie ręczne w pobliżu znanego uzbrojenia",
+          "Stosowanie lokalizatorów kabli i rurociągów",
+          "Przestrzeganie wytycznych przedsiębiorstwa sieciowego"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Zagrożenie wybuchem NIE jest bezpośrednim ryzykiem samego wykonywania wykopu, natomiast uduszenie (gaz) i porażenie prądem (kable) SĄ ryzykiem bezpośrednim."
+        }
+      },
+      {
+        "title": "Praca w wykopach",
+        "paragraphs": [
+          "Podczas pracy w wykopie lub w jego pobliżu skuteczne rozparcie obudowy oraz odpowiednie wyprofilowanie skarp mają zasadnicze znaczenie dla zapobiegania obsypaniu się ścian."
+        ],
+        "bullets": [
+          "Wymagane skuteczne rozparcie obudowy",
+          "Prawidłowe wyprofilowanie skarp",
+          "Zabezpieczenie krawędzi dla osób pracujących powyżej",
+          "Bezpieczne drogi wejścia i wyjścia",
+          "Regularne kontrole stabilności"
+        ]
+      }
+    ]
+  },
+  "14": {
+    "sections": [
+      {
+        "title": "Wymagania prawne",
+        "paragraphs": [
+          "Od wysokości 2,5 metra pracodawca ma obowiązek zastosować wymagane prawem środki zapobiegające ryzyku upadku. Szelki bezpieczeństwa to środek, który zmniejsza zagrożenie dla każdej osoby pracującej na dachu płaskim."
+        ],
+        "bullets": [
+          "2,5 metra: wymagane środki prawne",
+          "Szelki bezpieczeństwa do pracy na dachu płaskim",
+          "Ochrona zbiorowa ma pierwszeństwo przed indywidualną",
+          "Ocena ryzyka dla wszystkich prac na wysokości"
+        ]
+      },
+      {
+        "title": "Drabiny",
+        "paragraphs": [
+          "Przed użyciem należy sprawdzić, czy drabina jest ustawiona pod kątem około 75 stopni. Drabiny służą do wykonywania drobnych czynności oraz do pokonywania różnicy wysokości. Podstawową zasadą jest zasięg pracy nie większy niż długość jednego ramienia."
+        ],
+        "bullets": [
+          "Kąt: około 75 stopni",
+          "Do drobnych czynności i pokonywania wysokości",
+          "Zasięg maksymalnie na długość jednego ramienia",
+          "Trzy punkty podparcia podczas wchodzenia",
+          "Zabezpieczenie u góry lub przytrzymanie przez drugą osobę"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Drabinę należy ustawić pod kątem około 75 stopni. Zbyt pionowo = przewrócenie się do tyłu. Zbyt płasko = ześlizgnięcie się podstawy."
+        }
+      },
+      {
+        "title": "Rusztowania",
+        "paragraphs": [
+          "Na rusztowania jezdne należy wchodzić od wewnątrz. Osoby przebywające na rusztowaniu wiszącym muszą stosować szelki bezpieczeństwa. Otwory w stropie należy w pierwszej kolejności zakrywać materiałem o odpowiedniej wytrzymałości."
+        ],
+        "bullets": [
+          "Rusztowanie jezdne: wchodzenie od wewnątrz",
+          "Rusztowanie wiszące: wymagane szelki bezpieczeństwa",
+          "Otwory w stropie: zakrycie wytrzymałym materiałem",
+          "Balustrady ochronne na wszystkich otwartych stronach",
+          "Regularna kontrola elementów rusztowania"
+        ]
+      },
+      {
+        "title": "Otwory w stropach i ścianach",
+        "paragraphs": [
+          "Do zagrożeń należy uderzenie spadającym przedmiotem oraz wpadnięcie przez otwór. Zamknięcie dużego otworu w stropie NIE jest zagrożeniem, lecz środkiem zabezpieczającym."
+        ],
+        "bullets": [
+          "Wpadnięcie przez otwór",
+          "Uderzenie przedmiotem spadającym przez otwór",
+          "Zakrywanie otworów wytrzymałym materiałem",
+          "Balustrady ochronne tam, gdzie zakrycie nie jest możliwe",
+          "Wyraźne oznakowanie wszystkich otworów"
+        ]
+      }
+    ]
+  },
+  "15": {
+    "sections": [
+      {
+        "title": "Zagrożenia podstawowe",
+        "paragraphs": [
+          "Osoba nieposiadająca kwalifikacji NIGDY nie może pracować przy instalacjach elektrycznych pod napięciem, nawet za zgodą specjalisty. Największym zagrożeniem przy przepływie prądu przez ciało jest przepływ przez serce. Porażenie prądem jest następstwem korzystania z energii elektrycznej."
+        ],
+        "bullets": [
+          "Osoby bez kwalifikacji: NIGDY przy instalacjach pod napięciem",
+          "Największe zagrożenie: przepływ prądu przez serce",
+          "Brak uziemienia jest przyczyną wypadków",
+          "O rozmiarze urazu decydują natężenie prądu i czas przepływu",
+          "Grubość skóry NIE ma wpływu na rozmiar urazu"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Osoba nieposiadająca kwalifikacji NIGDY nie może pracować przy instalacjach elektrycznych pod napięciem — nawet za zgodą specjalisty."
+        }
+      },
+      {
+        "title": "Napięcia bezpieczne",
+        "table": {
+          "headers": [
+            "Rodzaj",
+            "Maksymalne napięcie bezpieczne",
+            "Zastosowanie"
+          ],
+          "rows": [
+            [
+              "Prąd stały",
+              "120V",
+              "Przestrzenie zamknięte"
+            ],
+            [
+              "Prąd przemienny",
+              "50V",
+              "Przestrzenie zamknięte"
+            ],
+            [
+              "Wyłącznik różnicowoprądowy",
+              "30 mA",
+              "Place budowy"
+            ]
+          ]
+        },
+        "callout": {
+          "type": "info",
+          "text": "W przestrzeniach zamkniętych: maks. 120V prądu stałego lub maks. 50V prądu przemiennego. Rozdzielnice budowlane wymagają zabezpieczenia różnicowoprądowego 30 mA."
+        }
+      },
+      {
+        "title": "Elektryczność statyczna i zwarcia",
+        "paragraphs": [
+          "Zwarcie powstaje, gdy dwie części o różnym napięciu zetkną się bezpośrednio. Zagrożenia związane z elektrycznością statyczną to iskrzenie oraz uszkodzenie urządzeń elektronicznych. Do pracy w warunkach występowania elektryczności statycznej stosuje się obuwie antystatyczne."
+        ],
+        "bullets": [
+          "Zwarcie: zetknięcie się części o różnym napięciu",
+          "Elektryczność statyczna: iskry i uszkodzenie urządzeń",
+          "Obuwie antystatyczne do pracy z elektrycznością statyczną",
+          "Elektryczność statyczna NIE powstaje w pomieszczeniach o niskiej zawartości tlenu",
+          "Przedłużacze bębnowe: zawsze rozwijać do końca"
+        ]
+      },
+      {
+        "title": "Bezpieczeństwo kabli i sprzętu",
+        "paragraphs": [
+          "Przedłużacze bębnowe należy całkowicie rozwinąć, aby zapobiec przegrzaniu i pożarowi. Kable zasilające mogą zostać przeciążone. Przed każdym użyciem należy sprawdzić sprzęt wzrokowo i zgłaszać uszkodzenia."
+        ],
+        "bullets": [
+          "Całkowite rozwinięcie przedłużacza bębnowego (ryzyko pożaru)",
+          "Przeciążenie to główne zagrożenie dla kabli",
+          "Kontrola wzrokowa przed każdym użyciem",
+          "Zgłaszać uszkodzenia — nie używać sprzętu",
+          "Rusztowanie musi być uziemione"
+        ]
+      }
+    ]
+  },
+  "16": {
+    "sections": [
+      {
+        "title": "Czym jest przestrzeń zamknięta?",
+        "paragraphs": [
+          "Przestrzeń zamknięta charakteryzuje się między innymi wystarczającą powierzchnią roboczą, ale słabą wentylacją i ograniczonym dostępem. Przykładami są zbiorniki magazynowe, zbiorniki procesowe oraz namioty spawalnicze w pobliżu głębokich wykopów."
+        ],
+        "bullets": [
+          "Ograniczone wejście i wyjście",
+          "Słaba wentylacja naturalna",
+          "Nieprzeznaczona do stałego przebywania ludzi",
+          "Przykłady: zbiorniki procesowe, zbiorniki magazynowe, silosy, kanały",
+          "To NIE tylko przestrzenie wąskie, małe lub wilgotne"
+        ]
+      },
+      {
+        "title": "Zagrożenia i pomiary",
+        "paragraphs": [
+          "Uduszenie następuje wskutek niewystarczającego stężenia tlenu. Pomiary musi wykonywać osoba posiadająca odpowiednie kwalifikacje, a nie przełożony ani pracownik przebywający w tej przestrzeni."
+        ],
+        "bullets": [
+          "Uduszenie: niewystarczająca ilość tlenu (poniżej 19%)",
+          "Pomiary wyłącznie przez osobę o odpowiednich kwalifikacjach",
+          "Kontrola tlenu, gazów palnych i gazów toksycznych",
+          "Ciągły monitoring w czasie pracy",
+          "Napięcie bezpieczne: 120V prądu stałego w przestrzeniach zamkniętych"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Zagrożenie uduszeniem: powodowane NIEWYSTARCZAJĄCYM stężeniem tlenu. Podwyższone stężenie tlenu stanowi ryzyko pożaru, a nie uduszenia."
+        }
+      },
+      {
+        "title": "Asekurujący przy włazie i nadzór",
+        "paragraphs": [
+          "Asekurujący przy włazie jest obowiązkowy przez cały czas, gdy ktokolwiek przebywa w przestrzeni zamkniętej. Osoba stale asekurująca musi posiadać wiedzę fachową potwierdzoną sprawdzeniem. Czas przebywania powinien być możliwie najkrótszy."
+        ],
+        "bullets": [
+          "Asekurujący przy włazie: obowiązkowy przez cały czas",
+          "Asekurujący: wymagana potwierdzona wiedza fachowa",
+          "Czas przebywania możliwie najkrótszy",
+          "Powiadomienie służb ratowniczych w razie zagrożenia",
+          "Stała łączność utrzymywana przez cały czas"
+        ]
+      },
+      {
+        "title": "Bezpieczeństwo elektryczne w przestrzeniach zamkniętych",
+        "paragraphs": [
+          "Napięcie bezpieczne w przestrzeniach zamkniętych o ścianach przewodzących wynosi 120V prądu stałego. Sprzęt należy prawidłowo odłączyć od zasilania oraz stosować napięcia bezpieczne."
+        ],
+        "bullets": [
+          "Maksymalnie 120V prądu stałego w przestrzeniach przewodzących",
+          "Maksymalnie 50V prądu przemiennego",
+          "Prawidłowe odłączenie zasilania przed wejściem",
+          "Stosowanie narzędzi akumulatorowych, gdy to możliwe",
+          "Niezbędne zabezpieczenie różnicowoprądowe"
+        ]
+      }
+    ]
+  },
+  "17": {
+    "sections": [
+      {
+        "title": "Urządzenia dźwignicowe",
+        "paragraphs": [
+          "Urządzenia dźwignicowe umożliwiają przemieszczanie ładunków zarówno w pionie, jak i w poziomie. Przykładami są żurawie wieżowe i suwnice pomostowe. Wózek paletowy NIE jest urządzeniem dźwignicowym."
+        ],
+        "bullets": [
+          "Żurawie wieżowe",
+          "Suwnice pomostowe (dźwignice natorowe)",
+          "Żurawie samojezdne",
+          "NIE wózki paletowe",
+          "Przemieszczanie ładunków w pionie ORAZ w poziomie"
+        ]
+      },
+      {
+        "title": "Zawiesia i osprzęt do podnoszenia",
+        "paragraphs": [
+          "Pas nośny stanowi osprzęt do podnoszenia. Dwa zawiesia zamocowane na stalowym pierścieniu tworzą zawiesie dwucięgnowe. Lin stalowych nie wolno wiązać w węzły i nie należy ich używać, gdy są silnie skorodowane."
+        ],
+        "bullets": [
+          "Pas nośny = osprzęt do podnoszenia",
+          "Zawiesie dwucięgnowe: 2 zawiesia na stalowym pierścieniu",
+          "Liny stalowe: nigdy nie wiązać w węzły",
+          "Łańcuchy: stosować ochraniacze na ostrych krawędziach",
+          "Książka dźwignicy: rejestr wszystkich przeglądów"
+        ]
+      },
+      {
+        "title": "Środki bezpieczeństwa",
+        "paragraphs": [
+          "Do zagrożeń ogólnych należy upadek ładunku oraz przewrócenie się urządzenia dźwignicowego. W urządzeniach dźwignicowych stosuje się podpory stabilizujące, aby zapobiec przewróceniu. Prace należy przerwać przy sile wiatru powyżej 5 w skali Beauforta."
+        ],
+        "bullets": [
+          "Zagrożenia: upadek ładunku, przewrócenie się urządzenia",
+          "Podpory stabilizujące zapobiegają przewróceniu",
+          "Przerwanie prac przy sile wiatru powyżej 5",
+          "Przestrzeganie instrukcji producenta dotyczących siły wiatru",
+          "Nigdy nie przebywać pod zawieszonym ładunkiem"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Prace dźwignicowe należy przerwać przy sile wiatru powyżej 5 w skali Beauforta. Zawsze należy sprawdzić instrukcję producenta żurawia w zakresie dopuszczalnej siły wiatru."
+        }
+      }
+    ]
+  },
+  "18": {
+    "sections": [
+      {
+        "title": "Rodzaje promieniowania",
+        "paragraphs": [
+          "Promieniowanie podczerwone jest promieniowaniem niejonizującym. Promieniowanie niejonizujące jest słabsze niż promieniowanie jonizujące. Zasadnicza różnica polega na tym, że promieniowanie jonizujące może tworzyć jony w tkankach ciała."
+        ],
+        "bullets": [
+          "Jonizujące: promieniowanie rentgenowskie, gamma, jądrowe",
+          "Niejonizujące: podczerwień, UV, fale radiowe, mikrofale",
+          "Niejonizujące jest SŁABSZE niż jonizujące",
+          "Jonizujące tworzy jony w tkankach (bardziej niebezpieczne)"
+        ]
+      },
+      {
+        "title": "Środki bezpieczeństwa",
+        "paragraphs": [
+          "W przypadku promieniowania jonizującego: zachować możliwie największą odległość ORAZ wygrodzić strefę. W przypadku promieniowania niejonizującego: przestrzegać instrukcji urządzeń oraz dopuszczalnego czasu narażenia."
+        ],
+        "bullets": [
+          "Jonizujące: odległość + osłony + czas",
+          "Wygrodzenie strefy wokół źródeł promieniowania jonizującego",
+          "Niejonizujące: przestrzegać instrukcji urządzeń",
+          "Przestrzeganie ograniczeń czasu użytkowania",
+          "Badania lekarskie dla pracowników narażonych na promieniowanie jonizujące"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Pracownicy obsługujący źródła promieniowania jonizującego muszą przechodzić badania lekarskie. Nadzór nad bezpieczeństwem radiologicznym i higieną sprawuje specjalista ochrony radiologicznej."
+        }
+      },
+      {
+        "title": "Zakres odpowiedzialności",
+        "paragraphs": [
+          "Nadzór nad bezpieczeństwem radiologicznym i higieną jest zadaniem specjalisty ochrony radiologicznej, a nie przełożonego ani zespołu ratowniczego."
+        ],
+        "bullets": [
+          "Specjalista ochrony radiologicznej: nadzór nad bezpieczeństwem i higieną",
+          "Badania lekarskie: obowiązkowe dla pracowników narażonych na promieniowanie",
+          "Przełożony: dba o przestrzeganie zasad",
+          "Zespół ratowniczy: reaguje na zdarzenia radiacyjne"
+        ]
+      }
+    ]
+  },
+  "19": {
+    "sections": [
+      {
+        "title": "Warunki środowiska pracy",
+        "paragraphs": [
+          "Środowisko pracy jest określane przez drgania, oświetlenie, temperaturę i hałas. Przełożony NIE określa warunków środowiska pracy – on zarządza ludźmi."
+        ],
+        "bullets": [
+          "Drgania (miejscowe na ręce/ramiona oraz ogólne na całe ciało)",
+          "Poziomy oświetlenia",
+          "Temperatura i wilgotność",
+          "Poziomy hałasu",
+          "NIE są określane przez przełożonego"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "PRZEŁOŻONY nie określa warunków środowiska pracy. Decydują o nich czynniki fizyczne, takie jak drgania, oświetlenie i temperatura."
+        }
+      },
+      {
+        "title": "Drgania i obciążenie fizyczne",
+        "paragraphs": [
+          "Do drgań mechanicznych należą drgania miejscowe działające na ręce i ramiona, pochodzące od narzędzi mechanicznych, oraz drgania ogólne działające na całe ciało, pochodzące od pojazdów. Zakażenia skóry NIE są powodowane przez drgania. Na obciążenie fizyczne wpływa pozycja/postawa przy pracy ORAZ ruchy, które trzeba wykonywać."
+        ],
+        "bullets": [
+          "Ręce/ramiona: od ręcznych narzędzi mechanicznych",
+          "Całe ciało: od pojazdów, instalacji, podłóg",
+          "NIE są powodowane: zakażenia skóry",
+          "Obciążenie fizyczne: postawa + ruchy",
+          "Przerwy zapobiegają przeciążeniu"
+        ]
+      },
+      {
+        "title": "Ręczne podnoszenie ładunków",
+        "paragraphs": [
+          "Zalecana maksymalna masa przy ręcznym podnoszeniu wynosi 25 kg. Prawidłowa postawa: podnosić z wyprostowanymi plecami, ugiąć kolana i trzymać ładunek jak najbliżej ciała."
+        ],
+        "bullets": [
+          "Maksymalnie 25 kg przy ręcznym podnoszeniu",
+          "Wyprostowane plecy + ugięte kolana",
+          "Trzymać ładunek blisko ciała",
+          "Zaplanować podnoszenie przed rozpoczęciem",
+          "Poprosić o pomoc przy ładunkach ciężkich lub nieporęcznych"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Maksymalna masa przy ręcznym podnoszeniu: 25 kg. Zawsze podnosić z WYPROSTOWANYMI PLECAMI i UGIĘTYMI KOLANAMI, trzymając ładunek BLISKO ciała."
+        }
+      },
+      {
+        "title": "Praca w pozycji siedzącej i stojącej",
+        "paragraphs": [
+          "Optymalna pozycja siedząca obejmuje dobre podparcie ud ORAZ odciążenie barków. Zasadą jest zapewnienie optymalnej pozycji, ale regularna zmiana pozycji. Pozycja stojąca NIE jest zalecana, gdy trzeba używać sił przekraczających 30N."
+        ],
+        "bullets": [
+          "Dobre podparcie ud na siedzisku",
+          "Odciążenie barków (podpórki pod ramiona)",
+          "Regularnie zmieniać pozycję",
+          "Pozycja stojąca zalecana przy zadaniach wymagających sięgania",
+          "Pozycja stojąca NIE jest zalecana przy siłach powyżej 30N"
+        ]
+      }
+    ]
+  },
+  "20": {
+    "sections": [
+      {
+        "title": "Skutki hałasu",
+        "paragraphs": [
+          "Nadmiernie głośny hałas zwiększa ryzyko na stanowisku pracy, ponieważ zagłusza sygnały ostrzegawcze i obniża koncentrację. Narażenie na nadmierny hałas powoduje utratę koncentracji."
+        ],
+        "bullets": [
+          "Zwiększa ryzyko na stanowisku pracy",
+          "Powoduje utratę koncentracji",
+          "Zagłusza sygnały ostrzegawcze",
+          "Może powodować trwałe uszkodzenie słuchu",
+          "Mierzony w decybelach (dB)"
+        ]
+      },
+      {
+        "title": "Fizyka dźwięku",
+        "paragraphs": [
+          "Dwa jednakowe źródła dźwięku razem zwiększają poziom dźwięku o 3 dB. Podwojenie odległości daje w przybliżeniu obniżenie o 6 dB(A). O tym, czy hałas jest szkodliwy, decydują wysokość i natężenie dźwięku."
+        ],
+        "bullets": [
+          "Dwa jednakowe źródła: +3 dB",
+          "Podwojona odległość: -6 dB(A)",
+          "Czynniki szkodliwości: wysokość i natężenie dźwięku",
+          "Trwały ubytek słuchu: trudności z rozmowami telefonicznymi",
+          "Jednostka miary: decybel (dB)"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Dwa jednakowe źródła dźwięku = +3 dB. Podwojona odległość = -6 dB(A). To kluczowe liczby na egzaminie."
+        }
+      },
+      {
+        "title": "Hierarchia ograniczania hałasu",
+        "paragraphs": [
+          "Prawidłowa kolejność jest następująca: 1) ograniczenie hałasu u źródła, 2) ekranowanie źródła, 3) tłumienie drgań wywołujących hałas, 4) stosowanie ochronników słuchu. Od 80 dB(A) pracodawca musi zapewnić badanie słuchu i udostępnić ochronniki słuchu."
+        ],
+        "bullets": [
+          "1. Ograniczenie u źródła",
+          "2. Ekranowanie źródła",
+          "3. Tłumienie drgań wywołujących hałas",
+          "4. Ochronniki słuchu (ostatnia linia obrony)",
+          "Od 80 dB(A): badanie słuchu + udostępnienie ochronników",
+          "Od 85 dB(A): stosowanie ochronników słuchu obowiązkowe"
+        ]
+      }
+    ]
+  },
+  "21": {
+    "sections": [
+      {
+        "title": "Ogólne wymagania dotyczące środków ochrony indywidualnej",
+        "paragraphs": [
+          "Wszystkie środki ochrony indywidualnej muszą być badane. Metalowych hełmów ochronnych nie należy stosować w przemyśle, ponieważ mogą przewodzić prąd elektryczny. Środki ochrony indywidualnej są ostatnią linią obrony, po środkach technicznych i organizacyjnych."
+        ],
+        "bullets": [
+          "Muszą być badane i certyfikowane",
+          "Metalowe hełmy przewodzą prąd elektryczny",
+          "Ostatnia linia obrony",
+          "Muszą być właściwie dopasowane",
+          "Wymagane są regularne przeglądy"
+        ]
+      },
+      {
+        "title": "Ochrona głowy i oczu",
+        "paragraphs": [
+          "Wyposażenie wewnętrzne hełmu ochronnego pochłania uderzenia i rozkłada je na powierzchnię głowy. Gogle ochronne chronią przed rozpryskami kwasów. Tarcze spawalnicze chronią przed promieniowaniem podczerwonym, a gogle chronią przed odpryskami cząstek."
+        ],
+        "bullets": [
+          "Wyposażenie wewnętrzne hełmu: pochłania i rozkłada uderzenie",
+          "Zagrożenia dla głowy: uderzenie + spadające przedmioty",
+          "Gogle ochronne: ochrona przed rozpryskami kwasów",
+          "Tarcza spawalnicza: ochrona przed promieniowaniem podczerwonym",
+          "Okulary ochronne: ochrona przed odpryskami cząstek"
+        ]
+      },
+      {
+        "title": "Ochrona układu oddechowego i słuchu",
+        "paragraphs": [
+          "Maska z filtrem przeciwpyłowym chroni przy pracach rozbiórkowych i kuciu. Półmaska zakrywająca nos i usta chroni wyłącznie przed cząstkami, a nie przed gazami czy parami. Sprzęt izolujący (niezależny od powietrza otoczenia) jest konieczny przy wysokich lub nieznanych stężeniach albo przy zawartości tlenu poniżej 19%. Stosowanie ochronników słuchu jest obowiązkowe powyżej 85 dB(A)."
+        ],
+        "bullets": [
+          "Filtr przeciwpyłowy: prace rozbiórkowe i kucie",
+          "Półmaska na nos/usta: tylko cząstki, NIE gazy",
+          "Sprzęt izolujący: wysokie stężenia lub niska zawartość tlenu",
+          "Ochronniki słuchu: obowiązkowe powyżej 85 dB(A)",
+          "Zbyt niska zawartość tlenu = zagrożenie dla oddychania"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Półmaska zakrywająca nos i usta chroni WYŁĄCZNIE przed cząstkami. NIE chroni przed gazami ani parami. Przy zagrożeniach chemicznych stosować właściwy sprzęt ochrony układu oddechowego."
+        }
+      },
+      {
+        "title": "Ochrona ciała i ochrona przed upadkiem z wysokości",
+        "paragraphs": [
+          "Odzież ostrzegawcza sprawia, że użytkownik jest widoczny. Poślizgnięcie jest zagrożeniem dla stóp i nóg. Sprzęt chroniący przed upadkiem z wysokości, który zatrzymał upadek, NIE może być użyty ponownie."
+        ],
+        "bullets": [
+          "Odzież ostrzegawcza: widoczność",
+          "Zagrożenie poślizgnięciem: stopy i nogi",
+          "Ochrona rąk: rękawice z wydłużonym mankietem na przedramię",
+          "Ochrona przed upadkiem: nie wolno używać ponownie po zatrzymaniu upadku",
+          "Szelki bezpieczeństwa: muszą być dopasowane i wyregulowane"
+        ]
+      }
+    ]
+  },
+  "22": {
+    "sections": [
+      {
+        "title": "Kategorie znaków",
+        "paragraphs": [
+          "Znaki bezpieczeństwa są klasyfikowane według kształtu, barwy i znaczenia. Każda kategoria ma odrębny wygląd, co zapewnia natychmiastowe rozpoznanie."
+        ],
+        "table": {
+          "headers": [
+            "Rodzaj",
+            "Kształt",
+            "Barwa",
+            "Znaczenie"
+          ],
+          "rows": [
+            [
+              "Nakazu",
+              "Okrągły",
+              "Niebieski + biały symbol",
+              "Trzeba wykonać"
+            ],
+            [
+              "Ostrzegawczy",
+              "Trójkątny",
+              "Żółty + czarna obwódka/symbol",
+              "Uwaga, niebezpieczeństwo"
+            ],
+            [
+              "Zakazu",
+              "Okrągły",
+              "Biały + czerwona obwódka + czerwony ukośny pas",
+              "Nie wolno wykonywać"
+            ],
+            [
+              "Środek bezpieczeństwa",
+              "Kwadratowy/prostokątny",
+              "Zielony + biały symbol",
+              "Stan bezpieczny"
+            ],
+            [
+              "Sprzęt pożarowy",
+              "Kwadratowy/prostokątny",
+              "Czerwony + biały symbol",
+              "Miejsce sprzętu do gaszenia pożaru"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "Znaki ostrzegawcze i znaki nakazu",
+        "paragraphs": [
+          "Znaki ostrzegawcze są trójkątne, żółte, z czarną obwódką – oznaczają uwagę/niebezpieczeństwo. Znaki nakazu są okrągłe i niebieskie, z białym symbolem. Ich forma musi być zrozumiała dla wszystkich pracowników, niezależnie od języka."
+        ],
+        "bullets": [
+          "Ostrzegawczy: trójkątny, żółty, czarna obwódka = NIEBEZPIECZEŃSTWO",
+          "Nakazu: okrągły, niebieski, biały symbol = TRZEBA WYKONAĆ",
+          "Forma musi być zrozumiała dla WSZYSTKICH pracowników",
+          "Przekaz niezależny od języka",
+          "Umieszczane na wysokości oczu, gdy to możliwe"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Znaki muszą być zaprojektowane tak, aby ich znaczenie było zrozumiałe dla WSZYSTKICH pracowników – niezależnie od języka. Dlatego stosuje się piktogramy."
+        }
+      },
+      {
+        "title": "Znaki zakazu i znaki bezpieczeństwa",
+        "paragraphs": [
+          "Znak zakazu jest okrągły, biały, z czerwoną obwódką i czerwonym ukośnym pasem. Znaki środków bezpieczeństwa są kwadratowe/prostokątne, zielone, z białymi symbolami. Znaki sprzętu do gaszenia pożaru są kwadratowe/prostokątne, czerwone, z białymi symbolami."
+        ],
+        "bullets": [
+          "Zakazu: białe koło, czerwona obwódka, czerwony ukośny pas",
+          "Bezpieczeństwa/ewakuacyjne: zielony prostokąt, biały symbol",
+          "Sprzęt pożarowy: czerwony prostokąt, biały symbol",
+          "Znaki pożarowe wskazują zarówno drogę, jak i miejsce",
+          "Żółte/białe pasy: przejścia i miejsca składowania"
+        ]
+      },
+      {
+        "title": "Oznakowanie posadzek",
+        "paragraphs": [
+          "Żółte lub białe pasy stosuje się do oznakowania przejść i miejsc składowania. Pomagają one uporządkować ruch oraz wyznaczyć strefy bezpieczne na terenie zakładu."
+        ],
+        "bullets": [
+          "Żółte/białe pasy: przejścia i miejsca składowania",
+          "Utrzymywać oznakowanie widoczne i w dobrym stanie",
+          "Nie zastawiać oznakowanych powierzchni",
+          "Regularna kontrola stanu oznakowania"
+        ]
+      }
+    ]
+  }
+}

@@ -6,6 +6,7 @@
     "build": "node --experimental-strip-types ../../scripts/route-contract-guard.ts && vite build",
     "lint": "eslint --quiet ./src",
     "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit --skipLibCheck",
     "postinstall": "echo 'Dependencies installed successfully'"
   },
   "engines": {

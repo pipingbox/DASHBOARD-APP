@@ -87,6 +87,12 @@ export interface CatalogComponent {
    * prose in the YAML is the real fallback when a locale lacks the key.
    */
   ratingNoteKey: string | null;
+  /**
+   * i18n key (`catalog.valveGuide.*`) of the practical usage guide
+   * (what it is / types / when to use / installation / common error).
+   * Non-normative educational content; null on components without a guide.
+   */
+  guideKey: string | null;
   standards: CatalogStandardRef[];
   dimensionSets: string[];
   drawings: CatalogDrawing[];

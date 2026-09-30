@@ -35,6 +35,7 @@ import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useAdminFeedbackCount } from '@/hooks/useAdminFeedbackCount';
 import { PipingBoxLogo } from '@/components/PipingBoxLogo';
 import { BetaFeedbackProvider } from '@/components/beta/BetaFeedbackProvider';
+import { TranslationBetaBanner } from '@/components/beta/TranslationBetaBanner';
 
 /**
  * Navigation items for WORKER / MODERATOR views.
@@ -598,6 +599,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
 
+        <TranslationBetaBanner />
+
         <main className="min-w-0 overflow-x-hidden p-3 sm:p-4 lg:p-8">{children}</main>
 
         {/* Footer */}
@@ -611,6 +614,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span>·</span>
             <Link to="/terms" className="hover:text-zinc-400 transition">
               {t('footer.terms', { defaultValue: 'Terms of Service' })}
+            </Link>
+            <span>·</span>
+            <Link to="/legal" className="hover:text-zinc-400 transition">
+              {t('footer.legal', { defaultValue: 'Legal Notice' })}
             </Link>
             <span>·</span>
             <Link to="/dsa" className="hover:text-zinc-400 transition">

@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
@@ -7,23 +7,44 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { PipingBoxLogo } from '@/components/PipingBoxLogo';
+import { MailWarning } from 'lucide-react';
+import { CONFIRMATION_RESEND_COOLDOWN_SECONDS } from '@/lib/authFlow';
 
 export default function Login() {
   const { t } = useTranslation();
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, resendConfirmation } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [emailUnconfirmed, setEmailUnconfirmed] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = window.setInterval(() => {
+      setCooldown((seconds) => Math.max(0, seconds - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [cooldown]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signIn(email, password);
+    const { error, errorCode } = await signIn(email, password);
     setLoading(false);
     if (error) {
-      toast.error(error);
+      if (errorCode === 'email_not_confirmed') {
+        setEmailUnconfirmed(true);
+        return;
+      }
+      toast.error(
+        errorCode === 'rate_limit'
+          ? t('auth.confirmationRateLimited')
+          : t('auth.signInError'),
+      );
       return;
     }
     toast.success(t('auth.welcomeBackToast'));
@@ -35,8 +56,21 @@ export default function Login() {
     const { error } = await signInWithGoogle();
     setGoogleLoading(false);
     if (error) {
-      toast.error(error);
+      toast.error(t('auth.oauthStartError'));
     }
+  };
+
+  const handleResend = async () => {
+    if (!email || resending || cooldown > 0) return;
+    setResending(true);
+    const { errorCode } = await resendConfirmation(email);
+    setResending(false);
+    setCooldown(CONFIRMATION_RESEND_COOLDOWN_SECONDS);
+    if (errorCode === 'rate_limit') {
+      toast.error(t('auth.confirmationRateLimited'));
+      return;
+    }
+    toast.success(t('auth.confirmationResendNeutral'));
   };
 
   return (
@@ -166,6 +200,35 @@ export default function Login() {
 
           {/* Form fields */}
           <div className="space-y-5">
+            {emailUnconfirmed && (
+              <div
+                role="alert"
+                className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4"
+              >
+                <div className="flex items-start gap-3">
+                  <MailWarning className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
+                  <div>
+                    <p className="text-sm font-semibold text-amber-200">
+                      {t('auth.emailUnconfirmedTitle')}
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-zinc-300">
+                      {t('auth.emailUnconfirmedDescription')}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleResend}
+                  disabled={!email || resending || cooldown > 0}
+                  className="mt-4 h-10 w-full border-amber-500/30 bg-transparent text-amber-200 hover:bg-amber-500/10"
+                >
+                  {cooldown > 0
+                    ? t('auth.resendCountdown', { seconds: cooldown })
+                    : t('auth.resendConfirmation')}
+                </Button>
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-xs uppercase tracking-wider text-zinc-400">
                 {t('common.email')}
@@ -176,7 +239,10 @@ export default function Login() {
                 autoComplete="email"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailUnconfirmed(false);
+                }}
                 className="h-11 bg-zinc-950 border-zinc-800 focus-visible:ring-[#f59e0b] focus-visible:border-[#f59e0b]"
                 placeholder={t('auth.emailPlaceholder')}
               />

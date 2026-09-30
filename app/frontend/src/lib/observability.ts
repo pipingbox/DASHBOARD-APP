@@ -32,12 +32,33 @@ export const OBS_EVENT_NAMES = [
   'page_viewed',
   'signup_started',
   'auth_created',
+  'signup_confirmation_required',
+  'confirmation_resend_requested',
+  'confirmation_resend_succeeded',
+  'confirmation_resend_failed',
+  'email_confirmation_completed',
+  'signin_blocked_unconfirmed',
   'onboarding_started',
   'onboarding_step_reached',
   'onboarding_completed',
   'referral_link_opened',
   'referral_captured',
   'app_error',
+  // PB-LIBRARY-COMPLETE-001 — Library V1 usage (Stream B).
+  'library_viewed',
+  'library_search_performed',
+  'library_filter_selected',
+  'library_item_opened',
+  'library_resource_action',
+  'library_empty_result',
+  'library_access_error',
+  // PB-JOBS-PILOT-003 — Jobs funnel (§14–§15). Only stages with a real
+  // product state are instrumented: view → start → submit. Later stages
+  // (candidate_reviewed/forwarded/selected) have no workflow yet and are
+  // documented as a PRODUCT GAP, not invented here.
+  'job_viewed',
+  'apply_started',
+  'apply_submitted',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -47,7 +68,70 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   page_viewed: ['route', 'origin', 'locale', 'device_type'],
   signup_started: ['origin', 'account_type'],
   auth_created: ['origin', 'account_type'],
+  signup_confirmation_required: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
+  confirmation_resend_requested: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
+  confirmation_resend_succeeded: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
+  confirmation_resend_failed: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
+  email_confirmation_completed: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
+  signin_blocked_unconfirmed: [
+    'route',
+    'correlation_id',
+    'provider',
+    'status',
+    'reason_code',
+    'attempt_bucket',
+  ],
   onboarding_started: ['account_type'],
+  // PB-LIBRARY-COMPLETE-001 — Library V1 usage (Stream B). All values are
+  // catalog IDs / closed enums / counts — never user free text.
+  library_viewed: ['results_count'],
+  library_search_performed: ['query_length', 'results_count'],
+  library_filter_selected: ['filter_type', 'filter_value', 'results_count'],
+  library_item_opened: ['component_id', 'component_family'],
+  library_resource_action: ['component_id', 'resource_type'],
+  library_empty_result: ['query_length', 'filter_count'],
+  library_access_error: ['component_id', 'resource_type', 'reason_code'],
+  // PB-JOBS-PILOT-003 — Jobs funnel. job_id is a technical UUID (validated
+  // against JOB_ID_RE, kept raw like component_id); country/trade are closed
+  // job metadata, never candidate data. NO candidate identity anywhere.
+  job_viewed: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade'],
+  apply_started: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade'],
+  apply_submitted: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade'],
   onboarding_step_reached: ['step', 'account_type'],
   onboarding_completed: ['account_type'],
   referral_link_opened: ['origin', 'route'],
@@ -72,6 +156,18 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;
 export type ObsOrigin = (typeof OBS_ORIGINS)[number];
 
+/** PB-LIBRARY-COMPLETE-001 — closed enums for Library analytics props. */
+export const LIBRARY_FILTER_TYPES = ['family', 'connection_type', 'standard', 'pressure_class'] as const;
+export type LibraryFilterType = (typeof LIBRARY_FILTER_TYPES)[number];
+export const LIBRARY_RESOURCE_TYPES = ['preview_2d', 'preview_3d', 'download_2d', 'download_3d'] as const;
+export type LibraryResourceType = (typeof LIBRARY_RESOURCE_TYPES)[number];
+/** `PB-COMP-*` internal catalog id — never a filename or user text. */
+export const LIBRARY_COMPONENT_ID_RE = /^PB-COMP-[A-Z0-9-]+$/;
+
+/** PB-JOBS-PILOT-003 — technical job UUID for funnel events. Raw passthrough
+ *  like component_id: it is OUR taxonomy (a DB primary key), never PII. */
+export const JOB_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
  * SDK-internal event names allowed through `before_send` even though they sit
  * outside the 9-event functional taxonomy above. Any other event name the SDK
@@ -85,6 +181,25 @@ export const OBS_INTERNAL_SDK_EVENTS = ['$web_vitals', '$identify'] as const;
 
 const ACCOUNT_TYPES = ['worker', 'company'] as const;
 const DEVICE_TYPES = ['mobile', 'tablet', 'desktop'] as const;
+const AUTH_PROVIDERS = ['email', 'google'] as const;
+const AUTH_STATUSES = [
+  'requested',
+  'succeeded',
+  'failed',
+  'blocked',
+  'created',
+  'neutral',
+  'completed',
+] as const;
+const AUTH_REASON_CODES = [
+  'email_not_confirmed',
+  'rate_limited',
+  'invalid_callback',
+  'unknown',
+  // PB-LIBRARY-COMPLETE-001 — Library asset access failures.
+  'asset_load_failed',
+] as const;
+const AUTH_ATTEMPT_BUCKETS = ['first', 'retry'] as const;
 
 // ---------------------------------------------------------------------------
 // PII guard
@@ -186,6 +301,18 @@ const PASSTHROUGH_VALUE_KEYS = new Set([
   'app_version',
   '$browser_version',
   '$lib_version',
+  // PB-LIBRARY-COMPLETE-001 — closed Library props. Values are validated
+  // against closed enums / the PB-COMP-* id pattern by buildEventProps before
+  // this stage, and catalog ids match the long-token regex by shape (they are
+  // OUR taxonomy, not credentials) — passthrough keeps them intact.
+  'component_id',
+  'component_family',
+  'filter_type',
+  'filter_value',
+  'resource_type',
+  'reason_code',
+  // PB-JOBS-PILOT-003 — job UUID (validated against JOB_ID_RE upstream).
+  'job_id',
 ]);
 
 const ABSOLUTE_URL_RE = /https?:\/\/[^\s"'<>\\]+/gi;
@@ -570,6 +697,20 @@ export function buildEventProps(
     const raw = props[key];
     if (raw === undefined || raw === null) continue;
     if (typeof raw === 'string') {
+      // PB-LIBRARY-COMPLETE-001 — closed catalog ids (PB-COMP-*) are validated
+      // against the id pattern and kept RAW. sanitizeValue would redact ids
+      // ≥32 chars as "long tokens" before validation could accept them; they
+      // are our taxonomy by construction, never credentials or PII.
+      if (key === 'component_id' || key === 'component_family') {
+        if (LIBRARY_COMPONENT_ID_RE.test(raw)) out[key] = raw;
+        continue;
+      }
+      // PB-JOBS-PILOT-003 — job UUIDs are kept raw (technical id, our
+      // taxonomy); sanitizeValue would redact them as "long tokens".
+      if (key === 'job_id') {
+        if (JOB_ID_RE.test(raw)) out[key] = raw;
+        continue;
+      }
       out[key] = sanitizeValue(raw);
     } else if (typeof raw === 'number' || typeof raw === 'boolean') {
       out[key] = raw;
@@ -578,11 +719,44 @@ export function buildEventProps(
   }
   // Closed enums: drop values outside the approved sets.
   if ('origin' in out && !OBS_ORIGINS.includes(out.origin as ObsOrigin)) delete out.origin;
+  if ('filter_type' in out && !LIBRARY_FILTER_TYPES.includes(out.filter_type as LibraryFilterType)) {
+    delete out.filter_type;
+  }
+  if ('resource_type' in out && !LIBRARY_RESOURCE_TYPES.includes(out.resource_type as LibraryResourceType)) {
+    delete out.resource_type;
+  }
+  if ('component_id' in out && !LIBRARY_COMPONENT_ID_RE.test(String(out.component_id))) {
+    delete out.component_id;
+  }
+  if ('component_family' in out && !LIBRARY_COMPONENT_ID_RE.test(String(out.component_family))) {
+    delete out.component_family;
+  }
+  if ('job_id' in out && !JOB_ID_RE.test(String(out.job_id))) {
+    delete out.job_id;
+  }
+  if ('query_length' in out && typeof out.query_length === 'number' && (out.query_length < 0 || out.query_length > 500)) {
+    delete out.query_length;
+  }
   if ('account_type' in out && !ACCOUNT_TYPES.includes(out.account_type as never)) {
     delete out.account_type;
   }
   if ('device_type' in out && !DEVICE_TYPES.includes(out.device_type as never)) {
     delete out.device_type;
+  }
+  if ('provider' in out && !AUTH_PROVIDERS.includes(out.provider as never)) {
+    delete out.provider;
+  }
+  if ('status' in out && !AUTH_STATUSES.includes(out.status as never)) {
+    delete out.status;
+  }
+  if ('reason_code' in out && !AUTH_REASON_CODES.includes(out.reason_code as never)) {
+    delete out.reason_code;
+  }
+  if (
+    'attempt_bucket' in out &&
+    !AUTH_ATTEMPT_BUCKETS.includes(out.attempt_bucket as never)
+  ) {
+    delete out.attempt_bucket;
   }
   return out;
 }

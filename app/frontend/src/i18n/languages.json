@@ -43,5 +43,15 @@
     "code": "uk",
     "label": "Українська",
     "flag": "🇺🇦"
+  },
+  {
+    "code": "pl",
+    "label": "Polski",
+    "flag": "🇵🇱"
+  },
+  {
+    "code": "bg",
+    "label": "Български",
+    "flag": "🇧🇬"
   }
 ]

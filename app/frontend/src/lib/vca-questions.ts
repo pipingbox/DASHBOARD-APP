@@ -1,4 +1,5 @@
 import { VCA_QUESTIONS } from './academy-questions';
+import type { VCAQuestion } from './academy-types';
 
 export interface VCAQuizQuestion {
   id: number;
@@ -17,7 +18,8 @@ export interface VCAQuizQuestion {
 
 // Convert from academy-questions format to quiz format with numeric ids.
 // Only single_choice questions are used in module quizzes.
-export const QUIZ_QUESTIONS: VCAQuizQuestion[] = VCA_QUESTIONS
+export function toQuizQuestions(pool: VCAQuestion[]): VCAQuizQuestion[] {
+  return pool
   .filter(q => q.questionType === 'single_choice')
   .map((q, idx) => {
     // q is narrowed to SingleChoiceQuestion here
@@ -37,9 +39,15 @@ export const QUIZ_QUESTIONS: VCAQuizQuestion[] = VCA_QUESTIONS
       isVOLVCA: q.isVOLVCA,
     };
   });
+}
 
-export function getModuleQuestions(moduleId: number): VCAQuizQuestion[] {
-  return QUIZ_QUESTIONS.filter(q => q.moduleId === moduleId);
+export const QUIZ_QUESTIONS: VCAQuizQuestion[] = toQuizQuestions(VCA_QUESTIONS);
+
+export function getModuleQuestions(
+  moduleId: number,
+  pool: VCAQuizQuestion[] = QUIZ_QUESTIONS,
+): VCAQuizQuestion[] {
+  return pool.filter(q => q.moduleId === moduleId);
 }
 
 export function getModuleCount(): Record<number, number> {

@@ -1,0 +1,99 @@
+[
+  {
+    "id": "m6-gestion",
+    "iconKey": "ClipboardList",
+    "officialRef": "RD 39/1997 §6",
+    "hours": "8 ore",
+    "title": "Modulul 6: Managementul activității de prevenire",
+    "lessons": [
+      {
+        "title": "6.1 Evaluarea riscurilor",
+        "duration": "90 min",
+        "topics": [
+          "Metodologia de evaluare",
+          "Identificare, estimare, apreciere",
+          "Documentația",
+          "Revizuiri"
+        ]
+      },
+      {
+        "title": "6.2 Planificarea activității de prevenire",
+        "duration": "90 min",
+        "topics": [
+          "Planul de prevenire",
+          "Măsuri de prevenire",
+          "Termene și responsabili",
+          "Monitorizare"
+        ]
+      },
+      {
+        "title": "6.3 Cercetarea accidentelor",
+        "duration": "60 min",
+        "topics": [
+          "Arborele cauzelor",
+          "Colectarea informațiilor",
+          "Analiza cauzelor",
+          "Măsuri corective"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-auditorias",
+    "iconKey": "Search",
+    "officialRef": "RD 39/1997 §7",
+    "hours": "6 ore",
+    "title": "Modulul 7: Audituri și inspecții",
+    "lessons": [
+      {
+        "title": "7.1 Auditul sistemului de prevenire",
+        "duration": "90 min",
+        "topics": [
+          "Obiectul auditului",
+          "Audit obligatoriu prin lege",
+          "Audit voluntar",
+          "Raportul de audit"
+        ]
+      },
+      {
+        "title": "7.2 Inspecții de securitate",
+        "duration": "90 min",
+        "topics": [
+          "Inspecții planificate",
+          "Inspecții ale locurilor de muncă",
+          "Inspecții ale echipamentelor",
+          "Fișe de inspecție"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-cae",
+    "iconKey": "Users",
+    "officialRef": "RD 171/2004",
+    "hours": "6 ore",
+    "title": "Modulul 8: Coordonarea activităților între firme (CAE)",
+    "lessons": [
+      {
+        "title": "8.1 Obligațiile beneficiarului",
+        "duration": "90 min",
+        "topics": [
+          "RD 171/2004",
+          "Verificarea activității de prevenire a antreprenorului",
+          "Informarea privind riscurile",
+          "Coordonatorul de activități"
+        ]
+      },
+      {
+        "title": "8.2 Obligațiile antreprenorului",
+        "duration": "90 min",
+        "topics": [
+          "Respectarea regulilor unității beneficiare",
+          "Informarea lucrătorilor",
+          "Subcontractarea",
+          "Registrul de subcontractare (sectorul construcții)"
+        ]
+      }
+    ]
+  }
+]

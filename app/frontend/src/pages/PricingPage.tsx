@@ -1,13 +1,18 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { getNetPriceCents, formatNetPriceEur } from '@/lib/academy/pricing';
 
 // ENT-002: Pricing page UI (no Stripe integration yet — this is display only).
 // Plans per DEC-31 (subscription-based) and MASTER_ROADMAP ENT-002.
+// PB-MARKET-PRICING-001: prices resolve from the app_stripe_prices catalog
+// (net amounts, tax_behavior='exclusive'). No hardcoded price literals.
 
 interface Plan {
   name: string;
-  price: string;
+  productKey?: string; // catalog row; absent = Free / contact-only
+  price: string; // resolved at render from the catalog
   period: string;
   description: string;
   features: { text: string; included: boolean }[];
@@ -34,7 +39,8 @@ const PLANS: Plan[] = [
   },
   {
     name: 'Professional',
-    price: '299',
+    productKey: 'b2b_professional_monthly',
+    price: '',
     period: '/month',
     description: 'For growing companies hiring regularly',
     features: [
@@ -51,7 +57,8 @@ const PLANS: Plan[] = [
   },
   {
     name: 'Enterprise',
-    price: '799',
+    productKey: 'b2b_enterprise_monthly',
+    price: '',
     period: '/month',
     description: 'For large-scale industrial contractors',
     features: [
@@ -69,6 +76,23 @@ const PLANS: Plan[] = [
 
 export default function PricingPage() {
   const { t } = useTranslation();
+  const [prices, setPrices] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const next: Record<string, string> = {};
+      for (const plan of PLANS) {
+        if (!plan.productKey) continue;
+        const cents = await getNetPriceCents(plan.productKey);
+        if (cents != null) next[plan.productKey] = formatNetPriceEur(cents);
+      }
+      if (!cancelled) setPrices(next);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-zinc-100">
@@ -121,8 +145,10 @@ export default function PricingPage() {
               )}
               <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">{plan.name}</h3>
               <div className="mt-3 flex items-baseline gap-1">
-                {plan.price !== 'Free' && <span className="text-2xl text-zinc-500">€</span>}
-                <span className="text-4xl font-bold">{plan.price}</span>
+                {plan.productKey && <span className="text-2xl text-zinc-500">€</span>}
+                <span className="text-4xl font-bold">
+                  {plan.productKey ? (prices[plan.productKey]?.replace('€', '') ?? '…') : plan.price}
+                </span>
                 {plan.period && <span className="text-sm text-zinc-500">{plan.period}</span>}
               </div>
               <p className="mt-2 text-xs text-zinc-500">{plan.description}</p>

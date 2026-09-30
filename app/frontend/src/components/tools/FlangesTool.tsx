@@ -659,9 +659,9 @@ function FlangeDetailModal({
             </div>
             <div>
               <h3 className="text-sm font-semibold text-zinc-100">
-                {spec.typeLabel} — {spec.nps} Class 150
+                {spec.typeLabel} — {spec.nps} {t('tools.flanges.ui.classLabel', { cls: 150 })}
               </h3>
-              <p className="text-[10px] text-zinc-500">ASME B16.5-2020 | RF Facing</p>
+              <p className="text-[10px] text-zinc-500">{t('tools.flanges.ui.facingSubtitle')}</p>
             </div>
             <span className={`ml-2 px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
               spec.type === 'WN' ? 'bg-[#f97316]/20 text-[#f97316]' :
@@ -680,13 +680,13 @@ function FlangeDetailModal({
         <Tabs defaultValue="dimensions" className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-zinc-900 border-b border-zinc-800 rounded-none">
             <TabsTrigger value="dimensions" className="flex items-center gap-1.5 text-xs data-[state=active]:bg-zinc-800">
-              <Ruler className="h-3.5 w-3.5" /> Dimensions
+              <Ruler className="h-3.5 w-3.5" /> {t('tools.flanges.ui.tabDimensions')}
             </TabsTrigger>
             <TabsTrigger value="crosslink" className="flex items-center gap-1.5 text-xs data-[state=active]:bg-zinc-800">
-              <Link2 className="h-3.5 w-3.5" /> Cross-Link
+              <Link2 className="h-3.5 w-3.5" /> {t('tools.flanges.ui.tabCrossLink')}
             </TabsTrigger>
             <TabsTrigger value="notes" className="flex items-center gap-1.5 text-xs data-[state=active]:bg-zinc-800">
-              <BookOpen className="h-3.5 w-3.5" /> Notes
+              <BookOpen className="h-3.5 w-3.5" /> {t('tools.flanges.ui.tabNotesShort')}
             </TabsTrigger>
           </TabsList>
 
@@ -697,22 +697,22 @@ function FlangeDetailModal({
               <label className="flex items-center gap-1.5 text-[10px] text-zinc-400 cursor-pointer">
                 <input type="checkbox" checked={showDimensions} onChange={(e) => setShowDimensions(e.target.checked)}
                   className="rounded border-zinc-700 bg-zinc-900 text-amber-500 w-3 h-3" />
-                Cotas
+                {t('tools.flanges.ui.toggleDimensions')}
               </label>
               <label className="flex items-center gap-1.5 text-[10px] text-zinc-400 cursor-pointer">
                 <input type="checkbox" checked={showCenter} onChange={(e) => setShowCenter(e.target.checked)}
                   className="rounded border-zinc-700 bg-zinc-900 text-amber-500 w-3 h-3" />
-                Centro
+                {t('tools.flanges.ui.toggleCenter')}
               </label>
               <label className="flex items-center gap-1.5 text-[10px] text-zinc-400 cursor-pointer">
                 <input type="checkbox" checked={showBoltHoles} onChange={(e) => setShowBoltHoles(e.target.checked)}
                   className="rounded border-zinc-700 bg-zinc-900 text-amber-500 w-3 h-3" />
-                Agujeros
+                {t('tools.flanges.ui.toggleHoles')}
               </label>
               <label className="flex items-center gap-1.5 text-[10px] text-zinc-400 cursor-pointer">
                 <input type="checkbox" checked={showFill} onChange={(e) => setShowFill(e.target.checked)}
                   className="rounded border-zinc-700 bg-zinc-900 text-amber-500 w-3 h-3" />
-                Relleno
+                {t('tools.flanges.ui.toggleFill')}
               </label>
             </div>
 
@@ -729,10 +729,10 @@ function FlangeDetailModal({
 
                 {/* Labels */}
                 <text x={sideCx} y="18" fill="#a1a1aa" fontSize="9" textAnchor="middle" fontWeight="bold">
-                  VISTA LATERAL
+                  {t('tools.flanges.ui.sideView')}
                 </text>
                 <text x={frontCx} y="18" fill="#a1a1aa" fontSize="9" textAnchor="middle" fontWeight="bold">
-                  VISTA FRONTAL
+                  {t('tools.flanges.ui.frontView')}
                 </text>
 
                 {/* Side view */}
@@ -748,12 +748,12 @@ function FlangeDetailModal({
                 {/* Legend */}
                 <rect x="8" y={svgH - 50} width="180" height="42" fill="#0a0a0a90" rx="3" stroke="#27272a" strokeWidth="0.5" />
                 <circle cx="18" cy={svgH - 36} r="3" fill="#f59e0b" />
-                <text x="26" y={svgH - 34} fill="#d4d4d8" fontSize="7" dominantBaseline="middle">Cotas principales (OD, BCD)</text>
+                <text x="26" y={svgH - 34} fill="#d4d4d8" fontSize="7" dominantBaseline="middle">{t('tools.flanges.ui.legendMainDims')}</text>
                 <circle cx="18" cy={svgH - 23} r="3" fill="#22d3ee" />
-                <text x="26" y={svgH - 21} fill="#d4d4d8" fontSize="7" dominantBaseline="middle">Raised Face (RF)</text>
+                <text x="26" y={svgH - 21} fill="#d4d4d8" fontSize="7" dominantBaseline="middle">{t('tools.flanges.ui.legendRaisedFaceRf')}</text>
                 <circle cx="18" cy={svgH - 12} r="3" fill="#f97316" />
                 <text x="26" y={svgH - 10} fill="#d4d4d8" fontSize="7" dominantBaseline="middle">
-                  {spec.type === 'WN' ? 'Hub / Weld prep' : spec.type === 'SO' ? 'Fillet welds' : 'Solid body'}
+                  {spec.type === 'WN' ? t('tools.flanges.ui.legendHubWeldPrep') : spec.type === 'SO' ? t('tools.flanges.ui.legendFilletWelds') : t('tools.flanges.ui.legendSolidBody')}
                 </text>
 
                 {/* Info */}
@@ -768,71 +768,71 @@ function FlangeDetailModal({
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-zinc-800">
-                    <th className="py-1.5 px-2 text-left text-zinc-500">Dimensión</th>
-                    <th className="py-1.5 px-2 text-left text-zinc-500">Símbolo</th>
-                    <th className="py-1.5 px-2 text-right text-zinc-500">Valor</th>
-                    <th className="py-1.5 px-2 text-right text-zinc-500">Unidad</th>
+                    <th className="py-1.5 px-2 text-left text-zinc-500">{t('tools.flanges.ui.dimension')}</th>
+                    <th className="py-1.5 px-2 text-left text-zinc-500">{t('tools.flanges.symbol')}</th>
+                    <th className="py-1.5 px-2 text-right text-zinc-500">{t('tools.flanges.value')}</th>
+                    <th className="py-1.5 px-2 text-right text-zinc-500">{t('tools.flanges.unit')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b border-zinc-800/50">
-                    <td className="py-1.5 px-2 text-zinc-200">Outside Diameter</td>
+                    <td className="py-1.5 px-2 text-zinc-200">{t('tools.flanges.flangeOD')}</td>
                     <td className="py-1.5 px-2 text-[#f59e0b] font-mono">OD</td>
                     <td className="py-1.5 px-2 text-right font-mono text-[#f59e0b] font-bold">{fmt(spec.od)}</td>
                     <td className="py-1.5 px-2 text-right text-zinc-500">{unit}</td>
                   </tr>
                   <tr className="border-b border-zinc-800/50">
-                    <td className="py-1.5 px-2 text-zinc-200">Flange Thickness</td>
+                    <td className="py-1.5 px-2 text-zinc-200">{t('tools.flanges.thickness')}</td>
                     <td className="py-1.5 px-2 text-[#3ea6ff] font-mono">T</td>
                     <td className="py-1.5 px-2 text-right font-mono text-[#3ea6ff] font-bold">{fmt(spec.flangeThickness)}</td>
                     <td className="py-1.5 px-2 text-right text-zinc-500">{unit}</td>
                   </tr>
                   <tr className="border-b border-zinc-800/50">
-                    <td className="py-1.5 px-2 text-zinc-200">Bolt Circle Diameter</td>
+                    <td className="py-1.5 px-2 text-zinc-200">{t('tools.flanges.bcd')}</td>
                     <td className="py-1.5 px-2 text-[#f59e0b] font-mono">BCD</td>
                     <td className="py-1.5 px-2 text-right font-mono text-[#f59e0b] font-bold">{fmt(spec.boltCircleDiameter)}</td>
                     <td className="py-1.5 px-2 text-right text-zinc-500">{unit}</td>
                   </tr>
                   <tr className="border-b border-zinc-800/50">
-                    <td className="py-1.5 px-2 text-zinc-200">Raised Face Diameter</td>
+                    <td className="py-1.5 px-2 text-zinc-200">{t('tools.flanges.rfDia')}</td>
                     <td className="py-1.5 px-2 text-[#22d3ee] font-mono">RF</td>
                     <td className="py-1.5 px-2 text-right font-mono text-[#22d3ee] font-bold">{fmt(spec.rfDia)}</td>
                     <td className="py-1.5 px-2 text-right text-zinc-500">{unit}</td>
                   </tr>
                   <tr className="border-b border-zinc-800/50">
-                    <td className="py-1.5 px-2 text-zinc-200">Number of Bolts</td>
+                    <td className="py-1.5 px-2 text-zinc-200">{t('tools.flanges.bolts')}</td>
                     <td className="py-1.5 px-2 text-zinc-400 font-mono">n</td>
                     <td className="py-1.5 px-2 text-right font-mono text-zinc-100 font-bold">{spec.numBolts}</td>
-                    <td className="py-1.5 px-2 text-right text-zinc-500">pcs</td>
+                    <td className="py-1.5 px-2 text-right text-zinc-500">{t('tools.flanges.ui.pcs')}</td>
                   </tr>
                   <tr className="border-b border-zinc-800/50">
-                    <td className="py-1.5 px-2 text-zinc-200">Bolt Size</td>
+                    <td className="py-1.5 px-2 text-zinc-200">{t('tools.boltSize')}</td>
                     <td className="py-1.5 px-2 text-zinc-400 font-mono">d</td>
                     <td className="py-1.5 px-2 text-right font-mono text-zinc-100">{spec.boltSize}</td>
                     <td className="py-1.5 px-2 text-right text-zinc-500">in</td>
                   </tr>
                   <tr className="border-b border-zinc-800/50">
-                    <td className="py-1.5 px-2 text-zinc-200">Bolt Hole Diameter</td>
+                    <td className="py-1.5 px-2 text-zinc-200">{t('tools.flanges.ui.boltHoleDiameter')}</td>
                     <td className="py-1.5 px-2 text-zinc-400 font-mono">Ø<sub>h</sub></td>
                     <td className="py-1.5 px-2 text-right font-mono text-zinc-100">{fmt(spec.boltHoleDiameter)}</td>
                     <td className="py-1.5 px-2 text-right text-zinc-500">{unit}</td>
                   </tr>
                   <tr className="border-b border-zinc-800/50">
-                    <td className="py-1.5 px-2 text-zinc-200">Pipe OD</td>
+                    <td className="py-1.5 px-2 text-zinc-200">{t('tools.flanges.pipeOD')}</td>
                     <td className="py-1.5 px-2 text-zinc-400 font-mono">OD<sub>p</sub></td>
                     <td className="py-1.5 px-2 text-right font-mono text-zinc-300">{fmt(spec.pipeOD)}</td>
                     <td className="py-1.5 px-2 text-right text-zinc-500">{unit}</td>
                   </tr>
                   {spec.type === 'WN' && spec.hubLength && (
                     <tr className="border-b border-zinc-800/50">
-                      <td className="py-1.5 px-2 text-zinc-200">Hub Length</td>
+                      <td className="py-1.5 px-2 text-zinc-200">{t('tools.flanges.ui.hubLength')}</td>
                       <td className="py-1.5 px-2 text-[#f97316] font-mono">H</td>
                       <td className="py-1.5 px-2 text-right font-mono text-[#f97316] font-bold">{fmt(spec.hubLength)}</td>
                       <td className="py-1.5 px-2 text-right text-zinc-500">{unit}</td>
                     </tr>
                   )}
                   <tr>
-                    <td className="py-1.5 px-2 text-zinc-200">Weight (approx)</td>
+                    <td className="py-1.5 px-2 text-zinc-200">{t('tools.flanges.ui.weightApprox')}</td>
                     <td className="py-1.5 px-2 text-zinc-400 font-mono">W</td>
                     <td className="py-1.5 px-2 text-right font-mono text-zinc-300">{spec.weight.toFixed(1)}</td>
                     <td className="py-1.5 px-2 text-right text-zinc-500">kg</td>
@@ -847,11 +847,11 @@ function FlangeDetailModal({
             <div className="grid gap-4 sm:grid-cols-3">
               {/* Gasket */}
               <div className="border border-zinc-800 rounded-lg p-3 bg-zinc-900/30">
-                <p className="text-[9px] uppercase tracking-wider text-[#22d3ee] font-semibold mb-2">Gasket</p>
+                <p className="text-[9px] uppercase tracking-wider text-[#22d3ee] font-semibold mb-2">{t('tools.flanges.ui.gasket')}</p>
                 <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-zinc-400">Type</span>
-                    <span className="text-zinc-200 font-mono">Spiral Wound</span>
+                    <span className="text-zinc-400">{t('tools.flanges.ui.type')}</span>
+                    <span className="text-zinc-200 font-mono">{t('tools.flanges.ui.spiralWound')}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-zinc-400">OD</span>
@@ -862,7 +862,7 @@ function FlangeDetailModal({
                     <span className="text-zinc-200 font-mono">{fmt(spec.pipeOD + 3)} {unit}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-400">Material</span>
+                    <span className="text-zinc-400">{t('tools.flanges.ui.material')}</span>
                     <span className="text-zinc-200 font-mono">SS304 + Graphite</span>
                   </div>
                 </div>
@@ -870,22 +870,22 @@ function FlangeDetailModal({
 
               {/* Bolts */}
               <div className="border border-zinc-800 rounded-lg p-3 bg-zinc-900/30">
-                <p className="text-[9px] uppercase tracking-wider text-[#f59e0b] font-semibold mb-2">Bolts</p>
+                <p className="text-[9px] uppercase tracking-wider text-[#f59e0b] font-semibold mb-2">{t('tools.flanges.ui.bolts')}</p>
                 <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-zinc-400">Size</span>
+                    <span className="text-zinc-400">{t('tools.flanges.ui.size')}</span>
                     <span className="text-zinc-200 font-mono">{spec.boltSize}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-400">Quantity</span>
-                    <span className="text-zinc-200 font-mono">{spec.numBolts} pcs</span>
+                    <span className="text-zinc-400">{t('tools.flanges.ui.quantity')}</span>
+                    <span className="text-zinc-200 font-mono">{spec.numBolts} {t('tools.flanges.ui.pcs')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-400">Material</span>
+                    <span className="text-zinc-400">{t('tools.flanges.ui.material')}</span>
                     <span className="text-zinc-200 font-mono">ASTM A193 B7</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-400">Nut</span>
+                    <span className="text-zinc-400">{t('tools.flanges.ui.nut')}</span>
                     <span className="text-zinc-200 font-mono">A194 2H</span>
                   </div>
                 </div>
@@ -893,22 +893,22 @@ function FlangeDetailModal({
 
               {/* Torque */}
               <div className="border border-zinc-800 rounded-lg p-3 bg-zinc-900/30">
-                <p className="text-[9px] uppercase tracking-wider text-[#f97316] font-semibold mb-2">Torque</p>
+                <p className="text-[9px] uppercase tracking-wider text-[#f97316] font-semibold mb-2">{t('tools.flanges.ui.torque')}</p>
                 <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-zinc-400">Target</span>
-                    <span className="text-zinc-200 font-mono">Per PCC-1</span>
+                    <span className="text-zinc-400">{t('tools.flanges.ui.target')}</span>
+                    <span className="text-zinc-200 font-mono">{t('tools.flanges.ui.perPcc1')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-400">Pattern</span>
-                    <span className="text-zinc-200 font-mono">Star (cross)</span>
+                    <span className="text-zinc-400">{t('tools.flanges.ui.pattern')}</span>
+                    <span className="text-zinc-200 font-mono">{t('tools.flanges.ui.starCross')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-400">Passes</span>
-                    <span className="text-zinc-200 font-mono">3 min</span>
+                    <span className="text-zinc-400">{t('tools.flanges.ui.passes')}</span>
+                    <span className="text-zinc-200 font-mono">{t('tools.flanges.ui.passesMinimum', { count: 3 })}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-400">Lubricant</span>
+                    <span className="text-zinc-400">{t('tools.flanges.ui.lubricant')}</span>
                     <span className="text-zinc-200 font-mono">Moly paste</span>
                   </div>
                 </div>
@@ -916,9 +916,9 @@ function FlangeDetailModal({
             </div>
 
             <div className="bg-[#f59e0b]/5 border border-[#f59e0b]/20 rounded-lg p-3">
-              <p className="text-xs text-[#f59e0b] font-semibold mb-1">⚠️ Premium Feature</p>
+              <p className="text-xs text-[#f59e0b] font-semibold mb-1">⚠️ {t('tools.flanges.ui.premiumFeature')}</p>
               <p className="text-[11px] text-zinc-400">
-                Detailed torque tables, gasket selection guide, and bolt length calculator available in PRO plan.
+                {t('tools.flanges.ui.premiumFeatureDesc')}
               </p>
             </div>
           </TabsContent>
@@ -927,20 +927,20 @@ function FlangeDetailModal({
           <TabsContent value="notes" className="p-4 space-y-4">
             <div className="space-y-3 text-xs text-zinc-400">
               <div className="border-l-2 border-[#f59e0b] pl-3">
-                <p className="text-zinc-200 font-semibold mb-1">Standard Reference</p>
-                <p>ASME B16.5-2020 — Pipe Flanges and Flanged Fittings (NPS 1/2 through NPS 24)</p>
+                <p className="text-zinc-200 font-semibold mb-1">{t('tools.flanges.ui.standardReference')}</p>
+                <p>{t('tools.flanges.ui.standardReferenceText')}</p>
               </div>
               <div className="border-l-2 border-[#22d3ee] pl-3">
-                <p className="text-zinc-200 font-semibold mb-1">Facing</p>
-                <p>Raised Face (RF) — 1.6mm raised, serrated finish 125-250 AARH</p>
+                <p className="text-zinc-200 font-semibold mb-1">{t('tools.flanges.ui.facing')}</p>
+                <p>{t('tools.flanges.ui.facingText')}</p>
               </div>
               <div className="border-l-2 border-[#f97316] pl-3">
-                <p className="text-zinc-200 font-semibold mb-1">Material</p>
-                <p>ASTM A105 (Carbon Steel), A182 F304/F316 (Stainless Steel), A182 F11/F22 (Alloy)</p>
+                <p className="text-zinc-200 font-semibold mb-1">{t('tools.flanges.ui.material')}</p>
+                <p>{t('tools.flanges.ui.materialText')}</p>
               </div>
               <div className="border-l-2 border-zinc-600 pl-3">
-                <p className="text-zinc-200 font-semibold mb-1">Disclaimer</p>
-                <p>Dimensions are nominal values per ASME B16.5. Always verify with manufacturer data sheets for actual procurement. Weight values are approximate.</p>
+                <p className="text-zinc-200 font-semibold mb-1">{t('tools.flanges.ui.disclaimerTitle')}</p>
+                <p>{t('tools.flanges.ui.disclaimerFull')}</p>
               </div>
             </div>
           </TabsContent>
@@ -1098,7 +1098,7 @@ export default function FlangesTool() {
 
   const mainSvgContent = useMemo(() => (
     <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full" style={{ maxWidth: '560px' }}
-      role="img" aria-label={`${previewFlange.typeLabel} flange ${previewFlange.nps} Class ${flangeClass}`}>
+      role="img" aria-label={t('tools.flanges.ui.svgAriaLabel', { type: previewFlange.typeLabel, nps: previewFlange.nps, cls: flangeClass })}>
       <rect width={svgW} height={svgH} fill="#0a0a0a" rx="6" />
       <defs>
         <pattern id="flangeMainGrid" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -1108,8 +1108,8 @@ export default function FlangesTool() {
       <rect width={svgW} height={svgH} fill="url(#flangeMainGrid)" opacity="0.3" />
 
       {/* View labels */}
-      <text x={sideCx} y="18" fill="#a1a1aa" fontSize="9" textAnchor="middle" fontWeight="bold">VISTA LATERAL</text>
-      <text x={frontCx} y="18" fill="#a1a1aa" fontSize="9" textAnchor="middle" fontWeight="bold">VISTA FRONTAL</text>
+      <text x={sideCx} y="18" fill="#a1a1aa" fontSize="9" textAnchor="middle" fontWeight="bold">{t('tools.flanges.ui.sideView')}</text>
+      <text x={frontCx} y="18" fill="#a1a1aa" fontSize="9" textAnchor="middle" fontWeight="bold">{t('tools.flanges.ui.frontView')}</text>
 
       {/* Side view */}
       {renderMainSideView()}
@@ -1124,20 +1124,20 @@ export default function FlangesTool() {
       {/* Legend */}
       <rect x="8" y={svgH - 48} width="170" height="40" fill="#0a0a0a90" rx="3" stroke="#27272a" strokeWidth="0.5" />
       <circle cx="18" cy={svgH - 34} r="3" fill="#f59e0b" />
-      <text x="26" y={svgH - 32} fill="#d4d4d8" fontSize="7" dominantBaseline="middle">Cotas (OD, BCD, T)</text>
+      <text x="26" y={svgH - 32} fill="#d4d4d8" fontSize="7" dominantBaseline="middle">{t('tools.flanges.ui.legendDims')}</text>
       <circle cx="18" cy={svgH - 22} r="3" fill="#22d3ee" />
-      <text x="26" y={svgH - 20} fill="#d4d4d8" fontSize="7" dominantBaseline="middle">Raised Face</text>
+      <text x="26" y={svgH - 20} fill="#d4d4d8" fontSize="7" dominantBaseline="middle">{t('tools.flanges.ui.legendRaisedFace')}</text>
       <circle cx="18" cy={svgH - 12} r="3" fill="#f97316" />
       <text x="26" y={svgH - 10} fill="#d4d4d8" fontSize="7" dominantBaseline="middle">
-        {previewFlange.type === 'WN' ? 'Hub taper' : previewFlange.type === 'SO' ? 'Fillet welds' : 'Solid'}
+        {previewFlange.type === 'WN' ? t('tools.flanges.ui.legendHubTaper') : previewFlange.type === 'SO' ? t('tools.flanges.ui.legendFilletWelds') : t('tools.flanges.ui.legendSolid')}
       </text>
 
       {/* Info */}
       <text x={svgW - 8} y={svgH - 8} fill="#52525b" fontSize="8" textAnchor="end">
-        {previewFlange.nps} {previewFlange.typeLabel} — Class {flangeClass} — {previewFlange.numBolts}×{previewFlange.boltSize}
+        {previewFlange.nps} {previewFlange.typeLabel} — {t('tools.flanges.ui.classLabel', { cls: flangeClass })} — {previewFlange.numBolts}×{previewFlange.boltSize}
       </text>
     </svg>
-  ), [previewFlange, flangeClass, showDimensions, showCenter, showBoltHoles, showFill, fmt, unit, svgW, svgH, mainScale, frontScale, sideCx, sideCy, frontCx, frontCy, renderMainSideView]);
+  ), [previewFlange, flangeClass, showDimensions, showCenter, showBoltHoles, showFill, fmt, unit, svgW, svgH, mainScale, frontScale, sideCx, sideCy, frontCx, frontCy, renderMainSideView, t]);
 
   return (
     <div className="space-y-4">
@@ -1169,28 +1169,28 @@ export default function FlangesTool() {
           <div className="border border-zinc-800 rounded-lg bg-zinc-900/30 p-3">
             <div className="grid gap-2 sm:grid-cols-4">
               <div className="space-y-0.5">
-                <label className="text-[9px] uppercase tracking-wider text-zinc-500">Type</label>
+                <label className="text-[9px] uppercase tracking-wider text-zinc-500">{t('tools.flanges.ui.filterType')}</label>
                 <Select value={flangeType} onValueChange={(v) => setFlangeType(v as FlangeType | 'ALL')}>
                   <SelectTrigger className="h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ALL">All Types</SelectItem>
-                    <SelectItem value="WN">Weld Neck (WN)</SelectItem>
-                    <SelectItem value="SO">Slip-On (SO)</SelectItem>
-                    <SelectItem value="BL">Blind (BL)</SelectItem>
+                    <SelectItem value="ALL">{t('tools.flanges.ui.allTypes')}</SelectItem>
+                    <SelectItem value="WN">{t('tools.flanges.ui.typeWeldNeck')}</SelectItem>
+                    <SelectItem value="SO">{t('tools.flanges.ui.typeSlipOn')}</SelectItem>
+                    <SelectItem value="BL">{t('tools.flanges.ui.typeBlind')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-0.5">
-                <label className="text-[9px] uppercase tracking-wider text-zinc-500">Class</label>
+                <label className="text-[9px] uppercase tracking-wider text-zinc-500">{t('tools.flanges.ui.filterClass')}</label>
                 <Select value={flangeClass} onValueChange={setFlangeClass}>
                   <SelectTrigger className="h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {CLASSES.map((cls) => (
-                      <SelectItem key={cls} value={cls}>Class {cls}#</SelectItem>
+                      <SelectItem key={cls} value={cls}>{t('tools.flanges.ui.classHash', { cls })}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -1202,7 +1202,7 @@ export default function FlangesTool() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ALL">All Sizes</SelectItem>
+                    <SelectItem value="ALL">{t('tools.flanges.ui.allSizes')}</SelectItem>
                     {NPS_LIST.map((nps) => (
                       <SelectItem key={nps} value={nps}>{nps}</SelectItem>
                     ))}
@@ -1234,22 +1234,22 @@ export default function FlangesTool() {
                 <label className="flex items-center gap-1 text-[9px] text-zinc-400 cursor-pointer">
                   <input type="checkbox" checked={showDimensions} onChange={(e) => setShowDimensions(e.target.checked)}
                     className="rounded border-zinc-700 bg-zinc-900 text-amber-500 w-3 h-3" />
-                  Cotas
+                  {t('tools.flanges.ui.toggleDimensions')}
                 </label>
                 <label className="flex items-center gap-1 text-[9px] text-zinc-400 cursor-pointer">
                   <input type="checkbox" checked={showCenter} onChange={(e) => setShowCenter(e.target.checked)}
                     className="rounded border-zinc-700 bg-zinc-900 text-amber-500 w-3 h-3" />
-                  Centro
+                  {t('tools.flanges.ui.toggleCenter')}
                 </label>
                 <label className="flex items-center gap-1 text-[9px] text-zinc-400 cursor-pointer">
                   <input type="checkbox" checked={showBoltHoles} onChange={(e) => setShowBoltHoles(e.target.checked)}
                     className="rounded border-zinc-700 bg-zinc-900 text-amber-500 w-3 h-3" />
-                  Agujeros
+                  {t('tools.flanges.ui.toggleHoles')}
                 </label>
                 <label className="flex items-center gap-1 text-[9px] text-zinc-400 cursor-pointer">
                   <input type="checkbox" checked={showFill} onChange={(e) => setShowFill(e.target.checked)}
                     className="rounded border-zinc-700 bg-zinc-900 text-amber-500 w-3 h-3" />
-                  Relleno
+                  {t('tools.flanges.ui.toggleFill')}
                 </label>
               </div>
             </div>
@@ -1267,10 +1267,10 @@ export default function FlangesTool() {
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-zinc-800">
-                    <th className="py-1.5 px-2 text-left text-zinc-500">Dim</th>
-                    <th className="py-1.5 px-2 text-right text-zinc-500">Valor</th>
-                    <th className="py-1.5 px-2 text-left text-zinc-500">Dim</th>
-                    <th className="py-1.5 px-2 text-right text-zinc-500">Valor</th>
+                    <th className="py-1.5 px-2 text-left text-zinc-500">{t('tools.flanges.ui.dim')}</th>
+                    <th className="py-1.5 px-2 text-right text-zinc-500">{t('tools.flanges.value')}</th>
+                    <th className="py-1.5 px-2 text-left text-zinc-500">{t('tools.flanges.ui.dim')}</th>
+                    <th className="py-1.5 px-2 text-right text-zinc-500">{t('tools.flanges.value')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1287,22 +1287,22 @@ export default function FlangesTool() {
                     <td className="py-1 px-2 text-right font-mono text-zinc-200">{fmt(previewFlange.rfDia)} {unit}</td>
                   </tr>
                   <tr className="border-b border-zinc-800/50">
-                    <td className="py-1 px-2 text-zinc-400 font-mono">Bolts</td>
+                    <td className="py-1 px-2 text-zinc-400 font-mono">{t('tools.flanges.ui.bolts')}</td>
                     <td className="py-1 px-2 text-right font-mono text-zinc-200">{previewFlange.numBolts}×{previewFlange.boltSize}</td>
-                    <td className="py-1 px-2 text-zinc-400 font-mono">Pipe OD</td>
+                    <td className="py-1 px-2 text-zinc-400 font-mono">{t('tools.flanges.pipeOD')}</td>
                     <td className="py-1 px-2 text-right font-mono text-zinc-200">{fmt(previewFlange.pipeOD)} {unit}</td>
                   </tr>
                   <tr>
-                    <td className="py-1 px-2 text-zinc-400 font-mono">Weight</td>
+                    <td className="py-1 px-2 text-zinc-400 font-mono">{t('tools.weight')}</td>
                     <td className="py-1 px-2 text-right font-mono text-zinc-200">{previewFlange.weight.toFixed(1)} kg</td>
                     {previewFlange.type === 'WN' && previewFlange.hubLength ? (
                       <>
-                        <td className="py-1 px-2 text-[#f97316] font-mono">Hub L</td>
+                        <td className="py-1 px-2 text-[#f97316] font-mono">{t('tools.flanges.ui.hubLengthShort')}</td>
                         <td className="py-1 px-2 text-right font-mono text-zinc-200">{fmt(previewFlange.hubLength)} {unit}</td>
                       </>
                     ) : (
                       <>
-                        <td className="py-1 px-2 text-zinc-400 font-mono">Hole Ø</td>
+                        <td className="py-1 px-2 text-zinc-400 font-mono">{t('tools.flanges.ui.holeDiaShort')}</td>
                         <td className="py-1 px-2 text-right font-mono text-zinc-200">{fmt(previewFlange.boltHoleDiameter)} {unit}</td>
                       </>
                     )}
@@ -1315,7 +1315,7 @@ export default function FlangesTool() {
           {/* Cards Grid */}
           <div>
             <p className="text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-2">
-              {filteredFlanges.length} {t('tools.flanges.results', { defaultValue: 'resultados' })} — Click para detalle
+              {filteredFlanges.length} {t('tools.flanges.results', { defaultValue: 'resultados' })} — {t('tools.flanges.ui.clickForDetails')}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
               {filteredFlanges.map((f, i) => (
@@ -1336,74 +1336,74 @@ export default function FlangesTool() {
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="space-y-4">
               <div className="border border-zinc-800 rounded-lg p-5 bg-zinc-900/30 space-y-3">
-                <h4 className="text-sm font-semibold text-[#f59e0b] uppercase tracking-wider">Tipos de Brida</h4>
+                <h4 className="text-sm font-semibold text-[#f59e0b] uppercase tracking-wider">{t('tools.flanges.ui.flangeTypes')}</h4>
                 <div className="space-y-3">
                   <div className="p-3 rounded bg-[#f97316]/5 border border-[#f97316]/20">
-                    <p className="text-[#f97316] text-xs font-bold mb-1">WN — Weld Neck</p>
-                    <p className="text-zinc-400 text-xs">Hub taper provides gradual stress transition. Best for high-pressure, high-temperature, and cyclic service. Butt-welded to pipe.</p>
+                    <p className="text-[#f97316] text-xs font-bold mb-1">{t('tools.flanges.ui.wnTitle')}</p>
+                    <p className="text-zinc-400 text-xs">{t('tools.flanges.ui.wnDesc')}</p>
                   </div>
                   <div className="p-3 rounded bg-[#22d3ee]/5 border border-[#22d3ee]/20">
-                    <p className="text-[#22d3ee] text-xs font-bold mb-1">SO — Slip-On</p>
-                    <p className="text-zinc-400 text-xs">Pipe slides through and is fillet-welded on both sides. Lower cost, easier alignment. Suitable for low-pressure utility services.</p>
+                    <p className="text-[#22d3ee] text-xs font-bold mb-1">{t('tools.flanges.ui.soTitle')}</p>
+                    <p className="text-zinc-400 text-xs">{t('tools.flanges.ui.soDesc')}</p>
                   </div>
                   <div className="p-3 rounded bg-zinc-800/50 border border-zinc-700/50">
-                    <p className="text-zinc-300 text-xs font-bold mb-1">BL — Blind</p>
-                    <p className="text-zinc-400 text-xs">Solid disc to close pipe end or vessel nozzle. Used for testing, future connections, or permanent closure. No bore.</p>
+                    <p className="text-zinc-300 text-xs font-bold mb-1">{t('tools.flanges.ui.blTitle')}</p>
+                    <p className="text-zinc-400 text-xs">{t('tools.flanges.ui.blDesc')}</p>
                   </div>
                 </div>
               </div>
 
               <div className="border border-zinc-800 rounded-lg p-5 bg-zinc-900/30 space-y-3">
-                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Pressure Classes</h4>
+                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">{t('tools.flanges.ui.pressureClasses')}</h4>
                 <div className="space-y-2 text-xs text-zinc-400">
-                  <p><strong className="text-zinc-200">Class 150#</strong> — Up to ~20 bar (290 psi) @ ambient</p>
-                  <p><strong className="text-zinc-200">Class 300#</strong> — Up to ~50 bar (720 psi) @ ambient</p>
-                  <p><strong className="text-zinc-200">Class 600#</strong> — Up to ~100 bar (1440 psi) @ ambient</p>
-                  <p className="text-[10px] text-zinc-500 mt-2">* Ratings decrease with temperature per ASME B16.5 Table 2</p>
+                  <p><strong className="text-zinc-200">Class 150#</strong> — {t('tools.flanges.ui.ratingAmbient', { bar: 20, psi: 290 })}</p>
+                  <p><strong className="text-zinc-200">Class 300#</strong> — {t('tools.flanges.ui.ratingAmbient', { bar: 50, psi: 720 })}</p>
+                  <p><strong className="text-zinc-200">Class 600#</strong> — {t('tools.flanges.ui.ratingAmbient', { bar: 100, psi: 1440 })}</p>
+                  <p className="text-[10px] text-zinc-500 mt-2">{t('tools.flanges.ui.ratingsNote')}</p>
                 </div>
               </div>
             </div>
 
             <div className="space-y-4">
               <div className="border-l-2 border-[#f59e0b] bg-[#f59e0b]/5 p-5 rounded-r-lg space-y-3">
-                <h4 className="text-sm font-semibold text-[#f59e0b] uppercase tracking-wider">Referencia Rápida</h4>
+                <h4 className="text-sm font-semibold text-[#f59e0b] uppercase tracking-wider">{t('tools.flanges.ui.quickReference')}</h4>
                 <ul className="space-y-2 text-xs text-zinc-300">
                   <li className="flex items-start gap-2">
                     <span className="text-[#f59e0b] mt-0.5">•</span>
-                    <span><strong className="text-zinc-100">BCD</strong> = Bolt Circle Diameter — diámetro del círculo de pernos</span>
+                    <span><strong className="text-zinc-100">BCD</strong> = {t('tools.flanges.ui.refBcd')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[#f59e0b] mt-0.5">•</span>
-                    <span><strong className="text-zinc-100">RF</strong> = Raised Face — cara elevada 1.6mm (Class 150/300)</span>
+                    <span><strong className="text-zinc-100">RF</strong> = {t('tools.flanges.ui.refRf')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[#f59e0b] mt-0.5">•</span>
-                    <span><strong className="text-zinc-100">RTJ</strong> = Ring Type Joint — para Class 600+</span>
+                    <span><strong className="text-zinc-100">RTJ</strong> = {t('tools.flanges.ui.refRtj')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-[#f59e0b] mt-0.5">•</span>
-                    <span><strong className="text-zinc-100">Hub</strong> = Transición cónica entre pipe y flange (solo WN)</span>
+                    <span><strong className="text-zinc-100">Hub</strong> = {t('tools.flanges.ui.refHub')}</span>
                   </li>
                 </ul>
               </div>
 
               <div className="border border-zinc-800 rounded-lg p-5 bg-zinc-900/30 space-y-3">
-                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Standards</h4>
+                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">{t('tools.flanges.ui.standards')}</h4>
                 <div className="space-y-2 text-xs text-zinc-400">
-                  <p><strong className="text-zinc-200">ASME B16.5</strong> — Pipe Flanges and Flanged Fittings (NPS 1/2 - 24)</p>
-                  <p><strong className="text-zinc-200">ASME B16.47</strong> — Large Diameter Steel Flanges (NPS 26 - 60)</p>
-                  <p><strong className="text-zinc-200">ASME PCC-1</strong> — Guidelines for Pressure Boundary Bolted Flange Joint Assembly</p>
-                  <p><strong className="text-zinc-200">ASME B16.20</strong> — Metallic Gaskets for Pipe Flanges</p>
+                  <p><strong className="text-zinc-200">ASME B16.5</strong> — {t('tools.flanges.ui.stdB165')}</p>
+                  <p><strong className="text-zinc-200">ASME B16.47</strong> — {t('tools.flanges.ui.stdB1647')}</p>
+                  <p><strong className="text-zinc-200">ASME PCC-1</strong> — {t('tools.flanges.ui.stdPcc1')}</p>
+                  <p><strong className="text-zinc-200">ASME B16.20</strong> — {t('tools.flanges.ui.stdB1620')}</p>
                 </div>
               </div>
 
               <div className="border border-zinc-800 rounded-lg p-5 bg-zinc-900/30 space-y-3">
-                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Material</h4>
+                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">{t('tools.flanges.ui.material')}</h4>
                 <div className="space-y-2 text-xs text-zinc-400">
-                  <p><strong className="text-zinc-200">A105</strong> — Carbon Steel (most common)</p>
-                  <p><strong className="text-zinc-200">A182 F304/F316</strong> — Stainless Steel</p>
-                  <p><strong className="text-zinc-200">A182 F11/F22</strong> — Chrome-Moly Alloy</p>
-                  <p><strong className="text-zinc-200">A350 LF2</strong> — Low Temperature Carbon Steel</p>
+                  <p><strong className="text-zinc-200">A105</strong> — {t('tools.flanges.ui.matA105')}</p>
+                  <p><strong className="text-zinc-200">A182 F304/F316</strong> — {t('tools.flanges.ui.matF304F316')}</p>
+                  <p><strong className="text-zinc-200">A182 F11/F22</strong> — {t('tools.flanges.ui.matF11F22')}</p>
+                  <p><strong className="text-zinc-200">A350 LF2</strong> — {t('tools.flanges.ui.matLf2')}</p>
                 </div>
               </div>
             </div>

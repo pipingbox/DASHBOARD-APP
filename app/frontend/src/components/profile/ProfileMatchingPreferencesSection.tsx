@@ -137,10 +137,10 @@ export function ProfileMatchingPreferencesSection() {
         {saving ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            {t('common.saving', 'Saving...')}
+            <span>{t('common.saving', 'Saving...')}</span>
           </>
         ) : (
-          t('profile.saveMatchingPreferences', 'Save preferences')
+          <span>{t('profile.saveMatchingPreferences', 'Save preferences')}</span>
         )}
       </Button>
     </div>

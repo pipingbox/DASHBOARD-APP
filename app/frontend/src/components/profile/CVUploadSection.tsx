@@ -251,7 +251,7 @@ export function CVUploadSection() {
   };
 
   return (
-    <section className="border border-zinc-800/80 bg-[#0d0d0d] p-6">
+    <section id="profile-section-visibility" className="border border-zinc-800/80 bg-[#0d0d0d] p-6">
       <div>
         <p className="text-[10px] uppercase tracking-[0.3em] text-[#f59e0b]">
           {t('workerProfile.cv.label')}
@@ -345,9 +345,11 @@ export function CVUploadSection() {
             ) : (
               <Upload className="h-5 w-5" />
             )}
-            {uploading
-              ? t('common.loading')
-              : t('workerProfile.cv.uploadPdf')}
+            <span>
+              {uploading
+                ? t('common.loading')
+                : t('workerProfile.cv.uploadPdf')}
+            </span>
             <input
               ref={fileInputRef}
               type="file"

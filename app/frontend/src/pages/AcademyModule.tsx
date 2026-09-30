@@ -8,8 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { LessonRenderer } from '@/components/LessonRenderer';
-import { VCA_LESSONS } from '@/lib/vca-lessons';
-import { getModuleQuestions, VCAQuizQuestion } from '@/lib/vca-questions';
+import { getModuleQuestions, toQuizQuestions, VCAQuizQuestion } from '@/lib/vca-questions';
+import { useVcaContent } from '@/lib/academy/content';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -108,8 +108,9 @@ export default function AcademyModule() {
   const [existingProgress, setExistingProgress] = useState<{ best_score: number; attempts: number } | null>(null);
   const studyRef = useRef<HTMLDivElement>(null);
 
-  const questions = getModuleQuestions(mid);
-  const lesson = VCA_LESSONS[mid];
+  const { lessons: localizedLessons, questions: localizedQuestions } = useVcaContent();
+  const questions = getModuleQuestions(mid, toQuizQuestions(localizedQuestions));
+  const lesson = localizedLessons[mid];
   const moduleName = MODULE_NAMES[mid] || `Module ${mid}`;
   const estimatedMinutes = Math.max(5, Math.ceil(questions.length * 1.5));
 

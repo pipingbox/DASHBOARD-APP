@@ -12,6 +12,8 @@ import pt from './locales/pt.json';
 import it from './locales/it.json';
 import ro from './locales/ro.json';
 import uk from './locales/uk.json';
+import pl from './locales/pl.json';
+import bg from './locales/bg.json';
 
 /**
  * PB-I18N-LAYER3-001: `languages.json` is the single canonical list of
@@ -43,6 +45,8 @@ const RESOURCES: Record<string, { translation: Record<string, unknown> }> = {
   it: { translation: it },
   ro: { translation: ro },
   uk: { translation: uk },
+  pl: { translation: pl },
+  bg: { translation: bg },
 };
 
 for (const code of SUPPORTED_CODES) {
@@ -52,7 +56,7 @@ for (const code of SUPPORTED_CODES) {
 }
 
 /** Normalise "ro-RO" / "uk-UA" / "PT" to a supported base code, or null. */
-function toSupportedCode(value: string | null | undefined): SupportedLanguageCode | null {
+export function toSupportedCode(value: string | null | undefined): SupportedLanguageCode | null {
   if (!value) return null;
   const base = value.trim().slice(0, 2).toLowerCase();
   return SUPPORTED_CODES.includes(base) ? base : null;

@@ -337,13 +337,13 @@ export default function CompanyProfile() {
                 onChange={handleChange}
                 className="w-full rounded-sm border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[#f59e0b]/50 transition"
               >
-                <option value="Oil & Gas / Industrial Services">Oil & Gas / Industrial Services</option>
-                <option value="Construction">Construction</option>
-                <option value="Marine & Offshore">Marine & Offshore</option>
-                <option value="Mining">Mining</option>
-                <option value="Energy & Renewables">Energy & Renewables</option>
-                <option value="Manufacturing">Manufacturing</option>
-                <option value="Other">Other</option>
+                <option value="Oil & Gas / Industrial Services">{t('companyProfilePage.industryOilGas')}</option>
+                <option value="Construction">{t('companyProfilePage.industryConstruction')}</option>
+                <option value="Marine & Offshore">{t('companyProfilePage.industryMarine')}</option>
+                <option value="Mining">{t('companyProfilePage.industryMining')}</option>
+                <option value="Energy & Renewables">{t('companyProfilePage.industryEnergy')}</option>
+                <option value="Manufacturing">{t('companyProfilePage.industryManufacturing')}</option>
+                <option value="Other">{t('companyProfilePage.industryOther')}</option>
               </select>
             </div>
           </div>

@@ -1,0 +1,45 @@
+name: TypeScript Regression Gate
+
+# PB-INFRA-TS-GATE-001: replaces the historical false gate
+# (`cd app/frontend && npx tsc --skipLibCheck`, which compiles NOTHING against
+# the solution-style root tsconfig.json and always exits 0) with a real
+# regression check against a versioned baseline.
+#
+# Policy: a PR may not introduce NEW TypeScript diagnostics. The 31
+# pre-existing production diagnostics (23 unique identities) are recorded in
+# scripts/ts-error-baseline.txt and tolerated until paid down by separate
+# tickets. The baseline never grows automatically — only via ticket + PO
+# review. See scripts/ts-regression-gate.mjs for the full contract.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - 'app/frontend/**'
+      - 'scripts/ts-regression-gate.mjs'
+      - 'scripts/ts-error-baseline.txt'
+      - '.github/workflows/typecheck-regression.yml'
+
+concurrency:
+  group: typecheck-regression-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck-regression:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install frontend deps
+        working-directory: app/frontend
+        run: npm ci
+
+      - name: Authoritative typecheck vs baseline
+        run: node scripts/ts-regression-gate.mjs

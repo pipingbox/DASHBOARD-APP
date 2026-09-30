@@ -1,0 +1,297 @@
+[
+  {
+    "id": "m1-legal",
+    "iconKey": "Shield",
+    "officialRef": "VCA 2026 §1",
+    "title": "Modulul 1: Legislație și reglementări",
+    "lessons": [
+      {
+        "title": "1.1 Legislația belgiană și europeană de securitate",
+        "duration": "15 min",
+        "topics": [
+          "Codex over Welzijn op het Werk (Codul privind bunăstarea la locul de muncă)",
+          "Directiva-cadru UE 89/391/CEE",
+          "Drepturile și obligațiile lucrătorului",
+          "Responsabilitățile angajatorului"
+        ]
+      },
+      {
+        "title": "1.2 Sistemul VCA și certificarea",
+        "duration": "10 min",
+        "topics": [
+          "Ce este VCA?",
+          "B-VCA față de VOL-VCA",
+          "Valabilitate (10 ani)",
+          "Guvernanța SSVV/BESACC"
+        ]
+      },
+      {
+        "title": "1.3 ARAB și CODELCO",
+        "duration": "12 min",
+        "topics": [
+          "Algemeen Reglement voor de Arbeidsbescherming (regulamentul general de protecție a muncii)",
+          "Commissie voor Welzijn op het Werk (comitetul pentru bunăstare la locul de muncă)",
+          "Raportarea accidentelor"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m2-risk",
+    "iconKey": "AlertTriangle",
+    "officialRef": "VCA 2026 §2",
+    "title": "Modulul 2: Analiza riscurilor și prevenirea",
+    "lessons": [
+      {
+        "title": "2.1 Identificarea riscurilor",
+        "duration": "20 min",
+        "topics": [
+          "Ce este un risc?",
+          "Pericol față de risc",
+          "Matricea riscurilor",
+          "Analiza securității lucrării (JSA)"
+        ]
+      },
+      {
+        "title": "2.2 Ierarhia măsurilor de control",
+        "duration": "15 min",
+        "topics": [
+          "Eliminarea",
+          "Înlocuirea",
+          "Măsuri tehnice",
+          "Măsuri organizatorice",
+          "Echipament individual de protecție (ultima soluție)"
+        ]
+      },
+      {
+        "title": "2.3 Sistemul de permise de lucru",
+        "duration": "12 min",
+        "topics": [
+          "Permis de lucru cu foc deschis",
+          "Permis de intrare în spații închise",
+          "Blocare/etichetare (LOTO)",
+          "Permis de lucru la înălțime"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m3-ppe",
+    "iconKey": "HardHat",
+    "officialRef": "VCA 2026 §3",
+    "title": "Modulul 3: Echipamentul individual de protecție",
+    "lessons": [
+      {
+        "title": "3.1 Echipament de protecție obligatoriu pe șantierele industriale",
+        "duration": "10 min",
+        "topics": [
+          "Cască de protecție (EN 397)",
+          "Ochelari de protecție (EN 166)",
+          "Bocanci de protecție (EN ISO 20345)",
+          "Vestă reflectorizantă (EN 20471)",
+          "Mănuși de protecție (EN 388)"
+        ]
+      },
+      {
+        "title": "3.2 Protecția respiratorie",
+        "duration": "15 min",
+        "topics": [
+          "Măști FFP1/FFP2/FFP3",
+          "Semimăști și măști integrale",
+          "Aparat autonom de respirat pentru spații închise",
+          "Alegerea filtrului (A, B, E, K, P)"
+        ]
+      },
+      {
+        "title": "3.3 Protecția auzului și protecția împotriva căderii",
+        "duration": "10 min",
+        "topics": [
+          "Antifoane interne față de antifoane externe (indice SNR)",
+          "Centură complexă de siguranță (EN 361)",
+          "Cordoane de ancorare și linii de viață",
+          "Puncte de ancorare (EN 795)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m4-fire",
+    "iconKey": "Flame",
+    "officialRef": "VCA 2026 §4",
+    "title": "Modulul 4: Securitatea la incendiu și explozie",
+    "lessons": [
+      {
+        "title": "4.1 Triunghiul focului și clasele de incendiu",
+        "duration": "12 min",
+        "topics": [
+          "Triunghiul focului (căldură, combustibil, oxigen)",
+          "Clasele A/B/C/D/F",
+          "Tipuri de stingătoare (apă, spumă, CO2, pulbere)",
+          "Metoda PASS"
+        ]
+      },
+      {
+        "title": "4.2 Zone ATEX",
+        "duration": "15 min",
+        "topics": [
+          "Zona 0/1/2 (gaze)",
+          "Zona 20/21/22 (pulberi)",
+          "Categorii de echipamente (1/2/3)",
+          "Lucrul cu foc deschis în zone ATEX"
+        ]
+      },
+      {
+        "title": "4.3 Proceduri de evacuare",
+        "duration": "10 min",
+        "topics": [
+          "Semnale de alarmă",
+          "Căi de evacuare",
+          "Puncte de adunare",
+          "Apel nominal la punctul de adunare"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m5-electrical",
+    "iconKey": "Zap",
+    "officialRef": "VCA 2026 §5",
+    "title": "Modulul 5: Securitatea electrică",
+    "lessons": [
+      {
+        "title": "5.1 Pericole de natură electrică",
+        "duration": "15 min",
+        "topics": [
+          "Electrocutarea",
+          "Arcul electric",
+          "Tensiunea de pas",
+          "Niveluri de autorizare BA4/BA5"
+        ]
+      },
+      {
+        "title": "5.2 Blocare/etichetare (LOTO)",
+        "duration": "12 min",
+        "topics": [
+          "Procedura LOTO în 6 pași",
+          "Izolarea surselor de energie",
+          "Verificarea energiei zero",
+          "Blocare de grup"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m6-height",
+    "iconKey": "Wind",
+    "officialRef": "VCA 2026 §6",
+    "title": "Modulul 6: Lucrul la înălțime",
+    "lessons": [
+      {
+        "title": "6.1 Riscuri de cădere și prevenirea lor",
+        "duration": "15 min",
+        "topics": [
+          "Definiție (>2 m)",
+          "Balustrade și borduri de protecție",
+          "Plase de siguranță",
+          "Sisteme de oprire a căderii"
+        ]
+      },
+      {
+        "title": "6.2 Securitatea schelelor",
+        "duration": "12 min",
+        "topics": [
+          "Etichete de schelă (verde/roșu/galben)",
+          "Cerințe de verificare",
+          "Clase de încărcare",
+          "Persoană competentă"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-chemical",
+    "iconKey": "Droplets",
+    "officialRef": "VCA 2026 §7",
+    "title": "Modulul 7: Substanțe periculoase",
+    "lessons": [
+      {
+        "title": "7.1 Clasificarea CLP/GHS",
+        "duration": "15 min",
+        "topics": [
+          "Pictograme de pericol",
+          "Fraze H și fraze P",
+          "Cuvinte de avertizare (Pericol/Atenție)",
+          "Fișe cu date de securitate (SDS)"
+        ]
+      },
+      {
+        "title": "7.2 Azbest și silice",
+        "duration": "12 min",
+        "topics": [
+          "Tipuri de azbest (alb/brun/albastru)",
+          "Regulamentul REACH",
+          "Pulbere de silice (RESPIRE-SILICE)",
+          "Limite de expunere"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-ergonomics",
+    "iconKey": "Eye",
+    "officialRef": "VCA 2026 §8",
+    "title": "Modulul 8: Ergonomie și manipularea manuală a maselor",
+    "lessons": [
+      {
+        "title": "8.1 Tehnici de ridicare",
+        "duration": "10 min",
+        "topics": [
+          "Postura corectă la ridicare",
+          "Ridicarea în echipă",
+          "Mijloace mecanice de ridicare",
+          "Limite de greutate (25 kg bărbați / 12,5 kg femei)"
+        ]
+      },
+      {
+        "title": "8.2 Lucrul la monitor și postura",
+        "duration": "8 min",
+        "topics": [
+          "Distanța față de monitor",
+          "Reglarea scaunului",
+          "Pauze (5 min/oră)",
+          "Prevenirea oboselii oculare"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m9-accidents",
+    "iconKey": "ClipboardList",
+    "officialRef": "VCA 2026 §9",
+    "title": "Modulul 9: Accidente și prim ajutor",
+    "lessons": [
+      {
+        "title": "9.1 Raportarea accidentelor",
+        "duration": "12 min",
+        "topics": [
+          "Raportarea incidentelor fără vătămare",
+          "Cercetarea accidentelor",
+          "Analiza cauzelor-rădăcină",
+          "Acțiuni corective"
+        ]
+      },
+      {
+        "title": "9.2 Prim ajutor de bază",
+        "duration": "15 min",
+        "topics": [
+          "Protocolul DRABC",
+          "Resuscitare cardiopulmonară (30:2)",
+          "Poziția laterală de siguranță",
+          "Oprirea hemoragiilor",
+          "Tratarea arsurilor",
+          "Spălarea ochilor"
+        ]
+      }
+    ]
+  }
+]

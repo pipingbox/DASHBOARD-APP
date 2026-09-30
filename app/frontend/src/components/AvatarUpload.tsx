@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Camera, Eye, EyeOff, Loader2, Trash2, User } from 'lucide-react';
 import { supabase, STORAGE_BUCKETS, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -29,6 +30,7 @@ export function AvatarUpload({
   onChange,
   onToggleShow,
 }: AvatarUploadProps) {
+  const { t } = useTranslation();
   const { user, refreshProfile } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -49,7 +51,7 @@ export function AvatarUpload({
 
     // Validate file type (mobile-friendly: includes HEIC/HEIF)
     if (!isValidImageFile(file)) {
-      const msg = 'Solo se aceptan imágenes JPG, PNG, WebP o HEIC';
+      const msg = t('profile.avatarInvalidType');
       setUploadError(msg);
       toast.error(msg);
       return;
@@ -65,7 +67,7 @@ export function AvatarUpload({
 
     // Warn about HEIC (it will upload but may not preview in all browsers)
     if (isHeicFile(file)) {
-      toast.info('Foto HEIC detectada. Se subirá correctamente pero la vista previa puede no funcionar en todos los navegadores.');
+      toast.info(t('profile.avatarHeicNotice'));
     }
 
     setUploading(true);
@@ -112,7 +114,7 @@ export function AvatarUpload({
     setUploading(false);
     if (updateErr || !upsertedData) {
       console.error('[AvatarUpload] Upsert failed:', updateErr?.message);
-      const msg = updateErr?.message || 'Failed to save avatar to profile';
+      const msg = updateErr?.message || t('profile.avatarSaveFailed');
       setUploadError(msg);
       toast.error(msg);
       return;
@@ -120,7 +122,7 @@ export function AvatarUpload({
     setUploadError(null);
     onChange(publicUrl);
     await refreshProfile();
-    toast.success('Profile picture updated');
+    toast.success(t('profile.avatarUpdated'));
 
     // Recalculate profile completion (non-blocking)
     recalculateAndSaveProfileCompletion(user.id).catch(() => {});
@@ -140,12 +142,12 @@ export function AvatarUpload({
     setRemoving(false);
     if (error || !upsertedData) {
       console.error('[AvatarUpload] Remove upsert failed:', error?.message);
-      toast.error(error?.message || 'Failed to remove avatar');
+      toast.error(error?.message || t('profile.avatarRemoveFailed'));
       return;
     }
     onChange(null);
     await refreshProfile();
-    toast.success('Profile photo removed');
+    toast.success(t('profile.avatarRemoved'));
   };
 
   const handleToggleVisibility = async () => {
@@ -163,12 +165,12 @@ export function AvatarUpload({
     setTogglingVisibility(false);
     if (error || !upsertedData) {
       console.error('[AvatarUpload] Toggle visibility upsert failed:', error?.message);
-      toast.error(error?.message || 'Failed to update visibility');
+      toast.error(error?.message || t('profile.avatarVisibilityFailed'));
       return;
     }
     onToggleShow(next);
     await refreshProfile();
-    toast.success(next ? 'Photo is now visible' : 'Photo is now hidden');
+    toast.success(next ? t('profile.avatarNowVisible') : t('profile.avatarNowHidden'));
   };
 
   const displayAvatar = avatarUrl && showAvatar;
@@ -205,7 +207,7 @@ export function AvatarUpload({
             ) : (
               <Camera className="h-3.5 w-3.5" />
             )}
-            {uploading ? 'Uploading…' : avatarUrl ? 'Change photo' : 'Upload photo'}
+            {uploading ? t('profile.avatarUploading') : avatarUrl ? t('profile.avatarChange') : t('profile.avatarUpload')}
             <input
               ref={inputRef}
               type="file"
@@ -236,7 +238,7 @@ export function AvatarUpload({
                 ) : (
                   <Eye className="h-3.5 w-3.5" />
                 )}
-                {showAvatar ? 'Hide photo' : 'Show photo'}
+                {showAvatar ? t('profile.avatarHide') : t('profile.avatarShow')}
               </button>
 
               <button

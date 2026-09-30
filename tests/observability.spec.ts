@@ -681,3 +681,225 @@ test.describe('queue and identity', () => {
     ]);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PB-LIBRARY-COMPLETE-001 — Library V1 usage analytics (Stream B).
+// Closed taxonomy: catalog IDs / closed enums / counts only — never user
+// free text, never filenames.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('library analytics (PB-LIBRARY-COMPLETE-001)', () => {
+  test('the seven Library events are part of the closed OBS_EVENT_NAMES taxonomy', () => {
+    for (const name of [
+      'library_viewed',
+      'library_search_performed',
+      'library_filter_selected',
+      'library_item_opened',
+      'library_resource_action',
+      'library_empty_result',
+      'library_access_error',
+    ]) {
+      expect(OBS_EVENT_NAMES).toContain(name);
+    }
+  });
+
+  test('library_search_performed keeps only query_length + counts — free text is dropped', () => {
+    const props = buildEventProps('library_search_performed', {
+      query_length: 12,
+      results_count: 3,
+      query: 'John Doe welding near Madrid', // must never leave the app
+      component_id: 'PB-COMP-ELBOW-90-LR-B16-9', // not allowed on this event
+    });
+    expect(props).toEqual({ query_length: 12, results_count: 3 });
+    expect(JSON.stringify(props)).not.toContain('John Doe');
+  });
+
+  test('library_filter_selected enforces the closed filter_type enum', () => {
+    expect(buildEventProps('library_filter_selected', {
+      filter_type: 'family', filter_value: 'flanges', results_count: 8,
+    })).toEqual({ filter_type: 'family', filter_value: 'flanges', results_count: 8 });
+    // Out-of-enum filter types are dropped, not emitted.
+    expect(buildEventProps('library_filter_selected', {
+      filter_type: 'price_range', filter_value: 'cheap',
+    })).toEqual({ filter_value: 'cheap' });
+  });
+
+  test('library_item_opened drops component ids that are not closed PB-COMP-* ids', () => {
+    expect(buildEventProps('library_item_opened', {
+      component_id: 'PB-COMP-GASKET-SW-B16-20',
+    })).toEqual({ component_id: 'PB-COMP-GASKET-SW-B16-20' });
+    // A filename / user text is not a valid catalog id → dropped.
+    const bad = buildEventProps('library_item_opened', {
+      component_id: 'curriculum-juan-perez.pdf',
+    });
+    expect(bad).not.toHaveProperty('component_id');
+  });
+
+  test('library_resource_action enforces the closed resource_type enum', () => {
+    expect(buildEventProps('library_resource_action', {
+      component_id: 'PB-COMP-VALVE-BUTTERFLY-API609',
+      resource_type: 'download_2d',
+    })).toEqual({ component_id: 'PB-COMP-VALVE-BUTTERFLY-API609', resource_type: 'download_2d' });
+    const bad = buildEventProps('library_resource_action', {
+      component_id: 'PB-COMP-VALVE-BUTTERFLY-API609',
+      resource_type: 'purchase_invoice_pdf',
+    });
+    expect(bad).toEqual({ component_id: 'PB-COMP-VALVE-BUTTERFLY-API609' });
+  });
+
+  test('the before_send recursive sanitizer keeps closed Library props (gate-3 interaction)', () => {
+    // Regression: property NAMES must not match the URL/query key patterns of
+    // sanitizePostHogProperty — `component_id` must survive before_send.
+    const event = {
+      event: 'library_access_error',
+      properties: {
+        component_id: 'PB-COMP-ELBOW-90-LR-BW-ASME-B16-9',
+        resource_type: 'preview_2d',
+        reason_code: 'asset_load_failed',
+      },
+    };
+    const out = sanitizePostHogEvent(event);
+    expect(out).not.toBeNull();
+    expect(out?.properties?.component_id).toBe('PB-COMP-ELBOW-90-LR-BW-ASME-B16-9');
+    expect(out?.properties?.resource_type).toBe('preview_2d');
+    expect(out?.properties?.reason_code).toBe('asset_load_failed');
+  });
+
+  test('library_access_error keeps ≥32-char catalog ids (long-token regression)', () => {
+    // 33 chars: matched LONG_TOKEN_RE and was redacted before validation.
+    expect(buildEventProps('library_access_error', {
+      component_id: 'PB-COMP-ELBOW-90-LR-BW-ASME-B16-9',
+      resource_type: 'preview_2d',
+      reason_code: 'asset_load_failed',
+    })).toEqual({
+      component_id: 'PB-COMP-ELBOW-90-LR-BW-ASME-B16-9',
+      resource_type: 'preview_2d',
+      reason_code: 'asset_load_failed',
+    });
+  });
+
+  test('library_access_error accepts asset_load_failed as a closed reason_code', () => {
+    expect(buildEventProps('library_access_error', {
+      component_id: 'PB-COMP-PIPE-SCH40-B36-10M',
+      resource_type: 'preview_2d',
+      reason_code: 'asset_load_failed',
+    })).toEqual({
+      component_id: 'PB-COMP-PIPE-SCH40-B36-10M',
+      resource_type: 'preview_2d',
+      reason_code: 'asset_load_failed',
+    });
+  });
+
+  test('tracked Library events travel through PostHog with environment + app_version, PII-free', async () => {
+    __resetObservabilityForTests();
+    const { client, captured } = makeClient();
+    await initObservability({ injectedClient: client });
+    trackEvent('library_search_performed', {
+      query_length: 7,
+      results_count: 0,
+      query: 'someone@example.com flange',
+    });
+    expect(captured).toHaveLength(1);
+    expect(captured[0].event).toBe('library_search_performed');
+    expect(captured[0].properties).toMatchObject({ query_length: 7, results_count: 0 });
+    expect(captured[0].properties).toHaveProperty('environment');
+    expect(captured[0].properties).toHaveProperty('app_version');
+    expect(JSON.stringify(captured[0].properties)).not.toContain('someone@example.com');
+    __resetObservabilityForTests();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// PB-JOBS-PILOT-003 §14–§16, §31 — Jobs funnel events
+// ---------------------------------------------------------------------------
+
+test.describe('Jobs funnel events (PB-JOBS-PILOT-003)', () => {
+  const JOB_ID = 'c15f2a9c-5f3d-4c98-b2b5-febf38ca6ee8';
+
+  test('job_viewed keeps a UUID job_id raw (long-token regression)', () => {
+    // job_id is 36 chars: LONG_TOKEN_RE would redact it without the
+    // JOB_ID_RE passthrough — same class of bug as component_id.
+    expect(buildEventProps('job_viewed', {
+      job_id: JOB_ID,
+      source_language: 'en',
+      rendered_locale: 'es',
+      country: 'Belgium',
+      trade: 'Pipefitting',
+    })).toEqual({
+      job_id: JOB_ID,
+      source_language: 'en',
+      rendered_locale: 'es',
+      country: 'Belgium',
+      trade: 'Pipefitting',
+    });
+  });
+
+  test('job_viewed drops a non-UUID job_id (never raw user text)', () => {
+    const props = buildEventProps('job_viewed', { job_id: 'not-a-uuid; DROP TABLE' });
+    expect(props?.job_id).toBeUndefined();
+  });
+
+  test('apply_started / apply_submitted share the funnel allowlist', () => {
+    for (const name of ['apply_started', 'apply_submitted'] as const) {
+      const props = buildEventProps(name, {
+        job_id: JOB_ID,
+        source_language: 'en',
+        rendered_locale: 'nl',
+        country: 'Belgium',
+        trade: 'Pipefitting',
+      });
+      expect(props).toEqual({
+        job_id: JOB_ID,
+        source_language: 'en',
+        rendered_locale: 'nl',
+        country: 'Belgium',
+        trade: 'Pipefitting',
+      });
+    }
+  });
+
+  test('candidate identity never survives a funnel event (§16 anti-PII)', () => {
+    // Even if a caller mistakenly passes candidate data, the allowlist drops
+    // unknown keys — no email/name/phone/user_id can ever travel.
+    const props = buildEventProps('apply_submitted', {
+      job_id: JOB_ID,
+      candidate_email: 'joao.silva@example.com',
+      candidate_name: 'João Silva',
+      phone: '+32 470 12 34 56',
+      user_id: '96a4d6eb-fb0d-407b-91e6-ccc51c0f3ae2',
+    });
+    expect(props).toEqual({ job_id: JOB_ID });
+  });
+
+  test('funnel events travel through PostHog PII-free with environment + app_version', async () => {
+    __resetObservabilityForTests();
+    const { client, captured } = makeClient();
+    await initObservability({ injectedClient: client });
+    trackEvent('apply_submitted', {
+      job_id: JOB_ID,
+      source_language: 'en',
+      rendered_locale: 'es',
+      country: 'Belgium',
+      trade: 'Pipefitting',
+    });
+    expect(captured).toHaveLength(1);
+    expect(captured[0].event).toBe('apply_submitted');
+    expect(captured[0].properties).toMatchObject({ job_id: JOB_ID, rendered_locale: 'es' });
+    expect(captured[0].properties).toHaveProperty('environment');
+    expect(captured[0].properties).toHaveProperty('app_version');
+    const raw = JSON.stringify(captured[0].properties);
+    expect(raw).not.toContain('@');
+    expect(raw).not.toContain('96a4d6eb');
+    __resetObservabilityForTests();
+  });
+
+  test('job_viewed dedupes by job id (no double-count on re-render)', async () => {
+    __resetObservabilityForTests();
+    const { client, captured } = makeClient();
+    await initObservability({ injectedClient: client });
+    trackEvent('job_viewed', { job_id: JOB_ID }, { dedupeKey: JOB_ID });
+    trackEvent('job_viewed', { job_id: JOB_ID }, { dedupeKey: JOB_ID });
+    expect(captured.filter((c) => c.event === 'job_viewed')).toHaveLength(1);
+    __resetObservabilityForTests();
+  });
+});

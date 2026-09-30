@@ -28,6 +28,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 export const TABLES = {
   profiles: 'app_14da0f1941_profiles',
   jobs: 'app_14da0f1941_jobs',
+  jobTranslations: 'app_14da0f1941_job_translations',
   jobApplications: 'app_14da0f1941_job_applications',
   toolUsage: 'app_14da0f1941_tool_usage',
   dailyLogs: 'app_14da0f1941_daily_logs',
@@ -88,6 +89,7 @@ export const TABLES = {
   // Stripe / monetization (PB-STRIPE-001 Fase 2, DEC-30)
   // Client access is read-only; all writes happen in Edge Functions via service_role.
   stripePrices: 'app_stripe_prices',
+  legalEntities: 'app_legal_entities',
   orders: 'app_orders',
   subscriptions: 'app_subscriptions',
   stripeEvents: 'app_stripe_events',
@@ -109,6 +111,18 @@ export const TABLES = {
   // personal data, which instructors must never receive.
   marketplaceRevenueEvents: 'app_marketplace_revenue_events',
   marketplaceRevenueEventsInstructor: 'app_marketplace_revenue_events_instructor',
+  // NCR / ledger / settlement / self-billing (PB-MARKET-NCR-LEDGER-001,
+  // sql/014-ncr-ledger-settlement.sql). Instructor reads own rows via RLS;
+  // writes are service_role only (webhook + instructor-settlement-run).
+  instructorLedgerEntries: 'app_instructor_ledger_entries',
+  settlements: 'app_settlements',
+  selfBillingInvoices: 'app_self_billing_invoices',
+  // Consent + tax evidence (PB-MARKET-CONSENT-001 / PB-MARKET-TAX-ENGINE-001,
+  // sql/012, sql/013). Append-only; owner/admin read.
+  consentEvidence: 'app_consent_evidence',
+  supplyEvents: 'app_supply_events',
+  taxDeterminations: 'app_tax_determinations',
+  taxRegistrations: 'app_tax_registrations',
   // PIDM Catalog (Phase C — PIDM-CATALOG-EXPANSION-001)
   pidmStandards: 'pidm_standards',
   pidmComponents: 'pidm_components',

@@ -119,7 +119,7 @@ export default function CommunityChannel() {
     if (userIds.length > 0) {
       const { data: profData } = await supabase
         .from(TABLES.profiles)
-        .select('id, display_name, title, avatar_url')
+        .select('id, full_name, title, avatar_url')
         .in('id', userIds);
       (profData as AuthorSummary[] | null)?.forEach((p) => authorsMap.set(p.id, p));
     }
@@ -257,10 +257,11 @@ export default function CommunityChannel() {
           recipientId: post.user_id,
           actorId: user.id,
           type: 'like',
-          postId: post.id,
-          postTitle: post.title,
-          postChannelSlug: channelSlug ?? null,
-          actorName: profile?.display_name ?? null,
+          title: post.title ?? undefined,
+          relatedEntityType: 'community_post',
+          relatedEntityId: post.id,
+          actionUrl: channelSlug ? `/community/${channelSlug}/post/${post.id}` : undefined,
+          actorName: profile?.full_name ?? null,
         });
       }
     }
@@ -331,17 +332,26 @@ export default function CommunityChannel() {
 
     const morePosts = (moreData as Post[]) ?? [];
     if (morePosts.length > 0) {
-      // Fetch authors for new posts
-      const newUserIds = Array.from(new Set(morePosts.map((p) => p.user_id).filter((uid) => !posts.find((p) => p.user_id === uid))));
+      // Merge already-loaded authors with newly fetched ones (same pattern as initial load).
+      const authorsMap = new Map<string, AuthorSummary>();
+      posts.forEach((p) => {
+        if (p.author) authorsMap.set(p.author.id, p.author);
+      });
+      const newUserIds = Array.from(
+        new Set(morePosts.map((p) => p.user_id).filter((uid) => !authorsMap.has(uid))),
+      );
       if (newUserIds.length > 0) {
         const { data: profData } = await supabase
           .from(TABLES.profiles)
-          .select('id, display_name, title, avatar_url')
+          .select('id, full_name, title, avatar_url')
           .in('id', newUserIds);
-        // Note: authors are enriched in the render layer via posts state;
-        // a full implementation would merge authors here. For now, append posts.
+        (profData as AuthorSummary[] | null)?.forEach((p) => authorsMap.set(p.id, p));
       }
-      setPosts((prev) => [...prev, ...morePosts]);
+      const enrichedMore = morePosts.map((p) => ({
+        ...p,
+        author: authorsMap.get(p.user_id) ?? null,
+      }));
+      setPosts((prev) => [...prev, ...enrichedMore]);
       setHasMore(morePosts.length === PAGE_SIZE);
       setPage(nextPage);
     } else {
@@ -582,7 +592,7 @@ function PostRow({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 text-[11px] text-zinc-500">
             <span className="font-medium text-zinc-300">
-              {post.author?.display_name || t('common.anonymous')}
+              {post.author?.full_name || t('common.anonymous')}
             </span>
             {post.author?.title && (
               <>
@@ -734,14 +744,14 @@ function Avatar({
     return (
       <img
         src={author.avatar_url}
-        alt={author.display_name || t('common.anonymous')}
+        alt={author.full_name || t('common.anonymous')}
         className="h-10 w-10 object-cover bg-zinc-900"
       />
     );
   }
   return (
     <div className="flex h-10 w-10 items-center justify-center bg-zinc-900 text-[11px] font-semibold text-[#f59e0b] uppercase">
-      {initialsFrom(author?.display_name)}
+      {initialsFrom(author?.full_name)}
     </div>
   );
 }

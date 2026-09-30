@@ -140,7 +140,13 @@ jobs:
       contents: read
     uses: ./.github/workflows/auth-e2e.yml
     with:
-      target_url: 'https://app.pipingbox.com'
+      # PB-PWA-IDENTITY-001 housekeeping: verify the canonical origin directly.
+      # This used to target app.pipingbox.com, which only reaches production
+      # through the PB-WEB-007 301. The assertion still passed (Playwright
+      # follows the redirect), but it measured the legacy hop instead of the
+      # origin users actually land on, and it would keep passing even if the
+      # canonical origin broke while the redirect stayed healthy.
+      target_url: 'https://pipingbox.com'
       source_ref: ${{ github.event.inputs.commit_sha }}
     secrets:
       E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
@@ -153,7 +159,9 @@ jobs:
     permissions:
       contents: read
     env:
-      PREVIEW_URL: 'https://app.pipingbox.com'
+      # Same housekeeping as the auth gate above: assert the public/protected
+      # route surface on the canonical origin, not on the legacy 301 hop.
+      PREVIEW_URL: 'https://pipingbox.com'
     steps:
       - name: Checkout exact deployed app ref
         uses: actions/checkout@v4

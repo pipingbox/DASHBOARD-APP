@@ -158,6 +158,38 @@ interface RevenueEventRow {
 }
 
 /**
+ * PB-CORP-LEGAL-ENTITY-001: resolve the invoice supplier fields from the
+ * active LegalEntity. NEVER hardcodes a legal person — 'PIPINGBOX OU' does
+ * not exist and the 003 schema DEFAULT for supplier_name is removed by
+ * 007-legal-entities.sql. Until an entity is activated (real fiscal data
+ * loaded by the PO), the honest issuer is the brand itself with no VAT id.
+ */
+async function resolveInvoiceSupplier(): Promise<{
+  supplier_name: string;
+  supplier_vat_id: string | null;
+  legal_entity_id?: string;
+}> {
+  try {
+    const { data } = await supabase
+      .from("app_legal_entities")
+      .select("id, legal_name, vat_number, trading_name")
+      .eq("is_active", true)
+      .limit(1);
+    const entity = data?.[0];
+    if (entity) {
+      return {
+        supplier_name: entity.legal_name,
+        supplier_vat_id: entity.vat_number ?? null,
+        legal_entity_id: entity.id,
+      };
+    }
+  } catch (err) {
+    console.error("stripe-webhook: legal entity lookup failed", err);
+  }
+  return { supplier_name: "PIPINGBOX", supplier_vat_id: null };
+}
+
+/**
  * Insert one revenue event. NEVER throws.
  *
  * Telemetry must not be able to break payment processing: an instructor's
@@ -321,6 +353,97 @@ async function fetchChargeForIntent(
   } catch (err) {
     console.error("stripe-webhook: charge lookup failed for intent", paymentIntentId, err);
     return null;
+  }
+}
+
+// =============================================================================
+// PB-MARKET-NCR-LEDGER-001 (T7, PO GO 2026-09-23) — instructor ledger writes
+// =============================================================================
+
+/** T+30 settlement window (DEC-66), in days. */
+const SETTLEMENT_WINDOW_DAYS = 30;
+
+interface LedgerEntryInput {
+  instructorId: string;
+  orderId: string | null;
+  courseId: string | null;
+  // PO 2026-09-24, section 2 — 1:1 traceability: the ORIGINAL payment
+  // reference (payment intent / charge id) the entry refers to.
+  stripePaymentReference: string | null;
+  entryType: "SALE_CREDIT" | "REFUND_DEBIT" | "CHARGEBACK_DEBIT";
+  amountCents: number;
+  currency: string;
+  occurredAt: string;
+  livemode: boolean | null;
+}
+
+/**
+ * Append one instructor-ledger entry for a sale/refund/chargeback that has an
+ * instructor attribution. NEVER throws (same rule as recordRevenueEvent:
+ * telemetry must not break payment processing).
+ *
+ * 1:1 TRACEABILITY (PO 2026-09-24, section 2): every row carries the ORIGINAL
+ * order, payment, revenue event, course and instructor it refers to, so an
+ * April chargeback links to its January sale without touching the (immutable)
+ * January settlement. The revenue-event link is best-effort: the latest
+ * matching event for the order is attached when found.
+ *
+ * SALE_CREDIT rows start PENDING with available_at = occurred_at + T+30; the
+ * settlement runner matures them. REFUND/CHARGEBACK debits carry a NEGATIVE
+ * amount and are AVAILABLE immediately: post-payout reversals are compensated
+ * OFFSET-first against future settlements, RECOVERABLE when no future
+ * balance suffices (PO, section 5). The OFFSET/RECOVERABLE rows themselves
+ * are produced by the settlement runner from these debits — the webhook only
+ * records the observed reversal.
+ */
+async function recordLedgerEntry(input: LedgerEntryInput): Promise<void> {
+  try {
+    const occurred = new Date(input.occurredAt);
+    const availableAt =
+      input.entryType === "SALE_CREDIT"
+        ? new Date(occurred.getTime() + SETTLEMENT_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString()
+        : input.occurredAt;
+
+    // Best-effort link to the revenue event for this order (the SALE event
+    // for credits; the REFUND/CHARGEBACK event for debits — the latest one
+    // wins, which is the event this entry refers to). Absence is honest:
+    // "not linked", never "nothing happened".
+    let revenueEventId: string | null = null;
+    if (input.orderId) {
+      const { data: revEvent } = await supabase
+        .from("app_marketplace_revenue_events")
+        .select("id")
+        .eq("order_id", input.orderId)
+        .order("occurred_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      revenueEventId = revEvent?.id ?? null;
+    }
+
+    const { error } = await supabase.from("app_instructor_ledger_entries").insert({
+      instructor_id: input.instructorId,
+      order_id: input.orderId,
+      revenue_event_id: revenueEventId,
+      course_id: input.courseId,
+      stripe_payment_reference: input.stripePaymentReference,
+      entry_type: input.entryType,
+      // Debits are available for offset immediately; credits wait T+30.
+      status: input.entryType === "SALE_CREDIT" ? "PENDING" : "AVAILABLE",
+      amount_cents: input.amountCents,
+      currency: input.currency,
+      occurred_at: input.occurredAt,
+      available_at: availableAt,
+      livemode: input.livemode,
+    });
+    if (error) {
+      console.error(
+        "stripe-webhook: ledger entry insert failed, type=",
+        input.entryType,
+        error,
+      );
+    }
+  } catch (err) {
+    console.error("stripe-webhook: ledger entry insert threw, type=", input.entryType, err);
   }
 }
 
@@ -490,6 +613,80 @@ Deno.serve(async (req) => {
 
           if (error) throw error;
 
+          // PB-MARKET-CONSENT-001 — close the evidence chain:
+          // consent -> session -> paid order -> SUPPLY START.
+          //
+          // The withdrawal-right clock runs from the START OF SUPPLY, which
+          // for a recorded course is the moment the entitlement opens — right
+          // here, when the order turns paid. Recorded as an append-only fact;
+          // the unique partial index on app_supply_events makes a webhook
+          // retry a no-op rather than a second "supply began".
+          //
+          // Wrapped in its own try: access is already granted above and a
+          // telemetry failure must not undo it (same rule as revenue events).
+          try {
+            const consentId = metadata.consent_id ?? null;
+            const paidOrderIds = (updated ?? []).map((o: { id: string }) => o.id);
+
+            if (paidOrderIds.length > 0) {
+              if (consentId) {
+                // Link the consent to the order it unlocked. A one-time
+                // linkage update on a service-owned row: the consent FACT
+                // (text, hash, timestamp) is never touched.
+                const { error: linkErr } = await supabase
+                  .from("app_consent_evidence")
+                  .update({ order_id: paidOrderIds[0] })
+                  .eq("id", consentId)
+                  .is("order_id", null);
+                if (linkErr) {
+                  console.error("stripe-webhook: consent order link failed", linkErr);
+                }
+              }
+
+              const occurredAt = toIso(event.created) ?? new Date().toISOString();
+              const supplyRows = paidOrderIds.map((orderId: string) => ({
+                order_id: orderId,
+                user_id: userId,
+                consent_id: consentId,
+                event_type: "SUPPLY_STARTED",
+                occurred_at: occurredAt,
+                // The durable confirmation the buyer keeps is the Stripe
+                // receipt for the session plus their own readable evidence
+                // rows (owner SELECT on app_consent_evidence /
+                // app_supply_events). The session id identifies that receipt.
+                durable_confirmation_ref: session.id,
+                evidence: { source: "checkout.session.completed" },
+              }));
+
+              // Plain insert, not an upsert: the one-start-per-order index is
+              // PARTIAL (WHERE event_type = 'SUPPLY_STARTED'), and PostgREST
+              // cannot target a partial index as an upsert arbiter. A webhook
+              // retry hits 23505, which is the idempotency guarantee working,
+              // so it is logged at info level and is not an error.
+              for (const row of supplyRows) {
+                const { error: supplyErr } = await supabase
+                  .from("app_supply_events")
+                  .insert(row);
+                if (supplyErr) {
+                  if (supplyErr.code === "23505") {
+                    console.log(
+                      "stripe-webhook: supply start already recorded (retry), order=",
+                      row.order_id,
+                    );
+                  } else {
+                    console.error("stripe-webhook: supply event insert failed", supplyErr);
+                  }
+                }
+              }
+            }
+          } catch (consentChainErr) {
+            console.error(
+              "stripe-webhook: consent/supply chain failed for session",
+              session.id,
+              consentChainErr,
+            );
+          }
+
           // Recovery path: create-checkout logs and continues if its pending
           // insert fails, so the rows may not exist. Rebuild them from metadata
           // rather than lose a paid order.
@@ -591,6 +788,105 @@ Deno.serve(async (req) => {
               // Real money or a test-mode run. Transcribed from the event.
               livemode: event.livemode,
             });
+
+            // PB-MARKET-NCR-LEDGER-001: instructor ledger credit (T+30 PENDING).
+            // Only when the sale has an instructor attribution — PipingBox
+            // Originals have no instructor and settle with no one.
+            if (attribution.instructor_id) {
+              await recordLedgerEntry({
+                instructorId: attribution.instructor_id,
+                orderId: attribution.id,
+                courseId: attribution.course_id,
+                stripePaymentReference:
+                  (session.payment_intent as string | null) ?? session.id,
+                entryType: "SALE_CREDIT",
+                amountCents: session.amount_total ?? 0,
+                currency: (session.currency || "eur").toUpperCase(),
+                occurredAt: toIso(event.created) ?? new Date().toISOString(),
+                livemode: event.livemode,
+              });
+            }
+
+            // -----------------------------------------------------------
+            // PB-MARKET-TAX-ENGINE-001 (DEC-69) — persist the tax result.
+            //
+            // PIPINGBOX is the source of truth for tax RESULTS: whatever the
+            // provider determined is persisted here with our own product
+            // classification snapshot. A determination is recorded ONLY when
+            // the provider actually ran (automatic_tax complete): while it is
+            // disabled there is NO result to persist, and writing a zero-tax
+            // row would fabricate "no obligation" (NON_EU ≠ TAX_FREE).
+            // -----------------------------------------------------------
+            try {
+              const automaticTaxRan =
+                (session as { automatic_tax?: { status?: string } }).automatic_tax
+                  ?.status === "complete";
+
+              if (automaticTaxRan) {
+                const productKey = (metadata.product_keys || "").split(",")[0] || null;
+
+                // Our classification snapshot from the catalog (the row may be
+                // reclassified later; the transaction keeps what was true then).
+                let productTaxCategory: string | null = null;
+                if (productKey) {
+                  const { data: priceRow } = await supabase
+                    .from("app_stripe_prices")
+                    .select("tax_category")
+                    .eq("product_key", productKey)
+                    .maybeSingle();
+                  productTaxCategory = priceRow?.tax_category ?? null;
+                }
+
+                const supplier = await resolveInvoiceSupplier();
+
+                const { error: taxErr } = await supabase
+                  .from("app_tax_determinations")
+                  .insert({
+                    order_id: attribution.id,
+                    legal_entity_id: supplier.legal_entity_id ?? null,
+                    provider: "stripe_tax",
+                    provider_reference: session.id,
+                    jurisdiction:
+                      customerDetails?.address?.country ??
+                      charge?.billing_details?.address?.country ??
+                      null,
+                    tax_type: null,
+                    tax_rate: null,
+                    taxable_amount_cents: session.amount_subtotal ?? null,
+                    tax_amount_cents: session.total_details?.amount_tax ?? null,
+                    currency: (session.currency || "eur").toUpperCase(),
+                    product_tax_category: productTaxCategory,
+                    customer_country: customerDetails?.address?.country ?? null,
+                    customer_region: customerDetails?.address?.state ?? null,
+                    // THREE-STATE: never defaulted.
+                    buyer_is_business: null,
+                    customer_tax_id_status: buyerTaxId ? "PROVIDED" : "NOT_PROVIDED",
+                    // Only positive evidence may ever set reverse_charge true;
+                    // no code path produces it yet, and vat_determination_status
+                    // stays UNDETERMINED (the coherence constraint in 013 makes
+                    // true + UNDETERMINED unrepresentable).
+                    reverse_charge: false,
+                    reverse_charge_status: "UNDETERMINED",
+                    determined_at:
+                      toIso(event.created) ?? new Date().toISOString(),
+                    provider_config_version: null,
+                    evidence: {
+                      source: "checkout.session.completed",
+                      automatic_tax_status: "complete",
+                    },
+                    livemode: event.livemode,
+                  });
+                if (taxErr) {
+                  console.error("stripe-webhook: tax determination insert failed", taxErr);
+                }
+              }
+            } catch (taxCaptureErr) {
+              console.error(
+                "stripe-webhook: tax determination capture failed for session",
+                session.id,
+                taxCaptureErr,
+              );
+            }
           } catch (captureErr) {
             console.error(
               "stripe-webhook: SALE capture failed for session",
@@ -710,6 +1006,9 @@ Deno.serve(async (req) => {
               customer_country_evidence: countryEvidence,
               currency: (invoice.currency || "eur").toUpperCase(),
               pdf_url: invoice.invoice_pdf,
+              // PB-CORP-LEGAL-ENTITY-001: supplier resolved from the active
+              // LegalEntity — never a hardcoded legal person.
+              ...(await resolveInvoiceSupplier()),
             },
             { onConflict: "stripe_invoice_id" },
           );
@@ -834,6 +1133,26 @@ Deno.serve(async (req) => {
               // Real money or a test-mode run. Transcribed from the event.
               livemode: event.livemode,
             });
+
+            // PB-MARKET-NCR-LEDGER-001: instructor ledger debit. Negative
+            // amount (money leaving), AVAILABLE immediately — post-payout
+            // reversals are compensated OFFSET-first against future
+            // settlements by the settlement runner (PO, section 5).
+            if (attribution.instructor_id && refundedCents > 0) {
+              await recordLedgerEntry({
+                instructorId: attribution.instructor_id,
+                orderId: attribution.id,
+                courseId: attribution.course_id,
+                // The ORIGINAL payment the refund reverses.
+                stripePaymentReference:
+                  (charge.payment_intent as string | null) ?? charge.id,
+                entryType: "REFUND_DEBIT",
+                amountCents: -refundedCents,
+                currency: (charge.currency || "eur").toUpperCase(),
+                occurredAt: toIso(event.created) ?? new Date().toISOString(),
+                livemode: event.livemode,
+              });
+            }
           } catch (captureErr) {
             console.error("stripe-webhook: refund capture failed for", charge.id, captureErr);
           }
@@ -913,6 +1232,27 @@ Deno.serve(async (req) => {
             // Real money or a test-mode run. Transcribed from the event.
             livemode: event.livemode,
           });
+
+          // PB-MARKET-NCR-LEDGER-001: instructor ledger debit on dispute open.
+          // The funds are withdrawn pending outcome; the debit is AVAILABLE
+          // immediately and compensated OFFSET-first by the settlement runner.
+          // If the dispute is later WON, charge.dispute.closed records the
+          // reversal and the runner nets it out — nothing here is edited.
+          if (attribution.instructor_id && (dispute.amount ?? 0) > 0) {
+            await recordLedgerEntry({
+              instructorId: attribution.instructor_id,
+              orderId: attribution.id,
+              courseId: attribution.course_id,
+              // The ORIGINAL payment under dispute.
+              stripePaymentReference:
+                (dispute.payment_intent as string | null) ?? dispute.id,
+              entryType: "CHARGEBACK_DEBIT",
+              amountCents: -(dispute.amount ?? 0),
+              currency: (dispute.currency || "eur").toUpperCase(),
+              occurredAt: toIso(event.created) ?? new Date().toISOString(),
+              livemode: event.livemode,
+            });
+          }
         } catch (captureErr) {
           console.error("stripe-webhook: dispute capture failed for", dispute.id, captureErr);
         }

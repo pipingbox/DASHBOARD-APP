@@ -1,0 +1,241 @@
+[
+  {
+    "id": "m1-conceptos",
+    "iconKey": "Scale",
+    "officialRef": "Ley 31/1995 §1",
+    "hours": "4 horas",
+    "title": "Módulo 1: Conceptos básicos y marco normativo",
+    "lessons": [
+      {
+        "title": "1.1 Concepto de trabajo y de salud",
+        "duration": "45 min",
+        "topics": [
+          "Definición de trabajo",
+          "Definición de salud (OMS)",
+          "Trabajo y salud: relación",
+          "Daños derivados del trabajo"
+        ]
+      },
+      {
+        "title": "1.2 Marco normativo",
+        "duration": "60 min",
+        "topics": [
+          "Ley 31/1995 de Prevención de Riesgos Laborales",
+          "RD 39/1997 Reglamento de los Servicios de Prevención",
+          "Directivas marco de la UE (89/391/CEE)",
+          "Obligaciones del empresario y del trabajador"
+        ]
+      },
+      {
+        "title": "1.3 Organización de la prevención",
+        "duration": "45 min",
+        "topics": [
+          "Servicios de prevención propios y ajenos",
+          "Delegados de prevención",
+          "Comité de Seguridad y Salud",
+          "Mutuas de accidentes de trabajo"
+        ]
+      },
+      {
+        "title": "1.4 Riesgo profesional y daño",
+        "duration": "30 min",
+        "topics": [
+          "Concepto de riesgo profesional",
+          "Factor de riesgo",
+          "Daño: accidente vs enfermedad profesional",
+          "Enfermedades profesionales (RD 1299/2006)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m2-riesgos-generales",
+    "iconKey": "AlertTriangle",
+    "officialRef": "RD 39/1997 §2",
+    "hours": "4 horas",
+    "title": "Módulo 2: Riesgos generales",
+    "lessons": [
+      {
+        "title": "2.1 Caídas y atrapamientos",
+        "duration": "45 min",
+        "topics": [
+          "Caídas al mismo nivel",
+          "Caídas a distinto nivel",
+          "Atrapamientos por máquinas",
+          "Prevención en trabajos en altura"
+        ]
+      },
+      {
+        "title": "2.2 Riesgo eléctrico",
+        "duration": "45 min",
+        "topics": [
+          "Contacto directo e indirecto",
+          "Zonas de riesgo eléctrico (BA4/BA5)",
+          "Trabajos en proximidad",
+          "Locales húmedos y conductores"
+        ]
+      },
+      {
+        "title": "2.3 Riesgo químico",
+        "duration": "45 min",
+        "topics": [
+          "Vías de entrada (inhalación, dérmica, ingestión)",
+          "Productos químicos peligrosos",
+          "Frases H y P (CLP)",
+          "Fichas de datos de seguridad"
+        ]
+      },
+      {
+        "title": "2.4 Riesgo de incendio",
+        "duration": "45 min",
+        "topics": [
+          "Triángulo del fuego",
+          "Clases de fuego (A, B, C, D, K)",
+          "Extintores portátiles",
+          "Plan de evacuación"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m3-sector-industrial",
+    "iconKey": "Factory",
+    "officialRef": "RD 39/1997 §3",
+    "hours": "4 horas",
+    "title": "Módulo 3: Riesgos específicos del sector industrial",
+    "lessons": [
+      {
+        "title": "3.1 Soldadura y oxicorte",
+        "duration": "60 min",
+        "topics": [
+          "Riesgos de soldadura eléctrica (SMAW, GMAW, GTAW)",
+          "Humos de soldadura (manganeso, níquel, cromo VI)",
+          "Radiación UV/IR",
+          "Oxicorte: riesgo de incendio y explosión",
+          "Permiso de trabajo en caliente"
+        ]
+      },
+      {
+        "title": "3.2 Trabajos con tuberías industriales",
+        "duration": "60 min",
+        "topics": [
+          "Espacios confinados (RD 681/2003)",
+          "Izaje de cargas (grúas, polipastos)",
+          "Trabajos a presión",
+          "Etiquetado y bloqueo (LOTO)"
+        ]
+      },
+      {
+        "title": "3.3 Espacios confinados",
+        "duration": "60 min",
+        "topics": [
+          "Definición y ejemplos (tanques, tuberías, pozos)",
+          "Atmósferas peligrosas (O2, H2S, CO, LEL)",
+          "Permisos de entrada",
+          "Vigilante y equipo de rescate",
+          "Ventilación y medición de gases"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m4-preventivas",
+    "iconKey": "ShieldCheck",
+    "officialRef": "RD 39/1997 §4",
+    "hours": "4 horas",
+    "title": "Módulo 4: Medidas preventivas y EPIs",
+    "lessons": [
+      {
+        "title": "4.1 EPIs (Equipos de Protección Individual)",
+        "duration": "60 min",
+        "topics": [
+          "Clases de EPI (categoría I, II, III)",
+          "Casco, gafas, guantes, calzado",
+          "Protectores auditivos",
+          "Mascarillas (FFP1/2/3)",
+          "Arnés anticaída"
+        ]
+      },
+      {
+        "title": "4.2 Señalización de seguridad",
+        "duration": "45 min",
+        "topics": [
+          "Señales de prohibición (rojo)",
+          "Advertencia (amarillo)",
+          "Obligación (azul)",
+          "Salvamento o socorro (verde)",
+          "Señalización de tuberías (RD 485/1997)"
+        ]
+      },
+      {
+        "title": "4.3 LOTO (Lockout/Tagout)",
+        "duration": "45 min",
+        "topics": [
+          "Bloqueo de energías",
+          "Etiquetado",
+          "Procedimiento LOTO paso a paso",
+          "Aplicación en válvulas y bombas"
+        ]
+      },
+      {
+        "title": "4.4 Permisos de trabajo",
+        "duration": "30 min",
+        "topics": [
+          "Permiso de trabajo en caliente",
+          "Permiso de espacios confinados",
+          "Permiso de trabajo en altura",
+          "Permiso de trabajo eléctrico"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "5-primeros-auxilios",
+    "iconKey": "HeartPulse",
+    "officialRef": "RD 39/1997 §5",
+    "hours": "4 horas",
+    "title": "Módulo 5: Primeros auxilios y emergencias",
+    "lessons": [
+      {
+        "title": "5.1 RCP (Reanimación Cardiopulmonar)",
+        "duration": "60 min",
+        "topics": [
+          "Cadena de supervivencia",
+          "Compresiones torácicas (30:2)",
+          "Uso de DEA (desfibrilador)",
+          "Posición lateral de seguridad"
+        ]
+      },
+      {
+        "title": "5.2 Hemorragias y heridas",
+        "duration": "45 min",
+        "topics": [
+          "Hemorragias externas",
+          "Compresión directa",
+          "Torniquete (cuándo usarlo)",
+          "Heridas y quemaduras"
+        ]
+      },
+      {
+        "title": "5.3 Quemaduras químicas y térmicas",
+        "duration": "45 min",
+        "topics": [
+          "Clasificación de quemaduras (1º, 2º, 3º grado)",
+          "Quemaduras químicas (ducha de emergencia)",
+          "Tratamiento de primeros auxilios",
+          "Evacuación"
+        ]
+      },
+      {
+        "title": "5.4 Plan de autoprotección y emergencias",
+        "duration": "30 min",
+        "topics": [
+          "Plan de autoprotección (RD 393/2007)",
+          "Simulacros",
+          "Puntos de encuentro",
+          "Equipos de primera intervención (EPI)"
+        ]
+      }
+    ]
+  }
+]

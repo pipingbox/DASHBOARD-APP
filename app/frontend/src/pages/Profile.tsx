@@ -26,6 +26,7 @@ import { ProfileCompleteness } from '@/components/profile/ProfileCompleteness';
 import { generateCV } from '@/lib/generateCV';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import type { Certification } from '@/lib/certifications';
+import type { WorkExperience } from '@/lib/workerProfile';
 
 /**
  * Profile page — strict DB-as-source-of-truth approach.
@@ -56,6 +57,7 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [experienceToEdit, setExperienceToEdit] = useState<WorkExperience | null>(null);
 
   const isMountedRef = useRef(true);
 
@@ -286,7 +288,17 @@ export default function Profile() {
 
       <CertExpiryWarnings />
 
-      <MatchReadyBanner />
+      <MatchReadyBanner
+        onAddExperienceDetails={setExperienceToEdit}
+        onNavigateToTarget={(elementId, focus) => {
+          const el = document.getElementById(elementId);
+          if (!el) return;
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (focus && typeof el.focus === 'function') {
+            window.setTimeout(() => el.focus({ preventScroll: true }), 450);
+          }
+        }}
+      />
 
       {/* Basic Professional Info */}
       <form onSubmit={save} className="grid gap-6 lg:grid-cols-3">
@@ -305,6 +317,7 @@ export default function Profile() {
                 {t('common.fullName')}
               </Label>
               <Input
+                id="profile-field-full_name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 className="bg-zinc-950 border-zinc-800 focus-visible:ring-[#f59e0b]"
@@ -315,6 +328,7 @@ export default function Profile() {
                 {t('profile.jobTitle')}
               </Label>
               <Input
+                id="profile-field-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={t('profile.jobTitlePlaceholder')}
@@ -336,6 +350,7 @@ export default function Profile() {
                 {t('profile.location')}
               </Label>
               <Input
+                id="profile-field-location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder={t('profile.locationPlaceholder')}
@@ -347,6 +362,7 @@ export default function Profile() {
                 {t('profile.yearsExperience')}
               </Label>
               <Input
+                id="profile-field-years_experience"
                 type="number"
                 min={0}
                 value={years}
@@ -362,6 +378,7 @@ export default function Profile() {
               {t('profile.skills')}
             </Label>
             <Input
+              id="profile-field-skills"
               value={skills}
               onChange={(e) => setSkills(e.target.value)}
               placeholder={t('profile.skillsPlaceholder')}
@@ -374,6 +391,7 @@ export default function Profile() {
               {t('profile.bio')}
             </Label>
             <Textarea
+              id="profile-field-bio"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={5}
@@ -402,7 +420,7 @@ export default function Profile() {
               ) : (
                 <FileDown className="mr-2 h-4 w-4" />
               )}
-              {generating ? t('profile.generatingCV') : t('profile.generateCV')}
+              <span>{generating ? t('profile.generatingCV') : t('profile.generateCV')}</span>
             </Button>
           </div>
         </div>
@@ -480,7 +498,10 @@ export default function Profile() {
       <CVUploadSection />
 
       {/* Work Experience */}
-      <WorkExperienceSection />
+      <WorkExperienceSection
+        experienceToEdit={experienceToEdit}
+        onEditHandled={() => setExperienceToEdit(null)}
+      />
 
       {/* Certifications */}
       <CertificationsSection />

@@ -19,10 +19,11 @@
  * Supabase itself will reject the callback regardless of this code.
  */
 
-const PRODUCTION_URL = 'https://app.pipingbox.com';
+const PRODUCTION_URL = 'https://pipingbox.com';
+const LEGACY_APP_URL = 'https://app.pipingbox.com';
 const PREVIEW_URL = 'https://pipingbox-app.pipingbox.workers.dev';
 
-const ALLOWED_AUTH_ORIGINS = [PRODUCTION_URL, PREVIEW_URL];
+const ALLOWED_AUTH_ORIGINS = [PRODUCTION_URL, LEGACY_APP_URL, PREVIEW_URL];
 
 function isLocalOrigin(origin: string): boolean {
   return origin.includes('localhost') || origin.includes('127.0.0.1');
@@ -51,6 +52,20 @@ export function getAppBaseUrl(): string {
  */
 export function getAuthRedirectUrl(path: string = '/dashboard'): string {
   return `${getAppBaseUrl()}${path}`;
+}
+
+export function getAuthCallbackUrl(
+  nextPath: string = '/dashboard',
+  language?: string,
+  flow?: 'confirmation' | 'google',
+): string {
+  const params = new URLSearchParams({ next: nextPath });
+  const normalizedLanguage = language?.trim().slice(0, 2).toLowerCase();
+  if (normalizedLanguage && /^[a-z]{2}$/.test(normalizedLanguage)) {
+    params.set('lng', normalizedLanguage);
+  }
+  if (flow) params.set('flow', flow);
+  return `${getAppBaseUrl()}/auth/callback?${params.toString()}`;
 }
 
 /**

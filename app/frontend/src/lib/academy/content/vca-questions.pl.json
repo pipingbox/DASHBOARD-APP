@@ -1,0 +1,2024 @@
+{
+  "m1q1": {
+    "questionText": "Jaki środek może zastosować Inspekcja Pracy?",
+    "optionA": "Zwołać zebranie w celu omówienia warunków pracy.",
+    "optionB": "Nałożyć grzywnę.",
+    "optionC": "Przeprowadzić badanie stanu zdrowia.",
+    "explanation": "Inspekcja Pracy (organ nadzoru nad warunkami pracy) może przeprowadzać badania stanu zdrowia, wstrzymywać pracę i nakładać grzywny. Organizowanie zebrań nie należy do jej uprawnień nadzorczych.",
+    "officialRef": "Moduł 1 — Przepisy prawne",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q2": {
+    "questionText": "Jaki jest cel przepisów o bezpieczeństwie i higienie pracy?",
+    "optionA": "Zapewnienie najlepszych możliwych warunków pracy.",
+    "optionB": "Zmniejszenie liczby wypadków przy pracy.",
+    "optionC": "Poprawa atmosfery w pracy.",
+    "explanation": "Podstawowym celem przepisów BHP jest zapewnienie wszystkim pracownikom najlepszych możliwych warunków pracy, obejmujących zdrowie, bezpieczeństwo i dobrostan.",
+    "officialRef": "Moduł 1 — Przepisy prawne",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q3": {
+    "questionText": "Który z poniższych środków może zastosować Inspekcja Pracy?",
+    "optionA": "Doprowadzić do zwolnienia jednego lub kilku pracowników.",
+    "optionB": "Doprowadzić do wstrzymania pracy.",
+    "optionC": "Przeprowadzić badania lekarskie.",
+    "explanation": "Inspekcja Pracy może wstrzymać pracę w razie bezpośredniego zagrożenia. Nie może zwalniać pracowników — jest to uprawnienie pracodawcy.",
+    "officialRef": "Moduł 1 — Przepisy prawne",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q4": {
+    "questionText": "Co oznacza oznakowanie CE na wyrobie?",
+    "optionA": "Wyrób spełnia minimalne wymagania europejskie.",
+    "optionB": "Wyrobem można handlować wyłącznie na terenie UE.",
+    "optionC": "Producent spełnia europejskie przepisy o bezpieczeństwie i higienie pracy.",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q5": {
+    "questionText": "Co jest jednym z celów ustawy o ochronie środowiska?",
+    "optionA": "Kontrolowanie strumieni odpadów w całym procesie produkcyjnym.",
+    "optionB": "Ochrona środowiska przed szkodliwą działalnością przedsiębiorstw.",
+    "optionC": "Ochrona ludzi przed substancjami niebezpiecznymi.",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q6": {
+    "questionText": "Co opisuje ARBO?",
+    "optionA": "ARBO opisuje warunki pracy (bezpieczeństwo i higienę pracy).",
+    "optionB": "ARBO opisuje sytuacje, w których należy powiadomić Inspekcję Pracy.",
+    "optionC": "ARBO opisuje ryzyko związane z pracą z substancjami niebezpiecznymi.",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q7": {
+    "questionText": "Jaki jest zakres stosowania przepisów o bezpieczeństwie i higienie pracy?",
+    "optionA": "Prawa i obowiązki pracodawcy oraz pracownika w zakresie bezpieczeństwa i higieny w domu.",
+    "optionB": "Prawa i obowiązki pracodawcy oraz pracownika w zakresie bezpieczeństwa i higieny na stanowisku pracy.",
+    "optionC": "Prawa i obowiązki pracownika w zakresie bezpieczeństwa i higieny.",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q8": {
+    "questionText": "W jakich miejscach obowiązują przepisy BHP?",
+    "optionA": "We wszystkich miejscach, w których wykonywana jest praca.",
+    "optionB": "We wszystkich miejscach, w których nie jest wykonywana praca.",
+    "optionC": "We wszystkich miejscach o szczególnych warunkach pracy.",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q9": {
+    "questionText": "Przepisy BHP dotyczą:",
+    "optionA": "Pracodawcy.",
+    "optionB": "Pracowników.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q10": {
+    "questionText": "Przepisy BHP nie odnoszą się do:",
+    "optionA": "Zdrowia",
+    "optionB": "Dobrostanu",
+    "optionC": "Ochrony mienia",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q11": {
+    "questionText": "Przepisy BHP mają zastosowanie do:",
+    "optionA": "Pracodawcy",
+    "optionB": "Pracownika",
+    "optionC": "Obie odpowiedzi są prawidłowe",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q12": {
+    "questionText": "Co nie jest założeniem leżącym u podstaw przepisów BHP?",
+    "optionA": "Wsparcie udzielane przez specjalistów lub służby.",
+    "optionB": "Poszczególni pracownicy nie muszą współpracować.",
+    "optionC": "Konsultowanie się i współpraca z pracownikami.",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q13": {
+    "questionText": "Co jest ważnym zadaniem specjalistów do spraw prewencji?",
+    "optionA": "Współudział w ocenie ryzyka zawodowego.",
+    "optionB": "Nadzorowanie pracodawców.",
+    "optionC": "Przeprowadzanie badań lekarskich.",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q14": {
+    "questionText": "Ważnymi celami przepisów o czasie pracy są:",
+    "optionA": "Wyznaczenie maksymalnego czasu pracy i minimalnego czasu odpoczynku.",
+    "optionB": "Wspieranie możliwości łączenia pracy z obowiązkami opiekuńczymi.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Przepisy prawne"
+  },
+  "m1q15": {
+    "questionText": "Zasady dotyczące oznakowania identyfikacyjnego CE są następujące:",
+    "optionA": "Oznakowanie CE musi być umieszczone przez producenta i importera.",
+    "optionB": "Oznakowanie CE nie jest wymagane dla każdego urządzenia.",
+    "optionC": "Oznakowanie CE musi być umieszczone przez producenta lub importera.",
+    "moduleName": "Przepisy prawne"
+  },
+  "m2q1": {
+    "questionText": "Jak opisuje się pojęcie ryzyka?",
+    "optionA": "Ryzyko = prawdopodobieństwo X skutek.",
+    "optionB": "Ryzyko = zagrożenie X prawdopodobieństwo.",
+    "optionC": "Ryzyko = skutek X zagrożenie.",
+    "explanation": "Ryzyko obliczane jest jako prawdopodobieństwo × skutek (następstwo). Wysokie prawdopodobieństwo zdarzenia o niewielkich skutkach może dawać takie samo ryzyko jak niskie prawdopodobieństwo zdarzenia katastrofalnego.",
+    "officialRef": "Moduł 2 — Zagrożenia, ryzyko i prewencja",
+    "moduleName": "Zagrożenia, ryzyko i prewencja"
+  },
+  "m2q2": {
+    "questionText": "Zagrożeniami na stanowisku pracy są:",
+    "optionA": "Hałas.",
+    "optionB": "Promieniowanie.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "explanation": "Zarówno hałas, jak i promieniowanie są uznanymi zagrożeniami na stanowisku pracy w rozumieniu przepisów BHP. Mogą powodować długotrwałe szkody zdrowotne nawet bez natychmiastowego, widocznego urazu.",
+    "officialRef": "Moduł 2 — Zagrożenia, ryzyko i prewencja",
+    "moduleName": "Zagrożenia, ryzyko i prewencja"
+  },
+  "m2q3": {
+    "questionText": "Co nie jest źródłem zagrożeń i ryzyka na stanowisku pracy?",
+    "optionA": "Sprzęt i urządzenia.",
+    "optionB": "Zachowanie pracownika.",
+    "optionC": "Problemy w domu.",
+    "moduleName": "Zagrożenia, ryzyko i prewencja"
+  },
+  "m2q4": {
+    "questionText": "W jaki sposób można praktycznie podejść do prewencji?",
+    "optionA": "Zapobieganie niebezpiecznym sytuacjom.",
+    "optionB": "Zapobieganie niebezpiecznym zachowaniom.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Zagrożenia, ryzyko i prewencja"
+  },
+  "m2q5": {
+    "questionText": "Czym jest niebezpieczna sytuacja?",
+    "optionA": "Sytuacja spełniająca warunki bezpiecznej pracy.",
+    "optionB": "Sytuacja, w której ludzie nie noszą środków ochrony indywidualnej mimo znaków nakazu.",
+    "optionC": "Sytuacja niespełniająca warunków bezpiecznej pracy, która może doprowadzić do wypadku.",
+    "moduleName": "Zagrożenia, ryzyko i prewencja"
+  },
+  "m2q6": {
+    "questionText": "Które działanie jest niebezpiecznym zachowaniem?",
+    "optionA": "Praca na podstawie pozwoleń tam, gdzie są one wymagane.",
+    "optionB": "Nieprawidłowe używanie narzędzi.",
+    "optionC": "Stosowanie zaleconych środków ochrony indywidualnej.",
+    "moduleName": "Zagrożenia, ryzyko i prewencja"
+  },
+  "m2q7": {
+    "questionText": "Jaki jest najlepszy sposób postępowania w niebezpiecznych sytuacjach?",
+    "optionA": "Usunięcie przyczyny.",
+    "optionB": "Wzywanie innych osób.",
+    "optionC": "Ostrzeganie innych osób.",
+    "moduleName": "Zagrożenia, ryzyko i prewencja"
+  },
+  "m2q8": {
+    "questionText": "Poszczególne etapy RI&E to:",
+    "optionA": "1. Ocena ryzyka / 2. Identyfikacja zagrożeń / 3. Sporządzenie wykazu",
+    "optionB": "1. Identyfikacja zagrożeń / 2. Sporządzenie wykazu ryzyka / 3. Ocena ryzyka",
+    "optionC": "1. Identyfikacja zagrożeń / 2. Ocena ryzyka / 3. Sporządzenie wykazu",
+    "moduleName": "Zagrożenia, ryzyko i prewencja"
+  },
+  "m2q9": {
+    "questionText": "Co oznacza skrót LMRA?",
+    "optionA": "Urząd regulacji rynku pracy.",
+    "optionB": "Analiza ryzyka w ostatniej chwili (Last Minute Risk Analysis).",
+    "optionC": "Ostatnia niewielka analiza losowa.",
+    "moduleName": "Zagrożenia, ryzyko i prewencja"
+  },
+  "m2q10": {
+    "questionText": "Jaki jest cel planowania pracy?",
+    "optionA": "Określenie czasu potrzebnego na wykonanie pracy.",
+    "optionB": "Określenie metody pracy, która jest bezpieczna i nie powoduje szkód zdrowotnych.",
+    "optionC": "Określenie sposobu jak najszybszego wykonania pracy.",
+    "moduleName": "Zagrożenia, ryzyko i prewencja"
+  },
+  "m2q11": {
+    "questionText": "Jakie jest podejście agencji pośrednictwa pracy do zadań o wysokim ryzyku?",
+    "optionA": "Ustalenia z pracodawcą użytkownikiem dotyczące informowania pracownika tymczasowego.",
+    "optionB": "Przekazanie pracownikowi tymczasowemu informacji o zadaniach o wysokim ryzyku.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Zagrożenia, ryzyko i prewencja"
+  },
+  "m3q1": {
+    "questionText": "Jaka jest przyczyna większości wypadków?",
+    "optionA": "Błąd człowieka.",
+    "optionB": "Złe warunki pracy.",
+    "optionC": "Brak właściwej konserwacji narzędzi.",
+    "explanation": "Niebezpieczne zachowanie (błąd człowieka, skróty w pracy) jest główną przyczyną wypadków przy pracy. Awarie techniczne i czynniki środowiskowe również mają w tym udział, ale rzadziej.",
+    "officialRef": "Moduł 3 — Wypadki: przyczyny i zapobieganie",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m3q2": {
+    "questionText": "Według Lateinera jakie czynniki odgrywają rolę w wypadkach?",
+    "optionA": "Uwarunkowania, błąd człowieka oraz niebezpieczne sytuacje i czynności.",
+    "optionB": "Otoczenie, błąd człowieka i niebezpieczne sytuacje.",
+    "optionC": "Środowisko, błąd człowieka i niebezpieczne sytuacje.",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m3q3": {
+    "questionText": "Opracowanie procedur postępowania w razie wypadku jest środkiem odnoszącym się do:",
+    "optionA": "Otoczenia.",
+    "optionB": "Organizacji.",
+    "optionC": "Człowieka.",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m3q4": {
+    "questionText": "Jakie elementy muszą znaleźć się w raporcie końcowym z badania wypadku?",
+    "optionA": "Szkice wypadku, zeznania świadków i zastosowane środki.",
+    "optionB": "Analiza, wnioski i zalecenia.",
+    "optionC": "Protokoły rozmów, istotne dokumenty i zdjęcia.",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m3q5": {
+    "questionText": "Dwie bezpośrednie przyczyny wypadku lub zdarzenia potencjalnie wypadkowego to:",
+    "optionA": "Niebezpieczne zachowania lub uszkodzony sprzęt.",
+    "optionB": "Niebezpieczne zachowania lub niebezpieczne sytuacje.",
+    "optionC": "Błąd człowieka lub uszkodzony sprzęt.",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m3q6": {
+    "questionText": "Co nie jest czynnikiem związanym z osobą, który może doprowadzić do zdarzenia?",
+    "optionA": "Niewystarczające planowanie.",
+    "optionB": "Niewystarczająca uwaga.",
+    "optionC": "Niewystarczające doświadczenie.",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m3q7": {
+    "questionText": "Której osobie należy zgłosić wypadek?",
+    "optionA": "Inspekcji Pracy.",
+    "optionB": "Najbliższym współpracownikom.",
+    "optionC": "Bezpośredniemu przełożonemu.",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m3q8": {
+    "questionText": "Co należy zrobić ze wszystkimi wypadkami i zdarzeniami potencjalnie wypadkowymi?",
+    "optionA": "Zapewnić więcej środków ochrony indywidualnej.",
+    "optionB": "Zarejestrować zdarzenie.",
+    "optionC": "Ustalić czynniki, które spowodowały wypadki.",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m3q9": {
+    "questionText": "Kto jest odpowiedzialny za badanie wypadków?",
+    "optionA": "Pracodawca użytkownik.",
+    "optionB": "Agencja pracy tymczasowej.",
+    "optionC": "Inspekcja Pracy.",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m3q10": {
+    "questionText": "Kto jest odpowiedzialny za nieobecność z powodu choroby?",
+    "optionA": "Pracodawca użytkownik.",
+    "optionB": "Agencja pracy tymczasowej.",
+    "optionC": "Inspekcja Pracy.",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m3q11": {
+    "questionText": "Jaki jest cel ustawy o świadczeniach z tytułu trwałej niezdolności do pracy?",
+    "optionA": "Poprawa reintegracji nowych pracowników.",
+    "optionB": "Poprawa reintegracji chorych pracowników w firmie lub poza nią.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m3q12": {
+    "questionText": "Jaki obowiązek ma agencja pracy tymczasowej w ramach ustawy o świadczeniach z tytułu niezdolności do pracy?",
+    "optionA": "Obie odpowiedzi są prawidłowe.",
+    "optionB": "W razie zaniedbania obowiązek wypłaty wynagrodzenia może zostać wydłużony o rok.",
+    "optionC": "Opracowanie i realizacja planu działań na rzecz reintegracji.",
+    "moduleName": "Wypadki: przyczyny i zapobieganie"
+  },
+  "m4q1": {
+    "questionText": "Co jest przyczyną wypadku wskutek upadku lub potknięcia?",
+    "optionA": "Równa podłoga o właściwościach antypoślizgowych.",
+    "optionB": "Luźno leżące kable i liny.",
+    "optionC": "Uporządkowane stanowisko pracy.",
+    "moduleName": "Bezpieczne zachowanie"
+  },
+  "m4q2": {
+    "questionText": "Co nie jest przyczyną niebezpiecznego zachowania?",
+    "optionA": "Brak dobrego przykładu ze strony przełożonych.",
+    "optionB": "Niechęć (brak woli).",
+    "optionC": "Dobrze sformułowane cele.",
+    "moduleName": "Bezpieczne zachowanie"
+  },
+  "m4q3": {
+    "questionText": "Który element polityki firmy wpływa na zachowanie ludzi w zakresie bezpiecznej pracy?",
+    "optionA": "Polityka sankcji.",
+    "optionB": "Jasność co do priorytetu bezpiecznej pracy.",
+    "optionC": "Polityka nastawiona na sprawnie działające maszyny.",
+    "moduleName": "Bezpieczne zachowanie"
+  },
+  "m4q4": {
+    "questionText": "Dlaczego rola przełożonego jest ważna dla zachowania ludzi?",
+    "optionA": "Przełożony jest wzorem do naśladowania.",
+    "optionB": "Przełożony pozwala pracownikom samodzielnie ustalać metodę pracy.",
+    "optionC": "Przełożony posiada niezbędne informacje o pracownikach, pracy i okolicznościach.",
+    "moduleName": "Bezpieczne zachowanie"
+  },
+  "m4q5": {
+    "questionText": "Jaka jest ogólna zasada zachowania sprzyjająca bezpiecznej pracy?",
+    "optionA": "Krytyczne podejście do samego siebie.",
+    "optionB": "Pracownicy nie powinni interweniować, lecz zgłaszać sprawę przełożonemu.",
+    "optionC": "Zapisywanie opinii i przechowywanie ich.",
+    "moduleName": "Bezpieczne zachowanie"
+  },
+  "m4q6": {
+    "questionText": "Które zachowanie nie sprzyja bezpiecznej pracy?",
+    "optionA": "Dbałość o higienę osobistą, ład i porządek.",
+    "optionB": "Myślenie wyłącznie o własnym zdrowiu i bezpieczeństwie.",
+    "optionC": "Zgłaszanie niebezpiecznych sytuacji i odpowiednie interweniowanie.",
+    "moduleName": "Bezpieczne zachowanie"
+  },
+  "m4q7": {
+    "questionText": "Wpływ alkoholu i narkotyków na bezpieczną pracę powoduje:",
+    "optionA": "Obniżoną lub zaburzoną zdolność do pracy.",
+    "optionB": "Brak zmian w zachowaniu.",
+    "optionC": "Prawidłową ocenę sytuacji.",
+    "moduleName": "Bezpieczne zachowanie"
+  },
+  "m4q8": {
+    "questionText": "Czego oczekuje się w zakresie spożywania alkoholu i narkotyków w kontekście bezpiecznej pracy?",
+    "optionA": "Spożywanie jest dozwolone, gdy przełożeni o tym wiedzą.",
+    "optionB": "Szukanie pomocy w przypadku przewlekłego, problemowego używania.",
+    "optionC": "Przełożony nie musi być informowany o okazjonalnym spożywaniu.",
+    "moduleName": "Bezpieczne zachowanie"
+  },
+  "m4q9": {
+    "questionText": "Zadaniem pośrednika w zakresie promowania bezpiecznej pracy jest?",
+    "optionA": "Obie odpowiedzi są poprawne.",
+    "optionB": "Informowanie pracownika tymczasowego o konieczności bezpiecznej pracy.",
+    "optionC": "Sprawdzenie podstawowej wiedzy z zakresu bezpieczeństwa i higieny pracy.",
+    "moduleName": "Bezpieczne zachowanie"
+  },
+  "m5q1": {
+    "questionText": "Jakie obowiązki mają pracodawcy zgodnie z przepisami BHP?",
+    "optionA": "Przekazywanie informacji i instruktażu na temat zagrożeń występujących w pracy.",
+    "optionB": "Zgłaszanie sytuacji niebezpiecznych kierownikowi.",
+    "optionC": "Wezwanie państwowej inspekcji BHP.",
+    "explanation": "Pracownicy mają prawo odmówić wykonywania niebezpiecznej pracy bez obawy o działania odwetowe. Jest to podstawowe prawo wynikające z przepisów BHP.",
+    "officialRef": "Moduł 5 — Zadania, prawa, obowiązki",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q2": {
+    "questionText": "Jakie obowiązki mają pracownicy zgodnie z ustawą o warunkach pracy?",
+    "optionA": "Wezwanie inspekcji pracy.",
+    "optionB": "Zgłaszanie sytuacji niebezpiecznych kierownikowi/przełożonemu.",
+    "optionC": "Przekazywanie informacji na temat zagrożeń występujących w pracy.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q3": {
+    "questionText": "Kiedy pracownicy mają prawo przerwać pracę?",
+    "optionA": "Jeżeli środki ochrony indywidualnej nie są dostępne.",
+    "optionB": "Jeżeli inspekcja pracy przychodzi na kontrolę.",
+    "optionC": "Jeżeli występuje bezpośrednie i poważne zagrożenie dla ludzi.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q4": {
+    "questionText": "Kto uczestniczy w konsultacjach rady zakładowej?",
+    "optionA": "Kierownictwo działu i pracownicy.",
+    "optionB": "Wszyscy pracownicy, w tym personel tymczasowy.",
+    "optionC": "Pracodawca i przedstawiciele pracowników.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q5": {
+    "questionText": "Jaka jest różnica między certyfikacją SCC* i SCC**?",
+    "optionA": "SCC* koncentruje się na strukturach bezpieczeństwa, SCC** obejmuje ochronę środowiska.",
+    "optionB": "SCC* koncentruje się na bezpośrednim nadzorze nad bezpieczeństwem, SCC** obejmuje struktury bezpieczeństwa.",
+    "optionC": "SCC* koncentruje się na zarządzaniu jakością, SCC** obejmuje dbałość o warunki pracy.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q6": {
+    "questionText": "Co należy zrobić w przypadku bezpośredniego zagrożenia?",
+    "optionA": "Usunąć ryzyka, które spowodowały zagrożenie.",
+    "optionB": "Pracować dalej, dopóki ktoś nie każe przerwać.",
+    "optionC": "Przerwać pracę i/lub zapewnić własne bezpieczeństwo.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q7": {
+    "questionText": "Jaka jest korzyść z inspekcji stanowisk pracy?",
+    "optionA": "Zapewniają dobry wgląd w stan bezpieczeństwa.",
+    "optionB": "Zwiększają świadomość bezpieczeństwa.",
+    "optionC": "Obie odpowiedzi są poprawne.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q8": {
+    "questionText": "Ustawową odpowiedzialnością w zakresie BHP jest:",
+    "optionA": "Agencja pracy tymczasowej odpowiada za ubezpieczenie od wypadków przy pracy.",
+    "optionB": "Pracodawca użytkownik ma określone zadania.",
+    "optionC": "Relacje między pracodawcą użytkownikiem, pracownikiem tymczasowym i inspekcją pracy.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q9": {
+    "questionText": "Różnica między formalnym a faktycznym pracodawcą polega na tym, że:",
+    "optionA": "Faktycznym pracodawcą jest ten, pod czyim zwierzchnictwem pracuje pracownik tymczasowy.",
+    "optionB": "Obie odpowiedzi są poprawne.",
+    "optionC": "Formalny pracodawca faktycznie zatrudnia pracownika.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q10": {
+    "questionText": "Kto odpowiada za warunki pracy w pracy tymczasowej?",
+    "optionA": "Pracodawca tymczasowy zapewnia osobiste warunki pracy pracodawcy użytkownikowi.",
+    "optionB": "Odpowiada agencja pracy tymczasowej.",
+    "optionC": "Odpowiada faktyczny pracodawca (pracodawca użytkownik).",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q11": {
+    "questionText": "Ustawowa odpowiedzialność w zakresie BHP jest uregulowana jako:",
+    "optionA": "Szczególna relacja: agencja, pracodawca użytkownik, inspekcja pracy i pracownik.",
+    "optionB": "Relacja trójstronna: agencja, pracodawca użytkownik i pracownik.",
+    "optionC": "Pracodawca użytkownik odpowiada za obowiązek przekazywania informacji.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q12": {
+    "questionText": "Aspektem BHP istotnym przy kierowaniu pracownika tymczasowego do pracy jest:",
+    "optionA": "Żądanie wymaganych dokumentów BHP.",
+    "optionB": "Procedura zgłoszeń i dokumentowania ustaleń dotyczących BHP.",
+    "optionC": "Obie odpowiedzi są poprawne.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q13": {
+    "questionText": "Co należy ustalić z pracodawcą użytkownikiem w sprawie badań lekarskich?",
+    "optionA": "Na których stanowiskach wymagane jest badanie lekarskie.",
+    "optionB": "Badanie lekarskie przeprowadzane przez przełożonego.",
+    "optionC": "Przekazywanie informacji o wymaganej zdolności zdrowotnej do pracy.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q14": {
+    "questionText": "Elementy, które muszą znajdować się w aktach pracownika tymczasowego, to:",
+    "optionA": "Ograniczenia związane z rodzajem wykonywanej pracy.",
+    "optionB": "Kopia dokumentu tożsamości.",
+    "optionC": "Obie odpowiedzi są poprawne.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q15": {
+    "questionText": "Co nie wymaga uwagi, gdy pracodawca użytkownik składa zgłoszenie?",
+    "optionA": "Wymagana zdolność zdrowotna do pracy.",
+    "optionB": "Kto przekaże instruktaż dotyczący środków ochrony indywidualnej.",
+    "optionC": "Posiadanie ważnego certyfikatu VOL SCC.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q16": {
+    "questionText": "Co należy zrobić, aby zweryfikować ustalenia z pracodawcą użytkownikiem?",
+    "optionA": "Oficjalne przedstawienie współpracownikom.",
+    "optionB": "Przyjęcie w firmie; spotkanie z przełożonym.",
+    "optionC": "Pracownik tymczasowy musi przynieść własne środki ochrony indywidualnej.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q17": {
+    "questionText": "Aspektem, na który należy zwrócić uwagę przy ocenie pracy tymczasowej, jest:",
+    "optionA": "Wydawanie środków ochrony indywidualnej i odzieży roboczej.",
+    "optionB": "Zaplecze socjalne, takie jak szatnia, stołówka, pomieszczenia sanitarne.",
+    "optionC": "Obie odpowiedzi są poprawne.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q18": {
+    "questionText": "Co jest istotne na spotkaniach BHP w agencji pracy tymczasowej?",
+    "optionA": "Udział inspekcji pracy.",
+    "optionB": "Zaangażowanie współpracowników.",
+    "optionC": "Zaangażowanie kierownictwa i przełożonych.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m5q19": {
+    "questionText": "Jaki jest udział pracownika tymczasowego w spotkaniach HSE?",
+    "optionA": "Pracownik tymczasowy musi brać udział w spotkaniach HSE u pracodawcy użytkownika.",
+    "optionB": "Pośrednik informuje pracownika o tym, że spotkania HSE się odbywają.",
+    "optionC": "Obie odpowiedzi są poprawne.",
+    "moduleName": "Zadania, prawa, obowiązki i konsultacje"
+  },
+  "m6q1": {
+    "questionText": "Procedura zgłaszania pożaru podlega:",
+    "optionA": "Procedurom SCC.",
+    "optionB": "Ogólnym zasadom bezpieczeństwa.",
+    "optionC": "Szczegółowym zasadom bezpieczeństwa.",
+    "moduleName": "Procedury, instrukcje i znaki"
+  },
+  "m6q2": {
+    "questionText": "Co musi być opisane w pozwoleniu na pracę?",
+    "optionA": "Odpowiednie punkty kontrolne z SCC.",
+    "optionB": "Liczba pracowników z dyplomem IER.",
+    "optionC": "Środki, które muszą podjąć wydający pozwolenie oraz jego posiadacz.",
+    "moduleName": "Procedury, instrukcje i znaki"
+  },
+  "m6q3": {
+    "questionText": "Ogólne zasady bezpieczeństwa są przeznaczone dla:",
+    "optionA": "Jednego działu firmy.",
+    "optionB": "Pracowników agencji pracy tymczasowej.",
+    "optionC": "Wykonawców i podwykonawców.",
+    "moduleName": "Procedury, instrukcje i znaki"
+  },
+  "m6q4": {
+    "questionText": "Ogólne zasady bezpieczeństwa:",
+    "optionA": "Muszą być sporządzone w formie pisemnej.",
+    "optionB": "Są zasadami użytkowania dotyczącymi konkretnego narzędzia.",
+    "optionC": "Muszą być sporządzone w jednym języku.",
+    "moduleName": "Procedury, instrukcje i znaki"
+  },
+  "m6q5": {
+    "questionText": "Szczegółowe zasady bezpieczeństwa nie dotyczą:",
+    "optionA": "Przerw na posiłek.",
+    "optionB": "Wentylacji.",
+    "optionC": "Wchodzenia do przestrzeni zamkniętych.",
+    "moduleName": "Procedury, instrukcje i znaki"
+  },
+  "m6q6": {
+    "questionText": "Wytyczną dotyczącą szczegółowych zasad bezpieczeństwa jest:",
+    "optionA": "Powinny być zrozumiałe również dla rodzimych użytkowników języka.",
+    "optionB": "Muszą być udostępnione wszystkim pracownikom.",
+    "optionC": "Po wyjaśnieniu można przyjąć, że wszyscy wiedzą, co one oznaczają.",
+    "moduleName": "Procedury, instrukcje i znaki"
+  },
+  "m6q7": {
+    "questionText": "Funkcją kołnierza zaślepiającego jest:",
+    "optionA": "Odcięcie przewodów zasilających do zbiorników, cystern lub instalacji.",
+    "optionB": "Oddzielenie odcinków rurociągu.",
+    "optionC": "Obie odpowiedzi są poprawne.",
+    "moduleName": "Procedury, instrukcje i znaki"
+  },
+  "m6q8": {
+    "questionText": "Co nie jest częścią pozwolenia na pracę dotyczącą wnioskowanych prac?",
+    "optionA": "W jaki sposób prace będą wykonywane.",
+    "optionB": "Gdzie prace będą wykonywane.",
+    "optionC": "Dlaczego prace będą wykonywane.",
+    "moduleName": "Procedury, instrukcje i znaki"
+  },
+  "m6q9": {
+    "questionText": "Co jest częścią pozwolenia na pracę dotyczącą środków podejmowanych przez pracownika operacyjnego?",
+    "optionA": "Należy tu wymienić wszystkie środki ochrony indywidualnej.",
+    "optionB": "Środki, które pracownicy operacyjni muszą podjąć, aby pracować bezpiecznie.",
+    "optionC": "Obie odpowiedzi są poprawne.",
+    "moduleName": "Procedury, instrukcje i znaki"
+  },
+  "m6q10": {
+    "questionText": "Na czym polega obowiązek przekazywania informacji?",
+    "optionA": "Obie odpowiedzi są poprawne.",
+    "optionB": "Agencja musi przekazać informacje dotyczące stanowiska pracy.",
+    "optionC": "Pracodawca użytkownik i agencja mają wspólny obowiązek informowania.",
+    "moduleName": "Procedury, instrukcje i znaki"
+  },
+  "m7q1": {
+    "questionText": "Które zadanie należy do roli członków zakładowej służby ratowniczej?",
+    "optionA": "Gaszenie pożaru w zarodku oraz ograniczanie szkód i obrażeń.",
+    "optionB": "Udział w zespole badającym wypadek.",
+    "optionC": "Wykonywanie pomiarów detekcji gazów.",
+    "moduleName": "Przygotowanie na sytuacje awaryjne"
+  },
+  "m7q2": {
+    "questionText": "Co jest pojęciem sytuacji awaryjnej?",
+    "optionA": "Sytuacje awaryjne spowodowane wypadkami, pożarem, wybuchem, niekontrolowanym uwolnieniem substancji.",
+    "optionB": "Zagrożenie wynikające ze złej pogody, klęsk żywiołowych, niepokojów społecznych, ataku terrorystycznego.",
+    "optionC": "Obie odpowiedzi są poprawne.",
+    "moduleName": "Przygotowanie na sytuacje awaryjne"
+  },
+  "m7q3": {
+    "questionText": "Zakładowy plan awaryjny to:",
+    "optionA": "Opis środków i rozwiązań przygotowanych na sytuacje awaryjne.",
+    "optionB": "Wykaz środków zapewniających bezpieczne warunki pracy.",
+    "optionC": "Wykaz środków, które pracownicy muszą przygotować przed rozpoczęciem pracy.",
+    "moduleName": "Przygotowanie na sytuacje awaryjne"
+  },
+  "m7q4": {
+    "questionText": "Ograniczenie skutków możliwych sytuacji awaryjnych jest celem:",
+    "optionA": "Zestawu warunków pracy.",
+    "optionB": "(Wewnętrznego) zakładowego planu awaryjnego.",
+    "optionC": "Zakładowej służby ratowniczej.",
+    "moduleName": "Przygotowanie na sytuacje awaryjne"
+  },
+  "m7q5": {
+    "questionText": "Co nie jest fazą opanowywania sytuacji awaryjnych?",
+    "optionA": "Pierwszy alarm.",
+    "optionB": "Drugi alarm.",
+    "optionC": "Zakończenie.",
+    "moduleName": "Przygotowanie na sytuacje awaryjne"
+  },
+  "m7q6": {
+    "questionText": "Pierwszy alarm w sytuacjach awaryjnych to:",
+    "optionA": "Wykaz sposobów alarmowania ludzi.",
+    "optionB": "Opis sposobów zgłoszenia sytuacji awaryjnej oraz informacji, które należy przekazać.",
+    "optionC": "Głośny dzwonek sygnalizujący sytuację awaryjną.",
+    "moduleName": "Przygotowanie na sytuacje awaryjne"
+  },
+  "m7q7": {
+    "questionText": "Elementem zakończenia sytuacji awaryjnej jest:",
+    "optionA": "Sposób, w jaki ogłaszane jest zakończenie.",
+    "optionB": "Kto jest upoważniony do ogłoszenia zakończenia sytuacji awaryjnej.",
+    "optionC": "Obie odpowiedzi są poprawne.",
+    "moduleName": "Przygotowanie na sytuacje awaryjne"
+  },
+  "m7q8": {
+    "questionText": "Jednym z minimalnych wymagań dotyczących pierwszej pomocy jest:",
+    "optionA": "Przeszkoleni członkowie zakładowej służby ratowniczej.",
+    "optionB": "Stale dostępny sprzęt pierwszej pomocy.",
+    "optionC": "Obie odpowiedzi są poprawne.",
+    "moduleName": "Przygotowanie na sytuacje awaryjne"
+  },
+  "m7q9": {
+    "questionText": "Która kolejność jest prawidłowa po sygnale ewakuacji?",
+    "optionA": "1: Przerwać pracę / 2: Nie korzystać z wind / 3: Udać się do punktu zbiórki.",
+    "optionB": "1: Przerwać pracę / 2: Nie korzystać z wind / 3: Zgłosić swoją obecność w punkcie zbiórki.",
+    "optionC": "1: Przerwać pracę / 2: Zgłosić obecność / 3: Ewakuować się prostopadle do kierunku wiatru.",
+    "moduleName": "Przygotowanie na sytuacje awaryjne"
+  },
+  "m8q1": {
+    "questionText": "Jak na podstawie etykiety rozpoznać, jakie ryzyka stwarza produkt niebezpieczny?",
+    "optionA": "Na podstawie zwrotów S.",
+    "optionB": "Na podstawie zwrotów M.",
+    "optionC": "Na podstawie zwrotów R.",
+    "explanation": "SDS (karta charakterystyki) zawiera podstawowe informacje o substancjach niebezpiecznych: skład, zagrożenia, pierwszą pomoc, postępowanie, magazynowanie i usuwanie.",
+    "officialRef": "Moduł 8 — Substancje niebezpieczne",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q2": {
+    "questionText": "Co oznacza żółte pole na znaku ostrzegawczym w formie rombu?",
+    "optionA": "Zagrożenie reaktywnością.",
+    "optionB": "Zagrożenie dla zdrowia.",
+    "optionC": "Zagrożenie pożarowe.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q3": {
+    "questionText": "Jakie działanie toksyczne ma tlenek węgla?",
+    "optionA": "Paraliż węchu.",
+    "optionB": "Tlen nie jest już wchłaniany do krwi.",
+    "optionC": "Działanie drażniące na drogi oddechowe.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q4": {
+    "questionText": "Jakie informacje znajdują się w karcie charakterystyki materiału?",
+    "optionA": "Informacje o krokach niezbędnych do pracy w przestrzeni zamkniętej.",
+    "optionB": "Informacje o pozwoleniach niezbędnych do pracy z produktem.",
+    "optionC": "Informacje o zagrożeniach i środkach bezpieczeństwa, które należy zastosować.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q5": {
+    "questionText": "W normalnych warunkach zawartość tlenu w powietrzu wynosi:",
+    "optionA": "21%.",
+    "optionB": "19%.",
+    "optionC": "25%.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q6": {
+    "questionText": "Brak wentylacji:",
+    "optionA": "Eliminuje niedobór tlenu.",
+    "optionB": "Może spowodować zbyt niskie stężenie tlenu.",
+    "optionC": "Powoduje problemy z oddychaniem.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q7": {
+    "questionText": "Białe oznaczenie na szyjce butli oznacza:",
+    "optionA": "Dwutlenek węgla.",
+    "optionB": "Powietrze.",
+    "optionC": "Tlen.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q8": {
+    "questionText": "Przy składowaniu butli gazowych:",
+    "optionA": "Należy je odpowiednio zabezpieczyć przed przewróceniem.",
+    "optionB": "Należy je umieszczać w specjalnych piwnicach.",
+    "optionC": "Należy je ustawiać blisko stanowiska pracy, aby były łatwo dostępne.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q9": {
+    "questionText": "Co oznacza pojęcie substancji niebezpiecznych?",
+    "optionA": "Materiały, które łatwo wybuchają po zmieszaniu z dużą ilością tlenu.",
+    "optionB": "Materiały, które stanowią zagrożenie dla zdrowia i/lub dla środowiska.",
+    "optionC": "Materiały, które przed użyciem wymagają specjalnego szkolenia.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q10": {
+    "questionText": "Substancje niebezpieczne na stanowisku pracy oznacza się:",
+    "optionA": "Kwadratowym znakiem ostrzegawczym, czarnym na czerwonym tle.",
+    "optionB": "Kwadratowym znakiem ostrzegawczym, czarnym na pomarańczowym tle.",
+    "optionC": "Kwadratowym znakiem ostrzegawczym, czarnym na żółtym tle.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q11": {
+    "questionText": "Szczepienia są środkiem ostrożności przy pracy z:",
+    "optionA": "Substancjami biologicznymi.",
+    "optionB": "Substancjami łatwopalnymi.",
+    "optionC": "Substancjami drażniącymi.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q12": {
+    "questionText": "Substancje biologiczne mogą występować w:",
+    "optionA": "Rolnictwie.",
+    "optionB": "Skażonej glebie.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q13": {
+    "questionText": "Fachowe usuwanie rozlanego produktu jest środkiem zapobiegającym:",
+    "optionA": "Pożarowi.",
+    "optionB": "Spadającym przedmiotom.",
+    "optionC": "Wyciekom.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q14": {
+    "questionText": "Co nie jest przyczyną wycieków?",
+    "optionA": "Uszkodzenie (np. najechanie wózkiem widłowym).",
+    "optionB": "Błędna procedura przy przepompowywaniu zawartości zbiorników.",
+    "optionC": "Prawidłowy montaż kołnierzy.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q15": {
+    "questionText": "Poślizgnięcie jest następstwem:",
+    "optionA": "Skażenia środowiska.",
+    "optionB": "Wycieków.",
+    "optionC": "Stosowania substancji niebezpiecznych.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q16": {
+    "questionText": "Zagrożeniem związanym z rozpuszczalnikami organicznymi jest to, że są:",
+    "optionA": "Łatwopalne lub skrajnie łatwopalne.",
+    "optionB": "Żrące.",
+    "optionC": "Drażniące.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q17": {
+    "questionText": "Przykładem związków cyklicznych jest:",
+    "optionA": "Cynk.",
+    "optionB": "Fenol.",
+    "optionC": "Benzyna lakowa.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q18": {
+    "questionText": "Ryzyko międzybłoniaka opłucnej jest skutkiem zdrowotnym związanym z:",
+    "optionA": "Benzenem.",
+    "optionB": "Benzyną lakową.",
+    "optionC": "Azbestem.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q19": {
+    "questionText": "Co nie jest możliwym miejscem występowania azbestu?",
+    "optionA": "W nowo wybudowanych domach.",
+    "optionB": "Materiały pokryć dachowych i okładziny ścian.",
+    "optionC": "W murze pieców i kotłów oraz za nim.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q20": {
+    "questionText": "Co nie jest wymogiem prawnym dotyczącym azbestu?",
+    "optionA": "Nowe zastosowania i przetwarzanie azbestu są dozwolone.",
+    "optionB": "Odpady zawierające azbest muszą być zbierane oddzielnie.",
+    "optionC": "Tam, gdzie istnieje ryzyko kontaktu z azbestem, stosuje się specjalne oznakowanie.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q21": {
+    "questionText": "Założeniem okresowych badań lekarskich jest:",
+    "optionA": "Ustalenie, czy kandydat nadal jest zdolny do pracy z substancjami.",
+    "optionB": "Ustalenie, czy kandydat nadal jest zdolny do pracy z daną substancją niebezpieczną.",
+    "optionC": "Częstotliwość zależy od pracownika.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q22": {
+    "questionText": "Zalecenia bezpieczeństwa na nowych etykietach opisują:",
+    "optionA": "Środki pozwalające uniknąć zmiany warunków pracy.",
+    "optionB": "Środki pozwalające uniknąć ryzyka przy pracy z produktem.",
+    "optionC": "Środki pozwalające uniknąć pożaru.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q23": {
+    "questionText": "Liczby w rombie zagrożeń mieszczą się w zakresie:",
+    "optionA": "Od 1 do 5.",
+    "optionB": "Od 0 do 4.",
+    "optionC": "Od 0 do 5.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m8q24": {
+    "questionText": "Środki pozwalające uniknąć ryzyka przy pracy z produktem są opisane w:",
+    "optionA": "Zwrotach H.",
+    "optionB": "Zwrotach R.",
+    "optionC": "Zwrotach S.",
+    "moduleName": "Substancje niebezpieczne"
+  },
+  "m9q1": {
+    "questionText": "Co jest wadą gaszenia pożaru wodą?",
+    "optionA": "Palący się materiał może gwałtownie zareagować z wodą.",
+    "optionB": "Dym utrudnia pracę ratownikom.",
+    "optionC": "Użycie wody jest stosunkowo drogie.",
+    "explanation": "Trójkąt pożaru wymaga paliwa, tlenu i ciepła (źródła zapłonu). Usunięcie choćby jednego z tych elementów gasi pożar lub zapobiega jego powstaniu.",
+    "officialRef": "Moduł 9 — Pożary i wybuchy",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q2": {
+    "questionText": "Co musisz wiedzieć przed przystąpieniem do gaszenia pożaru?",
+    "optionA": "Jak długo już się pali.",
+    "optionB": "Jak wysoka jest temperatura.",
+    "optionC": "Jaka substancja się pali.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q3": {
+    "questionText": "Co należy zrobić w pierwszej kolejności po wykryciu pożaru?",
+    "optionA": "Jeśli to możliwe, ugasić go samodzielnie.",
+    "optionB": "Wyprowadzić ludzi w bezpieczne miejsce.",
+    "optionC": "Zgłosić pożar.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q4": {
+    "questionText": "Co oznacza granica wybuchowości?",
+    "optionA": "Najwyższą/najniższą temperaturę ciała stałego, przy której może dojść do wybuchu.",
+    "optionB": "Najwyższe/najniższe stężenie gazu w powietrzu, przy którym może dojść do wybuchu.",
+    "optionC": "Najwyższe/najniższe stężenie metali, przy którym może dojść do wybuchu.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q5": {
+    "questionText": "Co rozumie się pod pojęciem temperatury zapłonu?",
+    "optionA": "Najwyższe/najniższe stężenie gazu i powietrza umożliwiające wybuch.",
+    "optionB": "Najwyższą/najniższą temperaturę ciała stałego umożliwiającą wybuch.",
+    "optionC": "Najniższą temperaturę cieczy, przy której jej pary mogą zostać zapalone.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q6": {
+    "questionText": "Jaki skutek może mieć nadmiar tlenu podczas pożaru?",
+    "optionA": "Łatwiejszy zapłon substancji łatwopalnych.",
+    "optionB": "Dłuższe palenie się.",
+    "optionC": "Zduszenie pożaru.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q7": {
+    "questionText": "Substancja łatwopalna:",
+    "optionA": "Jest niezbędna do powstania pożaru lub wybuchu.",
+    "optionB": "Zawsze jest gazem.",
+    "optionC": "Zawsze powoduje pożar lub wybuch.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q8": {
+    "questionText": "Czym jest wybuch?",
+    "optionA": "Pożarem wywołanym przez substancję łatwopalną.",
+    "optionB": "Bardzo szybko rozwijającym się pożarem, który wyzwala falę ciśnienia.",
+    "optionC": "Pożarem grupy C.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q9": {
+    "questionText": "Czego dotyczy pożar grupy A?",
+    "optionA": "Gazów.",
+    "optionB": "Cieczy.",
+    "optionC": "Materiałów stałych.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q10": {
+    "questionText": "Znak oznaczający strefę zagrożenia wybuchem:",
+    "optionA": "Przedstawia oznaczenie Ex.",
+    "optionB": "Przedstawia oznaczenie Er.",
+    "optionC": "Przedstawia symbol ognia.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q11": {
+    "questionText": "Środowisko zagrożone wybuchem to takie, w którym:",
+    "optionA": "Trzeba stosować specjalne środki, aby zapobiec zapłonowi mieszanin wybuchowych.",
+    "optionB": "Powstanie mieszaniny wybuchowej nie jest możliwe.",
+    "optionC": "Nie wolno stosować specjalnych środków.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q12": {
+    "questionText": "Wymogiem wobec osoby pełniącej asekurację przy pracach gorących jest:",
+    "optionA": "Minimum pięcioletnie doświadczenie z pożarami.",
+    "optionB": "Odpowiednie szkolenie.",
+    "optionC": "Minimum roczne doświadczenie z pożarami.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q13": {
+    "questionText": "Przy udzielaniu pomocy w razie oparzeń:",
+    "optionA": "Chłodzić wodą przez co najmniej 5 minut.",
+    "optionB": "Chłodzić wodą przez co najmniej 15 minut.",
+    "optionC": "Chłodzić wodą przez co najmniej 10 minut.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q14": {
+    "questionText": "Przy gaszeniu pożaru nie wolno:",
+    "optionA": "Zachowywać czujności także wtedy, gdy pożar wydaje się ugaszony.",
+    "optionB": "Stale dbać o własne bezpieczeństwo.",
+    "optionC": "Po prostu odejść, gdy pożar zostanie ugaszony.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q15": {
+    "questionText": "Koce gaśnicze:",
+    "optionA": "Chłodzą.",
+    "optionB": "Wypierają tlen.",
+    "optionC": "Odcinają dostęp tlenu.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q16": {
+    "questionText": "Wadą gaszenia kocem gaśniczym jest:",
+    "optionA": "Ryzyko odmrożeń.",
+    "optionB": "Konieczność podejścia blisko źródła pożaru.",
+    "optionC": "Zanieczyszczenie.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q17": {
+    "questionText": "Wadą gaszenia dwutlenkiem węgla jest:",
+    "optionA": "Możliwość powstania atmosfery duszącej.",
+    "optionB": "Ryzyko odmrożeń z powodu niskiej temperatury.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m9q18": {
+    "questionText": "Właściwością gaśniczą piasku jest to, że:",
+    "optionA": "Piasek wypiera tlen.",
+    "optionB": "Piasek odcina dostęp tlenu.",
+    "optionC": "Piasek ma zdolność chłodzącą.",
+    "moduleName": "Pożary i wybuchy"
+  },
+  "m10q1": {
+    "questionText": "Na co trzeba uważać przy używaniu przecinaków?",
+    "optionA": "Używać wyłącznie przecinaków bez zadziorów na krawędzi tnącej.",
+    "optionB": "Używać wyłącznie przecinaków, które zostały poddane badaniom.",
+    "optionC": "Używać wyłącznie przecinaków o odpowiedniej wytrzymałości.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q2": {
+    "questionText": "Dlaczego nigdy nie wolno nosić rękawic przy maszynach z obracającymi się częściami?",
+    "optionA": "Ponieważ dłonie nie mają kontaktu z obracającymi się częściami.",
+    "optionB": "Ponieważ maszyna może zostać uszkodzona.",
+    "optionC": "Ponieważ rękawica razem z dłonią może zostać wciągnięta w maszynę.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q3": {
+    "questionText": "Co oznacza bezpieczna praca na wiertarkach kolumnowych?",
+    "optionA": "Stosowanie klina rozdzielającego.",
+    "optionB": "Pewne zamocowanie obrabianego przedmiotu.",
+    "optionC": "Stosowanie docisku przeciwnego podczas wiercenia.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q4": {
+    "questionText": "Czym muszą być wyposażone młotki, aby zapobiec wypadkom?",
+    "optionA": "Trzonkiem z plastiku.",
+    "optionB": "Trzonkiem metalowym.",
+    "optionC": "Trzonkiem zaklinowanym pewnie w obuchu młotka.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q5": {
+    "questionText": "Jaki jest cel wyłącznika samoczynnego (czuwakowego) w narzędziu pneumatycznym?",
+    "optionA": "Umożliwia operatorowi robienie przerw.",
+    "optionB": "Ustawienie narzędzia w pozycji rozgrzewania.",
+    "optionC": "Natychmiastowe zatrzymanie maszyny po puszczeniu uchwytu.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q6": {
+    "questionText": "Co musi znajdować się na stołowej pile tarczowej?",
+    "optionA": "Szklana osłona.",
+    "optionB": "Osłona tarczy zamocowana na solidnym wsporniku.",
+    "optionC": "Zabezpieczenie przed odrzutem.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q7": {
+    "questionText": "Elektryczne narzędzia ręczne na 230 V:",
+    "optionA": "Muszą mieć podwójną izolację.",
+    "optionB": "Muszą być wyposażone w uziemienie ochronne.",
+    "optionC": "Mogą być używane wyłącznie przez osobę odpowiednio poinstruowaną.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q8": {
+    "questionText": "Przegląd okresowy trzeba wykonywać:",
+    "optionA": "Na maszynach i narzędziach z napędem.",
+    "optionB": "Co tydzień.",
+    "optionC": "Aby upewnić się, że każdy pracownik lubi swoją pracę.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q9": {
+    "questionText": "Maszyna zatrzyma się w najkrótszym możliwym czasie, gdy:",
+    "optionA": "Zostanie użyty wyłącznik awaryjny.",
+    "optionB": "Zostanie puszczony uchwyt sterujący.",
+    "optionC": "Obracające się części zostaną zablokowane.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q10": {
+    "questionText": "Czym jest wózek paletowy?",
+    "optionA": "Pojazdem do przewozu ludzi.",
+    "optionB": "Pojazdem do przemieszczania ładunków na różne wysokości.",
+    "optionC": "Pojazdem o wysokości podnoszenia 20 cm.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q11": {
+    "questionText": "Wymogiem wobec operatora wózka widłowego jest:",
+    "optionA": "Stosowanie pasa bezpieczeństwa.",
+    "optionB": "Posiadanie potwierdzonych egzaminem kwalifikacji.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q12": {
+    "questionText": "Co nie jest środkiem bezpieczeństwa przy pracy wózkami widłowymi?",
+    "optionA": "Nie przewozić pasażera, jeśli nie ma dla niego specjalnego siedziska.",
+    "optionB": "W razie potrzeby można zwiększyć przeciwwagę.",
+    "optionC": "Żadna z odpowiedzi nie jest środkiem bezpieczeństwa.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q13": {
+    "questionText": "Podczas pracy pilarkami:",
+    "optionA": "Brzeszczot musi być dobrze naprężony.",
+    "optionB": "Brzeszczot nie może być zbyt ostry.",
+    "optionC": "Operator musi mieć ukończone odpowiednie szkolenie.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q14": {
+    "questionText": "Podczas pracy nożami:",
+    "optionA": "Zęby muszą być skierowane do przodu.",
+    "optionB": "Nie wysuwać zbyt daleko ostrza łamanego.",
+    "optionC": "Ostrze musi być dobrze naprężone.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q15": {
+    "questionText": "Podczas obróbki małych przedmiotów:",
+    "optionA": "Należy trzymać je jedną ręką.",
+    "optionB": "Należy zamocować przedmiot obrabiany w uchwycie.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q16": {
+    "questionText": "Spodnie i rękawice z włókna specjalnego stosuje się przy:",
+    "optionA": "Pracy pilarką łańcuchową.",
+    "optionB": "Pracy wkrętakami.",
+    "optionC": "Pracy młotkami.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q17": {
+    "questionText": "Gwoździarka/zszywacz musi mieć:",
+    "optionA": "Dodatkowy uchwyt z boku.",
+    "optionB": "Zabezpieczenie przed niezamierzonym wystrzeleniem.",
+    "optionC": "Przezroczystą osłonę.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q18": {
+    "questionText": "Klin rozdzielający stosuje się przy:",
+    "optionA": "Ręcznej pilarce tarczowej.",
+    "optionB": "Pilarce łańcuchowej.",
+    "optionC": "Wkrętaku.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q19": {
+    "questionText": "Jaka informacja musi znajdować się na tarczy szlifierskiej?",
+    "optionA": "Minimalna dopuszczalna prędkość obrotowa.",
+    "optionB": "Nazwa producenta.",
+    "optionC": "Użytkownik tarczy.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q20": {
+    "questionText": "Podczas pracy pneumatycznymi narzędziami ręcznymi należy:",
+    "optionA": "Po zakończeniu pracy odciąć dopływ powietrza.",
+    "optionB": "Przy narzędziach wibracyjnych robić regularne przerwy.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m10q21": {
+    "questionText": "Co nie jest możliwym zagrożeniem podczas pracy szlifierką stołową?",
+    "optionA": "Dolegliwości zdrowotne z powodu wdychania szkodliwego pyłu.",
+    "optionB": "Klin rozdzielający może się poluzować.",
+    "optionC": "Uderzenie lub wciągnięcie przez części ruchome.",
+    "moduleName": "Sprzęt i urządzenia"
+  },
+  "m11q1": {
+    "questionText": "Zagrożeniem podczas rozbiórki jest?",
+    "optionA": "Niestabilność frontu rozbiórki.",
+    "optionB": "Wystające elementy konstrukcji.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Prace rozbiórkowe"
+  },
+  "m11q2": {
+    "questionText": "Podczas prac rozbiórkowych należy zapewnić:",
+    "optionA": "Urządzenie samohamujące chroniące przed upadkiem.",
+    "optionB": "Wystarczająco długie przerwy.",
+    "optionC": "Jak najmniej przerw.",
+    "moduleName": "Prace rozbiórkowe"
+  },
+  "m11q3": {
+    "questionText": "Co należy zrobić przy usuwaniu włókien ceramicznych?",
+    "optionA": "Rozdrobnić wszystko na małe kawałki.",
+    "optionB": "Nie używać rynny zsypowej.",
+    "optionC": "Nosić kombinezon roboczy.",
+    "moduleName": "Prace rozbiórkowe"
+  },
+  "m12q1": {
+    "questionText": "Co należy zrobić przy spawaniu gazowym tlenem i acetylenem?",
+    "optionA": "Butle z acetylenem przechowywać w pozycji pionowej lub pod kątem co najmniej 25 stopni.",
+    "optionB": "Butle z acetylenem przechowywać w pozycji pionowej lub pod kątem co najmniej 30 stopni.",
+    "optionC": "Butle z acetylenem przechowywać w pozycji pionowej lub pod kątem co najmniej 40 stopni.",
+    "moduleName": "Spawanie, cięcie i prace ogniowe"
+  },
+  "m12q2": {
+    "questionText": "Co jest zagrożeniem przy spawaniu gazowym?",
+    "optionA": "Powietrze jest cięższe od propanu.",
+    "optionB": "Cofnięcie płomienia.",
+    "optionC": "Butle nie są pod ciśnieniem.",
+    "moduleName": "Spawanie, cięcie i prace ogniowe"
+  },
+  "m12q3": {
+    "questionText": "Co jest środkiem bezpieczeństwa przy spawaniu elektrycznym?",
+    "optionA": "Ochrona osobista: przyłbica spawalnicza, fartuch, odzież, obuwie ochronne.",
+    "optionB": "Kurtyny spawalnicze chroniące przed promieniowaniem UV i podczerwonym.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Spawanie, cięcie i prace ogniowe"
+  },
+  "m12q4": {
+    "questionText": "Co nie jest zagrożeniem związanym ze spawaniem elektrycznym?",
+    "optionA": "Olśnienie spowodowane promieniowaniem podczerwonym.",
+    "optionB": "Oparzenie rogówki spowodowane promieniowaniem cieplnym.",
+    "optionC": "Dolegliwości płucne z powodu wdychania dymów spawalniczych.",
+    "moduleName": "Spawanie, cięcie i prace ogniowe"
+  },
+  "m13q1": {
+    "questionText": "Dlaczego ważne jest ostrożne wykonywanie wykopów?",
+    "optionA": "Korzyści ekonomiczne.",
+    "optionB": "Ciągłość dostaw przedsiębiorstw sieciowych.",
+    "optionC": "Wykop może się osunąć.",
+    "moduleName": "Roboty ziemne i praca przy wykopach lub w wykopach"
+  },
+  "m13q2": {
+    "questionText": "Co nie jest zagrożeniem związanym z wykonywaniem wykopów?",
+    "optionA": "Uduszenie z powodu uszkodzenia gazociągów.",
+    "optionB": "Porażenie prądem z powodu uszkodzenia kabli pod napięciem.",
+    "optionC": "Zagrożenie wybuchem.",
+    "moduleName": "Roboty ziemne i praca przy wykopach lub w wykopach"
+  },
+  "m13q3": {
+    "questionText": "Jaka zasada obowiązuje przy ostrożnym wykonywaniu wykopów?",
+    "optionA": "Zgłaszać osobie odpowiedzialnej każde odmienne położenie lub uszkodzenie.",
+    "optionB": "Kopać dopiero po ustaleniu położenia kabli przekopami kontrolnymi w promieniu 1,5 m.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Roboty ziemne i praca przy wykopach lub w wykopach"
+  },
+  "m13q4": {
+    "questionText": "Podczas pracy w wykopie lub w jego pobliżu należy:",
+    "optionA": "Ustawić drabinę.",
+    "optionB": "Zastosować ogrodzenie w miejscach niebezpiecznych.",
+    "optionC": "Zapewnić skuteczne rozparcie i wyprofilowanie skarp.",
+    "moduleName": "Roboty ziemne i praca przy wykopach lub w wykopach"
+  },
+  "m14q1": {
+    "questionText": "Od jakiej wysokości pracodawca musi zastosować środki zapobiegające upadkowi?",
+    "optionA": "Od 3,5 metra.",
+    "optionB": "Od 1,5 metra.",
+    "optionC": "Od 2,5 metra.",
+    "explanation": "Praca na wysokości powyżej 2 metrów wymaga zastosowania środków ochrony przed upadkiem. Kolejność jest następująca: najpierw ochrona zbiorowa (balustrady), a następnie ochrona indywidualna (szelki bezpieczeństwa).",
+    "officialRef": "Moduł 14 — Praca na wysokości",
+    "moduleName": "Praca na wysokości"
+  },
+  "m14q2": {
+    "questionText": "Jaki środek bezpieczeństwa zmniejsza zagrożenie upadkiem z dachu płaskiego?",
+    "optionA": "System zabezpieczenia krawędzi dachu.",
+    "optionB": "Pomosty do chodzenia.",
+    "optionC": "Szelki bezpieczeństwa.",
+    "moduleName": "Praca na wysokości"
+  },
+  "m14q3": {
+    "questionText": "Co należy sprawdzić, zanim drabina zostanie użyta?",
+    "optionA": "Czy drabina nie jest dłuższa niż 12 metrów.",
+    "optionB": "Czy jest ustawiona pod kątem około 75 stopni.",
+    "optionC": "Czy podłużnice mają na dole stalowe stopki.",
+    "moduleName": "Praca na wysokości"
+  },
+  "m14q4": {
+    "questionText": "Czego muszą używać osoby pracujące na rusztowaniu wiszącym?",
+    "optionA": "Szelek z urządzeniem samohamującym.",
+    "optionB": "Pasa lędźwiowego.",
+    "optionC": "Szelek bezpieczeństwa.",
+    "moduleName": "Praca na wysokości"
+  },
+  "m14q5": {
+    "questionText": "Z której strony należy wchodzić na rusztowanie jezdne?",
+    "optionA": "Z przodu.",
+    "optionB": "Od wewnątrz.",
+    "optionC": "Z tyłu.",
+    "moduleName": "Praca na wysokości"
+  },
+  "m14q6": {
+    "questionText": "Co najlepiej zrobić z otworem w podłodze?",
+    "optionA": "Zachować odstęp podczas pracy.",
+    "optionB": "Zakryć go trwałym materiałem.",
+    "optionC": "Nosić szelki bezpieczeństwa przypięte do liny bezpieczeństwa.",
+    "moduleName": "Praca na wysokości"
+  },
+  "m14q7": {
+    "questionText": "Co nie jest zagrożeniem przy pracy w pobliżu otworów w ścianach i podłogach?",
+    "optionA": "Uderzenie przedmiotem spadającym przez otwór.",
+    "optionB": "Wpadnięcie przez otwór w podłodze.",
+    "optionC": "Zamykanie dużego otworu w podłodze.",
+    "moduleName": "Praca na wysokości"
+  },
+  "m14q8": {
+    "questionText": "Drabina służy do:",
+    "optionA": "Wykonywania drobnych czynności.",
+    "optionB": "Pokonywania określonej wysokości.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Praca na wysokości"
+  },
+  "m14q9": {
+    "questionText": "Zasięg maksymalnie na długość jednej ręki to zasada obowiązująca przy pracy z:",
+    "optionA": "Wiertarkami kolumnowymi.",
+    "optionB": "Drabinami.",
+    "optionC": "Pilarkami stołowymi.",
+    "moduleName": "Praca na wysokości"
+  },
+  "m15q1": {
+    "questionText": "Czy osoba nieposiadająca kwalifikacji może pracować przy instalacjach elektrycznych pod napięciem?",
+    "optionA": "Tak, pod warunkiem że ma ukończone 21 lat.",
+    "optionB": "Tak, ale tylko jeśli specjalista jest stale dostępny.",
+    "optionC": "Nie, nigdy.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q2": {
+    "questionText": "Jak działa wyłącznik różnicowoprądowy?",
+    "optionA": "Odprowadza prąd wysokiego napięcia do przewodu uziemiającego.",
+    "optionB": "Odłącza zasilanie przy określonym prądzie różnicowym.",
+    "optionC": "Działa jak sztuczne uziemienie.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q3": {
+    "questionText": "Jakiego napięcia bezpiecznego należy używać w przestrzeni zamkniętej?",
+    "optionA": "Prąd stały (maks. 50 V) lub prąd przemienny (maks. 130 V).",
+    "optionB": "Prąd stały (maks. 12 V) lub prąd przemienny (maks. 120 V).",
+    "optionC": "Prąd stały (maks. 120 V) lub prąd przemienny (maks. 50 V).",
+    "moduleName": "Elektryczność"
+  },
+  "m15q4": {
+    "questionText": "Co może być przyczyną wypadków z udziałem prądu elektrycznego?",
+    "optionA": "Brak uziemienia.",
+    "optionB": "Wciśnięcie wyłącznika awaryjnego.",
+    "optionC": "Przepalenie bezpiecznika.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q5": {
+    "questionText": "Jakie jest największe niebezpieczeństwo przepływu prądu przez ciało?",
+    "optionA": "Reakcja szokowa.",
+    "optionB": "Powstanie oparzeń.",
+    "optionC": "Przepływ prądu przez serce.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q6": {
+    "questionText": "Porażenie prądem jest zagrożeniem związanym z:",
+    "optionA": "Stosowaniem substancji niebezpiecznych.",
+    "optionB": "Wykorzystywaniem energii elektrycznej.",
+    "optionC": "Stosowaniem substancji łatwopalnych.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q7": {
+    "questionText": "Uraz spowodowany prądem elektrycznym nie zależy od:",
+    "optionA": "Natężenia prądu.",
+    "optionB": "Czasu przepływu prądu przez ciało.",
+    "optionC": "Grubości skóry.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q8": {
+    "questionText": "Natężenie prądu przepływającego przez ciało zależy od:",
+    "optionA": "Oporu podłoża, bez uwzględnienia obuwia.",
+    "optionB": "Napięcia.",
+    "optionC": "Twojego stylu życia.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q9": {
+    "questionText": "Jak powstaje zwarcie?",
+    "optionA": "Gdy dwie części o różnym napięciu zetkną się bezpośrednio.",
+    "optionB": "Gdy dwie części o tym samym napięciu zetkną się bezpośrednio.",
+    "optionC": "Gdy przewód elektryczny nie jest uziemiony.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q10": {
+    "questionText": "Powstanie i wielkość łuku elektrycznego zależą od:",
+    "optionA": "Natężenia prądu.",
+    "optionB": "Różnicy potencjałów między częściami.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q11": {
+    "questionText": "Obuwie antystatyczne nosi się podczas:",
+    "optionA": "Pracy w przestrzeniach zamkniętych.",
+    "optionB": "Pracy z elektrycznością statyczną.",
+    "optionC": "Pracy z drabinami.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q12": {
+    "questionText": "Zagrożeniem związanym z elektrycznością statyczną jest:",
+    "optionA": "Rozładowanie może wywołać iskrę.",
+    "optionB": "Wrażliwy sprzęt elektroniczny może zostać uszkodzony.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q13": {
+    "questionText": "W jakiej sytuacji elektryczność statyczna nie powstanie?",
+    "optionA": "W pomieszczeniach o niskim poziomie tlenu.",
+    "optionB": "Gdy ciecze przepływają przez rurę z tworzywa sztucznego lub są mieszane.",
+    "optionC": "Podczas chodzenia po wykładzinie z tworzywa sztucznego.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q14": {
+    "questionText": "Co nie jest metodą ochrony obudów?",
+    "optionA": "Podwójna izolacja chroni przed wnikaniem pyłu i wilgoci.",
+    "optionB": "Ochrona przed uderzeniem i spadającymi przedmiotami.",
+    "optionC": "Ochrona przed wnikaniem wilgoci.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q15": {
+    "questionText": "Zagrożeniem przy używaniu przewodów zasilających i przedłużaczy jest:",
+    "optionA": "Przewody zasilające są zbyt krótkie.",
+    "optionB": "Potknięcie się o przewody.",
+    "optionC": "Przeciążenie przewodu.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q16": {
+    "questionText": "Przy korzystaniu z przedłużacza bębnowego należy:",
+    "optionA": "Całkowicie rozwinąć przewód z bębna.",
+    "optionB": "Nie stosować go w przestrzeniach zamkniętych.",
+    "optionC": "Nigdy nie rozwijać przewodu całkowicie z bębna.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q17": {
+    "questionText": "Gdy przedłużacz na bębnie nie jest całkowicie rozwinięty:",
+    "optionA": "Może powodować powstawanie elektryczności statycznej.",
+    "optionB": "Może bardzo się nagrzać i wywołać pożar.",
+    "optionC": "Może powodować iskrzenie elektryczne.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q18": {
+    "questionText": "Wartość zabezpieczenia wyłącznika różnicowoprądowego na budowie wynosi:",
+    "optionA": "300 mA.",
+    "optionB": "25 mA.",
+    "optionC": "30 mA.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q19": {
+    "questionText": "Środkiem bezpieczeństwa przed rozpoczęciem pracy z urządzeniami elektrycznymi jest:",
+    "optionA": "Sprawdzenie wzrokowe pod kątem uszkodzeń i niezgodności.",
+    "optionB": "Zgłoszenie uszkodzenia i niekorzystanie z uszkodzonego sprzętu.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Elektryczność"
+  },
+  "m15q20": {
+    "questionText": "Podczas korzystania z energii elektrycznej:",
+    "optionA": "Rusztowanie musi być ustawione na matach gumowych.",
+    "optionB": "Rusztowanie musi być uziemione.",
+    "optionC": "Z rusztowaniem nie trzeba robić nic szczególnego.",
+    "moduleName": "Elektryczność"
+  },
+  "m16q1": {
+    "questionText": "Co jest cechą przestrzeni zamkniętej?",
+    "optionA": "Utrudniony dostęp.",
+    "optionB": "Dobre oświetlenie.",
+    "optionC": "Wystarczająca przestrzeń do pracy.",
+    "moduleName": "Przestrzenie zamknięte"
+  },
+  "m16q2": {
+    "questionText": "Czy asekurujący przy włazie jest obowiązkowy podczas pracy w przestrzeni zamkniętej?",
+    "optionA": "Tak, ale może odejść po zakończeniu pomiarów.",
+    "optionB": "Nie, chyba że wskazano to w zezwoleniu dla wykonawcy.",
+    "optionC": "Tak, tak długo, jak ktoś przebywa w przestrzeni zamkniętej.",
+    "moduleName": "Przestrzenie zamknięte"
+  },
+  "m16q3": {
+    "questionText": "W jaki sposób w przestrzeni zamkniętej może powstać zagrożenie uduszeniem?",
+    "optionA": "Przez usterki instalacji elektrycznej.",
+    "optionB": "Przez wysokie stężenie tlenu.",
+    "optionC": "Przez niewystarczające stężenie tlenu.",
+    "moduleName": "Przestrzenie zamknięte"
+  },
+  "m16q4": {
+    "questionText": "Które z poniższych napięć jest bezpieczne?",
+    "optionA": "120 V prądu przemiennego.",
+    "optionB": "240 V prądu stałego.",
+    "optionC": "120 V prądu stałego.",
+    "moduleName": "Przestrzenie zamknięte"
+  },
+  "m16q5": {
+    "questionText": "Co nie jest przykładem przestrzeni zamkniętej?",
+    "optionA": "Zbiorniki magazynowe lub cysterny.",
+    "optionB": "Namioty spawalnicze w głębokich wykopach lub w ich pobliżu.",
+    "optionC": "Wąsko, ciasno, wilgotno, ślisko i mało miejsca na manewry.",
+    "moduleName": "Przestrzenie zamknięte"
+  },
+  "m16q6": {
+    "questionText": "Zasadą wykonywania pomiarów w przestrzeni zamkniętej jest:",
+    "optionA": "Pomiary musi wykonywać przełożony.",
+    "optionB": "Pomiary musi wykonywać pracownik przebywający w tej przestrzeni.",
+    "optionC": "Pomiary musi wykonywać osoba o odpowiednich kwalifikacjach.",
+    "moduleName": "Przestrzenie zamknięte"
+  },
+  "m16q7": {
+    "questionText": "Przy nadzorze nad przestrzenią zamkniętą należy uwzględnić, że:",
+    "optionA": "Komunikacja nie powinna odbywać się przy zagrożeniu zawaleniem.",
+    "optionB": "Należy powiadomić służby ratownicze, jeżeli osoba jest w niebezpieczeństwie.",
+    "optionC": "Osoba nadzorująca powinna w trakcie kontroli wykonywać inną pracę.",
+    "moduleName": "Przestrzenie zamknięte"
+  },
+  "m16q8": {
+    "questionText": "Stały asekurujący musi:",
+    "optionA": "Być obecny, gdy występują materiały łatwopalne.",
+    "optionB": "Przebywać na stanowisku przez cały czas.",
+    "optionC": "Posiadać w sposób udokumentowany sprawdzone kwalifikacje.",
+    "moduleName": "Przestrzenie zamknięte"
+  },
+  "m16q9": {
+    "questionText": "Czas przebywania w przestrzeni zamkniętej:",
+    "optionA": "Zależy od tego, gdzie znajduje się przestrzeń zamknięta.",
+    "optionB": "Musi być jak najkrótszy.",
+    "optionC": "Nie ma znaczenia.",
+    "moduleName": "Przestrzenie zamknięte"
+  },
+  "m16q10": {
+    "questionText": "Środkiem bezpieczeństwa zmniejszającym ryzyko porażenia prądem w przestrzeni zamkniętej jest:",
+    "optionA": "Obie odpowiedzi są prawidłowe.",
+    "optionB": "Prawidłowe odłączenie urządzeń od zasilania.",
+    "optionC": "Stosowanie napięć bezpiecznych w przestrzeniach zamkniętych o ścianach przewodzących.",
+    "moduleName": "Przestrzenie zamknięte"
+  },
+  "m17q1": {
+    "questionText": "Kiedy należy wstrzymać prace podnoszenia?",
+    "optionA": "Należy przestrzegać instrukcji producenta żurawia dotyczących siły wiatru.",
+    "optionB": "Powyżej 4 stopnia siły wiatru.",
+    "optionC": "Powyżej 5 stopnia siły wiatru.",
+    "moduleName": "Podnoszenie"
+  },
+  "m17q2": {
+    "questionText": "Co jest sprzętem pomocniczym do podnoszenia?",
+    "optionA": "Zawiesie pasowe.",
+    "optionB": "Pas mocujący ładunek.",
+    "optionC": "Szelki bezpieczeństwa.",
+    "moduleName": "Podnoszenie"
+  },
+  "m17q3": {
+    "questionText": "Jak nazywa się zestaw dwóch zawiesi na stalowym ogniwie?",
+    "optionA": "Zawiesie dwucięgnowe.",
+    "optionB": "Para zawiesi.",
+    "optionC": "Duet.",
+    "moduleName": "Podnoszenie"
+  },
+  "m17q4": {
+    "questionText": "Co zapisuje się w książce żurawia?",
+    "optionA": "Które certyfikaty odbiorowe są obowiązkowe.",
+    "optionB": "Jakie ciężary można przemieszczać na jaką odległość.",
+    "optionC": "Jakim przeglądom żuraw był poddany.",
+    "moduleName": "Podnoszenie"
+  },
+  "m17q5": {
+    "questionText": "Które stwierdzenie dotyczące łańcuchów jest PRAWIDŁOWE?",
+    "optionA": "Przy łańcuchach prowadzonych po ostrych krawędziach stosuje się osłony krawędzi.",
+    "optionB": "Łańcuchy z rozciągniętymi ogniwami można stosować, jeżeli ciężar nie przekracza dopuszczalnego limitu.",
+    "optionC": "Łańcuchów nigdy nie wolno wydłużać.",
+    "moduleName": "Podnoszenie"
+  },
+  "m17q6": {
+    "questionText": "Co nie jest przykładem urządzenia do podnoszenia?",
+    "optionA": "Żuraw wieżowy.",
+    "optionB": "Suwnica pomostowa.",
+    "optionC": "Wózek paletowy.",
+    "moduleName": "Podnoszenie"
+  },
+  "m17q7": {
+    "questionText": "Co można robić za pomocą urządzeń do podnoszenia?",
+    "optionA": "Przemieszczać ładunki w pionie.",
+    "optionB": "Przemieszczać ładunki w poziomie.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Podnoszenie"
+  },
+  "m17q8": {
+    "questionText": "Ogólnym zagrożeniem przy pracy ze sprzętem do podnoszenia jest:",
+    "optionA": "Spadnięcie ładunku.",
+    "optionB": "Przewrócenie się urządzenia do podnoszenia.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Podnoszenie"
+  },
+  "m17q9": {
+    "questionText": "Podpory stabilizujące stosuje się przy pracy z:",
+    "optionA": "Wiertarkami kolumnowymi.",
+    "optionB": "Materiałami niebezpiecznymi.",
+    "optionC": "Urządzeniami do podnoszenia.",
+    "moduleName": "Podnoszenie"
+  },
+  "m17q10": {
+    "questionText": "Liny stalowe:",
+    "optionA": "Nie mogą być wiązane w węzły.",
+    "optionB": "Powinny być przechowywane w wilgotnym pomieszczeniu.",
+    "optionC": "Mogą być używane nawet wtedy, gdy są silnie skorodowane.",
+    "moduleName": "Podnoszenie"
+  },
+  "m18q1": {
+    "questionText": "Promieniowanie podczerwone jest?",
+    "optionA": "Promieniowaniem niejonizującym.",
+    "optionB": "Promieniowaniem jonizującym.",
+    "optionC": "Naturalnym promieniowaniem tła.",
+    "moduleName": "Promieniowanie"
+  },
+  "m18q2": {
+    "questionText": "Środkiem ochrony przed promieniowaniem jonizującym jest:",
+    "optionA": "Zachowanie jak największej odległości.",
+    "optionB": "Wygrodzenie strefy wokół źródła.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Promieniowanie"
+  },
+  "m18q3": {
+    "questionText": "Badanie lekarskie jest obowiązkowe dla pracowników, którzy:",
+    "optionA": "Pracują z substancjami niebezpiecznymi w krótkim okresie.",
+    "optionB": "Pracują z urządzeniami lub substancjami emitującymi promieniowanie jonizujące.",
+    "optionC": "Chorują od czasu do czasu.",
+    "moduleName": "Promieniowanie"
+  },
+  "m18q4": {
+    "questionText": "Nadzór nad bezpieczeństwem radiologicznym i higieną jest zadaniem:",
+    "optionA": "Przełożonego.",
+    "optionB": "Specjalisty ochrony radiologicznej.",
+    "optionC": "Zespołu reagowania w sytuacjach awaryjnych.",
+    "moduleName": "Promieniowanie"
+  },
+  "m18q5": {
+    "questionText": "Jaka jest różnica między promieniowaniem jonizującym a niejonizującym?",
+    "optionA": "Promieniowanie niejonizujące jest jedynym promieniowaniem, które tworzy jony.",
+    "optionB": "Promieniowanie niejonizujące jest słabsze niż promieniowanie jonizujące.",
+    "optionC": "Promieniowanie niejonizujące jest silniejsze niż promieniowanie jonizujące.",
+    "moduleName": "Promieniowanie"
+  },
+  "m18q6": {
+    "questionText": "Środkiem zapobiegającym szkodliwemu wpływowi promieniowania niejonizującego na zdrowie jest:",
+    "optionA": "Zwracanie uwagi na instrukcje umieszczone na urządzeniach.",
+    "optionB": "Przestrzeganie wskazań dotyczących czasu użytkowania.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Promieniowanie"
+  },
+  "m19q1": {
+    "questionText": "Co nie decyduje o warunkach środowiska pracy?",
+    "optionA": "Przełożony.",
+    "optionB": "Drgania.",
+    "optionC": "Oświetlenie.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q2": {
+    "questionText": "Rodzajem drgań mechanicznych jest:",
+    "optionA": "Drgania dłoni/ramienia od narzędzi mechanicznych.",
+    "optionB": "Drgania całego ciała od pojazdu lub drgającego podłoża.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q3": {
+    "questionText": "Co nie jest dolegliwością zdrowotną wywołaną drganiami całego ciała?",
+    "optionA": "Zakażenia skóry.",
+    "optionB": "Bóle mięśni.",
+    "optionC": "Zmęczenie.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q4": {
+    "questionText": "Utrzymanie równowagi wodnej organizmu jest środkiem zapobiegawczym:",
+    "optionA": "Przy pracy z substancjami niebezpiecznymi.",
+    "optionB": "Aby nie doszło do pożarów.",
+    "optionC": "Aby zapewnić komfort pracy.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q5": {
+    "questionText": "Czynnikiem wpływającym na obciążenie fizyczne jest:",
+    "optionA": "Pozycja/postawa przy pracy.",
+    "optionB": "Obie odpowiedzi są prawidłowe.",
+    "optionC": "Ruchy, które trzeba wykonywać.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q6": {
+    "questionText": "Funkcją przerwy w pracy jest:",
+    "optionA": "Możliwość miłej, nieformalnej rozmowy ze współpracownikami.",
+    "optionB": "Zapobieganie przeciążeniu organizmu.",
+    "optionC": "Zapewnienie wystarczającego czasu na zjedzenie obiadu.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q7": {
+    "questionText": "Przewlekłe zmęczenie jest zagrożeniem dla zdrowia:",
+    "optionA": "Przy pracy w nadgodzinach raz w miesiącu.",
+    "optionB": "Wynikającym z obciążenia statycznego.",
+    "optionC": "Wynikającym z pracy z substancjami niebezpiecznymi.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q8": {
+    "questionText": "Relacje ze współpracownikami:",
+    "optionA": "Wpływają na rozkład czasu pracy.",
+    "optionB": "Powinny być zawsze pozytywne.",
+    "optionC": "Wpływają na obciążenie psychiczne.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q9": {
+    "questionText": "Prawidłowa postawa przy ręcznym podnoszeniu i przemieszczaniu to:",
+    "optionA": "Trzymanie ładunku jak najbliżej ciała.",
+    "optionB": "Podnoszenie z wyprostowanymi plecami i ugiętymi kolanami.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q10": {
+    "questionText": "Co nie jest warunkiem, w którym preferowana jest praca w pozycji stojącej?",
+    "optionA": "Przy częstym sięganiu w dół, w górę lub daleko.",
+    "optionB": "Jeżeli konieczne jest użycie sił przekraczających 30 N (3.0 kg).",
+    "optionC": "Jeżeli brakuje miejsca na nogi.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q11": {
+    "questionText": "Optymalna pozycja siedząca przy pracy to:",
+    "optionA": "Dobre podparcie ud na siedzisku.",
+    "optionB": "Odciążenie ramion, na przykład za pomocą podłokietników.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q12": {
+    "questionText": "Co jest wytyczną prawidłowego siedzenia przy pracy?",
+    "optionA": "Zapewnienie optymalnej pozycji siedzącej.",
+    "optionB": "Po przyjęciu optymalnej pozycji należy pracować w niej jak najdłużej.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q13": {
+    "questionText": "Zalecana maksymalna masa 25 kg jest środkiem bezpieczeństwa przy:",
+    "optionA": "Podnoszeniu w pozycji siedzącej.",
+    "optionB": "Podnoszeniu ręcznym.",
+    "optionC": "Podnoszeniu żurawiem.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m19q14": {
+    "questionText": "Prawidłowa postawa przy ręcznym podnoszeniu to:",
+    "optionA": "Podnoszenie z wyprostowanymi plecami i ugiętymi kolanami.",
+    "optionB": "Trzymanie ładunku jak najbliżej ciała.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Ergonomiczne stanowisko pracy"
+  },
+  "m20q1": {
+    "questionText": "Jaki jest skutek nadmiernie głośnego hałasu na stanowisku pracy?",
+    "optionA": "Zwiększa ryzyko na stanowisku pracy.",
+    "optionB": "Jeżeli stosuje się ochronniki słuchu, głośny hałas nie ma żadnego skutku.",
+    "optionC": "Można pracować wydajniej, ponieważ nie da się rozmawiać.",
+    "moduleName": "Hałas na stanowisku pracy"
+  },
+  "m20q2": {
+    "questionText": "Jakie czynniki decydują o tym, czy hałas jest szkodliwy?",
+    "optionA": "Czas narażenia i wytrzymałość kosteczek słuchowych.",
+    "optionB": "Wysokość i natężenie dźwięku.",
+    "optionC": "Odległość i wytwarzanie ciepła w uchu.",
+    "moduleName": "Hałas na stanowisku pracy"
+  },
+  "m20q3": {
+    "questionText": "Dwa jednakowe źródła dźwięku razem podnoszą poziom dźwięku o:",
+    "optionA": "3 dB.",
+    "optionB": "6 dB.",
+    "optionC": "9 dB.",
+    "moduleName": "Hałas na stanowisku pracy"
+  },
+  "m20q4": {
+    "questionText": "Narażenie na nadmierny hałas powoduje:",
+    "optionA": "Blade palce.",
+    "optionB": "Trwałe uszkodzenie mózgu.",
+    "optionC": "Utratę koncentracji.",
+    "moduleName": "Hałas na stanowisku pracy"
+  },
+  "m20q5": {
+    "questionText": "Podwojenie odległości od źródła hałasu daje obniżenie o około:",
+    "optionA": "3 dB(A).",
+    "optionB": "6 dB(A).",
+    "optionC": "9 dB(A).",
+    "moduleName": "Hałas na stanowisku pracy"
+  },
+  "m20q6": {
+    "questionText": "Trudności w prowadzeniu rozmów telefonicznych są objawem:",
+    "optionA": "Czasowego ubytku słuchu.",
+    "optionB": "Hałaśliwego tła.",
+    "optionC": "Trwałego ubytku słuchu.",
+    "moduleName": "Hałas na stanowisku pracy"
+  },
+  "m20q7": {
+    "questionText": "Jednostką miary poziomu (ciśnienia) dźwięku jest:",
+    "optionA": "Lumen.",
+    "optionB": "Decybel.",
+    "optionC": "Amplituda.",
+    "moduleName": "Hałas na stanowisku pracy"
+  },
+  "m20q8": {
+    "questionText": "Prawidłowa kolejność ograniczania nadmiernego hałasu to:",
+    "optionA": "1. Ograniczyć źródło / 2. Stosować ochronniki słuchu / 3. Wytłumić hałas / 4. Osłonić ekranem",
+    "optionB": "1. Stosować ochronniki słuchu / 2. Osłonić ekranem / 3. Wytłumić hałas / 4. Ograniczyć źródło",
+    "optionC": "1. Ograniczyć źródło / 2. Osłonić ekranem / 3. Wytłumić hałas / 4. Stosować ochronniki słuchu",
+    "moduleName": "Hałas na stanowisku pracy"
+  },
+  "m20q9": {
+    "questionText": "Jakie środki musi podjąć pracodawca przy tych poziomach dźwięku?",
+    "optionA": "Od 85 dB(A) zapewnić badanie słuchu i ochronniki słuchu.",
+    "optionB": "Od 80 dB(A) zapewnić badanie słuchu i ochronniki słuchu.",
+    "optionC": "Od 75 dB(A) zapewnić badanie słuchu i ochronniki słuchu.",
+    "moduleName": "Hałas na stanowisku pracy"
+  },
+  "m21q1": {
+    "questionText": "Dlaczego pracownicy w przemyśle nie powinni nosić metalowych hełmów ochronnych?",
+    "optionA": "Metalowy hełm może zranić głowę.",
+    "optionB": "Metalowy hełm nie amortyzuje dostatecznie spadających przedmiotów.",
+    "optionC": "Metalowy hełm może przewodzić prąd elektryczny.",
+    "explanation": "Środki ochrony indywidualnej są zawsze ostatnim ogniwem w hierarchii środków ograniczania ryzyka. Chronią tylko osobę, która je nosi, i zależą od prawidłowego stosowania. Środki ochrony zbiorowej mają zawsze pierwszeństwo.",
+    "officialRef": "Moduł 21 — Środki ochrony indywidualnej",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q2": {
+    "questionText": "Przy jakich pracach maska przeciwpyłowa stanowi ochronę dróg oddechowych?",
+    "optionA": "Przy natryskowym malowaniu farbą.",
+    "optionB": "Przy spawaniu.",
+    "optionC": "Przy rozbijaniu i wyrębywaniu.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q3": {
+    "questionText": "W jakich sytuacjach gogle ochronne zapewniają dobrą ochronę?",
+    "optionA": "Przy pracach, przy których dochodzi do rozprysku kwasów.",
+    "optionB": "Przy pracy nad głową.",
+    "optionC": "Przy pracy w przestrzeniach zamkniętych.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q4": {
+    "questionText": "Przy pracy w hałasie o poziomie wyższym niż 85 dB(A):",
+    "optionA": "Ochronniki słuchu są zalecane.",
+    "optionB": "Pracownik może sam zdecydować o stosowaniu ochronników słuchu.",
+    "optionC": "Stosowanie ochronników słuchu jest obowiązkowe.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q5": {
+    "questionText": "Środki ochrony indywidualnej muszą być:",
+    "optionA": "Dostępne w jednym rozmiarze.",
+    "optionB": "Na miejscu na każdym stanowisku pracy.",
+    "optionC": "Poddane badaniom.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q6": {
+    "questionText": "Różnica między okularami ochronnymi a tarczą spawalniczą:",
+    "optionA": "Tarcze spawalnicze chronią przed promieniowaniem podczerwonym, a gogle przed odpryskami.",
+    "optionB": "Okulary ochronne chronią przed promieniowaniem UV, a tarcze spawalnicze przed odpryskami.",
+    "optionC": "Okulary ochronne zakrywają całą twarz, a tarcze spawalnicze nie.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q7": {
+    "questionText": "Zbyt niskie stężenie tlenu jest zagrożeniem dla:",
+    "optionA": "Środowiska.",
+    "optionB": "Pożarów.",
+    "optionC": "Oddychania.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q8": {
+    "questionText": "Aparat oddechowy izolujący, niezależny od otoczenia, należy stosować:",
+    "optionA": "Gdy występują wysokie i nieznane stężenia substancji niebezpiecznych.",
+    "optionB": "Gdy w powietrzu jest mniej niż 19% tlenu.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q9": {
+    "questionText": "Co nie jest zasadą stosowania środków ochrony przed upadkiem z wysokości?",
+    "optionA": "Szelki bezpieczeństwa muszą dobrze leżeć i być dopasowane do użytkownika.",
+    "optionB": "Sprzęt chroniący przed upadkiem, który powstrzymał upadek, można używać ponownie.",
+    "optionC": "Liny bezpieczeństwa nie mogą być zabrudzone.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q10": {
+    "questionText": "Odzież ostrzegawcza jest stosowana:",
+    "optionA": "W niskich temperaturach.",
+    "optionB": "Aby użytkownik był widoczny.",
+    "optionC": "Przeciw zanieczyszczeniom, przy spawaniu i szlifowaniu.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q11": {
+    "questionText": "Poślizgnięcie jest zagrożeniem dla:",
+    "optionA": "Dłoni i rąk.",
+    "optionB": "Stóp i nóg.",
+    "optionC": "Głowy i twarzy.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q12": {
+    "questionText": "Różne formy ochrony dłoni i rąk to:",
+    "optionA": "Rękawice z antypoślizgową podeszwą.",
+    "optionB": "Rękawice z wydłużonym mankietem i/lub ochroną ramienia.",
+    "optionC": "Stalowy nosek chroniący palce przed ciężkimi spadającymi przedmiotami.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q13": {
+    "questionText": "Podstawową właściwością hełmu ochronnego jest:",
+    "optionA": "Wnętrze: pochłania uderzenie i rozkłada je na całą głowę.",
+    "optionB": "Skorupa zewnętrzna: pochłania uderzenie i rozkłada je na całą głowę.",
+    "optionC": "Wnętrze: dostatecznie wytrzymałe, aby zatrzymać spadające przedmioty.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q14": {
+    "questionText": "Zagrożenia dla głowy podczas pracy to:",
+    "optionA": "Uderzenie.",
+    "optionB": "Spadające przedmioty.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m21q15": {
+    "questionText": "Półmaska zakrywająca nos i usta jest stosowana:",
+    "optionA": "Przeciw pyłom oraz gazom lub parom.",
+    "optionB": "Do zakrycia całej twarzy.",
+    "optionC": "Tylko przeciw pyłom, nie przeciw gazom ani parom.",
+    "moduleName": "Środki ochrony indywidualnej"
+  },
+  "m22q1": {
+    "questionText": "Jakie cechy ma znak nakazu?",
+    "optionA": "Jest okrągły, niebieski i ma biały symbol.",
+    "optionB": "Jest trójkątny i żółty z czarnym symbolem.",
+    "optionC": "Jest prostokątny i zielony z białym symbolem.",
+    "moduleName": "Znaki i oznakowanie"
+  },
+  "m22q2": {
+    "questionText": "Jakie wymagania dotyczą znaków ostrzegawczych na stanowisku pracy?",
+    "optionA": "Ich forma musi być zrozumiała dla wszystkich.",
+    "optionB": "Muszą być umieszczone na bezpiecznej wysokości.",
+    "optionC": "Powinny mieć tekst w języku niderlandzkim.",
+    "moduleName": "Znaki i oznakowanie"
+  },
+  "m22q3": {
+    "questionText": "Grupą znaków są:",
+    "optionA": "Znaki nakazu.",
+    "optionB": "Znaki pierwszej pomocy.",
+    "optionC": "Znaki wyjścia.",
+    "moduleName": "Znaki i oznakowanie"
+  },
+  "m22q4": {
+    "questionText": "Znak, który czegoś zakazuje, to:",
+    "optionA": "Okrągły czerwony znak z białym obrzeżem i czerwonym ukośnym pasem.",
+    "optionB": "Trójkątny żółty znak z czarnym obrzeżem.",
+    "optionC": "Okrągły biały znak z czerwonym obrzeżem i czerwonym ukośnym pasem.",
+    "moduleName": "Znaki i oznakowanie"
+  },
+  "m22q5": {
+    "questionText": "Trójkątny żółty znak z czarnym obrzeżem to forma:",
+    "optionA": "Znaku informacyjnego o urządzeniach.",
+    "optionB": "Znaku ostrzegawczego.",
+    "optionC": "Znaku nakazu.",
+    "moduleName": "Znaki i oznakowanie"
+  },
+  "m22q6": {
+    "questionText": "Ogólne znaczenie znaków ostrzegawczych to:",
+    "optionA": "Zakaz czegoś.",
+    "optionB": "Droga do urządzeń.",
+    "optionC": "Uwaga, niebezpieczeństwo.",
+    "moduleName": "Znaki i oznakowanie"
+  },
+  "m22q7": {
+    "questionText": "Kwadratowy lub prostokątny zielony znak z białym symbolem służy do oznaczania:",
+    "optionA": "Znaków nakazu.",
+    "optionB": "Znaków ostrzegawczych.",
+    "optionC": "Znaków urządzeń bezpieczeństwa.",
+    "moduleName": "Znaki i oznakowanie"
+  },
+  "m22q8": {
+    "questionText": "Sprzęt do zwalczania pożarów znajduje się przy znakach, które są:",
+    "optionA": "Kwadratowe/prostokątne i zielone z białym symbolem.",
+    "optionB": "Kwadratowe/prostokątne i czerwone z białym symbolem.",
+    "optionC": "Kwadratowe/prostokątne i czarne z białym symbolem.",
+    "moduleName": "Znaki i oznakowanie"
+  },
+  "m22q9": {
+    "questionText": "Ogólne znaczenie znaków sprzętu przeciwpożarowego:",
+    "optionA": "Wskazują, gdzie znajduje się sprzęt: droga do niego.",
+    "optionB": "Wskazują, gdzie znajduje się sprzęt: samo miejsce.",
+    "optionC": "Obie odpowiedzi są prawidłowe.",
+    "moduleName": "Znaki i oznakowanie"
+  },
+  "m22q10": {
+    "questionText": "Żółte lub białe pasy stosuje się do:",
+    "optionA": "Oznaczenia pierwszego i ostatniego stopnia schodów.",
+    "optionB": "Oznakowania przejść i miejsc składowania.",
+    "optionC": "Znaków nakazu.",
+    "moduleName": "Znaki i oznakowanie"
+  },
+  "mc001": {
+    "questionText": "Które z poniższych są obowiązkowe podczas pracy na wysokości powyżej 2 metrów?",
+    "explanation": "Praca na wysokości wymaga co najmniej ochrony przed upadkiem (szelki bezpieczeństwa z linką bezpieczeństwa), ochrony głowy i ochrony stóp. Odzież ostrzegawcza i ochronniki słuchu zależą od konkretnych warunków otoczenia.",
+    "officialRef": "Moduł 14 — Praca na wysokości",
+    "moduleName": "Praca na wysokości",
+    "options": {
+      "a": "Szelki bezpieczeństwa z linką bezpieczeństwa",
+      "b": "Hełm ochronny",
+      "c": "Obuwie ochronne ze stalowym noskiem",
+      "d": "Kamizelka ostrzegawcza o intensywnej widzialności",
+      "e": "Ochronniki słuchu"
+    }
+  },
+  "mc002": {
+    "questionText": "Które z poniższych są klasyfikowane jako substancje niebezpieczne zgodnie z rozporządzeniem REACH?",
+    "explanation": "Azbest, benzen i pył krzemowy są klasyfikowane jako substancje niebezpieczne o surowych limitach narażenia. Woda do picia i sprężone powietrze nie są klasyfikowane jako niebezpieczne w rozporządzeniu REACH.",
+    "officialRef": "Moduł 8 — Substancje niebezpieczne",
+    "moduleName": "Substancje niebezpieczne",
+    "options": {
+      "a": "Włókna azbestu",
+      "b": "Benzen",
+      "c": "Woda do picia",
+      "d": "Pył krzemowy",
+      "e": "Sprężone powietrze"
+    }
+  },
+  "mc003": {
+    "questionText": "Które z poniższych są właściwymi metodami zapobiegania pożarom na stanowisku pracy?",
+    "explanation": "Ochrona przeciwpożarowa polega na usuwaniu źródeł zapłonu, właściwym magazynowaniu materiałów łatwopalnych i odpowiedniej wentylacji. Wody nie należy używać do usuwania rozlanych substancji chemicznych (może je rozprowadzić lub z nimi zareagować). Gaśnice muszą być łatwo dostępne, a nie zamknięte pod kluczem.",
+    "officialRef": "Moduł 9 — Pożary i wybuchy",
+    "moduleName": "Pożary i wybuchy",
+    "options": {
+      "a": "Usuwanie źródeł zapłonu w pobliżu materiałów łatwopalnych",
+      "b": "Przechowywanie cieczy łatwopalnych w dopuszczonych szafach bezpieczeństwa",
+      "c": "Zwiększenie wentylacji w celu rozcieńczenia palnych par",
+      "d": "Używanie wody do usuwania wszystkich rozlanych substancji chemicznych",
+      "e": "Zamykanie gaśnic pod kluczem, aby zapobiec ich niewłaściwemu użyciu"
+    }
+  },
+  "tf001": {
+    "questionText": "Wskaż, czy każde z poniższych stwierdzeń o substancjach niebezpiecznych jest prawdziwe czy fałszywe:",
+    "explanation": "Karta SDS musi być dostępna zgodnie z rozporządzeniem REACH. Oryginalne opakowania zapobiegają pomyłkom. Odpady chemiczne muszą być usuwane wyznaczonymi drogami. Zarówno ciecze, jak i gazy mogą wymagać wentylacji.",
+    "officialRef": "Moduł 8 — Substancje niebezpieczne",
+    "moduleName": "Substancje niebezpieczne",
+    "statements": {
+      "s1": "Karta SDS (karta charakterystyki) musi być zawsze dostępna na terenie obiektu",
+      "s2": "Substancje niebezpieczne muszą być przechowywane w oryginalnych opakowaniach",
+      "s3": "Odpady chemiczne można wyrzucać do zwykłych śmieci",
+      "s4": "Wentylacja jest wymagana tylko przy cieczach, nie przy gazach"
+    }
+  },
+  "tf002": {
+    "questionText": "Wskaż, czy każde z poniższych stwierdzeń o środkach ochrony indywidualnej jest prawdziwe czy fałszywe:",
+    "explanation": "Środki ochrony indywidualnej są ostatnim, a nie pierwszym ogniwem w hierarchii środków ograniczania ryzyka. Pracodawca musi je zapewnić nieodpłatnie. Uszkodzone środki ochrony muszą być wymienione. Oznakowanie CE potwierdza zgodność z unijnymi wymaganiami bezpieczeństwa.",
+    "officialRef": "Moduł 21 — Środki ochrony indywidualnej",
+    "moduleName": "Środki ochrony indywidualnej",
+    "statements": {
+      "s1": "Środki ochrony indywidualnej są pierwszą linią obrony w hierarchii środków ograniczania ryzyka",
+      "s2": "Pracodawca jest odpowiedzialny za nieodpłatne zapewnienie środków ochrony indywidualnej",
+      "s3": "Uszkodzone środki ochrony indywidualnej muszą być niezwłocznie wymienione",
+      "s4": "Środki ochrony indywidualnej z oznakowaniem CE spełniają minimalne europejskie wymagania bezpieczeństwa"
+    }
+  },
+  "tf003": {
+    "questionText": "Wskaż, czy każde z poniższych stwierdzeń o pracy w przestrzeniach zamkniętych jest prawdziwe czy fałszywe:",
+    "explanation": "Wejście do przestrzeni zamkniętej zawsze wymaga pisemnego pozwolenia na pracę. Pomiary atmosfery są obowiązkowe niezależnie od widocznych zagrożeń (niedobór tlenu jest niewidoczny). Osoba asekurująca oraz sprzęt ratowniczy są zawsze wymagane.",
+    "officialRef": "Moduł 16 — Przestrzenie zamknięte",
+    "moduleName": "Przestrzenie zamknięte",
+    "statements": {
+      "s1": "Pisemne pozwolenie na pracę jest zawsze wymagane przed wejściem do przestrzeni zamkniętej",
+      "s2": "Pomiary atmosfery są potrzebne tylko wtedy, gdy występuje widoczne zagrożenie",
+      "s3": "Osoba asekurująca musi być obecna na zewnątrz przestrzeni zamkniętej",
+      "s4": "Sprzęt ratowniczy musi być dostępny przed wejściem"
+    }
+  },
+  "ord001": {
+    "questionText": "Ustaw etapy hierarchii środków ograniczania ryzyka (od eliminacji do środka ostatecznego) w prawidłowej kolejności, zaczynając od najbardziej preferowanego:",
+    "explanation": "Hierarchia środków ograniczania ryzyka przebiega od eliminacji → zastąpienia → rozwiązań technicznych → środków organizacyjnych → środków ochrony indywidualnej. Środki ochrony indywidualnej są zawsze ostatnie, ponieważ zależą od prawidłowego stosowania przez pracownika.",
+    "officialRef": "Moduł 3 — Zapobieganie ryzyku",
+    "moduleName": "Wypadki: przyczyny i zapobieganie",
+    "items": {
+      "i1": "Środki organizacyjne (procedury, szkolenia)",
+      "i2": "Eliminacja zagrożenia",
+      "i3": "Środki ochrony indywidualnej",
+      "i4": "Zastąpienie (wymiana na mniej niebezpieczne)",
+      "i5": "Rozwiązania techniczne (bariery fizyczne)"
+    }
+  },
+  "ord002": {
+    "questionText": "Ustaw w prawidłowej kolejności czynności podejmowane w reakcji na rozlanie substancji chemicznej:",
+    "explanation": "Przy rozlaniu substancji chemicznej: najpierw ewakuować i ostrzec innych, następnie zidentyfikować substancję na podstawie karty SDS, potem usunąć rozlanie przy użyciu właściwych środków ochrony indywidualnej i materiałów, a na koniec zgłosić zdarzenie.",
+    "officialRef": "Moduł 8 — Substancje niebezpieczne",
+    "moduleName": "Substancje niebezpieczne",
+    "items": {
+      "i1": "Powiadomić przełożonego i sporządzić zgłoszenie zdarzenia",
+      "i2": "Ewakuować najbliższy obszar i ostrzec innych",
+      "i3": "Usunąć rozlanie przy użyciu odpowiednich sorbentów i środków ochrony indywidualnej",
+      "i4": "Zidentyfikować substancję na podstawie karty SDS"
+    }
+  },
+  "ord003": {
+    "questionText": "Ustaw w prawidłowej kolejności czynności użycia gaśnicy (technika PASS):",
+    "explanation": "Technika PASS: wyciągnij zawleczkę → skieruj strumień na podstawę ognia → naciśnij dźwignię → prowadź strumień na boki. Zawsze kieruj środek gaśniczy na podstawę ognia, a nie w płomienie.",
+    "officialRef": "Moduł 9 — Pożary i wybuchy",
+    "moduleName": "Pożary i wybuchy",
+    "items": {
+      "i1": "Naciśnij dźwignię, aby uwolnić środek gaśniczy",
+      "i2": "Wyciągnij zawleczkę zabezpieczającą",
+      "i3": "Prowadź strumień na boki wzdłuż podstawy ognia",
+      "i4": "Skieruj dyszę na podstawę ognia"
+    }
+  },
+  "mat001": {
+    "questionText": "Dopasuj każdy typ gaśnicy do klasy pożaru, do której jest przeznaczona:",
+    "explanation": "Woda: tylko ciała stałe klasy A. Piana: ciecze klasy B (oraz A). CO₂: pożary urządzeń elektrycznych (klasa C) — wypiera tlen i nie pozostawia śladów. Proszek gaśniczy: uniwersalny (A, B, C), ale pozostawia osad.",
+    "officialRef": "Moduł 9 — Pożary i wybuchy",
+    "moduleName": "Pożary i wybuchy",
+    "leftItems": {
+      "l1": "Gaśnica wodna",
+      "l2": "Gaśnica CO₂",
+      "l3": "Gaśnica pianowa",
+      "l4": "Gaśnica proszkowa"
+    },
+    "rightItems": {
+      "r1": "Klasa A — materiały stałe (drewno, papier)",
+      "r2": "Klasa B — ciecze łatwopalne (benzyna, olej)",
+      "r3": "Klasa C — pożary urządzeń elektrycznych",
+      "r4": "Pożary klasy A, B i C (wielofunkcyjna)"
+    }
+  },
+  "mat002": {
+    "questionText": "Dopasuj każdy kolor znaku bezpieczeństwa do jego znaczenia:",
+    "explanation": "Kodowanie kolorami według ISO 7010: czerwony = zakaz/ochrona przeciwpożarowa, żółty = ostrzeżenie, niebieski = nakaz, zielony = warunek bezpieczny/ewakuacja. Kolory te są ujednolicone w całej UE.",
+    "officialRef": "Moduł 22 — Znaki i oznakowanie",
+    "moduleName": "Znaki i oznakowanie",
+    "leftItems": {
+      "l1": "Czerwony",
+      "l2": "Żółty / pomarańczowożółty",
+      "l3": "Niebieski",
+      "l4": "Zielony"
+    },
+    "rightItems": {
+      "r1": "Zakaz lub sprzęt przeciwpożarowy",
+      "r2": "Ostrzeżenie / uwaga",
+      "r3": "Nakaz określonego działania (obowiązek)",
+      "r4": "Warunek bezpieczny / droga ewakuacyjna"
+    }
+  },
+  "mat003": {
+    "questionText": "Dopasuj każdy rodzaj środka ochrony indywidualnej do zagrożenia, przed którym chroni przede wszystkim:",
+    "explanation": "Każdy rodzaj środka ochrony indywidualnej jest przypisany do swojego głównego zagrożenia. Nauszniki chronią przed hałasem. Półmaski FFP3 chronią przed drobnym pyłem. Gogle chronią oczy. Rękawice antywibracyjne zmniejszają ryzyko zespołu wibracyjnego przy pracy narzędziami mechanicznymi.",
+    "officialRef": "Moduł 21 — Środki ochrony indywidualnej",
+    "moduleName": "Środki ochrony indywidualnej",
+    "leftItems": {
+      "l1": "Nauszniki przeciwhałasowe / wkładki przeciwhałasowe",
+      "l2": "Półmaska filtrująca (FFP3)",
+      "l3": "Gogle ochronne",
+      "l4": "Rękawice antywibracyjne"
+    },
+    "rightItems": {
+      "r1": "Ubytek słuchu spowodowany hałasem",
+      "r2": "Wdychanie drobnego pyłu i aerozoli",
+      "r3": "Rozprysk substancji chemicznych lub odpryski do oczu",
+      "r4": "Zespół wibracyjny kończyn górnych (HAVS)"
+    }
+  }
+}

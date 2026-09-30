@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { VCA_QUESTIONS } from '@/lib/academy-questions';
+import { useVcaContent } from '@/lib/academy/content';
 import {
   VCAQuestion,
   QuestionAnswer,
@@ -605,6 +605,7 @@ export default function AcademyExam() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { questions: localizedQuestions } = useVcaContent();
 
   const type: ExamType = examType === 'volvca' ? 'volvca' : 'bvca';
   const config = EXAM_CONFIG[type];
@@ -692,7 +693,7 @@ export default function AcademyExam() {
 
   // Select questions on exam start
   const startExam = useCallback(() => {
-    const pool = VCA_QUESTIONS.filter(q =>
+    const pool = localizedQuestions.filter(q =>
       type === 'bvca' ? q.isBVCA : q.isVOLVCA
     );
 
@@ -716,7 +717,7 @@ export default function AcademyExam() {
     startTimeRef.current = Date.now();
     warningShownRef.current = false;
     setPhase('exam');
-  }, [type, config]);
+  }, [type, config, localizedQuestions]);
 
   // Timer — uses handleSubmitRef.current to avoid stale closure
   useEffect(() => {

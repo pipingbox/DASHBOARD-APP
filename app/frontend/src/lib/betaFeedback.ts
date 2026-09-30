@@ -11,7 +11,10 @@ export interface BetaFeedbackReport {
   screen_size: string;
 }
 
+export const BETA_SUPPORT_EMAIL = 'support@pipingbox.com';
+
 export const FEEDBACK_CATEGORIES = [
+  'translation',
   'ai_error',
   'export',
   'login_account',
@@ -21,6 +24,23 @@ export const FEEDBACK_CATEGORIES = [
 ] as const;
 
 export type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
+
+const OPEN_FEEDBACK_EVENT = 'pipingbox:open-beta-feedback';
+
+/**
+ * Opens the beta feedback modal from anywhere in the tree (the modal lives in
+ * `BetaFeedbackProvider` at the bottom of the shell, while triggers such as the
+ * translation banner render above it).
+ */
+export function openBetaFeedback(category: FeedbackCategory) {
+  window.dispatchEvent(new CustomEvent<FeedbackCategory>(OPEN_FEEDBACK_EVENT, { detail: category }));
+}
+
+export function onOpenBetaFeedback(handler: (category: FeedbackCategory) => void) {
+  const listener = (event: Event) => handler((event as CustomEvent<FeedbackCategory>).detail);
+  window.addEventListener(OPEN_FEEDBACK_EVENT, listener);
+  return () => window.removeEventListener(OPEN_FEEDBACK_EVENT, listener);
+}
 
 const BETA_DISMISSED_KEY = 'pipingbox_beta_dismissed';
 const SCREENSHOT_BUCKET = 'feedback-screenshots';

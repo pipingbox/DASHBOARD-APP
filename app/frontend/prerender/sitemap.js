@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { getBlogRoutes } from './blog-routes.js';
 import { getSitemapLastmod } from './blog-sitemap.js';
+import { TOOL_LANDINGS } from '../src/lib/tool-landings';
 
 // PB-OBSERVABILITY-PROD-ROLLOUT-001: replaces vite-plugin-sitemap.
 //
@@ -41,7 +42,10 @@ const APP_ROUTES = [
 
 export function buildSitemapEntries() {
   const lastmod = getSitemapLastmod();
-  const routes = ['/', ...APP_ROUTES, ...getBlogRoutes()].sort();
+  // PB-SEO-103: tool landing routes (no trailing slash, per the canonical
+  // policy above) come from the same registry the router/prerenderer use.
+  const toolLandingRoutes = TOOL_LANDINGS.map((tool) => `/tools/${tool.slug}`);
+  const routes = ['/', ...APP_ROUTES, ...toolLandingRoutes, ...getBlogRoutes()].sort();
 
   return routes.map((route) => ({
     loc: `${HOSTNAME}${route}`,

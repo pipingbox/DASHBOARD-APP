@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs><style>
+    .profile{stroke:#1a1a1a;stroke-width:2;fill:#e2e5e8}
+    .bore{stroke:#555;stroke-width:1;fill:none;stroke-dasharray:4 2}
+    .centerline{stroke:#999;stroke-width:.8;stroke-dasharray:8 4;fill:none}
+    .dim-line{stroke:#c62828;stroke-width:.9;fill:none}
+    .dim-text{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#c62828;text-anchor:middle}
+    .dim-sub{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#c62828;text-anchor:middle}
+    .title{font-family:'Segoe UI',Arial,sans-serif;font-size:18px;font-weight:600;fill:#1a1a1a}
+    .subtitle{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#555}
+    .std-ref{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#888}
+    .note{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888}
+    .label{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#999;text-anchor:middle}
+    .tbl-hdr{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;fill:#1a1a1a;font-weight:600;text-anchor:middle}
+    .tbl-key{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#555;text-anchor:start}
+    .tbl-val{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888;text-anchor:end}
+  </style>
+  <marker id="as" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  <marker id="ae" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  </defs>
+  <rect width="800" height="700" fill="#fafafa"/>
+  <text x="40" y="40" class="title">Cap — Threaded</text>
+  <text x="40" y="60" class="subtitle">NPS 1-1/4 (DN 32) — Class 3000</text>
+  <text x="40" y="78" class="std-ref">ASME B16.11-2016 | Forged, threaded end (NPT)</text>
+  <path d="M 296.9117647058824 226.25 L 316.2132352941177 226.25 Q 386.5257352941177 320 316.2132352941177 413.75 L 296.9117647058824 413.75 Z" class="profile"/><rect x="296.9117647058824" y="246.76470588235296" width="0" height="146.4705882352941" class="bore"/><line x1="409.0882352941177" y1="226.25" x2="409.0882352941177" y2="413.75" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="417.0882352941177" y="320" class="dim-text" style="text-anchor:start">R = 2.125"</text>
+  <text x="417.0882352941177" y="334" class="dim-sub" style="text-anchor:start">54.0 mm</text><line x1="296.9117647058824" y1="447.75" x2="363.0882352941177" y2="447.75" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="330" y="441.75" class="dim-text">L = 0.750"</text>
+  <text x="330" y="463.75" class="dim-sub">19.1 mm</text>
+  <text x="640" y="130" class="tbl-hdr">Dimensions</text>
+  <text x="560" y="148" class="tbl-key">L (length)</text>
+  <text x="725" y="148" class="tbl-val">0.750" / 19.1 mm</text>
+  <text x="560" y="162" class="tbl-key">OD</text>
+  <text x="725" y="162" class="tbl-val">2.125" / 54.0 mm</text>
+  <text x="40" y="640" class="note">Cap threaded per ASME B16.11-2016, Class 3000.</text>
+  <text x="40" y="654" class="note">Thread: ASME B1.20.1 NPT. A = overall length.</text>
+  <text x="40" y="668" class="note">All dims in inches and mm.</text>
+</svg>

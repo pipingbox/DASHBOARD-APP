@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Briefcase, BadgeCheck, TrendingUp, Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { supabase, TABLES } from '@/lib/supabase';
 import type { TrustMetric } from '@/lib/jobs/types';
 
@@ -32,6 +33,7 @@ function useCounter(target: number, duration = 1600) {
   return { count, ref };
 }
 
+/** `TrustMetric.label` holds the i18n key; MetricCard translates it at render. */
 function useTrustMetrics(): { metrics: TrustMetric[]; loading: boolean } {
   const [metrics, setMetrics] = useState<TrustMetric[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,17 +75,17 @@ function useTrustMetrics(): { metrics: TrustMetric[]; loading: boolean } {
         const countryCount = countries.size;
 
         setMetrics([
-          { label: 'Active Jobs', value: activeJobs, icon: Briefcase },
-          { label: 'Companies', value: verifiedCompanies, icon: BadgeCheck },
-          { label: 'Applications', value: applications, icon: TrendingUp },
-          { label: 'Countries', value: countryCount, icon: Globe },
+          { label: 'jobs.activeJobs', value: activeJobs, icon: Briefcase },
+          { label: 'jobs.metrics.companies', value: verifiedCompanies, icon: BadgeCheck },
+          { label: 'jobs.metrics.applications', value: applications, icon: TrendingUp },
+          { label: 'jobs.countries', value: countryCount, icon: Globe },
         ]);
       } catch {
         setMetrics([
-          { label: 'Active Jobs', value: 0, icon: Briefcase },
-          { label: 'Companies', value: 0, icon: BadgeCheck },
-          { label: 'Applications', value: 0, icon: TrendingUp },
-          { label: 'Countries', value: 0, icon: Globe },
+          { label: 'jobs.activeJobs', value: 0, icon: Briefcase },
+          { label: 'jobs.metrics.companies', value: 0, icon: BadgeCheck },
+          { label: 'jobs.metrics.applications', value: 0, icon: TrendingUp },
+          { label: 'jobs.countries', value: 0, icon: Globe },
         ]);
       } finally {
         setLoading(false);
@@ -95,6 +97,7 @@ function useTrustMetrics(): { metrics: TrustMetric[]; loading: boolean } {
 }
 
 function MetricCard({ metric }: { metric: TrustMetric }) {
+  const { t } = useTranslation();
   const { count, ref } = useCounter(metric.value);
   const Icon = metric.icon;
   return (
@@ -109,7 +112,7 @@ function MetricCard({ metric }: { metric: TrustMetric }) {
             {count.toLocaleString()}
           </p>
           <p className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 mt-1 font-medium">
-            {metric.label}
+            {t(metric.label)}
           </p>
         </div>
         <div className="flex h-9 w-9 items-center justify-center rounded-sm bg-[#f59e0b]/10 border border-[#f59e0b]/20">

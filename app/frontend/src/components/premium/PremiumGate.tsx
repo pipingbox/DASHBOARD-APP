@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,8 +15,9 @@ import {
   Loader2,
 } from 'lucide-react';
 import type { PremiumStatus } from '@/lib/premium';
-import { PREMIUM_PRICE_MONTHLY, PREMIUM_PRICE_YEARLY, PREMIUM_FEATURES } from '@/lib/premium';
+import { PREMIUM_FEATURES } from '@/lib/premium';
 import { redirectToCheckout } from '@/lib/stripe';
+import { getNetPriceCents, formatNetPriceEur, EXCL_VAT_NOTE } from '@/lib/academy/pricing';
 
 /**
  * PremiumGate — paywall modal for premium features.
@@ -40,6 +41,30 @@ export function PremiumGate({ open, onClose, feature, featureDescription, status
   const [plan, setPlan] = useState<'monthly' | 'annual'>('annual');
   const [busy, setBusy] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  // PB-MARKET-PRICING-001: catalog-driven prices, never hardcoded literals.
+  const [priceMonthly, setPriceMonthly] = useState<string | null>(null);
+  const [priceAnnual, setPriceAnnual] = useState<string | null>(null);
+  const [priceAnnualPerMonth, setPriceAnnualPerMonth] = useState<string | null>(null);
+  const [vcaPrice, setVcaPrice] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const monthly = await getNetPriceCents('premium_tools_monthly');
+      const annual = await getNetPriceCents('premium_tools_annual');
+      const vca = await getNetPriceCents('vca_course_bvca');
+      if (cancelled) return;
+      if (monthly != null) setPriceMonthly(formatNetPriceEur(monthly));
+      if (annual != null) {
+        setPriceAnnual(formatNetPriceEur(annual));
+        setPriceAnnualPerMonth(`€${(annual / 1200).toFixed(2)}/month`);
+      }
+      if (vca != null) setVcaPrice(formatNetPriceEur(vca));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   if (!open) return null;
 
@@ -106,7 +131,7 @@ export function PremiumGate({ open, onClose, feature, featureDescription, status
               }`}
             >
               <p className="text-[10px] uppercase tracking-wider text-zinc-500">Monthly</p>
-              <p className="text-2xl font-bold text-zinc-100">€{PREMIUM_PRICE_MONTHLY}</p>
+              <p className="text-2xl font-bold text-zinc-100">{priceMonthly ?? '—'}</p>
               <p className="text-[10px] text-zinc-600">per month</p>
             </button>
             <button
@@ -122,8 +147,8 @@ export function PremiumGate({ open, onClose, feature, featureDescription, status
                 Save 35%
               </span>
               <p className="text-[10px] uppercase tracking-wider text-[#f59e0b]">Yearly</p>
-              <p className="text-2xl font-bold text-[#f59e0b]">€{PREMIUM_PRICE_YEARLY}</p>
-              <p className="text-[10px] text-zinc-500">€3.25/month</p>
+              <p className="text-2xl font-bold text-[#f59e0b]">{priceAnnual ?? '—'}</p>
+              <p className="text-[10px] text-zinc-500">{priceAnnualPerMonth ?? ''}</p>
             </button>
           </div>
 
@@ -171,7 +196,9 @@ export function PremiumGate({ open, onClose, feature, featureDescription, status
             >
               <GraduationCap className="h-4 w-4 text-[#f59e0b] shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-zinc-300 font-medium">Buy VCA Course (€59.90)</p>
+                <p className="text-xs text-zinc-300 font-medium">
+                  Buy VCA Course{vcaPrice ? ` (${vcaPrice} ${EXCL_VAT_NOTE})` : ''}
+                </p>
                 <p className="text-[10px] text-zinc-500">Includes 1 year of premium tools</p>
               </div>
             </Link>
@@ -187,7 +214,9 @@ export function PremiumGate({ open, onClose, feature, featureDescription, status
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
               {busy
                 ? 'Redirecting to checkout…'
-                : `Upgrade to Premium — €${plan === 'annual' ? PREMIUM_PRICE_YEARLY : PREMIUM_PRICE_MONTHLY}`}
+                : `Upgrade to Premium — ${
+                    (plan === 'annual' ? priceAnnual : priceMonthly) ?? ''
+                  } ${EXCL_VAT_NOTE}`}
             </button>
 
             {checkoutError && (

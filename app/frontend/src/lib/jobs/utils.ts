@@ -1,32 +1,213 @@
-import type { Job } from './types';
+import type { Job, JobTranslation } from './types';
 
-export function formatSalary(job: Job): string | null {
+/**
+ * FNV-1a over the source-language content fields — the translation staleness
+ * key (PB-JOBS-PILOT-FOLLOWUP-002). MUST stay byte-identical to the seed
+ * algorithm in sql/016-jobs-localization.sql.
+ */
+export function hashJobSourceContent(
+  job: Pick<Job, 'title' | 'summary' | 'description' | 'requirements'>,
+): string {
+  const src = [
+    job.title ?? '',
+    job.summary ?? '',
+    job.description ?? '',
+    job.requirements ?? '',
+  ].join('|');
+  let h = 0x811c9dc5;
+  for (let i = 0; i < src.length; i++) {
+    h ^= src.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
+}
+
+export interface ResolvedJobTranslation {
+  translation: JobTranslation;
+  isStale: boolean;
+}
+
+/**
+ * Resolve the reader-locale translation for a job.
+ *
+ * Contract (PB-JOBS-PILOT-FOLLOWUP-002 §5–§7, §10, §12):
+ * - source language === reader locale → null (show the original, no label);
+ * - no translation for the locale → null (fallback to the original);
+ * - translation whose source_content_hash no longer matches the current
+ *   source content → stale → null (fallback to the original, never serve a
+ *   silently outdated translation).
+ */
+export function getJobTranslation(
+  job: Pick<Job, 'title' | 'summary' | 'description' | 'requirements' | 'source_language' | 'translations'>,
+  locale: string | null | undefined,
+): ResolvedJobTranslation | null {
+  if (!locale) return null;
+  const lang = locale.slice(0, 2);
+  if (!job.source_language || lang === job.source_language.slice(0, 2)) return null;
+  const tr = job.translations?.find((x) => x.language.slice(0, 2) === lang);
+  if (!tr) return null;
+  const isStale = tr.source_content_hash !== hashJobSourceContent(job);
+  return { translation: tr, isStale };
+}
+
+/** Reader-locale display title: translated when fresh, original otherwise. */
+export function jobDisplayTitle(
+  job: Pick<Job, 'title' | 'summary' | 'description' | 'requirements' | 'source_language' | 'translations'>,
+  locale: string | null | undefined,
+): string {
+  const resolved = getJobTranslation(job, locale);
+  if (resolved && !resolved.isStale) return resolved.translation.title;
+  return job.title;
+}
+
+/** Reader-locale display summary: translated when fresh, original otherwise. */
+export function jobDisplaySummary(
+  job: Pick<Job, 'title' | 'summary' | 'description' | 'requirements' | 'source_language' | 'translations'>,
+  locale: string | null | undefined,
+): string | null {
+  const resolved = getJobTranslation(job, locale);
+  if (resolved && !resolved.isStale) return resolved.translation.summary ?? job.summary ?? null;
+  return job.summary ?? null;
+}
+
+/** Currency code → display symbol for compact salary rendering. */
+export function currencySymbol(code: string | null | undefined): string {
+  switch ((code ?? 'EUR').toUpperCase()) {
+    case 'EUR':
+      return '€';
+    case 'USD':
+      return '$';
+    case 'GBP':
+      return '£';
+    default:
+      return (code ?? '€').toUpperCase();
+  }
+}
+
+export interface FormattedSalary {
+  amount: string;
+  period: 'year' | 'month';
+}
+
+/**
+ * Explicit structured salary label (PB-JOBS-PILOT-003 §2).
+ *
+ * Used ONLY when the job carries the explicit structured metadata
+ * (salary_period + salary_mode) written by the admin job editor — the
+ * replacement for the legacy formatSalary "amount < 10000 = monthly"
+ * heuristic. Returns null when either field is absent so callers can fall
+ * back to the legacy rendering for un-migrated rows.
+ *
+ * Modes: from (≥ min), fixed (exact min), range (min–max).
+ */
+export function structuredSalaryLabel(
+  job: Pick<Job, 'salary_min' | 'salary_max' | 'currency' | 'salary_period' | 'salary_mode'>,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string | null {
+  const period = job.salary_period;
+  const mode = job.salary_mode;
+  if (!period || !mode) return null;
+  if (!['hour', 'day', 'month', 'year'].includes(period)) return null;
+  if (!['from', 'fixed', 'range'].includes(mode)) return null;
+  if (job.salary_min == null && job.salary_max == null) return null;
+
+  const symbol = currencySymbol(job.currency);
+  const min = job.salary_min != null ? `${symbol}${job.salary_min.toLocaleString()}` : null;
+  const max = job.salary_max != null ? `${symbol}${job.salary_max.toLocaleString()}` : null;
+  const periodKey = { hour: 'Hourly', day: 'Daily', month: 'Monthly', year: 'Yearly' }[
+    period as 'hour' | 'day' | 'month' | 'year'
+  ];
+
+  if (mode === 'range' && min && max) {
+    return t(`jobs.salaryRange${periodKey}`, { min, max });
+  }
+  if (mode === 'fixed') {
+    return t(`jobs.salaryFixed${periodKey}`, { amount: min ?? max });
+  }
+  // 'from' — a minimum, never a guaranteed final rate.
+  return t(`jobs.salaryFrom${periodKey}`, { amount: min ?? max });
+}
+
+export function formatSalary(job: Job): FormattedSalary | null {
   if (!job.salary_min && !job.salary_max) return null;
   const min = job.salary_min ?? 0;
   const max = job.salary_max ?? 0;
   if (min >= 10000) {
-    return `${job.currency}${(min / 1000).toFixed(0)}k–${(max / 1000).toFixed(0)}k /yr`;
+    return {
+      amount: `${job.currency}${(min / 1000).toFixed(0)}k–${(max / 1000).toFixed(0)}k`,
+      period: 'year',
+    };
   }
-  return `${job.currency}${min.toLocaleString()}–${max.toLocaleString()} /mo`;
+  return {
+    amount: `${job.currency}${min.toLocaleString()}–${max.toLocaleString()}`,
+    period: 'month',
+  };
 }
 
-export function formatPostedTime(createdAt: string): string {
-  if (!createdAt) return '';
+export type PostedTimeKey = 'justNow' | 'h_ago' | 'd_ago' | 'w_ago';
+
+export interface PostedTime {
+  key: PostedTimeKey;
+  count: number;
+}
+
+export function formatPostedTime(createdAt: string): PostedTime | null {
+  if (!createdAt) return null;
   const posted = new Date(createdAt).getTime();
-  if (Number.isNaN(posted)) return '';
+  if (Number.isNaN(posted)) return null;
   const diffMs = Date.now() - posted;
   const diffHours = Math.floor(diffMs / 3600000);
-  if (diffHours < 1) return 'just now';
-  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffHours < 1) return { key: 'justNow', count: 0 };
+  if (diffHours < 24) return { key: 'h_ago', count: diffHours };
   const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return `${Math.floor(diffDays / 7)}w ago`;
+  if (diffDays < 7) return { key: 'd_ago', count: diffDays };
+  return { key: 'w_ago', count: Math.floor(diffDays / 7) };
 }
 
 /* ─── Filter Options ─── */
 export const COUNTRIES = ['Belgium', 'Netherlands', 'Germany', 'Norway', 'UAE', 'United Kingdom', 'USA'];
 export const DISCIPLINES = ['Pipefitter', 'TIG Welder', 'QA/QC', 'Supervisor', 'Planner', 'Rigger', 'Offshore Technician'];
 export const CONTRACT_TYPES_OPTIONS = ['Freelance', 'Employee', 'Contract', 'Full-time'];
+
+/* ─── Option label keys (internal value → i18n key) ─── */
+export type OptionGroup = 'countries' | 'disciplines' | 'contractTypes';
+
+const OPTION_LABEL_KEYS: Record<OptionGroup, Record<string, string>> = {
+  countries: {
+    'Belgium': 'belgium',
+    'Netherlands': 'netherlands',
+    'Germany': 'germany',
+    'Norway': 'norway',
+    'UAE': 'uae',
+    'United Kingdom': 'unitedKingdom',
+    'USA': 'usa',
+  },
+  disciplines: {
+    'Pipefitter': 'pipefitter',
+    'TIG Welder': 'tigWelder',
+    'QA/QC': 'qaqc',
+    'Supervisor': 'supervisor',
+    'Planner': 'planner',
+    'Rigger': 'rigger',
+    'Offshore Technician': 'offshoreTechnician',
+  },
+  contractTypes: {
+    'Freelance': 'freelance',
+    'Employee': 'employee',
+    'Contract': 'contract',
+    'Full-time': 'fullTime',
+  },
+};
+
+/**
+ * Maps an internal option value (matched against DB strings, never translated)
+ * to its i18n key `jobs.options.<group>.<camelKey>`. Unknown values fall back
+ * to the raw value so callers can pass the result straight to `t()`.
+ */
+export function optionLabelKey(group: OptionGroup, value: string): string {
+  const camelKey = OPTION_LABEL_KEYS[group][value];
+  return camelKey ? `jobs.options.${group}.${camelKey}` : value;
+}
 
 /* ─── Discipline mapping (category → discipline label) ─── */
 export const DISCIPLINE_MAP: Record<string, string> = {

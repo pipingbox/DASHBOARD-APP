@@ -293,10 +293,10 @@ export function PhoneVerificationSection() {
             {sending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t('profile.sendingOtp', 'Sending...')}
+                <span>{t('profile.sendingOtp', 'Sending...')}</span>
               </>
             ) : (
-              t('profile.sendOtp', 'Send verification code')
+              <span>{t('profile.sendOtp', 'Send verification code')}</span>
             )}
           </Button>
 
@@ -322,10 +322,10 @@ export function PhoneVerificationSection() {
               {verifying ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('profile.verifying', 'Verifying...')}
+                  <span>{t('profile.verifying', 'Verifying...')}</span>
                 </>
               ) : (
-                t('profile.verifyOtp', 'Verify')
+                <span>{t('profile.verifyOtp', 'Verify')}</span>
               )}
             </Button>
           </div>

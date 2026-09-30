@@ -346,9 +346,9 @@ export default function BoltsNutsTool() {
         {/* Legend */}
         <rect x="10" y="10" width="140" height="50" fill="#0E111790" rx="4" stroke="#232A36" strokeWidth="1" />
         <circle cx="22" cy="25" r="4" fill="#FF8C00" />
-        <text x="30" y="27" fill="#F5F7FA" fontSize="9" dominantBaseline="middle">Dimensiones principales</text>
+        <text x="30" y="27" fill="#F5F7FA" fontSize="9" dominantBaseline="middle">{t('tools.bolts.legend.mainDimensions')}</text>
         <circle cx="22" cy="42" r="4" fill="#3EA6FF" />
-        <text x="30" y="44" fill="#F5F7FA" fontSize="9" dominantBaseline="middle">Dimensiones secundarias</text>
+        <text x="30" y="44" fill="#F5F7FA" fontSize="9" dominantBaseline="middle">{t('tools.bolts.legend.secondaryDimensions')}</text>
 
         {/* Title */}
         <text x={w - 10} y={h - 10} fill="#A3A9B3" fontSize="9" textAnchor="end">
@@ -800,11 +800,11 @@ export default function BoltsNutsTool() {
     <div className="space-y-3 text-xs text-[#A3A9B3]">
       <p><strong className="text-[#F5F7FA]">Material:</strong> {material.studGrade} ({t('tools.bolts.studs', { defaultValue: 'espárragos' })}), {material.nutGrade} ({t('tools.bolts.nuts', { defaultValue: 'tuercas' })})</p>
       <p><strong className="text-[#F5F7FA]">Norma:</strong> ANSI/ASME B16.5 — Pipe Flanges and Flanged Fittings</p>
-      <p><strong className="text-[#F5F7FA]">{t('tools.bolts.torqueStandard', { defaultValue: 'Par y montaje' })}:</strong> ASME PCC-1 — Guidelines for Pressure Boundary Bolted Flange Joint Assembly (Tabla 1, Tabla 3, Apéndice O)</p>
+      <p><strong className="text-[#F5F7FA]">{t('tools.bolts.torqueStandard')}:</strong> ASME PCC-1 — Guidelines for Pressure Boundary Bolted Flange Joint Assembly (Tabla 1, Tabla 3, Apéndice O)</p>
       <p><strong className="text-[#F5F7FA]">{t('tools.bolts.materialStandard', { defaultValue: 'Materiales' })}:</strong> ASTM A193/A193M ({t('tools.bolts.studs', { defaultValue: 'espárragos' })}), ASTM A194/A194M ({t('tools.bolts.nuts', { defaultValue: 'tuercas' })})</p>
-      <p><strong className="text-[#F5F7FA]">Nota:</strong> Las longitudes incluyen 2 tuercas pesadas. Para espárragos (stud bolts), la longitud total = longitud efectiva + 2 × espesor de tuerca. Las longitudes tabuladas corresponden a bridas de cara resaltada (RF).</p>
+      <p><strong className="text-[#F5F7FA]">{t('tools.bolts.notes.noteLabel')}</strong> {t('tools.bolts.notes.noteText')}</p>
       <p><strong className="text-[#F5F7FA]">{t('tools.bolts.coverageNote', { defaultValue: 'Cobertura' })}:</strong> {t('tools.bolts.coverageNoteText', { defaultValue: 'ASME B16.5 cubre de NPS 1/2 a NPS 24. La Class 2500 solo está definida hasta NPS 12; por encima de ese tamaño no se muestran valores en lugar de estimarlos.' })}</p>
-      <p><strong className="text-[#F5F7FA]">Lubricación:</strong> Se recomienda lubricante anti-seize para evitar galling en acero inoxidable. El lubricante empleado determina el factor de tuerca K y, con él, el par requerido.</p>
+      <p><strong className="text-[#F5F7FA]">{t('tools.bolts.notes.lubricationLabel')}</strong> {t('tools.bolts.notes.lubricationText')}</p>
     </div>
   );
 

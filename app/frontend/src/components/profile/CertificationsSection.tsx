@@ -324,7 +324,7 @@ export function CertificationsSection() {
       console.error('[CertSave] HARD TIMEOUT: save exceeded 20s, force-resetting UI');
       setSaving(false);
       setDialogOpen(false);
-      toast.error('Save timed out. Your certificate may have been saved — please refresh to check.');
+      toast.error(t('workerProfile.certifications.saveTimedOut'));
     }, 20000);
 
     try {
@@ -424,14 +424,14 @@ export function CertificationsSection() {
         // Step 2: Abort if no user session
         if (authError || !authData?.user) {
           console.error('[CertSave] No authenticated user session');
-          toast.error('User session not found. Please sign in again.');
+          toast.error(t('common.sessionNotFound'));
           return;
         }
 
         const authUserId = authData.user.id;
         if (!authUserId) {
           console.error('[CertSave] user_id is null or undefined, aborting insert');
-          toast.error('User session not found. Please sign in again.');
+          toast.error(t('common.sessionNotFound'));
           return;
         }
 
@@ -578,7 +578,8 @@ export function CertificationsSection() {
         {loading ? (
           <div className="flex items-center gap-2 text-sm text-zinc-500">
             <Loader2 className="h-4 w-4 animate-spin" />
-            {t('common.loading')}
+            {/* PB-UI-DOM-INSERTBEFORE-001: span anchor — see WorkExperienceSection */}
+            <span>{t('common.loading')}</span>
           </div>
         ) : items.length === 0 ? (
           <div className="border border-dashed border-zinc-800 bg-zinc-950 p-8 text-center">
@@ -904,9 +905,11 @@ export function CertificationsSection() {
                     ) : (
                       <Upload className="h-4 w-4" />
                     )}
-                    {uploading
-                      ? `${t('common.loading')} ${uploadProgress}%`
-                      : t('workerProfile.certifications.uploadFile')}
+                    <span>
+                      {uploading
+                        ? `${t('common.loading')} ${uploadProgress}%`
+                        : t('workerProfile.certifications.uploadFile')}
+                    </span>
                   </label>
                   {uploading && (
                     <div className="w-full space-y-1">

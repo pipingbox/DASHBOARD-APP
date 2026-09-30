@@ -126,6 +126,18 @@ test.describe('PB-OBSERVABILITY-001 onboarding E2E (SHA-locked, authorized QA re
       'the disposable account must be in the internal qa* test namespace on pipingbox.com',
     ).toMatch(/^qa[^@]*@pipingbox\.com$/i);
 
+    // Language determinism (PB-UI-DOM-INSERTBEFORE-001): this spec asserts
+    // Spanish wizard copy, but the runner's navigator.language is not a
+    // stable input. Pin the UI language so the spec is reproducible in any
+    // CI environment.
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('pipingbox_language', 'es');
+      } catch {
+        /* storage unavailable */
+      }
+    });
+
     // PostHog wire capture (gzip batches).
     const payloads: Buffer[] = [];
     page.on('request', (req) => {

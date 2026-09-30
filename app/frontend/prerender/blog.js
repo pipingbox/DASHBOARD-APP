@@ -43,6 +43,15 @@ function getHeadElements(url) {
       : null,
     seoMeta.url
       ? {
+          type: 'link',
+          props: {
+            rel: 'canonical',
+            href: seoMeta.url,
+          },
+        }
+      : null,
+    seoMeta.url
+      ? {
           type: 'meta',
           props: {
             property: 'og:url',

@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminPreview } from '@/contexts/AdminPreviewContext';
+import { toast } from 'sonner';
 import {
   Briefcase,
   Plus,
@@ -13,6 +14,9 @@ import {
   FileText,
   CheckCircle2,
   XCircle,
+  Pencil,
+  Upload,
+  Archive,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -27,6 +31,9 @@ interface Job {
   company_name: string | null;
 }
 
+const isOpenStatus = (s: string) => s === 'open' || s === 'active' || !s;
+const isClosedStatus = (s: string) => s === 'closed' || s === 'expired';
+
 export default function CompanyJobs() {
   const { user } = useAuth();
   const { isRealAdmin, isPreviewMode } = useAdminPreview();
@@ -35,6 +42,7 @@ export default function CompanyJobs() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'open' | 'draft' | 'closed'>('all');
+  const [actionJobId, setActionJobId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -72,19 +80,37 @@ export default function CompanyJobs() {
     })();
   }, [user, isRealAdmin]);
 
+  // Publish / close / reopen (PB-JOBS-PILOT-003 §13). Rides on the existing
+  // jobs_*_own_or_primary_admin UPDATE policy — no permission change.
+  // Historical applications are untouched: only the job status flips.
+  const setStatus = async (job: Job, status: 'open' | 'closed') => {
+    setActionJobId(job.id);
+    const { error: updateError } = await supabase
+      .from(TABLES.jobs)
+      .update({ status })
+      .eq('id', job.id);
+    setActionJobId(null);
+    if (updateError) {
+      toast.error(t('companyJobs.actionFailed', { error: updateError.message }));
+      return;
+    }
+    setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, status } : j)));
+    toast.success(status === 'open' ? t('companyJobs.publishSuccess') : t('companyJobs.closeSuccess'));
+  };
+
   const filtered = jobs.filter((j) => {
     if (filter === 'all') return true;
-    if (filter === 'open') return j.status === 'open' || j.status === 'active' || !j.status;
+    if (filter === 'open') return isOpenStatus(j.status);
     if (filter === 'draft') return j.status === 'draft';
-    if (filter === 'closed') return j.status === 'closed' || j.status === 'expired';
+    if (filter === 'closed') return isClosedStatus(j.status);
     return true;
   });
 
   const counts = {
     all: jobs.length,
-    open: jobs.filter((j) => j.status === 'open' || j.status === 'active' || !j.status).length,
+    open: jobs.filter((j) => isOpenStatus(j.status)).length,
     draft: jobs.filter((j) => j.status === 'draft').length,
-    closed: jobs.filter((j) => j.status === 'closed' || j.status === 'expired').length,
+    closed: jobs.filter((j) => isClosedStatus(j.status)).length,
   };
 
   return (
@@ -177,6 +203,39 @@ export default function CompanyJobs() {
                 </div>
               </div>
               <StatusBadge status={job.status} />
+              {/* Manage actions (PB-JOBS-PILOT-003 §13) */}
+              <div className="flex items-center gap-1 shrink-0">
+                <Link
+                  to={`/company/post-job?edit=${job.id}`}
+                  title={t('companyJobs.edit')}
+                  className="inline-flex items-center gap-1 rounded-sm border border-zinc-700 px-2.5 py-1.5 text-[10px] font-medium text-zinc-300 hover:border-zinc-500 hover:text-zinc-100 transition"
+                >
+                  <Pencil className="h-3 w-3" />
+                  {t('companyJobs.edit')}
+                </Link>
+                {!isOpenStatus(job.status) && (
+                  <button
+                    onClick={() => void setStatus(job, 'open')}
+                    disabled={actionJobId === job.id}
+                    title={t('companyJobs.publish')}
+                    className="inline-flex items-center gap-1 rounded-sm border border-emerald-500/40 px-2.5 py-1.5 text-[10px] font-medium text-emerald-400 hover:bg-emerald-500/10 transition disabled:opacity-50"
+                  >
+                    <Upload className="h-3 w-3" />
+                    {t('companyJobs.publish')}
+                  </button>
+                )}
+                {isOpenStatus(job.status) && (
+                  <button
+                    onClick={() => void setStatus(job, 'closed')}
+                    disabled={actionJobId === job.id}
+                    title={t('companyJobs.close')}
+                    className="inline-flex items-center gap-1 rounded-sm border border-red-500/40 px-2.5 py-1.5 text-[10px] font-medium text-red-400 hover:bg-red-500/10 transition disabled:opacity-50"
+                  >
+                    <Archive className="h-3 w-3" />
+                    {t('companyJobs.close')}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

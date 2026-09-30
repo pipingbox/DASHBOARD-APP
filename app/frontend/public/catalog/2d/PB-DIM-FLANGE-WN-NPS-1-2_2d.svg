@@ -2,8 +2,12 @@
   <defs><style>
     .profile{stroke:#1a1a1a;stroke-width:2;fill:#e2e5e8}
     .bore{stroke:#555;stroke-width:1;fill:none;stroke-dasharray:4 2}
+    .bore-solid{stroke:#555;stroke-width:1.6;fill:none}
+    .thread{stroke:#8a5a00;stroke-width:1.1;fill:none}
+    .radius{stroke:#0b6b8a;stroke-width:1.6;fill:none}
     .centerline{stroke:#999;stroke-width:.8;stroke-dasharray:8 4;fill:none}
     .dim-line{stroke:#c62828;stroke-width:.9;fill:none}
+    .dim-ext{stroke:#c62828;stroke-width:.5;stroke-dasharray:2 2}
     .dim-text{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#c62828;text-anchor:middle}
     .dim-sub{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#c62828;text-anchor:middle}
     .title{font-family:'Segoe UI',Arial,sans-serif;font-size:18px;font-weight:600;fill:#1a1a1a}
@@ -22,66 +26,49 @@
   <text x="40" y="40" class="title">Welding Neck Flange</text>
   <text x="40" y="60" class="subtitle">NPS 1/2 (DN 15) — Class 150 — Raised Face</text>
   <text x="40" y="78" class="std-ref">ASME B16.5-2020 | WN RF</text>
-  <rect x="290" y="262" width="10" height="77" class="profile"/>
-  <rect x="300" y="285" width="4" height="30" fill="#d0d5da" stroke="#1a1a1a" stroke-width="1.5"/>
-  <path d="M 290 290 L 257 293 L 257 307 L 290 310 Z" class="profile"/>
-  <line x1="237" y1="293" x2="314" y2="293" class="bore"/>
-  <line x1="237" y1="307" x2="314" y2="307" class="bore"/>
-  <circle cx="295" cy="274" r="5" fill="white" stroke="#1a1a1a" stroke-width="1"/>
-  <circle cx="295" cy="326" r="5" fill="white" stroke="#1a1a1a" stroke-width="1"/>
-  <line x1="295" y1="256" x2="295" y2="344" class="bore"/>
-  <line x1="217" y1="300" x2="330" y2="300" class="centerline"/>
-  <text x="212" y="304" class="label" text-anchor="end">CL</text>
-  <line x1="295" y1="246" x2="295" y2="354" class="centerline"/>
-  <line x1="310" y1="261.5" x2="360" y2="261.5" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="310" y1="338.5" x2="360" y2="338.5" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="355" y1="261.5" x2="355" y2="338.5" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="363" y="295.0" class="dim-text" text-anchor="start">D</text>
-  <text x="363" y="310.0" class="dim-sub" text-anchor="start">3.500" | 88.9 mm</text>
-  <line x1="290.32" y1="348.5" x2="290.32" y2="378.5" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="300" y1="348.5" x2="300" y2="378.5" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="290.32" y1="373.5" x2="300" y2="373.5" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="295" y="366.5" class="dim-text">T</text>
-  <text x="295" y="388.5" class="dim-sub">0.440" | 11.2 mm</text>
-  <line x1="257.32" y1="393.5" x2="257.32" y2="418.5" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="257.32" y1="413.5" x2="290.32" y2="413.5" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="274" y="406.5" class="dim-text">Hub L</text>
-  <text x="274" y="428.5" class="dim-sub">1.500" | 38.1 mm</text>
-  <line x1="242.32" y1="278.158" x2="242.32" y2="278.158" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="242" y="271.158" class="dim-text"></text>
-  <text x="242" y="293.158" class="dim-sub">0.000" | 0.0 mm</text>
-  <line x1="227.32" y1="293.158" x2="252.32" y2="293.158" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="227.32" y1="306.842" x2="252.32" y2="306.842" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="232.32" y1="293.158" x2="232.32" y2="306.842" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="240.32" y="295.0" class="dim-text" text-anchor="start">Bore</text>
-  <text x="240.32" y="310.0" class="dim-sub" text-anchor="start">0.622" | 15.8 mm</text>
-  <line x1="309" y1="284.82" x2="350" y2="284.82" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="309" y1="315.18" x2="350" y2="315.18" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="345" y1="284.82" x2="345" y2="315.18" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="353" y="295.0" class="dim-text" text-anchor="start">RF</text>
-  <text x="353" y="310.0" class="dim-sub" text-anchor="start">1.380" | 35.1 mm</text>
-  <rect x="530" y="120" width="240" height="186" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
+  <rect x="274.85714285714283" y="200" width="25.142857142857146" height="200" class="profile"/>
+  <rect x="300" y="260.57142857142856" width="4" height="78.85714285714286" fill="#d0d5da" stroke="#1a1a1a" stroke-width="1.5"/>
+  <circle cx="287.4285714285714" cy="232" r="17.857142857142858" fill="white" stroke="#1a1a1a" stroke-width="1"/>
+  <circle cx="287.4285714285714" cy="368" r="17.857142857142858" fill="white" stroke="#1a1a1a" stroke-width="1"/>
+  <path d="M 274.85714285714283 266 L 167.4285714285714 276 L 167.4285714285714 324 L 274.85714285714283 334 Z" class="profile"/>
+  <line x1="314" y1="281.3" x2="147.4285714285714" y2="281.3" class="bore"/>
+  <line x1="314" y1="318.7" x2="147.4285714285714" y2="318.7" class="bore"/>
+  <line x1="103.42857142857139" y1="300" x2="330" y2="300" class="centerline"/>
+  <text x="98.42857142857139" y="304" class="label" text-anchor="end">CL</text>
+  
+  <line x1="355" y1="200" x2="355" y2="400" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="363" y="295" class="dim-text" text-anchor="start">D</text>
+  <text x="363" y="310" class="dim-sub" text-anchor="start">3.500" | 88.900 mm</text>
+  <line x1="300" y1="200" x2="362" y2="200" class="dim-ext"/><line x1="300" y1="400" x2="362" y2="400" class="dim-ext"/>
+  
+  <line x1="274.85714285714283" y1="435" x2="300" y2="435" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="287.42857142857144" y="429" class="dim-text">T</text>
+  <text x="287.42857142857144" y="451" class="dim-sub">0.440" | 11.180 mm</text>
+  
+  <line x1="167.4285714285714" y1="470" x2="274.85714285714283" y2="470" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="221.1428571428571" y="464" class="dim-text">Hub L</text>
+  <text x="221.1428571428571" y="486" class="dim-sub">1.880" | 47.750 mm</text>
+  
+  <line x1="151.4285714285714" y1="260.57142857142856" x2="151.4285714285714" y2="339.42857142857144" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="143.4285714285714" y="274.4971428571429" class="dim-text" text-anchor="end">RF</text>
+  <text x="143.4285714285714" y="289.4971428571429" class="dim-sub" text-anchor="end">1.380" | 35.050 mm</text>
+  <rect x="530" y="120" width="240" height="232" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
   <text x="650" y="140" class="tbl-hdr">NPS 1/2 — Key Data</text>
   <line x1="545" y1="148" x2="755" y2="148" stroke="#eee" stroke-width=".5"/>
-  <text x="550" y="165" class="tbl-key">NPS / DN</text>
-  <text x="750" y="165" class="tbl-val">1/2 / 15</text>
-  <text x="550" y="182" class="tbl-key">Class</text>
-  <text x="750" y="182" class="tbl-val">150</text>
-  <text x="550" y="199" class="tbl-key">D (flange OD)</text>
-  <text x="750" y="199" class="tbl-val">3.500" | 88.9 mm</text>
-  <text x="550" y="216" class="tbl-key">BCD</text>
-  <text x="750" y="216" class="tbl-val">2.375" | 60.3 mm</text>
-  <text x="550" y="233" class="tbl-key">T (thickness)</text>
-  <text x="750" y="233" class="tbl-val">0.440" | 11.2 mm</text>
-  <text x="550" y="250" class="tbl-key">Hub length</text>
-  <text x="750" y="250" class="tbl-val">1.500" | 38.1 mm</text>
-  <text x="550" y="267" class="tbl-key">Bore</text>
-  <text x="750" y="267" class="tbl-val">0.622" | 15.8 mm</text>
-  <text x="550" y="284" class="tbl-key">Bolts</text>
-  <text x="750" y="284" class="tbl-val">4 x 1/2"</text>
+  <text x="550" y="165" class="tbl-key">NPS / DN</text><text x="750" y="165" class="tbl-val">1/2 / 15</text>
+  <text x="550" y="182" class="tbl-key">Class</text><text x="750" y="182" class="tbl-val">150</text>
+  <text x="550" y="199" class="tbl-key">D (flange OD)</text><text x="750" y="199" class="tbl-val">3.500" | 88.900 mm</text>
+  <text x="550" y="216" class="tbl-key">BCD</text><text x="750" y="216" class="tbl-val">2.380" | 60.450 mm</text>
+  <text x="550" y="233" class="tbl-key">T (thickness)</text><text x="750" y="233" class="tbl-val">0.440" | 11.180 mm</text>
+  <text x="550" y="250" class="tbl-key">Hub length</text><text x="750" y="250" class="tbl-val">1.880" | 47.750 mm</text>
+  <text x="550" y="267" class="tbl-key">RF dia</text><text x="750" y="267" class="tbl-val">1.380" | 35.050 mm</text>
+  <text x="550" y="284" class="tbl-key">Weld point dia</text><text x="750" y="284" class="tbl-val">0.840" | 21.340 mm</text>
+  <text x="550" y="301" class="tbl-key">Bolts</text><text x="750" y="301" class="tbl-val">4 x 0.5"</text>
+  <text x="550" y="318" class="tbl-key">Hole dia</text><text x="750" y="318" class="tbl-val">0.625" | 15.880 mm</text>
+  <text x="550" y="335" class="tbl-key">Weight (approx)</text><text x="750" y="335" class="tbl-val">2 lb | 0.91 kg</text>
   <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
-  <text x="40" y="648" class="note">Welding Neck Flange per ASME B16.5-2020, Class 150, Raised Face.</text>
-  <text x="40" y="663" class="note">D = flange OD. BCD = bolt circle dia. T = flange thickness. Hub L = hub length.</text>
-  <text x="40" y="678" class="note">Bore per ASME B36.10M. Wall thickness varies by schedule. All dims in inches and mm.</text>
+  <text x="40" y="648" class="note">Welding Neck Flange per ASME B16.5, Class 150. Source: ferrobend manufacturer table (primary) + wermac drilling/thickness cross-check. CROSS_REFERENCE.</text>
+  <text x="40" y="663" class="note">Butt-weld hub with smooth bore transition. Bore to be specified by purchaser (schedule dependent).</text>
+  <text x="40" y="678" class="note">All dims in inches and mm. Weights are approximate.</text>
   <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
 </svg>

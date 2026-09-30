@@ -9,6 +9,7 @@
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import type { Styles } from 'jspdf-autotable';
 import { WorkDayLog } from './workDayLogs';
 import { formatCurrency, getCurrencySymbol } from './currency';
 
@@ -95,7 +96,6 @@ const BRAND_DARK = '#1C1917';
 const HEADER_BG: [number, number, number] = [245, 158, 11]; // #F59E0B
 const HEADER_TEXT: [number, number, number] = [28, 25, 23]; // dark
 const ROW_ALT: [number, number, number] = [249, 250, 251]; // gray-50
-const ROW_EVEN: [number, number, number] = [255, 255, 255];
 const TOTAL_BG: [number, number, number] = [254, 243, 199]; // amber-100
 const TOTAL_TEXT: [number, number, number] = [120, 53, 15]; // amber-900
 
@@ -238,9 +238,8 @@ export function generateMonthlyPdf(
         ...(col.width ? { cellWidth: col.width } : {}),
       };
       return acc;
-    }, {} as Record<number, { halign: string; cellWidth?: number }>),
+    }, {} as Record<number, Partial<Styles>>),
     alternateRowStyles: { fillColor: ROW_ALT },
-    rowStyles: { fillColor: ROW_EVEN },
     // Style the totals row differently
     didParseCell(data) {
       if (data.row.index === rows.length) {

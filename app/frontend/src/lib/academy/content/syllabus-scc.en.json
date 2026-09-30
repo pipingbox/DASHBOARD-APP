@@ -1,0 +1,244 @@
+[
+  {
+    "id": "m1-arbeitssicherheit",
+    "iconKey": "Shield",
+    "officialRef": "SCC §1",
+    "weight": "~30%",
+    "title": "Module 1: Occupational Safety",
+    "lessons": [
+      {
+        "title": "1.1 Basics of Occupational Safety",
+        "duration": "20 min",
+        "topics": [
+          "ArbSchG (Arbeitsschutzgesetz)",
+          "Duties of employer and employee",
+          "Risk assessment (Gefährdungsbeurteilung)",
+          "Safety culture on industrial sites"
+        ]
+      },
+      {
+        "title": "1.2 Personal Protective Equipment (PPE)",
+        "duration": "15 min",
+        "topics": [
+          "Helmet, safety glasses, gloves, safety shoes",
+          "PPE for welding and cutting",
+          "Hearing protection",
+          "Respiratory protection"
+        ]
+      },
+      {
+        "title": "1.3 Working at Heights",
+        "duration": "15 min",
+        "topics": [
+          "Fall protection (Absturzsicherung)",
+          "Scaffolding safety",
+          "Ladders and platforms",
+          "Harness inspection"
+        ]
+      },
+      {
+        "title": "1.4 Machine and Tool Safety",
+        "duration": "15 min",
+        "topics": [
+          "GUVMachine directive",
+          "Guards and emergency stops",
+          "Hand tool inspection",
+          "Grinding and cutting safety"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m2-gefahrstoffe",
+    "iconKey": "AlertTriangle",
+    "officialRef": "SCC §2",
+    "weight": "~20%",
+    "title": "Module 2: Hazardous Substances",
+    "lessons": [
+      {
+        "title": "2.1 GHS and Hazard Symbols",
+        "duration": "15 min",
+        "topics": [
+          "GHS pictograms",
+          "H and P phrases",
+          "CLP regulation",
+          "Safety data sheets (Sicherheitsdatenblatt)"
+        ]
+      },
+      {
+        "title": "2.2 Asbestos and Silica",
+        "duration": "15 min",
+        "topics": [
+          "Asbestos in old piping (critical for pipefitters)",
+          "Silica dust (quartz)",
+          "TRGS 519 (asbestos)",
+          "TRGS 559 (silica)"
+        ]
+      },
+      {
+        "title": "2.3 Chemical Exposure on Industrial Sites",
+        "duration": "15 min",
+        "topics": [
+          "BASF / Bayer / Ludwigshafen context",
+          "Chemical plants — specific risks",
+          "Exposure limits (AGW)",
+          "Decontamination procedures"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m3-brandschutz",
+    "iconKey": "Flame",
+    "officialRef": "SCC §3",
+    "weight": "~15%",
+    "title": "Module 3: Fire and Explosion Protection",
+    "lessons": [
+      {
+        "title": "3.1 Fire Classes and Extinguishers",
+        "duration": "12 min",
+        "topics": [
+          "Fire classes A-D",
+          "Extinguisher types",
+          "Use on industrial sites",
+          "Hot work (Schweißarbeiten) permits"
+        ]
+      },
+      {
+        "title": "3.2 Explosion Protection (Ex)",
+        "duration": "15 min",
+        "topics": [
+          "ATEX zones (Zone 0/1/2)",
+          "Explosion-proof equipment",
+          "Hot work in Ex-zones",
+          "Permits and gas measurements"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m4-gesetz",
+    "iconKey": "Scale",
+    "officialRef": "SCC §4",
+    "weight": "~10%",
+    "title": "Module 4: Legal Basics",
+    "lessons": [
+      {
+        "title": "4.1 German Safety Law",
+        "duration": "15 min",
+        "topics": [
+          "ArbSchG",
+          "BetrSichV (Betriebssicherheitsverordnung)",
+          "DGUV regulations",
+          "Responsibilities of contractor vs. site owner"
+        ]
+      },
+      {
+        "title": "4.2 SCC System",
+        "duration": "10 min",
+        "topics": [
+          "SCC Stiftung governance",
+          "Doc 016/017/018 differences",
+          "Validity (3-5 years)",
+          "Recertification process"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m5-umweltschutz",
+    "iconKey": "Leaf",
+    "officialRef": "SCC §5",
+    "weight": "~10%",
+    "title": "Module 5: Environmental Protection",
+    "lessons": [
+      {
+        "title": "5.1 Waste and Pollution",
+        "duration": "15 min",
+        "topics": [
+          "Waste separation on industrial sites",
+          "KrWG (Kreislaufwirtschaftsgesetz)",
+          "Soil and water protection",
+          "Reporting environmental incidents"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m6-erste-hilfe",
+    "iconKey": "HeartPulse",
+    "officialRef": "SCC §6",
+    "weight": "~10%",
+    "title": "Module 6: First Aid",
+    "lessons": [
+      {
+        "title": "6.1 Emergency Response on Industrial Sites",
+        "duration": "15 min",
+        "topics": [
+          "CPR (Herz-Lungen-Wiederbelebung)",
+          "Severe bleeding",
+          "Burns (chemical and thermal)",
+          "Site-specific emergency numbers"
+        ]
+      },
+      {
+        "title": "6.2 Reporting Accidents",
+        "duration": "10 min",
+        "topics": [
+          "BG (Berufsgenossenschaft) reporting",
+          "Near-miss reporting",
+          "Documentation requirements",
+          "Investigation process"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-organisation",
+    "iconKey": "ClipboardList",
+    "officialRef": "SCC §7",
+    "weight": "~5%",
+    "title": "Module 7: Organizational Aspects",
+    "lessons": [
+      {
+        "title": "7.1 Permits and Coordination",
+        "duration": "15 min",
+        "topics": [
+          "Work permits (Arbeitserlaubnis)",
+          "Permit-to-work systems",
+          "Coordination with site owner",
+          "Briefings (Unterweisung)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-fuehrung",
+    "iconKey": "Users",
+    "officialRef": "SCC §8 (Supervisor)",
+    "weight": "Doc 017/018",
+    "title": "Module 8: Leadership & Responsibility (Doc 017/018 only)",
+    "lessons": [
+      {
+        "title": "8.1 Supervisor Duties",
+        "duration": "20 min",
+        "topics": [
+          "Delegating tasks safely",
+          "Instruction and supervision",
+          "Documentation for supervisors",
+          "Liability (Führungshaftung)"
+        ]
+      },
+      {
+        "title": "8.2 Self-Employed Contractor Obligations",
+        "duration": "15 min",
+        "topics": [
+          "Doc 018 specific",
+          "Risk assessment as self-employed",
+          "Insurance (Berufshaftpflicht)",
+          "Coordination with general contractor"
+        ]
+      }
+    ]
+  }
+]

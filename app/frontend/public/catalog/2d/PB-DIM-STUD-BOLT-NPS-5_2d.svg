@@ -22,46 +22,44 @@
   <text x="40" y="40" class="title">Stud Bolt + 2 Hex Nuts</text>
   <text x="40" y="60" class="subtitle">For NPS 5 (DN 125) Flange — Class 150</text>
   <text x="40" y="78" class="std-ref">ASME B16.5 App.2 | ASTM A193 B7 + A194 2H</text>
-  <rect x="340" y="289" width="120" height="22" class="profile"/>
-  <line x1="343" y1="290" x2="343" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="349" y1="290" x2="349" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="355" y1="290" x2="355" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="361" y1="290" x2="361" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="367" y1="290" x2="367" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="373" y1="290" x2="373" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="379" y1="290" x2="379" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="385" y1="290" x2="385" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="391" y1="290" x2="391" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="397" y1="290" x2="397" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="403" y1="290" x2="403" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="409" y1="290" x2="409" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="415" y1="290" x2="415" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="421" y1="290" x2="421" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="427" y1="290" x2="427" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="433" y1="290" x2="433" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="439" y1="290" x2="439" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="445" y1="290" x2="445" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="451" y1="290" x2="451" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <line x1="457" y1="290" x2="457" y2="310" stroke="#aaa" stroke-width=".4"/>
-  <rect x="329" y="282" width="21" height="35" rx="2" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="2"/>
-  <rect x="449" y="282" width="21" height="35" rx="2" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="2"/>
-  <line x1="299" y1="300" x2="501" y2="300" class="centerline"/>
-  <text x="294" y="304" class="label" text-anchor="end">CL</text>
-  <line x1="340.0" y1="321.25" x2="340.0" y2="361.25" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="460.0" y1="321.25" x2="460.0" y2="361.25" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="340.0" y1="356.25" x2="460.0" y2="356.25" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <rect x="344" y="289" width="113" height="23" class="profile"/>
+  <line x1="347" y1="290" x2="347" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="353" y1="290" x2="353" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="359" y1="290" x2="359" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="365" y1="290" x2="365" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="371" y1="290" x2="371" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="377" y1="290" x2="377" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="383" y1="290" x2="383" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="389" y1="290" x2="389" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="395" y1="290" x2="395" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="401" y1="290" x2="401" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="407" y1="290" x2="407" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="413" y1="290" x2="413" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="419" y1="290" x2="419" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="425" y1="290" x2="425" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="431" y1="290" x2="431" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="437" y1="290" x2="437" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="443" y1="290" x2="443" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <line x1="449" y1="290" x2="449" y2="310" stroke="#aaa" stroke-width=".4"/>
+  <rect x="333" y="281" width="23" height="38" rx="2" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="2"/>
+  <rect x="445" y="281" width="23" height="38" rx="2" fill="#c8cdd2" stroke="#1a1a1a" stroke-width="2"/>
+  <line x1="303" y1="300" x2="498" y2="300" class="centerline"/>
+  <text x="298" y="304" class="label" text-anchor="end">CL</text>
+  <line x1="343.75" y1="321.25" x2="343.75" y2="361.25" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="456.25" y1="321.25" x2="456.25" y2="361.25" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="343.75" y1="356.25" x2="456.25" y2="356.25" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
   <text x="400" y="349.25" class="dim-text">L</text>
-  <text x="400" y="371.25" class="dim-sub">4.000" | 101.6 mm</text>
-  <line x1="330.0" y1="288.75" x2="290.0" y2="288.75" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="330.0" y1="311.25" x2="290.0" y2="311.25" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="295.0" y1="288.75" x2="295.0" y2="311.25" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="303.0" y="295.0" class="dim-text" text-anchor="start">d</text>
-  <text x="303.0" y="310.0" class="dim-sub" text-anchor="start">0.750" | 19.1 mm</text>
-  <line x1="475.575" y1="282.375" x2="515.575" y2="282.375" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="475.575" y1="317.625" x2="515.575" y2="317.625" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
-  <line x1="510.575" y1="282.375" x2="510.575" y2="317.625" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
-  <text x="518.575" y="295.0" class="dim-text" text-anchor="start">AF</text>
-  <text x="518.575" y="310.0" class="dim-sub" text-anchor="start">1.175" | 29.8 mm</text>
+  <text x="400" y="371.25" class="dim-sub">3.750" | 95.3 mm</text>
+  <line x1="333.75" y1="288.75" x2="293.75" y2="288.75" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="333.75" y1="311.25" x2="293.75" y2="311.25" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="298.75" y1="288.75" x2="298.75" y2="311.25" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="306.75" y="295" class="dim-text" text-anchor="start">d</text>
+  <text x="306.75" y="310" class="dim-sub" text-anchor="start">0.750" | 19.1 mm</text>
+  <line x1="472.5" y1="281.25" x2="512.5" y2="281.25" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="472.5" y1="318.75" x2="512.5" y2="318.75" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="507.5" y1="281.25" x2="507.5" y2="318.75" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="515.5" y="295" class="dim-text" text-anchor="start">AF</text>
+  <text x="515.5" y="310" class="dim-sub" text-anchor="start">1.250" | 31.8 mm</text>
   <rect x="530" y="120" width="240" height="169" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
   <text x="650" y="140" class="tbl-hdr">NPS 5 — Key Data</text>
   <line x1="545" y1="148" x2="755" y2="148" stroke="#eee" stroke-width=".5"/>
@@ -72,9 +70,9 @@
   <text x="550" y="199" class="tbl-key">Bolt dia.</text>
   <text x="750" y="199" class="tbl-val">0.750" | 19.1 mm</text>
   <text x="550" y="216" class="tbl-key">Length</text>
-  <text x="750" y="216" class="tbl-val">4.000" | 101.6 mm</text>
+  <text x="750" y="216" class="tbl-val">3.750" | 95.3 mm</text>
   <text x="550" y="233" class="tbl-key">Nut AF</text>
-  <text x="750" y="233" class="tbl-val">1.175" | 29.8 mm</text>
+  <text x="750" y="233" class="tbl-val">1.250" | 31.8 mm</text>
   <text x="550" y="250" class="tbl-key">Quantity</text>
   <text x="750" y="250" class="tbl-val">8 per joint</text>
   <text x="550" y="267" class="tbl-key">Material</text>
@@ -82,6 +80,6 @@
   <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
   <text x="40" y="648" class="note">Stud Bolt per ASME B16.5-2020 Appendix 2, Class 150.</text>
   <text x="40" y="663" class="note">Material: ASTM A193 Grade B7 bolt + ASTM A194 Grade 2H nut.</text>
-  <text x="40" y="678" class="note">L = total stud length. AF = nut across flats. All dims in inches and mm.</text>
+  <text x="40" y="678" class="note">L = total stud length. AF = nut across flats (ASME B18.2.2 heavy hex). All dims in inches and mm.</text>
   <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
 </svg>

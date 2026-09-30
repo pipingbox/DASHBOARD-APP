@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs><style>
+    .profile{stroke:#1a1a1a;stroke-width:2;fill:#e2e5e8}
+    .profile2{stroke:#1a1a1a;stroke-width:1.6;fill:#d0d5da}
+    .winding{stroke:#555;stroke-width:1;fill:none}
+    .centerline{stroke:#999;stroke-width:.8;stroke-dasharray:8 4;fill:none}
+    .dim-line{stroke:#c62828;stroke-width:.9;fill:none}
+    .dim-text{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#c62828;text-anchor:middle}
+    .dim-sub{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#c62828;text-anchor:middle}
+    .title{font-family:'Segoe UI',Arial,sans-serif;font-size:18px;font-weight:600;fill:#1a1a1a}
+    .subtitle{font-family:'Segoe UI',Arial,sans-serif;font-size:13px;fill:#555}
+    .std-ref{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#888}
+    .note{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888}
+    .label{font-family:'Segoe UI',Arial,sans-serif;font-size:11px;fill:#666;text-anchor:middle}
+    .tbl-hdr{font-family:'Segoe UI',Arial,sans-serif;font-size:12px;fill:#1a1a1a;font-weight:600;text-anchor:middle}
+    .tbl-key{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#555;text-anchor:start}
+    .tbl-val{font-family:'Segoe UI',Arial,sans-serif;font-size:10.5px;fill:#888;text-anchor:end}
+  </style>
+  <marker id="as" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  <marker id="ae" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#c62828" stroke-width=".8"/></marker>
+  </defs>
+  <rect width="800" height="700" fill="#fafafa"/>
+  <text x="40" y="40" class="title">Paddle Spacer (Ring Spacer)</text>
+  <text x="40" y="60" class="subtitle">NPS 2 (DN 50) — Class 150</text>
+  <text x="40" y="78" class="std-ref">ASME B16.48-2015 | Open ring with handle</text>
+  <rect x="304.2718446601942" y="105" width="71.45631067961165" height="262.2330097087379" class="profile2"/>
+  <circle cx="340" cy="451.11650485436894" r="113.88349514563106" class="profile"/>
+  <circle cx="340" cy="451.11650485436894" r="68.10679611650485" fill="#fafafa" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="340" cy="125" r="6" fill="#fafafa" stroke="#1a1a1a" stroke-width="1.5"/>
+  <line x1="166.11650485436894" y1="451.11650485436894" x2="513.8834951456311" y2="451.11650485436894" class="centerline"/>
+  <line x1="340" y1="85" x2="340" y2="625" class="centerline"/>
+  <line x1="226.11650485436894" y1="607" x2="453.88349514563106" y2="607" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="340" y="600" class="dim-text">D</text>
+  <text x="340" y="622" class="dim-sub">4.02" | 102 mm</text>
+  <line x1="226.11650485436894" y1="577" x2="226.11650485436894" y2="612" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="453.88349514563106" y1="577" x2="453.88349514563106" y2="612" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="271.8932038834952" y1="451.11650485436894" x2="408.1067961165048" y2="451.11650485436894" class="dim-line" marker-start="url(#as)" marker-end="url(#ae)"/>
+  <text x="340" y="444.11650485436894" class="dim-text">B</text>
+  <text x="340" y="466.11650485436894" class="dim-sub">2.4" | 61 mm</text>
+  <line x1="271.8932038834952" y1="421.11650485436894" x2="271.8932038834952" y2="456.11650485436894" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <line x1="408.1067961165048" y1="421.11650485436894" x2="408.1067961165048" y2="456.11650485436894" stroke="#c62828" stroke-width=".5" stroke-dasharray="2 2"/>
+  <rect x="530" y="60" width="240" height="140" rx="4" fill="white" stroke="#ddd" stroke-width=".8"/>
+  <text x="650" y="80" class="tbl-hdr">NPS 2 — Key Data</text>
+  <line x1="545" y1="88" x2="755" y2="88" stroke="#eee" stroke-width=".5"/><text x="550" y="105" class="tbl-key">NPS / DN</text><text x="750" y="105" class="tbl-val">2 / 50</text><text x="550" y="122" class="tbl-key">Class</text><text x="750" y="122" class="tbl-val">150</text><text x="550" y="139" class="tbl-key">D (ring OD)</text><text x="750" y="139" class="tbl-val">4.02" | 102 mm</text><text x="550" y="156" class="tbl-key">B (bore)</text><text x="750" y="156" class="tbl-val">2.4" | 61 mm</text><text x="550" y="173" class="tbl-key">t (thickness)</text><text x="750" y="173" class="tbl-val">0.25" | 6.4 mm</text><text x="550" y="190" class="tbl-key">W (handle width)</text><text x="750" y="190" class="tbl-val">1.26" | 32 mm</text>
+  <line x1="40" y1="630" x2="760" y2="630" stroke="#ddd" stroke-width=".5"/>
+  <text x="40" y="648" class="note">Ring spacer per ASME B16.48-2015, Class 150. Open bore maintains flow.</text>
+  <text x="40" y="663" class="note">Single identification hole (>=12 mm) in handle per B16.48. All dimensions from PB-DIM-ASME-B16-48-SPACER.</text>
+  <text x="760" y="692" class="note" text-anchor="end" fill="#ccc">PIPINGBOX</text>
+</svg>

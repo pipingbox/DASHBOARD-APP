@@ -15,6 +15,9 @@ import {
   ArrowLeft,
   Crown,
   Loader2,
+  MoveDiagonal,
+  Shapes,
+  AlignJustify,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/PageHeader';
@@ -27,6 +30,7 @@ import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { redirectToCheckout } from '@/lib/stripe';
 import ElbowCutTool from '@/components/tools/ElbowCutTool';
+import NewElbowCutTool from '@/tools/prefabrication/elbow-cut/ElbowCutTool';
 import BranchLayoutTool from '@/components/tools/BranchLayoutTool';
 import UnitConverterTool from '@/components/tools/UnitConverterTool';
 import PressureDropTool from '@/components/tools/PressureDropTool';
@@ -35,6 +39,9 @@ import BoltsNutsTool from '@/components/tools/BoltsNutsTool';
 import FlangesTool from '@/components/tools/FlangesTool';
 import ColorLookup from '@/tools/color-lookup/ColorLookup';
 import AccessoriesLibrary from '@/components/tools/AccessoriesLibrary';
+import OffsetTool from '@/tools/prefabrication/offsets/OffsetTool';
+import MiteredElbowTool from '@/tools/prefabrication/miters/MiteredElbowTool';
+import PipeCombTool from '@/tools/prefabrication/pipe-comb/PipeCombTool';
 
 interface ToolDef {
   key: string;
@@ -46,16 +53,19 @@ interface ToolDef {
 }
 
 const TOOLS: ToolDef[] = [
+  { key: 'branch-layout', nameKey: 'tools.branchLayout.name', descKey: 'tools.branchLayout.subtitle', icon: GitBranch, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'elbow-cut', nameKey: 'tools.elbowCut.name', descKey: 'tools.elbowCut.subtitle', icon: Scissors, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'pipe-offset', nameKey: 'tools.prefab.offset.title', descKey: 'tools.prefab.offset.tabWithElbows', icon: MoveDiagonal, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'accessories-library', nameKey: 'tools.accessoriesLibrary.title', descKey: 'tools.accessoriesLibraryDesc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'bolts-nuts', nameKey: 'tools.bolts.name', descKey: 'tools.bolts.desc', icon: Wrench, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'flanges', nameKey: 'tools.flanges.name', descKey: 'tools.flanges.desc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
-  { key: 'elbow-cut', nameKey: 'tools.elbowCut.name', descKey: 'tools.elbowCut.subtitle', icon: Scissors, categoryKey: 'tools.categoryFabrication', implemented: true },
-  { key: 'branch-layout', nameKey: 'tools.branchLayout.name', descKey: 'tools.branchLayout.subtitle', icon: GitBranch, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'mitered-elbow', nameKey: 'tools.prefab.miteredElbow.title', descKey: 'tools.prefab.miteredElbow.noteGeometry', icon: Shapes, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'pipe-comb', nameKey: 'tools.prefab.pipeComb.title', descKey: 'tools.prefab.pipeComb.noteGeometry', icon: AlignJustify, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'pipe-dimensions', nameKey: 'tools.pipeDim.name', descKey: 'tools.pipeDim.subtitle', icon: Table2, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'pressure-drop', nameKey: 'tools.pressureDrop.name', descKey: 'tools.pressureDrop.subtitle', icon: Gauge, categoryKey: 'tools.categoryHydraulics', implemented: true },
   { key: 'unit-converter', nameKey: 'tools.unitConverter', descKey: 'tools.unitConverterDesc', icon: Calculator, categoryKey: 'tools.categoryUtility', implemented: true },
   { key: 'wall-thickness', nameKey: 'tools.wallThickness', descKey: 'tools.wallThicknessDesc', icon: Ruler, categoryKey: 'tools.categoryDesign', implemented: true },
   { key: 'color-lookup', nameKey: 'tools.colorLookup', descKey: 'tools.colorLookupDesc', icon: Paintbrush, categoryKey: 'tools.categoryReference', implemented: true },
-  { key: 'accessories-library', nameKey: 'tools.accessoriesLibrary.title', descKey: 'tools.accessoriesLibraryDesc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'thermal-expansion', nameKey: 'tools.thermalExpansion', descKey: 'tools.thermalExpansionDesc', icon: Thermometer, categoryKey: 'tools.categoryStress', implemented: false },
   { key: 'reynolds', nameKey: 'tools.reynolds', descKey: 'tools.reynoldsDesc', icon: Beaker, categoryKey: 'tools.categoryHydraulics', implemented: false },
 ];
@@ -151,10 +161,8 @@ export default function Tools() {
                   <Crown className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[#F5F7FA]">Unlock Premium Tools</p>
-                  <p className="text-[11px] text-[#A3A9B3]">
-                    PDF exports, printable templates, torque reports &amp; more.
-                  </p>
+                  <p className="text-sm font-semibold text-[#F5F7FA]">{t('tools.premiumBanner.title')}</p>
+                  <p className="text-[11px] text-[#A3A9B3]">{t('tools.premiumBanner.description')}</p>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -164,7 +172,7 @@ export default function Tools() {
                   className="inline-flex items-center gap-1.5 rounded-lg border border-[#f59e0b]/40 bg-transparent px-3 py-1.5 text-xs font-semibold text-[#f59e0b] transition hover:bg-[#f59e0b]/10 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {checkoutLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-                  {checkoutLoading ? 'Loading...' : 'Monthly €4.99'}
+                  {checkoutLoading ? t('tools.premiumBanner.loading') : t('tools.premiumBanner.monthly')}
                 </button>
                 <button
                   disabled={checkoutLoading}
@@ -172,7 +180,7 @@ export default function Tools() {
                   className="inline-flex items-center gap-1.5 rounded-lg bg-[#f59e0b] px-3 py-1.5 text-xs font-semibold text-black transition hover:bg-[#d97706] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {checkoutLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
-                  {checkoutLoading ? 'Loading...' : 'Annual €39 (save 35%)'}
+                  {checkoutLoading ? t('tools.premiumBanner.loading') : t('tools.premiumBanner.annual')}
                 </button>
               </div>
             </div>
@@ -256,7 +264,13 @@ export default function Tools() {
         ) : active === 'flanges' ? (
           <FlangesTool />
         ) : active === 'elbow-cut' ? (
-          <ElbowCutTool />
+          <NewElbowCutTool />
+        ) : active === 'pipe-offset' ? (
+          <OffsetTool />
+        ) : active === 'mitered-elbow' ? (
+          <MiteredElbowTool />
+        ) : active === 'pipe-comb' ? (
+          <PipeCombTool />
         ) : active === 'branch-layout' ? (
           <BranchLayoutTool />
         ) : active === 'unit-converter' ? (

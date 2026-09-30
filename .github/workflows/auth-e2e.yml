@@ -30,7 +30,11 @@ on:
       target_url:
         description: 'Deployed origin to test'
         required: true
-        default: 'https://app.pipingbox.com'
+        # Canonical origin. A manual dispatch used to default to
+        # app.pipingbox.com, which only reaches production through the
+        # PB-WEB-007 301, so a hand-run gate silently measured the legacy hop
+        # instead of the origin users actually land on.
+        default: 'https://pipingbox.com'
         type: string
       source_ref:
         description: 'Exact app commit/ref whose E2E tests must be executed'
@@ -52,13 +56,28 @@ on:
         required: false
         default: false
         type: boolean
+      run_wfa_e2e:
+        description: 'Run ONLY the PB-WORKFORCE-ACTIVATION B1 verification pack (WFA E2E + insertBefore regression + RLS worker-experiences + corrected rls-security + monetization kill-switch) in an isolated window'
+        required: false
+        default: false
+        type: boolean
+      run_dashboard_e2e:
+        description: 'Run ONLY the PB-PDI-004 /dashboard DOM-mutation smoke (dashboard-dom-mutation, Android Chrome emulation) in an isolated window — the 7/7 auth gate and the other onboarding specs are skipped for this dispatch'
+        required: false
+        default: false
+        type: boolean
+      expected_env:
+        description: 'Expected PostHog environment of the target deployment (preview|production); the SHA-locked specs assert it in pre-flight'
+        required: false
+        default: 'preview'
+        type: string
 
 jobs:
   auth-e2e:
     name: Auth E2E — require 7/7 PASS
     # Gate 6: the onboarding E2E needs a truly isolated window (same QA
     # account, same preview Worker) — skip the auth gate for that dispatch.
-    if: ${{ inputs.run_onboarding_e2e != true }}
+    if: ${{ inputs.run_onboarding_e2e != true && inputs.run_wfa_e2e != true && inputs.run_dashboard_e2e != true }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -235,7 +254,7 @@ jobs:
 
   onboarding-e2e:
     name: PB-OBSERVABILITY-001 onboarding E2E (preview, SHA-locked, isolated window)
-    if: ${{ inputs.run_onboarding_e2e == true }}
+    if: ${{ inputs.run_onboarding_e2e == true || inputs.run_dashboard_e2e == true }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -252,6 +271,7 @@ jobs:
       E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
       E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
       EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
+      EXPECTED_ENV: ${{ inputs.expected_env }}
 
     steps:
       - name: Require expected_sha and exclusive dispatch mode
@@ -259,11 +279,19 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${EXPECTED_APP_VERSION:-}" ]; then
-            echo "::error::expected_sha is required when run_onboarding_e2e=true (the served build must be traceable to the tested SHA)."
+            echo "::error::expected_sha is required when run_onboarding_e2e/run_dashboard_e2e=true (the served build must be traceable to the tested SHA)."
             exit 1
           fi
           if [ "${{ inputs.run_identity_e2e }}" = "true" ]; then
-            echo "::error::run_onboarding_e2e and run_identity_e2e are mutually exclusive (same QA account, isolated window required)."
+            echo "::error::run_onboarding_e2e/run_dashboard_e2e and run_identity_e2e are mutually exclusive (same QA account, isolated window required)."
+            exit 1
+          fi
+          if [ "${{ inputs.run_wfa_e2e }}" = "true" ]; then
+            echo "::error::run_onboarding_e2e/run_dashboard_e2e and run_wfa_e2e are mutually exclusive (same QA account, isolated window required)."
+            exit 1
+          fi
+          if [ "${EXPECTED_ENV:-preview}" != "preview" ] && [ "${EXPECTED_ENV:-preview}" != "production" ]; then
+            echo "::error::expected_env must be 'preview' or 'production' (got ${EXPECTED_ENV})."
             exit 1
           fi
 
@@ -290,9 +318,227 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run onboarding E2E — SHA pre-flight, snapshot, funnel, restore
+        if: ${{ inputs.run_dashboard_e2e != true }}
         shell: bash
         run: |
           set -euo pipefail
           npx playwright test tests/observability-onboarding-e2e.spec.ts \
             --config=playwright.config.ts \
             --reporter=line
+
+      # PB-UI-DOM-INSERTBEFORE-001: translator-grade DOM-mutation regression.
+      # Same isolated window and QA account; the spec does its own authorized
+      # reset + exact restore, so it is safe to run right after the funnel E2E.
+      - name: Run onboarding DOM-mutation E2E — insertBefore regression
+        if: ${{ inputs.run_dashboard_e2e != true }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/onboarding-dom-mutation.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      # PB-UI-DOM-INSERTBEFORE-001 (/profile): mount + edit/save regression
+      # for the real-device NO-GO (PB-ERR-JYAHES et al.). Same window/account.
+      - name: Run profile DOM-mutation E2E — mount + edit/save regression
+        if: ${{ inputs.run_dashboard_e2e != true }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/profile-dom-mutation.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      # PB-UI-DOM-INSERTBEFORE-001 (/dashboard, PB-PDI-004): pending-
+      # invitation Accept action under translator mutation — the production
+      # 8x app_error loop (PB-ERR-WDNH8A et al., build cccf0d0). Hermetic:
+      # synthetic invitation intercepted at PostgREST level, ZERO DB writes.
+      - name: Run dashboard DOM-mutation E2E — invitation action regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/dashboard-dom-mutation.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+  wfa-e2e:
+    name: PB-WORKFORCE-ACTIVATION B1 verification pack (preview, SHA-locked, isolated window)
+    if: ${{ inputs.run_wfa_e2e == true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Same isolated window as the onboarding E2E: shares the deploy-preview
+    # concurrency group (no preview deploy can overwrite the Worker mid-run)
+    # and the dispatch is mutually exclusive with every other mode, so no
+    # other browser session touches the QA account during the run.
+    concurrency:
+      group: deploy-preview
+      cancel-in-progress: false
+    env:
+      PREVIEW_URL: ${{ inputs.target_url }}
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+      # QA B reuses the existing second worker identity already configured for
+      # broker-e2e (PO GO 2026-09-26 §3: reuse a suitable QA account if one
+      # already exists — no new secrets, no password resets).
+      E2E_TEST_EMAIL_B: ${{ secrets.E2E_SECOND_WORKER_EMAIL }}
+      E2E_TEST_PASSWORD_B: ${{ secrets.E2E_SECOND_WORKER_PASSWORD }}
+      # QA admin identity (already configured for broker-e2e) for the P0
+      # positive controls + anti-spoof on audit_logs. Never used to prove a
+      # normal user's permissions; never grants admin to QA A/B.
+      E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+      EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
+      EXPECTED_ENV: ${{ inputs.expected_env }}
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+    steps:
+      - name: Require expected_sha and exclusive dispatch mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${EXPECTED_APP_VERSION:-}" ]; then
+            echo "::error::expected_sha is required when run_wfa_e2e=true (the served build must be traceable to the tested SHA)."
+            exit 1
+          fi
+          if [ "${{ inputs.run_identity_e2e }}" = "true" ] || [ "${{ inputs.run_onboarding_e2e }}" = "true" ]; then
+            echo "::error::run_wfa_e2e is mutually exclusive with run_identity_e2e / run_onboarding_e2e (same QA account, isolated window required)."
+            exit 1
+          fi
+          # Credential availability is reported WITHOUT printing values.
+          for v in E2E_TEST_EMAIL E2E_TEST_PASSWORD VITE_SUPABASE_URL VITE_SUPABASE_ANON_KEY; do
+            if [ -z "${!v:-}" ]; then echo "::error::$v is not configured as a GitHub Secret."; exit 1; fi
+          done
+          if [ -z "${E2E_TEST_EMAIL_B:-}" ] || [ -z "${E2E_TEST_PASSWORD_B:-}" ]; then
+            echo "::warning::E2E_SECOND_WORKER_EMAIL / E2E_SECOND_WORKER_PASSWORD (mapped to the _B env) are NOT configured — the cross-user RLS isolation test will FAIL LOUDLY (B3 stays HOLD until they exist)."
+          fi
+
+      - name: Checkout exact tested app ref
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact tested SHA
+        env:
+          INPUT_SHA: ${{ inputs.source_ref }}
+        run: git checkout "$INPUT_SHA"
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # Frontend deps for hook-importing unit suites (workforceReadinessEvents
+      # imports react); root npm ci alone cannot resolve them.
+      - name: Install frontend dependencies (unit suite imports)
+        run: npm ci --prefix app/frontend
+
+      # Pure WFA unit/architecture suites (no network): canonical predicates,
+      # D18 event taxonomy, Quick Capture architecture, WFA-002 journey
+      # presentation mapping. Previously local-only; now a CI gate.
+      - name: WFA unit suites (readiness, events, arch, quick capture, journey)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/workforce-readiness.spec.ts \
+            tests/workforce-readiness-events.spec.ts \
+            tests/match-ready-arch.spec.ts \
+            tests/quick-experience-capture.spec.ts \
+            tests/completion-journey.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      # Stream A: monetization kill-switch containment (pure, no network).
+      - name: Monetization kill-switch guard (fail-closed matrix + wiring)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/monetization-guard.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      # Stream A: corrected lead-table RLS suite (fixture-scoped, positive
+      # controls, genuine-denial semantics — safe for the shared project).
+      - name: Corrected rls-security suite (lead tables)
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          npx playwright test tests/rls-security.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      # WFA RLS: owner controls + spoof attempts on app_worker_experiences.
+      # The cross-user isolation test requires the second QA identity; without
+      # E2E_TEST_EMAIL_B / E2E_TEST_PASSWORD_B it fails loudly by design.
+      - name: RLS app_worker_experiences (owner + spoof + cross-user)
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          npx playwright test tests/rls-worker-experiences.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      # WFA browser E2E: scenarios A–F with snapshot → exact restore.
+      - name: Workforce Activation E2E — quick capture, readiness, failure paths
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          npx playwright test tests/workforce-activation-e2e.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      # WFA-002 completion journey E2E: canonical-gap rendering, deep-links,
+      # post-action feedback, GA4 emission. Bounded bio mutation, exact restore.
+      - name: Completion journey E2E (WFA-002) — gaps, deep-links, feedback
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          npx playwright test tests/completion-journey-e2e.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      # PB-LIBRARY-COMPLETE-001 — Library V1 browser E2E (public route, no QA
+      # account needed): catalog, search/filters, detail/deep-link, broken
+      # asset → access_error, back navigation, PostHog closed-payload
+      # analytics intercepted at the request layer, PII-free assertion.
+      - name: Library V1 E2E (catalog, search, detail, analytics, PII-free)
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          npx playwright test tests/library-e2e.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      # PB-UI-DOM-INSERTBEFORE-001 (/profile): regression on the final candidate.
+      - name: Profile DOM-mutation regression (insertBefore) on the WFA candidate
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          npx playwright test tests/profile-dom-mutation.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      # P0 security verification (AUDITLOG / INTERNAL-DATA / ASSIGNMENTS) with
+      # QA identities — no service_role. Separates PUBLIC/anon/authenticated
+      # from backend roles; proves denials for normal users, not the absence
+      # of service_role access.
+      - name: P0 security permissions verification (QA identities, no service_role)
+        shell: bash
+        if: always()
+        run: |
+          set -euo pipefail
+          node tests/verify-p0-permissions.mjs
