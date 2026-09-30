@@ -19,6 +19,7 @@ import { PDF_PAGE_FORMATS, DEFAULT_PDF_PAGE_FORMAT_ID } from '@/tools/branch/pdf
 import type { PdfPageFormatId } from '@/tools/branch/pdfPageFormat';
 import { buildBranchIsometric } from '@/tools/branch/branchIsometricSvg';
 import { svgPagesToPdf, pdfLatin1Safe } from '@/tools/branch/svgMmToPdf';
+import BranchOnElbowPanel from './BranchOnElbowPanel';
 
 /* ─── NPS pipe data (OD in mm) ─── */
 const NPS_OPTIONS: { label: string; od: number }[] = [
@@ -233,6 +234,7 @@ type FabricationMode = 'template' | 'marking';
 export default function BranchLayoutTool() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [family, setFamily] = useState<'straight' | 'elbow'>('straight');
 
   const [headerNPS, setHeaderNPS] = useState('6"');
   const [branchNPS, setBranchNPS] = useState('3"');
@@ -482,10 +484,27 @@ export default function BranchLayoutTool() {
         <p className="text-[10px] uppercase tracking-[0.25em] text-[#f59e0b]">
           {t('tools.branchLayout.name')}
         </p>
-        <h3 className="mt-1 text-xl font-semibold">{t('tools.branchLayout.subtitle')}</h3>
-        <p className="mt-1 text-xs text-zinc-500">{t('tools.branchLayout.description')}</p>
+        <h3 className="mt-1 text-xl font-semibold">
+          {family === 'straight' ? t('tools.branchLayout.subtitle') : t('tools.branchOnElbow.subtitle')}
+        </h3>
+        <p className="mt-1 text-xs text-zinc-500">
+          {family === 'straight' ? t('tools.branchLayout.description') : t('tools.branchOnElbow.description')}
+        </p>
       </div>
 
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2" role="group" aria-label={t('tools.branchOnElbow.family')}>
+        <button type="button" aria-pressed={family === 'straight'} onClick={() => setFamily('straight')}
+          className={`min-h-11 rounded-lg border px-4 py-3 text-left text-sm font-semibold ${family === 'straight' ? 'border-amber-500 bg-amber-500/10 text-amber-400' : 'border-zinc-800 bg-zinc-900/40 text-zinc-300 hover:border-zinc-600'}`}>
+          {t('tools.branchOnElbow.familyStraight')}
+        </button>
+        <button type="button" aria-pressed={family === 'elbow'} onClick={() => setFamily('elbow')}
+          className={`min-h-11 rounded-lg border px-4 py-3 text-left text-sm font-semibold ${family === 'elbow' ? 'border-amber-500 bg-amber-500/10 text-amber-400' : 'border-zinc-800 bg-zinc-900/40 text-zinc-300 hover:border-zinc-600'}`}>
+          {t('tools.branchOnElbow.familyElbow')}
+        </button>
+      </div>
+
+      {family === 'elbow' ? <BranchOnElbowPanel /> : (
+        <>
       {/* ═══ FABRICATION ═══ */}
       <div className="space-y-4">
         <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-medium border-b border-zinc-800 pb-2">
@@ -1347,6 +1366,8 @@ export default function BranchLayoutTool() {
           </>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 }
