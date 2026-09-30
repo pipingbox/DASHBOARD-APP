@@ -854,7 +854,7 @@ function CandidatePipelineBlock({
     const url = buildWhatsAppInviteUrl(phone, worker.full_name || worker.username || 'there', {
       company: request.company_name,
       workerType: request.worker_type,
-      location: request.location,
+      location: request.country,
     });
     if (!url) {
       toast.error('Could not build WhatsApp invite link');
