@@ -1,4 +1,0 @@
-# PB-INFRA-TS-GATE-001 — TypeScript diagnostic baseline (versioned, multiplicity-aware).
-# Format: app/frontend/<path>|<TScode>|<normalized message>|<expected count>  (no line/col by design).
-# 0 diagnostics across 0 fingerprints. This file may ONLY shrink
-# (--prune-baseline) — adding fingerprints or raising counts requires a ticket + PO review.
