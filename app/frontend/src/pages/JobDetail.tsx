@@ -347,10 +347,12 @@ export default function JobDetail() {
               <Building2 className="h-3.5 w-3.5" />
               {job.company}
             </span>
-            {(job.country ?? job.location) && (
+            {/* City/site first (PB-JOBS-UMICORE-MECHANIC-001); country stays
+                the normalized value used by filters. */}
+            {(job.location ?? job.country) && (
               <span className="flex items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5" />
-                {job.country ?? job.location}
+                {job.location ?? job.country}
               </span>
             )}
             <span className="uppercase tracking-[0.15em]">{jobTypeLabel}</span>
