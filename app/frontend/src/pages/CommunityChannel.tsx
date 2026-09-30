@@ -257,9 +257,10 @@ export default function CommunityChannel() {
           recipientId: post.user_id,
           actorId: user.id,
           type: 'like',
-          postId: post.id,
-          postTitle: post.title,
-          postChannelSlug: channelSlug ?? null,
+          title: post.title ?? undefined,
+          relatedEntityType: 'community_post',
+          relatedEntityId: post.id,
+          actionUrl: channelSlug ? `/community/${channelSlug}/post/${post.id}` : undefined,
           actorName: profile?.full_name ?? null,
         });
       }
