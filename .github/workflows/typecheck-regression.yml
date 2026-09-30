@@ -1,15 +1,22 @@
 name: TypeScript Regression Gate
 
-# PB-INFRA-TS-GATE-001: replaces the historical false gate
-# (`cd app/frontend && npx tsc --skipLibCheck`, which compiles NOTHING against
-# the solution-style root tsconfig.json and always exits 0) with a real
-# regression check against a versioned baseline.
+# PB-INFRA-TS-ZERO-GATE-001: STRICT ZERO-ERROR TYPECHECK.
 #
-# Policy: a PR may not introduce NEW TypeScript diagnostics. The 31
-# pre-existing production diagnostics (23 unique identities) are recorded in
-# scripts/ts-error-baseline.txt and tolerated until paid down by separate
-# tickets. The baseline never grows automatically — only via ticket + PO
-# review. See scripts/ts-regression-gate.mjs for the full contract.
+# The TypeScript debt campaign is CLOSED (31 diagnostics / 23 fingerprints
+# -> 0 / 0). The transitional baseline mechanism
+# (scripts/ts-regression-gate.mjs + scripts/ts-error-baseline.txt) has been
+# retired; the gate is now a strict zero-error typecheck.
+#
+# Policy: ZERO TYPE ERRORS. Success condition is exclusively
+# `npm run typecheck` exit code 0 in app/frontend
+# (`tsc -p tsconfig.app.json --noEmit --skipLibCheck` — the authoritative
+# command). Any TypeScript diagnostic fails this check and blocks the PR.
+# No baselines, no known-error tolerances, no fingerprint normalization.
+#
+# Note: the check display name "TypeScript Regression Gate" is preserved on
+# purpose so GitHub branch protection keeps matching the required check.
+# The historical `npx tsc --skipLibCheck` against the solution-style root
+# tsconfig.json remains DEPRECATED (it compiles nothing and always exits 0).
 
 on:
   pull_request:
@@ -17,8 +24,6 @@ on:
     branches: [main]
     paths:
       - 'app/frontend/**'
-      - 'scripts/ts-regression-gate.mjs'
-      - 'scripts/ts-error-baseline.txt'
       - '.github/workflows/typecheck-regression.yml'
 
 concurrency:
@@ -41,5 +46,6 @@ jobs:
         working-directory: app/frontend
         run: npm ci
 
-      - name: Authoritative typecheck vs baseline
-        run: node scripts/ts-regression-gate.mjs
+      - name: Strict zero-error typecheck
+        working-directory: app/frontend
+        run: npm run typecheck
