@@ -23,16 +23,25 @@ Edge Function que genera y envía el informe **PipingBox Daily Intelligence** a
 - pg_cron ejecuta el job `daily-intelligence-report` con schedule
   **`5 * * * *`** (tick horario; UTC y Brussels comparten offsets en horas
   exactas).
-- La función **solo envía el informe productivo cuando la hora local de
-  Bruselas es 00:05** (ventana de tolerancia 00:00–00:59). El resto de ticks
-  horarios se saltan sin efecto, sin claim y sin correo. El cálculo es vía
-  `Intl` con la zona `Europe/Brussels`, por lo que CET/CEST (incluidos los
-  cambios de horario) siempre es correcto sin tocar el cron.
+- La función **solo genera el informe nuevo cuando la hora local de Bruselas
+  es 00:05** (ventana de tolerancia 00:00–00:59). El cálculo es vía `Intl`
+  con la zona `Europe/Brussels`, por lo que CET/CEST (incluidos los cambios
+  de horario) siempre es correcto sin tocar el cron.
+- **Recovery horario (PB-DAILY-EMAIL-RETRY-001):** el resto de ticks horarios
+  entran en modo recovery. Si el Daily de "ayer" quedó `FAILED`/`PARTIAL` con
+  `email_ok=false` (el correo nunca salió) y le quedan intentos, se reintenta
+  automáticamente con la misma ventana (`report_date`/`startUtc`/`endUtc`
+  recalculados para el mismo día). Tope: `MAX_DAILY_ATTEMPTS=4` claims por
+  report_date (00:05 + hasta 3 recoveries).
+- **Retry SMTP en la misma ejecución:** los errores transitorios (blacklist
+  temporal de one.com `[B1.A11]`, timeouts, conexión, 4xx) se reintentan con
+  backoff (~2s, ~5s; 3 intentos). Los permanentes (destinatario inválido,
+  credenciales, 5xx) fallan sin bucle.
 - Además, **todo envío productivo exige el secreto `DAILY_REPORT_ENABLED="true"`**
   (activación explícita del PO tras aprobar el correo de prueba). Hasta que se
   active, cada tick se salta con `production_disabled`.
 - El path admin (`Bearer SERVICE_ROLE_KEY`) permite reintentos manuales de un
-  día fallido una vez activado el flag (claim idempotente protege duplicados).
+  día fallido (con `{"report_date":"YYYY-MM-DD"}`) una vez activado el flag.
 
 ## Autenticación (Supabase Vault, sin claves en SQL)
 
@@ -49,11 +58,17 @@ El valor de la cron key se genera **dentro de la base de datos**
 se escribe en SQL, código, logs ni respuestas; solo viaja DB → función en la
 cabecera en tiempo de ejecución.
 
-## Idempotencia y fail-closed
+## Idempotencia y fail-closed (EXACTLY-ONCE)
 
 - `UNIQUE(report_date)` impide dos informes del mismo día.
 - Si ya existe `SENT` para el día, la función responde `already_sent` y no
-  reenvía.
+  reenvía. Ídem si el correo ya salió (`email_ok=true`, p. ej. `PARTIAL` por
+  fuentes): un Daily cuyo correo salió jamás se reenvía.
+- El claim es una transición condicional ATÓMICA (`UPDATE ... WHERE status IN
+  (FAILED,PARTIAL) AND email_ok IS NOT true`): dos ejecuciones concurrentes
+  sobre el mismo report_date no pueden enviar dos correos — la segunda ve 0
+  filas afectadas y se salta. Un `GENERATING` fresco está protegido; uno
+  abandonado (>15 min) se puede reclamar.
 - Si el correo no sale, el estado nunca es `SENT` (fail-closed).
 - Si una fuente cae, el informe es `PARTIAL` y se marca claramente en el correo.
 - **La prueba `{"test":true}` NO escribe en `app_daily_intelligence_runs`**:

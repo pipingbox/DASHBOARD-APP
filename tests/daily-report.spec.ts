@@ -19,6 +19,9 @@ import {
   scanForPii,
   isBrusselsDailyTick,
   evaluateProductionGate,
+  classifySmtpError,
+  sendWithRetry,
+  claimDecision,
   hogqlTraffic,
   hogqlRoutes,
   hogqlFunnelSignup,
@@ -152,16 +155,216 @@ test.describe('Production gate (PO activation flag + tick + auth mode)', () => {
       .toEqual({ action: 'skip', reason: 'production_disabled' });
   });
 
-  test('cron only sends at the Brussels 00:05 tick', () => {
+  test('cron sends at the Brussels 00:05 tick and enters recovery mode otherwise', () => {
     expect(evaluateProductionGate({ isTest: false, enabled: true, authMode: 'cron', isDailyTick: true }))
       .toEqual({ action: 'run' });
+    // PB-DAILY-EMAIL-RETRY-001: hourly ticks outside 00:xx Brussels no longer
+    // skip — they may recover a FAILED/PARTIAL daily without delivered email.
     expect(evaluateProductionGate({ isTest: false, enabled: true, authMode: 'cron', isDailyTick: false }))
-      .toEqual({ action: 'skip', reason: 'outside_brussels_daily_tick' });
+      .toEqual({ action: 'check_recovery' });
   });
 
   test('admin (service_role) can retry manually once the PO enabled the flag', () => {
     expect(evaluateProductionGate({ isTest: false, enabled: true, authMode: 'admin', isDailyTick: false }))
       .toEqual({ action: 'run' });
+  });
+});
+
+// ── PB-DAILY-EMAIL-RETRY-001 ────────────────────────────────────────────────
+
+test.describe('SMTP error classification (transient vs permanent)', () => {
+  test('the real one.com incident error is retryable (blacklisted + try again later)', () => {
+    // Real sanitized shape of the 2026-09-29 incident (numbers redacted).
+    const incident = 'Invalid login: 12.34.56.78 [B1.A11] 12.34.56.78 temporarily blacklisted, try again later';
+    expect(classifySmtpError(new Error(incident))).toBe('retryable');
+  });
+
+  test('common transient errors are retryable without depending on [B1.A11]', () => {
+    for (const msg of [
+      '421 Service not available',
+      '450 mailbox unavailable',
+      '451 local error in processing',
+      '452 insufficient system storage',
+      'Connection reset by peer',
+      'connection closed unexpectedly',
+      'connect ETIMEDOUT 1.2.3.4:465',
+      'email timeout after 30s',
+    ]) {
+      expect(classifySmtpError(new Error(msg)), msg).toBe('retryable');
+    }
+  });
+
+  test('permanent errors are NOT retryable', () => {
+    for (const msg of [
+      'email_provider_not_configured',
+      'Invalid recipient: no such user',
+      '550 Requested action not taken',
+      '535 Authentication credentials invalid',
+      'Invalid login: bad password',
+    ]) {
+      expect(classifySmtpError(new Error(msg)), msg).toBe('non_retryable');
+    }
+  });
+
+  test('unknown errors are conservatively non-retryable (bounded by hourly recovery)', () => {
+    expect(classifySmtpError(new Error('something odd happened'))).toBe('non_retryable');
+    expect(classifySmtpError(null)).toBe('non_retryable');
+  });
+});
+
+test.describe('sendWithRetry (T1/T2/T3/T7)', () => {
+  const fastPolicy = { maxAttempts: 3, delaysMs: [1, 1] };
+  const logOf = (entries: Array<{ action: string; attempt: number; reason?: string }>) =>
+    (e: { action: string; attempt: number; reason?: string }) => entries.push(e);
+
+  // T1 — normal send: first attempt succeeds.
+  test('T1: SMTP OK on first attempt → sent, single send call', async () => {
+    let calls = 0;
+    const entries: Array<{ action: string; attempt: number; reason?: string }> = [];
+    const out = await sendWithRetry(async () => { calls++; }, fastPolicy, logOf(entries));
+    expect(out).toEqual({ sent: true, attempts: 1, lastError: null, lastErrorClass: null });
+    expect(calls).toBe(1);
+    expect(entries).toEqual([{ action: 'email_attempt', attempt: 1 }]);
+  });
+
+  // T2 — transient failure + immediate recovery within the same execution.
+  test('T2: attempt 1 transient failure, attempt 2 success → SENT, one delivered email', async () => {
+    let calls = 0;
+    const entries: Array<{ action: string; attempt: number; reason?: string }> = [];
+    const out = await sendWithRetry(async () => {
+      calls++;
+      if (calls === 1) throw new Error('temporarily blacklisted, try again later');
+    }, fastPolicy, logOf(entries));
+    expect(out.sent).toBe(true);
+    expect(out.attempts).toBe(2);
+    expect(calls).toBe(2); // two send calls, but only ONE delivery (first threw)
+    expect(entries).toEqual([
+      { action: 'email_attempt', attempt: 1 },
+      { action: 'email_retry', attempt: 2, reason: 'smtp_retryable' },
+      { action: 'email_attempt', attempt: 2 },
+    ]);
+  });
+
+  // T3 — three transient failures → FAILED after exhausting attempts.
+  test('T3: three SMTP failures → not sent, 3 attempts, sanitized error kept', async () => {
+    let calls = 0;
+    const entries: Array<{ action: string; attempt: number; reason?: string }> = [];
+    const out = await sendWithRetry(async () => {
+      calls++;
+      throw new Error('421 temporarily blacklisted');
+    }, fastPolicy, logOf(entries));
+    expect(out.sent).toBe(false);
+    expect(out.attempts).toBe(3);
+    expect(calls).toBe(3);
+    expect(out.lastErrorClass).toBe('retryable');
+    expect(out.lastError).toContain('temporarily blacklisted');
+    expect(entries.filter((e) => e.action === 'email_retry')).toHaveLength(2);
+  });
+
+  // T7 — non-retryable failure: no retry loop.
+  test('T7: email_provider_not_configured → single attempt, no retry loop', async () => {
+    let calls = 0;
+    const entries: Array<{ action: string; attempt: number; reason?: string }> = [];
+    const out = await sendWithRetry(async () => {
+      calls++;
+      throw new Error('email_provider_not_configured');
+    }, fastPolicy, logOf(entries));
+    expect(out.sent).toBe(false);
+    expect(out.attempts).toBe(1);
+    expect(calls).toBe(1); // permanent error → never retried
+    expect(out.lastErrorClass).toBe('non_retryable');
+    expect(entries).toEqual([{ action: 'email_attempt', attempt: 1 }]);
+  });
+});
+
+test.describe('claimDecision — exactly-once claim semantics (T4/T5/T6)', () => {
+  const freshGenerating = (updatedAgoMs: number) => ({
+    status: 'GENERATING', attempts: 1, email_ok: null,
+    updated_at: new Date(Date.now() - updatedAgoMs).toISOString(),
+  });
+
+  // T4 — a FAILED daily (email never sent) is recoverable.
+  test('T4: FAILED with email_ok=false and attempts left → reclaim (hourly recovery allowed)', () => {
+    const row = { status: 'FAILED', attempts: 1, email_ok: false, updated_at: new Date().toISOString() };
+    expect(claimDecision(row, { recoveryMode: true })).toBe('reclaim');
+    expect(claimDecision(row, { recoveryMode: false })).toBe('reclaim');
+  });
+
+  // T4b — recovery mode never creates a new daily outside the 00:xx tick.
+  test('T4b: no row at a non-daily tick → nothing_to_recover (no out-of-schedule daily)', () => {
+    expect(claimDecision(null, { recoveryMode: true })).toBe('nothing_to_recover');
+    expect(claimDecision(null, { recoveryMode: false })).toBe('insert_fresh');
+  });
+
+  // T5 — SENT never re-sends; delivered PARTIAL never re-sends either.
+  test('T5: SENT and email_ok=true rows are never claimable → provider.send stays at 0', () => {
+    const sent = { status: 'SENT', attempts: 1, email_ok: true, updated_at: new Date().toISOString() };
+    expect(claimDecision(sent, { recoveryMode: true })).toBe('already_sent');
+    expect(claimDecision(sent, { recoveryMode: false })).toBe('already_sent');
+    // PARTIAL because a data source failed, but the email WAS delivered:
+    const partialDelivered = { status: 'PARTIAL', attempts: 1, email_ok: true, updated_at: new Date().toISOString() };
+    expect(claimDecision(partialDelivered, { recoveryMode: true })).toBe('already_delivered');
+    expect(claimDecision(partialDelivered, { recoveryMode: false })).toBe('already_delivered');
+  });
+
+  // T6 — concurrency: two claimers race on the same report_date; only one wins.
+  test('T6: after claimant 1 transitions FAILED→GENERATING, claimant 2 is rejected', () => {
+    const failed = { status: 'FAILED', attempts: 1, email_ok: false, updated_at: new Date().toISOString() };
+    // Claimant 1 reclaims and flips the row to a fresh GENERATING (what the
+    // atomic conditional UPDATE persists):
+    expect(claimDecision(failed, { recoveryMode: true })).toBe('reclaim');
+    const inFlight = freshGenerating(1000);
+    // Claimant 2 reads the row mid-flight → rejected; no second email.
+    expect(claimDecision(inFlight, { recoveryMode: true })).toBe('reject_in_progress');
+    expect(claimDecision(inFlight, { recoveryMode: false })).toBe('reject_in_progress');
+  });
+
+  // T6b — stale GENERATING (crashed execution) becomes reclaimable after 15 min.
+  test('T6b: GENERATING older than the staleness threshold is reclaimed, never before', () => {
+    expect(claimDecision(freshGenerating(5 * 60 * 1000), { recoveryMode: true })).toBe('reject_in_progress');
+    expect(claimDecision(freshGenerating(16 * 60 * 1000), { recoveryMode: true })).toBe('stale_reclaim');
+  });
+
+  // Attempt cap: MAX_DAILY_ATTEMPTS bounds the recovery chain.
+  test('recovery is capped at MAX_DAILY_ATTEMPTS claims per report_date', () => {
+    const exhausted = { status: 'FAILED', attempts: 4, email_ok: false, updated_at: new Date().toISOString() };
+    expect(claimDecision(exhausted, { recoveryMode: true })).toBe('reject_exhausted');
+    const lastAllowed = { status: 'FAILED', attempts: 3, email_ok: false, updated_at: new Date().toISOString() };
+    expect(claimDecision(lastAllowed, { recoveryMode: true })).toBe('reclaim');
+  });
+});
+
+test.describe('Recovery timezone semantics (T8)', () => {
+  // The hourly recovery must target the SAME report_date the 00:05 run used:
+  // at any hour of the Brussels day, "previous Brussels day" is stable.
+  test('T8: at 01:05 Brussels the window still maps to the failed daily (CET)', () => {
+    // 2026-01-15 00:05 Brussels (CET) = 2026-01-14 23:05 UTC → report 01-14.
+    const daily = getPreviousBrusselsDayWindow(new Date('2026-01-14T23:05:00.000Z'));
+    // 2026-01-15 13:05 Brussels (CET) = 13:05 UTC → still reports 01-14.
+    const later = getPreviousBrusselsDayWindow(new Date('2026-01-15T13:05:00.000Z'));
+    expect(daily.reportDate).toBe('2026-01-14');
+    expect(later.reportDate).toBe('2026-01-14');
+    expect(daily.startUtc).toBe(later.startUtc);
+    expect(daily.endUtc).toBe(later.endUtc);
+  });
+
+  test('T8: CEST hourly recovery maps to the same window as the daily tick', () => {
+    // 2026-07-15 00:05 Brussels (CEST) = 2026-07-14 22:05 UTC.
+    const daily = getPreviousBrusselsDayWindow(new Date('2026-07-14T22:05:00.000Z'));
+    // 2026-07-15 09:05 Brussels (CEST) = 07:05 UTC.
+    const later = getPreviousBrusselsDayWindow(new Date('2026-07-15T07:05:00.000Z'));
+    expect(daily.reportDate).toBe('2026-07-14');
+    expect(later.reportDate).toBe('2026-07-14');
+    // Brussels 2026-07-14 (CEST, UTC+2) = [07-13 22:00Z, 07-14 22:00Z).
+    expect(daily.startUtc).toBe('2026-07-13T22:00:00.000Z');
+    expect(daily.endUtc).toBe('2026-07-14T22:00:00.000Z');
+  });
+
+  test('T8: the daily tick is only the Brussels 00:xx hour in both CET and CEST', () => {
+    expect(isBrusselsDailyTick(new Date('2026-01-14T23:05:00.000Z'))).toBe(true); // 00:05 CET
+    expect(isBrusselsDailyTick(new Date('2026-07-14T22:05:00.000Z'))).toBe(true); // 00:05 CEST
+    expect(isBrusselsDailyTick(new Date('2026-01-15T13:05:00.000Z'))).toBe(false); // 14:05 CET
+    expect(isBrusselsDailyTick(new Date('2026-07-15T07:05:00.000Z'))).toBe(false); // 09:05 CEST
   });
 });
 

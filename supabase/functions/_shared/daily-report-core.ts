@@ -119,19 +119,23 @@ export interface ProductionGateInput {
 
 export type ProductionGateDecision =
   | { action: "run" }
-  | { action: "skip"; reason: "production_disabled" | "outside_brussels_daily_tick" };
+  | { action: "check_recovery" }
+  | { action: "skip"; reason: "production_disabled" };
 
 /**
  * Decide si procede el envío:
  *   - test: siempre corre (sin claim ni consumo del report_date productivo);
  *   - envío productivo desactivado (flag del PO): skip;
- *   - cron fuera de la hora Brussels 00:xx: skip (tick diario 00:05);
+ *   - cron en la hora Brussels 00:xx: envío normal del día;
+ *   - cron fuera de esa hora: modo recovery — puede recuperar un Daily que
+ *     quedó FAILED/PARTIAL sin correo (email_ok=false) y con intentos
+ *     restantes (PB-DAILY-EMAIL-RETRY-001);
  *   - admin (service_role, flag activo): reintento manual permitido.
  */
 export function evaluateProductionGate(i: ProductionGateInput): ProductionGateDecision {
   if (i.isTest) return { action: "run" };
   if (!i.enabled) return { action: "skip", reason: "production_disabled" };
-  if (i.authMode === "cron" && !i.isDailyTick) return { action: "skip", reason: "outside_brussels_daily_tick" };
+  if (i.authMode === "cron" && !i.isDailyTick) return { action: "check_recovery" };
   return { action: "run" };
 }
 
@@ -422,6 +426,142 @@ export function sanitizeText(input: string): string {
 export function sanitizeError(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err ?? "unknown_error");
   return sanitizeText(msg).slice(0, 300);
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// SMTP: clasificación de errores y envío con retry (PB-DAILY-EMAIL-RETRY-001)
+// ──────────────────────────────────────────────────────────────────────────
+
+export type SmtpErrorClass = "retryable" | "non_retryable";
+
+// Patrones transitorios: se comprueban PRIMERO (el error real del incidente
+// one.com combina "Invalid login" con "temporarily blacklisted, try again
+// later"; la señal transitoria manda). No se depende del código "[B1.A11]".
+const RETRYABLE_SMTP_PATTERNS: RegExp[] = [
+  /temporarily blacklisted/i,
+  /blacklist/i,
+  /try again later/i,
+  /greylist/i,
+  /timeout|timed?\s*out|etimedout|esocket/i,
+  /connection\s+(reset|closed|refused|dropped|error)|econnreset|epipe|econnrefused|eai_again|ehostunreach|enetunreach/i,
+  /\b(421|450|451|452)\b/,
+  /server busy|too many connections|service unavailable|insufficient system storage/i,
+];
+
+// Errores permanentes: reintentar no aporta nada (solo retrasa el FAILED).
+const NON_RETRYABLE_SMTP_PATTERNS: RegExp[] = [
+  /email_provider_not_configured/,
+  /invalid recipient|no such user|unknown user|bad destination|address rejected/i,
+  /\b(535|550|551|552|553|554)\b/,
+  /sender rejected|message rejected|authentication (failed|required)|invalid login/i,
+  /relaying denied|dns ?error/i,
+];
+
+/** Clasifica un error de envío SMTP como transitorio o permanente. */
+export function classifySmtpError(err: unknown): SmtpErrorClass {
+  const msg = err instanceof Error ? err.message : String(err ?? "");
+  if (RETRYABLE_SMTP_PATTERNS.some((re) => re.test(msg))) return "retryable";
+  if (NON_RETRYABLE_SMTP_PATTERNS.some((re) => re.test(msg))) return "non_retryable";
+  // Desconocido: conservador, sin retry dentro de la misma ejecución
+  // (el recovery horario sigue disponible, acotado por MAX_DAILY_ATTEMPTS).
+  return "non_retryable";
+}
+
+export interface SmtpRetryPolicy {
+  maxAttempts: number;
+  delaysMs: number[];
+}
+
+/** 3 intentos: envío + ~2s + reintento + ~5s + reintento final. */
+export const SMTP_RETRY_POLICY: SmtpRetryPolicy = { maxAttempts: 3, delaysMs: [2000, 5000] };
+
+export interface SmtpSendOutcome {
+  sent: boolean;
+  attempts: number;
+  lastError: string | null;
+  lastErrorClass: SmtpErrorClass | null;
+}
+
+/**
+ * Envía con retry/backoff SOLO para errores clasificados como transitorios.
+ * El `send` inyectado debe lanzar en fallo; el log recibe entradas
+ * estructuradas (action/attempt/reason) sin mensajes de error crudos.
+ */
+export async function sendWithRetry(
+  send: () => Promise<void>,
+  policy: SmtpRetryPolicy,
+  log: (entry: { action: string; attempt: number; reason?: string }) => void,
+): Promise<SmtpSendOutcome> {
+  let attempts = 0;
+  let lastError: string | null = null;
+  let lastErrorClass: SmtpErrorClass | null = null;
+
+  for (let i = 1; i <= policy.maxAttempts; i++) {
+    attempts = i;
+    log({ action: "email_attempt", attempt: i });
+    try {
+      await send();
+      return { sent: true, attempts, lastError: null, lastErrorClass: null };
+    } catch (e) {
+      lastError = sanitizeError(e);
+      lastErrorClass = classifySmtpError(e);
+      if (lastErrorClass === "non_retryable" || i === policy.maxAttempts) break;
+      log({ action: "email_retry", attempt: i + 1, reason: `smtp_${lastErrorClass}` });
+      await new Promise((r) => setTimeout(r, policy.delaysMs[i - 1] ?? 5000));
+    }
+  }
+  return { sent: false, attempts, lastError, lastErrorClass };
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Recovery de un Daily fallido (PB-DAILY-EMAIL-RETRY-001)
+// ──────────────────────────────────────────────────────────────────────────
+
+/** Máximo de claims del mismo report_date: 00:05 + hasta 3 recoveries. */
+export const MAX_DAILY_ATTEMPTS = 4;
+/** Un GENERATING con updated_at más antiguo que esto se considera abandonado. */
+export const STALE_GENERATING_MS = 15 * 60 * 1000;
+
+export interface RunRow {
+  status: string;
+  attempts: number | null;
+  email_ok: boolean | null;
+  updated_at: string | null;
+}
+
+export type ClaimDecisionAction =
+  | "already_sent"
+  | "already_delivered"
+  | "insert_fresh"
+  | "reclaim"
+  | "stale_reclaim"
+  | "reject_in_progress"
+  | "reject_exhausted"
+  | "nothing_to_recover";
+
+/**
+ * Decisión pura sobre qué hacer con el claim de un report_date, a partir del
+ * estado persistido. El SQL de claimRun ejecuta la transición de forma ATÓMICA
+ * (UPDATE condicional que re-verifica el estado bajo el row lock), así que dos
+ * ejecuciones concurrentes nunca pueden reclamar la misma fila: solo la
+ * primera ve la transición FAILED→GENERATING.
+ *
+ * `recoveryMode` = tick horario fuera de las 00:xx Brussels: solo puede
+ * reclamar filas existentes fallidas (nunca crea un Daily nuevo a deshora).
+ */
+export function claimDecision(row: RunRow | null, opts: { recoveryMode: boolean }, now = new Date()): ClaimDecisionAction {
+  if (!row) return opts.recoveryMode ? "nothing_to_recover" : "insert_fresh";
+  if (row.status === "SENT") return "already_sent";
+  // El correo ya salió (estado PARTIAL por fuentes, o FAILED tardío): un
+  // reintento duplicaría el email. EXACTLY-ONCE inquebrantable.
+  if (row.email_ok === true) return "already_delivered";
+  if (row.status === "GENERATING") {
+    const stale = !!row.updated_at &&
+      now.getTime() - new Date(row.updated_at).getTime() > STALE_GENERATING_MS;
+    return stale ? "stale_reclaim" : "reject_in_progress";
+  }
+  if ((row.attempts ?? 0) >= MAX_DAILY_ATTEMPTS) return "reject_exhausted";
+  return "reclaim";
 }
 
 // ──────────────────────────────────────────────────────────────────────────

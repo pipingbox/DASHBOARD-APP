@@ -36,6 +36,10 @@ import {
   brusselsWallToUtc,
   isBrusselsDailyTick,
   evaluateProductionGate,
+  claimDecision,
+  sendWithRetry,
+  SMTP_RETRY_POLICY,
+  STALE_GENERATING_MS,
   buildRecommendations,
   renderReportHtml,
   renderReportText,
@@ -52,6 +56,7 @@ import {
   hogqlErrors,
   type DailyMetrics,
   type SourceStatus,
+  type RunRow,
 } from "../_shared/daily-report-core.ts";
 
 const corsHeaders = {
@@ -234,53 +239,99 @@ async function collectMetrics(
   return { metrics: m, routes };
 }
 
-// ── Claim idempotente del día ─────────────────────────────────────────────
+// ── Claim idempotente del día (PB-DAILY-EMAIL-RETRY-001) ──────────────────
+// EXACTLY-ONCE: la transición a GENERATING es un UPDATE condicional atómico
+// (el WHERE re-verifica status/email_ok bajo el row lock). Dos ejecuciones
+// concurrentes sobre el mismo report_date no pueden reclamar ambas: la
+// segunda afecta a 0 filas. Las filas SENT o con email_ok=true jamás se
+// tocan (un Daily cuyo correo salió no puede volver a enviarse).
 async function claimRun(
   supabase: SupabaseClient,
   reportDate: string,
   correlationId: string,
-): Promise<{ claimed: boolean; alreadySent: boolean }> {
+  opts: { recoveryMode: boolean },
+): Promise<{ claimed: boolean; skipReason: string | null }> {
   const logErr = (op: string, error: unknown) =>
     console.error(JSON.stringify({
       correlationId, action: "claim_db_error", op,
       error: sanitizeError((error as { message?: string })?.message ?? error),
     }));
 
-  // Si ya existe un SENT para este día, no reenviar.
   const { data: existing, error: selectError } = await supabase
     .from("app_daily_intelligence_runs")
-    .select("status, attempts")
+    .select("status, attempts, email_ok, updated_at")
     .eq("report_date", reportDate)
     .maybeSingle();
   if (selectError) {
     logErr("select", selectError);
-    return { claimed: false, alreadySent: false };
+    return { claimed: false, skipReason: "claim_db_error" };
   }
-  if (existing?.status === "SENT") return { claimed: false, alreadySent: true };
 
-  if (!existing) {
-    const { error } = await supabase.from("app_daily_intelligence_runs").insert({
-      report_date: reportDate,
-      status: "GENERATING",
-      attempts: 1,
-      correlation_id: correlationId,
-    });
-    // UNIQUE(report_date): otro proceso ganó el claim.
-    if (error) {
-      logErr("insert", error);
-      return { claimed: false, alreadySent: false };
+  const decision = claimDecision((existing ?? null) as RunRow | null, opts);
+
+  switch (decision) {
+    case "already_sent":
+    case "already_delivered":
+      // SENT o correo ya entregado (PARTIAL con email_ok): nunca reenviar.
+      return { claimed: false, skipReason: "already_sent" };
+    case "nothing_to_recover":
+      // Tick horario de recovery sin Daily fallido que recuperar.
+      return { claimed: false, skipReason: "nothing_to_recover" };
+    case "reject_in_progress":
+      // Otra ejecución tiene el claim vivo (GENERATING fresco).
+      return { claimed: false, skipReason: "claim_in_progress" };
+    case "reject_exhausted":
+      return { claimed: false, skipReason: "recovery_exhausted" };
+    case "insert_fresh": {
+      const { error } = await supabase.from("app_daily_intelligence_runs").insert({
+        report_date: reportDate,
+        status: "GENERATING",
+        attempts: 1,
+        correlation_id: correlationId,
+      });
+      // UNIQUE(report_date): otra ejecución concurrente ganó el claim.
+      if (error) {
+        logErr("insert", error);
+        return { claimed: false, skipReason: "claim_contended" };
+      }
+      return { claimed: true, skipReason: null };
     }
-    return { claimed: true, alreadySent: false };
+    case "reclaim":
+    case "stale_reclaim": {
+      // Transición atómica condicional: re-verifica el estado en el WHERE.
+      const nowIso = new Date().toISOString();
+      let q = supabase
+        .from("app_daily_intelligence_runs")
+        .update({
+          status: "GENERATING",
+          attempts: (existing?.attempts ?? 0) + 1,
+          correlation_id: correlationId,
+          updated_at: nowIso,
+        })
+        .eq("report_date", reportDate);
+      if (decision === "reclaim") {
+        // Solo FAILED/PARTIAL cuyo correo NUNCA salió (email_ok null/false).
+        q = q
+          .in("status", ["FAILED", "PARTIAL"])
+          .or("email_ok.is.null,email_ok.eq.false");
+      } else {
+        // GENERATING abandonado (ejecución muerta hace >15 min).
+        q = q
+          .eq("status", "GENERATING")
+          .lt("updated_at", new Date(Date.now() - STALE_GENERATING_MS).toISOString());
+      }
+      const { data: updated, error } = await q.select();
+      if (error) {
+        logErr("update", error);
+        return { claimed: false, skipReason: "claim_db_error" };
+      }
+      // 0 filas afectadas: el estado cambió bajo nosotros (ganador concurrente).
+      if (!updated || updated.length === 0) {
+        return { claimed: false, skipReason: "claim_contended" };
+      }
+      return { claimed: true, skipReason: null };
+    }
   }
-
-  // Reintento de una ejecución previa fallida/parcial.
-  const { error } = await supabase
-    .from("app_daily_intelligence_runs")
-    .update({ status: "GENERATING", attempts: (existing.attempts ?? 0) + 1, correlation_id: correlationId, updated_at: new Date().toISOString() })
-    .eq("report_date", reportDate)
-    .neq("status", "SENT");
-  if (error) logErr("update", error);
-  return { claimed: !error, alreadySent: false };
 }
 
 async function finalizeRun(
@@ -343,21 +394,38 @@ async function generateAndSend(
   if (!provider.isConfigured()) {
     return { ok: false, status: "FAILED", sources, sendError: "email_provider_not_configured" };
   }
-  try {
-    await withTimeout(
-      provider.send({
-        to: recipient,
-        subject: reportSubject(window.reportDate, isTest),
-        html,
-        text,
-      }),
-      SOURCE_TIMEOUT_MS,
-      "email",
-    );
-    sources.email = true;
-  } catch (e) {
-    return { ok: false, status: "FAILED", sources, sendError: sanitizeError(e) };
+  // PB-DAILY-EMAIL-RETRY-001: retry con backoff SOLO para errores SMTP
+  // transitorios (blacklist temporal, timeout, conexión, 4xx). Los permanentes
+  // fallan rápido; el recovery horario queda acotado por MAX_DAILY_ATTEMPTS.
+  const sendLog = (e: { action: string; attempt: number; reason?: string }) =>
+    console.log(JSON.stringify({ correlationId, report_date: window.reportDate, ...e }));
+  const sendResult = await sendWithRetry(
+    () =>
+      withTimeout(
+        provider.send({
+          to: recipient,
+          subject: reportSubject(window.reportDate, isTest),
+          html,
+          text,
+        }).then(() => undefined),
+        SOURCE_TIMEOUT_MS,
+        "email",
+      ),
+    SMTP_RETRY_POLICY,
+    sendLog,
+  );
+  if (!sendResult.sent) {
+    console.error(JSON.stringify({
+      correlationId,
+      action: "email_failed",
+      report_date: window.reportDate,
+      attempts: sendResult.attempts,
+      error_class: sendResult.lastErrorClass,
+      error: sendResult.lastError,
+    }));
+    return { ok: false, status: "FAILED", sources, sendError: sendResult.lastError ?? "email_send_failed" };
   }
+  sources.email = true;
 
   // Verificación del contenido (secciones/recomendaciones/PII) para evidencia.
   const pii = scanForPii(`${html}\n${text}`);
@@ -372,7 +440,6 @@ async function generateAndSend(
     subject: reportSubject(window.reportDate, isTest),
     recipient_domain: "pipingbox.com",
   };
-  void correlationId;
 
   const status = executionStatus === "SUCCESS" ? (isTest ? "SENT_TEST" : "SENT") : "PARTIAL";
   return { ok: true, status, sources, sendError, verification };
@@ -443,12 +510,16 @@ Deno.serve(async (req) => {
   }
 
   // ── Gate de producción: activación por el PO + tick diario Brussels 00:05.
+  // PB-DAILY-EMAIL-RETRY-001: los ticks horarios fuera de las 00:xx Brussels
+  // entran en modo recovery (recuperar un FAILED de email), no en skip.
   const enabled = Deno.env.get("DAILY_REPORT_ENABLED") === "true";
-  const gate = evaluateProductionGate({ isTest, enabled, authMode, isDailyTick: isBrusselsDailyTick(new Date()) });
+  const isDailyTick = isBrusselsDailyTick(new Date());
+  const gate = evaluateProductionGate({ isTest, enabled, authMode, isDailyTick });
   if (gate.action === "skip") {
     log({ action: "skip", reason: gate.reason, auth_mode: authMode });
     return json({ ok: true, skipped: gate.reason, auth_mode: authMode, correlation_id: correlationId });
   }
+  const recoveryMode = gate.action === "check_recovery";
 
   const window = forcedDate ? windowForReportDate(forcedDate) : getPreviousBrusselsDayWindow(new Date());
 
@@ -470,14 +541,16 @@ Deno.serve(async (req) => {
   }
 
   // ── Producción: claim idempotente → pipeline → finalize fail-closed.
-  const { claimed, alreadySent } = await claimRun(supabase, window.reportDate, correlationId);
-  if (alreadySent) {
-    log({ action: "skip_already_sent", report_date: window.reportDate });
-    return json({ ok: true, skipped: "already_sent", report_date: window.reportDate, correlation_id: correlationId });
+  if (recoveryMode) {
+    log({ action: "recovery_attempt", report_date: window.reportDate });
   }
-  if (!claimed) {
-    log({ action: "skip_claim_contended", report_date: window.reportDate });
-    return json({ ok: true, skipped: "claim_contended", report_date: window.reportDate, correlation_id: correlationId });
+  const claim = await claimRun(supabase, window.reportDate, correlationId, { recoveryMode });
+  if (!claim.claimed) {
+    log({ action: "skip", reason: claim.skipReason, report_date: window.reportDate, recovery: recoveryMode });
+    return json({
+      ok: true, skipped: claim.skipReason, report_date: window.reportDate,
+      correlation_id: correlationId, recovery: recoveryMode,
+    });
   }
 
   try {
