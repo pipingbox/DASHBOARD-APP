@@ -48,8 +48,11 @@ export function JobCard({ job, applied, applying, onApply }: JobCardProps) {
     ? t(optionLabelKey('contractTypes', getContractTypeLabel(job.job_type)))
     : job.job_type;
 
-  // Country label: structured column first (i18n when known), raw otherwise.
-  const countryRaw = job.country ?? job.location ?? null;
+  // Location label: city/site first (PB-JOBS-UMICORE-MECHANIC-001 — the
+  // visible location must show the city, e.g. "Antwerpen, Belgium"), falling
+  // back to the structured country column. Country filtering still uses
+  // `country` (Jobs.tsx getCountry), so normalization is preserved.
+  const countryRaw = job.location ?? job.country ?? null;
   const countryLabel = countryRaw
     ? OPTION_COUNTRY_KEYS[countryRaw]
       ? t(OPTION_COUNTRY_KEYS[countryRaw])
