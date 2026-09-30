@@ -125,7 +125,10 @@ export function InviteToJobModal({
           recipientId: candidateUserId,
           actorId: authUser.id,
           type: 'job_invitation',
-          postTitle: selectedJob?.title || 'Job',
+          title: selectedJob?.title || 'Job',
+          relatedEntityType: 'job',
+          relatedEntityId: selectedJobId ?? undefined,
+          actionUrl: '/jobs',
           actorName,
         });
       } catch (notifErr) {

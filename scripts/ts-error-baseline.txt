@@ -1,8 +1,5 @@
 # PB-INFRA-TS-GATE-001 — TypeScript diagnostic baseline (versioned, multiplicity-aware).
 # Format: app/frontend/<path>|<TScode>|<normalized message>|<expected count>  (no line/col by design).
-# 5 diagnostics across 4 fingerprints. This file may ONLY shrink
+# 1 diagnostics across 1 fingerprints. This file may ONLY shrink
 # (--prune-baseline) — adding fingerprints or raising counts requires a ticket + PO review.
-app/frontend/src/components/InviteToJobModal.tsx|TS2353|Object literal may only specify known properties, and 'postTitle' does not exist in type 'CreateNotificationArgs'.|1
 app/frontend/src/components/admin/AdminWorkforceRequestDetail.tsx|TS2339|Property 'location' does not exist on type 'WorkforceRequestRow'.|1
-app/frontend/src/pages/CommunityChannel.tsx|TS2353|Object literal may only specify known properties, and 'postId' does not exist in type 'CreateNotificationArgs'.|1
-app/frontend/src/pages/CommunityPost.tsx|TS2353|Object literal may only specify known properties, and 'postId' does not exist in type 'CreateNotificationArgs'.|2

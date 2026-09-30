@@ -189,9 +189,10 @@ export default function CommunityPost() {
           recipientId: post.user_id,
           actorId: user.id,
           type: 'like',
-          postId: post.id,
-          postTitle: post.title,
-          postChannelSlug: channelSlug ?? null,
+          title: post.title ?? undefined,
+          relatedEntityType: 'community_post',
+          relatedEntityId: post.id,
+          actionUrl: channelSlug ? `/community/${channelSlug}/post/${post.id}` : undefined,
           actorName: profile?.full_name ?? null,
         });
       }
@@ -292,7 +293,7 @@ export default function CommunityPost() {
       return;
     }
     setSubmittingComment(true);
-    const { data: newComment, error: insErr } = await supabase
+    const { error: insErr } = await supabase
       .from(TABLES.communityComments)
       .insert({
         post_id: post.id,
@@ -310,10 +311,10 @@ export default function CommunityPost() {
       recipientId: post.user_id,
       actorId: user.id,
       type: 'comment',
-      postId: post.id,
-      commentId: (newComment as { id: string } | null)?.id,
-      postTitle: post.title,
-      postChannelSlug: channelSlug ?? null,
+      title: post.title ?? undefined,
+      relatedEntityType: 'community_post',
+      relatedEntityId: post.id,
+      actionUrl: channelSlug ? `/community/${channelSlug}/post/${post.id}` : undefined,
       actorName: profile?.full_name ?? null,
     });
     setCommentBody('');
