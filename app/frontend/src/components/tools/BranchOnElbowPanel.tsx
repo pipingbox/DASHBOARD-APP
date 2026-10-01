@@ -1,11 +1,18 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { ELBOW_DATA, SCHEDULE_WT } from '@/tools/data/elbowData';
 import { computeBranchOnElbow, type BranchOnElbowDatum, type BranchOnElbowErrorCode, type BranchOnElbowStation } from '@/tools/branch/branchOnElbowGeometry';
 import { buildBranchOnElbowDevelopment } from '@/tools/branch/branchOnElbowDevelopmentSvg';
 import { buildBranchOnElbowPicaje } from '@/tools/branch/branchOnElbowPicajeSvg';
 import { buildBranchOnElbowSchematic } from '@/tools/branch/branchOnElbowSchematicSvg';
+import { buildBranchOnElbowCutTemplate } from '@/tools/branch/branchOnElbowTemplateSvg';
+import { buildBranchOnElbowMarkingGuide } from '@/tools/branch/branchOnElbowMarkingGuideSvg';
+import { buildBranchOnElbowPdfLabels } from '@/tools/branch/branchOnElbowPdfLabels';
+import { svgPagesToPdf } from '@/tools/branch/svgMmToPdf';
+import { PDF_PAGE_FORMATS, type PdfPageFormatId } from '@/tools/branch/pdfPageFormat';
 import { formatMm } from '@/tools/branch/formatMm';
 
 type GraphicTab = 'injerto' | 'picaje' | 'geometry';
@@ -44,6 +51,7 @@ export default function BranchOnElbowPanel() {
   const [datumType, setDatumType] = useState<BranchOnElbowDatum['type']>('EJE');
   const [fe, setFe] = useState('20');
   const [graphic, setGraphic] = useState<GraphicTab>('injerto');
+  const [pdfFormat, setPdfFormat] = useState<PdfPageFormatId>('A4');
 
   const branch = ELBOW_DATA.find(pipe => pipe.nps === branchNps)!;
   const elbow = ELBOW_DATA.find(pipe => pipe.nps === elbowNps)!;
@@ -128,6 +136,54 @@ export default function BranchOnElbowPanel() {
       notToScale: t('tools.branchOnElbow.notToScale'),
     })?.svg ?? null;
   }, [result, graphic, datumType, radius, height, length, elbow.od, branch.od, t]);
+
+  /* U4 — physical fabrication outputs. Both artifacts are built in millimetres
+     straight from the U1 result and converted with the shared PDF engine; the
+     paper format only changes page size and tiling, never the geometry. */
+  const datumLabel = datumType === 'FE'
+    ? `${t('tools.branchOnElbow.datumFE')} = ${result.datumOffsetMm >= 0 ? '+' : ''}${formatMm(result.datumOffsetMm)} mm`
+    : t(`tools.branchOnElbow.datum${datumType}`);
+  const branchLabel = `${branchNps} Sch ${schedule} · OD ${formatMm(branch.od)} mm · ID ${formatMm(branchId)} mm`;
+  const elbowLabel = `${elbowNps} · D ${formatMm(elbow.od)} mm · R ${formatMm(parseMm(radius))} mm · L ${formatMm(parseMm(length))} mm · a ${formatMm(parseMm(height))} mm`;
+  /* Screen text and PDF text are not interchangeable: the sheets go through a
+     PDF-safe label layer (ASCII folding + English fallback for locales the PDF
+     writer cannot encode) so no fabrication label can ever print as '?'. */
+  const pdfLabels = useMemo(() => buildBranchOnElbowPdfLabels({
+    translate: (key: string) => t(key),
+    datumLabel, branchLabel, elbowLabel,
+  }), [datumLabel, branchLabel, elbowLabel, t]);
+  const cutTemplate = useMemo(() => result.valid ? buildBranchOnElbowCutTemplate(result, {
+    format: pdfFormat,
+    meta: pdfLabels.cut,
+  }) : null, [result, pdfFormat, pdfLabels]);
+  const markingGuide = useMemo(() => result.valid ? buildBranchOnElbowMarkingGuide(result, {
+    format: pdfFormat,
+    elbowOuterDiameterMm: elbow.od,
+    meta: pdfLabels.guide,
+  }) : null, [result, pdfFormat, elbow.od, pdfLabels]);
+
+  const downloadPdf = (bytes: Uint8Array, filename: string) => {
+    const blob = new Blob([new Uint8Array(bytes)], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    toast.success(t('tools.branchLayout.pdfDownloaded'));
+  };
+  const slug = (value: string) => value.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+  const fileStem = `pipingbox-tubo-codo-${slug(branchNps)}-sch${slug(schedule)}-on-${slug(elbowNps)}-${slug(datumType === 'FE' ? `fe${formatMm(result.datumOffsetMm)}` : datumType)}-${pdfFormat}`;
+  const handleDownloadCutPdf = () => {
+    if (!cutTemplate) return;
+    downloadPdf(svgPagesToPdf(cutTemplate.tiles.map(tile => ({ svg: tile.svg, widthMm: tile.widthMm, heightMm: tile.heightMm }))), `${fileStem}-cut-template-1to1.pdf`);
+  };
+  const handleDownloadGuidePdf = () => {
+    if (!markingGuide) return;
+    downloadPdf(svgPagesToPdf(markingGuide.tiles.map(tile => ({ svg: tile.svg, widthMm: tile.widthMm, heightMm: tile.heightMm }))), `${fileStem}-elbow-marking-guide.pdf`);
+  };
 
   return (
     <section className="space-y-5" aria-label={t('tools.branchOnElbow.familyElbow')}>
@@ -238,6 +294,38 @@ export default function BranchOnElbowPanel() {
           </div>
           <p className="text-xs text-zinc-500">{t('tools.branchOnElbow.mapping', { n: divisions, last: divisions - 1 })}</p>
           <p className="text-xs text-zinc-500">{t('tools.branchOnElbow.numericOnly')}</p>
+
+          {cutTemplate && markingGuide && (
+            <div data-testid="elbow-fabrication" className="space-y-3 rounded-lg border border-amber-500/30 bg-zinc-950 p-4">
+              <h5 className="text-xs font-medium uppercase tracking-widest text-zinc-400">{t('tools.branchOnElbow.fabrication')}</h5>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="elbow-pdf-format" className="whitespace-nowrap text-xs text-zinc-500">{t('tools.branchLayout.printFormat')}</Label>
+                  <select id="elbow-pdf-format" value={pdfFormat} onChange={event => setPdfFormat(event.target.value as PdfPageFormatId)}
+                    className="min-h-11 rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-amber-500">
+                    {PDF_PAGE_FORMATS.map(format => (
+                      <option key={format.id} value={format.id}>{format.id} · {format.widthMm} × {format.heightMm} mm</option>
+                    ))}
+                  </select>
+                </div>
+                <Button onClick={handleDownloadCutPdf} data-testid="elbow-download-cut" className="min-h-11 bg-amber-500 font-semibold text-black hover:bg-amber-600">
+                  {t('tools.branchOnElbow.downloadCutPdf')}
+                </Button>
+                <Button onClick={handleDownloadGuidePdf} data-testid="elbow-download-guide" variant="outline" className="min-h-11 border-zinc-700 !bg-transparent !text-zinc-100 hover:!bg-zinc-900">
+                  {t('tools.branchOnElbow.downloadGuidePdf')}
+                </Button>
+              </div>
+              <p data-testid="elbow-cut-pages" data-pages={cutTemplate.tiles.length} data-pages-x={cutTemplate.pagesX} data-pages-y={cutTemplate.pagesY}
+                data-circumference-mm={cutTemplate.circumferenceMm} className="text-xs text-zinc-300">
+                {t('tools.branchOnElbow.cutPages', { pages: cutTemplate.tiles.length, format: pdfFormat, c: formatMm(cutTemplate.circumferenceMm, 3) })}
+              </p>
+              <p className="text-xs text-zinc-500">{t('tools.branchOnElbow.cutWhy')}</p>
+              <p data-testid="elbow-guide-pages" data-pages={markingGuide.tiles.length} data-strip-length-mm={markingGuide.stripLengthMm} className="text-xs text-zinc-500">
+                {t('tools.branchOnElbow.guideWhy')}
+              </p>
+              <p className="text-xs font-medium text-amber-400/90">{t('tools.branchOnElbow.printPolicy')}</p>
+            </div>
+          )}
 
           <div className="rounded-lg border border-zinc-800/80 bg-zinc-950 p-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">

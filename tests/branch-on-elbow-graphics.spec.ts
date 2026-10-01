@@ -41,8 +41,10 @@ test('injerto development renders the U1 stations with a real closure', async ({
   const closure = graphic(page).locator('[data-station-kind="closure"]');
   expect(Math.abs(await attr(closure, 'data-injerto-mm') - plotted)).toBeLessThan(1e-9);
   expect(Math.abs(await attr(closure, 'data-arc-mm') - 279.2876)).toBeLessThan(0.001);
-  /* Screen preview only: no print/PDF/page-format affordance in this family. */
-  await expect(page.getByRole('button', { name: /Print|PDF/i })).toHaveCount(0);
+  /* The screen preview is not the physical artifact: the tube→tube print buttons
+     never appear here; U4 fabrication downloads live in their own section. */
+  await expect(page.getByRole('button', { name: /^Print/ })).toHaveCount(0);
+  await expect(page.getByTestId('elbow-fabrication').getByRole('button', { name: /PDF/ })).toHaveCount(2);
 });
 
 test('picaje preview follows the datum and mirrors signed Fe', async ({ page }) => {
