@@ -3943,5 +3943,20 @@
     "empty": "No history yet.",
     "transition": "{{from}} → {{to}}",
     "created": "Created as {{status}}"
+  },
+  "shareLinks": {
+    "title": "Share / Tracking links",
+    "source": "Source",
+    "medium": "Medium",
+    "campaign": "Campaign",
+    "group": "Destination / group",
+    "noGroups": "No preset groups for this channel",
+    "customGroup": "Custom…",
+    "customGroupPlaceholder": "custom_group_slug",
+    "url": "Campaign URL",
+    "copyLink": "Copy link",
+    "copyAllFacebook": "Copy all Facebook links",
+    "copied": "Copied",
+    "note": "UTM parameters contain only generic campaign identifiers — never personal data."
   }
 }

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock, Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ONBOARDING_STATUS, hasCompletedOnboarding } from '@/lib/onboarding';
+import { getTrafficProps } from '@/lib/jobs/attribution';
 import { trackEvent } from '@/lib/observability';
 import { isValidImageFile, isHeicFile, validateFileSize, getSafeImageExtension, ACCEPT_IMAGES } from '@/lib/fileUploadUtils';
 
@@ -582,7 +583,9 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         .eq('user_id', user.id)
         .maybeSingle();
       if (data && hasCompletedOnboarding(data.onboarding_status)) {
-        trackEvent('onboarding_completed', { account_type: accountType }, { dedupeKey: 'completed' });
+        // PB-JOBS-ATTRIBUTION-001: campaign attribution snapshot (traffic_* /
+        // first_touch_*), persisted in localStorage since first landing.
+        trackEvent('onboarding_completed', { account_type: accountType, ...getTrafficProps() }, { dedupeKey: 'completed' });
       }
     } catch {
       // Observability must never break onboarding; without canonical

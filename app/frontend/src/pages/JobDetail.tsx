@@ -16,7 +16,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import type { Job, JobTranslation } from '@/lib/jobs/types';
 import { trackEvent } from '@/lib/observability';
-import { getAttribution, readUtmFromLocation, rememberAttribution } from '@/lib/jobs/attribution';
+import {
+  captureAttributionVisit,
+  getFirstTouch,
+  getJobAttribution,
+  getTrafficProps,
+} from '@/lib/jobs/attribution';
 import {
   getJobTranslation,
   formatPostedTime,
@@ -83,10 +88,11 @@ export default function JobDetail() {
       }
       let jobRow = data as Job;
 
-      // PB-JOBS-ATS-001 §8: remember the last attributed entry for this
-      // user+job so apply() can stamp it on the application.
-      const utm = readUtmFromLocation(window.location.search);
-      if (utm && user?.id) rememberAttribution(user.id, jobRow.id, utm);
+      // PB-JOBS-ATTRIBUTION-001 §6–8: capture the tagged campaign landing at
+      // VISITOR level (auth-independent — the visitor may register/login
+      // later). First touch is written once; last touch only on tagged
+      // entries; job-level last entry refreshed for apply-time stamping.
+      captureAttributionVisit(window.location.search, jobRow.id);
 
       // Localized content (public read mirrors the job's open boundary).
       const { data: trs } = await supabase
@@ -98,6 +104,7 @@ export default function JobDetail() {
 
       // Funnel step 1 (PB-JOBS-PILOT-003 §15): a legitimate detail view.
       // Dedupe by job id so re-renders / locale switches never double-count.
+      // PB-JOBS-ATTRIBUTION-001: traffic_* / first_touch_* campaign snapshot.
       trackEvent(
         'job_viewed',
         {
@@ -106,6 +113,7 @@ export default function JobDetail() {
           rendered_locale: i18n.language.slice(0, 2),
           country: jobRow.country ?? undefined,
           trade: jobRow.discipline ?? jobRow.category ?? undefined,
+          ...getTrafficProps(),
         },
         { dedupeKey: jobRow.id },
       );
@@ -164,12 +172,14 @@ export default function JobDetail() {
     // Funnel step 2 (PB-JOBS-PILOT-003 §15): an authenticated candidate
     // genuinely starts the application workflow. Deduped per job so a
     // double-click never inflates the start count.
+    // PB-JOBS-ATTRIBUTION-001: campaign attribution snapshot on the funnel.
     const funnelProps = {
       job_id: job.id,
       source_language: job.source_language ?? 'en',
       rendered_locale: i18n.language.slice(0, 2),
       country: job.country ?? undefined,
       trade: job.discipline ?? job.category ?? undefined,
+      ...getTrafficProps(),
     };
     trackEvent('apply_started', funnelProps, { dedupeKey: job.id });
 
@@ -186,10 +196,26 @@ export default function JobDetail() {
     };
     if (job.company_user_id) applicationPayload.company_user_id = job.company_user_id;
 
-    // PB-JOBS-ATS-001 §8: stamp the last attributed entry (if any) on the
-    // application. No attribution → columns stay NULL ("unknown").
-    const attribution = getAttribution(authData.user.id, job.id);
-    if (attribution) Object.assign(applicationPayload, attribution);
+    // PB-JOBS-ATTRIBUTION-001 §6–8: stamp BOTH attribution levels on the
+    // application. utm_* = last attributed entry for this job (visitor-level,
+    // persisted pre-registration through localStorage); first_touch_* = the
+    // visitor's first campaign entry (never overwritten). No attribution →
+    // columns stay NULL ("unknown"), never invented.
+    const lastTouch = getJobAttribution(job.id, authData.user.id);
+    if (lastTouch) {
+      applicationPayload.utm_source = lastTouch.utm_source ?? null;
+      applicationPayload.utm_medium = lastTouch.utm_medium ?? null;
+      applicationPayload.utm_campaign = lastTouch.utm_campaign ?? null;
+      applicationPayload.utm_content = lastTouch.utm_content ?? null;
+      applicationPayload.utm_term = lastTouch.utm_term ?? null;
+    }
+    const firstTouch = getFirstTouch();
+    if (firstTouch) {
+      applicationPayload.first_touch_source = firstTouch.utm_source ?? null;
+      applicationPayload.first_touch_medium = firstTouch.utm_medium ?? null;
+      applicationPayload.first_touch_campaign = firstTouch.utm_campaign ?? null;
+      applicationPayload.first_touch_content = firstTouch.utm_content ?? null;
+    }
 
     const { error } = await supabase.from(TABLES.jobApplications).insert(applicationPayload);
     setApplying(false);

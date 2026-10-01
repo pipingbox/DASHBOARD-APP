@@ -5,6 +5,7 @@ import { CheckCircle2, CircleAlert } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { safeAuthNextPath } from '@/lib/authFlow';
 import { getCorrelationId, trackEvent } from '@/lib/observability';
+import { getTrafficProps } from '@/lib/jobs/attribution';
 import { Button } from '@/components/ui/button';
 
 export default function AuthCallback() {
@@ -43,6 +44,7 @@ export default function AuthCallback() {
           provider: 'email',
           status: 'failed',
           reason_code: 'invalid_callback',
+          ...getTrafficProps(),
         });
         setStatus('error');
         return;
@@ -57,6 +59,7 @@ export default function AuthCallback() {
           correlation_id: getCorrelationId(),
           provider: 'email',
           status: 'completed',
+          ...getTrafficProps(),
         });
       }
       redirectTimer = window.setTimeout(() => {

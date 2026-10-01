@@ -3957,5 +3957,20 @@
     "empty": "Brak historii.",
     "transition": "{{from}} → {{to}}",
     "created": "Utworzono jako {{status}}"
+  },
+  "shareLinks": {
+    "title": "Udostępnij / Linki śledzące",
+    "source": "Źródło",
+    "medium": "Medium",
+    "campaign": "Kampania",
+    "group": "Miejsce docelowe / grupa",
+    "noGroups": "Brak predefiniowanych grup dla tego kanału",
+    "customGroup": "Niestandardowy…",
+    "customGroupPlaceholder": "niestandardowy_slug_grupy",
+    "url": "URL kampanii",
+    "copyLink": "Kopiuj link",
+    "copyAllFacebook": "Kopiuj wszystkie linki Facebook",
+    "copied": "Skopiowano",
+    "note": "Parametry UTM zawierają wyłącznie ogólne identyfikatory kampanii, nigdy dane osobowe."
   }
 }
