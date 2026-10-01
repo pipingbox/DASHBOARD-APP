@@ -3950,5 +3950,20 @@
     "empty": "Fără istoric.",
     "transition": "{{from}} → {{to}}",
     "created": "Creată ca {{status}}"
+  },
+  "shareLinks": {
+    "title": "Partajare / Linkuri de urmărire",
+    "source": "Sursă",
+    "medium": "Canal",
+    "campaign": "Campanie",
+    "group": "Destinație / grup",
+    "noGroups": "Fără grupuri predefinite pentru acest canal",
+    "customGroup": "Personalizat…",
+    "customGroupPlaceholder": "slug_grup_personalizat",
+    "url": "URL campanie",
+    "copyLink": "Copiază linkul",
+    "copyAllFacebook": "Copiază toate linkurile de Facebook",
+    "copied": "Copiat",
+    "note": "Parametrii UTM conțin doar identificatori generici de campanie, niciodată date personale."
   }
 }

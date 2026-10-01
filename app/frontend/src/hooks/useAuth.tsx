@@ -5,6 +5,7 @@ import { getStoredReferralCode, clearStoredReferralCode, validateReferralCode } 
 import { notifyReferralJoined } from '@/lib/notifications';
 import { getAuthCallbackUrl } from '@/lib/constants';
 import { classifyAuthError, isNewSignupIdentity, type AuthErrorCode } from '@/lib/authFlow';
+import { getTrafficProps } from '@/lib/jobs/attribution';
 import { ONBOARDING_STATUS } from '@/lib/onboarding';
 import { edgeFunctionUrl } from '@/lib/supabase';
 import {
@@ -579,9 +580,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch { /* ignore */ }
 
     // PB-OBSERVABILITY-001: funnel signup_started (closed schema, origin only).
+    // PB-JOBS-ATTRIBUTION-001: campaign attribution snapshot (traffic_* /
+    // first_touch_*), persisted pre-registration in localStorage.
     trackEvent(
       'signup_started',
-      { origin: detectOrigin(), account_type: accountType || 'worker' },
+      { origin: detectOrigin(), account_type: accountType || 'worker', ...getTrafficProps() },
       { dedupeKey: 'signup' },
     );
 
@@ -606,7 +609,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.user && isNewUser) {
       trackEvent(
         'auth_created',
-        { origin: detectOrigin(), account_type: accountType || 'worker' },
+        { origin: detectOrigin(), account_type: accountType || 'worker', ...getTrafficProps() },
         { dedupeKey: `auth:${data.user.id}` },
       );
     }

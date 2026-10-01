@@ -871,6 +871,57 @@ test.describe('Jobs funnel events (PB-JOBS-PILOT-003)', () => {
     expect(props).toEqual({ job_id: JOB_ID });
   });
 
+  // -------------------------------------------------------------
+  // PB-JOBS-ATTRIBUTION-001 — campaign attribution props
+  // -------------------------------------------------------------
+
+  test('funnel events accept traffic_* / first_touch_* campaign attribution', () => {
+    for (const name of ['job_viewed', 'apply_started', 'apply_submitted'] as const) {
+      const props = buildEventProps(name, {
+        job_id: JOB_ID,
+        traffic_source: 'facebook',
+        traffic_medium: 'group',
+        traffic_campaign: 'umicore_antwerpen_mechanic',
+        traffic_content: 'lassers_pijpfitters_be_nl',
+        first_touch_source: 'facebook',
+        first_touch_content: 'polacy_w_belgii',
+      });
+      expect(props).toMatchObject({
+        traffic_source: 'facebook',
+        traffic_medium: 'group',
+        traffic_campaign: 'umicore_antwerpen_mechanic',
+        traffic_content: 'lassers_pijpfitters_be_nl',
+        first_touch_source: 'facebook',
+        first_touch_content: 'polacy_w_belgii',
+      });
+    }
+  });
+
+  test('signup funnel events accept campaign attribution (registration by group)', () => {
+    for (const name of ['signup_started', 'auth_created', 'email_confirmation_completed', 'onboarding_completed'] as const) {
+      const props = buildEventProps(name, {
+        traffic_source: 'facebook',
+        traffic_content: 'espanoles_en_belgica',
+        first_touch_source: 'facebook',
+        first_touch_content: 'espanoles_en_belgica',
+      });
+      expect(props).toMatchObject({ traffic_source: 'facebook', traffic_content: 'espanoles_en_belgica' });
+    }
+  });
+
+  test('campaign attribution never carries PII-shaped values', () => {
+    const props = buildEventProps('job_viewed', {
+      job_id: JOB_ID,
+      traffic_source: 'joao.silva@example.com',
+      traffic_campaign: '+32 470 12 34 56',
+      traffic_content: 'x'.repeat(300),
+    });
+    // emails/phones are pattern-redacted by sanitizeValue; oversized values truncated
+    expect(props.traffic_source).toBe('[redacted-email]');
+    expect(props.traffic_campaign).toBe('[redacted-phone]');
+    expect(String(props.traffic_content).length).toBeLessThanOrEqual(200);
+  });
+
   test('funnel events travel through PostHog PII-free with environment + app_version', async () => {
     __resetObservabilityForTests();
     const { client, captured } = makeClient();

@@ -3950,5 +3950,20 @@
     "empty": "Sem histórico.",
     "transition": "{{from}} → {{to}}",
     "created": "Criada como {{status}}"
+  },
+  "shareLinks": {
+    "title": "Partilhar / Links de rastreio",
+    "source": "Fonte",
+    "medium": "Meio",
+    "campaign": "Campanha",
+    "group": "Destino / grupo",
+    "noGroups": "Sem grupos pré-configurados para este canal",
+    "customGroup": "Personalizado…",
+    "customGroupPlaceholder": "slug_grupo_personalizado",
+    "url": "URL da campanha",
+    "copyLink": "Copiar link",
+    "copyAllFacebook": "Copiar todos os links do Facebook",
+    "copied": "Copiado",
+    "note": "Os parâmetros UTM contêm apenas identificadores genéricos de campanha, nunca dados pessoais."
   }
 }

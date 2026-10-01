@@ -63,11 +63,26 @@ export const OBS_EVENT_NAMES = [
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
 
+/**
+ * PB-JOBS-ATTRIBUTION-001 — campaign attribution props shared by funnel
+ * events (signup → email confirmation → job viewed → apply → onboarding).
+ * Values are generic campaign/group identifiers (snake_case, sanitized by
+ * buildEventProps) supplied by lib/jobs/attribution.ts. NEVER PII.
+ */
+const TRAFFIC_ATTRIBUTION_KEYS = [
+  'traffic_source',
+  'traffic_medium',
+  'traffic_campaign',
+  'traffic_content',
+  'first_touch_source',
+  'first_touch_content',
+] as const;
+
 /** Allowed property keys per event. Anything else is dropped. */
 const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   page_viewed: ['route', 'origin', 'locale', 'device_type'],
-  signup_started: ['origin', 'account_type'],
-  auth_created: ['origin', 'account_type'],
+  signup_started: ['origin', 'account_type', ...TRAFFIC_ATTRIBUTION_KEYS],
+  auth_created: ['origin', 'account_type', ...TRAFFIC_ATTRIBUTION_KEYS],
   signup_confirmation_required: [
     'route',
     'correlation_id',
@@ -107,6 +122,7 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
     'status',
     'reason_code',
     'attempt_bucket',
+    ...TRAFFIC_ATTRIBUTION_KEYS,
   ],
   signin_blocked_unconfirmed: [
     'route',
@@ -129,11 +145,12 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   // PB-JOBS-PILOT-003 — Jobs funnel. job_id is a technical UUID (validated
   // against JOB_ID_RE, kept raw like component_id); country/trade are closed
   // job metadata, never candidate data. NO candidate identity anywhere.
-  job_viewed: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade'],
-  apply_started: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade'],
-  apply_submitted: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade'],
+  // PB-JOBS-ATTRIBUTION-001 — traffic_* / first_touch_* campaign attribution.
+  job_viewed: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade', ...TRAFFIC_ATTRIBUTION_KEYS],
+  apply_started: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade', ...TRAFFIC_ATTRIBUTION_KEYS],
+  apply_submitted: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade', ...TRAFFIC_ATTRIBUTION_KEYS],
   onboarding_step_reached: ['step', 'account_type'],
-  onboarding_completed: ['account_type'],
+  onboarding_completed: ['account_type', ...TRAFFIC_ATTRIBUTION_KEYS],
   referral_link_opened: ['origin', 'route'],
   referral_captured: ['origin'],
   app_error: [

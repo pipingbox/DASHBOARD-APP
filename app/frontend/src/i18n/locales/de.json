@@ -3943,5 +3943,20 @@
     "empty": "Noch kein Verlauf.",
     "transition": "{{from}} → {{to}}",
     "created": "Erstellt als {{status}}"
+  },
+  "shareLinks": {
+    "title": "Teilen / Tracking-Links",
+    "source": "Quelle",
+    "medium": "Medium",
+    "campaign": "Kampagne",
+    "group": "Ziel / Gruppe",
+    "noGroups": "Keine Voreinstellungen für diesen Kanal",
+    "customGroup": "Benutzerdefiniert…",
+    "customGroupPlaceholder": "custom_gruppe_slug",
+    "url": "Kampagnen-URL",
+    "copyLink": "Link kopieren",
+    "copyAllFacebook": "Alle Facebook-Links kopieren",
+    "copied": "Kopiert",
+    "note": "UTM-Parameter enthalten nur generische Kampagnen-IDs, niemals personenbezogene Daten."
   }
 }

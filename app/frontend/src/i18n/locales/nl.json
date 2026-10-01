@@ -3943,5 +3943,20 @@
     "empty": "Nog geen geschiedenis.",
     "transition": "{{from}} → {{to}}",
     "created": "Aangemaakt als {{status}}"
+  },
+  "shareLinks": {
+    "title": "Delen / Trackinglinks",
+    "source": "Bron",
+    "medium": "Medium",
+    "campaign": "Campagne",
+    "group": "Bestemming / groep",
+    "noGroups": "Geen vooraf ingestelde groepen voor dit kanaal",
+    "customGroup": "Aangepast…",
+    "customGroupPlaceholder": "aangepaste_groep_slug",
+    "url": "Campagne-URL",
+    "copyLink": "Link kopiëren",
+    "copyAllFacebook": "Alle Facebook-links kopiëren",
+    "copied": "Gekopieerd",
+    "note": "UTM-parameters bevatten alleen algemene campagne-identificaties, nooit persoonsgegevens."
   }
 }

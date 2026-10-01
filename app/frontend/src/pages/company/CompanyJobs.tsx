@@ -17,8 +17,10 @@ import {
   Pencil,
   Upload,
   Archive,
+  Share2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ShareLinksDialog } from '@/components/jobs/ShareLinksDialog';
 
 interface Job {
   id: string;
@@ -43,6 +45,7 @@ export default function CompanyJobs() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'open' | 'draft' | 'closed'>('all');
   const [actionJobId, setActionJobId] = useState<string | null>(null);
+  const [shareJob, setShareJob] = useState<Job | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -113,7 +116,7 @@ export default function CompanyJobs() {
     closed: jobs.filter((j) => isClosedStatus(j.status)).length,
   };
 
-  return (
+  const list = (
     <div className="space-y-6">
       <PageHeader
         eyebrow={t('companyJobs.eyebrow')}
@@ -213,6 +216,14 @@ export default function CompanyJobs() {
                   <Pencil className="h-3 w-3" />
                   {t('companyJobs.edit')}
                 </Link>
+                <button
+                  onClick={() => setShareJob(job)}
+                  title={t('shareLinks.title')}
+                  className="inline-flex items-center gap-1 rounded-sm border border-zinc-700 px-2.5 py-1.5 text-[10px] font-medium text-zinc-300 hover:border-zinc-500 hover:text-zinc-100 transition"
+                >
+                  <Share2 className="h-3 w-3" />
+                  {t('shareLinks.title')}
+                </button>
                 {!isOpenStatus(job.status) && (
                   <button
                     onClick={() => void setStatus(job, 'open')}
@@ -241,6 +252,17 @@ export default function CompanyJobs() {
         </div>
       )}
     </div>
+  );
+
+  // Share links dialog is rendered outside the list markup.
+  return (
+    <>
+      {list}
+      <ShareLinksDialog
+        job={shareJob ? { id: shareJob.id, title: shareJob.title, company: shareJob.company_name ?? '', location: shareJob.location ?? '' } : null}
+        onClose={() => setShareJob(null)}
+      />
+    </>
   );
 }
 
