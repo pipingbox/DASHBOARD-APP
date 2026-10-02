@@ -81,6 +81,16 @@ function syntheticPdf(targetBytes = 800): Buffer {
 test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)', () => {
   test.skip(!hasCreds, 'E2E_TEST_EMAIL / E2E_TEST_PASSWORD not set -- skipping cert upload E2E');
 
+  // Production builds do NOT set posthog's opt_out_useragent_filter (that is
+  // preview-only, observability.ts), so the SDK silently drops every event
+  // whose user agent looks like a bot — including Playwright's default
+  // "HeadlessChrome" UA. Use a real Chrome UA so the production smoke can
+  // observe the event wire (same as a real user sends).
+  test.use({
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36',
+  });
+
   const setupCommon = async (page: import('@playwright/test').Page) => {
     // Language determinism + PostHog bot-signal shim (same rationale as the
     // other isolated-window specs).
