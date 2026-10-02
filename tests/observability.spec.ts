@@ -954,3 +954,80 @@ test.describe('Jobs funnel events (PB-JOBS-PILOT-003)', () => {
     __resetObservabilityForTests();
   });
 });
+
+// ---------------------------------------------------------------------------
+// PB-CERT-UPLOAD-UX-001 — certificate upload diagnostics (closed taxonomy)
+// ---------------------------------------------------------------------------
+
+test.describe('PB-CERT-UPLOAD-UX-001 cert upload diagnostics', () => {
+  test('the three cert_upload events are part of the closed taxonomy', () => {
+    for (const name of ['cert_upload_started', 'cert_upload_completed', 'cert_upload_failed'] as const) {
+      expect(OBS_EVENT_NAMES).toContain(name);
+    }
+  });
+
+  test('cert_upload_completed keeps only closed-enum props', () => {
+    const props = buildEventProps('cert_upload_completed', {
+      route: '/profile',
+      correlation_id: 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d',
+      bucket: 'certificates',
+      size_bucket: '1mb-5mb',
+      mime: 'application/pdf',
+      duration_ms: 8200,
+      attempt_number: 1,
+    });
+    // App-supplied correlation_id is long-token-redacted by sanitizeValue —
+    // same as every existing event that carries it; linking happens via the
+    // before_send passthrough for SDK-added ids.
+    expect(props).toEqual({
+      route: '/profile',
+      correlation_id: '[redacted-token]',
+      bucket: 'certificates',
+      size_bucket: '1mb-5mb',
+      mime: 'application/pdf',
+      duration_ms: 8200,
+      attempt_number: 1,
+    });
+  });
+
+  test('cert_upload_failed drops out-of-enum values (bucket, mime, error_category, attempts)', () => {
+    const props = buildEventProps('cert_upload_failed', {
+      route: '/profile',
+      bucket: 'app_14da0f1941_certificates', // physical bucket name — must be dropped
+      size_bucket: '999mb', // out of enum
+      mime: 'application/x-msdownload', // out of enum
+      error_category: 'dns_failure', // out of enum
+      attempt_number: 99, // out of range
+      duration_ms: -5, // out of range
+      storage_path: 'uid/cert-123.pdf', // not in allowlist — must be dropped
+      file_name: 'secret.pdf', // not in allowlist — must be dropped
+    });
+    expect(props).toEqual({ route: '/profile' });
+  });
+
+  test('cert_upload_failed keeps a valid timeout classification end to end', async () => {
+    __resetObservabilityForTests();
+    const { client, captured } = makeClient();
+    await initObservability({ injectedClient: client });
+    trackEvent('cert_upload_failed', {
+      route: '/profile',
+      correlation_id: 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d',
+      bucket: 'certificates',
+      size_bucket: '1mb-5mb',
+      mime: 'application/pdf',
+      duration_ms: 13250,
+      attempt_number: 2,
+      error_category: 'timeout',
+    });
+    expect(captured).toHaveLength(1);
+    expect(captured[0].properties).toMatchObject({
+      bucket: 'certificates',
+      error_category: 'timeout',
+      attempt_number: 2,
+    });
+    const raw = JSON.stringify(captured[0].properties);
+    expect(raw).not.toContain('.pdf');
+    expect(raw).not.toContain('cert-');
+    __resetObservabilityForTests();
+  });
+});

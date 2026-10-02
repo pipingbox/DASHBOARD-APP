@@ -78,6 +78,20 @@ export async function compressImage(
 }
 
 /**
+ * PB-CERT-UPLOAD-UX-001 — coarse failure classification for observability.
+ * Closed taxonomy: timeout | network | storage_4xx | storage_5xx | unknown.
+ * Derived from the actual failure mode (event type / HTTP status), never
+ * from user-visible message strings.
+ */
+export type UploadErrorCategory = 'timeout' | 'network' | 'storage_4xx' | 'storage_5xx' | 'unknown';
+
+export type UploadTelemetry = {
+  attempts: number;
+  durationMs: number;
+  errorCategory: UploadErrorCategory | null;
+};
+
+/**
  * Upload a file to Supabase Storage using XHR with real abort on timeout.
  * Prevents infinite hanging on mobile networks.
  * Uses XHR instead of fetch/SDK so the upload is truly cancelled on timeout.
@@ -87,7 +101,8 @@ export async function compressImage(
  * @param path - File path within the bucket
  * @param file - File or Blob to upload
  * @param options - Upload options (upsert, cacheControl, timeout)
- * @returns Object with data (path) or error
+ * @returns Object with data (path), error and PB-CERT-UPLOAD-UX-001
+ *   telemetry (attempts / durationMs / errorCategory) for observability.
  */
 export async function uploadWithTimeout(
   bucket: string,
@@ -100,7 +115,7 @@ export async function uploadWithTimeout(
     contentType?: string;
     onProgress?: (percent: number) => void;
   } = {}
-): Promise<{ data: { path: string } | null; error: Error | null }> {
+): Promise<{ data: { path: string } | null; error: Error | null } & UploadTelemetry> {
   const { upsert = true, cacheControl = '3600', timeoutMs = 120000, contentType, onProgress } = options;
 
   const resolvedContentType = contentType || (file instanceof File ? resolveFileMime(file) : 'application/octet-stream');
@@ -114,8 +129,13 @@ export async function uploadWithTimeout(
     upsert,
   });
 
+  const startedAt = Date.now();
+  let attempts = 0;
+  let errorCategory: UploadErrorCategory | null = null;
+
   // Attempt upload with 1 retry on timeout/network error
   for (let attempt = 1; attempt <= 2; attempt++) {
+    attempts = attempt;
     const result = await _doXhrUpload(bucket, path, file, {
       upsert,
       cacheControl,
@@ -126,11 +146,13 @@ export async function uploadWithTimeout(
     });
 
     if (result.error) {
+      if (result.category) errorCategory = result.category;
       const isRetryable = result.retryable && attempt < 2;
       console.warn(`[uploadWithTimeout] Attempt ${attempt} failed:`, {
         error: result.error.message,
         retryable: result.retryable,
         willRetry: isRetryable,
+        category: result.category,
       });
 
       if (isRetryable) {
@@ -138,13 +160,31 @@ export async function uploadWithTimeout(
         await new Promise(r => setTimeout(r, 2000));
         continue;
       }
-      return { data: null, error: result.error };
+      return {
+        data: null,
+        error: result.error,
+        attempts,
+        durationMs: Date.now() - startedAt,
+        errorCategory,
+      };
     }
 
-    return { data: { path }, error: null };
+    return {
+      data: { path },
+      error: null,
+      attempts,
+      durationMs: Date.now() - startedAt,
+      errorCategory: null,
+    };
   }
 
-  return { data: null, error: new Error('Upload failed after retries.') };
+  return {
+    data: null,
+    error: new Error('Upload failed after retries.'),
+    attempts,
+    durationMs: Date.now() - startedAt,
+    errorCategory: errorCategory ?? 'unknown',
+  };
 }
 
 async function _doXhrUpload(
@@ -159,7 +199,7 @@ async function _doXhrUpload(
     onProgress?: (percent: number) => void;
     attempt: number;
   }
-): Promise<{ error: Error | null; retryable: boolean }> {
+): Promise<{ error: Error | null; retryable: boolean; category: UploadErrorCategory | null }> {
   const { upsert, cacheControl, timeoutMs, contentType, onProgress, attempt } = options;
   const startTime = Date.now();
 
@@ -168,7 +208,7 @@ async function _doXhrUpload(
   const accessToken = sessionData?.session?.access_token;
 
   if (!accessToken) {
-    return { error: new Error('Session expired. Please sign in again.'), retryable: false };
+    return { error: new Error('Session expired. Please sign in again.'), retryable: false, category: 'unknown' };
   }
 
   // Normalize file to Blob for mobile compatibility
@@ -216,7 +256,7 @@ async function _doXhrUpload(
     xhr.addEventListener('load', () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         onProgress?.(100);
-        safeResolve({ error: null, retryable: false });
+        safeResolve({ error: null, retryable: false, category: null });
       } else {
         let errorMsg = `Upload failed (HTTP ${xhr.status})`;
         try {
@@ -227,7 +267,9 @@ async function _doXhrUpload(
         }
         // 4xx errors are not retryable (auth, permissions, etc.)
         const retryable = xhr.status >= 500 || xhr.status === 0;
-        safeResolve({ error: new Error(errorMsg), retryable });
+        const category: UploadErrorCategory =
+          xhr.status >= 500 ? 'storage_5xx' : xhr.status === 0 ? 'network' : 'storage_4xx';
+        safeResolve({ error: new Error(errorMsg), retryable, category });
       }
     });
 
@@ -235,6 +277,7 @@ async function _doXhrUpload(
       safeResolve({
         error: new Error('Network error during upload. Please check your connection.'),
         retryable: true,
+        category: 'network',
       });
     });
 
@@ -255,6 +298,7 @@ async function _doXhrUpload(
             : 'Upload was cancelled.',
         ),
         retryable: hangGuardFired,
+        category: hangGuardFired ? 'timeout' : 'unknown',
       });
     });
 
@@ -262,6 +306,7 @@ async function _doXhrUpload(
       safeResolve({
         error: new Error(`Upload timed out after ${timeoutMs / 1000}s. Your connection may be too slow — try on WiFi or a stronger signal.`),
         retryable: true,
+        category: 'timeout',
       });
     });
 
@@ -272,13 +317,14 @@ async function _doXhrUpload(
       safeResolve({
         error: new Error('Upload did not respond. Please try again.'),
         retryable: true,
+        category: 'timeout',
       });
     }, timeoutMs + 10000);
 
     xhr.addEventListener('loadend', () => {
       clearTimeout(hangGuard);
       // Ensure resolution if not already
-      safeResolve({ error: new Error('Upload ended unexpectedly.'), retryable: true });
+      safeResolve({ error: new Error('Upload ended unexpectedly.'), retryable: true, category: 'unknown' });
     });
 
     xhr.open('POST', uploadUrl);

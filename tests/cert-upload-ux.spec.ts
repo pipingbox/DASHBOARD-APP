@@ -459,7 +459,22 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       for (const e of decoded) {
         expect(JSON.stringify(e)).not.toContain('@');
       }
-      console.log('wire PASS: app_error=0, zero PII');
+      // PB-CERT-UPLOAD-UX-001 diagnostics: started + completed exactly once,
+      // closed-enum properties only, no file name / storage path / UID.
+      const started = decoded.filter((e) => e.event === 'cert_upload_started');
+      const completed = decoded.filter((e) => e.event === 'cert_upload_completed');
+      expect(started, 'cert_upload_started must be emitted exactly once').toHaveLength(1);
+      expect(completed, 'cert_upload_completed must be emitted exactly once').toHaveLength(1);
+      const cp = (completed[0].properties ?? {}) as Record<string, unknown>;
+      expect(cp.bucket).toBe('certificates');
+      expect(cp.size_bucket).toBe('1mb-5mb'); // 1.5 MB fixture
+      expect(cp.mime).toBe('application/pdf');
+      expect(cp.attempt_number).toBe(1);
+      expect(typeof cp.duration_ms).toBe('number');
+      expect(cp.error_category).toBeUndefined();
+      expect(cp.storage_path).toBeUndefined();
+      expect(cp.file_name).toBeUndefined();
+      console.log('wire PASS: app_error=0, zero PII, cert_upload_started+completed x1 (closed enums)');
     } finally {
       // ── Restore: delete created row + storage object, verify ZERO DIFF ──
       if (createdRowId) {
@@ -623,7 +638,27 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       const after = await readCerts();
       const unexpected = after.filter((c) => !snapshotIds.has(String(c.id)));
       expect(unexpected, `no cert rows may be created on failed upload; got ${unexpected.length}`).toHaveLength(0);
-      console.log('recoverable timeout PASS: no partial object/row, retry available, no boundary');
+
+      // Wire: cert_upload_failed with the timeout category (closed enum),
+      // attempt_number=2 (initial + 1 retry), no PII.
+      await page.waitForTimeout(4500);
+      const decoded = decodeAll();
+      const failed = decoded.filter((e) => e.event === 'cert_upload_failed');
+      const startedT = decoded.filter((e) => e.event === 'cert_upload_started');
+      const appErrorsT = decoded.filter((e) => e.event === 'app_error');
+      expect(appErrorsT, 'app_error=0 required').toHaveLength(0);
+      expect(startedT, 'cert_upload_started must be emitted').toHaveLength(1);
+      expect(failed, 'cert_upload_failed must be emitted exactly once').toHaveLength(1);
+      const fp = (failed[0].properties ?? {}) as Record<string, unknown>;
+      expect(fp.error_category).toBe('timeout');
+      expect(fp.attempt_number).toBe(2);
+      expect(fp.bucket).toBe('certificates');
+      expect(fp.storage_path).toBeUndefined();
+      expect(fp.file_name).toBeUndefined();
+      for (const e of decoded) {
+        expect(JSON.stringify(e)).not.toContain('@');
+      }
+      console.log('recoverable timeout PASS: no partial object/row, retry available, no boundary, cert_upload_failed(timeout, attempts=2) emitted');
     } finally {
       // Clean any accidental row (defensive; expect none).
       const after = await readCerts();

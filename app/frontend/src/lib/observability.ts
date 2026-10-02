@@ -59,6 +59,13 @@ export const OBS_EVENT_NAMES = [
   'job_viewed',
   'apply_started',
   'apply_submitted',
+  // PB-CERT-UPLOAD-UX-001 — certificate upload funnel (started → completed |
+  // failed). Closed property enums (bucket/size_bucket/mime/error_category)
+  // are validated in buildEventProps; no file names, paths, UIDs or signed
+  // URLs ever enter the payload.
+  'cert_upload_started',
+  'cert_upload_completed',
+  'cert_upload_failed',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -168,10 +175,62 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
     'account_type',
     'onboarding_status',
   ],
+  // PB-CERT-UPLOAD-UX-001 — certificate upload diagnostics. Logical bucket
+  // only (never the Storage URL or signed link), size as a coarse bucket
+  // (never exact bytes of a possibly unique file), MIME restricted to the
+  // accepted document/image set, error_category closed for future incident
+  // triage (timeout vs network vs storage_4xx/5xx vs unknown).
+  cert_upload_started: [
+    'route',
+    'correlation_id',
+    'bucket',
+    'size_bucket',
+    'mime',
+  ],
+  cert_upload_completed: [
+    'route',
+    'correlation_id',
+    'bucket',
+    'size_bucket',
+    'mime',
+    'duration_ms',
+    'attempt_number',
+  ],
+  cert_upload_failed: [
+    'route',
+    'correlation_id',
+    'bucket',
+    'size_bucket',
+    'mime',
+    'duration_ms',
+    'attempt_number',
+    'error_category',
+  ],
 };
 
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;
 export type ObsOrigin = (typeof OBS_ORIGINS)[number];
+
+// PB-CERT-UPLOAD-UX-001 — closed enums for certificate-upload diagnostics.
+// The app caps certificate files at 10 MB, so the coarse size buckets cover
+// the whole accepted range; 'other' keeps the MIME set closed when a browser
+// reports a generic type.
+export const CERT_UPLOAD_BUCKETS = ['certificates'] as const;
+export const CERT_SIZE_BUCKETS = ['<=100kb', '100kb-1mb', '1mb-5mb', '5mb-10mb'] as const;
+export const CERT_UPLOAD_MIMES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+  'image/heic-sequence',
+  'image/heif-sequence',
+  'other',
+] as const;
+export const CERT_ERROR_CATEGORIES = ['timeout', 'network', 'storage_4xx', 'storage_5xx', 'unknown'] as const;
 
 /** PB-LIBRARY-COMPLETE-001 — closed enums for Library analytics props. */
 export const LIBRARY_FILTER_TYPES = ['family', 'connection_type', 'standard', 'pressure_class'] as const;
@@ -736,6 +795,17 @@ export function buildEventProps(
   }
   // Closed enums: drop values outside the approved sets.
   if ('origin' in out && !OBS_ORIGINS.includes(out.origin as ObsOrigin)) delete out.origin;
+  // PB-CERT-UPLOAD-UX-001 — cert upload closed enums.
+  if ('bucket' in out && !CERT_UPLOAD_BUCKETS.includes(out.bucket as never)) delete out.bucket;
+  if ('size_bucket' in out && !CERT_SIZE_BUCKETS.includes(out.size_bucket as never)) delete out.size_bucket;
+  if ('mime' in out && !CERT_UPLOAD_MIMES.includes(out.mime as never)) delete out.mime;
+  if ('error_category' in out && !CERT_ERROR_CATEGORIES.includes(out.error_category as never)) delete out.error_category;
+  if ('attempt_number' in out && (typeof out.attempt_number !== 'number' || out.attempt_number < 1 || out.attempt_number > 5)) {
+    delete out.attempt_number;
+  }
+  if ('duration_ms' in out && (typeof out.duration_ms !== 'number' || out.duration_ms < 0 || out.duration_ms > 600000)) {
+    delete out.duration_ms;
+  }
   if ('filter_type' in out && !LIBRARY_FILTER_TYPES.includes(out.filter_type as LibraryFilterType)) {
     delete out.filter_type;
   }

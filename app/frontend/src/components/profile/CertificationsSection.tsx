@@ -41,6 +41,7 @@ import type { WorkerCertification } from '@/lib/workerProfile';
 import { normalizeCertification } from '@/lib/workerProfile';
 import { syncCertificationReminders, deleteCertificationReminders } from '@/lib/certificationReminders';
 import { uploadWithTimeout, resolveFileMime } from '@/lib/uploadHelpers';
+import { trackEvent, getCorrelationId, CERT_SIZE_BUCKETS, CERT_UPLOAD_MIMES } from '@/lib/observability';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { getSecureFileUrl, deleteStorageObject, extractStoragePathAndBucket } from '@/lib/storageHelpers';
 import { hasStoredRecordFile } from '@/lib/filePresence';
@@ -269,6 +270,29 @@ export function CertificationsSection() {
     setUploadError(null);
     console.log('[CertUpload] setUploading(true)');
 
+    // PB-CERT-UPLOAD-UX-001 — upload diagnostics. Closed taxonomy, no PII:
+    // logical bucket, coarse size bucket, allowed MIME only. Never the file
+    // name, never the storage path (it embeds the owner UID).
+    const sizeBucket =
+      file.size <= 100 * 1024
+        ? '<=100kb'
+        : file.size <= 1024 * 1024
+          ? '100kb-1mb'
+          : file.size <= 5 * 1024 * 1024
+            ? '1mb-5mb'
+            : '5mb-10mb';
+    const telemetryMime = (CERT_UPLOAD_MIMES as readonly string[]).includes(resolvedMime)
+      ? resolvedMime
+      : 'other';
+    const obsBase = {
+      route: '/profile',
+      correlation_id: getCorrelationId(),
+      bucket: 'certificates',
+      size_bucket: sizeBucket satisfies (typeof CERT_SIZE_BUCKETS)[number],
+      mime: telemetryMime,
+    };
+    trackEvent('cert_upload_started', obsBase);
+
     try {
       const filePath = `${user.id}/cert-${Date.now()}.${ext || 'pdf'}`;
       // PB-STORAGE-SECURITY-001: certificates live in the certificates bucket.
@@ -286,7 +310,7 @@ export function CertificationsSection() {
       // PB-CERT-UPLOAD-UX-001: real XHR progress instead of the fixed 30%
       // placeholder. Cap at 99 until the server confirms so the bar reflects
       // actual bytes sent.
-      const { error } = await uploadWithTimeout(bucketName, filePath, file, {
+      const { error, attempts, durationMs, errorCategory } = await uploadWithTimeout(bucketName, filePath, file, {
         upsert: true,
         cacheControl: '3600',
         timeoutMs: 120000,
@@ -299,6 +323,12 @@ export function CertificationsSection() {
           error: error.message,
           bucket: bucketName,
           path: filePath,
+        });
+        trackEvent('cert_upload_failed', {
+          ...obsBase,
+          duration_ms: durationMs,
+          attempt_number: attempts,
+          error_category: errorCategory ?? 'unknown',
         });
         // Recoverable state: keep the dialog open so the user can retry with
         // the same form data instead of losing it.
@@ -316,6 +346,11 @@ export function CertificationsSection() {
         return;
       }
 
+      trackEvent('cert_upload_completed', {
+        ...obsBase,
+        duration_ms: durationMs,
+        attempt_number: attempts,
+      });
       setUploadProgress(100);
       console.log('[CertUpload] Upload success:', { bucket: bucketName, path: filePath });
 
