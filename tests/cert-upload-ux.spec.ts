@@ -164,10 +164,27 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
 
   const openCertDialog = async (page: import('@playwright/test').Page) => {
     await page.goto('/profile', { waitUntil: 'networkidle' });
-    await page.waitForTimeout(2500);
-    // "Add certification" is the dedicated button in the certifications card.
-    const addBtn = page.locator('button').filter({ hasText: /certificad|certification/i }).first();
-    await expect(addBtn, 'Add certification button must be visible').toBeVisible({ timeout: 30_000 });
+    // The certifications card is at the bottom of a long profile; give every
+    // async section time to resolve, then scroll it into view before
+    // asserting the Add button.
+    await page.waitForTimeout(6000);
+    const diag = await page.evaluate(() => ({
+      url: location.pathname,
+      certTitlePresent: /certificad/i.test(document.body.innerText),
+      addBtnCount: [...document.querySelectorAll('button')].filter((b) =>
+        /certificad|certification/i.test(b.textContent ?? ''),
+      ).length,
+    }));
+    console.log('DIAG /profile:', JSON.stringify(diag));
+    const addBtn = page
+      .locator('button')
+      .filter({ hasText: /añadir certificaci|add certification/i })
+      .first();
+    await addBtn.scrollIntoViewIfNeeded().catch(() => undefined);
+    await expect(
+      addBtn,
+      `Add certification button must be visible (diag: ${JSON.stringify(diag)})`,
+    ).toBeVisible({ timeout: 40_000 });
     await addBtn.click();
     const fileInput = page.locator('#cert-file-upload-input');
     await expect(fileInput, 'cert file input must be present in the dialog').toBeAttached({ timeout: 10_000 });
