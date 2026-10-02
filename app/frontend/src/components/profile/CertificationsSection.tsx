@@ -58,6 +58,10 @@ export function CertificationsSection() {
   const [deleting, setDeleting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  // PB-CERT-UPLOAD-UX-001: elapsed clock while uploading (visible timeout feedback).
+  const [uploadElapsedSec, setUploadElapsedSec] = useState(0);
+  // Recoverable failure state (network/timeout): user can retry without reloading.
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   // Alert preferences state
   const [reminderDays, setReminderDays] = useState<number>(90);
@@ -157,6 +161,15 @@ export function CertificationsSection() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
+  // PB-CERT-UPLOAD-UX-001: visible elapsed clock while an upload is running,
+  // so a slow network does not look like a frozen app.
+  useEffect(() => {
+    if (!uploading) return;
+    setUploadElapsedSec(0);
+    const id = setInterval(() => setUploadElapsedSec((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [uploading]);
+
   const resetForm = () => {
     setCertName('');
     setIssuingOrg('');
@@ -253,6 +266,7 @@ export function CertificationsSection() {
 
     setUploading(true);
     setUploadProgress(0);
+    setUploadError(null);
     console.log('[CertUpload] setUploading(true)');
 
     try {
@@ -269,13 +283,15 @@ export function CertificationsSection() {
         fileName: file.name,
       });
 
-      setUploadProgress(30);
-
+      // PB-CERT-UPLOAD-UX-001: real XHR progress instead of the fixed 30%
+      // placeholder. Cap at 99 until the server confirms so the bar reflects
+      // actual bytes sent.
       const { error } = await uploadWithTimeout(bucketName, filePath, file, {
         upsert: true,
         cacheControl: '3600',
         timeoutMs: 120000,
         contentType: resolvedMime,
+        onProgress: (percent) => setUploadProgress(Math.min(percent, 99)),
       });
 
       if (error) {
@@ -284,7 +300,19 @@ export function CertificationsSection() {
           bucket: bucketName,
           path: filePath,
         });
-        toast.error(error.message || t('common.unexpectedError'));
+        // Recoverable state: keep the dialog open so the user can retry with
+        // the same form data instead of losing it.
+        const isTimeout = /timed out|timeout|did not respond/i.test(error.message);
+        setUploadError(
+          isTimeout
+            ? t('workerProfile.certifications.uploadTimedOut')
+            : error.message || t('workerProfile.certifications.uploadFailed'),
+        );
+        toast.error(
+          isTimeout
+            ? t('workerProfile.certifications.uploadTimedOut')
+            : error.message || t('common.unexpectedError'),
+        );
         return;
       }
 
@@ -299,6 +327,7 @@ export function CertificationsSection() {
       toast.success(t('workerProfile.certifications.fileUploaded'));
     } catch (uploadErr) {
       console.error('[CertUpload] Unexpected exception:', uploadErr);
+      setUploadError(t('common.unexpectedError'));
       toast.error(t('common.unexpectedError'));
     } finally {
       console.log('[CertUpload] setUploading(false) — finally block');
@@ -923,8 +952,21 @@ export function CertificationsSection() {
                         {uploadProgress < 100
                           ? `${uploadProgress}% ${t('workerProfile.certifications.uploading') || 'uploading...'}`
                           : `✓ ${t('workerProfile.certifications.uploadComplete') || 'Upload complete'}`}
+                        {uploadProgress < 100 && (
+                          <span className="ml-1 text-zinc-600">({uploadElapsedSec}s)</span>
+                        )}
                       </p>
+                      {uploadElapsedSec >= 30 && uploadProgress < 100 && (
+                        <p className="text-center text-[11px] text-amber-500/90">
+                          {t('workerProfile.certifications.uploadSlowHint')}
+                        </p>
+                      )}
                     </div>
+                  )}
+                  {uploadError && !uploading && (
+                    <p className="text-center text-[11px] text-red-400" role="alert">
+                      {uploadError} {t('workerProfile.certifications.uploadRetryHint')}
+                    </p>
                   )}
                 </div>
               )}
