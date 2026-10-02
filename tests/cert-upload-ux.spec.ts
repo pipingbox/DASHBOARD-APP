@@ -342,6 +342,18 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
         } else {
           nullSamples++;
         }
+        if (i % 10 === 0) {
+          const diag = await page.evaluate(() => {
+            const bars = [...document.querySelectorAll('.h-full.rounded-full')].map((el) => ({
+              width: (el as HTMLElement).style.width,
+              inDialog: Boolean(el.closest('[role="dialog"]')),
+            }));
+            const dlg = document.querySelector('[role="dialog"]');
+            const pct = [...(dlg?.textContent ?? '').matchAll(/(\d+)\s*%/g)].map((m) => m[1]);
+            return { bars, pct };
+          });
+          console.log(`sample[${i}] diag: ${JSON.stringify(diag)}`);
+        }
         const stillUploading = await page.evaluate(() =>
           /Subiendo|uploading|Cargando/i.test(
             document.querySelector('[role="dialog"]')?.textContent ?? '',
