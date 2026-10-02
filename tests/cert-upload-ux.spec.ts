@@ -129,10 +129,14 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     page.on('pageerror', (e) => browserErrors.push('pageerror: ' + String(e).slice(0, 300)));
 
     const payloads: Buffer[] = [];
+    const posthogUrls: string[] = [];
     page.on('request', (req) => {
       if (req.url().includes('posthog.com') && req.method() === 'POST') {
         const b = req.postDataBuffer();
         if (b) payloads.push(b);
+      }
+      if (req.url().includes('posthog')) {
+        posthogUrls.push(`${req.method()} ${req.url().replace(/([?/])phc_[A-Za-z0-9_-]+/g, '$1phc_[redacted]')}`);
       }
     });
 
@@ -163,7 +167,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
         }
       });
 
-    return { browserErrors, appLogs, decodeAll, getRest: () => rest };
+    return { browserErrors, appLogs, decodeAll, getRest: () => rest, getPosthogUrls: () => posthogUrls };
   };
 
   /**
@@ -233,7 +237,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     page,
   }) => {
     test.setTimeout(300_000);
-    const { browserErrors, appLogs, decodeAll, getRest } = await setupCommon(page);
+    const { browserErrors, appLogs, decodeAll, getRest, getPosthogUrls } = await setupCommon(page);
 
     const emailTrimmed = (EMAIL ?? '').trim();
     expect(emailTrimmed, 'disposable account must be in qa* namespace').toMatch(/^qa[^@]*@pipingbox\.com$/i);
@@ -282,8 +286,14 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     });
 
     await login(page);
-    // SHA pre-flight on flushed login events.
-    const pre = decodeAll();
+    // SHA pre-flight on flushed login events. The SDK flushes on an
+    // interval; production (Cloudflare fronting) can take longer than
+    // preview, so poll the wire instead of decoding once.
+    let pre: Record<string, unknown>[] = [];
+    for (let i = 0; i < 30 && pre.length === 0; i++) {
+      pre = decodeAll();
+      if (pre.length === 0) await page.waitForTimeout(1000);
+    }
     expect(pre.length, 'pre-flight requires flushed login events').toBeGreaterThan(0);
     for (const e of pre) {
       const p = (e.properties ?? {}) as Record<string, unknown>;
@@ -526,6 +536,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
 
     if (browserErrors.length) {
       console.log('app upload logs:', JSON.stringify(appLogs.slice(0, 30)));
+      console.log('posthog requests (informational):', JSON.stringify(getPosthogUrls().slice(0, 15)));
       console.log('browser console errors (informational):', JSON.stringify(browserErrors.slice(0, 5)));
     }
   });
@@ -534,7 +545,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     page,
   }) => {
     test.setTimeout(300_000);
-    const { browserErrors, appLogs, decodeAll, getRest } = await setupCommon(page);
+    const { browserErrors, appLogs, decodeAll, getRest, getPosthogUrls } = await setupCommon(page);
     await login(page);
 
     expect(getRest(), 'REST context must be captured').toBeTruthy();
@@ -546,7 +557,8 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     };
 
     let uid = '';
-    for (let i = 0; i < 10 && !uid; i++) {
+    // Production can flush later than preview — poll the wire up to 30s.
+    for (let i = 0; i < 30 && !uid; i++) {
       await page.waitForTimeout(1000);
       const id = decodeAll().find((e) => e.event === '$identify');
       if (id) {
@@ -699,6 +711,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
 
     if (browserErrors.length) {
       console.log('app upload logs:', JSON.stringify(appLogs.slice(0, 30)));
+      console.log('posthog requests (informational):', JSON.stringify(getPosthogUrls().slice(0, 15)));
       console.log('browser console errors (informational):', JSON.stringify(browserErrors.slice(0, 5)));
     }
   });
