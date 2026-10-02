@@ -238,10 +238,23 @@ async function _doXhrUpload(
       });
     });
 
+    // PB-CERT-UPLOAD-UX-001 (E2E finding): xhr.abort() dispatches the 'abort'
+    // event synchronously in Chromium, so the abort listener below used to win
+    // the race against the hang guard's own safeResolve — a hang-guard abort
+    // was misclassified as a user cancel ("Upload was cancelled", NOT
+    // retryable), which skipped the intended automatic retry and bypassed the
+    // localized timeout message. Flag the hang-guard abort so it resolves as
+    // the retryable timeout it is; a genuine user cancel stays non-retryable.
+    let hangGuardFired = false;
+
     xhr.addEventListener('abort', () => {
       safeResolve({
-        error: new Error('Upload was cancelled.'),
-        retryable: false,
+        error: new Error(
+          hangGuardFired
+            ? 'Upload did not respond. Please try again.'
+            : 'Upload was cancelled.',
+        ),
+        retryable: hangGuardFired,
       });
     });
 
@@ -254,6 +267,7 @@ async function _doXhrUpload(
 
     // Fallback hang guard: if nothing fires within timeout + 10s
     const hangGuard = setTimeout(() => {
+      hangGuardFired = true;
       try { xhr.abort(); } catch { /* ignore */ }
       safeResolve({
         error: new Error('Upload did not respond. Please try again.'),

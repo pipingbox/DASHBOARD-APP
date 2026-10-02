@@ -53,8 +53,10 @@ interface RestCtx {
   authorization: string;
 }
 
-/** Minimal, valid PDF (synthetic, safe, ~800 bytes) used as a certificate. */
-function syntheticPdf(): Buffer {
+/** Minimal, valid PDF (synthetic, safe) used as a certificate. The
+ * `targetBytes` parameter pads the file with a trailing comment so the
+ * upload lasts long enough to sample real byte progress under throttling. */
+function syntheticPdf(targetBytes = 800): Buffer {
   const body = [
     '%PDF-1.4',
     '1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj',
@@ -67,7 +69,13 @@ function syntheticPdf(): Buffer {
     'trailer<</Root 1 0 R>>',
     '%%EOF',
   ].join('\n');
-  return Buffer.from(body, 'latin1');
+  let buf = Buffer.from(body, 'latin1');
+  if (buf.length < targetBytes) {
+    // PDF comments (%) are ignored by parsers; pad to the requested size.
+    const pad = Buffer.alloc(targetBytes - buf.length, 0x25); // '%'
+    buf = Buffer.concat([buf, Buffer.from('\n', 'latin1'), pad]);
+  }
+  return buf.subarray(0, targetBytes);
 }
 
 test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)', () => {
@@ -260,20 +268,34 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       await nameInput.fill('QA Synthetic Certificate');
       await orgInput.fill('QA Synthetic Org');
 
-      // Track storage upload XHR progress client-side is implicit; assert on the UI bar.
-      const pdf = syntheticPdf();
+      // Throttle the uplink so an ~1.5 MB file takes several seconds to
+      // send — without this the datacenter network finishes in milliseconds
+      // and the progress bar unmounts before it can be sampled (exactly what
+      // happened to Aldo: the bar was invisible on fast connections, frozen
+      // at the fake 30% on slow ones).
+      const cdp = await page.context().newCDPSession(page);
+      await cdp.send('Network.enable');
+      await cdp.send('Network.emulateNetworkConditions', {
+        offline: false,
+        latency: 50,
+        downloadThroughput: 4_000_000,
+        uploadThroughput: 200_000, // ~200 KB/s → 1.5 MB ≈ 7.5 s
+      });
+
+      const pdf = syntheticPdf(1_500_000);
       const fileInput = page.locator('#cert-file-upload-input');
       await fileInput.setInputFiles({ name: 'qa-synthetic-cert.pdf', mimeType: 'application/pdf', buffer: pdf });
 
-      // Progress bar must appear and move with bytes (not the fixed 30%).
+      // Progress bar must attach while uploading (at 0% width it has no
+      // bounding box, so assert attachment, not visibility).
       const bar = page.locator('.h-full.rounded-full');
-      await expect(bar, 'upload progress bar must render').toBeVisible({ timeout: 15_000 });
+      await expect(bar, 'upload progress bar must attach').toBeAttached({ timeout: 15_000 });
 
       // Sample widths over time; they must vary (real progress), never jump
       // from the fixed placeholder 30, and never show 100 before confirm.
       const widths: number[] = [];
       let saw100Early = false;
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 90; i++) {
         const w = await page.evaluate(() => {
           const el = document.querySelector('.h-full.rounded-full') as HTMLElement | null;
           if (!el) return null;
@@ -291,6 +313,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
         if (!stillUploading) break;
         await page.waitForTimeout(200);
       }
+      console.log(`sampled progress widths: ${JSON.stringify([...new Set(widths)])}`);
       expect(widths.length, 'progress must be sampled').toBeGreaterThan(0);
       const unique = new Set(widths);
       expect(unique.size, 'progress must move with bytes (not frozen)').toBeGreaterThan(1);
@@ -298,6 +321,14 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       // The bar must NOT be frozen at the old placeholder 30.
       const all30 = widths.every((w) => w === 30);
       expect(all30, 'progress must not be the fixed 30% placeholder').toBe(false);
+
+      // Upload done → restore full bandwidth before driving the rest.
+      await cdp.send('Network.emulateNetworkConditions', {
+        offline: false,
+        latency: 0,
+        downloadThroughput: -1,
+        uploadThroughput: -1,
+      });
 
       // Wait for upload to resolve → fileUrl set → submit enabled.
       await page.waitForFunction(
@@ -433,9 +464,13 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     const snapshotIds = new Set(snapshot.map((c) => String(c.id)));
 
     try {
-      // Compress the app's upload timeout (120s) so the abort path fires in
-      // seconds. We override setTimeout so the uploadHelpers timeout trips
-      // quickly while the real network request is delayed by our route.
+      // Compress the app's timers so the abort path fires in seconds while
+      // preserving the ORDER of UX states:
+      //   - elapsed-second counter (setInterval 1000ms) → 50ms tick, so the
+      //     30s slow-connection hint appears after ~1.5s of test time;
+      //   - the 120s upload hang-guard (setTimeout ≥100000) → 6s per attempt;
+      //   - other long timers (≥5000) → 1500ms.
+      // Short UI timers (retry backoff 2s, etc.) are left untouched.
       await page.addInitScript(() => {
         const realSetTimeout = window.setTimeout.bind(window);
         const realClearTimeout = window.clearTimeout.bind(window);
@@ -444,12 +479,24 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
           timeout?: number,
           ...args: unknown[]
         ) => {
-          // Compress only long timeouts (the 120s upload timeout and its
-          // retry backoff) to ~1500ms; leave short UI timers untouched.
-          const compressed = typeof timeout === 'number' && timeout >= 5000 ? 1500 : timeout;
+          const compressed =
+            typeof timeout === 'number' && timeout >= 100_000
+              ? 6_000
+              : typeof timeout === 'number' && timeout >= 5_000
+                ? 1_500
+                : timeout;
           return realSetTimeout(handler, compressed, ...args);
         }) as typeof setTimeout;
         (window as unknown as { clearTimeout: typeof clearTimeout }).clearTimeout = realClearTimeout;
+        const realSetInterval = window.setInterval.bind(window);
+        (window as unknown as { setInterval: typeof setInterval }).setInterval = ((
+          handler: TimerHandler,
+          timeout?: number,
+          ...args: unknown[]
+        ) => {
+          const compressed = typeof timeout === 'number' && timeout >= 1_000 ? 50 : timeout;
+          return realSetInterval(handler, compressed, ...args);
+        }) as typeof setInterval;
       });
 
       // Intercept the Storage upload and stall it, forcing the (compressed)
@@ -476,13 +523,26 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       const fileInput = page.locator('#cert-file-upload-input');
       await fileInput.setInputFiles({ name: 'qa-timeout-cert.pdf', mimeType: 'application/pdf', buffer: pdf });
 
-      // Progress bar appears and shows some progress (bytes before interruption).
+      // Progress bar attaches while uploading (0% width ⇒ no bounding box,
+      // so assert attachment). With the stalled route no byte progress is
+      // reported, so the bar must remain BELOW 100% the whole time.
       const bar = page.locator('.h-full.rounded-full');
-      await expect(bar, 'progress bar must render').toBeVisible({ timeout: 15_000 });
+      await expect(bar, 'progress bar must attach while uploading').toBeAttached({ timeout: 15_000 });
+      const earlyWidth = await page.evaluate(() => {
+        const el = document.querySelector('.h-full.rounded-full') as HTMLElement | null;
+        return el ? el.style.width : null;
+      });
+      expect(earlyWidth, 'bar must never show 100% before server confirmation').not.toBe('100%');
 
-      // The recoverable message must appear after the (compressed) timeout.
-      const recoverable = page.getByText(/tiempo máximo|time limit|conexión lenta|Slow connection/i).first();
-      await expect(recoverable, 'recoverable timeout message must appear').toBeVisible({ timeout: 30_000 });
+      // Slow-connection hint after the (compressed) 30 elapsed seconds.
+      const slowHint = page.getByText(/conexión es lenta|connection is slow|slow connection/i).first();
+      await expect(slowHint, 'slow-connection hint must appear at 30 elapsed seconds').toBeVisible({ timeout: 15_000 });
+
+      // The recoverable message must appear after the (compressed) timeout
+      // and both attempts (initial + 1 retry). The hang-guard path maps to
+      // the localized uploadTimedOut copy ("…superado el tiempo máximo…").
+      const recoverable = page.getByText(/tiempo máximo|time limit|did not respond/i).first();
+      await expect(recoverable, 'recoverable timeout message must appear').toBeVisible({ timeout: 40_000 });
 
       // No ErrorBoundary.
       const boundaryVisible = await page
