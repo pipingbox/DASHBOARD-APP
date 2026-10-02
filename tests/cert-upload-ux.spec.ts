@@ -236,7 +236,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
   test('happy path: real progress, single Storage object + single row, persistence, ZERO DIFF', async ({
     page,
   }) => {
-    test.setTimeout(300_000);
+    test.setTimeout(420_000);
     const { browserErrors, appLogs, decodeAll, getRest, getPosthogUrls } = await setupCommon(page);
 
     const emailTrimmed = (EMAIL ?? '').trim();
@@ -287,15 +287,26 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
 
     await login(page);
     // SHA pre-flight on flushed login events. The SDK flushes on an
-    // interval; production (Cloudflare fronting) can take longer than
-    // preview, so poll the wire instead of decoding once.
+    // interval; production (Cloudflare fronting) can take much longer than
+    // preview, so poll the wire instead of decoding once. SDK-internal
+    // events (autocapture, feature-flag calls) do not carry our props —
+    // validate environment/app_version only on app events that have them,
+    // but require at least one carrying the expected values.
     let pre: Record<string, unknown>[] = [];
-    for (let i = 0; i < 30 && pre.length === 0; i++) {
+    for (let i = 0; i < 60 && pre.length === 0; i++) {
       pre = decodeAll();
       if (pre.length === 0) await page.waitForTimeout(1000);
     }
     expect(pre.length, 'pre-flight requires flushed login events').toBeGreaterThan(0);
-    for (const e of pre) {
+    console.log(
+      `pre-flight wire events: ${JSON.stringify(pre.map((e) => ({ event: e.event, env: (e.properties as Record<string, unknown> | undefined)?.environment })))}`,
+    );
+    const withEnv = pre.filter((e) => {
+      const p = (e.properties ?? {}) as Record<string, unknown>;
+      return typeof p.environment === 'string';
+    });
+    expect(withEnv.length, 'at least one app event must carry environment').toBeGreaterThan(0);
+    for (const e of withEnv) {
       const p = (e.properties ?? {}) as Record<string, unknown>;
       expect(String(p.environment), `served environment must be ${expectedEnv}`).toBe(expectedEnv);
       if (expectedVersion) {
@@ -311,9 +322,9 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       'Content-Type': 'application/json',
     };
 
-    // Identify QA user uuid.
+    // Identify QA user uuid (production can flush late — poll up to 60s).
     let uid = '';
-    for (let i = 0; i < 10 && !uid; i++) {
+    for (let i = 0; i < 60 && !uid; i++) {
       await page.waitForTimeout(1000);
       const id = decodeAll().find((e) => e.event === '$identify');
       if (id) {
@@ -544,7 +555,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
   test('recoverable timeout: slow hint, persistent message, retry, no partial object/row, no boundary', async ({
     page,
   }) => {
-    test.setTimeout(300_000);
+    test.setTimeout(420_000);
     const { browserErrors, appLogs, decodeAll, getRest, getPosthogUrls } = await setupCommon(page);
     await login(page);
 
@@ -557,14 +568,19 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     };
 
     let uid = '';
-    // Production can flush later than preview — poll the wire up to 30s.
-    for (let i = 0; i < 30 && !uid; i++) {
+    // Production can flush much later than preview — poll the wire up to 60s.
+    for (let i = 0; i < 60 && !uid; i++) {
       await page.waitForTimeout(1000);
       const id = decodeAll().find((e) => e.event === '$identify');
       if (id) {
         const p = (id.properties ?? {}) as Record<string, unknown>;
         uid = String(p.$identified_id ?? id.distinct_id ?? p.distinct_id ?? '');
       }
+    }
+    if (!uid) {
+      console.log(
+        `uid extraction failed; wire events: ${JSON.stringify(decodeAll().map((e) => e.event))}; posthog requests: ${JSON.stringify(getPosthogUrls().slice(0, 20))}`,
+      );
     }
     expect(uid).toMatch(/^[0-9a-f-]{36}$/i);
 
