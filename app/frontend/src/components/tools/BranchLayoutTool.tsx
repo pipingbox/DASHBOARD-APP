@@ -20,6 +20,7 @@ import type { PdfPageFormatId } from '@/tools/branch/pdfPageFormat';
 import { buildBranchIsometric } from '@/tools/branch/branchIsometricSvg';
 import { svgPagesToPdf, pdfLatin1Safe } from '@/tools/branch/svgMmToPdf';
 import BranchOnElbowPanel from './BranchOnElbowPanel';
+import ElbowOnPipePanel from './ElbowOnPipePanel';
 
 /* ─── NPS pipe data (OD in mm) ─── */
 const NPS_OPTIONS: { label: string; od: number }[] = [
@@ -230,11 +231,31 @@ function getWT(npsLabel: string, schedule: string): number {
 
 type FabricationMode = 'template' | 'marking';
 
+/** Geometry families offered by the injerto calculator. */
+type BranchFamily = 'straight' | 'elbow' | 'elbowOnPipe';
+
+/* Heading copy per family. Kept as a table so adding a family cannot leave the
+   header showing another family's description. */
+const FAMILY_COPY: Record<BranchFamily, { subtitle: string; description: string }> = {
+  straight: {
+    subtitle: 'tools.branchLayout.subtitle',
+    description: 'tools.branchLayout.description',
+  },
+  elbow: {
+    subtitle: 'tools.branchOnElbow.subtitle',
+    description: 'tools.branchOnElbow.description',
+  },
+  elbowOnPipe: {
+    subtitle: 'tools.elbowOnPipe.subtitle',
+    description: 'tools.elbowOnPipe.description',
+  },
+};
+
 /* ─── Component ─── */
 export default function BranchLayoutTool() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [family, setFamily] = useState<'straight' | 'elbow'>('straight');
+  const [family, setFamily] = useState<BranchFamily>('straight');
 
   const [headerNPS, setHeaderNPS] = useState('6"');
   const [branchNPS, setBranchNPS] = useState('3"');
@@ -485,14 +506,14 @@ export default function BranchLayoutTool() {
           {t('tools.branchLayout.name')}
         </p>
         <h3 className="mt-1 text-xl font-semibold">
-          {family === 'straight' ? t('tools.branchLayout.subtitle') : t('tools.branchOnElbow.subtitle')}
+          {t(FAMILY_COPY[family].subtitle)}
         </h3>
         <p className="mt-1 text-xs text-zinc-500">
-          {family === 'straight' ? t('tools.branchLayout.description') : t('tools.branchOnElbow.description')}
+          {t(FAMILY_COPY[family].description)}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2" role="group" aria-label={t('tools.branchOnElbow.family')}>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3" role="group" aria-label={t('tools.branchOnElbow.family')}>
         <button type="button" aria-pressed={family === 'straight'} onClick={() => setFamily('straight')}
           className={`min-h-11 rounded-lg border px-4 py-3 text-left text-sm font-semibold ${family === 'straight' ? 'border-amber-500 bg-amber-500/10 text-amber-400' : 'border-zinc-800 bg-zinc-900/40 text-zinc-300 hover:border-zinc-600'}`}>
           {t('tools.branchOnElbow.familyStraight')}
@@ -501,9 +522,13 @@ export default function BranchLayoutTool() {
           className={`min-h-11 rounded-lg border px-4 py-3 text-left text-sm font-semibold ${family === 'elbow' ? 'border-amber-500 bg-amber-500/10 text-amber-400' : 'border-zinc-800 bg-zinc-900/40 text-zinc-300 hover:border-zinc-600'}`}>
           {t('tools.branchOnElbow.familyElbow')}
         </button>
+        <button type="button" aria-pressed={family === 'elbowOnPipe'} onClick={() => setFamily('elbowOnPipe')}
+          className={`min-h-11 rounded-lg border px-4 py-3 text-left text-sm font-semibold ${family === 'elbowOnPipe' ? 'border-amber-500 bg-amber-500/10 text-amber-400' : 'border-zinc-800 bg-zinc-900/40 text-zinc-300 hover:border-zinc-600'}`}>
+          {t('tools.elbowOnPipe.family')}
+        </button>
       </div>
 
-      {family === 'elbow' ? <BranchOnElbowPanel /> : (
+      {family === 'elbowOnPipe' ? <ElbowOnPipePanel /> : family === 'elbow' ? <BranchOnElbowPanel /> : (
         <>
       {/* ═══ FABRICATION ═══ */}
       <div className="space-y-4">
