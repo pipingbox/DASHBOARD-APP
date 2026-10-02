@@ -437,6 +437,15 @@ jobs:
             --config=playwright.config.ts \
             --reporter=line
 
+      - name: Upload E2E artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cert-upload-e2e-results
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore
+
   wfa-e2e:
     name: PB-WORKFORCE-ACTIVATION B1 verification pack (preview, SHA-locked, isolated window)
     if: ${{ inputs.run_wfa_e2e == true }}

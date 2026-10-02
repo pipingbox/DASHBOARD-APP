@@ -79,6 +79,10 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     await page.addInitScript(() => {
       try {
         localStorage.setItem('pipingbox_language', 'es');
+        // BetaNoticePopup renders a modal (inert background) on first visit;
+        // a returning user has dismissed it — keep it from intercepting
+        // pointer events on the Add-certification button.
+        localStorage.setItem('pipingbox_beta_dismissed', 'true');
       } catch {
         /* noop */
       }
