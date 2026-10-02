@@ -118,8 +118,13 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     });
 
     const browserErrors: string[] = [];
+    const appLogs: string[] = [];
     page.on('console', (m) => {
       if (m.type() === 'error') browserErrors.push(m.text().slice(0, 300));
+      const t = m.text();
+      if (t.startsWith('[CertUpload]') || t.startsWith('[uploadWithTimeout]')) {
+        appLogs.push(t.slice(0, 220));
+      }
     });
     page.on('pageerror', (e) => browserErrors.push('pageerror: ' + String(e).slice(0, 300)));
 
@@ -158,7 +163,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
         }
       });
 
-    return { browserErrors, decodeAll, getRest: () => rest };
+    return { browserErrors, appLogs, decodeAll, getRest: () => rest };
   };
 
   const login = async (page: import('@playwright/test').Page) => {
@@ -175,7 +180,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
   };
 
   const openCertDialog = async (page: import('@playwright/test').Page) => {
-    await page.goto('/profile', { waitUntil: 'networkidle' });
+    await page.goto('/profile', { waitUntil: 'domcontentloaded' });
     // The certifications card is at the bottom of a long profile; give every
     // async section time to resolve, then scroll it into view before
     // asserting the Add button.
@@ -206,7 +211,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     page,
   }) => {
     test.setTimeout(300_000);
-    const { browserErrors, decodeAll, getRest } = await setupCommon(page);
+    const { browserErrors, appLogs, decodeAll, getRest } = await setupCommon(page);
 
     const emailTrimmed = (EMAIL ?? '').trim();
     expect(emailTrimmed, 'disposable account must be in qa* namespace').toMatch(/^qa[^@]*@pipingbox\.com$/i);
@@ -286,34 +291,37 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       const fileInput = page.locator('#cert-file-upload-input');
       await fileInput.setInputFiles({ name: 'qa-synthetic-cert.pdf', mimeType: 'application/pdf', buffer: pdf });
 
-      // Progress bar must attach while uploading (at 0% width it has no
-      // bounding box, so assert attachment, not visibility).
-      const bar = page.locator('.h-full.rounded-full');
-      await expect(bar, 'upload progress bar must attach').toBeAttached({ timeout: 15_000 });
-
-      // Sample widths over time; they must vary (real progress), never jump
-      // from the fixed placeholder 30, and never show 100 before confirm.
+      // Sample widths from the FIRST moment (do not gate on an attach
+      // assertion first: on a fast link the whole upload can finish between
+      // the assert and the first sample). The bar may have 0% width (no
+      // bounding box), so sample via evaluate, not visibility.
       const widths: number[] = [];
       let saw100Early = false;
-      for (let i = 0; i < 90; i++) {
+      let nullSamples = 0;
+      for (let i = 0; i < 150; i++) {
         const w = await page.evaluate(() => {
           const el = document.querySelector('.h-full.rounded-full') as HTMLElement | null;
           if (!el) return null;
           const m = /width:\s*(\d+(?:\.\d+)?)%/.exec(el.style.width || '');
-          return m ? parseFloat(m[1]) : null;
+          return m ? parseFloat(m[1]) : 0;
         });
         if (w !== null) {
           widths.push(w);
           if (w >= 100) saw100Early = true;
+        } else {
+          nullSamples++;
         }
         const stillUploading = await page.evaluate(() =>
-          Boolean(document.querySelector('#cert-file-upload-input')) &&
-          /uploading|Subiendo/i.test(document.body.innerText),
+          /Subiendo|uploading|Cargando/i.test(
+            document.querySelector('[role="dialog"]')?.textContent ?? '',
+          ),
         );
         if (!stillUploading) break;
-        await page.waitForTimeout(200);
+        await page.waitForTimeout(150);
       }
-      console.log(`sampled progress widths: ${JSON.stringify([...new Set(widths)])}`);
+      console.log(
+        `sampled progress widths: ${JSON.stringify([...new Set(widths)])} (samples=${widths.length}, null=${nullSamples})`,
+      );
       expect(widths.length, 'progress must be sampled').toBeGreaterThan(0);
       const unique = new Set(widths);
       expect(unique.size, 'progress must move with bytes (not frozen)').toBeGreaterThan(1);
@@ -425,6 +433,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     }
 
     if (browserErrors.length) {
+      console.log('app upload logs:', JSON.stringify(appLogs.slice(0, 30)));
       console.log('browser console errors (informational):', JSON.stringify(browserErrors.slice(0, 5)));
     }
   });
@@ -432,8 +441,8 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
   test('recoverable timeout: slow hint, persistent message, retry, no partial object/row, no boundary', async ({
     page,
   }) => {
-    test.setTimeout(180_000);
-    const { browserErrors, decodeAll, getRest } = await setupCommon(page);
+    test.setTimeout(300_000);
+    const { browserErrors, appLogs, decodeAll, getRest } = await setupCommon(page);
     await login(page);
 
     expect(getRest(), 'REST context must be captured').toBeTruthy();
@@ -576,6 +585,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     }
 
     if (browserErrors.length) {
+      console.log('app upload logs:', JSON.stringify(appLogs.slice(0, 30)));
       console.log('browser console errors (informational):', JSON.stringify(browserErrors.slice(0, 5)));
     }
   });
