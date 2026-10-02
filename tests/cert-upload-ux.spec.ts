@@ -333,7 +333,8 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
         const w = await page.evaluate(() => {
           const el = document.querySelector('[role="dialog"] .h-full.rounded-full') as HTMLElement | null;
           if (!el) return null;
-          const m = /width:\s*(\d+(?:\.\d+)?)%/.exec(el.style.width || '');
+          // el.style.width is the VALUE only ("25%"), not "width: 25%".
+          const m = /(\d+(?:\.\d+)?)%/.exec(el.style.width || '');
           return m ? parseFloat(m[1]) : 0;
         });
         if (w !== null) {
@@ -341,18 +342,6 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
           if (w >= 100) saw100Early = true;
         } else {
           nullSamples++;
-        }
-        if (i % 10 === 0) {
-          const diag = await page.evaluate(() => {
-            const bars = [...document.querySelectorAll('.h-full.rounded-full')].map((el) => ({
-              width: (el as HTMLElement).style.width,
-              inDialog: Boolean(el.closest('[role="dialog"]')),
-            }));
-            const dlg = document.querySelector('[role="dialog"]');
-            const pct = [...(dlg?.textContent ?? '').matchAll(/(\d+)\s*%/g)].map((m) => m[1]);
-            return { bars, pct };
-          });
-          console.log(`sample[${i}] diag: ${JSON.stringify(diag)}`);
         }
         const stillUploading = await page.evaluate(() =>
           /Subiendo|uploading|Cargando/i.test(
