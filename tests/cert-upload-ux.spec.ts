@@ -166,6 +166,28 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     return { browserErrors, appLogs, decodeAll, getRest: () => rest };
   };
 
+  /**
+   * Wait until a PostHog event name appears on the actual request wire
+   * (decoded from POST batches). Needed because the SDK flushes on an
+   * interval: a one-time event emitted right before a page.reload() can
+   * otherwise sit in the in-memory queue and be lost, making the wire
+   * assertion flaky (exactly what happened with cert_upload_completed).
+   */
+  const waitForWireEvent = async (
+    page: import('@playwright/test').Page,
+    decodeAll: () => Record<string, unknown>[],
+    name: string,
+    timeoutMs = 20_000,
+  ): Promise<Record<string, unknown>[]> => {
+    const t0 = Date.now();
+    for (;;) {
+      const found = decodeAll().filter((e) => e.event === name);
+      if (found.length > 0) return found;
+      if (Date.now() - t0 > timeoutMs) return found;
+      await page.waitForTimeout(500);
+    }
+  };
+
   const login = async (page: import('@playwright/test').Page) => {
     await page.goto('/login', { waitUntil: 'networkidle' });
     await page.waitForTimeout(4000);
@@ -440,7 +462,11 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
         'row size must match fixture (or be absent)',
       ).toBeGreaterThan(0);
 
-      // Persistence: reload → certificate still visible.
+      // Persistence: reload → certificate still visible. Wait for the
+      // completed diagnostic event to hit the PostHog wire FIRST — the SDK
+      // flushes on an interval and a pending queue is dropped on reload.
+      const completedWire = await waitForWireEvent(page, decodeAll, 'cert_upload_completed', 20_000);
+      expect(completedWire, 'cert_upload_completed must reach the wire before reload').toHaveLength(1);
       await page.reload({ waitUntil: 'networkidle' });
       await page.waitForTimeout(2500);
       const stillVisible = await page
@@ -640,8 +666,9 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       expect(unexpected, `no cert rows may be created on failed upload; got ${unexpected.length}`).toHaveLength(0);
 
       // Wire: cert_upload_failed with the timeout category (closed enum),
-      // attempt_number=2 (initial + 1 retry), no PII.
-      await page.waitForTimeout(4500);
+      // attempt_number=2 (initial + 1 retry), no PII. Poll the wire for the
+      // flush instead of a fixed sleep (SDK flushes on an interval).
+      const failedWire = await waitForWireEvent(page, decodeAll, 'cert_upload_failed', 20_000);
       const decoded = decodeAll();
       const failed = decoded.filter((e) => e.event === 'cert_upload_failed');
       const startedT = decoded.filter((e) => e.event === 'cert_upload_started');
