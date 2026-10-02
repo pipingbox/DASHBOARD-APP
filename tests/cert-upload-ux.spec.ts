@@ -331,7 +331,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       let nullSamples = 0;
       for (let i = 0; i < 150; i++) {
         const w = await page.evaluate(() => {
-          const el = document.querySelector('.h-full.rounded-full') as HTMLElement | null;
+          const el = document.querySelector('[role="dialog"] .h-full.rounded-full') as HTMLElement | null;
           if (!el) return null;
           const m = /width:\s*(\d+(?:\.\d+)?)%/.exec(el.style.width || '');
           return m ? parseFloat(m[1]) : 0;
@@ -585,10 +585,10 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       // Progress bar attaches while uploading (0% width ⇒ no bounding box,
       // so assert attachment). With the stalled route no byte progress is
       // reported, so the bar must remain BELOW 100% the whole time.
-      const bar = page.locator('.h-full.rounded-full');
+      const bar = page.locator('[role="dialog"] .h-full.rounded-full');
       await expect(bar, 'progress bar must attach while uploading').toBeAttached({ timeout: 15_000 });
       const earlyWidth = await page.evaluate(() => {
-        const el = document.querySelector('.h-full.rounded-full') as HTMLElement | null;
+        const el = document.querySelector('[role="dialog"] .h-full.rounded-full') as HTMLElement | null;
         return el ? el.style.width : null;
       });
       expect(earlyWidth, 'bar must never show 100% before server confirmation').not.toBe('100%');
