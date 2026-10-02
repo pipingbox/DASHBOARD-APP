@@ -231,7 +231,6 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       await openCertDialog(page);
 
       // Fill required fields.
-      await page.locator('input[placeholder]').filter({ hasText: '' }).first(); // noop guard
       const nameInput = page.locator('form input').nth(0);
       const orgInput = page.locator('form input').nth(1);
       await nameInput.fill('QA Synthetic Certificate');
