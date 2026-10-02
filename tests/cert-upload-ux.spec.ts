@@ -251,9 +251,12 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     try {
       await openCertDialog(page);
 
-      // Fill required fields.
-      const nameInput = page.locator('form input').nth(0);
-      const orgInput = page.locator('form input').nth(1);
+      // Fill required fields. Scope to the open dialog: /profile renders
+      // other sections with their own (sometimes hidden) form inputs, so a
+      // page-wide 'form input' locator can bind to an invisible element.
+      const dialog = page.locator('[role="dialog"]');
+      const nameInput = dialog.locator('form input').nth(0);
+      const orgInput = dialog.locator('form input').nth(1);
       await nameInput.fill('QA Synthetic Certificate');
       await orgInput.fill('QA Synthetic Org');
 
@@ -312,7 +315,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       expect(boundaryVisible, 'no ErrorBoundary during upload').toBe(false);
 
       // Submit the certification.
-      const submitBtn = page.locator('form button[type="submit"]').first();
+      const submitBtn = dialog.locator('form button[type="submit"]').first();
       await expect(submitBtn, 'submit must be enabled after upload').toBeEnabled({ timeout: 15_000 });
       await submitBtn.click();
 
@@ -463,8 +466,9 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       });
 
       await openCertDialog(page);
-      const nameInput = page.locator('form input').nth(0);
-      const orgInput = page.locator('form input').nth(1);
+      const dialog = page.locator('[role="dialog"]');
+      const nameInput = dialog.locator('form input').nth(0);
+      const orgInput = dialog.locator('form input').nth(1);
       await nameInput.fill('QA Timeout Cert');
       await orgInput.fill('QA Timeout Org');
 
@@ -489,7 +493,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       expect(boundaryVisible, 'no ErrorBoundary on timeout').toBe(false);
 
       // Form preserved (dialog still open, fields intact).
-      await expect(page.locator('form input').nth(0), 'form name field preserved').toHaveValue('QA Timeout Cert');
+      await expect(dialog.locator('form input').nth(0), 'form name field preserved').toHaveValue('QA Timeout Cert');
 
       // uploadWithTimeout retries once on timeout → expect 2 attempts total.
       console.log(`storage upload attempts observed: ${storageAttempts}`);
