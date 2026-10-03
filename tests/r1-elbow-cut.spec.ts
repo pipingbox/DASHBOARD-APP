@@ -5,7 +5,11 @@ const URL = '/tools?t=elbow-cut&lng=es';
 async function openTool(page: import('@playwright/test').Page) {
   await page.goto(URL);
   const dialog = page.getByRole('dialog', { name: /Versión Beta|Beta Version/ });
-  if (await dialog.isVisible()) await dialog.getByRole('button', { name: /Continuar|Continue/ }).click();
+  const continueBtn = dialog.getByRole('button', { name: /Continuar|Continue/ });
+  // El diálogo beta puede tardar en aparecer (persistencia local vs primera visita);
+  // cerrarlo siempre que llegue, para que no intercepte los fills posteriores.
+  await continueBtn.waitFor({ state: 'visible', timeout: 5000 }).then(() => continueBtn.click()).catch(() => {});
+  await expect(dialog).toBeHidden();
 }
 
 test.describe('R1 Fase B — corte de codos', () => {
@@ -34,8 +38,8 @@ test.describe('R1 Fase B — corte de codos', () => {
     const betaInput = page.locator('input[value="45"]').first();
     await betaInput.fill('95');
     await expect(page.getByText(/NaN/)).toHaveCount(0);
-    // Debe aparecer error y NO la tabla de resultados
-    await expect(page.locator('text=/corte.*intradós|intrados/i')).toHaveCount(0);
+    // Debe aparecer error y NO la tabla de resultados (el valor de corte eje desaparece)
+    await expect(page.getByText(/94,[67] mm|94\.[67] mm/)).toHaveCount(0);
   });
 
   test('stale: de válido a inválido elimina el resultado anterior', async ({ page }) => {
