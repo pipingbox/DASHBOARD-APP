@@ -1029,6 +1029,7 @@
     "allowableStress": "Tensão admissível S (MPa)",
     "yCoefficient": "Coeficiente Y",
     "fillRequired": "Preencha diâmetro, pressão e tensão admissível",
+    "invalidPositive": "Diâmetro, pressão e tensão admissível devem ser números positivos",
     "resultThickness": "Espessura de parede necessária ≈ {{value}} mm",
     "calculationSaved": "Cálculo guardado no seu histórico",
     "comingSoon": "Interface da ferramenta em breve — motor de cálculo pronto.",

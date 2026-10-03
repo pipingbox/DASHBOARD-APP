@@ -1029,6 +1029,7 @@
     "allowableStress": "Contrainte admissible S (MPa)",
     "yCoefficient": "Coefficient Y",
     "fillRequired": "Veuillez renseigner le diamètre, la pression et la contrainte admissible",
+    "invalidPositive": "Le diamètre, la pression et la contrainte admissible doivent être des nombres positifs",
     "resultThickness": "Épaisseur de paroi requise ≈ {{value}} mm",
     "calculationSaved": "Calcul sauvegardé dans votre historique",
     "comingSoon": "Interface outil à venir — module de calcul prêt.",

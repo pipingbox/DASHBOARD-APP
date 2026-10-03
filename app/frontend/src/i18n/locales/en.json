@@ -1098,6 +1098,7 @@
     "allowableStress": "Allowable stress S (MPa)",
     "yCoefficient": "Y coefficient",
     "fillRequired": "Fill diameter, pressure and allowable stress",
+    "invalidPositive": "Diameter, pressure and allowable stress must be positive numbers",
     "resultThickness": "Required wall thickness ≈ {{value}} mm",
     "calculationSaved": "Calculation saved to your history",
     "comingSoon": "Tool UI coming soon — calculator scaffolding in place.",

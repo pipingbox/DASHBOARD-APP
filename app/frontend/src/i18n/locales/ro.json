@@ -1029,6 +1029,7 @@
     "allowableStress": "Tensiune admisibilă S (MPa)",
     "yCoefficient": "Coeficient Y",
     "fillRequired": "Completați diametrul, presiunea și tensiunea admisibilă",
+    "invalidPositive": "Diametrul, presiunea și tensiunea admisibilă trebuie să fie numere pozitive",
     "resultThickness": "Grosime de perete necesară ≈ {{value}} mm",
     "calculationSaved": "Calcul salvat în istoricul dumneavoastră",
     "comingSoon": "Interfața instrumentului va fi disponibilă curând — structura calculatorului este pregătită.",

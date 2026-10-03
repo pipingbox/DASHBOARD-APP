@@ -1026,6 +1026,7 @@
     "allowableStress": "Toelaatbare spanning S (MPa)",
     "yCoefficient": "Y-coëfficiënt",
     "fillRequired": "Vul diameter, druk en toelaatbare spanning in",
+    "invalidPositive": "Diameter, druk en toelaatbare spanning moeten positieve getallen zijn",
     "resultThickness": "Benodigde wanddikte ≈ {{value}} mm",
     "calculationSaved": "Berekening opgeslagen in je historie",
     "comingSoon": "Tool-UI komt eraan — rekenmodule staat klaar.",

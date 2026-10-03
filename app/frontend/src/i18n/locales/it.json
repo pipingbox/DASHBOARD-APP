@@ -1029,6 +1029,7 @@
     "allowableStress": "Tensione ammissibile S (MPa)",
     "yCoefficient": "Coefficiente Y",
     "fillRequired": "Inserisca diametro, pressione e tensione ammissibile",
+    "invalidPositive": "Diametro, pressione e tensione ammissibile devono essere numeri positivi",
     "resultThickness": "Spessore richiesto ≈ {{value}} mm",
     "calculationSaved": "Calcolo salvato nello Suo storico",
     "comingSoon": "Interfaccia strumento in arrivo — scaffolding del calcolatore presente.",

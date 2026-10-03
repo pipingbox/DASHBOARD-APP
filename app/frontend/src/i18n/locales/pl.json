@@ -1032,6 +1032,7 @@
     "allowableStress": "Naprężenie dopuszczalne S (MPa)",
     "yCoefficient": "Współczynnik Y",
     "fillRequired": "Wprowadź średnicę, ciśnienie i naprężenie dopuszczalne",
+    "invalidPositive": "Średnica, ciśnienie i naprężenie dopuszczalne muszą być liczbami dodatnimi",
     "resultThickness": "Wymagana grubość ścianki ≈ {{value}} mm",
     "calculationSaved": "Obliczenie zapisano w twojej historii",
     "comingSoon": "Interfejs narzędzia wkrótce — szkielet kalkulatora jest już gotowy.",

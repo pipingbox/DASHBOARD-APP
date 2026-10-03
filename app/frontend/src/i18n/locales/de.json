@@ -1026,6 +1026,7 @@
     "allowableStress": "Zulässige Spannung S (MPa)",
     "yCoefficient": "Y-Koeffizient",
     "fillRequired": "Bitte Durchmesser, Druck und zulässige Spannung angeben",
+    "invalidPositive": "Durchmesser, Druck und zulässige Spannung müssen positive Zahlen sein",
     "resultThickness": "Erforderliche Wanddicke ≈ {{value}} mm",
     "calculationSaved": "Berechnung in Ihrem Verlauf gespeichert",
     "comingSoon": "Tool-Oberfläche folgt — Rechenkern ist bereits vorhanden.",

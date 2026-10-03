@@ -119,11 +119,21 @@ export default function Tools() {
     const P = Number(p);
     const S = Number(s);
     const Y = Number(y);
-    if (!D || !P || !S) {
+    // Validación real: finito y positivo en D/P/S; Y finito. Sin NaN/Infinity,
+    // sin coerción silenciosa de negativos o texto. La fórmula B31.3 no se toca.
+    if (!Number.isFinite(D) || !Number.isFinite(P) || !Number.isFinite(S) || !Number.isFinite(Y)) {
       toast.error(t('tools.fillRequired'));
       return;
     }
+    if (D <= 0 || P <= 0 || S <= 0) {
+      toast.error(t('tools.invalidPositive'));
+      return;
+    }
     const tValue = (P * D) / (2 * (S + P * Y));
+    if (!Number.isFinite(tValue) || tValue <= 0) {
+      toast.error(t('tools.invalidPositive'));
+      return;
+    }
     setResult(t('tools.resultThickness', { value: tValue.toFixed(3) }));
 
     if (user) {
