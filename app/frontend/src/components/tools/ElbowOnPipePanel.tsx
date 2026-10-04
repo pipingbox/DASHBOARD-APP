@@ -11,11 +11,14 @@ import {
   projectElbowOnPipe,
   type ElbowOnPipeSummaryKey,
 } from '@/tools/branch/elbowOnPipeDisplay';
+import { buildElbowOnPipePicaje } from '@/tools/branch/elbowOnPipePicajeSvg';
+import { buildElbowOnPipeMarking } from '@/tools/branch/elbowOnPipeMarkingSvg';
+import { buildElbowOnPipeSchematic } from '@/tools/branch/elbowOnPipeSchematicSvg';
 import { formatMm } from '@/tools/branch/formatMm';
 
 /**
- * PB-BRANCH-INJERTO-EXPANSION-001 — U5.2a
- * CODO → TUBO panel: numeric results only.
+ * PB-BRANCH-INJERTO-EXPANSION-001 — U5.2a + U5.3
+ * CODO → TUBO panel: numeric results and screen previews.
  *
  * The elbow is the member being cut and the straight pipe is the receiver, the
  * exact inverse of the tubo→codo family. Two consequences are visible on screen
@@ -31,16 +34,27 @@ import { formatMm } from '@/tools/branch/formatMm';
  *
  * Cota Y' is an external positioning dimension carried over from the drawing. It
  * is deliberately NOT part of the kernel input, so it cannot move Cota X', the
- * seating height, any picaje coordinate or any arc output. An unusable Y' is
- * reported next to its own field and never suppresses the geometry, precisely
- * because the geometry does not depend on it.
+ * seating height, any picaje coordinate, any arc output or any plotted point of
+ * the three previews. An unusable Y' is reported next to its own field and never
+ * suppresses the geometry, precisely because the geometry does not depend on it.
  *
- * No SVG and no PDF here: screen graphics are U5.3, physical sheets are U5.4.
+ * U5.3 adds SCREEN previews only: they are projections of the kernel result, so
+ * no geometry is computed in this component or in the SVG generators. Physical
+ * 1:1 sheets (receiver picaje template, elbow marking guide) are U5.4; there is
+ * deliberately no download or print action here.
  */
 
 const DIVISIONS = [12, 16, 24, 36, 48];
 const INPUT_CLASS = 'min-h-11 w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-amber-500';
 const DATUM_TYPES = ['EJE', 'BOP', 'TOP', 'FE'] as const;
+
+type GraphicTab = 'picaje' | 'marking' | 'schematic';
+const GRAPHIC_TABS: GraphicTab[] = ['picaje', 'marking', 'schematic'];
+const GRAPHIC_TAB_KEYS: Record<GraphicTab, string> = {
+  picaje: 'tools.elbowOnPipe.tabPicaje',
+  marking: 'tools.elbowOnPipe.tabMarking',
+  schematic: 'tools.elbowOnPipe.tabSchematic',
+};
 
 /** All eleven kernel codes map onto a shop-readable cause. */
 const ERROR_KEYS: Record<ElbowOnPipeErrorCode, string> = {
@@ -80,6 +94,7 @@ export default function ElbowOnPipePanel() {
   const [datumType, setDatumType] = useState<ElbowOnPipeDatum['type']>('EJE');
   const [fe, setFe] = useState('20');
   const [yPrime, setYPrime] = useState('');
+  const [graphic, setGraphic] = useState<GraphicTab>('picaje');
 
   const elbow = ELBOW_DATA.find(pipe => pipe.nps === elbowNps)!;
   const receiver = ELBOW_DATA.find(pipe => pipe.nps === receiverNps)!;
@@ -112,6 +127,65 @@ export default function ElbowOnPipePanel() {
     ['D', receiver.od], ['R', parseMm(radius)],
     ['d.ex', elbow.od], ['d.in', elbowId],
   ] as const;
+
+  /* U5.3 screen previews. Every millimetre comes from the kernel result; the
+     generators only map mm → px. Y' is forwarded as an annotation, never as
+     geometry, so switching it cannot move a single plotted point. */
+  const graphicSvg = useMemo(() => {
+    if (!result.valid) return null;
+    const screenPreviewNote = t('tools.branchOnElbow.screenPreview');
+    if (graphic === 'picaje') {
+      return buildElbowOnPipePicaje(result, {
+        title: t('tools.elbowOnPipe.picajeTitle'),
+        originLabel: t('tools.elbowOnPipe.picajeOrigin'),
+        xAxis: t('tools.elbowOnPipe.picajeXAxis'),
+        yAxis: t('tools.elbowOnPipe.picajeYAxis'),
+        cotaX: t('tools.elbowOnPipe.cotaX'),
+        cotaY: t('tools.elbowOnPipe.yPrime'),
+        datum: t(`tools.branchOnElbow.datum${datumType}`),
+        closesOn: t('tools.branchOnElbow.picajeClosesOn'),
+        clampedLegend: t('tools.elbowOnPipe.clampedLegend'),
+        screenPreviewNote,
+      }, { yPrimeMm })?.svg ?? null;
+    }
+    if (graphic === 'marking') {
+      return buildElbowOnPipeMarking(result, {
+        title: t('tools.elbowOnPipe.markingTitle'),
+        note: t('tools.elbowOnPipe.markingNote'),
+        arcAxis: t('tools.elbowOnPipe.markingArcAxis'),
+        lengthAxis: t('tools.elbowOnPipe.markingLengthAxis'),
+        angleAxis: t('tools.elbowOnPipe.markingAngleAxis'),
+        limitLabel: t('tools.elbowOnPipe.markingLimit'),
+        closureLabel: t('tools.branchOnElbow.closure'),
+        clampedLegend: t('tools.elbowOnPipe.clampedLegend'),
+        screenPreviewNote,
+      }, { yPrimeMm })?.svg ?? null;
+    }
+    return buildElbowOnPipeSchematic({
+      elbowCentrelineRadiusMm: parseMm(radius),
+      elbowOuterDiameterMm: elbow.od,
+      elbowInnerDiameterMm: elbowId,
+      receiverOuterDiameterMm: receiver.od,
+      datumOffsetMm: result.datumOffsetMm,
+      seatingHeightMm: result.seatingHeightMm,
+      cotaXMm: result.cotaXMm,
+      datumName: datumType,
+    }, {
+      title: t('tools.branchOnElbow.schematicTitle'),
+      elevation: t('tools.branchOnElbow.schematicElevation'),
+      section: t('tools.elbowOnPipe.schematicSection'),
+      elbow: t('tools.branchOnElbow.elbow'),
+      receiver: t('tools.elbowOnPipe.receiver'),
+      endFace: t('tools.elbowOnPipe.schematicEndFace'),
+      legPlane: t('tools.elbowOnPipe.schematicLegPlane'),
+      seating: t('tools.elbowOnPipe.seating'),
+      cotaX: t('tools.elbowOnPipe.cotaX'),
+      cotaY: t('tools.elbowOnPipe.yPrime'),
+      datumOffset: t('tools.branchOnElbow.schematicOffset'),
+      screenPreviewNote,
+      notToScale: t('tools.branchOnElbow.notToScale'),
+    }, { yPrimeMm })?.svg ?? null;
+  }, [result, graphic, yPrimeMm, datumType, radius, elbow.od, elbowId, receiver.od, t]);
 
   return (
     <section className="space-y-5" aria-label={t('tools.elbowOnPipe.family')}>
@@ -240,6 +314,32 @@ export default function ElbowOnPipePanel() {
             </p>
           )}
           <p className="text-xs text-zinc-500">{t('tools.elbowOnPipe.description')}</p>
+
+          <div className="rounded-lg border border-zinc-800/80 bg-zinc-950 p-4">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <h5 className="text-xs font-medium uppercase tracking-widest text-zinc-400">{t('tools.elbowOnPipe.graphics')}</h5>
+              <span className="text-[10px] text-zinc-500">{t('tools.branchOnElbow.screenPreview')}</span>
+            </div>
+            <div role="tablist" aria-label={t('tools.elbowOnPipe.graphics')} className="grid grid-cols-3 gap-2">
+              {GRAPHIC_TABS.map(tab => (
+                <button key={tab} type="button" role="tab" id={`elbow-on-pipe-tab-${tab}`}
+                  aria-selected={graphic === tab} aria-controls="elbow-on-pipe-graphic-panel"
+                  onClick={() => setGraphic(tab)}
+                  className={`min-h-11 rounded-md border px-2 py-2 text-xs font-semibold sm:text-sm ${graphic === tab ? 'border-amber-500 bg-amber-500/10 text-amber-400' : 'border-zinc-800 bg-zinc-900/40 text-zinc-300 hover:border-zinc-600'}`}>
+                  {t(GRAPHIC_TAB_KEYS[tab])}
+                </button>
+              ))}
+            </div>
+            {graphicSvg && (
+              <div id="elbow-on-pipe-graphic-panel" role="tabpanel" aria-labelledby={`elbow-on-pipe-tab-${graphic}`}
+                data-testid="elbow-on-pipe-graphic" data-graphic={graphic}
+                className="mt-3 w-full overflow-hidden rounded-md border border-zinc-800/80"
+                dangerouslySetInnerHTML={{ __html: graphicSvg }} />
+            )}
+            {graphic === 'marking' && (
+              <p className="mt-3 text-xs text-amber-400/90" data-testid="elbow-on-pipe-marking-note">{t('tools.elbowOnPipe.markingNote')}</p>
+            )}
+          </div>
 
           <div className="rounded-lg border border-zinc-800/80 bg-zinc-950 p-4">
             <h5 className="mb-3 text-xs font-medium uppercase tracking-widest text-zinc-400">{t('tools.elbowOnPipe.stations')}</h5>

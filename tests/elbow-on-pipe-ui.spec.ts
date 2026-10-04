@@ -47,8 +47,8 @@ test('the third family appears without disturbing the default straight header', 
 
   await page.getByRole('button', { name: FAMILY, exact: true }).click();
   await expect(page.getByTestId('elbow-on-pipe-results')).toBeVisible();
-  await expect(page.getByText('Elbow-to-tube intersection · numeric results')).toBeVisible();
-  /* U5.2a ships no physical output: no 1:1 button may appear in this family. */
+  await expect(page.getByText('Elbow-to-tube intersection · numeric results and screen previews')).toBeVisible();
+  /* U5.2a/U5.3 ship no physical output: no 1:1 button may appear in this family. */
   await expect(page.getByRole('button', { name: 'Print Template 1:1' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Print picaje template 1:1' })).toHaveCount(0);
   await expect(page.getByTestId('elbow-results')).toHaveCount(0);
