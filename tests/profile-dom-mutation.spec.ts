@@ -342,6 +342,27 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
       });
       console.log('phase: save clicked ->', saveClick, ', waiting for saved status');
 
+      // PB-UI-DOM-REMOVECHILD-RESIDUAL-001: the status banner mounts AFTER
+      // the click, so the pre-click mutation never covered it. Real Chrome
+      // keeps translating newly inserted DOM: re-mutate while the banner
+      // shows the saving state, so the saving→saved swap must delete a
+      // font-wrapped (detached) bare text node — the exact production
+      // removeChild path (PB-ERR-2F5VN8 class, Chrome Android).
+      let mutatedDuringSaving = -1;
+      for (let i = 0; i < 60; i++) {
+        const saving = await page
+          .evaluate(() =>
+            [...document.querySelectorAll('span')].some((s) => /guardando|saving/i.test(s.textContent ?? '')),
+          )
+          .catch(() => false);
+        if (saving) {
+          mutatedDuringSaving = await page.evaluate(TRANSLATE_SIM);
+          break;
+        }
+        await page.waitForTimeout(25);
+      }
+      console.log(`translate-sim during saving banner: ${mutatedDuringSaving} nodes font-wrapped`);
+
       try {
         await expect(
           page.getByText(/Guardado/i).first(),
