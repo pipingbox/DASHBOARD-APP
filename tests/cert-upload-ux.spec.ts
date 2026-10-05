@@ -78,6 +78,16 @@ function syntheticPdf(targetBytes = 800): Buffer {
   return buf.subarray(0, targetBytes);
 }
 
+/** Minimal synthetic PNG (signature + padding). Nothing in the app or
+ * Storage decodes the image content; validation is MIME/extension-based,
+ * so a signature-correct synthetic buffer is a safe fixture. */
+function syntheticPng(targetBytes = 800): Buffer {
+  // PNG signature + a padded IHDR-ish payload of filter bytes.
+  const head = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  const pad = Buffer.alloc(Math.max(0, targetBytes - head.length), 0x00);
+  return Buffer.concat([head, pad]).subarray(0, targetBytes);
+}
+
 test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)', () => {
   test.skip(!hasCreds, 'E2E_TEST_EMAIL / E2E_TEST_PASSWORD not set -- skipping cert upload E2E');
 
@@ -243,6 +253,46 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
     await expect(fileInput, 'cert file input must be present in the dialog').toBeAttached({ timeout: 10_000 });
   };
 
+  /**
+   * Sample the dialog progress bar widths from the FIRST moment (do not gate
+   * on an attach assertion first: on a fast link the whole upload can finish
+   * between the assert and the first sample). The bar may have 0% width (no
+   * bounding box), so sample via evaluate, not visibility.
+   */
+  const sampleDialogProgress = async (page: import('@playwright/test').Page) => {
+    const widths: number[] = [];
+    let saw100Early = false;
+    let nullSamples = 0;
+    for (let i = 0; i < 150; i++) {
+      const w = await page.evaluate(() => {
+        const el = document.querySelector('[role="dialog"] .h-full.rounded-full') as HTMLElement | null;
+        if (!el) return null;
+        // el.style.width is the VALUE only ("25%"), not "width: 25%".
+        const m = /(\d+(?:\.\d+)?)%/.exec(el.style.width || '');
+        return m ? parseFloat(m[1]) : 0;
+      });
+      if (w !== null) {
+        widths.push(w);
+        if (w >= 100) saw100Early = true;
+      } else {
+        nullSamples++;
+      }
+      const stillUploading = await page.evaluate(() =>
+        /Subiendo|uploading|Cargando/i.test(
+          document.querySelector('[role="dialog"]')?.textContent ?? '',
+        ),
+      );
+      if (!stillUploading) break;
+      await page.waitForTimeout(150);
+    }
+    return { widths, saw100Early, nullSamples };
+  };
+
+  const uploadPickerButtonLocator = (page: import('@playwright/test').Page) =>
+    page
+      .locator('[role="dialog"]')
+      .getByRole('button', { name: /haz clic para subir certificado|click to upload certificate|subir certificado|upload certificate/i });
+
   test('happy path: real progress, single Storage object + single row, persistence, ZERO DIFF', async ({
     page,
   }) => {
@@ -356,6 +406,8 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
 
     let createdRowId = '';
     let createdStoragePath = '';
+    let createdRowId2 = '';
+    let createdStoragePath2 = '';
 
     try {
       await openCertDialog(page);
@@ -379,35 +431,8 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       ]);
       await chooser.setFiles({ name: 'qa-synthetic-cert.pdf', mimeType: 'application/pdf', buffer: pdf });
 
-      // Sample widths from the FIRST moment (do not gate on an attach
-      // assertion first: on a fast link the whole upload can finish between
-      // the assert and the first sample). The bar may have 0% width (no
-      // bounding box), so sample via evaluate, not visibility.
-      const widths: number[] = [];
-      let saw100Early = false;
-      let nullSamples = 0;
-      for (let i = 0; i < 150; i++) {
-        const w = await page.evaluate(() => {
-          const el = document.querySelector('[role="dialog"] .h-full.rounded-full') as HTMLElement | null;
-          if (!el) return null;
-          // el.style.width is the VALUE only ("25%"), not "width: 25%".
-          const m = /(\d+(?:\.\d+)?)%/.exec(el.style.width || '');
-          return m ? parseFloat(m[1]) : 0;
-        });
-        if (w !== null) {
-          widths.push(w);
-          if (w >= 100) saw100Early = true;
-        } else {
-          nullSamples++;
-        }
-        const stillUploading = await page.evaluate(() =>
-          /Subiendo|uploading|Cargando/i.test(
-            document.querySelector('[role="dialog"]')?.textContent ?? '',
-          ),
-        );
-        if (!stillUploading) break;
-        await page.waitForTimeout(150);
-      }
+      // Sample widths from the first moment (helper).
+      const { widths, saw100Early, nullSamples } = await sampleDialogProgress(page);
       console.log(
         `sampled progress widths: ${JSON.stringify([...new Set(widths)])} (samples=${widths.length}, null=${nullSamples})`,
       );
@@ -536,16 +561,107 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       expect(cp.storage_path).toBeUndefined();
       expect(cp.file_name).toBeUndefined();
       console.log('wire PASS: app_error=0, zero PII, cert_upload_started+completed x1 (closed enums)');
+
+      // ── Second upload: IMAGE (PNG) through the same real picker flow ──
+      // Production smoke requires proving both accepted file kinds open the
+      // native selector and upload with real progress.
+      await cdp.send('Network.emulateNetworkConditions', {
+        offline: false,
+        latency: 50,
+        downloadThroughput: 4_000_000,
+        uploadThroughput: 200_000,
+      });
+      await openCertDialog(page);
+      const dialog2 = page.locator('[role="dialog"]');
+      await dialog2.locator('form input').nth(0).fill('QA Synthetic Image Cert');
+      await dialog2.locator('form input').nth(1).fill('QA Synthetic Image Org');
+      const png = syntheticPng(1_200_000);
+      const [chooser2] = await Promise.all([
+        page.waitForEvent('filechooser'),
+        uploadPickerButtonLocator(page).click(),
+      ]);
+      await chooser2.setFiles({ name: 'qa-synthetic-cert.png', mimeType: 'image/png', buffer: png });
+      const imgProgress = await sampleDialogProgress(page);
+      console.log(
+        `image sampled progress widths: ${JSON.stringify([...new Set(imgProgress.widths)])} (samples=${imgProgress.widths.length}, null=${imgProgress.nullSamples})`,
+      );
+      expect(imgProgress.widths.length, 'image progress must be sampled').toBeGreaterThan(0);
+      expect(imgProgress.saw100Early, 'image: never 100% before confirmation').toBe(false);
+      expect(
+        imgProgress.widths.every((w) => w === 30),
+        'image progress must not be the fixed 30% placeholder',
+      ).toBe(false);
+      await cdp.send('Network.emulateNetworkConditions', {
+        offline: false,
+        latency: 0,
+        downloadThroughput: -1,
+        uploadThroughput: -1,
+      });
+      await page.waitForFunction(
+        () => !/uploading|Subiendo/i.test(document.body.innerText),
+        undefined,
+        { timeout: 60_000 },
+      );
+      const submitBtn2 = dialog2.locator('form button[type="submit"]').first();
+      await expect(submitBtn2, 'image: submit must be enabled after upload').toBeEnabled({ timeout: 15_000 });
+      await submitBtn2.click();
+
+      let row2: Record<string, unknown> | null = null;
+      for (let i = 0; i < 15 && !row2; i++) {
+        await page.waitForTimeout(1000);
+        const after = await readCerts();
+        row2 = after.find((c) => !snapshotIds.has(String(c.id)) && String(c.id) !== createdRowId) ?? null;
+      }
+      expect(row2, 'exactly one new image certification row must be created').toBeTruthy();
+      createdRowId2 = String(row2!.id);
+      createdStoragePath2 = String(row2!.storage_path ?? '');
+      expect(String(row2!.storage_bucket), 'image row must reference the certificates bucket').toBe(CERT_BUCKET);
+      expect(createdStoragePath2.startsWith(`${uid}/`), 'image storage path must be owner-scoped').toBe(true);
+
+      // Second completed event on the wire before reload.
+      const completedWire2 = await waitForWireEvent(page, decodeAll, 'cert_upload_completed', 20_000);
+      expect(completedWire2, 'cert_upload_completed x2 after image upload').toHaveLength(2);
+      const cp2 = (completedWire2[1].properties ?? {}) as Record<string, unknown>;
+      expect(cp2.mime).toBe('image/png');
+      expect(cp2.bucket).toBe('certificates');
+      expect(cp2.attempt_number).toBe(1);
+      expect(cp2.storage_path).toBeUndefined();
+      expect(cp2.file_name).toBeUndefined();
+
+      // Persistence: reload → BOTH certificates still visible.
+      await page.reload({ waitUntil: 'networkidle' });
+      await page.waitForTimeout(2500);
+      for (const label of ['QA Synthetic Certificate', 'QA Synthetic Image Cert']) {
+        const visible = await page
+          .getByText(label)
+          .first()
+          .isVisible()
+          .catch(() => false);
+        expect(visible, `${label} must persist after reload`).toBe(true);
+      }
+      console.log('happy path PASS: PDF + image, 2 objects + 2 rows, persisted after reload');
+
+      // Final wire sweep after both uploads.
+      await page.waitForTimeout(4500);
+      const decodedFinal = decodeAll();
+      const appErrorsFinal = decodedFinal.filter((e) => e.event === 'app_error');
+      expect(appErrorsFinal, `app_error=0 required after both uploads; got ${JSON.stringify(appErrorsFinal.map((e) => (e.properties as Record<string, unknown>)?.incident_code))}`).toHaveLength(0);
+      for (const e of decodedFinal) {
+        expect(JSON.stringify(e)).not.toContain('@');
+      }
+      expect(decodedFinal.filter((e) => e.event === 'cert_upload_started')).toHaveLength(2);
+      expect(decodedFinal.filter((e) => e.event === 'cert_upload_completed')).toHaveLength(2);
+      console.log('wire PASS (final): app_error=0, zero PII, started+completed x2');
     } finally {
-      // ── Restore: delete created row + storage object, verify ZERO DIFF ──
-      if (createdRowId) {
-        await fetch(`${restCtx.base}/rest/v1/${CERT_TABLE}?id=eq.${createdRowId}`, {
+      // ── Restore: delete created rows + storage objects, verify ZERO DIFF ──
+      for (const rowId of [createdRowId, createdRowId2].filter(Boolean)) {
+        await fetch(`${restCtx.base}/rest/v1/${CERT_TABLE}?id=eq.${rowId}`, {
           method: 'DELETE',
           headers: restHeaders,
         }).catch(() => undefined);
       }
-      if (createdStoragePath) {
-        await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
+      for (const storagePath of [createdStoragePath, createdStoragePath2].filter(Boolean)) {
+        await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${storagePath}`, {
           method: 'DELETE',
           headers: restHeaders,
         }).catch(() => undefined);
