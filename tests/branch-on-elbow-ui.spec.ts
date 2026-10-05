@@ -4,8 +4,15 @@ const TOOL_URL = '/tools?t=branch-layout&lng=en';
 
 async function openTool(page: import('@playwright/test').Page) {
   await page.goto(TOOL_URL);
+  /* The modal mounts after hydration, so it is not there when goto() resolves. isVisible()
+     never waits (its timeout option is ignored), hence waitFor: otherwise the overlay is
+     still intercepting pointer events when the first family click happens. */
   const betaDialog = page.getByRole('dialog', { name: 'Beta Version' });
-  if (await betaDialog.isVisible()) await betaDialog.getByRole('button', { name: 'Continue' }).click();
+  const shown = await betaDialog.waitFor({ state: 'visible', timeout: 10_000 }).then(() => true).catch(() => false);
+  if (shown) {
+    await betaDialog.getByRole('button', { name: 'Continue' }).click();
+    await betaDialog.waitFor({ state: 'hidden' });
+  }
 }
 
 async function selectElbow(page: import('@playwright/test').Page) {
