@@ -372,8 +372,12 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       // (Uplink throttling was armed before login — see top of test — so
       // the storage connection is created under emulation.)
       const pdf = syntheticPdf(1_500_000);
-      const fileInput = page.locator('#cert-file-upload-input');
-      await fileInput.setInputFiles({ name: 'qa-synthetic-cert.pdf', mimeType: 'application/pdf', buffer: pdf });
+      const uploadPickerButton = dialog.getByRole('button', { name: /subir archivo|upload file/i });
+      const [chooser] = await Promise.all([
+        page.waitForEvent('filechooser'),
+        uploadPickerButton.click(),
+      ]);
+      await chooser.setFiles({ name: 'qa-synthetic-cert.pdf', mimeType: 'application/pdf', buffer: pdf });
 
       // Sample widths from the FIRST moment (do not gate on an attach
       // assertion first: on a fast link the whole upload can finish between
@@ -659,8 +663,14 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       await orgInput.fill('QA Timeout Org');
 
       const pdf = syntheticPdf();
-      const fileInput = page.locator('#cert-file-upload-input');
-      await fileInput.setInputFiles({ name: 'qa-timeout-cert.pdf', mimeType: 'application/pdf', buffer: pdf });
+      const uploadPickerButton = page
+        .locator('[role="dialog"]')
+        .getByRole('button', { name: /subir archivo|upload file/i });
+      const [chooser] = await Promise.all([
+        page.waitForEvent('filechooser'),
+        uploadPickerButton.click(),
+      ]);
+      await chooser.setFiles({ name: 'qa-timeout-cert.pdf', mimeType: 'application/pdf', buffer: pdf });
 
       // Progress bar attaches while uploading (0% width ⇒ no bounding box,
       // so assert attachment). With the stalled route no byte progress is

@@ -372,6 +372,11 @@ export function CertificationsSection() {
     }
   };
 
+  const openCertificateFilePicker = () => {
+    if (uploading) return;
+    fileInputRef.current?.click();
+  };
+
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -854,7 +859,7 @@ export function CertificationsSection() {
             ref={fileInputRef}
             id="cert-file-upload-input"
             type="file"
-            accept="application/pdf,image/png,image/jpeg,image/jpg,image/webp"
+            accept="application/pdf,image/png,image/jpeg,image/jpg,image/webp,image/heic,image/heif"
             className="sr-only"
             tabIndex={-1}
             onChange={(e) => {
@@ -959,9 +964,11 @@ export function CertificationsSection() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <label
-                    htmlFor="cert-file-upload-input"
+                  <button
+                    type="button"
+                    aria-controls="cert-file-upload-input"
                     aria-disabled={uploading}
+                    onClick={openCertificateFilePicker}
                     className={`flex w-full cursor-pointer items-center justify-center gap-2 border border-dashed border-zinc-800 bg-zinc-950 px-3 py-6 text-xs uppercase tracking-[0.15em] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b] ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
                   >
                     {uploading ? (
@@ -974,7 +981,7 @@ export function CertificationsSection() {
                         ? `${t('common.loading')} ${uploadProgress}%`
                         : t('workerProfile.certifications.uploadFile')}
                     </span>
-                  </label>
+                  </button>
                   {uploading && (
                     <div className="w-full space-y-1">
                       <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
