@@ -1,5 +1,6 @@
 /* ───────────────────────────────────────────────────────────────────────────
-   Shared helpers for the tubo→codo SCREEN previews (U3).
+   Shared helpers for the SCREEN previews of both elbow branch families:
+   tubo→codo (U3) and codo→tubo (U5.3). Nothing here is family specific.
 
    These previews are RESPONSIVE SCREEN GRAPHICS, never physical templates:
    the emitted <svg> carries a viewBox plus width:100% so it adapts to the
@@ -7,10 +8,11 @@
    belongs to the existing tube→tube pipeline and to a later unit — nothing
    here may be printed as a fabrication template.
 
-   Geometry is NEVER computed here. Every millimetre value originates in
-   branchOnElbowGeometry.ts (U1); this module only maps mm → screen px with
-   documented affine transforms and exposes the transform parameters so the
-   tests can prove that each plotted point is the image of a U1 value.
+   Geometry is NEVER computed here. Every millimetre value originates in a
+   kernel — branchOnElbowGeometry.ts (U1) or elbowOnPipeGeometry.ts (U5.1);
+   this module only maps mm → screen px with documented affine transforms and
+   exposes the transform parameters so the tests can prove that each plotted
+   point is the image of a kernel value.
    ─────────────────────────────────────────────────────────────────────────── */
 
 export const ELBOW_SVG = {
