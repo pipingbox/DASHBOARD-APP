@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase, TABLES } from '@/lib/supabase';
-import { getStoredReferralCode, clearStoredReferralCode, validateReferralCode } from '@/lib/referrals';
+import { getStoredReferralCode, clearStoredReferralCode, validateReferralCode, isDefinitiveReferralOutcome } from '@/lib/referrals';
 import { notifyReferralJoined } from '@/lib/notifications';
 import { getAuthCallbackUrl } from '@/lib/constants';
 import { classifyAuthError, isNewSignupIdentity, type AuthErrorCode } from '@/lib/authFlow';
@@ -260,18 +260,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               // table has no cross-user select policy, so client-side
               // validation always returned zero rows and the stored code was
               // then cleared, losing the attribution (PB-REFERRAL-ALDO-001).
-              await bootstrapReferrals(authUser.id, storedCode);
-              const { data: rechecked } = await supabase
-                .from('app_14da0f1941_profiles')
-                .select('referred_by_user_id')
-                .eq('user_id', authUser.id)
-                .maybeSingle();
-              if (rechecked?.referred_by_user_id) {
-                console.log('[REFERRAL_RECOVERY] ✅ Referral recovered for existing profile');
+              // Only clear on DEFINITIVE outcomes; keep on transient ones.
+              const boot = await bootstrapReferrals(authUser.id, storedCode);
+              const attribution = String(boot?.attribution ?? '');
+              if (isDefinitiveReferralOutcome(attribution)) {
+                console.log('[REFERRAL_RECOVERY] Recovery outcome (definitive):', attribution);
                 clearStoredReferralCode();
+              } else {
+                // Transient/unknown (network, 5xx, 'none') — keep the code;
+                // the Dashboard recovery will retry.
+                console.warn('[REFERRAL_RECOVERY] Recovery inconclusive, keeping code:', attribution || 'no-response');
               }
-              // If bootstrap could not resolve it, keep the stored code:
-              // the Dashboard recovery retries and clears it if invalid.
             }
           } catch (recoveryErr) {
             console.error('[REFERRAL_RECOVERY] Recovery failed:', recoveryErr);
@@ -408,15 +407,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           console.log('PROFILE CREATED (bare)', bareInserted?.user_id);
           setProfile((bareInserted as Profile) ?? null);
-          await bootstrapReferrals(authUser.id, referralCode);
-          clearStoredReferralCode();
+          {
+            const boot = await bootstrapReferrals(authUser.id, referralCode);
+            // Only consume the stored code on a definitive backend outcome;
+            // a transient bootstrap failure keeps it for Dashboard recovery.
+            if (!referralCode || isDefinitiveReferralOutcome(boot?.attribution)) {
+              clearStoredReferralCode();
+            }
+          }
           return;
         }
 
         console.log('PROFILE CREATED (minimal)', retryInserted?.user_id);
         setProfile((retryInserted as Profile) ?? null);
-        await bootstrapReferrals(authUser.id, referralCode);
-        clearStoredReferralCode();
+        {
+          const boot = await bootstrapReferrals(authUser.id, referralCode);
+          if (!referralCode || isDefinitiveReferralOutcome(boot?.attribution)) {
+            clearStoredReferralCode();
+          }
+        }
         return;
       }
 
@@ -424,10 +433,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile((inserted as Profile) ?? null);
 
       // Bootstrap referral code and assignment via backend.
-      await bootstrapReferrals(authUser.id, referralCode);
+      const boot = await bootstrapReferrals(authUser.id, referralCode);
 
-      // Only clear referral code AFTER everything is done
-      clearStoredReferralCode();
+      // Only consume the stored code on a definitive backend outcome; a
+      // transient bootstrap failure keeps it for Dashboard recovery.
+      if (!referralCode || isDefinitiveReferralOutcome(boot?.attribution)) {
+        clearStoredReferralCode();
+      }
 
     } catch (err) {
       console.error(`PROFILE CREATION ERROR (unexpected, attempt ${attempt}):`, err);

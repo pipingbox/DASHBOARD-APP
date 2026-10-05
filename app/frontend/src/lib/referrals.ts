@@ -161,6 +161,23 @@ export function getStoredReferralCode(): string | null {
 }
 
 /**
+ * Definitive referral outcomes: only these may consume (clear) the stored
+ * referral code. Anything else (no response, 'none', unknown) is treated as
+ * transient and the code is kept for a later retry (PB-REFERRAL-ALDO-001).
+ */
+export const DEFINITIVE_REFERRAL_OUTCOMES = [
+  'confirmed',
+  'existing_same',
+  'existing_other',
+  'invalid_code',
+  'self_referral',
+] as const;
+
+export function isDefinitiveReferralOutcome(attribution: unknown): boolean {
+  return (DEFINITIVE_REFERRAL_OUTCOMES as readonly string[]).includes(String(attribution ?? ''));
+}
+
+/**
  * Clear all stored referral data after processing.
  */
 export function clearStoredReferralCode(): void {
@@ -259,7 +276,10 @@ export async function getUserReferralCode(userId: string): Promise<string> {
     .eq('user_id', userId)
     .single();
 
-  return (refreshed?.referral_code as string) ?? generateReferralCode(userId);
+  // NEVER return a locally generated code that is not confirmed as
+  // persisted — the widget would display/share a code that does not exist
+  // server-side (PB-REFERRAL-ALDO-001). Empty string hides the share UI.
+  return (refreshed?.referral_code as string) ?? '';
 }
 
 /**
@@ -382,35 +402,47 @@ export async function processStoredReferral(userId: string, userEmail?: string):
     // client-side code validation (validateReferralCode) returns zero rows
     // and the attribution was silently dropped — and the stored code then
     // cleared — losing the referral forever (PB-REFERRAL-ALDO-001).
-    // Bootstrap resolves the referrer with the service role, sets
-    // referred_by_user_id only when empty, inserts the referrals row
-    // atomically and rejects self-referrals.
-    const applied = await callReferralsBootstrap(code);
+    // Bootstrap classifies the outcome explicitly; the stored code is only
+    // cleared on DEFINITIVE results, never on transient/unknown ones.
+    const result = await callReferralsBootstrap(code);
 
-    if (!applied) {
-      console.error('[REFERRAL_RECOVERY] Failed to apply referral via backend');
-      // Keep the stored code — retry on next Dashboard load.
+    if (!result) {
+      // Network failure, 5xx or unparsable response — recoverable.
+      console.error('[REFERRAL_RECOVERY] Backend call failed — keeping stored code for retry');
       return;
     }
 
-    // Confirm the attribution is visible (own row is always readable).
-    const { data: updated } = await supabase
-      .from(TABLES.profiles)
-      .select('referred_by_user_id')
-      .eq('user_id', userId)
-      .maybeSingle();
+    const attribution = String(result.attribution ?? '');
 
-    const referrerId = (updated?.referred_by_user_id as string | null) ?? null;
-
-    if (!referrerId) {
-      // Bootstrap resolved definitively server-side: the code is invalid or
-      // a self-referral — clear it so we do not retry forever.
-      console.log('[REFERRAL_RECOVERY] Code invalid or self-referral, clearing');
-      clearStoredReferralCode();
-      return;
+    switch (attribution) {
+      case 'confirmed':
+        console.log('[REFERRAL_RECOVERY] ✅ Referral applied via backend:', result.referrer_id);
+        clearStoredReferralCode();
+        break;
+      case 'existing_same':
+        console.log('[REFERRAL_RECOVERY] Already attributed to this referrer — consumed');
+        clearStoredReferralCode();
+        break;
+      case 'existing_other':
+        console.log('[REFERRAL_RECOVERY] Prior attribution preserved — stored code consumed');
+        clearStoredReferralCode();
+        break;
+      case 'invalid_code':
+      case 'self_referral':
+        console.log('[REFERRAL_RECOVERY] Code definitively rejected:', attribution);
+        clearStoredReferralCode();
+        break;
+      default:
+        // 'none', unknown or missing classification — do NOT clear.
+        console.warn('[REFERRAL_RECOVERY] Inconclusive backend result, keeping code:', attribution || 'missing');
+        return;
     }
 
-    console.log('[REFERRAL_RECOVERY] ✅ Referral applied via backend:', referrerId);
+    const referrerId = (result.referrer_id as string | null) ?? null;
+
+    if (!referrerId || attribution !== 'confirmed') {
+      return;
+    }
 
     // Store debug info
     try {
