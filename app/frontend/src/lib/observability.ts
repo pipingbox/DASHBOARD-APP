@@ -1076,21 +1076,40 @@ function firstComponentFrame(componentStack: string | null | undefined): string 
  * Capture an ErrorBoundary error exactly once, with an incident code that
  * lets support locate the session server-side. Returns the incident code.
  * Never throws.
+ *
+ * PB-UI-DOM-REMOVECHILD-RESIDUAL-001: React can invoke componentDidCatch
+ * TWICE for the same commit-phase DOM error (initial pass + recovery pass),
+ * which double-reported one incident as two PB-ERR codes ~2 ms apart
+ * (production evidence: PB-ERR-WQ9NR9/JWCAD4, PB-ERR-2F5VN8/UUR7NJ).
+ * The same (name, message, route) signature inside a short window collapses
+ * to the FIRST incident code and a single app_error. Distinct errors
+ * (different signature, or later than the window) are still captured in
+ * full — nothing real is hidden.
  */
+const BOUNDARY_CAPTURE_DEDUPE_WINDOW_MS = 5_000;
+const recentBoundaryCaptures = new Map<string, { code: string; ts: number }>();
+
 export function captureBoundaryError(
   error: Error,
   componentStack: string | null | undefined,
   context: { route?: string; account_type?: string; onboarding_status?: string } = {},
 ): string {
-  const incidentCode = generateIncidentCode();
   try {
     const fallbackRoute =
       typeof window !== 'undefined' ? normalizeRoute(window.location.pathname) : 'unknown';
+    const route = context.route ?? fallbackRoute;
+    const signature = `${error?.name ?? 'Error'}|${error?.message ?? 'unknown'}|${route}`;
+    const now = Date.now();
+    const previous = recentBoundaryCaptures.get(signature);
+    if (previous && now - previous.ts < BOUNDARY_CAPTURE_DEDUPE_WINDOW_MS) {
+      return previous.code; // same underlying incident — do not emit again
+    }
+    const incidentCode = generateIncidentCode();
     trackEvent('app_error', {
       error_name: error?.name ?? 'Error',
       error_message: error?.message ?? 'unknown',
       component_top: firstComponentFrame(componentStack),
-      route: context.route ?? fallbackRoute,
+      route,
       incident_code: incidentCode,
       origin: detectOrigin(),
       app_version: getAppVersion(),
@@ -1101,10 +1120,12 @@ export function captureBoundaryError(
       account_type: context.account_type,
       onboarding_status: context.onboarding_status,
     });
+    recentBoundaryCaptures.set(signature, { code: incidentCode, ts: now });
+    return incidentCode;
   } catch (err) {
     logger.warn('[obs] captureBoundaryError failed (swallowed)', err);
+    return generateIncidentCode();
   }
-  return incidentCode;
 }
 
 /** Test hook: reset all module state. */
@@ -1113,6 +1134,7 @@ export function __resetObservabilityForTests(): void {
   initialized = false;
   queue = [];
   emittedDedupeKeys.clear();
+  recentBoundaryCaptures.clear();
   cachedOrigin = null;
   sessionCorrelationId = null;
 }
