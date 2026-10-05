@@ -50,10 +50,47 @@ serve(async (req: Request) => {
     { auth: { persistSession: false } },
   );
 
-  const code = `PB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  // Idempotency: an existing referral_code is stable and must be returned
+  // as-is instead of being regenerated (PB-REFERRAL-ALDO-001).
+  const { data: profile } = await adminClient
+    .from('app_14da0f1941_profiles')
+    .select('referral_code, referred_by_user_id')
+    .eq('user_id', user.id)
+    .maybeSingle();
 
+  let code = (profile?.referral_code as string | null) ?? null;
+
+  if (!code) {
+    // Generate with collision retry (referral_code has a UNIQUE index).
+    for (let attempt = 0; attempt < 3 && !code; attempt++) {
+      const candidate = `PB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      const { error: codeErr } = await adminClient
+        .from('app_14da0f1941_profiles')
+        .update({ referral_code: candidate })
+        .eq('user_id', user.id)
+        .is('referral_code', null);
+      if (!codeErr) {
+        code = candidate;
+      } else if (codeErr.code !== '23505') {
+        return new Response(JSON.stringify({ error: codeErr.message }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    if (!code) {
+      return new Response(JSON.stringify({ error: 'Could not allocate referral code' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
+  // Referrer assignment: only when the profile has NO previous attribution.
+  // A prior referred_by_user_id is never overwritten (PB-REFERRAL-ALDO-001).
   let referrerId: string | null = null;
-  if (body.referral_code) {
+  if (body.referral_code && !profile?.referred_by_user_id) {
     const { data: referrer } = await adminClient
       .from('app_14da0f1941_profiles')
       .select('user_id')
@@ -64,24 +101,20 @@ serve(async (req: Request) => {
     }
   }
 
-  const updates: Record<string, unknown> = { referral_code: code };
   if (referrerId) {
-    updates.referred_by_user_id = referrerId;
-  }
+    const { error: updateErr } = await adminClient
+      .from('app_14da0f1941_profiles')
+      .update({ referred_by_user_id: referrerId })
+      .eq('user_id', user.id)
+      .is('referred_by_user_id', null);
 
-  const { error: updateErr } = await adminClient
-    .from('app_14da0f1941_profiles')
-    .update(updates)
-    .eq('user_id', user.id);
+    if (updateErr) {
+      return new Response(JSON.stringify({ error: updateErr.message }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
-  if (updateErr) {
-    return new Response(JSON.stringify({ error: updateErr.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  if (referrerId) {
     const { data: existing } = await adminClient
       .from('app_14da0f1941_referrals')
       .select('id')

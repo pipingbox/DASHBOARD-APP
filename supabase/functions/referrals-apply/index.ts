@@ -76,10 +76,38 @@ serve(async (req: Request) => {
     });
   }
 
+  // Never overwrite a previous attribution on the self-service path.
+  // (Admin corrections keep the ability to reassign explicitly.)
+  const { data: referredProfile } = await adminClient
+    .from('app_14da0f1941_profiles')
+    .select('referred_by_user_id')
+    .eq('user_id', referred_id)
+    .maybeSingle();
+
+  const previousAttribution = (referredProfile?.referred_by_user_id as string | null) ?? null;
+
+  if (!isAdmin && previousAttribution && previousAttribution !== referrer_id) {
+    return new Response(
+      JSON.stringify({ success: true, already_assigned: true }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+  }
+
+  if (previousAttribution === referrer_id) {
+    return new Response(JSON.stringify({ success: true, already_assigned: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const { error: profileErr } = await adminClient
     .from('app_14da0f1941_profiles')
     .update({ referred_by_user_id: referrer_id })
-    .eq('user_id', referred_id);
+    .eq('user_id', referred_id)
+    .is('referred_by_user_id', null);
 
   if (profileErr) {
     return new Response(JSON.stringify({ error: profileErr.message }), {
@@ -96,10 +124,13 @@ serve(async (req: Request) => {
     .maybeSingle();
 
   if (!existing) {
+    // referred_email must be the REFERRED user's email, not the caller's
+    // (the caller may be an admin assigning on their behalf).
+    const { data: referredAuth } = await adminClient.auth.admin.getUserById(referred_id);
     await adminClient.from('app_14da0f1941_referrals').insert({
       referrer_id,
       referred_id,
-      referred_email: user.email ?? '',
+      referred_email: referredAuth?.user?.email ?? '',
       status: 'pending',
     });
   }
