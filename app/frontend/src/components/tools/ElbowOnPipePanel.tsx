@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { ELBOW_DATA, SCHEDULE_WT } from '@/tools/data/elbowData';
 import {
   computeElbowOnPipe,
@@ -15,10 +17,15 @@ import { buildElbowOnPipePicaje } from '@/tools/branch/elbowOnPipePicajeSvg';
 import { buildElbowOnPipeMarking } from '@/tools/branch/elbowOnPipeMarkingSvg';
 import { buildElbowOnPipeSchematic } from '@/tools/branch/elbowOnPipeSchematicSvg';
 import { formatMm } from '@/tools/branch/formatMm';
+import { buildElbowOnPipeReceiverTemplate } from '@/tools/branch/elbowOnPipeReceiverTemplateSvg';
+import { buildElbowOnPipeMarkingGuide } from '@/tools/branch/elbowOnPipeMarkingGuideSvg';
+import { buildElbowOnPipePdfLabels } from '@/tools/branch/elbowOnPipePdfLabels';
+import { svgPagesToPdf } from '@/tools/branch/svgMmToPdf';
+import { PDF_PAGE_FORMATS, type PdfPageFormatId } from '@/tools/branch/pdfPageFormat';
 
 /**
- * PB-BRANCH-INJERTO-EXPANSION-001 — U5.2a + U5.3
- * CODO → TUBO panel: numeric results and screen previews.
+ * PB-BRANCH-INJERTO-EXPANSION-001 — U5.2a + U5.3 + U5.4
+ * CODO → TUBO panel: numeric results, screen previews and fabrication PDFs.
  *
  * The elbow is the member being cut and the straight pipe is the receiver, the
  * exact inverse of the tubo→codo family. Two consequences are visible on screen
@@ -39,9 +46,14 @@ import { formatMm } from '@/tools/branch/formatMm';
  * suppresses the geometry, precisely because the geometry does not depend on it.
  *
  * U5.3 adds SCREEN previews only: they are projections of the kernel result, so
- * no geometry is computed in this component or in the SVG generators. Physical
- * 1:1 sheets (receiver picaje template, elbow marking guide) are U5.4; there is
- * deliberately no download or print action here.
+ * no geometry is computed in this component or in the SVG generators.
+ *
+ * U5.4 adds the two PHYSICAL outputs, and they are deliberately different kinds
+ * of object: the receiver is a cylinder, so its picaje develops exactly and is
+ * delivered as a true 1:1 template; the elbow is a torus with no flat
+ * development, so it gets a MARKING GUIDE (1:1 OD division strip + per-station
+ * arc radius / arc length), never a "cut template 1:1". The paper selector only
+ * changes MediaBox and tiling. Cota Y' is forwarded as annotation only.
  */
 
 const DIVISIONS = [12, 16, 24, 36, 48];
@@ -95,6 +107,7 @@ export default function ElbowOnPipePanel() {
   const [fe, setFe] = useState('20');
   const [yPrime, setYPrime] = useState('');
   const [graphic, setGraphic] = useState<GraphicTab>('picaje');
+  const [pdfFormat, setPdfFormat] = useState<PdfPageFormatId>('A4');
 
   const elbow = ELBOW_DATA.find(pipe => pipe.nps === elbowNps)!;
   const receiver = ELBOW_DATA.find(pipe => pipe.nps === receiverNps)!;
@@ -186,6 +199,50 @@ export default function ElbowOnPipePanel() {
       notToScale: t('tools.branchOnElbow.notToScale'),
     }, { yPrimeMm })?.svg ?? null;
   }, [result, graphic, yPrimeMm, datumType, radius, elbow.od, elbowId, receiver.od, t]);
+
+  /* U5.4 physical outputs. Both sheets are built from the kernel result and
+     converted with the shared PDF engine; paper format only changes MediaBox
+     and tiling. Labels go through the PDF-safe layer so nothing prints as '?'. */
+  const datumLabel = datumType === 'FE'
+    ? `${t('tools.branchOnElbow.datumFE')} = ${result.datumOffsetMm >= 0 ? '+' : ''}${formatMm(result.datumOffsetMm)} mm`
+    : t(`tools.branchOnElbow.datum${datumType}`);
+  const elbowLabel = `${elbowNps} Sch ${schedule} · OD ${formatMm(elbow.od)} mm · ID ${formatMm(elbowId)} mm · R ${formatMm(parseMm(radius))} mm`;
+  const receiverLabel = `${t('tools.elbowOnPipe.receiver')} ${receiverNps} · D ${formatMm(receiver.od)} mm`;
+  const pdfLabels = useMemo(() => buildElbowOnPipePdfLabels({
+    translate: (key: string) => t(key),
+    datumLabel, elbowLabel, receiverLabel,
+  }), [datumLabel, elbowLabel, receiverLabel, t]);
+  const receiverTemplate = useMemo(() => result.valid ? buildElbowOnPipeReceiverTemplate(result, {
+    format: pdfFormat, meta: pdfLabels.receiver, yPrimeMm,
+  }) : null, [result, pdfFormat, pdfLabels, yPrimeMm]);
+  const markingGuide = useMemo(() => result.valid ? buildElbowOnPipeMarkingGuide(result, {
+    format: pdfFormat, meta: pdfLabels.guide, yPrimeMm,
+  }) : null, [result, pdfFormat, pdfLabels, yPrimeMm]);
+
+  const downloadPdf = (bytes: Uint8Array, filename: string) => {
+    const blob = new Blob([new Uint8Array(bytes)], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    toast.success(t('tools.branchLayout.pdfDownloaded'));
+  };
+  const slug = (value: string) => value.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+  const fileStem = `pipingbox-codo-tubo-${slug(elbowNps)}-sch${slug(schedule)}-on-${slug(receiverNps)}-${slug(datumType === 'FE' ? `fe${formatMm(result.datumOffsetMm)}` : datumType)}-${pdfFormat}`;
+  const handleDownloadReceiverPdf = () => {
+    if (!receiverTemplate) return;
+    downloadPdf(svgPagesToPdf(receiverTemplate.tiles.map(tile => ({ svg: tile.svg, widthMm: tile.widthMm, heightMm: tile.heightMm }))),
+      `${fileStem}-receiver-picaje-template-1to1.pdf`);
+  };
+  const handleDownloadGuidePdf = () => {
+    if (!markingGuide) return;
+    downloadPdf(svgPagesToPdf(markingGuide.tiles.map(tile => ({ svg: tile.svg, widthMm: tile.widthMm, heightMm: tile.heightMm }))),
+      `${fileStem}-elbow-marking-guide.pdf`);
+  };
 
   return (
     <section className="space-y-5" aria-label={t('tools.elbowOnPipe.family')}>
@@ -314,6 +371,38 @@ export default function ElbowOnPipePanel() {
             </p>
           )}
           <p className="text-xs text-zinc-500">{t('tools.elbowOnPipe.description')}</p>
+
+          {receiverTemplate && markingGuide && (
+            <div data-testid="elbow-on-pipe-fabrication" className="space-y-3 rounded-lg border border-amber-500/30 bg-zinc-950 p-4">
+              <h5 className="text-xs font-medium uppercase tracking-widest text-zinc-400">{t('tools.elbowOnPipe.fabrication')}</h5>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="elbow-on-pipe-pdf-format" className="whitespace-nowrap text-xs text-zinc-500">{t('tools.branchLayout.printFormat')}</Label>
+                  <select id="elbow-on-pipe-pdf-format" value={pdfFormat} onChange={event => setPdfFormat(event.target.value as PdfPageFormatId)}
+                    className="min-h-11 rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 focus:ring-1 focus:ring-amber-500">
+                    {PDF_PAGE_FORMATS.map(format => (
+                      <option key={format.id} value={format.id}>{format.id} · {format.widthMm} × {format.heightMm} mm</option>
+                    ))}
+                  </select>
+                </div>
+                <Button onClick={handleDownloadReceiverPdf} data-testid="elbow-on-pipe-download-receiver" className="min-h-11 max-w-full whitespace-normal text-left bg-amber-500 font-semibold text-black hover:bg-amber-600">
+                  {t('tools.elbowOnPipe.downloadReceiverPdf')}
+                </Button>
+                <Button onClick={handleDownloadGuidePdf} data-testid="elbow-on-pipe-download-guide" variant="outline" className="min-h-11 max-w-full whitespace-normal text-left border-zinc-700 !bg-transparent !text-zinc-100 hover:!bg-zinc-900">
+                  {t('tools.elbowOnPipe.downloadGuidePdf')}
+                </Button>
+              </div>
+              <p data-testid="elbow-on-pipe-receiver-pages" data-pages={receiverTemplate.tiles.length} data-pages-x={receiverTemplate.pagesX} data-pages-y={receiverTemplate.pagesY}
+                data-width-mm={receiverTemplate.widthMm} data-height-mm={receiverTemplate.heightMm} data-crown-x-mm={receiverTemplate.crownXMm} className="text-xs text-zinc-300">
+                {t('tools.elbowOnPipe.receiverPages', { pages: receiverTemplate.tiles.length, format: pdfFormat, w: formatMm(receiverTemplate.widthMm), h: formatMm(receiverTemplate.heightMm) })}
+              </p>
+              <p className="text-xs text-zinc-500">{t('tools.elbowOnPipe.receiverWhy')}</p>
+              <p data-testid="elbow-on-pipe-guide-pages" data-pages={markingGuide.tiles.length} data-strip-length-mm={markingGuide.stripLengthMm} className="text-xs text-zinc-500">
+                {t('tools.elbowOnPipe.guideWhy')}
+              </p>
+              <p className="text-xs font-medium text-amber-400/90">{t('tools.elbowOnPipe.printPolicy')}</p>
+            </div>
+          )}
 
           <div className="rounded-lg border border-zinc-800/80 bg-zinc-950 p-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">

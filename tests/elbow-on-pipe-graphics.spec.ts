@@ -282,7 +282,7 @@ for (const width of [390, 360]) {
   });
 }
 
-test('U5.3 ships screen output only: no page format, tiling, calibration or download', async ({ page }) => {
+test('screen previews stay screen-only: no page format, tiling, calibration or download inside the graphics', async ({ page }) => {
   await selectElbowOnPipe(page);
   for (const name of ['Receiver picaje', 'Elbow marking', 'Geometry']) {
     await tab(page, name).click();
@@ -293,8 +293,13 @@ test('U5.3 ships screen output only: no page format, tiling, calibration or down
     expect(markup).not.toMatch(/calibration/i);
     /* The disclaimer stays on every preview: screen only, never a 1:1 sheet. */
     expect(markup).toContain('not a 1:1 template');
+    await expect(graphic(page).getByRole('button')).toHaveCount(0);
   }
+  /* Since U5.4 the physical actions exist, but only inside the fabrication block, never in the previews. */
+  const fabrication = page.getByTestId('elbow-on-pipe-fabrication');
   for (const name of [/download/i, /print/i, /1:1/, /PDF/i]) {
-    await expect(page.getByRole('button', { name })).toHaveCount(0);
+    const all = await page.getByRole('button', { name }).count();
+    const inFabrication = await fabrication.getByRole('button', { name }).count();
+    expect(all).toBe(inFabrication);
   }
 });
