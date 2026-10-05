@@ -9,8 +9,15 @@ const TOOL_URL = '/tools?t=branch-layout&lng=en';
 
 async function openElbow(page: Page) {
   await page.goto(TOOL_URL);
+  /* The modal mounts after hydration, so it is not there when goto() resolves. isVisible()
+     never waits (its timeout option is ignored), hence waitFor: otherwise the overlay is
+     still intercepting pointer events when the first family click happens. */
   const beta = page.getByRole('dialog', { name: 'Beta Version' });
-  if (await beta.isVisible()) await beta.getByRole('button', { name: 'Continue' }).click();
+  const shown = await beta.waitFor({ state: 'visible', timeout: 10_000 }).then(() => true).catch(() => false);
+  if (shown) {
+    await beta.getByRole('button', { name: 'Continue' }).click();
+    await beta.waitFor({ state: 'hidden' });
+  }
   await page.getByRole('button', { name: 'Tube → elbow' }).click();
   await expect(page.getByTestId('elbow-results')).toBeVisible();
 }
@@ -140,8 +147,15 @@ for (const width of [360, 390]) {
 
 test('straight tube→tube family keeps its own flow with no elbow graphics', async ({ page }) => {
   await page.goto(TOOL_URL);
+  /* The modal mounts after hydration, so it is not there when goto() resolves. isVisible()
+     never waits (its timeout option is ignored), hence waitFor: otherwise the overlay is
+     still intercepting pointer events when the first family click happens. */
   const beta = page.getByRole('dialog', { name: 'Beta Version' });
-  if (await beta.isVisible()) await beta.getByRole('button', { name: 'Continue' }).click();
+  const shown = await beta.waitFor({ state: 'visible', timeout: 10_000 }).then(() => true).catch(() => false);
+  if (shown) {
+    await beta.getByRole('button', { name: 'Continue' }).click();
+    await beta.waitFor({ state: 'hidden' });
+  }
   await expect(page.getByRole('button', { name: 'Print Template 1:1' })).toBeVisible();
   await expect(page.getByTestId('elbow-graphic')).toHaveCount(0);
   await expect(page.locator('[data-preview="branch-on-elbow-development"]')).toHaveCount(0);

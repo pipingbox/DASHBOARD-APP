@@ -10,8 +10,15 @@ const MM2PT = 72 / 25.4;
 
 async function openElbow(page: import('@playwright/test').Page) {
   await page.goto(TOOL_URL);
+  /* The modal mounts after hydration, so it is not there when goto() resolves. isVisible()
+     never waits (its timeout option is ignored), hence waitFor: otherwise the overlay is
+     still intercepting pointer events when the first family click happens. */
   const betaDialog = page.getByRole('dialog', { name: 'Beta Version' });
-  if (await betaDialog.isVisible()) await betaDialog.getByRole('button', { name: 'Continue' }).click();
+  const shown = await betaDialog.waitFor({ state: 'visible', timeout: 10_000 }).then(() => true).catch(() => false);
+  if (shown) {
+    await betaDialog.getByRole('button', { name: 'Continue' }).click();
+    await betaDialog.waitFor({ state: 'hidden' });
+  }
   await page.getByRole('button', { name: 'Tube → elbow' }).click();
   await expect(page.getByTestId('elbow-results')).toBeVisible();
   await expect(page.getByTestId('elbow-fabrication')).toBeVisible();
@@ -99,8 +106,15 @@ test('invalid geometry hides the fabrication actions', async ({ page }) => {
 
 test('tube → tube fabrication actions are unchanged and separate', async ({ page }) => {
   await page.goto(TOOL_URL);
+  /* The modal mounts after hydration, so it is not there when goto() resolves. isVisible()
+     never waits (its timeout option is ignored), hence waitFor: otherwise the overlay is
+     still intercepting pointer events when the first family click happens. */
   const betaDialog = page.getByRole('dialog', { name: 'Beta Version' });
-  if (await betaDialog.isVisible()) await betaDialog.getByRole('button', { name: 'Continue' }).click();
+  const shown = await betaDialog.waitFor({ state: 'visible', timeout: 10_000 }).then(() => true).catch(() => false);
+  if (shown) {
+    await betaDialog.getByRole('button', { name: 'Continue' }).click();
+    await betaDialog.waitFor({ state: 'hidden' });
+  }
   await expect(page.getByRole('button', { name: 'Print Template 1:1' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Print picaje template 1:1' })).toBeVisible();
   await expect(page.locator('#pdf-format-select')).toHaveValue('A4');
