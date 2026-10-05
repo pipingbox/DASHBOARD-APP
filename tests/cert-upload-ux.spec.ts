@@ -372,7 +372,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       // (Uplink throttling was armed before login — see top of test — so
       // the storage connection is created under emulation.)
       const pdf = syntheticPdf(1_500_000);
-      const uploadPickerButton = dialog.getByRole('button', { name: /subir archivo|upload file/i });
+      const uploadPickerButton = dialog.getByRole('button', { name: /subir pdf o imagen|upload pdf or image/i });
       const [chooser] = await Promise.all([
         page.waitForEvent('filechooser'),
         uploadPickerButton.click(),
@@ -665,7 +665,7 @@ test.describe('PB-CERT-UPLOAD-UX-001 certificate upload UX (preview, SHA-locked)
       const pdf = syntheticPdf();
       const uploadPickerButton = page
         .locator('[role="dialog"]')
-        .getByRole('button', { name: /subir archivo|upload file/i });
+        .getByRole('button', { name: /subir pdf o imagen|upload pdf or image/i });
       const [chooser] = await Promise.all([
         page.waitForEvent('filechooser'),
         uploadPickerButton.click(),
