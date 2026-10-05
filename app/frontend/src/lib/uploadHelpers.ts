@@ -234,7 +234,7 @@ async function _doXhrUpload(
     const xhr = new XMLHttpRequest();
     let resolved = false;
 
-    const safeResolve = (result: { error: Error | null; retryable: boolean }) => {
+    const safeResolve = (result: { error: Error | null; retryable: boolean; category: UploadErrorCategory | null }) => {
       if (resolved) return;
       resolved = true;
       const elapsed = Date.now() - startTime;
