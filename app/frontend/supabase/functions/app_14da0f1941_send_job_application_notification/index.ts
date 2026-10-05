@@ -157,13 +157,25 @@ serve(async (req: Request) => {
       }
     }
 
-    // SMTP setup (project-level secrets, same provider as the lead alert).
-    const smtpHost = Deno.env.get("SMTP_HOST");
-    const smtpPort = parseInt(Deno.env.get("SMTP_PORT") || "587", 10);
-    const smtpSecure = Deno.env.get("SMTP_SECURE") !== "false";
-    const smtpUser = Deno.env.get("SMTP_USER");
-    const smtpPassword = Deno.env.get("SMTP_PASSWORD");
-    const smtpFrom = Deno.env.get("SMTP_FROM") || "noreply@pipingbox.com";
+    // SMTP setup (project-level secrets).
+    // PB-EDGE-RESEND-MIGRATION-001 — NOTIFY_SMTP_* (Resend,
+    // notify.pipingbox.com) tiene prioridad; SMTP_* (one.com) queda como
+    // rollback. El corte solo se produce con el trio HOST/USER/PASSWORD
+    // completo; una configuracion parcial nunca se usa a medias.
+    const notifyConfigured = !!(
+      Deno.env.get("NOTIFY_SMTP_HOST") &&
+      Deno.env.get("NOTIFY_SMTP_USER") &&
+      Deno.env.get("NOTIFY_SMTP_PASSWORD")
+    );
+    const env = (name: string) => Deno.env.get(`${notifyConfigured ? "NOTIFY_" : ""}${name}`);
+    const smtpHost = env("SMTP_HOST");
+    const smtpPort = parseInt(env("SMTP_PORT") || (notifyConfigured ? "465" : "587"), 10);
+    const smtpSecure = env("SMTP_SECURE") !== "false";
+    const smtpUser = env("SMTP_USER");
+    const smtpPassword = env("SMTP_PASSWORD");
+    const smtpFrom = env("SMTP_FROM") ||
+      (notifyConfigured ? "notifications@notify.pipingbox.com" : "noreply@pipingbox.com");
+    const providerName = notifyConfigured ? "resend_smtp" : "smtp_onecom";
 
     if (!smtpHost || !smtpUser || !smtpPassword) {
       console.log(JSON.stringify({ requestId, warning: "SMTP not configured, skipping email" }));
@@ -238,10 +250,18 @@ serve(async (req: Request) => {
       ? `New application — ${candidateName} — ${job.title}`
       : `New application — ${job.title}`;
 
+    // From: con Resend el remitente visible es "PipingBox Notifications
+    // <notifications@notify.pipingbox.com>"; en rollback (one.com) se conserva
+    // el From historico sin display name. Reply-To operativo: jobs@.
+    const fromField = notifyConfigured
+      ? { name: "PipingBox Notifications", address: smtpFrom }
+      : smtpFrom;
+
     const info = await transporter.sendMail({
-      from: smtpFrom,
+      from: fromField,
       to: alertTo,
       ...(alertBcc ? { bcc: alertBcc } : {}),
+      replyTo: CANONICAL_JOBS_MAILBOX,
       subject,
       html: adminHtml,
     });
@@ -253,6 +273,7 @@ serve(async (req: Request) => {
         action: "application_alert_email",
         smtpAccepted: accepted,
         messageId: info.messageId,
+        provider: providerName,
       }),
     );
 

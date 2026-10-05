@@ -407,6 +407,9 @@ async function generateAndSend(
           subject: reportSubject(window.reportDate, isTest),
           html,
           text,
+          // PB-EDGE-RESEND-MIGRATION-001: display name del From por defecto.
+          // Sin Reply-To: se conserva el comportamiento operativo historico.
+          fromName: "PipingBox Notifications",
         }).then(() => undefined),
         SOURCE_TIMEOUT_MS,
         "email",
@@ -489,22 +492,38 @@ Deno.serve(async (req) => {
   // ── Preflight: presencia de configuración por NOMBRE, sin valores.
   if (isPreflight) {
     const has = (n: string) => (Deno.env.get(n) || "").length > 0;
+    // PB-EDGE-RESEND-MIGRATION-001: el transporte efectivo es Resend cuando el
+    // trio NOTIFY_SMTP_* esta completo; si no, el SMTP_* legacy (rollback).
+    const notifySmtp = has("NOTIFY_SMTP_HOST") && has("NOTIFY_SMTP_USER") && has("NOTIFY_SMTP_PASSWORD");
+    const legacySmtp = has("SMTP_HOST") && has("SMTP_USER") && has("SMTP_PASSWORD");
     const config: Record<string, boolean | string> = {
       SUPABASE_URL: !!supabaseUrl,
       SUPABASE_SERVICE_ROLE_KEY: !!serviceKey,
       POSTHOG_PERSONAL_API_KEY: has("POSTHOG_PERSONAL_API_KEY"),
+      SMTP_TRANSPORT: notifySmtp ? "resend_smtp" : legacySmtp ? "smtp_onecom" : false,
       SMTP_HOST: has("SMTP_HOST"),
       SMTP_USER: has("SMTP_USER"),
       SMTP_PASSWORD: has("SMTP_PASSWORD"),
       SMTP_PORT: has("SMTP_PORT") ? true : "587 (default)",
       SMTP_SECURE: has("SMTP_SECURE") ? true : "true (default)",
       SMTP_FROM: has("SMTP_FROM") ? true : "noreply@pipingbox.com (default)",
+      NOTIFY_SMTP_HOST: has("NOTIFY_SMTP_HOST"),
+      NOTIFY_SMTP_USER: has("NOTIFY_SMTP_USER"),
+      NOTIFY_SMTP_PASSWORD: has("NOTIFY_SMTP_PASSWORD"),
+      NOTIFY_SMTP_PORT: has("NOTIFY_SMTP_PORT") ? true : "465 (default)",
+      NOTIFY_SMTP_SECURE: has("NOTIFY_SMTP_SECURE") ? true : "true (default)",
+      NOTIFY_SMTP_FROM: has("NOTIFY_SMTP_FROM") ? true : "notifications@notify.pipingbox.com (default)",
       POSTHOG_PROJECT_ID: has("POSTHOG_PROJECT_ID") ? true : "271316 (default)",
       POSTHOG_HOST: has("POSTHOG_HOST") ? true : "https://eu.i.posthog.com (default)",
       DAILY_REPORT_RECIPIENT: has("DAILY_REPORT_RECIPIENT") ? true : "support@pipingbox.com (default)",
       DAILY_REPORT_ENABLED: Deno.env.get("DAILY_REPORT_ENABLED") === "true",
     };
-    const missing = Object.entries(config).filter(([, v]) => v === false).map(([k]) => k);
+    // Los SMTP_* individuales son informativos: lo requerido es el transporte
+    // efectivo (SMTP_TRANSPORT) y las claves no-SMTP.
+    const missing = Object.entries(config)
+      .filter(([k, v]) => v === false && !k.startsWith("NOTIFY_SMTP_") && !k.startsWith("SMTP_"))
+      .map(([k]) => k);
+    if (!notifySmtp && !legacySmtp) missing.push("SMTP_TRANSPORT");
     log({ action: "preflight", auth_mode: authMode, missing_required_secrets: missing });
     return json({ ok: true, action: "preflight", auth_mode: authMode, missing_required_secrets: missing, config });
   }

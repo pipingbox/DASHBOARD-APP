@@ -1,8 +1,18 @@
 // _shared/email-provider.ts
-// Adapter para envio de email via SMTP one.com.
+// Adapter para envio de email via SMTP.
 // PB-MATCHING-NOTIFICATIONS-001
+// PB-EDGE-RESEND-MIGRATION-001 — NOTIFY_SMTP_* (Resend, notify.pipingbox.com)
+// tiene prioridad; SMTP_* (one.com) queda intacto como rollback. El corte a
+// Resend solo se produce cuando el trio NOTIFY_SMTP_HOST/USER/PASSWORD esta
+// completo; una configuracion parcial NUNCA se usa a medias.
 
 import nodemailer from "npm:nodemailer";
+
+export const RESEND_PROVIDER_NAME = "resend_smtp";
+export const ONECOM_PROVIDER_NAME = "smtp_onecom";
+
+export const NOTIFY_DEFAULT_FROM = "notifications@notify.pipingbox.com";
+const LEGACY_DEFAULT_FROM = "noreply@pipingbox.com";
 
 export interface EmailMessage {
   to: string;
@@ -34,19 +44,68 @@ export interface EmailProvider {
   isConfigured(): boolean;
 }
 
+interface ResolvedSmtpConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  pass: string;
+  from: string;
+  providerName: string;
+}
+
+/**
+ * Resuelve el transporte SMTP efectivo.
+ * Prioridad: NOTIFY_SMTP_* (Resend) > SMTP_* (one.com, rollback).
+ * NOTIFY_SMTP_* solo se considera con el trio HOST/USER/PASSWORD completo.
+ */
+export function resolveSmtpConfig(): ResolvedSmtpConfig | null {
+  const notifyHost = Deno.env.get("NOTIFY_SMTP_HOST");
+  const notifyUser = Deno.env.get("NOTIFY_SMTP_USER");
+  const notifyPass = Deno.env.get("NOTIFY_SMTP_PASSWORD");
+  if (notifyHost && notifyUser && notifyPass) {
+    return {
+      host: notifyHost,
+      port: parseInt(Deno.env.get("NOTIFY_SMTP_PORT") || "465", 10),
+      secure: Deno.env.get("NOTIFY_SMTP_SECURE") !== "false",
+      user: notifyUser,
+      pass: notifyPass,
+      from: Deno.env.get("NOTIFY_SMTP_FROM") || NOTIFY_DEFAULT_FROM,
+      providerName: RESEND_PROVIDER_NAME,
+    };
+  }
+
+  const host = Deno.env.get("SMTP_HOST");
+  const user = Deno.env.get("SMTP_USER");
+  const pass = Deno.env.get("SMTP_PASSWORD");
+  if (!host || !user || !pass) {
+    return null;
+  }
+  return {
+    host,
+    port: parseInt(Deno.env.get("SMTP_PORT") || "587", 10),
+    secure: Deno.env.get("SMTP_SECURE") !== "false",
+    user,
+    pass,
+    from: Deno.env.get("SMTP_FROM") || LEGACY_DEFAULT_FROM,
+    providerName: ONECOM_PROVIDER_NAME,
+  };
+}
+
 class SmtpEmailProvider implements EmailProvider {
   private transporter;
   private from: string;
-  private providerName = "smtp_onecom";
+  private providerName: string;
 
-  constructor(host: string, port: number, secure: boolean, user: string, pass: string, from: string) {
+  constructor(config: ResolvedSmtpConfig) {
     this.transporter = nodemailer.createTransport({
-      host,
-      port,
-      secure,
-      auth: { user, pass },
+      host: config.host,
+      port: config.port,
+      secure: config.secure,
+      auth: { user: config.user, pass: config.pass },
     });
-    this.from = from;
+    this.from = config.from;
+    this.providerName = config.providerName;
   }
 
   isConfigured(): boolean {
@@ -83,16 +142,11 @@ class NoopEmailProvider implements EmailProvider {
 }
 
 export function createEmailProvider(): EmailProvider {
-  const host = Deno.env.get("SMTP_HOST");
-  const port = parseInt(Deno.env.get("SMTP_PORT") || "587", 10);
-  const secure = Deno.env.get("SMTP_SECURE") !== "false";
-  const user = Deno.env.get("SMTP_USER");
-  const pass = Deno.env.get("SMTP_PASSWORD");
-  const from = Deno.env.get("SMTP_FROM") || "noreply@pipingbox.com";
+  const config = resolveSmtpConfig();
 
-  if (!host || !user || !pass) {
+  if (!config) {
     return new NoopEmailProvider();
   }
 
-  return new SmtpEmailProvider(host, port, secure, user, pass, from);
+  return new SmtpEmailProvider(config);
 }

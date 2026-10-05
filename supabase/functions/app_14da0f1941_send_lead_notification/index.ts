@@ -190,12 +190,24 @@ serve(async (req: Request) => {
       .update({ priority })
       .eq("id", lead.id);
 
-    const smtpHost = Deno.env.get("SMTP_HOST");
-    const smtpPort = parseInt(Deno.env.get("SMTP_PORT") || "587", 10);
-    const smtpSecure = Deno.env.get("SMTP_SECURE") !== "false";
-    const smtpUser = Deno.env.get("SMTP_USER");
-    const smtpPassword = Deno.env.get("SMTP_PASSWORD");
-    const smtpFrom = Deno.env.get("SMTP_FROM") || "noreply@pipingbox.com";
+    // PB-EDGE-RESEND-MIGRATION-001 — NOTIFY_SMTP_* (Resend,
+    // notify.pipingbox.com) tiene prioridad; SMTP_* (one.com) queda como
+    // rollback. El corte solo se produce con el trio HOST/USER/PASSWORD
+    // completo; una configuracion parcial nunca se usa a medias.
+    const notifyConfigured = !!(
+      Deno.env.get("NOTIFY_SMTP_HOST") &&
+      Deno.env.get("NOTIFY_SMTP_USER") &&
+      Deno.env.get("NOTIFY_SMTP_PASSWORD")
+    );
+    const env = (name: string) => Deno.env.get(`${notifyConfigured ? "NOTIFY_" : ""}${name}`);
+    const smtpHost = env("SMTP_HOST");
+    const smtpPort = parseInt(env("SMTP_PORT") || (notifyConfigured ? "465" : "587"), 10);
+    const smtpSecure = env("SMTP_SECURE") !== "false";
+    const smtpUser = env("SMTP_USER");
+    const smtpPassword = env("SMTP_PASSWORD");
+    const smtpFrom = env("SMTP_FROM") ||
+      (notifyConfigured ? "notifications@notify.pipingbox.com" : "noreply@pipingbox.com");
+    const providerName = notifyConfigured ? "resend_smtp" : "smtp_onecom";
 
     if (!smtpHost || !smtpUser || !smtpPassword) {
       // Release the claim: nothing was sent, so a later retry should be able
@@ -259,9 +271,18 @@ serve(async (req: Request) => {
       </div>
     `;
 
+    // From: con Resend el remitente visible es "PipingBox Notifications
+    // <notifications@notify.pipingbox.com>"; en rollback (one.com) se conserva
+    // el From historico sin display name. Reply-To operativo: jobs@.
+    const fromField = notifyConfigured
+      ? { name: "PipingBox Notifications", address: smtpFrom }
+      : smtpFrom;
+    const replyTo = "jobs@pipingbox.com";
+
     await transporter.sendMail({
-      from: smtpFrom,
+      from: fromField,
       to: "jobs@pipingbox.com",
+      replyTo,
       subject: `New Workforce Request - ${lead.company_name}`,
       html: adminHtml,
     });
@@ -270,7 +291,7 @@ serve(async (req: Request) => {
     // claim stays: re-running would spam jobs@ with duplicates.
     adminMailSent = true;
 
-    console.log(JSON.stringify({ requestId, action: "admin_email_sent", to: "jobs@pipingbox.com", leadId: lead.id }));
+    console.log(JSON.stringify({ requestId, action: "admin_email_sent", to: "jobs@pipingbox.com", leadId: lead.id, provider: providerName }));
 
     const companyHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #ffffff; color: #18181b;">
@@ -319,8 +340,9 @@ serve(async (req: Request) => {
     // the caller can tell "nobody was told" from "the customer wasn't told".
     try {
       await transporter.sendMail({
-        from: smtpFrom,
+        from: fromField,
         to: lead.email,
+        replyTo,
         subject: "PipingBox Workforce Request Received",
         html: companyHtml,
       });
@@ -345,7 +367,7 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log(JSON.stringify({ requestId, action: "company_confirmation_sent", leadId: lead.id }));
+    console.log(JSON.stringify({ requestId, action: "company_confirmation_sent", leadId: lead.id, provider: providerName }));
 
     return new Response(
       JSON.stringify({ success: true, priority, emailsSent: true }),
