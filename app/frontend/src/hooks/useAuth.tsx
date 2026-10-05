@@ -256,12 +256,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const storedCode = getStoredReferralCode();
             if (storedCode) {
               console.log('[REFERRAL_RECOVERY] Found unprocessed referral code for existing profile:', storedCode);
-              const referrerId = await validateReferralCode(storedCode);
-              if (referrerId && referrerId !== authUser.id) {
-                await completeReferralAssignment(authUser.id, authUser.email, referrerId, storedCode);
+              // Resolve SERVER-SIDE via referrals-bootstrap: the profiles
+              // table has no cross-user select policy, so client-side
+              // validation always returned zero rows and the stored code was
+              // then cleared, losing the attribution (PB-REFERRAL-ALDO-001).
+              await bootstrapReferrals(authUser.id, storedCode);
+              const { data: rechecked } = await supabase
+                .from('app_14da0f1941_profiles')
+                .select('referred_by_user_id')
+                .eq('user_id', authUser.id)
+                .maybeSingle();
+              if (rechecked?.referred_by_user_id) {
                 console.log('[REFERRAL_RECOVERY] ✅ Referral recovered for existing profile');
+                clearStoredReferralCode();
               }
-              clearStoredReferralCode();
+              // If bootstrap could not resolve it, keep the stored code:
+              // the Dashboard recovery retries and clears it if invalid.
             }
           } catch (recoveryErr) {
             console.error('[REFERRAL_RECOVERY] Recovery failed:', recoveryErr);

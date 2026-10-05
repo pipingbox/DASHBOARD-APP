@@ -377,50 +377,40 @@ export async function processStoredReferral(userId: string, userEmail?: string):
   console.log('[REFERRAL_RECOVERY] Found unprocessed referral code:', code);
 
   try {
-    // Validate the referral code and get referrer
-    const referrerId = await validateReferralCode(code);
+    // Resolve + apply SERVER-SIDE via referrals-bootstrap: the profiles
+    // table intentionally has NO cross-user select policy, so any
+    // client-side code validation (validateReferralCode) returns zero rows
+    // and the attribution was silently dropped — and the stored code then
+    // cleared — losing the referral forever (PB-REFERRAL-ALDO-001).
+    // Bootstrap resolves the referrer with the service role, sets
+    // referred_by_user_id only when empty, inserts the referrals row
+    // atomically and rejects self-referrals.
+    const applied = await callReferralsBootstrap(code);
 
-    if (!referrerId || referrerId === userId) {
+    if (!applied) {
+      console.error('[REFERRAL_RECOVERY] Failed to apply referral via backend');
+      // Keep the stored code — retry on next Dashboard load.
+      return;
+    }
+
+    // Confirm the attribution is visible (own row is always readable).
+    const { data: updated } = await supabase
+      .from(TABLES.profiles)
+      .select('referred_by_user_id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    const referrerId = (updated?.referred_by_user_id as string | null) ?? null;
+
+    if (!referrerId) {
+      // Bootstrap resolved definitively server-side: the code is invalid or
+      // a self-referral — clear it so we do not retry forever.
       console.log('[REFERRAL_RECOVERY] Code invalid or self-referral, clearing');
       clearStoredReferralCode();
       return;
     }
 
-    console.log('[REFERRAL_RECOVERY] Valid referrer found:', referrerId, '— assigning now');
-
-    // Apply referral via backend.
-    const applied = await callReferralsApply(userId, referrerId);
-
-    if (!applied) {
-      console.error('[REFERRAL_RECOVERY] Failed to apply referral via backend');
-    } else {
-      console.log('[REFERRAL_RECOVERY] ✅ Referral applied via backend');
-    }
-
-    // Check if referral record already exists (prevent duplicates)
-    const { data: existing } = await supabase
-      .from(TABLES.referrals)
-      .select('id')
-      .eq('referrer_id', referrerId)
-      .eq('referred_id', userId)
-      .maybeSingle();
-
-    if (!existing) {
-      const { error: insertErr } = await supabase.from(TABLES.referrals).insert({
-        referrer_id: referrerId,
-        referred_id: userId,
-        referred_email: userEmail || '',
-        status: 'pending',
-      });
-
-      if (insertErr) {
-        console.error('[REFERRAL_RECOVERY] Failed to create referral record:', insertErr.message);
-      } else {
-        console.log('[REFERRAL_RECOVERY] ✅ Referral record created');
-      }
-    }
-
-    // Referral stats are updated by the backend Edge Function; skip local update.
+    console.log('[REFERRAL_RECOVERY] ✅ Referral applied via backend:', referrerId);
 
     // Store debug info
     try {
