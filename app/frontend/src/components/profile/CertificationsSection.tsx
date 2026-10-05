@@ -822,8 +822,10 @@ export function CertificationsSection() {
               disabled={savingPrefs}
               className="bg-[#f59e0b] text-black hover:bg-[#d97706] text-xs h-7 px-3 font-semibold"
             >
+              {/* PB-UI-DOM-REMOVECHILD-RESIDUAL-001: span anchor — same crash class as the
+                  /tools premium banner buttons (conditional icon insert + bare label swap). */}
               {savingPrefs ? <Loader2 className="mr-1.5 h-3 w-3 animate-spin" /> : null}
-              {savingPrefs ? t('common.saving') : t('common.save')}
+              <span>{savingPrefs ? t('common.saving') : t('common.save')}</span>
             </Button>
           </div>
         </div>

@@ -278,10 +278,16 @@ export default function Profile() {
           {saveStatus === 'saving' && <Loader2 className="h-3 w-3 animate-spin" />}
           {saveStatus === 'saved' && <CheckCircle2 className="h-3 w-3" />}
           {saveStatus === 'error' && <AlertCircle className="h-3 w-3" />}
+          {/* PB-UI-DOM-REMOVECHILD-RESIDUAL-001: single conditional text child —
+              sibling conditional texts made the saving→saved swap DELETE a bare
+              text fiber; with auto-translate having font-wrapped (detached) it,
+              React's removeChild threw NotFoundError (PB-ERR-2F5VN8 class). */}
           <span>
-            {saveStatus === 'saving' && t('common.saving', 'Saving...')}
-            {saveStatus === 'saved' && t('common.saved', 'Saved')}
-            {saveStatus === 'error' && t('common.saveError', 'Save error')}
+            {saveStatus === 'saving'
+              ? t('common.saving', 'Saving...')
+              : saveStatus === 'saved'
+                ? t('common.saved', 'Saved')
+                : t('common.saveError', 'Save error')}
           </span>
         </div>
       )}

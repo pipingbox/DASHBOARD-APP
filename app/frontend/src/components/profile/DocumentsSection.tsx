@@ -622,8 +622,10 @@ export function DocumentsSection() {
                 disabled={saving || uploading || !storagePath}
                 className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
               >
+                {/* PB-UI-DOM-REMOVECHILD-RESIDUAL-001: span anchor — same crash class as the
+                    /tools premium banner buttons (conditional icon insert + bare label swap). */}
                 {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {saving ? t('common.saving', { defaultValue: 'Saving...' }) : t('workerProfile.documents.upload', { defaultValue: 'Upload Document' })}
+                <span>{saving ? t('common.saving', { defaultValue: 'Saving...' }) : t('workerProfile.documents.upload', { defaultValue: 'Upload Document' })}</span>
               </Button>
             </div>
           </form>

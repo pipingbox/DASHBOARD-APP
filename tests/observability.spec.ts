@@ -189,6 +189,31 @@ test.describe('dedupe by re-render', () => {
     trackEvent('onboarding_step_reached', { step: 2 }, { dedupeKey: 'step-2' });
     expect(captured.filter((c) => c.event === 'onboarding_step_reached')).toHaveLength(2);
   });
+
+  // PB-UI-DOM-REMOVECHILD-RESIDUAL-001: React can invoke componentDidCatch
+  // twice for the same commit-phase DOM error (recovery pass). One incident
+  // must produce ONE app_error and ONE incident code.
+  test('captureBoundaryError collapses the double componentDidCatch into one app_error', async () => {
+    const { client, captured } = makeClient();
+    await initObservability({ injectedClient: client });
+    const err = new Error("Failed to execute 'removeChild' on 'Node'");
+    const code1 = captureBoundaryError(err, '\n at Tools');
+    const code2 = captureBoundaryError(err, '\n at Tools');
+    expect(code1).toMatch(/^PB-ERR-/);
+    expect(code2).toBe(code1); // same incident, same code
+    const appErrors = captured.filter((c) => c.event === 'app_error');
+    expect(appErrors).toHaveLength(1);
+    expect(appErrors[0].properties?.incident_code).toBe(code1);
+  });
+
+  test('distinct error signatures still emit separately', async () => {
+    const { client, captured } = makeClient();
+    await initObservability({ injectedClient: client });
+    captureBoundaryError(new Error('removeChild crash'), '\n at Tools');
+    captureBoundaryError(new Error('a different failure'), '\n at Tools');
+    captureBoundaryError(new Error('removeChild crash'), '\n at Tools', { route: '/profile' });
+    expect(captured.filter((c) => c.event === 'app_error')).toHaveLength(3);
+  });
 });
 
 // ---------------------------------------------------------------------------
