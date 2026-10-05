@@ -213,22 +213,72 @@ test.describe('PB-REFERRAL-ALDO-001 referral attribution E2E (production, SHA-lo
     console.log(`snapshot: uid captured, code=${snapshotCode}, referred_by=NULL, referral rows=0`);
 
     try {
-      // ── 1) Link capture: /register?ref=PB-ALDO0017 persists the code ──
-      await page.goto(`/register?ref=${ALDO_CODE}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(3000);
-      const stored = await page.evaluate(() => localStorage.getItem('pipingbox_referral_code'));
+      // ── 1) Link capture with a REAL anonymous visitor ──
+      // GuestRoute redirects logged-in users away from /register, so capture
+      // only happens for not-authenticated visitors — exactly the campaign
+      // audience. Use a separate anonymous context (incognito equivalent).
+      const anonCtx = await page.context().browser()!.newContext({
+        userAgent:
+          'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36',
+        baseURL: BASE_URL,
+      });
+      const anonPage = await anonCtx.newPage();
+      const anonPayloads: Buffer[] = [];
+      anonPage.on('request', (req) => {
+        if (req.url().includes('posthog.com') && req.method() === 'POST') {
+          const b = req.postDataBuffer();
+          if (b) anonPayloads.push(b);
+        }
+      });
+      const decodeAnon = (): Record<string, unknown>[] =>
+        anonPayloads.flatMap((buf) => {
+          let text: string;
+          try {
+            text = gunzipSync(buf).toString('utf8');
+          } catch {
+            text = buf.toString('utf8');
+          }
+          try {
+            const j = JSON.parse(text) as Record<string, unknown> & { batch?: unknown[] };
+            return (j.batch ?? [j]) as Record<string, unknown>[];
+          } catch {
+            return [];
+          }
+        });
+
+      await anonPage.goto(`/register?ref=${ALDO_CODE}`, { waitUntil: 'domcontentloaded' });
+      await anonPage.waitForTimeout(3000);
+      const stored = await anonPage.evaluate(() => localStorage.getItem('pipingbox_referral_code'));
       expect(stored, 'referral code must be persisted by the capture hook').toBe(ALDO_CODE);
-      const opened = await waitForWireEvent(page, decodeAll, 'referral_link_opened');
-      const captured = await waitForWireEvent(page, decodeAll, 'referral_captured');
+
+      let opened: Record<string, unknown>[] = [];
+      let captured: Record<string, unknown>[] = [];
+      {
+        const t0 = Date.now();
+        while (Date.now() - t0 < 25_000) {
+          const events = decodeAnon();
+          opened = events.filter((e) => e.event === 'referral_link_opened');
+          captured = events.filter((e) => e.event === 'referral_captured');
+          if (opened.length > 0 && captured.length > 0) break;
+          await anonPage.waitForTimeout(500);
+        }
+      }
       expect(opened.length, 'referral_link_opened must reach the wire').toBeGreaterThan(0);
       expect(captured.length, 'referral_captured must reach the wire').toBeGreaterThan(0);
       for (const e of [...opened, ...captured]) {
         // The referral CODE itself must never be sent to analytics.
         expect(JSON.stringify(e), 'analytics must not contain the referral code').not.toContain(ALDO_CODE);
       }
-      console.log('capture PASS: code persisted, referral_link_opened + referral_captured on wire, code not leaked');
+      await anonCtx.close();
+      console.log('capture PASS: anonymous visitor persisted the code, referral_link_opened + referral_captured on wire, code not leaked');
 
       // ── 2) Attribution via Dashboard recovery (referrals-apply) ──
+      // A user who registered through the link carries the stored code; the
+      // Dashboard recovery path applies it on the next authenticated visit.
+      await page.evaluate((code) => {
+        localStorage.setItem('pipingbox_referral_code', code);
+        localStorage.setItem('pipingbox_referral_timestamp', Date.now().toString());
+      }, ALDO_CODE);
       await page.goto('/dashboard', { waitUntil: 'networkidle' });
       let attributed = false;
       for (let i = 0; i < 45 && !attributed; i++) {
