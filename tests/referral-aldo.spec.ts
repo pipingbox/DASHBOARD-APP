@@ -180,10 +180,29 @@ test.describe('PB-REFERRAL-ALDO-001 referral attribution E2E (production, SHA-lo
     const profiles = (await profileRes.json()) as Array<Record<string, unknown>>;
     expect(profiles.length, 'QA profile must exist').toBe(1);
     const uid = String(profiles[0].user_id);
-    const snapshotCode = (profiles[0].referral_code as string | null) ?? null;
+    let snapshotCode = (profiles[0].referral_code as string | null) ?? null;
     const snapshotReferredBy = (profiles[0].referred_by_user_id as string | null) ?? null;
     expect(snapshotReferredBy, 'QA account must start unattributed for this test').toBeNull();
-    expect(snapshotCode, 'QA profile must already own a stable referral_code (T1)').toMatch(/^PB-/);
+
+    const fnHeaders: Record<string, string> = {
+      Authorization: restCtx!.authorization,
+      'Content-Type': 'application/json',
+    };
+
+    // Existing full profiles (like Aldo's) never hit the AUTH_ONLY bootstrap
+    // path, so they may still lack a code — exactly the gap this ticket fixed
+    // for Aldo manually. Assign one through the now-deployed function, which
+    // also exercises referrals-bootstrap directly.
+    if (!snapshotCode) {
+      const boot = await fetch(`${restCtx!.base}/functions/v1/referrals-bootstrap`, {
+        method: 'POST',
+        headers: fnHeaders,
+        body: JSON.stringify({}),
+      });
+      expect(boot.status, 'referrals-bootstrap must assign a code').toBe(200);
+      snapshotCode = String(((await boot.json()) as Record<string, unknown>).referral_code ?? '');
+    }
+    expect(snapshotCode, 'QA profile must own a stable referral_code (T1)').toMatch(/^PB-/);
 
     const referralsBefore = (await (
       await fetch(`${restCtx!.base}/rest/v1/${REFERRALS_TABLE}?referred_id=eq.${uid}&select=id`, {
@@ -192,11 +211,6 @@ test.describe('PB-REFERRAL-ALDO-001 referral attribution E2E (production, SHA-lo
     ).json()) as Array<Record<string, unknown>>;
     expect(referralsBefore.length, 'QA account must start with zero referral rows').toBe(0);
     console.log(`snapshot: uid captured, code=${snapshotCode}, referred_by=NULL, referral rows=0`);
-
-    const fnHeaders: Record<string, string> = {
-      Authorization: restCtx!.authorization,
-      'Content-Type': 'application/json',
-    };
 
     try {
       // ── 1) Link capture: /register?ref=PB-ALDO0017 persists the code ──
