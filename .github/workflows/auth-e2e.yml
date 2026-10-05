@@ -479,9 +479,11 @@ jobs:
             echo "::error::expected_sha is required when run_referral_aldo_e2e=true (the served build must be traceable to the tested SHA)."
             exit 1
           fi
-          for other in run_identity_e2e run_wfa_e2e run_dashboard_e2e run_cert_upload_e2e run_onboarding_e2e; do
-            if [ "${{ inputs[other] }}" = "true" ]; then
-              echo "::error::run_referral_aldo_e2e and ${other} are mutually exclusive (same QA account, isolated window required)."
+          for pair in "run_identity_e2e=${{ inputs.run_identity_e2e }}" "run_wfa_e2e=${{ inputs.run_wfa_e2e }}" "run_dashboard_e2e=${{ inputs.run_dashboard_e2e }}" "run_cert_upload_e2e=${{ inputs.run_cert_upload_e2e }}" "run_onboarding_e2e=${{ inputs.run_onboarding_e2e }}"; do
+            name="${pair%%=*}"
+            value="${pair##*=}"
+            if [ "$value" = "true" ]; then
+              echo "::error::run_referral_aldo_e2e and ${name} are mutually exclusive (same QA account, isolated window required)."
               exit 1
             fi
           done
