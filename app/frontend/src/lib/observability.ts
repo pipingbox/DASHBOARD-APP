@@ -66,6 +66,26 @@ export const OBS_EVENT_NAMES = [
   'cert_upload_started',
   'cert_upload_completed',
   'cert_upload_failed',
+  // PB-DOCUMENT-INTAKE-001 — unified document intake funnel (Vía A: TUS
+  // resumable; Vía B: inbound email, events reserved for that delivery).
+  // Closed property enums (document_type/channel/transport/mime_category/
+  // size_bucket/progress_checkpoint/error_category/extraction_status) are
+  // validated in buildEventProps; no file names, paths, UIDs, URLs or email
+  // content ever enter the payload.
+  'document_upload_started',
+  'document_upload_progress_checkpoint',
+  'document_upload_paused',
+  'document_upload_resumed',
+  'document_upload_retrying',
+  'document_upload_completed',
+  'document_upload_failed',
+  'document_upload_cancelled',
+  'document_email_reference_created',
+  'document_email_received',
+  'document_email_rejected',
+  'document_extraction_completed',
+  'document_user_confirmed',
+  'document_promoted',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -206,6 +226,154 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
     'attempt_number',
     'error_category',
   ],
+  // PB-DOCUMENT-INTAKE-001 — unified document intake funnel. Props are the
+  // PO-approved allowlist ONLY: never file name, email, UID, storage path,
+  // signed URL, certificate number, content, OCR text or token. All values
+  // go through the closed-enum validation below.
+  document_upload_started: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'mime_category',
+    'size_bucket',
+  ],
+  document_upload_progress_checkpoint: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'mime_category',
+    'size_bucket',
+    'progress_checkpoint',
+    'resumed',
+  ],
+  document_upload_paused: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'mime_category',
+    'size_bucket',
+    'attempt_number',
+    'duration_ms',
+    'resumed',
+  ],
+  document_upload_resumed: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'mime_category',
+    'size_bucket',
+    'attempt_number',
+    'duration_ms',
+    'resumed',
+  ],
+  document_upload_retrying: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'mime_category',
+    'size_bucket',
+    'attempt_number',
+    'resumed',
+  ],
+  document_upload_completed: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'mime_category',
+    'size_bucket',
+    'duration_ms',
+    'attempt_number',
+    'resumed',
+  ],
+  document_upload_failed: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'mime_category',
+    'size_bucket',
+    'duration_ms',
+    'attempt_number',
+    'error_category',
+    'resumed',
+  ],
+  document_upload_cancelled: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'mime_category',
+    'size_bucket',
+    'duration_ms',
+    'attempt_number',
+    'resumed',
+  ],
+  // Vía B (inbound email) — taxonomy declared now, emitted only by the
+  // email pipeline once that delivery is approved and deployed.
+  document_email_reference_created: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+  ],
+  document_email_received: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'mime_category',
+    'size_bucket',
+  ],
+  document_email_rejected: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'mime_category',
+    'size_bucket',
+    'error_category',
+  ],
+  document_extraction_completed: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'extraction_status',
+  ],
+  document_user_confirmed: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+  ],
+  document_promoted: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'transport',
+    'mime_category',
+    'size_bucket',
+  ],
 };
 
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;
@@ -231,6 +399,55 @@ export const CERT_UPLOAD_MIMES = [
   'other',
 ] as const;
 export const CERT_ERROR_CATEGORIES = ['timeout', 'network', 'storage_4xx', 'storage_5xx', 'unknown'] as const;
+
+// PB-DOCUMENT-INTAKE-001 — closed enums for the unified document intake
+// funnel (Vía A TUS + Vía B inbound email). Superset of the legacy
+// CERT_ERROR_CATEGORIES so historical events stay valid.
+export const DOC_TYPES = ['certificate', 'cv'] as const;
+export const DOC_CHANNELS = ['direct', 'email', 'admin'] as const;
+export const DOC_TRANSPORTS = ['tus', 'inbound_email'] as const;
+export const DOC_MIME_CATEGORIES = ['pdf', 'image', 'document', 'unknown'] as const;
+export const DOC_SIZE_BUCKETS = ['<=100kb', '100kb-1mb', '1mb-5mb', '5mb-10mb'] as const;
+export const DOC_PROGRESS_CHECKPOINTS = [25, 50, 75] as const;
+export const DOC_ERROR_CATEGORIES = [
+  'file_read',
+  'no_bytes_started',
+  'network',
+  'timeout',
+  'auth',
+  'storage_4xx',
+  'storage_5xx',
+  'database',
+  'cancelled',
+  'unknown',
+] as const;
+export const DOC_EXTRACTION_STATUSES = ['pending', 'completed', 'low_confidence', 'failed', 'skipped'] as const;
+
+/** Map a resolved MIME type to the coarse document category (no exact type). */
+export function mimeToCategory(mime: string): (typeof DOC_MIME_CATEGORIES)[number] {
+  const m = (mime || '').toLowerCase();
+  if (m === 'application/pdf') return 'pdf';
+  if (m.startsWith('image/')) return 'image';
+  if (
+    m === 'application/msword' ||
+    m === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+    m === 'application/rtf' ||
+    m === 'text/plain' ||
+    m === 'text/csv'
+  ) {
+    return 'document';
+  }
+  return 'unknown';
+}
+
+/** Coarse size bucket for telemetry (never exact bytes of a unique file). */
+export function sizeToBucket(bytes: number): (typeof DOC_SIZE_BUCKETS)[number] | 'unknown' {
+  if (!Number.isFinite(bytes) || bytes < 0) return 'unknown';
+  if (bytes <= 100 * 1024) return '<=100kb';
+  if (bytes <= 1024 * 1024) return '100kb-1mb';
+  if (bytes <= 5 * 1024 * 1024) return '1mb-5mb';
+  return '5mb-10mb';
+}
 
 /** PB-LIBRARY-COMPLETE-001 — closed enums for Library analytics props. */
 export const LIBRARY_FILTER_TYPES = ['family', 'connection_type', 'standard', 'pressure_class'] as const;
@@ -797,10 +1014,25 @@ export function buildEventProps(
   if ('origin' in out && !OBS_ORIGINS.includes(out.origin as ObsOrigin)) delete out.origin;
   // PB-CERT-UPLOAD-UX-001 — cert upload closed enums.
   if ('bucket' in out && !CERT_UPLOAD_BUCKETS.includes(out.bucket as never)) delete out.bucket;
-  if ('size_bucket' in out && !CERT_SIZE_BUCKETS.includes(out.size_bucket as never)) delete out.size_bucket;
+  if ('size_bucket' in out && !DOC_SIZE_BUCKETS.includes(out.size_bucket as never)) delete out.size_bucket;
   if ('mime' in out && !CERT_UPLOAD_MIMES.includes(out.mime as never)) delete out.mime;
-  if ('error_category' in out && !CERT_ERROR_CATEGORIES.includes(out.error_category as never)) delete out.error_category;
-  if ('attempt_number' in out && (typeof out.attempt_number !== 'number' || out.attempt_number < 1 || out.attempt_number > 5)) {
+  if ('error_category' in out && !DOC_ERROR_CATEGORIES.includes(out.error_category as never)) delete out.error_category;
+  // PB-DOCUMENT-INTAKE-001 — unified document intake closed enums.
+  if ('document_type' in out && !DOC_TYPES.includes(out.document_type as never)) delete out.document_type;
+  if ('channel' in out && !DOC_CHANNELS.includes(out.channel as never)) delete out.channel;
+  if ('transport' in out && !DOC_TRANSPORTS.includes(out.transport as never)) delete out.transport;
+  if ('mime_category' in out && !DOC_MIME_CATEGORIES.includes(out.mime_category as never)) delete out.mime_category;
+  if (
+    'progress_checkpoint' in out &&
+    !DOC_PROGRESS_CHECKPOINTS.includes(out.progress_checkpoint as never)
+  ) {
+    delete out.progress_checkpoint;
+  }
+  if ('extraction_status' in out && !DOC_EXTRACTION_STATUSES.includes(out.extraction_status as never)) {
+    delete out.extraction_status;
+  }
+  if ('resumed' in out && typeof out.resumed !== 'boolean') delete out.resumed;
+  if ('attempt_number' in out && (typeof out.attempt_number !== 'number' || out.attempt_number < 1 || out.attempt_number > 8)) {
     delete out.attempt_number;
   }
   if ('duration_ms' in out && (typeof out.duration_ms !== 'number' || out.duration_ms < 0 || out.duration_ms > 600000)) {

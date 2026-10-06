@@ -52,7 +52,23 @@
     "saveError": "Save error",
     "saved": "Saved",
     "fixHighlightedFields": "Please fix the highlighted fields",
-    "sessionNotFound": "User session not found. Please sign in again."
+    "sessionNotFound": "User session not found. Please sign in again.",
+    "upload": {
+      "fileAttached": "File uploaded",
+      "preparingFile": "Preparing the file…",
+      "verifying": "Checking the file…",
+      "retrying": "Reconnecting…",
+      "cancel": "Cancel upload",
+      "noBytesStarted": "The file could not be sent. Check the file and your connection, then try again.",
+      "timedOut": "The upload took too long and was stopped. You can retry; it will resume where it left off.",
+      "networkError": "The connection was lost during the upload. Retry when you are back online; it will resume where it left off.",
+      "authExpired": "Your session has expired. Sign in again and retry the upload.",
+      "storageError": "Storage rejected the file. Check the format and size, then try again.",
+      "verifyFailed": "The file was sent but could not be confirmed on the server. Try again.",
+      "cancelled": "Upload cancelled. You can select the file again.",
+      "databaseError": "The file was uploaded but the reference could not be saved. Try again.",
+      "failed": "The upload failed. Please try again."
+    }
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -2405,7 +2421,7 @@
       "uploadPdf": "Upload CV (PDF)",
       "pdfOnly": "Only PDF files are accepted",
       "fileTooBig": "File must be under 10MB",
-      "uploaded": "CV uploaded successfully",
+      "uploaded": "CV saved successfully",
       "removed": "CV removed",
       "view": "View",
       "replace": "Replace",
@@ -2481,7 +2497,8 @@
       "prefsSaved": "Alert preferences saved",
       "prefsSaveError": "Failed to save alert preferences",
       "viewFileDenied": "Access denied",
-      "saveTimedOut": "Save timed out. Your certificate may have been saved — please refresh to check."
+      "saveTimedOut": "Save timed out. Your certificate may have been saved — please refresh to check.",
+      "savedConfirm": "Certificate saved successfully"
     }
   },
   "profileCompleteness": {

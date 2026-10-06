@@ -52,7 +52,23 @@
     "saveError": "Errore di salvataggio",
     "saved": "Salvato",
     "fixHighlightedFields": "Correggi i campi evidenziati",
-    "sessionNotFound": "Sessione utente non trovata. Accedi di nuovo."
+    "sessionNotFound": "Sessione utente non trovata. Accedi di nuovo.",
+    "upload": {
+      "fileAttached": "File caricato",
+      "preparingFile": "Preparazione del file…",
+      "verifying": "Verifica del file…",
+      "retrying": "Riconnessione…",
+      "cancel": "Annulla caricamento",
+      "noBytesStarted": "Impossibile avviare l’invio del file. Controlla il file e la connessione e riprova.",
+      "timedOut": "Il caricamento ha impiegato troppo tempo ed è stato interrotto. Puoi riprovare; riprenderà da dove si era fermato.",
+      "networkError": "Connessione persa durante il caricamento. Riprova quando hai di nuovo rete; riprenderà da dove si era fermato.",
+      "authExpired": "La sessione è scaduta. Accedi di nuovo e riprova il caricamento.",
+      "storageError": "L’archiviazione ha rifiutato il file. Verifica formato e dimensione e riprova.",
+      "verifyFailed": "Il file è stato inviato ma non è stato possibile confermarlo sul server. Riprova.",
+      "cancelled": "Caricamento annullato. Puoi selezionare di nuovo il file.",
+      "databaseError": "Il file è stato caricato ma non è stato possibile salvare il riferimento. Riprova.",
+      "failed": "Il caricamento non è riuscito. Riprova."
+    }
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -2412,7 +2428,7 @@
       "uploadPdf": "Carica CV (PDF)",
       "pdfOnly": "Sono accettati solo file PDF",
       "fileTooBig": "Il file deve essere inferiore a 10MB",
-      "uploaded": "CV caricato con successo",
+      "uploaded": "CV salvato correttamente",
       "removed": "CV rimosso",
       "view": "Visualizza",
       "replace": "Sostituisci",
@@ -2488,7 +2504,8 @@
       "prefsSaved": "Preferenze di avviso salvate",
       "prefsSaveError": "Salvataggio delle preferenze di avviso non riuscito",
       "viewFileDenied": "Accesso negato",
-      "saveTimedOut": "Tempo di salvataggio scaduto. Il certificato potrebbe essere stato salvato: aggiorna la pagina per verificare."
+      "saveTimedOut": "Tempo di salvataggio scaduto. Il certificato potrebbe essere stato salvato: aggiorna la pagina per verificare.",
+      "savedConfirm": "Certificato salvato correttamente"
     }
   },
   "profileCompleteness": {

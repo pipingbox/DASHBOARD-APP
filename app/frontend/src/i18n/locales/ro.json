@@ -52,7 +52,23 @@
     "saveError": "Eroare la salvare",
     "saved": "Salvat",
     "fixHighlightedFields": "Vă rugăm să corectați câmpurile evidențiate",
-    "sessionNotFound": "Sesiunea utilizatorului nu a fost găsită. Vă rugăm să vă autentificați din nou."
+    "sessionNotFound": "Sesiunea utilizatorului nu a fost găsită. Vă rugăm să vă autentificați din nou.",
+    "upload": {
+      "fileAttached": "Fișier încărcat",
+      "preparingFile": "Se pregătește fișierul…",
+      "verifying": "Se verifică fișierul…",
+      "retrying": "Reconectare…",
+      "cancel": "Anulează încărcarea",
+      "noBytesStarted": "Fișierul nu a putut fi trimis. Verifică fișierul și conexiunea și încearcă din nou.",
+      "timedOut": "Încărcarea a durat prea mult și a fost oprită. Poți încerca din nou; va continua de unde a rămas.",
+      "networkError": "Conexiunea s-a pierdut în timpul încărcării. Încearcă din nou când ai din nou rețea; va continua de unde a rămas.",
+      "authExpired": "Sesiunea ta a expirat. Autentifică-te din nou și reia încărcarea.",
+      "storageError": "Stocarea a respins fișierul. Verifică formatul și dimensiunea și încearcă din nou.",
+      "verifyFailed": "Fișierul a fost trimis, dar nu a putut fi confirmat pe server. Încearcă din nou.",
+      "cancelled": "Încărcare anulată. Poți selecta din nou fișierul.",
+      "databaseError": "Fișierul a fost încărcat, dar referința nu a putut fi salvată. Încearcă din nou.",
+      "failed": "Încărcarea a eșuat. Încearcă din nou."
+    }
   },
   "nav": {
     "dashboard": "Panou de control",
@@ -2412,7 +2428,7 @@
       "uploadPdf": "Încarcă CV (PDF)",
       "pdfOnly": "Sunt acceptate doar fișiere PDF",
       "fileTooBig": "Fișierul trebuie să aibă sub 10 MB",
-      "uploaded": "CV-ul a fost încărcat cu succes",
+      "uploaded": "CV salvat corect",
       "removed": "CV-ul a fost eliminat",
       "view": "Vezi",
       "replace": "Înlocuiește",
@@ -2488,7 +2504,8 @@
       "prefsSaved": "Preferințele de alertare au fost salvate",
       "prefsSaveError": "Salvarea preferințelor de alertare a eșuat",
       "viewFileDenied": "Acces refuzat",
-      "saveTimedOut": "Salvarea a expirat. Este posibil ca certificatul să fi fost salvat — vă rugăm să reîmprospătați pagina pentru a verifica."
+      "saveTimedOut": "Salvarea a expirat. Este posibil ca certificatul să fi fost salvat — vă rugăm să reîmprospătați pagina pentru a verifica.",
+      "savedConfirm": "Certificat salvat corect"
     }
   },
   "profileCompleteness": {

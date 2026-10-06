@@ -40,8 +40,15 @@ import {
 import type { WorkerCertification } from '@/lib/workerProfile';
 import { normalizeCertification } from '@/lib/workerProfile';
 import { syncCertificationReminders, deleteCertificationReminders } from '@/lib/certificationReminders';
-import { uploadWithTimeout, resolveFileMime } from '@/lib/uploadHelpers';
-import { trackEvent, getCorrelationId, CERT_SIZE_BUCKETS, CERT_UPLOAD_MIMES } from '@/lib/observability';
+import { resolveFileMime } from '@/lib/uploadHelpers';
+import {
+  startResumableUpload,
+  UPLOAD_FAILURE_I18N,
+  formatBytes,
+  type DocumentUploadController,
+  type DocumentUploadProgress,
+} from '@/lib/resumableUpload';
+import { trackEvent, getCorrelationId } from '@/lib/observability';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { getSecureFileUrl, deleteStorageObject, extractStoragePathAndBucket } from '@/lib/storageHelpers';
 import { hasStoredRecordFile } from '@/lib/filePresence';
@@ -58,9 +65,14 @@ export function CertificationsSection() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  // PB-CERT-UPLOAD-UX-001: elapsed clock while uploading (visible timeout feedback).
-  const [uploadElapsedSec, setUploadElapsedSec] = useState(0);
+  // PB-DOCUMENT-INTAKE-001 — resumable (TUS) upload machine state for the UI.
+  const [uploadUi, setUploadUi] = useState<DocumentUploadProgress | null>(null);
+  const uploadControllerRef = useRef<DocumentUploadController | null>(null);
+  // Controller of a transport-completed upload whose canonical row has not
+  // been written yet (stays in VERIFYING until submit confirms or fails).
+  const pendingConfirmRef = useRef<DocumentUploadController | null>(null);
+  // Stable path per file selection so TUS can resume the same object.
+  const lastUploadAttemptRef = useRef<{ signature: string; path: string } | null>(null);
   // Recoverable failure state (network/timeout): user can retry without reloading.
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -162,14 +174,10 @@ export function CertificationsSection() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  // PB-CERT-UPLOAD-UX-001: visible elapsed clock while an upload is running,
-  // so a slow network does not look like a frozen app.
-  useEffect(() => {
-    if (!uploading) return;
-    setUploadElapsedSec(0);
-    const id = setInterval(() => setUploadElapsedSec((s) => s + 1), 1000);
-    return () => clearInterval(id);
-  }, [uploading]);
+  // PB-DOCUMENT-INTAKE-001: the elapsed clock, byte counters, retry/slow
+  // flags and the state machine all live in the shared uploader; this
+  // component only renders what it reports. The accumulated time never
+  // resets across internal retries or pauses.
 
   const resetForm = () => {
     setCertName('');
@@ -266,110 +274,68 @@ export function CertificationsSection() {
     }
 
     setUploading(true);
-    setUploadProgress(0);
     setUploadError(null);
-    console.log('[CertUpload] setUploading(true)');
+    setUploadUi(null);
 
-    // PB-CERT-UPLOAD-UX-001 — upload diagnostics. Closed taxonomy, no PII:
-    // logical bucket, coarse size bucket, allowed MIME only. Never the file
-    // name, never the storage path (it embeds the owner UID).
-    const sizeBucket =
-      file.size <= 100 * 1024
-        ? '<=100kb'
-        : file.size <= 1024 * 1024
-          ? '100kb-1mb'
-          : file.size <= 5 * 1024 * 1024
-            ? '1mb-5mb'
-            : '5mb-10mb';
-    const telemetryMime = (CERT_UPLOAD_MIMES as readonly string[]).includes(resolvedMime)
-      ? resolvedMime
-      : 'other';
-    const obsBase = {
+    // PB-DOCUMENT-INTAKE-001 — TUS resumable upload via the shared uploader.
+    // The object path is stable per file selection: re-selecting the same
+    // file after a recoverable failure RESUMES from the previous offset
+    // instead of restarting the whole transfer.
+    const signature = `${file.name}|${file.size}|${file.lastModified}`;
+    const previousAttempt = lastUploadAttemptRef.current;
+    const filePath =
+      previousAttempt && previousAttempt.signature === signature
+        ? previousAttempt.path
+        : `${user.id}/cert-${Date.now()}.${ext || 'pdf'}`;
+    lastUploadAttemptRef.current = { signature, path: filePath };
+    // PB-STORAGE-SECURITY-001: certificates live in the certificates bucket.
+    const bucketName = STORAGE_BUCKETS.certificates;
+
+    const controller = startResumableUpload(file, {
+      documentType: 'certificate',
+      bucket: bucketName,
+      path: filePath,
+      contentType: resolvedMime,
       route: '/profile',
-      correlation_id: getCorrelationId(),
-      bucket: 'certificates',
-      size_bucket: sizeBucket satisfies (typeof CERT_SIZE_BUCKETS)[number],
-      mime: telemetryMime,
-    };
-    trackEvent('cert_upload_started', obsBase);
+      onProgress: (p) => setUploadUi(p),
+    });
+    uploadControllerRef.current = controller;
 
-    try {
-      const filePath = `${user.id}/cert-${Date.now()}.${ext || 'pdf'}`;
-      // PB-STORAGE-SECURITY-001: certificates live in the certificates bucket.
-      // worker-documents is reserved for documents.
-      const bucketName = STORAGE_BUCKETS.certificates;
+    const result = await controller.promise;
+    uploadControllerRef.current = null;
 
-      console.log('[CertUpload] Upload config:', {
-        bucket: bucketName,
-        path: filePath,
-        resolvedMime,
-        fileSize: file.size,
-        fileName: file.name,
-      });
-
-      // PB-CERT-UPLOAD-UX-001: real XHR progress instead of the fixed 30%
-      // placeholder. Cap at 99 until the server confirms so the bar reflects
-      // actual bytes sent.
-      const { error, attempts, durationMs, errorCategory } = await uploadWithTimeout(bucketName, filePath, file, {
-        upsert: true,
-        cacheControl: '3600',
-        timeoutMs: 120000,
-        contentType: resolvedMime,
-        onProgress: (percent) => setUploadProgress(Math.min(percent, 99)),
-      });
-
-      if (error) {
-        console.error('[CertUpload] Upload failed:', {
-          error: error.message,
-          bucket: bucketName,
-          path: filePath,
-        });
-        trackEvent('cert_upload_failed', {
-          ...obsBase,
-          duration_ms: durationMs,
-          attempt_number: attempts,
-          error_category: errorCategory ?? 'unknown',
-        });
-        // Recoverable state: keep the dialog open so the user can retry with
-        // the same form data instead of losing it.
-        const isTimeout = /timed out|timeout|did not respond/i.test(error.message);
-        setUploadError(
-          isTimeout
-            ? t('workerProfile.certifications.uploadTimedOut')
-            : error.message || t('workerProfile.certifications.uploadFailed'),
-        );
-        toast.error(
-          isTimeout
-            ? t('workerProfile.certifications.uploadTimedOut')
-            : error.message || t('common.unexpectedError'),
-        );
-        return;
-      }
-
-      trackEvent('cert_upload_completed', {
-        ...obsBase,
-        duration_ms: durationMs,
-        attempt_number: attempts,
-      });
-      setUploadProgress(100);
-      console.log('[CertUpload] Upload success:', { bucket: bucketName, path: filePath });
-
-      // PB-STORAGE-SECURITY-001 phase 2: persist the canonical location only.
+    if (result.ok) {
+      // Transport + verification HEAD confirmed. The canonical row is
+      // created on submit; until then the controller stays in VERIFYING
+      // and is confirmed/failed by the submit path.
+      pendingConfirmRef.current = controller;
+      setUploadUi(null);
       setFileUrl(null);
       setStorageBucket(bucketName);
       setStoragePath(filePath);
       setFileName(file.name);
-      toast.success(t('workerProfile.certifications.fileUploaded'));
-    } catch (uploadErr) {
-      console.error('[CertUpload] Unexpected exception:', uploadErr);
-      setUploadError(t('common.unexpectedError'));
-      toast.error(t('common.unexpectedError'));
-    } finally {
-      console.log('[CertUpload] setUploading(false) — finally block');
+      toast.success(t('common.upload.fileAttached'));
       setUploading(false);
-      // Reset progress after a brief delay so user sees 100%
-      setTimeout(() => setUploadProgress(0), 1500);
+      return;
     }
+
+    setUploadUi(null);
+    setUploading(false);
+    if ('reason' in result && result.reason === 'cancelled') {
+      // User-initiated cancel: no error banner, form preserved.
+      return;
+    }
+    if ('reason' in result) {
+      // Recoverable state: keep the dialog open so the user can retry with
+      // the same form data instead of losing it.
+      const message = t(UPLOAD_FAILURE_I18N[result.reason]);
+      setUploadError(message);
+      toast.error(message);
+    }
+  };
+
+  const cancelUpload = () => {
+    uploadControllerRef.current?.cancel();
   };
 
   const openCertificateFilePicker = () => {
@@ -431,6 +397,16 @@ export function CertificationsSection() {
 
         if (error) {
           toast.error(error.message);
+          // PB-DOCUMENT-INTAKE-001 — same compensation on update failures.
+          pendingConfirmRef.current?.failCanonical();
+          if (pendingConfirmRef.current && storageBucket && storagePath) {
+            await deleteStorageObject(storageBucket, storagePath).catch(() => undefined);
+            setFileUrl(null);
+            setStorageBucket(null);
+            setStoragePath(null);
+            setFileName('');
+          }
+          pendingConfirmRef.current = null;
           return;
         }
 
@@ -461,6 +437,9 @@ export function CertificationsSection() {
         setItems((prev) =>
           prev.map((i) => (i.id === editing.id ? { ...i, ...payload } : i)),
         );
+        // PB-DOCUMENT-INTAKE-001 — canonical write confirmed (update path).
+        pendingConfirmRef.current?.confirmSaved();
+        pendingConfirmRef.current = null;
         toast.success(t('workerProfile.certifications.updated'));
 
         // Sync reminders (non-blocking — don't let this hang the UI)
@@ -521,12 +500,30 @@ export function CertificationsSection() {
 
         if (error) {
           toast.error(error.message);
+          // PB-DOCUMENT-INTAKE-001 — safe compensation: the object finished
+          // but the canonical row failed. Close the upload machine as a
+          // database failure and remove the freshly-created object so no
+          // orphan remains; the user keeps the form and can retry.
+          pendingConfirmRef.current?.failCanonical();
+          if (pendingConfirmRef.current && storageBucket && storagePath) {
+            await deleteStorageObject(storageBucket, storagePath).catch(() => undefined);
+            setFileUrl(null);
+            setStorageBucket(null);
+            setStoragePath(null);
+            setFileName('');
+          }
+          pendingConfirmRef.current = null;
           return;
         }
 
         if (data) {
           console.log('[CertSave] Insert successful, updating local state...');
           setItems((prev) => [data as WorkerCertification, ...prev]);
+          // PB-DOCUMENT-INTAKE-001 — canonical write confirmed: only now the
+          // upload machine reaches SAVED and document_upload_completed is
+          // emitted ("Certificado guardado correctamente").
+          pendingConfirmRef.current?.confirmSaved();
+          pendingConfirmRef.current = null;
 
           // Create reminders (non-blocking — don't let this hang the UI)
           console.log('[CertSave] Syncing reminders for new cert (non-blocking)...');
@@ -549,7 +546,9 @@ export function CertificationsSection() {
             console.error('[CertSave] Reload failed (non-blocking):', loadErr);
           });
         }
-        toast.success(t('workerProfile.certifications.added'));
+        // PB-DOCUMENT-INTAKE-001 — unambiguous final confirmation: only shown
+        // after both the object AND the canonical row are persisted.
+        toast.success(t('workerProfile.certifications.savedConfirm'));
       }
 
       console.log('[CertSave] Closing dialog...');
@@ -953,6 +952,10 @@ export function CertificationsSection() {
                           await deleteStorageObject(storageBucket, storagePath);
                         }
                       }
+                      // PB-DOCUMENT-INTAKE-001 — the detached upload never
+                      // reached its canonical write: close the machine.
+                      pendingConfirmRef.current?.failCanonical();
+                      pendingConfirmRef.current = null;
                       // Edit mode: just clear state; the old object is deleted on save if confirmed.
                       setFileUrl(null);
                       setStorageBucket(null);
@@ -978,37 +981,65 @@ export function CertificationsSection() {
                     ) : (
                       <Upload className="h-4 w-4" />
                     )}
-                    <span>
+                    <span data-testid="cert-upload-button-label">
                       {uploading
-                        ? `${t('common.loading')} ${uploadProgress}%`
+                        ? `${t('common.loading')} ${uploadUi?.percent ?? 0}%`
                         : t('workerProfile.certifications.uploadFile')}
                     </span>
                   </button>
-                  {uploading && (
-                    <div className="w-full space-y-1">
+                  {uploading && uploadUi && (
+                    <div className="w-full space-y-1" data-testid="cert-upload-status">
                       <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
                         <div
+                          data-testid="cert-upload-progress-bar"
                           className="h-full rounded-full bg-[#f59e0b] transition-all duration-300 ease-out"
-                          style={{ width: `${uploadProgress}%` }}
+                          style={{ width: `${uploadUi.percent}%` }}
                         />
                       </div>
-                      <p className="text-center text-[11px] text-zinc-500">
-                        {uploadProgress < 100
-                          ? `${uploadProgress}% ${t('workerProfile.certifications.uploading') || 'uploading...'}`
-                          : `✓ ${t('workerProfile.certifications.uploadComplete') || 'Upload complete'}`}
-                        {uploadProgress < 100 && (
-                          <span className="ml-1 text-zinc-600">({uploadElapsedSec}s)</span>
+                      <p className="text-center text-[11px] text-zinc-500" data-testid="cert-upload-status-line">
+                        {uploadUi.state === 'VERIFYING'
+                          ? t('common.upload.verifying')
+                          : uploadUi.state === 'RETRYING'
+                            ? `${uploadUi.percent}% ${t('common.upload.retrying')}`
+                            : `${uploadUi.percent}% ${t('workerProfile.certifications.uploading') || 'uploading...'}`}
+                        {uploadUi.state !== 'VERIFYING' && (
+                          <span className="ml-1 text-zinc-600">
+                            ({Math.floor(uploadUi.elapsedMs / 1000)}
+                            s)
+                          </span>
+                        )}
+                        {uploadUi.state !== 'VERIFYING' && uploadUi.bytesTotal > 0 && (
+                          <span className="ml-1 text-zinc-600">
+                            {formatBytes(uploadUi.bytesUploaded)} / {formatBytes(uploadUi.bytesTotal)}
+                          </span>
                         )}
                       </p>
-                      {uploadElapsedSec >= 30 && uploadProgress < 100 && (
+                      {/* PB-DOCUMENT-INTAKE-001 — "Preparando el archivo…" while
+                          the browser has not produced the first byte. */}
+                      {uploadUi.preparingFile && uploadUi.state !== 'VERIFYING' && (
+                        <p className="text-center text-[11px] text-zinc-400" data-testid="cert-upload-preparing">
+                          {t('common.upload.preparingFile')}
+                        </p>
+                      )}
+                      {/* Slow hint only after 30s of real accumulated time. */}
+                      {uploadUi.slowConnection && uploadUi.state !== 'VERIFYING' && (
                         <p className="text-center text-[11px] text-amber-500/90">
                           {t('workerProfile.certifications.uploadSlowHint')}
                         </p>
                       )}
+                      {/* User can always cancel; the form stays intact. */}
+                      <button
+                        type="button"
+                        onClick={cancelUpload}
+                        className="mx-auto block text-[11px] uppercase tracking-wider text-zinc-500 hover:text-red-400"
+                        data-testid="cert-upload-cancel"
+                      >
+                        {t('common.upload.cancel')}
+                      </button>
                     </div>
                   )}
                   {uploadError && !uploading && (
-                    <p className="text-center text-[11px] text-red-400" role="alert">
+                    <p className="text-center text-[11px] text-red-400" role="alert" data-testid="cert-upload-error">
                       {uploadError} {t('workerProfile.certifications.uploadRetryHint')}
                     </p>
                   )}

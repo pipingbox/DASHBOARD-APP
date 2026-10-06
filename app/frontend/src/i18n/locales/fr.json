@@ -52,7 +52,23 @@
     "saveError": "Erreur d'enregistrement",
     "saved": "Enregistré",
     "fixHighlightedFields": "Veuillez corriger les champs mis en évidence",
-    "sessionNotFound": "Session utilisateur introuvable. Veuillez vous reconnecter."
+    "sessionNotFound": "Session utilisateur introuvable. Veuillez vous reconnecter.",
+    "upload": {
+      "fileAttached": "Fichier envoyé",
+      "preparingFile": "Préparation du fichier…",
+      "verifying": "Vérification du fichier…",
+      "retrying": "Reconnexion…",
+      "cancel": "Annuler l’envoi",
+      "noBytesStarted": "Impossible de commencer l’envoi du fichier. Vérifiez le fichier et votre connexion, puis réessayez.",
+      "timedOut": "L’envoi a pris trop de temps et a été interrompu. Vous pouvez réessayer ; il reprendra là où il s’était arrêté.",
+      "networkError": "La connexion a été perdue pendant l’envoi. Réessayez quand vous serez de nouveau en ligne ; il reprendra là où il s’était arrêté.",
+      "authExpired": "Votre session a expiré. Reconnectez-vous et réessayez l’envoi.",
+      "storageError": "Le stockage a refusé le fichier. Vérifiez le format et la taille, puis réessayez.",
+      "verifyFailed": "Le fichier a été envoyé mais n’a pas pu être confirmé par le serveur. Réessayez.",
+      "cancelled": "Envoi annulé. Vous pouvez resélectionner le fichier.",
+      "databaseError": "Le fichier a été envoyé mais la référence n’a pas pu être enregistrée. Réessayez.",
+      "failed": "L’envoi a échoué. Veuillez réessayer."
+    }
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -2412,7 +2428,7 @@
       "uploadPdf": "Télécharger le CV (PDF)",
       "pdfOnly": "Seuls les fichiers PDF sont acceptés",
       "fileTooBig": "Le fichier doit faire moins de 10 Mo",
-      "uploaded": "CV téléchargé avec succès",
+      "uploaded": "CV enregistré correctement",
       "removed": "CV supprimé",
       "view": "Voir",
       "replace": "Remplacer",
@@ -2488,7 +2504,8 @@
       "uploadRetryHint": "Vous pouvez réessayer sans quitter le formulaire.",
       "uploading": "Téléchargement en cours...",
       "viewFileDenied": "Accès refusé",
-      "saveTimedOut": "Délai d'enregistrement dépassé. Votre certificat a peut-être été enregistré — veuillez actualiser la page pour vérifier."
+      "saveTimedOut": "Délai d'enregistrement dépassé. Votre certificat a peut-être été enregistré — veuillez actualiser la page pour vérifier.",
+      "savedConfirm": "Certificat enregistré correctement"
     }
   },
   "profileCompleteness": {

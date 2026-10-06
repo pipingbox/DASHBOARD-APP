@@ -52,7 +52,23 @@
     "saveError": "Erro ao guardar",
     "saved": "Guardado",
     "fixHighlightedFields": "Corrija os campos assinalados",
-    "sessionNotFound": "Sessão de utilizador não encontrada. Inicie sessão novamente."
+    "sessionNotFound": "Sessão de utilizador não encontrada. Inicie sessão novamente.",
+    "upload": {
+      "fileAttached": "Ficheiro enviado",
+      "preparingFile": "A preparar o ficheiro…",
+      "verifying": "A verificar o ficheiro…",
+      "retrying": "A reconectar…",
+      "cancel": "Cancelar envio",
+      "noBytesStarted": "Não foi possível começar a enviar o ficheiro. Verifica o ficheiro e a ligação e tenta novamente.",
+      "timedOut": "O envio demorou demasiado e foi interrompido. Podes tentar novamente; retomará de onde parou.",
+      "networkError": "A ligação perdeu-se durante o envio. Tenta novamente quando tiveres rede; retomará de onde parou.",
+      "authExpired": "A tua sessão expirou. Inicia sessão novamente e tenta o envio.",
+      "storageError": "O armazenamento rejeitou o ficheiro. Verifica o formato e o tamanho e tenta novamente.",
+      "verifyFailed": "O ficheiro foi enviado mas não foi possível confirmá-lo no servidor. Tenta novamente.",
+      "cancelled": "Envio cancelado. Podes selecionar o ficheiro novamente.",
+      "databaseError": "O ficheiro foi enviado mas não foi possível guardar a referência. Tenta novamente.",
+      "failed": "O envio falhou. Tenta novamente."
+    }
   },
   "nav": {
     "dashboard": "Painel",
@@ -2412,7 +2428,7 @@
       "uploadPdf": "Carregar CV (PDF)",
       "pdfOnly": "Apenas ficheiros PDF são aceites",
       "fileTooBig": "O ficheiro deve ter menos de 10MB",
-      "uploaded": "CV carregado com sucesso",
+      "uploaded": "CV guardado com sucesso",
       "removed": "CV removido",
       "view": "Ver",
       "replace": "Substituir",
@@ -2488,7 +2504,8 @@
       "uploadRetryHint": "Pode tentar novamente sem sair do formulário.",
       "uploading": "Enviando...",
       "viewFileDenied": "Acesso negado",
-      "saveTimedOut": "A gravação excedeu o tempo limite. O seu certificado pode ter sido guardado; atualize a página para verificar."
+      "saveTimedOut": "A gravação excedeu o tempo limite. O seu certificado pode ter sido guardado; atualize a página para verificar.",
+      "savedConfirm": "Certificado guardado com sucesso"
     }
   },
   "profileCompleteness": {

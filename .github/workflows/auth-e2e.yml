@@ -67,7 +67,7 @@ on:
         default: false
         type: boolean
       run_cert_upload_e2e:
-        description: 'Run ONLY the PB-CERT-UPLOAD-UX-001 certificate-upload E2E (cert-upload-ux, Android Chrome emulation) in an isolated window — the 7/7 auth gate and the other specs are skipped for this dispatch'
+        description: 'Run ONLY the PB-DOCUMENT-INTAKE-001 document-upload E2E (document-upload-e2e, Android Chrome emulation, TUS resumable) in an isolated window — the 7/7 auth gate and the other specs are skipped for this dispatch'
         required: false
         default: false
         type: boolean
@@ -434,11 +434,11 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run certificate-upload E2E — happy path + recoverable timeout, ZERO DIFF
+      - name: 'Run document-upload E2E (PB-DOCUMENT-INTAKE-001) — TUS resumable: happy path, interruption/resume, no_bytes_started regression, ZERO DIFF'
         shell: bash
         run: |
           set -euo pipefail
-          npx playwright test tests/cert-upload-ux.spec.ts \
+          npx playwright test tests/document-upload-e2e.spec.ts \
             --config=playwright.config.ts \
             --reporter=line
 

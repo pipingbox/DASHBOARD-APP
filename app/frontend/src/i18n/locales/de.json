@@ -52,7 +52,23 @@
     "saveError": "Fehler beim Speichern",
     "saved": "Gespeichert",
     "fixHighlightedFields": "Bitte korrigieren Sie die markierten Felder",
-    "sessionNotFound": "Benutzersitzung nicht gefunden. Bitte melden Sie sich erneut an."
+    "sessionNotFound": "Benutzersitzung nicht gefunden. Bitte melden Sie sich erneut an.",
+    "upload": {
+      "fileAttached": "Datei hochgeladen",
+      "preparingFile": "Datei wird vorbereitet…",
+      "verifying": "Datei wird geprüft…",
+      "retrying": "Verbindung wird wiederhergestellt…",
+      "cancel": "Upload abbrechen",
+      "noBytesStarted": "Die Datei konnte nicht gesendet werden. Prüfe Datei und Verbindung und versuche es erneut.",
+      "timedOut": "Der Upload hat zu lange gedauert und wurde gestoppt. Du kannst es erneut versuchen; er wird fortgesetzt.",
+      "networkError": "Die Verbindung ging beim Upload verloren. Versuche es erneut, wenn du wieder online bist; er wird fortgesetzt.",
+      "authExpired": "Deine Sitzung ist abgelaufen. Melde dich erneut an und versuche den Upload erneut.",
+      "storageError": "Der Speicher hat die Datei abgelehnt. Prüfe Format und Größe und versuche es erneut.",
+      "verifyFailed": "Die Datei wurde gesendet, konnte aber nicht auf dem Server bestätigt werden. Versuche es erneut.",
+      "cancelled": "Upload abgebrochen. Du kannst die Datei erneut auswählen.",
+      "databaseError": "Die Datei wurde hochgeladen, aber die Referenz konnte nicht gespeichert werden. Versuche es erneut.",
+      "failed": "Der Upload ist fehlgeschlagen. Bitte erneut versuchen."
+    }
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -2405,7 +2421,7 @@
       "uploadPdf": "CV hochladen (PDF)",
       "pdfOnly": "Nur PDF-Dateien werden akzeptiert",
       "fileTooBig": "Datei muss kleiner als 10MB sein",
-      "uploaded": "CV erfolgreich hochgeladen",
+      "uploaded": "CV erfolgreich gespeichert",
       "removed": "CV entfernt",
       "view": "Ansehen",
       "replace": "Ersetzen",
@@ -2481,7 +2497,8 @@
       "uploadRetryHint": "Du kannst den Upload wiederholen, ohne das Formular zu verlassen.",
       "uploading": "Wird hochgeladen...",
       "viewFileDenied": "Zugriff verweigert",
-      "saveTimedOut": "Zeitüberschreitung beim Speichern. Ihr Zertifikat wurde möglicherweise trotzdem gespeichert — bitte aktualisieren Sie die Seite, um dies zu prüfen."
+      "saveTimedOut": "Zeitüberschreitung beim Speichern. Ihr Zertifikat wurde möglicherweise trotzdem gespeichert — bitte aktualisieren Sie die Seite, um dies zu prüfen.",
+      "savedConfirm": "Zertifikat erfolgreich gespeichert"
     }
   },
   "profileCompleteness": {
