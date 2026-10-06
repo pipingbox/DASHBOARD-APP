@@ -313,6 +313,94 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
     return Boolean(del1?.ok);
   };
 
+  /** Safe cert-row read (no expect): used by best-effort restore paths. */
+  const fetchCertRows = async (
+    restCtx: { base: string; apiKey: string; authorization: string },
+    restHeaders: Record<string, string>,
+    uid: string,
+  ): Promise<Record<string, unknown>[]> => {
+    const r = await fetch(`${restCtx.base}/rest/v1/${CERT_TABLE}?select=*&user_id=eq.${uid}`, {
+      headers: restHeaders,
+      signal: AbortSignal.timeout(15_000),
+    }).catch(() => null);
+    if (!r?.ok) return [];
+    return (await r.json().catch(() => [])) as Record<string, unknown>[];
+  };
+
+  /**
+   * Remove orphan synthetic cert objects left behind by earlier failed
+   * runs: an object with the app's canonical cert naming
+   * (cert-<epoch-ms>.pdf) that no certification row references — the exact
+   * "object without row" inconsistency this feature eliminates. Runs
+   * BEFORE the snapshot so ZERO DIFF compares against the cleaned state.
+   * Never touches referenced objects.
+   */
+  const cleanupOrphanCertObjects = async (
+    restCtx: { base: string; apiKey: string; authorization: string },
+    restHeaders: Record<string, string>,
+    uid: string,
+    page: import('@playwright/test').Page,
+  ) => {
+    const rows = await fetchCertRows(restCtx, restHeaders, uid);
+    const referenced = new Set(rows.map((c) => String(c.storage_path ?? '')));
+    const objects = await listObjects(restCtx, uid).catch(() => [] as string[]);
+    for (const obj of objects) {
+      if (/\/cert-\d+\.pdf$/.test(obj) && !referenced.has(obj)) {
+        console.log(`[residue] deleting orphan cert object: ${obj}`);
+        await deleteObjectRobust(restCtx, restHeaders, obj, page);
+      }
+    }
+  };
+
+  /**
+   * Robust restore for cert tests: delete EVERY row and object created by
+   * the test, even when the body failed before tracking them — so the
+   * finally never masks the body's error with its own leftover failure.
+   * Best-effort: the ZERO DIFF assertions after it are the source of truth.
+   */
+  const restoreAllCertState = async (
+    restCtx: { base: string; apiKey: string; authorization: string },
+    restHeaders: Record<string, string>,
+    uid: string,
+    snapshotIds: Set<string>,
+    snapshotObjects: string[],
+    page: import('@playwright/test').Page,
+  ) => {
+    const rowsNow = await fetchCertRows(restCtx, restHeaders, uid);
+    for (const c of rowsNow) {
+      if (!snapshotIds.has(String(c.id))) {
+        await fetch(`${restCtx.base}/rest/v1/${CERT_TABLE}?id=eq.${c.id}`, {
+          method: 'DELETE',
+          headers: restHeaders,
+        }).catch(() => undefined);
+      }
+    }
+    const objectsNow = await listObjects(restCtx, uid).catch(() => [] as string[]);
+    for (const obj of objectsNow) {
+      if (!snapshotObjects.includes(obj)) {
+        await deleteObjectRobust(restCtx, restHeaders, obj, page);
+      }
+    }
+  };
+
+  /**
+   * PB-DOCUMENT-INTAKE-001 — zero-PII scope for the PostHog wire check.
+   * PostHog platform-managed fields (distinct_id, $user_id, $device_id,
+   * token, event uuids, ...) are the analytics platform's own identity
+   * system — present in every legacy event too — and are out of scope.
+   * The uploader contract covers the custom properties WE attach.
+   */
+  const customPropsOf = (e: Record<string, unknown>): Record<string, unknown> => {
+    const props = (e.properties ?? {}) as Record<string, unknown>;
+    const custom: Record<string, unknown> = { event: e.event };
+    for (const [k, v] of Object.entries(props)) {
+      if (k.startsWith('$')) continue;
+      if (k === 'token' || k === 'distinct_id' || k === 'pb_anonymous_id') continue;
+      custom[k] = v;
+    }
+    return custom;
+  };
+
   // -------------------------------------------------------------------------
   // TEST 1 — happy path, PDF 8–10 MB, slow mobile uplink
   // -------------------------------------------------------------------------
@@ -369,11 +457,11 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
     };
     const snapshot = await readCerts();
     const snapshotIds = new Set(snapshot.map((c) => String(c.id)));
-    // Targeted cleanup: the first E2E dispatch (run 37427465677) left one
-    // synthetic object behind when its restore used the wrong path form.
-    // Remove exactly that residue before snapshotting.
-    const residue = `${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${uid}/cert-1791270856175.pdf`;
-    await fetch(residue, { method: 'DELETE', headers: restHeaders }).catch(() => undefined);
+    // Targeted residue cleanup: earlier dispatches left synthetic cert
+    // objects behind when a test failed mid-body (the restore only ran for
+    // tracked objects). Remove every orphan app-named cert object before
+    // snapshotting so ZERO DIFF compares against the cleaned state.
+    await cleanupOrphanCertObjects(restCtx, restHeaders, uid, page);
     const snapshotObjects = await listObjects(restCtx, uid);
 
     let createdRowId = '';
@@ -485,24 +573,20 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       expect(cp).toMatchObject({ document_type: 'certificate', transport: 'tus', mime_category: 'pdf', size_bucket: '5mb-10mb' });
       expect(typeof cp.duration_ms).toBe('number');
 
-      // Zero PII on the PostHog wire.
-      const wire = JSON.stringify(decoded.filter((e) => String(e.event).startsWith('document_upload')));
+      // Zero PII on the PostHog wire — scoped to OUR custom event
+      // properties (see customPropsOf): the platform's own identity
+      // fields (distinct_id, $user_id, ...) are out of scope.
+      const wire = JSON.stringify(
+        decoded.filter((e) => String(e.event).startsWith('document_upload')).map(customPropsOf),
+      );
       expect(wire).not.toContain('@');
       expect(wire).not.toContain(uid);
       expect(wire).not.toContain(FILE_NAME);
       expect(wire).not.toContain(createdStoragePath);
       console.log('TUS happy path PASS');
     } finally {
-      // ── Restore: delete created row + object, verify ZERO DIFF ──
-      if (createdRowId) {
-        await fetch(`${restCtx.base}/rest/v1/${CERT_TABLE}?id=eq.${createdRowId}`, {
-          method: 'DELETE',
-          headers: restHeaders,
-        }).catch(() => undefined);
-      }
-      if (createdStoragePath) {
-        await deleteObjectRobust(restCtx, restHeaders, createdStoragePath, page);
-      }
+      // ── Restore: delete every row + object this test created, verify ZERO DIFF ──
+      await restoreAllCertState(restCtx, restHeaders, uid, snapshotIds, snapshotObjects, page);
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
       expect([...snapshotIds].filter((id) => !finalIds.has(id)), 'pre-existing rows must remain').toHaveLength(0);
@@ -578,6 +662,9 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
     };
     const snapshot = await readCerts();
     const snapshotIds = new Set(snapshot.map((c) => String(c.id)));
+    // Residue cleanup: remove orphan cert objects left by earlier failed
+    // runs BEFORE snapshotting (see cleanupOrphanCertObjects).
+    await cleanupOrphanCertObjects(restCtx, restHeaders, uid, page);
     const snapshotObjects = await listObjects(restCtx, uid);
 
     let createdRowId = '';
@@ -621,7 +708,12 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       // resumable endpoint (unlike CDP offline, this keeps
       // navigator.onLine=true, so the tus client exercises its retry ladder
       // exactly like a flaky mobile link).
-      await page.route(`**${TUS_PATH}*`, (route) => route.abort('connectionreset'));
+      // NOTE: the pattern must end with `**` — a trailing `*` does NOT
+      // cross the `/` of the base64 upload id in the chunk PATCH URL
+      // (/upload/resumable/{id}), so the PATCH was never intercepted and
+      // the retrying state never surfaced (dispatch 3, run 37432437423).
+      const TUS_CUT_PATTERN = `**${TUS_PATH}**`;
+      await page.route(TUS_CUT_PATTERN, (route) => route.abort('connectionreset'));
 
       // Chrome to the background and back (lifecycle emulation, best effort).
       try {
@@ -647,7 +739,7 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       // Restore the transport within the TUS retry budget (the ladder allows
       // ~38 s; keep the outage window short so retries remain).
       await page.waitForTimeout(4000);
-      await page.unroute(`**${TUS_PATH}*`);
+      await page.unroute(TUS_CUT_PATTERN);
 
       // The transfer must complete without restarting the whole upload:
       // sampled progress after the restore never falls below the maximum
@@ -700,15 +792,9 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       await waitForWireEvent(page, decodeAll, 'document_upload_completed', 20_000);
       console.log('interruption + resume PASS');
     } finally {
-      if (createdRowId) {
-        await fetch(`${restCtx.base}/rest/v1/${CERT_TABLE}?id=eq.${createdRowId}`, {
-          method: 'DELETE',
-          headers: restHeaders,
-        }).catch(() => undefined);
-      }
-      if (createdStoragePath) {
-        await deleteObjectRobust(restCtx, restHeaders, createdStoragePath, page);
-      }
+      // Robust restore: delete every row + object this test created, even
+      // if the body failed before tracking them (never mask the body error).
+      await restoreAllCertState(restCtx, restHeaders, uid, snapshotIds, snapshotObjects, page);
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
       expect([...snapshotIds].filter((id) => !finalIds.has(id)), 'pre-existing rows must remain').toHaveLength(0);
@@ -771,6 +857,9 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
     };
     const snapshot = await readCerts();
     const snapshotIds = new Set(snapshot.map((c) => String(c.id)));
+    // Residue cleanup: remove orphan cert objects left by earlier failed
+    // runs BEFORE snapshotting (see cleanupOrphanCertObjects).
+    await cleanupOrphanCertObjects(restCtx, restHeaders, uid, page);
     const snapshotObjects = await listObjects(restCtx, uid);
 
     let createdRowId = '';
@@ -814,15 +903,9 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       expect((started[0].properties ?? {}) as Record<string, unknown>).toMatchObject({ mime_category: 'image' });
       console.log('image upload PASS');
     } finally {
-      if (createdRowId) {
-        await fetch(`${restCtx.base}/rest/v1/${CERT_TABLE}?id=eq.${createdRowId}`, {
-          method: 'DELETE',
-          headers: restHeaders,
-        }).catch(() => undefined);
-      }
-      if (createdStoragePath) {
-        await deleteObjectRobust(restCtx, restHeaders, createdStoragePath, page);
-      }
+      // Robust restore: delete every row + object this test created, even
+      // if the body failed before tracking them (never mask the body error).
+      await restoreAllCertState(restCtx, restHeaders, uid, snapshotIds, snapshotObjects, page);
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
       expect(finalRows.filter((c) => !snapshotIds.has(String(c.id))), 'ZERO DIFF: no leftover rows').toHaveLength(0);
@@ -1040,15 +1123,23 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
     test.setTimeout(420_000);
     const { decodeAll, getRest } = await setupCommon(page);
 
-    const cdp = await page.context().newCDPSession(page);
-    // Zero upload throughput = the browser cannot begin transferring bytes:
-    // the exact observable condition of the Aldo incident (no request ever
-    // reaches Storage, progress stays at 0%).
-    await cdp.send('Network.emulateNetworkConditions', {
-      offline: false,
-      latency: 200,
-      downloadThroughput: 1024 * 1024,
-      uploadThroughput: 0,
+    // The incident condition: the file is selected, the upload UI starts,
+    // but the browser never manages to transfer a single byte — no request
+    // ever reaches Storage, progress stays at 0% (the Aldo incident).
+    //
+    // Emulated at the network layer: every request to the TUS endpoint is
+    // intercepted and NEVER continued, so the transport cannot begin.
+    // (Verified experimentally: XHR upload.onprogress does not fire while a
+    // request is paused by interception, so tus reports zero bytes and the
+    // uploader's 15 s no-bytes watchdog is the exact code path exercised.)
+    //
+    // DO NOT use CDP Network.emulateNetworkConditions uploadThroughput: 0 —
+    // in CDP semantics 0 means "no limit" (unlimited), NOT zero bytes: with
+    // it the upload runs at full speed and this regression never triggers
+    // (dispatch 3, run 37432437423).
+    const TUS_HANG_PATTERN = `**${TUS_PATH}**`;
+    await page.route(TUS_HANG_PATTERN, () => {
+      /* never continue: zero throughput */
     });
 
     await login(page);
@@ -1090,6 +1181,9 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
     };
     const snapshot = await readCerts();
     const snapshotIds = new Set(snapshot.map((c) => String(c.id)));
+    // Residue cleanup: remove orphan cert objects left by earlier failed
+    // runs BEFORE snapshotting (see cleanupOrphanCertObjects).
+    await cleanupOrphanCertObjects(restCtx, restHeaders, uid, page);
     const snapshotObjects = await listObjects(restCtx, uid);
 
     let createdRowId = '';
@@ -1142,12 +1236,10 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       });
 
       // Re-selection is possible and completes once the link recovers.
-      await cdp.send('Network.emulateNetworkConditions', {
-        offline: false,
-        latency: 0,
-        downloadThroughput: -1,
-        uploadThroughput: -1,
-      });
+      // Un-hang the transport: the paused creation request was already
+      // aborted client-side by the uploader's watchdog (upload.abort),
+      // so the fresh selection starts a clean TUS creation.
+      await page.unroute(TUS_HANG_PATTERN);
       const [chooser2] = await Promise.all([
         page.waitForEvent('filechooser'),
         uploadPickerButton(page).click(),
@@ -1177,15 +1269,9 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       ).toEqual([createdStoragePath]);
       console.log('no_bytes_started regression PASS');
     } finally {
-      if (createdRowId) {
-        await fetch(`${restCtx.base}/rest/v1/${CERT_TABLE}?id=eq.${createdRowId}`, {
-          method: 'DELETE',
-          headers: restHeaders,
-        }).catch(() => undefined);
-      }
-      if (createdStoragePath) {
-        await deleteObjectRobust(restCtx, restHeaders, createdStoragePath, page);
-      }
+      // Robust restore: delete every row + object this test created, even
+      // if the body failed before tracking them (never mask the body error).
+      await restoreAllCertState(restCtx, restHeaders, uid, snapshotIds, snapshotObjects, page);
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
       expect([...snapshotIds].filter((id) => !finalIds.has(id)), 'pre-existing rows must remain').toHaveLength(0);
