@@ -273,7 +273,9 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
     });
     expect(r.ok, `object list failed: HTTP ${r.status}`).toBeTruthy();
     const items = (await r.json()) as Array<{ name?: string }>;
-    return items.map((i) => String(i.name ?? ''));
+    // The list API returns names RELATIVE to the prefix — normalize to the
+    // full object path so every comparison and DELETE uses one form.
+    return items.map((i) => `${uid}/${String(i.name ?? '')}`);
   };
 
   // -------------------------------------------------------------------------
@@ -301,9 +303,20 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       'Content-Type': 'application/json',
     };
 
-    // Identify the QA user (uid) from the PostHog identify on the wire.
+    // Identify the QA user deterministically from the captured session JWT
+    // (payload.sub). The PostHog $identify wire event is only a fallback:
+    // its flush timing is not guaranteed within the polling window.
     let uid = '';
-    for (let i = 0; i < 60 && !uid; i++) {
+    try {
+      const token = restCtx.authorization.replace(/^Bearer\s+/i, '');
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8')) as {
+        sub?: string;
+      };
+      uid = String(payload.sub ?? '');
+    } catch {
+      /* fall through to the wire fallback */
+    }
+    for (let i = 0; i < 30 && !uid; i++) {
       await page.waitForTimeout(1000);
       const id = decodeAll().find((e) => e.event === '$identify');
       if (id) {
@@ -311,7 +324,7 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
         uid = String(p.$identified_id ?? id.distinct_id ?? p.distinct_id ?? '');
       }
     }
-    expect(uid, 'exactly one $identify must flush after login').toMatch(/^[0-9a-f-]{36}$/i);
+    expect(uid, 'uid must resolve from the session JWT (or the identify wire)').toMatch(/^[0-9a-f-]{36}$/i);
 
     const listUrl = `${restCtx.base}/rest/v1/${CERT_TABLE}?select=*&user_id=eq.${uid}`;
     const readCerts = async (): Promise<Record<string, unknown>[]> => {
@@ -321,6 +334,11 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
     };
     const snapshot = await readCerts();
     const snapshotIds = new Set(snapshot.map((c) => String(c.id)));
+    // Targeted cleanup: the first E2E dispatch (run 37427465677) left one
+    // synthetic object behind when its restore used the wrong path form.
+    // Remove exactly that residue before snapshotting.
+    const residue = `${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${uid}/cert-1791270856175.pdf`;
+    await fetch(residue, { method: 'DELETE', headers: restHeaders }).catch(() => undefined);
     const snapshotObjects = await listObjects(restCtx, uid);
 
     let createdRowId = '';
@@ -448,10 +466,14 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
         }).catch(() => undefined);
       }
       if (createdStoragePath) {
-        await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
-          method: 'DELETE',
-          headers: restHeaders,
-        }).catch(() => undefined);
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const del = await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
+            method: 'DELETE',
+            headers: restHeaders,
+          }).catch(() => null);
+          if (del && del.ok) break;
+          await page.waitForTimeout(2000);
+        }
       }
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
@@ -460,11 +482,15 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
         finalRows.filter((c) => !snapshotIds.has(String(c.id))),
         'ZERO DIFF: no leftover rows',
       ).toHaveLength(0);
-      const finalObjects = await listObjects(restCtx, uid);
-      expect(
-        finalObjects.filter((o) => !snapshotObjects.includes(o)),
-        'ZERO DIFF: no leftover objects',
-      ).toHaveLength(0);
+      // Storage list can lag slightly behind a DELETE — poll before failing.
+      let leftovers: string[] = [];
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const finalObjects = await listObjects(restCtx, uid);
+        leftovers = finalObjects.filter((o) => !snapshotObjects.includes(o));
+        if (leftovers.length === 0) break;
+        await page.waitForTimeout(3000);
+      }
+      expect(leftovers, 'ZERO DIFF: no leftover objects').toHaveLength(0);
       console.log('restore PASS: ZERO DIFF');
     }
     void browserErrors;
@@ -493,16 +519,28 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       'Content-Type': 'application/json',
     };
 
+    // Identify the QA user deterministically from the captured session JWT
+    // (payload.sub). The PostHog $identify wire event is only a fallback:
+    // its flush timing is not guaranteed within the polling window.
     let uid = '';
-    for (let i = 0; i < 60 && !uid; i++) {
+    try {
+      const token = restCtx.authorization.replace(/^Bearer\s+/i, '');
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8')) as {
+        sub?: string;
+      };
+      uid = String(payload.sub ?? '');
+    } catch {
+      /* fall through to the wire fallback */
+    }
+    for (let i = 0; i < 30 && !uid; i++) {
       await page.waitForTimeout(1000);
       const id = decodeAll().find((e) => e.event === '$identify');
       if (id) {
         const p = (id.properties ?? {}) as Record<string, unknown>;
-        uid = String(p.$identified_id ?? id.distinct_id ?? '');
+        uid = String(p.$identified_id ?? id.distinct_id ?? p.distinct_id ?? '');
       }
     }
-    expect(uid).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(uid, 'uid must resolve from the session JWT (or the identify wire)').toMatch(/^[0-9a-f-]{36}$/i);
 
     const listUrl = `${restCtx.base}/rest/v1/${CERT_TABLE}?select=*&user_id=eq.${uid}`;
     const readCerts = async (): Promise<Record<string, unknown>[]> => {
@@ -646,17 +684,28 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
         }).catch(() => undefined);
       }
       if (createdStoragePath) {
-        await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
-          method: 'DELETE',
-          headers: restHeaders,
-        }).catch(() => undefined);
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const del = await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
+            method: 'DELETE',
+            headers: restHeaders,
+          }).catch(() => null);
+          if (del && del.ok) break;
+          await page.waitForTimeout(2000);
+        }
       }
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
       expect([...snapshotIds].filter((id) => !finalIds.has(id)), 'pre-existing rows must remain').toHaveLength(0);
       expect(finalRows.filter((c) => !snapshotIds.has(String(c.id))), 'ZERO DIFF: no leftover rows').toHaveLength(0);
-      const finalObjects = await listObjects(restCtx, uid);
-      expect(finalObjects.filter((o) => !snapshotObjects.includes(o)), 'ZERO DIFF: no leftover objects').toHaveLength(0);
+      // Storage list can lag slightly behind a DELETE — poll before failing.
+      let leftovers: string[] = [];
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const finalObjects = await listObjects(restCtx, uid);
+        leftovers = finalObjects.filter((o) => !snapshotObjects.includes(o));
+        if (leftovers.length === 0) break;
+        await page.waitForTimeout(3000);
+      }
+      expect(leftovers, 'ZERO DIFF: no leftover objects').toHaveLength(0);
       console.log('restore PASS: ZERO DIFF');
     }
   });
@@ -675,16 +724,28 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       'Content-Type': 'application/json',
     };
 
+    // Identify the QA user deterministically from the captured session JWT
+    // (payload.sub). The PostHog $identify wire event is only a fallback:
+    // its flush timing is not guaranteed within the polling window.
     let uid = '';
-    for (let i = 0; i < 60 && !uid; i++) {
+    try {
+      const token = restCtx.authorization.replace(/^Bearer\s+/i, '');
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8')) as {
+        sub?: string;
+      };
+      uid = String(payload.sub ?? '');
+    } catch {
+      /* fall through to the wire fallback */
+    }
+    for (let i = 0; i < 30 && !uid; i++) {
       await page.waitForTimeout(1000);
       const id = decodeAll().find((e) => e.event === '$identify');
       if (id) {
         const p = (id.properties ?? {}) as Record<string, unknown>;
-        uid = String(p.$identified_id ?? id.distinct_id ?? '');
+        uid = String(p.$identified_id ?? id.distinct_id ?? p.distinct_id ?? '');
       }
     }
-    expect(uid).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(uid, 'uid must resolve from the session JWT (or the identify wire)').toMatch(/^[0-9a-f-]{36}$/i);
 
     const listUrl = `${restCtx.base}/rest/v1/${CERT_TABLE}?select=*&user_id=eq.${uid}`;
     const readCerts = async (): Promise<Record<string, unknown>[]> => {
@@ -744,16 +805,27 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
         }).catch(() => undefined);
       }
       if (createdStoragePath) {
-        await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
-          method: 'DELETE',
-          headers: restHeaders,
-        }).catch(() => undefined);
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const del = await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
+            method: 'DELETE',
+            headers: restHeaders,
+          }).catch(() => null);
+          if (del && del.ok) break;
+          await page.waitForTimeout(2000);
+        }
       }
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
       expect(finalRows.filter((c) => !snapshotIds.has(String(c.id))), 'ZERO DIFF: no leftover rows').toHaveLength(0);
-      const finalObjects = await listObjects(restCtx, uid);
-      expect(finalObjects.filter((o) => !snapshotObjects.includes(o)), 'ZERO DIFF: no leftover objects').toHaveLength(0);
+      // Storage list can lag slightly behind a DELETE — poll before failing.
+      let leftovers: string[] = [];
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const finalObjects = await listObjects(restCtx, uid);
+        leftovers = finalObjects.filter((o) => !snapshotObjects.includes(o));
+        if (leftovers.length === 0) break;
+        await page.waitForTimeout(3000);
+      }
+      expect(leftovers, 'ZERO DIFF: no leftover objects').toHaveLength(0);
       console.log('restore PASS: ZERO DIFF');
     }
   });
@@ -772,16 +844,28 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       'Content-Type': 'application/json',
     };
 
+    // Identify the QA user deterministically from the captured session JWT
+    // (payload.sub). The PostHog $identify wire event is only a fallback:
+    // its flush timing is not guaranteed within the polling window.
     let uid = '';
-    for (let i = 0; i < 60 && !uid; i++) {
+    try {
+      const token = restCtx.authorization.replace(/^Bearer\s+/i, '');
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8')) as {
+        sub?: string;
+      };
+      uid = String(payload.sub ?? '');
+    } catch {
+      /* fall through to the wire fallback */
+    }
+    for (let i = 0; i < 30 && !uid; i++) {
       await page.waitForTimeout(1000);
       const id = decodeAll().find((e) => e.event === '$identify');
       if (id) {
         const p = (id.properties ?? {}) as Record<string, unknown>;
-        uid = String(p.$identified_id ?? id.distinct_id ?? '');
+        uid = String(p.$identified_id ?? id.distinct_id ?? p.distinct_id ?? '');
       }
     }
-    expect(uid).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(uid, 'uid must resolve from the session JWT (or the identify wire)').toMatch(/^[0-9a-f-]{36}$/i);
 
     // Snapshot the QA profile CV columns for an exact restore.
     const profileUrl = `${restCtx.base}/rest/v1/${PROFILES_TABLE}?select=*&user_id=eq.${uid}`;
@@ -929,11 +1013,17 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
         body: JSON.stringify(snapshotCv),
       }).catch(() => undefined);
 
-      const finalObjects = await listObjects(restCtx, uid);
-      const extra = finalObjects.filter((o) => !snapshotObjects.includes(o));
+      let extra: string[] = [];
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const finalObjects = await listObjects(restCtx, uid);
+        extra = finalObjects.filter((o) => !snapshotObjects.includes(o));
+        if (extra.length === 0) break;
+        await page.waitForTimeout(3000);
+      }
       expect(extra, `ZERO DIFF objects; leftovers: ${extra.join(',')}`).toHaveLength(0);
       if (previousCvPath && previousCvBytes) {
-        expect(finalObjects, 'previous CV object restored').toContain(previousCvPath);
+        const finalObjectsForRestore = await listObjects(restCtx, uid);
+        expect(finalObjectsForRestore, 'previous CV object restored').toContain(previousCvPath);
       }
       const finalProfile = (await readProfile())[0] ?? null;
       for (const col of CV_COLUMNS) {
@@ -972,16 +1062,28 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       'Content-Type': 'application/json',
     };
 
+    // Identify the QA user deterministically from the captured session JWT
+    // (payload.sub). The PostHog $identify wire event is only a fallback:
+    // its flush timing is not guaranteed within the polling window.
     let uid = '';
-    for (let i = 0; i < 60 && !uid; i++) {
+    try {
+      const token = restCtx.authorization.replace(/^Bearer\s+/i, '');
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8')) as {
+        sub?: string;
+      };
+      uid = String(payload.sub ?? '');
+    } catch {
+      /* fall through to the wire fallback */
+    }
+    for (let i = 0; i < 30 && !uid; i++) {
       await page.waitForTimeout(1000);
       const id = decodeAll().find((e) => e.event === '$identify');
       if (id) {
         const p = (id.properties ?? {}) as Record<string, unknown>;
-        uid = String(p.$identified_id ?? id.distinct_id ?? '');
+        uid = String(p.$identified_id ?? id.distinct_id ?? p.distinct_id ?? '');
       }
     }
-    expect(uid).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(uid, 'uid must resolve from the session JWT (or the identify wire)').toMatch(/^[0-9a-f-]{36}$/i);
 
     const listUrl = `${restCtx.base}/rest/v1/${CERT_TABLE}?select=*&user_id=eq.${uid}`;
     const readCerts = async (): Promise<Record<string, unknown>[]> => {
@@ -1085,17 +1187,28 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
         }).catch(() => undefined);
       }
       if (createdStoragePath) {
-        await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
-          method: 'DELETE',
-          headers: restHeaders,
-        }).catch(() => undefined);
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const del = await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
+            method: 'DELETE',
+            headers: restHeaders,
+          }).catch(() => null);
+          if (del && del.ok) break;
+          await page.waitForTimeout(2000);
+        }
       }
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
       expect([...snapshotIds].filter((id) => !finalIds.has(id)), 'pre-existing rows must remain').toHaveLength(0);
       expect(finalRows.filter((c) => !snapshotIds.has(String(c.id))), 'ZERO DIFF: no leftover rows').toHaveLength(0);
-      const finalObjects = await listObjects(restCtx, uid);
-      expect(finalObjects.filter((o) => !snapshotObjects.includes(o)), 'ZERO DIFF: no leftover objects').toHaveLength(0);
+      // Storage list can lag slightly behind a DELETE — poll before failing.
+      let leftovers: string[] = [];
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const finalObjects = await listObjects(restCtx, uid);
+        leftovers = finalObjects.filter((o) => !snapshotObjects.includes(o));
+        if (leftovers.length === 0) break;
+        await page.waitForTimeout(3000);
+      }
+      expect(leftovers, 'ZERO DIFF: no leftover objects').toHaveLength(0);
       console.log('restore PASS: ZERO DIFF');
     }
   });
