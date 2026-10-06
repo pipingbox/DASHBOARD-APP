@@ -3,116 +3,250 @@ import { useTranslation } from 'react-i18next';
 import { AlignHorizontalDistributeCenter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { solvePipeComb, type PipeCombSolution } from '@/tools/core/geometry/pipe-comb';
-import { listNps, listSchedules, getPipeDimension, getElbowRadius } from '@/tools/core/standards';
+import {
+  solvePipeCombStagger,
+  type PipeCombStaggerSolution,
+} from '@/tools/core/geometry/pipe-comb-stagger';
 import { toMm, fromMm } from '@/tools/core/units';
-import { mapEngineError, useUnitFieldConversion, type UnitSystem } from '../shared';
-
-interface PipeCombDiagramProps {
-  /** Solved engine result (all lengths in mm). */
-  result: PipeCombSolution;
-  /** Label formatters supplied by the tool (already localized + unit-aware). */
-  fmt: (v: number | undefined) => string;
-  labels: {
-    startSpacing: string;
-    endSpacing: string;
-    angle: string;
-    placeholder: string;
-  };
-}
+import { useUnitFieldConversion, type UnitSystem } from '../shared';
+import {
+  buildPipeCombStaggerViewModel,
+  type PipeCombStaggerViewModel,
+} from './pipe-comb-stagger-svg';
 
 /**
- * Original PipingBox pipe-comb diagram.
+ * PB-PIPE-COMB-CORRECTION-001 / P2 — genuine pipe comb (peines de tubería) UI.
  *
- * All geometry is computed in mm from the engine result; the formatter is
- * only used for text labels, so toggling mm/in changes labels but never the
- * physical geometry. Line i starts at y = i · initialSpacing and ends at
- * y = i · finalSpacing (equivalent to the engine's per-line offset), so the
- * drawing reference and the offset reference are the same.
+ * Primary workflow: number of pipes, initial/final centre-to-centre spacing
+ * and elbow angle. All geometry (A, sign, direction, cumulative stagger)
+ * comes exclusively from the P1 kernel `solvePipeCombStagger`; this
+ * component never reproduces the core equation. NPS/Schedule/LR/SR/CLR are
+ * deferred to P3 optional fabrication enrichment.
  */
-function PipeCombDiagram({ result, fmt, labels }: PipeCombDiagramProps) {
-  const { lines, initialSpacingMm, finalSpacingMm, elbowAngleDeg, deltaSpacingMm } = result;
-  const lineCount = lines.length;
-  if (lineCount === 0) {
-    return (
-      <svg viewBox="0 0 400 260" className="w-full max-w-xl">
-        <text x="200" y="130" textAnchor="middle" fill="#A3A9B3" fontSize="12">
-          {labels.placeholder}
-        </text>
-      </svg>
+
+/** UX/readability limit only — NOT a geometric or fabrication limit. */
+const MAX_UI_PIPES = 12;
+const ANGLE_PRESETS = [15, 22.5, 30, 45, 60, 90];
+
+const KERNEL_ERROR_KEYS: Record<string, string> = {
+  non_finite_input: 'tools.prefab.pipeComb.errorNonFinite',
+  initial_spacing_positive: 'tools.prefab.pipeComb.errorInitialSpacing',
+  final_spacing_positive: 'tools.prefab.pipeComb.errorFinalSpacing',
+  elbow_angle_range: 'tools.prefab.pipeComb.errorAngle',
+  pipe_count_range: 'tools.prefab.pipeComb.errorPipeCount',
+  pipe_count_resource_limit: 'tools.prefab.pipeComb.errorResourceLimit',
+};
+
+interface DiagramLabels {
+  svgTitle: string;
+  pipeLabel: string;
+  dimInitial: string;
+  dimFinal: string;
+  dimStagger: string;
+  angle: string;
+}
+
+interface PipeCombStaggerDiagramProps {
+  solution: PipeCombStaggerSolution;
+  fmt: (v: number | undefined) => string;
+  labels: DiagramLabels;
+}
+
+/** Screen schematic of the genuine pipe comb. NOT a 1:1 fabrication drawing. */
+function PipeCombStaggerDiagram({ solution, fmt, labels }: PipeCombStaggerDiagramProps) {
+  const vm: PipeCombStaggerViewModel = useMemo(() => buildPipeCombStaggerViewModel(solution), [solution]);
+
+  const W = 640;
+  const H = 440;
+  const pad = 46;
+  const spanX = Math.max(vm.bounds.maxX - vm.bounds.minX, 1e-6);
+  const spanY = Math.max(vm.bounds.maxY - vm.bounds.minY, 1e-6);
+  const scale = Math.min((W - 2 * pad) / spanX, (H - 2 * pad) / spanY);
+  // Model space is +Y up; SVG is +Y down, so Y is flipped.
+  const X = (x: number) => pad + (x - vm.bounds.minX) * scale;
+  const Y = (y: number) => H - pad - (y - vm.bounds.minY) * scale;
+
+  const axisColor = '#FF8C00';
+  const dimColor = '#8FB8E8';
+  const guideColor = '#3A4454';
+
+  const tick = (x: number, y: number, vertical: boolean) =>
+    vertical ? (
+      <line x1={x} y1={y - 3} x2={x} y2={y + 3} stroke={dimColor} strokeWidth={1.2} />
+    ) : (
+      <line x1={x - 3} y1={y} x2={x + 3} y2={y} stroke={dimColor} strokeWidth={1.2} />
     );
-  }
 
-  const maxAdvance = Math.max(...lines.map((l) => l.advanceMm), 0);
-  const yStart = (i: number) => i * initialSpacingMm;
-  const yEnd = (i: number) => i * finalSpacingMm;
-  const xMax = Math.max(2 * maxAdvance, 1);
-  const yMax = Math.max(yStart(lineCount - 1), yEnd(lineCount - 1), 1);
+  // Angle arc between the final direction v and the initial direction u at
+  // the elbow of pipe 1 (math degrees; screen Y is flipped).
+  const arc = vm.angleArc;
+  const arcStart = {
+    x: X(arc.center.x + arc.radiusMm * Math.cos((arc.startDeg * Math.PI) / 180)),
+    y: Y(arc.center.y + arc.radiusMm * Math.sin((arc.startDeg * Math.PI) / 180)),
+  };
+  const arcEnd = {
+    x: X(arc.center.x + arc.radiusMm * Math.cos((arc.endDeg * Math.PI) / 180)),
+    y: Y(arc.center.y + arc.radiusMm * Math.sin((arc.endDeg * Math.PI) / 180)),
+  };
+  const arcMid = {
+    x: arc.center.x + (arc.radiusMm + 26 / scale) * Math.cos((((arc.startDeg + arc.endDeg) / 2) * Math.PI) / 180),
+    y: arc.center.y + (arc.radiusMm + 26 / scale) * Math.sin((((arc.startDeg + arc.endDeg) / 2) * Math.PI) / 180),
+  };
 
-  // Station coordinates in mm space.
-  const station1 = (i: number) => lines[i].advanceMm; // first bend
-  const station2 = (i: number) => 2 * lines[i].advanceMm; // second bend
-
-  // Fit into viewBox.
-  const padX = 56;
-  const padY = 34;
-  const svgW = 460;
-  const svgH = 300;
-  const scale = Math.min((svgW - 2 * padX) / xMax, (svgH - 2 * padY) / yMax);
-  const X = (mm: number) => padX + mm * scale;
-  const Y = (mm: number) => padY + mm * scale;
+  const staggerVisible = Math.abs(vm.dimStagger.valueMm) > 1e-9;
 
   return (
-    <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full max-w-xl">
-      {lines.map((line, i) => {
-        const y0 = yStart(i);
-        const y1 = yEnd(i);
-        const s1 = station1(i);
-        const s2 = station2(i);
-        const color = deltaSpacingMm === 0 ? '#3A4454' : '#FF8C00';
-        return (
-          <g key={line.id}>
-            {line.offsetAbsMm === 0 ? (
-              <line x1={X(0)} y1={Y(y0)} x2={X(xMax)} y2={Y(y1)} stroke={color} strokeWidth={2.5} />
-            ) : (
-              <>
-                <line x1={X(0)} y1={Y(y0)} x2={X(s1)} y2={Y(y0)} stroke={color} strokeWidth={2.5} />
-                <line x1={X(s1)} y1={Y(y0)} x2={X(s2)} y2={Y(y1)} stroke={color} strokeWidth={2.5} />
-                <line x1={X(s2)} y1={Y(y1)} x2={X(xMax)} y2={Y(y1)} stroke={color} strokeWidth={2.5} />
-                {/* bend stations */}
-                <circle cx={X(s1)} cy={Y(y0)} r={2.5} fill="#F5F7FA" />
-                <circle cx={X(s2)} cy={Y(y1)} r={2.5} fill="#F5F7FA" />
-              </>
-            )}
-            <text x={padX - 8} y={Y(y0) + 3} textAnchor="end" fill="#A3A9B3" fontSize="10">
-              L{line.id}
-            </text>
-          </g>
-        );
-      })}
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      className="w-full max-w-2xl"
+      role="img"
+      aria-labelledby="pipe-comb-svg-title pipe-comb-svg-desc"
+      data-testid="pipe-comb-stagger-svg"
+      data-direction={solution.staggerDirection}
+      data-pipe-count={solution.pipeCount}
+    >
+      <title id="pipe-comb-svg-title">{labels.svgTitle}</title>
+      <desc id="pipe-comb-svg-desc">{solution.pipeCount} × θ = {solution.elbowAngleDeg}°</desc>
 
-      {/* spacing annotations — same reference as the engine offsets */}
-      <text x={X(xMax) + 8} y={Y(0) + 4} fill="#A3A9B3" fontSize="9">
-        {labels.startSpacing} {fmt(initialSpacingMm)}
-      </text>
-      <text x={X(xMax) + 8} y={Y(finalSpacingMm) + 4} fill="#A3A9B3" fontSize="9">
-        {labels.endSpacing} {fmt(finalSpacingMm)}
-      </text>
+      {/* Dashed level guide linking elbow 1 to the stagger dimension. */}
+      {staggerVisible && (
+        <line
+          x1={X(vm.pipes[0].elbow.x)}
+          y1={Y(vm.pipes[0].elbow.y)}
+          x2={X(vm.pipes[1].elbow.x)}
+          y2={Y(vm.pipes[0].elbow.y)}
+          stroke={guideColor}
+          strokeWidth={1}
+          strokeDasharray="4 4"
+        />
+      )}
 
-      {/* common elbow angle */}
-      {deltaSpacingMm !== 0 && (
-        <text x={X(xMax / 2)} y={Y(yMax) + 22} textAnchor="middle" fill="#A3A9B3" fontSize="10">
-          {labels.angle} {elbowAngleDeg}°
+      {vm.pipes.map((p) => (
+        <g key={p.pipeNumber}>
+          <polyline
+            points={`${X(p.start.x)},${Y(p.start.y)} ${X(p.elbow.x)},${Y(p.elbow.y)} ${X(p.end.x)},${Y(p.end.y)}`}
+            fill="none"
+            stroke={axisColor}
+            strokeWidth={2.4}
+            strokeLinejoin="round"
+          />
+          <circle cx={X(p.elbow.x)} cy={Y(p.elbow.y)} r={3} fill="#F5F7FA" />
+          <text
+            x={X(p.elbow.x) - 8}
+            y={Y(p.elbow.y) + (vm.dimStagger.valueMm >= 0 ? 16 : -10)}
+            textAnchor="end"
+            fill="#A3A9B3"
+            fontSize="10"
+            data-testid="pipe-comb-pipe-label"
+          >
+            {labels.pipeLabel} {p.pipeNumber}
+          </text>
+        </g>
+      ))}
+
+      {/* Di dimension between the first two initial axes. */}
+      <g>
+        <line
+          x1={X(vm.dimInitial.from.x)}
+          y1={Y(vm.dimInitial.from.y)}
+          x2={X(vm.dimInitial.to.x)}
+          y2={Y(vm.dimInitial.to.y)}
+          stroke={dimColor}
+          strokeWidth={1.2}
+        />
+        {tick(X(vm.dimInitial.from.x), Y(vm.dimInitial.from.y), true)}
+        {tick(X(vm.dimInitial.to.x), Y(vm.dimInitial.to.y), true)}
+        <text
+          x={(X(vm.dimInitial.from.x) + X(vm.dimInitial.to.x)) / 2}
+          y={Y(vm.dimInitial.from.y) + 14}
+          textAnchor="middle"
+          fill={dimColor}
+          fontSize="10"
+          data-testid="pipe-comb-dim-initial"
+        >
+          {labels.dimInitial} {fmt(vm.dimInitial.valueMm)}
+        </text>
+      </g>
+
+      {/* Df dimension between the first two final axes. */}
+      <g>
+        <line
+          x1={X(vm.dimFinal.from.x)}
+          y1={Y(vm.dimFinal.from.y)}
+          x2={X(vm.dimFinal.to.x)}
+          y2={Y(vm.dimFinal.to.y)}
+          stroke={dimColor}
+          strokeWidth={1.2}
+        />
+        {tick(X(vm.dimFinal.from.x), Y(vm.dimFinal.from.y), false)}
+        {tick(X(vm.dimFinal.to.x), Y(vm.dimFinal.to.y), false)}
+        <text
+          x={(X(vm.dimFinal.from.x) + X(vm.dimFinal.to.x)) / 2 + 12}
+          y={(Y(vm.dimFinal.from.y) + Y(vm.dimFinal.to.y)) / 2 - 6}
+          fill={dimColor}
+          fontSize="10"
+          data-testid="pipe-comb-dim-final"
+        >
+          {labels.dimFinal} {fmt(vm.dimFinal.valueMm)}
+        </text>
+      </g>
+
+      {/* Signed stagger A between elbows 1 and 2. */}
+      {staggerVisible && (
+        <g>
+          <line
+            x1={X(vm.dimStagger.from.x)}
+            y1={Y(vm.dimStagger.from.y)}
+            x2={X(vm.dimStagger.to.x)}
+            y2={Y(vm.dimStagger.to.y)}
+            stroke={dimColor}
+            strokeWidth={1.4}
+          />
+          {tick(X(vm.dimStagger.from.x), Y(vm.dimStagger.from.y), false)}
+          {tick(X(vm.dimStagger.to.x), Y(vm.dimStagger.to.y), false)}
+          <text
+            x={X(vm.dimStagger.from.x) + 8}
+            y={(Y(vm.dimStagger.from.y) + Y(vm.dimStagger.to.y)) / 2}
+            fill={dimColor}
+            fontSize="10"
+            data-testid="pipe-comb-dim-stagger"
+          >
+            {labels.dimStagger} {fmt(vm.dimStagger.valueMm)}
+          </text>
+        </g>
+      )}
+      {!staggerVisible && (
+        <text
+          x={X(vm.pipes[1].elbow.x) + 10}
+          y={Y(vm.pipes[1].elbow.y) - 8}
+          fill={dimColor}
+          fontSize="10"
+          data-testid="pipe-comb-dim-stagger"
+        >
+          {labels.dimStagger} {fmt(0)}
         </text>
       )}
+
+      {/* Elbow angle arc near pipe 1. */}
+      <g>
+        <path
+          d={`M ${arcStart.x} ${arcStart.y} A ${arc.radiusMm * scale} ${arc.radiusMm * scale} 0 0 1 ${arcEnd.x} ${arcEnd.y}`}
+          fill="none"
+          stroke={dimColor}
+          strokeWidth={1.2}
+        />
+        <text
+          x={X(arcMid.x)}
+          y={Y(arcMid.y)}
+          textAnchor="middle"
+          fill={dimColor}
+          fontSize="10"
+          data-testid="pipe-comb-angle-label"
+        >
+          {labels.angle} {solution.elbowAngleDeg}°
+        </text>
+      </g>
     </svg>
   );
 }
@@ -120,67 +254,66 @@ function PipeCombDiagram({ result, fmt, labels }: PipeCombDiagramProps) {
 export default function PipeCombTool() {
   const { t } = useTranslation();
   const [unitSystem, setUnitSystem] = useState<UnitSystem>('metric');
-  const [lineCount, setLineCount] = useState('4');
+  const [pipeCount, setPipeCount] = useState('4');
   const [initialSpacing, setInitialSpacing] = useState('200');
   const [finalSpacing, setFinalSpacing] = useState('400');
   const [elbowAngle, setElbowAngle] = useState('45');
-  const [nps, setNps] = useState('6');
-  const [schedule, setSchedule] = useState('STD');
-  const [elbowType, setElbowType] = useState<'LR' | 'SR'>('LR');
-  const [clrOverride, setClrOverride] = useState('');
 
-  // Unit toggle converts values, preserving physical dimensions.
+  // Unit toggle converts the visible values, preserving the physical
+  // dimensions; geometry is never recalculated from rounded displays.
   useUnitFieldConversion(unitSystem, [
     [initialSpacing, setInitialSpacing],
     [finalSpacing, setFinalSpacing],
-    [clrOverride, setClrOverride],
   ]);
 
-  const schedules = useMemo(() => listSchedules(nps), [nps]);
-
-  const parseLength = (v: string) => {
-    const n = Number(v);
-    if (!Number.isFinite(n) || n <= 0) return undefined;
-    return toMm(n, unitSystem === 'metric' ? 'mm' : 'in');
-  };
-
-  const clrMm = useMemo(() => {
-    if (clrOverride.trim()) {
-      const v = Number(clrOverride);
-      return Number.isFinite(v) && v > 0 ? toMm(v, unitSystem === 'metric' ? 'mm' : 'in') : undefined;
-    }
-    return getElbowRadius(nps, elbowType);
-  }, [clrOverride, nps, elbowType, unitSystem]);
-
-  const { result, error } = useMemo(() => {
-    const count = Number(lineCount);
-    const initial = parseLength(initialSpacing);
-    const final = parseLength(finalSpacing);
+  const { result, errorCode } = useMemo(() => {
+    const count = Number(pipeCount);
+    const initial = Number(initialSpacing);
+    const final = Number(finalSpacing);
     const angle = Number(elbowAngle);
-    if (initial === undefined || final === undefined) {
-      return { result: null, error: null };
+
+    // Input-level validation mirrors the kernel domain; the kernel remains
+    // the single source of geometry.
+    if (!Number.isFinite(count) || !Number.isFinite(initial) || !Number.isFinite(final) || !Number.isFinite(angle)) {
+      return { result: null, errorCode: 'non_finite_input' };
     }
-    if (clrMm === undefined) {
-      return { result: null, error: t('tools.prefab.offset.errorClr') };
+    if (!(initial > 0)) return { result: null, errorCode: 'initial_spacing_positive' };
+    if (!(final > 0)) return { result: null, errorCode: 'final_spacing_positive' };
+    if (!(angle > 0 && angle <= 90)) return { result: null, errorCode: 'elbow_angle_range' };
+    if (!Number.isInteger(count) || count < 2 || count > MAX_UI_PIPES) {
+      return { result: null, errorCode: 'pipe_count_range' };
     }
-    const res = solvePipeComb({
-      lineCount: count,
-      initialSpacingMm: initial,
-      finalSpacingMm: final,
+
+    const unit = unitSystem === 'metric' ? 'mm' : 'in';
+    const res = solvePipeCombStagger({
+      pipeCount: count,
+      initialSpacingMm: toMm(initial, unit),
+      finalSpacingMm: toMm(final, unit),
       elbowAngleDeg: angle,
-      clrMm,
     });
     if (res.success === false) {
-      return { result: null, error: mapEngineError(t, res) };
+      return { result: null, errorCode: res.code ?? 'non_finite_input' };
     }
-    return { result: res.result, error: null };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lineCount, initialSpacing, finalSpacing, elbowAngle, clrMm, unitSystem, t]);
+    return { result: res.result, errorCode: null };
+  }, [pipeCount, initialSpacing, finalSpacing, elbowAngle, unitSystem]);
 
+  /** Human-readable formatting; the kernel itself never rounds. */
   const fmt = (v: number | undefined) => {
     if (v === undefined || !Number.isFinite(v)) return '—';
-    return unitSystem === 'metric' ? `${v.toFixed(1)} mm` : `${fromMm(v, 'in').toFixed(3)} in`;
+    if (unitSystem === 'metric') return `${Number(v.toFixed(2))} mm`;
+    return `${fromMm(v, 'in').toFixed(3)} in`;
   };
+
+  const directionText =
+    result?.staggerDirection === 'positive'
+      ? t('tools.prefab.pipeComb.directionPositive')
+      : result?.staggerDirection === 'negative'
+        ? t('tools.prefab.pipeComb.directionNegative')
+        : t('tools.prefab.pipeComb.directionAligned');
+
+  const errorText = errorCode
+    ? t(KERNEL_ERROR_KEYS[errorCode] ?? 'tools.prefab.pipeComb.errorNonFinite', { max: MAX_UI_PIPES })
+    : null;
 
   return (
     <div className="space-y-5">
@@ -190,7 +323,7 @@ export default function PipeCombTool() {
         </div>
         <div>
           <h3 className="text-lg font-semibold text-[#F5F7FA]">{t('tools.prefab.pipeComb.title')}</h3>
-          <p className="text-xs text-[#A3A9B3]">{t('tools.prefab.common.engineBadge')}</p>
+          <p className="text-xs text-[#A3A9B3]">{t('tools.prefab.pipeComb.subtitle')}</p>
         </div>
       </div>
 
@@ -198,7 +331,7 @@ export default function PipeCombTool() {
         <Button
           type="button"
           size="sm"
-          variant={unitSystem === 'metric' ? 'default' : 'outline'}
+          aria-pressed={unitSystem === 'metric'}
           onClick={() => setUnitSystem('metric')}
           className={unitSystem === 'metric' ? 'bg-[#FF8C00] text-black' : 'border-[#232A36]'}
         >
@@ -207,7 +340,7 @@ export default function PipeCombTool() {
         <Button
           type="button"
           size="sm"
-          variant={unitSystem === 'imperial' ? 'default' : 'outline'}
+          aria-pressed={unitSystem === 'imperial'}
           onClick={() => setUnitSystem('imperial')}
           className={unitSystem === 'imperial' ? 'bg-[#FF8C00] text-black' : 'border-[#232A36]'}
         >
@@ -217,105 +350,150 @@ export default function PipeCombTool() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1">
-          <Label className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">{t('tools.prefab.pipeComb.lineCount')}</Label>
-          <Input value={lineCount} onChange={(e) => setLineCount(e.target.value)} className="bg-[#0E1117] border-[#232A36]" />
+          <Label htmlFor="pipe-comb-pipe-count" className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">
+            {t('tools.prefab.pipeComb.pipeCount')}
+          </Label>
+          <Input
+            id="pipe-comb-pipe-count"
+            value={pipeCount}
+            inputMode="numeric"
+            onChange={(e) => setPipeCount(e.target.value)}
+            className="bg-[#0E1117] border-[#232A36]"
+          />
         </div>
         <div className="space-y-1">
-          <Label className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">{t('tools.prefab.pipeComb.initialSpacing')}</Label>
-          <Input value={initialSpacing} onChange={(e) => setInitialSpacing(e.target.value)} className="bg-[#0E1117] border-[#232A36]" />
+          <Label htmlFor="pipe-comb-initial-spacing" className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">
+            {t('tools.prefab.pipeComb.initialCenterSpacing')}
+          </Label>
+          <Input
+            id="pipe-comb-initial-spacing"
+            value={initialSpacing}
+            inputMode="decimal"
+            onChange={(e) => setInitialSpacing(e.target.value)}
+            className="bg-[#0E1117] border-[#232A36]"
+          />
         </div>
         <div className="space-y-1">
-          <Label className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">{t('tools.prefab.pipeComb.finalSpacing')}</Label>
-          <Input value={finalSpacing} onChange={(e) => setFinalSpacing(e.target.value)} className="bg-[#0E1117] border-[#232A36]" />
+          <Label htmlFor="pipe-comb-final-spacing" className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">
+            {t('tools.prefab.pipeComb.finalCenterSpacing')}
+          </Label>
+          <Input
+            id="pipe-comb-final-spacing"
+            value={finalSpacing}
+            inputMode="decimal"
+            onChange={(e) => setFinalSpacing(e.target.value)}
+            className="bg-[#0E1117] border-[#232A36]"
+          />
         </div>
         <div className="space-y-1">
-          <Label className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">{t('tools.prefab.pipeComb.elbowAngle')}</Label>
-          <Input value={elbowAngle} onChange={(e) => setElbowAngle(e.target.value)} className="bg-[#0E1117] border-[#232A36]" />
-        </div>
-        <div className="space-y-1">
-          <Label className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">{t('tools.prefab.pipeComb.nps')}</Label>
-          <Select value={nps} onValueChange={setNps}>
-            <SelectTrigger className="bg-[#0E1117] border-[#232A36]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-[#0E1117] border-[#232A36]">
-              {listNps().map((n) => (
-                <SelectItem key={n} value={n}>{npsLabel(n)}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-1">
-          <Label className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">{t('tools.prefab.pipeComb.schedule')}</Label>
-          <Select value={schedule} onValueChange={setSchedule}>
-            <SelectTrigger className="bg-[#0E1117] border-[#232A36]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-[#0E1117] border-[#232A36]">
-              {schedules.map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-1">
-          <Label className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">{t('tools.prefab.pipeComb.elbowType')}</Label>
-          <Select value={elbowType} onValueChange={(v) => setElbowType(v as 'LR' | 'SR')}>
-            <SelectTrigger className="bg-[#0E1117] border-[#232A36]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-[#0E1117] border-[#232A36]">
-              <SelectItem value="LR">LR</SelectItem>
-              <SelectItem value="SR">SR</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-1">
-          <Label className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">{t('tools.prefab.pipeComb.clrOverride')}</Label>
-          <Input value={clrOverride} onChange={(e) => setClrOverride(e.target.value)} className="bg-[#0E1117] border-[#232A36]" />
+          <Label htmlFor="pipe-comb-angle" className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">
+            {t('tools.prefab.pipeComb.elbowAngle')}
+          </Label>
+          <Input
+            id="pipe-comb-angle"
+            value={elbowAngle}
+            inputMode="decimal"
+            onChange={(e) => setElbowAngle(e.target.value)}
+            className="bg-[#0E1117] border-[#232A36]"
+          />
         </div>
       </div>
 
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      <div className="space-y-2">
+        <p className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">
+          {t('tools.prefab.pipeComb.commonAngles')}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {ANGLE_PRESETS.map((preset) => (
+            <Button
+              key={preset}
+              type="button"
+              size="sm"
+              variant={Number(elbowAngle) === preset ? 'default' : 'outline'}
+              aria-pressed={Number(elbowAngle) === preset}
+              data-testid={`pipe-comb-preset-${String(preset).replace('.', '-')}`}
+              onClick={() => setElbowAngle(String(preset))}
+              className={Number(elbowAngle) === preset ? 'bg-[#FF8C00] text-black' : 'border-[#232A36]'}
+            >
+              {preset}°
+            </Button>
+          ))}
+        </div>
+        <p className="text-[11px] text-[#A3A9B3]">
+          {t('tools.prefab.pipeComb.customAngle')} · {t('tools.prefab.pipeComb.maxPipesNote')}
+        </p>
+      </div>
 
-      <p className="text-[11px] text-[#A3A9B3]">
-        CLR = {clrMm !== undefined ? fmt(clrMm) : t('tools.prefab.common.na')}
-      </p>
+      {errorText && (
+        <p
+          role="alert"
+          data-testid="pipe-comb-error"
+          data-code={errorCode}
+          className="text-xs text-red-400"
+        >
+          {errorText}
+        </p>
+      )}
 
       <div className="rounded-lg border border-[#232A36] bg-[#151A22] p-4">
-        <h4 className="mb-3 text-[11px] uppercase tracking-wider text-[#A3A9B3]">{t('tools.prefab.common.drawing')}</h4>
+        <h4 className="mb-3 text-[11px] uppercase tracking-wider text-[#A3A9B3]">
+          {t('tools.prefab.common.drawing')}
+        </h4>
         {result ? (
-          <PipeCombDiagram
-            result={result}
+          <PipeCombStaggerDiagram
+            solution={result}
             fmt={fmt}
             labels={{
-              startSpacing: t('tools.prefab.pipeComb.startSpacing'),
-              endSpacing: t('tools.prefab.pipeComb.endSpacing'),
+              svgTitle: t('tools.prefab.pipeComb.title'),
+              pipeLabel: t('tools.prefab.pipeComb.pipe'),
+              dimInitial: t('tools.prefab.pipeComb.dimensionInitial'),
+              dimFinal: t('tools.prefab.pipeComb.dimensionFinal'),
+              dimStagger: t('tools.prefab.pipeComb.dimensionA'),
               angle: t('tools.prefab.pipeComb.angleLabel'),
-              placeholder: t('tools.prefab.pipeComb.drawPlaceholder'),
             }}
           />
         ) : (
-          <svg viewBox="0 0 460 300" className="w-full max-w-xl">
-            <text x="230" y="150" textAnchor="middle" fill="#A3A9B3" fontSize="12">
+          <svg viewBox={`0 0 640 440`} className="w-full max-w-2xl">
+            <text x="320" y="220" textAnchor="middle" fill="#A3A9B3" fontSize="12">
               {t('tools.prefab.pipeComb.drawPlaceholder')}
             </text>
           </svg>
         )}
+        <p className="mt-2 text-[11px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.schematicNote')}</p>
       </div>
 
-      <div className="rounded-lg border border-[#232A36] bg-[#151A22] p-4">
-        <h4 className="mb-3 text-[11px] uppercase tracking-wider text-[#A3A9B3]">{t('tools.prefab.common.results')}</h4>
+      <div className="rounded-lg border border-[#232A36] bg-[#151A22] p-4" data-testid="pipe-comb-stagger-results">
+        <h4 className="mb-3 text-[11px] uppercase tracking-wider text-[#A3A9B3]">
+          {t('tools.prefab.common.results')}
+        </h4>
         {result ? (
           <div className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-md border border-[#232A36] bg-[#0E1117] p-3">
-                <p className="text-[11px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.angleLabel')}</p>
-                <p className="text-lg font-semibold text-[#F5F7FA]">{result.elbowAngleDeg}°</p>
+                <p className="text-[11px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.cotaA')}</p>
+                <p className="break-words text-lg font-semibold text-[#F5F7FA]" data-testid="pipe-comb-stagger-metric" data-metric="cotaA">
+                  {fmt(result.adjacentStaggerMm)}
+                </p>
+                <p className="text-[10px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.adjacentStagger')}</p>
               </div>
               <div className="rounded-md border border-[#232A36] bg-[#0E1117] p-3">
-                <p className="text-[11px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.travelSpread')}</p>
-                <p className="text-lg font-semibold text-[#F5F7FA]">{fmt(result.travelSpreadMm)}</p>
+                <p className="text-[11px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.totalStagger')}</p>
+                <p className="break-words text-lg font-semibold text-[#F5F7FA]" data-testid="pipe-comb-stagger-metric" data-metric="totalStagger">
+                  {fmt(result.pipes[result.pipeCount - 1].cumulativeStaggerMm)}
+                </p>
+                <p className="text-[10px] text-[#A3A9B3]">P{result.pipeCount} − P1</p>
+              </div>
+              <div className="rounded-md border border-[#232A36] bg-[#0E1117] p-3">
+                <p className="text-[11px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.staggerDirection')}</p>
+                <p className="text-base font-semibold text-[#F5F7FA]" data-testid="pipe-comb-stagger-metric" data-metric="direction">
+                  {directionText}
+                </p>
+              </div>
+              <div className="rounded-md border border-[#232A36] bg-[#0E1117] p-3">
+                <p className="text-[11px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.elbowAngle')}</p>
+                <p className="text-lg font-semibold text-[#F5F7FA]" data-testid="pipe-comb-stagger-metric" data-metric="angle">
+                  {result.elbowAngleDeg}°
+                </p>
               </div>
             </div>
 
@@ -323,28 +501,28 @@ export default function PipeCombTool() {
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="text-[11px] uppercase tracking-wider text-[#A3A9B3]">
-                    <th className="py-2">{t('tools.prefab.pipeComb.line')}</th>
-                    <th className="py-2">{t('tools.prefab.pipeComb.offset')}</th>
-                    <th className="py-2">{t('tools.prefab.pipeComb.advance')}</th>
-                    <th className="py-2">{t('tools.prefab.pipeComb.travel')}</th>
-                    <th className="py-2">{t('tools.prefab.pipeComb.straightCut')}</th>
-                    <th className="py-2">{t('tools.prefab.pipeComb.diff')}</th>
+                    <th scope="col" className="py-2 pr-4">{t('tools.prefab.pipeComb.pipe')}</th>
+                    <th scope="col" className="py-2 pr-4">{t('tools.prefab.pipeComb.cumulativeStagger')}</th>
+                    <th scope="col" className="py-2">{t('tools.prefab.pipeComb.adjacentStep')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#232A36]">
-                  {result.lines.map((line) => (
-                    <tr key={line.id}>
-                      <td className="py-2 text-[#F5F7FA]">{line.id}</td>
-                      <td className="py-2 text-[#F5F7FA]">{fmt(line.offsetMm)}</td>
-                      <td className="py-2 text-[#F5F7FA]">{fmt(line.advanceMm)}</td>
-                      <td className="py-2 text-[#F5F7FA]">{fmt(line.travelMm)}</td>
-                      <td className="py-2 text-[#F5F7FA]">{fmt(line.straightCutLengthMm)}</td>
-                      <td className="py-2 text-[#F5F7FA]">{fmt(line.travelDifferenceMm)}</td>
+                  {result.pipes.map((pipe, i) => (
+                    <tr key={pipe.pipeNumber} data-testid="pipe-comb-stagger-row" data-pipe={pipe.pipeNumber}>
+                      <td className="py-2 pr-4 text-[#F5F7FA]">
+                        {t('tools.prefab.pipeComb.pipe')} {pipe.pipeNumber}
+                      </td>
+                      <td className="py-2 pr-4 text-[#F5F7FA]">{fmt(pipe.cumulativeStaggerMm)}</td>
+                      <td className="py-2 text-[#F5F7FA]">
+                        {i === 0 ? t('tools.prefab.pipeComb.reference') : fmt(result.adjacentStaggerMm)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+
+            <p className="text-[11px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.unitNote')}</p>
           </div>
         ) : (
           <p className="text-sm text-[#A3A9B3]">{t('tools.prefab.common.noResult')}</p>
@@ -352,8 +530,4 @@ export default function PipeCombTool() {
       </div>
     </div>
   );
-}
-
-function npsLabel(nps: string): string {
-  return `${nps}"`;
 }
