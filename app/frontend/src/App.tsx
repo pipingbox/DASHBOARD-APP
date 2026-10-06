@@ -16,6 +16,8 @@ import { OnboardingGate } from '@/components/OnboardingGate';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { DeploymentBadge } from '@/components/DeploymentBadge';
 import { CompanyVerificationGate } from '@/components/company/CompanyVerificationGate';
+import { PathNormalizer } from '@/components/PathNormalizer';
+import { AppUpdateBanner } from '@/components/AppUpdateBanner';
 
 import Index from './pages/Index';
 import Login from './pages/Login';
@@ -427,9 +429,16 @@ const App = () => {
             <Toaster theme="dark" />
             <BrowserRouter>
               <ErrorBoundary>
+                {/* PB-AUTH-CALLBACK-STALE-APP-001: redirect paths contaminated
+                    with invisible Unicode format chars (e.g. WhatsApp
+                    "/profile%E2%81%A0") to their canonical route. */}
+                <PathNormalizer />
                 <AppRoutes />
               </ErrorBoundary>
             </BrowserRouter>
+            {/* PB-AUTH-CALLBACK-STALE-APP-001: stale-bundle detection banner
+                (user-initiated, loop-safe controlled update). */}
+            <AppUpdateBanner />
             <DeploymentBadge />
           </TooltipProvider>
         </AdminPreviewProvider>

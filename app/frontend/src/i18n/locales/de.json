@@ -288,7 +288,22 @@
     "authCallbackErrorDescription": "Dieser Link ist möglicherweise ungültig oder abgelaufen. Fordere eine neue E-Mail an oder melde dich erneut an.",
     "authGenericError": "Dein Konto konnte nicht erstellt werden. Versuche es erneut.",
     "signInError": "Die Anmeldung ist fehlgeschlagen. Prüfe deine Angaben und versuche es erneut.",
-    "oauthStartError": "Die Google-Anmeldung konnte nicht gestartet werden. Versuche es erneut."
+    "oauthStartError": "Die Google-Anmeldung konnte nicht gestartet werden. Versuche es erneut.",
+    "callbackRecoveryTitle": "Die Anmeldung dauert länger als erwartet",
+    "callbackRecoveryDescription": "Ihre Sitzung ist möglicherweise in Kürze bereit. Prüfen Sie es erneut oder melden Sie sich neu an.",
+    "callbackRecheck": "Erneut prüfen",
+    "callbackRecheckFailed": "Es gibt immer noch keine Sitzung. Bitte melden Sie sich erneut an.",
+    "callbackGoHome": "Zur Startseite",
+    "callbackRelogin": "Erneut anmelden",
+    "callbackIncidentCode": "Vorfallcode"
+  },
+  "appUpdate": {
+    "title": "Eine neue Version von PipingBox ist verfügbar",
+    "description": "Aktualisieren Sie, um mit der neuesten Version weiterzuarbeiten.",
+    "updateButton": "App aktualisieren",
+    "persistedTitle": "Die App konnte nicht aktualisiert werden",
+    "persistedDescription": "Schließen Sie diesen Tab und öffnen Sie PipingBox erneut, um die neue Version zu nutzen.",
+    "later": "Später"
   },
   "community": {
     "title": "PipingBox Community",

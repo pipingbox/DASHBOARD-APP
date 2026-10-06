@@ -288,7 +288,22 @@
     "authCallbackErrorDescription": "Ce lien est peut-être invalide ou expiré. Demandez un nouvel e-mail ou reconnectez-vous.",
     "authGenericError": "Impossible de créer votre compte. Veuillez réessayer.",
     "signInError": "Impossible de vous connecter. Vérifiez vos informations et réessayez.",
-    "oauthStartError": "Impossible de démarrer la connexion Google. Veuillez réessayer."
+    "oauthStartError": "Impossible de démarrer la connexion Google. Veuillez réessayer.",
+    "callbackRecoveryTitle": "La connexion prend plus de temps que prévu",
+    "callbackRecoveryDescription": "Votre session est peut-être prête dans un instant. Vérifiez à nouveau ou reconnectez-vous.",
+    "callbackRecheck": "Vérifier à nouveau",
+    "callbackRecheckFailed": "La session n'est toujours pas établie. Reconnectez-vous.",
+    "callbackGoHome": "Aller à l'accueil",
+    "callbackRelogin": "Se reconnecter",
+    "callbackIncidentCode": "Code d'incident"
+  },
+  "appUpdate": {
+    "title": "Une nouvelle version de PipingBox est disponible",
+    "description": "Mettez à jour pour continuer avec la dernière version.",
+    "updateButton": "Mettre à jour",
+    "persistedTitle": "Impossible de mettre à jour l'application",
+    "persistedDescription": "Fermez cet onglet et rouvrez PipingBox pour utiliser la nouvelle version.",
+    "later": "Plus tard"
   },
   "community": {
     "title": "Communauté PipingBox",

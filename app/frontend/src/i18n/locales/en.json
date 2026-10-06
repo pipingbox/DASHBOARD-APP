@@ -288,7 +288,22 @@
     "authCallbackErrorDescription": "This link may be invalid or expired. Request a new email or sign in again.",
     "authGenericError": "We could not create your account. Please try again.",
     "signInError": "We could not sign you in. Check your details and try again.",
-    "oauthStartError": "We could not start Google sign-in. Please try again."
+    "oauthStartError": "We could not start Google sign-in. Please try again.",
+    "callbackRecoveryTitle": "We're taking longer than expected to complete the sign-in",
+    "callbackRecoveryDescription": "Your session may be ready in a moment. Check again or sign in once more.",
+    "callbackRecheck": "Check again",
+    "callbackRecheckFailed": "There is still no session. Please sign in again.",
+    "callbackGoHome": "Go to home",
+    "callbackRelogin": "Sign in again",
+    "callbackIncidentCode": "Incident code"
+  },
+  "appUpdate": {
+    "title": "A new version of PipingBox is available",
+    "description": "Update to keep working on the latest version.",
+    "updateButton": "Update app",
+    "persistedTitle": "We couldn't update the app",
+    "persistedDescription": "Close this tab and open PipingBox again to use the new version.",
+    "later": "Later"
   },
   "community": {
     "title": "PipingBox Community",

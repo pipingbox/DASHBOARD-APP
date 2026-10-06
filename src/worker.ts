@@ -77,6 +77,14 @@ export default {
       ) {
         return new Response('Not found', { status: 404 });
       }
+      // PB-AUTH-CALLBACK-STALE-APP-001: the build stamp must never be cached
+      // by the browser or an intermediary — stale-version detection compares
+      // the running bundle against the CURRENT deployed version.
+      if (pathname === '/version.json') {
+        const headers = new Headers(response.headers);
+        headers.set('cache-control', 'no-store');
+        return new Response(response.body, { status: response.status, headers });
+      }
       return response;
     }
 

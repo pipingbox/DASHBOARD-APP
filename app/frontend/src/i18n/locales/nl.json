@@ -288,7 +288,22 @@
     "authCallbackErrorDescription": "Deze link is mogelijk ongeldig of verlopen. Vraag een nieuwe e-mail aan of log opnieuw in.",
     "authGenericError": "Je account kon niet worden aangemaakt. Probeer het opnieuw.",
     "signInError": "Inloggen is niet gelukt. Controleer je gegevens en probeer het opnieuw.",
-    "oauthStartError": "Inloggen met Google kon niet worden gestart. Probeer het opnieuw."
+    "oauthStartError": "Inloggen met Google kon niet worden gestart. Probeer het opnieuw.",
+    "callbackRecoveryTitle": "Het inloggen duurt langer dan verwacht",
+    "callbackRecoveryDescription": "Je sessie is misschien zo klaar. Controleer opnieuw of log opnieuw in.",
+    "callbackRecheck": "Opnieuw controleren",
+    "callbackRecheckFailed": "Er is nog steeds geen sessie. Log opnieuw in.",
+    "callbackGoHome": "Naar de startpagina",
+    "callbackRelogin": "Opnieuw inloggen",
+    "callbackIncidentCode": "Incidentcode"
+  },
+  "appUpdate": {
+    "title": "Er is een nieuwe versie van PipingBox beschikbaar",
+    "description": "Werk bij om door te gaan met de nieuwste versie.",
+    "updateButton": "App bijwerken",
+    "persistedTitle": "We konden de app niet bijwerken",
+    "persistedDescription": "Sluit dit tabblad en open PipingBox opnieuw om de nieuwe versie te gebruiken.",
+    "later": "Later"
   },
   "community": {
     "title": "PipingBox Community",

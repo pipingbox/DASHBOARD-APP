@@ -288,7 +288,22 @@
     "passwordWeak": "Slabă — adăugați mai multe caractere",
     "passwordFair": "Acceptabilă — continuați",
     "passwordGood": "Bună — parolă reușită",
-    "passwordStrong": "Puternică — excelent!"
+    "passwordStrong": "Puternică — excelent!",
+    "callbackRecoveryTitle": "Autentificarea durează mai mult decât era de așteptat",
+    "callbackRecoveryDescription": "Sesiunea ta ar putea fi gata în câteva momente. Verifică din nou sau autentifică-te încă o dată.",
+    "callbackRecheck": "Verifică din nou",
+    "callbackRecheckFailed": "Nu există încă o sesiune. Autentifică-te din nou.",
+    "callbackGoHome": "Mergi la pagina principală",
+    "callbackRelogin": "Autentifică-te din nou",
+    "callbackIncidentCode": "Cod de incident"
+  },
+  "appUpdate": {
+    "title": "Este disponibilă o nouă versiune PipingBox",
+    "description": "Actualizează pentru a continua cu cea mai recentă versiune.",
+    "updateButton": "Actualizează aplicația",
+    "persistedTitle": "Nu am putut actualiza aplicația",
+    "persistedDescription": "Închide această filă și deschide din nou PipingBox pentru a folosi noua versiune.",
+    "later": "Mai târziu"
   },
   "community": {
     "title": "Comunitatea PipingBox",
