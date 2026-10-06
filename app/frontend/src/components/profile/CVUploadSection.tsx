@@ -19,7 +19,14 @@ import {
   getSafeDocExtension,
   ACCEPT_DOCUMENTS,
 } from '@/lib/fileUploadUtils';
-import { uploadWithTimeout } from '@/lib/uploadHelpers';
+import { resolveFileMime } from '@/lib/uploadHelpers';
+import {
+  startResumableUpload,
+  UPLOAD_FAILURE_I18N,
+  formatBytes,
+  type DocumentUploadController,
+  type DocumentUploadProgress,
+} from '@/lib/resumableUpload';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { hasStoredCv } from '@/lib/filePresence';
 import {
@@ -35,6 +42,11 @@ export function CVUploadSection() {
   const [uploading, setUploading] = useState(false);
   const [removing, setRemoving] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  // PB-DOCUMENT-INTAKE-001 — resumable (TUS) upload machine state for the UI.
+  const [uploadUi, setUploadUi] = useState<DocumentUploadProgress | null>(null);
+  const uploadControllerRef = useRef<DocumentUploadController | null>(null);
+  // Stable path per file selection so TUS can resume the same object.
+  const lastUploadAttemptRef = useRef<{ signature: string; path: string } | null>(null);
 
   const [cvSignedUrl, setCvSignedUrl] = useState<string | null>(null);
 
@@ -87,34 +99,51 @@ export function CVUploadSection() {
     }
 
     setUploading(true);
+    setUploadUi(null);
+
+    // PB-DOCUMENT-INTAKE-001 — TUS resumable upload via the shared uploader.
+    // The object path is stable per file selection: re-selecting the same
+    // file after a recoverable failure RESUMES from the previous offset.
+    const signature = `${file.name}|${file.size}|${file.lastModified}`;
+    const previousAttempt = lastUploadAttemptRef.current;
     const safeExt = `.${getSafeDocExtension(file.name)}`;
-    const path = `${user.id}/cv-${Date.now()}${safeExt}`;
+    const path =
+      previousAttempt && previousAttempt.signature === signature
+        ? previousAttempt.path
+        : `${user.id}/cv-${Date.now()}${safeExt}`;
+    lastUploadAttemptRef.current = { signature, path };
     const bucketName = STORAGE_BUCKETS.certificates;
 
-    console.log('[CVUploadSection] File upload starting:', {
+    const controller = startResumableUpload(file, {
+      documentType: 'cv',
       bucket: bucketName,
       path,
-      fileType: file.type,
-      fileSize: file.size,
-      fileName: file.name,
+      contentType: resolveFileMime(file),
+      route: '/profile',
+      onProgress: (p) => setUploadUi(p),
     });
+    uploadControllerRef.current = controller;
 
-    const { error } = await uploadWithTimeout(bucketName, path, file, {
-      upsert: false,
-      cacheControl: '3600',
-      timeoutMs: 120000,
-    });
-    if (error) {
-      console.error('[CVUploadSection] Upload error:', { bucket: bucketName, path, error: error.message });
+    const result = await controller.promise;
+    uploadControllerRef.current = null;
+
+    if ('reason' in result && result.reason === 'cancelled') {
+      setUploadUi(null);
       setUploading(false);
-      const msg = `Error al subir: ${error.message}`;
+      return;
+    }
+    if ('reason' in result) {
+      setUploadUi(null);
+      setUploading(false);
+      const msg = t(UPLOAD_FAILURE_I18N[result.reason]);
       setUploadError(msg);
       toast.error(msg);
       return;
     }
 
-    console.log('[CVUploadSection] Upload success:', { bucket: bucketName, path });
-
+    // Transport finished and the verification HEAD confirmed the object.
+    // Now update the canonical profile columns (requirement: only after the
+    // object is complete and verified).
     const { data: upsertedData, error: updateError } = await supabase
       .from(TABLES.profiles)
       .upsert(
@@ -136,14 +165,23 @@ export function CVUploadSection() {
       .select()
       .single();
 
-    setUploading(false);
     if (updateError || !upsertedData) {
-      console.error('[CVUploadSection] Profile upsert error:', updateError?.message);
+      // PB-DOCUMENT-INTAKE-001 — canonical write failed: close the upload
+      // machine as a database failure and remove the freshly-created object
+      // (safe compensation — no orphan, no partial success).
+      controller.failCanonical();
+      await deleteStorageObject(bucketName, path).catch(() => undefined);
+      setUploading(false);
+      setUploadUi(null);
       const msg = t('workerProfile.cv.saveError', 'CV uploaded but failed to save reference: ') + (updateError?.message || 'No data returned');
       setUploadError(msg);
       toast.error(msg);
       return;
     }
+
+    // PB-DOCUMENT-INTAKE-001 — canonical columns confirmed: only now the
+    // machine reaches SAVED and document_upload_completed is emitted.
+    controller.confirmSaved();
 
     // PB-STORAGE-SECURITY-001: delete the previous CV object after the DB
     // reference has been successfully replaced.
@@ -159,16 +197,19 @@ export function CVUploadSection() {
       }
     }
 
-    console.log('[CVUploadSection] Profile upserted with CV fields:', {
-      cv_storage_bucket: bucketName,
-      cv_storage_path: path,
-      cv_file_name: file.name,
-    });
+    setUploading(false);
+    setUploadUi(null);
     setUploadError(null);
-    toast.success(t('workerProfile.cv.uploaded'));
+    // refreshProfile() re-reads the canonical columns so the saved state is
+    // what a reload would show — no ambiguous success.
     await refreshProfile();
+    toast.success(t('workerProfile.cv.uploaded'));
     // Recalculate profile completion (non-blocking)
     recalculateAndSaveProfileCompletion(user.id).catch(() => {});
+  };
+
+  const cancelUpload = () => {
+    uploadControllerRef.current?.cancel();
   };
 
   const handleRemove = async () => {
@@ -345,9 +386,9 @@ export function CVUploadSection() {
             ) : (
               <Upload className="h-5 w-5" />
             )}
-            <span>
+            <span data-testid="cv-upload-button-label">
               {uploading
-                ? t('common.loading')
+                ? `${t('common.loading')} ${uploadUi?.percent ?? 0}%`
                 : t('workerProfile.cv.uploadPdf')}
             </span>
             <input
@@ -365,6 +406,54 @@ export function CVUploadSection() {
           </label>
         )}
       </div>
+
+      {/* PB-DOCUMENT-INTAKE-001 — resumable upload status: real progress,
+          bytes transferred, cumulative time (never reset across retries),
+          preparing/retrying/verifying states and an always-available cancel. */}
+      {uploading && uploadUi && (
+        <div className="mt-3 w-full space-y-1" data-testid="cv-upload-status">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+            <div
+              data-testid="cv-upload-progress-bar"
+              className="h-full rounded-full bg-[#f59e0b] transition-all duration-300 ease-out"
+              style={{ width: `${uploadUi.percent}%` }}
+            />
+          </div>
+          <p className="text-center text-[11px] text-zinc-500" data-testid="cv-upload-status-line">
+            {uploadUi.state === 'VERIFYING'
+              ? t('common.upload.verifying')
+              : uploadUi.state === 'RETRYING'
+                ? `${uploadUi.percent}% ${t('common.upload.retrying')}`
+                : `${uploadUi.percent}% ${t('workerProfile.certifications.uploading', 'Subiendo…')}`}
+            {uploadUi.state !== 'VERIFYING' && (
+              <span className="ml-1 text-zinc-600">({Math.floor(uploadUi.elapsedMs / 1000)}s)</span>
+            )}
+            {uploadUi.state !== 'VERIFYING' && uploadUi.bytesTotal > 0 && (
+              <span className="ml-1 text-zinc-600">
+                {formatBytes(uploadUi.bytesUploaded)} / {formatBytes(uploadUi.bytesTotal)}
+              </span>
+            )}
+          </p>
+          {uploadUi.preparingFile && uploadUi.state !== 'VERIFYING' && (
+            <p className="text-center text-[11px] text-zinc-400" data-testid="cv-upload-preparing">
+              {t('common.upload.preparingFile')}
+            </p>
+          )}
+          {uploadUi.slowConnection && uploadUi.state !== 'VERIFYING' && (
+            <p className="text-center text-[11px] text-amber-500/90">
+              {t('workerProfile.certifications.uploadSlowHint', 'La conexión es lenta; la subida sigue en curso.')}
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={cancelUpload}
+            className="mx-auto block text-[11px] uppercase tracking-wider text-zinc-500 hover:text-red-400"
+            data-testid="cv-upload-cancel"
+          >
+            {t('common.upload.cancel')}
+          </button>
+        </div>
+      )}
 
       {/* Error message - visible on mobile with clear styling */}
       {uploadError && (

@@ -52,7 +52,23 @@
     "saveError": "Błąd zapisu",
     "saved": "Zapisano",
     "fixHighlightedFields": "Popraw zaznaczone pola",
-    "sessionNotFound": "Nie znaleziono sesji użytkownika. Zaloguj się ponownie."
+    "sessionNotFound": "Nie znaleziono sesji użytkownika. Zaloguj się ponownie.",
+    "upload": {
+      "fileAttached": "Plik wysłany",
+      "preparingFile": "Przygotowywanie pliku…",
+      "verifying": "Sprawdzanie pliku…",
+      "retrying": "Łączenie ponownie…",
+      "cancel": "Anuluj przesyłanie",
+      "noBytesStarted": "Nie udało się rozpocząć wysyłania pliku. Sprawdź plik i połączenie, a następnie spróbuj ponownie.",
+      "timedOut": "Przesyłanie trwało zbyt długo i zostało zatrzymane. Możesz spróbować ponownie; wznowi się od tego samego miejsca.",
+      "networkError": "Połączenie zostało utracone podczas przesyłania. Spróbuj ponownie, gdy będziesz mieć sieć; wznowi się od tego samego miejsca.",
+      "authExpired": "Twoja sesja wygasła. Zaloguj się ponownie i spróbuj przesłać plik.",
+      "storageError": "Magazyn odrzucił plik. Sprawdź format i rozmiar, a następnie spróbuj ponownie.",
+      "verifyFailed": "Plik został wysłany, ale nie udało się potwierdzić go na serwerze. Spróbuj ponownie.",
+      "cancelled": "Przesyłanie anulowano. Możesz ponownie wybrać plik.",
+      "databaseError": "Plik został wysłany, ale nie udało się zapisać odniesienia. Spróbuj ponownie.",
+      "failed": "Przesyłanie nie powiodło się. Spróbuj ponownie."
+    }
   },
   "nav": {
     "dashboard": "Panel",
@@ -2419,7 +2435,7 @@
       "uploadPdf": "Prześlij CV (PDF)",
       "pdfOnly": "Akceptowane są tylko pliki PDF",
       "fileTooBig": "Plik musi mieć mniej niż 10 MB",
-      "uploaded": "CV zostało przesłane",
+      "uploaded": "CV zapisane poprawnie",
       "removed": "CV usunięte",
       "view": "Zobacz",
       "replace": "Zamień",
@@ -2495,7 +2511,8 @@
       "prefsSaved": "Ustawienia powiadomień zapisane",
       "prefsSaveError": "Nie udało się zapisać ustawień powiadomień",
       "viewFileDenied": "Brak dostępu",
-      "saveTimedOut": "Upłynął limit czasu zapisu. Certyfikat mógł zostać zapisany — odśwież stronę, aby to sprawdzić."
+      "saveTimedOut": "Upłynął limit czasu zapisu. Certyfikat mógł zostać zapisany — odśwież stronę, aby to sprawdzić.",
+      "savedConfirm": "Certyfikat zapisany poprawnie"
     }
   },
   "profileCompleteness": {

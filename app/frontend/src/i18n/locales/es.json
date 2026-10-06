@@ -52,7 +52,23 @@
     "saveError": "Error al guardar",
     "saved": "Guardado",
     "fixHighlightedFields": "Corrija los campos resaltados",
-    "sessionNotFound": "No se encontró la sesión de usuario. Inicie sesión de nuevo."
+    "sessionNotFound": "No se encontró la sesión de usuario. Inicie sesión de nuevo.",
+    "upload": {
+      "fileAttached": "Archivo subido",
+      "preparingFile": "Preparando el archivo…",
+      "verifying": "Comprobando archivo…",
+      "retrying": "Reintentando conexión…",
+      "cancel": "Cancelar subida",
+      "noBytesStarted": "No se pudo empezar a enviar el archivo. Comprueba el archivo y tu conexión, e inténtalo de nuevo.",
+      "timedOut": "La subida ha tardado demasiado y se ha detenido. Puedes reintentarla; continuará donde la dejaste.",
+      "networkError": "Se perdió la conexión durante la subida. Reintenta cuando tengas red; continuará donde la dejaste.",
+      "authExpired": "Tu sesión ha caducado. Vuelve a iniciar sesión y reintenta la subida.",
+      "storageError": "El almacenamiento ha rechazado el archivo. Verifica el formato y el tamaño, e inténtalo de nuevo.",
+      "verifyFailed": "El archivo se envió pero no se pudo confirmar en el servidor. Inténtalo de nuevo.",
+      "cancelled": "Subida cancelada. Puedes volver a seleccionar el archivo.",
+      "databaseError": "El archivo se subió pero no se pudo guardar la referencia. Inténtalo de nuevo.",
+      "failed": "La subida ha fallado. Inténtalo de nuevo."
+    }
   },
   "nav": {
     "dashboard": "Panel",
@@ -2412,7 +2428,7 @@
       "uploadPdf": "Subir CV (PDF)",
       "pdfOnly": "Solo se aceptan archivos PDF",
       "fileTooBig": "El archivo debe ser menor de 10MB",
-      "uploaded": "CV subido correctamente",
+      "uploaded": "CV guardado correctamente",
       "removed": "CV eliminado",
       "view": "Ver",
       "replace": "Reemplazar",
@@ -2488,7 +2504,8 @@
       "prefsSaved": "Preferencias de alertas guardadas",
       "prefsSaveError": "Error al guardar preferencias de alertas",
       "viewFileDenied": "Acceso denegado",
-      "saveTimedOut": "El guardado ha tardado demasiado. Es posible que su certificado se haya guardado; actualice la página para comprobarlo."
+      "saveTimedOut": "El guardado ha tardado demasiado. Es posible que su certificado se haya guardado; actualice la página para comprobarlo.",
+      "savedConfirm": "Certificado guardado correctamente"
     }
   },
   "profileCompleteness": {
