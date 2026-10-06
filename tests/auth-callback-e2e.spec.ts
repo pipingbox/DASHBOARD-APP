@@ -171,11 +171,16 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
       // Poll until BOTH callback completions have flushed to the wire.
       const completed = await s.waitForWireEvent('auth_callback_completed', 90_000, 2);
       expect(completed.length).toBeGreaterThanOrEqual(2);
+      const providers = completed.map((evt) => s.customPropsOf(evt).provider);
+      // Visit A (flow=google) reports google; the bare visit B reports the
+      // default email-confirmation provider. Both are closed enum values.
+      expect(providers).toContain('google');
+      expect(providers).toContain('email');
       for (const evt of completed) {
         const props = s.customPropsOf(evt);
         // Closed custom props only — no URL, no OAuth code, no PII.
         expect(JSON.stringify(props)).not.toMatch(/code=|@evil|access_token|https?:\/\//i);
-        expect(props.provider).toBe('google');
+        expect(['google', 'email']).toContain(props.provider);
       }
     }
 
