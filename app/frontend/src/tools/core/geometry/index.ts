@@ -8,3 +8,4 @@
 export * from './offsets.ts';
 export * from './miters.ts';
 export * from './pipe-comb.ts';
+export * from './pipe-comb-stagger.ts';
