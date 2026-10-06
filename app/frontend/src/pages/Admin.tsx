@@ -29,6 +29,7 @@ import { AdminRegistros } from '@/components/admin/AdminRegistros';
 import { AdminNotifications } from '@/components/admin/AdminNotifications';
 import { AdminVCABookings } from '@/components/admin/AdminVCABookings';
 import { AdminCompanyVerification } from '@/components/admin/AdminCompanyVerification';
+import { AdminDocumentInbox } from '@/components/admin/AdminDocumentInbox';
 import { ALL_ROLES, getRoleLabel } from '@/lib/roles';
 import { toast } from 'sonner';
 
@@ -91,9 +92,9 @@ function getActivityIcon(type: ActivityItem['type']) {
 }
 
 /* ─── Tabs ─── */
-type AdminTab = 'overview' | 'users' | 'registros' | 'activity' | 'workforce' | 'leads' | 'analytics' | 'audit' | 'notifications' | 'vca-bookings' | 'company-verification';
+type AdminTab = 'overview' | 'users' | 'registros' | 'activity' | 'workforce' | 'leads' | 'analytics' | 'audit' | 'notifications' | 'vca-bookings' | 'company-verification' | 'document-inbox';
 
-const VALID_TABS: AdminTab[] = ['overview', 'users', 'registros', 'activity', 'workforce', 'leads', 'analytics', 'audit', 'notifications', 'vca-bookings', 'company-verification'];
+const VALID_TABS: AdminTab[] = ['overview', 'users', 'registros', 'activity', 'workforce', 'leads', 'analytics', 'audit', 'notifications', 'vca-bookings', 'company-verification', 'document-inbox'];
 
 export default function Admin() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -351,6 +352,7 @@ export default function Admin() {
     { id: 'notifications', label: 'Notifications', icon: <Bell className="h-3.5 w-3.5" /> },
     { id: 'vca-bookings', label: 'VCA Bookings', icon: <Calendar className="h-3.5 w-3.5" /> },
     { id: 'company-verification', label: 'Company Verification', icon: <Building2 className="h-3.5 w-3.5" /> },
+    { id: 'document-inbox', label: 'Documentos recibidos', icon: <FileText className="h-3.5 w-3.5" /> },
   ];
 
   return (
@@ -454,6 +456,7 @@ export default function Admin() {
       {activeTab === 'notifications' && <AdminNotifications />}
       {activeTab === 'vca-bookings' && <AdminVCABookings />}
       {activeTab === 'company-verification' && <AdminCompanyVerification />}
+      {activeTab === 'document-inbox' && <AdminDocumentInbox />}
     </div>
   );
 }

@@ -2499,6 +2499,12 @@
       "viewFileDenied": "Toegang geweigerd",
       "saveTimedOut": "Time-out bij het opslaan. Uw certificaat is mogelijk toch opgeslagen — vernieuw de pagina om dit te controleren.",
       "savedConfirm": "Certificaat succesvol opgeslagen"
+    },
+    "emailIntake": {
+      "link": "Kunt u het bestand niet uploaden? Stuur het per e-mail.",
+      "instructions": "Stuur het bestand als bijlage naar het weergegeven adres, zonder het onderwerp te wijzigen. Formaten: PDF, PNG of JPG (max. 10 MB). De referentie verloopt na 72 uur en is eenmalig. Uw document wordt gecontroleerd voordat het aan uw profiel wordt toegevoegd; er wordt niets automatisch gepubliceerd.",
+      "referenceReady": "Referentie aangemaakt. Controleer uw e-mailprogramma: het onderwerp bevat al de referentie.",
+      "error": "Het e-mailverzoek kon niet worden voorbereid. Probeer het opnieuw."
     }
   },
   "profileCompleteness": {
@@ -2941,6 +2947,28 @@
       "minutesAgo": "{{count}} min geleden",
       "hoursAgo": "{{count}} u geleden",
       "daysAgo": "{{count}} d geleden"
+    },
+    "documentInbox": {
+      "title": "Ontvangen documenten",
+      "empty": "Geen documenten per e-mail ontvangen.",
+      "disabled": "De documentinbox is uitgeschakeld in deze omgeving (VITE_DOCUMENT_EMAIL_INTAKE).",
+      "loadError": "De documentinbox kon niet worden geladen.",
+      "actionDone": "Actie toegepast.",
+      "actionError": "De actie kon niet worden toegepast.",
+      "promotionDisabled": "Promotie naar het profiel is uitgeschakeld in deze fase.",
+      "attachments": "{{count}} bijlagen",
+      "senderMatch": {
+        "match": "Afzender komt overeen",
+        "mismatch": "Afzender wijkt af",
+        "unknown": "Onbekende afzender"
+      },
+      "detail": "Berichtdetails",
+      "malware": "Beveiliging",
+      "extraction": "Extractie",
+      "reviewFile": "Bestand controleren (tijdelijke link)",
+      "sendForConfirmation": "Naar gebruiker sturen voor bevestiging",
+      "reject": "Afwijzen",
+      "promote": "Promoveren naar profiel (uitgeschakeld)"
     }
   },
   "companyDashboard": {

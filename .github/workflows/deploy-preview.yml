@@ -143,6 +143,9 @@ jobs:
           VITE_APP_VERSION: ${{ steps.expected_sha.outputs.sha }}
           # Mark preview traffic so it can be excluded from production reports.
           VITE_APP_ENV: preview
+          # PB-DOCUMENT-INTAKE-001 — Entrega B (Vía B): email intake UI is
+          # preview-only while the TEST phase lasts; production stays false.
+          VITE_DOCUMENT_EMAIL_INTAKE: 'true'
         run: npx wrangler deploy
 
       # PB-OBSERVABILITY-PROD-ROLLOUT-001 (ChatGPT review): a deploy is only

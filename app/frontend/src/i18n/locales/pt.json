@@ -2506,6 +2506,12 @@
       "viewFileDenied": "Acesso negado",
       "saveTimedOut": "A gravação excedeu o tempo limite. O seu certificado pode ter sido guardado; atualize a página para verificar.",
       "savedConfirm": "Certificado guardado com sucesso"
+    },
+    "emailIntake": {
+      "link": "Não consegue carregar o ficheiro? Envie-o por e-mail.",
+      "instructions": "Envie o ficheiro como anexo para o endereço indicado, sem alterar o assunto. Formatos: PDF, PNG ou JPG (máx. 10 MB). A referência expira em 72 horas e é de utilização única. O seu documento será revisto antes de ser adicionado ao seu perfil; nada é publicado automaticamente.",
+      "referenceReady": "Referência criada. Verifique o seu cliente de e-mail: o assunto já inclui a referência.",
+      "error": "Não foi possível preparar o envio por e-mail. Tente novamente."
     }
   },
   "profileCompleteness": {
@@ -2948,6 +2954,28 @@
       "minutesAgo": "há {{count}}m",
       "hoursAgo": "há {{count}}h",
       "daysAgo": "há {{count}}d"
+    },
+    "documentInbox": {
+      "title": "Documentos recebidos",
+      "empty": "Nenhum documento recebido por e-mail.",
+      "disabled": "A caixa de documentos está desativada neste ambiente (VITE_DOCUMENT_EMAIL_INTAKE).",
+      "loadError": "Não foi possível carregar a caixa de documentos.",
+      "actionDone": "Ação aplicada.",
+      "actionError": "Não foi possível aplicar a ação.",
+      "promotionDisabled": "A promoção para o perfil está desativada nesta fase.",
+      "attachments": "{{count}} anexos",
+      "senderMatch": {
+        "match": "Remetente coincidente",
+        "mismatch": "Remetente diferente",
+        "unknown": "Remetente desconhecido"
+      },
+      "detail": "Detalhe da mensagem",
+      "malware": "Segurança",
+      "extraction": "Extração",
+      "reviewFile": "Rever ficheiro (ligação temporária)",
+      "sendForConfirmation": "Enviar ao utilizador para confirmação",
+      "reject": "Rejeitar",
+      "promote": "Promover para o perfil (desativado)"
     }
   },
   "companyDashboard": {

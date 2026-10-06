@@ -2499,6 +2499,12 @@
       "viewFileDenied": "Zugriff verweigert",
       "saveTimedOut": "Zeitüberschreitung beim Speichern. Ihr Zertifikat wurde möglicherweise trotzdem gespeichert — bitte aktualisieren Sie die Seite, um dies zu prüfen.",
       "savedConfirm": "Zertifikat erfolgreich gespeichert"
+    },
+    "emailIntake": {
+      "link": "Können Sie die Datei nicht hochladen? Senden Sie sie per E-Mail.",
+      "instructions": "Senden Sie die Datei als Anhang an die angezeigte Adresse, ohne den Betreff zu ändern. Formate: PDF, PNG oder JPG (max. 10 MB). Die Referenz läuft nach 72 Stunden ab und ist einmalig gültig. Ihr Dokument wird geprüft, bevor es Ihrem Profil hinzugefügt wird; nichts wird automatisch veröffentlicht.",
+      "referenceReady": "Referenz erstellt. Prüfen Sie Ihr E-Mail-Programm: der Betreff enthält bereits die Referenz.",
+      "error": "Der E-Mail-Versand konnte nicht vorbereitet werden. Bitte versuchen Sie es erneut."
     }
   },
   "profileCompleteness": {
@@ -2941,6 +2947,28 @@
       "minutesAgo": "vor {{count}} Min",
       "hoursAgo": "vor {{count}} Std",
       "daysAgo": "vor {{count}} T"
+    },
+    "documentInbox": {
+      "title": "Empfangene Dokumente",
+      "empty": "Keine Dokumente per E-Mail erhalten.",
+      "disabled": "Die Dokumentenablage ist in dieser Umgebung deaktiviert (VITE_DOCUMENT_EMAIL_INTAKE).",
+      "loadError": "Die Dokumentenablage konnte nicht geladen werden.",
+      "actionDone": "Aktion angewendet.",
+      "actionError": "Die Aktion konnte nicht angewendet werden.",
+      "promotionDisabled": "Die Übernahme ins Profil ist in dieser Phase deaktiviert.",
+      "attachments": "{{count}} Anhänge",
+      "senderMatch": {
+        "match": "Absender stimmt überein",
+        "mismatch": "Absender abweichend",
+        "unknown": "Unbekannter Absender"
+      },
+      "detail": "Nachrichtendetails",
+      "malware": "Sicherheit",
+      "extraction": "Extraktion",
+      "reviewFile": "Datei prüfen (temporärer Link)",
+      "sendForConfirmation": "Zur Bestätigung an den Nutzer senden",
+      "reject": "Ablehnen",
+      "promote": "Ins Profil übernehmen (deaktiviert)"
     }
   },
   "companyDashboard": {

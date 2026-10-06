@@ -2506,6 +2506,12 @@
       "viewFileDenied": "Accesso negato",
       "saveTimedOut": "Tempo di salvataggio scaduto. Il certificato potrebbe essere stato salvato: aggiorna la pagina per verificare.",
       "savedConfirm": "Certificato salvato correttamente"
+    },
+    "emailIntake": {
+      "link": "Non riesci a caricare il file? Invialo via e-mail.",
+      "instructions": "Invia il file come allegato all'indirizzo indicato, senza modificare l'oggetto. Formati: PDF, PNG o JPG (max 10 MB). Il riferimento scade dopo 72 ore ed è monouso. Il documento sarà esaminato prima di essere aggiunto al profilo; nulla viene pubblicato automaticamente.",
+      "referenceReady": "Riferimento creato. Controlla il tuo client e-mail: l'oggetto include già il riferimento.",
+      "error": "Impossibile preparare l'invio via e-mail. Riprova."
     }
   },
   "profileCompleteness": {
@@ -2948,6 +2954,28 @@
       "minutesAgo": "{{count}} min fa",
       "hoursAgo": "{{count}} h fa",
       "daysAgo": "{{count}} g fa"
+    },
+    "documentInbox": {
+      "title": "Documenti ricevuti",
+      "empty": "Nessun documento ricevuto via e-mail.",
+      "disabled": "La casella documentale è disattivata in questo ambiente (VITE_DOCUMENT_EMAIL_INTAKE).",
+      "loadError": "Impossibile caricare la casella documentale.",
+      "actionDone": "Azione applicata.",
+      "actionError": "Impossibile applicare l'azione.",
+      "promotionDisabled": "La promozione al profilo è disattivata in questa fase.",
+      "attachments": "{{count}} allegati",
+      "senderMatch": {
+        "match": "Mittente corrispondente",
+        "mismatch": "Mittente diverso",
+        "unknown": "Mittente sconosciuto"
+      },
+      "detail": "Dettaglio del messaggio",
+      "malware": "Sicurezza",
+      "extraction": "Estrazione",
+      "reviewFile": "Esamina file (link temporaneo)",
+      "sendForConfirmation": "Invia all'utente per conferma",
+      "reject": "Rifiuta",
+      "promote": "Promuovi nel profilo (disattivato)"
     }
   },
   "companyDashboard": {

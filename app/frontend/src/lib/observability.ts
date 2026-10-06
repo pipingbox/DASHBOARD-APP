@@ -83,7 +83,10 @@ export const OBS_EVENT_NAMES = [
   'document_email_reference_created',
   'document_email_received',
   'document_email_rejected',
+  'document_quarantined',
+  'document_scan_completed',
   'document_extraction_completed',
+  'document_awaiting_confirmation',
   'document_user_confirmed',
   'document_promoted',
 ] as const;
@@ -330,6 +333,7 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
     'document_type',
     'channel',
     'transport',
+    'provider',
   ],
   document_email_received: [
     'route',
@@ -339,6 +343,8 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
     'transport',
     'mime_category',
     'size_bucket',
+    'provider',
+    'status',
   ],
   document_email_rejected: [
     'route',
@@ -349,6 +355,28 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
     'mime_category',
     'size_bucket',
     'error_category',
+    'provider',
+    'status',
+  ],
+  document_quarantined: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'mime_category',
+    'size_bucket',
+    'provider',
+  ],
+  document_scan_completed: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'mime_category',
+    'size_bucket',
+    'provider',
+    'status',
+    'duration_ms',
   ],
   document_extraction_completed: [
     'route',
@@ -357,6 +385,16 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
     'channel',
     'transport',
     'extraction_status',
+    'confidence_bucket',
+    'duration_ms',
+    'provider',
+  ],
+  document_awaiting_confirmation: [
+    'route',
+    'correlation_id',
+    'document_type',
+    'channel',
+    'provider',
   ],
   document_user_confirmed: [
     'route',
@@ -373,6 +411,7 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
     'transport',
     'mime_category',
     'size_bucket',
+    'provider',
   ],
 };
 
@@ -422,6 +461,34 @@ export const DOC_ERROR_CATEGORIES = [
   'unknown',
 ] as const;
 export const DOC_EXTRACTION_STATUSES = ['pending', 'completed', 'low_confidence', 'failed', 'skipped'] as const;
+// PB-DOCUMENT-INTAKE-001 — Entrega B: enums cerrados del canal correo.
+export const DOC_PROVIDERS = ['resend', 'postmark', 'cloudflare'] as const;
+export const DOC_INBOUND_STATUSES = [
+  'RECEIVED',
+  'QUARANTINED',
+  'SCANNING',
+  'EXTRACTION_PENDING',
+  'NEEDS_REVIEW',
+  'AWAITING_USER_CONFIRMATION',
+  'APPROVED',
+  'REJECTED',
+  'PROMOTED',
+  'FAILED',
+  'EXPIRED',
+] as const;
+export const DOC_CONFIDENCE_BUCKETS = ['high', 'medium', 'low', 'none'] as const;
+
+/** Eventos de la Entrega B (canal correo) a los que aplican los enums provider/status/confidence_bucket. */
+const EMAIL_INTAKE_OBS_EVENTS: ReadonlySet<ObsEventName> = new Set([
+  'document_email_reference_created',
+  'document_email_received',
+  'document_email_rejected',
+  'document_quarantined',
+  'document_scan_completed',
+  'document_extraction_completed',
+  'document_awaiting_confirmation',
+  'document_promoted',
+]);
 
 /** Map a resolved MIME type to the coarse document category (no exact type). */
 export function mimeToCategory(mime: string): (typeof DOC_MIME_CATEGORIES)[number] {
@@ -1030,6 +1097,16 @@ export function buildEventProps(
   }
   if ('extraction_status' in out && !DOC_EXTRACTION_STATUSES.includes(out.extraction_status as never)) {
     delete out.extraction_status;
+  }
+  // Entrega B (canal correo) — enums cerrados adicionales. Solo aplican a los
+  // eventos del pipeline documental por correo: 'provider'/'status' también
+  // existen en eventos de auth con otros valores válidos (email/failed, …).
+  if (EMAIL_INTAKE_OBS_EVENTS.has(name)) {
+    if ('provider' in out && !DOC_PROVIDERS.includes(out.provider as never)) delete out.provider;
+    if ('status' in out && !DOC_INBOUND_STATUSES.includes(out.status as never)) delete out.status;
+    if ('confidence_bucket' in out && !DOC_CONFIDENCE_BUCKETS.includes(out.confidence_bucket as never)) {
+      delete out.confidence_bucket;
+    }
   }
   if ('resumed' in out && typeof out.resumed !== 'boolean') delete out.resumed;
   if ('attempt_number' in out && (typeof out.attempt_number !== 'number' || out.attempt_number < 1 || out.attempt_number > 8)) {

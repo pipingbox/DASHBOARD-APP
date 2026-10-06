@@ -2506,6 +2506,12 @@
       "viewFileDenied": "Acceso denegado",
       "saveTimedOut": "El guardado ha tardado demasiado. Es posible que su certificado se haya guardado; actualice la página para comprobarlo.",
       "savedConfirm": "Certificado guardado correctamente"
+    },
+    "emailIntake": {
+      "link": "¿No puedes subir el archivo? Envíalo por correo.",
+      "instructions": "Envía el archivo como adjunto a la dirección indicada, sin cambiar el asunto. Formatos: PDF, PNG o JPG (máx. 10 MB). La referencia caduca en 72 horas y es de un solo uso. Tu documento será revisado antes de añadirse a tu perfil; nada se publica automáticamente.",
+      "referenceReady": "Referencia creada. Revisa tu cliente de correo: el asunto ya incluye la referencia.",
+      "error": "No se pudo preparar el envío por correo. Inténtalo de nuevo."
     }
   },
   "profileCompleteness": {
@@ -2948,6 +2954,28 @@
       "minutesAgo": "hace {{count}}m",
       "hoursAgo": "hace {{count}}h",
       "daysAgo": "hace {{count}}d"
+    },
+    "documentInbox": {
+      "title": "Documentos recibidos",
+      "empty": "No hay documentos recibidos por correo.",
+      "disabled": "La bandeja documental está desactivada en este entorno (VITE_DOCUMENT_EMAIL_INTAKE).",
+      "loadError": "No se pudo cargar la bandeja documental.",
+      "actionDone": "Acción aplicada.",
+      "actionError": "No se pudo aplicar la acción.",
+      "promotionDisabled": "La promoción al perfil está desactivada en esta fase.",
+      "attachments": "{{count}} adjuntos",
+      "senderMatch": {
+        "match": "Remitente coincidente",
+        "mismatch": "Remitente distinto",
+        "unknown": "Remitente desconocido"
+      },
+      "detail": "Detalle del mensaje",
+      "malware": "Seguridad",
+      "extraction": "Extracción",
+      "reviewFile": "Revisar archivo (enlace temporal)",
+      "sendForConfirmation": "Enviar al usuario para confirmación",
+      "reject": "Rechazar",
+      "promote": "Promover al perfil (desactivado)"
     }
   },
   "companyDashboard": {

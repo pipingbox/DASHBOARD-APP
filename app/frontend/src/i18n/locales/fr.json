@@ -2506,6 +2506,12 @@
       "viewFileDenied": "Accès refusé",
       "saveTimedOut": "Délai d'enregistrement dépassé. Votre certificat a peut-être été enregistré — veuillez actualiser la page pour vérifier.",
       "savedConfirm": "Certificat enregistré correctement"
+    },
+    "emailIntake": {
+      "link": "Impossible de téléverser le fichier ? Envoyez-le par e-mail.",
+      "instructions": "Envoyez le fichier en pièce jointe à l'adresse indiquée, sans modifier l'objet. Formats : PDF, PNG ou JPG (max 10 Mo). La référence expire dans 72 heures et est à usage unique. Votre document sera vérifié avant d'être ajouté à votre profil ; rien n'est publié automatiquement.",
+      "referenceReady": "Référence créée. Vérifiez votre client e-mail : l'objet contient déjà la référence.",
+      "error": "Impossible de préparer l'envoi par e-mail. Veuillez réessayer."
     }
   },
   "profileCompleteness": {
@@ -2948,6 +2954,28 @@
       "minutesAgo": "il y a {{count}} min",
       "hoursAgo": "il y a {{count}} h",
       "daysAgo": "il y a {{count}} j"
+    },
+    "documentInbox": {
+      "title": "Documents reçus",
+      "empty": "Aucun document reçu par e-mail.",
+      "disabled": "La boîte documentaire est désactivée dans cet environnement (VITE_DOCUMENT_EMAIL_INTAKE).",
+      "loadError": "Impossible de charger la boîte documentaire.",
+      "actionDone": "Action appliquée.",
+      "actionError": "Impossible d'appliquer l'action.",
+      "promotionDisabled": "La promotion vers le profil est désactivée dans cette phase.",
+      "attachments": "{{count}} pièces jointes",
+      "senderMatch": {
+        "match": "Expéditeur correspondant",
+        "mismatch": "Expéditeur différent",
+        "unknown": "Expéditeur inconnu"
+      },
+      "detail": "Détail du message",
+      "malware": "Sécurité",
+      "extraction": "Extraction",
+      "reviewFile": "Examiner le fichier (lien temporaire)",
+      "sendForConfirmation": "Envoyer à l'utilisateur pour confirmation",
+      "reject": "Rejeter",
+      "promote": "Promouvoir vers le profil (désactivé)"
     }
   },
   "companyDashboard": {

@@ -52,6 +52,7 @@ import { trackEvent, getCorrelationId } from '@/lib/observability';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { getSecureFileUrl, deleteStorageObject, extractStoragePathAndBucket } from '@/lib/storageHelpers';
 import { hasStoredRecordFile } from '@/lib/filePresence';
+import { EmailIntakeEntry } from '@/components/profile/EmailIntakeEntry';
 
 export function CertificationsSection() {
   const { t } = useTranslation();
@@ -1048,6 +1049,9 @@ export function CertificationsSection() {
               <p className="text-[11px] text-zinc-600">
                 {t('workerProfile.certifications.fileHint')}
               </p>
+              {/* PB-DOCUMENT-INTAKE-001 — Entrega B: canal alternativo por
+                  correo (visible solo con VITE_DOCUMENT_EMAIL_INTAKE=true). */}
+              <EmailIntakeEntry documentType="certificate" testId="cert" />
             </div>
 
             <div className="space-y-2">

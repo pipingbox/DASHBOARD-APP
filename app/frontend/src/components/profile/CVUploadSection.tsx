@@ -34,6 +34,7 @@ import {
   extractStoragePathAndBucket,
   deleteStorageObject,
 } from '@/lib/storageHelpers';
+import { EmailIntakeEntry } from '@/components/profile/EmailIntakeEntry';
 
 export function CVUploadSection() {
   const { t } = useTranslation();
@@ -465,6 +466,10 @@ export function CVUploadSection() {
       <p className="mt-2 text-[10px] text-zinc-600">
         PDF, DOC, DOCX — máx. 10 MB
       </p>
+
+      {/* PB-DOCUMENT-INTAKE-001 — Entrega B: canal alternativo por correo
+          (visible solo con VITE_DOCUMENT_EMAIL_INTAKE=true). */}
+      <EmailIntakeEntry documentType="cv" testId="cv" />
     </section>
   );
 }

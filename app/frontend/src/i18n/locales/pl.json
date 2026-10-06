@@ -2513,6 +2513,12 @@
       "viewFileDenied": "Brak dostępu",
       "saveTimedOut": "Upłynął limit czasu zapisu. Certyfikat mógł zostać zapisany — odśwież stronę, aby to sprawdzić.",
       "savedConfirm": "Certyfikat zapisany poprawnie"
+    },
+    "emailIntake": {
+      "link": "Nie możesz przesłać pliku? Wyślij go e-mailem.",
+      "instructions": "Wyślij plik jako załącznik na wskazany adres, nie zmieniając tematu. Formaty: PDF, PNG lub JPG (maks. 10 MB). Referencja wygasa po 72 godzinach i jest jednorazowa. Dokument zostanie sprawdzony, zanim trafi do Twojego profilu; nic nie jest publikowane automatycznie.",
+      "referenceReady": "Referencja utworzona. Sprawdź swój program pocztowy: temat zawiera już referencję.",
+      "error": "Nie udało się przygotować wysyłki e-mailem. Spróbuj ponownie."
     }
   },
   "profileCompleteness": {
@@ -2986,6 +2992,28 @@
       "minutesAgo": "{{count}} min temu",
       "hoursAgo": "{{count}} godz. temu",
       "daysAgo": "{{count}} dn. temu"
+    },
+    "documentInbox": {
+      "title": "Otrzymane dokumenty",
+      "empty": "Brak dokumentów otrzymanych e-mailem.",
+      "disabled": "Skrzynka dokumentów jest wyłączona w tym środowisku (VITE_DOCUMENT_EMAIL_INTAKE).",
+      "loadError": "Nie udało się załadować skrzynki dokumentów.",
+      "actionDone": "Akcja zastosowana.",
+      "actionError": "Nie udało się zastosować akcji.",
+      "promotionDisabled": "Promocja do profilu jest wyłączona w tej fazie.",
+      "attachments": "{{count}} załączników",
+      "senderMatch": {
+        "match": "Nadawca zgodny",
+        "mismatch": "Nadawca niezgodny",
+        "unknown": "Nieznany nadawca"
+      },
+      "detail": "Szczegóły wiadomości",
+      "malware": "Bezpieczeństwo",
+      "extraction": "Ekstrakcja",
+      "reviewFile": "Przejrzyj plik (tymczasowy link)",
+      "sendForConfirmation": "Wyślij do użytkownika do potwierdzenia",
+      "reject": "Odrzuć",
+      "promote": "Promuj do profilu (wyłączone)"
     }
   },
   "companyDashboard": {

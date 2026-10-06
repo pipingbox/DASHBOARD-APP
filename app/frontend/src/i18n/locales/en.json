@@ -2499,6 +2499,12 @@
       "viewFileDenied": "Access denied",
       "saveTimedOut": "Save timed out. Your certificate may have been saved — please refresh to check.",
       "savedConfirm": "Certificate saved successfully"
+    },
+    "emailIntake": {
+      "link": "Can't upload the file? Send it by email.",
+      "instructions": "Send the file as an attachment to the address shown, without changing the subject. Formats: PDF, PNG or JPG (max 10 MB). The reference expires in 72 hours and is single-use. Your document will be reviewed before anything is added to your profile; nothing is published automatically.",
+      "referenceReady": "Reference created. Check your email client: the subject already includes the reference.",
+      "error": "Could not prepare the email submission. Please try again."
     }
   },
   "profileCompleteness": {
@@ -2941,6 +2947,28 @@
       "minutesAgo": "{{count}}m ago",
       "hoursAgo": "{{count}}h ago",
       "daysAgo": "{{count}}d ago"
+    },
+    "documentInbox": {
+      "title": "Received documents",
+      "empty": "No documents received by email.",
+      "disabled": "The document inbox is disabled in this environment (VITE_DOCUMENT_EMAIL_INTAKE).",
+      "loadError": "Could not load the document inbox.",
+      "actionDone": "Action applied.",
+      "actionError": "Could not apply the action.",
+      "promotionDisabled": "Promotion to the profile is disabled in this phase.",
+      "attachments": "{{count}} attachments",
+      "senderMatch": {
+        "match": "Sender matches",
+        "mismatch": "Sender differs",
+        "unknown": "Unknown sender"
+      },
+      "detail": "Message detail",
+      "malware": "Security",
+      "extraction": "Extraction",
+      "reviewFile": "Review file (temporary link)",
+      "sendForConfirmation": "Send to user for confirmation",
+      "reject": "Reject",
+      "promote": "Promote to profile (disabled)"
     }
   },
   "companyDashboard": {

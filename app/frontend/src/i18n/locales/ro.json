@@ -2506,6 +2506,12 @@
       "viewFileDenied": "Acces refuzat",
       "saveTimedOut": "Salvarea a expirat. Este posibil ca certificatul să fi fost salvat — vă rugăm să reîmprospătați pagina pentru a verifica.",
       "savedConfirm": "Certificat salvat corect"
+    },
+    "emailIntake": {
+      "link": "Nu puteți încărca fișierul? Trimiteți-l prin e-mail.",
+      "instructions": "Trimiteți fișierul ca atașament la adresa afișată, fără a modifica subiectul. Formate: PDF, PNG sau JPG (max. 10 MB). Referința expiră în 72 de ore și este de unică folosință. Documentul va fi verificat înainte de a fi adăugat în profil; nimic nu se publică automat.",
+      "referenceReady": "Referință creată. Verificați clientul de e-mail: subiectul include deja referința.",
+      "error": "Trimiterea prin e-mail nu a putut fi pregătită. Încercați din nou."
     }
   },
   "profileCompleteness": {
@@ -2979,6 +2985,28 @@
       "minutesAgo": "acum {{count}} min",
       "hoursAgo": "acum {{count}} h",
       "daysAgo": "acum {{count}} z"
+    },
+    "documentInbox": {
+      "title": "Documente primite",
+      "empty": "Niciun document primit prin e-mail.",
+      "disabled": "Cutia documentelor este dezactivată în acest mediu (VITE_DOCUMENT_EMAIL_INTAKE).",
+      "loadError": "Cutia documentelor nu a putut fi încărcată.",
+      "actionDone": "Acțiune aplicată.",
+      "actionError": "Acțiunea nu a putut fi aplicată.",
+      "promotionDisabled": "Promovarea în profil este dezactivată în această fază.",
+      "attachments": "{{count}} atașamente",
+      "senderMatch": {
+        "match": "Expeditor corespunzător",
+        "mismatch": "Expeditor diferit",
+        "unknown": "Expeditor necunoscut"
+      },
+      "detail": "Detaliul mesajului",
+      "malware": "Securitate",
+      "extraction": "Extracție",
+      "reviewFile": "Examinați fișierul (link temporar)",
+      "sendForConfirmation": "Trimiteți utilizatorului pentru confirmare",
+      "reject": "Respingeți",
+      "promote": "Promovați în profil (dezactivat)"
     }
   },
   "companyDashboard": {
