@@ -24,7 +24,7 @@
    copied from the U6.1 kernel result.
    ─────────────────────────────────────────────────────────────────────────── */
 
-import type { EqualTubeElbowResult } from './equalTubeElbowGeometry.ts';
+import type { EqualTubeElbowSuccess } from './equalTubeElbowGeometry.ts';
 import { getPdfPageFormat, pdfFormatUsableWidthMm } from './pdfPageFormat.ts';
 import type { PdfPageFormatId } from './pdfPageFormat.ts';
 
@@ -90,7 +90,7 @@ const MARK_X_LEFT = 14;
 
 /** Canonical template coordinates: (arc, ordinate) in mm for station i. */
 export function equalTubeTemplatePoint(
-  result: EqualTubeElbowResult,
+  result: EqualTubeElbowSuccess,
   index: number,
   ordinate: EqualTubeTemplateOrdinate,
 ): [number, number] {
@@ -105,7 +105,7 @@ const fmt = (v: number) => Number(v.toFixed(3)).toString();
 const textW = (s: string, fs: number) => s.length * 0.6 * fs;
 
 export function buildEqualTubeTemplate(
-  result: EqualTubeElbowResult,
+  result: EqualTubeElbowSuccess,
   options: EqualTubeTemplateOptions,
 ): EqualTubeTemplateResult {
   const page = getPdfPageFormat(options.format);

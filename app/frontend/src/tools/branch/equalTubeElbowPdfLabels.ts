@@ -84,7 +84,7 @@ export function buildEqualTubeElbowPdfLabels(inputs: EqualTubeElbowPdfLabelInput
 
   const memberLabel = pdfSafeLabel(inputs.memberLabel);
   const pick = (value: string, fallback: string) => (localized ? value : fallback);
-  const pickSteps = (values: string[]) => (localized ? values : EN.steps);
+  const pickSteps = (values: string[]): string[] => (localized ? values : [...EN.steps]);
 
   const template: EqualTubeTemplateMeta = {
     titleLabel: pick(tr('pdfTemplateTitle'), EN.templateTitle),
