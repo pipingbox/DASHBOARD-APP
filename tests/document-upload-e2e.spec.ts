@@ -1058,7 +1058,15 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       expect((profileAfter as Record<string, unknown>).cv_storage_path ?? null, 'cv_storage_path must be cleared').toBeNull();
 
       // Telemetry: CV events on the wire with the cv document_type.
-      const started = decodeAll().filter((e) => e.event === 'document_upload_started');
+      // The PostHog batch flush is not deterministic — poll the wire until
+      // both started events (original + replacement) are captured (dispatch
+      // 4 failed here with Received: 1 because the second batch had not
+      // been flushed yet when the check ran).
+      let started: Record<string, unknown>[] = [];
+      for (let i = 0; i < 40 && started.length < 2; i++) {
+        started = decodeAll().filter((e) => e.event === 'document_upload_started');
+        if (started.length < 2) await page.waitForTimeout(500);
+      }
       expect(started.length).toBeGreaterThanOrEqual(2);
       for (const s of started) {
         expect((s.properties ?? {}) as Record<string, unknown>).toMatchObject({ document_type: 'cv', transport: 'tus' });
