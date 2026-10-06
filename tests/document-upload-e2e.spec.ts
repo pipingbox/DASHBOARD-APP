@@ -44,6 +44,17 @@ const hasCreds = Boolean(EMAIL && PASSWORD);
 
 const expectedEnv = process.env.EXPECTED_ENV ?? 'preview';
 const expectedVersion = process.env.EXPECTED_APP_VERSION ?? '';
+// PB-DOCUMENT-INTAKE-001 — PostHog wire assertions are preview-only BY
+// DESIGN: the observability layer keeps PostHog's default user-agent/bot
+// filter active in production (opt_out_useragent_filter is preview-only,
+// see observability.ts). Playwright exposes navigator.webdriver=true, so
+// the production PostHog client correctly drops ALL synthetic traffic
+// client-side — no /e or /batch request ever leaves the browser
+// (production smoke dispatch 1, run 37455639563: zero capture requests,
+// all functional assertions green). Real users (webdriver=false) are
+// unaffected. In preview the filter is opted out, so the wire is
+// assertable there.
+const telemetryAssertable = expectedEnv !== 'production';
 
 const CERT_TABLE = 'app_worker_certifications';
 const CERT_BUCKET = 'app_14da0f1941_certificates';
@@ -545,7 +556,7 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       expect(tusMethods.filter((m) => m === 'PATCH').length, 'TUS chunk PATCH observed').toBeGreaterThanOrEqual(1);
 
       // Persistence: reload → certificate still visible. Flush the queue first.
-      await waitForWireEvent(page, decodeAll, 'document_upload_completed', 20_000);
+      if (telemetryAssertable) await waitForWireEvent(page, decodeAll, 'document_upload_completed', 20_000);
       await page.reload({ waitUntil: 'networkidle' });
       await page.waitForTimeout(2500);
       const stillVisible = await page
@@ -556,33 +567,39 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       expect(stillVisible, 'certificate must persist after reload').toBe(true);
 
       // Wire: unified telemetry, app_error=0, zero PII.
-      await page.waitForTimeout(4500);
-      const decoded = decodeAll();
-      const appErrors = decoded.filter((e) => e.event === 'app_error');
-      expect(appErrors, `app_error=0 required; got ${JSON.stringify(appErrors)}`).toHaveLength(0);
-      expect(decoded.filter((e) => e.event === 'cert_upload_started'), 'legacy cert_upload_* must be gone').toHaveLength(0);
-      expect(decoded.filter((e) => e.event === 'cert_upload_completed'), 'legacy cert_upload_* must be gone').toHaveLength(0);
+      // (Preview-only: production drops synthetic traffic client-side —
+      // see telemetryAssertable.)
+      if (telemetryAssertable) {
+        await page.waitForTimeout(4500);
+        const decoded = decodeAll();
+        const appErrors = decoded.filter((e) => e.event === 'app_error');
+        expect(appErrors, `app_error=0 required; got ${JSON.stringify(appErrors)}`).toHaveLength(0);
+        expect(decoded.filter((e) => e.event === 'cert_upload_started'), 'legacy cert_upload_* must be gone').toHaveLength(0);
+        expect(decoded.filter((e) => e.event === 'cert_upload_completed'), 'legacy cert_upload_* must be gone').toHaveLength(0);
 
-      const started = decoded.filter((e) => e.event === 'document_upload_started');
-      const completed = decoded.filter((e) => e.event === 'document_upload_completed');
-      expect(started, 'document_upload_started emitted exactly once').toHaveLength(1);
-      expect(completed, 'document_upload_completed emitted exactly once').toHaveLength(1);
-      const sp = (started[0].properties ?? {}) as Record<string, unknown>;
-      const cp = (completed[0].properties ?? {}) as Record<string, unknown>;
-      expect(sp).toMatchObject({ document_type: 'certificate', transport: 'tus', mime_category: 'pdf', size_bucket: '5mb-10mb' });
-      expect(cp).toMatchObject({ document_type: 'certificate', transport: 'tus', mime_category: 'pdf', size_bucket: '5mb-10mb' });
-      expect(typeof cp.duration_ms).toBe('number');
+        const started = decoded.filter((e) => e.event === 'document_upload_started');
+        const completed = decoded.filter((e) => e.event === 'document_upload_completed');
+        expect(started, 'document_upload_started emitted exactly once').toHaveLength(1);
+        expect(completed, 'document_upload_completed emitted exactly once').toHaveLength(1);
+        const sp = (started[0].properties ?? {}) as Record<string, unknown>;
+        const cp = (completed[0].properties ?? {}) as Record<string, unknown>;
+        expect(sp).toMatchObject({ document_type: 'certificate', transport: 'tus', mime_category: 'pdf', size_bucket: '5mb-10mb' });
+        expect(cp).toMatchObject({ document_type: 'certificate', transport: 'tus', mime_category: 'pdf', size_bucket: '5mb-10mb' });
+        expect(typeof cp.duration_ms).toBe('number');
 
-      // Zero PII on the PostHog wire — scoped to OUR custom event
-      // properties (see customPropsOf): the platform's own identity
-      // fields (distinct_id, $user_id, ...) are out of scope.
-      const wire = JSON.stringify(
-        decoded.filter((e) => String(e.event).startsWith('document_upload')).map(customPropsOf),
-      );
-      expect(wire).not.toContain('@');
-      expect(wire).not.toContain(uid);
-      expect(wire).not.toContain(FILE_NAME);
-      expect(wire).not.toContain(createdStoragePath);
+        // Zero PII on the PostHog wire — scoped to OUR custom event
+        // properties (see customPropsOf): the platform's own identity
+        // fields (distinct_id, $user_id, ...) are out of scope.
+        const wire = JSON.stringify(
+          decoded.filter((e) => String(e.event).startsWith('document_upload')).map(customPropsOf),
+        );
+        expect(wire).not.toContain('@');
+        expect(wire).not.toContain(uid);
+        expect(wire).not.toContain(FILE_NAME);
+        expect(wire).not.toContain(createdStoragePath);
+      } else {
+        console.log('[production] PostHog wire assertions skipped — bot filter drops synthetic (webdriver) traffic by design; real users unaffected.');
+      }
       console.log('TUS happy path PASS');
     } finally {
       // ── Restore: delete every row + object this test created, verify ZERO DIFF ──
@@ -786,10 +803,13 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       const newObjects = objectsAfter.filter((o) => !snapshotObjects.includes(o));
       expect(newObjects, 'exactly one new object (no partials, no duplicates)').toEqual([createdStoragePath]);
 
-      // Telemetry: retrying observed on the wire.
-      const retrying = await waitForWireEvent(page, decodeAll, 'document_upload_retrying', 20_000);
-      expect(retrying.length, 'document_upload_retrying must reach the wire').toBeGreaterThanOrEqual(1);
-      await waitForWireEvent(page, decodeAll, 'document_upload_completed', 20_000);
+      // Telemetry: retrying observed on the wire. (Preview-only — production
+      // drops synthetic traffic client-side, see telemetryAssertable.)
+      if (telemetryAssertable) {
+        const retrying = await waitForWireEvent(page, decodeAll, 'document_upload_retrying', 20_000);
+        expect(retrying.length, 'document_upload_retrying must reach the wire').toBeGreaterThanOrEqual(1);
+        await waitForWireEvent(page, decodeAll, 'document_upload_completed', 20_000);
+      }
       console.log('interruption + resume PASS');
     } finally {
       // Robust restore: delete every row + object this test created, even
@@ -898,9 +918,13 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       const objectsAfter = await listObjects(restCtx, uid);
       expect(objectsAfter.filter((o) => !snapshotObjects.includes(o))).toEqual([createdStoragePath]);
 
-      const started = decodeAll().filter((e) => e.event === 'document_upload_started');
-      expect(started.length).toBeGreaterThanOrEqual(1);
-      expect((started[0].properties ?? {}) as Record<string, unknown>).toMatchObject({ mime_category: 'image' });
+      // Telemetry: image upload through the shared uploader. (Preview-only —
+      // production drops synthetic traffic client-side, see telemetryAssertable.)
+      if (telemetryAssertable) {
+        const started = decodeAll().filter((e) => e.event === 'document_upload_started');
+        expect(started.length).toBeGreaterThanOrEqual(1);
+        expect((started[0].properties ?? {}) as Record<string, unknown>).toMatchObject({ mime_category: 'image' });
+      }
       console.log('image upload PASS');
     } finally {
       // Robust restore: delete every row + object this test created, even
@@ -1058,18 +1082,21 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       expect((profileAfter as Record<string, unknown>).cv_storage_path ?? null, 'cv_storage_path must be cleared').toBeNull();
 
       // Telemetry: CV events on the wire with the cv document_type.
-      // The PostHog batch flush is not deterministic — poll the wire until
-      // both started events (original + replacement) are captured (dispatch
-      // 4 failed here with Received: 1 because the second batch had not
-      // been flushed yet when the check ran).
-      let started: Record<string, unknown>[] = [];
-      for (let i = 0; i < 40 && started.length < 2; i++) {
-        started = decodeAll().filter((e) => e.event === 'document_upload_started');
-        if (started.length < 2) await page.waitForTimeout(500);
-      }
-      expect(started.length).toBeGreaterThanOrEqual(2);
-      for (const s of started) {
-        expect((s.properties ?? {}) as Record<string, unknown>).toMatchObject({ document_type: 'cv', transport: 'tus' });
+      // (Preview-only — production drops synthetic traffic client-side, see
+      // telemetryAssertable.) The PostHog batch flush is not deterministic —
+      // poll the wire until both started events (original + replacement)
+      // are captured (dispatch 4 failed here with Received: 1 because the
+      // second batch had not been flushed yet when the check ran).
+      if (telemetryAssertable) {
+        let started: Record<string, unknown>[] = [];
+        for (let i = 0; i < 40 && started.length < 2; i++) {
+          started = decodeAll().filter((e) => e.event === 'document_upload_started');
+          if (started.length < 2) await page.waitForTimeout(500);
+        }
+        expect(started.length).toBeGreaterThanOrEqual(2);
+        for (const s of started) {
+          expect((s.properties ?? {}) as Record<string, unknown>).toMatchObject({ document_type: 'cv', transport: 'tus' });
+        }
       }
       console.log('CV upload PASS');
     } finally {
@@ -1235,13 +1262,17 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       expect((await listObjects(restCtx, uid)).filter((o) => !snapshotObjects.includes(o)), 'zero objects during the stall').toHaveLength(0);
 
       // The failure reached the wire with the exact incident category.
-      const failed = await waitForWireEvent(page, decodeAll, 'document_upload_failed', 20_000);
-      expect(failed.length).toBeGreaterThanOrEqual(1);
-      expect((failed[0].properties ?? {}) as Record<string, unknown>).toMatchObject({
-        error_category: 'no_bytes_started',
-        document_type: 'certificate',
-        transport: 'tus',
-      });
+      // (Preview-only — production drops synthetic traffic client-side, see
+      // telemetryAssertable.)
+      if (telemetryAssertable) {
+        const failed = await waitForWireEvent(page, decodeAll, 'document_upload_failed', 20_000);
+        expect(failed.length).toBeGreaterThanOrEqual(1);
+        expect((failed[0].properties ?? {}) as Record<string, unknown>).toMatchObject({
+          error_category: 'no_bytes_started',
+          document_type: 'certificate',
+          transport: 'tus',
+        });
+      }
 
       // Re-selection is possible and completes once the link recovers.
       // Un-hang the transport: the paused creation request was already
