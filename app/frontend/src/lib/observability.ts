@@ -1040,8 +1040,6 @@ export interface ObsClient {
   reset?(): void;
   /** Current SDK distinct_id (anonymous pre-auth, canonical UUID post-auth). */
   get_distinct_id?(): string;
-  /** Best-effort flush (posthog-js). Optional; fail-open when absent. */
-  flush?(): Promise<void> | void;
 }
 
 interface QueuedEvent {
@@ -1191,23 +1189,6 @@ export function buildEventProps(
  * `dedupeKey`: when provided, the same (event, dedupeKey) pair is emitted at
  * most once per page lifecycle (re-render protection).
  */
-/**
- * Best-effort telemetry flush before a controlled page unload (e.g. the
- * stale-version update reload). Fail-open: never blocks and never throws.
- */
-export async function flushObservability(): Promise<void> {
-  try {
-    if (initialized && client && typeof client.flush === 'function') {
-      await Promise.race([
-        Promise.resolve(client.flush()),
-        new Promise<void>((resolve) => setTimeout(resolve, 800)),
-      ]);
-    }
-  } catch {
-    // fail-open by design
-  }
-}
-
 export function trackEvent(
   name: ObsEventName,
   props: Record<string, unknown> = {},

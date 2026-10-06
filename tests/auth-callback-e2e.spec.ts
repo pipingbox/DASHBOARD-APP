@@ -118,17 +118,12 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
     };
 
     /**
-     * Flush probe: posthog-js batches on an interval (~30s), which can
-     * outlive short assertions. Toggling visibility to hidden nudges the
-     * client to flush pending events so wire checks settle quickly.
+     * Note: do NOT nudge flushes via visibilitychange here — posthog-js
+     * pauses batch sending while the document is hidden, and synthetic
+     * hidden/visible toggles empirically STOP all flushes in CI. The SDK's
+     * own ~3s batch interval delivers events; the callers allow generous
+     * polling windows for it.
      */
-    const nudgeFlush = () =>
-      page.evaluate(() => {
-        Object.defineProperty(document, 'visibilityState', { get: () => 'hidden', configurable: true });
-        document.dispatchEvent(new Event('visibilitychange'));
-        Object.defineProperty(document, 'visibilityState', { get: () => 'visible', configurable: true });
-        document.dispatchEvent(new Event('visibilitychange'));
-      });
 
     const waitForWireEvent = async (
       name: string,
@@ -140,7 +135,6 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
         const found = decodeAll().filter((e) => e.event === name);
         if (found.length >= min) return found;
         if (Date.now() - t0 > timeoutMs) return found;
-        await nudgeFlush().catch(() => {});
         await page.waitForTimeout(1500);
       }
     };
@@ -260,7 +254,10 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
     ).toHaveCount(0);
 
     if (telemetryAssertable) {
-      const requested = await s.waitForWireEvent('app_update_requested');
+      // Emitted on the post-reload boot via the sessionStorage relay
+      // (posthog-js cannot deliver pre-reload captures) — allow the flush
+      // interval to deliver it.
+      const requested = await s.waitForWireEvent('app_update_requested', 30_000);
       expect(requested.length).toBe(1); // exactly one update request
     }
 

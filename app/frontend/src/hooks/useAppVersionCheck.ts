@@ -2,14 +2,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   VERSION_CHECK_INITIAL_DELAY_MS,
   clearReloadMarker,
+  consumePendingUpdateEvent,
   fetchRemoteVersion,
   isMismatchPersistent,
   isVersionMismatch,
   readReloadMarker,
   shouldCheckVersion,
+  writePendingUpdateEvent,
   writeReloadMarker,
 } from '@/lib/appVersion';
-import { getAppVersion, flushObservability, normalizeRoute, trackEvent } from '@/lib/observability';
+import { getAppVersion, normalizeRoute, trackEvent } from '@/lib/observability';
 
 export interface AppVersionState {
   /** Remote version differs from the running bundle. */
@@ -77,6 +79,17 @@ export function useAppVersionCheck(): AppVersionState {
   }, []);
 
   useEffect(() => {
+    // Relay: if the previous page lifecycle ended with a user-initiated
+    // controlled update, emit the update request NOW (posthog-js cannot
+    // deliver an event captured right before location.reload()). Exactly
+    // once: the sessionStorage flag is consumed here.
+    if (consumePendingUpdateEvent()) {
+      trackEvent('app_update_requested', {
+        route: normalizeRoute(window.location.pathname),
+        recovery_action: 'update_app',
+      });
+    }
+
     // Initial check, delayed so it never competes with app boot / auth.
     const initial = setTimeout(() => {
       void check();
@@ -102,18 +115,20 @@ export function useAppVersionCheck(): AppVersionState {
     };
   }, [check]);
 
-  const requestUpdate = useCallback(async () => {
+  const requestUpdate = useCallback(() => {
     // Loop protection: mark, then reload once. If the mismatch persists
     // after the reload the banner switches to manual instructions and NO
     // further automatic reload ever happens.
-    trackEvent('app_update_requested', {
-      route: normalizeRoute(window.location.pathname),
-      recovery_action: 'update_app',
-    });
+    const relayed = writePendingUpdateEvent();
+    if (!relayed) {
+      // sessionStorage unavailable: best-effort immediate emit (may be lost
+      // in the reload — fail-open by design).
+      trackEvent('app_update_requested', {
+        route: normalizeRoute(window.location.pathname),
+        recovery_action: 'update_app',
+      });
+    }
     writeReloadMarker(detectedVersion.current ?? 'unknown', Date.now());
-    // Best-effort telemetry flush so the update request is not lost in the
-    // controlled reload (fail-open: the reload always proceeds).
-    await flushObservability();
     window.location.reload();
   }, []);
 

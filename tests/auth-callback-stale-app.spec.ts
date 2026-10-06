@@ -16,14 +16,16 @@ import {
   stripBoundaryFormatChars,
 } from '../app/frontend/src/lib/pathNormalize';
 import {
+  clearReloadMarker,
+  consumePendingUpdateEvent,
   fetchRemoteVersion,
   isMismatchPersistent,
   isVersionMismatch,
   parseVersionPayload,
   readReloadMarker,
   shouldCheckVersion,
+  writePendingUpdateEvent,
   writeReloadMarker,
-  clearReloadMarker,
 } from '../app/frontend/src/lib/appVersion';
 import {
   buildEventProps,
@@ -425,6 +427,17 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 — version detection', () => {
     clearReloadMarker();
     expect(sessionStorageStub.store['pipingbox_drafts']).toBe('keep-me');
     expect(sessionStorageStub.store['pb_app_update_reload_marker']).toBeUndefined();
+  });
+
+  test('16b. pending update-event relay: written once, consumed exactly once', () => {
+    // posthog-js cannot deliver an event captured right before
+    // location.reload(): the request is relayed through sessionStorage and
+    // emitted exactly once on the next boot.
+    expect(consumePendingUpdateEvent()).toBe(false); // nothing pending
+    expect(writePendingUpdateEvent()).toBe(true);
+    expect(consumePendingUpdateEvent()).toBe(true); // first consume: true
+    expect(consumePendingUpdateEvent()).toBe(false); // second consume: false
+    expect(sessionStorageStub.store['pb_app_update_pending_event']).toBeUndefined();
   });
 });
 

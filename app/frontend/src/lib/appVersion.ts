@@ -102,6 +102,36 @@ export function clearReloadMarker(): void {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Pending update-event relay. posthog-js 1.429.4 has no public flush() and
+// its batch interval cannot deliver an event captured right before a
+// location.reload() (empirically verified: the event never reaches the
+// wire). So the user's update request is persisted and emitted exactly once
+// on the next boot, where the normal flush cadence delivers it.
+// ---------------------------------------------------------------------------
+
+const PENDING_UPDATE_EVENT_KEY = 'pb_app_update_pending_event';
+
+export function writePendingUpdateEvent(): boolean {
+  try {
+    sessionStorage.setItem(PENDING_UPDATE_EVENT_KEY, '1');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Consume the pending update request. True exactly once after a reload. */
+export function consumePendingUpdateEvent(): boolean {
+  try {
+    if (sessionStorage.getItem(PENDING_UPDATE_EVENT_KEY) !== '1') return false;
+    sessionStorage.removeItem(PENDING_UPDATE_EVENT_KEY);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * After a user-initiated reload, a persistent mismatch must NOT trigger
  * another automatic reload. True → show manual recovery instructions.
