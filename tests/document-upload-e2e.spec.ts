@@ -278,6 +278,41 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
     return items.map((i) => `${uid}/${String(i.name ?? '')}`);
   };
 
+  /**
+   * Storage delete using the same bulk form as the app's deleteStorageObject
+   * (DELETE /object/{bucket} with a {prefixes} body), with diagnostics and a
+   * single-object-form fallback. Never throws: the ZERO DIFF assertions
+   * below are the source of truth.
+   */
+  const deleteObjectRobust = async (
+    restCtx: { base: string; apiKey: string; authorization: string },
+    restHeaders: Record<string, string>,
+    path: string,
+    page: import('@playwright/test').Page,
+  ): Promise<boolean> => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const del = await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}`, {
+        method: 'DELETE',
+        headers: { ...restHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prefixes: [path] }),
+      }).catch((e: unknown) => {
+        console.log(`[restore] DELETE bulk threw: ${(e as Error)?.message ?? e}`);
+        return null;
+      });
+      console.log(`[restore] DELETE bulk ${path} -> HTTP ${del?.status ?? 'network-error'}`);
+      if (del?.ok) return true;
+      if (del) console.log(`[restore] body: ${(await del.text().catch(() => '')).slice(0, 300)}`);
+      await page.waitForTimeout(2000);
+    }
+    // Last resort: single-object form.
+    const del1 = await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${path}`, {
+      method: 'DELETE',
+      headers: { apikey: restCtx.apiKey, Authorization: restCtx.authorization },
+    }).catch(() => null);
+    console.log(`[restore] DELETE single ${path} -> HTTP ${del1?.status ?? 'network-error'}`);
+    return Boolean(del1?.ok);
+  };
+
   // -------------------------------------------------------------------------
   // TEST 1 — happy path, PDF 8–10 MB, slow mobile uplink
   // -------------------------------------------------------------------------
@@ -466,14 +501,7 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
         }).catch(() => undefined);
       }
       if (createdStoragePath) {
-        for (let attempt = 0; attempt < 3; attempt++) {
-          const del = await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
-            method: 'DELETE',
-            headers: restHeaders,
-          }).catch(() => null);
-          if (del && del.ok) break;
-          await page.waitForTimeout(2000);
-        }
+        await deleteObjectRobust(restCtx, restHeaders, createdStoragePath, page);
       }
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
@@ -589,13 +617,11 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       expect(maxPercentBefore, 'progress must have moved before the interruption').toBeGreaterThanOrEqual(5);
       console.log(`interruption armed at ~${maxPercentBefore}%`);
 
-      // Cut the network mid-transfer.
-      await cdp.send('Network.emulateNetworkConditions', {
-        offline: true,
-        latency: 400,
-        downloadThroughput: 1.5 * 1024 * 1024,
-        uploadThroughput: 500 * 1024,
-      });
+      // Cut the TUS transport mid-transfer by aborting requests to the
+      // resumable endpoint (unlike CDP offline, this keeps
+      // navigator.onLine=true, so the tus client exercises its retry ladder
+      // exactly like a flaky mobile link).
+      await page.route(`**${TUS_PATH}*`, (route) => route.abort('connectionreset'));
 
       // Chrome to the background and back (lifecycle emulation, best effort).
       try {
@@ -616,15 +642,12 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
           .catch(() => false);
         if (!sawRetrying) await page.waitForTimeout(300);
       }
-      expect(sawRetrying, 'the retrying state must be visible while offline').toBe(true);
+      expect(sawRetrying, 'the retrying state must be visible while the transport is cut').toBe(true);
 
-      // Restore the network within the TUS retry budget.
-      await cdp.send('Network.emulateNetworkConditions', {
-        offline: false,
-        latency: 400,
-        downloadThroughput: 1.5 * 1024 * 1024,
-        uploadThroughput: 500 * 1024,
-      });
+      // Restore the transport within the TUS retry budget (the ladder allows
+      // ~38 s; keep the outage window short so retries remain).
+      await page.waitForTimeout(4000);
+      await page.unroute(`**${TUS_PATH}*`);
 
       // The transfer must complete without restarting the whole upload:
       // sampled progress after the restore never falls below the maximum
@@ -684,14 +707,7 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
         }).catch(() => undefined);
       }
       if (createdStoragePath) {
-        for (let attempt = 0; attempt < 3; attempt++) {
-          const del = await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
-            method: 'DELETE',
-            headers: restHeaders,
-          }).catch(() => null);
-          if (del && del.ok) break;
-          await page.waitForTimeout(2000);
-        }
+        await deleteObjectRobust(restCtx, restHeaders, createdStoragePath, page);
       }
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
@@ -805,14 +821,7 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
         }).catch(() => undefined);
       }
       if (createdStoragePath) {
-        for (let attempt = 0; attempt < 3; attempt++) {
-          const del = await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
-            method: 'DELETE',
-            headers: restHeaders,
-          }).catch(() => null);
-          if (del && del.ok) break;
-          await page.waitForTimeout(2000);
-        }
+        await deleteObjectRobust(restCtx, restHeaders, createdStoragePath, page);
       }
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
@@ -899,15 +908,14 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       await page.waitForTimeout(6000);
 
       // The CV section: label-wrapped native picker.
-      const cvSection = page.locator('section').filter({ hasText: /CV\s*\/\s*Resume/i }).first();
+      const cvSection = page.locator('section#profile-section-visibility');
       await cvSection.scrollIntoViewIfNeeded().catch(() => undefined);
       await expect(cvSection, 'CV section must be visible').toBeVisible({ timeout: 40_000 });
 
       const pdf = syntheticPdf(9 * 1024 * 1024);
-      const pickerLabel = cvSection.locator('label').filter({ has: page.locator('input[type="file"]') }).first();
       const [chooser] = await Promise.all([
-        page.waitForEvent('filechooser'),
-        pickerLabel.click(),
+        page.waitForEvent('filechooser', { timeout: 15_000 }),
+        cvSection.getByText(/Subir CV \(PDF\)/i).first().click(),
       ]);
       await chooser.setFiles({ name: FILE_NAME, mimeType: 'application/pdf', buffer: pdf });
 
@@ -936,16 +944,9 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       ).toBeVisible({ timeout: 20_000 });
 
       // Explicit replace with a second file.
-      const replaceLabel = page
-        .locator('section')
-        .filter({ hasText: /CV\s*\/\s*Resume/i })
-        .first()
-        .locator('label')
-        .filter({ has: page.locator('input[type="file"]') })
-        .first();
       const [chooser2] = await Promise.all([
-        page.waitForEvent('filechooser'),
-        replaceLabel.click(),
+        page.waitForEvent('filechooser', { timeout: 15_000 }),
+        cvSection.getByText('Reemplazar', { exact: true }).first().click(),
       ]);
       await chooser2.setFiles({ name: FILE_NAME_2, mimeType: 'application/pdf', buffer: syntheticPdf(1024 * 1024) });
       await expect(
@@ -962,13 +963,12 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       expect(objectsAfterReplace, 'the first CV object must be deleted on replacement').not.toContain(newCvPath);
 
       // Explicit removal.
-      const removeBtn = page
-        .locator('section')
-        .filter({ hasText: /CV\s*\/\s*Resume/i })
+      // The icon-only remove Button is the immediate sibling of the
+      // Reemplazar label in the saved-state header.
+      const removeBtn = cvSection
+        .getByText('Reemplazar', { exact: true })
         .first()
-        .getByRole('button')
-        .filter({ has: page.locator('svg') })
-        .last();
+        .locator('xpath=following-sibling::button[1]');
       await removeBtn.click();
       await expect(page.getByText(FILE_NAME_2).first()).not.toBeVisible({ timeout: 30_000 });
       profileAfter = (await readProfile())[0] ?? null;
@@ -987,10 +987,7 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
       const objectsNow = await listObjects(restCtx, uid);
       for (const obj of objectsNow) {
         if (!snapshotObjects.includes(obj)) {
-          await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${obj}`, {
-            method: 'DELETE',
-            headers: restHeaders,
-          }).catch(() => undefined);
+          await deleteObjectRobust(restCtx, restHeaders, obj, page);
         }
       }
       // Restore the previous CV object bytes if the account had one.
@@ -1187,14 +1184,7 @@ test.describe('PB-DOCUMENT-INTAKE-001 document upload E2E (Android Chrome, TUS r
         }).catch(() => undefined);
       }
       if (createdStoragePath) {
-        for (let attempt = 0; attempt < 3; attempt++) {
-          const del = await fetch(`${restCtx.base}/storage/v1/object/${CERT_BUCKET}/${createdStoragePath}`, {
-            method: 'DELETE',
-            headers: restHeaders,
-          }).catch(() => null);
-          if (del && del.ok) break;
-          await page.waitForTimeout(2000);
-        }
+        await deleteObjectRobust(restCtx, restHeaders, createdStoragePath, page);
       }
       const finalRows = await readCerts();
       const finalIds = new Set(finalRows.map((c) => String(c.id)));
