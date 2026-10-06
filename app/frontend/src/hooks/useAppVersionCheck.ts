@@ -9,7 +9,7 @@ import {
   shouldCheckVersion,
   writeReloadMarker,
 } from '@/lib/appVersion';
-import { getAppVersion, normalizeRoute, trackEvent } from '@/lib/observability';
+import { getAppVersion, flushObservability, normalizeRoute, trackEvent } from '@/lib/observability';
 
 export interface AppVersionState {
   /** Remote version differs from the running bundle. */
@@ -67,6 +67,10 @@ export function useAppVersionCheck(): AppVersionState {
       }
       setPersistentMismatch(persistent);
       setUpdateAvailable(true);
+      // A fresh check (app start, tab back to visible, focus after the 60s
+      // throttle) re-shows the banner even if the user dismissed it earlier:
+      // "later" means "not now", not "never".
+      setDismissed(false);
     } finally {
       checking.current = false;
     }
@@ -98,7 +102,7 @@ export function useAppVersionCheck(): AppVersionState {
     };
   }, [check]);
 
-  const requestUpdate = useCallback(() => {
+  const requestUpdate = useCallback(async () => {
     // Loop protection: mark, then reload once. If the mismatch persists
     // after the reload the banner switches to manual instructions and NO
     // further automatic reload ever happens.
@@ -107,6 +111,9 @@ export function useAppVersionCheck(): AppVersionState {
       recovery_action: 'update_app',
     });
     writeReloadMarker(detectedVersion.current ?? 'unknown', Date.now());
+    // Best-effort telemetry flush so the update request is not lost in the
+    // controlled reload (fail-open: the reload always proceeds).
+    await flushObservability();
     window.location.reload();
   }, []);
 

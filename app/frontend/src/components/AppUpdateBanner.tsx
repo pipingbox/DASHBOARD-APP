@@ -48,7 +48,7 @@ export function AppUpdateBanner() {
             <Button
               type="button"
               size="sm"
-              onClick={requestUpdate}
+              onClick={() => void requestUpdate()}
               className="bg-[#f59e0b] font-semibold text-black hover:bg-[#d97706]"
             >
               {t('appUpdate.updateButton')}

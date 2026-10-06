@@ -92,12 +92,13 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
 
     const waitForWireEvent = async (
       name: string,
-      timeoutMs = 20_000,
+      timeoutMs = 25_000,
+      min = 1,
     ): Promise<Record<string, unknown>[]> => {
       const t0 = Date.now();
       for (;;) {
         const found = decodeAll().filter((e) => e.event === name);
-        if (found.length > 0) return found;
+        if (found.length >= min) return found;
         if (Date.now() - t0 > timeoutMs) return found;
         await page.waitForTimeout(500);
       }
@@ -131,7 +132,8 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
 
     if (telemetryAssertable) {
-      const completed = await s.waitForWireEvent('auth_callback_completed');
+      // Poll until BOTH callback completions have flushed to the wire.
+      const completed = await s.waitForWireEvent('auth_callback_completed', 25_000, 2);
       expect(completed.length).toBeGreaterThanOrEqual(2);
       for (const evt of completed) {
         const props = (evt.properties ?? {}) as Record<string, unknown>;
@@ -146,20 +148,17 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
   });
 
   test('C. stale version: banner, single user-initiated reload, route/session/drafts preserved, no loop', async ({ page, context }) => {
+    // The focus-recovery step waits out the real 60s check throttle.
+    test.setTimeout(210_000);
     const s = await setup(page);
     await s.login();
 
-    // Land on /profile (protected route — must be preserved across the
-    // controlled update).
-    await page.goto('/profile', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(6000);
-
     // Serve a DIFFERENT remote version from now on (simulates the new
     // deploy existing at the origin while this tab keeps the old bundle).
+    // Registered BEFORE the fresh /profile load so the app-start check
+    // (3s after mount) already sees the mismatch.
     const remoteVersion = 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef';
-    let versionFetches = 0;
     await context.route('**/version.json*', async (route) => {
-      versionFetches++;
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -168,14 +167,11 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
       });
     });
 
-    // Focus recovery triggers a re-check (the tab "comes back" to focus).
-    await page.evaluate(() => {
-      window.dispatchEvent(new Event('focus'));
-      Object.defineProperty(document, 'visibilityState', { get: () => 'visible', configurable: true });
-      document.dispatchEvent(new Event('visibilitychange'));
-    });
+    // Fresh page lifecycle on a protected route — must be preserved across
+    // the controlled update.
+    await page.goto('/profile', { waitUntil: 'domcontentloaded' });
 
-    // The banner appears with the update call to action.
+    // The banner appears from the app-start version check.
     const banner = page.getByTestId('app-update-banner');
     await expect(banner).toBeVisible({ timeout: 20_000 });
     await expect(banner).toContainText(/nueva versión|new version/i);
@@ -188,13 +184,27 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
       expect(JSON.stringify(props)).not.toMatch(/https?:\/\/|@|\?/);
     }
 
+    // "Later" hides the banner…
+    await banner.getByRole('button', { name: /más tarde|later/i }).click();
+    await expect(page.getByTestId('app-update-banner')).toHaveCount(0);
+
+    // …and focus recovery after the 60s throttle re-checks and re-shows it
+    // (an old tab returning to the foreground learns about the update).
+    await page.waitForTimeout(62_000);
+    await page.evaluate(() => {
+      window.dispatchEvent(new Event('focus'));
+      Object.defineProperty(document, 'visibilityState', { get: () => 'visible', configurable: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await expect(page.getByTestId('app-update-banner')).toBeVisible({ timeout: 20_000 });
+
     // Count page loads: exactly ONE reload after the user action.
     let loads = 0;
     page.on('load', () => {
       loads++;
     });
 
-    await banner.getByRole('button', { name: /actualizar aplicaci|update app/i }).click();
+    await page.getByTestId('app-update-banner').getByRole('button', { name: /actualizar aplicaci|update app/i }).click();
 
     // After the controlled reload: the SAME route, session intact, draft
     // sentinel intact, and the banner is now in "persistent" mode with
