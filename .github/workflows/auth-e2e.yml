@@ -434,7 +434,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run document-upload E2E (PB-DOCUMENT-INTAKE-001) — TUS resumable: happy path, interruption/resume, no_bytes_started regression, ZERO DIFF
+      - name: 'Run document-upload E2E (PB-DOCUMENT-INTAKE-001) — TUS resumable: happy path, interruption/resume, no_bytes_started regression, ZERO DIFF'
         shell: bash
         run: |
           set -euo pipefail
