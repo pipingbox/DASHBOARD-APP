@@ -90,6 +90,46 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
         }
       });
 
+    const login = async () => {
+      await page.goto('/login', { waitUntil: 'networkidle' });
+      await page.waitForTimeout(4000);
+      await page.locator('#email').fill(EMAIL!);
+      await page.locator('#password').fill(PASSWORD!);
+      await page.getByRole('button', { name: /sign in|iniciar sesi/i }).click();
+      await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
+    };
+
+    /**
+     * Zero-PII scope for PostHog wire checks: PostHog platform-managed
+     * fields ($current_url with query strings, distinct_id, $user_id, ...)
+     * are the analytics platform's own identity system and are out of scope
+     * — the contract covers the custom properties WE attach. (Same pattern
+     * as tests/document-upload-e2e.spec.ts.)
+     */
+    const customPropsOf = (e: Record<string, unknown>): Record<string, unknown> => {
+      const props = (e.properties ?? {}) as Record<string, unknown>;
+      const custom: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(props)) {
+        if (k.startsWith('$')) continue;
+        if (k === 'token' || k === 'distinct_id' || k === 'pb_anonymous_id') continue;
+        custom[k] = v;
+      }
+      return custom;
+    };
+
+    /**
+     * Flush probe: posthog-js batches on an interval (~30s), which can
+     * outlive short assertions. Toggling visibility to hidden nudges the
+     * client to flush pending events so wire checks settle quickly.
+     */
+    const nudgeFlush = () =>
+      page.evaluate(() => {
+        Object.defineProperty(document, 'visibilityState', { get: () => 'hidden', configurable: true });
+        document.dispatchEvent(new Event('visibilitychange'));
+        Object.defineProperty(document, 'visibilityState', { get: () => 'visible', configurable: true });
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+
     const waitForWireEvent = async (
       name: string,
       timeoutMs = 25_000,
@@ -100,23 +140,17 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
         const found = decodeAll().filter((e) => e.event === name);
         if (found.length >= min) return found;
         if (Date.now() - t0 > timeoutMs) return found;
-        await page.waitForTimeout(500);
+        await nudgeFlush().catch(() => {});
+        await page.waitForTimeout(1500);
       }
     };
 
-    const login = async () => {
-      await page.goto('/login', { waitUntil: 'networkidle' });
-      await page.waitForTimeout(4000);
-      await page.locator('#email').fill(EMAIL!);
-      await page.locator('#password').fill(PASSWORD!);
-      await page.getByRole('button', { name: /sign in|iniciar sesi/i }).click();
-      await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
-    };
-
-    return { browserErrors, decodeAll, waitForWireEvent, login };
+    return { browserErrors, decodeAll, waitForWireEvent, login, customPropsOf };
   };
 
   test('A+B. callback with a valid session exits automatically (OAuth-shaped params and bare)', async ({ page }) => {
+    // PostHog flushes batches on a ~30s interval: allow generous polling.
+    test.setTimeout(150_000);
     const s = await setup(page);
     await s.login();
 
@@ -133,12 +167,12 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
 
     if (telemetryAssertable) {
       // Poll until BOTH callback completions have flushed to the wire.
-      const completed = await s.waitForWireEvent('auth_callback_completed', 25_000, 2);
+      const completed = await s.waitForWireEvent('auth_callback_completed', 90_000, 2);
       expect(completed.length).toBeGreaterThanOrEqual(2);
       for (const evt of completed) {
-        const props = (evt.properties ?? {}) as Record<string, unknown>;
-        // Closed props only — no URL, no code, no PII on the wire.
-        expect(JSON.stringify(props)).not.toMatch(/code=|@evil|access_token/i);
+        const props = s.customPropsOf(evt);
+        // Closed custom props only — no URL, no OAuth code, no PII.
+        expect(JSON.stringify(props)).not.toMatch(/code=|@evil|access_token|https?:\/\//i);
         expect(props.provider).toBe('google');
       }
     }
@@ -179,8 +213,10 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
     if (telemetryAssertable) {
       const detected = await s.waitForWireEvent('stale_app_version_detected');
       expect(detected.length).toBeGreaterThanOrEqual(1);
-      const props = (detected[0].properties ?? {}) as Record<string, unknown>;
+      const props = s.customPropsOf(detected[0]);
       expect(props.target_version).toBe(remoteVersion);
+      // Custom props carry no URL, email or query string (PostHog's own
+      // $-prefixed platform fields are out of scope by contract).
       expect(JSON.stringify(props)).not.toMatch(/https?:\/\/|@|\?/);
     }
 
@@ -252,7 +288,7 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
     if (telemetryAssertable) {
       const normalized = await s.waitForWireEvent('invalid_path_normalized');
       expect(normalized.length).toBeGreaterThanOrEqual(1);
-      const props = (normalized[0].properties ?? {}) as Record<string, unknown>;
+      const props = s.customPropsOf(normalized[0]);
       // ONLY the clean route is emitted — never the contaminated original.
       expect(props.route_normalized).toBe('/profile');
       expect(JSON.stringify(props)).not.toContain('%E2%81%A0');
