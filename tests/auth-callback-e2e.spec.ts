@@ -151,13 +151,21 @@ test.describe('PB-AUTH-CALLBACK-STALE-APP-001 (Android Chrome, preview, SHA-lock
     // A — OAuth-shaped callback params (hash-token flow: no `code`; the
     // session already exists and must be found and used).
     await page.goto('/auth/callback?next=%2Fdashboard&lng=es&flow=google', { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
+    // NOTE: anchor on the END of the URL — a loose /\/dashboard/ regex also
+    // matches the callback URL itself via its ?next=%2Fdashboard query param
+    // and would pass before the flow even runs.
+    await expect(page).toHaveURL(/\/dashboard$/, { timeout: 20_000 });
     // No infinite spinner: the callback screen must not be visible anymore.
     await expect(page.getByText(/completando el acceso/i)).toHaveCount(0);
+    if (telemetryAssertable) {
+      // Let the SDK flush visit A's event BEFORE navigating away — a fresh
+      // goto kills the JS context and any still-queued batch with it.
+      await s.waitForWireEvent('auth_callback_completed', 30_000, 1);
+    }
 
     // B — bare callback with a live session.
     await page.goto('/auth/callback', { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
+    await expect(page).toHaveURL(/\/dashboard$/, { timeout: 20_000 });
 
     if (telemetryAssertable) {
       // Poll until BOTH callback completions have flushed to the wire.
