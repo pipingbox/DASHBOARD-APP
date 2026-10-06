@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase, TABLES } from '@/lib/supabase';
-import { getStoredReferralCode, clearStoredReferralCode, validateReferralCode, isDefinitiveReferralOutcome } from '@/lib/referrals';
+import { getStoredReferralCode, clearStoredReferralCode, validateReferralCode, isDefinitiveReferralOutcome, type ReferralsBootstrapOutcome } from '@/lib/referrals';
 import { notifyReferralJoined } from '@/lib/notifications';
 import { getAuthCallbackUrl } from '@/lib/constants';
 import { classifyAuthError, isNewSignupIdentity, type AuthErrorCode } from '@/lib/authFlow';
@@ -133,12 +133,12 @@ async function completeReferralAssignment(
   }
 }
 
-async function bootstrapReferrals(userId: string, storedCode: string | null): Promise<void> {
+async function bootstrapReferrals(userId: string, storedCode: string | null): Promise<ReferralsBootstrapOutcome | null> {
   try {
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData.session?.access_token;
-    if (!accessToken) return;
-    await fetch(edgeFunctionUrl('referrals-bootstrap'), {
+    if (!accessToken) return null;
+    const res = await fetch(edgeFunctionUrl('referrals-bootstrap'), {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -146,8 +146,11 @@ async function bootstrapReferrals(userId: string, storedCode: string | null): Pr
       },
       body: JSON.stringify({ referral_code: storedCode }),
     });
+    if (!res.ok) return null;
+    return (await res.json()) as ReferralsBootstrapOutcome;
   } catch {
     // Non-critical; dashboard recovery will retry.
+    return null;
   }
 }
 
