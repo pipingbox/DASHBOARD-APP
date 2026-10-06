@@ -22,11 +22,18 @@ async function callReferralsApply(referredId: string, referrerId: string): Promi
   }
 }
 
-async function callReferralsBootstrap(storedCode?: string): Promise<boolean> {
+/** Classified outcome of the referrals-bootstrap edge function (server-side truth). */
+export interface ReferralsBootstrapOutcome {
+  referral_code?: string | null;
+  referrer_id?: string | null;
+  attribution?: string;
+}
+
+async function callReferralsBootstrap(storedCode?: string): Promise<ReferralsBootstrapOutcome | null> {
   try {
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData.session?.access_token;
-    if (!accessToken) return false;
+    if (!accessToken) return null;
     const res = await fetch(edgeFunctionUrl('referrals-bootstrap'), {
       method: 'POST',
       headers: {
@@ -35,9 +42,10 @@ async function callReferralsBootstrap(storedCode?: string): Promise<boolean> {
       },
       body: JSON.stringify({ referral_code: storedCode }),
     });
-    return res.ok;
+    if (!res.ok) return null;
+    return (await res.json()) as ReferralsBootstrapOutcome;
   } catch {
-    return false;
+    return null;
   }
 }
 
