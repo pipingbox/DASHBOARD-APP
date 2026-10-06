@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlignHorizontalDistributeCenter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -8,11 +8,18 @@ import {
   solvePipeCombStagger,
   type PipeCombStaggerSolution,
 } from '@/tools/core/geometry/pipe-comb-stagger';
-import { toMm, fromMm } from '@/tools/core/units';
-import { useUnitFieldConversion, type UnitSystem } from '../shared';
+import { fromMm } from '@/tools/core/units';
+import type { UnitSystem } from '../shared';
 import {
-  buildPipeCombStaggerViewModel,
-  type PipeCombStaggerViewModel,
+  createLengthField,
+  lengthFieldOnEdit,
+  lengthFieldOnUnitChange,
+  lengthFieldIsValid,
+  parseDecimalInput,
+  type LengthFieldState,
+} from './number-input';
+import {
+  buildPipeCombStaggerScreenLayout,
 } from './pipe-comb-stagger-svg';
 
 /**
@@ -23,6 +30,17 @@ import {
  * comes exclusively from the P1 kernel `solvePipeCombStagger`; this
  * component never reproduces the core equation. NPS/Schedule/LR/SR/CLR are
  * deferred to P3 optional fabrication enrichment.
+ *
+ * Final-review fixes:
+ *  - H1: Di/Df are kept as CANONICAL millimetre values (full precision) in
+ *    `LengthFieldState`; a unit toggle only re-renders the display text and
+ *    can never change the physical geometry.
+ *  - H2/H3: the SVG consumes the pure screen layout
+ *    (`buildPipeCombStaggerScreenLayout`), which centres the angle arc on
+ *    the elbow and keeps text at a constant legible CSS-px size at any
+ *    viewport via the measured container width.
+ *  - Decimal input policy: one point OR one comma; ambiguous mixes are
+ *    rejected with a localized error instead of being guessed.
  */
 
 /** UX/readability limit only — NOT a geometric or fabrication limit. */
@@ -55,247 +73,271 @@ interface PipeCombStaggerDiagramProps {
 
 /** Screen schematic of the genuine pipe comb. NOT a 1:1 fabrication drawing. */
 function PipeCombStaggerDiagram({ solution, fmt, labels }: PipeCombStaggerDiagramProps) {
-  const vm: PipeCombStaggerViewModel = useMemo(() => buildPipeCombStaggerViewModel(solution), [solution]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [displayWidth, setDisplayWidth] = useState(640);
 
-  const W = 640;
-  const H = 440;
-  const pad = 46;
-  const spanX = Math.max(vm.bounds.maxX - vm.bounds.minX, 1e-6);
-  const spanY = Math.max(vm.bounds.maxY - vm.bounds.minY, 1e-6);
-  const scale = Math.min((W - 2 * pad) / spanX, (H - 2 * pad) / spanY);
-  // Model space is +Y up; SVG is +Y down, so Y is flipped.
-  const X = (x: number) => pad + (x - vm.bounds.minX) * scale;
-  const Y = (y: number) => H - pad - (y - vm.bounds.minY) * scale;
+  // Re-layout with the real rendered width so text stays at a constant,
+  // legible CSS-px size at every viewport (H3).
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      if (w > 0) setDisplayWidth(w);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const layout = useMemo(
+    () => buildPipeCombStaggerScreenLayout(solution, displayWidth),
+    [solution, displayWidth],
+  );
+  const upx = layout.unitsPerPx;
 
   const axisColor = '#FF8C00';
   const dimColor = '#8FB8E8';
   const guideColor = '#3A4454';
 
-  const tick = (x: number, y: number, vertical: boolean) =>
-    vertical ? (
-      <line x1={x} y1={y - 3} x2={x} y2={y + 3} stroke={dimColor} strokeWidth={1.2} />
-    ) : (
-      <line x1={x - 3} y1={y} x2={x + 3} y2={y} stroke={dimColor} strokeWidth={1.2} />
-    );
-
-  // Angle arc between the final direction v and the initial direction u at
-  // the elbow of pipe 1 (math degrees; screen Y is flipped).
-  const arc = vm.angleArc;
-  const arcStart = {
-    x: X(arc.center.x + arc.radiusMm * Math.cos((arc.startDeg * Math.PI) / 180)),
-    y: Y(arc.center.y + arc.radiusMm * Math.sin((arc.startDeg * Math.PI) / 180)),
-  };
-  const arcEnd = {
-    x: X(arc.center.x + arc.radiusMm * Math.cos((arc.endDeg * Math.PI) / 180)),
-    y: Y(arc.center.y + arc.radiusMm * Math.sin((arc.endDeg * Math.PI) / 180)),
-  };
-  const arcMid = {
-    x: arc.center.x + (arc.radiusMm + 26 / scale) * Math.cos((((arc.startDeg + arc.endDeg) / 2) * Math.PI) / 180),
-    y: arc.center.y + (arc.radiusMm + 26 / scale) * Math.sin((((arc.startDeg + arc.endDeg) / 2) * Math.PI) / 180),
+  // Background-colour halo behind every label: any pipe/dimension line
+  // crossing a text is knocked out behind it, so dense geometries stay
+  // readable at small display widths (P2 final review, H3).
+  const textHalo = {
+    paintOrder: 'stroke',
+    stroke: '#151A22',
+    strokeWidth: layout.fontSize * 0.5,
+    strokeLinejoin: 'round' as const,
   };
 
-  const staggerVisible = Math.abs(vm.dimStagger.valueMm) > 1e-9;
+  const tickV = (x: number, y: number) => (
+    <line x1={x} y1={y - layout.tick} x2={x} y2={y + layout.tick} stroke={dimColor} strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
+  );
+  const tickH = (x: number, y: number) => (
+    <line x1={x - layout.tick} y1={y} x2={x + layout.tick} y2={y} stroke={dimColor} strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
+  );
 
   return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      className="w-full max-w-2xl"
-      role="img"
-      aria-labelledby="pipe-comb-svg-title pipe-comb-svg-desc"
-      data-testid="pipe-comb-stagger-svg"
-      data-direction={solution.staggerDirection}
-      data-pipe-count={solution.pipeCount}
-    >
-      <title id="pipe-comb-svg-title">{labels.svgTitle}</title>
-      <desc id="pipe-comb-svg-desc">{solution.pipeCount} × θ = {solution.elbowAngleDeg}°</desc>
+    <div ref={containerRef}>
+      <svg
+        viewBox={`${layout.viewBox.x} ${layout.viewBox.y} ${layout.viewBox.w} ${layout.viewBox.h}`}
+        className="block w-full"
+        role="img"
+        aria-labelledby="pipe-comb-svg-title pipe-comb-svg-desc"
+        data-testid="pipe-comb-stagger-svg"
+        data-direction={solution.staggerDirection}
+        data-pipe-count={solution.pipeCount}
+      >
+        <title id="pipe-comb-svg-title">{labels.svgTitle}</title>
+        <desc id="pipe-comb-svg-desc">{solution.pipeCount} × θ = {solution.elbowAngleDeg}°</desc>
 
-      {/* Dashed level guide linking elbow 1 to the stagger dimension. */}
-      {staggerVisible && (
-        <line
-          x1={X(vm.pipes[0].elbow.x)}
-          y1={Y(vm.pipes[0].elbow.y)}
-          x2={X(vm.pipes[1].elbow.x)}
-          y2={Y(vm.pipes[0].elbow.y)}
-          stroke={guideColor}
-          strokeWidth={1}
-          strokeDasharray="4 4"
-        />
-      )}
-
-      {vm.pipes.map((p) => (
-        <g key={p.pipeNumber}>
-          <polyline
-            points={`${X(p.start.x)},${Y(p.start.y)} ${X(p.elbow.x)},${Y(p.elbow.y)} ${X(p.end.x)},${Y(p.end.y)}`}
-            fill="none"
-            stroke={axisColor}
-            strokeWidth={2.4}
-            strokeLinejoin="round"
+        {/* Dashed level guide linking elbow 1 to the stagger dimension. */}
+        {layout.dimStagger.visible && (
+          <line
+            x1={layout.pipes[0].elbow.x}
+            y1={layout.pipes[0].elbow.y}
+            x2={layout.pipes[1].elbow.x}
+            y2={layout.pipes[0].elbow.y}
+            stroke={guideColor}
+            strokeWidth={1}
+            strokeDasharray={`${4 * upx} ${4 * upx}`}
+            vectorEffect="non-scaling-stroke"
           />
-          <circle cx={X(p.elbow.x)} cy={Y(p.elbow.y)} r={3} fill="#F5F7FA" />
-          <text
-            x={X(p.elbow.x) - 8}
-            y={Y(p.elbow.y) + (vm.dimStagger.valueMm >= 0 ? 16 : -10)}
-            textAnchor="end"
-            fill="#A3A9B3"
-            fontSize="10"
-            data-testid="pipe-comb-pipe-label"
-          >
-            {labels.pipeLabel} {p.pipeNumber}
-          </text>
-        </g>
-      ))}
+        )}
 
-      {/* Di dimension between the first two initial axes. */}
-      <g>
-        <line
-          x1={X(vm.dimInitial.from.x)}
-          y1={Y(vm.dimInitial.from.y)}
-          x2={X(vm.dimInitial.to.x)}
-          y2={Y(vm.dimInitial.to.y)}
-          stroke={dimColor}
-          strokeWidth={1.2}
-        />
-        {tick(X(vm.dimInitial.from.x), Y(vm.dimInitial.from.y), true)}
-        {tick(X(vm.dimInitial.to.x), Y(vm.dimInitial.to.y), true)}
-        <text
-          x={(X(vm.dimInitial.from.x) + X(vm.dimInitial.to.x)) / 2}
-          y={Y(vm.dimInitial.from.y) + 14}
-          textAnchor="middle"
-          fill={dimColor}
-          fontSize="10"
-          data-testid="pipe-comb-dim-initial"
-        >
-          {labels.dimInitial} {fmt(vm.dimInitial.valueMm)}
-        </text>
-      </g>
+        {layout.pipes.map((p) => (
+          <g key={p.pipeNumber}>
+            <polyline
+              points={`${p.start.x},${p.start.y} ${p.elbow.x},${p.elbow.y} ${p.end.x},${p.end.y}`}
+              fill="none"
+              stroke={axisColor}
+              strokeWidth={2.4}
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <circle cx={p.elbow.x} cy={p.elbow.y} r={3 * upx} fill="#F5F7FA" />
+            {p.labelPos && (
+              <text
+                x={p.labelPos.x}
+                y={p.labelPos.y}
+                textAnchor={p.labelAnchor}
+                fill="#A3A9B3"
+                fontSize={layout.fontSize}
+                {...textHalo}
+                data-testid="pipe-comb-pipe-label"
+              >
+                {labels.pipeLabel} {p.pipeNumber}
+              </text>
+            )}
+          </g>
+        ))}
 
-      {/* Df dimension between the first two final axes. */}
-      <g>
-        <line
-          x1={X(vm.dimFinal.from.x)}
-          y1={Y(vm.dimFinal.from.y)}
-          x2={X(vm.dimFinal.to.x)}
-          y2={Y(vm.dimFinal.to.y)}
-          stroke={dimColor}
-          strokeWidth={1.2}
-        />
-        {tick(X(vm.dimFinal.from.x), Y(vm.dimFinal.from.y), false)}
-        {tick(X(vm.dimFinal.to.x), Y(vm.dimFinal.to.y), false)}
-        <text
-          x={(X(vm.dimFinal.from.x) + X(vm.dimFinal.to.x)) / 2 + 12}
-          y={(Y(vm.dimFinal.from.y) + Y(vm.dimFinal.to.y)) / 2 - 6}
-          fill={dimColor}
-          fontSize="10"
-          data-testid="pipe-comb-dim-final"
-        >
-          {labels.dimFinal} {fmt(vm.dimFinal.valueMm)}
-        </text>
-      </g>
-
-      {/* Signed stagger A between elbows 1 and 2. */}
-      {staggerVisible && (
+        {/* Di dimension between the first two initial axes. */}
         <g>
           <line
-            x1={X(vm.dimStagger.from.x)}
-            y1={Y(vm.dimStagger.from.y)}
-            x2={X(vm.dimStagger.to.x)}
-            y2={Y(vm.dimStagger.to.y)}
+            x1={layout.dimInitial.from.x}
+            y1={layout.dimInitial.from.y}
+            x2={layout.dimInitial.to.x}
+            y2={layout.dimInitial.to.y}
             stroke={dimColor}
-            strokeWidth={1.4}
+            strokeWidth={1.2}
+            vectorEffect="non-scaling-stroke"
           />
-          {tick(X(vm.dimStagger.from.x), Y(vm.dimStagger.from.y), false)}
-          {tick(X(vm.dimStagger.to.x), Y(vm.dimStagger.to.y), false)}
+          {tickV(layout.dimInitial.from.x, layout.dimInitial.from.y)}
+          {tickV(layout.dimInitial.to.x, layout.dimInitial.to.y)}
           <text
-            x={X(vm.dimStagger.from.x) + 8}
-            y={(Y(vm.dimStagger.from.y) + Y(vm.dimStagger.to.y)) / 2}
+            x={layout.dimInitial.labelPos.x}
+            y={layout.dimInitial.labelPos.y}
+            textAnchor="middle"
             fill={dimColor}
-            fontSize="10"
-            data-testid="pipe-comb-dim-stagger"
+            fontSize={layout.fontSize}
+            {...textHalo}
+            data-testid="pipe-comb-dim-initial"
           >
-            {labels.dimStagger} {fmt(vm.dimStagger.valueMm)}
+            {labels.dimInitial} {fmt(layout.dimInitial.valueMm)}
           </text>
         </g>
-      )}
-      {!staggerVisible && (
-        <text
-          x={X(vm.pipes[1].elbow.x) + 10}
-          y={Y(vm.pipes[1].elbow.y) - 8}
-          fill={dimColor}
-          fontSize="10"
-          data-testid="pipe-comb-dim-stagger"
-        >
-          {labels.dimStagger} {fmt(0)}
-        </text>
-      )}
 
-      {/* Elbow angle arc near pipe 1. */}
-      <g>
-        <path
-          d={`M ${arcStart.x} ${arcStart.y} A ${arc.radiusMm * scale} ${arc.radiusMm * scale} 0 0 1 ${arcEnd.x} ${arcEnd.y}`}
-          fill="none"
-          stroke={dimColor}
-          strokeWidth={1.2}
-        />
-        <text
-          x={X(arcMid.x)}
-          y={Y(arcMid.y)}
-          textAnchor="middle"
-          fill={dimColor}
-          fontSize="10"
-          data-testid="pipe-comb-angle-label"
-        >
-          {labels.angle} {solution.elbowAngleDeg}°
-        </text>
-      </g>
-    </svg>
+        {/* Df dimension between the first two final axes. */}
+        <g>
+          <line
+            x1={layout.dimFinal.from.x}
+            y1={layout.dimFinal.from.y}
+            x2={layout.dimFinal.to.x}
+            y2={layout.dimFinal.to.y}
+            stroke={dimColor}
+            strokeWidth={1.2}
+            vectorEffect="non-scaling-stroke"
+          />
+          {tickH(layout.dimFinal.from.x, layout.dimFinal.from.y)}
+          {tickH(layout.dimFinal.to.x, layout.dimFinal.to.y)}
+          <text
+            x={layout.dimFinal.labelPos.x}
+            y={layout.dimFinal.labelPos.y}
+            textAnchor="middle"
+            fill={dimColor}
+            fontSize={layout.fontSize}
+            {...textHalo}
+            data-testid="pipe-comb-dim-final"
+          >
+            {labels.dimFinal} {fmt(layout.dimFinal.valueMm)}
+          </text>
+        </g>
+
+        {/* Signed stagger A between elbows 1 and 2. */}
+        {layout.dimStagger.visible ? (
+          <g>
+            <line
+              x1={layout.dimStagger.from.x}
+              y1={layout.dimStagger.from.y}
+              x2={layout.dimStagger.to.x}
+              y2={layout.dimStagger.to.y}
+              stroke={dimColor}
+              strokeWidth={1.4}
+              vectorEffect="non-scaling-stroke"
+            />
+            {tickH(layout.dimStagger.from.x, layout.dimStagger.from.y)}
+            {tickH(layout.dimStagger.to.x, layout.dimStagger.to.y)}
+            <text
+              x={layout.dimStagger.labelPos.x}
+              y={layout.dimStagger.labelPos.y}
+              textAnchor="start"
+              fill={dimColor}
+              fontSize={layout.fontSize}
+              {...textHalo}
+              data-testid="pipe-comb-dim-stagger"
+            >
+              {labels.dimStagger} {fmt(layout.dimStagger.valueMm)}
+            </text>
+          </g>
+        ) : (
+          <text
+            x={layout.dimStagger.labelPos.x}
+            y={layout.dimStagger.labelPos.y}
+            textAnchor="start"
+            fill={dimColor}
+            fontSize={layout.fontSize}
+            {...textHalo}
+            data-testid="pipe-comb-dim-stagger"
+          >
+            {labels.dimStagger} {fmt(0)}
+          </text>
+        )}
+
+        {/* Elbow angle arc near pipe 1 (path from the pure layout, H2). */}
+        <g>
+          <path
+            d={layout.angleArcPath}
+            fill="none"
+            stroke={dimColor}
+            strokeWidth={1.2}
+            vectorEffect="non-scaling-stroke"
+          />
+          <text
+            x={layout.angleLabelPos.x}
+            y={layout.angleLabelPos.y}
+            textAnchor="middle"
+            fill={dimColor}
+            fontSize={layout.fontSize}
+            {...textHalo}
+            data-testid="pipe-comb-angle-label"
+          >
+            {labels.angle} {solution.elbowAngleDeg}°
+          </text>
+        </g>
+      </svg>
+    </div>
   );
 }
 
 export default function PipeCombTool() {
   const { t } = useTranslation();
   const [unitSystem, setUnitSystem] = useState<UnitSystem>('metric');
+  const unit = unitSystem === 'metric' ? ('mm' as const) : ('in' as const);
   const [pipeCount, setPipeCount] = useState('4');
-  const [initialSpacing, setInitialSpacing] = useState('200');
-  const [finalSpacing, setFinalSpacing] = useState('400');
   const [elbowAngle, setElbowAngle] = useState('45');
+  // Canonical physical values (mm, full precision). Unit toggles only
+  // re-render the display text; they NEVER rewrite these values (H1).
+  const [diField, setDiField] = useState<LengthFieldState>(() => createLengthField(200, 'mm'));
+  const [dfField, setDfField] = useState<LengthFieldState>(() => createLengthField(400, 'mm'));
 
-  // Unit toggle converts the visible values, preserving the physical
-  // dimensions; geometry is never recalculated from rounded displays.
-  useUnitFieldConversion(unitSystem, [
-    [initialSpacing, setInitialSpacing],
-    [finalSpacing, setFinalSpacing],
-  ]);
+  useEffect(() => {
+    setDiField((f) => lengthFieldOnUnitChange(f, unit));
+    setDfField((f) => lengthFieldOnUnitChange(f, unit));
+  }, [unit]);
 
   const { result, errorCode } = useMemo(() => {
-    const count = Number(pipeCount);
-    const initial = Number(initialSpacing);
-    const final = Number(finalSpacing);
-    const angle = Number(elbowAngle);
+    const count = parseDecimalInput(pipeCount);
+    const angle = parseDecimalInput(elbowAngle);
+    const diValid = lengthFieldIsValid(diField);
+    const dfValid = lengthFieldIsValid(dfField);
 
     // Input-level validation mirrors the kernel domain; the kernel remains
     // the single source of geometry.
-    if (!Number.isFinite(count) || !Number.isFinite(initial) || !Number.isFinite(final) || !Number.isFinite(angle)) {
+    if (count === null || angle === null || !diValid || !dfValid || diField.canonicalMm === null || dfField.canonicalMm === null) {
       return { result: null, errorCode: 'non_finite_input' };
     }
-    if (!(initial > 0)) return { result: null, errorCode: 'initial_spacing_positive' };
-    if (!(final > 0)) return { result: null, errorCode: 'final_spacing_positive' };
+    const initialMm = diField.canonicalMm;
+    const finalMm = dfField.canonicalMm;
+    if (!(initialMm > 0)) return { result: null, errorCode: 'initial_spacing_positive' };
+    if (!(finalMm > 0)) return { result: null, errorCode: 'final_spacing_positive' };
     if (!(angle > 0 && angle <= 90)) return { result: null, errorCode: 'elbow_angle_range' };
     if (!Number.isInteger(count) || count < 2 || count > MAX_UI_PIPES) {
       return { result: null, errorCode: 'pipe_count_range' };
     }
 
-    const unit = unitSystem === 'metric' ? 'mm' : 'in';
     const res = solvePipeCombStagger({
       pipeCount: count,
-      initialSpacingMm: toMm(initial, unit),
-      finalSpacingMm: toMm(final, unit),
+      initialSpacingMm: initialMm,
+      finalSpacingMm: finalMm,
       elbowAngleDeg: angle,
     });
     if (res.success === false) {
       return { result: null, errorCode: res.code ?? 'non_finite_input' };
     }
     return { result: res.result, errorCode: null };
-  }, [pipeCount, initialSpacing, finalSpacing, elbowAngle, unitSystem]);
+  }, [pipeCount, diField, dfField, elbowAngle]);
 
   /** Human-readable formatting; the kernel itself never rounds. */
   const fmt = (v: number | undefined) => {
@@ -367,9 +409,9 @@ export default function PipeCombTool() {
           </Label>
           <Input
             id="pipe-comb-initial-spacing"
-            value={initialSpacing}
+            value={diField.text}
             inputMode="decimal"
-            onChange={(e) => setInitialSpacing(e.target.value)}
+            onChange={(e) => setDiField((f) => lengthFieldOnEdit(f, e.target.value, unit))}
             className="bg-[#0E1117] border-[#232A36]"
           />
         </div>
@@ -379,9 +421,9 @@ export default function PipeCombTool() {
           </Label>
           <Input
             id="pipe-comb-final-spacing"
-            value={finalSpacing}
+            value={dfField.text}
             inputMode="decimal"
-            onChange={(e) => setFinalSpacing(e.target.value)}
+            onChange={(e) => setDfField((f) => lengthFieldOnEdit(f, e.target.value, unit))}
             className="bg-[#0E1117] border-[#232A36]"
           />
         </div>
@@ -409,11 +451,11 @@ export default function PipeCombTool() {
               key={preset}
               type="button"
               size="sm"
-              variant={Number(elbowAngle) === preset ? 'default' : 'outline'}
-              aria-pressed={Number(elbowAngle) === preset}
+              variant={parseDecimalInput(elbowAngle) === preset ? 'default' : 'outline'}
+              aria-pressed={parseDecimalInput(elbowAngle) === preset}
               data-testid={`pipe-comb-preset-${String(preset).replace('.', '-')}`}
               onClick={() => setElbowAngle(String(preset))}
-              className={Number(elbowAngle) === preset ? 'bg-[#FF8C00] text-black' : 'border-[#232A36]'}
+              className={parseDecimalInput(elbowAngle) === preset ? 'bg-[#FF8C00] text-black' : 'border-[#232A36]'}
             >
               {preset}°
             </Button>
@@ -453,7 +495,7 @@ export default function PipeCombTool() {
             }}
           />
         ) : (
-          <svg viewBox={`0 0 640 440`} className="w-full max-w-2xl">
+          <svg viewBox="0 0 640 440" className="w-full max-w-2xl">
             <text x="320" y="220" textAnchor="middle" fill="#A3A9B3" fontSize="12">
               {t('tools.prefab.pipeComb.drawPlaceholder')}
             </text>

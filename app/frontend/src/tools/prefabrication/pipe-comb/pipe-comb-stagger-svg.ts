@@ -94,11 +94,14 @@ export function buildPipeCombStaggerViewModel(solution: PipeCombStaggerSolution)
   }));
 
   // Scene scale drives the entrance/exit extensions so any geometry fits.
+  // Extensions are intentionally short: they inflate the scene span, and
+  // an inflated span squeezes the elbow pitch in screen pixels, which
+  // hurts label legibility (P2 final review, H3).
   const spanX = Math.max((n - 1) * di, di);
   const spanY = Math.max(Math.abs(elbows[n - 1].y - elbows[0].y), di, finalSpacingMm);
   const base = Math.max(spanX, spanY, finalSpacingMm, 1);
-  const back = 0.55 * base;
-  const fwd = 0.9 * base;
+  const back = 0.35 * base;
+  const fwd = 0.55 * base;
 
   // Common start plane perpendicular to u below (−u of) every elbow.
   const yStart = Math.min(...elbows.map((e) => e.y)) - back;
@@ -157,8 +160,10 @@ export function buildPipeCombStaggerViewModel(solution: PipeCombStaggerSolution)
     endDeg: 90,
   };
 
-  // Bounding box over every drawn point (arc approximated by its bounding
-  // square, which always encloses it).
+  // Bounding box over every drawn point. The arc only sweeps from the
+  // final direction (90deg − θ) to the initial direction (90deg), so its
+  // exact box is used instead of the full radius square (which inflated
+  // the scene width and squeezed the elbow pitch — P2 review, H3).
   const xs: number[] = [];
   const ys: number[] = [];
   for (const p of modelPipes) {
@@ -169,8 +174,9 @@ export function buildPipeCombStaggerViewModel(solution: PipeCombStaggerSolution)
     xs.push(d.from.x, d.to.x);
     ys.push(d.from.y, d.to.y);
   }
-  xs.push(angleArc.center.x - angleArc.radiusMm, angleArc.center.x + angleArc.radiusMm);
-  ys.push(angleArc.center.y - angleArc.radiusMm, angleArc.center.y + angleArc.radiusMm);
+  const thetaForArcBox = rad(elbowAngleDeg);
+  xs.push(angleArc.center.x, angleArc.center.x + angleArc.radiusMm * Math.sin(thetaForArcBox));
+  ys.push(angleArc.center.y + angleArc.radiusMm * Math.cos(thetaForArcBox), angleArc.center.y + angleArc.radiusMm);
 
   let minX = Math.min(...xs);
   let maxX = Math.max(...xs);
@@ -193,5 +199,466 @@ export function buildPipeCombStaggerViewModel(solution: PipeCombStaggerSolution)
     dimStagger,
     angleArc,
     bounds: { minX, minY, maxX, maxY },
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Screen layout (P2 final review fixes — H2 arc, H3 legibility).
+ *
+ * The view model above is unit-pure geometry; this section turns it into
+ * concrete viewBox coordinates with legibility guarantees:
+ *
+ *  - The viewBox tightly wraps the content (no fixed 640x440 canvas), so
+ *    desktop space is used and nothing is padded with emptiness.
+ *  - All font sizes, ticks and label offsets are computed from the real
+ *    display width (`displayWidthPx`), so text renders at a constant,
+ *    legible CSS-pixel size at ANY viewport instead of shrinking with the
+ *    drawing (H3).
+ *  - The elbow-angle arc path is emitted with the sweep flag that keeps
+ *    the arc CENTERED on the elbow of pipe 1 (H2). With the screen Y
+ *    flip, math-CCW from the final direction to the initial direction is
+ *    sweep=0; sweep=1 selected the mirrored centre away from the elbow.
+ *  - Pipe labels use a deterministic subset rule when elbows are too
+ *    close in screen pixels, so N=12 never produces unreadable overlaps.
+ *
+ * Everything is derived from the kernel solution via the view model; no
+ * geometry is recomputed here either.
+ * ------------------------------------------------------------------ */
+
+export interface PipeCombScreenPoint {
+  x: number;
+  y: number;
+}
+
+export interface PipeCombScreenPipe {
+  pipeNumber: number;
+  start: PipeCombScreenPoint;
+  elbow: PipeCombScreenPoint;
+  end: PipeCombScreenPoint;
+  /** Screen position of the pipe label; null when the subset rule hides it. */
+  labelPos: PipeCombScreenPoint | null;
+  labelAnchor: 'start' | 'end';
+}
+
+export interface PipeCombScreenDimension {
+  from: PipeCombScreenPoint;
+  to: PipeCombScreenPoint;
+  labelPos: PipeCombScreenPoint;
+  labelAnchor: 'start' | 'middle' | 'end';
+  valueMm: number;
+}
+
+export interface PipeCombStaggerScreenLayout {
+  viewBox: { x: number; y: number; w: number; h: number };
+  /** Constant on-screen font size in CSS px that `fontSize` renders at. */
+  fontPx: number;
+  /** Font size in viewBox units (fontPx * unitsPerPx). */
+  fontSize: number;
+  /** Model units per CSS px at the given display width. */
+  unitsPerPx: number;
+  /** Half-length of dimension ticks in viewBox units. */
+  tick: number;
+  pipes: PipeCombScreenPipe[];
+  dimInitial: PipeCombScreenDimension;
+  dimFinal: PipeCombScreenDimension;
+  dimStagger: PipeCombScreenDimension & { visible: boolean };
+  /** Real SVG path data for the angle arc, centred on elbow 1 (sweep=0). */
+  angleArcPath: string;
+  angleLabelPos: PipeCombScreenPoint;
+  /** Estimated on-screen label boxes (H3): guaranteed mutually
+   *  non-overlapping by the deterministic placement pass; exposed for
+   *  pure tests. */
+  labelRects: {
+    initial: PipeCombScreenRect;
+    final: PipeCombScreenRect;
+    stagger: PipeCombScreenRect;
+    angle: PipeCombScreenRect;
+    pipeLabels: PipeCombScreenRect[];
+  };
+}
+
+/** Margins reserved for labels, in CSS px of display width. */
+const SCREEN_MARGIN = { leftPx: 96, rightPx: 24, topPx: 56, bottomPx: 48 };
+
+function fmtNum(v: number): string {
+  // Compact, locale-independent path/attribute number formatting. Six
+  // decimals keep the serialised arc geometrically faithful (the H2 tests
+  // reconstruct the arc centre from this string within ~1e-6 units).
+  return String(Number(v.toFixed(6)));
+}
+
+/* ------------------------------------------------------------------ *
+ * Deterministic label placement (P2 final review, H3).
+ *
+ * Dimension labels ("Di/Df/A …") are placed by scoring a small candidate
+ * set: labels must never overlap each other or the other drawing labels,
+ * must stay inside the viewBox, and prefer not to cross drawn segments
+ * (the background-colour text halo in the component covers residual
+ * crossings). Fully deterministic and unit-tested.
+ * ------------------------------------------------------------------ */
+
+/** Axis-aligned rectangle in viewBox units. */
+export interface PipeCombScreenRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+function rectsOverlap(a: PipeCombScreenRect, b: PipeCombScreenRect): boolean {
+  return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+}
+
+function overlapArea(a: PipeCombScreenRect, b: PipeCombScreenRect): number {
+  if (!rectsOverlap(a, b)) return 0;
+  return (Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) *
+    (Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+}
+
+/** Liang–Barsky segment/axis-aligned-rect intersection. */
+function segIntersectsRect(
+  x1: number, y1: number, x2: number, y2: number, r: PipeCombScreenRect,
+): boolean {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  let t0 = 0;
+  let t1 = 1;
+  const clip = (p: number, q: number): boolean => {
+    if (p === 0) return q >= 0;
+    const t = q / p;
+    if (p < 0) {
+      if (t > t1) return false;
+      if (t > t0) t0 = t;
+    } else {
+      if (t < t0) return false;
+      if (t < t1) t1 = t;
+    }
+    return true;
+  };
+  return (
+    clip(-dx, x1 - r.x) &&
+    clip(dx, r.x + r.w - x1) &&
+    clip(-dy, y1 - r.y) &&
+    clip(dy, r.y + r.h - y1)
+  );
+}
+
+/**
+ * Estimated on-screen box of a label. Character count is derived from the
+ * value (sign, integer digits, two decimals, unit, short prefix) — a
+ * placement heuristic only, deliberately conservative.
+ */
+function estimateLabelRect(
+  pos: PipeCombScreenPoint,
+  anchor: 'start' | 'middle' | 'end',
+  chars: number,
+  fontSize: number,
+): PipeCombScreenRect {
+  const w = chars * 0.52 * fontSize;
+  const h = fontSize * 1.15;
+  const x = anchor === 'start' ? pos.x : anchor === 'middle' ? pos.x - w / 2 : pos.x - w;
+  return { x, y: pos.y - 0.85 * fontSize, w, h };
+}
+
+/** Estimated character count of a dimension label like "Df -117.16 mm". */
+function dimLabelChars(valueMm: number): number {
+  const a = Math.abs(valueMm);
+  const intDigits = a >= 1 ? Math.floor(Math.log10(a)) + 1 : 1;
+  return 2 + (valueMm < 0 ? 1 : 0) + intDigits + 3 + 3;
+}
+
+/**
+ * Build the concrete screen layout for a solved pipe comb.
+ *
+ * @param solution       P1 kernel result (geometry source of truth).
+ * @param displayWidthPx Real rendered width of the SVG in CSS px. The
+ *                       layout guarantees text stays at `fontPx` CSS px at
+ *                       this width; React re-invokes on container resize.
+ * @param fontPx         Target on-screen font size (default 12, >= 11 at
+ *                       every viewport for legibility — H3).
+ */
+export function buildPipeCombStaggerScreenLayout(
+  solution: PipeCombStaggerSolution,
+  displayWidthPx: number,
+  fontPx = 12,
+): PipeCombStaggerScreenLayout {
+  const vm = buildPipeCombStaggerViewModel(solution);
+
+  const spanX = Math.max(vm.bounds.maxX - vm.bounds.minX, 1e-6);
+  const spanY = Math.max(vm.bounds.maxY - vm.bounds.minY, 1e-6);
+
+  // unitsPerPx is solved (not iterated) so the final viewBox width maps
+  // exactly onto the real display width:
+  //   W_vb = spanX + margins_units,  unitsPerPx = W_vb / displayWidthPx.
+  const marginsPx = SCREEN_MARGIN.leftPx + SCREEN_MARGIN.rightPx;
+  const usablePx = Math.max(displayWidthPx - marginsPx, 40);
+  const unitsPerPx = spanX / usablePx;
+
+  const W = spanX + marginsPx * unitsPerPx;
+  const H = spanY + (SCREEN_MARGIN.topPx + SCREEN_MARGIN.bottomPx) * unitsPerPx;
+  const X = (x: number) => SCREEN_MARGIN.leftPx * unitsPerPx + (x - vm.bounds.minX);
+  const Y = (y: number) => SCREEN_MARGIN.topPx * unitsPerPx + (vm.bounds.maxY - y);
+
+  const fontSize = fontPx * unitsPerPx;
+  const tick = 3.5 * unitsPerPx;
+
+  // --- Pipe labels: deterministic subset so labels never overlap (H3).
+  const elbowPitchPx = solution.pipeCount > 1 ? solution.initialSpacingMm / unitsPerPx : Infinity;
+  // Right-anchored labels ("Tubería 12" ≈ 5.5em) extend left of the
+  // elbow; the subset rule guarantees at least width + 8px clearance.
+  const labelPitchPx = fontPx * 5.5 + 8;
+  const labelEvery = Math.max(1, Math.ceil(labelPitchPx / Math.max(elbowPitchPx, 1e-9)));
+  const lastK = solution.pipeCount - 1;
+  const labeledIdx = new Set<number>();
+  for (let k = 0; k <= lastK; k += labelEvery) labeledIdx.add(k);
+  labeledIdx.add(0);
+  labeledIdx.add(lastK);
+  // PN is always labeled; if it collides with the previous multiple of
+  // the subset step, the multiple yields (P1 and PN win).
+  const prevMultiple = Math.floor((lastK - 1) / labelEvery) * labelEvery;
+  if (lastK > 0 && prevMultiple > 0 && lastK - prevMultiple < labelEvery) {
+    labeledIdx.delete(prevMultiple);
+  }
+  const isLabeled = (k: number) => labeledIdx.has(k);
+
+  // Vertical label offset: below the elbow for positive/aligned stagger,
+  // above for clearly negative stagger (so text avoids the stagger dim).
+  // Near-zero stagger is treated as aligned: its A dimension is too short
+  // to collide with anything, and the free corridor below the elbow line
+  // keeps the Df label region clear (H3, tiny-A case).
+  const negative = vm.dimStagger.valueMm < 0;
+  const staggerTallPx = Math.abs(vm.dimStagger.valueMm) / unitsPerPx;
+  const labelsAbove = negative && staggerTallPx > fontPx * 2.5;
+
+  const pipes: PipeCombScreenPipe[] = vm.pipes.map((p, k) => ({
+    pipeNumber: p.pipeNumber,
+    start: { x: X(p.start.x), y: Y(p.start.y) },
+    elbow: { x: X(p.elbow.x), y: Y(p.elbow.y) },
+    end: { x: X(p.end.x), y: Y(p.end.y) },
+    labelPos: isLabeled(k)
+      ? {
+          x: X(p.elbow.x) - 8 * unitsPerPx,
+          y: Y(p.elbow.y) + (labelsAbove ? -10 : 16) * unitsPerPx,
+        }
+      : null,
+    labelAnchor: 'end',
+  }));
+
+  // --- Dimensions (first adjacent pair only, as before).
+  const dimInitial: PipeCombScreenDimension = {
+    from: { x: X(vm.dimInitial.from.x), y: Y(vm.dimInitial.from.y) },
+    to: { x: X(vm.dimInitial.to.x), y: Y(vm.dimInitial.to.y) },
+    labelPos: {
+      x: (X(vm.dimInitial.from.x) + X(vm.dimInitial.to.x)) / 2,
+      y: Y(vm.dimInitial.from.y) + (fontPx + 6) * unitsPerPx,
+    },
+    labelAnchor: 'middle',
+    valueMm: vm.dimInitial.valueMm,
+  };
+
+  // --- Angle arc (H2): centred on elbow 1 with sweep=0.
+  // Model: u = 90deg, v = 90deg - theta (CCW-positive, +Y up). Screen Y is
+  // flipped, so math-CCW maps to screen-CCW, i.e. SVG sweep-flag=0.
+  // sweep=1 selected the mirrored centre away from the elbow.
+  const arc = vm.angleArc;
+  const arcStart = {
+    x: X(arc.center.x + arc.radiusMm * Math.cos((arc.startDeg * Math.PI) / 180)),
+    y: Y(arc.center.y + arc.radiusMm * Math.sin((arc.startDeg * Math.PI) / 180)),
+  };
+  const arcEnd = {
+    x: X(arc.center.x + arc.radiusMm * Math.cos((arc.endDeg * Math.PI) / 180)),
+    y: Y(arc.center.y + arc.radiusMm * Math.sin((arc.endDeg * Math.PI) / 180)),
+  };
+  const r = arc.radiusMm;
+  const angleArcPath =
+    `M ${fmtNum(arcStart.x)} ${fmtNum(arcStart.y)} ` +
+    `A ${fmtNum(r)} ${fmtNum(r)} 0 0 0 ${fmtNum(arcEnd.x)} ${fmtNum(arcEnd.y)}`;
+
+  const midDeg = (arc.startDeg + arc.endDeg) / 2;
+
+  // --- Deterministic label placement (H3): score candidates so the
+  // angle, A and Df labels never overlap any other label and stay inside
+  // the viewBox.
+  const staggerVisible = Math.abs(vm.dimStagger.valueMm) > 1e-9;
+  const staggerFrom = { x: X(vm.dimStagger.from.x), y: Y(vm.dimStagger.from.y) };
+  const staggerTo = { x: X(vm.dimStagger.to.x), y: Y(vm.dimStagger.to.y) };
+  const finalFrom = { x: X(vm.dimFinal.from.x), y: Y(vm.dimFinal.from.y) };
+  const finalTo = { x: X(vm.dimFinal.to.x), y: Y(vm.dimFinal.to.y) };
+
+  // Drawn segments (screen coords) used for the crossing penalty.
+  const segments: Array<[number, number, number, number]> = [];
+  for (const p of pipes) {
+    segments.push([p.start.x, p.start.y, p.elbow.x, p.elbow.y]);
+    segments.push([p.elbow.x, p.elbow.y, p.end.x, p.end.y]);
+  }
+  segments.push([dimInitial.from.x, dimInitial.from.y, dimInitial.to.x, dimInitial.to.y]);
+  segments.push([finalFrom.x, finalFrom.y, finalTo.x, finalTo.y]);
+  if (staggerVisible) {
+    segments.push([staggerFrom.x, staggerFrom.y, staggerTo.x, staggerTo.y]);
+    segments.push([pipes[0].elbow.x, pipes[0].elbow.y, pipes[1].elbow.x, pipes[0].elbow.y]);
+  }
+
+  // Rects already occupied by fixed labels (pipe labels, Di).
+  const occupied: PipeCombScreenRect[] = [];
+  for (const p of pipes) {
+    if (p.labelPos) {
+      occupied.push(estimateLabelRect(p.labelPos, p.labelAnchor, 8 + String(p.pipeNumber).length, fontSize));
+    }
+  }
+  occupied.push(estimateLabelRect(dimInitial.labelPos, dimInitial.labelAnchor, dimLabelChars(dimInitial.valueMm), fontSize));
+
+  interface LabelCandidate {
+    pos: PipeCombScreenPoint;
+    anchor: 'start' | 'middle' | 'end';
+  }
+  const scoreCandidate = (cand: LabelCandidate, chars: number, index: number): number => {
+    const rect = estimateLabelRect(cand.pos, cand.anchor, chars, fontSize);
+    const m = 4 * unitsPerPx;
+    let score = index; // deterministic preference for earlier candidates
+    if (rect.x < m || rect.y < m || rect.x + rect.w > W - m || rect.y + rect.h > H - m) {
+      score += 1e6;
+    }
+    for (const o of occupied) score += overlapArea(rect, o) * 1000;
+    for (const [x1, y1, x2, y2] of segments) {
+      if (segIntersectsRect(x1, y1, x2, y2, rect)) score += 25;
+    }
+    return score;
+  };
+  const pick = (cands: LabelCandidate[], chars: number): LabelCandidate => {
+    let best = cands[0];
+    let bestScore = Infinity;
+    cands.forEach((c, i) => {
+      const s = scoreCandidate(c, chars, i);
+      if (s < bestScore) {
+        bestScore = s;
+        best = c;
+      }
+    });
+    const rect = estimateLabelRect(best.pos, best.anchor, chars, fontSize);
+    occupied.push(rect);
+    return best;
+  };
+
+  // Angle label candidates: radial offsets around the arc mid-direction
+  // (the pipe bundle rises to one side of the arc, so alternates matter).
+  const angleRadius = arc.radiusMm + 30 * unitsPerPx;
+  const angleAt = (deg: number, radius: number): PipeCombScreenPoint => ({
+    x: X(arc.center.x + radius * Math.cos((deg * Math.PI) / 180)),
+    y: Y(arc.center.y + radius * Math.sin((deg * Math.PI) / 180)),
+  });
+  const angleCandidates: LabelCandidate[] = [
+    { pos: angleAt(midDeg, angleRadius), anchor: 'middle' },
+    { pos: angleAt(midDeg + 14, angleRadius), anchor: 'middle' },
+    { pos: angleAt(midDeg - 14, angleRadius), anchor: 'middle' },
+    { pos: angleAt(midDeg + 14, angleRadius + 24 * unitsPerPx), anchor: 'middle' },
+  ];
+  const angleChars = 9 + String(solution.elbowAngleDeg).length;
+  const anglePick = pick(angleCandidates, angleChars);
+  const angleLabelPos = anglePick.pos;
+
+  // A label candidates: beside the line mid (both sides) and clear of
+  // either end of the line. The vertical order of the ends swaps with the
+  // sign of A, so candidates are expressed against the TOP/BOTTOM end
+  // rather than from/to (a "beyond to" guess landed on the pipe labels
+  // for negative A).
+  const aMid = { x: (staggerFrom.x + staggerTo.x) / 2, y: (staggerFrom.y + staggerTo.y) / 2 };
+  const aLineX = staggerFrom.x;
+  const aTopY = Math.min(staggerFrom.y, staggerTo.y);
+  const aBottomY = Math.max(staggerFrom.y, staggerTo.y);
+  const aCandidates: LabelCandidate[] = staggerVisible
+    ? [
+        { pos: { x: aLineX + 8 * unitsPerPx, y: aMid.y + fontSize * 0.35 }, anchor: 'start' },
+        { pos: { x: aLineX - 8 * unitsPerPx, y: aMid.y + fontSize * 0.35 }, anchor: 'end' },
+        { pos: { x: aLineX + 8 * unitsPerPx, y: aTopY - 10 * unitsPerPx }, anchor: 'start' },
+        { pos: { x: aLineX - 8 * unitsPerPx, y: aTopY - 10 * unitsPerPx }, anchor: 'end' },
+        { pos: { x: aLineX + 8 * unitsPerPx, y: aTopY - 26 * unitsPerPx }, anchor: 'start' },
+        { pos: { x: aLineX + 8 * unitsPerPx, y: aBottomY + 26 * unitsPerPx }, anchor: 'start' },
+      ]
+    : [];
+  const aChars = dimLabelChars(vm.dimStagger.valueMm);
+  const aPick = staggerVisible
+    ? pick(aCandidates, aChars)
+    : { pos: { x: pipes[1].elbow.x + 10 * unitsPerPx, y: pipes[1].elbow.y - 8 * unitsPerPx }, anchor: 'start' as const };
+  if (!staggerVisible) {
+    occupied.push(estimateLabelRect(aPick.pos, aPick.anchor, aChars, fontSize));
+  }
+
+  // Df label candidates: beside the line mid along v (both sides), then
+  // past either end of the line along n.
+  const thetaRadLayout = (solution.elbowAngleDeg * Math.PI) / 180;
+  const vScreen = { x: Math.sin(thetaRadLayout), y: -Math.cos(thetaRadLayout) };
+  const nScreen = { x: Math.cos(thetaRadLayout), y: Math.sin(thetaRadLayout) };
+  const dfMid = { x: (finalFrom.x + finalTo.x) / 2, y: (finalFrom.y + finalTo.y) / 2 };
+  const dfCandidates: LabelCandidate[] = [
+    {
+      pos: {
+        x: dfMid.x + vScreen.x * fontPx * 1.4 * unitsPerPx,
+        y: dfMid.y + vScreen.y * fontPx * 1.4 * unitsPerPx + fontSize * 0.35,
+      },
+      anchor: 'middle',
+    },
+    {
+      pos: {
+        x: dfMid.x - vScreen.x * fontPx * 1.4 * unitsPerPx,
+        y: dfMid.y - vScreen.y * fontPx * 1.4 * unitsPerPx + fontSize * 0.35,
+      },
+      anchor: 'middle',
+    },
+    { pos: { x: finalTo.x + nScreen.x * 8 * unitsPerPx, y: finalTo.y + nScreen.y * 8 * unitsPerPx }, anchor: 'start' },
+    { pos: { x: finalFrom.x - nScreen.x * 8 * unitsPerPx, y: finalFrom.y - nScreen.y * 8 * unitsPerPx }, anchor: 'end' },
+    {
+      pos: {
+        x: dfMid.x + vScreen.x * fontPx * 2.6 * unitsPerPx,
+        y: dfMid.y + vScreen.y * fontPx * 2.6 * unitsPerPx + fontSize * 0.35,
+      },
+      anchor: 'middle',
+    },
+    {
+      pos: {
+        x: dfMid.x - vScreen.x * fontPx * 2.6 * unitsPerPx,
+        y: dfMid.y - vScreen.y * fontPx * 2.6 * unitsPerPx + fontSize * 0.35,
+      },
+      anchor: 'middle',
+    },
+  ];
+  const dfPick = pick(dfCandidates, dimLabelChars(vm.dimFinal.valueMm));
+
+  const dimFinal: PipeCombScreenDimension = {
+    from: finalFrom,
+    to: finalTo,
+    labelPos: dfPick.pos,
+    labelAnchor: dfPick.anchor,
+    valueMm: vm.dimFinal.valueMm,
+  };
+  const dimStagger: PipeCombScreenDimension & { visible: boolean } = {
+    from: staggerFrom,
+    to: staggerTo,
+    labelPos: aPick.pos,
+    labelAnchor: aPick.anchor,
+    valueMm: vm.dimStagger.valueMm,
+    visible: staggerVisible,
+  };
+
+  return {
+    viewBox: { x: 0, y: 0, w: W, h: H },
+    fontPx,
+    fontSize,
+    unitsPerPx,
+    tick,
+    pipes,
+    dimInitial,
+    dimFinal,
+    dimStagger,
+    angleArcPath,
+    angleLabelPos,
+    labelRects: {
+      initial: estimateLabelRect(dimInitial.labelPos, dimInitial.labelAnchor, dimLabelChars(dimInitial.valueMm), fontSize),
+      final: estimateLabelRect(dimFinal.labelPos, dimFinal.labelAnchor, dimLabelChars(dimFinal.valueMm), fontSize),
+      stagger: estimateLabelRect(dimStagger.labelPos, dimStagger.labelAnchor, aChars, fontSize),
+      angle: estimateLabelRect(angleLabelPos, 'middle', angleChars, fontSize),
+      pipeLabels: pipes
+        .filter((p) => p.labelPos)
+        .map((p) => estimateLabelRect(p.labelPos as PipeCombScreenPoint, p.labelAnchor, 8 + String(p.pipeNumber).length, fontSize)),
+    },
   };
 }

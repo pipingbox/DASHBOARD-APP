@@ -24,7 +24,7 @@ import {
   solvePipeCombStagger,
   type PipeCombStaggerSolution,
 } from '../app/frontend/src/tools/core/geometry/pipe-comb-stagger.ts';
-import { buildPipeCombStaggerViewModel } from '../app/frontend/src/tools/prefabrication/pipe-comb/pipe-comb-stagger-svg.ts';
+import { buildPipeCombStaggerViewModel, buildPipeCombStaggerScreenLayout } from '../app/frontend/src/tools/prefabrication/pipe-comb/pipe-comb-stagger-svg.ts';
 
 let passed = 0;
 const failures: string[] = [];
@@ -227,6 +227,149 @@ for (const n of [2, 4, 12]) {
   check(`N=${n}: single initial dimension`, near(vm.dimInitial.valueMm, 200));
   check(`N=${n}: single final dimension`, near(vm.dimFinal.valueMm, 400));
   console.log(`N=${n}: bounds w=${(vm.bounds.maxX - vm.bounds.minX).toFixed(1)} h=${(vm.bounds.maxY - vm.bounds.minY).toFixed(1)}`);
+}
+
+// ---------------------------------------------------------------------------
+// P2 final-review fixes: real angle-arc path (H2) and screen layout (H3).
+// ---------------------------------------------------------------------------
+
+/** Reconstruct the centre of an SVG circular arc (SVG 1.1 F.6.5, phi = 0). */
+function arcCenterFromPath(
+  sx: number, sy: number, r: number, largeArc: number, sweep: number, ex: number, ey: number,
+): { cx: number; cy: number } {
+  const x1p = (sx - ex) / 2;
+  const y1p = (sy - ey) / 2;
+  const d2 = x1p * x1p + y1p * y1p;
+  const coef = Math.sqrt(Math.max(0, (r * r - d2) / d2));
+  const sign = largeArc !== sweep ? 1 : -1;
+  return { cx: (sx + ex) / 2 + sign * coef * y1p, cy: (sy + ey) / 2 - sign * coef * x1p };
+}
+
+function parseArcPath(d: string) {
+  const m = d.match(
+    /M\s*([\d.eE+-]+)\s+([\d.eE+-]+)\s+A\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s+0\s+0\s+([01])\s+([\d.eE+-]+)\s+([\d.eE+-]+)/,
+  );
+  if (!m) throw new Error(`unparseable arc path: ${d}`);
+  return { sx: +m[1], sy: +m[2], r: +m[3], sweep: +m[5], ex: +m[6], ey: +m[7] };
+}
+
+for (const deg of [15, 45, 60, 90]) {
+  for (const displayWidth of [288, 600]) {
+    const layout = buildPipeCombStaggerScreenLayout(solve(4, 200, 400, deg), displayWidth);
+    const p = parseArcPath(layout.angleArcPath);
+    const elbow = layout.pipes[0].elbow;
+    const center = arcCenterFromPath(p.sx, p.sy, p.r, 0, p.sweep, p.ex, p.ey);
+    const off = Math.hypot(center.cx - elbow.x, center.cy - elbow.y);
+    // Serialization bound: 6-decimal path rounding amplified through the
+    // centre reconstruction; far below any visible pixel.
+    const serTol = Math.max(1e-3, p.r * 1e-6);
+    check(`H2 ${deg}deg@${displayWidth}: arc centred on elbow 1`, off <= serTol, `offset=${off}`);
+    check(`H2 ${deg}deg@${displayWidth}: sweep flag 0`, p.sweep === 0);
+
+    // Interior points of the arc keep a constant radius around the elbow.
+    const a0 = Math.atan2(p.sy - center.cy, p.sx - center.cx);
+    const a1 = Math.atan2(p.ey - center.cy, p.ex - center.cx);
+    let delta = a1 - a0;
+    // sweep=0 travels in the direction of decreasing screen angle.
+    while (delta > 0) delta -= 2 * Math.PI;
+    const apertureDeg = (-delta * 180) / Math.PI;
+    check(`H2 ${deg}deg@${displayWidth}: aperture equals theta`, near(apertureDeg, deg, 1e-3),
+      `aperture=${apertureDeg}`);
+    let radiusOk = true;
+    for (let i = 1; i < 12; i++) {
+      const a = a0 + (delta * i) / 12;
+      const px = center.cx + p.r * Math.cos(a);
+      const py = center.cy + p.r * Math.sin(a);
+      if (Math.abs(Math.hypot(px - center.cx, py - center.cy) - p.r) > 1e-6) radiusOk = false;
+      // Interior arc points must lie on the arc, i.e. exactly r from the elbow.
+      if (Math.abs(Math.hypot(px - elbow.x, py - elbow.y) - p.r) > serTol) radiusOk = false;
+    }
+    check(`H2 ${deg}deg@${displayWidth}: constant radius on interior points`, radiusOk);
+    // Endpoints land on the two direction rays at distance r from the elbow.
+    check(`H2 ${deg}deg@${displayWidth}: start endpoint on circle`,
+      Math.abs(Math.hypot(p.sx - elbow.x, p.sy - elbow.y) - p.r) <= serTol);
+    check(`H2 ${deg}deg@${displayWidth}: end endpoint on circle`,
+      Math.abs(Math.hypot(p.ex - elbow.x, p.ey - elbow.y) - p.r) <= serTol);
+  }
+}
+
+// H3: constant legible on-screen font size at any display width.
+for (const displayWidth of [280, 320, 390, 600, 1200]) {
+  const layout = buildPipeCombStaggerScreenLayout(solve(4, 200, 400, 45), displayWidth, 12);
+  const effectivePx = layout.fontSize / layout.unitsPerPx;
+  check(`H3 @${displayWidth}px: effective font >= 11px`, effectivePx >= 11, `${effectivePx}`);
+  check(`H3 @${displayWidth}px: viewBox finite and positive`,
+    Number.isFinite(layout.viewBox.w) && Number.isFinite(layout.viewBox.h) && layout.viewBox.w > 0 && layout.viewBox.h > 0);
+  check(`H3 @${displayWidth}px: all pipe coordinates finite`,
+    layout.pipes.every((p) => [p.start, p.elbow, p.end].every((q) => Number.isFinite(q.x) && Number.isFinite(q.y))));
+}
+
+// H3: label subset rule — N=12 at narrow width must not overlap, P1/PN stay.
+{
+  const layout = buildPipeCombStaggerScreenLayout(solve(12, 200, 400, 45), 288, 12);
+  const labeled = layout.pipes.filter((p) => p.labelPos !== null);
+  check('H3 N=12@288: P1 labeled', layout.pipes[0].labelPos !== null);
+  check('H3 N=12@288: PN labeled', layout.pipes[11].labelPos !== null);
+  check('H3 N=12@288: subset applied (fewer labels than pipes)', labeled.length < 12, `${labeled.length}`);
+  let gapsOk = true;
+  for (let i = 1; i < labeled.length; i++) {
+    const gapPx = Math.abs(labeled[i].elbow.x - labeled[i - 1].elbow.x) / layout.unitsPerPx;
+    if (gapPx < 12 * 5.5 + 8 - 1e-6) gapsOk = false;
+  }
+  check('H3 N=12@288: labeled elbows keep >= label pitch gap', gapsOk);
+  // Wide display: every label fits again.
+  const wide = buildPipeCombStaggerScreenLayout(solve(12, 200, 400, 45), 2400, 12);
+  check('H3 N=12@2400: all pipes labeled when they fit',
+    wide.pipes.every((p) => p.labelPos !== null));
+}
+
+// H3: geometry fidelity of the screen layout (pure translate+flip, scale 1).
+for (const c of CASES) {
+  const layout = buildPipeCombStaggerScreenLayout(solve(c.pipeCount, c.di, c.df, c.deg), 600);
+  check(`H3 ${c.name}: screen Di preserved`,
+    near(Math.hypot(layout.dimInitial.to.x - layout.dimInitial.from.x, layout.dimInitial.to.y - layout.dimInitial.from.y), c.di, 1e-9));
+  check(`H3 ${c.name}: screen Df preserved`,
+    near(Math.hypot(layout.dimFinal.to.x - layout.dimFinal.from.x, layout.dimFinal.to.y - layout.dimFinal.from.y), c.df, 1e-9));
+  check(`H3 ${c.name}: screen stagger preserved`,
+    near(Math.hypot(layout.dimStagger.to.x - layout.dimStagger.from.x, layout.dimStagger.to.y - layout.dimStagger.from.y), Math.abs(c.expectedA), 1e-9));
+  const elbowGapX = layout.pipes[1].elbow.x - layout.pipes[0].elbow.x;
+  check(`H3 ${c.name}: elbow pitch equals Di`, near(elbowGapX, c.di, 1e-9));
+}
+
+// H3: deterministic label placement — no two labels may overlap, ever.
+{
+  const rectsOverlap = (a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) =>
+    a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+  const placementCases = [
+    ...CASES,
+    { name: 'N=2', pipeCount: 2, di: 200, df: 400, deg: 45, expectedA: 365.68542494923804, direction: 'positive' as const },
+    { name: 'tiny-A', pipeCount: 4, di: 200.04, df: 100, deg: 60, expectedA: -0.0230940107676, direction: 'negative' as const },
+  ];
+  for (const c of placementCases) {
+    for (const displayWidth of [288, 358, 600, 900, 1280]) {
+      const layout = buildPipeCombStaggerScreenLayout(solve(c.pipeCount, c.di, c.df, c.deg), displayWidth);
+      const all: Array<{ x: number; y: number; w: number; h: number }> = [
+        layout.labelRects.initial,
+        layout.labelRects.final,
+        layout.labelRects.stagger,
+        layout.labelRects.angle,
+        ...layout.labelRects.pipeLabels,
+      ];
+      let ok = true;
+      let inside = true;
+      for (let i = 0; i < all.length; i++) {
+        const r = all[i];
+        if (r.x < -1e-6 || r.y < -1e-6 || r.x + r.w > layout.viewBox.w + 1e-6 || r.y + r.h > layout.viewBox.h + 1e-6) {
+          inside = false;
+        }
+        for (let j = i + 1; j < all.length; j++) {
+          if (rectsOverlap(all[i], all[j])) ok = false;
+        }
+      }
+      check(`H3 labels ${c.name}@${displayWidth}: no label-label overlap`, ok);
+      check(`H3 labels ${c.name}@${displayWidth}: labels inside viewBox`, inside);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
