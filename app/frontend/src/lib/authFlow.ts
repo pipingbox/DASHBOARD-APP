@@ -53,7 +53,45 @@ export function isNewSignupIdentity(
   return Math.abs(now - createdAt) <= 30_000;
 }
 
+/**
+ * PB-AUTH-CALLBACK-STALE-APP-001 — allowlist of internal destinations the
+ * OAuth/email callback may redirect to. Mirrors SPA_ROUTE_CONTRACT.ts (repo
+ * root): top-level app segments only, no GUEST routes (avoids
+ * callback → login → callback loops), no arbitrary paths.
+ */
+const AUTH_NEXT_ALLOWED_PREFIXES = [
+  '/dashboard',
+  '/profile',
+  '/applications',
+  '/messages',
+  '/content-drafts',
+  '/community',
+  '/instructor',
+  '/academy',
+  '/tools',
+  '/jobs',
+  '/companies',
+  '/certifications',
+  '/certificaciones',
+  '/pricing',
+  '/blog',
+  '/admin',
+  '/company-dashboard',
+  '/enterprise-dashboard',
+  '/company/',
+  '/',
+];
+
 export function safeAuthNextPath(value: string | null | undefined): string {
   if (!value || !value.startsWith('/') || value.startsWith('//')) return '/dashboard';
-  return value;
+  // Split query so only the pathname is validated; legitimate query strings
+  // are preserved untouched.
+  const queryIndex = value.indexOf('?');
+  const pathname = queryIndex === -1 ? value : value.slice(0, queryIndex);
+  const query = queryIndex === -1 ? '' : value.slice(queryIndex);
+  const allowed = AUTH_NEXT_ALLOWED_PREFIXES.some(
+    (prefix) => prefix === '/' ? pathname === '/' : pathname.startsWith(prefix),
+  );
+  if (!allowed) return '/dashboard';
+  return `${pathname}${query}`;
 }

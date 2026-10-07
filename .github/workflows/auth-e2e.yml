@@ -71,6 +71,21 @@ on:
         required: false
         default: false
         type: boolean
+      run_auth_callback_e2e:
+        description: 'Run ONLY the PB-AUTH-CALLBACK-STALE-APP-001 callback/stale-version/path-normalization E2E (auth-callback-e2e, Android Chrome emulation) in an isolated window — the 7/7 auth gate and the other specs are skipped for this dispatch'
+        required: false
+        default: false
+        type: boolean
+      run_stale_crossdeploy_e2e:
+        description: 'Run ONLY the PB-AUTH-CALLBACK-STALE-APP-001 REAL cross-deploy E2E (stale-crossdeploy-e2e): logs in on the CURRENT preview deployment and WAITS (up to 45 min) for a deploy of expected_sha — the orchestrator dispatches deploy-preview.yml while this job holds an authenticated tab. The job has NO deploy-preview concurrency group on purpose (the preview Worker must change mid-run). Requires expected_env=preview.'
+        required: false
+        default: false
+        type: boolean
+      run_prod_stale_smoke:
+        description: 'Run ONLY the PB-AUTH-CALLBACK-STALE-APP-001 PRODUCTION smoke (prod-stale-smoke): starts BEFORE the production deploy (authenticated tab on the old bundle polls /version.json up to 45 min), then verifies old-tab safety, manual-reload migration, callback exit, /profile%E2%81%A0 normalization and zero-PII wire. Requires expected_env=production and target_url=https://pipingbox.com.'
+        required: false
+        default: false
+        type: boolean
       run_referral_aldo_e2e:
         description: 'Run ONLY the PB-REFERRAL-ALDO-001 referral-attribution E2E (referral-aldo) in an isolated window — the 7/7 auth gate and the other specs are skipped for this dispatch'
         required: false
@@ -87,7 +102,7 @@ jobs:
     name: Auth E2E — require 7/7 PASS
     # Gate 6: the onboarding E2E needs a truly isolated window (same QA
     # account, same preview Worker) — skip the auth gate for that dispatch.
-    if: ${{ inputs.run_onboarding_e2e != true && inputs.run_wfa_e2e != true && inputs.run_dashboard_e2e != true && inputs.run_cert_upload_e2e != true && inputs.run_referral_aldo_e2e != true }}
+    if: ${{ inputs.run_onboarding_e2e != true && inputs.run_wfa_e2e != true && inputs.run_dashboard_e2e != true && inputs.run_cert_upload_e2e != true && inputs.run_referral_aldo_e2e != true && inputs.run_auth_callback_e2e != true && inputs.run_stale_crossdeploy_e2e != true && inputs.run_prod_stale_smoke != true }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -447,6 +462,233 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cert-upload-e2e-results
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  auth-callback-e2e:
+    name: PB-AUTH-CALLBACK-STALE-APP-001 callback/stale-version E2E (SHA-locked, isolated window)
+    if: ${{ inputs.run_auth_callback_e2e == true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Same isolated window as the other disposable-QA specs: shares the
+    # deploy-preview concurrency group so no preview deploy can overwrite the
+    # shared Worker mid-run, and is mutually exclusive with the other modes.
+    concurrency:
+      group: deploy-preview
+      cancel-in-progress: false
+    env:
+      PREVIEW_URL: ${{ inputs.target_url }}
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+      EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
+      EXPECTED_ENV: ${{ inputs.expected_env }}
+
+    steps:
+      - name: Require expected_sha and exclusive dispatch mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${EXPECTED_APP_VERSION:-}" ]; then
+            echo "::error::expected_sha is required when run_auth_callback_e2e=true (the served build must be traceable to the tested SHA)."
+            exit 1
+          fi
+          if [ "${{ inputs.run_identity_e2e }}" = "true" ]; then
+            echo "::error::run_auth_callback_e2e and run_identity_e2e are mutually exclusive (same QA account, isolated window required)."
+            exit 1
+          fi
+          if [ "${{ inputs.run_cert_upload_e2e }}" = "true" ]; then
+            echo "::error::run_auth_callback_e2e and run_cert_upload_e2e are mutually exclusive (same QA account, isolated window required)."
+            exit 1
+          fi
+
+      - name: Checkout exact tested app ref
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact tested SHA
+        env:
+          INPUT_SHA: ${{ inputs.source_ref }}
+        run: git checkout "$INPUT_SHA"
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: 'Run auth-callback E2E (PB-AUTH-CALLBACK-STALE-APP-001) — callback exit, stale-version update loop-safety, /profile%E2%81%A0 normalization'
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/auth-callback-e2e.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      - name: Upload E2E artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auth-callback-e2e-results
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  stale-crossdeploy-e2e:
+    name: PB-AUTH-CALLBACK-STALE-APP-001 REAL cross-deploy E2E (waits for the orchestrator's deploy)
+    if: ${{ inputs.run_stale_crossdeploy_e2e == true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Deliberately NO concurrency group: the preview Worker MUST be allowed
+    # to change mid-run (the orchestrator dispatches deploy-preview.yml with
+    # expected_sha while this job holds an authenticated tab on the old one).
+    timeout-minutes: 70
+    env:
+      PREVIEW_URL: ${{ inputs.target_url }}
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+      EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
+      EXPECTED_ENV: ${{ inputs.expected_env }}
+
+    steps:
+      - name: Require expected_sha (preview) and exclusive dispatch mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${EXPECTED_APP_VERSION:-}" ] || [ "${#EXPECTED_APP_VERSION}" -ne 40 ]; then
+            echo "::error::expected_sha (full 40-char SHA of the deploy this test waits for) is required when run_stale_crossdeploy_e2e=true."
+            exit 1
+          fi
+          if [ "${EXPECTED_ENV}" != "preview" ]; then
+            echo "::error::run_stale_crossdeploy_e2e requires expected_env=preview (production uses run_prod_stale_smoke)."
+            exit 1
+          fi
+          if [ "${{ inputs.run_prod_stale_smoke }}" = "true" ] || [ "${{ inputs.run_cert_upload_e2e }}" = "true" ] || [ "${{ inputs.run_auth_callback_e2e }}" = "true" ]; then
+            echo "::error::run_stale_crossdeploy_e2e is mutually exclusive with the other isolated-window modes (same QA account)."
+            exit 1
+          fi
+
+      - name: Checkout exact tested app ref
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact tested SHA
+        env:
+          INPUT_SHA: ${{ inputs.source_ref }}
+        run: git checkout "$INPUT_SHA"
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: 'Run cross-deploy E2E (holds an authenticated tab while the orchestrator deploys expected_sha)'
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/stale-crossdeploy-e2e.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=list
+
+      - name: Upload E2E artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stale-crossdeploy-e2e-results
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  prod-stale-smoke:
+    name: PB-AUTH-CALLBACK-STALE-APP-001 PRODUCTION smoke (starts BEFORE the production deploy)
+    if: ${{ inputs.run_prod_stale_smoke == true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # No concurrency group: must run WHILE deploy-production.yml executes
+    # (the tab on the old bundle polls /version.json until the deploy lands).
+    timeout-minutes: 70
+    env:
+      PREVIEW_URL: ${{ inputs.target_url }}
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+      EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
+      EXPECTED_ENV: ${{ inputs.expected_env }}
+
+    steps:
+      - name: Require expected_sha (production) and exclusive dispatch mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${EXPECTED_APP_VERSION:-}" ] || [ "${#EXPECTED_APP_VERSION}" -ne 40 ]; then
+            echo "::error::expected_sha (full 40-char deployed SHA) is required when run_prod_stale_smoke=true."
+            exit 1
+          fi
+          if [ "${EXPECTED_ENV}" != "production" ]; then
+            echo "::error::run_prod_stale_smoke requires expected_env=production."
+            exit 1
+          fi
+          if [ "${PREVIEW_URL}" != "https://pipingbox.com" ]; then
+            echo "::error::run_prod_stale_smoke requires target_url=https://pipingbox.com (got ${PREVIEW_URL})."
+            exit 1
+          fi
+          if [ "${{ inputs.run_stale_crossdeploy_e2e }}" = "true" ] || [ "${{ inputs.run_cert_upload_e2e }}" = "true" ] || [ "${{ inputs.run_auth_callback_e2e }}" = "true" ]; then
+            echo "::error::run_prod_stale_smoke is mutually exclusive with the other isolated-window modes (same QA account)."
+            exit 1
+          fi
+
+      - name: Checkout exact tested app ref
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact tested SHA
+        env:
+          INPUT_SHA: ${{ inputs.source_ref }}
+        run: git checkout "$INPUT_SHA"
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: 'Run production smoke (old-tab cross-deploy + callback + path normalization + zero-PII wire)'
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/prod-stale-smoke.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=list
+
+      - name: Upload smoke artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prod-stale-smoke-results
           path: test-results/
           retention-days: 14
           if-no-files-found: ignore

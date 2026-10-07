@@ -216,6 +216,9 @@ export const STATIC_WELL_KNOWN_PATHS = new Set([
   '/site.webmanifest',
   '/.well-known/assetlinks.json',
   '/sw.js',
+  // PB-AUTH-CALLBACK-STALE-APP-001: build-stamp endpoint for stale-version
+  // detection; the Worker serves it with Cache-Control: no-store.
+  '/version.json',
 ]);
 
 // Prefixes that are unambiguously static assets (built JS/CSS/images/fonts).

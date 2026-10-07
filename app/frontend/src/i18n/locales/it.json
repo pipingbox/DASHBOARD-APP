@@ -288,7 +288,22 @@
     "authCallbackErrorDescription": "Questo link potrebbe non essere valido o essere scaduto. Richiedi una nuova email o accedi di nuovo.",
     "authGenericError": "Impossibile creare il tuo account. Riprova.",
     "signInError": "Impossibile accedere. Controlla i dati e riprova.",
-    "oauthStartError": "Impossibile avviare l’accesso con Google. Riprova."
+    "oauthStartError": "Impossibile avviare l’accesso con Google. Riprova.",
+    "callbackRecoveryTitle": "L'accesso sta richiedendo più tempo del previsto",
+    "callbackRecoveryDescription": "La tua sessione potrebbe essere pronta tra un momento. Ricontrolla o accedi di nuovo.",
+    "callbackRecheck": "Ricontrolla",
+    "callbackRecheckFailed": "Non c'è ancora una sessione. Accedi di nuovo.",
+    "callbackGoHome": "Vai alla home",
+    "callbackRelogin": "Accedi di nuovo",
+    "callbackIncidentCode": "Codice di incidenza"
+  },
+  "appUpdate": {
+    "title": "È disponibile una nuova versione di PipingBox",
+    "description": "Aggiorna per continuare a lavorare con la versione più recente.",
+    "updateButton": "Aggiorna app",
+    "persistedTitle": "Non è stato possibile aggiornare l'app",
+    "persistedDescription": "Chiudi questa scheda e riapri PipingBox per usare la nuova versione.",
+    "later": "Più tardi"
   },
   "community": {
     "title": "Community PipingBox",

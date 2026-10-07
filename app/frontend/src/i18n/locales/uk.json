@@ -288,7 +288,22 @@
     "passwordWeak": "Слабкий — додайте більше символів",
     "passwordFair": "Посередній — продовжуйте",
     "passwordGood": "Хороший — гарний пароль",
-    "passwordStrong": "Надійний — чудово!"
+    "passwordStrong": "Надійний — чудово!",
+    "callbackRecoveryTitle": "Вхід триває довше, ніж очікувалося",
+    "callbackRecoveryDescription": "Ваша сесія може бути готова за мить. Перевірте ще раз або увійдіть знову.",
+    "callbackRecheck": "Перевірити ще раз",
+    "callbackRecheckFailed": "Сесії досі немає. Увійдіть знову.",
+    "callbackGoHome": "На головну",
+    "callbackRelogin": "Увійти знову",
+    "callbackIncidentCode": "Код інциденту"
+  },
+  "appUpdate": {
+    "title": "Доступна нова версія PipingBox",
+    "description": "Оновіть, щоб продовжити з найновішою версією.",
+    "updateButton": "Оновити застосунок",
+    "persistedTitle": "Не вдалося оновити застосунок",
+    "persistedDescription": "Закрийте цю вкладку та знову відкрийте PipingBox, щоб використовувати нову версію.",
+    "later": "Пізніше"
   },
   "community": {
     "title": "Спільнота PipingBox",

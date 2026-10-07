@@ -86,6 +86,18 @@ export const OBS_EVENT_NAMES = [
   'document_extraction_completed',
   'document_user_confirmed',
   'document_promoted',
+  // PB-AUTH-CALLBACK-STALE-APP-001 — deterministic auth callback + stale app
+  // version + path normalization. Closed enums (provider/error_category/
+  // recovery_action) validated in buildEventProps; no URL, query string,
+  // OAuth code, token, email, UUID or contaminated original path ever enters
+  // the payload.
+  'auth_callback_started',
+  'auth_callback_completed',
+  'auth_callback_failed',
+  'auth_callback_timeout',
+  'stale_app_version_detected',
+  'app_update_requested',
+  'invalid_path_normalized',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -374,6 +386,32 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
     'mime_category',
     'size_bucket',
   ],
+  // PB-AUTH-CALLBACK-STALE-APP-001 — deterministic callback + version checks.
+  // environment/app_version are attached automatically by trackEvent.
+  // target_version is a build SHA validated against a closed shape (below),
+  // never a URL or free text. route_normalized is the CLEAN path only — the
+  // contaminated original is never emitted.
+  auth_callback_started: ['route', 'correlation_id', 'provider'],
+  auth_callback_completed: ['route', 'correlation_id', 'provider', 'duration_ms'],
+  auth_callback_failed: [
+    'route',
+    'correlation_id',
+    'provider',
+    'duration_ms',
+    'error_category',
+    'recovery_action',
+  ],
+  auth_callback_timeout: [
+    'route',
+    'correlation_id',
+    'provider',
+    'duration_ms',
+    'error_category',
+    'recovery_action',
+  ],
+  stale_app_version_detected: ['route', 'target_version'],
+  app_update_requested: ['route', 'recovery_action'],
+  invalid_path_normalized: ['route_normalized'],
 };
 
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;
@@ -422,6 +460,41 @@ export const DOC_ERROR_CATEGORIES = [
   'unknown',
 ] as const;
 export const DOC_EXTRACTION_STATUSES = ['pending', 'completed', 'low_confidence', 'failed', 'skipped'] as const;
+
+// PB-AUTH-CALLBACK-STALE-APP-001 — closed enums for the callback/version/
+// path-normalization taxonomy. error_category here is DIFFERENT from the
+// document upload one, so the global doc-enum check is scoped to document
+// events (see buildEventProps) and these apply only to auth_callback_*.
+export const AUTH_CALLBACK_ERROR_CATEGORIES = [
+  'session_missing',
+  'exchange_failed',
+  'callback_timeout',
+  'navigation_failed',
+  'stale_version',
+  'unknown',
+] as const;
+export const APP_UPDATE_RECOVERY_ACTIONS = [
+  'recheck',
+  'recheck_or_relogin',
+  'go_home',
+  'relogin',
+  'update_app',
+  'manual_reload',
+  'none',
+] as const;
+/** Events whose error_category uses the DOCUMENT taxonomy (scoped check). */
+const DOC_ERROR_CATEGORY_EVENTS: ReadonlySet<ObsEventName> = new Set([
+  'cert_upload_failed',
+  'document_upload_failed',
+  'document_email_rejected',
+]);
+/** Events whose error_category uses the AUTH CALLBACK taxonomy. */
+const AUTH_CALLBACK_ERROR_CATEGORY_EVENTS: ReadonlySet<ObsEventName> = new Set([
+  'auth_callback_failed',
+  'auth_callback_timeout',
+]);
+/** Build stamps: 40-hex git SHA, short SHA, semver or 'dev'. Closed shape. */
+const VERSION_STAMP_RE = /^(?:[0-9a-f]{7,40}|v?\d+(?:\.\d+){0,2}(?:[-.][A-Za-z0-9.]+)?|dev|[A-Za-z0-9][A-Za-z0-9._-]{0,63})$/;
 
 /** Map a resolved MIME type to the coarse document category (no exact type). */
 export function mimeToCategory(mime: string): (typeof DOC_MIME_CATEGORIES)[number] {
@@ -592,6 +665,7 @@ const PASSTHROUGH_VALUE_KEYS = new Set([
   'incident_code',
   // technical versions / build stamps
   'app_version',
+  'target_version',
   '$browser_version',
   '$lib_version',
   // PB-LIBRARY-COMPLETE-001 — closed Library props. Values are validated
@@ -1004,6 +1078,13 @@ export function buildEventProps(
         if (JOB_ID_RE.test(raw)) out[key] = raw;
         continue;
       }
+      // PB-AUTH-CALLBACK-STALE-APP-001 — build stamps (git SHA) are kept raw:
+      // they are our build identity (same treatment as app_version), and
+      // sanitizeValue would redact 40-hex SHAs as "long tokens".
+      if (key === 'target_version') {
+        if (VERSION_STAMP_RE.test(raw)) out[key] = raw;
+        continue;
+      }
       out[key] = sanitizeValue(raw);
     } else if (typeof raw === 'number' || typeof raw === 'boolean') {
       out[key] = raw;
@@ -1016,7 +1097,30 @@ export function buildEventProps(
   if ('bucket' in out && !CERT_UPLOAD_BUCKETS.includes(out.bucket as never)) delete out.bucket;
   if ('size_bucket' in out && !DOC_SIZE_BUCKETS.includes(out.size_bucket as never)) delete out.size_bucket;
   if ('mime' in out && !CERT_UPLOAD_MIMES.includes(out.mime as never)) delete out.mime;
-  if ('error_category' in out && !DOC_ERROR_CATEGORIES.includes(out.error_category as never)) delete out.error_category;
+  if ('error_category' in out) {
+    // Scoped enums: document events and auth callback events use DIFFERENT
+    // closed taxonomies for the same prop name (PB-AUTH-CALLBACK-STALE-APP-001).
+    if (DOC_ERROR_CATEGORY_EVENTS.has(name) && !DOC_ERROR_CATEGORIES.includes(out.error_category as never)) {
+      delete out.error_category;
+    }
+    if (
+      AUTH_CALLBACK_ERROR_CATEGORY_EVENTS.has(name) &&
+      !AUTH_CALLBACK_ERROR_CATEGORIES.includes(out.error_category as never)
+    ) {
+      delete out.error_category;
+    }
+  }
+  // PB-AUTH-CALLBACK-STALE-APP-001 — build stamps and recovery enums.
+  if ('target_version' in out) {
+    // Keep raw (validated closed shape): a SHA is our build identity, not a
+    // credential; sanitizeValue would otherwise redact it as a long token.
+    if (typeof out.target_version !== 'string' || !VERSION_STAMP_RE.test(out.target_version)) {
+      delete out.target_version;
+    }
+  }
+  if ('recovery_action' in out && !APP_UPDATE_RECOVERY_ACTIONS.includes(out.recovery_action as never)) {
+    delete out.recovery_action;
+  }
   // PB-DOCUMENT-INTAKE-001 — unified document intake closed enums.
   if ('document_type' in out && !DOC_TYPES.includes(out.document_type as never)) delete out.document_type;
   if ('channel' in out && !DOC_CHANNELS.includes(out.channel as never)) delete out.channel;

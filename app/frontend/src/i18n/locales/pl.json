@@ -288,7 +288,22 @@
     "passwordWeak": "Słabe — dodaj więcej znaków",
     "passwordFair": "Przeciętne — tak dalej",
     "passwordGood": "Dobre — niezłe hasło",
-    "passwordStrong": "Silne — doskonale!"
+    "passwordStrong": "Silne — doskonale!",
+    "callbackRecoveryTitle": "Logowanie trwa dłużej niż oczekiwano",
+    "callbackRecoveryDescription": "Twoja sesja może być gotowa za chwilę. Sprawdź ponownie lub zaloguj się jeszcze raz.",
+    "callbackRecheck": "Sprawdź ponownie",
+    "callbackRecheckFailed": "Nadal nie ma sesji. Zaloguj się ponownie.",
+    "callbackGoHome": "Przejdź na stronę główną",
+    "callbackRelogin": "Zaloguj się ponownie",
+    "callbackIncidentCode": "Kod zgłoszenia"
+  },
+  "appUpdate": {
+    "title": "Dostępna jest nowa wersja PipingBox",
+    "description": "Zaktualizuj, aby dalej pracować na najnowszej wersji.",
+    "updateButton": "Zaktualizuj aplikację",
+    "persistedTitle": "Nie udało się zaktualizować aplikacji",
+    "persistedDescription": "Zamknij tę kartę i otwórz PipingBox ponownie, aby używać nowej wersji.",
+    "later": "Później"
   },
   "community": {
     "title": "Społeczność PipingBox",

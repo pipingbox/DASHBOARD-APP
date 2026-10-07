@@ -62,6 +62,29 @@ function pbDeploymentManifestIdentity() {
   };
 }
 
+/**
+ * PB-AUTH-CALLBACK-STALE-APP-001: emit /version.json with the deployed build
+ * stamp. CI sets VITE_APP_VERSION to the exact commit SHA being deployed
+ * (same value embedded as the PostHog app_version), so a long-lived tab can
+ * compare its running bundle against what the origin serves now. Written at
+ * build time into dist/ like any static asset; served with no-store by the
+ * Worker in production and fetched with cache:'no-store' by the client.
+ */
+function pbVersionJsonPlugin() {
+  return {
+    name: 'pb-version-json',
+    apply: 'build' as const,
+    enforce: 'post' as const,
+    closeBundle() {
+      const version = process.env.VITE_APP_VERSION?.trim() || 'dev';
+      fs.writeFileSync(
+        path.resolve(__dirname, 'dist/version.json'),
+        `${JSON.stringify({ version }, null, 2)}\n`,
+      );
+    },
+  };
+}
+
 function escapeHtmlAttr(str: string): string {
   return str
     .replace(/&/g, '&amp;')
@@ -107,6 +130,7 @@ export default defineConfig(({ command }) => {
       // canonical. Fixes the duplicate-canonical defect for blog posts too.
       pbPrerenderHeadDedupePlugin(),
       pbDeploymentManifestIdentity(),
+      pbVersionJsonPlugin(),
       ...(prerenderRoutes.length > 0
         ? vitePrerenderPlugin({
             renderTarget: '#root',

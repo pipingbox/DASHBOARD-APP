@@ -288,7 +288,22 @@
     "authCallbackErrorDescription": "Esta ligação pode ser inválida ou ter expirado. Peça outro email ou inicie sessão novamente.",
     "authGenericError": "Não foi possível criar a sua conta. Tente novamente.",
     "signInError": "Não foi possível iniciar sessão. Verifique os dados e tente novamente.",
-    "oauthStartError": "Não foi possível iniciar o acesso com Google. Tente novamente."
+    "oauthStartError": "Não foi possível iniciar o acesso com Google. Tente novamente.",
+    "callbackRecoveryTitle": "O acesso está a demorar mais do que o esperado",
+    "callbackRecoveryDescription": "A sua sessão pode estar pronta em instantes. Verifique novamente ou inicie sessão outra vez.",
+    "callbackRecheck": "Verificar novamente",
+    "callbackRecheckFailed": "Ainda não existe sessão. Inicie sessão novamente.",
+    "callbackGoHome": "Ir para o início",
+    "callbackRelogin": "Iniciar sessão novamente",
+    "callbackIncidentCode": "Código de incidente"
+  },
+  "appUpdate": {
+    "title": "Está disponível uma nova versão do PipingBox",
+    "description": "Atualize para continuar a trabalhar na versão mais recente.",
+    "updateButton": "Atualizar aplicação",
+    "persistedTitle": "Não foi possível atualizar a aplicação",
+    "persistedDescription": "Feche este separador e abra o PipingBox novamente para usar a nova versão.",
+    "later": "Mais tarde"
   },
   "community": {
     "title": "PipingBox Community",
