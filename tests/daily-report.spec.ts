@@ -17,6 +17,8 @@ import {
   sanitizeText,
   sanitizeError,
   scanForPii,
+  throwOnQueryError,
+  collectStripeMetrics,
   isBrusselsDailyTick,
   evaluateProductionGate,
   classifySmtpError,
@@ -675,5 +677,162 @@ test.describe('Secrets hygiene', () => {
     expect(src).not.toMatch(/whsec_[A-Za-z0-9]/);
     // The cron key is only ever read from Vault at runtime, never a literal.
     expect(src).not.toMatch(/X-Cron-Key: [A-Za-z0-9]/);
+  });
+});
+
+test.describe('Source health semantics (PB-DAILY-MONETIZATION-PERMISSIONS-001)', () => {
+  // PostgREST never throws: a 403/42501 arrives as { data: null, error }.
+  // A failed required read must propagate (source unhealthy) and must NEVER
+  // become a silent zero; a successful empty read IS a legitimate zero.
+
+  type StubResponse = { data?: unknown; count?: number; error?: unknown };
+
+  /** Minimal awaitable PostgREST-chain stub; records queried tables. */
+  function stubSupabase(responses: Record<string, StubResponse>) {
+    const queried: string[] = [];
+    const client = {
+      from(table: string) {
+        queried.push(table);
+        const r = responses[table] ?? { data: [] };
+        // deno-lint-ignore no-explicit-any
+        const builder: any = {};
+        for (const m of ['select', 'gte', 'lt', 'eq', 'in', 'or']) {
+          builder[m] = () => builder;
+        }
+        // deno-lint-ignore no-explicit-any
+        builder.then = (resolve: any, reject: any) => Promise.resolve(r).then(resolve, reject);
+        return builder;
+      },
+    };
+    return { client, queried };
+  }
+
+  const START = '2026-10-05T22:00:00.000Z';
+  const END = '2026-10-06T22:00:00.000Z';
+  const E42501_REV = { code: '42501', message: 'permission denied for table app_marketplace_revenue_events' };
+  const E42501_ORDERS = { code: '42501', message: 'permission denied for table app_orders' };
+
+  test('throwOnQueryError: null/undefined error is a no-op', () => {
+    expect(() => throwOnQueryError(null, 't')).not.toThrow();
+    expect(() => throwOnQueryError(undefined, 't')).not.toThrow();
+  });
+
+  test('throwOnQueryError: query error throws with label and code (sanitizable)', () => {
+    expect(() => throwOnQueryError(E42501_REV, 'app_marketplace_revenue_events'))
+      .toThrow(/app_marketplace_revenue_events: 42501 permission denied/);
+    // The thrown message passes through sanitizeError cleanly (no PII pattern added).
+    try {
+      throwOnQueryError(E42501_REV, 'app_marketplace_revenue_events');
+    } catch (e) {
+      const s = sanitizeError(e);
+      expect(s).toContain('42501');
+      expect(s).not.toContain('[redacted');
+    }
+  });
+
+  // A. app_marketplace_revenue_events 403/42501 => failure propagates; the
+  // block rejects, so the handler marks sources.stripe = false (never OK).
+  test('A: 42501 on app_marketplace_revenue_events propagates (no silent zero)', async () => {
+    const { client, queried } = stubSupabase({
+      app_marketplace_revenue_events: { data: null, error: E42501_REV },
+    });
+    await expect(collectStripeMetrics(client, START, END))
+      .rejects.toThrow(/app_marketplace_revenue_events: 42501/);
+    // Fail-fast: orders/subscriptions are never queried after the first failure.
+    expect(queried).toEqual(['app_marketplace_revenue_events']);
+  });
+
+  // B. app_orders 403/42501 => same behavior.
+  test('B: 42501 on app_orders propagates (no silent zero)', async () => {
+    const { client, queried } = stubSupabase({
+      app_marketplace_revenue_events: { data: [] },
+      app_orders: { data: null, error: E42501_ORDERS },
+    });
+    await expect(collectStripeMetrics(client, START, END))
+      .rejects.toThrow(/app_orders: 42501/);
+    expect(queried).not.toContain('app_subscriptions');
+  });
+
+  test('B2: 42501 on app_subscriptions propagates when orders exist', async () => {
+    const { client } = stubSupabase({
+      app_marketplace_revenue_events: { data: [] },
+      app_orders: { data: [{ id: 'o1', user_id: 'u1', product_key: 'p' }] },
+      app_subscriptions: { count: null as unknown as number, error: { code: '42501', message: 'permission denied for table app_subscriptions' } },
+    });
+    await expect(collectStripeMetrics(client, START, END))
+      .rejects.toThrow(/app_subscriptions: 42501/);
+  });
+
+  // C. Successful queries with zero rows => legitimate zeros, source healthy.
+  test('C: empty successful reads are legitimate zeros (not a failure)', async () => {
+    const { client } = stubSupabase({
+      app_marketplace_revenue_events: { data: [] },
+      app_orders: { data: [] },
+    });
+    const m = await collectStripeMetrics(client, START, END);
+    expect(m.paymentsCompleted).toBe(0);
+    expect(m.paymentsFailed).toBe(0);
+    expect(m.grossCents).toBe(0);
+    expect(m.currency).toBe('EUR');
+    expect(m.checkoutNotActivated).toBe(0);
+  });
+
+  // D. Successful queries with rows => existing calculations stay correct.
+  test('D: populated reads aggregate exactly as before', async () => {
+    const { client } = stubSupabase({
+      app_marketplace_revenue_events: {
+        data: [
+          { event_type: 'SALE', gross_amount_cents: 4900, currency: 'EUR' },
+          { event_type: 'SALE', gross_amount_cents: 100, currency: 'EUR' },
+          { event_type: 'PAYMENT_FAILED', gross_amount_cents: null, currency: 'EUR' },
+          { event_type: 'REFUND', gross_amount_cents: 500, currency: 'EUR' },
+        ],
+      },
+      app_orders: {
+        data: [
+          { id: 'o1', user_id: 'u-with-sub', product_key: 'p' },
+          { id: 'o2', user_id: 'u-no-sub', product_key: 'p' },
+        ],
+      },
+      // u-with-sub has an active subscription; u-no-sub does not.
+      app_subscriptions: { count: 1 },
+    });
+    // First order resolves with sub (count 1), second without (count 0):
+    const origFrom = client.from.bind(client);
+    let subsCall = 0;
+    client.from = (table: string) => {
+      if (table !== 'app_subscriptions') return origFrom(table);
+      subsCall++;
+      const count = subsCall === 1 ? 1 : 0;
+      // deno-lint-ignore no-explicit-any
+      const builder: any = {};
+      for (const m of ['select', 'gte', 'lt', 'eq', 'in', 'or']) builder[m] = () => builder;
+      // deno-lint-ignore no-explicit-any
+      builder.then = (resolve: any, reject: any) => Promise.resolve({ count, error: null }).then(resolve, reject);
+      return builder;
+    };
+    const m = await collectStripeMetrics(client, START, END);
+    expect(m.paymentsCompleted).toBe(2);
+    expect(m.paymentsFailed).toBe(1);
+    expect(m.grossCents).toBe(5000);
+    expect(m.currency).toBe('EUR');
+    expect(m.checkoutNotActivated).toBe(1);
+  });
+
+  // E. Handler wiring: index.ts must check the error of every required read
+  // (source-hygiene regression guard against reintroducing bare { data }).
+  test('E: handler checks query errors on every required source read', async () => {
+    const fs = await import('node:fs/promises');
+    const src = await fs.readFile(
+      new URL('../supabase/functions/daily-intelligence-report/index.ts', import.meta.url),
+      'utf8',
+    );
+    // The stripe block delegates to the checked collector.
+    expect(src).toContain('collectStripeMetrics(supabase, start, end)');
+    // The profiles count read checks its error explicitly.
+    expect(src).toMatch(/profilesError[\s\S]{0,200}throwOnQueryError\(profilesError, "app_14da0f1941_profiles"\)/);
+    // No bare destructure of the monetization reads remains in the handler.
+    expect(src).not.toMatch(/const \{ data: rev \}/);
+    expect(src).not.toMatch(/const \{ data: paidOrders \}/);
   });
 });

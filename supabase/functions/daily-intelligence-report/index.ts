@@ -47,6 +47,8 @@ import {
   sanitizeError,
   sanitizeText,
   scanForPii,
+  throwOnQueryError,
+  collectStripeMetrics,
   hogqlTraffic,
   hogqlRoutes,
   hogqlFunnelSignup,
@@ -160,11 +162,12 @@ async function collectMetrics(
 
   // ── Supabase ──
   try {
-    const { count: newProfiles } = await supabase
+    const { count: newProfiles, error: profilesError } = await supabase
       .from("app_14da0f1941_profiles")
       .select("user_id", { count: "exact", head: true })
       .gte("created_at", start)
       .lt("created_at", end);
+    throwOnQueryError(profilesError, "app_14da0f1941_profiles");
     m.newUsers = newProfiles ?? 0;
 
     // Confirmación de correo vía Auth Admin API (service_role), sin auth.users directo.
@@ -198,38 +201,15 @@ async function collectMetrics(
   }
 
   // ── Stripe (tablas canónicas; livemode real) ──
+  // PB-DAILY-MONETIZATION-PERMISSIONS-001: cada lectura propaga su error
+  // (PostgREST no lanza); un 403/42501 NUNCA se convierte en cero + "OK".
   try {
-    const { data: rev } = await supabase
-      .from("app_marketplace_revenue_events")
-      .select("event_type, gross_amount_cents, currency, livemode")
-      .gte("occurred_at", start)
-      .lt("occurred_at", end)
-      .or("livemode.is.null,livemode.eq.true");
-    const events = (rev ?? []) as Array<{ event_type: string; gross_amount_cents: number | null; currency: string | null }>;
-    m.paymentsCompleted = events.filter((e) => e.event_type === "SALE").length;
-    m.paymentsFailed = events.filter((e) => e.event_type === "PAYMENT_FAILED").length;
-    m.grossCents = events
-      .filter((e) => e.event_type === "SALE")
-      .reduce((a: number, e) => a + (Number(e.gross_amount_cents) || 0), 0);
-    m.currency = events.find((e) => e.currency)?.currency ?? "EUR";
-
-    // Checkout completado pero plan no activado: órdenes pagadas sin suscripción activa.
-    const { data: paidOrders } = await supabase
-      .from("app_orders")
-      .select("id, user_id, product_key")
-      .eq("status", "paid")
-      .gte("paid_at", start)
-      .lt("paid_at", end);
-    let notActivated = 0;
-    for (const o of paidOrders ?? []) {
-      const { count } = await supabase
-        .from("app_subscriptions")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", o.user_id)
-        .in("status", ["active", "trialing"]);
-      if ((count ?? 0) === 0) notActivated++;
-    }
-    m.checkoutNotActivated = notActivated;
+    const slice = await collectStripeMetrics(supabase, start, end);
+    m.paymentsCompleted = slice.paymentsCompleted;
+    m.paymentsFailed = slice.paymentsFailed;
+    m.grossCents = slice.grossCents;
+    m.currency = slice.currency;
+    m.checkoutNotActivated = slice.checkoutNotActivated;
     sources.stripe = true;
   } catch (e) {
     console.error(JSON.stringify({ source: "stripe", error: sanitizeError(e) }));
