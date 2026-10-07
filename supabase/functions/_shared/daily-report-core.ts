@@ -429,6 +429,95 @@ export function sanitizeError(err: unknown): string {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
+// Health semantics de fuentes (PB-DAILY-MONETIZATION-PERMISSIONS-001)
+// ──────────────────────────────────────────────────────────────────────────
+
+/**
+ * PostgREST/supabase-js NUNCA lanza en errores 4xx/5xx: devuelve
+ * `{ data: null, error }`. Si solo se desestructura `data`, un fallo de
+ * permisos (403/42501), red o BD se convierte silenciosamente en [] / 0 /
+ * 0 EUR y la fuente se reporta OK — bug observado en el Daily 2026-10-06
+ * (403 en app_marketplace_revenue_events/app_orders con "Stripe: OK").
+ *
+ * Toda lectura requerida debe pasar por aquí: error ⇒ throw (el catch del
+ * bloque marca la fuente como fallida); sin error ⇒ dato legítimo, incluido
+ * el cero/vacío real. Mensaje limitado a code+message y sanitizado en el
+ * catch con sanitizeError (sin secretos ni PII).
+ */
+export function throwOnQueryError(error: unknown, label: string): void {
+  if (!error) return;
+  const e = error as { code?: unknown; message?: unknown };
+  const code = typeof e?.code === "string" && e.code ? `${e.code} ` : "";
+  const msg = typeof e?.message === "string" && e.message ? e.message : "query_failed";
+  throw new Error(`${label}: ${code}${msg}`);
+}
+
+/** Cliente mínimo que el collector Stripe necesita (supabase-js lo satisface). */
+export interface SupabaseQueryClient {
+  // deno-lint-ignore no-explicit-any
+  from(table: string): any;
+}
+
+export interface StripeMetricsSlice {
+  paymentsCompleted: number;
+  paymentsFailed: number;
+  grossCents: number;
+  currency: string;
+  checkoutNotActivated: number;
+}
+
+/**
+ * Bloque Stripe del Daily: lee las tablas canónicas de monetización en la
+ * ventana [start, end). Las tres lecturas son requeridas: cualquier error de
+ * query propaga (la fuente queda unhealthy) y NUNCA se convierte en cero.
+ * Cero filas con query exitosa SÍ es un cero legítimo.
+ */
+export async function collectStripeMetrics(
+  supabase: SupabaseQueryClient,
+  start: string,
+  end: string,
+): Promise<StripeMetricsSlice> {
+  const { data: rev, error: revError } = await supabase
+    .from("app_marketplace_revenue_events")
+    .select("event_type, gross_amount_cents, currency, livemode")
+    .gte("occurred_at", start)
+    .lt("occurred_at", end)
+    .or("livemode.is.null,livemode.eq.true");
+  throwOnQueryError(revError, "app_marketplace_revenue_events");
+  const events = (rev ?? []) as Array<{ event_type: string; gross_amount_cents: number | null; currency: string | null }>;
+
+  // Checkout completado pero plan no activado: órdenes pagadas sin suscripción activa.
+  const { data: paidOrders, error: ordersError } = await supabase
+    .from("app_orders")
+    .select("id, user_id, product_key")
+    .eq("status", "paid")
+    .gte("paid_at", start)
+    .lt("paid_at", end);
+  throwOnQueryError(ordersError, "app_orders");
+
+  let notActivated = 0;
+  for (const o of (paidOrders ?? []) as Array<{ id: string; user_id: string; product_key: string }>) {
+    const { count, error: subsError } = await supabase
+      .from("app_subscriptions")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", o.user_id)
+      .in("status", ["active", "trialing"]);
+    throwOnQueryError(subsError, "app_subscriptions");
+    if ((count ?? 0) === 0) notActivated++;
+  }
+
+  return {
+    paymentsCompleted: events.filter((e) => e.event_type === "SALE").length,
+    paymentsFailed: events.filter((e) => e.event_type === "PAYMENT_FAILED").length,
+    grossCents: events
+      .filter((e) => e.event_type === "SALE")
+      .reduce((a: number, e) => a + (Number(e.gross_amount_cents) || 0), 0),
+    currency: events.find((e) => e.currency)?.currency ?? "EUR",
+    checkoutNotActivated: notActivated,
+  };
+}
+
+// ──────────────────────────────────────────────────────────────────────────
 // SMTP: clasificación de errores y envío con retry (PB-DAILY-EMAIL-RETRY-001)
 // ──────────────────────────────────────────────────────────────────────────
 
