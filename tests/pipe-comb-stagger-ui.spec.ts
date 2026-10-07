@@ -541,9 +541,11 @@ test('H3: rendered text-anchor matches the computed layout anchors', async ({ pa
     });
     if (!res.success) throw new Error(`kernel rejected ${tag}`);
     const layout = buildPipeCombStaggerScreenLayout(res.result, containerWidth);
+    const diAnchor = await page.locator('[data-testid="pipe-comb-dim-initial"]').getAttribute('text-anchor');
     const dfAnchor = await page.locator('[data-testid="pipe-comb-dim-final"]').getAttribute('text-anchor');
     const aAnchor = await page.locator('[data-testid="pipe-comb-dim-stagger"]').getAttribute('text-anchor');
     const angleAnchor = await page.locator('[data-testid="pipe-comb-angle-label"]').getAttribute('text-anchor');
+    expect(diAnchor, `${tag}: Di anchor (layout=${layout.dimInitial.labelAnchor})`).toBe(layout.dimInitial.labelAnchor);
     expect(dfAnchor, `${tag}: Df anchor (layout=${layout.dimFinal.labelAnchor})`).toBe(layout.dimFinal.labelAnchor);
     expect(aAnchor, `${tag}: A anchor (layout=${layout.dimStagger.labelAnchor})`).toBe(layout.dimStagger.labelAnchor);
     expect(angleAnchor, `${tag}: angle anchor (layout=${layout.angleLabelAnchor})`).toBe(layout.angleLabelAnchor);
@@ -585,4 +587,48 @@ test('H3: rendered text-anchor matches the computed layout anchors', async ({ pa
   await page.setViewportSize({ width: 390, height: 800 });
   await setValues(page, { count: '4', di: '200', df: '100', angle: '60' });
   await expectAnchors(4, 200, 100, 60, 'aligned@390');
+});
+
+/* Di anchor integration (P2 final review): at REF-01 with a real 282px
+ * SVG the layout computes dimInitial.labelAnchor = 'end' (the below-mid
+ * candidate overlaps, so the scorer moves Di past the dimension end).
+ * The component must render that anchor — the previous build hardcoded
+ * textAnchor="middle" for Di, so the estimated box and the real glyph
+ * box disagreed. This regression is RED on that build, GREEN with the
+ * dynamic anchor. */
+test('Di: REF-01 at real 282px renders the computed end anchor', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await openTool(page, TOOL_URL_ES);
+  /* Defaults are REF-01: N=4, Di=200, Df=400, θ=45°. */
+  await page.evaluate(() => {
+    const svg = document.querySelector('[data-testid="pipe-comb-stagger-svg"]');
+    const parent = svg?.parentElement as HTMLElement | null;
+    if (parent) parent.style.width = '282px';
+  });
+  await waitForStableLayout(page);
+
+  const svg = page.locator('[data-testid="pipe-comb-stagger-svg"]');
+  const containerWidth = await svg.evaluate((el) => el.parentElement?.clientWidth ?? 0);
+  const res = solvePipeCombStagger({ pipeCount: 4, initialSpacingMm: 200, finalSpacingMm: 400, elbowAngleDeg: 45 });
+  if (!res.success) throw new Error('kernel rejected REF-01');
+  const layout = buildPipeCombStaggerScreenLayout(res.result, containerWidth);
+
+  /* Precondition: this rig genuinely exercises a non-middle Di anchor. */
+  expect(layout.dimInitial.labelAnchor, 'precondition: computed Di anchor at 282px').toBe('end');
+  /* The rendered anchor must match the computed one. */
+  const diAnchor = await page.locator('[data-testid="pipe-comb-dim-initial"]').getAttribute('text-anchor');
+  expect(diAnchor, 'rendered Di anchor must equal the computed layout anchor').toBe('end');
+
+  /* Joint DOM audit on the same case: no overlaps, nothing clipped,
+   * effective font at the legibility floor, no page overflow. */
+  const audit = await auditAnnotations(page);
+  console.log(
+    `Di-fix REF-01@282 viewport=${audit.viewportWidth}px svg=${audit.svgRenderedWidth.toFixed(1)}px minFont=${audit.minEffectivePx.toFixed(1)}px`,
+  );
+  expect(audit.svgRenderedWidth).toBeGreaterThan(280);
+  expect(audit.svgRenderedWidth).toBeLessThan(284);
+  expect(audit.overlapPairs, 'Di-fix REF-01@282: overlapping annotations').toEqual([]);
+  expect(audit.outsideLabels, 'Di-fix REF-01@282: annotations outside the visible area').toEqual([]);
+  expect(audit.minEffectivePx, 'Di-fix REF-01@282: text below 11 CSS px').toBeGreaterThanOrEqual(11);
+  expect(audit.pageOverflow, 'Di-fix REF-01@282: page overflow').toBeLessThanOrEqual(1);
 });

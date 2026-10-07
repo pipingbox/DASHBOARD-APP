@@ -189,7 +189,7 @@ function PipeCombStaggerDiagram({ solution, fmt, labels }: PipeCombStaggerDiagra
           <text
             x={layout.dimInitial.labelPos.x}
             y={layout.dimInitial.labelPos.y}
-            textAnchor="middle"
+            textAnchor={layout.dimInitial.labelAnchor}
             fill={dimColor}
             fontSize={layout.fontSize}
             {...textHalo}
