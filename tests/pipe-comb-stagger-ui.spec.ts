@@ -1,4 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { solvePipeCombStagger } from '../app/frontend/src/tools/core/geometry/pipe-comb-stagger';
+import { buildPipeCombStaggerScreenLayout } from '../app/frontend/src/tools/prefabrication/pipe-comb/pipe-comb-stagger-svg';
 
 /**
  * PB-PIPE-COMB-CORRECTION-001 — P2
@@ -10,15 +12,16 @@ import { expect, test } from '@playwright/test';
  */
 
 const TOOL_URL = '/tools?t=pipe-comb&lng=en';
+const TOOL_URL_ES = '/tools?t=pipe-comb&lng=es';
 
-async function openTool(page: import('@playwright/test').Page) {
-  await page.goto(TOOL_URL);
+async function openTool(page: import('@playwright/test').Page, url: string = TOOL_URL) {
+  await page.goto(url);
   /* The Beta modal mounts after hydration; dismiss it deterministically so
-     it never intercepts pointer events. */
-  const betaDialog = page.getByRole('dialog', { name: 'Beta Version' });
+     it never intercepts pointer events (locale-independent selector). */
+  const betaDialog = page.locator('div[role="dialog"][data-state="open"]');
   const shown = await betaDialog.waitFor({ state: 'visible', timeout: 10_000 }).then(() => true).catch(() => false);
   if (shown) {
-    await betaDialog.getByRole('button', { name: 'Continue' }).click();
+    await betaDialog.getByRole('button', { name: /continuar|continue/i }).click();
     await betaDialog.waitFor({ state: 'hidden' });
   }
 }
@@ -340,58 +343,246 @@ test('H2: angle arc path is centred on the elbow (real DOM path)', async ({ page
   }
 });
 
-test('H3: dimension and label text stays legible at 320px / 390px', async ({ page }) => {
-  const cases: Array<{ name: string; values: Partial<Record<'count' | 'di' | 'df' | 'angle', string>> }> = [
-    { name: 'positive N=4', values: { count: '4', di: '200', df: '400', angle: '45' } },
-    { name: 'negative N=4', values: { count: '4', di: '400', df: '200', angle: '45' } },
-    { name: '90 degrees', values: { count: '4', di: '200', df: '400', angle: '90' } },
-    { name: 'aligned', values: { count: '4', di: '200', df: '100', angle: '60' } },
-    { name: 'N=2', values: { count: '2', di: '200', df: '400', angle: '45' } },
-    { name: 'N=12', values: { count: '12', di: '200', df: '400', angle: '45' } },
-  ];
+/* ------------------------------------------------------------------ *
+ * H3 FINAL INTEGRATION — real-DOM annotation audit.
+ *
+ * Validates the rendered SVG, not just the pure helper: joint collision
+ * coverage of Di, Df, A, angle and ALL visible pipe labels with real DOM
+ * boxes (getBBox + screen CTM, so the text halo stroke never inflates
+ * the boxes), after fonts, ResizeObserver and the final layout settle.
+ * Records viewportWidth and svgRenderedWidth separately — the viewport
+ * width is never treated as the SVG width.
+ * ------------------------------------------------------------------ */
+
+/** Wait until webfonts, ResizeObserver and the re-layout have settled. */
+async function waitForStableLayout(page: import('@playwright/test').Page) {
+  await page.evaluate(() => document.fonts.ready);
+  const sig = async () =>
+    page.locator('[data-testid="pipe-comb-stagger-svg"]').evaluate((el) => {
+      const texts = Array.from(el.querySelectorAll('text'))
+        .map((t) => `${t.getAttribute('x')},${t.getAttribute('y')},${t.getAttribute('text-anchor')}`)
+        .join(';');
+      return `${el.getAttribute('viewBox')}|${texts}`;
+    });
+  let prev = '';
+  let cur = await sig();
+  for (let i = 0; i < 25 && cur !== prev; i++) {
+    prev = cur;
+    await page.waitForTimeout(120);
+    cur = await sig();
+  }
+}
+
+interface DomAudit {
+  minEffectivePx: number;
+  overlapPairs: string[];
+  outsideLabels: string[];
+  svgRenderedWidth: number;
+  viewportWidth: number;
+  pageOverflow: number;
+}
+
+/** Collect real DOM boxes of every annotation and audit them. */
+async function auditAnnotations(page: import('@playwright/test').Page): Promise<DomAudit> {
+  return page.locator('[data-testid="pipe-comb-stagger-svg"]').evaluate((el) => {
+    const vb = el.getAttribute('viewBox')?.split(/\s+/).map(Number) ?? [0, 0, 1, 1];
+    const svgRect = el.getBoundingClientRect();
+    const selectors: Array<[string, string]> = [
+      ['Di', '[data-testid="pipe-comb-dim-initial"]'],
+      ['Df', '[data-testid="pipe-comb-dim-final"]'],
+      ['A', '[data-testid="pipe-comb-dim-stagger"]'],
+      ['angle', '[data-testid="pipe-comb-angle-label"]'],
+      ['pipe', '[data-testid="pipe-comb-pipe-label"]'],
+    ];
+    const boxes: Array<{ name: string; x: number; y: number; w: number; h: number }> = [];
+    const fontSizes: number[] = [];
+    for (const [name, sel] of selectors) {
+      el.querySelectorAll<SVGTextElement>(sel).forEach((t, idx) => {
+        // getBBox + screen CTM: glyph box only (halo stroke excluded).
+        const bb = t.getBBox();
+        const m = t.getScreenCTM();
+        if (!m) return;
+        const corners = [
+          new DOMPoint(bb.x, bb.y).matrixTransform(m),
+          new DOMPoint(bb.x + bb.width, bb.y).matrixTransform(m),
+          new DOMPoint(bb.x, bb.y + bb.height).matrixTransform(m),
+          new DOMPoint(bb.x + bb.width, bb.y + bb.height).matrixTransform(m),
+        ];
+        const xs = corners.map((p) => p.x);
+        const ys = corners.map((p) => p.y);
+        boxes.push({
+          name: `${name}#${idx}`,
+          x: Math.min(...xs),
+          y: Math.min(...ys),
+          w: Math.max(...xs) - Math.min(...xs),
+          h: Math.max(...ys) - Math.min(...ys),
+        });
+        fontSizes.push(Number(t.getAttribute('font-size')));
+      });
+    }
+    const overlapPairs: string[] = [];
+    // 1px slack absorbs sub-pixel rounding; anything larger is a real overlap.
+    for (let i = 0; i < boxes.length; i++) {
+      for (let j = i + 1; j < boxes.length; j++) {
+        const ox = Math.min(boxes[i].x + boxes[i].w, boxes[j].x + boxes[j].w) - Math.max(boxes[i].x, boxes[j].x);
+        const oy = Math.min(boxes[i].y + boxes[i].h, boxes[j].y + boxes[j].h) - Math.max(boxes[i].y, boxes[j].y);
+        if (ox > 1 && oy > 1) overlapPairs.push(`${boxes[i].name} x ${boxes[j].name}`);
+      }
+    }
+    const outsideLabels: string[] = [];
+    for (const b of boxes) {
+      if (
+        b.x < svgRect.x - 1 ||
+        b.y < svgRect.y - 1 ||
+        b.x + b.w > svgRect.x + svgRect.width + 1 ||
+        b.y + b.h > svgRect.y + svgRect.height + 1
+      ) {
+        outsideLabels.push(b.name);
+      }
+    }
+    return {
+      minEffectivePx: Math.min(...fontSizes.map((f) => (f * svgRect.width) / vb[2])),
+      overlapPairs,
+      outsideLabels,
+      svgRenderedWidth: svgRect.width,
+      viewportWidth: window.innerWidth,
+      pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
+}
+
+const H3_CASES: Array<{ name: string; values: Partial<Record<'count' | 'di' | 'df' | 'angle', string>> }> = [
+  { name: 'REF-01 positive N=4', values: { count: '4', di: '200', df: '400', angle: '45' } },
+  { name: 'negative N=4', values: { count: '4', di: '400', df: '200', angle: '45' } },
+  { name: 'REF-05 90deg', values: { count: '4', di: '200', df: '400', angle: '90' } },
+  { name: 'aligned N=4', values: { count: '4', di: '200', df: '100', angle: '60' } },
+  { name: 'tiny-A negative', values: { count: '4', di: '200.04', df: '100', angle: '60' } },
+  { name: 'N=12', values: { count: '12', di: '200', df: '400', angle: '45' } },
+];
+
+async function runH3Matrix(page: import('@playwright/test').Page, url: string, imperial: boolean, tag: string) {
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 800 });
-    await openTool(page);
-    for (const c of cases) {
+    await openTool(page, url);
+    for (const c of H3_CASES) {
       await setValues(page, c.values);
-      await page.locator('[data-testid="pipe-comb-stagger-svg"]').waitFor();
-      const report = await page.locator('[data-testid="pipe-comb-stagger-svg"]').evaluate((el) => {
-        const vb = el.getAttribute('viewBox')?.split(/\s+/).map(Number) ?? [0, 0, 1, 1];
-        const displayed = el.getBoundingClientRect().width;
-        const texts = Array.from(
-          el.querySelectorAll(
-            '[data-testid="pipe-comb-dim-initial"], [data-testid="pipe-comb-dim-final"], [data-testid="pipe-comb-dim-stagger"], [data-testid="pipe-comb-angle-label"], [data-testid="pipe-comb-pipe-label"]',
-          ),
-        );
-        const minEffectivePx = Math.min(
-          ...texts.map((t) => (Number(t.getAttribute('font-size')) * displayed) / vb[2]),
-        );
-        const labelBoxes = Array.from(el.querySelectorAll('[data-testid="pipe-comb-pipe-label"]')).map((t) => {
-          const r = t.getBoundingClientRect();
-          return { x: r.x, y: r.y, w: r.width, h: r.height };
-        });
-        let labelsOverlap = false;
-        for (let i = 0; i < labelBoxes.length; i++) {
-          for (let j = i + 1; j < labelBoxes.length; j++) {
-            if (
-              labelBoxes[i].x < labelBoxes[j].x + labelBoxes[j].w &&
-              labelBoxes[j].x < labelBoxes[i].x + labelBoxes[i].w &&
-              labelBoxes[i].y < labelBoxes[j].y + labelBoxes[j].h &&
-              labelBoxes[j].y < labelBoxes[i].y + labelBoxes[i].h
-            ) {
-              labelsOverlap = true;
-            }
-          }
-        }
-        return { minEffectivePx, labelsOverlap, svgWidth: displayed, parentWidth: el.parentElement?.clientWidth ?? 0 };
-      });
-      expect(report.minEffectivePx, `${c.name} @${width}px: text too small`).toBeGreaterThanOrEqual(10.5);
-      expect(report.labelsOverlap, `${c.name} @${width}px: overlapping labels`).toBe(false);
-      expect(report.svgWidth, `${c.name} @${width}px: svg wider than container`).toBeLessThanOrEqual(report.parentWidth + 1);
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      if (imperial) {
+        await page.getByRole('button', { name: 'in', exact: true }).click();
+      }
+      await waitForStableLayout(page);
+      const audit = await auditAnnotations(page);
+      console.log(
+        `H3 ${tag} ${c.name} @viewport=${audit.viewportWidth}px svg=${audit.svgRenderedWidth.toFixed(1)}px minFont=${audit.minEffectivePx.toFixed(1)}px`,
       );
-      expect(overflow, `${c.name} @${width}px: page overflow`).toBeLessThanOrEqual(1);
+      expect(audit.overlapPairs, `${tag} ${c.name} @${width}px: overlapping annotations`).toEqual([]);
+      expect(audit.outsideLabels, `${tag} ${c.name} @${width}px: annotations outside the visible area`).toEqual([]);
+      expect(audit.minEffectivePx, `${tag} ${c.name} @${width}px: text below 11 CSS px`).toBeGreaterThanOrEqual(11);
+      expect(audit.pageOverflow, `${tag} ${c.name} @${width}px: page overflow`).toBeLessThanOrEqual(1);
+      if (imperial) {
+        await page.getByRole('button', { name: 'mm', exact: true }).click();
+      }
     }
   }
+}
+
+test('H3: real-DOM annotation audit (es, mm) at 320px / 390px', async ({ page }) => {
+  await runH3Matrix(page, TOOL_URL_ES, false, 'es/mm');
+});
+
+test('H3: real-DOM annotation audit (en, in) at 320px / 390px', async ({ page }) => {
+  await runH3Matrix(page, TOOL_URL, true, 'en/in');
+});
+
+test('H3: PO isolated widths 212px / 282px confirmed in the real app', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await openTool(page);
+  for (const forcedWidth of [212, 282]) {
+    for (const c of [
+      { name: 'negative N=4', values: { count: '4', di: '400', df: '200', angle: '45' } },
+      { name: 'REF-01 positive N=4', values: { count: '4', di: '200', df: '400', angle: '45' } },
+      { name: 'N=12', values: { count: '12', di: '200', df: '400', angle: '45' } },
+    ]) {
+      await setValues(page, c.values);
+      await page.evaluate((w) => {
+        const svg = document.querySelector('[data-testid="pipe-comb-stagger-svg"]');
+        const parent = svg?.parentElement as HTMLElement | null;
+        if (parent) parent.style.width = `${w}px`;
+      }, forcedWidth);
+      await waitForStableLayout(page);
+      const audit = await auditAnnotations(page);
+      console.log(
+        `H3 forced ${c.name} @viewport=${audit.viewportWidth}px svg=${audit.svgRenderedWidth.toFixed(1)}px minFont=${audit.minEffectivePx.toFixed(1)}px`,
+      );
+      expect(audit.svgRenderedWidth, `${c.name}: forced width not applied`).toBeGreaterThan(forcedWidth - 2);
+      expect(audit.svgRenderedWidth, `${c.name}: forced width not applied`).toBeLessThan(forcedWidth + 2);
+      expect(audit.overlapPairs, `${c.name} @${forcedWidth}px: overlapping annotations`).toEqual([]);
+      expect(audit.outsideLabels, `${c.name} @${forcedWidth}px: annotations outside the visible area`).toEqual([]);
+      expect(audit.minEffectivePx, `${c.name} @${forcedWidth}px: text below 11 CSS px`).toBeGreaterThanOrEqual(11);
+    }
+  }
+});
+
+test('H3: rendered text-anchor matches the computed layout anchors', async ({ page }) => {
+  const expectAnchors = async (
+    count: number,
+    di: number,
+    df: number,
+    angle: number,
+    tag: string,
+  ) => {
+    await waitForStableLayout(page);
+    const svg = page.locator('[data-testid="pipe-comb-stagger-svg"]');
+    const containerWidth = await svg.evaluate((el) => el.parentElement?.clientWidth ?? 0);
+    const res = solvePipeCombStagger({
+      pipeCount: count,
+      initialSpacingMm: di,
+      finalSpacingMm: df,
+      elbowAngleDeg: angle,
+    });
+    if (!res.success) throw new Error(`kernel rejected ${tag}`);
+    const layout = buildPipeCombStaggerScreenLayout(res.result, containerWidth);
+    const dfAnchor = await page.locator('[data-testid="pipe-comb-dim-final"]').getAttribute('text-anchor');
+    const aAnchor = await page.locator('[data-testid="pipe-comb-dim-stagger"]').getAttribute('text-anchor');
+    const angleAnchor = await page.locator('[data-testid="pipe-comb-angle-label"]').getAttribute('text-anchor');
+    expect(dfAnchor, `${tag}: Df anchor (layout=${layout.dimFinal.labelAnchor})`).toBe(layout.dimFinal.labelAnchor);
+    expect(aAnchor, `${tag}: A anchor (layout=${layout.dimStagger.labelAnchor})`).toBe(layout.dimStagger.labelAnchor);
+    expect(angleAnchor, `${tag}: angle anchor (layout=${layout.angleLabelAnchor})`).toBe(layout.angleLabelAnchor);
+    const domPipeAnchors = await svg.locator('[data-testid="pipe-comb-pipe-label"]').evaluateAll((els) =>
+      els.map((el) => el.getAttribute('text-anchor')),
+    );
+    const layoutPipeAnchors = layout.pipes.filter((p) => p.labelPos !== null).map((p) => p.labelAnchor);
+    expect(domPipeAnchors, `${tag}: pipe label anchors`).toEqual(layoutPipeAnchors);
+  };
+
+  /* Desktop default (REF-01). */
+  await openTool(page);
+  await expectAnchors(4, 200, 400, 45, 'desktop REF-01');
+
+  /* Negative case at the PO's 282px rig: layout picks Df=end. */
+  await setValues(page, { di: '400', df: '200' });
+  await page.evaluate(() => {
+    const svg = document.querySelector('[data-testid="pipe-comb-stagger-svg"]');
+    const parent = svg?.parentElement as HTMLElement | null;
+    if (parent) parent.style.width = '282px';
+  });
+  await expectAnchors(4, 400, 200, 45, 'negative@282');
+
+  /* N=12 at the PO's 212px rig: layout picks Df=end and A=end. */
+  await setValues(page, { count: '12', di: '200', df: '400' });
+  await page.evaluate(() => {
+    const svg = document.querySelector('[data-testid="pipe-comb-stagger-svg"]');
+    const parent = svg?.parentElement as HTMLElement | null;
+    if (parent) parent.style.width = '212px';
+  });
+  await expectAnchors(12, 200, 400, 45, 'N=12@212');
+
+  /* Aligned case at 390px viewport (invisible-stagger branch). */
+  await page.evaluate(() => {
+    const svg = document.querySelector('[data-testid="pipe-comb-stagger-svg"]');
+    const parent = svg?.parentElement as HTMLElement | null;
+    if (parent) parent.style.width = '';
+  });
+  await page.setViewportSize({ width: 390, height: 800 });
+  await setValues(page, { count: '4', di: '200', df: '100', angle: '60' });
+  await expectAnchors(4, 200, 100, 60, 'aligned@390');
 });

@@ -294,7 +294,9 @@ for (const deg of [15, 45, 60, 90]) {
 }
 
 // H3: constant legible on-screen font size at any display width.
-for (const displayWidth of [280, 320, 390, 600, 1200]) {
+// Widths include the real interior SVG sizes observed in the app and in
+// the PO's isolated review rigs (212/282 px), not just 288+.
+for (const displayWidth of [212, 280, 282, 320, 390, 600, 1200]) {
   const layout = buildPipeCombStaggerScreenLayout(solve(4, 200, 400, 45), displayWidth, 12);
   const effectivePx = layout.fontSize / layout.unitsPerPx;
   check(`H3 @${displayWidth}px: effective font >= 11px`, effectivePx >= 11, `${effectivePx}`);
@@ -305,18 +307,32 @@ for (const displayWidth of [280, 320, 390, 600, 1200]) {
 }
 
 // H3: label subset rule — N=12 at narrow width must not overlap, P1/PN stay.
+// Greedy inclusion: consecutive labeled elbows are >= labelPitchPx apart,
+// except possibly the forced PN, whose label the scorer moves to the free
+// side (verified by the no-overlap rect check here and in the sweep).
 {
   const layout = buildPipeCombStaggerScreenLayout(solve(12, 200, 400, 45), 288, 12);
   const labeled = layout.pipes.filter((p) => p.labelPos !== null);
   check('H3 N=12@288: P1 labeled', layout.pipes[0].labelPos !== null);
   check('H3 N=12@288: PN labeled', layout.pipes[11].labelPos !== null);
   check('H3 N=12@288: subset applied (fewer labels than pipes)', labeled.length < 12, `${labeled.length}`);
+  const labelPitchPx = 12 * 6.2 + 8;
   let gapsOk = true;
-  for (let i = 1; i < labeled.length; i++) {
+  for (let i = 1; i < labeled.length - 1; i++) {
     const gapPx = Math.abs(labeled[i].elbow.x - labeled[i - 1].elbow.x) / layout.unitsPerPx;
-    if (gapPx < 12 * 5.5 + 8 - 1e-6) gapsOk = false;
+    if (gapPx < labelPitchPx - 1e-6) gapsOk = false;
   }
-  check('H3 N=12@288: labeled elbows keep >= label pitch gap', gapsOk);
+  check('H3 N=12@288: greedy labels keep >= label pitch gap (PN excepted)', gapsOk);
+  // Forced PN never overlaps the previous labeled pipe (free-side pick).
+  const rectsOverlapLocal = (a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) =>
+    a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+  let pipeOverlap = false;
+  for (let i = 0; i < layout.labelRects.pipeLabels.length; i++) {
+    for (let j = i + 1; j < layout.labelRects.pipeLabels.length; j++) {
+      if (rectsOverlapLocal(layout.labelRects.pipeLabels[i], layout.labelRects.pipeLabels[j])) pipeOverlap = true;
+    }
+  }
+  check('H3 N=12@288: pipe labels never overlap (incl. forced PN)', !pipeOverlap);
   // Wide display: every label fits again.
   const wide = buildPipeCombStaggerScreenLayout(solve(12, 200, 400, 45), 2400, 12);
   check('H3 N=12@2400: all pipes labeled when they fit',
@@ -337,16 +353,23 @@ for (const c of CASES) {
 }
 
 // H3: deterministic label placement — no two labels may overlap, ever.
+// Final-integration review: the sweep includes the real interior widths
+// observed in the app (288/358) and the PO's isolated rigs (212/282),
+// plus the full minimum regression set (aligned N=4, tiny-A, negative,
+// REF-01, REF-05, N=12). The pick() fallback must always find a free,
+// in-viewBox spot without hiding dimensions or shrinking the font.
 {
   const rectsOverlap = (a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) =>
     a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
   const placementCases = [
     ...CASES,
+    { name: 'aligned N=4', pipeCount: 4, di: 200, df: 100, deg: 60, expectedA: 0, direction: 'aligned' as const },
     { name: 'N=2', pipeCount: 2, di: 200, df: 400, deg: 45, expectedA: 365.68542494923804, direction: 'positive' as const },
     { name: 'tiny-A', pipeCount: 4, di: 200.04, df: 100, deg: 60, expectedA: -0.0230940107676, direction: 'negative' as const },
+    { name: 'N=12', pipeCount: 12, di: 200, df: 400, deg: 45, expectedA: 365.68542494923804, direction: 'positive' as const },
   ];
   for (const c of placementCases) {
-    for (const displayWidth of [288, 358, 600, 900, 1280]) {
+    for (const displayWidth of [212, 240, 282, 288, 320, 358, 600, 900, 1280]) {
       const layout = buildPipeCombStaggerScreenLayout(solve(c.pipeCount, c.di, c.df, c.deg), displayWidth);
       const all: Array<{ x: number; y: number; w: number; h: number }> = [
         layout.labelRects.initial,
@@ -370,6 +393,45 @@ for (const c of CASES) {
       check(`H3 labels ${c.name}@${displayWidth}: labels inside viewBox`, inside);
     }
   }
+}
+
+// H3 final integration: the exact pre-fix failure — negative A at 212 px
+// had NO valid candidate (Df x A and A x pipe-2 overlapped). The
+// deterministic fallback must keep every mandatory annotation placed,
+// free and fully inside the viewBox, and the placement must be stable
+// across rebuilds (same inputs -> identical output).
+{
+  const rectsOverlap = (a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) =>
+    a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+  const build = () => buildPipeCombStaggerScreenLayout(solve(4, 400, 200, 45), 212);
+  const a = build();
+  const b = build();
+  const all = [
+    a.labelRects.initial,
+    a.labelRects.final,
+    a.labelRects.stagger,
+    a.labelRects.angle,
+    ...a.labelRects.pipeLabels,
+  ];
+  check('H3 fallback negative@212: every annotation has a real box',
+    all.every((r) => r.w > 0 && r.h > 0 && Number.isFinite(r.x) && Number.isFinite(r.y)));
+  let overlaps = false;
+  for (let i = 0; i < all.length; i++) {
+    for (let j = i + 1; j < all.length; j++) {
+      if (rectsOverlap(all[i], all[j])) overlaps = true;
+    }
+  }
+  check('H3 fallback negative@212: no label-label overlap', !overlaps);
+  check('H3 fallback negative@212: all labels inside viewBox',
+    all.every((r) => r.x >= -1e-6 && r.y >= -1e-6 && r.x + r.w <= a.viewBox.w + 1e-6 && r.y + r.h <= a.viewBox.h + 1e-6));
+  check('H3 fallback negative@212: deterministic rebuild',
+    JSON.stringify(a.labelRects) === JSON.stringify(b.labelRects));
+  // The mandatory dimensions are never hidden by the fallback.
+  check('H3 fallback negative@212: Di/Df/A/angle labels all present',
+    Boolean(a.dimInitial.labelPos) && Boolean(a.dimFinal.labelPos) &&
+    Boolean(a.dimStagger.labelPos) && Boolean(a.angleLabelPos));
+  // Font stays at the legibility floor even in the narrowest rig.
+  check('H3 fallback negative@212: effective font >= 11px', a.fontSize / a.unitsPerPx >= 11);
 }
 
 // ---------------------------------------------------------------------------

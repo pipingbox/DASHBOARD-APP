@@ -237,7 +237,7 @@ export interface PipeCombScreenPipe {
   end: PipeCombScreenPoint;
   /** Screen position of the pipe label; null when the subset rule hides it. */
   labelPos: PipeCombScreenPoint | null;
-  labelAnchor: 'start' | 'end';
+  labelAnchor: 'start' | 'middle' | 'end';
 }
 
 export interface PipeCombScreenDimension {
@@ -265,6 +265,7 @@ export interface PipeCombStaggerScreenLayout {
   /** Real SVG path data for the angle arc, centred on elbow 1 (sweep=0). */
   angleArcPath: string;
   angleLabelPos: PipeCombScreenPoint;
+  angleLabelAnchor: 'start' | 'middle' | 'end';
   /** Estimated on-screen label boxes (H3): guaranteed mutually
    *  non-overlapping by the deterministic placement pass; exposed for
    *  pure tests. */
@@ -346,7 +347,11 @@ function segIntersectsRect(
 /**
  * Estimated on-screen box of a label. Character count is derived from the
  * value (sign, integer digits, two decimals, unit, short prefix) — a
- * placement heuristic only, deliberately conservative.
+ * placement heuristic only, deliberately conservative. Calibrated against
+ * real Chromium glyph boxes (H3 final integration): the app font averages
+ * ≈0.56em/char and the ink box is ≈1.33em tall starting ≈1.0em above the
+ * baseline, so the estimate uses 0.62em/char, 1.5em height and a 1.1em
+ * baseline offset to always enclose the real glyphs.
  */
 function estimateLabelRect(
   pos: PipeCombScreenPoint,
@@ -354,10 +359,10 @@ function estimateLabelRect(
   chars: number,
   fontSize: number,
 ): PipeCombScreenRect {
-  const w = chars * 0.52 * fontSize;
-  const h = fontSize * 1.15;
+  const w = chars * 0.62 * fontSize;
+  const h = fontSize * 1.5;
   const x = anchor === 'start' ? pos.x : anchor === 'middle' ? pos.x - w / 2 : pos.x - w;
-  return { x, y: pos.y - 0.85 * fontSize, w, h };
+  return { x, y: pos.y - 1.1 * fontSize, w, h };
 }
 
 /** Estimated character count of a dimension label like "Df -117.16 mm". */
@@ -395,51 +400,47 @@ export function buildPipeCombStaggerScreenLayout(
   const unitsPerPx = spanX / usablePx;
 
   const W = spanX + marginsPx * unitsPerPx;
-  const H = spanY + (SCREEN_MARGIN.topPx + SCREEN_MARGIN.bottomPx) * unitsPerPx;
+  // `let`: the stage-2 fallback may extend the canvas downward (H only,
+  // never W — the horizontal scale guarantees the on-screen font size).
+  let H = spanY + (SCREEN_MARGIN.topPx + SCREEN_MARGIN.bottomPx) * unitsPerPx;
   const X = (x: number) => SCREEN_MARGIN.leftPx * unitsPerPx + (x - vm.bounds.minX);
   const Y = (y: number) => SCREEN_MARGIN.topPx * unitsPerPx + (vm.bounds.maxY - y);
 
   const fontSize = fontPx * unitsPerPx;
   const tick = 3.5 * unitsPerPx;
 
-  // --- Pipe labels: deterministic subset so labels never overlap (H3).
+  // --- Pipe labels: deterministic greedy subset (H3 final integration).
+  // Include pipe 1, then every pipe at least `labelPitchPx` away from the
+  // last included one, and always PN. The side (below/above the elbow) is
+  // NOT fixed: every label goes through the same scoring/fallback pass as
+  // the dimension labels, so a tight PN lands on the free side instead of
+  // overlapping its neighbour.
   const elbowPitchPx = solution.pipeCount > 1 ? solution.initialSpacingMm / unitsPerPx : Infinity;
-  // Right-anchored labels ("Tubería 12" ≈ 5.5em) extend left of the
-  // elbow; the subset rule guarantees at least width + 8px clearance.
-  const labelPitchPx = fontPx * 5.5 + 8;
-  const labelEvery = Math.max(1, Math.ceil(labelPitchPx / Math.max(elbowPitchPx, 1e-9)));
+  // End-anchored labels ("Tubería 12" ≈ 10 chars × 0.62em) extend left of
+  // the elbow; same-side labels keep at least width + 8px clearance.
+  const labelPitchPx = fontPx * 6.2 + 8;
   const lastK = solution.pipeCount - 1;
-  const labeledIdx = new Set<number>();
-  for (let k = 0; k <= lastK; k += labelEvery) labeledIdx.add(k);
-  labeledIdx.add(0);
-  labeledIdx.add(lastK);
-  // PN is always labeled; if it collides with the previous multiple of
-  // the subset step, the multiple yields (P1 and PN win).
-  const prevMultiple = Math.floor((lastK - 1) / labelEvery) * labelEvery;
-  if (lastK > 0 && prevMultiple > 0 && lastK - prevMultiple < labelEvery) {
-    labeledIdx.delete(prevMultiple);
+  const labeledIdx = new Set<number>([0]);
+  let lastIncluded = 0;
+  for (let k = 1; k < lastK; k++) {
+    if ((k - lastIncluded) * elbowPitchPx >= labelPitchPx) {
+      labeledIdx.add(k);
+      lastIncluded = k;
+    }
   }
+  if (lastK > 0) labeledIdx.add(lastK); // PN always labeled
   const isLabeled = (k: number) => labeledIdx.has(k);
-
-  // Vertical label offset: below the elbow for positive/aligned stagger,
-  // above for clearly negative stagger (so text avoids the stagger dim).
-  // Near-zero stagger is treated as aligned: its A dimension is too short
-  // to collide with anything, and the free corridor below the elbow line
-  // keeps the Df label region clear (H3, tiny-A case).
-  const negative = vm.dimStagger.valueMm < 0;
-  const staggerTallPx = Math.abs(vm.dimStagger.valueMm) / unitsPerPx;
-  const labelsAbove = negative && staggerTallPx > fontPx * 2.5;
 
   const pipes: PipeCombScreenPipe[] = vm.pipes.map((p, k) => ({
     pipeNumber: p.pipeNumber,
     start: { x: X(p.start.x), y: Y(p.start.y) },
     elbow: { x: X(p.elbow.x), y: Y(p.elbow.y) },
     end: { x: X(p.end.x), y: Y(p.end.y) },
+    // Provisional position (below the elbow); the scoring pass below may
+    // move it above when the free side requires it. Null when the greedy
+    // subset rule hides the label.
     labelPos: isLabeled(k)
-      ? {
-          x: X(p.elbow.x) - 8 * unitsPerPx,
-          y: Y(p.elbow.y) + (labelsAbove ? -10 : 16) * unitsPerPx,
-        }
+      ? { x: X(p.elbow.x) - 8 * unitsPerPx, y: Y(p.elbow.y) + 16 * unitsPerPx }
       : null,
     labelAnchor: 'end',
   }));
@@ -476,9 +477,11 @@ export function buildPipeCombStaggerScreenLayout(
 
   const midDeg = (arc.startDeg + arc.endDeg) / 2;
 
-  // --- Deterministic label placement (H3): score candidates so the
-  // angle, A and Df labels never overlap any other label and stay inside
-  // the viewBox.
+  // --- Deterministic label placement (H3 final integration): EVERY
+  // annotation — pipe labels, Di, angle, A and Df — goes through the same
+  // scoring pass with a ring-scan fallback, so no two labels ever overlap
+  // and all stay inside the viewBox. Pick order: pipe labels (P1..PN),
+  // then Di, angle, A, Df.
   const staggerVisible = Math.abs(vm.dimStagger.valueMm) > 1e-9;
   const staggerFrom = { x: X(vm.dimStagger.from.x), y: Y(vm.dimStagger.from.y) };
   const staggerTo = { x: X(vm.dimStagger.to.x), y: Y(vm.dimStagger.to.y) };
@@ -498,14 +501,8 @@ export function buildPipeCombStaggerScreenLayout(
     segments.push([pipes[0].elbow.x, pipes[0].elbow.y, pipes[1].elbow.x, pipes[0].elbow.y]);
   }
 
-  // Rects already occupied by fixed labels (pipe labels, Di).
+  // Boxes of already-placed labels; every pick appends its winner.
   const occupied: PipeCombScreenRect[] = [];
-  for (const p of pipes) {
-    if (p.labelPos) {
-      occupied.push(estimateLabelRect(p.labelPos, p.labelAnchor, 8 + String(p.pipeNumber).length, fontSize));
-    }
-  }
-  occupied.push(estimateLabelRect(dimInitial.labelPos, dimInitial.labelAnchor, dimLabelChars(dimInitial.valueMm), fontSize));
 
   interface LabelCandidate {
     pos: PipeCombScreenPoint;
@@ -524,6 +521,14 @@ export function buildPipeCombStaggerScreenLayout(
     }
     return score;
   };
+  // A rect is "free" when it stays inside the viewBox (same margin as the
+  // scorer) and overlaps none of the already-placed label boxes.
+  const rectIsFree = (rect: PipeCombScreenRect): boolean => {
+    const m = 4 * unitsPerPx;
+    if (rect.x < m || rect.y < m || rect.x + rect.w > W - m || rect.y + rect.h > H - m) return false;
+    for (const o of occupied) if (rectsOverlap(rect, o)) return false;
+    return true;
+  };
   const pick = (cands: LabelCandidate[], chars: number): LabelCandidate => {
     let best = cands[0];
     let bestScore = Infinity;
@@ -534,10 +539,99 @@ export function buildPipeCombStaggerScreenLayout(
         best = c;
       }
     });
-    const rect = estimateLabelRect(best.pos, best.anchor, chars, fontSize);
+    let rect = estimateLabelRect(best.pos, best.anchor, chars, fontSize);
+    // Deterministic fallback (H3 final integration), two stages:
+    //  1) When EVERY scored candidate still overlaps another label or
+    //     leaves the viewBox, scan concentric rings around the candidates'
+    //     centroid until a fully free, in-viewBox spot is found. Rings
+    //     stop at the farthest viewBox corner (beyond it every position is
+    //     outside, so the scan is exhaustive).
+    //  2) Extremely narrow canvases can be genuinely full: then grow the
+    //     canvas DOWNWARD (H only) and place the label in the fresh band.
+    //     Extending H never changes the horizontal scale, so the
+    //     guaranteed on-screen font size (fontPx) and the physical
+    //     geometry are untouched; no dimension is ever hidden.
+    if (!rectIsFree(rect)) {
+      const centre = {
+        x: cands.reduce((s, c) => s + c.pos.x, 0) / cands.length,
+        y: cands.reduce((s, c) => s + c.pos.y, 0) / cands.length,
+      };
+      const maxR = Math.max(
+        Math.hypot(centre.x, centre.y),
+        Math.hypot(W - centre.x, centre.y),
+        Math.hypot(centre.x, H - centre.y),
+        Math.hypot(W - centre.x, H - centre.y),
+      );
+      const stepR = fontSize * 0.8;
+      const anchors: Array<'start' | 'end' | 'middle'> = ['start', 'end', 'middle'];
+      let found: LabelCandidate | null = null;
+      for (let k = 0; k * stepR <= maxR && !found; k++) {
+        const r = k * stepR;
+        const steps = k === 0 ? 1 : Math.max(8, Math.ceil((2 * Math.PI * r) / stepR));
+        for (let j = 0; j < steps && !found; j++) {
+          const a = (j / steps) * 2 * Math.PI;
+          const pos = { x: centre.x + r * Math.cos(a), y: centre.y + r * Math.sin(a) };
+          for (const anchor of anchors) {
+            const candRect = estimateLabelRect(pos, anchor, chars, fontSize);
+            if (rectIsFree(candRect)) {
+              found = { pos, anchor };
+              break;
+            }
+          }
+        }
+      }
+      if (!found) {
+        // Stage 2: fresh band below everything — always free by
+        // construction (nothing occupies it yet).
+        const m2 = 4 * unitsPerPx;
+        H += fontSize * 1.5 + 2 * m2;
+        const bandBaseline = H - m2 - 0.4 * fontSize;
+        const rectW = chars * 0.62 * fontSize;
+        if (rectW <= W - 2 * m2) {
+          found = { pos: { x: m2, y: bandBaseline }, anchor: 'start' };
+        } else {
+          found = { pos: { x: W / 2, y: bandBaseline }, anchor: 'middle' };
+        }
+      }
+      best = found;
+      rect = estimateLabelRect(best.pos, best.anchor, chars, fontSize);
+    }
     occupied.push(rect);
     return best;
   };
+
+  // --- Pick 1: pipe labels (ascending). Below the elbow preferred, above
+  // as the alternate side; the scorer moves a tight PN to the free side
+  // instead of letting it overlap its neighbour (H3 final integration).
+  for (const p of pipes) {
+    if (!p.labelPos) continue;
+    const chars = 8 + String(p.pipeNumber).length;
+    const chosen = pick(
+      [
+        { pos: { x: p.elbow.x - 8 * unitsPerPx, y: p.elbow.y + 16 * unitsPerPx }, anchor: 'end' },
+        { pos: { x: p.elbow.x - 8 * unitsPerPx, y: p.elbow.y - 10 * unitsPerPx }, anchor: 'end' },
+      ],
+      chars,
+    );
+    p.labelPos = chosen.pos;
+    p.labelAnchor = chosen.anchor;
+  }
+
+  // --- Pick 2: Di label. Below the dimension line preferred; above,
+  // further below and past either end as alternates.
+  const diMidX = (dimInitial.from.x + dimInitial.to.x) / 2;
+  const diPick = pick(
+    [
+      { pos: { x: diMidX, y: dimInitial.from.y + (fontPx + 6) * unitsPerPx }, anchor: 'middle' },
+      { pos: { x: diMidX, y: dimInitial.from.y - 10 * unitsPerPx }, anchor: 'middle' },
+      { pos: { x: diMidX, y: dimInitial.from.y + (fontPx * 2.2 + 6) * unitsPerPx }, anchor: 'middle' },
+      { pos: { x: dimInitial.from.x - 8 * unitsPerPx, y: dimInitial.from.y + fontSize * 0.35 }, anchor: 'end' },
+      { pos: { x: dimInitial.to.x + 8 * unitsPerPx, y: dimInitial.from.y + fontSize * 0.35 }, anchor: 'start' },
+    ],
+    dimLabelChars(dimInitial.valueMm),
+  );
+  dimInitial.labelPos = diPick.pos;
+  dimInitial.labelAnchor = diPick.anchor;
 
   // Angle label candidates: radial offsets around the arc mid-direction
   // (the pipe bundle rises to one side of the arc, so alternates matter).
@@ -555,6 +649,7 @@ export function buildPipeCombStaggerScreenLayout(
   const angleChars = 9 + String(solution.elbowAngleDeg).length;
   const anglePick = pick(angleCandidates, angleChars);
   const angleLabelPos = anglePick.pos;
+  const angleLabelAnchor = anglePick.anchor;
 
   // A label candidates: beside the line mid (both sides) and clear of
   // either end of the line. The vertical order of the ends swaps with the
@@ -576,12 +671,23 @@ export function buildPipeCombStaggerScreenLayout(
       ]
     : [];
   const aChars = dimLabelChars(vm.dimStagger.valueMm);
+  // Aligned (A=0): no dimension line is drawn, but the "A 0" annotation
+  // still goes through the same collision-safe pick around elbow 2 (H3
+  // final integration — previously a fixed position that could overlap).
   const aPick = staggerVisible
     ? pick(aCandidates, aChars)
-    : { pos: { x: pipes[1].elbow.x + 10 * unitsPerPx, y: pipes[1].elbow.y - 8 * unitsPerPx }, anchor: 'start' as const };
-  if (!staggerVisible) {
-    occupied.push(estimateLabelRect(aPick.pos, aPick.anchor, aChars, fontSize));
-  }
+    : pick(
+        [
+          { pos: { x: pipes[1].elbow.x + 10 * unitsPerPx, y: pipes[1].elbow.y - 8 * unitsPerPx }, anchor: 'start' },
+          { pos: { x: pipes[1].elbow.x + 10 * unitsPerPx, y: pipes[1].elbow.y + 20 * unitsPerPx }, anchor: 'start' },
+          {
+            pos: { x: (pipes[0].elbow.x + pipes[1].elbow.x) / 2, y: pipes[0].elbow.y - 24 * unitsPerPx },
+            anchor: 'middle',
+          },
+          { pos: { x: pipes[1].elbow.x - 10 * unitsPerPx, y: pipes[1].elbow.y - 8 * unitsPerPx }, anchor: 'end' },
+        ],
+        aChars,
+      );
 
   // Df label candidates: beside the line mid along v (both sides), then
   // past either end of the line along n.
@@ -651,11 +757,12 @@ export function buildPipeCombStaggerScreenLayout(
     dimStagger,
     angleArcPath,
     angleLabelPos,
+    angleLabelAnchor,
     labelRects: {
       initial: estimateLabelRect(dimInitial.labelPos, dimInitial.labelAnchor, dimLabelChars(dimInitial.valueMm), fontSize),
       final: estimateLabelRect(dimFinal.labelPos, dimFinal.labelAnchor, dimLabelChars(dimFinal.valueMm), fontSize),
       stagger: estimateLabelRect(dimStagger.labelPos, dimStagger.labelAnchor, aChars, fontSize),
-      angle: estimateLabelRect(angleLabelPos, 'middle', angleChars, fontSize),
+      angle: estimateLabelRect(angleLabelPos, angleLabelAnchor, angleChars, fontSize),
       pipeLabels: pipes
         .filter((p) => p.labelPos)
         .map((p) => estimateLabelRect(p.labelPos as PipeCombScreenPoint, p.labelAnchor, 8 + String(p.pipeNumber).length, fontSize)),

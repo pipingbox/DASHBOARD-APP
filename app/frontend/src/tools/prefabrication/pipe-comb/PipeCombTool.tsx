@@ -215,7 +215,7 @@ function PipeCombStaggerDiagram({ solution, fmt, labels }: PipeCombStaggerDiagra
           <text
             x={layout.dimFinal.labelPos.x}
             y={layout.dimFinal.labelPos.y}
-            textAnchor="middle"
+            textAnchor={layout.dimFinal.labelAnchor}
             fill={dimColor}
             fontSize={layout.fontSize}
             {...textHalo}
@@ -242,7 +242,7 @@ function PipeCombStaggerDiagram({ solution, fmt, labels }: PipeCombStaggerDiagra
             <text
               x={layout.dimStagger.labelPos.x}
               y={layout.dimStagger.labelPos.y}
-              textAnchor="start"
+              textAnchor={layout.dimStagger.labelAnchor}
               fill={dimColor}
               fontSize={layout.fontSize}
               {...textHalo}
@@ -255,7 +255,7 @@ function PipeCombStaggerDiagram({ solution, fmt, labels }: PipeCombStaggerDiagra
           <text
             x={layout.dimStagger.labelPos.x}
             y={layout.dimStagger.labelPos.y}
-            textAnchor="start"
+            textAnchor={layout.dimStagger.labelAnchor}
             fill={dimColor}
             fontSize={layout.fontSize}
             {...textHalo}
@@ -277,7 +277,7 @@ function PipeCombStaggerDiagram({ solution, fmt, labels }: PipeCombStaggerDiagra
           <text
             x={layout.angleLabelPos.x}
             y={layout.angleLabelPos.y}
-            textAnchor="middle"
+            textAnchor={layout.angleLabelAnchor}
             fill={dimColor}
             fontSize={layout.fontSize}
             {...textHalo}
