@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES, edgeFunctionUrl, STORAGE_BUCKETS } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock, Cloud, CloudOff, Loader2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, X, Upload, Globe, Lock, Cloud, CloudOff, Loader2, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ONBOARDING_STATUS, hasCompletedOnboarding } from '@/lib/onboarding';
 import { getTrafficProps } from '@/lib/jobs/attribution';
@@ -117,7 +117,7 @@ interface OnboardingWizardProps {
 
 export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const { t } = useTranslation();
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile, signOut } = useAuth();
   const navigate = useNavigate();
 
   // Form state
@@ -467,6 +467,9 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       if (avatarUrl) {
         payload.avatar_url = avatarUrl;
       }
+      // PB-GROWTH-GATE-ONBOARDING-001: a completed onboarding clears any
+      // previous postponement signal.
+      payload.onboarding_postponed_at = null;
 
       const { error } = await supabase
         .from(TABLES.profiles)
@@ -568,14 +571,24 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     }
   };
 
+  // PB-GROWTH-GATE-ONBOARDING-001: the wizard is full-screen; the user must
+  // always retain a reachable sign-out while actively onboarding.
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } finally {
+      navigate('/login', { replace: true });
+    }
+  };
+
   /* ─── PB-OBSERVABILITY-001: canonical-completion-gated event ─── */
   // onboarding_completed may only be emitted after the CANONICAL
   // onboarding_status (set exclusively by the pb_complete_onboarding RPC
   // behind the complete-onboarding edge function) confirms the wizard really
   // finished: PROFILE_COMPLETED or MARKETPLACE_READY. Skipping leaves the
   // profile in PROFILE_STARTED, which must NOT emit the event.
-  const emitCompletedIfCanonical = async () => {
-    if (!user) return;
+  const emitCompletedIfCanonical = async (): Promise<boolean> => {
+    if (!user) return false;
     try {
       const { data } = await supabase
         .from(TABLES.profiles)
@@ -586,58 +599,83 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         // PB-JOBS-ATTRIBUTION-001: campaign attribution snapshot (traffic_* /
         // first_touch_*), persisted in localStorage since first landing.
         trackEvent('onboarding_completed', { account_type: accountType, ...getTrafficProps() }, { dedupeKey: 'completed' });
+        return true;
       }
     } catch {
       // Observability must never break onboarding; without canonical
       // confirmation we must not claim completion.
     }
+    return false;
   };
 
+  /* ─── PB-GROWTH-GATE-ONBOARDING-001 — "Completar después" / POSTPONE ─── */
+  // One deterministic transition: persist `onboarding_postponed_at`, a
+  // user-writable signal that neither profiles_privilege_guard nor the
+  // canonical RPC/recalculate paths ever overwrite. The wizard closes ONLY
+  // after that write succeeds — otherwise OnboardingGate would trap the user
+  // again on the next profile refresh (the production bug this fixes).
+  // Postponed is NOT completed: hasCompletedOnboarding is untouched and
+  // marketplace_ready stays backend-computed (false from this path).
   const skipOnboarding = async () => {
-    if (!user) return;
-
-    // Save whatever we have so far before skipping
+    if (!user || saving) return;
+    setSaving(true);
     try {
-      const payload = buildSupabasePayload();
+      const payload = {
+        ...buildSupabasePayload(),
+        onboarding_postponed_at: new Date().toISOString(),
+      };
       const { error } = await supabase
         .from(TABLES.profiles)
         .update(payload)
         .eq('user_id', user.id);
 
       if (error) {
-        // Best-effort save; continue to complete-onboarding below.
+        // Postponement could not be persisted: keep the wizard open with the
+        // draft intact (recoverable, same contract as saveAndFinish) instead
+        // of dropping the user back into the gate loop.
+        setSaveStatus('error');
+        return;
       }
-    } catch {
-      // Best-effort save
-    }
 
-    // Backend-controlled fields: profile remains PROFILE_STARTED, not marketplace ready.
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      if (accessToken) {
-        await fetch(edgeFunctionUrl('complete-onboarding'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({ marketplace_ready: false }),
-        });
+      // Canonical trio stays backend-owned: the RPC recomputes
+      // onboarding_status / marketplace_ready / profile_completion from the
+      // data actually saved. This path never asks for marketplace readiness.
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData.session?.access_token;
+        if (accessToken) {
+          await fetch(edgeFunctionUrl('complete-onboarding'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ marketplace_ready: false }),
+          });
+        }
+      } catch {
+        // Non-blocking: the postponement signal is already persisted.
       }
-    } catch {
-      // Non-blocking
-    }
 
-    clearDraftFromLocal(user.id);
-    setHasUnsavedChanges(false);
-    // Skipping leaves the canonical status in PROFILE_STARTED (the RPC only
-    // sets MARKETPLACE_READY when marketplace_ready=true), so this stays
-    // silent unless the canonical state truly finalizes.
-    await emitCompletedIfCanonical();
-    await refreshProfile();
-    onComplete();
-    navigate('/dashboard', { replace: true });
+      // The local draft is KEPT on purpose: reopening the wizard later
+      // resumes exactly where the user left off (data + step).
+      setHasUnsavedChanges(false);
+
+      // If the canonical recomputation actually finalized the profile (rich
+      // data, completion >= 30), that is a real completion; otherwise record
+      // the postponement. Never both, and postponed never emits
+      // onboarding_completed.
+      const canonicallyCompleted = await emitCompletedIfCanonical();
+      if (!canonicallyCompleted) {
+        trackEvent('onboarding_postponed', { account_type: accountType }, { dedupeKey: 'postponed' });
+      }
+
+      await refreshProfile();
+      onComplete();
+      navigate('/dashboard', { replace: true });
+    } finally {
+      setSaving(false);
+    }
   };
 
   /* ─── Save status indicator ─── */
@@ -1065,13 +1103,23 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
           </div>
         </div>
 
-        {/* Skip link at bottom */}
-        <div className="mt-4 text-center">
+        {/* Skip + sign-out links at bottom. PB-GROWTH-GATE-ONBOARDING-001:
+            while the wizard is full-screen the user must always retain a
+            reachable way out of the account as well as a way to postpone. */}
+        <div className="mt-4 flex items-center justify-center gap-6">
           <button
             onClick={skipOnboarding}
-            className="text-[10px] text-zinc-600 hover:text-zinc-400 transition uppercase tracking-wider"
+            disabled={saving}
+            className="text-[10px] text-zinc-600 hover:text-zinc-400 transition uppercase tracking-wider disabled:opacity-50"
           >
             {t('onboarding.completeLater')}
+          </button>
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-1 text-[10px] text-zinc-600 hover:text-zinc-400 transition uppercase tracking-wider"
+          >
+            <LogOut className="h-3 w-3" />
+            {t('common.signOut')}
           </button>
         </div>
       </div>

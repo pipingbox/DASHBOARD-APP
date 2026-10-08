@@ -41,6 +41,9 @@ export const OBS_EVENT_NAMES = [
   'onboarding_started',
   'onboarding_step_reached',
   'onboarding_completed',
+  // PB-GROWTH-GATE-ONBOARDING-001 — "Completar después". Never emitted
+  // together with onboarding_completed for the same transition.
+  'onboarding_postponed',
   'referral_link_opened',
   'referral_captured',
   'app_error',
@@ -190,6 +193,7 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   apply_submitted: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade', ...TRAFFIC_ATTRIBUTION_KEYS],
   onboarding_step_reached: ['step', 'account_type'],
   onboarding_completed: ['account_type', ...TRAFFIC_ATTRIBUTION_KEYS],
+  onboarding_postponed: ['account_type'],
   referral_link_opened: ['origin', 'route'],
   referral_captured: ['origin'],
   app_error: [

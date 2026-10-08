@@ -49,3 +49,5 @@ playwright/.cache/
 
 # Wrangler local dev state
 .wrangler/
+.tmp-ref-art/
+node_modules.bak-pwfix/

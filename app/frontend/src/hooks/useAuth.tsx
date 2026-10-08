@@ -41,6 +41,7 @@ export interface Profile {
   show_avatar: boolean;
   profile_completion: number;
   onboarding_status: string | null;
+  onboarding_postponed_at: string | null;
   marketplace_ready: boolean;
   profile_visibility: string | null;
   availability_status: string | null;
@@ -218,6 +219,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             show_avatar: true,
             profile_completion: 100,
             onboarding_status: 'MARKETPLACE_READY',
+            onboarding_postponed_at: null,
             marketplace_ready: true,
             profile_visibility: 'public',
             availability_status: 'available',
@@ -396,6 +398,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               show_avatar: true,
               profile_completion: 10,
               onboarding_status: null,
+              onboarding_postponed_at: null,
               marketplace_ready: false,
               profile_visibility: null,
               availability_status: 'not_specified',
@@ -479,6 +482,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           show_avatar: true,
           profile_completion: 100,
           onboarding_status: 'MARKETPLACE_READY',
+          onboarding_postponed_at: null,
           marketplace_ready: true,
           profile_visibility: 'public',
           availability_status: 'available',
@@ -511,6 +515,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           show_avatar: true,
           profile_completion: 10,
           onboarding_status: null,
+          onboarding_postponed_at: null,
           marketplace_ready: false,
           profile_visibility: null,
           availability_status: 'not_specified',

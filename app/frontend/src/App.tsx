@@ -27,6 +27,7 @@ import AuthCallback from './pages/AuthCallback';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
+import Onboarding from './pages/Onboarding';
 import CompanyDashboard from './pages/CompanyDashboard';
 import EnterpriseDashboard from './pages/EnterpriseDashboard';
 import Academy from './pages/Academy';
@@ -88,6 +89,15 @@ const withShell = (node: React.ReactNode) => (
     <OnboardingGate>
       <AppShell>{node}</AppShell>
     </OnboardingGate>
+  </ProtectedRoute>
+);
+
+// PB-GROWTH-GATE-ONBOARDING-001: full-screen wizard route (no AppShell),
+// still behind auth + gate. Postponed users pass the gate and re-enter the
+// wizard here; never-onboarded users simply see the gate's own wizard.
+const withGateOnly = (node: React.ReactNode) => (
+  <ProtectedRoute>
+    <OnboardingGate>{node}</OnboardingGate>
   </ProtectedRoute>
 );
 
@@ -205,6 +215,7 @@ const AppRoutes = () => {
     />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/dashboard" element={withShell(<Dashboard />)} />
+    <Route path="/onboarding" element={withGateOnly(<Onboarding />)} />
     <Route
       path="/company-dashboard"
       element={withShellRoles(<CompanyDashboard />, ['admin', 'company'])}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { supabase, TABLES } from '@/lib/supabase';
-import { hasCompletedOnboarding } from '@/lib/onboarding';
+import { shouldShowOnboardingWizard } from '@/lib/onboarding';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 
 interface OnboardingGateProps {
@@ -36,7 +36,7 @@ export function OnboardingGate({ children }: OnboardingGateProps) {
     const checkOnboarding = async () => {
       const { data, error } = await supabase
         .from(TABLES.profiles)
-        .select('onboarding_status, title, skills, location, role, account_type')
+        .select('onboarding_status, onboarding_postponed_at, title, skills, location, role, account_type')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -50,14 +50,19 @@ export function OnboardingGate({ children }: OnboardingGateProps) {
       }
 
       if (data) {
-        // Show onboarding if:
-        // 1. onboarding is not completed, AND
-        // 2. Profile is essentially empty (no title+location) OR role is 'user' (no account type selected)
-        const hasOnboarded = hasCompletedOnboarding(data.onboarding_status);
+        // PB-GROWTH-GATE-ONBOARDING-001: postponed users ("Completar después")
+        // are never gated; the pure helper keeps the decision unit-testable.
         const hasBasicInfo = !!(data.title && data.location);
         const needsRoleSelection = data.role === 'user' || !data.account_type;
-        
-        if (!hasOnboarded && (!hasBasicInfo || needsRoleSelection)) {
+
+        if (
+          shouldShowOnboardingWizard({
+            onboardingStatus: data.onboarding_status,
+            hasBasicInfo,
+            needsRoleSelection,
+            postponedAt: data.onboarding_postponed_at,
+          })
+        ) {
           setShowOnboarding(true);
         }
       }
