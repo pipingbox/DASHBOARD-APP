@@ -1,14 +1,18 @@
 /**
- * PB-PIPE-COMB-CORRECTION-001 / P3-A — fabrication layer tests.
+ * PB-PIPE-COMB-CORRECTION-001 / P3-A — fabrication layer tests (review-fix revision).
  *
  * Sections:
- *   F1  Main acceptance case 3x35 deg vs frozen literals
- *   F2  Independent vector reconstruction (recovers Di, Df, theta, planes)
+ *   F1  Main acceptance case 3x35 deg vs frozen literals (+ marking/joints/faces)
+ *   F2  Independent assembly reconstruction against the REQUESTED references
+ *       (absolute planes fixed from inputs; arc built from centre/radius/angle)
+ *       + sensitivity: uniform +10mm / single piece / common take-out error /
+ *       weld gap omitted or doubled must ALL fail
  *   F3  45 deg and 90 deg (90 deg: takeOut = CLR exactly, zero discarded arc)
- *   F4  Directions: positive / negative (REF-03) / aligned
- *   F5  Explicit weld gap + fitting allowance (exact decomposition)
+ *   F4  Directions on BOTH axes: inlet step A vs outlet step delta (finding 5)
+ *   F5  Explicit weld gap + fitting allowance (exact decomposition, joints)
  *   F6  Units: mm vs exact-inch round trip -> identical results
- *   F7  Insufficient references -> pending-references, P1 untouched
+ *   F7  Insufficient references -> pending pieces with stable ids, provided
+ *       values preserved, missing list, P1 untouched (finding 6)
  *   F8  Impossible lengths -> invalid pieces, plan flagged, rest computed
  *   F9  No double deduction (decomposition residual 0 on every pipe)
  *   F10 Negative A does NOT imply negative cut lengths
@@ -16,8 +20,11 @@
  *   F12 Invalid adjustments/references -> machine codes
  *   F13 Bend mode (custom CLR): tangencies, developed arc, bar length
  *   F14 Engine correspondence: |t_engine - CLR*tan(theta/2)| <= 5e-7
- *   F15 N=2 and N=12 piece counts + P1 cumulative propagation
+ *   F15 N=2 and N=12 piece/joint counts + P1 cumulative propagation
  *   F16 OD-across-schedules invariant + P1 non-mutation identity
+ *   F17 CLR incompatibility: <, =, slightly above OD/2, with/without refs (finding 1)
+ *   F18 Marking contract: datum/method semantics + independent cut-plane
+ *       and angle recovery from the delivered marks (finding 3)
  *
  * Run: node --experimental-strip-types scripts/test-pipe-comb-fabrication.ts
  */
@@ -25,6 +32,7 @@
 import {
   solvePipeCombFabrication,
   ELBOW_ENGINE_PRECISION_MM,
+  MVP_MARKING_METHOD,
   type PipeCombFabricationInput,
   type PipeCombFabricationSolution,
 } from '../app/frontend/src/tools/prefabrication/pipe-comb/pipe-comb-fabrication.ts';
@@ -47,7 +55,7 @@ const ENGINE_TOL = 1e-6; // documented integration tolerance (engine rounds to 6
 
 function solve(input: PipeCombFabricationInput): PipeCombFabricationSolution {
   const result = solvePipeCombFabrication(input);
-  if (!result.success) {
+  if (result.success === false) {
     throw new Error(`unexpected failure: ${result.code} ${result.reason} for ${JSON.stringify(input)}`);
   }
   return result.result;
@@ -56,7 +64,7 @@ function expectFail(input: PipeCombFabricationInput, code: string): void {
   const result = solvePipeCombFabrication(input);
   check(
     `${code} <- nps=${input.nps} elbow=${JSON.stringify(input.elbow)} refs=${JSON.stringify(input.references)}`,
-    !result.success && result.code === code,
+    result.success === false && result.code === code,
     JSON.stringify(result).slice(0, 220),
   );
 }
@@ -78,6 +86,122 @@ const mainInput: PipeCombFabricationInput = {
 };
 
 // ---------------------------------------------------------------------------
+// F2 (review finding 2): independent assembly reconstruction.
+//
+// Everything below is anchored to the REQUESTED data, never derived from the
+// module result: REF-ENT is the plane y=0 (u=(0,1)); pipe i inlet axis at
+// x = k*Di (Di fixed from input); E_i = (k*Di, Lin - k*A) with A from the
+// frozen kernel; REF-SAL is the plane through E_1 + Lout*v perpendicular to
+// v, fixed from inputs. Each pipe is assembled PHYSICALLY: free face at
+// REF-ENT -> finished pup -> weld gap -> elbow face -> arc built from its
+// CENTRE, RADIUS and ANGLE (never from the result's takeOutMm) -> weld gap
+// -> finished outlet pup -> real end Q_i. The take-out used in checks is
+// computed independently as CLR*tan(theta/2).
+// ---------------------------------------------------------------------------
+interface Vec {
+  x: number;
+  y: number;
+}
+function verifyAssembly(
+  label: string,
+  sol: PipeCombFabricationSolution,
+  input: PipeCombFabricationInput,
+  tol: number,
+): string[] {
+  const problems: string[] = [];
+  const thetaRad = (input.elbowAngleDeg * Math.PI) / 180;
+  const cos = Math.cos(thetaRad);
+  const sin = Math.sin(thetaRad);
+  const Di = input.initialSpacingMm;
+  const A = sol.stagger.adjacentStaggerMm; // frozen kernel source
+  const CLR = sol.elbow.clrMm;
+  const tIndep = CLR * Math.tan(thetaRad / 2); // independent of sol.elbow.takeOutMm
+  const Lin = input.references?.inletAxisToAxisMm as number;
+  const Lout = input.references?.outletAxisToAxisMm as number;
+  const g = sol.references.weldGapMm; // assembly gap as declared by the module
+  const isBend = sol.elbow.mode === 'bend';
+
+  // REQUESTED outlet plane, fixed from inputs.
+  const S1: Vec = { x: Lout * sin, y: Lin + Lout * cos };
+  const dotV = (p: Vec): number => p.x * sin + p.y * cos;
+
+  let prevT2: Vec | undefined;
+  let firstT1: Vec | undefined;
+  for (let k = 0; k < sol.pipes.length; k++) {
+    const pipe = sol.pipes[k];
+    const E: Vec = { x: k * Di, y: Lin - k * A };
+    const F: Vec = { x: k * Di, y: 0 }; // free face on REF-ENT, on pipe axis
+
+    let straightIn: number;
+    let straightOut: number;
+    if (isBend) {
+      const bend = pipe.pieces[0];
+      straightIn = bend.straightInletMm as number;
+      straightOut = bend.straightOutletMm as number;
+    } else {
+      straightIn = (pipe.pieces.find((p) => p.kind === 'inlet-pup')?.finishedLengthMm as number) + g;
+      straightOut = g + (pipe.pieces.find((p) => p.kind === 'outlet-pup')?.finishedLengthMm as number);
+    }
+
+    // Assemble: free face -> straight -> arc (centre/radius/angle) -> straight.
+    const T1: Vec = { x: F.x, y: F.y + straightIn };
+    const C: Vec = { x: T1.x + CLR, y: T1.y };
+    const T2: Vec = { x: C.x - CLR * cos, y: C.y + CLR * sin };
+    const Q: Vec = { x: T2.x + straightOut * sin, y: T2.y + straightOut * cos };
+
+    // (a) tangency vs axis intersection along the inlet axis.
+    const tIn = E.y - T1.y;
+    if (!near(tIn, tIndep, tol)) problems.push(`${label} P${k + 1}: (E-T1).u=${tIn} != t=${tIndep}`);
+    // (b) cut face/tangency vs axis intersection along the outlet axis.
+    const tOut = dotV({ x: T2.x - E.x, y: T2.y - E.y });
+    if (!near(tOut, tIndep, tol)) problems.push(`${label} P${k + 1}: (T2-E).v=${tOut} != t=${tIndep}`);
+    // (c) intersection of assembled axes lands on the input E_i.
+    const dx = T2.x - T1.x;
+    const dy = T2.y - T1.y;
+    if (Math.abs(sin) > 1e-12) {
+      const b = -dx / sin;
+      const a = dy + b * cos;
+      const I: Vec = { x: T1.x, y: T1.y + a };
+      if (!near(I.x, E.x, tol) || !near(I.y, E.y, tol)) {
+        problems.push(`${label} P${k + 1}: assembled axis intersection (${I.x},${I.y}) != E (${E.x},${E.y})`);
+      }
+    }
+    // (d) real assembled end against the REQUESTED REF-SAL plane.
+    const deviation = dotV({ x: Q.x - S1.x, y: Q.y - S1.y });
+    if (!near(deviation, 0, tol)) problems.push(`${label} P${k + 1}: REF-SAL deviation=${deviation}`);
+    // (e) stagger between assembled tangencies equals the kernel A.
+    if (firstT1 !== undefined) {
+      const staggerRec = firstT1.y - T1.y;
+      if (!near(staggerRec, k * A, tol)) problems.push(`${label} P${k + 1}: stagger recovered=${staggerRec} != ${k * A}`);
+    }
+    // (f) Df between consecutive assembled outlet axes.
+    if (prevT2 !== undefined) {
+      const dfRec = (T2.x - prevT2.x) * cos - (T2.y - prevT2.y) * sin;
+      if (!near(dfRec, input.finalSpacingMm, tol)) problems.push(`${label} P${k + 1}: Df recovered=${dfRec} != ${input.finalSpacingMm}`);
+    }
+    prevT2 = T2;
+    firstT1 = firstT1 ?? T1;
+  }
+  return problems;
+}
+function clone(sol: PipeCombFabricationSolution): PipeCombFabricationSolution {
+  return JSON.parse(JSON.stringify(sol)) as PipeCombFabricationSolution;
+}
+function mutateAllPups(sol: PipeCombFabricationSolution, deltaMm: number): void {
+  for (const pipe of sol.pipes) {
+    for (const piece of pipe.pieces) {
+      if (piece.kind === 'inlet-pup' || piece.kind === 'outlet-pup') {
+        piece.finishedLengthMm = (piece.finishedLengthMm as number) + deltaMm;
+      }
+      if (piece.kind === 'bent-tube') {
+        piece.straightInletMm = (piece.straightInletMm as number) + deltaMm;
+        piece.straightOutletMm = (piece.straightOutletMm as number) + deltaMm;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // F1. Main acceptance case 3x35 deg vs frozen literals
 // ---------------------------------------------------------------------------
 console.log('--- F1. Main case 3x35 vs fixture literals ---');
@@ -88,29 +212,47 @@ console.log('--- F1. Main case 3x35 vs fixture literals ---');
   check('F1 elbow mode', sol.elbow.mode === 'catalog-cut');
   check('F1 OD', near(sol.elbow.odMm, MAIN.odMm, PURE_TOL));
   check('F1 CLR', near(sol.elbow.clrMm, MAIN.clrMm, PURE_TOL));
+  check('F1 intrados radius', near(sol.elbow.intradosRadiusMm, MAIN.clrMm - MAIN.odMm / 2, PURE_TOL));
+  check('F1 geometryValid', sol.elbow.geometryValid === true);
   check('F1 takeOut (engine, 1e-6)', near(sol.elbow.takeOutMm, MAIN.takeOutMm, ENGINE_TOL), `${sol.elbow.takeOutMm}`);
   check('F1 takeOut engine literal', sol.elbow.takeOutMm === MAIN.takeOutEngineMm);
   check('F1 cutIntrados', near(sol.elbow.cutIntradosMm as number, MAIN.cutIntradosMm, ENGINE_TOL));
   check('F1 cutExtrados', near(sol.elbow.cutExtradosMm as number, MAIN.cutExtradosMm, ENGINE_TOL));
+  check('F1 arcIntrados (MVP mark)', near(sol.elbow.arcFromKeptFaceMm?.intradosMm as number, MAIN.arcIntradosMm, PURE_TOL));
+  check('F1 arcCenterline (MVP mark)', near(sol.elbow.arcFromKeptFaceMm?.centerlineMm as number, MAIN.arcCenterlineMm, PURE_TOL));
+  check('F1 arcExtrados (MVP mark)', near(sol.elbow.arcFromKeptFaceMm?.extradosMm as number, MAIN.arcExtradosMm, PURE_TOL));
+  check('F1 projCenterline', near(sol.elbow.axialProjectionFromKeptFaceMm?.centerlineMm as number, MAIN.projectionCenterlineMm, PURE_TOL));
+  check('F1 projIntrados', near(sol.elbow.axialProjectionFromKeptFaceMm?.intradosMm as number, MAIN.projectionIntradosMm, PURE_TOL));
+  check('F1 projExtrados', near(sol.elbow.axialProjectionFromKeptFaceMm?.extradosMm as number, MAIN.projectionExtradosMm, PURE_TOL));
   check('F1 keptArc', near(sol.elbow.keptArcLengthMm as number, MAIN.keptArcLengthMm, ENGINE_TOL));
   check('F1 discardedArc', near(sol.elbow.discardedArcLengthMm as number, MAIN.discardedArcLengthMm, ENGINE_TOL));
+  check('F1 markingMethodDeclared', sol.elbow.markingMethodDeclared === MVP_MARKING_METHOD);
+  check('F1 cutSemantics declared', typeof sol.elbow.cutSemantics === 'string' && sol.elbow.cutSemantics.includes('NOT an arc distance'));
+  check('F1 modelNote declared', typeof sol.elbow.modelNote === 'string' && sol.elbow.modelNote.includes('nominal circular-arc'));
+  check('F1 outletAxisStepMm', near(sol.outletAxisStepMm, MAIN.outletStepMm, PURE_TOL), `${sol.outletAxisStepMm}`);
   check('F1 clearance initial', near(sol.initialClearanceMm, MAIN.initialClearanceMm, PURE_TOL));
   check('F1 clearance final', near(sol.finalClearanceMm, MAIN.finalClearanceMm, PURE_TOL));
   check('F1 catalog_elbow_cut warning', sol.warnings.some((w) => w.code === 'catalog_elbow_cut'));
   check('F1 plan valid', sol.cutPlanValid === true);
-  check('F1 references defined', sol.references.defined === true);
+  check('F1 references defined', sol.references.defined === true && sol.references.missing.length === 0);
   check('F1 cutList length = 2N', sol.cutList.length === 2 * MAIN.pipeCount, `${sol.cutList.length}`);
+  check('F1 joints length = 2N', sol.joints.length === 2 * MAIN.pipeCount, `${sol.joints.length}`);
+  for (const j of sol.joints) {
+    check(`F1 joint ${j.id} faces distinct`, j.faceA !== j.faceB);
+    check(`F1 joint ${j.id} gap explicit`, j.gapMm === MAIN.weldGapMm);
+    check(`F1 joint ${j.id} links two pieces`, j.pieces.length === 2);
+  }
 
   for (const ref of MAIN.pups) {
     const pipe = sol.pipes[ref.pipeNumber - 1];
     check(`F1 P${ref.pipeNumber} cumulative`, near(pipe.cumulativeStaggerMm, (ref.pipeNumber - 1) * MAIN.staggerMm, PURE_TOL));
     const pupIn = pipe.pieces.find((p) => p.id === `P${ref.pipeNumber}-IN`);
     const pupOut = pipe.pieces.find((p) => p.id === `P${ref.pipeNumber}-OUT`);
-    const elbow = pipe.pieces.find((p) => p.id === `P${ref.pipeNumber}-ELBOW`);
+    const elbowPiece = pipe.pieces.find((p) => p.id === `P${ref.pipeNumber}-ELBOW`);
     check(`F1 P${ref.pipeNumber}-IN exists`, pupIn !== undefined);
     check(`F1 P${ref.pipeNumber}-OUT exists`, pupOut !== undefined);
-    check(`F1 P${ref.pipeNumber}-ELBOW exists`, elbow !== undefined);
-    if (pupIn && pupOut) {
+    check(`F1 P${ref.pipeNumber}-ELBOW exists`, elbowPiece !== undefined);
+    if (pupIn && pupOut && elbowPiece) {
       check(`F1 P${ref.pipeNumber}-IN axis`, near(pupIn.axisToAxisLengthMm as number, ref.axisInMm, PURE_TOL), `${pupIn.axisToAxisLengthMm}`);
       check(`F1 P${ref.pipeNumber}-OUT axis`, near(pupOut.axisToAxisLengthMm as number, ref.axisOutMm, PURE_TOL), `${pupOut.axisToAxisLengthMm}`);
       check(`F1 P${ref.pipeNumber}-IN finished`, near(pupIn.finishedLengthMm as number, ref.inletFinishedMm, ENGINE_TOL), `${pupIn.finishedLengthMm}`);
@@ -118,69 +260,57 @@ console.log('--- F1. Main case 3x35 vs fixture literals ---');
       check(`F1 P${ref.pipeNumber}-IN cut=finished (allowance 0)`, near(pupIn.cutLengthMm as number, pupIn.finishedLengthMm as number, PURE_TOL));
       check(`F1 P${ref.pipeNumber}-IN status`, pupIn.status === 'ok');
       check(`F1 P${ref.pipeNumber}-OUT status`, pupOut.status === 'ok');
+      check(`F1 P${ref.pipeNumber}-IN allowance handling`, pupIn.allowanceHandling === 'remove-at-fit-up');
+      check(`F1 P${ref.pipeNumber}-IN faces`, (pupIn.faces as { free: string; joint: string }).free === 'REF-ENT' && (pupIn.faces as { joint: string }).joint === `P${ref.pipeNumber}-IN-FACE-J`);
+      check(`F1 P${ref.pipeNumber}-ELBOW faces`, (elbowPiece.faces as { inlet: string }).inlet === `P${ref.pipeNumber}-ELBOW-FACE-IN`);
     }
   }
-  console.log(`A=${sol.stagger.adjacentStaggerMm.toFixed(6)} t=${sol.elbow.takeOutMm} cutList=${sol.cutList.length}`);
+  console.log(`A=${sol.stagger.adjacentStaggerMm.toFixed(6)} t=${sol.elbow.takeOutMm} cutList=${sol.cutList.length} joints=${sol.joints.length}`);
 }
 
 // ---------------------------------------------------------------------------
-// F2. Independent vector reconstruction from pieces + elbow + gap
+// F2. Independent assembly reconstruction + sensitivity (review finding 2)
 // ---------------------------------------------------------------------------
-console.log('--- F2. Independent reconstruction ---');
-function reconstructAndVerify(label: string, sol: PipeCombFabricationSolution, tol: number): void {
-  const thetaRad = (sol.elbow.keptAngleDeg * Math.PI) / 180;
-  const g = sol.references.weldGapMm;
-  const t = sol.elbow.takeOutMm;
-  const isBend = sol.elbow.mode === 'bend';
-  // Assemble each pipe from its PHYSICAL pieces only (different computation
-  // path than the module formulas): L_i along initial axis u=(0,1),
-  // M_i along final axis v=(sin t, cos t). REF-ENT plane: y = 0 for all.
-  const L: number[] = [];
-  const M: number[] = [];
-  for (const pipe of sol.pipes) {
-    if (isBend) {
-      const bend = pipe.pieces[0];
-      L.push((bend.straightInletMm as number) + t); // no weld gap in bend mode
-      M.push((bend.straightOutletMm as number) + t);
-    } else {
-      const pupIn = pipe.pieces.find((p) => p.kind === 'inlet-pup');
-      const pupOut = pipe.pieces.find((p) => p.kind === 'outlet-pup');
-      L.push((pupIn?.finishedLengthMm as number) + g + t);
-      M.push((pupOut?.finishedLengthMm as number) + g + t);
-    }
-  }
-  const cos = Math.cos(thetaRad);
-  const sin = Math.sin(thetaRad);
-  // REF-SAL common plane perpendicular to v: (F_i + L_i*u + M_i*v).v = const.
-  const C = L[0] * cos + M[0]; // pipe 1 at F_1 = (0,0)
-  const xs: number[] = [];
-  for (let i = 0; i < L.length; i++) {
-    xs.push((C - L[i] * cos - M[i]) / sin);
-  }
-  // Recovered magnitudes.
-  for (let i = 1; i < L.length; i++) {
-    const diRec = xs[i] - xs[i - 1];
-    check(`${label} Di recovered (pipe ${i}->${i + 1})`, near(diRec, sol.stagger.initialSpacingMm, tol), `${diRec}`);
-    // E_i = (x_i, L_i); final-axis normal n = (cos, -sin).
-    const ePrev = { x: xs[i - 1], y: L[i - 1] };
-    const eCur = { x: xs[i], y: L[i] };
-    const dfRec = (eCur.x - ePrev.x) * cos + (eCur.y - ePrev.y) * -sin * -1;
-    const dfRec2 = (eCur.x - ePrev.x) * cos - (eCur.y - ePrev.y) * sin;
-    check(`${label} Df recovered (pipe ${i}->${i + 1})`, near(dfRec2, sol.stagger.finalSpacingMm, tol), `${dfRec} vs ${dfRec2}`);
-    // Cumulative stagger recovered from assembly: L_1 - L_i = (i)*A.
-    const staggerRec = L[0] - L[i];
-    check(`${label} stagger recovered pipe ${i + 1}`, near(staggerRec, i * sol.stagger.adjacentStaggerMm, tol), `${staggerRec}`);
-    // REF-SAL planarity check.
-    const plane = L[i] * cos + M[i] + xs[i] * sin;
-    check(`${label} REF-SAL planar pipe ${i + 1}`, near(plane, C, tol), `${plane}`);
-  }
-  // Direction change of every assembled pipe equals the elbow kept angle.
-  const thetaRec = (Math.atan2(sin, cos) * 180) / Math.PI;
-  check(`${label} theta recovered`, near(thetaRec, sol.elbow.keptAngleDeg, tol), `${thetaRec}`);
-}
+console.log('--- F2. Independent assembly reconstruction ---');
 {
   const sol = solve(mainInput);
-  reconstructAndVerify('F2 main', sol, ENGINE_TOL);
+  const problems = verifyAssembly('F2 main', sol, mainInput, ENGINE_TOL);
+  check('F2 main assembly consistent', problems.length === 0, problems.join(' | '));
+
+  // Sensitivity 1: +10 mm to ALL pups -> must FAIL (old F2 stayed green).
+  const mutUniform = clone(sol);
+  mutateAllPups(mutUniform, 10);
+  const pUniform = verifyAssembly('F2 uniform+10', mutUniform, mainInput, ENGINE_TOL);
+  check('F2 SENS uniform +10mm detected', pUniform.length > 0, 'no problem reported');
+  const refSalDeviation = pUniform.find((p) => p.includes('REF-SAL deviation'));
+  const expectedShift = 10 * Math.cos((35 * Math.PI) / 180) + 10; // 18.191520 mm
+  check(
+    'F2 SENS uniform +10mm shifts REF-SAL by ~18.191520',
+    refSalDeviation !== undefined && near(Math.abs(Number(refSalDeviation.split('=')[1])), expectedShift, 1e-6),
+    `${refSalDeviation} vs ${expectedShift}`,
+  );
+
+  // Sensitivity 2: alter a single piece -> must FAIL.
+  const mutSingle = clone(sol);
+  const singlePup = mutSingle.pipes[1].pieces.find((p) => p.kind === 'inlet-pup');
+  if (singlePup) singlePup.finishedLengthMm = (singlePup.finishedLengthMm as number) + 3;
+  check('F2 SENS single piece +3mm detected', verifyAssembly('F2 single+3', mutSingle, mainInput, ENGINE_TOL).length > 0);
+
+  // Sensitivity 3: common elbow take-out error (all pups short by 0.5) -> FAIL.
+  const mutTakeout = clone(sol);
+  mutateAllPups(mutTakeout, -0.5);
+  check('F2 SENS common take-out error detected', verifyAssembly('F2 takeout-0.5', mutTakeout, mainInput, ENGINE_TOL).length > 0);
+
+  // Sensitivity 4: weld gap omitted or doubled -> must FAIL.
+  const inputG2: PipeCombFabricationInput = { ...mainInput, references: { ...mainInput.references, weldGapMm: 2 } };
+  const solG2 = solve(inputG2);
+  check('F2 with g=2 consistent', verifyAssembly('F2 g=2', solG2, inputG2, ENGINE_TOL).length === 0);
+  const mutGapOmitted = clone(solG2);
+  mutGapOmitted.references.weldGapMm = 0;
+  check('F2 SENS gap omitted detected', verifyAssembly('F2 gap-omitted', mutGapOmitted, inputG2, ENGINE_TOL).length > 0);
+  const mutGapDoubled = clone(solG2);
+  mutGapDoubled.references.weldGapMm = 4;
+  check('F2 SENS gap doubled detected', verifyAssembly('F2 gap-doubled', mutGapDoubled, inputG2, ENGINE_TOL).length > 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -198,46 +328,53 @@ console.log('--- F3. 45/90 deg ---');
   check('F3 90deg zero discarded arc', near(sol90.elbow.discardedArcLengthMm as number, 0, ENGINE_TOL));
   check('F3 90deg keptArc = CLR*pi/2', near(sol90.elbow.keptArcLengthMm as number, (MAIN.clrMm * Math.PI) / 2, ENGINE_TOL));
   check('F3 90deg no catalog-cut warning (nothing cut)', !sol90.warnings.some((w) => w.code === 'catalog_elbow_cut'));
+  const input90: PipeCombFabricationInput = { ...base, elbowAngleDeg: 90 };
+  check('F3 90deg assembly consistent', verifyAssembly('F3 90', sol90, input90, ENGINE_TOL).length === 0);
+  const input45: PipeCombFabricationInput = { ...base, elbowAngleDeg: 45 };
+  check('F3 45deg assembly consistent', verifyAssembly('F3 45', sol45, input45, ENGINE_TOL).length === 0);
 }
 
 // ---------------------------------------------------------------------------
-// F4. Directions: positive / negative / aligned
+// F4. Directions on BOTH axes (review finding 5)
 // ---------------------------------------------------------------------------
-console.log('--- F4. Directions ---');
+console.log('--- F4. Direction semantics: inlet step A vs outlet step delta ---');
 {
-  const neg = solve({
-    ...mainInput,
-    pipeCount: 3,
-    initialSpacingMm: 400,
-    finalSpacingMm: 200,
-    elbowAngleDeg: 45,
-  });
-  check('F4 negative A', neg.stagger.adjacentStaggerMm < 0, `${neg.stagger.adjacentStaggerMm}`);
-  const in1 = neg.pipes[0].pieces.find((p) => p.kind === 'inlet-pup');
-  const in3 = neg.pipes[2].pieces.find((p) => p.kind === 'inlet-pup');
-  const out1 = neg.pipes[0].pieces.find((p) => p.kind === 'outlet-pup');
-  const out3 = neg.pipes[2].pieces.find((p) => p.kind === 'outlet-pup');
-  check(
-    'F4 negative: inlet pups lengthen downstream',
-    (in3?.axisToAxisLengthMm as number) > (in1?.axisToAxisLengthMm as number),
-  );
-  check(
-    'F4 negative: outlet pups shorten downstream',
-    (out3?.axisToAxisLengthMm as number) < (out1?.axisToAxisLengthMm as number),
-  );
+  const inAt = (s: PipeCombFabricationSolution, i: number) => s.pipes[i].pieces.find((p) => p.kind === 'inlet-pup')?.finishedLengthMm as number;
+  const outAt = (s: PipeCombFabricationSolution, i: number) => s.pipes[i].pieces.find((p) => p.kind === 'outlet-pup')?.finishedLengthMm as number;
 
+  // Main 35 deg: A > 0, delta < 0 -> inlets shorten, outlets LENGTHEN.
+  const sol = solve(mainInput);
+  check('F4 35deg A>0: INLET pups shorten downstream (step A on inlet axis)', inAt(sol, 2) < inAt(sol, 0));
+  check('F4 35deg delta<0: OUTLET pups lengthen downstream (step delta on outlet axis)', outAt(sol, 2) > outAt(sol, 0));
+  check('F4 35deg delta sign independent of A sign', sol.stagger.adjacentStaggerMm > 0 && sol.outletAxisStepMm < 0);
+
+  // A = 0 (Di=200, Df=100, 60 deg): inlets equal, outlets DIFFER.
   const aligned = solve({ ...mainInput, initialSpacingMm: 200, finalSpacingMm: 100, elbowAngleDeg: 60 });
-  check('F4 aligned A = 0', aligned.stagger.adjacentStaggerMm === 0);
-  const a1 = aligned.pipes[0].pieces.find((p) => p.kind === 'inlet-pup');
-  const a3 = aligned.pipes[2].pieces.find((p) => p.kind === 'inlet-pup');
-  check('F4 aligned: identical pups', near(a1?.finishedLengthMm as number, a3?.finishedLengthMm as number, PURE_TOL));
-  check('F4 aligned direction', aligned.stagger.staggerDirection === 'aligned');
+  const deltaAligned = 200 * Math.sin((60 * Math.PI) / 180);
+  check('F4 A=0: stagger zero', aligned.stagger.adjacentStaggerMm === 0);
+  check('F4 A=0: INLET pups equal', near(inAt(aligned, 0), inAt(aligned, 2), ENGINE_TOL));
+  check('F4 A=0: OUTLET pups differ and shorten (delta = Di*sin60 > 0)', !near(outAt(aligned, 0), outAt(aligned, 2), ENGINE_TOL) && outAt(aligned, 2) < outAt(aligned, 0));
+  check('F4 A=0: outletAxisStepMm = Di*sin60', near(aligned.outletAxisStepMm, deltaAligned, PURE_TOL), `${aligned.outletAxisStepMm}`);
+
+  // 90 deg (Di=200, Df=400): A = +400, but delta = Di > 0 -> outlets SHORTEN.
+  const at90 = solve({ ...mainInput, initialSpacingMm: 200, finalSpacingMm: 400, elbowAngleDeg: 90 });
+  check('F4 90deg: A = +400', near(at90.stagger.adjacentStaggerMm, 400, PURE_TOL));
+  check('F4 90deg: A>0 yet OUTLET pups shorten downstream (delta = Di > 0)', outAt(at90, 2) < outAt(at90, 0));
+  check('F4 90deg: outletAxisStepMm = Di', near(at90.outletAxisStepMm, 200, PURE_TOL));
+
+  // Negative (REF-03): A < 0, delta = Di*sin - A*cos > 0.
+  const neg = solve({ ...mainInput, initialSpacingMm: 400, finalSpacingMm: 200, elbowAngleDeg: 45 });
+  const deltaNeg = 400 * Math.sin(Math.PI / 4) - neg.stagger.adjacentStaggerMm * Math.cos(Math.PI / 4);
+  check('F4 negative: A < 0', neg.stagger.adjacentStaggerMm < 0);
+  check('F4 negative: INLET pups lengthen downstream', inAt(neg, 2) > inAt(neg, 0));
+  check('F4 negative: OUTLET pups shorten downstream (delta > 0)', outAt(neg, 2) < outAt(neg, 0));
+  check('F4 negative: outletAxisStepMm', near(neg.outletAxisStepMm, deltaNeg, PURE_TOL));
 }
 
 // ---------------------------------------------------------------------------
-// F5. Explicit weld gap + fitting allowance
+// F5. Explicit weld gap + fitting allowance (+ joint contract, finding 4)
 // ---------------------------------------------------------------------------
-console.log('--- F5. Weld gap + allowance ---');
+console.log('--- F5. Weld gap + allowance + joint contract ---');
 {
   const sol = solve({
     ...mainInput,
@@ -250,12 +387,26 @@ console.log('--- F5. Weld gap + allowance ---');
       const expected = (pup?.axisToAxisLengthMm as number) - t - 2;
       check(`F5 ${pup?.id} finished = axis - t - g`, near(pup?.finishedLengthMm as number, expected, ENGINE_TOL));
       check(`F5 ${pup?.id} cut = finished + 5`, near(pup?.cutLengthMm as number, expected + 5, ENGINE_TOL));
+      check(`F5 ${pup?.id} finished != cut (allowance separate)`, !near(pup?.finishedLengthMm as number, pup?.cutLengthMm as number, PURE_TOL));
+      check(`F5 ${pup?.id} allowance remove-at-fit-up`, pup?.allowanceHandling === 'remove-at-fit-up');
       const gapDeduction = pup?.deductions.find((d) => d.source === 'weld_gap');
       check(`F5 ${pup?.id} explicit gap deduction`, gapDeduction?.mm === 2);
     }
   }
-  // Reconstruction with g = 2 must still recover Di/Df (gap is uniform).
-  reconstructAndVerify('F5 with g=2', sol, ENGINE_TOL);
+  // Joint contract: with g > 0 the pup face and the elbow face are distinct,
+  // both identified, and the joint links them with the explicit gap.
+  for (const joint of sol.joints) {
+    check(`F5 ${joint.id} gap = 2`, joint.gapMm === 2);
+    check(`F5 ${joint.id} faces distinct`, joint.faceA !== joint.faceB);
+    const pup = sol.pipes.flatMap((p) => p.pieces).find((p) => p.id === joint.pieces[0]);
+    const pupJointFace = (pup?.faces as { joint?: string })?.joint;
+    check(`F5 ${joint.id} faceA is the pup own face`, pupJointFace === joint.faceA);
+    const elbowPiece = sol.pipes.flatMap((p) => p.pieces).find((p) => p.id === joint.pieces[1]);
+    const elbowFaces = elbowPiece?.faces as { inlet: string; outlet: string };
+    check(`F5 ${joint.id} faceB is an elbow face`, elbowFaces.inlet === joint.faceB || elbowFaces.outlet === joint.faceB);
+  }
+  const inputG2A5: PipeCombFabricationInput = { ...mainInput, references: { inletAxisToAxisMm: 1000, outletAxisToAxisMm: 1200, weldGapMm: 2, fittingAllowanceMm: 5 } };
+  check('F5 assembly with g=2 consistent', verifyAssembly('F5 g=2', sol, inputG2A5, ENGINE_TOL).length === 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -286,21 +437,33 @@ console.log('--- F6. Units round trip ---');
 }
 
 // ---------------------------------------------------------------------------
-// F7. Insufficient references
+// F7. Insufficient references (review finding 6)
 // ---------------------------------------------------------------------------
-console.log('--- F7. Pending references ---');
+console.log('--- F7. Pending references state ---');
 {
   const noRefs = solve({ ...mainInput, references: undefined });
   check('F7 not defined', noRefs.references.defined === false);
-  check('F7 no pipes fabricated', noRefs.pipes.length === 0);
-  check('F7 empty cutList', noRefs.cutList.length === 0);
+  check('F7 missing both', noRefs.references.missing.join(',') === 'inletAxisToAxisMm,outletAxisToAxisMm');
+  check('F7 provided none', noRefs.references.provided.inlet === false && noRefs.references.provided.outlet === false);
+  check('F7 planned pieces emitted with stable ids', noRefs.pipes.length === 3 && noRefs.pipes.every((p) => p.pieces.length === 3));
+  check(
+    'F7 all pieces pending-references',
+    noRefs.pipes.every((p) => p.pieces.every((piece) => piece.status === 'pending-references')),
+  );
+  check('F7 piece ids stable', noRefs.pipes[0].pieces.map((p) => p.id).join(',') === 'P1-IN,P1-ELBOW,P1-OUT');
+  check('F7 no invented lengths', noRefs.pipes.every((p) => p.pieces.every((piece) => piece.finishedLengthMm === undefined && piece.cutLengthMm === undefined && piece.axisToAxisLengthMm === undefined)));
+  check('F7 cutList pending without lengths', noRefs.cutList.length === 6 && noRefs.cutList.every((c) => c.status === 'pending-references' && c.cutLengthMm === undefined));
   check('F7 elbow still computed', near(noRefs.elbow.takeOutMm, MAIN.takeOutMm, ENGINE_TOL));
   check('F7 P1 intact without refs', near(noRefs.stagger.adjacentStaggerMm, MAIN.staggerMm, PURE_TOL));
-  check('F7 no invented lengths', noRefs.references.inletAxisToAxisMm === undefined && noRefs.references.outletAxisToAxisMm === undefined);
+  check('F7 references not echoed when absent', noRefs.references.inletAxisToAxisMm === undefined);
+  check('F7 plan not valid', noRefs.cutPlanValid === false);
+  check('F7 cumulative preserved in pending pipes', near(noRefs.pipes[2].cumulativeStaggerMm, 2 * MAIN.staggerMm, PURE_TOL));
 
   const half = solve({ ...mainInput, references: { inletAxisToAxisMm: 1000 } });
-  check('F7 half refs still pending', half.references.defined === false && half.pipes.length === 0);
-  check('F7 references_incomplete warning', half.warnings.some((w) => w.code === 'references_incomplete'));
+  check('F7 half refs: provided value PRESERVED', half.references.inletAxisToAxisMm === 1000);
+  check('F7 half refs: missing list exact', half.references.missing.join(',') === 'outletAxisToAxisMm');
+  check('F7 half refs: provided flags', half.references.provided.inlet === true && half.references.provided.outlet === false);
+  check('F7 half refs: pieces still pending with ids', half.pipes.length === 3 && half.pipes.every((p) => p.pieces.every((piece) => piece.status === 'pending-references')));
 }
 
 // ---------------------------------------------------------------------------
@@ -386,15 +549,19 @@ console.log('--- F12. Invalid adjustments ---');
 console.log('--- F13. Bend mode ---');
 {
   const CLR = 300;
-  const sol = solve({ ...mainInput, elbow: { kind: 'bend', clrMm: CLR } });
+  const bendInput: PipeCombFabricationInput = { ...mainInput, elbow: { kind: 'bend', clrMm: CLR } };
+  const sol = solve(bendInput);
   const tPure = CLR * Math.tan((35 * Math.PI) / 360);
   const arcPure = (CLR * 35 * Math.PI) / 180;
   check('F13 bend mode', sol.elbow.mode === 'bend');
   check('F13 takeOut pure', near(sol.elbow.takeOutMm, tPure, PURE_TOL), `${sol.elbow.takeOutMm} vs ${tPure}`);
   check('F13 arc', near(sol.elbow.keptArcLengthMm as number, arcPure, PURE_TOL));
   check('F13 clrSource custom', sol.elbow.clrSource === 'user-custom');
+  check('F13 geometryValid (CLR > OD/2)', sol.elbow.geometryValid === true);
   check('F13 no catalog-cut warning', !sol.warnings.some((w) => w.code === 'catalog_elbow_cut'));
   check('F13 cutList length = N', sol.cutList.length === MAIN.pipeCount, `${sol.cutList.length}`);
+  check('F13 no joints in bend mode', sol.joints.length === 0);
+  check('F13 bend marks: takeout + developed arc', sol.elbow.marks.length === 2 && sol.elbow.marks[1].method === 'arc-development');
   for (let k = 0; k < MAIN.pipeCount; k++) {
     const bend = sol.pipes[k].pieces[0];
     const straightIn = (MAIN.inletAxisToAxisMm - k * MAIN.staggerMm) - tPure;
@@ -403,14 +570,9 @@ console.log('--- F13. Bend mode ---');
     check(`F13 P${k + 1}-BEND straightOut`, near(bend.straightOutletMm as number, straightOut, PURE_TOL));
     check(`F13 P${k + 1}-BEND bar`, near(bend.finishedLengthMm as number, straightIn + arcPure + straightOut, PURE_TOL));
   }
-  // Bend with g > 0 -> not-applicable warning; with CLR <= OD/2 -> warning.
   const solG = solve({ ...mainInput, elbow: { kind: 'bend', clrMm: CLR }, references: { ...mainInput.references, weldGapMm: 3 } });
   check('F13 weld gap not applicable warning', solG.warnings.some((w) => w.code === 'weld_gap_not_applicable_bend'));
-  const solSmall = solve({ ...mainInput, elbow: { kind: 'bend', clrMm: 50 } });
-  check('F13 clr_below_half_od warning', solSmall.warnings.some((w) => w.code === 'clr_below_half_od'));
-  check('F13 small CLR still computed (warning, not error)', solSmall.success !== false && solSmall.pipes.length === 3);
-  // Independent reconstruction also holds in bend mode.
-  reconstructAndVerify('F13 bend', sol, PURE_TOL);
+  check('F13 bend assembly consistent', verifyAssembly('F13 bend', sol, bendInput, PURE_TOL).length === 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -447,12 +609,15 @@ console.log('--- F15. N=2 / N=12 ---');
   const n2 = solve({ ...mainInput, pipeCount: 2 });
   check('F15 N=2 catalog pieces = 3N', n2.pipes.flatMap((p) => p.pieces).length === 6);
   check('F15 N=2 cutList = 2N', n2.cutList.length === 4);
+  check('F15 N=2 joints = 2N', n2.joints.length === 4);
   const n12 = solve({ ...mainInput, pipeCount: 12 });
   check('F15 N=12 catalog pieces = 3N', n12.pipes.flatMap((p) => p.pieces).length === 36);
+  check('F15 N=12 joints = 2N', n12.joints.length === 24);
   check('F15 N=12 cumulative pipe 12', near(n12.pipes[11].cumulativeStaggerMm, 11 * MAIN.staggerMm, PURE_TOL));
   const n12b = solve({ ...mainInput, pipeCount: 12, elbow: { kind: 'bend', clrMm: 300 } });
   check('F15 N=12 bend pieces = N', n12b.pipes.flatMap((p) => p.pieces).length === 12);
   check('F15 N=12 bend cutList = N', n12b.cutList.length === 12);
+  check('F15 N=12 bend joints = 0', n12b.joints.length === 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -477,9 +642,121 @@ console.log('--- F16. OD invariant + P1 identity ---');
 }
 
 // ---------------------------------------------------------------------------
+// F17. CLR incompatibility (review finding 1)
+// ---------------------------------------------------------------------------
+console.log('--- F17. CLR <= OD/2 invalidates fabrication ---');
+{
+  const HALF_OD = MAIN.odMm / 2; // 84.14
+
+  // CLR < OD/2 with references -> all pieces invalid, plan invalid, data kept.
+  const below = solve({ ...mainInput, elbow: { kind: 'bend', clrMm: 50 } });
+  check('F17 CLR<OD/2: geometryValid false', below.elbow.geometryValid === false);
+  check('F17 CLR<OD/2: intrados radius negative', below.elbow.intradosRadiusMm === 50 - HALF_OD);
+  check('F17 CLR<OD/2: warning present', below.warnings.some((w) => w.code === 'clr_below_half_od'));
+  check('F17 CLR<OD/2: plan NOT valid', below.cutPlanValid === false);
+  check(
+    'F17 CLR<OD/2: every piece invalid clr_incompatible_intrados',
+    below.pipes.every((p) => p.pieces.every((piece) => piece.status === 'invalid' && piece.statusCode === 'clr_incompatible_intrados')),
+  );
+  check(
+    'F17 CLR<OD/2: cutList carries invalid status',
+    below.cutList.every((c) => c.status === 'invalid' && c.statusCode === 'clr_incompatible_intrados'),
+  );
+  check('F17 CLR<OD/2: P1 data available', near(below.stagger.adjacentStaggerMm, MAIN.staggerMm, PURE_TOL));
+  check('F17 CLR<OD/2: lengths still exposed (data, not valid plan)', below.pipes[0].pieces[0].finishedLengthMm !== undefined);
+
+  // CLR = OD/2 -> intrados radius exactly 0 -> invalid.
+  const equal = solve({ ...mainInput, elbow: { kind: 'bend', clrMm: HALF_OD } });
+  check('F17 CLR=OD/2: intrados radius zero', equal.elbow.intradosRadiusMm === 0);
+  check('F17 CLR=OD/2: geometryValid false', equal.elbow.geometryValid === false);
+  check('F17 CLR=OD/2: plan NOT valid', equal.cutPlanValid === false);
+  check('F17 CLR=OD/2: pieces invalid', equal.pipes.every((p) => p.pieces.every((piece) => piece.status === 'invalid')));
+
+  // CLR slightly above OD/2 -> constructible (not a bendability certificate).
+  const above = solve({ ...mainInput, elbow: { kind: 'bend', clrMm: HALF_OD + 0.01 } });
+  check('F17 CLR>OD/2: geometryValid true', above.elbow.geometryValid === true);
+  check('F17 CLR>OD/2: plan valid', above.cutPlanValid === true);
+  check('F17 CLR>OD/2: pieces ok', above.pipes.every((p) => p.pieces.every((piece) => piece.status === 'ok')));
+  check('F17 CLR>OD/2: no clr warning', !above.warnings.some((w) => w.code === 'clr_below_half_od'));
+
+  // Without references: pending pieces, warning, data available, plan not valid.
+  const noRefs = solve({ ...mainInput, elbow: { kind: 'bend', clrMm: 50 }, references: undefined });
+  check('F17 CLR<OD/2 no refs: geometryValid false', noRefs.elbow.geometryValid === false);
+  check('F17 CLR<OD/2 no refs: warning present', noRefs.warnings.some((w) => w.code === 'clr_below_half_od'));
+  check('F17 CLR<OD/2 no refs: pieces pending (not fabricated)', noRefs.pipes.every((p) => p.pieces.every((piece) => piece.status === 'pending-references')));
+  check('F17 CLR<OD/2 no refs: plan not valid', noRefs.cutPlanValid === false);
+  check('F17 CLR<OD/2 no refs: P1 + elbow data available', near(noRefs.stagger.adjacentStaggerMm, MAIN.staggerMm, PURE_TOL) && Number.isFinite(noRefs.elbow.takeOutMm));
+}
+
+// ---------------------------------------------------------------------------
+// F18. Marking contract (review finding 3)
+// ---------------------------------------------------------------------------
+console.log('--- F18. Marking contract: datum/method + independent recovery ---');
+{
+  const sol = solve(mainInput);
+  const R = MAIN.clrMm;
+  const OD = MAIN.odMm;
+  const thetaRad = (MAIN.elbowAngleDeg * Math.PI) / 180;
+
+  // Declared semantics.
+  check('F18 MVP method declared', sol.elbow.markingMethodDeclared === 'arc-development-from-kept-face');
+  check('F18 cut values NOT labelled measurable', (sol.elbow.cutSemantics ?? '').includes('NOT an arc distance'));
+  const markById = new Map(sol.elbow.marks.map((mk) => [mk.id, mk]));
+  check('F18 takeout mark: tangent-takeout, off material', markById.get('takeout-axis')?.method === 'tangent-takeout' && markById.get('takeout-axis')?.onMaterial === false);
+  check('F18 arc marks on material', ['arc-intrados-from-kept-face', 'arc-centerline-from-kept-face', 'arc-extrados-from-kept-face'].every((id) => markById.get(id)?.method === 'arc-development' && markById.get(id)?.onMaterial === true));
+  check('F18 projection mark: axial-projection, off material', markById.get('projection-centerline-from-kept-face')?.method === 'axial-projection' && markById.get('projection-centerline-from-kept-face')?.onMaterial === false);
+  check('F18 every mark has origin and destination', sol.elbow.marks.every((mk) => mk.origin.length > 0 && mk.destination.length > 0));
+
+  // The three families are DISTINCT dimensions, not interchangeable names.
+  const t = markById.get('takeout-axis')?.valueMm as number;
+  const arcC = markById.get('arc-centerline-from-kept-face')?.valueMm as number;
+  const projC = markById.get('projection-centerline-from-kept-face')?.valueMm as number;
+  check('F18 takeout != arc != projection', !near(t, arcC, 1e-6) && !near(arcC, projC, 1e-6) && !near(t, projC, 1e-6));
+  check('F18 takeout = R*tan(theta/2)', near(t, R * Math.tan(thetaRad / 2), ENGINE_TOL));
+  check('F18 arc = R*theta', near(arcC, R * thetaRad, PURE_TOL));
+  check('F18 projection = R*sin(theta)', near(projC, R * Math.sin(thetaRad), PURE_TOL), `${projC} vs ${R * Math.sin(thetaRad)}`);
+
+  // Independent validation: the delivered arc marks (from the kept face,
+  // along each curve) must land on ONE radial cut plane and recover theta.
+  // Construct each cut point from its mark WITHOUT using the module's
+  // geometry: circle centre C=(R,0), kept face at T_in=(0,0); a point at
+  // arc distance s on a circle of radius r sits at swept angle s/r.
+  const C = { x: R, y: 0 };
+  const curves: Array<{ id: string; r: number; markId: string }> = [
+    { id: 'intrados', r: R - OD / 2, markId: 'arc-intrados-from-kept-face' },
+    { id: 'centerline', r: R, markId: 'arc-centerline-from-kept-face' },
+    { id: 'extrados', r: R + OD / 2, markId: 'arc-extrados-from-kept-face' },
+  ];
+  const radialAngles: number[] = [];
+  for (const curve of curves) {
+    const s = markById.get(curve.markId)?.valueMm as number;
+    const swept = s / curve.r;
+    const P = { x: C.x - curve.r * Math.cos(swept), y: curve.r * Math.sin(swept) };
+    // Swept angle recovered from the point itself (law of cosines on T_in, C, P).
+    // NOTE: T_in sits on the CENTERLINE circle (radius R); P sits on this
+    // curve's circle (radius r) — the denominator is R*r.
+    const vTin = { x: 0 - C.x, y: 0 - C.y };
+    const vP = { x: P.x - C.x, y: P.y - C.y };
+    const recovered = Math.acos((vTin.x * vP.x + vTin.y * vP.y) / (R * curve.r));
+    check(`F18 ${curve.id} mark recovers theta`, near(recovered, thetaRad, PURE_TOL), `${(recovered * 180) / Math.PI} deg`);
+    radialAngles.push(Math.atan2(P.y - C.y, P.x - C.x));
+  }
+  check(
+    'F18 all three marks on ONE radial cut plane',
+    near(radialAngles[0], radialAngles[1], PURE_TOL) && near(radialAngles[1], radialAngles[2], PURE_TOL),
+    radialAngles.join(','),
+  );
+  // The tangent direction at the cut point recovers the outlet axis angle.
+  const sweptCenter = (markById.get('arc-centerline-from-kept-face')?.valueMm as number) / R;
+  const tangentDir = { x: Math.sin(sweptCenter), y: Math.cos(sweptCenter) };
+  const outletAngle = (Math.atan2(tangentDir.x, tangentDir.y) * 180) / Math.PI;
+  check('F18 tangent at cut recovers 35 deg outlet axis', near(outletAngle, MAIN.elbowAngleDeg, PURE_TOL), `${outletAngle}`);
+}
+
+// ---------------------------------------------------------------------------
 console.log(`\n${passed} checks passed, ${failures.length} failed`);
 if (failures.length > 0) {
   for (const f of failures) console.log(`FAIL: ${f}`);
   process.exit(1);
 }
-console.log('PIPE COMB FABRICATION P3-A: ALL PASS');
+console.log('PIPE COMB FABRICATION P3-A (review fixes): ALL PASS');

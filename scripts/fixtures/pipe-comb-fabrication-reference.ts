@@ -12,6 +12,12 @@
  * (OD=168.28 mm B36.10M CROSS_REFERENCE, CLR=228.6 mm B16.9 90A /
  * Weldbend p.26 CROSS_REFERENCE), Lin=1000 mm, Lout=1200 mm,
  * weld gap g=0, fitting allowance=0.
+ *
+ * Marking contract literals (review finding 3) — three DISTINCT dimension
+ * families, not interchangeable names:
+ *   - tangent take-out:        r * tan(theta/2)   (axis-theoretical)
+ *   - arc development:         r * theta_rad      (on material, MVP method)
+ *   - axial projection:        r * sin(theta)     (geometric reference)
  */
 
 export interface FabricationPupReference {
@@ -48,8 +54,17 @@ export interface PipeCombFabricationReference {
   takeOutEngineMm: number;
   /** Longitudinal outlet step delta = Di*sin(theta) - A*cos(theta). */
   outletStepMm: number;
+  /** Engine tangent-construction family r*tan(theta/2) (geometric ref). */
   cutIntradosMm: number;
   cutExtradosMm: number;
+  /** MVP marking set: arc development from the kept face. */
+  arcIntradosMm: number;
+  arcCenterlineMm: number;
+  arcExtradosMm: number;
+  /** Geometric reference: axial projection from the kept-face plane. */
+  projectionIntradosMm: number;
+  projectionCenterlineMm: number;
+  projectionExtradosMm: number;
   keptArcLengthMm: number;
   discardedArcLengthMm: number;
   initialClearanceMm: number;
@@ -77,6 +92,12 @@ export const PIPE_COMB_FABRICATION_MAIN_CASE: PipeCombFabricationReference = {
   outletStepMm: -63.990103454465611,
   cutIntradosMm: 45.548063041457951,
   cutExtradosMm: 98.606543234013301,
+  arcIntradosMm: 88.245592310085271,
+  arcCenterlineMm: 139.64379345206629,
+  arcExtradosMm: 191.04199459404731,
+  projectionIntradosMm: 82.858851995272104,
+  projectionCenterlineMm: 131.11957334984913,
+  projectionExtradosMm: 179.38029470442615,
   keptArcLengthMm: 139.64379345206629,
   discardedArcLengthMm: 219.44024685324706,
   initialClearanceMm: 81.72,
