@@ -426,6 +426,26 @@ test('fab-24: Spanish localization of the section', async ({ page }) => {
   await expect(pieceRow(page, 'P1-IN')).toHaveCount(1);
 });
 
+test('fab-24b: Spanish localization of marking endpoints and joint detail', async ({ page }) => {
+  await setupCase3x35(page, TOOL_URL_ES);
+  await page.locator('#pipe-comb-fab-gap').fill('2');
+  /* Mark origin/destination are localized, not raw English internals. */
+  const intrados = page.locator('[data-testid="pipe-comb-fab-mark"][data-mark-id="arc-intrados-from-kept-face"]');
+  await expect(intrados).toContainText('cara conservada');
+  await expect(intrados).toContainText('plano de corte al ángulo conservado 35');
+  const takeout = page.locator('[data-testid="pipe-comb-fab-mark"][data-mark-id="takeout-axis"]');
+  await expect(takeout).toContainText('intersección teórica de ejes');
+  /* Joint line localized: pup face vs elbow face, applied gap. */
+  const detail = page.locator('[data-testid="pipe-comb-fab-detail"][data-piece-id="P1-IN"]');
+  await detail.locator('summary').click();
+  const joint = detail.locator('[data-testid="pipe-comb-fab-joint"][data-joint-id="J1-IN"]');
+  await expect(joint).toHaveCount(1);
+  await expect(joint).toContainText('J1-IN');
+  await expect(joint).toContainText('P1-IN-FACE-J');
+  await expect(joint).toContainText('P1-ELBOW-FACE-IN');
+  await expect(joint).toContainText('2 mm');
+});
+
 /* ------------------------------------------------------------------ *
  * 9. Responsive + en/in presentation
  * ------------------------------------------------------------------ */
@@ -440,6 +460,18 @@ test('fab-25: mobile 320/390 — cards layout, no overflow, full cut values', as
     await expect(card).toBeVisible();
     /* The full cut value with unit is present and unclipped. */
     await expect(card).toContainText('1255.9 mm');
+    /* Real rendered geometry, not just the global overflow counter: every
+       card sits inside the viewport and inside the section card. */
+    const sectionBox = await page.locator('[data-testid="pipe-comb-fab-section"]').boundingBox();
+    expect(sectionBox).not.toBeNull();
+    for (const cardEl of await page.locator('[data-testid="pipe-comb-fab-piece-card"]').all()) {
+      const box = await cardEl.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+      expect(box!.x).toBeGreaterThanOrEqual(sectionBox!.x - 0.5);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(sectionBox!.x + sectionBox!.width + 0.5);
+    }
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
@@ -484,4 +516,255 @@ test('fab-28: negative stagger case keeps signed presentation', async ({ page })
   /* Stagger A is ADDITIVE for a negative stagger: axis P2-IN =
      2000 + 117.157288 - t(45) 94.686986 = 2022.470301 mm. */
   await expect(pieceRow(page, 'P2-IN').locator('td').nth(5)).toHaveText('2022.47 mm');
+});
+
+/* ------------------------------------------------------------------ *
+ * 10. Integration review fixes — H1: canonical values feed the module
+ * ------------------------------------------------------------------ */
+
+test('fab-29: CLR limit case stays invalid in mm AND in inches (canonical input)', async ({ page }) => {
+  await setupCase3x35(page);
+  await page.locator('[data-testid="pipe-comb-fab-mode-bend"]').click();
+  /* OD(6)/2 = 84.14 exactly: CLR = 84.14 is invalid (zero intrados). */
+  await page.locator('#pipe-comb-fab-clr').fill('84.14');
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'invalid-plan');
+  /* Unit switch must NOT re-derive the consumed radius from the rounded
+     display text: "3.3126" in parses to 84.14004 mm and would silently
+     turn the plan valid. The canonical 84.14 mm must be consumed. */
+  await page.getByRole('button', { name: 'in', exact: true }).click();
+  await expect(page.locator('#pipe-comb-fab-clr')).toHaveValue('3.3126');
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'invalid-plan');
+  await page.getByRole('button', { name: 'mm', exact: true }).click();
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'invalid-plan');
+  /* Values on both sides of the limit keep their own state in both units. */
+  await page.locator('#pipe-comb-fab-clr').fill('84.13');
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'invalid-plan');
+  await page.locator('#pipe-comb-fab-clr').fill('84.15');
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'complete');
+  await page.getByRole('button', { name: 'in', exact: true }).click();
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'complete');
+});
+
+test('fab-30: Lin with sub-display precision feeds the module unrounded', async ({ page }) => {
+  await setupCase3x35(page);
+  /* 1000.004 mm displays as "1000" after a unit round-trip (mm 2-dec
+     convention) but the module must consume the full-precision canonical
+     value: P1-IN = 1000.004 - t(35) 72.077303 = 927.926697 -> 927.93 mm
+     (consuming the re-parsed "1000" would give 927.92). */
+  await page.locator('#pipe-comb-fab-lin').fill('1000.004');
+  await expect(pieceRow(page, 'P1-IN').locator('td').nth(5)).toHaveText('927.93 mm');
+  /* Inch phase consumes the SAME canonical value: 36.5325 in, not the
+     display-text re-parse 36.5324. */
+  await page.getByRole('button', { name: 'in', exact: true }).click();
+  await expect(pieceRow(page, 'P1-IN').locator('td').nth(5)).toHaveText('36.5325 in');
+  await page.getByRole('button', { name: 'mm', exact: true }).click();
+  await expect(pieceRow(page, 'P1-IN').locator('td').nth(5)).toHaveText('927.93 mm');
+});
+
+test('fab-31: 20 unit cycles — every inch phase checked, no drift in any field', async ({ page }) => {
+  await setupCase3x35(page);
+  /* Non-representable decimals on Lin/Lout and non-zero decimal g/margin.
+     P1-IN  = 1000.004 - 72.077303 - 0.03 + 0.05 = 927.946697 -> 927.95 mm / 36.5333 in.
+     P1-OUT = 1200.006 - 72.077303 - 0.03 + 0.05 = 1127.948697 -> 1127.95 mm / 44.4074 in. */
+  await page.locator('#pipe-comb-fab-lin').fill('1000.004');
+  await page.locator('#pipe-comb-fab-lout').fill('1200.006');
+  await page.locator('#pipe-comb-fab-gap').fill('0.03');
+  await page.locator('#pipe-comb-fab-allowance').fill('0.05');
+  for (let i = 0; i < 20; i++) {
+    await page.getByRole('button', { name: 'in', exact: true }).click();
+    await expect(pieceRow(page, 'P1-IN').locator('td').nth(5)).toHaveText('36.5333 in');
+    await expect(pieceRow(page, 'P1-OUT').locator('td').nth(5)).toHaveText('44.4074 in');
+    await expect(fabStatus(page)).toHaveAttribute('data-status', 'complete-warnings');
+    await page.getByRole('button', { name: 'mm', exact: true }).click();
+    await expect(pieceRow(page, 'P1-IN').locator('td').nth(5)).toHaveText('927.95 mm');
+    await expect(pieceRow(page, 'P1-OUT').locator('td').nth(5)).toHaveText('1127.95 mm');
+  }
+});
+
+/* ------------------------------------------------------------------ *
+ * 11. Integration review fixes — H2: empty/invalid never resurrect data
+ * ------------------------------------------------------------------ */
+
+test('fab-32: deleted reference stays EMPTY across a unit change', async ({ page }) => {
+  await setupCase3x35(page);
+  await page.locator('#pipe-comb-fab-lin').fill('');
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'pending-refs');
+  await page.getByRole('button', { name: 'in', exact: true }).click();
+  /* Absence survives the toggle: no "39.3701" reappears from the old value. */
+  await expect(page.locator('#pipe-comb-fab-lin')).toHaveValue('');
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'pending-refs');
+  const missingText = await page.locator('[data-testid="pipe-comb-fab-missing"]').textContent();
+  expect(missingText).toContain('Lin');
+  /* Lout is still valid and independently displayed. */
+  await expect(page.locator('#pipe-comb-fab-lout')).toHaveValue('47.2441');
+  /* A real edit in inches recovers the plan: 40 in = 1016 mm. */
+  await page.locator('#pipe-comb-fab-lin').fill('40');
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'complete-warnings');
+  await expect(pieceRow(page, 'P1-IN').locator('td').nth(5)).toHaveText('37.1623 in');
+});
+
+test('fab-33: invalid text is never replaced by the last valid value', async ({ page }) => {
+  await setupCase3x35(page);
+  for (const bad of ['abc', '10.0,5']) {
+    await page.locator('#pipe-comb-fab-lin').fill(bad);
+    await expect(fabStatus(page)).toHaveAttribute('data-status', 'review');
+    await page.getByRole('button', { name: 'in', exact: true }).click();
+    await expect(page.locator('#pipe-comb-fab-lin')).toHaveValue(bad);
+    await expect(fabStatus(page)).toHaveAttribute('data-status', 'review');
+    await expect(page.locator('[data-testid="pipe-comb-fab-cutlist"]')).toHaveCount(0);
+    await page.getByRole('button', { name: 'mm', exact: true }).click();
+    await expect(page.locator('#pipe-comb-fab-lin')).toHaveValue(bad);
+    await expect(fabStatus(page)).toHaveAttribute('data-status', 'review');
+  }
+  /* Only an explicit valid correction resolves the review state. */
+  await page.locator('#pipe-comb-fab-lin').fill('1000');
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'complete-warnings');
+});
+
+test('fab-34: empty/invalid states persist across close/reopen and mode switches', async ({ page }) => {
+  await setupCase3x35(page);
+  await page.locator('#pipe-comb-fab-lin').fill('');
+  await page.locator('#pipe-comb-fab-gap').fill('abc');
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'review');
+  /* Close/reopen: absence and review states survive. */
+  await page.locator('[data-testid="pipe-comb-fab-toggle"]').click();
+  await page.locator('[data-testid="pipe-comb-fab-toggle"]').click();
+  await expect(page.locator('#pipe-comb-fab-lin')).toHaveValue('');
+  await expect(page.locator('#pipe-comb-fab-gap')).toHaveValue('abc');
+  /* Mode round-trip: still empty/invalid, no stale values reappear. */
+  await page.locator('[data-testid="pipe-comb-fab-mode-bend"]').click();
+  await page.locator('#pipe-comb-fab-clr').fill('228.6');
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'review');
+  await page.locator('[data-testid="pipe-comb-fab-mode-catalog"]').click();
+  await expect(page.locator('#pipe-comb-fab-lin')).toHaveValue('');
+  await expect(page.locator('#pipe-comb-fab-gap')).toHaveValue('abc');
+  /* Explicit correction of the gap recovers (Lin still pending). */
+  await page.locator('#pipe-comb-fab-gap').fill('0');
+  await expect(fabStatus(page)).toHaveAttribute('data-status', 'pending-refs');
+});
+
+/* ------------------------------------------------------------------ *
+ * 12. Integration review fixes — H3: real responsive controls
+ * ------------------------------------------------------------------ */
+
+/** Assert a control is fully inside the viewport and the section card,
+ *  and that its own text is not clipped (scrollWidth check). */
+async function expectControlFullyVisible(
+  page: import('@playwright/test').Page,
+  selector: string,
+  width: number,
+  sectionBox: { x: number; width: number } | null,
+) {
+  const btn = page.locator(selector);
+  await expect(btn).toBeVisible();
+  const box = await btn.boundingBox();
+  expect(box, selector).not.toBeNull();
+  expect(box!.x, `${selector} inside viewport (x)`).toBeGreaterThanOrEqual(0);
+  expect(box!.x + box!.width, `${selector} inside viewport (right)`).toBeLessThanOrEqual(width);
+  expect(box!.x, `${selector} inside section (x)`).toBeGreaterThanOrEqual(sectionBox!.x - 0.5);
+  expect(box!.x + box!.width, `${selector} inside section (right)`).toBeLessThanOrEqual(
+    sectionBox!.x + sectionBox!.width + 0.5,
+  );
+  const clipped = await btn.evaluate((el) => el.scrollWidth - el.clientWidth);
+  expect(clipped, `${selector} text not clipped`).toBeLessThanOrEqual(1);
+}
+
+const FAB_CONTROLS = [
+  '[data-testid="pipe-comb-fab-toggle"]',
+  '[data-testid="pipe-comb-fab-mode-catalog"]',
+  '[data-testid="pipe-comb-fab-mode-bend"]',
+  '[data-testid="pipe-comb-fab-radius-lr"]',
+  '[data-testid="pipe-comb-fab-radius-sr"]',
+  '#pipe-comb-fab-nps',
+  '#pipe-comb-fab-lin',
+  '#pipe-comb-fab-lout',
+  '#pipe-comb-fab-gap',
+  '#pipe-comb-fab-allowance',
+];
+
+test('fab-35: controls fully visible, unclipped and actionable at 320/390 (es + en)', async ({ page }) => {
+  test.slow(); /* 4 full setups (2 widths x es/en) + per-control geometry checks. */
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 800 });
+    /* Spanish has the longest control labels of the locale set. */
+    await setupCase3x35(page, TOOL_URL_ES);
+    let sectionBox = await page.locator('[data-testid="pipe-comb-fab-section"]').boundingBox();
+    expect(sectionBox).not.toBeNull();
+    for (const sel of FAB_CONTROLS) await expectControlFullyVisible(page, sel, width, sectionBox);
+    /* Both modes are actionable at this width; the CLR field appears. */
+    await page.locator('[data-testid="pipe-comb-fab-mode-bend"]').click();
+    await expect(page.locator('[data-testid="pipe-comb-fab-mode-bend"]')).toHaveAttribute('aria-pressed', 'true');
+    await expectControlFullyVisible(page, '#pipe-comb-fab-clr', width, sectionBox);
+    await page.locator('[data-testid="pipe-comb-fab-mode-catalog"]').click();
+    await expect(page.locator('[data-testid="pipe-comb-fab-mode-catalog"]')).toHaveAttribute('aria-pressed', 'true');
+    /* Status and mobile cards with full identifiers/units stay visible. */
+    await expect(fabStatus(page)).toBeVisible();
+    const card = page.locator('[data-testid="pipe-comb-fab-piece-card"][data-piece-id="P3-OUT"]');
+    await expect(card).toBeVisible();
+    await expect(card).toContainText('1255.9 mm');
+    /* English: same guarantees. */
+    await setupCase3x35(page);
+    sectionBox = await page.locator('[data-testid="pipe-comb-fab-section"]').boundingBox();
+    expect(sectionBox).not.toBeNull();
+    for (const sel of FAB_CONTROLS) await expectControlFullyVisible(page, sel, width, sectionBox);
+  }
+});
+
+/* ------------------------------------------------------------------ *
+ * 13. Integration review fixes — H4: complete reference presentation
+ * ------------------------------------------------------------------ */
+
+test('fab-36: summary shows Lin and Lout independently; only-Lout keeps Lin pending', async ({ page }) => {
+  await setupCase3x35(page);
+  await expect(fabMetric(page, 'refs')).toHaveText('Lin: 1000 mm · Lout: 1200 mm');
+  /* Delete Lin: Lout must still be shown, Lin explicitly pending — both
+     are never hidden together just because Lin is empty. */
+  await page.locator('#pipe-comb-fab-lin').fill('');
+  await expect(fabMetric(page, 'refs')).toHaveText('Lin: pending · Lout: 1200 mm');
+});
+
+test('fab-37: marking shows localized origin → destination for every mark', async ({ page }) => {
+  await setupCase3x35(page);
+  /* Material mark: kept face -> cut plane at the kept angle. */
+  const intrados = page.locator('[data-testid="pipe-comb-fab-mark"][data-mark-id="arc-intrados-from-kept-face"]');
+  await expect(intrados).toContainText('kept face');
+  await expect(intrados).toContainText('cut plane at kept angle 35°');
+  /* Theoretical take-out: axis intersection -> elbow face plane. */
+  const takeout = page.locator('[data-testid="pipe-comb-fab-mark"][data-mark-id="takeout-axis"]');
+  await expect(takeout).toContainText('theoretical axis intersection');
+  await expect(takeout).toContainText('elbow face plane');
+  /* Method is still shown alongside the endpoints. */
+  await expect(intrados).toContainText('arc development');
+  /* Bend mode: tangent-to-tangent endpoints on the developed axis. */
+  await page.locator('[data-testid="pipe-comb-fab-mode-bend"]').click();
+  await page.locator('#pipe-comb-fab-clr').fill('228.6');
+  const developed = page.locator('[data-testid="pipe-comb-fab-mark"][data-mark-id="arc-centerline-developed"]');
+  await expect(developed).toContainText('tangent point T1');
+  await expect(developed).toContainText('tangent point T2');
+});
+
+test('fab-38: joint detail links each pup to its elbow faces with the applied gap', async ({ page }) => {
+  await setupCase3x35(page);
+  await page.locator('#pipe-comb-fab-gap').fill('2');
+  const detail = page.locator('[data-testid="pipe-comb-fab-detail"][data-piece-id="P1-IN"]');
+  await detail.locator('summary').click();
+  /* Own face and elbow face are distinct identified points when g > 0. */
+  const joint = detail.locator('[data-testid="pipe-comb-fab-joint"][data-joint-id="J1-IN"]');
+  await expect(joint).toHaveCount(1);
+  expect(await joint.textContent()).toContain('P1-IN-FACE-J');
+  expect(await joint.textContent()).toContain('P1-ELBOW-FACE-IN');
+  expect(await joint.textContent()).toContain('2 mm');
+  /* The outlet pup gets its own joint, not the inlet's. */
+  const outDetail = page.locator('[data-testid="pipe-comb-fab-detail"][data-piece-id="P1-OUT"]');
+  await outDetail.locator('summary').click();
+  const outJoint = outDetail.locator('[data-testid="pipe-comb-fab-joint"][data-joint-id="J1-OUT"]');
+  await expect(outJoint).toHaveCount(1);
+  expect(await outJoint.textContent()).toContain('P1-OUT-FACE-J');
+  /* The elbow piece itself does not own the pup-side joint line. */
+  const elbowDetail = page.locator('[data-testid="pipe-comb-fab-detail"][data-piece-id="P1-ELBOW"]');
+  await elbowDetail.locator('summary').click();
+  await expect(elbowDetail.locator('[data-testid="pipe-comb-fab-joint"]')).toHaveCount(0);
+  /* g = 0 is shown explicitly (0 mm), not hidden. */
+  await page.locator('#pipe-comb-fab-gap').fill('0');
+  await expect(joint).toContainText('0 mm');
 });

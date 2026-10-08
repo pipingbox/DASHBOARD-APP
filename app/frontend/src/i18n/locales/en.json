@@ -2079,7 +2079,6 @@
           "takeOutLabel": "Elbow take-out (t)",
           "takeOutHelp": "Per side, from the theoretical axis intersection.",
           "refsApplied": "Lin / Lout references",
-          "missingRefs": "—",
           "appliedAdjust": "Applied g / allowance",
           "gapNotApplied": "g does not apply in bend mode",
           "gapShort": "g",
@@ -2113,7 +2112,6 @@
           "marksReference": "Geometric references",
           "noMaterialMarks": "The module provides no marks on material in this mode.",
           "cutValuesNote": "Engine references (tangent family r·tan(θ/2)): intrados {{intrados}} · centerline {{centerline}} · extrados {{extrados}}. Not arc distances measurable from the kept face.",
-          "originKeptFace": "measured from the kept face",
           "modelNote": "Nominal circular-arc model, no extra tangent straights; no guarantee on real accessory tolerances or primary code verification.",
           "mark": {
             "takeout-axis": "Tangent take-out (axis)",
@@ -2146,7 +2144,26 @@
           "detailAllowanceNote": "Surplus of {{value}}: remove at fit-up, not part of the finished assembly.",
           "endOwnJointFace": "own joint face of {{id}}",
           "endInletFace": "elbow inlet face",
-          "endCutFace": "cut face"
+          "endCutFace": "cut face",
+          "refLinShort": "Lin",
+          "refLoutShort": "Lout",
+          "refPending": "pending",
+          "jointDetail": "Joint {{id}}: {{own}} ↔ {{elbow}} · gap {{gap}}",
+          "jointOwnFace": "pup face",
+          "jointElbowFace": "elbow face",
+          "markOrigin": {
+            "axisIntersection": "theoretical axis intersection E",
+            "keptFace": "kept face (physical accessory face)",
+            "keptFacePlane": "kept-face plane",
+            "tangentT1": "inlet tangent point T1"
+          },
+          "markDest": {
+            "elbowFacePlane": "elbow face plane (kept face or cut face)",
+            "cutPlaneAtAngle": "cut plane at kept angle {{angle}}°",
+            "cutCenterlineProjected": "cut centerline point projected along the inlet axis",
+            "tangentPoint": "tangent point (either tangent)",
+            "outletTangentT2": "outlet tangent point T2"
+          }
         }
       },
       "errors": {

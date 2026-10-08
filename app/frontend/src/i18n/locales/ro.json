@@ -2017,7 +2017,6 @@
           "takeOutLabel": "Decuparea cotului (t)",
           "takeOutHelp": "Pe parte, de la intersecția teoretică a axelor.",
           "refsApplied": "Referințe Lin / Lout",
-          "missingRefs": "—",
           "appliedAdjust": "g / marjă aplicate",
           "gapNotApplied": "g nu se aplică la îndoire",
           "gapShort": "g",
@@ -2051,7 +2050,6 @@
           "marksReference": "Referințe geometrice",
           "noMaterialMarks": "Modulul nu furnizează marcări pe material în acest mod.",
           "cutValuesNote": "Referințe ale motorului (familia tangentă r·tan(θ/2)): intrados {{intrados}} · axă {{centerline}} · extrados {{extrados}}. Nu sunt distanțe de arc măsurabile de la fața conservată.",
-          "originKeptFace": "măsurat de la fața conservată",
           "modelNote": "Model nominal cu arc circular, fără tangente drepte suplimentare; fără garanție privind toleranțele accesoriilor reale sau verificare normativă primară.",
           "mark": {
             "takeout-axis": "Decupare tangentă (axă)",
@@ -2084,7 +2082,26 @@
           "detailAllowanceNote": "Supradimensionare de {{value}}: se îndepărtează la ajustare, nu face parte din ansamblul finit.",
           "endOwnJointFace": "față de îmbinare proprie a {{id}}",
           "endInletFace": "fața de intrare a cotului",
-          "endCutFace": "fața de tăiere"
+          "endCutFace": "fața de tăiere",
+          "refLinShort": "Lin",
+          "refLoutShort": "Lout",
+          "refPending": "în așteptare",
+          "jointDetail": "Îmbinare {{id}}: {{own}} ↔ {{elbow}} · joc {{gap}}",
+          "jointOwnFace": "fața segmentului drept",
+          "jointElbowFace": "fața cotului",
+          "markOrigin": {
+            "axisIntersection": "intersecția teoretică a axelor E",
+            "keptFace": "fața păstrată (fața fizică a accesoriului)",
+            "keptFacePlane": "planul feței păstrate",
+            "tangentT1": "punct de tangență de intrare T1"
+          },
+          "markDest": {
+            "elbowFacePlane": "planul feței cotului (față păstrată sau față de tăiere)",
+            "cutPlaneAtAngle": "planul de tăiere la unghiul păstrat {{angle}}°",
+            "cutCenterlineProjected": "punctul de tăiere al axei proiectat pe axa de intrare",
+            "tangentPoint": "punct de tangență (oricare dintre cele două)",
+            "outletTangentT2": "punct de tangență de ieșire T2"
+          }
         }
       },
       "errors": {

@@ -1856,7 +1856,6 @@
           "takeOutLabel": "Desconto do cotovelo (t)",
           "takeOutHelp": "Por lado, da interseção teórica dos eixos.",
           "refsApplied": "Referências Lin / Lout",
-          "missingRefs": "—",
           "appliedAdjust": "g / margem aplicadas",
           "gapNotApplied": "g não se aplica na dobra",
           "gapShort": "g",
@@ -1890,7 +1889,6 @@
           "marksReference": "Referências geométricas",
           "noMaterialMarks": "O módulo não fornece marcas no material neste modo.",
           "cutValuesNote": "Referências do motor (família tangente r·tan(θ/2)): intradorso {{intrados}} · eixo {{centerline}} · extradorso {{extrados}}. Não são distâncias de arco medíveis desde a face conservada.",
-          "originKeptFace": "medido desde a face conservada",
           "modelNote": "Modelo nominal de arco circular, sem retas tangentes extras; sem garantia sobre tolerâncias de acessórios reais nem verificação normativa primária.",
           "mark": {
             "takeout-axis": "Retranco tangente (eixo)",
@@ -1923,7 +1921,26 @@
           "detailAllowanceNote": "Sobremedida de {{value}}: remover no ajuste, não faz parte da montagem final.",
           "endOwnJointFace": "face de junta própria de {{id}}",
           "endInletFace": "face de entrada do cotovelo",
-          "endCutFace": "face de corte"
+          "endCutFace": "face de corte",
+          "refLinShort": "Lin",
+          "refLoutShort": "Lout",
+          "refPending": "pendente",
+          "jointDetail": "Junta {{id}}: {{own}} ↔ {{elbow}} · folga {{gap}}",
+          "jointOwnFace": "face da peça reta",
+          "jointElbowFace": "face do cotovelo",
+          "markOrigin": {
+            "axisIntersection": "interseção teórica dos eixos E",
+            "keptFace": "face conservada (face física do acessório)",
+            "keptFacePlane": "plano da face conservada",
+            "tangentT1": "ponto de tangência de entrada T1"
+          },
+          "markDest": {
+            "elbowFacePlane": "plano da face do cotovelo (face conservada ou face de corte)",
+            "cutPlaneAtAngle": "plano de corte no ângulo conservado {{angle}}°",
+            "cutCenterlineProjected": "ponto de corte do eixo projetado no eixo de entrada",
+            "tangentPoint": "ponto de tangência (qualquer um dos dois)",
+            "outletTangentT2": "ponto de tangência de saída T2"
+          }
         }
       },
       "errors": {

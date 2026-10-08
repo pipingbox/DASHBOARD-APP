@@ -2010,7 +2010,6 @@
           "takeOutLabel": "Descuento del codo (t)",
           "takeOutHelp": "Por lado, desde la intersección teórica de ejes.",
           "refsApplied": "Referencias Lin / Lout",
-          "missingRefs": "—",
           "appliedAdjust": "g / margen aplicados",
           "gapNotApplied": "g no aplica en doblez",
           "gapShort": "g",
@@ -2044,7 +2043,6 @@
           "marksReference": "Referencias geométricas",
           "noMaterialMarks": "El módulo no proporciona marcas sobre el material en este modo.",
           "cutValuesNote": "Referencias del motor (familia tangente r·tan(θ/2)): intradós {{intrados}} · eje {{centerline}} · extradós {{extrados}}. No son distancias de arco medibles desde la cara conservada.",
-          "originKeptFace": "medido desde la cara conservada",
           "modelNote": "Modelo nominal de arco circular, sin rectas tangentes extra; sin garantía sobre tolerancias de accesorios reales ni verificación normativa primaria.",
           "mark": {
             "takeout-axis": "Retranqueo tangente (eje)",
@@ -2077,7 +2075,26 @@
           "detailAllowanceNote": "Sobremedida de {{value}}: retirar al ajustar, no forma parte del montaje terminado.",
           "endOwnJointFace": "cara de junta propia de {{id}}",
           "endInletFace": "cara de entrada del codo",
-          "endCutFace": "cara de corte"
+          "endCutFace": "cara de corte",
+          "refLinShort": "Lin",
+          "refLoutShort": "Lout",
+          "refPending": "pendiente",
+          "jointDetail": "Junta {{id}}: {{own}} ↔ {{elbow}} · separación {{gap}}",
+          "jointOwnFace": "cara del palillo",
+          "jointElbowFace": "cara del codo",
+          "markOrigin": {
+            "axisIntersection": "intersección teórica de ejes E",
+            "keptFace": "cara conservada (cara física del accesorio)",
+            "keptFacePlane": "plano de la cara conservada",
+            "tangentT1": "punto de tangencia de entrada T1"
+          },
+          "markDest": {
+            "elbowFacePlane": "plano de la cara del codo (cara conservada o cara de corte)",
+            "cutPlaneAtAngle": "plano de corte al ángulo conservado {{angle}}°",
+            "cutCenterlineProjected": "punto de corte del eje proyectado sobre el eje de entrada",
+            "tangentPoint": "punto de tangencia (cualquiera de los dos)",
+            "outletTangentT2": "punto de tangencia de salida T2"
+          }
         }
       },
       "errors": {

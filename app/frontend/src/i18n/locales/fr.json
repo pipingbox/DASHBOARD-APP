@@ -1856,7 +1856,6 @@
           "takeOutLabel": "Déduccion du coude (t)",
           "takeOutHelp": "Par côté, depuis l'intersection théorique des axes.",
           "refsApplied": "Références Lin / Lout",
-          "missingRefs": "—",
           "appliedAdjust": "g / marge appliquées",
           "gapNotApplied": "g ne s'applique pas en pliage",
           "gapShort": "g",
@@ -1890,7 +1889,6 @@
           "marksReference": "Références géométriques",
           "noMaterialMarks": "Le module ne fournit pas de marques sur le matériau dans ce mode.",
           "cutValuesNote": "Références du moteur (famille tangente r·tan(θ/2)) : intrados {{intrados}} · axe {{centerline}} · extrados {{extrados}}. Pas des longueurs d'arc mesurables depuis la face conservée.",
-          "originKeptFace": "mesuré depuis la face conservée",
           "modelNote": "Modèle nominal en arc circulaire, sans tangentes droites supplémentaires ; aucune garantie sur les tolérances d'accessoires réels ni vérification normative primaire.",
           "mark": {
             "takeout-axis": "Retranque tangent (axe)",
@@ -1923,7 +1921,26 @@
           "detailAllowanceNote": "Surplus de {{value}} : à retirer à l'ajustement, ne fait pas partie de l'assemblage fini.",
           "endOwnJointFace": "face de joint propre de {{id}}",
           "endInletFace": "face d'entrée du coude",
-          "endCutFace": "face de coupe"
+          "endCutFace": "face de coupe",
+          "refLinShort": "Lin",
+          "refLoutShort": "Lout",
+          "refPending": "à compléter",
+          "jointDetail": "Assemblage {{id}} : {{own}} ↔ {{elbow}} · jeu {{gap}}",
+          "jointOwnFace": "face du tube droit",
+          "jointElbowFace": "face du coude",
+          "markOrigin": {
+            "axisIntersection": "intersection théorique des axes E",
+            "keptFace": "face conservée (face physique de l’accessoire)",
+            "keptFacePlane": "plan de la face conservée",
+            "tangentT1": "point de tangence d’entrée T1"
+          },
+          "markDest": {
+            "elbowFacePlane": "plan de la face du coude (face conservée ou face de coupe)",
+            "cutPlaneAtAngle": "plan de coupe à l’angle conservé {{angle}}°",
+            "cutCenterlineProjected": "point de coupe de l’axe projeté sur l’axe d’entrée",
+            "tangentPoint": "point de tangence (l’une ou l’autre tangente)",
+            "outletTangentT2": "point de tangence de sortie T2"
+          }
         }
       },
       "errors": {

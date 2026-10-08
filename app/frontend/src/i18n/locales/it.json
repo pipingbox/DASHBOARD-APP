@@ -2010,7 +2010,6 @@
           "takeOutLabel": "Detrazione del gomito (t)",
           "takeOutHelp": "Per lato, dall'intersezione teorica degli assi.",
           "refsApplied": "Riferimenti Lin / Lout",
-          "missingRefs": "—",
           "appliedAdjust": "g / margine applicati",
           "gapNotApplied": "g non si applica in piegatura",
           "gapShort": "g",
@@ -2044,7 +2043,6 @@
           "marksReference": "Riferimenti geometrici",
           "noMaterialMarks": "Il modulo non fornisce marcature sul materiale in questa modalità.",
           "cutValuesNote": "Riferimenti del motore (famiglia tangente r·tan(θ/2)): intrados {{intrados}} · asse {{centerline}} · extrados {{extrados}}. Non sono lunghezze d'arco misurabili dalla faccia conservata.",
-          "originKeptFace": "misurato dalla faccia conservata",
           "modelNote": "Modello nominale ad arco circolare, senza rette tangenti extra; nessuna garanzia sulle tolleranze di accessori reali né verifica normativa primaria.",
           "mark": {
             "takeout-axis": "Retranquo tangente (asse)",
@@ -2077,7 +2075,26 @@
           "detailAllowanceNote": "Sovramisura di {{value}}: da rimuovere al montaggio, non fa parte dell'assieme finito.",
           "endOwnJointFace": "faccia di giunto propria di {{id}}",
           "endInletFace": "faccia di ingresso del gomito",
-          "endCutFace": "faccia di taglio"
+          "endCutFace": "faccia di taglio",
+          "refLinShort": "Lin",
+          "refLoutShort": "Lout",
+          "refPending": "in attesa",
+          "jointDetail": "Giunto {{id}}: {{own}} ↔ {{elbow}} · gioco {{gap}}",
+          "jointOwnFace": "faccia del pezzo retto",
+          "jointElbowFace": "faccia del gomito",
+          "markOrigin": {
+            "axisIntersection": "intersezione teorica degli assi E",
+            "keptFace": "faccia conservata (faccia fisica del raccordo)",
+            "keptFacePlane": "piano della faccia conservata",
+            "tangentT1": "punto di tangenza di entrata T1"
+          },
+          "markDest": {
+            "elbowFacePlane": "piano della faccia del gomito (faccia conservata o faccia di taglio)",
+            "cutPlaneAtAngle": "piano di taglio all’angolo conservato {{angle}}°",
+            "cutCenterlineProjected": "punto di taglio dell’asse proiettato sull’asse di entrata",
+            "tangentPoint": "punto di tangenza (una qualsiasi delle due)",
+            "outletTangentT2": "punto di tangenza di uscita T2"
+          }
         }
       },
       "errors": {

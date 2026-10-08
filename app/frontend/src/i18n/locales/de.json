@@ -1853,7 +1853,6 @@
           "takeOutLabel": "Bogen-Abzug (t)",
           "takeOutHelp": "Je Seite, vom theoretischen Achsenschnittpunkt.",
           "refsApplied": "Lin-/Lout-Referenzen",
-          "missingRefs": "—",
           "appliedAdjust": "Angewandte g / Zugabe",
           "gapNotApplied": "g gilt nicht im Biegemodus",
           "gapShort": "g",
@@ -1887,7 +1886,6 @@
           "marksReference": "Geometrische Referenzen",
           "noMaterialMarks": "Das Modul liefert in diesem Modus keine Markierungen auf dem Material.",
           "cutValuesNote": "Engine-Referenzen (Tangentenfamilie r·tan(θ/2)): Intrados {{intrados}} · Mittellinie {{centerline}} · Extrados {{extrados}}. Keine abmessbaren Bogenlängen von der erhaltenen Fläche.",
-          "originKeptFace": "gemessen ab der erhaltenen Fläche",
           "modelNote": "Nominales Kreisbogenmodell ohne zusätzliche Tangenten; keine Garantie über Toleranzen echter Fittings oder primäre Normprüfung.",
           "mark": {
             "takeout-axis": "Tangenten-Abzug (Achse)",
@@ -1920,7 +1918,26 @@
           "detailAllowanceNote": "Überschuss von {{value}}: beim Fügen entfernen, nicht Teil der endgültigen Montage.",
           "endOwnJointFace": "eigene Stoßfläche von {{id}}",
           "endInletFace": "Bogeneintrittsfläche",
-          "endCutFace": "Schnittfläche"
+          "endCutFace": "Schnittfläche",
+          "refLinShort": "Lin",
+          "refLoutShort": "Lout",
+          "refPending": "ausstehend",
+          "jointDetail": "Schweißnaht {{id}}: {{own}} ↔ {{elbow}} · Spalt {{gap}}",
+          "jointOwnFace": "Fläche des Rohrstücks",
+          "jointElbowFace": "Bogenfläche",
+          "markOrigin": {
+            "axisIntersection": "theoretischer Achsenschnittpunkt E",
+            "keptFace": "beibehaltene Fläche (physische Bauteilfläche)",
+            "keptFacePlane": "Ebene der beibehaltenen Fläche",
+            "tangentT1": "Eintritts-Tangentenpunkt T1"
+          },
+          "markDest": {
+            "elbowFacePlane": "Ebene der Bogenfläche (beibehaltene Fläche oder Schnittfläche)",
+            "cutPlaneAtAngle": "Schnittebene beim beibehaltenen Winkel {{angle}}°",
+            "cutCenterlineProjected": "Schnitt-Mittellinienpunkt, projiziert auf die Eintrittsachse",
+            "tangentPoint": "Tangentenpunkt (beliebige Tangente)",
+            "outletTangentT2": "Austritts-Tangentenpunkt T2"
+          }
         }
       },
       "errors": {

@@ -8,16 +8,17 @@ import {
   solvePipeCombFabrication,
   type PipeCombFabricationSolution,
   type FabricationPiece,
+  type FabricationJoint,
 } from './pipe-comb-fabrication';
 import type { LengthUnit } from '@/tools/core/units';
+import { formatLengthForUnit } from './number-input';
 import {
-  createLengthField,
-  lengthFieldOnEdit,
-  lengthFieldOnUnitChange,
-  parseLengthInputToMm,
-  formatLengthForUnit,
-  type LengthFieldState,
-} from './number-input';
+  createFabField,
+  fabFieldOnEdit,
+  fabFieldOnUnitChange,
+  fabFieldStatus,
+  type FabFieldState,
+} from './fab-fields';
 import { PIPE_DIMENSIONS } from '@/tools/core/standards/generated/pipe-dimensions';
 
 /**
@@ -34,11 +35,12 @@ import { PIPE_DIMENSIONS } from '@/tools/core/standards/generated/pipe-dimension
  * (`geometryValid`, `cutPlanValid`, piece `status`, `warnings`) to
  * presentation instead of re-validating in parallel.
  *
- * Input policy (inherited from number-input.ts): canonical physical mm at
- * full precision; unit toggles re-render text only; one point OR one comma;
- * ambiguous mixes rejected. An empty optional field (Lin/Lout) is absence,
- * NOT zero; an invalid text blocks the plan (state "review") instead of
- * silently falling back to the last valid value.
+ * Input policy (local `fab-fields.ts` adapter, integration review fixes
+ * H1/H2): the module is fed the CANONICAL mm values, never a re-parse of the
+ * display text, so presentation rounding cannot change validity or results.
+ * Empty optional fields (Lin/Lout) are absence, NOT zero; invalid text
+ * blocks the plan (state "review") and a unit toggle never resurrects a
+ * deleted or invalid value — only an explicit valid edit does.
  */
 
 /** Unique NPS options from the B36.10M layer, in table order. */
@@ -75,15 +77,12 @@ interface PipeCombFabricationSectionProps {
   geometry: PipeCombFabGeometry | null;
 }
 
-/** A field is "filled and valid" when its visible text parses. */
-function fieldValid(field: LengthFieldState): boolean {
-  return field.text.trim() !== '' && parseLengthInputToMm(field.text, field.unit) !== null;
-}
-
-/** A field is empty (absence) — distinct from invalid text. */
-function fieldEmpty(field: LengthFieldState): boolean {
-  return field.text.trim() === '';
-}
+/** Shared classes for the local mode/radius toggle buttons. They are NATIVE
+ *  buttons (not the global Button component) so long locale labels can wrap
+ *  and stack on mobile without touching the global `whitespace-nowrap`. */
+const toggleButtonBase =
+  'w-full sm:w-auto h-auto min-h-9 rounded-md px-3 py-1.5 text-center text-sm font-medium transition-colors ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
 export default function PipeCombFabricationSection({ unit, geometry }: PipeCombFabricationSectionProps) {
   const { t } = useTranslation();
@@ -91,20 +90,21 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
   const [nps, setNps] = useState('');
   const [elbowMode, setElbowMode] = useState<'catalog' | 'bend'>('catalog');
   const [radiusType, setRadiusType] = useState<'LR' | 'SR'>('LR');
-  // Canonical mm fields; unit toggles only re-render their display text.
-  const [clrField, setClrField] = useState<LengthFieldState>(() => ({ text: '', canonicalMm: null, unit: 'mm' }));
-  const [linField, setLinField] = useState<LengthFieldState>(() => ({ text: '', canonicalMm: null, unit: 'mm' }));
-  const [loutField, setLoutField] = useState<LengthFieldState>(() => ({ text: '', canonicalMm: null, unit: 'mm' }));
-  const [gapField, setGapField] = useState<LengthFieldState>(() => createLengthField(0, 'mm'));
-  const [allowField, setAllowField] = useState<LengthFieldState>(() => createLengthField(0, 'mm'));
+  // Canonical mm fields via the LOCAL adapter: canonicalMm is non-null only
+  // while the current text parses; unit toggles re-render valid text only.
+  const [clrField, setClrField] = useState<FabFieldState>(() => createFabField(unit));
+  const [linField, setLinField] = useState<FabFieldState>(() => createFabField(unit));
+  const [loutField, setLoutField] = useState<FabFieldState>(() => createFabField(unit));
+  const [gapField, setGapField] = useState<FabFieldState>(() => createFabField(unit, 0));
+  const [allowField, setAllowField] = useState<FabFieldState>(() => createFabField(unit, 0));
 
   // Entries survive close/reopen during the session (state lives here).
   useEffect(() => {
-    setClrField((f) => lengthFieldOnUnitChange(f, unit));
-    setLinField((f) => lengthFieldOnUnitChange(f, unit));
-    setLoutField((f) => lengthFieldOnUnitChange(f, unit));
-    setGapField((f) => lengthFieldOnUnitChange(f, unit));
-    setAllowField((f) => lengthFieldOnUnitChange(f, unit));
+    setClrField((f) => fabFieldOnUnitChange(f, unit));
+    setLinField((f) => fabFieldOnUnitChange(f, unit));
+    setLoutField((f) => fabFieldOnUnitChange(f, unit));
+    setGapField((f) => fabFieldOnUnitChange(f, unit));
+    setAllowField((f) => fabFieldOnUnitChange(f, unit));
   }, [unit]);
 
   const fab: FabState = useMemo(() => {
@@ -112,20 +112,24 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
     if (!geometry) return { status: 'p2-invalid' };
     const bend = elbowMode === 'bend';
     if (nps === '') return { status: 'review', reviewReason: 'nps' };
-    if (bend && !fieldValid(clrField)) return { status: 'review', reviewReason: 'clr' };
-    if (!fieldValid(gapField) || !fieldValid(allowField)) return { status: 'review', reviewReason: 'adjust' };
-    // Lin/Lout: empty = absence (optional); non-empty invalid text = review.
-    if (!fieldEmpty(linField) && !fieldValid(linField)) return { status: 'review', reviewReason: 'lin' };
-    if (!fieldEmpty(loutField) && !fieldValid(loutField)) return { status: 'review', reviewReason: 'lout' };
+    if (bend && fabFieldStatus(clrField) !== 'valid') return { status: 'review', reviewReason: 'clr' };
+    if (fabFieldStatus(gapField) !== 'valid' || fabFieldStatus(allowField) !== 'valid') {
+      return { status: 'review', reviewReason: 'adjust' };
+    }
+    // Lin/Lout: empty = absence (optional); invalid text = review.
+    if (fabFieldStatus(linField) === 'invalid') return { status: 'review', reviewReason: 'lin' };
+    if (fabFieldStatus(loutField) === 'invalid') return { status: 'review', reviewReason: 'lout' };
 
+    // The module consumes the CANONICAL values directly — never a re-parse
+    // of the (rounded) display text.
     const references: Record<string, number> = {};
-    if (!fieldEmpty(linField)) references.inletAxisToAxisMm = parseLengthInputToMm(linField.text, linField.unit) as number;
-    if (!fieldEmpty(loutField)) references.outletAxisToAxisMm = parseLengthInputToMm(loutField.text, loutField.unit) as number;
+    if (linField.canonicalMm !== null) references.inletAxisToAxisMm = linField.canonicalMm;
+    if (loutField.canonicalMm !== null) references.outletAxisToAxisMm = loutField.canonicalMm;
     // Weld gap is always handed to the module: in bend mode the module keeps
     // it, does NOT apply it, and emits weld_gap_not_applicable_bend — the
     // module's own treatment is the single source of this state.
-    references.weldGapMm = parseLengthInputToMm(gapField.text, gapField.unit) as number;
-    references.fittingAllowanceMm = parseLengthInputToMm(allowField.text, allowField.unit) as number;
+    references.weldGapMm = gapField.canonicalMm as number;
+    references.fittingAllowanceMm = allowField.canonicalMm as number;
 
     const res = solvePipeCombFabrication({
       pipeCount: geometry.pipeCount,
@@ -134,7 +138,7 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
       elbowAngleDeg: geometry.elbowAngleDeg,
       nps,
       elbow: bend
-        ? { kind: 'bend', clrMm: parseLengthInputToMm(clrField.text, clrField.unit) as number }
+        ? { kind: 'bend', clrMm: clrField.canonicalMm as number }
         : { kind: 'catalog', radiusType },
       references: Object.keys(references).length > 0 ? references : undefined,
     });
@@ -204,9 +208,9 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
       data-testid="pipe-comb-fab-section"
       data-open={open ? 'true' : 'false'}
     >
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Scissors className="h-4 w-4 text-[#FF8C00]" aria-hidden="true" />
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Scissors className="h-4 w-4 shrink-0 text-[#FF8C00]" aria-hidden="true" />
           <h4 className="text-[11px] uppercase tracking-wider text-[#A3A9B3]">
             {t('tools.prefab.pipeComb.fab.title')}
           </h4>
@@ -253,27 +257,25 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
                 <p className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">
                   {t('tools.prefab.pipeComb.fab.elbowMode')}
                 </p>
-                <div className="flex gap-2">
-                  <Button
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <button
                     type="button"
-                    size="sm"
                     aria-pressed={elbowMode === 'catalog'}
                     data-testid="pipe-comb-fab-mode-catalog"
                     onClick={() => setElbowMode('catalog')}
-                    className={elbowMode === 'catalog' ? 'bg-[#FF8C00] text-black' : 'border-[#232A36]'}
+                    className={`${toggleButtonBase} ${elbowMode === 'catalog' ? 'bg-[#FF8C00] text-black' : 'border border-[#232A36] text-[#F5F7FA] hover:bg-[#1A2029]'}`}
                   >
                     {t('tools.prefab.pipeComb.fab.modeCatalog')}
-                  </Button>
-                  <Button
+                  </button>
+                  <button
                     type="button"
-                    size="sm"
                     aria-pressed={elbowMode === 'bend'}
                     data-testid="pipe-comb-fab-mode-bend"
                     onClick={() => setElbowMode('bend')}
-                    className={elbowMode === 'bend' ? 'bg-[#FF8C00] text-black' : 'border-[#232A36]'}
+                    className={`${toggleButtonBase} ${elbowMode === 'bend' ? 'bg-[#FF8C00] text-black' : 'border border-[#232A36] text-[#F5F7FA] hover:bg-[#1A2029]'}`}
                   >
                     {t('tools.prefab.pipeComb.fab.modeBend')}
-                  </Button>
+                  </button>
                 </div>
               </div>
               {!bend && (
@@ -281,27 +283,25 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
                   <p className="text-[10px] uppercase tracking-wider text-[#A3A9B3]">
                     {t('tools.prefab.pipeComb.fab.radiusType')}
                   </p>
-                  <div className="flex gap-2">
-                    <Button
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <button
                       type="button"
-                      size="sm"
                       aria-pressed={radiusType === 'LR'}
                       data-testid="pipe-comb-fab-radius-lr"
                       onClick={() => setRadiusType('LR')}
-                      className={radiusType === 'LR' ? 'bg-[#FF8C00] text-black' : 'border-[#232A36]'}
+                      className={`${toggleButtonBase} ${radiusType === 'LR' ? 'bg-[#FF8C00] text-black' : 'border border-[#232A36] text-[#F5F7FA] hover:bg-[#1A2029]'}`}
                     >
                       LR
-                    </Button>
-                    <Button
+                    </button>
+                    <button
                       type="button"
-                      size="sm"
                       aria-pressed={radiusType === 'SR'}
                       data-testid="pipe-comb-fab-radius-sr"
                       onClick={() => setRadiusType('SR')}
-                      className={radiusType === 'SR' ? 'bg-[#FF8C00] text-black' : 'border-[#232A36]'}
+                      className={`${toggleButtonBase} ${radiusType === 'SR' ? 'bg-[#FF8C00] text-black' : 'border border-[#232A36] text-[#F5F7FA] hover:bg-[#1A2029]'}`}
                     >
                       SR
-                    </Button>
+                    </button>
                   </div>
                 </div>
               )}
@@ -315,8 +315,8 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
                     data-testid="pipe-comb-fab-clr"
                     value={clrField.text}
                     inputMode="decimal"
-                    aria-invalid={!fieldEmpty(clrField) && !fieldValid(clrField)}
-                    onChange={(e) => setClrField((f) => lengthFieldOnEdit(f, e.target.value, unit))}
+                    aria-invalid={fabFieldStatus(clrField) === 'invalid'}
+                    onChange={(e) => setClrField((f) => fabFieldOnEdit(f, e.target.value))}
                     className="bg-[#0E1117] border-[#232A36]"
                   />
                 </div>
@@ -350,8 +350,8 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
                   data-testid="pipe-comb-fab-lin"
                   value={linField.text}
                   inputMode="decimal"
-                  aria-invalid={!fieldEmpty(linField) && !fieldValid(linField)}
-                  onChange={(e) => setLinField((f) => lengthFieldOnEdit(f, e.target.value, unit))}
+                  aria-invalid={fabFieldStatus(linField) === 'invalid'}
+                  onChange={(e) => setLinField((f) => fabFieldOnEdit(f, e.target.value))}
                   className="bg-[#0E1117] border-[#232A36]"
                 />
                 <p className="text-[10px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.fab.linHelp')}</p>
@@ -365,8 +365,8 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
                   data-testid="pipe-comb-fab-lout"
                   value={loutField.text}
                   inputMode="decimal"
-                  aria-invalid={!fieldEmpty(loutField) && !fieldValid(loutField)}
-                  onChange={(e) => setLoutField((f) => lengthFieldOnEdit(f, e.target.value, unit))}
+                  aria-invalid={fabFieldStatus(loutField) === 'invalid'}
+                  onChange={(e) => setLoutField((f) => fabFieldOnEdit(f, e.target.value))}
                   className="bg-[#0E1117] border-[#232A36]"
                 />
                 <p className="text-[10px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.fab.loutHelp')}</p>
@@ -388,8 +388,8 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
                   data-testid="pipe-comb-fab-gap"
                   value={gapField.text}
                   inputMode="decimal"
-                  aria-invalid={!fieldValid(gapField)}
-                  onChange={(e) => setGapField((f) => lengthFieldOnEdit(f, e.target.value, unit))}
+                  aria-invalid={fabFieldStatus(gapField) === 'invalid'}
+                  onChange={(e) => setGapField((f) => fabFieldOnEdit(f, e.target.value))}
                   className="bg-[#0E1117] border-[#232A36]"
                 />
                 <p className="text-[10px] text-[#A3A9B3]">
@@ -405,8 +405,8 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
                   data-testid="pipe-comb-fab-allowance"
                   value={allowField.text}
                   inputMode="decimal"
-                  aria-invalid={!fieldValid(allowField)}
-                  onChange={(e) => setAllowField((f) => lengthFieldOnEdit(f, e.target.value, unit))}
+                  aria-invalid={fabFieldStatus(allowField) === 'invalid'}
+                  onChange={(e) => setAllowField((f) => fabFieldOnEdit(f, e.target.value))}
                   className="bg-[#0E1117] border-[#232A36]"
                 />
                 <p className="text-[10px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.fab.allowanceNote')}</p>
@@ -454,10 +454,14 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
               </div>
               <div className="rounded-md border border-[#232A36] bg-[#0E1117] p-3">
                 <p className="text-[11px] text-[#A3A9B3]">{t('tools.prefab.pipeComb.fab.refsApplied')}</p>
+                {/* Lin and Lout are shown INDEPENDENTLY: a missing Lin never
+                    hides a provided Lout (integration review finding 4A). */}
                 <p className="break-words text-base font-semibold text-[#F5F7FA]" data-testid="pipe-comb-fab-metric" data-metric="refs">
-                  {sol.references.inletAxisToAxisMm !== undefined
-                    ? `${fmtFab(sol.references.inletAxisToAxisMm)} / ${fmtFab(sol.references.outletAxisToAxisMm)}`
-                    : t('tools.prefab.pipeComb.fab.missingRefs')}
+                  {`${t('tools.prefab.pipeComb.fab.refLinShort')}: ${
+                    sol.references.inletAxisToAxisMm !== undefined ? fmtFab(sol.references.inletAxisToAxisMm) : t('tools.prefab.pipeComb.fab.refPending')
+                  } · ${t('tools.prefab.pipeComb.fab.refLoutShort')}: ${
+                    sol.references.outletAxisToAxisMm !== undefined ? fmtFab(sol.references.outletAxisToAxisMm) : t('tools.prefab.pipeComb.fab.refPending')
+                  }`}
                 </p>
                 <p className="text-[10px] text-[#A3A9B3]">Lin / Lout</p>
               </div>
@@ -592,7 +596,13 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
               {/* Per-piece expandable detail (desktop table rows link here via id). */}
               <div className="space-y-1">
                 {sol.pipes.flatMap((pipe) => pipe.pieces).map((piece) => (
-                  <PieceDetail key={piece.id} piece={piece} fmtFab={fmtFab} t={t} />
+                  <PieceDetail
+                    key={piece.id}
+                    piece={piece}
+                    joints={sol.joints.filter((j) => j.pieces[0] === piece.id)}
+                    fmtFab={fmtFab}
+                    t={t}
+                  />
                 ))}
               </div>
 
@@ -631,7 +641,9 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
                       {sol.elbow.marks.filter((m) => m.onMaterial).map((m) => (
                         <li key={m.id} data-testid="pipe-comb-fab-mark" data-mark-id={m.id} data-material="true">
                           <p className="text-sm text-[#F5F7FA]">{markLabel(m.id)}: <span className="font-semibold">{fmtFab(m.valueMm)}</span></p>
-                          <p className="text-[10px] text-[#A3A9B3]">{markMethod(m.method)} · {t('tools.prefab.pipeComb.fab.originKeptFace')}</p>
+                          <p className="text-[10px] text-[#A3A9B3]">
+                            {markEndpointLabel(m.origin, t)} → {markEndpointLabel(m.destination, t)} · {markMethod(m.method)}
+                          </p>
                         </li>
                       ))}
                     </ul>
@@ -645,7 +657,9 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
                     {sol.elbow.marks.filter((m) => !m.onMaterial).map((m) => (
                       <li key={m.id} data-testid="pipe-comb-fab-mark" data-mark-id={m.id} data-material="false">
                         <p className="text-sm text-[#F5F7FA]">{markLabel(m.id)}: <span className="font-semibold">{fmtFab(m.valueMm)}</span></p>
-                        <p className="text-[10px] text-[#A3A9B3]">{markMethod(m.method)}</p>
+                        <p className="text-[10px] text-[#A3A9B3]">
+                          {markEndpointLabel(m.origin, t)} → {markEndpointLabel(m.destination, t)} · {markMethod(m.method)}
+                        </p>
                       </li>
                     ))}
                   </ul>
@@ -683,13 +697,44 @@ function endsLabel(raw: string, t: (k: string, o?: Record<string, string | numbe
   return raw;
 }
 
-/** Expandable per-piece detail: ends, axis length, deductions, faces, joint. */
+/** Map module mark origin/destination strings to localized labels
+ *  (integration review finding 4B: origin and destination of every mark,
+ *  localized — never raw English internals). Stable identifiers fall
+ *  through unchanged. */
+function markEndpointLabel(raw: string, t: (k: string, o?: Record<string, string | number>) => string): string {
+  switch (raw) {
+    case 'theoretical axis intersection E':
+      return t('tools.prefab.pipeComb.fab.markOrigin.axisIntersection');
+    case 'kept face (physical accessory face)':
+      return t('tools.prefab.pipeComb.fab.markOrigin.keptFace');
+    case 'kept-face plane':
+      return t('tools.prefab.pipeComb.fab.markOrigin.keptFacePlane');
+    case 'inlet tangent point T1':
+      return t('tools.prefab.pipeComb.fab.markOrigin.tangentT1');
+    case 'elbow face plane (kept face or cut face)':
+      return t('tools.prefab.pipeComb.fab.markDest.elbowFacePlane');
+    case 'cut centerline point projected along the inlet axis':
+      return t('tools.prefab.pipeComb.fab.markDest.cutCenterlineProjected');
+    case 'tangent point (either tangent)':
+      return t('tools.prefab.pipeComb.fab.markDest.tangentPoint');
+    case 'outlet tangent point T2':
+      return t('tools.prefab.pipeComb.fab.markDest.outletTangentT2');
+  }
+  const cutPlane = raw.match(/^cut plane at kept angle ([0-9.]+) deg$/);
+  if (cutPlane) return t('tools.prefab.pipeComb.fab.markDest.cutPlaneAtAngle', { angle: cutPlane[1] });
+  return raw;
+}
+
+/** Expandable per-piece detail: ends, axis length, deductions, faces, joints. */
 function PieceDetail({
   piece,
+  joints,
   fmtFab,
   t,
 }: {
   piece: FabricationPiece;
+  /** Weld joints owned by THIS piece (pup side; integration review 4C). */
+  joints: FabricationJoint[];
   fmtFab: (v: number | undefined) => string;
   t: (key: string, opts?: Record<string, string | number>) => string;
 }) {
@@ -709,6 +754,19 @@ function PieceDetail({
         {elbow !== undefined && <p>{t('tools.prefab.pipeComb.fab.detailDeductElbow', { value: fmtFab(elbow) })}</p>}
         {gap !== undefined && <p>{t('tools.prefab.pipeComb.fab.detailDeductGap', { value: fmtFab(gap) })}</p>}
         {faces?.joint && <p>{t('tools.prefab.pipeComb.fab.detailFaces', { joint: faces.joint, free: faces.free ?? '' })}</p>}
+        {/* Joint association (integration review 4C): own face vs elbow face
+            are distinct identified points when g > 0; the applied gap is
+            explicit, never assumed. */}
+        {joints.map((j) => (
+          <p key={j.id} data-testid="pipe-comb-fab-joint" data-joint-id={j.id}>
+            {t('tools.prefab.pipeComb.fab.jointDetail', {
+              id: j.id,
+              own: `${j.faceA} (${t('tools.prefab.pipeComb.fab.jointOwnFace')})`,
+              elbow: `${j.faceB} (${t('tools.prefab.pipeComb.fab.jointElbowFace')})`,
+              gap: fmtFab(j.gapMm),
+            })}
+          </p>
+        ))}
         {piece.allowanceHandling === 'remove-at-fit-up' && piece.fittingAllowanceMm > 0 && (
           <p className="text-yellow-400">{t('tools.prefab.pipeComb.fab.detailAllowanceNote', { value: fmtFab(piece.fittingAllowanceMm) })}</p>
         )}

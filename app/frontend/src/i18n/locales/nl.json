@@ -1853,7 +1853,6 @@
           "takeOutLabel": "Boogaftrek (t)",
           "takeOutHelp": "Per zijde, vanaf de theoretische assnede.",
           "refsApplied": "Lin-/Lout-referenties",
-          "missingRefs": "—",
           "appliedAdjust": "Toegepaste g / ruimte",
           "gapNotApplied": "g geldt niet in buigmodus",
           "gapShort": "g",
@@ -1887,7 +1886,6 @@
           "marksReference": "Geometrische referenties",
           "noMaterialMarks": "De module levert in deze modus geen markeringen op het materiaal.",
           "cutValuesNote": "Motorreferenties (tangentfamilie r·tan(θ/2)): intrados {{intrados}} · as {{centerline}} · extrados {{extrados}}. Geen booglengtes meetbaar vanaf het behouden vlak.",
-          "originKeptFace": "gemeten vanaf het behouden vlak",
           "modelNote": "Nominale cirkelboogmodel, zonder extra tangenten; geen garantie over toleranties van echte fittingen of primaire normcontrole.",
           "mark": {
             "takeout-axis": "Tangente aftrek (as)",
@@ -1920,7 +1918,26 @@
           "detailAllowanceNote": "Overschoot van {{value}}: verwijderen bij het passen, geen onderdeel van de eindmontage.",
           "endOwnJointFace": "eigen stootvlak van {{id}}",
           "endInletFace": "instroomvlak van de boog",
-          "endCutFace": "snijvlak"
+          "endCutFace": "snijvlak",
+          "refLinShort": "Lin",
+          "refLoutShort": "Lout",
+          "refPending": "in te vullen",
+          "jointDetail": "Las {{id}}: {{own}} ↔ {{elbow}} · lasafstand {{gap}}",
+          "jointOwnFace": "vlak van het rechte stuk",
+          "jointElbowFace": "bochtvlak",
+          "markOrigin": {
+            "axisIntersection": "theoretisch snijpunt van de assen E",
+            "keptFace": "behouden vlak (fysiek hulpstukvlak)",
+            "keptFacePlane": "vlak van de behouden kant",
+            "tangentT1": "tangentpunt aan de inloopzijde T1"
+          },
+          "markDest": {
+            "elbowFacePlane": "vlak van de boogzijde (behouden kant of snijvlak)",
+            "cutPlaneAtAngle": "snijvlak bij de behouden hoek {{angle}}°",
+            "cutCenterlineProjected": "snijpunt van de as, geprojecteerd op de inloopas",
+            "tangentPoint": "tangentpunt (een van beide)",
+            "outletTangentT2": "tangentpunt aan de uitloopzijde T2"
+          }
         }
       },
       "errors": {

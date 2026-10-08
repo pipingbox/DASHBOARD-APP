@@ -2020,7 +2020,6 @@
           "takeOutLabel": "Odjęcie kolana (t)",
           "takeOutHelp": "Na stronę, od teoretycznego przecięcia osi.",
           "refsApplied": "Odniesienia Lin / Lout",
-          "missingRefs": "—",
           "appliedAdjust": "Zastosowane g / zapas",
           "gapNotApplied": "g nie ma zastosowania w gięciu",
           "gapShort": "g",
@@ -2054,7 +2053,6 @@
           "marksReference": "Odniesienia geometryczne",
           "noMaterialMarks": "Moduł nie dostarcza znaczników na materiale w tym trybie.",
           "cutValuesNote": "Odniesienia silnika (rodzina stycznych r·tan(θ/2)): intrados {{intrados}} · oś {{centerline}} · extrados {{extrados}}. Nie są to długości łukowe mierzalne od zachowanej płaszczyzny.",
-          "originKeptFace": "mierzone od zachowanej płaszczyzny",
           "modelNote": "Nominalny model łuku kołowego, bez dodatkowych stycznych; bez gwarancji tolerancji rzeczywistych kształtek ani pierwotnej weryfikacji norm.",
           "mark": {
             "takeout-axis": "Odejmowanie styczne (oś)",
@@ -2087,7 +2085,26 @@
           "detailAllowanceNote": "Naddatek {{value}}: usunąć przy dopasowaniu, nie jest częścią gotowego montażu.",
           "endOwnJointFace": "własna płaszczyzna łączeniowa {{id}}",
           "endInletFace": "powierzchnia wlotu kolana",
-          "endCutFace": "powierzchnia cięcia"
+          "endCutFace": "powierzchnia cięcia",
+          "refLinShort": "Lin",
+          "refLoutShort": "Lout",
+          "refPending": "do uzupełnienia",
+          "jointDetail": "Złącze {{id}}: {{own}} ↔ {{elbow}} · szczelina {{gap}}",
+          "jointOwnFace": "powierzchnia prostego odcinka",
+          "jointElbowFace": "powierzchnia kolana",
+          "markOrigin": {
+            "axisIntersection": "teoretyczne przecięcie osi E",
+            "keptFace": "zachowana powierzchnia (fizyczna powierzchnia kształtki)",
+            "keptFacePlane": "płaszczyzna zachowanej powierzchni",
+            "tangentT1": "punkt styczności wlotu T1"
+          },
+          "markDest": {
+            "elbowFacePlane": "płaszczyzna powierzchni kolana (powierzchnia zachowana lub cięcia)",
+            "cutPlaneAtAngle": "płaszczyzna cięcia przy zachowanym kącie {{angle}}°",
+            "cutCenterlineProjected": "punkt cięcia osi rzutowany na oś wlotu",
+            "tangentPoint": "punkt styczności (jedna z dwóch stycznych)",
+            "outletTangentT2": "punkt styczności wylotu T2"
+          }
         }
       },
       "errors": {
