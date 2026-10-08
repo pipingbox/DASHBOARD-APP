@@ -91,6 +91,11 @@ on:
         required: false
         default: false
         type: boolean
+      run_documents_open_e2e:
+        description: 'Run ONLY the PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001 documents-open E2E (documents-open-first-click, mobile + desktop) in an isolated window — the 7/7 auth gate and the other specs are skipped for this dispatch'
+        required: false
+        default: false
+        type: boolean
       expected_env:
         description: 'Expected PostHog environment of the target deployment (preview|production); the SHA-locked specs assert it in pre-flight'
         required: false
@@ -102,7 +107,7 @@ jobs:
     name: Auth E2E — require 7/7 PASS
     # Gate 6: the onboarding E2E needs a truly isolated window (same QA
     # account, same preview Worker) — skip the auth gate for that dispatch.
-    if: ${{ inputs.run_onboarding_e2e != true && inputs.run_wfa_e2e != true && inputs.run_dashboard_e2e != true && inputs.run_cert_upload_e2e != true && inputs.run_referral_aldo_e2e != true && inputs.run_auth_callback_e2e != true && inputs.run_stale_crossdeploy_e2e != true && inputs.run_prod_stale_smoke != true }}
+    if: ${{ inputs.run_onboarding_e2e != true && inputs.run_wfa_e2e != true && inputs.run_dashboard_e2e != true && inputs.run_cert_upload_e2e != true && inputs.run_referral_aldo_e2e != true && inputs.run_auth_callback_e2e != true && inputs.run_stale_crossdeploy_e2e != true && inputs.run_prod_stale_smoke != true && inputs.run_documents_open_e2e != true }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -765,6 +770,82 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: referral-aldo-e2e-results
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  documents-open-e2e:
+    name: PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001 documents-open E2E (SHA-locked, isolated window)
+    if: ${{ inputs.run_documents_open_e2e == true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Same isolated window as the other disposable-QA specs: shares the
+    # deploy-preview concurrency group so no preview deploy can overwrite the
+    # shared Worker mid-run, and is mutually exclusive with the other modes.
+    concurrency:
+      group: deploy-preview
+      cancel-in-progress: false
+    env:
+      PREVIEW_URL: ${{ inputs.target_url }}
+      E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+      E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+      EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
+      EXPECTED_ENV: ${{ inputs.expected_env }}
+
+    steps:
+      - name: Require expected_sha and exclusive dispatch mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${EXPECTED_APP_VERSION:-}" ]; then
+            echo "::error::expected_sha is required when run_documents_open_e2e=true (the served build must be traceable to the tested SHA)."
+            exit 1
+          fi
+          for pair in "run_identity_e2e=${{ inputs.run_identity_e2e }}" "run_wfa_e2e=${{ inputs.run_wfa_e2e }}" "run_dashboard_e2e=${{ inputs.run_dashboard_e2e }}" "run_cert_upload_e2e=${{ inputs.run_cert_upload_e2e }}" "run_onboarding_e2e=${{ inputs.run_onboarding_e2e }}" "run_referral_aldo_e2e=${{ inputs.run_referral_aldo_e2e }}" "run_stale_crossdeploy_e2e=${{ inputs.run_stale_crossdeploy_e2e }}" "run_prod_stale_smoke=${{ inputs.run_prod_stale_smoke }}"; do
+            name="${pair%%=*}"
+            value="${pair##*=}"
+            if [ "$value" = "true" ]; then
+              echo "::error::run_documents_open_e2e and ${name} are mutually exclusive (same QA account, isolated window required)."
+              exit 1
+            fi
+          done
+
+      - name: Checkout exact tested app ref
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Switch to exact tested SHA
+        env:
+          INPUT_SHA: ${{ inputs.source_ref }}
+        run: git checkout "$INPUT_SHA"
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run documents-open E2E — first click opens the document
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/documents-open-first-click.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      - name: Upload E2E artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: documents-open-e2e-results
           path: test-results/
           retention-days: 14
           if-no-files-found: ignore

@@ -2427,6 +2427,7 @@
       "file": "Datei",
       "notes": "Anmerkungen",
       "notesPlaceholder": "Optionale Anmerkungen zu diesem Dokument...",
+      "open": "Dokument öffnen",
       "uploadFile": "Klicken zum Hochladen",
       "upload": "Dokument hochladen",
       "fileRequired": "Bitte laden Sie zuerst eine Datei hoch",

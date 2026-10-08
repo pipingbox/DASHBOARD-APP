@@ -2427,6 +2427,7 @@
       "file": "Bestand",
       "notes": "Opmerkingen",
       "notesPlaceholder": "Optionele opmerkingen over dit document...",
+      "open": "Document openen",
       "uploadFile": "Klik om bestand te uploaden",
       "upload": "Document uploaden",
       "fileRequired": "Upload eerst een bestand",
