@@ -122,6 +122,23 @@ async function interceptSign(page: Page, behavior: SignBehavior = {}) {
   return state;
 }
 
+/**
+ * Pre-navigation page setup: dismiss the beta banner dialog (a Radix overlay
+ * that otherwise intercepts pointer events on /profile — seen in the repro
+ * run 37740244798) and pin the language so the aria-label / toast assertions
+ * are deterministic.
+ */
+function preparePage(page: Page) {
+  return page.addInitScript(() => {
+    try {
+      localStorage.setItem('pipingbox_beta_dismissed', 'true');
+      localStorage.setItem('pipingbox_language', 'es');
+    } catch {
+      /* noop */
+    }
+  });
+}
+
 async function login(page: Page) {
   await page.goto('/login', { waitUntil: 'networkidle' });
   await page.locator('#email').fill(EMAIL!);
@@ -169,6 +186,7 @@ test.describe('PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001', () => {
   test('A+B+D+F (mobile): first click opens PDF and image; double-click does not duplicate; storage_path preferred', async ({ page }) => {
     await interceptDocuments(page);
     const sign = await interceptSign(page, { delayMs: SIGN_DELAY_MS });
+    await preparePage(page);
     await login(page);
     await gotoProfileDocuments(page);
 
@@ -216,6 +234,7 @@ test.describe('PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001', () => {
 
     // ── Scenario C: signed URL failure ──
     const signFail = await interceptSign(page, { fail: true });
+    await preparePage(page);
     await login(page);
     await gotoProfileDocuments(page);
 
@@ -250,6 +269,12 @@ test.describe('PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001', () => {
     const context = await browser.newContext({
       viewport: { width: 1280, height: 800 },
       locale: 'es-ES',
+    });
+    await context.addInitScript(() => {
+      try {
+        localStorage.setItem('pipingbox_beta_dismissed', 'true');
+        localStorage.setItem('pipingbox_language', 'es');
+      } catch { /* noop */ }
     });
     const page = await context.newPage();
     try {
