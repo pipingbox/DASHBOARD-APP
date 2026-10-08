@@ -211,9 +211,12 @@ test.describe('referral DB contracts', () => {
 
   test('T4: REFERRAL_JOINED notification can be inserted and retrieved', async () => {
     const testTitle = 'REFERRAL-TEST-CLEANUP'; // used by afterAll for cleanup
-    const insertRes = await api.post(
-      `/rest/v1/${NOTIFICATIONS_TABLE}`,
-      {
+    // NOTE: APIRequestContext.post(url, options) takes TWO arguments. The
+    // original three-argument form silently dropped the headers object
+    // (401 "No API key found"), so this probe never actually exercised the
+    // INSERT contract until PB-GROWTH-GATE-PERMISSIONS-403-001 fixed the call.
+    const insertRes = await api.post(`/rest/v1/${NOTIFICATIONS_TABLE}`, {
+      data: {
         user_id: userId,
         type: 'REFERRAL_JOINED',
         title: testTitle,
@@ -223,15 +226,13 @@ test.describe('referral DB contracts', () => {
         action_url: '/dashboard',
         is_read: false,
       },
-      {
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-          Prefer: 'return=representation',
-        },
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
       },
-    );
+    });
 
     expect(
       insertRes.status(),
@@ -248,9 +249,9 @@ test.describe('referral DB contracts', () => {
 
   test('T5: REFERRAL_VERIFIED notification can be inserted and retrieved', async () => {
     const testTitle = 'REFERRAL-TEST-CLEANUP';
-    const insertRes = await api.post(
-      `/rest/v1/${NOTIFICATIONS_TABLE}`,
-      {
+    // Same two-argument call-shape fix as T4 (headers were silently dropped).
+    const insertRes = await api.post(`/rest/v1/${NOTIFICATIONS_TABLE}`, {
+      data: {
         user_id: userId,
         type: 'REFERRAL_VERIFIED',
         title: testTitle,
@@ -260,15 +261,13 @@ test.describe('referral DB contracts', () => {
         action_url: '/dashboard',
         is_read: false,
       },
-      {
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-          Prefer: 'return=representation',
-        },
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
       },
-    );
+    });
 
     expect(
       insertRes.status(),

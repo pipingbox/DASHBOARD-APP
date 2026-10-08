@@ -1,0 +1,34 @@
+-- ══════════════════════════════════════════════════════════════════════════════
+-- PB-GROWTH-GATE-PERMISSIONS-403-001 — app_orders: GRANT SELECT owner-scoped.
+--
+-- ROOT CAUSE que resuelve (misma clase A que sql/023):
+--   * `hasCourseEntitlement()` (app/frontend/src/lib/academy/entitlement.ts) es
+--     el gate premium de Academy (PB-MARKET-ACCESS-001): consulta las OWN orders
+--     del usuario (status='paid' + product_key del curso) para decidir el acceso.
+--   * La tabla tenía RLS habilitado y la política owner-scope CORRECTA ya
+--     existente: SELECT TO authenticated USING ((user_id = auth.uid()) OR
+--     app_is_admin()).
+--   * Pero `authenticated` carecía del privilegio SELECT a nivel Data API
+--     (SQLSTATE 42501 → HTTP 403) — PostgREST exige AMBAS capas.
+--   * Consecuencia reproducida en preview (g030): GET /rest/v1/app_orders → 403.
+--     El gate es fail-closed, así que el usuario NO pagado ve correctamente la
+--     pantalla "Premium Course" bloqueada, pero un usuario QUE SÍ PAGÓ nunca
+--     podría pasar el gate (el 403 enmascara su order pagada) y cada visita a
+--     una lección premium genera un 403 erróneo en el journey autenticado.
+--
+-- FIX (mínimo, sin ampliar acceso):
+--   GRANT SELECT únicamente, constreñido por la política RLS existente
+--   (owner OR admin). Sin INSERT/UPDATE/DELETE para el cliente: las orders las
+--   crea el backend de pagos (webhook/service_role) — así era por diseño y
+--   sigue igual (documentado en tests/academy-access.spec.ts).
+--
+-- ROLLBACK: REVOKE SELECT ON public.app_orders FROM authenticated;
+-- ══════════════════════════════════════════════════════════════════════════════
+
+GRANT SELECT ON public.app_orders TO authenticated;
+
+-- ── Verificación post-aplicación ─────────────────────────────────────────────
+-- 1) SELECT has_table_privilege('authenticated','public.app_orders','SELECT');  -> true
+-- 2) GET /rest/v1/app_orders?select=id&user_id=eq.<own>  (JWT propio)          -> 200
+-- 3) GET /rest/v1/app_orders?select=id&user_id=eq.<otro> (JWT propio)          -> 200 + []
+-- 4) GET /rest/v1/app_orders  (apikey anon, sin JWT)                           -> 403

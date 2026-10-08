@@ -29,11 +29,16 @@
 --   app_14da0f1941_notifications  → authenticated: SELECT, UPDATE, DELETE
 --     SELECT: campana + badge de no leídas (useNotifications).
 --     UPDATE: "marcar como leída" (NotificationList). Las políticas
---       read_own/update_own_notifications restringen a auth.uid() = user_id.
---     DELETE: la política delete_own_notifications ya existe y la limpieza de
---       tests de referrals borra solo sus propias filas REFERRAL_TEST;
---       owner-scope por RLS. NO se concede INSERT: las notificaciones las crea
---       el backend (service_role); el usuario no tiene superficie de creación.
+--       users_read_own/users_update_own_notifications restringen a
+--       auth.uid() = user_id.
+--     DELETE: `deleteNotification()` (NotificationsBell) borra las propias.
+--     NOTA (corregido en sql/026): en el momento de este 023 se documentó
+--       erróneamente que INSERT no era necesario y que ya existía política
+--       DELETE. La regresión completa (referrals.spec T4/T5) probó que
+--       `createNotification()` inserta DESDE EL NAVEGADOR (flujo referral
+--       cross-recipient, política authenticated_insert_notifications
+--       preexistente) y que faltaba la política DELETE owner-scope.
+--       sql/026 concede INSERT y crea users_delete_own_notifications.
 --
 --   app_14da0f1941_tool_usage → authenticated: SELECT, INSERT
 --     SELECT: historial "Herramientas recientes" del Dashboard (solo sus

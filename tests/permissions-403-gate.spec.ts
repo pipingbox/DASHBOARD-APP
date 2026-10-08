@@ -2,7 +2,7 @@ import { test, expect, request as pwRequest } from '@playwright/test';
 
 /**
  * PB-GROWTH-GATE-PERMISSIONS-403-001 — security contract for the Data API
- * privileges granted in sql/023-pb-permissions-403-grants.sql.
+ * privileges granted in sql/023, sql/024 and sql/025.
  *
  * Root cause fixed there: RLS owner policies already existed, but the tables
  * lacked table-level GRANTs for the API roles (SQLSTATE 42501 → HTTP 403).
@@ -17,8 +17,10 @@ import { test, expect, request as pwRequest } from '@playwright/test';
  *   - UPDATE keeps USING + WITH CHECK ownership
  *
  * Uses raw REST (same pattern as referrals.spec.ts T6/T7) so it runs without
- * a browser and without writing any rows: every probe is read-only or expects
- * rejection. The only write probes are forge attempts, which must fail.
+ * a browser. Probes are read-only or expect rejection; the only write is the
+ * notifications INSERT probe, which asserts the real product contract
+ * (createNotification runs in the browser, sql/026) and cleans up after
+ * itself via owner DELETE in the same test.
  *
  * NOTE: context-level `headers` silently drops the `apikey` header in this
  * Playwright version (reproduced: same values per-request → 200, context →
@@ -39,6 +41,7 @@ const COURSES = 'app_academy_courses';
 const LESSONS = 'app_academy_lessons';
 const ACADEMY_PROGRESS = 'app_academy_progress';
 const STRIPE_PRICES = 'app_stripe_prices';
+const ORDERS = 'app_orders';
 
 async function loginToken(email: string, password: string): Promise<string> {
   const ctx = await pwRequest.newContext();
@@ -67,6 +70,7 @@ async function rest(token: string | null) {
     get: (url: string, opts?: ReqOpts) => ctx.get(url, merge(opts)),
     post: (url: string, opts?: ReqOpts) => ctx.post(url, merge(opts)),
     patch: (url: string, opts?: ReqOpts) => ctx.patch(url, merge(opts)),
+    delete: (url: string, opts?: ReqOpts) => ctx.delete(url, merge(opts)),
     dispose: () => ctx.dispose(),
   };
 }
@@ -149,14 +153,35 @@ test.describe('PB-GROWTH-GATE-PERMISSIONS-403-001 — privilege + RLS contract',
     await ctx.dispose();
   });
 
-  test('notifications INSERT by user → denied (backend-only creation)', async () => {
+  test('notifications INSERT by user → 201 + owner DELETE cleanup (sql/026)', async () => {
+    // Contract: `createNotification()` inserts from the browser (referral flow
+    // notifies the REFERRER, a different user — hence the pre-existing
+    // authenticated_insert_notifications policy with WITH CHECK (true), and
+    // referrals.spec.ts T4/T5 expecting 201). The missing table GRANT made
+    // every client-side notification a swallowed 403 (sql/026 fixes it).
     const ctx = await rest(tokenA);
-    const res = await ctx.post(`/rest/v1/${NOTIFICATIONS}`, {
-      data: { user_id: uidA, type: 'probe', title: 'probe', message: 'probe' },
+    const probe = {
+      user_id: uidA,
+      type: 'PERM_GATE_PROBE',
+      title: 'PB-PERM-GATE-CLEANUP',
+      message: 'permissions-403-gate write probe',
+      related_entity_type: 'permission-gate',
+      related_entity_id: 'probe',
+      action_url: '/dashboard',
+      is_read: false,
+    };
+    const ins = await ctx.post(`/rest/v1/${NOTIFICATIONS}`, {
+      headers: { Prefer: 'return=representation' },
+      data: probe,
     });
-    expect([401, 403], `user INSERT notifications must stay denied, got ${res.status()}`).toContain(
-      res.status(),
+    expect(ins.status(), `user INSERT notifications must succeed (sql/026), got ${ins.status()}`).toBe(
+      201,
     );
+    // Owner DELETE (bell UI contract, users_delete_own_notifications / sql/026):
+    const del = await ctx.delete(`/rest/v1/${NOTIFICATIONS}?title=eq.PB-PERM-GATE-CLEANUP`);
+    expect([200, 204], `owner DELETE must work, got ${del.status()}`).toContain(del.status());
+    const after = await ctx.get(`/rest/v1/${NOTIFICATIONS}?select=id&title=eq.PB-PERM-GATE-CLEANUP`);
+    expect((await after.json()).length, 'probe row must be gone after owner DELETE').toBe(0);
     await ctx.dispose();
   });
 
@@ -215,11 +240,44 @@ test.describe('PB-GROWTH-GATE-PERMISSIONS-403-001 — privilege + RLS contract',
     await ctx.dispose();
   });
 
+  // ── sql/025: app_orders (academy premium entitlement, owner-scoped) ────
+
+  test('owner SELECT app_orders → 200; zero rows is a valid empty state (sql/025)', async () => {
+    const ctx = await rest(tokenA);
+    const res = await ctx.get(`/rest/v1/${ORDERS}?select=id&user_id=eq.${uidA}&limit=1`);
+    expect(res.status(), 'owner SELECT app_orders must not be 403 (hasPaidOrder / sql/025)').toBe(
+      200,
+    );
+    const body = await res.json();
+    expect(Array.isArray(body), 'zero-row state must be [], never a permission error').toBeTruthy();
+    await ctx.dispose();
+  });
+
+  test('app_orders INSERT by user → denied (orders are backend/webhook-only)', async () => {
+    const ctx = await rest(tokenA);
+    const res = await ctx.post(`/rest/v1/${ORDERS}`, {
+      data: { user_id: uidA, product_key: 'forge-probe', status: 'paid' },
+    });
+    expect([401, 403], `user INSERT app_orders must stay denied, got ${res.status()}`).toContain(
+      res.status(),
+    );
+    await ctx.dispose();
+  });
+
+  test('anon denied on app_orders (private payment data)', async () => {
+    const ctx = await rest(null);
+    const res = await ctx.get(`/rest/v1/${ORDERS}?select=id&limit=1`);
+    expect([401, 403], `anon app_orders must be denied, got ${res.status()}`).toContain(
+      res.status(),
+    );
+    await ctx.dispose();
+  });
+
   // ── ANON: private data denied, public catalog allowed ─────────────────
 
   test('anon denied on notifications / tool_usage / cert_alert_prefs', async () => {
     const ctx = await rest(null);
-    for (const table of [NOTIFICATIONS, TOOL_USAGE, CERT_PREFS, ACADEMY_PROGRESS]) {
+    for (const table of [NOTIFICATIONS, TOOL_USAGE, CERT_PREFS, ACADEMY_PROGRESS, ORDERS]) {
       const res = await ctx.get(`/rest/v1/${table}?select=id&limit=1`);
       expect([401, 403], `anon ${table} must be denied, got ${res.status()}`).toContain(
         res.status(),
@@ -243,7 +301,7 @@ test.describe('PB-GROWTH-GATE-PERMISSIONS-403-001 — privilege + RLS contract',
     test.skip(!EMAIL_B || !PASSWORD_B, 'requires E2E_TEST_EMAIL_B / E2E_TEST_PASSWORD_B');
     const tokenB = await loginToken(EMAIL_B, PASSWORD_B);
     const ctx = await rest(tokenB);
-    for (const table of [NOTIFICATIONS, TOOL_USAGE, CERT_PREFS, ACADEMY_PROGRESS]) {
+    for (const table of [NOTIFICATIONS, TOOL_USAGE, CERT_PREFS, ACADEMY_PROGRESS, ORDERS]) {
       const res = await ctx.get(`/rest/v1/${table}?select=id&user_id=eq.${uidA}`);
       expect(res.status(), `cross-user SELECT ${table} must not error`).toBe(200);
       const rows = await res.json();
@@ -260,6 +318,15 @@ test.describe('PB-GROWTH-GATE-PERMISSIONS-403-001 — privilege + RLS contract',
       upd.status() === 403 || affected === 0,
       `cross-user UPDATE must not succeed (status=${upd.status()}, range=${range})`,
     ).toBeTruthy();
+    // cross-user DELETE on owner notifications → zero rows (users_delete_own_notifications)
+    const del = await ctx.delete(`/rest/v1/${NOTIFICATIONS}?user_id=eq.${uidA}`);
+    expect([200, 204], `cross-user DELETE must not error, got ${del.status()}`).toContain(
+      del.status(),
+    );
+    const stillThere = await ctx.get(
+      `/rest/v1/${NOTIFICATIONS}?select=id&user_id=eq.${uidA}&limit=1`,
+    );
+    expect(stillThere.status()).toBe(200);
     await ctx.dispose();
   });
 });
