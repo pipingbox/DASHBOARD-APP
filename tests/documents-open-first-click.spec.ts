@@ -218,6 +218,7 @@ test.describe('PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001', () => {
 
     // ── Scenario D: rapid double-click fires ONE sign request and ONE tab ──
     const before = sign.requests;
+    const pagesBefore = page.context().pages().length;
     const popup3Promise = page.waitForEvent('popup', { timeout: 10_000 });
     await pdfButton.dblclick();
     const popup3 = await popup3Promise;
@@ -225,8 +226,10 @@ test.describe('PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001', () => {
     // wait out the delayed route to make sure no second request lands
     await page.waitForTimeout(SIGN_DELAY_MS + 500);
     expect(sign.requests, 'double-click must not duplicate the sign request').toBe(before + 1);
-    const popups = [popup, popup2, popup3];
-    expect(popups.filter((p) => !p.isClosed()).length, 'exactly one live tab for the double-click').toBe(1);
+    expect(
+      page.context().pages().length - pagesBefore,
+      'double-click must open exactly ONE additional tab',
+    ).toBe(1);
   });
 
   test('C+E (mobile): sign failure leaves no dead tab and shows toast; popup blocked falls back to same-tab', async ({ page }) => {

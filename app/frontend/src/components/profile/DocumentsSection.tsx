@@ -103,7 +103,10 @@ export function DocumentsSection() {
   // PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001: per-document opening state so a
   // pending open disables only its own button (no global loading state) and a
   // rapid double-click cannot fire a second signed-url request or open a
-  // second tab.
+  // second tab. The REF is the synchronous guard (state closures can be stale
+  // when a second click lands before React re-renders); the STATE only drives
+  // the disabled/spinner UI.
+  const openingRef = useRef<Set<string>>(new Set());
   const [openingIds, setOpeningIds] = useState<ReadonlySet<string>>(new Set());
 
   // Form state
@@ -198,7 +201,7 @@ export function DocumentsSection() {
    * still same-origin about:blank — equivalent isolation, usable handle.
    */
   const openDocument = async (doc: WorkerDocument) => {
-    if (openingIds.has(doc.id)) return;
+    if (openingRef.current.has(doc.id)) return;
     const bucket = doc.storage_bucket || STORAGE_BUCKETS.workerDocuments;
     // Canonical path first; legacy URL only for records not yet migrated.
     const sourceRef = doc.storage_path || doc.file_url;
@@ -207,7 +210,8 @@ export function DocumentsSection() {
       return;
     }
 
-    setOpeningIds((prev) => new Set(prev).add(doc.id));
+    openingRef.current.add(doc.id);
+    setOpeningIds(new Set(openingRef.current));
     const popup = window.open('', '_blank');
     if (popup) {
       try {
@@ -238,11 +242,8 @@ export function DocumentsSection() {
       popup?.close();
       toast.error(t('workerProfile.documents.accessDenied', { defaultValue: 'Access denied' }));
     } finally {
-      setOpeningIds((prev) => {
-        const next = new Set(prev);
-        next.delete(doc.id);
-        return next;
-      });
+      openingRef.current.delete(doc.id);
+      setOpeningIds(new Set(openingRef.current));
     }
   };
 
