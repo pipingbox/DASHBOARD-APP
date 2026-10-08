@@ -196,7 +196,9 @@
       "Oktober",
       "November",
       "December"
-    ]
+    ],
+    "resumeOnboardingTitle": "Rond de begeleide setup af",
+    "resumeOnboardingSubtitle": "Hervat de onboarding waar je was gebleven en voltooi je profiel."
   },
   "auth": {
     "secureAccess": "Beveiligde toegang",

@@ -125,6 +125,7 @@ export const SPA_ROUTE_CONTRACT: RouteRule[] = [
 
   // ─── PROTECTED exact routes ────────────────────────────────────────────────
   { pattern: '/dashboard', visibility: 'PROTECTED', kind: 'EXACT' },
+  { pattern: '/onboarding', visibility: 'PROTECTED', kind: 'EXACT', note: 'PB-GROWTH-GATE-ONBOARDING-001: resume entry for postponed onboarding' },
   { pattern: '/profile', visibility: 'PROTECTED', kind: 'EXACT' },
   { pattern: '/applications', visibility: 'PROTECTED', kind: 'EXACT' },
   { pattern: '/messages', visibility: 'PROTECTED', kind: 'EXACT' },

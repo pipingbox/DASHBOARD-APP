@@ -196,7 +196,9 @@
       "Octubre",
       "Noviembre",
       "Diciembre"
-    ]
+    ],
+    "resumeOnboardingTitle": "Termina tu registro guiado",
+    "resumeOnboardingSubtitle": "Retoma el onboarding donde lo dejaste y completa tu perfil."
   },
   "auth": {
     "secureAccess": "Acceso seguro",

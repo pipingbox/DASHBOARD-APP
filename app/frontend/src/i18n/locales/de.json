@@ -196,7 +196,9 @@
       "Oktober",
       "November",
       "Dezember"
-    ]
+    ],
+    "resumeOnboardingTitle": "Guided setup abschließen",
+    "resumeOnboardingSubtitle": "Setze das Onboarding dort fort, wo du aufgehört hast, und vervollständige dein Profil."
   },
   "auth": {
     "secureAccess": "Sicherer Zugang",

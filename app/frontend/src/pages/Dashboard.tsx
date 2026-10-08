@@ -28,6 +28,7 @@ import { RatePresetManager } from '@/components/RatePresetManager';
 import { ProNetworkWidget } from '@/components/profile/ProNetworkWidget';
 import { PendingInvitationsWidget } from '@/components/PendingInvitationsWidget';
 import { ProfileCompletionCard } from '@/components/dashboard/ProfileCompletionCard';
+import { hasCompletedOnboarding } from '@/lib/onboarding';
 import { processStoredReferral, verifyReferralIfEligible } from '@/lib/referrals';
 import { CurrencyCode, DEFAULT_CURRENCY, formatCurrency } from '@/lib/currency';
 import { RatePreset, WorkDayLog, monthBounds } from '@/lib/workDayLogs';
@@ -544,6 +545,24 @@ export default function Dashboard() {
               </div>
             )}
           </div>
+          {/* PB-GROWTH-GATE-ONBOARDING-001 — postponed/incomplete users get a
+              clear, always-visible path back into the guided wizard. */}
+          {profile && !hasCompletedOnboarding(profile.onboarding_status) && (
+            <Link
+              to="/onboarding"
+              className="flex items-center justify-between gap-3 rounded-lg border border-[#f59e0b]/40 bg-[#f59e0b]/10 px-4 py-3 transition hover:border-[#f59e0b]/70 hover:bg-[#f59e0b]/15"
+            >
+              <div>
+                <p className="text-sm font-semibold text-[#f59e0b]">
+                  {t('dashboard.resumeOnboardingTitle')}
+                </p>
+                <p className="text-xs text-zinc-400">
+                  {t('dashboard.resumeOnboardingSubtitle')}
+                </p>
+              </div>
+              <ArrowRight className="h-4 w-4 shrink-0 text-[#f59e0b]" />
+            </Link>
+          )}
           {/* Profile Completion Card — always visible */}
           <ProfileCompletionCard />
         </div>

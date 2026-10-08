@@ -196,7 +196,9 @@
       "Octombrie",
       "Noiembrie",
       "Decembrie"
-    ]
+    ],
+    "resumeOnboardingTitle": "Finalizează configurarea ghidată",
+    "resumeOnboardingSubtitle": "Reia onboardingul de unde ai rămas și completează-ți profilul."
   },
   "auth": {
     "secureAccess": "Acces securizat",

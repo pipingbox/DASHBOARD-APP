@@ -34,6 +34,33 @@ export function hasCompletedOnboarding(
 }
 
 /**
+ * PB-GROWTH-GATE-ONBOARDING-001 — gate decision, kept pure for unit tests.
+ *
+ * "Should the wizard block the app shell?" is NOT the same question as
+ * "has the user finished onboarding?":
+ *
+ *   - COMPLETE  (hasCompletedOnboarding)      -> never gated.
+ *   - POSTPONED (onboarding_postponed_at set) -> never gated; the user chose
+ *     "Completar después". Still NOT completed for marketplace/readiness
+ *     purposes: hasCompletedOnboarding is deliberately untouched.
+ *   - IN PROGRESS / never started             -> gated only when the profile
+ *     still lacks basic info or the account role was never chosen (the
+ *     pre-existing OnboardingGate conditions, unchanged).
+ */
+export interface OnboardingGateInput {
+  onboardingStatus: string | null | undefined;
+  hasBasicInfo: boolean;
+  needsRoleSelection: boolean;
+  postponedAt: string | null | undefined;
+}
+
+export function shouldShowOnboardingWizard(input: OnboardingGateInput): boolean {
+  if (hasCompletedOnboarding(input.onboardingStatus)) return false;
+  if (input.postponedAt) return false;
+  return !input.hasBasicInfo || input.needsRoleSelection;
+}
+
+/**
  * Canonical marketplace-readiness threshold.
  *
  * Mirrors the `recalculate-profiles` edge function, which is the source of truth:
