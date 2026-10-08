@@ -19,7 +19,6 @@ import { DocumentsSection } from '@/components/profile/DocumentsSection';
 import { AvailabilityMobilitySection } from '@/components/profile/AvailabilityMobilitySection';
 import { AICVExtraction } from '@/components/profile/AICVExtraction';
 import { MatchReadyBanner } from '@/components/profile/MatchReadyBanner';
-import { ProfileMatchingPreferencesSection } from '@/components/profile/ProfileMatchingPreferencesSection';
 import { PhoneVerificationSection } from '@/components/profile/PhoneVerificationSection';
 import { notifyProfileSuggestions } from '@/lib/notifications';
 import { ProfileCompleteness } from '@/components/profile/ProfileCompleteness';
@@ -494,9 +493,8 @@ export default function Profile() {
       {/* Availability & Mobility — has its own save/load from DB */}
       <AvailabilityMobilitySection />
 
-      {/* Matching Preferences + Phone Verification */}
+      {/* Phone Verification */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <ProfileMatchingPreferencesSection />
         <PhoneVerificationSection />
       </div>
 
