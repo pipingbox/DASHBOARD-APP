@@ -59,7 +59,8 @@ export const TABLES = {
   savedFilters: 'app_14da0f1941_saved_filters',
   jobInvitations: 'app_14da0f1941_job_invitations',
   // Matching + multichannel notifications (PB-MATCHING-NOTIFICATIONS-001)
-  matchingPreferences: 'app_14da0f1941_matching_preferences',
+  // NOTE: matchingPreferences removed (PB-GROWTH-GATE-PERMISSIONS-403-001) —
+  // the table does not exist in the schema and its only consumer was deleted.
   phoneVerifications: 'app_14da0f1941_phone_verifications',
   notificationQueue: 'app_14da0f1941_notification_queue',
   deliveryLogs: 'app_14da0f1941_delivery_logs',

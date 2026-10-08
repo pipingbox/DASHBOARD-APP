@@ -233,6 +233,7 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
 
     // ── 3. Snapshot + preflight ──────────────────────────────────────────
     const snapshot = await readProfile();
+    console.log(`DIAG snapshot: onboarding_status=${String(snapshot.onboarding_status)} completion=${String(snapshot.profile_completion)} years=${String(snapshot.years_experience)}`);
     expect(snapshot.role, "preflight: role must be 'worker'").toBe('worker');
     expect(snapshot.account_type, 'preflight: admin accounts are untouchable').not.toBe('admin');
     const snapshotYears = snapshot.years_experience === null || snapshot.years_experience === undefined
@@ -255,10 +256,20 @@ test.describe('PB-UI-DOM-INSERTBEFORE-001 /profile under translator-grade DOM mu
       // Wait for async sections to finish loading (years input is rendered
       // by the static form; the Work Experience section header proves the
       // async sections resolved).
-      await expect(
-        page.locator('input[type="number"]').first(),
-        'years-of-experience input must render on /profile',
-      ).toBeVisible({ timeout: 30_000 });
+      try {
+        await expect(
+          page.locator('input[type="number"]').first(),
+          'years-of-experience input must render on /profile',
+        ).toBeVisible({ timeout: 30_000 });
+      } catch (err) {
+        console.log('DIAG fail URL:', page.url());
+        console.log(
+          'DIAG fail body:',
+          (await page.locator('body').innerText().catch(() => 'eval failed')).replace(/\s+/g, ' ').slice(0, 600),
+        );
+        console.log('DIAG fail browser errors:', JSON.stringify(browserErrors.slice(0, 8)));
+        throw err;
+      }
       await page.waitForTimeout(4000); // allow every section fetch to resolve
 
       const boundaryVisible = () =>

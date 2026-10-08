@@ -95,6 +95,16 @@ test.describe('Academy premium access gate (PB-MARKET-ACCESS-001)', () => {
 
   test('authenticated unpaid: direct premium lesson URL shows the blocked screen', async ({ page }) => {
     test.skip(!hasCreds, 'E2E_TEST_EMAIL / E2E_TEST_PASSWORD not set');
+    // First-visit Beta notice sets aria-hidden on the app root while open,
+    // which hides the blocked screen from role queries on a fresh context.
+    // Same dismissal pattern as referral-aldo.spec.ts / library-e2e.spec.ts.
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('pipingbox_beta_dismissed', 'true');
+      } catch {
+        /* noop */
+      }
+    });
     await login(page);
     await page.goto(`/academy/lesson/${premiumLesson.id}`);
     await expect(page.getByRole('heading', { name: BLOCKED_HEADING })).toBeVisible({ timeout: 15_000 });
