@@ -45,8 +45,8 @@ const SYNTHETIC_CERTS = [
   {
     id: 'qa-synthetic-cert-001',
     user_id: 'qa-synthetic-owner',
-    name: 'QA Synthetic VCA VOL',
-    issuer: 'QA Authority',
+    certification_name: 'QA Synthetic VCA VOL',
+    issuing_organization: 'QA Authority',
     issue_date: '2026-01-15',
     expiry_date: '2030-01-15',
     credential_id: null,
@@ -62,8 +62,8 @@ const SYNTHETIC_CERTS = [
   {
     id: 'qa-synthetic-cert-002',
     user_id: 'qa-synthetic-owner',
-    name: 'QA Synthetic Flange Card',
-    issuer: 'QA Authority',
+    certification_name: 'QA Synthetic Flange Card',
+    issuing_organization: 'QA Authority',
     issue_date: '2026-02-10',
     expiry_date: null,
     credential_id: null,
