@@ -21,6 +21,9 @@ import {
 import {
   buildPipeCombStaggerScreenLayout,
 } from './pipe-comb-stagger-svg';
+import PipeCombFabricationSection, {
+  type PipeCombFabGeometry,
+} from './PipeCombFabricationSection';
 
 /**
  * PB-PIPE-COMB-CORRECTION-001 / P2 — genuine pipe comb (peines de tubería) UI.
@@ -307,7 +310,7 @@ export default function PipeCombTool() {
     setDfField((f) => lengthFieldOnUnitChange(f, unit));
   }, [unit]);
 
-  const { result, errorCode } = useMemo(() => {
+  const { result, errorCode, fabGeometry } = useMemo(() => {
     const count = parseDecimalInput(pipeCount);
     const angle = parseDecimalInput(elbowAngle);
     const diValid = lengthFieldIsValid(diField);
@@ -316,16 +319,25 @@ export default function PipeCombTool() {
     // Input-level validation mirrors the kernel domain; the kernel remains
     // the single source of geometry.
     if (count === null || angle === null || !diValid || !dfValid || diField.canonicalMm === null || dfField.canonicalMm === null) {
-      return { result: null, errorCode: 'non_finite_input' };
+      return { result: null, errorCode: 'non_finite_input', fabGeometry: null };
     }
     const initialMm = diField.canonicalMm;
     const finalMm = dfField.canonicalMm;
-    if (!(initialMm > 0)) return { result: null, errorCode: 'initial_spacing_positive' };
-    if (!(finalMm > 0)) return { result: null, errorCode: 'final_spacing_positive' };
-    if (!(angle > 0 && angle <= 90)) return { result: null, errorCode: 'elbow_angle_range' };
+    if (!(initialMm > 0)) return { result: null, errorCode: 'initial_spacing_positive', fabGeometry: null };
+    if (!(finalMm > 0)) return { result: null, errorCode: 'final_spacing_positive', fabGeometry: null };
+    if (!(angle > 0 && angle <= 90)) return { result: null, errorCode: 'elbow_angle_range', fabGeometry: null };
     if (!Number.isInteger(count) || count < 2 || count > MAX_UI_PIPES) {
-      return { result: null, errorCode: 'pipe_count_range' };
+      return { result: null, errorCode: 'pipe_count_range', fabGeometry: null };
     }
+
+    // Canonical geometry handed to the optional P3-B fabrication section
+    // (single source: these same parsed P2 inputs, never display strings).
+    const geometry: PipeCombFabGeometry = {
+      pipeCount: count,
+      initialSpacingMm: initialMm,
+      finalSpacingMm: finalMm,
+      elbowAngleDeg: angle,
+    };
 
     const res = solvePipeCombStagger({
       pipeCount: count,
@@ -334,9 +346,9 @@ export default function PipeCombTool() {
       elbowAngleDeg: angle,
     });
     if (res.success === false) {
-      return { result: null, errorCode: res.code ?? 'non_finite_input' };
+      return { result: null, errorCode: res.code ?? 'non_finite_input', fabGeometry: geometry };
     }
-    return { result: res.result, errorCode: null };
+    return { result: res.result, errorCode: null, fabGeometry: geometry };
   }, [pipeCount, diField, dfField, elbowAngle]);
 
   /** Human-readable formatting; the kernel itself never rounds. */
@@ -570,6 +582,10 @@ export default function PipeCombTool() {
           <p className="text-sm text-[#A3A9B3]">{t('tools.prefab.common.noResult')}</p>
         )}
       </div>
+
+      {/* P3-B: optional fabrication & cut list. Collapsed by default; the
+          P2 basic experience above is unaffected. */}
+      <PipeCombFabricationSection unit={unit} geometry={fabGeometry} />
     </div>
   );
 }
