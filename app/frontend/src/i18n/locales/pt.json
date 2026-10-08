@@ -2434,6 +2434,7 @@
       "file": "Ficheiro",
       "notes": "Notas",
       "notesPlaceholder": "Notas opcionais sobre este documento...",
+      "open": "Abrir documento",
       "uploadFile": "Clique para carregar ficheiro",
       "upload": "Carregar Documento",
       "fileRequired": "Carregue um ficheiro primeiro",

@@ -2441,6 +2441,7 @@
       "file": "Plik",
       "notes": "Uwagi",
       "notesPlaceholder": "Opcjonalne uwagi dotyczące tego dokumentu...",
+      "open": "Otwórz dokument",
       "uploadFile": "Kliknij, aby przesłać plik",
       "upload": "Prześlij dokument",
       "fileRequired": "Najpierw prześlij plik",

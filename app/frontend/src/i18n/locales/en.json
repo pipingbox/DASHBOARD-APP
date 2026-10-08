@@ -2427,6 +2427,7 @@
       "file": "File",
       "notes": "Notes",
       "notesPlaceholder": "Optional notes about this document...",
+      "open": "Open document",
       "uploadFile": "Click to upload file",
       "upload": "Upload Document",
       "fileRequired": "Please upload a file first",

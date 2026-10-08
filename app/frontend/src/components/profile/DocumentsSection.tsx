@@ -100,6 +100,14 @@ export function DocumentsSection() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  // PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001: per-document opening state so a
+  // pending open disables only its own button (no global loading state) and a
+  // rapid double-click cannot fire a second signed-url request or open a
+  // second tab. The REF is the synchronous guard (state closures can be stale
+  // when a second click lands before React re-renders); the STATE only drives
+  // the disabled/spinner UI.
+  const openingRef = useRef<Set<string>>(new Set());
+  const [openingIds, setOpeningIds] = useState<ReadonlySet<string>>(new Set());
 
   // Form state
   const [documentType, setDocumentType] = useState<string>('other');
@@ -170,6 +178,72 @@ export function DocumentsSection() {
       setItems((prev) =>
         prev.map((i) => (i.id === doc.id ? { ...i, is_visible: !i.is_visible } : i))
       );
+    }
+  };
+
+  /**
+   * PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001 — open a document on the FIRST
+   * click.
+   *
+   * The old pattern was `<a href={doc.storageUrl || '#'}>` with an async
+   * onClick that resolved the signed URL and only then updated state: the
+   * browser made its navigation decision against href="#" before the URL
+   * existed, so the first click opened a dead tab and the document only
+   * appeared on the second click.
+   *
+   * Popup-safe replacement: the blank tab is opened SYNCHRONOUSLY inside the
+   * user gesture (so it stays user-initiated for popup blockers), then the
+   * signed URL is resolved and the already-open tab is navigated to it.
+   *
+   * Note on `noopener`: passing it as a window.open() feature makes browsers
+   * return null, which would break the deferred navigation. The opener link
+   * is severed manually instead (`popup.opener = null`) while the tab is
+   * still same-origin about:blank — equivalent isolation, usable handle.
+   */
+  const openDocument = async (doc: WorkerDocument) => {
+    if (openingRef.current.has(doc.id)) return;
+    const bucket = doc.storage_bucket || STORAGE_BUCKETS.workerDocuments;
+    // Canonical path first; legacy URL only for records not yet migrated.
+    const sourceRef = doc.storage_path || doc.file_url;
+    if (!sourceRef) {
+      toast.error(t('workerProfile.documents.accessDenied', { defaultValue: 'Access denied' }));
+      return;
+    }
+
+    openingRef.current.add(doc.id);
+    setOpeningIds(new Set(openingRef.current));
+    const popup = window.open('', '_blank');
+    if (popup) {
+      try {
+        popup.opener = null;
+      } catch {
+        // Cross-origin guard: about:blank is same-origin, so this cannot
+        // normally happen; ignore per-window isolation quirks.
+      }
+    }
+
+    try {
+      // Always resolve a fresh short-lived signed URL: never navigate to a
+      // stale cached one that may have expired.
+      const url = await getSecureFileUrl(bucket, sourceRef);
+      if (url) {
+        if (popup && !popup.closed) {
+          popup.location.assign(url);
+        } else {
+          // Popup blocker (or the user closed the blank tab): fall back to
+          // same-tab navigation AFTER the URL exists — never a dead '#'.
+          window.location.assign(url);
+        }
+      } else {
+        popup?.close();
+        toast.error(t('workerProfile.documents.accessDenied', { defaultValue: 'Access denied' }));
+      }
+    } catch {
+      popup?.close();
+      toast.error(t('workerProfile.documents.accessDenied', { defaultValue: 'Access denied' }));
+    } finally {
+      openingRef.current.delete(doc.id);
+      setOpeningIds(new Set(openingRef.current));
     }
   };
 
@@ -422,34 +496,20 @@ export function DocumentsSection() {
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <a
-                      href={doc.storageUrl || '#'}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={async (e) => {
-                        const bucket = doc.storage_bucket || STORAGE_BUCKETS.workerDocuments;
-                        // Canonical path first; legacy URL only for records not yet migrated.
-                        const sourceRef = doc.storage_path || doc.file_url;
-                        if (!sourceRef) {
-                          e.preventDefault();
-                          return;
-                        }
-                        const url = await getSecureFileUrl(bucket, sourceRef);
-                        if (url) {
-                          setItems((prev) =>
-                            prev.map((i) =>
-                              i.id === doc.id ? { ...i, storageUrl: url } : i,
-                            ),
-                          );
-                        } else {
-                          e.preventDefault();
-                          toast.error(t('workerProfile.documents.accessDenied', { defaultValue: 'Access denied' }));
-                        }
-                      }}
-                      className="inline-flex items-center gap-1 border border-zinc-800 bg-zinc-900 px-2 py-1 text-[11px] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b]"
+                    <button
+                      type="button"
+                      onClick={() => openDocument(doc)}
+                      disabled={openingIds.has(doc.id)}
+                      title={t('workerProfile.documents.open', { defaultValue: 'Open document' })}
+                      aria-label={t('workerProfile.documents.open', { defaultValue: 'Open document' })}
+                      className="inline-flex items-center gap-1 border border-zinc-800 bg-zinc-900 px-2 py-1 text-[11px] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:cursor-wait disabled:opacity-60"
                     >
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
+                      {openingIds.has(doc.id) ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <ExternalLink className="h-3 w-3" />
+                      )}
+                    </button>
                     <button
                       type="button"
                       onClick={() => toggleVisibility(doc)}

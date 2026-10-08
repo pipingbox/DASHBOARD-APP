@@ -2434,6 +2434,7 @@
       "file": "Fichier",
       "notes": "Notes",
       "notesPlaceholder": "Notes optionnelles sur ce document...",
+      "open": "Ouvrir le document",
       "uploadFile": "Cliquez pour télécharger",
       "upload": "Télécharger le document",
       "fileRequired": "Veuillez d'abord télécharger un fichier",
