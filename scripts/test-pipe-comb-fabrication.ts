@@ -689,7 +689,7 @@ console.log('--- F17. CLR <= OD/2 invalidates fabrication ---');
 }
 
 // ---------------------------------------------------------------------------
-// F18. Marking contract (review finding 3)
+// F18. Marking contract (review finding 3 + marking-semantics final fix)
 // ---------------------------------------------------------------------------
 console.log('--- F18. Marking contract: datum/method + independent recovery ---');
 {
@@ -703,7 +703,29 @@ console.log('--- F18. Marking contract: datum/method + independent recovery ---'
   check('F18 cut values NOT labelled measurable', (sol.elbow.cutSemantics ?? '').includes('NOT an arc distance'));
   const markById = new Map(sol.elbow.marks.map((mk) => [mk.id, mk]));
   check('F18 takeout mark: tangent-takeout, off material', markById.get('takeout-axis')?.method === 'tangent-takeout' && markById.get('takeout-axis')?.onMaterial === false);
-  check('F18 arc marks on material', ['arc-intrados-from-kept-face', 'arc-centerline-from-kept-face', 'arc-extrados-from-kept-face'].every((id) => markById.get(id)?.method === 'arc-development' && markById.get(id)?.onMaterial === true));
+  // Marking-semantics fix: classification is checked INDIVIDUALLY. The
+  // intrados/extrados arc developments are MATERIAL marks (inner/outer
+  // surface of the nominal model); the CENTERLINE arc development is a
+  // THEORETICAL axis reference, NOT a mark on material.
+  check(
+    'F18 arc-intrados mark: arc-development ON material',
+    markById.get('arc-intrados-from-kept-face')?.method === 'arc-development' && markById.get('arc-intrados-from-kept-face')?.onMaterial === true,
+    `onMaterial=${markById.get('arc-intrados-from-kept-face')?.onMaterial}`,
+  );
+  check(
+    'F18 arc-extrados mark: arc-development ON material',
+    markById.get('arc-extrados-from-kept-face')?.method === 'arc-development' && markById.get('arc-extrados-from-kept-face')?.onMaterial === true,
+    `onMaterial=${markById.get('arc-extrados-from-kept-face')?.onMaterial}`,
+  );
+  check(
+    'F18 arc-centerline mark: arc-development OFF material (theoretical axis development)',
+    markById.get('arc-centerline-from-kept-face')?.method === 'arc-development' && markById.get('arc-centerline-from-kept-face')?.onMaterial === false,
+    `onMaterial=${markById.get('arc-centerline-from-kept-face')?.onMaterial}`,
+  );
+  check(
+    'F18 not all three arc marks are material (centreline excluded)',
+    ['arc-intrados-from-kept-face', 'arc-centerline-from-kept-face', 'arc-extrados-from-kept-face'].filter((id) => markById.get(id)?.onMaterial === true).length === 2,
+  );
   check('F18 projection mark: axial-projection, off material', markById.get('projection-centerline-from-kept-face')?.method === 'axial-projection' && markById.get('projection-centerline-from-kept-face')?.onMaterial === false);
   check('F18 every mark has origin and destination', sol.elbow.marks.every((mk) => mk.origin.length > 0 && mk.destination.length > 0));
 
@@ -727,11 +749,13 @@ console.log('--- F18. Marking contract: datum/method + independent recovery ---'
     { id: 'centerline', r: R, markId: 'arc-centerline-from-kept-face' },
     { id: 'extrados', r: R + OD / 2, markId: 'arc-extrados-from-kept-face' },
   ];
+  const points: Record<string, { x: number; y: number }> = {};
   const radialAngles: number[] = [];
   for (const curve of curves) {
     const s = markById.get(curve.markId)?.valueMm as number;
     const swept = s / curve.r;
     const P = { x: C.x - curve.r * Math.cos(swept), y: curve.r * Math.sin(swept) };
+    points[curve.id] = P;
     // Swept angle recovered from the point itself (law of cosines on T_in, C, P).
     // NOTE: T_in sits on the CENTERLINE circle (radius R); P sits on this
     // curve's circle (radius r) — the denominator is R*r.
@@ -751,6 +775,59 @@ console.log('--- F18. Marking contract: datum/method + independent recovery ---'
   const tangentDir = { x: Math.sin(sweptCenter), y: Math.cos(sweptCenter) };
   const outletAngle = (Math.atan2(tangentDir.x, tangentDir.y) * 180) / Math.PI;
   check('F18 tangent at cut recovers 35 deg outlet axis', near(outletAngle, MAIN.elbowAngleDeg, PURE_TOL), `${outletAngle}`);
+
+  // Marking-semantics fix, section verification (independent construction):
+  // the section at the cut plane is the radial plane through the arc centre
+  // at the swept angle. Its centre is the CENTRELINE point on the arc; the
+  // intrados/extrados mark points must sit at exactly OD/2 from it (inner
+  // and outer surfaces of the nominal model) and the centreline mark point
+  // must BE the section centre.
+  const uRadial = { x: -Math.cos(sweptCenter), y: Math.sin(sweptCenter) };
+  const S = { x: C.x + R * uRadial.x, y: C.y + R * uRadial.y };
+  check('F18 section: centreline mark point IS the section centre', near(points.centerline.x, S.x, PURE_TOL) && near(points.centerline.y, S.y, PURE_TOL), `(${points.centerline.x},${points.centerline.y}) vs (${S.x},${S.y})`);
+  const dIntrados = Math.hypot(points.intrados.x - S.x, points.intrados.y - S.y);
+  const dExtrados = Math.hypot(points.extrados.x - S.x, points.extrados.y - S.y);
+  check('F18 section: intrados mark point at OD/2 from section centre', near(dIntrados, OD / 2, PURE_TOL), `${dIntrados} vs ${OD / 2}`);
+  check('F18 section: extrados mark point at OD/2 from section centre', near(dExtrados, OD / 2, PURE_TOL), `${dExtrados} vs ${OD / 2}`);
+  // The three section points are collinear with the arc centre (radial line).
+  check(
+    'F18 section: intrados/centre/extrados collinear (radial cut plane)',
+    near(
+      Math.abs(
+        (points.intrados.x - S.x) * (points.extrados.y - S.y) - (points.intrados.y - S.y) * (points.extrados.x - S.x),
+      ),
+      0,
+      PURE_TOL,
+    ),
+  );
+
+  // Equivalent regression for BEND mode (marking-semantics fix).
+  const CLR_BEND = 300;
+  const bendSol = solve({ ...mainInput, elbow: { kind: 'bend', clrMm: CLR_BEND } });
+  const bendMarks = new Map(bendSol.elbow.marks.map((mk) => [mk.id, mk]));
+  check('F18bend takeout mark: off material', bendMarks.get('takeout-axis')?.onMaterial === false);
+  check(
+    'F18bend arc-centerline-developed: arc-development OFF material (theoretical axis development)',
+    bendMarks.get('arc-centerline-developed')?.method === 'arc-development' && bendMarks.get('arc-centerline-developed')?.onMaterial === false,
+    `onMaterial=${bendMarks.get('arc-centerline-developed')?.onMaterial}`,
+  );
+  check('F18bend bend mode declares no material marks', bendSol.elbow.marks.every((mk) => mk.onMaterial === false));
+  // Independent geometric recovery of the bend from its developed-arc mark.
+  const sBend = bendMarks.get('arc-centerline-developed')?.valueMm as number;
+  const sweptBend = sBend / CLR_BEND;
+  check('F18bend developed arc recovers theta', near(sweptBend, thetaRad, PURE_TOL), `${(sweptBend * 180) / Math.PI} deg`);
+  const CB = { x: CLR_BEND, y: 0 };
+  const T1B = { x: 0, y: 0 };
+  const T2B = { x: CB.x - CLR_BEND * Math.cos(sweptBend), y: CB.y + CLR_BEND * Math.sin(sweptBend) };
+  const EB = { x: 0, y: CLR_BEND * Math.tan(thetaRad / 2) };
+  check('F18bend T1 tangency at CLR*tan(theta/2) from E', near(Math.abs(EB.y - T1B.y), CLR_BEND * Math.tan(thetaRad / 2), PURE_TOL));
+  const cosB = Math.cos(thetaRad);
+  const sinB = Math.sin(thetaRad);
+  const t2AlongV = (T2B.x - EB.x) * sinB + (T2B.y - EB.y) * cosB;
+  check('F18bend T2 tangency at CLR*tan(theta/2) from E along outlet axis', near(t2AlongV, CLR_BEND * Math.tan(thetaRad / 2), PURE_TOL), `${t2AlongV}`);
+  const tangentB = { x: Math.sin(sweptBend), y: Math.cos(sweptBend) };
+  const outletAngleB = (Math.atan2(tangentB.x, tangentB.y) * 180) / Math.PI;
+  check('F18bend tangent at T2 recovers 35 deg outlet axis', near(outletAngleB, MAIN.elbowAngleDeg, PURE_TOL), `${outletAngleB}`);
 }
 
 // ---------------------------------------------------------------------------

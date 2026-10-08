@@ -19,18 +19,21 @@
  *   intersection along each axis. That t is exactly `cutCenterlineMm`
  *   from the existing `solveElbowCut` engine, which is consumed read-only
  *   (the engine is NOT modified).
- * - MARKING CONTRACT (review finding 3): every delivered mark declares its
- *   origin, destination, direction and measurement method
- *   (arc-development / tangent-takeout / axial-projection), and whether it
- *   is a point on material or an axis-theoretical reference. The MVP
- *   marking method for the accessory is ARC DEVELOPMENT FROM THE KEPT
- *   FACE (measurable on the physical elbow along each curve). The engine
- *   cutIntrados/centerline/extrados values are the tangent-construction
- *   family r*tan(theta/2): they are kept as GEOMETRIC REFERENCES ONLY and
- *   are NOT labelled as distances measurable from the kept face.
- *   t = CLR*tan(theta/2) (tangent take-out from the axis intersection),
- *   R*sin(theta) (axial projection from the kept-face plane) and
- *   R*theta (arc development) are DIFFERENT dimensions — not
+ * - MARKING CONTRACT (review finding 3 + marking-semantics final fix):
+ *   every delivered mark declares its origin, destination, direction and
+ *   measurement method (arc-development / tangent-takeout /
+ *   axial-projection), and whether it is a point on material or an
+ *   axis-theoretical reference. The MVP marking method for the accessory is
+ *   ARC DEVELOPMENT FROM THE KEPT FACE. The intrados/extrados developments
+ *   are MATERIAL marks (inner/outer surface of the nominal model); the
+ *   CENTRELINE development is a THEORETICAL axis reference — the centreline
+ *   is not a surface of the accessory, so it is NOT a material mark. The
+ *   engine cutIntrados/centerline/extrados values are the
+ *   tangent-construction family r*tan(theta/2): they are kept as GEOMETRIC
+ *   REFERENCES ONLY and are NOT labelled as distances measurable from the
+ *   kept face. t = CLR*tan(theta/2) (tangent take-out from the axis
+ *   intersection), R*sin(theta) (axial projection from the kept-face plane)
+ *   and R*theta (arc development) are DIFFERENT dimensions — not
  *   interchangeable names.
  * - Bend mode (custom CLR, "doblez"): no accessory; t = CLR*tan(theta/2)
  *   by direct tangent construction. If CLR <= OD/2 the intrados radius of
@@ -410,7 +413,9 @@ export function solvePipeCombFabrication(
         origin: 'kept face (physical accessory face)',
         destination: `cut plane at kept angle ${stagger.elbowAngleDeg} deg`,
         method: 'arc-development',
-        onMaterial: true,
+        // Theoretical axis development: the centreline is not a surface of
+        // the accessory — this is a reference dimension, not a material mark.
+        onMaterial: false,
       },
       {
         id: 'arc-extrados-from-kept-face',
@@ -509,7 +514,9 @@ export function solvePipeCombFabrication(
           origin: 'inlet tangent point T1',
           destination: 'outlet tangent point T2',
           method: 'arc-development',
-          onMaterial: true,
+          // Theoretical axis development: the centreline of a bend is not a
+          // surface of the tube — reference dimension, not a material mark.
+          onMaterial: false,
         },
       ],
     };
