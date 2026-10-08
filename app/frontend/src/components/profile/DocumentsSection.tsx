@@ -15,7 +15,7 @@ import {
   CalendarClock,
 } from 'lucide-react';
 import { supabase, TABLES, STORAGE_BUCKETS } from '@/lib/supabase';
-import { getSecureFileUrl, deleteStorageObject, extractStoragePathAndBucket } from '@/lib/storageHelpers';
+import { openSecureFileInNewTab, deleteStorageObject, extractStoragePathAndBucket } from '@/lib/storageHelpers';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -183,64 +183,25 @@ export function DocumentsSection() {
 
   /**
    * PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001 — open a document on the FIRST
-   * click.
-   *
-   * The old pattern was `<a href={doc.storageUrl || '#'}>` with an async
-   * onClick that resolved the signed URL and only then updated state: the
-   * browser made its navigation decision against href="#" before the URL
-   * existed, so the first click opened a dead tab and the document only
-   * appeared on the second click.
-   *
-   * Popup-safe replacement: the blank tab is opened SYNCHRONOUSLY inside the
-   * user gesture (so it stays user-initiated for popup blockers), then the
-   * signed URL is resolved and the already-open tab is navigated to it.
-   *
-   * Note on `noopener`: passing it as a window.open() feature makes browsers
-   * return null, which would break the deferred navigation. The opener link
-   * is severed manually instead (`popup.opener = null`) while the tab is
-   * still same-origin about:blank — equivalent isolation, usable handle.
+   * click. The popup-safe mechanics live in the shared
+   * `openSecureFileInNewTab` helper (storageHelpers); this component only owns
+   * the per-document pending state that dedupes rapid double-clicks.
    */
   const openDocument = async (doc: WorkerDocument) => {
     if (openingRef.current.has(doc.id)) return;
     const bucket = doc.storage_bucket || STORAGE_BUCKETS.workerDocuments;
     // Canonical path first; legacy URL only for records not yet migrated.
     const sourceRef = doc.storage_path || doc.file_url;
-    if (!sourceRef) {
-      toast.error(t('workerProfile.documents.accessDenied', { defaultValue: 'Access denied' }));
-      return;
-    }
 
     openingRef.current.add(doc.id);
     setOpeningIds(new Set(openingRef.current));
-    const popup = window.open('', '_blank');
-    if (popup) {
-      try {
-        popup.opener = null;
-      } catch {
-        // Cross-origin guard: about:blank is same-origin, so this cannot
-        // normally happen; ignore per-window isolation quirks.
-      }
-    }
-
     try {
-      // Always resolve a fresh short-lived signed URL: never navigate to a
-      // stale cached one that may have expired.
-      const url = await getSecureFileUrl(bucket, sourceRef);
-      if (url) {
-        if (popup && !popup.closed) {
-          popup.location.assign(url);
-        } else {
-          // Popup blocker (or the user closed the blank tab): fall back to
-          // same-tab navigation AFTER the URL exists — never a dead '#'.
-          window.location.assign(url);
-        }
-      } else {
-        popup?.close();
-        toast.error(t('workerProfile.documents.accessDenied', { defaultValue: 'Access denied' }));
-      }
-    } catch {
-      popup?.close();
-      toast.error(t('workerProfile.documents.accessDenied', { defaultValue: 'Access denied' }));
+      await openSecureFileInNewTab({
+        bucket,
+        sourceRef: sourceRef || '',
+        onError: () =>
+          toast.error(t('workerProfile.documents.accessDenied', { defaultValue: 'Access denied' })),
+      });
     } finally {
       openingRef.current.delete(doc.id);
       setOpeningIds(new Set(openingRef.current));

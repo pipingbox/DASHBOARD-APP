@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   FileText,
@@ -30,7 +30,7 @@ import {
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { hasStoredCv } from '@/lib/filePresence';
 import {
-  getSecureFileUrl,
+  openSecureFileInNewTab,
   extractStoragePathAndBucket,
   deleteStorageObject,
 } from '@/lib/storageHelpers';
@@ -48,7 +48,12 @@ export function CVUploadSection() {
   // Stable path per file selection so TUS can resume the same object.
   const lastUploadAttemptRef = useRef<{ signature: string; path: string } | null>(null);
 
-  const [cvSignedUrl, setCvSignedUrl] = useState<string | null>(null);
+  // PB-GROWTH-GATE-PROFILE-E2E-001 — the CV open action resolves a FRESH
+  // signed URL per click (openCv). The previous approach resolved once at
+  // mount into state: first-click-before-resolution hit href="#" and the
+  // cached URL broke after its 1h expiry.
+  const [openingCv, setOpeningCv] = useState(false);
+  const openingCvRef = useRef(false);
 
   const cvFileUrl = profile?.cv_file_url as string | null;
   const cvStorageBucket = profile?.cv_storage_bucket as string | null;
@@ -59,24 +64,28 @@ export function CVUploadSection() {
   const cvFileName = profile?.cv_file_name as string | null;
   const cvVisible = (profile?.cv_visible as boolean) ?? true;
 
-  // Resolve legacy or canonical CV URL to a short-lived signed URL.
-  useEffect(() => {
-    let cancelled = false;
-    setCvSignedUrl(null);
-    if (!hasCv) return;
+  const openCv = async () => {
+    if (openingCvRef.current) return;
     const pathOrUrl = cvStoragePath || cvFileUrl;
-    if (!pathOrUrl) return;
     const bucket =
       cvStorageBucket ||
       (cvFileUrl ? extractStoragePathAndBucket(cvFileUrl).bucket : null) ||
       STORAGE_BUCKETS.certificates;
-    getSecureFileUrl(bucket, pathOrUrl).then((url) => {
-      if (!cancelled) setCvSignedUrl(url);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [hasCv, cvFileUrl, cvStorageBucket, cvStoragePath]);
+
+    openingCvRef.current = true;
+    setOpeningCv(true);
+    try {
+      await openSecureFileInNewTab({
+        bucket,
+        sourceRef: pathOrUrl || '',
+        onError: () =>
+          toast.error(t('workerProfile.certifications.viewFileDenied', { defaultValue: 'Access denied' })),
+      });
+    } finally {
+      openingCvRef.current = false;
+      setOpeningCv(false);
+    }
+  };
 
   const handleUpload = async (file: File) => {
     if (!user) return;
@@ -321,15 +330,20 @@ export function CVUploadSection() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <a
-                  href={cvSignedUrl || '#'}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.15em] text-zinc-300 hover:border-[#f59e0b] hover:text-[#f59e0b]"
+                <button
+                  type="button"
+                  onClick={openCv}
+                  disabled={openingCv}
+                  aria-label={t('workerProfile.cv.view')}
+                  className="inline-flex items-center gap-1 border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.15em] text-zinc-300 hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:opacity-50"
                 >
-                  <Download className="h-3 w-3" />
+                  {openingCv ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Download className="h-3 w-3" />
+                  )}
                   {t('workerProfile.cv.view')}
-                </a>
+                </button>
                 {/* Mobile fix: Use <label> instead of button + programmatic click */}
                 <label
                   className={`inline-flex cursor-pointer items-center gap-1 border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.15em] text-zinc-300 hover:border-zinc-600 hover:text-zinc-200 ${uploading ? 'pointer-events-none opacity-50' : ''}`}

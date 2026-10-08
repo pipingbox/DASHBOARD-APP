@@ -50,7 +50,7 @@ import {
 } from '@/lib/resumableUpload';
 import { trackEvent, getCorrelationId } from '@/lib/observability';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
-import { getSecureFileUrl, deleteStorageObject, extractStoragePathAndBucket } from '@/lib/storageHelpers';
+import { openSecureFileInNewTab, deleteStorageObject, extractStoragePathAndBucket } from '@/lib/storageHelpers';
 import { hasStoredRecordFile } from '@/lib/filePresence';
 
 export function CertificationsSection() {
@@ -75,6 +75,10 @@ export function CertificationsSection() {
   const lastUploadAttemptRef = useRef<{ signature: string; path: string } | null>(null);
   // Recoverable failure state (network/timeout): user can retry without reloading.
   const [uploadError, setUploadError] = useState<string | null>(null);
+  // PB-GROWTH-GATE-PROFILE-E2E-001 — per-cert pending state that dedupes
+  // rapid double-clicks on the first-click open action.
+  const openingRef = useRef<Set<string>>(new Set());
+  const [openingIds, setOpeningIds] = useState<ReadonlySet<string>>(new Set());
 
   // Alert preferences state
   const [reminderDays, setReminderDays] = useState<number>(90);
@@ -213,6 +217,33 @@ export function CertificationsSection() {
     setNotes(cert.notes ?? '');
     setIsVisible(cert.is_visible);
     setDialogOpen(true);
+  };
+
+  /**
+   * PB-GROWTH-GATE-PROFILE-E2E-001 — open a certification file on the FIRST
+   * click (popup-safe shared helper; the previous anchor reproduced the
+   * Fernando defect: navigation decided against href="#" before the async
+   * signed URL existed).
+   */
+  const openCertificateFile = async (cert: WorkerCertification) => {
+    if (openingRef.current.has(cert.id)) return;
+    const bucket = cert.storage_bucket || STORAGE_BUCKETS.certificates;
+    // Canonical path first; legacy URL only for records not yet migrated.
+    const sourceRef = cert.storage_path || cert.file_url || cert.certificate_file_url;
+
+    openingRef.current.add(cert.id);
+    setOpeningIds(new Set(openingRef.current));
+    try {
+      await openSecureFileInNewTab({
+        bucket,
+        sourceRef: sourceRef || '',
+        onError: () =>
+          toast.error(t('workerProfile.certifications.viewFileDenied', { defaultValue: 'Access denied' })),
+      });
+    } finally {
+      openingRef.current.delete(cert.id);
+      setOpeningIds(new Set(openingRef.current));
+    }
   };
 
   const toggleVisibility = async (cert: WorkerCertification) => {
@@ -719,35 +750,24 @@ export function CertificationsSection() {
                   </div>
                   <div className="flex gap-1">
                     {hasStoredRecordFile(cert) && (
-                      <a
-                        href={cert.storageUrl || '#'}
-                        target="_blank"
-                        rel="noreferrer"
+                      /* PB-GROWTH-GATE-PROFILE-E2E-001 — first-click open, same
+                         popup-safe pattern as DocumentsSection (shared
+                         openSecureFileInNewTab). The old <a href="#"> +
+                         async onClick reproduced the Fernando defect here. */
+                      <button
+                        type="button"
+                        aria-label={t('workerProfile.certifications.viewFile')}
                         title={t('workerProfile.certifications.viewFile')}
-                        onClick={async (e) => {
-                          const bucket = cert.storage_bucket || STORAGE_BUCKETS.certificates;
-                          // Canonical path first; legacy URL only for records not yet migrated.
-                          const sourceRef = cert.storage_path || cert.file_url || cert.certificate_file_url;
-                          if (!sourceRef) {
-                            e.preventDefault();
-                            return;
-                          }
-                          const url = await getSecureFileUrl(bucket, sourceRef);
-                          if (url) {
-                            setItems((prev) =>
-                              prev.map((i) =>
-                                i.id === cert.id ? { ...i, storageUrl: url } : i,
-                              ),
-                            );
-                          } else {
-                            e.preventDefault();
-                            toast.error(t('workerProfile.certifications.viewFileDenied', { defaultValue: 'Access denied' }));
-                          }
-                        }}
-                        className="inline-flex items-center gap-1 border border-zinc-800 bg-zinc-900 px-2 py-1 text-[11px] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b]"
+                        disabled={openingIds.has(cert.id)}
+                        onClick={() => openCertificateFile(cert)}
+                        className="inline-flex items-center gap-1 border border-zinc-800 bg-zinc-900 px-2 py-1 text-[11px] text-zinc-400 hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:opacity-50"
                       >
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
+                        {openingIds.has(cert.id) ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <ExternalLink className="h-3 w-3" />
+                        )}
+                      </button>
                     )}
                     <button
                       type="button"

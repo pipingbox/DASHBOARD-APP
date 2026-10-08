@@ -60,6 +60,75 @@ export async function getBrokerSignedUrl(options: {
 }
 
 /**
+ * PB-GROWTH-GATE-PROFILE-E2E-001 — open a private file on the FIRST click.
+ *
+ * Shared popup-safe pattern (first deployed for DocumentsSection in
+ * PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001): the blank tab is opened
+ * SYNCHRONOUSLY inside the user gesture (so it stays user-initiated for popup
+ * blockers), then a FRESH short-lived signed URL is resolved and the
+ * already-open tab is navigated to it.
+ *
+ * Why not `<a href={signedUrl || '#'}>`: the browser makes its navigation
+ * decision against the href at click time — before any async resolution — so
+ * the first click opens a dead '#'/about:blank tab (the Fernando incident).
+ * And why not a cached signed URL: it expires (1h), so a stale state copy
+ * breaks the open after the page has been sitting idle.
+ *
+ * Note on `noopener`: passing it as a window.open() feature makes browsers
+ * return null, which would break the deferred navigation. The opener link is
+ * severed manually instead (`popup.opener = null`) while the tab is still
+ * same-origin about:blank — equivalent isolation, usable handle.
+ *
+ * Popup-blocker fallback: if window.open returns null (or the user closed the
+ * blank tab before resolution), navigate the CURRENT tab once the URL exists
+ * — never a dead '#'. On failure the blank tab is closed and `onError` runs.
+ */
+export async function openSecureFileInNewTab(options: {
+  bucket: string;
+  sourceRef: string;
+  onError?: () => void;
+}): Promise<void> {
+  const { bucket, sourceRef, onError } = options;
+  const fail = () => {
+    onError?.();
+  };
+
+  if (!sourceRef) {
+    fail();
+    return;
+  }
+
+  const popup = window.open('', '_blank');
+  if (popup) {
+    try {
+      popup.opener = null;
+    } catch {
+      // Cross-origin guard: about:blank is same-origin, so this cannot
+      // normally happen; ignore per-window isolation quirks.
+    }
+  }
+
+  try {
+    // Always resolve a fresh short-lived signed URL: never navigate to a
+    // stale cached one that may have expired.
+    const url = await getSecureFileUrl(bucket, sourceRef);
+    if (url) {
+      if (popup && !popup.closed) {
+        popup.location.assign(url);
+      } else {
+        window.location.assign(url);
+      }
+    } else {
+      popup?.close();
+      fail();
+    }
+  } catch {
+    popup?.close();
+    fail();
+  }
+}
+
+/**
  * Delete a single Storage object. Returns true on success.
  */
 export async function deleteStorageObject(
