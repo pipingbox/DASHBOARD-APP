@@ -48,6 +48,16 @@ test.describe('CV upload smoke test', () => {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
 
+    // The beta modal puts the app root in aria-hidden, which excludes
+    // getByRole queries from the accessibility tree. Dismiss it up front.
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('pipingbox_beta_dismissed', 'true');
+      } catch {
+        /* storage unavailable */
+      }
+    });
+
     await login(page);
     await page.goto('/profile');
     await expect(page.locator('#root')).not.toBeEmpty({ timeout: 10_000 });
@@ -73,12 +83,25 @@ test.describe('CV upload smoke test', () => {
     // strongest signal that the upload + DB upsert + refresh succeeded.
     await expect(cvSection.getByText(fileName)).toBeVisible({ timeout: 30_000 });
 
-    // Capture the signed view link and verify it is a signed URL, not a raw public URL.
-    const viewLink = cvSection.locator('a[href^="https://"]').first();
-    await expect(viewLink).toBeVisible({ timeout: 10_000 });
-    const href = await viewLink.getAttribute('href');
-    expect(href).toMatch(/[?&]token=/);
-    expect(href).not.toMatch(/\/object\/public\//);
+    // PB-GROWTH-GATE-PROFILE-E2E-001: the view action is now a BUTTON that
+    // resolves a FRESH signed URL per click and opens it popup-safe in a new
+    // tab (the old anchor pre-resolved the URL once at mount — first-click
+    // race + 1h staleness). Assert the opened URL is signed, never public.
+    const viewButton = cvSection.getByRole('button', { name: /view|ver/i }).first();
+    await expect(viewButton).toBeVisible({ timeout: 10_000 });
+    const popupPromise = page.waitForEvent('popup', { timeout: 10_000 });
+    // The signed PDF may be served as a download (navigation aborts with
+    // ERR_ABORTED), so assert on the navigation REQUEST instead of the URL.
+    const signedNavPromise = page.context().waitForEvent(
+      'request',
+      (r) => r.url().includes('/object/sign/') && /[?&]token=/.test(r.url()),
+      { timeout: 15_000 },
+    );
+    await viewButton.click();
+    const popup = await popupPromise;
+    const signedNav = await signedNavPromise;
+    expect(signedNav.url()).not.toMatch(/\/object\/public\//);
+    await popup.close().catch(() => {});
 
     // Verify DB persistence by refreshing the page: the file name must survive reload.
     await page.reload({ waitUntil: 'networkidle' });
