@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Scissors } from 'lucide-react';
+import { Scissors, FileDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,13 @@ import {
   type FabFieldState,
 } from './fab-fields';
 import { PIPE_DIMENSIONS } from '@/tools/core/standards/generated/pipe-dimensions';
+import PipeCombFabDrawingView from './PipeCombFabDrawingView';
+import {
+  generatePipeCombFabPdf,
+  type PdfPaperFormat,
+  type PipeCombFabPdfSnapshot,
+} from './pipe-comb-fab-pdf';
+import { buildFabPdfStrings, localizeJointFace } from './pipe-comb-fab-pdf-strings';
 
 /**
  * PB-PIPE-COMB-CORRECTION-001 / P3-B — fabrication & cut list section.
@@ -85,11 +92,12 @@ const toggleButtonBase =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
 export default function PipeCombFabricationSection({ unit, geometry }: PipeCombFabricationSectionProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const [nps, setNps] = useState('');
   const [elbowMode, setElbowMode] = useState<'catalog' | 'bend'>('catalog');
   const [radiusType, setRadiusType] = useState<'LR' | 'SR'>('LR');
+  const [paper, setPaper] = useState<PdfPaperFormat>('a4');
   // Canonical mm fields via the LOCAL adapter: canonicalMm is non-null only
   // while the current text parses; unit toggles re-render valid text only.
   const [clrField, setClrField] = useState<FabFieldState>(() => createFabField(unit));
@@ -201,6 +209,49 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
 
   const sol = fab.sol;
   const bend = elbowMode === 'bend';
+
+  /* --- P3-C: fabrication PDF export gating (spec §6) -------------------
+   * Export is enabled ONLY when the CURRENT state is a fully valid plan:
+   * current inputs valid (the `fab` memo already re-checks the live field
+   * states on every render, so a deleted/invalidated input flips the
+   * status away from complete/*), references complete, geometry valid,
+   * cutPlanValid true and no pending/invalid cut pieces. A stale valid
+   * result can never enable the button because `fab` is recomputed from
+   * the live fields. The blocked reason is the same status text the user
+   * already sees. */
+  const exportEnabled =
+    (fab.status === 'complete' || fab.status === 'complete-warnings') &&
+    sol !== undefined &&
+    sol.references.defined &&
+    sol.elbow.geometryValid &&
+    sol.cutPlanValid &&
+    sol.cutList.every((e) => e.status === 'ok');
+
+  /** Immutable export snapshot (spec §2): the document is generated from
+   *  the solution, unit, language and strings captured AT CLICK TIME.
+   *  Later edits cannot leak into an in-flight document. */
+  const buildSnapshot = (): PipeCombFabPdfSnapshot | null => {
+    if (!exportEnabled || !sol) return null;
+    const lang = i18n.language;
+    return {
+      solution: sol,
+      unit,
+      language: lang,
+      formatLength: (mm) => `${formatLengthForUnit(mm, unit)} ${unit}`,
+      strings: buildFabPdfStrings(sol, unit, t),
+      localizeJointFace: (raw) => localizeJointFace(raw, t),
+      documentId: `PBC-${Date.now().toString(36).toUpperCase()}`,
+      generatedAt: new Date().toLocaleString(lang, { dateStyle: 'medium', timeStyle: 'short' }),
+      paper,
+    };
+  };
+
+  const onExportPdf = () => {
+    const snap = buildSnapshot();
+    if (!snap) return;
+    const doc = generatePipeCombFabPdf(snap);
+    doc.save(`pipe-comb-fabrication-${snap.documentId}.pdf`);
+  };
 
   return (
     <div
@@ -677,6 +728,62 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
               <p className="text-[10px] text-[#A3A9B3]" data-testid="pipe-comb-fab-model-note">
                 {t('tools.prefab.pipeComb.fab.modelNote')}
               </p>
+            </div>
+          )}
+
+          {/* --- 5D. Fabrication drawing (P3-C): same pure model as the PDF. --- */}
+          {sol && fab.status !== 'review' && fab.status !== 'pending-refs' && (
+            <PipeCombFabDrawingView solution={sol} unit={unit} />
+          )}
+
+          {/* --- 5E. PDF export (P3-C): gated by the CURRENT plan state. --- */}
+          {sol && fab.status !== 'closed' && fab.status !== 'p2-invalid' && (
+            <div className="space-y-2" data-testid="pipe-comb-fab-export">
+              <p className="text-[11px] font-medium text-[#F5F7FA]">{t('tools.prefab.pipeComb.fab.pdf.exportTitle')}</p>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <div className="flex gap-2" role="group" aria-label={t('tools.prefab.pipeComb.fab.pdf.paperLabel')}>
+                  <button
+                    type="button"
+                    aria-pressed={paper === 'a4'}
+                    data-testid="pipe-comb-fab-paper-a4"
+                    onClick={() => setPaper('a4')}
+                    className={`${toggleButtonBase} ${paper === 'a4' ? 'bg-[#FF8C00] text-black' : 'border border-[#232A36] text-[#F5F7FA] hover:bg-[#1A2029]'}`}
+                  >
+                    A4
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={paper === 'a3'}
+                    data-testid="pipe-comb-fab-paper-a3"
+                    onClick={() => setPaper('a3')}
+                    className={`${toggleButtonBase} ${paper === 'a3' ? 'bg-[#FF8C00] text-black' : 'border border-[#232A36] text-[#F5F7FA] hover:bg-[#1A2029]'}`}
+                  >
+                    A3
+                  </button>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  data-testid="pipe-comb-fab-export-pdf"
+                  disabled={!exportEnabled}
+                  aria-disabled={!exportEnabled}
+                  onClick={onExportPdf}
+                  className="w-full sm:w-auto"
+                >
+                  <FileDown className="mr-2 h-4 w-4" aria-hidden="true" />
+                  {t('tools.prefab.pipeComb.fab.pdf.exportButton')}
+                </Button>
+              </div>
+              {!exportEnabled && (
+                <p className="text-xs text-[#A3A9B3]" data-testid="pipe-comb-fab-export-blocked">
+                  {t('tools.prefab.pipeComb.fab.pdf.blockedPrefix')}{' '}
+                  {fab.status === 'review' && fab.reviewReason
+                    ? reviewReasonText[fab.reviewReason]
+                    : fab.status === 'review' && fab.errorCode
+                      ? t(errorCodeKey(fab.errorCode))
+                      : statusText[fab.status]}
+                </p>
+              )}
             </div>
           )}
         </div>
