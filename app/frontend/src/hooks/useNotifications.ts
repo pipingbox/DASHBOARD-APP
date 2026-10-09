@@ -84,7 +84,7 @@ export function useNotifications() {
       void refreshCount();
       return;
     }
-    let timeoutId: ReturnType<typeof window.setTimeout>;
+    let timeoutId: number | undefined;
     let cancelled = false;
     const tick = async () => {
       await refreshCount();
