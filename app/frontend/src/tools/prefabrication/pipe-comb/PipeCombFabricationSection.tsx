@@ -239,12 +239,16 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
   const buildSnapshot = (): PipeCombFabPdfSnapshot | null => {
     if (!exportEnabled || !sol) return null;
     const lang = i18n.language;
+    /* The fabrication PDF contract is intentionally limited to mm/in. The
+     * shared tool unit type also contains metres; normalize that display-only
+     * case to millimetres without changing canonical solver values. */
+    const pdfUnit: 'mm' | 'in' = unit === 'in' ? 'in' : 'mm';
     return {
       solution: sol,
-      unit,
+      unit: pdfUnit,
       language: lang,
-      formatLength: (mm) => `${formatLengthForUnit(mm, unit)} ${unit}`,
-      strings: buildFabPdfStrings(sol, unit, t),
+      formatLength: (mm) => `${formatLengthForUnit(mm, pdfUnit)} ${pdfUnit}`,
+      strings: buildFabPdfStrings(sol, pdfUnit, t),
       localizeJointFace: (raw) => localizeJointFace(raw, t),
       documentId: `PBC-${Date.now().toString(36).toUpperCase()}`,
       generatedAt: new Date().toLocaleString(lang, { dateStyle: 'medium', timeStyle: 'short' }),
