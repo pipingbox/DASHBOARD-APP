@@ -54,10 +54,13 @@ test.describe('PB-UI-DOM-REMOVECHILD-RESIDUAL-001 /tools under translator-grade 
   }) => {
     test.setTimeout(120_000);
 
-    // Anonymous session determinism: same language every run.
+    // Anonymous session determinism: same language every run, and dismiss
+    // the beta-welcome modal (otherwise it intercepts pointer events on
+    // the first real click, per project convention in other specs).
     await page.addInitScript(() => {
       try {
         localStorage.setItem('pipingbox_language', 'es');
+        localStorage.setItem('pipingbox_beta_dismissed', 'true');
       } catch {
         /* storage unavailable */
       }
