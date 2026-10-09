@@ -52,22 +52,27 @@ interface CreateNotificationArgs {
 /**
  * Create a notification row. Skips if recipient equals actor (no self-notify).
  * Errors are swallowed to avoid breaking the primary action.
+ *
+ * PB-NOTIFICATIONS-INSERT-HARDENING-001: direct table INSERT from the browser
+ * is no longer possible for cross-recipient rows (RLS restricts INSERT to
+ * self-only). Cross-recipient creation goes through the narrowly scoped
+ * pb_create_client_notification RPC, which (a) derives the actor from
+ * auth.uid(), (b) allows only benign client types, and (c) requires a
+ * verifiable business relationship for referral types.
  */
 export async function createNotification(args: CreateNotificationArgs): Promise<void> {
   if (!args.recipientId) return;
   if (args.actorId && args.recipientId === args.actorId) return;
 
   try {
-    await supabase.from(TABLES.notifications).insert({
-      user_id: args.recipientId,
-      type: args.type,
-      title: args.title ?? null,
-      message: args.message ?? null,
-      related_entity_type: args.relatedEntityType ?? null,
-      related_entity_id: args.relatedEntityId ?? null,
-      action_url: args.actionUrl ?? null,
-      actor_id: args.actorId ?? null,
-      actor_name: args.actorName ?? null,
+    await supabase.rpc('pb_create_client_notification', {
+      p_type: args.type,
+      p_title: args.title ?? null,
+      p_message: args.message ?? null,
+      p_related_entity_type: args.relatedEntityType ?? null,
+      p_related_entity_id: args.relatedEntityId ?? null,
+      p_action_url: args.actionUrl ?? null,
+      p_recipient_id: args.recipientId,
     });
   } catch {
     // Silently ignore — notification failure must not break core UX.

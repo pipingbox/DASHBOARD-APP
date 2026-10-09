@@ -153,12 +153,12 @@ test.describe('PB-GROWTH-GATE-PERMISSIONS-403-001 — privilege + RLS contract',
     await ctx.dispose();
   });
 
-  test('notifications INSERT by user → 201 + owner DELETE cleanup (sql/026)', async () => {
-    // Contract: `createNotification()` inserts from the browser (referral flow
-    // notifies the REFERRER, a different user — hence the pre-existing
-    // authenticated_insert_notifications policy with WITH CHECK (true), and
-    // referrals.spec.ts T4/T5 expecting 201). The missing table GRANT made
-    // every client-side notification a swallowed 403 (sql/026 fixes it).
+  test('notifications INSERT by user → self-only (sql/027 hardened)', async () => {
+    // PB-NOTIFICATIONS-INSERT-HARDENING-001 tightened the INSERT contract:
+    // direct REST INSERT is now self-only (WITH CHECK auth.uid() = user_id);
+    // cross-user creation goes through pb_create_client_notification. The
+    // browser's createNotification() uses the RPC for cross-recipient rows.
+    // Here we verify the direct-INSERT self-only contract + owner DELETE.
     const ctx = await rest(tokenA);
     const probe = {
       user_id: uidA,
@@ -174,14 +174,29 @@ test.describe('PB-GROWTH-GATE-PERMISSIONS-403-001 — privilege + RLS contract',
       headers: { Prefer: 'return=representation' },
       data: probe,
     });
-    expect(ins.status(), `user INSERT notifications must succeed (sql/026), got ${ins.status()}`).toBe(
-      201,
-    );
-    // Owner DELETE (bell UI contract, users_delete_own_notifications / sql/026):
+    expect(ins.status(), `self INSERT notifications must succeed, got ${ins.status()}`).toBe(201);
     const del = await ctx.delete(`/rest/v1/${NOTIFICATIONS}?title=eq.PB-PERM-GATE-CLEANUP`);
     expect([200, 204], `owner DELETE must work, got ${del.status()}`).toContain(del.status());
     const after = await ctx.get(`/rest/v1/${NOTIFICATIONS}?select=id&title=eq.PB-PERM-GATE-CLEANUP`);
     expect((await after.json()).length, 'probe row must be gone after owner DELETE').toBe(0);
+    await ctx.dispose();
+  });
+
+  test('notifications INSERT by user → cross-user denied (sql/027 hardened)', async () => {
+    test.skip(!EMAIL_B || !PASSWORD_B, 'requires E2E_TEST_EMAIL_B / E2E_TEST_PASSWORD_B');
+    const tokenB = await loginToken(EMAIL_B, PASSWORD_B);
+    const bctx = await rest(tokenB);
+    const me = await bctx.get('/auth/v1/user');
+    const uidB = (await me.json()).id;
+    await bctx.dispose();
+
+    const ctx = await rest(tokenA);
+    const res = await ctx.post(`/rest/v1/${NOTIFICATIONS}`, {
+      data: { user_id: uidB, type: 'probe', title: 'PB-PERM-GATE-CLEANUP', message: 'probe' },
+    });
+    expect([401, 403], `cross-user INSERT notifications must be denied, got ${res.status()}`).toContain(
+      res.status(),
+    );
     await ctx.dispose();
   });
 

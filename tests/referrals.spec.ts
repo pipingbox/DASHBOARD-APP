@@ -209,12 +209,12 @@ test.describe('referral DB contracts', () => {
 
   // ── T4: Notifications table schema accepts REFERRAL_JOINED ───────────────
 
-  test('T4: REFERRAL_JOINED notification can be inserted and retrieved', async () => {
+  test('T4: REFERRAL_JOINED self-notification can be inserted and retrieved (sql/027)', async () => {
     const testTitle = 'REFERRAL-TEST-CLEANUP'; // used by afterAll for cleanup
-    // NOTE: APIRequestContext.post(url, options) takes TWO arguments. The
-    // original three-argument form silently dropped the headers object
-    // (401 "No API key found"), so this probe never actually exercised the
-    // INSERT contract until PB-GROWTH-GATE-PERMISSIONS-403-001 fixed the call.
+    // PB-NOTIFICATIONS-INSERT-HARDENING-001 (sql/027): direct cross-user INSERT
+    // is now denied (self-only policy); cross-recipient referral notifications
+    // go through pb_create_client_notification. Self direct INSERT remains the
+    // table-level contract for own rows.
     const insertRes = await api.post(`/rest/v1/${NOTIFICATIONS_TABLE}`, {
       data: {
         user_id: userId,
@@ -236,7 +236,7 @@ test.describe('referral DB contracts', () => {
 
     expect(
       insertRes.status(),
-      `REFERRAL_JOINED insert must succeed (got ${insertRes.status()})`,
+      `REFERRAL_JOINED self insert must succeed (got ${insertRes.status()})`,
     ).toBe(201);
 
     const inserted = await insertRes.json();
@@ -247,9 +247,9 @@ test.describe('referral DB contracts', () => {
 
   // ── T5: Notifications table schema accepts REFERRAL_VERIFIED ─────────────
 
-  test('T5: REFERRAL_VERIFIED notification can be inserted and retrieved', async () => {
+  test('T5: REFERRAL_VERIFIED self-notification can be inserted and retrieved (sql/027)', async () => {
     const testTitle = 'REFERRAL-TEST-CLEANUP';
-    // Same two-argument call-shape fix as T4 (headers were silently dropped).
+    // Same self-only direct INSERT contract as T4 (sql/027).
     const insertRes = await api.post(`/rest/v1/${NOTIFICATIONS_TABLE}`, {
       data: {
         user_id: userId,
