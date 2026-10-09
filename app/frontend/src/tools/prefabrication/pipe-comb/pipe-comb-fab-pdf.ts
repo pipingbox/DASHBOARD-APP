@@ -192,6 +192,273 @@ function measureWrapped(doc: jsPDF, text: string, maxWidth: number): { lines: st
   return { lines, height };
 }
 
+/* ------------------------------------------------------------------ */
+/* Page-space annotation layout: every floating label (piece ids, E    */
+/* points, dimension labels, reference names) is planned with its REAL  */
+/* text box in page coordinates and resolved against the other labels,  */
+/* the fixed text rows (titles, legends, data strips) and the drawn     */
+/* strokes before anything is written, so labels can neither stack on   */
+/* each other nor sit on the geometry. Values, anchors and the physical */
+/* geometry never change — only the label position (with a thin leader  */
+/* when displaced), which is representation, not recomputation.         */
+
+interface PageBox { x0: number; y0: number; x1: number; y1: number }
+interface PageSeg { x0: number; y0: number; x1: number; y1: number }
+
+interface PlannedLabel {
+  text: string;
+  /** Baseline anchor (preferred position). */
+  x: number;
+  y: number;
+  align: 'left' | 'center' | 'right';
+  fontPt: number;
+  bold: boolean;
+  color: [number, number, number];
+  /** Lower is placed first (semantic anchors keep their spot). */
+  priority: number;
+  /** Ordered page-space unit vectors tried at growing distances. */
+  escape: Vec2[];
+  /** Point the label refers to: a thin leader is drawn when displaced. */
+  anchor?: Vec2;
+  /** Strokes ignored while scoring THIS label (its own dimension and
+   *  extension lines — the dimension line is gapped around the label). */
+  ownLines?: PageSeg[];
+  origX?: number;
+  origY?: number;
+}
+
+/** Candidate displacement distances (mm), tried per escape direction. */
+const LABEL_DIST_LADDER = [2.5, 5, 8, 12, 17, 24, 32, 45, 60];
+
+function boxesOverlapArea(a: PageBox, b: PageBox): number {
+  const w = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0);
+  const h = Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0);
+  return w > 0 && h > 0 ? w * h : 0;
+}
+
+/** Liang-Barsky segment × axis-aligned-box intersection test. */
+function segHitsBox(s: PageSeg, b: PageBox): boolean {
+  if (Math.max(s.x0, s.x1) < b.x0 || Math.min(s.x0, s.x1) > b.x1) return false;
+  if (Math.max(s.y0, s.y1) < b.y0 || Math.min(s.y0, s.y1) > b.y1) return false;
+  const dx = s.x1 - s.x0;
+  const dy = s.y1 - s.y0;
+  let t0 = 0;
+  let t1 = 1;
+  const clip = (p: number, q: number): boolean => {
+    if (p === 0) return q >= 0;
+    const r = q / p;
+    if (p < 0) {
+      if (r > t1) return false;
+      if (r > t0) t0 = r;
+    } else {
+      if (r < t0) return false;
+      if (r < t1) t1 = r;
+    }
+    return true;
+  };
+  return (
+    clip(-dx, s.x0 - b.x0) && clip(dx, b.x1 - s.x0) &&
+    clip(-dy, s.y0 - b.y0) && clip(dy, b.y1 - s.y0)
+  );
+}
+
+const norm2 = (v: Vec2): Vec2 => {
+  const l = Math.hypot(v.x, v.y);
+  return l === 0 ? { x: 0, y: 0 } : { x: v.x / l, y: v.y / l };
+};
+
+/** Greedy, priority-ordered, deterministic label placement. */
+class AnnotationLayout {
+  private labels: PlannedLabel[] = [];
+  private placed: { box: PageBox; label: PlannedLabel }[] = [];
+  private fixedBoxes: PageBox[] = [];
+  private segs: PageSeg[] = [];
+  private readonly doc: jsPDF;
+  private readonly pageW: number;
+  private readonly pageH: number;
+  /** Lowest allowed box top (below the title block + view title). */
+  private readonly yTopLimit: number;
+
+  constructor(doc: jsPDF, pageW: number, pageH: number, yTopLimit: number) {
+    this.doc = doc;
+    this.pageW = pageW;
+    this.pageH = pageH;
+    this.yTopLimit = yTopLimit;
+  }
+
+  label(l: PlannedLabel): void {
+    l.origX = l.x;
+    l.origY = l.y;
+    this.labels.push(l);
+  }
+
+  fixedBox(b: PageBox): void {
+    this.fixedBoxes.push(b);
+  }
+
+  /** Measured box of a fixed text row already drawn on the page. */
+  fixedText(text: string, x: number, y: number, fontPt: number, bold: boolean, pageWLimit: number): void {
+    this.doc.setFont(FONT_FAMILY, bold ? 'bold' : 'normal');
+    this.doc.setFontSize(fontPt);
+    const w = Math.min(this.doc.getTextWidth(text), pageWLimit);
+    const h = fontPt * 0.48;
+    this.fixedBoxes.push({ x0: x, y0: y - h * 0.78, x1: x + w, y1: y + h * 0.22 });
+  }
+
+  seg(s: PageSeg): void {
+    this.segs.push(s);
+  }
+
+  boxOf(l: PlannedLabel, x: number, y: number): PageBox {
+    this.doc.setFont(FONT_FAMILY, l.bold ? 'bold' : 'normal');
+    this.doc.setFontSize(l.fontPt);
+    const w = this.doc.getTextWidth(l.text);
+    const h = l.fontPt * 0.48;
+    const x0 = l.align === 'center' ? x - w / 2 : l.align === 'right' ? x - w : x;
+    return { x0, y0: y - h * 0.78, x1: x0 + w, y1: y + h * 0.22 };
+  }
+
+  private score(l: PlannedLabel, x: number, y: number): number {
+    const b = this.boxOf(l, x, y);
+    let s = 0;
+    for (const f of this.fixedBoxes) s += boxesOverlapArea(b, f) * 3;
+    for (const p of this.placed) s += boxesOverlapArea(b, p.box) * 3;
+    /* Geometry strokes dominate: text on a piece line is far worse than
+     * a slightly larger displacement, so a segment hit outweighs typical
+     * box-overlap penalties. */
+    for (const seg of this.segs) {
+      if (l.ownLines && l.ownLines.indexOf(seg) >= 0) continue;
+      if (segHitsBox(seg, b)) s += 60;
+    }
+    if (b.x0 < MARGIN) s += (MARGIN - b.x0) * 5;
+    if (b.x1 > this.pageW - MARGIN) s += (b.x1 - (this.pageW - MARGIN)) * 5;
+    if (b.y0 < this.yTopLimit) s += (this.yTopLimit - b.y0) * 5;
+    if (b.y1 > this.pageH - MARGIN - 8) s += (b.y1 - (this.pageH - MARGIN - 8)) * 5;
+    return s;
+  }
+
+  /** Place every label: preferred spot first, then escape directions at
+   *  growing distances; first collision-free candidate wins, otherwise
+   *  the least-overlapping one (bounded, no oscillation). */
+  resolve(): void {
+    const sorted = [...this.labels].sort((a, b) => a.priority - b.priority);
+    for (const l of sorted) {
+      const cands: { x: number; y: number }[] = [{ x: l.x, y: l.y }];
+      for (const d of l.escape) {
+        for (const m of LABEL_DIST_LADDER) cands.push({ x: l.x + d.x * m, y: l.y + d.y * m });
+      }
+      let best = cands[0];
+      let bestScore = Infinity;
+      for (const c of cands) {
+        const s = this.score(l, c.x, c.y);
+        if (s <= 0) {
+          best = c;
+          bestScore = 0;
+          break;
+        }
+        if (s < bestScore) {
+          bestScore = s;
+          best = c;
+        }
+      }
+      l.x = best.x;
+      l.y = best.y;
+      this.placed.push({ box: this.boxOf(l, l.x, l.y), label: l });
+    }
+  }
+
+  /** Final placed label boxes — auxiliary strokes (reference planes,
+   *  dimension/extension lines, leaders) are gapped around them after
+   *  resolve. */
+  placedBoxes(): PageBox[] {
+    return this.placed.map((p) => p.box);
+  }
+
+  /** Draw leaders for displaced labels, then all label texts. Leaders
+   *  stop at the label's REAL glyph box (tighter than the layout box, so
+   *  the stroke never penetrates the rendered text) and are gapped
+   *  around every OTHER placed label — a long leader never crosses text. */
+  draw(): void {
+    this.doc.setDrawColor(...GREY);
+    this.doc.setLineWidth(0.15);
+    for (const l of this.labels) {
+      if (!l.anchor || l.origX === undefined || l.origY === undefined) continue;
+      if (Math.hypot(l.x - l.origX, l.y - l.origY) <= 3) continue;
+      /* Real glyph extents (mm from baseline): ascent 0.72*em, descent
+       * 0.28*em — tighter than the superset box used for placement. */
+      const w = this.placed.find((p) => p.label === l)?.box;
+      if (!w) continue;
+      const rb = {
+        x0: w.x0 + 0.3,
+        x1: w.x1 - 0.3,
+        y0: l.y - (l.fontPt * 0.48) * 0.72,
+        y1: l.y + (l.fontPt * 0.48) * 0.28,
+      };
+      const tx = Math.max(rb.x0, Math.min(l.anchor.x, rb.x1));
+      const ty = Math.max(rb.y0, Math.min(l.anchor.y, rb.y1));
+      if (tx === l.anchor.x && ty === l.anchor.y) continue; // inside its own box
+      const others = this.placed.filter((p) => p.label !== l).map((p) => p.box);
+      drawGappedLine(this.doc, { x0: l.anchor.x, y0: l.anchor.y, x1: tx, y1: ty }, others, 0.4);
+    }
+    for (const l of this.labels) {
+      this.doc.setFont(FONT_FAMILY, l.bold ? 'bold' : 'normal');
+      this.doc.setFontSize(l.fontPt);
+      this.doc.setTextColor(...l.color);
+      this.doc.text(l.text, l.x, l.y, { align: l.align });
+    }
+  }
+}
+
+/** Draw an AUXILIARY stroke (reference plane, dimension or extension
+ *  line) split around every placed label box: the line keeps its exact
+ *  endpoints and direction, only short gaps open where a label sits, so
+ *  no text is ever crossed by an auxiliary line. Geometry strokes
+ *  (pieces, arcs, joint ticks) are never gapped. */
+function drawGappedLine(doc: jsPDF, s: PageSeg, boxes: PageBox[], gap = 0.8): void {
+  const dx = s.x1 - s.x0;
+  const dy = s.y1 - s.y0;
+  if (dx === 0 && dy === 0) return;
+  const clips: { t0: number; t1: number }[] = [];
+  for (const raw of boxes) {
+    const b = { x0: raw.x0 - gap, y0: raw.y0 - gap, x1: raw.x1 + gap, y1: raw.y1 + gap };
+    let t0 = 0;
+    let t1 = 1;
+    let ok = true;
+    const clip = (p: number, q: number): void => {
+      if (p === 0) {
+        if (q < 0) ok = false;
+        return;
+      }
+      const r = q / p;
+      if (p < 0) {
+        if (r > t1) ok = false;
+        else if (r > t0) t0 = r;
+      } else {
+        if (r < t0) ok = false;
+        else if (r < t1) t1 = r;
+      }
+    };
+    clip(-dx, s.x0 - b.x0);
+    if (ok) clip(dx, b.x1 - s.x0);
+    if (ok) clip(-dy, s.y0 - b.y0);
+    if (ok) clip(dy, b.y1 - s.y0);
+    if (ok && t1 > t0) clips.push({ t0, t1 });
+  }
+  clips.sort((a, b) => a.t0 - b.t0);
+  const merged: { t0: number; t1: number }[] = [];
+  for (const c of clips) {
+    const last = merged[merged.length - 1];
+    if (last && c.t0 <= last.t1) last.t1 = Math.max(last.t1, c.t1);
+    else merged.push({ ...c });
+  }
+  let t = 0;
+  for (const c of merged) {
+    if (c.t0 > t + 0.05) doc.line(s.x0 + dx * t, s.y0 + dy * t, s.x0 + dx * c.t0, s.y0 + dy * c.t0);
+    t = Math.max(t, c.t1);
+  }
+  if (t < 1 - 0.05) doc.line(s.x0 + dx * t, s.y0 + dy * t, s.x1, s.y1);
+}
+
 /**
  * Generate the fabrication PDF and return the jsPDF document (caller
  * decides `save()` vs `output()` — the tests inspect the real file).
@@ -249,7 +516,7 @@ export function generatePipeCombFabPdf(snapshot: PipeCombFabPdfSnapshot): jsPDF 
       flow((yy) => drawPipeGroupView(doc, drawing, sol, snapshot, yy, pageW, pageH, group), groupNeeded);
     }
   }
-  flow((yy) => drawElbowDetail(doc, drawing, sol, snapshot, yy, pageW), 100);
+  flow((yy) => drawElbowDetail(doc, drawing, sol, snapshot, yy, pageW), elbowDetailExtent(doc, drawing, sol, snapshot, pageW));
   flow((yy) => drawMarking(doc, sol, snapshot, yy, pageW, ensure), 14 + sol.elbow.marks.length * 5 + 12);
   flow((yy) => drawJoints(doc, sol, snapshot, yy, pageW, ensure), 14 + Math.min(sol.joints.length, 8) * 5 + 10);
   flow((yy) => drawWarnings(doc, sol, snapshot, yy, pageW, ensure), 16 + Math.max(1, snapshot.strings.warnings.length) * 5 + 10);
@@ -348,10 +615,14 @@ function drawGeneralView(
   pageH: number,
 ): number {
   const S = snap.strings;
+  const titleY = yTop + 4;
+  const layout = new AnnotationLayout(doc, pageW, pageH, titleY + 2.5);
+
   doc.setFont(FONT_FAMILY, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...INK);
-  doc.text(S.generalView, MARGIN, yTop + 4);
+  doc.text(S.generalView, MARGIN, titleY);
+  layout.fixedText(S.generalView, MARGIN, titleY, 11, true, pageW - 2 * MARGIN);
 
   const boxX = MARGIN;
   const boxY = yTop + 8;
@@ -368,22 +639,38 @@ function drawGeneralView(
    * Lin/Lout dimensions. */
   const overviewIsDense = drawing.pipeCount > 6;
 
-  // Reference planes (dashed).
-  doc.setDrawColor(...GREY);
-  doc.setLineDashPattern([3, 2], 0);
-  doc.setLineWidth(0.25);
+  // Reference planes (dashed) + floating plane labels. The STROKE is
+  // deferred until after the label layout resolves: planes are auxiliary
+  // lines and are gapped around the final label boxes (they pass through
+  // the piece faces, so ungapped they would cross the piece labels).
+  const planeSegs: PageSeg[] = [];
   for (const ref of drawing.referencePlanes) {
     const half = (drawing.bounds.max.y - drawing.bounds.min.y) * 0.62 + 20;
-    const a = map({ x: ref.point.x - ref.direction.x * half, y: ref.point.y - ref.direction.y * half });
-    const b = map({ x: ref.point.x + ref.direction.x * half, y: ref.point.y + ref.direction.y * half });
-    doc.line(a.x, a.y, b.x, b.y);
+    let a = map({ x: ref.point.x - ref.direction.x * half, y: ref.point.y - ref.direction.y * half });
+    let b = map({ x: ref.point.x + ref.direction.x * half, y: ref.point.y + ref.direction.y * half });
+    /* Clamp the plane stroke to the drawing box (+3 mm): an unclamped
+     * plane line runs far below the fitted view and crosses the assembly
+     * data strip under it. */
+    const clampY = (p: Vec2): Vec2 => ({ x: p.x, y: Math.max(boxY - 3, Math.min(boxY + boxH + 3, p.y)) });
+    a = clampY(a);
+    b = clampY(b);
+    const seg: PageSeg = { x0: a.x, y0: a.y, x1: b.x, y1: b.y };
+    planeSegs.push(seg);
     const labelPos = map({ x: ref.point.x + ref.direction.x * (half + 4), y: ref.point.y + ref.direction.y * (half + 4) });
-    doc.setFont(FONT_FAMILY, 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(...GREY);
-    doc.text(ref.id === 'REF-ENT' ? S.refEnt : S.refSal, labelPos.x, labelPos.y);
+    const pd = directionToPage(ref.direction);
+    layout.label({
+      text: ref.id === 'REF-ENT' ? S.refEnt : S.refSal,
+      x: labelPos.x,
+      y: labelPos.y,
+      align: 'left',
+      fontPt: 9,
+      bold: true,
+      color: GREY,
+      priority: 1,
+      escape: [pd, { x: -pd.x, y: -pd.y }, { x: -pd.y, y: pd.x }, { x: pd.y, y: -pd.x }],
+      anchor: map(ref.point),
+    });
   }
-  doc.setLineDashPattern([], 0);
 
   // Pieces: solid for finished, thin dashed for allowance over-length.
   for (const seg of drawing.segments) {
@@ -399,89 +686,116 @@ function drawGeneralView(
       doc.setLineDashPattern([1.5, 1.5], 0);
     }
     doc.line(a.x, a.y, b.x, b.y);
+    layout.seg({ x0: a.x, y0: a.y, x1: b.x, y1: b.y });
   }
   doc.setLineDashPattern([], 0);
 
   // Elbow / bend arcs (polyline approximation of the model arc).
   doc.setDrawColor(...INK);
   doc.setLineWidth(0.7);
-  for (const arc of drawing.arcs) {
-    const steps = Math.max(12, Math.ceil(Math.abs(arc.endRad - arc.startRad) / (Math.PI / 72)));
-    let prev: Vec2 | null = null;
-    for (let i = 0; i <= steps; i++) {
-      const ang = arc.startRad + ((arc.endRad - arc.startRad) * i) / steps;
-      const p = map({
-        x: arc.center.x + arc.radiusMm * Math.cos(ang),
-        y: arc.center.y + arc.radiusMm * Math.sin(ang),
-      });
-      if (prev) doc.line(prev.x, prev.y, p.x, p.y);
-      prev = p;
-    }
-  }
+  for (const arc of drawing.arcs) strokeArc(doc, arc, map, layout);
 
-  // Axis intersections E_i (theoretical points).
-  doc.setFont(FONT_FAMILY, 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(...GREY);
+  // Axis intersections E_i (theoretical points) + floating labels.
   for (const det of drawing.elbowDetails) {
     const e = map(det.axisIntersection);
     doc.setDrawColor(...GREY);
     doc.setLineWidth(0.2);
     doc.line(e.x - 2, e.y, e.x + 2, e.y);
     doc.line(e.x, e.y - 2, e.x, e.y + 2);
-    if (!overviewIsDense) doc.text(S.axisE.replace('{pipe}', String(det.pipeNumber)), e.x + 2.5, e.y - 1.5);
+    layout.seg({ x0: e.x - 2, y0: e.y, x1: e.x + 2, y1: e.y });
+    layout.seg({ x0: e.x, y0: e.y - 2, x1: e.x, y1: e.y + 2 });
+    if (!overviewIsDense) {
+      layout.label({
+        text: S.axisE.replace('{pipe}', String(det.pipeNumber)),
+        x: e.x + 3.2,
+        y: e.y - 2.4,
+        align: 'left',
+        fontPt: 9,
+        bold: false,
+        color: GREY,
+        priority: 3,
+        escape: [
+          norm2({ x: 1, y: -0.5 }),
+          norm2({ x: -1, y: -0.5 }),
+          norm2({ x: 1, y: 0.6 }),
+          norm2({ x: -1, y: 0.6 }),
+          { x: 0, y: -1 },
+        ],
+        anchor: { x: e.x, y: e.y },
+      });
+    }
   }
 
   // Joint markers: orientation from the joint's LOCAL AXIS (model data),
   // never from the two faces — they coincide when g = 0 and would
   // degenerate the marker into a zero-length line.
-  drawJointMarkers(doc, drawing.joints, map, false, snap);
+  drawJointMarkers(doc, drawing.joints, map, false, snap, layout);
 
-  // Dimensions: thin lines with end ticks + label (real model values).
-  // Dense overviews keep only the GLOBAL dimensions (Lin/Lout/Di/Df/A);
-  // per-piece lengths live in the per-group detail views. The Di/Df/A
-  // anchors collapse onto the same corner at dense scale, so their
-  // labels are carried out on short page-space leaders.
-  doc.setLineWidth(0.2);
-  /* Dense global-dim label leaders (page-space): Di down-left, A up-left,
-   * Df down-right (the up-right zone is taken by the Lout label). */
+  /* Dimensions (thin lines with end ticks + label carrying the real model
+   * value). Dense overviews keep only the GLOBAL dimensions (Lin/Lout/Di/
+   * Df/A); per-piece lengths live in the per-group detail views. The
+   * Di/Df/A anchors collapse onto the same corner at dense scale, so
+   * their preferred label positions start on short page-space offsets
+   * (resolved further by the label layout). */
+  const pending: PendingDimension[] = [];
   const denseLeader: Record<string, { mm: number; dir?: Vec2 }> = {
     'dim-Di': { mm: 10 },
     'dim-stagger': { mm: 15 },
     'dim-Df': { mm: 12, dir: { x: 0.5, y: 0.87 } },
   };
   for (const dim of drawing.dimensions) {
-    if (overviewIsDense && (dim.kind === 'finished-length' || dim.kind === 'cut-length')) continue;
-    const leader = overviewIsDense ? denseLeader[dim.id] : undefined;
-    /* Same along-run parity shift as the group views: keeps a pup's
-     * finished/cut labels from landing on the Lin/Lout global anchors
-     * (e.g. the 90° case, where those anchors coincide visually). */
-    if (!overviewIsDense && (dim.kind === 'finished-length' || dim.kind === 'cut-length')) {
+    const isPieceDim = dim.kind === 'finished-length' || dim.kind === 'cut-length';
+    if (overviewIsDense && isPieceDim) continue;
+    let d = dim;
+    if (!overviewIsDense && isPieceDim) {
+      /* Along-run parity shift: keeps a pup's finished/cut labels away
+       * from the Lin/Lout global anchors (e.g. the 90° case, where those
+       * anchors coincide visually). Only the initial label position
+       * slides parallel to the run. */
       const pipeNo = Number(/^P(\d+)-/.exec(dim.ownerId)?.[1] ?? 0);
       const f = pipeNo % 2 === 0 ? 0.7 : 0.3;
       const mid = { x: (dim.from.x + dim.to.x) / 2, y: (dim.from.y + dim.to.y) / 2 };
       const perpOff = { x: dim.labelAt.x - mid.x, y: dim.labelAt.y - mid.y };
-      drawDimensionLine(doc, {
+      d = {
         ...dim,
         labelAt: {
           x: dim.from.x + (dim.to.x - dim.from.x) * f + perpOff.x,
           y: dim.from.y + (dim.to.y - dim.from.y) * f + perpOff.y,
         },
-      }, map, snap);
-      continue;
+      };
     }
-    drawDimensionLine(doc, dim, map, snap, leader?.mm ?? 0, leader?.dir);
+    const pre = overviewIsDense ? denseLeader[dim.id] : undefined;
+    const preDir = pre ? norm2(pre.dir ?? directionToPage(d.offsetDir)) : undefined;
+    pending.push(
+      planDimension(
+        doc,
+        layout,
+        d,
+        map,
+        snap,
+        isPieceDim ? 0 : 0,
+        pre && preDir ? { x: preDir.x * pre.mm, y: preDir.y * pre.mm } : undefined,
+      ),
+    );
   }
 
-  // Piece identifiers near segment midpoints.
-  doc.setFont(FONT_FAMILY, 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(...INK);
+  // Piece identifiers near segment midpoints (floating, with leaders).
   for (const seg of drawing.segments) {
     if (!seg.finished) continue;
     if (overviewIsDense) continue;
     const mid = map({ x: (seg.from.x + seg.to.x) / 2, y: (seg.from.y + seg.to.y) / 2 });
-    doc.text(seg.pieceId, mid.x, mid.y - 1.6, { align: 'center' });
+    layout.label({
+      text: seg.pieceId,
+      x: mid.x,
+      y: mid.y - 1.6,
+      align: 'center',
+      fontPt: 9,
+      bold: true,
+      color: INK,
+      priority: 1,
+      escape: [{ x: 0, y: -1 }, { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0.7, y: -0.7 }, { x: -0.7, y: -0.7 }, { x: 0.7, y: 0.7 }, { x: -0.7, y: 0.7 }],
+      anchor: mid,
+    });
   }
   for (const arc of drawing.arcs) {
     const midAng = (arc.startRad + arc.endRad) / 2;
@@ -490,16 +804,54 @@ function drawGeneralView(
       y: arc.center.y + arc.radiusMm * Math.sin(midAng),
     });
     if (!overviewIsDense) {
-      doc.text(arc.pieceId, p.x, p.y - 1.6, { align: 'center' });
+      layout.label({
+        text: arc.pieceId,
+        x: p.x,
+        y: p.y - 1.6,
+        align: 'center',
+        fontPt: 9,
+        bold: true,
+        color: INK,
+        priority: 1,
+        escape: [
+          { x: 0, y: -1 },
+          norm2({ x: 0.6, y: -0.8 }),
+          norm2({ x: -0.6, y: -0.8 }),
+          { x: 0, y: 1 },
+          { x: 1, y: 0 },
+          { x: -1, y: 0 },
+        ],
+        anchor: p,
+      });
     } else {
       // Dense overview: short pipe labels keep every pipe (and therefore
       // every detail-view group) unequivocally identifiable.
       const pipeNo = arc.pieceId.match(/^P(\d+)-/)?.[1];
-      if (pipeNo) doc.text(S.pipeLabel.replace('{pipe}', pipeNo), p.x, p.y - 1.6, { align: 'center' });
+      if (pipeNo) {
+        layout.label({
+          text: S.pipeLabel.replace('{pipe}', pipeNo),
+          x: p.x,
+          y: p.y - 1.6,
+          align: 'center',
+          fontPt: 9,
+          bold: true,
+          color: INK,
+          priority: 1,
+          escape: [
+            { x: 0, y: -1 },
+            norm2({ x: 0.6, y: -0.8 }),
+            norm2({ x: -0.6, y: -0.8 }),
+            { x: 0, y: 1 },
+            { x: 1, y: 0 },
+            { x: -1, y: 0 },
+          ],
+          anchor: p,
+        });
+      }
     }
   }
 
-  // Assembly data strip under the view.
+  // Assembly data strip under the view (fixed obstacle for the labels).
   const dataY = boxY + boxH + 6;
   doc.setFont(FONT_FAMILY, 'normal');
   doc.setFontSize(9);
@@ -510,7 +862,21 @@ function drawGeneralView(
   const dfTxt = `Df: ${snap.formatLength(sol.stagger.finalSpacingMm)}`;
   const linTxt = `${S.dimLin}: ${sol.references.inletAxisToAxisMm !== undefined ? snap.formatLength(sol.references.inletAxisToAxisMm) : '—'}`;
   const loutTxt = `${S.dimLout}: ${sol.references.outletAxisToAxisMm !== undefined ? snap.formatLength(sol.references.outletAxisToAxisMm) : '—'}`;
-  doc.text([diTxt, dfTxt, angleTxt, staggerTxt, linTxt, loutTxt].join('    ·    '), MARGIN, dataY);
+  const strip = [diTxt, dfTxt, angleTxt, staggerTxt, linTxt, loutTxt].join('    ·    ');
+  doc.text(strip, MARGIN, dataY);
+  layout.fixedText(strip, MARGIN, dataY, 9, false, pageW - 2 * MARGIN);
+
+  // Resolve the annotation layout, then draw the reference planes
+  // (dashed, gapped around the final label boxes), the dimension strokes
+  // (gapped likewise), leaders and texts.
+  layout.resolve();
+  doc.setDrawColor(...GREY);
+  doc.setLineDashPattern([3, 2], 0);
+  doc.setLineWidth(0.25);
+  for (const seg of planeSegs) drawGappedLine(doc, seg, layout.placedBoxes());
+  doc.setLineDashPattern([], 0);
+  for (const pd of pending) drawResolvedDimension(doc, layout, pd);
+  layout.draw();
   return dataY + 2;
 }
 
@@ -537,6 +903,7 @@ function drawJointMarkers(
   map: (p: Vec2) => Vec2,
   withIds: boolean,
   snap: PipeCombFabPdfSnapshot,
+  layout?: AnnotationLayout,
 ): void {
   const off = 1.6;
   for (const j of joints) {
@@ -546,9 +913,11 @@ function drawJointMarkers(
     doc.setDrawColor(...INK);
     doc.setLineWidth(0.5);
     doc.line(a.x - n.x * off, a.y - n.y * off, a.x + n.x * off, a.y + n.y * off);
+    layout?.seg({ x0: a.x - n.x * off, y0: a.y - n.y * off, x1: a.x + n.x * off, y1: a.y + n.y * off });
     if (j.gapMm > 0) {
       const b = map(j.elbowFace);
       doc.line(b.x - n.x * off, b.y - n.y * off, b.x + n.x * off, b.y + n.y * off);
+      layout?.seg({ x0: b.x - n.x * off, y0: b.y - n.y * off, x1: b.x + n.x * off, y1: b.y + n.y * off });
     }
     if (withIds) {
       const label = j.gapMm > 0
@@ -558,67 +927,128 @@ function drawJointMarkers(
        * not stack on top of each other in the compressed elbow zone. */
       const pipeNo = Number(/^J(\d+)-/.exec(j.jointId)?.[1] ?? 0);
       const side = pipeNo % 2 === 0 ? 1 : -1;
-      doc.setFont(FONT_FAMILY, 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(...INK);
-      doc.text(label, a.x + n.x * side * (off + 2.5), a.y + n.y * side * (off + 2.5) + 1);
+      const lx = a.x + n.x * side * (off + 2.5);
+      const ly = a.y + n.y * side * (off + 2.5) + 1;
+      layout?.label({
+        text: label,
+        x: lx,
+        y: ly,
+        align: 'left',
+        fontPt: 9,
+        bold: false,
+        color: INK,
+        priority: 2,
+        escape: [norm2(n), norm2(d), norm2({ x: -d.x, y: -d.y }), norm2({ x: -n.x, y: -n.y })],
+        anchor: { x: a.x, y: a.y },
+      });
+      if (!layout) {
+        doc.setFont(FONT_FAMILY, 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(...INK);
+        doc.text(label, lx, ly);
+      }
     }
   }
 }
 
-/** One dimension line: extension lines, measured run, end ticks and the
- *  localized label at its model anchor (real solution values). When
- *  `labelLeaderMm` is given, the label is moved a fixed PAGE-space
- *  distance along the offset direction with a thin leader line — used in
- *  dense overviews, where the model-space anchors of the global Di/Df/A
- *  dimensions would otherwise collapse onto each other. */
-function drawDimensionLine(
+/** A dimension whose label is planned into the view's AnnotationLayout;
+ *  the strokes are drawn only after resolve() so the dimension line is
+ *  gapped around the label's FINAL position (never under the text). */
+interface PendingDimension {
+  a: Vec2;
+  b: Vec2;
+  a2: Vec2;
+  b2: Vec2;
+  label: PlannedLabel;
+}
+
+/** Plan one dimension: page-space endpoints, offset dimension line,
+ *  extension lines (registered as obstacles for OTHER labels) and the
+ *  floating label. `preOffset` moves the preferred label position in
+ *  page space (dense-overview leaders) without touching the anchor. */
+function planDimension(
   doc: jsPDF,
+  layout: AnnotationLayout,
   dim: FabDrawingDimension,
   map: (p: Vec2) => Vec2,
   snap: PipeCombFabPdfSnapshot,
-  labelLeaderMm = 0,
-  labelLeaderDirPage?: Vec2,
-): void {
+  priority: number,
+  preOffset?: Vec2,
+): PendingDimension {
   const a = map(dim.from);
   const b = map(dim.to);
   const l = map(dim.labelAt);
-  doc.setDrawColor(...GREY);
-  // Extension + dimension line through the label anchor offset.
   const dir = { x: b.x - a.x, y: b.y - a.y };
   const len = Math.hypot(dir.x, dir.y) || 1;
   const u = { x: dir.x / len, y: dir.y / len };
-  // Project label anchor onto the dimension line direction.
-  const tStar = ((l.x - a.x) * u.x + (l.y - a.y) * u.y);
+  const tStar = (l.x - a.x) * u.x + (l.y - a.y) * u.y;
   const proj = { x: a.x + u.x * tStar, y: a.y + u.y * tStar };
   const offVec = { x: l.x - proj.x, y: l.y - proj.y };
   const a2 = { x: a.x + offVec.x, y: a.y + offVec.y };
   const b2 = { x: b.x + offVec.x, y: b.y + offVec.y };
-  doc.line(a.x, a.y, a2.x, a2.y);
-  doc.line(b.x, b.y, b2.x, b2.y);
-  doc.line(a2.x, a2.y, b2.x, b2.y);
-  // End ticks.
+  const extA: PageSeg = { x0: a.x, y0: a.y, x1: a2.x, y1: a2.y };
+  const extB: PageSeg = { x0: b.x, y0: b.y, x1: b2.x, y1: b2.y };
+  const dimLine: PageSeg = { x0: a2.x, y0: a2.y, x1: b2.x, y1: b2.y };
+  /* Aux strokes are NOT registered as label obstacles: they are gapped
+   * around the final label boxes at draw time (drawGappedLine), so a
+   * label may legitimately sit on its own or another dimension line —
+   * only real geometry constrains the labels. */
+  const offDir = norm2(offVec.x === 0 && offVec.y === 0 ? { x: -u.y, y: u.x } : offVec);
+  const label: PlannedLabel = {
+    text: dimensionLabel(dim.id, dim.measureKey, dim.valueMm, snap),
+    x: l.x + (preOffset?.x ?? 0),
+    y: l.y + (preOffset?.y ?? 0),
+    align: 'center',
+    fontPt: 9,
+    bold: false,
+    color: INK,
+    priority,
+    escape: [
+      offDir,
+      { x: -offDir.x, y: -offDir.y },
+      { x: u.x, y: u.y },
+      { x: -u.x, y: -u.y },
+      norm2({ x: offDir.x + u.x, y: offDir.y + u.y }),
+      norm2({ x: offDir.x - u.x, y: offDir.y - u.y }),
+      norm2({ x: -offDir.x + u.x, y: -offDir.y + u.y }),
+      norm2({ x: -offDir.x - u.x, y: -offDir.y - u.y }),
+      { x: -u.y, y: u.x },
+      { x: u.y, y: -u.x },
+    ],
+    anchor: { x: l.x, y: l.y },
+    ownLines: [extA, extB, dimLine],
+  };
+  layout.label(label);
+  void extA; void extB; void dimLine;
+  void doc;
+  return { a, b, a2, b2, label };
+}
+
+/** Draw a resolved dimension: extension lines, dimension line and end
+ *  ticks, all gapped around the FINAL placed label boxes (its own label
+ *  first, but every other displaced label too). Values and anchors are
+ *  untouched — only the gaps follow the resolved labels. */
+function drawResolvedDimension(doc: jsPDF, layout: AnnotationLayout, pd: PendingDimension): void {
+  const { a, b, a2, b2 } = pd;
+  const boxes = layout.placedBoxes();
+  doc.setDrawColor(...GREY);
+  doc.setLineWidth(0.2);
+  drawGappedLine(doc, { x0: a.x, y0: a.y, x1: a2.x, y1: a2.y }, boxes);
+  drawGappedLine(doc, { x0: b.x, y0: b.y, x1: b2.x, y1: b2.y }, boxes);
+  drawGappedLine(doc, { x0: a2.x, y0: a2.y, x1: b2.x, y1: b2.y }, boxes);
+  const dx = b2.x - a2.x;
+  const dy = b2.y - a2.y;
+  const L = Math.hypot(dx, dy) || 1;
+  const u = { x: dx / L, y: dy / L };
   const tick = 1.4;
   const tn = { x: -u.y, y: u.x };
   doc.line(a2.x - tn.x * tick, a2.y - tn.y * tick, a2.x + tn.x * tick, a2.y + tn.y * tick);
   doc.line(b2.x - tn.x * tick, b2.y - tn.y * tick, b2.x + tn.x * tick, b2.y + tn.y * tick);
-  let labelAt = l;
-  if (labelLeaderMm > 0) {
-    const dOff = labelLeaderDirPage ?? directionToPage(dim.offsetDir);
-    const dn = Math.hypot(dOff.x, dOff.y) || 1;
-    labelAt = { x: l.x + (dOff.x / dn) * labelLeaderMm, y: l.y + (dOff.y / dn) * labelLeaderMm };
-    doc.setLineWidth(0.15);
-    doc.line(l.x, l.y, labelAt.x, labelAt.y);
-    doc.setLineWidth(0.2);
-  }
-  doc.setFont(FONT_FAMILY, 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(...INK);
-  doc.text(dimensionLabel(dim.id, dim.measureKey, dim.valueMm, snap), labelAt.x, labelAt.y, { align: 'center' });
 }
 
-/** Polyline stroke of a drawing-model arc (elbow/bend centerline). */
-function strokeArc(doc: jsPDF, arc: PipeCombFabDrawing['arcs'][number], map: (p: Vec2) => Vec2): void {
+/** Polyline stroke of a drawing-model arc (elbow/bend centerline). The
+ *  polyline segments are registered as label obstacles. */
+function strokeArc(doc: jsPDF, arc: PipeCombFabDrawing['arcs'][number], map: (p: Vec2) => Vec2, layout?: AnnotationLayout): void {
   const steps = Math.max(12, Math.ceil(Math.abs(arc.endRad - arc.startRad) / (Math.PI / 72)));
   let prev: Vec2 | null = null;
   for (let i = 0; i <= steps; i++) {
@@ -627,7 +1057,10 @@ function strokeArc(doc: jsPDF, arc: PipeCombFabDrawing['arcs'][number], map: (p:
       x: arc.center.x + arc.radiusMm * Math.cos(ang),
       y: arc.center.y + arc.radiusMm * Math.sin(ang),
     });
-    if (prev) doc.line(prev.x, prev.y, p.x, p.y);
+    if (prev) {
+      doc.line(prev.x, prev.y, p.x, p.y);
+      layout?.seg({ x0: prev.x, y0: prev.y, x1: p.x, y1: p.y });
+    }
     prev = p;
   }
 }
@@ -652,11 +1085,14 @@ function drawPipeGroupView(
   pipeNumbers: number[],
 ): number {
   const S = snap.strings;
+  const titleY = yTop + 4;
+  const layout = new AnnotationLayout(doc, pageW, pageH, titleY + 2.5);
   doc.setFont(FONT_FAMILY, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...INK);
   const title = `${S.detailView}: ${pipeNumbers.map((n) => S.pipeLabel.replace('{pipe}', String(n))).join('–')}`;
-  doc.text(title, MARGIN, yTop + 4);
+  doc.text(title, MARGIN, titleY);
+  layout.fixedText(title, MARGIN, titleY, 11, true, pageW - 2 * MARGIN);
 
   const pieceIds = new Set(
     sol.pipes
@@ -721,43 +1157,62 @@ function drawPipeGroupView(
       doc.setLineDashPattern([1.5, 1.5], 0);
     }
     doc.line(a.x, a.y, b.x, b.y);
+    layout.seg({ x0: a.x, y0: a.y, x1: b.x, y1: b.y });
   }
   doc.setLineDashPattern([], 0);
 
   // Elbow / bend arcs.
   doc.setDrawColor(...INK);
   doc.setLineWidth(0.7);
-  for (const arc of arcs) strokeArc(doc, arc, map);
+  for (const arc of arcs) strokeArc(doc, arc, map, layout);
 
   // Axis intersections E_i (theoretical points), labelled.
-  doc.setFont(FONT_FAMILY, 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(...GREY);
   for (const det of dets) {
     const e = map(det.axisIntersection);
     doc.setDrawColor(...GREY);
     doc.setLineWidth(0.2);
     doc.line(e.x - 2, e.y, e.x + 2, e.y);
     doc.line(e.x, e.y - 2, e.x, e.y + 2);
-    doc.text(S.axisE.replace('{pipe}', String(det.pipeNumber)), e.x + 2.5, e.y - 1.5);
+    layout.seg({ x0: e.x - 2, y0: e.y, x1: e.x + 2, y1: e.y });
+    layout.seg({ x0: e.x, y0: e.y - 2, x1: e.x, y1: e.y + 2 });
+    layout.label({
+      text: S.axisE.replace('{pipe}', String(det.pipeNumber)),
+      x: e.x + 3.2,
+      y: e.y - 2.4,
+      align: 'left',
+      fontPt: 9,
+      bold: false,
+      color: GREY,
+      priority: 3,
+      escape: [
+        norm2({ x: 1, y: -0.5 }),
+        norm2({ x: -1, y: -0.5 }),
+        norm2({ x: 1, y: 0.6 }),
+        norm2({ x: -1, y: 0.6 }),
+        { x: 0, y: -1 },
+      ],
+      anchor: { x: e.x, y: e.y },
+    });
   }
 
   // Joint ticks (axis-based orientation; non-degenerate at g = 0; both
   // real faces + true gap when g > 0). Ids live in the per-pipe legend
   // below: the elbow zone of a dense group is far too compressed to
   // carry six joint ids + three elbow ids legibly at 9 pt.
-  drawJointMarkers(doc, joints, map, false, snap);
+  drawJointMarkers(doc, joints, map, false, snap, layout);
 
-  // Per-piece finished/cut dimensions with real model values. Adjacent
-  // pipes share the same visual region in a group view, so each label
-  // anchor is shifted ALONG its measured run by pipe parity (0.38/0.62):
-  // the run, value and perpendicular offset are unchanged, only the
-  // anchor slides parallel to the run so same-name dimensions of
-  // neighbouring pipes never stack.
-  doc.setLineWidth(0.2);
+  /* Per-piece finished/cut dimensions with real model values. Adjacent
+   * pipes share the same visual region in a group view, so each label
+   * anchor is shifted ALONG its measured run by a modulo-3 fraction
+   * (0.25 / 0.55 / 0.85 by pipe position in the group): the run, value
+   * and perpendicular offset are unchanged, only the anchor slides
+   * parallel to the run so same-name dimensions of neighbouring pipes
+   * never stack. The annotation layout resolves any residual overlap. */
+  const pending: PendingDimension[] = [];
   for (const dim of dims) {
     const pipeNo = Number(/^P(\d+)-/.exec(dim.ownerId)?.[1] ?? 0);
-    const f = pipeNo % 2 === 0 ? 0.7 : 0.3;
+    const slot = (pipeNumbers.indexOf(pipeNo) + 3) % 3;
+    const f = [0.25, 0.55, 0.85][slot];
     const mid = { x: (dim.from.x + dim.to.x) / 2, y: (dim.from.y + dim.to.y) / 2 };
     const perpOff = { x: dim.labelAt.x - mid.x, y: dim.labelAt.y - mid.y };
     const anchored: FabDrawingDimension = {
@@ -767,14 +1222,15 @@ function drawPipeGroupView(
         y: dim.from.y + (dim.to.y - dim.from.y) * f + perpOff.y,
       },
     };
-    drawDimensionLine(doc, anchored, map, snap);
+    pending.push(planDimension(doc, layout, anchored, map, snap, 0));
   }
 
-  // Per-pipe identification legend: every elbow (catalog) or bend bar,
-  // and every joint of the group, unequivocally tied to its pipe. The
-  // pup ids are already carried by their finished-length dimension
-  // labels, so each cut-list row links to a represented piece.
-  let legendY = boxY + boxH + 5;
+  /* Per-pipe identification legend: every elbow (catalog) or bend bar,
+   * and every joint of the group, unequivocally tied to its pipe. The
+   * pup ids are already carried by their finished-length dimension
+   * labels, so each cut-list row links to a represented piece. Legend
+   * rows are FIXED obstacles for the floating labels above. */
+  const legendRows: string[] = [];
   for (const pipeNo of pipeNumbers) {
     const pipe = sol.pipes.find((p) => p.pipeNumber === pipeNo);
     if (!pipe) continue;
@@ -782,15 +1238,26 @@ function drawPipeGroupView(
     if (!fitting) continue;
     const jointIds = joints
       .filter((j) => j.jointId.startsWith(`J${pipeNo}-`))
-      .map((j) => (j.gapMm > 0 ? `${j.jointId} (${snap.strings.dimGap} ${snap.formatLength(j.gapMm)})` : j.jointId));
+      .map((j) => (j.gapMm > 0 ? `${j.jointId} (${S.dimGap} ${snap.formatLength(j.gapMm)})` : j.jointId));
+    legendRows.push(jointIds.length > 0 ? `${fitting.id}  ·  ${jointIds.join('  ·  ')}` : fitting.id);
+  }
+  let legendY = boxY + boxH + 5;
+  for (const row of legendRows) {
+    layout.fixedText(row, MARGIN + 1, legendY, 9, true, pageW - 2 * MARGIN);
+    legendY += 4.6;
+  }
+
+  // Resolve, draw the dimension strokes (gapped around the final label
+  // positions), leaders and texts, then the legend rows themselves.
+  layout.resolve();
+  for (const pd of pending) drawResolvedDimension(doc, layout, pd);
+  layout.draw();
+  legendY = boxY + boxH + 5;
+  for (const row of legendRows) {
     doc.setFont(FONT_FAMILY, 'bold');
     doc.setFontSize(9);
     doc.setTextColor(...INK);
-    doc.text(fitting.id, MARGIN + 1, legendY);
-    if (jointIds.length > 0) {
-      doc.setFont(FONT_FAMILY, 'normal');
-      doc.text(`  ·  ${jointIds.join('  ·  ')}`, MARGIN + 1 + doc.getTextWidth(fitting.id), legendY);
-    }
+    doc.text(row, MARGIN + 1, legendY);
     legendY += 4.6;
   }
   return legendY + 2;
@@ -842,8 +1309,28 @@ function drawCutList(
     ];
   });
 
+  /* Section heading (localized) — every section of the document is
+   * titled, so the cut list is identifiable on every page it spans. */
+  doc.setFont(FONT_FAMILY, 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(...INK);
+  doc.text(S.cutList, MARGIN, yTop);
+
+  /* Orphan-header guard: if fewer than ~2 rows + header fit below the
+   * start position, start the table on a fresh page instead of leaving a
+   * lone header at the bottom (rowPageBreak only protects ROWS). The
+   * estimate uses the real 9 pt row metrics (header + 2 data rows). */
+  const tableTop = yTop + 6;
+  const rowH = (9 * 0.48) + 2 * 1.6; // font height + cell padding
+  const availForTable = (doc.internal.pageSize.getHeight()) - tableTop - (MARGIN + 12);
+  let startY = tableTop;
+  if (availForTable < rowH * 3.2) {
+    doc.addPage();
+    drawTitleBlock(doc, snap, pageW);
+    startY = MARGIN + TITLE_BLOCK_H + 6;
+  }
   autoTable(doc, {
-    startY: yTop + 2,
+    startY,
     head: [[S.colPiece, S.colQty, S.colType, S.colFinished, S.colAllowance, S.colCut, S.colStatus]],
     body,
     theme: 'grid',
@@ -895,6 +1382,33 @@ function drawCutList(
     doc.text(block.lines, MARGIN, ay + 3.5);
     ay += block.height + 1.5;
   }
+}
+
+/** Measured on-paper extent (mm below yTop) of the elbow detail for
+ *  pipe 1's construction: every stroked point of the arc, centre/face
+ *  lines, tick markers and the wrapped text block on the right. The
+ *  section height is MEASURED, never a fixed constant — the pagination
+ *  decision uses the same number. */
+function elbowDetailExtent(
+  doc: jsPDF,
+  drawing: PipeCombFabDrawing,
+  sol: PipeCombFabricationSolution,
+  snap: PipeCombFabPdfSnapshot,
+  pageW: number,
+): number {
+  const det = drawing.elbowDetails.find((d) => d.pipeNumber === 1);
+  if (!det) return 8;
+  const scale = 44 / det.clrMm;
+  let maxDown = 66 + det.clrMm * scale; // arc bottom below the view centre
+  maxDown += 2.5; // tick marker overhang
+  const S = snap.strings;
+  const note = S.nominalModelNote;
+  doc.setFont(FONT_FAMILY, 'normal');
+  doc.setFontSize(9);
+  const noteLines = doc.splitTextToSize(note, pageW - MARGIN - 118 - MARGIN) as string[];
+  const noteBottom = 32.5 + ((doc.getLineHeight() / doc.internal.scaleFactor) * noteLines.length);
+  maxDown = Math.max(maxDown, noteBottom);
+  return maxDown + 4;
 }
 
 function drawElbowDetail(
@@ -970,7 +1484,10 @@ function drawElbowDetail(
   );
   doc.setTextColor(...GREY);
   doc.text(S.nominalModelNote, MARGIN + 118, yTop + 32.5, { maxWidth: pageW - MARGIN - 118 - MARGIN });
-  return yTop + 96;
+  /* Return the MEASURED extent (same computation the pagination uses):
+   * arc bottom + tick overhang + the wrapped note block, so the next
+   * section can never start on top of the drawing. */
+  return yTop + elbowDetailExtent(doc, drawing, sol, snap, pageW);
 }
 
 function drawMarking(doc: jsPDF, sol: PipeCombFabricationSolution, snap: PipeCombFabPdfSnapshot, yTop: number, pageW: number, ensure: (yy: number, needed: number) => number): number {

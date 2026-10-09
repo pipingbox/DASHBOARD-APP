@@ -159,6 +159,86 @@ test('p3c-04: joints with g > 0 show two distinct face ticks', async ({ page }) 
 });
 
 /* ------------------------------------------------------------------ *
+ * 1b. Joint tick geometry: orientation from the joint's LOCAL AXIS
+ *     (PDF parity). With g = 0 the two faces coincide, so deriving the
+ *     tick direction from b-a degenerates to a zero-length line; the
+ *     rendered segment itself is inspected (attributes, real geometry).
+ * ------------------------------------------------------------------ */
+
+interface LineAttrs { x1: number; y1: number; x2: number; y2: number }
+
+async function lineAttrs(page: import('@playwright/test').Page, selector: string): Promise<LineAttrs> {
+  const el = page.locator(selector);
+  const g = (n: 'x1' | 'y1' | 'x2' | 'y2') => el.getAttribute(n);
+  return { x1: Number(await g('x1')), y1: Number(await g('y1')), x2: Number(await g('x2')), y2: Number(await g('y2')) };
+}
+
+/** A tick is valid when non-degenerate and perpendicular (|cos| < 0.02)
+ * to the run segment it marks. */
+function assertTickPerpendicular(tick: LineAttrs, run: LineAttrs): void {
+  const tv = { x: tick.x2 - tick.x1, y: tick.y2 - tick.y1 };
+  const rv = { x: run.x2 - run.x1, y: run.y2 - run.y1 };
+  const tl = Math.hypot(tv.x, tv.y);
+  expect(tl).toBeGreaterThan(1);
+  const cos = Math.abs(tv.x * rv.x + tv.y * rv.y) / (tl * Math.hypot(rv.x, rv.y));
+  expect(cos).toBeLessThan(0.02);
+}
+
+test('p3c-05: g=0 joint ticks are non-degenerate and axis-oriented (35°, in/out)', async ({ page }) => {
+  await setupCase3x35(page); // g = 0
+  await expect(page.locator('[data-testid="fab-draw-joint-J1-IN"] line')).toHaveCount(1);
+  /* Inlet joint: tick perpendicular to the P1-IN run (inlet axis). */
+  assertTickPerpendicular(
+    await lineAttrs(page, '[data-testid="fab-draw-joint-J1-IN"] line'),
+    await lineAttrs(page, '[data-testid="fab-draw-seg-P1-IN"]'),
+  );
+  /* Outlet joint: tick perpendicular to the P1-OUT run (outlet axis). */
+  assertTickPerpendicular(
+    await lineAttrs(page, '[data-testid="fab-draw-joint-J1-OUT"] line'),
+    await lineAttrs(page, '[data-testid="fab-draw-seg-P1-OUT"]'),
+  );
+  /* A middle pipe's joints too (P2). */
+  assertTickPerpendicular(
+    await lineAttrs(page, '[data-testid="fab-draw-joint-J2-IN"] line'),
+    await lineAttrs(page, '[data-testid="fab-draw-seg-P2-IN"]'),
+  );
+});
+
+test('p3c-06: g=2 keeps two non-degenerate face ticks (35°), axis-oriented at 90°', async ({ page }) => {
+  await setupCase3x35(page);
+  await page.locator('#pipe-comb-fab-gap').fill('2');
+  const j1in = page.locator('[data-testid="fab-draw-joint-J1-IN"]');
+  await expect(j1in.locator('line')).toHaveCount(2);
+  /* Both faces carry their own non-degenerate, run-perpendicular tick. */
+  const ticks = j1in.locator('line');
+  const run = await lineAttrs(page, '[data-testid="fab-draw-seg-P1-IN"]');
+  assertTickPerpendicular(await lineAttrs(page, '[data-testid="fab-draw-joint-J1-IN"] line:nth-child(1)'), run);
+  assertTickPerpendicular(await lineAttrs(page, '[data-testid="fab-draw-joint-J1-IN"] line:nth-child(2)'), run);
+  /* The two ticks sit on DIFFERENT faces (J1 carries the real gap) and
+   * their midpoints differ by the true scaled separation: 2 mm at whole-
+   * comb view scale is sub-pixel (~0.6 px here), so the threshold is the
+   * distinct-face epsilon, not a legibility one. */
+  await expect(j1in).toHaveAttribute('data-gap', '2');
+  const mid = (l: LineAttrs) => ({ x: (l.x1 + l.x2) / 2, y: (l.y1 + l.y2) / 2 });
+  const m1 = mid(await lineAttrs(page, '[data-testid="fab-draw-joint-J1-IN"] line:nth-child(1)'));
+  const m2 = mid(await lineAttrs(page, '[data-testid="fab-draw-joint-J1-IN"] line:nth-child(2)'));
+  expect(Math.hypot(m2.x - m1.x, m2.y - m1.y)).toBeGreaterThan(0.3);
+  /* 90° case, g = 0: the outlet axis is perpendicular to the inlet one,
+   * still non-degenerate and perpendicular to its own run. */
+  await page.locator('#pipe-comb-fab-gap').fill('0');
+  await setValues(page, { angle: '90' });
+  await expect(page.locator('[data-testid="fab-draw-joint-J1-IN"] line')).toHaveCount(1);
+  assertTickPerpendicular(
+    await lineAttrs(page, '[data-testid="fab-draw-joint-J1-IN"] line'),
+    await lineAttrs(page, '[data-testid="fab-draw-seg-P1-IN"]'),
+  );
+  assertTickPerpendicular(
+    await lineAttrs(page, '[data-testid="fab-draw-joint-J1-OUT"] line'),
+    await lineAttrs(page, '[data-testid="fab-draw-seg-P1-OUT"]'),
+  );
+});
+
+/* ------------------------------------------------------------------ *
  * 2. Export gating (spec §6): blocked states never reuse stale data
  * ------------------------------------------------------------------ */
 

@@ -166,18 +166,24 @@ export default function PipeCombFabDrawingView({ solution, unit }: PipeCombFabDr
             );
           })}
 
-          {/* Joint markers: two ticks when g > 0. */}
+          {/* Joint markers: two ticks when g > 0. Tick orientation comes
+           * from the joint's LOCAL AXIS (j.axis, same contract as the PDF
+           * exporter) projected linearly to screen space — NEVER from the
+           * segment between the two faces, which COINCIDE when g = 0 and
+           * degenerated the tick into a zero-length line. */}
           {drawing.joints.map((j) => {
             const a = map(j.pupFace);
             const b = map(j.elbowFace);
-            const n = { x: -(b.y - a.y), y: b.x - a.x };
-            const nl = Math.hypot(n.x, n.y) || 1;
+            const axisProj = projectPoint(j.axis);
+            const axisScreen = { x: axisProj.x, y: -axisProj.y }; // map() flips y
+            const al = Math.hypot(axisScreen.x, axisScreen.y) || 1;
+            const n = { x: -axisScreen.y / al, y: axisScreen.x / al };
             const off = 4;
             return (
               <g key={j.jointId} data-testid={`fab-draw-joint-${j.jointId}`} data-gap={j.gapMm}>
-                <line x1={a.x - (n.x / nl) * off} y1={a.y - (n.y / nl) * off} x2={a.x + (n.x / nl) * off} y2={a.y + (n.y / nl) * off} stroke="#F5F7FA" strokeWidth={1.6} />
+                <line x1={a.x - n.x * off} y1={a.y - n.y * off} x2={a.x + n.x * off} y2={a.y + n.y * off} stroke="#F5F7FA" strokeWidth={1.6} />
                 {j.gapMm > 0 && (
-                  <line x1={b.x - (n.x / nl) * off} y1={b.y - (n.y / nl) * off} x2={b.x + (n.x / nl) * off} y2={b.y + (n.y / nl) * off} stroke="#F5F7FA" strokeWidth={1.6} />
+                  <line x1={b.x - n.x * off} y1={b.y - n.y * off} x2={b.x + n.x * off} y2={b.y + n.y * off} stroke="#F5F7FA" strokeWidth={1.6} />
                 )}
               </g>
             );

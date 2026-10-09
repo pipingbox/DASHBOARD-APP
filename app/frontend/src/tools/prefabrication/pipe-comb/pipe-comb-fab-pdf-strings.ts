@@ -23,7 +23,7 @@ import type {
 } from './pipe-comb-fabrication';
 import type { PdfStrings } from './pipe-comb-fab-pdf';
 import type { LengthUnit } from '@/tools/core/units';
-import { formatLengthForUnit } from './number-input';
+import { formatLengthForUnit } from './number-input.ts';
 
 /** Localized warning line, identical wording to the on-screen list. */
 function warningLine(
