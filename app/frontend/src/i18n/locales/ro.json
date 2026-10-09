@@ -2133,7 +2133,7 @@
             "colQty": "Cant.",
             "colType": "Tip",
             "accessoriesTitle": "Accesorii (nu piese de tăiat)",
-            "accessoryLine": "{id}: cot NPS {nps} 90° LR redus la {angle}° — cant. 1",
+            "accessoryLine": "{id}: cot NPS {nps} 90° {family} redus la {angle}° — cant. 1",
             "bendAccessoryLine": "Bare îndoite continue (fără tronsoane sudate).",
             "dimAngle": "Unghiul cotului",
             "dimGap": "joc",

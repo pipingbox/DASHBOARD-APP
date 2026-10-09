@@ -1,19 +1,41 @@
 import { expect, test } from '@playwright/test';
 import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 /**
  * PB-PIPE-COMB-CORRECTION-001 — P3-C
  * Fabrication drawing view + real PDF export from the application.
  *
  * The PDF assertions inspect the REAL downloaded file (magic bytes and
- * non-trivial size); the full text-extraction / rasterization verification
+ * non-trivial size). Text-content assertions go through
+ * scripts/extract-pdf-text.mjs (pdfjs-dist): the exporter embeds Noto
+ * Sans, so the document text is CID-hex-encoded and NOT searchable in the
+ * raw latin1 bytes. The full text-extraction / rasterization verification
  * of the same exporter lives in scripts/test-pipe-comb-fab-pdf.ts (Node
- * runner, 103 checks). Values come from the FROZEN 3x35° P3-A acceptance
+ * runner, 190 checks). Values come from the FROZEN 3x35° P3-A acceptance
  * fixture, never recomputed here.
  */
 
 const TOOL_URL = '/tools?t=pipe-comb&lng=en';
 const TOOL_URL_ES = '/tools?t=pipe-comb&lng=es';
+
+/** Extract searchable text from a downloaded PDF via the Node helper. */
+function pdfText(buf: Buffer): string {
+  const tmp = path.join(os.tmpdir(), `p3c-e2e-${Date.now()}-${Math.random().toString(36).slice(2)}.pdf`);
+  fs.writeFileSync(tmp, buf);
+  try {
+    const out = execFileSync(
+      'node',
+      [path.resolve(process.cwd(), 'scripts', 'extract-pdf-text.mjs'), tmp],
+      { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 },
+    );
+    return (JSON.parse(out) as { text: string }).text;
+  } finally {
+    fs.unlinkSync(tmp);
+  }
+}
 
 async function openTool(page: import('@playwright/test').Page, url: string = TOOL_URL) {
   await page.goto(url);
@@ -228,14 +250,16 @@ test('p3c-22: export snapshot is immutable — edits during generation never lea
   await page.locator('[data-testid="pipe-comb-fab-export-pdf"]').click();
   await page.locator('#pipe-comb-fab-lin').fill('500');
   const download = await downloadPromise;
-  const buf = fs.readFileSync(await download.path()).toString('latin1');
+  const buf = fs.readFileSync(await download.path());
   /* The UI now shows the edited plan (500 mm Lin)… */
   await expect(page.locator('#pipe-comb-fab-lin')).toHaveValue('500');
   /* …but the document was generated from the click-time snapshot: the
      P1-IN cut length of the 1000 mm plan (927.92) is embedded, and the
-     500 mm plan's value (427.92) is not. */
-  expect(buf).toContain('927.92');
-  expect(buf).not.toContain('427.92');
+     500 mm plan's value (427.92) is not. The embedded Noto Sans encodes
+     text as CID hex, so the check runs on the EXTRACTED text. */
+  const text = pdfText(buf);
+  expect(text).toContain('927.92');
+  expect(text).not.toContain('427.92');
 });
 
 test('p3c-23: Spanish export produces a localized real PDF', async ({ page }) => {
@@ -244,10 +268,11 @@ test('p3c-23: Spanish export produces a localized real PDF', async ({ page }) =>
     page.waitForEvent('download', { timeout: 30_000 }),
     page.locator('[data-testid="pipe-comb-fab-export-pdf"]').click(),
   ]);
-  const buf = fs.readFileSync(await download.path()).toString('latin1');
-  expect(buf.slice(0, 5)).toBe('%PDF-');
-  /* Localized title block strings (WinAnsi-safe subset check). */
-  expect(buf).toContain('Página');
+  const buf = fs.readFileSync(await download.path());
+  expect(buf.subarray(0, 5).toString('latin1')).toBe('%PDF-');
+  /* Localized title-block strings, read from the extracted text (the
+     embedded font encodes text as CID hex, not latin1 literals). */
+  expect(pdfText(buf)).toContain('Página');
 });
 
 test('p3c-24: export from a 320 px viewport produces the same document', async ({ page }) => {
@@ -258,11 +283,12 @@ test('p3c-24: export from a 320 px viewport produces the same document', async (
     page.waitForEvent('download', { timeout: 30_000 }),
     page.locator('[data-testid="pipe-comb-fab-export-pdf"]').click(),
   ]);
-  const buf = fs.readFileSync(await download.path()).toString('latin1');
-  expect(buf.slice(0, 5)).toBe('%PDF-');
+  const buf = fs.readFileSync(await download.path());
+  expect(buf.subarray(0, 5).toString('latin1')).toBe('%PDF-');
   /* A4 landscape MediaBox (~841.89 x ~595.28 pt) regardless of viewport. */
-  expect(buf).toMatch(/MediaBox \[0 0 841\.8/);
-  expect(buf).toContain('927.92');
+  expect(buf.toString('latin1')).toMatch(/MediaBox \[0 0 841\.8/);
+  /* Same cut values as the desktop export (extracted text: CID font). */
+  expect(pdfText(buf)).toContain('927.92');
 });
 
 test('p3c-25: English/inches bend case (CLR 9 in) exports a valid PDF', async ({ page }) => {
@@ -275,8 +301,9 @@ test('p3c-25: English/inches bend case (CLR 9 in) exports a valid PDF', async ({
     page.waitForEvent('download', { timeout: 30_000 }),
     page.locator('[data-testid="pipe-comb-fab-export-pdf"]').click(),
   ]);
-  const buf = fs.readFileSync(await download.path()).toString('latin1');
-  expect(buf.slice(0, 5)).toBe('%PDF-');
-  /* Inch presentation inside the document (CLR 9 in = 228.6 mm). */
-  expect(buf).toContain('9 in');
+  const buf = fs.readFileSync(await download.path());
+  expect(buf.subarray(0, 5).toString('latin1')).toBe('%PDF-');
+  /* Inch presentation inside the document (CLR 9 in = 228.6 mm), read
+     from the extracted text (CID-hex font encoding). */
+  expect(pdfText(buf)).toContain('9 in');
 });

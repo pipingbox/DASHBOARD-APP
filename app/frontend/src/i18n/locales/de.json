@@ -1969,7 +1969,7 @@
             "colQty": "Menge",
             "colType": "Typ",
             "accessoriesTitle": "Zubehör (keine Schnittteile)",
-            "accessoryLine": "{id}: NPS {nps} 90°-LR-Bogen gekürzt auf {angle}° — Menge 1",
+            "accessoryLine": "{id}: NPS {nps} 90°-{family}-Bogen gekürzt auf {angle}° — Menge 1",
             "bendAccessoryLine": "Durchgehend gebogene Stäbe (keine geschweißten Stücke).",
             "dimAngle": "Bogenwinkel",
             "dimGap": "Spalt",

@@ -27,6 +27,12 @@ import {
   type PipeCombFabPdfSnapshot,
 } from './pipe-comb-fab-pdf';
 import { buildFabPdfStrings, localizeJointFace } from './pipe-comb-fab-pdf-strings';
+import { NOTO_SANS_BOLD_B64, NOTO_SANS_REGULAR_B64 } from './assets/noto-sans-base64';
+
+/* Embedded Noto Sans (SIL OFL 1.1, Latin-ext + Cyrillic) for the PDF
+ * exporter. The base64 module is generated from the TTFs (see
+ * scripts/gen-pipe-comb-pdf-fonts.mjs), so an export never performs a
+ * font request and the bytes are identical in dev, build and test. */
 
 /**
  * PB-PIPE-COMB-CORRECTION-001 / P3-B — fabrication & cut list section.
@@ -243,6 +249,12 @@ export default function PipeCombFabricationSection({ unit, geometry }: PipeCombF
       documentId: `PBC-${Date.now().toString(36).toUpperCase()}`,
       generatedAt: new Date().toLocaleString(lang, { dateStyle: 'medium', timeStyle: 'short' }),
       paper,
+      fonts: { regularBase64: NOTO_SANS_REGULAR_B64, boldBase64: NOTO_SANS_BOLD_B64 },
+      /* LR/SR comes from the live UI selection (the approved P3-A solution
+       * deliberately carries no radius-family metadata); the snapshot
+       * captures it at click time so the document cannot read "LR" for an
+       * SR selection. */
+      elbowRadiusFamily: radiusType,
     };
   };
 

@@ -2126,7 +2126,7 @@
             "colQty": "Qtà",
             "colType": "Tipo",
             "accessoriesTitle": "Accessori (non pezzi da taglio)",
-            "accessoryLine": "{id}: gomito NPS {nps} 90° LR ridotto a {angle}° — qtà 1",
+            "accessoryLine": "{id}: gomito NPS {nps} 90° {family} ridotto a {angle}° — qtà 1",
             "bendAccessoryLine": "Barre piegate continue (senza spezzoni saldati).",
             "dimAngle": "Angolo del gomito",
             "dimGap": "gioco",

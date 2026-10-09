@@ -2195,7 +2195,7 @@
             "colQty": "Qty",
             "colType": "Type",
             "accessoriesTitle": "Accessories (not cut pieces)",
-            "accessoryLine": "{id}: NPS {nps} 90° LR elbow cut to {angle}° — qty 1",
+            "accessoryLine": "{id}: NPS {nps} 90° {family} elbow cut to {angle}° — qty 1",
             "bendAccessoryLine": "Continuous bent bars (no welded pups).",
             "dimAngle": "Elbow angle",
             "dimGap": "gap",

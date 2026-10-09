@@ -2126,7 +2126,7 @@
             "colQty": "Cant.",
             "colType": "Tipo",
             "accessoriesTitle": "Accesorios (no son piezas de corte)",
-            "accessoryLine": "{id}: codo NPS {nps} 90° LR recortado a {angle}° — cant. 1",
+            "accessoryLine": "{id}: codo NPS {nps} 90° {family} recortado a {angle}° — cant. 1",
             "bendAccessoryLine": "Barras dobladas continuas (sin palillos soldados).",
             "dimAngle": "Ángulo del codo",
             "dimGap": "separación",

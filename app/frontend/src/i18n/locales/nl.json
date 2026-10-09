@@ -1969,7 +1969,7 @@
             "colQty": "Aantal",
             "colType": "Type",
             "accessoriesTitle": "Accessoires (geen zaagstukken)",
-            "accessoryLine": "{id}: NPS {nps} 90° LR-bocht ingekort tot {angle}° — aantal 1",
+            "accessoryLine": "{id}: NPS {nps} 90°-{family}-bocht ingekort tot {angle}° — aantal 1",
             "bendAccessoryLine": "Doorlopende gebogen staven (geen gelaste stukken).",
             "dimAngle": "Bochthoek",
             "dimGap": "speling",

@@ -2130,7 +2130,7 @@
             "colQty": "Кол.",
             "colType": "Тип",
             "accessoriesTitle": "Фитинги (не са детайли за рязане)",
-            "accessoryLine": "{id}: коляно NPS {nps} 90° LR, скъсено до {angle}° — кол. 1",
+            "accessoryLine": "{id}: коляно NPS {nps} 90° {family}, скъсено до {angle}° — кол. 1",
             "bendAccessoryLine": "Непрекъснати огънати пръти (без заварени отсечки).",
             "dimAngle": "Ъгъл на коляното",
             "dimGap": "процеп",

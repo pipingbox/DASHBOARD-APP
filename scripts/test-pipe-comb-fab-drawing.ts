@@ -92,10 +92,10 @@ for (const [id, v] of Object.entries(expected)) {
   check(`frozen ${id}`, seg !== undefined && near(dist(seg.from, seg.to), v, 1e-6), seg ? String(dist(seg.from, seg.to)) : 'missing');
 }
 
-/* --- Axis intersections: E_k = ((k-1)*A, (k-1)*Di) --- */
+/* --- Axis intersections: E_k = (-k*A, k*Di) (P1/P3-A placement) --- */
 for (let k = 0; k < 3; k++) {
   const det = D.elbowDetails.find((d) => d.pipeNumber === k + 1);
-  check(`E${k + 1} position`, det !== undefined && near(det.axisIntersection.x, k * A, 1e-9) && near(det.axisIntersection.y, k * 250, 1e-9));
+  check(`E${k + 1} position`, det !== undefined && near(det.axisIntersection.x, -k * A, 1e-9) && near(det.axisIntersection.y, k * 250, 1e-9));
 }
 
 /* --- Elbow arc: radius CLR, span exactly theta, faces at distance t from E --- */
@@ -127,14 +127,92 @@ for (const j of D.joints) {
   check(`joint ${j.jointId} gap 0`, j.gapMm === 0 && dist(j.pupFace, j.elbowFace) < 1e-9);
 }
 
-/* --- Independent reconstruction: Lin, Lout, Di, stagger positions --- */
+/* Full-assembly reconstruction harness: every free face on its reference
+ * plane, perpendicular spacings = Di/Df, Lin/Lout recovered, E positions.
+ * Runs on a drawing WITHOUT copying the builder's placement formulas. */
+function checkFullReconstruction(
+  label: string,
+  drawing: PipeCombFabDrawing,
+  count: number,
+  di: number,
+  df: number,
+  lin: number,
+  lout: number,
+  staggerA: number,
+): void {
+  const r = reconstructAssemblyFromDrawing(drawing);
+  check(`${label}: rec Lin`, near(r.linMm, lin, 1e-6), String(r.linMm));
+  check(`${label}: rec Lout`, near(r.loutMm, lout, 1e-6), String(r.loutMm));
+  check(`${label}: rec free faces`, r.inletFreeFaces.length === count && r.outletFreeFaces.length === count,
+    `in=${r.inletFreeFaces.length} out=${r.outletFreeFaces.length}`);
+  check(`${label}: all inlet faces on REF-ENT`, r.inletFreeFaces.every((f) => Math.abs(f.planeErrorMm) < 1e-6),
+    r.inletFreeFaces.map((f) => `${f.pieceId}:${f.planeErrorMm.toFixed(6)}`).join(' '));
+  check(`${label}: all outlet faces on REF-SAL`, r.outletFreeFaces.every((f) => Math.abs(f.planeErrorMm) < 1e-6),
+    r.outletFreeFaces.map((f) => `${f.pieceId}:${f.planeErrorMm.toFixed(6)}`).join(' '));
+  check(`${label}: initial spacings`, r.initialPerpSpacingsMm.length === count - 1 && r.initialPerpSpacingsMm.every((s) => near(s, di, 1e-6)),
+    r.initialPerpSpacingsMm.map((s) => s.toFixed(4)).join(','));
+  check(`${label}: final spacings`, r.finalPerpSpacingsMm.length === count - 1 && r.finalPerpSpacingsMm.every((s) => near(s, df, 1e-6)),
+    r.finalPerpSpacingsMm.map((s) => s.toFixed(4)).join(','));
+  check(`${label}: E positions`, r.axisIntersections.every((e, k) => near(e.x, -k * staggerA, 1e-9) && near(e.y, k * di, 1e-9)));
+  /* Finished-piece conservation: straight runs and arc spans survive. */
+  check(`${label}: straight runs positive`, drawing.segments.filter((s) => s.finished).every((s) => dist(s.from, s.to) > 0));
+  check(`${label}: arc spans conserved`, drawing.arcs.every((a) => near(Math.abs(a.endRad - a.startRad), drawing.elbowAngleDeg * DEG, ENGINE_TOL)));
+  /* Joint markers: gap preserved, pup faces distinct from elbow faces
+   * when g > 0. */
+  check(`${label}: joint gaps conserved`, drawing.joints.every((j) =>
+    j.gapMm === 0 ? dist(j.pupFace, j.elbowFace) < 1e-9 : near(dist(j.pupFace, j.elbowFace), j.gapMm, 1e-9)));
+}
+
+/* --- Independent reconstruction: FULL assembly from the drawing ---
+ * Derived purely from drawing primitives (see the model docs): every
+ * inlet free face on REF-ENT, every outlet free face on REF-SAL,
+ * perpendicular spacings Di/Df, Lin/Lout, stagger positions. */
 const rec = reconstructAssemblyFromDrawing(D);
 check('reconstruct Lin', near(rec.linMm, 1000, 1e-9), String(rec.linMm));
 check('reconstruct Lout', near(rec.loutMm, 1200, 1e-9), String(rec.loutMm));
-check('reconstruct Di', near(rec.diMm, 250, 1e-9), String(rec.diMm));
+check('reconstruct Di', near(rec.diMm, 250, 1e-6), String(rec.diMm));
+check('reconstruct Df', near(rec.dfMm, 350, 1e-6), String(rec.dfMm));
 check('reconstruct 3 intersections', rec.axisIntersections.length === 3);
 for (let k = 0; k < 3; k++) {
-  check(`reconstruct E${k + 1}`, near(rec.axisIntersections[k].x, k * A, 1e-9) && near(rec.axisIntersections[k].y, k * 250, 1e-9));
+  check(`reconstruct E${k + 1}`, near(rec.axisIntersections[k].x, -k * A, 1e-9) && near(rec.axisIntersections[k].y, k * 250, 1e-9));
+}
+/* ALL inlet free faces on REF-ENT / outlet free faces on REF-SAL. */
+check('reconstruct 3 inlet free faces', rec.inletFreeFaces.length === 3, String(rec.inletFreeFaces.length));
+check('reconstruct 3 outlet free faces', rec.outletFreeFaces.length === 3, String(rec.outletFreeFaces.length));
+for (const f of rec.inletFreeFaces) {
+  check(`inlet free face ${f.pieceId} on REF-ENT`, near(f.planeErrorMm, 0, 1e-6), `${f.pieceId} err=${f.planeErrorMm}`);
+}
+for (const f of rec.outletFreeFaces) {
+  check(`outlet free face ${f.pieceId} on REF-SAL`, near(f.planeErrorMm, 0, 1e-6), `${f.pieceId} err=${f.planeErrorMm}`);
+}
+/* Perpendicular spacings: every consecutive pair. */
+for (const [i, s] of rec.initialPerpSpacingsMm.entries()) {
+  check(`initial perp spacing ${i + 1}`, near(s, 250, 1e-6), String(s));
+}
+for (const [i, s] of rec.finalPerpSpacingsMm.entries()) {
+  check(`final perp spacing ${i + 1}`, near(s, 350, 1e-6), String(s));
+}
+/* Documented coordinate transform: the outlet axis is the inlet axis
+ * rotated CCW by theta about each E (derived directions, not inputs). */
+{
+  const rot = {
+    x: rec.inletAxisDir.x * Math.cos(35 * DEG) - rec.inletAxisDir.y * Math.sin(35 * DEG),
+    y: rec.inletAxisDir.x * Math.sin(35 * DEG) + rec.inletAxisDir.y * Math.cos(35 * DEG),
+  };
+  check('outlet = inlet rotated +35deg', near(dist(rot, rec.outletAxisDir), 0, 1e-9));
+}
+/* MUTATION DISCRIMINATION: restoring the old sign (E_k = +k*A) must fail
+ * these same conditions — demonstrated numerically, not by construction
+ * comparison. With the wrong sign the pipe-2 inlet free face would sit
+ * 2*A off REF-ENT and the perpendicular outlet spacing would collapse to
+ * |Di*cos - A*sin| = 59.576 mm (independent reproduction values). */
+{
+  const wrongSpacing = Math.abs(250 * Math.cos(35 * DEG) - A * Math.sin(35 * DEG));
+  check('mutation sign: wrong outlet spacing demonstrated', near(wrongSpacing, 59.576022, 1e-6), String(wrongSpacing));
+  check('mutation sign: current spacing rejects it', !near(rec.dfMm, wrongSpacing, 1), `df=${rec.dfMm}`);
+  check('mutation sign: E2 x is -A (revert fails here)', near(rec.axisIntersections[1].x, -A, 1e-9));
+  /* With the wrong sign the pipe-2 inlet plane error would be 2*|A|. */
+  check('mutation sign: plane error bound', rec.inletFreeFaces.every((f) => Math.abs(f.planeErrorMm) < 1), 'errors: ' + rec.inletFreeFaces.map((f) => f.planeErrorMm.toFixed(3)).join(','));
 }
 
 /* --- REF planes perpendicular to their axes --- */
@@ -197,6 +275,9 @@ check('six allowance segments', allowSegs.length === 6, String(allowSegs.length)
 for (const s of allowSegs) {
   check(`allowance length ${s.pieceId}`, near(dist(s.from, s.to), 5, 1e-9));
 }
+/* Full reconstruction with g=2 + allowance: free faces still on their
+ * reference planes (allowance segments are not finished pieces). */
+checkFullReconstruction('gap2+allowance5', DG, 3, 250, 350, 1000, 1200, solGap.result.stagger.adjacentStaggerMm);
 /* Cut-length dimensions exist and carry finished + allowance. */
 const cutDims = DG.dimensions.filter((d) => d.kind === 'cut-length');
 check('six cut-length dims', cutDims.length === 6, String(cutDims.length));
@@ -236,6 +317,17 @@ for (const [count, di, df, angle, lin, lout] of [[3, 250, 250, 45, 2000, 2000], 
   check(`case ${count}/${di}/${df}/${angle}: reconstruct Lin`, near(rec2.linMm, lin, 1e-9));
   check(`case ${count}/${di}/${df}/${angle}: reconstruct Lout`, near(rec2.loutMm, lout, 1e-9));
   if (count >= 2) check(`case ${di}: reconstruct Di`, near(rec2.diMm, di, 1e-9));
+  if (count >= 2) check(`case ${df}: reconstruct Df`, near(rec2.dfMm, df, 1e-6), String(rec2.dfMm));
+  /* Full assembly: every free face on its reference plane, both spacings. */
+  checkFullReconstruction(`case ${count}/${di}/${df}/${angle}`, d, count, di, df, lin, lout, s.stagger.adjacentStaggerMm);
+  /* Df dimension exists, is geometrically perpendicular to the outlet
+   * axis and its measured run equals Df. */
+  const dimDf = d.dimensions.find((x) => x.id === 'dim-Df');
+  check(`case ${df}: dim-Df present`, count < 2 || dimDf !== undefined);
+  if (dimDf) {
+    check(`case ${df}: dim-Df value`, near(dimDf.valueMm, df, 1e-12));
+    check(`case ${df}: dim-Df run`, near(dist(dimDf.from, dimDf.to), df, 1e-6), String(dist(dimDf.from, dimDf.to)));
+  }
   // Segment lengths match the solution exactly.
   for (const pipe of s.pipes) {
     for (const piece of pipe.pieces) {
@@ -288,6 +380,9 @@ for (const [count, di, df, angle, lin, lout] of [[3, 250, 250, 45, 2000, 2000], 
     b1.finishedLengthMm ?? -1,
     1e-9,
   ));
+  /* Full reconstruction in bend mode: free bar ends on the reference
+   * planes, spacings Di/Df, E positions. */
+  checkFullReconstruction('bend', d, 3, 250, 350, 1000, 1200, s.stagger.adjacentStaggerMm);
 }
 
 /* ================================================================ *

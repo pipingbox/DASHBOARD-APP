@@ -68,6 +68,7 @@ export default function PipeCombFabDrawingView({ solution, unit }: PipeCombFabDr
       case 'lin': return `Lin = ${fmt(valueMm)}`;
       case 'lout': return `Lout = ${fmt(valueMm)}`;
       case 'di': return `Di = ${fmt(valueMm)}`;
+      case 'df': return `Df = ${fmt(valueMm)}`;
       case 'staggerA': return `A = ${fmt(valueMm)}`;
       case 'finishedLength': return `${ownerId} ${t('tools.prefab.pipeComb.fab.draw.finished')} ${fmt(valueMm)}`;
       case 'cutLength': return `${ownerId} ${t('tools.prefab.pipeComb.fab.draw.cut')} ${fmt(valueMm)}`;

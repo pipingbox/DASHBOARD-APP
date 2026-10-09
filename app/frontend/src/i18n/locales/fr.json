@@ -1972,7 +1972,7 @@
             "colQty": "Qté",
             "colType": "Type",
             "accessoriesTitle": "Accessoires (pas des pièces de coupe)",
-            "accessoryLine": "{id} : coude NPS {nps} 90° LR réduit à {angle}° — qté 1",
+            "accessoryLine": "{id} : coude NPS {nps} 90° {family} réduit à {angle}° — qté 1",
             "bendAccessoryLine": "Barres cintrées continues (sans tronçons soudés).",
             "dimAngle": "Angle du coude",
             "dimGap": "jeu",

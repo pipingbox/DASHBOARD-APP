@@ -19,11 +19,24 @@
  *   template: "do not scale the drawing".
  *
  * GEOMETRY (documented, fixed):
- * - The comb is planar. Pipe i axis intersection E_i sits at
- *   (k*A, k*Di) in the (initial-axis, perpendicular) plane, where A is the
- *   signed P1 stagger and Di the initial spacing. The elbow turns by the
- *   comb angle theta; the outlet axis direction is
- *   (cos(theta), sin(theta)) rotated about E_i.
+ * - The comb is planar. With the inlet axis direction (1, 0) and the
+ *   outlet axis direction (cos(theta), sin(theta)) turned CCW by the comb
+ *   angle theta about each axis intersection, pipe i's axis intersection
+ *   E_i sits at
+ *       E_k = (-k*A, k*Di)        (k = 0 .. N-1)
+ *   where A is the SIGNED P1 stagger and Di the initial spacing.
+ *   Sign convention (P1/P3-A contract, verified by reconstruction):
+ *   the inlet free faces of ALL pipes lie on the common REF-ENT plane and
+ *   the outlet free faces on REF-SAL. With E_k = (-k*A, k*Di):
+ *     inlet pup length  = Lin  - t - k*A - g        (P3-A relation)
+ *     outlet pup length = Lout - t - k*delta - g
+ *     delta = (E_{k+1} - E_k) . outletDir = Di*sin(theta) - A*cos(theta)
+ *   and the perpendicular spacing of adjacent OUTLET axes is
+ *     Df = A*sin(theta) + Di*cos(theta)             (P1 definition of A)
+ *   The opposite sign (E_k = (+k*A, k*Di)) puts every free face k >= 2 off
+ *   its reference plane by multiples of A and yields a wrong outlet
+ *   spacing |Di*cos(theta) - A*sin(theta)|; the reconstruction checks in
+ *   the test suite fail against that mutation.
  * - REF-ENT is the common plane perpendicular to the initial axes holding
  *   the free face of pipe 1's inlet pup; REF-SAL likewise on the outlet
  *   side. Lin/Lout are axis-to-axis on pipe 1 (P3-A contract).
@@ -235,7 +248,10 @@ export function buildPipeCombFabDrawing(sol: PipeCombFabricationSolution): PipeC
 
   for (let k = 0; k < sol.stagger.pipeCount; k++) {
     const pipeNumber = k + 1;
-    const E: Vec2 = { x: k * A, y: k * Di };
+    /* P1/P3-A placement: E_k = (-k*A, k*Di). See header: with this sign
+     * every inlet free face lies on REF-ENT and every outlet free face on
+     * REF-SAL, and the perpendicular outlet spacing equals Df. */
+    const E: Vec2 = { x: -k * A, y: k * Di };
     const pieces = sol.pipes[k]?.pieces ?? [];
     const byId = new Map(pieces.map((p) => [p.id, p]));
 
@@ -474,18 +490,47 @@ export function buildPipeCombFabDrawing(sol: PipeCombFabricationSolution): PipeC
       offsetDir: { x: -1, y: 0 },
       labelAt: { x: -dimOffsetBase * 1.2, y: Di / 2 },
     });
+    /* Signed stagger A: E_1 = (0, Di) line to E_2 = (-A, Di). The run is
+     * |A|; the value keeps the P1 sign (positive A offsets each successive
+     * pipe upstream, -x). */
     dimensions.push({
       id: 'dim-stagger',
       kind: 'stagger',
       ownerId: 'assembly',
       measureKey: 'staggerA',
       from: { x: 0, y: Di },
-      to: { x: A, y: Di },
+      to: { x: -A, y: Di },
       valueMm: A,
       offsetDir: { x: 0, y: 1 },
-      labelAt: { x: A / 2, y: Di + dimOffsetBase * 1.1 },
+      labelAt: { x: -A / 2, y: Di + dimOffsetBase * 1.1 },
+    });
+    /* Df as a REAL perpendicular dimension between the outlet axes of
+     * pipes 1 and 2: from E_1 to the projection of E_2 on the plane
+     * perpendicular to the outlet axis through E_1. Measured run == Df. */
+    const E2: Vec2 = { x: -A, y: Di };
+    const step = sub(E2, { x: 0, y: 0 });
+    const along = step.x * outletDir.x + step.y * outletDir.y;
+    const E2perp: Vec2 = sub(E2, scale(outletDir, along));
+    dimensions.push({
+      id: 'dim-Df',
+      kind: 'spacing',
+      ownerId: 'assembly',
+      measureKey: 'df',
+      from: { x: 0, y: 0 },
+      to: E2perp,
+      valueMm: sol.stagger.finalSpacingMm,
+      offsetDir: outletDir,
+      labelAt: add(scale(E2perp, 0.5), scale(outletDir, dimOffsetBase * 1.2)),
     });
   }
+
+  /* Framing includes the annotation layer: dimension label anchors,
+   * theoretical-point labels and reference-plane label zones are part of
+   * the bounding box so neither the SVG view nor the PDF crops text. */
+  for (const dim of dimensions) expandBounds(bounds, dim.labelAt, dimOffsetBase * 0.45);
+  for (const lab of labels) expandBounds(bounds, lab.at, dimOffsetBase * 0.3);
+  expandBounds(bounds, refEnt.point, dimOffsetBase * 0.6);
+  expandBounds(bounds, refSal.point, dimOffsetBase * 0.6);
 
   return {
     pipeCount: sol.stagger.pipeCount,
@@ -530,29 +575,119 @@ function pupDimension(
 }
 
 /**
- * Independent reconstruction check (test support): rebuild the pipe-1
- * reference planes and every axis intersection from the drawing model and
- * verify they recover Lin, Lout, Di and the stagger positions of the
- * original solution. Pure geometry — does not share formulas with the
- * fabrication module beyond the documented coordinate construction.
+ * Independent reconstruction of the assembly FROM THE DRAWING PRIMITIVES
+ * (test support). It deliberately derives everything geometrically from
+ * segments, arcs, joint markers, elbow details and reference planes — it
+ * never re-applies the builder's placement formulas:
+ *
+ * - Inlet axis direction: unit(E_1 - keptFacePoint_1) (travel direction of
+ *   pipe 1 towards its axis intersection).
+ * - Outlet axis direction: unit(cutFacePoint_1 - E_1).
+ * - Free faces: for each piece segment, the endpoint that is neither a
+ *   joint pup face (catalog) nor an arc tangent point (bend).
+ * - Plane errors: signed distance of each free face to REF-ENT / REF-SAL,
+ *   using the planes' own point+normal.
+ * - Spacings: perpendicular distances between consecutive axis
+ *   intersections measured on the derived axis directions.
+ *
+ * A mutation restoring the old placement (E_k = +k*A) leaves every free
+ * face k >= 2 off its reference plane by multiples of A and changes the
+ * perpendicular outlet spacing, so these checks fail against it.
  */
-export function reconstructAssemblyFromDrawing(drawing: PipeCombFabDrawing): {
+export interface AssemblyReconstruction {
   linMm: number;
   loutMm: number;
   diMm: number;
+  dfMm: number;
   axisIntersections: Vec2[];
-} {
+  inletAxisDir: Vec2;
+  outletAxisDir: Vec2;
+  inletFreeFaces: { pieceId: string; point: Vec2; planeErrorMm: number }[];
+  outletFreeFaces: { pieceId: string; point: Vec2; planeErrorMm: number }[];
+  /** Perpendicular spacing between consecutive inlet axes (k, k+1). */
+  initialPerpSpacingsMm: number[];
+  /** Perpendicular spacing between consecutive outlet axes (k, k+1). */
+  finalPerpSpacingsMm: number[];
+}
+
+export function reconstructAssemblyFromDrawing(drawing: PipeCombFabDrawing): AssemblyReconstruction {
   const refEnt = drawing.referencePlanes.find((r) => r.id === 'REF-ENT');
   const refSal = drawing.referencePlanes.find((r) => r.id === 'REF-SAL');
-  const e1 = drawing.elbowDetails.find((d) => d.pipeNumber === 1)?.axisIntersection ?? { x: 0, y: 0 };
+  const details = drawing.elbowDetails.slice().sort((a, b) => a.pipeNumber - b.pipeNumber);
+  const d1 = details[0];
+  const e1 = d1?.axisIntersection ?? { x: 0, y: 0 };
+  const inletAxisDir = d1 ? norm(sub(d1.axisIntersection, d1.keptFacePoint)) : { x: 1, y: 0 };
+  const outletAxisDir = d1 ? norm(sub(d1.cutFacePoint, d1.axisIntersection)) : { x: 1, y: 0 };
+  const axisIntersections = details.map((d) => d.axisIntersection);
+
   const linMm = refEnt ? Math.hypot(e1.x - refEnt.point.x, e1.y - refEnt.point.y) : 0;
   const loutMm = refSal ? Math.hypot(refSal.point.x - e1.x, refSal.point.y - e1.y) : 0;
-  const axisIntersections = drawing.elbowDetails
-    .slice()
-    .sort((a, b) => a.pipeNumber - b.pipeNumber)
-    .map((d) => d.axisIntersection);
-  const diMm = axisIntersections.length >= 2
-    ? Math.abs(axisIntersections[1].y - axisIntersections[0].y)
-    : 0;
-  return { linMm, loutMm, diMm, axisIntersections };
+
+  // Free faces: segment endpoints that are not joint pup faces and not arc
+  // tangent points. Catalog: pup free face = endpoint != pupFace; bend:
+  // bar free ends = endpoints not lying on the arc circle.
+  const jointFaces = new Set(drawing.joints.map((j) => `${j.pupFace.x.toFixed(9)},${j.pupFace.y.toFixed(9)}`));
+  const onArc = (p: Vec2): boolean =>
+    drawing.arcs.some((a) => Math.abs(Math.hypot(p.x - a.center.x, p.y - a.center.y) - a.radiusMm) < 1e-6);
+  const key = (p: Vec2) => `${p.x.toFixed(9)},${p.y.toFixed(9)}`;
+  const freeEnd = (seg: FabDrawingSegment): Vec2 | null => {
+    const cands = [seg.from, seg.to].filter((p) => !jointFaces.has(key(p)) && !onArc(p));
+    // A finished straight has exactly one free end (the other is a joint
+    // face or a tangent). Allowance over-length segments are ignored by
+    // the caller (they are not finished).
+    if (cands.length !== 1) return null;
+    return cands[0];
+  };
+
+  const planeError = (p: Vec2, plane: FabDrawingReferencePlane | undefined): number => {
+    if (!plane) return Number.NaN;
+    const n = { x: -plane.direction.y, y: plane.direction.x };
+    return (p.x - plane.point.x) * n.x + (p.y - plane.point.y) * n.y;
+  };
+
+  const inletFreeFaces: AssemblyReconstruction['inletFreeFaces'] = [];
+  const outletFreeFaces: AssemblyReconstruction['outletFreeFaces'] = [];
+  for (const seg of drawing.segments) {
+    if (!seg.finished) continue;
+    const free = freeEnd(seg);
+    if (!free) continue;
+    // Classify by side: inlet pieces run along the inlet axis; outlet
+    // pieces (and bend outlet straights) along the outlet axis.
+    const run = norm(sub(seg.to, seg.from));
+    const alongIn = Math.abs(run.x * inletAxisDir.x + run.y * inletAxisDir.y);
+    const alongOut = Math.abs(run.x * outletAxisDir.x + run.y * outletAxisDir.y);
+    if (alongIn >= alongOut) {
+      inletFreeFaces.push({ pieceId: seg.pieceId, point: free, planeErrorMm: planeError(free, refEnt) });
+    } else {
+      outletFreeFaces.push({ pieceId: seg.pieceId, point: free, planeErrorMm: planeError(free, refSal) });
+    }
+  }
+  const byPiece = (a: { pieceId: string }, b: { pieceId: string }) => a.pieceId.localeCompare(b.pieceId);
+  inletFreeFaces.sort(byPiece);
+  outletFreeFaces.sort(byPiece);
+
+  const perpOf = (dir: Vec2): Vec2 => ({ x: -dir.y, y: dir.x });
+  const initialPerpSpacingsMm: number[] = [];
+  const finalPerpSpacingsMm: number[] = [];
+  for (let i = 1; i < axisIntersections.length; i++) {
+    const step = sub(axisIntersections[i], axisIntersections[i - 1]);
+    initialPerpSpacingsMm.push(Math.abs(step.x * perpOf(inletAxisDir).x + step.y * perpOf(inletAxisDir).y));
+    finalPerpSpacingsMm.push(Math.abs(step.x * perpOf(outletAxisDir).x + step.y * perpOf(outletAxisDir).y));
+  }
+  const diMm = initialPerpSpacingsMm[0] ?? 0;
+  const dfMm = finalPerpSpacingsMm[0] ?? 0;
+
+  return {
+    linMm,
+    loutMm,
+    diMm,
+    dfMm,
+    axisIntersections,
+    inletAxisDir,
+    outletAxisDir,
+    inletFreeFaces,
+    outletFreeFaces,
+    initialPerpSpacingsMm,
+    finalPerpSpacingsMm,
+  };
 }

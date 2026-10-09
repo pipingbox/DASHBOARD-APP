@@ -1972,7 +1972,7 @@
             "colQty": "Qtd.",
             "colType": "Tipo",
             "accessoriesTitle": "Acessórios (não são peças de corte)",
-            "accessoryLine": "{id}: cotovelo NPS {nps} 90° LR reduzido a {angle}° — qtd. 1",
+            "accessoryLine": "{id}: cotovelo NPS {nps} 90° {family} reduzido a {angle}° — qtd. 1",
             "bendAccessoryLine": "Barras curvadas contínuas (sem troços soldados).",
             "dimAngle": "Ângulo do cotovelo",
             "dimGap": "folga",

@@ -2136,7 +2136,7 @@
             "colQty": "К-сть",
             "colType": "Тип",
             "accessoriesTitle": "Фітинги (не деталі для різки)",
-            "accessoryLine": "{id}: коліно NPS {nps} 90° LR, вкорочене до {angle}° — к-сть 1",
+            "accessoryLine": "{id}: коліно NPS {nps} 90° {family}, вкорочене до {angle}° — к-сть 1",
             "bendAccessoryLine": "Суцільні гнуті стрижні (без зварних відрізків).",
             "dimAngle": "Кут коліна",
             "dimGap": "зазор",

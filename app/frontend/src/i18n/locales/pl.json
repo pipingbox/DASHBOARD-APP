@@ -2136,7 +2136,7 @@
             "colQty": "Ilość",
             "colType": "Typ",
             "accessoriesTitle": "Akcesoria (nie elementy do cięcia)",
-            "accessoryLine": "{id}: kolano NPS {nps} 90° LR skrócone do {angle}° — ilość 1",
+            "accessoryLine": "{id}: kolano NPS {nps} 90° {family} skrócone do {angle}° — ilość 1",
             "bendAccessoryLine": "Ciągłe gięte pręty (bez spawanych odcinków).",
             "dimAngle": "Kąt kolana",
             "dimGap": "szczelina",

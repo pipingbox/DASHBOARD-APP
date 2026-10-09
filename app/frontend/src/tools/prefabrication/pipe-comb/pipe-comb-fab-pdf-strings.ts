@@ -128,6 +128,7 @@ export function buildFabPdfStrings(
     dimLin: 'Lin',
     dimLout: 'Lout',
     dimDi: 'Di',
+    dimDf: 'Df',
     dimStagger: 'A',
     dimAngle: t(`${K}.dimAngle`),
     dimFinished: t('tools.prefab.pipeComb.fab.draw.finished'),

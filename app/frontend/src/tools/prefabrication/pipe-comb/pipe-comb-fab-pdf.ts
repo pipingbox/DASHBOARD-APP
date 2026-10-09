@@ -65,6 +65,21 @@ export interface PipeCombFabPdfSnapshot {
    *  strings to localized labels (screen parity). When omitted the raw
    *  stable identifiers are printed (Node tests use this path). */
   localizeJointFace?: (raw: string) => string;
+  /**
+   * Embedded fonts (REQUIRED): base64-encoded TTF files registered into
+   * the document. The standard-14 Helvetica is WinAnsi-only and cannot
+   * represent the accepted languages (Polish, Romanian, Cyrillic…), so
+   * the exporter embeds Noto Sans (SIL OFL 1.1) loaded locally by the
+   * caller — no remote requests, no transliteration, no dropped letters.
+   */
+  fonts: { regularBase64: string; boldBase64: string };
+  /**
+   * Selected radius family in catalog mode ('LR' | 'SR'), captured at
+   * snapshot time from the current UI selection (the approved fabrication
+   * result carries only clrSource, not the family). Undefined in bend
+   * mode. Never inferred from text or radius heuristics.
+   */
+  elbowRadiusFamily?: 'LR' | 'SR';
 }
 
 export interface PdfStrings {
@@ -98,11 +113,15 @@ export interface PdfStrings {
   statusInvalid: string;
   statusPending: string;
   accessoriesTitle: string;
-  accessoryLine: string; // "{id}: NPS {nps} 90° LR elbow cut to {angle}° — qty 1"
+  /** "{id}: NPS {nps} 90° {family} elbow cut to {angle}° — qty 1".
+   *  {family} is the SELECTED radius family (LR/SR), captured in the
+   *  snapshot — never a fixed string. */
+  accessoryLine: string;
   bendAccessoryLine: string;
   dimLin: string;
   dimLout: string;
   dimDi: string;
+  dimDf: string;
   dimStagger: string;
   dimAngle: string;
   dimFinished: string;
@@ -145,6 +164,29 @@ const LIGHT: [number, number, number] = [200, 200, 200];
 const MARGIN = 12;
 const TITLE_BLOCK_H = 26;
 
+/** Embedded font family (Noto Sans, SIL OFL 1.1): full Latin-extended and
+ *  Cyrillic coverage for all accepted languages. Registered per document
+ *  from the snapshot's base64 payload; no remote requests at export time
+ *  and no transliteration or letter dropping. */
+const FONT_FAMILY = 'NotoSans';
+
+function registerFonts(doc: jsPDF, snap: PipeCombFabPdfSnapshot): void {
+  doc.addFileToVFS('NotoSans-Regular.ttf', snap.fonts.regularBase64);
+  doc.addFont('NotoSans-Regular.ttf', FONT_FAMILY, 'normal');
+  doc.addFileToVFS('NotoSans-Bold.ttf', snap.fonts.boldBase64);
+  doc.addFont('NotoSans-Bold.ttf', FONT_FAMILY, 'bold');
+  doc.setFont(FONT_FAMILY, 'normal');
+}
+
+/** Real rendered height (mm) of a possibly multi-line text block, from
+ *  the document's own line-height metrics. Pagination decisions use this
+ *  measured height, never a fixed per-line constant. */
+function measureWrapped(doc: jsPDF, text: string, maxWidth: number): { lines: string[]; height: number } {
+  const lines = doc.splitTextToSize(text, maxWidth) as string[];
+  const height = (doc.getLineHeight() / doc.internal.scaleFactor) * lines.length;
+  return { lines, height };
+}
+
 /**
  * Generate the fabrication PDF and return the jsPDF document (caller
  * decides `save()` vs `output()` — the tests inspect the real file).
@@ -153,6 +195,7 @@ export function generatePipeCombFabPdf(snapshot: PipeCombFabPdfSnapshot): jsPDF 
   const { solution: sol, strings: S, paper } = snapshot;
   const drawing = buildPipeCombFabDrawing(sol);
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: paper });
+  registerFonts(doc, snapshot);
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
 
@@ -171,7 +214,9 @@ export function generatePipeCombFabPdf(snapshot: PipeCombFabPdfSnapshot): jsPDF 
   // ── Cut list (own flow; autotable handles pagination with repeated
   //    headers and no split rows) ─────────────────────────────────────────
   y += 4;
-  drawCutList(doc, sol, snapshot, y);
+  const ensureShared = (yy: number, needed: number): number =>
+    yy + needed > pageH - MARGIN - 12 ? addPage() : yy;
+  drawCutList(doc, sol, snapshot, y, pageW, ensureShared);
 
   // ── Elbow / marking / joints detail pages (flow with pagination: a
   //    section that would overflow the printable area starts a new page
@@ -179,23 +224,22 @@ export function generatePipeCombFabPdf(snapshot: PipeCombFabPdfSnapshot): jsPDF 
   addPage();
   y = MARGIN + TITLE_BLOCK_H + 4;
   const flow = (draw: (yy: number) => number, needed: number) => {
-    if (y + needed > pageH - MARGIN - 10) {
+    if (y + needed > pageH - MARGIN - 12) {
       y = addPage();
     }
     y = draw(y);
   };
-  const ensure = (yy: number, needed: number): number =>
-    yy + needed > pageH - MARGIN - 10 ? addPage() : yy;
+  const ensure = ensureShared;
   flow((yy) => drawElbowDetail(doc, drawing, sol, snapshot, yy, pageW), 100);
   flow((yy) => drawMarking(doc, sol, snapshot, yy, pageW, ensure), 14 + sol.elbow.marks.length * 5 + 12);
   flow((yy) => drawJoints(doc, sol, snapshot, yy, pageW, ensure), 14 + Math.min(sol.joints.length, 8) * 5 + 10);
-  flow((yy) => drawWarnings(doc, sol, snapshot, yy, pageW), 16 + Math.max(1, snapshot.strings.warnings.length) * 5 + 10);
+  flow((yy) => drawWarnings(doc, sol, snapshot, yy, pageW, ensure), 16 + Math.max(1, snapshot.strings.warnings.length) * 5 + 10);
 
   // ── Footer: page X of Y on every page ─────────────────────────────────
   const total = doc.getNumberOfPages();
   for (let p = 1; p <= total; p++) {
     doc.setPage(p);
-    doc.setFont('helvetica', 'normal');
+    doc.setFont(FONT_FAMILY, 'normal');
     doc.setFontSize(9);
     doc.setTextColor(...GREY);
     doc.text(
@@ -215,12 +259,12 @@ function drawTitleBlock(doc: jsPDF, snap: PipeCombFabPdfSnapshot, pageW: number)
   const S = snap.strings;
   doc.setFillColor(...BRAND);
   doc.rect(0, 0, pageW, 12, 'F');
-  doc.setFont('helvetica', 'bold');
+  doc.setFont(FONT_FAMILY, 'bold');
   doc.setFontSize(12);
   doc.setTextColor(0, 0, 0);
   doc.text('PIPINGBOX', MARGIN, 8);
   doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
+  doc.setFont(FONT_FAMILY, 'normal');
   doc.text(S.title, MARGIN + 34, 8);
 
   doc.setFontSize(9);
@@ -285,7 +329,7 @@ function drawGeneralView(
   pageH: number,
 ): number {
   const S = snap.strings;
-  doc.setFont('helvetica', 'bold');
+  doc.setFont(FONT_FAMILY, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...INK);
   doc.text(S.generalView, MARGIN, yTop + 4);
@@ -310,7 +354,7 @@ function drawGeneralView(
     const b = map({ x: ref.point.x + ref.direction.x * half, y: ref.point.y + ref.direction.y * half });
     doc.line(a.x, a.y, b.x, b.y);
     const labelPos = map({ x: ref.point.x + ref.direction.x * (half + 4), y: ref.point.y + ref.direction.y * (half + 4) });
-    doc.setFont('helvetica', 'bold');
+    doc.setFont(FONT_FAMILY, 'bold');
     doc.setFontSize(9);
     doc.setTextColor(...GREY);
     doc.text(ref.id === 'REF-ENT' ? S.refEnt : S.refSal, labelPos.x, labelPos.y);
@@ -352,7 +396,7 @@ function drawGeneralView(
   }
 
   // Axis intersections E_i (theoretical points).
-  doc.setFont('helvetica', 'normal');
+  doc.setFont(FONT_FAMILY, 'normal');
   doc.setFontSize(9);
   doc.setTextColor(...GREY);
   for (const det of drawing.elbowDetails) {
@@ -404,14 +448,14 @@ function drawGeneralView(
     const tn = { x: -u.y, y: u.x };
     doc.line(a2.x - tn.x * tick, a2.y - tn.y * tick, a2.x + tn.x * tick, a2.y + tn.y * tick);
     doc.line(b2.x - tn.x * tick, b2.y - tn.y * tick, b2.x + tn.x * tick, b2.y + tn.y * tick);
-    doc.setFont('helvetica', 'normal');
+    doc.setFont(FONT_FAMILY, 'normal');
     doc.setFontSize(9);
     doc.setTextColor(...INK);
     doc.text(dimensionLabel(dim.id, dim.measureKey, dim.valueMm, snap), l.x, l.y, { align: 'center' });
   }
 
   // Piece identifiers near segment midpoints.
-  doc.setFont('helvetica', 'bold');
+  doc.setFont(FONT_FAMILY, 'bold');
   doc.setFontSize(9);
   doc.setTextColor(...INK);
   for (const seg of drawing.segments) {
@@ -430,7 +474,7 @@ function drawGeneralView(
 
   // Assembly data strip under the view.
   const dataY = boxY + boxH + 6;
-  doc.setFont('helvetica', 'normal');
+  doc.setFont(FONT_FAMILY, 'normal');
   doc.setFontSize(9);
   doc.setTextColor(...INK);
   const staggerTxt = `${S.dimStagger}: ${snap.formatLength(sol.stagger.adjacentStaggerMm)}`;
@@ -450,6 +494,7 @@ function dimensionLabel(id: string, measureKey: string, valueMm: number, snap: P
     case 'lin': return `${S.dimLin} = ${v}`;
     case 'lout': return `${S.dimLout} = ${v}`;
     case 'di': return `${S.dimDi} = ${v}`;
+    case 'df': return `${S.dimDf} = ${v}`;
     case 'staggerA': return `${S.dimStagger} = ${v}`;
     case 'finishedLength': return `${id.replace('dim-', '').replace('-finished-length', '')} ${S.dimFinished} ${v}`;
     case 'cutLength': return `${id.replace('dim-', '').replace('-cut-length', '')} ${S.dimCut} ${v}`;
@@ -460,7 +505,14 @@ function dimensionLabel(id: string, measureKey: string, valueMm: number, snap: P
   }
 }
 
-function drawCutList(doc: jsPDF, sol: PipeCombFabricationSolution, snap: PipeCombFabPdfSnapshot, yTop: number): void {
+function drawCutList(
+  doc: jsPDF,
+  sol: PipeCombFabricationSolution,
+  snap: PipeCombFabPdfSnapshot,
+  yTop: number,
+  pageW: number,
+  ensure: (yy: number, needed: number) => number,
+): void {
   const S = snap.strings;
   const typeOf = (kind: FabricationPiece['kind']) =>
     kind === 'inlet-pup' ? S.typeInlet : kind === 'outlet-pup' ? S.typeOutlet : S.typeBend;
@@ -486,39 +538,53 @@ function drawCutList(doc: jsPDF, sol: PipeCombFabricationSolution, snap: PipeCom
     head: [[S.colPiece, S.colQty, S.colType, S.colFinished, S.colAllowance, S.colCut, S.colStatus]],
     body,
     theme: 'grid',
-    styles: { font: 'helvetica', fontSize: 9, textColor: INK, lineColor: LIGHT, lineWidth: 0.15, cellPadding: 1.6 },
+    styles: { font: FONT_FAMILY, fontSize: 9, textColor: INK, lineColor: LIGHT, lineWidth: 0.15, cellPadding: 1.6 },
     headStyles: { fontStyle: 'bold', fillColor: [240, 240, 240], textColor: INK },
     rowPageBreak: 'avoid',
-    margin: { left: MARGIN, right: MARGIN },
+    // Pages added by the table keep the title block (top margin reserves
+    // the title-block zone) and the footer zone (bottom); repeated header
+    // rows come from autotable itself.
+    margin: { left: MARGIN, right: MARGIN, top: MARGIN + TITLE_BLOCK_H + 4, bottom: MARGIN + 12 },
     didDrawPage: () => {
-      // Section title above the table on its first page.
+      drawTitleBlock(doc, snap, pageW);
     },
   });
 
-  // Accessories (NOT cut pieces) listed separately.
-  const finalY = (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? yTop + 20;
-  doc.setFont('helvetica', 'bold');
+  // Accessories (NOT cut pieces) listed separately, with REAL multiline
+  // heights and pagination: N=12 accessory lines cannot silently overflow.
+  let ay = (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? yTop + 20;
+  doc.setFont(FONT_FAMILY, 'bold');
   doc.setFontSize(10);
   doc.setTextColor(...INK);
-  doc.text(S.accessoriesTitle, MARGIN, finalY + 8);
-  doc.setFont('helvetica', 'normal');
+  const titleBlock = measureWrapped(doc, S.accessoriesTitle, pageW - 2 * MARGIN);
+  ay = ensure(ay + 8, titleBlock.height + 2);
+  doc.setFont(FONT_FAMILY, 'bold');
+  doc.setFontSize(10);
+  doc.text(titleBlock.lines, MARGIN, ay + 4);
+  ay += titleBlock.height + 3;
+  doc.setFont(FONT_FAMILY, 'normal');
   doc.setFontSize(9);
-  let ay = finalY + 13;
+  const lines: string[] = [];
   if (sol.elbow.mode === 'catalog-cut') {
     for (const pipe of sol.pipes) {
-      doc.text(
+      lines.push(
         S.accessoryLine
           .replace('{id}', `P${pipe.pipeNumber}-ELBOW`)
           .replace('{nps}', sol.elbow.nps)
+          .replace('{family}', snap.elbowRadiusFamily ?? '')
           .replace('{angle}', String(sol.elbow.keptAngleDeg)),
-        MARGIN,
-        ay,
       );
-      ay += 4.6;
     }
   } else {
-    doc.text(S.bendAccessoryLine, MARGIN, ay);
-    ay += 4.6;
+    lines.push(S.bendAccessoryLine);
+  }
+  for (const line of lines) {
+    const block = measureWrapped(doc, line, pageW - 2 * MARGIN);
+    ay = ensure(ay, block.height + 1.5);
+    doc.setFont(FONT_FAMILY, 'normal');
+    doc.setFontSize(9);
+    doc.text(block.lines, MARGIN, ay + 3.5);
+    ay += block.height + 1.5;
   }
 }
 
@@ -531,7 +597,7 @@ function drawElbowDetail(
   pageW: number,
 ): number {
   const S = snap.strings;
-  doc.setFont('helvetica', 'bold');
+  doc.setFont(FONT_FAMILY, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...INK);
   doc.text(S.elbowDetail, MARGIN, yTop + 4);
@@ -576,7 +642,7 @@ function drawElbowDetail(
   doc.line(cf.x - 2, cf.y - 2, cf.x + 2, cf.y + 2);
   doc.line(cf.x - 2, cf.y + 2, cf.x + 2, cf.y - 2);
 
-  doc.setFont('helvetica', 'normal');
+  doc.setFont(FONT_FAMILY, 'normal');
   doc.setFontSize(9);
   doc.setTextColor(...INK);
   const keptTxt = sol.elbow.mode === 'catalog-cut'
@@ -600,7 +666,7 @@ function drawElbowDetail(
 
 function drawMarking(doc: jsPDF, sol: PipeCombFabricationSolution, snap: PipeCombFabPdfSnapshot, yTop: number, pageW: number, ensure: (yy: number, needed: number) => number): number {
   const S = snap.strings;
-  doc.setFont('helvetica', 'bold');
+  doc.setFont(FONT_FAMILY, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...INK);
   doc.text(S.markingTitle, MARGIN, yTop);
@@ -613,28 +679,25 @@ function drawMarking(doc: jsPDF, sol: PipeCombFabricationSolution, snap: PipeCom
   for (const group of groups) {
     if (group.marks.length === 0) continue;
     y = ensure(y, 10);
-    doc.setFont('helvetica', 'bold');
+    doc.setFont(FONT_FAMILY, 'bold');
     doc.setFontSize(9);
     doc.setTextColor(...GREY);
     doc.text(group.title, MARGIN, y);
     y += 4.6;
-    doc.setFont('helvetica', 'normal');
+    doc.setFont(FONT_FAMILY, 'normal');
     doc.setTextColor(...INK);
     for (const m of group.marks) {
-      y = ensure(y, 6);
       const v = valueOf.get(m.id);
-      doc.text(
-        S.markLine
-          .replace('{label}', m.label)
-          .replace('{value}', v !== undefined ? snap.formatLength(v) : '—')
-          .replace('{origin}', m.origin)
-          .replace('{destination}', m.destination)
-          .replace('{method}', m.method),
-        MARGIN + 2,
-        y,
-        { maxWidth: pageW - 2 * MARGIN - 2 },
-      );
-      y += 4.6;
+      const text = S.markLine
+        .replace('{label}', m.label)
+        .replace('{value}', v !== undefined ? snap.formatLength(v) : '—')
+        .replace('{origin}', m.origin)
+        .replace('{destination}', m.destination)
+        .replace('{method}', m.method);
+      const block = measureWrapped(doc, text, pageW - 2 * MARGIN - 2);
+      y = ensure(y, block.height + 1);
+      doc.text(block.lines, MARGIN + 2, y);
+      y += block.height + 1;
     }
     y += 1.5;
   }
@@ -644,46 +707,45 @@ function drawMarking(doc: jsPDF, sol: PipeCombFabricationSolution, snap: PipeCom
 function drawJoints(doc: jsPDF, sol: PipeCombFabricationSolution, snap: PipeCombFabPdfSnapshot, yTop: number, pageW: number, ensure: (yy: number, needed: number) => number): number {
   const S = snap.strings;
   if (sol.joints.length === 0) return yTop;
-  doc.setFont('helvetica', 'bold');
+  doc.setFont(FONT_FAMILY, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...INK);
   doc.text(S.jointsTitle, MARGIN, yTop);
   let y = yTop + 6;
-  doc.setFont('helvetica', 'normal');
+  doc.setFont(FONT_FAMILY, 'normal');
   doc.setFontSize(9);
+  const face = snap.localizeJointFace ?? ((raw: string) => raw);
   for (const j of sol.joints) {
-    y = ensure(y, 6);
-    const face = snap.localizeJointFace ?? ((raw: string) => raw);
-    doc.text(
-      S.jointLine
-        .replace('{id}', j.id)
-        .replace('{faceA}', face(j.faceA))
-        .replace('{faceB}', face(j.faceB))
-        .replace('{gap}', snap.formatLength(j.gapMm)),
-      MARGIN + 2,
-      y,
-      { maxWidth: pageW - 2 * MARGIN - 2 },
-    );
-    y += 4.6;
+    const text = S.jointLine
+      .replace('{id}', j.id)
+      .replace('{faceA}', face(j.faceA))
+      .replace('{faceB}', face(j.faceB))
+      .replace('{gap}', snap.formatLength(j.gapMm));
+    const block = measureWrapped(doc, text, pageW - 2 * MARGIN - 2);
+    y = ensure(y, block.height + 1);
+    doc.text(block.lines, MARGIN + 2, y);
+    y += block.height + 1;
   }
   if (sol.references.fittingAllowanceMm > 0) {
-    y = ensure(y, 6);
+    const note = S.allowanceNote.replace('{value}', snap.formatLength(sol.references.fittingAllowanceMm));
+    const block = measureWrapped(doc, note, pageW - 2 * MARGIN - 2);
+    y = ensure(y, block.height + 1);
     doc.setTextColor(...GREY);
-    doc.text(S.allowanceNote.replace('{value}', snap.formatLength(sol.references.fittingAllowanceMm)), MARGIN + 2, y);
-    y += 4.6;
+    doc.text(block.lines, MARGIN + 2, y);
+    y += block.height + 1;
   }
   return y + 2;
 }
 
-function drawWarnings(doc: jsPDF, sol: PipeCombFabricationSolution, snap: PipeCombFabPdfSnapshot, yTop: number, pageW: number): number {
+function drawWarnings(doc: jsPDF, sol: PipeCombFabricationSolution, snap: PipeCombFabPdfSnapshot, yTop: number, pageW: number, ensure: (yy: number, needed: number) => number): number {
   const S = snap.strings;
   let y = yTop;
-  doc.setFont('helvetica', 'bold');
+  doc.setFont(FONT_FAMILY, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...INK);
   doc.text(S.warningsTitle, MARGIN, y);
   y += 6;
-  doc.setFont('helvetica', 'normal');
+  doc.setFont(FONT_FAMILY, 'normal');
   doc.setFontSize(9);
   if (S.warnings.length === 0) {
     doc.setTextColor(...GREY);
@@ -693,11 +755,15 @@ function drawWarnings(doc: jsPDF, sol: PipeCombFabricationSolution, snap: PipeCo
     doc.setTextColor(...INK);
     for (const w of S.warnings) {
       // ASCII bullet: the standard-14 Helvetica cannot encode "•".
-      doc.text(`- ${w}`, MARGIN + 2, y, { maxWidth: pageW - 2 * MARGIN - 2 });
-      y += 4.6;
+      const block = measureWrapped(doc, `- ${w}`, pageW - 2 * MARGIN - 2);
+      y = ensure(y, block.height + 1);
+      doc.text(block.lines, MARGIN + 2, y);
+      y += block.height + 1;
     }
   }
+  const tail = measureWrapped(doc, S.notCertified, pageW - 2 * MARGIN - 2);
+  y = ensure(y + 1, tail.height + 2);
   doc.setTextColor(...GREY);
-  doc.text(S.notCertified, MARGIN + 2, y + 1, { maxWidth: pageW - 2 * MARGIN - 2 });
-  return y + 8;
+  doc.text(tail.lines, MARGIN + 2, y + 1);
+  return y + tail.height + 6;
 }
