@@ -120,9 +120,12 @@ test.describe('PB-UI-DOM-REMOVECHILD-RESIDUAL-001 /tools under translator-grade 
     expect(domErrors(), 'no DOM reconciliation errors on mount').toHaveLength(0);
 
     // ── 2. Catalog → tool detail → back (full view swap) ────────────────
+    // Locale-independent: match by stable data-tool-key attribute, not
+    // translated copy. The regex this replaced assumed English/legacy
+    // tool names and silently matched zero cards once es.json renamed
+    // "branch-layout" to "Calculadora de Injertos" (PB-GROWTH-GATE-FINAL-001).
     await page.evaluate(() => {
-      const cards = [...document.querySelectorAll('button.group')];
-      const card = cards.find((c) => /branch|trazado|layout/i.test(c.textContent ?? ''));
+      const card = document.querySelector('button[data-tool-key="branch-layout"]') as HTMLElement | null;
       if (card) card.click();
     });
     await page.waitForTimeout(1500);
