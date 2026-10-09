@@ -124,33 +124,45 @@ test.describe('PB-UI-DOM-REMOVECHILD-RESIDUAL-001 /tools under translator-grade 
     // translated copy. The regex this replaced assumed English/legacy
     // tool names and silently matched zero cards once es.json renamed
     // "branch-layout" to "Calculadora de Injertos" (PB-GROWTH-GATE-FINAL-001).
-    await page.evaluate(() => {
-      const card = document.querySelector('button[data-tool-key="branch-layout"]') as HTMLElement | null;
-      if (card) card.click();
-    });
+    // Use a real Playwright locator (throws/times out loudly if the card
+    // is missing) instead of a page.evaluate + `if (found)` no-op, so a
+    // regressed selector fails the test instead of silently skipping the
+    // transition it's meant to cover.
+    const toolCard = page.locator('button[data-tool-key="branch-layout"]');
+    await expect(toolCard, 'branch-layout catalog card must be present').toBeVisible({ timeout: 10_000 });
+    await toolCard.click();
     await page.waitForTimeout(1500);
     await page.evaluate(TRANSLATE_SIM); // translate the newly mounted tool view
-    await expect(page).toHaveURL(/t=/, { timeout: 10_000 });
+    // Verify the actual catalog → detail transition happened (not just
+    // "no error" — assert we really landed on the clicked tool's detail view).
+    await expect(page, 'clicking the card must navigate into the tool detail view').toHaveURL(
+      /t=branch-layout/,
+      { timeout: 10_000 },
+    );
     // back to catalog (detail subtree unmounts under mutation)
-    await page.evaluate(() => {
-      const back = [...document.querySelectorAll('button')].find((b) =>
-        /volver al cat|back to catalog/i.test(b.textContent ?? ''),
-      );
-      if (back) back.click();
+    const backButton = page.getByRole('button', { name: /volver al cat|back to catalog/i });
+    await expect(backButton, '"back to catalog" button must be present in the tool detail view').toBeVisible({
+      timeout: 10_000,
     });
+    await backButton.click();
     await page.waitForTimeout(1500);
     await page.evaluate(TRANSLATE_SIM);
+    // Verify the actual detail → catalog return transition happened.
+    await expect(page, '"back to catalog" must actually return to the catalog view').not.toHaveURL(
+      /t=branch-layout/,
+      { timeout: 10_000 },
+    );
     expect(await boundaryVisible(), 'view swap must not crash').toBe(false);
     expect(domErrors(), 'no DOM reconciliation errors on view swap').toHaveLength(0);
 
     // ── 3. Premium banner upgrade click (icon insert + label swap) ──────
     // This is the exact reproduced crash: anonymous click → checkoutLoading
     // inserts Loader2 anchored at the (font-wrapped) bare label → NotFoundError.
-    await page.evaluate(() => {
-      const btns = [...document.querySelectorAll('button')];
-      const b = btns.find((x) => /mensual|monthly/i.test(x.textContent ?? '') && x.className.includes('border'));
-      if (b) b.click();
+    const upgradeButton = page.getByRole('button', { name: /mensual|monthly/i });
+    await expect(upgradeButton.first(), 'premium banner "monthly" upgrade button must be present').toBeVisible({
+      timeout: 10_000,
     });
+    await upgradeButton.first().click();
     // Anonymous users get redirected to /login?next=/tools after the swap.
     await page.waitForTimeout(4000);
     expect(domErrors(), 'upgrade click must not throw removeChild/insertBefore').toHaveLength(0);
@@ -160,11 +172,11 @@ test.describe('PB-UI-DOM-REMOVECHILD-RESIDUAL-001 /tools under translator-grade 
     await page.locator('#root').first().waitFor({ state: 'attached', timeout: 15_000 });
     await page.waitForTimeout(1500);
     const toolMutated = await page.evaluate(TRANSLATE_SIM);
-    await page.evaluate(() => {
-      const btns = [...document.querySelectorAll('button')];
-      const b = btns.find((x) => /calcular|calculate/i.test(x.textContent ?? ''));
-      if (b) b.click();
+    const calculateButton = page.getByRole('button', { name: /calcular|calculate/i });
+    await expect(calculateButton.first(), 'wall-thickness "calculate" button must be present').toBeVisible({
+      timeout: 10_000,
     });
+    await calculateButton.first().click();
     await page.waitForTimeout(3000);
     expect(await boundaryVisible(), 'calculate must not crash').toBe(false);
     expect(domErrors(), 'no DOM reconciliation errors on calculate').toHaveLength(0);

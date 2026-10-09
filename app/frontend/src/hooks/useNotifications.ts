@@ -11,7 +11,7 @@ import {
 } from '@/lib/notifications';
 
 const POLL_MS = 45_000;
-const MAX_CONSECUTIVE_FAILURES = 3;
+const MAX_BACKOFF_MS = 10 * 60_000; // 10 min cap
 
 /**
  * Hook for managing user notifications with real-time updates.
@@ -30,11 +30,14 @@ export function useNotifications() {
     }
     try {
       setUnreadCount(await countUnread(user.id));
+      // PB-GROWTH-GATE-FINAL-001: a successful poll always resets the
+      // backoff — a transient 403 (e.g. stale session) must not keep the
+      // loop throttled forever once the underlying cause clears.
       failureCountRef.current = 0;
     } catch (err) {
-      // PB-GROWTH-GATE-FINAL-001: a denied poll (e.g. transient session
-      // mismatch) must not be retried forever at full cadence — back off
-      // after MAX_CONSECUTIVE_FAILURES instead of hammering every 45s.
+      // Back off exponentially on repeated denials instead of hammering
+      // every POLL_MS forever, but keep retrying (capped) so a transient
+      // failure can self-heal without requiring a remount/relogin.
       failureCountRef.current += 1;
       // eslint-disable-next-line no-console
       console.warn('[notifications] refreshCount failed', failureCountRef.current, err);
@@ -71,20 +74,30 @@ export function useNotifications() {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  // Poll for unread count — stops after MAX_CONSECUTIVE_FAILURES to avoid
-  // hammering a persistently-denied session every POLL_MS.
+  // Poll for unread count with exponential backoff on repeated denials.
+  // A single successful poll resets to the base cadence (self-healing);
+  // persistent denials slow down (capped at MAX_BACKOFF_MS) instead of
+  // either hammering every 45s forever or stopping permanently.
   useEffect(() => {
     failureCountRef.current = 0;
-    void refreshCount();
-    if (!user) return;
-    const id = window.setInterval(() => {
-      if (failureCountRef.current >= MAX_CONSECUTIVE_FAILURES) {
-        window.clearInterval(id);
-        return;
-      }
+    if (!user) {
       void refreshCount();
-    }, POLL_MS);
-    return () => window.clearInterval(id);
+      return;
+    }
+    let timeoutId: ReturnType<typeof window.setTimeout>;
+    let cancelled = false;
+    const tick = async () => {
+      await refreshCount();
+      if (cancelled) return;
+      const exponent = Math.min(failureCountRef.current, 10);
+      const delay = Math.min(POLL_MS * 2 ** exponent, MAX_BACKOFF_MS);
+      timeoutId = window.setTimeout(() => void tick(), delay);
+    };
+    void tick();
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
   }, [user, refreshCount]);
 
   // Real-time subscription
