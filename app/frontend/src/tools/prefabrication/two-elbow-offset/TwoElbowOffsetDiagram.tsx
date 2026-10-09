@@ -133,7 +133,10 @@ export default function TwoElbowOffsetDiagramView({
   const maxLane = model.dimensions.reduce((m, d) => Math.max(m, Math.abs(d.lane)), 0);
 
   const fontH = Math.min(h / 22, w / 34);
-  const margin = maxLane + fontH * 2.6;
+  // Dimension labels are laid out outside their witness lines.  Reserve
+  // enough horizontal room for the longest localized label; using only a
+  // short arrow clearance clips the first characters at the SVG viewport.
+  const margin = maxLane + fontH * 8;
   const vx = bounds.minX - margin;
   const vy = bounds.minY - margin;
   const vw = w + 2 * margin;
