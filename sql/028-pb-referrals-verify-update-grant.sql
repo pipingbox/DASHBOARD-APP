@@ -1,0 +1,32 @@
+-- ══════════════════════════════════════════════════════════════════════════════
+-- PB-NOTIFICATIONS-INSERT-HARDENING-001 — fix complementario (test G:
+-- duplicate/replay): GRANT UPDATE limitado a columnas en referrals.
+--
+-- CAUSA RAÍZ (reproducida en producción, 2026-10-09):
+--   * verifyReferralIfEligible() (app/frontend/src/lib/referrals.ts, llamado
+--     desde Dashboard) hace un UPDATE browser-side:
+--       UPDATE app_14da0f1941_referrals SET status='verified', verified_at=...
+--       WHERE id=<referral pendiente del usuario>
+--   * El rol `authenticated` solo tenía INSERT + SELECT sobre la tabla
+--     (sin UPDATE) → el UPDATE falla con 42501 en silencio (el código no
+--     comprueba el error) → la fila queda status='pending' para siempre.
+--   * Antes de sql/027 esto era invisible porque la notificación
+--     REFERRAL_VERIFIED (INSERT cross-user) también fallaba en silencio.
+--     Con la RPC funcionando, cada reload de /dashboard re-verifica y
+--     re-notifica → duplicados (repro: 2× REFERRAL_VERIFIED en 11s).
+--
+-- FIX MÍNIMO (siguiendo el patrón sql/023 del gate 403):
+--   GRANT UPDATE (status, verified_at) — a nivel de COLUMNA, para que una
+--   parte del referral NO pueda reasignar referrer_id/referred_id ni tocar
+--   otras columnas. La política preexistente allow_update_own_referrals
+--   (auth.uid() = referrer_id OR referred_id) ya restringe por filas.
+--
+-- POR QUÉ ES NECESARIO: consumer browser-side legítimo
+--   (verifyReferralIfEligible → Dashboard.tsx:339); sin el GRANT el contrato
+--   de verificación de referidos nunca funcionó desde el navegador.
+--
+-- ROLLBACK:
+--   REVOKE UPDATE (status, verified_at) ON public.app_14da0f1941_referrals FROM authenticated;
+-- ══════════════════════════════════════════════════════════════════════════════
+
+GRANT UPDATE (status, verified_at) ON public.app_14da0f1941_referrals TO authenticated;
