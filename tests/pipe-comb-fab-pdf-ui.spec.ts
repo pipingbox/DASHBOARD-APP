@@ -37,6 +37,20 @@ function pdfText(buf: Buffer): string {
   }
 }
 
+/** Count degenerate zero-length "move+line" ops in a real PDF content
+ *  stream (the old g=0 joint ticks collapsed to nothing). jsPDF writes
+ *  uncompressed streams with newline-separated path operators. */
+function zeroLengthLineOps(buf: Buffer): number {
+  const raw = buf.toString('latin1');
+  const re = /(-?[\d.]+) (-?[\d.]+) m\s+(-?[\d.]+) (-?[\d.]+) l/g;
+  let m: RegExpExecArray | null;
+  let zero = 0;
+  while ((m = re.exec(raw)) !== null) {
+    if (Math.abs(Number(m[3]) - Number(m[1])) < 1e-9 && Math.abs(Number(m[4]) - Number(m[2])) < 1e-9) zero++;
+  }
+  return zero;
+}
+
 async function openTool(page: import('@playwright/test').Page, url: string = TOOL_URL) {
   await page.goto(url);
   const betaDialog = page.locator('div[role="dialog"][data-state="open"]');
@@ -223,6 +237,9 @@ test('p3c-20: A4 export downloads a real PDF from the app', async ({ page }) => 
   expect(buf.length).toBeGreaterThan(20_000);
   /* A4 landscape MediaBox (~841.89 x ~595.28 pt). */
   expect(buf.toString('latin1')).toMatch(/MediaBox \[0 0 841\.8/);
+  /* g = 0 joint markers use the joint's local axis: no degenerate
+   * zero-length strokes in the real downloaded file. */
+  expect(zeroLengthLineOps(buf)).toBe(0);
 });
 
 test('p3c-21: A3 export downloads a real PDF after switching the format', async ({ page }) => {
@@ -306,4 +323,36 @@ test('p3c-25: English/inches bend case (CLR 9 in) exports a valid PDF', async ({
   /* Inch presentation inside the document (CLR 9 in = 228.6 mm), read
      from the extracted text (CID-hex font encoding). */
   expect(pdfText(buf)).toContain('9 in');
+});
+
+test('p3c-26: dense assembly (N=7) exports per-group detail views covering every pipe', async ({ page }) => {
+  test.setTimeout(90_000);
+  await openTool(page);
+  await setValues(page, { count: '7', di: '250', df: '350', angle: '35' });
+  await page.locator('[data-testid="pipe-comb-fab-toggle"]').click();
+  await page.locator('#pipe-comb-fab-nps').selectOption('6');
+  /* Long enough references: with A = 253.17 mm, pipe 7's inlet pup needs
+   * Lin > t + 6·A (same valid reference set as the N=12 runner case). */
+  await page.locator('#pipe-comb-fab-lin').fill('5000');
+  await page.locator('#pipe-comb-fab-lout').fill('2000');
+  /* Export stays enabled with warnings (N=7 stagger/contact notices). */
+  await expect(fabStatus(page)).toHaveAttribute('data-status', /^complete/);
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 30_000 }),
+    page.locator('[data-testid="pipe-comb-fab-export-pdf"]').click(),
+  ]);
+  const buf = fs.readFileSync(await download.path());
+  expect(buf.subarray(0, 5).toString('latin1')).toBe('%PDF-');
+  expect(zeroLengthLineOps(buf)).toBe(0);
+  const text = pdfText(buf).replace(/\s+/g, ' ');
+  /* The density threshold no longer drops per-piece data: detail views
+   * exist and every piece (including the last single-pipe group) appears
+   * in the cut list AND in a drawn view. */
+  expect(text.split('Detail view').length - 1).toBeGreaterThanOrEqual(3);
+  for (const id of ['P1-IN', 'P4-OUT', 'P7-IN', 'P7-OUT', 'P7-ELBOW']) {
+    expect(text.split(id).length - 1).toBeGreaterThanOrEqual(2);
+  }
+  /* Global dimensions survive as real dimension lines in the overview. */
+  expect(text).toContain('Di = 250');
+  expect(text).toContain('Df = 350');
 });

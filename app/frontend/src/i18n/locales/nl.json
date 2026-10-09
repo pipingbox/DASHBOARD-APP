@@ -1961,6 +1961,7 @@
             "jobRef": "Werkref.",
             "pageOf": "Pagina {x} van {y}",
             "generalView": "Bemaakt algemeen aanzicht",
+            "detailView": "Detailweergave",
             "elbowDetail": "Bochtdetail (buis 1, ware vorm)",
             "jointsTitle": "Lasvoegen",
             "warningsTitle": "Waarschuwingen",

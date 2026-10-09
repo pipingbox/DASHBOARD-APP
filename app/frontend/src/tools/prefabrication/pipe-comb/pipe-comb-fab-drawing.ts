@@ -206,6 +206,21 @@ const norm = (a: Vec2): Vec2 => {
   return l === 0 ? { x: 0, y: 0 } : { x: a.x / l, y: a.y / l };
 };
 
+/** Offset direction for a dimension label: when the requested direction
+ * is (near-)parallel to the measured run, fall back to the run's own
+ * perpendicular. Without this the label anchor lies ON the run and the
+ * extension lines degenerate to zero-length strokes (e.g. outlet pups
+ * at theta = 90 deg, where the outlet axis is parallel to the spacing
+ * direction). The geometric value and the measured run never change. */
+function dimOffsetDir(offsetDir: Vec2, from: Vec2, to: Vec2): Vec2 {
+  const run = norm(sub(to, from));
+  const d = offsetDir.x * run.x + offsetDir.y * run.y;
+  if (Math.abs(d) < 0.9) return offsetDir;
+  const p = perp(run);
+  const side = (p.x * offsetDir.x + p.y * offsetDir.y) >= 0 ? 1 : -1;
+  return scale(p, side);
+}
+
 function expandBounds(bounds: { min: Vec2; max: Vec2 }, p: Vec2, margin = 0): void {
   bounds.min.x = Math.min(bounds.min.x, p.x - margin);
   bounds.min.y = Math.min(bounds.min.y, p.y - margin);
@@ -382,8 +397,8 @@ export function buildPipeCombFabDrawing(sol: PipeCombFabricationSolution): PipeC
           from: start,
           to: T1,
           valueMm: bend.straightInletMm,
-          offsetDir: spacingDir,
-          labelAt: add(add(scale(add(start, T1), 0.5), scale(spacingDir, dimOffsetBase)), { x: 0, y: 0 }),
+          offsetDir: dimOffsetDir(spacingDir, start, T1),
+          labelAt: add(scale(add(start, T1), 0.5), scale(dimOffsetDir(spacingDir, start, T1), dimOffsetBase)),
         });
         dimensions.push({
           id: `dim-${bend.id}-straight-out`,
@@ -393,8 +408,8 @@ export function buildPipeCombFabDrawing(sol: PipeCombFabricationSolution): PipeC
           from: T2,
           to: end,
           valueMm: bend.straightOutletMm,
-          offsetDir: spacingDir,
-          labelAt: add(scale(add(T2, end), 0.5), scale(spacingDir, dimOffsetBase)),
+          offsetDir: dimOffsetDir(spacingDir, T2, end),
+          labelAt: add(scale(add(T2, end), 0.5), scale(dimOffsetDir(spacingDir, T2, end), dimOffsetBase)),
         });
         dimensions.push({
           id: `dim-${bend.id}-arc`,
@@ -561,6 +576,7 @@ function pupDimension(
 ): FabDrawingDimension {
   const mid = scale(add(from, to), 0.5);
   const side = pup.kind === 'inlet-pup' ? -1 : 1;
+  const off = dimOffsetDir(offsetDir, from, to);
   return {
     id: `dim-${pup.id}-${kind}`,
     kind,
@@ -569,8 +585,8 @@ function pupDimension(
     from,
     to,
     valueMm: kind === 'finished-length' ? (pup.finishedLengthMm ?? 0) : (pup.cutLengthMm ?? 0),
-    offsetDir,
-    labelAt: add(mid, scale(offsetDir, side * offset * (1 + (pipeIndex % 2) * 0.35))),
+    offsetDir: off,
+    labelAt: add(mid, scale(off, side * offset * (1 + (pipeIndex % 2) * 0.35))),
   };
 }
 

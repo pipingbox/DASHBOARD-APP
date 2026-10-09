@@ -2118,6 +2118,7 @@
             "jobRef": "Ref. trabajo",
             "pageOf": "Página {x} de {y}",
             "generalView": "Vista general acotada",
+            "detailView": "Vista de detalle",
             "elbowDetail": "Detalle del codo (tubería 1, forma real)",
             "jointsTitle": "Juntas de soldadura",
             "warningsTitle": "Advertencias",

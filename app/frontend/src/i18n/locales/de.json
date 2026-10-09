@@ -1961,6 +1961,7 @@
             "jobRef": "Auftragsref.",
             "pageOf": "Seite {x} von {y}",
             "generalView": "Bemaßte Gesamtansicht",
+            "detailView": "Detailansicht",
             "elbowDetail": "Bogendetail (Rohr 1, wahre Form)",
             "jointsTitle": "Schweißnähte",
             "warningsTitle": "Warnungen",

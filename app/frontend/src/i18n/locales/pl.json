@@ -2128,6 +2128,7 @@
             "jobRef": "Ref. zlecenia",
             "pageOf": "Strona {x} z {y}",
             "generalView": "Wymiarowany widok ogólny",
+            "detailView": "Widok szczegółowy",
             "elbowDetail": "Szczegół kolana (rura 1, kształt rzeczywisty)",
             "jointsTitle": "Złącza spawane",
             "warningsTitle": "Ostrzeżenia",

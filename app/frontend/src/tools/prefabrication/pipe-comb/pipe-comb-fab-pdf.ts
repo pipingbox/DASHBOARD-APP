@@ -36,6 +36,8 @@ import type {
 import {
   buildPipeCombFabDrawing,
   projectPoint,
+  type FabDrawingDimension,
+  type FabDrawingJointMarker,
   type PipeCombFabDrawing,
   type Vec2,
 } from './pipe-comb-fab-drawing.ts';
@@ -91,6 +93,9 @@ export interface PdfStrings {
   jobRef: string;
   pageOf: string; // "Page {x} of {y}"
   generalView: string;
+  /** Section/view title for the per-pipe-group dimensioned detail views
+   *  used when the assembly is dense (N > 6). */
+  detailView: string;
   cutList: string;
   elbowDetail: string;
   markingTitle: string;
@@ -230,6 +235,20 @@ export function generatePipeCombFabPdf(snapshot: PipeCombFabPdfSnapshot): jsPDF 
     y = draw(y);
   };
   const ensure = ensureShared;
+  /* Dense assemblies (N > 6): the overview stays readable (global
+   * dimensions only), and EVERY pipe keeps its identifiers, finished/cut
+   * dimensions and joint markers in per-group detail views, so no
+   * dimension is lost to the density threshold. */
+  if (drawing.pipeCount > 6) {
+    const groups: number[][] = [];
+    for (let i = 0; i < drawing.pipeCount; i += 3) {
+      groups.push(Array.from({ length: Math.min(3, drawing.pipeCount - i) }, (_, j) => i + j + 1));
+    }
+    const groupNeeded = Math.min(pageH - (MARGIN + TITLE_BLOCK_H + 4) - 38, (pageW - 2 * MARGIN) * 0.26) + 36;
+    for (const group of groups) {
+      flow((yy) => drawPipeGroupView(doc, drawing, sol, snapshot, yy, pageW, pageH, group), groupNeeded);
+    }
+  }
   flow((yy) => drawElbowDetail(doc, drawing, sol, snapshot, yy, pageW), 100);
   flow((yy) => drawMarking(doc, sol, snapshot, yy, pageW, ensure), 14 + sol.elbow.marks.length * 5 + 12);
   flow((yy) => drawJoints(doc, sol, snapshot, yy, pageW, ensure), 14 + Math.min(sol.joints.length, 8) * 5 + 10);
@@ -413,51 +432,45 @@ function drawGeneralView(
     if (!overviewIsDense) doc.text(S.axisE.replace('{pipe}', String(det.pipeNumber)), e.x + 2.5, e.y - 1.5);
   }
 
-  // Joint markers: two short ticks when g > 0 (distinct faces), one when 0.
-  for (const j of drawing.joints) {
-    const a = map(j.pupFace);
-    const b = map(j.elbowFace);
-    doc.setDrawColor(...INK);
-    doc.setLineWidth(0.5);
-    const n = { x: -(b.y - a.y), y: b.x - a.x };
-    const nl = Math.hypot(n.x, n.y) || 1;
-    const off = 1.6;
-    doc.line(a.x - (n.x / nl) * off, a.y - (n.y / nl) * off, a.x + (n.x / nl) * off, a.y + (n.y / nl) * off);
-    if (j.gapMm > 0) {
-      doc.line(b.x - (n.x / nl) * off, b.y - (n.y / nl) * off, b.x + (n.x / nl) * off, b.y + (n.y / nl) * off);
-    }
-  }
+  // Joint markers: orientation from the joint's LOCAL AXIS (model data),
+  // never from the two faces — they coincide when g = 0 and would
+  // degenerate the marker into a zero-length line.
+  drawJointMarkers(doc, drawing.joints, map, false, snap);
 
   // Dimensions: thin lines with end ticks + label (real model values).
+  // Dense overviews keep only the GLOBAL dimensions (Lin/Lout/Di/Df/A);
+  // per-piece lengths live in the per-group detail views. The Di/Df/A
+  // anchors collapse onto the same corner at dense scale, so their
+  // labels are carried out on short page-space leaders.
   doc.setLineWidth(0.2);
+  /* Dense global-dim label leaders (page-space): Di down-left, A up-left,
+   * Df down-right (the up-right zone is taken by the Lout label). */
+  const denseLeader: Record<string, { mm: number; dir?: Vec2 }> = {
+    'dim-Di': { mm: 10 },
+    'dim-stagger': { mm: 15 },
+    'dim-Df': { mm: 12, dir: { x: 0.5, y: 0.87 } },
+  };
   for (const dim of drawing.dimensions) {
-    if (overviewIsDense) continue;
-    const a = map(dim.from);
-    const b = map(dim.to);
-    const l = map(dim.labelAt);
-    doc.setDrawColor(...GREY);
-    // Extension + dimension line through the label anchor offset.
-    const dir = { x: b.x - a.x, y: b.y - a.y };
-    const len = Math.hypot(dir.x, dir.y) || 1;
-    const u = { x: dir.x / len, y: dir.y / len };
-    // Project label anchor onto the dimension line direction.
-    const tStar = ((l.x - a.x) * u.x + (l.y - a.y) * u.y);
-    const proj = { x: a.x + u.x * tStar, y: a.y + u.y * tStar };
-    const offVec = { x: l.x - proj.x, y: l.y - proj.y };
-    const a2 = { x: a.x + offVec.x, y: a.y + offVec.y };
-    const b2 = { x: b.x + offVec.x, y: b.y + offVec.y };
-    doc.line(a.x, a.y, a2.x, a2.y);
-    doc.line(b.x, b.y, b2.x, b2.y);
-    doc.line(a2.x, a2.y, b2.x, b2.y);
-    // End ticks.
-    const tick = 1.4;
-    const tn = { x: -u.y, y: u.x };
-    doc.line(a2.x - tn.x * tick, a2.y - tn.y * tick, a2.x + tn.x * tick, a2.y + tn.y * tick);
-    doc.line(b2.x - tn.x * tick, b2.y - tn.y * tick, b2.x + tn.x * tick, b2.y + tn.y * tick);
-    doc.setFont(FONT_FAMILY, 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(...INK);
-    doc.text(dimensionLabel(dim.id, dim.measureKey, dim.valueMm, snap), l.x, l.y, { align: 'center' });
+    if (overviewIsDense && (dim.kind === 'finished-length' || dim.kind === 'cut-length')) continue;
+    const leader = overviewIsDense ? denseLeader[dim.id] : undefined;
+    /* Same along-run parity shift as the group views: keeps a pup's
+     * finished/cut labels from landing on the Lin/Lout global anchors
+     * (e.g. the 90° case, where those anchors coincide visually). */
+    if (!overviewIsDense && (dim.kind === 'finished-length' || dim.kind === 'cut-length')) {
+      const pipeNo = Number(/^P(\d+)-/.exec(dim.ownerId)?.[1] ?? 0);
+      const f = pipeNo % 2 === 0 ? 0.7 : 0.3;
+      const mid = { x: (dim.from.x + dim.to.x) / 2, y: (dim.from.y + dim.to.y) / 2 };
+      const perpOff = { x: dim.labelAt.x - mid.x, y: dim.labelAt.y - mid.y };
+      drawDimensionLine(doc, {
+        ...dim,
+        labelAt: {
+          x: dim.from.x + (dim.to.x - dim.from.x) * f + perpOff.x,
+          y: dim.from.y + (dim.to.y - dim.from.y) * f + perpOff.y,
+        },
+      }, map, snap);
+      continue;
+    }
+    drawDimensionLine(doc, dim, map, snap, leader?.mm ?? 0, leader?.dir);
   }
 
   // Piece identifiers near segment midpoints.
@@ -476,7 +489,14 @@ function drawGeneralView(
       x: arc.center.x + arc.radiusMm * Math.cos(midAng),
       y: arc.center.y + arc.radiusMm * Math.sin(midAng),
     });
-    if (!overviewIsDense) doc.text(arc.pieceId, p.x, p.y - 1.6, { align: 'center' });
+    if (!overviewIsDense) {
+      doc.text(arc.pieceId, p.x, p.y - 1.6, { align: 'center' });
+    } else {
+      // Dense overview: short pipe labels keep every pipe (and therefore
+      // every detail-view group) unequivocally identifiable.
+      const pipeNo = arc.pieceId.match(/^P(\d+)-/)?.[1];
+      if (pipeNo) doc.text(S.pipeLabel.replace('{pipe}', pipeNo), p.x, p.y - 1.6, { align: 'center' });
+    }
   }
 
   // Assembly data strip under the view.
@@ -492,6 +512,288 @@ function drawGeneralView(
   const loutTxt = `${S.dimLout}: ${sol.references.outletAxisToAxisMm !== undefined ? snap.formatLength(sol.references.outletAxisToAxisMm) : '—'}`;
   doc.text([diTxt, dfTxt, angleTxt, staggerTxt, linTxt, loutTxt].join('    ·    '), MARGIN, dataY);
   return dataY + 2;
+}
+
+/** Page-space image of a model-plane DIRECTION vector: the projection is
+ *  linear (so it maps vectors too) and jsPDF y grows downwards (flip). */
+function directionToPage(v: Vec2): Vec2 {
+  const q = projectPoint(v);
+  const n = Math.hypot(q.x, q.y) || 1;
+  return { x: q.x / n, y: -q.y / n };
+}
+
+/**
+ * Joint tick markers. The tick orientation comes from the joint's LOCAL
+ * AXIS provided by the drawing model (j.axis), transformed to page space
+ * and normalized — NEVER from the segment between the two joint faces,
+ * which COINCIDE when g = 0 and used to degenerate the marker into a
+ * zero-length line (the old "|| 1" fallback produced length, not
+ * direction). g > 0 keeps both real faces with their true separation;
+ * no fictitious gap is introduced when g = 0.
+ */
+function drawJointMarkers(
+  doc: jsPDF,
+  joints: FabDrawingJointMarker[],
+  map: (p: Vec2) => Vec2,
+  withIds: boolean,
+  snap: PipeCombFabPdfSnapshot,
+): void {
+  const off = 1.6;
+  for (const j of joints) {
+    const d = directionToPage(j.axis);
+    const n = { x: -d.y, y: d.x };
+    const a = map(j.pupFace);
+    doc.setDrawColor(...INK);
+    doc.setLineWidth(0.5);
+    doc.line(a.x - n.x * off, a.y - n.y * off, a.x + n.x * off, a.y + n.y * off);
+    if (j.gapMm > 0) {
+      const b = map(j.elbowFace);
+      doc.line(b.x - n.x * off, b.y - n.y * off, b.x + n.x * off, b.y + n.y * off);
+    }
+    if (withIds) {
+      const label = j.gapMm > 0
+        ? `${j.jointId} · ${snap.strings.dimGap} ${snap.formatLength(j.gapMm)}`
+        : j.jointId;
+      /* Alternate the label side per pipe so adjacent pipes' joint ids do
+       * not stack on top of each other in the compressed elbow zone. */
+      const pipeNo = Number(/^J(\d+)-/.exec(j.jointId)?.[1] ?? 0);
+      const side = pipeNo % 2 === 0 ? 1 : -1;
+      doc.setFont(FONT_FAMILY, 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(...INK);
+      doc.text(label, a.x + n.x * side * (off + 2.5), a.y + n.y * side * (off + 2.5) + 1);
+    }
+  }
+}
+
+/** One dimension line: extension lines, measured run, end ticks and the
+ *  localized label at its model anchor (real solution values). When
+ *  `labelLeaderMm` is given, the label is moved a fixed PAGE-space
+ *  distance along the offset direction with a thin leader line — used in
+ *  dense overviews, where the model-space anchors of the global Di/Df/A
+ *  dimensions would otherwise collapse onto each other. */
+function drawDimensionLine(
+  doc: jsPDF,
+  dim: FabDrawingDimension,
+  map: (p: Vec2) => Vec2,
+  snap: PipeCombFabPdfSnapshot,
+  labelLeaderMm = 0,
+  labelLeaderDirPage?: Vec2,
+): void {
+  const a = map(dim.from);
+  const b = map(dim.to);
+  const l = map(dim.labelAt);
+  doc.setDrawColor(...GREY);
+  // Extension + dimension line through the label anchor offset.
+  const dir = { x: b.x - a.x, y: b.y - a.y };
+  const len = Math.hypot(dir.x, dir.y) || 1;
+  const u = { x: dir.x / len, y: dir.y / len };
+  // Project label anchor onto the dimension line direction.
+  const tStar = ((l.x - a.x) * u.x + (l.y - a.y) * u.y);
+  const proj = { x: a.x + u.x * tStar, y: a.y + u.y * tStar };
+  const offVec = { x: l.x - proj.x, y: l.y - proj.y };
+  const a2 = { x: a.x + offVec.x, y: a.y + offVec.y };
+  const b2 = { x: b.x + offVec.x, y: b.y + offVec.y };
+  doc.line(a.x, a.y, a2.x, a2.y);
+  doc.line(b.x, b.y, b2.x, b2.y);
+  doc.line(a2.x, a2.y, b2.x, b2.y);
+  // End ticks.
+  const tick = 1.4;
+  const tn = { x: -u.y, y: u.x };
+  doc.line(a2.x - tn.x * tick, a2.y - tn.y * tick, a2.x + tn.x * tick, a2.y + tn.y * tick);
+  doc.line(b2.x - tn.x * tick, b2.y - tn.y * tick, b2.x + tn.x * tick, b2.y + tn.y * tick);
+  let labelAt = l;
+  if (labelLeaderMm > 0) {
+    const dOff = labelLeaderDirPage ?? directionToPage(dim.offsetDir);
+    const dn = Math.hypot(dOff.x, dOff.y) || 1;
+    labelAt = { x: l.x + (dOff.x / dn) * labelLeaderMm, y: l.y + (dOff.y / dn) * labelLeaderMm };
+    doc.setLineWidth(0.15);
+    doc.line(l.x, l.y, labelAt.x, labelAt.y);
+    doc.setLineWidth(0.2);
+  }
+  doc.setFont(FONT_FAMILY, 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...INK);
+  doc.text(dimensionLabel(dim.id, dim.measureKey, dim.valueMm, snap), labelAt.x, labelAt.y, { align: 'center' });
+}
+
+/** Polyline stroke of a drawing-model arc (elbow/bend centerline). */
+function strokeArc(doc: jsPDF, arc: PipeCombFabDrawing['arcs'][number], map: (p: Vec2) => Vec2): void {
+  const steps = Math.max(12, Math.ceil(Math.abs(arc.endRad - arc.startRad) / (Math.PI / 72)));
+  let prev: Vec2 | null = null;
+  for (let i = 0; i <= steps; i++) {
+    const ang = arc.startRad + ((arc.endRad - arc.startRad) * i) / steps;
+    const p = map({
+      x: arc.center.x + arc.radiusMm * Math.cos(ang),
+      y: arc.center.y + arc.radiusMm * Math.sin(ang),
+    });
+    if (prev) doc.line(prev.x, prev.y, p.x, p.y);
+    prev = p;
+  }
+}
+
+/**
+ * Dense-assembly detail view (N > 6) for a group of up to three pipes.
+ * The de-cluttered overview keeps only the global dimensions; this view
+ * carries, for every pipe of the group: piece identifiers, finished and
+ * cut dimension lines (when an allowance makes them differ), joint
+ * markers with their ids and real gaps, and the theoretical intersection
+ * E. Values come from the solution/drawing model — nothing recomputed,
+ * no topology or measure altered for layout.
+ */
+function drawPipeGroupView(
+  doc: jsPDF,
+  drawing: PipeCombFabDrawing,
+  sol: PipeCombFabricationSolution,
+  snap: PipeCombFabPdfSnapshot,
+  yTop: number,
+  pageW: number,
+  pageH: number,
+  pipeNumbers: number[],
+): number {
+  const S = snap.strings;
+  doc.setFont(FONT_FAMILY, 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(...INK);
+  const title = `${S.detailView}: ${pipeNumbers.map((n) => S.pipeLabel.replace('{pipe}', String(n))).join('–')}`;
+  doc.text(title, MARGIN, yTop + 4);
+
+  const pieceIds = new Set(
+    sol.pipes
+      .filter((p) => pipeNumbers.includes(p.pipeNumber))
+      .flatMap((p) => p.pieces.map((x) => x.id)),
+  );
+  const segs = drawing.segments.filter((s) => pieceIds.has(s.pieceId));
+  const arcs = drawing.arcs.filter((a) => pieceIds.has(a.pieceId));
+  const joints = drawing.joints.filter((j) => {
+    const m = /^J(\d+)-/.exec(j.jointId);
+    return m !== null && pipeNumbers.includes(Number(m[1]));
+  });
+  const dims = drawing.dimensions.filter((d) => pieceIds.has(d.ownerId));
+  const dets = drawing.elbowDetails.filter((d) => pipeNumbers.includes(d.pipeNumber));
+
+  // Local framing: projected bounds of everything drawn, labels included.
+  const pts: Vec2[] = [];
+  for (const s of segs) pts.push(s.from, s.to);
+  for (const a of arcs) {
+    pts.push(
+      { x: a.center.x - a.radiusMm, y: a.center.y - a.radiusMm },
+      { x: a.center.x + a.radiusMm, y: a.center.y + a.radiusMm },
+    );
+  }
+  for (const d of dims) pts.push(d.from, d.to, d.labelAt);
+  for (const j of joints) pts.push(j.pupFace, j.elbowFace);
+  for (const d of dets) pts.push(d.axisIntersection);
+  const pMin = { x: Infinity, y: Infinity };
+  const pMax = { x: -Infinity, y: -Infinity };
+  for (const p of pts) {
+    const q = projectPoint(p);
+    pMin.x = Math.min(pMin.x, q.x);
+    pMin.y = Math.min(pMin.y, q.y);
+    pMax.x = Math.max(pMax.x, q.x);
+    pMax.y = Math.max(pMax.y, q.y);
+  }
+  const w = Math.max(pMax.x - pMin.x, 1e-6);
+  const h = Math.max(pMax.y - pMin.y, 1e-6);
+  const boxX = MARGIN;
+  const boxY = yTop + 8;
+  const boxW = pageW - 2 * MARGIN;
+  const boxH = Math.min(pageH - boxY - 30, boxW * 0.26);
+  const scale = Math.min(boxW / w, boxH / h);
+  const tx = boxX + (boxW - w * scale) / 2 - pMin.x * scale;
+  const ty = boxY + (boxH - h * scale) / 2 + pMax.y * scale;
+  const map = (p: Vec2): Vec2 => {
+    const q = projectPoint(p);
+    return { x: tx + q.x * scale, y: ty - q.y * scale };
+  };
+
+  // Pieces: solid for finished, thin dashed for allowance over-length.
+  for (const seg of segs) {
+    const a = map(seg.from);
+    const b = map(seg.to);
+    if (seg.finished) {
+      doc.setDrawColor(...INK);
+      doc.setLineWidth(0.7);
+      doc.setLineDashPattern([], 0);
+    } else {
+      doc.setDrawColor(...GREY);
+      doc.setLineWidth(0.3);
+      doc.setLineDashPattern([1.5, 1.5], 0);
+    }
+    doc.line(a.x, a.y, b.x, b.y);
+  }
+  doc.setLineDashPattern([], 0);
+
+  // Elbow / bend arcs.
+  doc.setDrawColor(...INK);
+  doc.setLineWidth(0.7);
+  for (const arc of arcs) strokeArc(doc, arc, map);
+
+  // Axis intersections E_i (theoretical points), labelled.
+  doc.setFont(FONT_FAMILY, 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...GREY);
+  for (const det of dets) {
+    const e = map(det.axisIntersection);
+    doc.setDrawColor(...GREY);
+    doc.setLineWidth(0.2);
+    doc.line(e.x - 2, e.y, e.x + 2, e.y);
+    doc.line(e.x, e.y - 2, e.x, e.y + 2);
+    doc.text(S.axisE.replace('{pipe}', String(det.pipeNumber)), e.x + 2.5, e.y - 1.5);
+  }
+
+  // Joint ticks (axis-based orientation; non-degenerate at g = 0; both
+  // real faces + true gap when g > 0). Ids live in the per-pipe legend
+  // below: the elbow zone of a dense group is far too compressed to
+  // carry six joint ids + three elbow ids legibly at 9 pt.
+  drawJointMarkers(doc, joints, map, false, snap);
+
+  // Per-piece finished/cut dimensions with real model values. Adjacent
+  // pipes share the same visual region in a group view, so each label
+  // anchor is shifted ALONG its measured run by pipe parity (0.38/0.62):
+  // the run, value and perpendicular offset are unchanged, only the
+  // anchor slides parallel to the run so same-name dimensions of
+  // neighbouring pipes never stack.
+  doc.setLineWidth(0.2);
+  for (const dim of dims) {
+    const pipeNo = Number(/^P(\d+)-/.exec(dim.ownerId)?.[1] ?? 0);
+    const f = pipeNo % 2 === 0 ? 0.7 : 0.3;
+    const mid = { x: (dim.from.x + dim.to.x) / 2, y: (dim.from.y + dim.to.y) / 2 };
+    const perpOff = { x: dim.labelAt.x - mid.x, y: dim.labelAt.y - mid.y };
+    const anchored: FabDrawingDimension = {
+      ...dim,
+      labelAt: {
+        x: dim.from.x + (dim.to.x - dim.from.x) * f + perpOff.x,
+        y: dim.from.y + (dim.to.y - dim.from.y) * f + perpOff.y,
+      },
+    };
+    drawDimensionLine(doc, anchored, map, snap);
+  }
+
+  // Per-pipe identification legend: every elbow (catalog) or bend bar,
+  // and every joint of the group, unequivocally tied to its pipe. The
+  // pup ids are already carried by their finished-length dimension
+  // labels, so each cut-list row links to a represented piece.
+  let legendY = boxY + boxH + 5;
+  for (const pipeNo of pipeNumbers) {
+    const pipe = sol.pipes.find((p) => p.pipeNumber === pipeNo);
+    if (!pipe) continue;
+    const fitting = pipe.pieces.find((p) => p.kind === 'elbow' || p.kind === 'bent-tube');
+    if (!fitting) continue;
+    const jointIds = joints
+      .filter((j) => j.jointId.startsWith(`J${pipeNo}-`))
+      .map((j) => (j.gapMm > 0 ? `${j.jointId} (${snap.strings.dimGap} ${snap.formatLength(j.gapMm)})` : j.jointId));
+    doc.setFont(FONT_FAMILY, 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...INK);
+    doc.text(fitting.id, MARGIN + 1, legendY);
+    if (jointIds.length > 0) {
+      doc.setFont(FONT_FAMILY, 'normal');
+      doc.text(`  ·  ${jointIds.join('  ·  ')}`, MARGIN + 1 + doc.getTextWidth(fitting.id), legendY);
+    }
+    legendY += 4.6;
+  }
+  return legendY + 2;
 }
 
 function dimensionLabel(id: string, measureKey: string, valueMm: number, snap: PipeCombFabPdfSnapshot): string {

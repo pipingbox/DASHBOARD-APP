@@ -2118,6 +2118,7 @@
             "jobRef": "Rif. lavoro",
             "pageOf": "Pagina {x} di {y}",
             "generalView": "Vista generale quotata",
+            "detailView": "Vista di dettaglio",
             "elbowDetail": "Dettaglio del gomito (tubo 1, forma reale)",
             "jointsTitle": "Giunti di saldatura",
             "warningsTitle": "Avvertenze",

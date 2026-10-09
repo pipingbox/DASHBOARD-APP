@@ -2125,6 +2125,7 @@
             "jobRef": "Ref. lucrare",
             "pageOf": "Pagina {x} din {y}",
             "generalView": "Vedere generală cotată",
+            "detailView": "Vedere de detaliu",
             "elbowDetail": "Detaliu cot (țeava 1, formă reală)",
             "jointsTitle": "Îmbinări sudate",
             "warningsTitle": "Avertismente",

@@ -101,6 +101,7 @@ export function buildFabPdfStrings(
     jobRef: t(`${K}.jobRef`),
     pageOf: t(`${K}.pageOf`),
     generalView: t(`${K}.generalView`),
+    detailView: t(`${K}.detailView`),
     cutList: t('tools.prefab.pipeComb.fab.cutListTitle'),
     elbowDetail: t(`${K}.elbowDetail`),
     markingTitle: t('tools.prefab.pipeComb.fab.marksTitle'),

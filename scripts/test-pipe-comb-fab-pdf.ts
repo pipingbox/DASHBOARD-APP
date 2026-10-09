@@ -49,6 +49,7 @@ function englishStrings(warnings: string[], marks: PdfStrings['marks']): PdfStri
     docId: 'Doc', date: 'Date', unit: 'Unit', language: 'Language', jobRef: 'Job ref',
     pageOf: 'Page {x} of {y}',
     generalView: 'General dimensioned view',
+    detailView: 'Detail view',
     cutList: 'Cut list',
     elbowDetail: 'Elbow detail (pipe 1, true shape)',
     markingTitle: 'Marking',
@@ -176,6 +177,29 @@ function textHas(info: { text: string }, needle: string): boolean {
   return normText(info.text).includes(normText(needle));
 }
 
+/** Occurrences of a needle in the normalized extracted text. */
+function countOccurrences(info: { text: string }, needle: string): number {
+  return normText(info.text).split(normText(needle)).length - 1;
+}
+
+/** Count degenerate zero-length "move+line" ops in the REAL PDF content
+ *  stream (e.g. the old g=0 joint ticks, whose direction was computed
+ *  from two coincident faces). jsPDF writes uncompressed content streams
+ *  and separates path operators with newlines, so the pattern is
+ *  whitespace-tolerant. */
+function zeroLengthLineOps(file: string): number {
+  const raw = fs.readFileSync(file).toString('latin1');
+  const re = /(-?[\d.]+) (-?[\d.]+) m\s+(-?[\d.]+) (-?[\d.]+) l/g;
+  let m: RegExpExecArray | null;
+  let zero = 0;
+  while ((m = re.exec(raw)) !== null) {
+    const dx = Math.abs(Number(m[3]) - Number(m[1]));
+    const dy = Math.abs(Number(m[4]) - Number(m[2]));
+    if (dx < 1e-9 && dy < 1e-9) zero++;
+  }
+  return zero;
+}
+
 function solveCase(over: Partial<Parameters<typeof solvePipeCombFabrication>[0]> = {}) {
   const r = solvePipeCombFabrication({
     pipeCount: 3, initialSpacingMm: 250, finalSpacingMm: 350, elbowAngleDeg: 35,
@@ -224,6 +248,10 @@ for (const paper of ['a4', 'a3'] as const) {
     const count = info.text.split(id).length - 1;
     check(`${paper}: ${id} not duplicated`, count >= 1 && count <= 4, String(count));
   }
+  /* g = 0 joint markers: orientation from the joint's local axis, so NO
+   * degenerate zero-length strokes (RED before the fix: 6). */
+  check(`${paper}: g=0 no degenerate strokes`, zeroLengthLineOps(file) === 0,
+    String(zeroLengthLineOps(file)));
 }
 
 /* ================================================================ *
@@ -240,6 +268,33 @@ for (const paper of ['a4', 'a3'] as const) {
   check('gap case cut', textHas(info, '930.92'), 'P1-IN cut');
   check('gap value', textHas(info, '2 mm'));
   check('allowance note', textHas(info, '5 mm') && textHas(info, 'fit-up'));
+  // g = 2: two real faces with their true separation, no degenerate ops.
+  check('gap case: no degenerate strokes', zeroLengthLineOps(file) === 0,
+    String(zeroLengthLineOps(file)));
+  // Cut lengths stay distinct from finished lengths in the drawn views.
+  check('gap case: cut dim drawn', countOccurrences(info, 'cut 930.92') >= 1, 'P1-IN cut 930.92 mm');
+}
+
+/* ================================================================ *
+ * 2b. 90° catalog elbow with g = 0: joint markers must not degenerate
+ *     either (orientation from the local joint axis, not from faces).
+ * ================================================================ */
+{
+  const sol = solveCase({ elbowAngleDeg: 90 });
+  const doc = generatePipeCombFabPdf(snapshotFor(sol, 'mm', 'a4'));
+  const file = `${OUT_DIR}/elbow90-g0-a4.pdf`;
+  fs.writeFileSync(file, Buffer.from(doc.output('arraybuffer')));
+  const info = await extractPdf(file);
+  check('90deg g=0: no degenerate strokes', zeroLengthLineOps(file) === 0,
+    String(zeroLengthLineOps(file)));
+  check('90deg g=0: joints identified', textHas(info, 'J1-IN') && textHas(info, 'J3-OUT'));
+  check('90deg: angle', textHas(info, '90°'));
+  check('90deg: no degenerate strokes A3', (() => {
+    const doc3 = generatePipeCombFabPdf(snapshotFor(sol, 'mm', 'a3'));
+    const file3 = `${OUT_DIR}/elbow90-g0-a3.pdf`;
+    fs.writeFileSync(file3, Buffer.from(doc3.output('arraybuffer')));
+    return zeroLengthLineOps(file3) === 0;
+  })());
 }
 
 /* ================================================================ *
@@ -276,7 +331,9 @@ for (const family of ['LR', 'SR'] as const) {
 }
 
 /* ================================================================ *
- * 4. N=12 multipage
+ * 4. N=12 multipage: dense overview keeps GLOBAL dimensions, and the
+ *    per-group detail views carry EVERY piece id, per-piece dimension
+ *    and joint id (nothing lost to the density threshold).
  * ================================================================ */
 {
   const sol = solveCase({ pipeCount: 12, references: { inletAxisToAxisMm: 5000, outletAxisToAxisMm: 2000, weldGapMm: 0, fittingAllowanceMm: 0 } });
@@ -287,10 +344,71 @@ for (const family of ['LR', 'SR'] as const) {
   check('N=12 multipage', info.pages >= 3, String(info.pages));
   check('N=12 P12 present', textHas(info, 'P12-IN') && textHas(info, 'P12-OUT'));
   check('N=12 page-of', textHas(info, `Page 1 of ${info.pages}`) || textHas(info, 'Page 1 of'));
-  // All 24 pups present exactly once in the cut list section at least.
-  for (const id of ['P1-IN', 'P6-OUT', 'P12-IN']) {
-    check(`N=12 ${id}`, textHas(info, id));
+  // Detail views exist and cover all four groups (1-3, 4-6, 7-9, 10-12).
+  check('N=12 detail views section', countOccurrences(info, 'Detail view') >= 4,
+    String(countOccurrences(info, 'Detail view')));
+  // Every piece appears in the cut list AND in a drawn detail view.
+  for (let k = 1; k <= 12; k++) {
+    for (const suffix of ['IN', 'OUT', 'ELBOW'] as const) {
+      const id = `P${k}-${suffix}`;
+      check(`N=12 ${id} listed AND drawn`, countOccurrences(info, id) >= 2,
+        String(countOccurrences(info, id)));
+    }
   }
+  // Every joint appears in the joints section AND drawn in a detail view.
+  for (const jid of ['J1-IN', 'J5-OUT', 'J8-IN', 'J12-OUT']) {
+    check(`N=12 ${jid} listed AND drawn`, countOccurrences(info, jid) >= 2,
+      String(countOccurrences(info, jid)));
+  }
+  // Global dimensions survive the density threshold as real dimension
+  // lines in the overview (not only the textual data strip).
+  check('N=12 global Di dim', textHas(info, 'Di = 250'));
+  check('N=12 global Df dim', textHas(info, 'Df = 350'));
+  check('N=12 global stagger dim', textHas(info, 'A = 253.17'));
+  check('N=12 global Lin dim', textHas(info, 'Lin = 5000'));
+  check('N=12 global Lout dim', textHas(info, 'Lout = 2000'));
+  check('N=12 no degenerate strokes', zeroLengthLineOps(file) === 0,
+    String(zeroLengthLineOps(file)));
+}
+
+/* ================================================================ *
+ * 4b. Density boundary: N=6 keeps the FULL overview (no detail views
+ *     needed); N=7 crosses the threshold and gains detail views that
+ *     cover every pipe including the last single-pipe group.
+ * ================================================================ */
+{
+  const sol6 = solveCase({ pipeCount: 6 });
+  const doc6 = generatePipeCombFabPdf(snapshotFor(sol6, 'mm', 'a4'));
+  const file6 = `${OUT_DIR}/n6-a4.pdf`;
+  fs.writeFileSync(file6, Buffer.from(doc6.output('arraybuffer')));
+  const info6 = await extractPdf(file6);
+  for (const id of ['P1-IN', 'P3-OUT', 'P6-IN', 'P6-OUT']) {
+    check(`N=6 ${id} listed AND drawn`, countOccurrences(info6, id) >= 2,
+      String(countOccurrences(info6, id)));
+  }
+  check('N=6 no degenerate strokes', zeroLengthLineOps(file6) === 0,
+    String(zeroLengthLineOps(file6)));
+}
+{
+  const sol7 = solveCase({ pipeCount: 7 });
+  const doc7 = generatePipeCombFabPdf(snapshotFor(sol7, 'mm', 'a4'));
+  const file7 = `${OUT_DIR}/n7-a4.pdf`;
+  fs.writeFileSync(file7, Buffer.from(doc7.output('arraybuffer')));
+  const info7 = await extractPdf(file7);
+  check('N=7 detail views present', countOccurrences(info7, 'Detail view') >= 3,
+    String(countOccurrences(info7, 'Detail view')));
+  for (let k = 1; k <= 7; k++) {
+    for (const suffix of ['IN', 'OUT', 'ELBOW'] as const) {
+      const id = `P${k}-${suffix}`;
+      check(`N=7 ${id} listed AND drawn`, countOccurrences(info7, id) >= 2,
+        String(countOccurrences(info7, id)));
+    }
+  }
+  check('N=7 global dims kept', textHas(info7, 'Di = 250') && textHas(info7, 'Df = 350'));
+  check('N=7 joints drawn', countOccurrences(info7, 'J7-OUT') >= 2,
+    String(countOccurrences(info7, 'J7-OUT')));
+  check('N=7 no degenerate strokes', zeroLengthLineOps(file7) === 0,
+    String(zeroLengthLineOps(file7)));
 }
 
 /* ================================================================ *

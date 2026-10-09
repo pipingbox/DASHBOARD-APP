@@ -2187,6 +2187,7 @@
             "jobRef": "Job ref",
             "pageOf": "Page {x} of {y}",
             "generalView": "General dimensioned view",
+            "detailView": "Detail view",
             "elbowDetail": "Elbow detail (pipe 1, true shape)",
             "jointsTitle": "Weld joints",
             "warningsTitle": "Warnings",

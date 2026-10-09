@@ -1964,6 +1964,7 @@
             "jobRef": "Ref. trabalho",
             "pageOf": "Página {x} de {y}",
             "generalView": "Vista geral cotada",
+            "detailView": "Vista de detalhe",
             "elbowDetail": "Detalhe do cotovelo (tubo 1, forma real)",
             "jointsTitle": "Juntas de soldadura",
             "warningsTitle": "Avisos",

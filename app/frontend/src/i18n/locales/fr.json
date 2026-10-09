@@ -1964,6 +1964,7 @@
             "jobRef": "Réf. travail",
             "pageOf": "Page {x} sur {y}",
             "generalView": "Vue générale cotée",
+            "detailView": "Vue de détail",
             "elbowDetail": "Détail du coude (tube 1, forme réelle)",
             "jointsTitle": "Joints de soudure",
             "warningsTitle": "Avertissements",
