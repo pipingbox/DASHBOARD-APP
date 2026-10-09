@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/lib/notifications';
 
 const POLL_MS = 45_000;
+const MAX_CONSECUTIVE_FAILURES = 3;
 
 /**
  * Hook for managing user notifications with real-time updates.
@@ -20,13 +21,24 @@ export function useNotifications() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<NotificationRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const failureCountRef = useRef(0);
 
   const refreshCount = useCallback(async () => {
     if (!user) {
       setUnreadCount(0);
       return;
     }
-    setUnreadCount(await countUnread(user.id));
+    try {
+      setUnreadCount(await countUnread(user.id));
+      failureCountRef.current = 0;
+    } catch (err) {
+      // PB-GROWTH-GATE-FINAL-001: a denied poll (e.g. transient session
+      // mismatch) must not be retried forever at full cadence — back off
+      // after MAX_CONSECUTIVE_FAILURES instead of hammering every 45s.
+      failureCountRef.current += 1;
+      // eslint-disable-next-line no-console
+      console.warn('[notifications] refreshCount failed', failureCountRef.current, err);
+    }
   }, [user]);
 
   const loadNotifications = useCallback(async () => {
@@ -59,11 +71,19 @@ export function useNotifications() {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  // Poll for unread count
+  // Poll for unread count — stops after MAX_CONSECUTIVE_FAILURES to avoid
+  // hammering a persistently-denied session every POLL_MS.
   useEffect(() => {
+    failureCountRef.current = 0;
     void refreshCount();
     if (!user) return;
-    const id = window.setInterval(() => void refreshCount(), POLL_MS);
+    const id = window.setInterval(() => {
+      if (failureCountRef.current >= MAX_CONSECUTIVE_FAILURES) {
+        window.clearInterval(id);
+        return;
+      }
+      void refreshCount();
+    }, POLL_MS);
     return () => window.clearInterval(id);
   }, [user, refreshCount]);
 
