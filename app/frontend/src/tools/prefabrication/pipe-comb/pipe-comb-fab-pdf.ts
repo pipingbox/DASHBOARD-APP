@@ -343,6 +343,11 @@ function drawGeneralView(
     const q = projectPoint(p);
     return { x: tx + q.x * scale, y: ty - q.y * scale };
   };
+  /* Keep a dense N=12 overview readable: the cut list and detail pages
+   * retain every piece identifier and its physical dimension. The overview
+   * still shows the complete topology, reference planes and global Di/Df/A/
+   * Lin/Lout dimensions. */
+  const overviewIsDense = drawing.pipeCount > 6;
 
   // Reference planes (dashed).
   doc.setDrawColor(...GREY);
@@ -405,7 +410,7 @@ function drawGeneralView(
     doc.setLineWidth(0.2);
     doc.line(e.x - 2, e.y, e.x + 2, e.y);
     doc.line(e.x, e.y - 2, e.x, e.y + 2);
-    doc.text(S.axisE.replace('{pipe}', String(det.pipeNumber)), e.x + 2.5, e.y - 1.5);
+    if (!overviewIsDense) doc.text(S.axisE.replace('{pipe}', String(det.pipeNumber)), e.x + 2.5, e.y - 1.5);
   }
 
   // Joint markers: two short ticks when g > 0 (distinct faces), one when 0.
@@ -426,6 +431,7 @@ function drawGeneralView(
   // Dimensions: thin lines with end ticks + label (real model values).
   doc.setLineWidth(0.2);
   for (const dim of drawing.dimensions) {
+    if (overviewIsDense) continue;
     const a = map(dim.from);
     const b = map(dim.to);
     const l = map(dim.labelAt);
@@ -460,6 +466,7 @@ function drawGeneralView(
   doc.setTextColor(...INK);
   for (const seg of drawing.segments) {
     if (!seg.finished) continue;
+    if (overviewIsDense) continue;
     const mid = map({ x: (seg.from.x + seg.to.x) / 2, y: (seg.from.y + seg.to.y) / 2 });
     doc.text(seg.pieceId, mid.x, mid.y - 1.6, { align: 'center' });
   }
@@ -469,7 +476,7 @@ function drawGeneralView(
       x: arc.center.x + arc.radiusMm * Math.cos(midAng),
       y: arc.center.y + arc.radiusMm * Math.sin(midAng),
     });
-    doc.text(arc.pieceId, p.x, p.y - 1.6, { align: 'center' });
+    if (!overviewIsDense) doc.text(arc.pieceId, p.x, p.y - 1.6, { align: 'center' });
   }
 
   // Assembly data strip under the view.

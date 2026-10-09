@@ -37,6 +37,11 @@ export default function PipeCombFabDrawingView({ solution, unit }: PipeCombFabDr
   const { t } = useTranslation();
   const drawing = useMemo(() => buildPipeCombFabDrawing(solution), [solution]);
   const fmt = (v: number) => `${formatLengthForUnit(v, unit)} ${unit}`;
+  /* A dense N=12 overview remains useful for topology and reference planes,
+   * but individual labels/dimensions belong to the cut-list/detail pages.
+   * Omitting them here prevents the overview from becoming unreadable while
+   * preserving every value in the shared drawing model and PDF tables. */
+  const overviewIsDense = drawing.pipeCount > 6;
 
   // Fit projected bounds into the viewBox (y flipped for screen coords).
   const { map } = useMemo(() => {
@@ -140,7 +145,9 @@ export default function PipeCombFabDrawingView({ solution, unit }: PipeCombFabDr
             return (
               <g key={arc.pieceId}>
                 <polyline data-testid={`fab-draw-arc-${arc.pieceId}`} points={pts.join(' ')} fill="none" stroke="#F5F7FA" strokeWidth={2.4} />
-                <text x={lp.x} y={lp.y - 6} fill="#F5F7FA" fontSize={12} fontWeight={700} textAnchor="middle">{arc.pieceId}</text>
+                {!overviewIsDense && (
+                  <text x={lp.x} y={lp.y - 6} fill="#F5F7FA" fontSize={12} fontWeight={700} textAnchor="middle">{arc.pieceId}</text>
+                )}
               </g>
             );
           })}
@@ -152,7 +159,9 @@ export default function PipeCombFabDrawingView({ solution, unit }: PipeCombFabDr
               <g key={`E${det.pipeNumber}`} data-testid={`fab-draw-E${det.pipeNumber}`}>
                 <line x1={e.x - 5} y1={e.y} x2={e.x + 5} y2={e.y} stroke="#8a93a0" strokeWidth={0.8} />
                 <line x1={e.x} y1={e.y - 5} x2={e.x} y2={e.y + 5} stroke="#8a93a0" strokeWidth={0.8} />
-                <text x={e.x + 7} y={e.y - 4} fill="#8a93a0" fontSize={12}>{`E${det.pipeNumber}`}</text>
+                {!overviewIsDense && (
+                  <text x={e.x + 7} y={e.y - 4} fill="#8a93a0" fontSize={12}>{`E${det.pipeNumber}`}</text>
+                )}
               </g>
             );
           })}
@@ -175,7 +184,7 @@ export default function PipeCombFabDrawingView({ solution, unit }: PipeCombFabDr
           })}
 
           {/* Dimensions. */}
-          {drawing.dimensions.map((dim) => {
+          {drawing.dimensions.filter((dim) => !overviewIsDense).map((dim) => {
             const a = map(dim.from);
             const b = map(dim.to);
             const l = map(dim.labelAt);
@@ -198,7 +207,7 @@ export default function PipeCombFabDrawingView({ solution, unit }: PipeCombFabDr
           })}
 
           {/* Pup identifiers near segment midpoints. */}
-          {drawing.segments.filter((s) => s.finished).map((seg) => {
+          {drawing.segments.filter((s) => s.finished && !overviewIsDense).map((seg) => {
             const mid = map({ x: (seg.from.x + seg.to.x) / 2, y: (seg.from.y + seg.to.y) / 2 });
             return (
               <text key={`lbl-${seg.pieceId}`} x={mid.x} y={mid.y - 5} fill="#F5F7FA" fontSize={12} fontWeight={700} textAnchor="middle">
