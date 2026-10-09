@@ -177,6 +177,10 @@ function snapshotFor(
   };
 }
 
+function radiusFamilyFor(inputs: CaseInputs): 'LR' | 'SR' | undefined {
+  return inputs.elbow.kind === 'catalog' ? inputs.elbow.radiusType : undefined;
+}
+
 /** Acceptance-document precondition: the fixture must be a FULLY valid
  *  fabrication plan. Impossible fixtures are negative tests, never
  *  delivered as printable plans. */
@@ -272,6 +276,7 @@ const ES = {
   warnCatalogCut: tEs('tools.prefab.pipeComb.fab.warn.catalog_elbow_cut', { total: '90', kept: '35' }),
   finished: tEs('tools.prefab.pipeComb.fab.draw.finished'),
   cut: tEs('tools.prefab.pipeComb.fab.draw.cut'),
+  cutList: tEs('tools.prefab.pipeComb.fab.cutListTitle'),
   accessory: (family: string) =>
     tEs('tools.prefab.pipeComb.fab.pdf.accessoryLine')
       .replace('{id}', 'P1-ELBOW').replace('{nps}', '6').replace('{family}', family).replace('{angle}', '35'),
@@ -290,7 +295,7 @@ const EN = {
 for (const paper of ['a4', 'a3'] as const) {
   const { sol, inputs } = solveCase();
   assertValidPlan(sol, `acceptance-3x35 ${paper}`);
-  const snap = snapshotFor(sol, 'mm', paper, 'es');
+  const snap = snapshotFor(sol, 'mm', paper, 'es', radiusFamilyFor(inputs));
   const doc = generatePipeCombFabPdf(snap);
   const file = `${OUT_DIR}/acceptance-3x35-${paper}.pdf`;
   fs.writeFileSync(file, Buffer.from(doc.output('arraybuffer')));
@@ -299,6 +304,12 @@ for (const paper of ['a4', 'a3'] as const) {
   check(`${paper}: file exists non-trivial`, fs.statSync(file).size > 8000, String(fs.statSync(file).size));
   check(`${paper}: >= 2 pages`, info.pages >= 2, String(info.pages));
   check(`${paper}: page-of footer (es)`, textHas(info, ES.pageOf), info.pageTexts[0].slice(0, 200));
+  check(`${paper}: drawing section contains P2-IN annotation`,
+    info.pageTexts[0].includes('P2-IN') && info.pageTexts[0].includes('674.75 mm'));
+  check(`${paper}: cut-list boundary is not crossed`,
+    !info.pageTexts[0].includes(ES.cutList) && info.pageTexts.some((text, i) => i > 0 && text.includes(ES.cutList)));
+  check(`${paper}: cut-list title/header/first row stay together`,
+    info.pageTexts.some((text, i) => i > 0 && text.includes(ES.cutList) && text.includes('P1-IN')));
   // Six pups with frozen cut values (mm presentation, 2-dec trimmed).
   for (const [id, v] of [['P1-IN', '927.92'], ['P1-OUT', '1127.92'], ['P2-IN', '674.75'], ['P2-OUT', '1191.91'], ['P3-IN', '421.58'], ['P3-OUT', '1255.9']] as const) {
     check(`${paper}: cut row ${id}`, textHas(info, id), id);
@@ -342,7 +353,7 @@ for (const paper of ['a4', 'a3'] as const) {
 {
   const { sol, inputs } = solveCase({ references: { inletAxisToAxisMm: 1000, outletAxisToAxisMm: 1200, weldGapMm: 2, fittingAllowanceMm: 5 } });
   assertValidPlan(sol, 'gap-allowance');
-  const snap = snapshotFor(sol, 'mm', 'a4', 'es');
+  const snap = snapshotFor(sol, 'mm', 'a4', 'es', radiusFamilyFor(inputs));
   const doc = generatePipeCombFabPdf(snap);
   const file = `${OUT_DIR}/gap-allowance-a4.pdf`;
   fs.writeFileSync(file, Buffer.from(doc.output('arraybuffer')));
@@ -365,7 +376,7 @@ for (const paper of ['a4', 'a3'] as const) {
 {
   const { sol, inputs } = solveCase({ elbowAngleDeg: 90 });
   assertValidPlan(sol, 'elbow90-g0');
-  const snap = snapshotFor(sol, 'mm', 'a4', 'es');
+  const snap = snapshotFor(sol, 'mm', 'a4', 'es', radiusFamilyFor(inputs));
   const doc = generatePipeCombFabPdf(snap);
   const file = `${OUT_DIR}/elbow90-g0-a4.pdf`;
   fs.writeFileSync(file, Buffer.from(doc.output('arraybuffer')));
@@ -376,7 +387,7 @@ for (const paper of ['a4', 'a3'] as const) {
   check('90deg g=0: joints identified', textHas(info, 'J1-IN') && textHas(info, 'J3-OUT'));
   check('90deg: angle', textHas(info, '90°'));
   {
-    const snap3 = snapshotFor(sol, 'mm', 'a3', 'es');
+    const snap3 = snapshotFor(sol, 'mm', 'a3', 'es', radiusFamilyFor(inputs));
     const doc3 = generatePipeCombFabPdf(snap3);
     const file3 = `${OUT_DIR}/elbow90-g0-a3.pdf`;
     fs.writeFileSync(file3, Buffer.from(doc3.output('arraybuffer')));
@@ -415,7 +426,7 @@ for (const family of ['LR', 'SR'] as const) {
  * ================================================================ */
 {
   const { sol, inputs } = solveCase();
-  const snap = snapshotFor(sol, 'mm', 'a4', 'es');
+  const snap = snapshotFor(sol, 'mm', 'a4', 'es', radiusFamilyFor(inputs));
   const doc = generatePipeCombFabPdf(snap);
   const file = `${OUT_DIR}/df-dimension-a4.pdf`;
   fs.writeFileSync(file, Buffer.from(doc.output('arraybuffer')));
@@ -436,7 +447,7 @@ for (const family of ['LR', 'SR'] as const) {
 {
   const { sol, inputs } = solveCase({ pipeCount: 12, references: { inletAxisToAxisMm: 5000, outletAxisToAxisMm: 2000, weldGapMm: 0, fittingAllowanceMm: 0 } });
   assertValidPlan(sol, 'n12');
-  const snap = snapshotFor(sol, 'mm', 'a4', 'es');
+  const snap = snapshotFor(sol, 'mm', 'a4', 'es', radiusFamilyFor(inputs));
   const doc = generatePipeCombFabPdf(snap);
   const file = `${OUT_DIR}/n12-a4.pdf`;
   fs.writeFileSync(file, Buffer.from(doc.output('arraybuffer')));
@@ -485,7 +496,7 @@ for (const family of ['LR', 'SR'] as const) {
 {
   const { sol, inputs } = solveCase({ pipeCount: 6, references: { inletAxisToAxisMm: 5000, outletAxisToAxisMm: 2000, weldGapMm: 0, fittingAllowanceMm: 0 } });
   assertValidPlan(sol, 'n6');
-  const snap = snapshotFor(sol, 'mm', 'a4', 'es');
+  const snap = snapshotFor(sol, 'mm', 'a4', 'es', radiusFamilyFor(inputs));
   const doc = generatePipeCombFabPdf(snap);
   const file = `${OUT_DIR}/n6-a4.pdf`;
   fs.writeFileSync(file, Buffer.from(doc.output('arraybuffer')));
@@ -507,7 +518,7 @@ for (const family of ['LR', 'SR'] as const) {
 {
   const { sol, inputs } = solveCase({ pipeCount: 7, references: { inletAxisToAxisMm: 5000, outletAxisToAxisMm: 2000, weldGapMm: 0, fittingAllowanceMm: 0 } });
   assertValidPlan(sol, 'n7');
-  const snap = snapshotFor(sol, 'mm', 'a4', 'es');
+  const snap = snapshotFor(sol, 'mm', 'a4', 'es', radiusFamilyFor(inputs));
   const doc = generatePipeCombFabPdf(snap);
   const file = `${OUT_DIR}/n7-a4.pdf`;
   fs.writeFileSync(file, Buffer.from(doc.output('arraybuffer')));
@@ -615,7 +626,7 @@ for (const family of ['LR', 'SR'] as const) {
   for (const code of LANG_CASES) {
     const t = makeT(code);
     const { sol, inputs } = solveCase();
-    const snap = snapshotFor(sol, 'mm', 'a4', code);
+    const snap = snapshotFor(sol, 'mm', 'a4', code, radiusFamilyFor(inputs));
     /* No manually localized fields: the entire PdfStrings set comes from
      * buildFabPdfStrings over this locale. Verify the locale actually
      * provides the keys (a silent en-fallback would weaken coverage). */

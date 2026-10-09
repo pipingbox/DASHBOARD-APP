@@ -485,7 +485,10 @@ export function generatePipeCombFabPdf(snapshot: PipeCombFabPdfSnapshot): jsPDF 
 
   // ── Cut list (own flow; autotable handles pagination with repeated
   //    headers and no split rows) ─────────────────────────────────────────
-  y += 4;
+  // The general-view block has a real, resolved extent. Keep the next
+  // section wholly separate so no dimension label can sit beneath its
+  // heading, and keep the cut-list title/header/first row together.
+  y = addPage();
   const ensureShared = (yy: number, needed: number): number =>
     yy + needed > pageH - MARGIN - 12 ? addPage() : yy;
   drawCutList(doc, sol, snapshot, y, pageW, ensureShared);
@@ -877,7 +880,12 @@ function drawGeneralView(
   doc.setLineDashPattern([], 0);
   for (const pd of pending) drawResolvedDimension(doc, layout, pd);
   layout.draw();
-  return dataY + 2;
+  /* The next document section must start after the REAL resolved drawing
+   * extent.  Dimension labels may escape below the assembly data strip;
+   * returning only dataY allowed the cut-list heading to orphan those
+   * labels on the previous section boundary. */
+  const labelBottom = layout.placedBoxes().reduce((max, box) => Math.max(max, box.y1), dataY);
+  return Math.max(dataY + 2, labelBottom + 2);
 }
 
 /** Page-space image of a model-plane DIRECTION vector: the projection is
@@ -1309,26 +1317,25 @@ function drawCutList(
     ];
   });
 
-  /* Section heading (localized) — every section of the document is
-   * titled, so the cut list is identifiable on every page it spans. */
+  /* Keep the section title, table header and first row together. This guard
+   * runs BEFORE drawing the title; otherwise a forced page break leaves an
+   * orphaned heading at the bottom of the preceding page. */
+  const rowH = (9 * 0.48) + 2 * 1.6; // font height + cell padding
+  let sectionTop = yTop;
+  const pageBottom = doc.internal.pageSize.getHeight() - MARGIN - 12;
+  const titleAndFirstRow = 6 + rowH * 2.2;
+  if (sectionTop + titleAndFirstRow > pageBottom) {
+    doc.addPage();
+    drawTitleBlock(doc, snap, pageW);
+    sectionTop = MARGIN + TITLE_BLOCK_H + 4;
+  }
   doc.setFont(FONT_FAMILY, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...INK);
-  doc.text(S.cutList, MARGIN, yTop);
+  doc.text(S.cutList, MARGIN, sectionTop);
 
-  /* Orphan-header guard: if fewer than ~2 rows + header fit below the
-   * start position, start the table on a fresh page instead of leaving a
-   * lone header at the bottom (rowPageBreak only protects ROWS). The
-   * estimate uses the real 9 pt row metrics (header + 2 data rows). */
-  const tableTop = yTop + 6;
-  const rowH = (9 * 0.48) + 2 * 1.6; // font height + cell padding
-  const availForTable = (doc.internal.pageSize.getHeight()) - tableTop - (MARGIN + 12);
-  let startY = tableTop;
-  if (availForTable < rowH * 3.2) {
-    doc.addPage();
-    drawTitleBlock(doc, snap, pageW);
-    startY = MARGIN + TITLE_BLOCK_H + 6;
-  }
+  const tableTop = sectionTop + 6;
+  const startY = tableTop;
   autoTable(doc, {
     startY,
     head: [[S.colPiece, S.colQty, S.colType, S.colFinished, S.colAllowance, S.colCut, S.colStatus]],
