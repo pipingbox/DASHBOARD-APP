@@ -13,8 +13,10 @@
     "node": "22.x"
   },
   "devDependencies": {
+    "@napi-rs/canvas": "^1.0.9",
     "@playwright/test": "^1.62.1",
     "@supabase/supabase-js": "^2.49.1",
+    "pdfjs-dist": "^4.2.67",
     "wrangler": "^4.125.0"
   }
 }
