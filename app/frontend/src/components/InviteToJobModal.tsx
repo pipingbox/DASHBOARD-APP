@@ -98,10 +98,11 @@ export function InviteToJobModal({
 
     setSending(true);
     try {
-      const { error } = await supabase
+      const { data: invitation, error } = await supabase
         .from(TABLES.jobInvitations)
         .insert(payload)
-        .select();
+        .select('id')
+        .single();
 
       if (error) {
         console.log('ERROR', error);
@@ -126,8 +127,8 @@ export function InviteToJobModal({
           actorId: authUser.id,
           type: 'job_invitation',
           title: selectedJob?.title || 'Job',
-          relatedEntityType: 'job',
-          relatedEntityId: selectedJobId ?? undefined,
+          relatedEntityType: 'job_invitation',
+          relatedEntityId: invitation.id,
           actionUrl: '/jobs',
           actorName,
         });

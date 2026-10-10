@@ -73,7 +73,7 @@ function rpcPayload(type: string, recipientId: string) {
   };
 }
 
-test.describe('PB-NOTIFICATIONS-INSERT-HARDENING-001 — sql/027 security matrix', () => {
+test.describe('PB-NOTIFICATIONS — sql/027 + sql/029 security matrix', () => {
   test.skip(!SUPABASE_URL || !ANON_KEY || !EMAIL_A || !EMAIL_B, 'env missing');
 
   let tokenA = '';
@@ -82,6 +82,9 @@ test.describe('PB-NOTIFICATIONS-INSERT-HARDENING-001 — sql/027 security matrix
   let uidB = '';
 
   test.beforeAll(async () => {
+    if (SUPABASE_URL !== 'https://uqfbilyfpflrlthnyijj.supabase.co') {
+      throw new Error('QA project identity mismatch; refusing notification test writes');
+    }
     ({ token: tokenA, uid: uidA } = await login(EMAIL_A, PASSWORD_A));
     ({ token: tokenB, uid: uidB } = await login(EMAIL_B, PASSWORD_B));
   });
@@ -160,25 +163,18 @@ test.describe('PB-NOTIFICATIONS-INSERT-HARDENING-001 — sql/027 security matrix
 
   // ── RPC pb_create_client_notification ───────────────────────────────
 
-  test('RPC like cross-user → 200 (benign social type)', async () => {
+  test('RPC like without a real source is rejected', async () => {
     const ctx = await rest(tokenA);
     const res = await ctx.post(`/rest/v1/rpc/${RPC}`, { data: rpcPayload('like', uidB) });
-    expect(res.status(), `like RPC must succeed, got ${res.status()} ${(await res.text()).slice(0, 120)}`).toBe(200);
+    expect([400, 403]).toContain(res.status());
     await ctx.dispose();
-    // cleanup: B deletes its own probe rows
-    const bctx = await rest(tokenB);
-    await bctx.delete(`/rest/v1/${T}?user_id=eq.${uidB}&title=eq.${PROBE_TITLE}`);
-    await bctx.dispose();
   });
 
-  test('RPC job_invitation cross-user → 200 (benign job type)', async () => {
+  test('RPC job_invitation without a real source is rejected', async () => {
     const ctx = await rest(tokenA);
     const res = await ctx.post(`/rest/v1/rpc/${RPC}`, { data: rpcPayload('job_invitation', uidB) });
-    expect(res.status(), `job_invitation RPC must succeed, got ${res.status()}`).toBe(200);
+    expect([400, 403]).toContain(res.status());
     await ctx.dispose();
-    const bctx = await rest(tokenB);
-    await bctx.delete(`/rest/v1/${T}?user_id=eq.${uidB}&title=eq.${PROBE_TITLE}`);
-    await bctx.dispose();
   });
 
   test('RPC privileged type (ADMIN_BROADCAST) → error (not client-creatable)', async () => {
@@ -215,29 +211,15 @@ test.describe('PB-NOTIFICATIONS-INSERT-HARDENING-001 — sql/027 security matrix
     await ctx.dispose();
   });
 
-  test('recipient sees RPC-created notification; unrelated user does not', async () => {
-    // A creates a like notification for B via RPC
+  test('RPC without a real source creates no third-party notification', async () => {
     const actx = await rest(tokenA);
-    const ins = await actx.post(`/rest/v1/rpc/${RPC}`, { data: rpcPayload('like', uidB) });
-    expect(ins.status()).toBe(200);
+    const before = await actx.post(`/rest/v1/rpc/${RPC}`, { data: rpcPayload('like', uidB) });
+    expect([400, 403]).toContain(before.status());
     await actx.dispose();
 
-    // B (recipient) reads it
     const bctx = await rest(tokenB);
     const readB = await bctx.get(`/rest/v1/${T}?select=id&user_id=eq.${uidB}&title=eq.${PROBE_TITLE}`);
-    expect((await readB.json()).length, 'recipient must see the notification').toBe(1);
-
-    // A (unrelated for this row) reads B's notifications → 0 rows
-    const actx2 = await rest(tokenA);
-    const readA = await actx2.get(`/rest/v1/${T}?select=id&user_id=eq.${uidB}&title=eq.${PROBE_TITLE}`);
-    expect((await readA.json()).length, 'unrelated user must not see recipient rows').toBe(0);
-    await actx2.dispose();
-
-    // B deletes it (owner DELETE still works)
-    const del = await bctx.delete(`/rest/v1/${T}?user_id=eq.${uidB}&title=eq.${PROBE_TITLE}`);
-    expect([200, 204], `owner DELETE must work, got ${del.status()}`).toContain(del.status());
-    const after = await bctx.get(`/rest/v1/${T}?select=id&user_id=eq.${uidB}&title=eq.${PROBE_TITLE}`);
-    expect((await after.json()).length, 'probe row must be gone').toBe(0);
+    expect((await readB.json()).length, 'recipient must have no forged notification').toBe(0);
     await bctx.dispose();
   });
 });

@@ -57,8 +57,8 @@ interface CreateNotificationArgs {
  * is no longer possible for cross-recipient rows (RLS restricts INSERT to
  * self-only). Cross-recipient creation goes through the narrowly scoped
  * pb_create_client_notification RPC, which (a) derives the actor from
- * auth.uid(), (b) allows only benign client types, and (c) requires a
- * verifiable business relationship for referral types.
+ * auth.uid(), (b) allows only client types, and (c) requires a
+ * verifiable business relationship for social, job, and referral types.
  */
 export async function createNotification(args: CreateNotificationArgs): Promise<void> {
   if (!args.recipientId) return;
