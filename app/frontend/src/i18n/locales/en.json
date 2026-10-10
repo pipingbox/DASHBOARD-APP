@@ -2255,7 +2255,10 @@
           "advance": "Advance",
           "travel": "Travel",
           "straightCut": "Straight"
-        }
+        },
+        "clrSourceCatalog": "CLR resolved from the catalog: NPS {{combo}}.",
+        "clrSourceCustom": "Custom CLR; not taken from the catalog.",
+        "clrMissing": "This tool's catalog has no tabulated CLR for NPS {{combo}}. Enter a CLR to calculate."
       },
       "errors": {
         "line_count_range": "Line count must be an integer between {{min}} and {{max}}",

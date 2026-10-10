@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import type {
   DiagramDimension,
   DiagramPoint,
@@ -15,7 +16,16 @@ import type {
  *   - Entry/exit stubs (decorative, NOT pipe to cut): dark, thin.
  *   - Theoretical axes through the intersection points: dashed.
  *   - Dimensions with explicit extension lines and arrowheads.
+ *   - Legibility floor: the effective on-screen text size never drops
+ *     below MIN_EFFECTIVE_FONT_CSS_PX. On narrow viewports the drawing
+ *     keeps its scale and scrolls horizontally inside its container
+ *     instead of shrinking annotations below the readable threshold.
  */
+
+/** Minimum effective (on-screen) text size in CSS pixels. The renderer adds
+ * a small tolerance so sub-pixel layout rounding never dips below it. */
+const MIN_EFFECTIVE_FONT_CSS_PX = 11;
+const MIN_EFFECTIVE_FONT_EPS_PX = 0.25;
 
 const COLORS = {
   assembly: '#FF8C00',
@@ -85,12 +95,11 @@ function DimensionView({ dim, text, fontH }: { dim: DiagramDimension; text: stri
   const laneAbs = Math.abs(dim.lane);
   const a = { x: dim.from.x + nx * laneAbs, y: dim.from.y + ny * laneAbs };
   const b = { x: dim.to.x + nx * laneAbs, y: dim.to.y + ny * laneAbs };
-  const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  // Label position along the dimension line (default: middle).
+  const at = dim.labelAt ?? 0.5;
+  const pos = { x: a.x + (b.x - a.x) * at, y: a.y + (b.y - a.y) * at };
 
-  const labelPos =
-    dim.kind === 'vertical'
-      ? { x: mid.x + nx * fontH * 0.4, y: mid.y + fontH * 0.3, anchor: nx >= 0 ? ('start' as const) : ('end' as const) }
-      : { x: mid.x + nx * fontH * 0.5, y: mid.y + ny * fontH * 0.9 + fontH * 0.3, anchor: ('middle' as const) };
+  const common = { fill: COLORS.dimText, fontSize: fontH } as const;
 
   return (
     <g>
@@ -114,9 +123,30 @@ function DimensionView({ dim, text, fontH }: { dim: DiagramDimension; text: stri
       <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS.dim} strokeWidth={fontH * 0.09} />
       <Arrow at={a} dir={{ x: -ux, y: -uy }} size={arrow} />
       <Arrow at={b} dir={{ x: ux, y: uy }} size={arrow} />
-      <text x={labelPos.x} y={labelPos.y} textAnchor={labelPos.anchor} fill={COLORS.dimText} fontSize={fontH}>
-        {text}
-      </text>
+      {dim.kind === 'vertical' ? (
+        /* Vertical dimensions are lettered ALONG the dimension line
+           (technical-drawing convention): the long localized label runs
+           vertically, so it never spills past the left/right SVG edges. */
+        <text
+          x={a.x + nx * fontH * 0.75}
+          y={pos.y}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          transform={`rotate(-90 ${a.x + nx * fontH * 0.75} ${pos.y})`}
+          {...common}
+        >
+          {text}
+        </text>
+      ) : (
+        <text
+          x={pos.x + nx * fontH * 0.5}
+          y={pos.y + ny * fontH * 0.9 + fontH * 0.3}
+          textAnchor="middle"
+          {...common}
+        >
+          {text}
+        </text>
+      )}
     </g>
   );
 }
@@ -133,25 +163,49 @@ export default function TwoElbowOffsetDiagramView({
   const maxLane = model.dimensions.reduce((m, d) => Math.max(m, Math.abs(d.lane)), 0);
 
   const fontH = Math.min(h / 22, w / 34);
-  // Dimension labels are laid out outside their witness lines.  Reserve
-  // enough horizontal room for the longest localized label; using only a
-  // short arrow clearance clips the first characters at the SVG viewport.
-  const margin = maxLane + fontH * 8;
+  // Dimension labels: vertical ones are lettered along their dimension line
+  // (technical-drawing convention), so the horizontal reserve only needs to
+  // cover the rotated label height, the line identifiers and the arrow
+  // clearance — not a full horizontal label width.
+  const margin = maxLane + fontH * 4;
   const vx = bounds.minX - margin;
   const vy = bounds.minY - margin;
   const vw = w + 2 * margin;
   const vh = h + 2 * margin;
 
-  const idX = bounds.minX - fontH * 0.6;
+  // Effective legibility floor: rendered text must stay >= 11 CSS px.
+  // scale = renderedWidth / vw, so the minimum rendered width that keeps
+  // fontH readable is MIN_EFFECTIVE_FONT_CSS_PX * vw / fontH. Below that
+  // container width the SVG keeps its minimum width and the wrapper
+  // scrolls horizontally — the drawing is never shrunk into illegibility.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      setContainerWidth(entries[0].contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const minRenderedWidth = ((MIN_EFFECTIVE_FONT_CSS_PX + MIN_EFFECTIVE_FONT_EPS_PX) * vw) / fontH;
+  const renderedWidth = containerWidth === null ? null : Math.max(containerWidth, minRenderedWidth);
+  const widthAttr = renderedWidth === null ? '100%' : renderedWidth;
+  const heightAttr = renderedWidth === null ? undefined : (renderedWidth * vh) / vw;
 
   return (
-    <svg
-      viewBox={`${vx} ${vy} ${vw} ${vh}`}
-      className="w-full"
-      role="img"
-      aria-label="two-elbow-offset-diagram"
-      data-testid="two-elbow-offset-diagram"
-    >
+    <div ref={containerRef} className="overflow-x-auto">
+      <svg
+        viewBox={`${vx} ${vy} ${vw} ${vh}`}
+        width={widthAttr}
+        height={heightAttr}
+        role="img"
+        aria-label="two-elbow-offset-diagram"
+        data-testid="two-elbow-offset-diagram"
+        data-min-effective-font-px={MIN_EFFECTIVE_FONT_CSS_PX}
+      >
       {/* entry/exit stubs: decorative continuations, NOT pipe to cut */}
       {model.lines.map((line) => (
         <g key={`stubs-${line.id}`}>
@@ -257,15 +311,26 @@ export default function TwoElbowOffsetDiagramView({
         <DimensionView key={i} dim={dim} text={dimText(dim)} fontH={fontH} />
       ))}
 
-      {/* line identifiers, related to the results table */}
+      {/* line identifiers, related to the results table. Placed inside the
+          drawing just above each entry stub: the outer left lane belongs to
+          the rotated spacing dimension, and stacking IDs there collides on
+          crowded assemblies (N=12). */}
       {model.lines.map((line) => {
         const y = line.straightRun?.from.y ?? line.entryStub?.from.y ?? 0;
         return (
-          <text key={`id-${line.id}`} x={idX} y={y + fontH * 0.32} textAnchor="end" fill={COLORS.id} fontSize={fontH}>
+          <text
+            key={`id-${line.id}`}
+            x={bounds.minX + fontH * 0.5}
+            y={y - fontH * 0.35}
+            textAnchor="start"
+            fill={COLORS.id}
+            fontSize={fontH}
+          >
             {lineText(line.id)}
           </text>
         );
       })}
-    </svg>
+      </svg>
+    </div>
   );
 }

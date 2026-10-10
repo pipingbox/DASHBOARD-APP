@@ -2032,7 +2032,10 @@
           "advance": "Avancement",
           "travel": "Parcours",
           "straightCut": "Segment droit"
-        }
+        },
+        "clrSourceCatalog": "CLR résolu du catalogue : NPS {{combo}}.",
+        "clrSourceCustom": "CLR personnalisé ; ne provient pas du catalogue.",
+        "clrMissing": "Le catalogue de cet outil n'a pas de CLR tabulé pour NPS {{combo}}. Saisissez un CLR pour calculer."
       },
       "errors": {
         "line_count_range": "Le nombre de lignes doit être un entier entre {{min}} et {{max}}",

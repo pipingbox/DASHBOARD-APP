@@ -2196,7 +2196,10 @@
           "advance": "Wyprz.",
           "travel": "Droga",
           "straightCut": "Odcinek"
-        }
+        },
+        "clrSourceCatalog": "CLR z katalogu: NPS {{combo}}.",
+        "clrSourceCustom": "CLR własny; nie pochodzi z katalogu.",
+        "clrMissing": "Katalog tego narzędzia nie ma zestawionego CLR dla NPS {{combo}}. Wprowadź CLR, aby obliczyć."
       },
       "errors": {
         "line_count_range": "Liczba linii musi być liczbą całkowitą od {{min}} do {{max}}",

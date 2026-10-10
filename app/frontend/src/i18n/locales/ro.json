@@ -2193,7 +2193,10 @@
           "travel": "Parcurs",
           "straightCut": "Segment"
         },
-        "drawPlaceholder": "Introdu parametrii pentru a vedea deplasarea"
+        "drawPlaceholder": "Introdu parametrii pentru a vedea deplasarea",
+        "clrSourceCatalog": "CLR din catalog: NPS {{combo}}.",
+        "clrSourceCustom": "CLR personalizat; nu provine din catalog.",
+        "clrMissing": "Catalogul acestei unelte nu are CLR tabulat pentru NPS {{combo}}. Introdu un CLR pentru a calcula."
       },
       "errors": {
         "line_count_range": "Numărul de linii trebuie să fie un număr întreg între {{min}} și {{max}}",

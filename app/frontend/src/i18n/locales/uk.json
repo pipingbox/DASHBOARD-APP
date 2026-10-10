@@ -2196,7 +2196,10 @@
           "advance": "Випер.",
           "travel": "Шлях",
           "straightCut": "Прямий"
-        }
+        },
+        "clrSourceCatalog": "CLR із каталогу: NPS {{combo}}.",
+        "clrSourceCustom": "Власний CLR; не з каталогу.",
+        "clrMissing": "У каталозі цього інструмента немає табличного CLR для NPS {{combo}}. Введіть CLR, щоб обчислити."
       },
       "errors": {
         "line_count_range": "Кількість ліній має бути цілим числом від {{min}} до {{max}}",

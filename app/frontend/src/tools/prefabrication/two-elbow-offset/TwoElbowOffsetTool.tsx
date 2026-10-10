@@ -50,6 +50,37 @@ const KEY = 'tools.prefab.twoElbowOffset';
 /** Elbow angles with common commercial fittings; others are nominal geometry. */
 const COMMERCIAL_ANGLES = new Set([45, 90]);
 
+/**
+ * Provenance of the CLR value, made explicit so a non-tabulated catalog
+ * combination can never silently reuse a previous radius as its own:
+ *   - 'catalog': resolved from the standards elbow-radius table.
+ *   - 'custom': entered/edited by the user (visible, explicit choice).
+ *   - 'untabulated': NPS/type has no CLR in this tool's catalog; the field
+ *     is cleared and calculation is blocked until the user enters one.
+ */
+type ClrSource = 'catalog' | 'custom' | 'untabulated';
+
+/** Trim trailing zeros of a decimal string ("200.00" -> "200"). */
+function trimTrailingZeros(s: string): string {
+  if (!s.includes('.')) return s;
+  return s.replace(/\.?0+$/, '');
+}
+
+/**
+ * Display a value without ever rendering a non-zero quantity as "0":
+ * precision extends until the rounded text is non-zero (0.004 mm,
+ * 0.0002 in). Presentation only — canonical values and engine precision
+ * are untouched.
+ */
+function fmtNonZero(v: number, baseDecimals: number): string {
+  if (v === 0) return '0';
+  for (let p = baseDecimals; p <= 8; p++) {
+    const s = trimTrailingZeros(v.toFixed(p));
+    if (Number(s) !== 0) return s;
+  }
+  return v.toExponential(2);
+}
+
 export default function TwoElbowOffsetTool() {
   const { t } = useTranslation();
   const [unitSystem, setUnitSystem] = useState<UnitSystem>('metric');
@@ -68,6 +99,7 @@ export default function TwoElbowOffsetTool() {
   // Default matches the PC-01 reference: CLR 152.4 mm = NPS 4 LR (A = 6 in).
   const [nps, setNps] = useState('4');
   const [elbowType, setElbowType] = useState<'LR' | 'SR'>('LR');
+  const [clrSource, setClrSource] = useState<ClrSource>('catalog');
 
   useEffect(() => {
     // P4 policy (GO): empty stays empty and invalid text stays invalid
@@ -79,9 +111,18 @@ export default function TwoElbowOffsetTool() {
     setClrField((f) => (lengthFieldIsValid(f) ? lengthFieldOnUnitChange(f, unit) : { ...f, unit }));
   }, [unit]);
 
-  const applyCatalogClr = (nextNps: string, nextType: 'LR' | 'SR') => {
+  const applyCatalogSelection = (nextNps: string, nextType: 'LR' | 'SR') => {
     const radius = getElbowRadius(nextNps, nextType);
-    if (radius !== undefined) setClrField(createLengthField(radius, unit));
+    if (radius !== undefined) {
+      setClrField(createLengthField(radius, unit));
+      setClrSource('catalog');
+    } else {
+      // Non-tabulated combination: clear the field instead of silently
+      // keeping a radius that belongs to a different NPS/type. Calculation
+      // is blocked until the user explicitly enters a CLR.
+      setClrField({ text: '', canonicalMm: null, unit });
+      setClrSource('untabulated');
+    }
   };
 
   const { presentation, diagram, error, invalidInput } = useMemo(() => {
@@ -122,11 +163,12 @@ export default function TwoElbowOffsetTool() {
     };
   }, [lineCount, elbowAngle, initialField, finalField, clrField, t]);
 
-  /** Human-readable formatting; the engine itself never rounds. */
+  /** Human-readable formatting; the engine itself never rounds. Precision
+   * extends so a positive value never displays as "0" (review finding 4). */
   const fmt = (v: number | undefined) => {
     if (v === undefined || !Number.isFinite(v)) return '—';
-    if (unitSystem === 'metric') return `${Number(v.toFixed(2))} mm`;
-    return `${fromMm(v, 'in').toFixed(3)} in`;
+    if (unitSystem === 'metric') return `${fmtNonZero(v, 2)} mm`;
+    return `${fmtNonZero(fromMm(v, 'in'), 3)} in`;
   };
 
   const fmtSigned = (v: number) => {
@@ -238,10 +280,24 @@ export default function TwoElbowOffsetTool() {
           <Input
             id="teo-clr"
             value={clrField.text}
-            onChange={(e) => setClrField((f) => lengthFieldOnEdit(f, e.target.value, unit))}
+            onChange={(e) => {
+              setClrField((f) => lengthFieldOnEdit(f, e.target.value, unit));
+              // Any manual edit is an explicit user choice: it no longer
+              // belongs to the catalog selection.
+              setClrSource((prev) => (prev === 'untabulated' && e.target.value === '' ? prev : 'custom'));
+            }}
             aria-invalid={fieldInvalid(clrField)}
             className="bg-[#0E1117] border-[#232A36]"
           />
+          {/* Visible CLR provenance: catalog / custom / missing data. */}
+          <p
+            data-testid="two-elbow-offset-clr-source"
+            className={`text-[10px] ${clrSource === 'untabulated' ? 'text-amber-400' : 'text-[#7C8694]'}`}
+          >
+            {clrSource === 'catalog' && t(`${KEY}.clrSourceCatalog`, { combo: `${nps}" ${elbowType}` })}
+            {clrSource === 'custom' && t(`${KEY}.clrSourceCustom`)}
+            {clrSource === 'untabulated' && t(`${KEY}.clrMissing`, { combo: `${nps}" ${elbowType}` })}
+          </p>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
@@ -250,7 +306,7 @@ export default function TwoElbowOffsetTool() {
               value={nps}
               onValueChange={(v) => {
                 setNps(v);
-                applyCatalogClr(v, elbowType);
+                applyCatalogSelection(v, elbowType);
               }}
             >
               <SelectTrigger className="bg-[#0E1117] border-[#232A36]" aria-label={t(`${KEY}.nps`)}>
@@ -270,7 +326,7 @@ export default function TwoElbowOffsetTool() {
               onValueChange={(v) => {
                 const next = v as 'LR' | 'SR';
                 setElbowType(next);
-                applyCatalogClr(nps, next);
+                applyCatalogSelection(nps, next);
               }}
             >
               <SelectTrigger className="bg-[#0E1117] border-[#232A36]" aria-label={t(`${KEY}.elbowType`)}>

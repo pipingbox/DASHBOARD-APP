@@ -28,7 +28,7 @@
  * Pure module: no React, no DOM, no i18n.
  */
 
-import type { PipeCombSolution } from '../../../core/geometry/pipe-comb.ts';
+import type { PipeCombSolution } from '../../core/geometry/pipe-comb.ts';
 
 const DEG_TO_RAD = Math.PI / 180;
 const ARC_SAMPLES = 24;
@@ -78,6 +78,12 @@ export interface DiagramDimension {
    * (mm, signed; positive = down/right of the element).
    */
   lane: number;
+  /**
+   * Position of the label along the dimension line (0 = start, 0.5 =
+   * middle, default). Used to keep long localized labels from piling up at
+   * the jog midpoint on crowded assemblies (e.g. N=12).
+   */
+  labelAt?: number;
   /** i18n key suffix under tools.prefab.twoElbowOffset.dims. */
   labelKey: 'spacingInitial' | 'spacingFinal' | 'offset' | 'advance' | 'travel' | 'straightCut';
   /** Display value (mm) taken from the engine solution / inputs. */
@@ -210,6 +216,7 @@ export function buildTwoElbowOffsetDiagram(
       pi2,
       tangentPoints: [entryTangent, diagStart, diagEnd, exitTangent],
       zeroCut,
+      straightRun: null,
     };
   });
 
@@ -253,12 +260,15 @@ export function buildTwoElbowOffsetDiagram(
     const laneBase = Math.max(0.5 * stubLen, 2.2 * rep.takeOutPerElbowMm);
 
     // Offset: between the (extended) theoretical entry/exit axes, mid-jog.
+    // Label sits toward the entry end, away from the travel/cut labels that
+    // occupy the upper side of the diagonal.
     const midX = (pi1.x + pi2.x) / 2;
     dimensions.push({
       kind: 'vertical',
       from: { x: midX, y: pi1.y },
       to: { x: midX, y: pi2.y },
       lane: 0.35 * stubLen,
+      labelAt: 0.28,
       labelKey: 'offset',
       valueMm: rep.offsetAbsMm,
       lineId: rep.id,
@@ -274,23 +284,27 @@ export function buildTwoElbowOffsetDiagram(
       valueMm: rep.advanceMm,
       lineId: rep.id,
     });
-    // Travel: aligned with the diagonal between the PIs, outward lane.
+    // Travel: aligned with the diagonal between the PIs, outward lane far
+    // enough to clear the rotated offset label at the jog midpoint.
     dimensions.push({
       kind: 'aligned',
       from: pi1,
       to: pi2,
-      lane: s > 0 ? 0.55 * laneBase : -0.55 * laneBase,
+      lane: s > 0 ? 1.05 * laneBase : -1.05 * laneBase,
+      labelAt: 0.35,
       labelKey: 'travel',
       valueMm: rep.travelMm,
       lineId: rep.id,
     });
-    // Straight cut: aligned between the diagonal tangent points, further out.
+    // Straight cut: aligned between the diagonal tangent points, further out
+    // and toward the exit end so it never stacks on the travel label.
     if (!repModel.zeroCut) {
       dimensions.push({
         kind: 'aligned',
         from: repModel.tangentPoints[1],
         to: repModel.tangentPoints[2],
-        lane: s > 0 ? 1.05 * laneBase : -1.05 * laneBase,
+        lane: s > 0 ? 1.95 * laneBase : -1.95 * laneBase,
+        labelAt: 0.75,
         labelKey: 'straightCut',
         valueMm: rep.straightCutLengthMm,
         lineId: rep.id,

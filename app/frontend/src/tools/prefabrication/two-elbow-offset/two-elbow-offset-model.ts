@@ -21,7 +21,7 @@
  * Pure module: no React, no DOM, no i18n.
  */
 
-import type { PipeCombSolution } from '../../../core/geometry/pipe-comb.ts';
+import type { PipeCombSolution } from '../../core/geometry/pipe-comb.ts';
 
 /** Presentation status of one solved line. */
 export type TwoElbowOffsetLineStatus =

@@ -2029,7 +2029,10 @@
           "advance": "Vorschub",
           "travel": "Weg",
           "straightCut": "Gerades"
-        }
+        },
+        "clrSourceCatalog": "CLR aus dem Katalog: NPS {{combo}}.",
+        "clrSourceCustom": "Eigener CLR; nicht aus dem Katalog.",
+        "clrMissing": "Der Katalog dieses Tools enthält keinen tabellierten CLR für NPS {{combo}}. Gib einen CLR ein, um zu rechnen."
       },
       "errors": {
         "line_count_range": "Die Leitungsanzahl muss eine ganze Zahl zwischen {{min}} und {{max}} sein",

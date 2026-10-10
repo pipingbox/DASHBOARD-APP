@@ -2029,7 +2029,10 @@
           "advance": "Voorschot",
           "travel": "Weg",
           "straightCut": "Recht"
-        }
+        },
+        "clrSourceCatalog": "CLR uit de catalogus: NPS {{combo}}.",
+        "clrSourceCustom": "Eigen CLR; niet uit de catalogus.",
+        "clrMissing": "De catalogus van deze tool heeft geen getabuleerde CLR voor NPS {{combo}}. Voer een CLR in om te berekenen."
       },
       "errors": {
         "line_count_range": "Het aantal leidingen moet een geheel getal tussen {{min}} en {{max}} zijn",

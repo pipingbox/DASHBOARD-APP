@@ -2190,7 +2190,10 @@
           "advance": "Напред.",
           "travel": "Път",
           "straightCut": "Прав участък"
-        }
+        },
+        "clrSourceCatalog": "CLR от каталога: NPS {{combo}}.",
+        "clrSourceCustom": "Персонален CLR; не е от каталога.",
+        "clrMissing": "Каталогът на този инструмент няма табулиран CLR за NPS {{combo}}. Въведете CLR, за да се изчисли."
       },
       "errors": {
         "line_count_range": "Броят линии трябва да е цяло число между {{min}} и {{max}}",
