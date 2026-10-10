@@ -82,6 +82,9 @@ test.describe('PB-NOTIFICATIONS — sql/027 + sql/029 security matrix', () => {
   let uidB = '';
 
   test.beforeAll(async () => {
+    if (SUPABASE_URL !== 'https://uqfbilyfpflrlthnyijj.supabase.co') {
+      throw new Error('QA project identity mismatch; refusing notification test writes');
+    }
     ({ token: tokenA, uid: uidA } = await login(EMAIL_A, PASSWORD_A));
     ({ token: tokenB, uid: uidB } = await login(EMAIL_B, PASSWORD_B));
   });
