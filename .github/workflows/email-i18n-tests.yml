@@ -1,0 +1,58 @@
+name: Email i18n Tests
+
+# PB-I18N-EMAIL-001: pruebas de la capa de correos localizados (11 idiomas),
+# del Send Email Auth Hook y paridad con app/frontend/src/i18n/languages.json.
+# Solo lectura: no despliega, no envía correos, no toca ningún proyecto Supabase.
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/functions/_shared/email-i18n/**'
+      - 'supabase/functions/_shared/email-provider.ts'
+      - 'supabase/functions/_shared/standard-webhooks.ts'
+      - 'supabase/functions/auth-send-email-hook/**'
+      - 'supabase/functions/notification-dispatcher/**'
+      - 'supabase/functions/cert-expiry-alerts/**'
+      - 'supabase/functions/job-match-notify/**'
+      - 'supabase/functions/workforce-match-notify/**'
+      - 'app/frontend/src/i18n/languages.json'
+      - '.github/workflows/email-i18n-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/_shared/email-i18n/**'
+      - 'supabase/functions/auth-send-email-hook/**'
+
+concurrency:
+  group: email-i18n-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  email-i18n:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Typecheck (email-i18n, hook, provider, dispatcher, cert-expiry, match-notify)
+        run: |
+          deno check --node-modules-dir=none \
+            supabase/functions/_shared/email-i18n/mod.ts \
+            supabase/functions/_shared/email-provider.ts \
+            supabase/functions/_shared/standard-webhooks.ts \
+            supabase/functions/auth-send-email-hook/index.ts \
+            supabase/functions/notification-dispatcher/index.ts \
+            supabase/functions/cert-expiry-alerts/index.ts \
+            supabase/functions/job-match-notify/index.ts \
+            supabase/functions/workforce-match-notify/index.ts
+
+      - name: Tests (11 idiomas, seguridad, firma, URL de verificación)
+        run: |
+          deno test --node-modules-dir=none --allow-read --allow-env \
+            supabase/functions/_shared/email-i18n/ \
+            supabase/functions/auth-send-email-hook/

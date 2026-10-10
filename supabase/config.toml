@@ -1,0 +1,84 @@
+# supabase/config.toml — PB-I18N-EMAIL-001
+#
+# Configuración para `supabase start` (CLI local). NO se aplica a ningún
+# proyecto hospedado: la CLI solo la usa para el stack Docker local. Permite
+# probar el Send Email Auth Hook de extremo a extremo con GoTrue real y el
+# servidor de correo local (Inbucket/Mailpit en http://127.0.0.1:54324), sin
+# enviar nada al exterior.
+#
+# Uso:
+#   supabase start
+#   supabase functions serve auth-send-email-hook --no-verify-jwt \
+#     --env-file supabase/functions/.env.local
+#   # Registro desde la app apuntando a http://127.0.0.1:54321 → el correo
+#   # aparece en Inbucket en el idioma de user_metadata.lang.
+#
+# .env.local (NO versionar; ver DESPLIEGUE.md):
+#   SEND_EMAIL_HOOK_SECRET=v1,whsec_<base64>   (el mismo valor que abajo)
+#   EMAIL_DELIVERY_MODE=smtp
+#   AUTH_SMTP_HOST=host.docker.internal  AUTH_SMTP_PORT=54325  AUTH_SMTP_SECURE=false
+#   AUTH_SMTP_USER=local  AUTH_SMTP_PASSWORD=local  AUTH_SMTP_FROM=no-reply@auth.pipingbox.com
+#   AUTH_PUBLIC_URL=http://127.0.0.1:54321
+
+project_id = "pipingbox-local"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:5173"
+additional_redirect_urls = ["http://127.0.0.1:5173/auth/callback", "http://localhost:5173/auth/callback"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+# Igual que producción: la confirmación es obligatoria.
+enable_confirmations = true
+# mailer_otp_exp de producción = 3600 s.
+otp_expiry = 3600
+max_frequency = "1s"
+
+# Send Email Auth Hook → Edge Function local. Con el hook activo GoTrue NO
+# usa las plantillas nativas ni el SMTP de [auth.email.smtp].
+[auth.hook.send_email]
+enabled = true
+uri = "http://host.docker.internal:54321/functions/v1/auth-send-email-hook"
+# Secreto de desarrollo (solo local). En hospedado lo genera el panel.
+secrets = "env(SEND_EMAIL_HOOK_SECRET)"
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+inspector_port = 8083
+
+[functions.auth-send-email-hook]
+verify_jwt = false
+
+[functions.notification-dispatcher]
+verify_jwt = true
+
+[functions.cert-expiry-alerts]
+verify_jwt = true

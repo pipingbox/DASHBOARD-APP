@@ -241,6 +241,16 @@ Deno.serve(async (req) => {
       title: "Nueva oportunidad de proyecto PipingBox",
       message: `${result.score}% de compatibilidad con "${opportunity.title}"${opportunity.country ? ` en ${opportunity.country}` : ""}.`,
       action_url: `/workforce/${request.id}`,
+      // PB-I18N-EMAIL-001: datos estructurados para el correo localizado por
+      // destinatario (notification-dispatcher). in_app/WhatsApp sin cambios.
+      email_template: {
+        template: "workforce_match",
+        vars: {
+          score: result.score,
+          workerType: request.worker_type ?? "",
+          country: request.country ?? "",
+        },
+      },
       metadata: {
         score: result.score,
         breakdown: result.breakdown,

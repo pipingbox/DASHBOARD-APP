@@ -23,6 +23,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { notifyNewCompanyLead, notifyLeadEmailFailure } from '@/lib/notifications';
 import { useTranslation } from 'react-i18next';
+import { toSupportedCode, DEFAULT_LANGUAGE } from '@/i18n';
 
 interface FormData {
   company_name: string;
@@ -62,7 +63,7 @@ const WORKER_TYPES = [
 ];
 
 export default function RequestWorkers() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [form, setForm] = useState<FormData>(INITIAL);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -192,6 +193,9 @@ export default function RequestWorkers() {
             body: {
               company_name: workforcePayload.company_name,
               email: workforcePayload.email,
+              // PB-I18N-EMAIL-001: idioma de la UI del lead (destinatario externo
+              // sin cuenta) para el acuse de recibo; la función lo normaliza.
+              lang: toSupportedCode(i18n.resolvedLanguage || i18n.language) ?? DEFAULT_LANGUAGE,
             },
           },
         );
