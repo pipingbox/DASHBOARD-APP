@@ -231,11 +231,21 @@ Deno.test("handleRequest: payload sin email → 400", async () => {
 // Redacción para captura QA
 // ─────────────────────────────────────────────────────────────────────────────
 
-Deno.test("redactSensitive elimina tokens y OTP antes de persistir", () => {
+Deno.test("redactSensitive elimina tokens, OTP y direcciones antes de persistir", () => {
   const html = `<a href="https://auth.pipingbox.com/auth/v1/verify?token=SECRET_HASH&type=signup&redirect_to=x">go</a> code 123456`;
   const out = redactSensitive(html);
   assert(!out.includes("SECRET_HASH"));
   assert(!out.includes("123456"));
   assertStringIncludes(out, "token=[REDACTED]&type=signup");
   assertStringIncludes(out, "[OTP]");
+
+  // mailer_otp_length = 8 en QA y producción: el código debe quedar redactado.
+  const otp8 = redactSensitive("Your code is 48213706 and expires in 60 minutes");
+  assert(!otp8.includes("48213706"), "OTP de 8 digitos sin redactar");
+  assertStringIncludes(otp8, "[OTP]");
+
+  // Sin datos personales reales en la tabla de captura.
+  const withPii = redactSensitive("<p>Hola worker.test+qa@example.com, confirma tu correo</p>");
+  assert(!withPii.includes("worker.test+qa@example.com"), "direccion sin redactar");
+  assertStringIncludes(withPii, "[EMAIL]");
 });

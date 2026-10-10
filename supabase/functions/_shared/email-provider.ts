@@ -238,12 +238,19 @@ async function sha256Hex(input: string): Promise<string> {
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/** Redacta tokens y querystrings de enlaces de verificación/OTP antes de persistir. */
+/**
+ * Redacta, antes de persistir en la tabla de captura QA, todo lo que no debe
+ * quedar almacenado: tokens de verificación, códigos OTP (la longitud real la
+ * fija `mailer_otp_length`, 8 en PIPINGBOX) y direcciones de correo reales.
+ * Lo que se conserva (idioma, asunto, estructura, textos traducidos) es lo
+ * único necesario para validar la localización.
+ */
 export function redactSensitive(value: string | undefined): string {
   if (!value) return "";
   return value
     .replace(/([?&](?:token|token_hash|code|access_token|refresh_token)=)[^&\s"'<]+/gi, "$1[REDACTED]")
-    .replace(/\b\d{6}\b/g, "[OTP]");
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[EMAIL]")
+    .replace(/\b\d{6,8}\b/g, "[OTP]");
 }
 
 class CaptureEmailProvider implements EmailProvider {
@@ -270,7 +277,7 @@ class CaptureEmailProvider implements EmailProvider {
       lang_source: message.capture?.langSource ?? "fallback",
       recipient_hash: await sha256Hex(email),
       recipient_domain: at > 0 ? email.slice(at + 1) : null,
-      subject: message.subject,
+      subject: redactSensitive(message.subject),
       html: redactSensitive(message.html),
       text_body: redactSensitive(message.text),
       meta: message.capture?.meta ?? {},
