@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, TABLES } from '@/lib/supabase';
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/lib/notifications';
 
 const POLL_MS = 45_000;
+const MAX_BACKOFF_MS = 10 * 60_000; // 10 min cap
 
 /**
  * Hook for managing user notifications with real-time updates.
@@ -20,13 +21,27 @@ export function useNotifications() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<NotificationRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const failureCountRef = useRef(0);
 
   const refreshCount = useCallback(async () => {
     if (!user) {
       setUnreadCount(0);
       return;
     }
-    setUnreadCount(await countUnread(user.id));
+    try {
+      setUnreadCount(await countUnread(user.id));
+      // PB-GROWTH-GATE-FINAL-001: a successful poll always resets the
+      // backoff — a transient 403 (e.g. stale session) must not keep the
+      // loop throttled forever once the underlying cause clears.
+      failureCountRef.current = 0;
+    } catch (err) {
+      // Back off exponentially on repeated denials instead of hammering
+      // every POLL_MS forever, but keep retrying (capped) so a transient
+      // failure can self-heal without requiring a remount/relogin.
+      failureCountRef.current += 1;
+      // eslint-disable-next-line no-console
+      console.warn('[notifications] refreshCount failed', failureCountRef.current, err);
+    }
   }, [user]);
 
   const loadNotifications = useCallback(async () => {
@@ -59,12 +74,30 @@ export function useNotifications() {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  // Poll for unread count
+  // Poll for unread count with exponential backoff on repeated denials.
+  // A single successful poll resets to the base cadence (self-healing);
+  // persistent denials slow down (capped at MAX_BACKOFF_MS) instead of
+  // either hammering every 45s forever or stopping permanently.
   useEffect(() => {
-    void refreshCount();
-    if (!user) return;
-    const id = window.setInterval(() => void refreshCount(), POLL_MS);
-    return () => window.clearInterval(id);
+    failureCountRef.current = 0;
+    if (!user) {
+      void refreshCount();
+      return;
+    }
+    let timeoutId: number | undefined;
+    let cancelled = false;
+    const tick = async () => {
+      await refreshCount();
+      if (cancelled) return;
+      const exponent = Math.min(failureCountRef.current, 10);
+      const delay = Math.min(POLL_MS * 2 ** exponent, MAX_BACKOFF_MS);
+      timeoutId = window.setTimeout(() => void tick(), delay);
+    };
+    void tick();
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
   }, [user, refreshCount]);
 
   // Real-time subscription

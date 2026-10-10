@@ -379,11 +379,17 @@ export async function fetchAllNotificationsAdmin(limit = 100): Promise<Notificat
 }
 
 export async function countUnread(userId: string): Promise<number> {
-  const { count } = await supabase
+  const { count, error } = await supabase
     .from(TABLES.notifications)
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
     .eq('is_read', false);
+  if (error) {
+    // PB-GROWTH-GATE-FINAL-001: surface instead of silently swallowing so the
+    // polling loop (useNotifications) can back off on persistent denials
+    // (e.g. stale/mismatched session) instead of retrying forever.
+    throw error;
+  }
   return count ?? 0;
 }
 
