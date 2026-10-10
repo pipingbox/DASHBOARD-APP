@@ -35,6 +35,17 @@ function toBase64(bytes: ArrayBuffer): string {
   return btoa(s);
 }
 
+/**
+ * Copia los bytes a un ArrayBuffer propio. Necesario porque `Uint8Array` puede
+ * estar respaldado por un `SharedArrayBuffer` y las definiciones recientes de
+ * WebCrypto (`BufferSource`) solo aceptan `ArrayBuffer`.
+ */
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const buf = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(buf).set(bytes);
+  return buf;
+}
+
 function constantTimeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
@@ -50,12 +61,16 @@ export async function signWebhook(
 ): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
-    secretBytes,
+    toArrayBuffer(secretBytes),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"],
   );
-  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${id}.${timestamp}.${payload}`));
+  const sig = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(`${id}.${timestamp}.${payload}`),
+  );
   return `v1,${toBase64(sig)}`;
 }
 
