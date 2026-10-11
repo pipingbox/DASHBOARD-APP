@@ -15,6 +15,7 @@ on:
       - 'supabase/functions/cert-expiry-alerts/**'
       - 'supabase/functions/job-match-notify/**'
       - 'supabase/functions/workforce-match-notify/**'
+      - 'supabase/functions/app_14da0f1941_send_job_application_notification/**'
       - 'app/frontend/src/i18n/languages.json'
       - '.github/workflows/email-i18n-tests.yml'
   push:
@@ -50,11 +51,13 @@ jobs:
             supabase/functions/notification-dispatcher/index.ts \
             supabase/functions/cert-expiry-alerts/index.ts \
             supabase/functions/job-match-notify/index.ts \
-            supabase/functions/workforce-match-notify/index.ts
+            supabase/functions/workforce-match-notify/index.ts \
+            supabase/functions/app_14da0f1941_send_job_application_notification/index.reconstructed.ts
 
       - name: Tests (11 idiomas, seguridad, firma, URL de verificación, modo de entrega)
         run: |
           deno test --node-modules-dir=none --allow-read --allow-env \
             supabase/functions/_shared/email-i18n/ \
             supabase/functions/_shared/email-provider_test.ts \
-            supabase/functions/auth-send-email-hook/
+            supabase/functions/auth-send-email-hook/ \
+            supabase/functions/app_14da0f1941_send_job_application_notification/
