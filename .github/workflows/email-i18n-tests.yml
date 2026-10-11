@@ -44,6 +44,7 @@ jobs:
           deno check --node-modules-dir=none \
             supabase/functions/_shared/email-i18n/mod.ts \
             supabase/functions/_shared/email-provider.ts \
+            supabase/functions/_shared/email-provider_test.ts \
             supabase/functions/_shared/standard-webhooks.ts \
             supabase/functions/auth-send-email-hook/index.ts \
             supabase/functions/notification-dispatcher/index.ts \
@@ -51,8 +52,9 @@ jobs:
             supabase/functions/job-match-notify/index.ts \
             supabase/functions/workforce-match-notify/index.ts
 
-      - name: Tests (11 idiomas, seguridad, firma, URL de verificación)
+      - name: Tests (11 idiomas, seguridad, firma, URL de verificación, modo de entrega)
         run: |
           deno test --node-modules-dir=none --allow-read --allow-env \
             supabase/functions/_shared/email-i18n/ \
+            supabase/functions/_shared/email-provider_test.ts \
             supabase/functions/auth-send-email-hook/

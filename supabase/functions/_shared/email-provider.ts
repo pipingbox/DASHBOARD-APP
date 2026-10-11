@@ -79,9 +79,16 @@ interface ResolvedSmtpConfig {
 }
 
 export function resolveDeliveryMode(): EmailDeliveryMode {
-  const raw = (Deno.env.get("EMAIL_DELIVERY_MODE") || "smtp").trim().toLowerCase();
-  if (raw === "capture" || raw === "resend_api") return raw;
-  return "smtp";
+  const raw = (Deno.env.get("EMAIL_DELIVERY_MODE") || "").trim().toLowerCase();
+  // Sin configurar: comportamiento histórico, sin cambios (modo smtp por defecto).
+  if (raw === "") return "smtp";
+  if (raw === "smtp" || raw === "capture" || raw === "resend_api") return raw;
+  // PB-I18N-EMAIL-001 (revisión del PO, 2026-10-11): un valor presente pero
+  // mal escrito ("captrue", "Capture ", …) NUNCA debe caer en silencio al modo
+  // `smtp` real. Se lanza un error explícito para que el despliegue/la
+  // invocación fallen de forma visible en vez de arriesgar un envío SMTP real
+  // durante pruebas de QA.
+  throw new Error(`email_delivery_mode_invalid: "${raw}"`);
 }
 
 /**

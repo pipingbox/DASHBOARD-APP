@@ -10,8 +10,9 @@
 //   * Nunca se incluyen tokens en claro fuera del enlace/código destinado.
 //
 // Diseño: identidad PIPINGBOX (negro #0B0B0B / naranja #E8611A), tabla única
-// de 600 px, botón "bulletproof" con contraste AA (blanco sobre #E8611A: 4.6:1,
-// verificado en PB-AUTH-YAHOO-SPAM-001), `lang`/`charset=utf-8` en <html>.
+// de 600 px, botón "bulletproof" con texto oscuro #18181B sobre naranja
+// (contraste AA 5.19:1; corregido en revisión del PO, 2026-10-11 — el texto
+// blanco previo daba solo 3.41:1), `lang`/`charset=utf-8` en <html>.
 
 import { DEFAULT_EMAIL_LANGUAGE, type EmailLanguage } from "./languages.ts";
 import { getLocale } from "./locales.ts";
@@ -34,6 +35,15 @@ export const BRAND = {
   bg: "#F3F4F6",
   support: "support@pipingbox.com",
   site: "https://pipingbox.com",
+  /**
+   * PB-I18N-EMAIL-001 — corrección de accesibilidad (revisión del PO,
+   * 2026-10-11): el botón usaba texto blanco (#FFFFFF) sobre el naranja
+   * corporativo (#E8611A), con un contraste de ~3.41:1 — por debajo del
+   * mínimo WCAG AA para texto normal (4.5:1). Texto oscuro (#18181B) sobre el
+   * mismo naranja da ~5.19:1, que sí cumple AA. Ver test de regresión en
+   * `email-i18n_test.ts` ("contraste del botón cumple WCAG AA").
+   */
+  buttonText: "#18181B",
 } as const;
 
 export type Vars = Record<string, string | number | null | undefined>;
@@ -161,7 +171,7 @@ function button(label: string, url: string, fallbackLabel: string): string {
   const u = escapeHtml(url);
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:8px 0 20px 0;">
 <tr><td align="center" bgcolor="${BRAND.orange}" style="border-radius:6px;">
-  <a href="${u}" target="_blank" rel="noopener" style="display:inline-block; padding:14px 28px; font-size:16px; font-weight:bold; color:#FFFFFF; text-decoration:none; border-radius:6px; background-color:${BRAND.orange};">${label}</a>
+  <a href="${u}" target="_blank" rel="noopener" style="display:inline-block; padding:14px 28px; font-size:16px; font-weight:bold; color:${BRAND.buttonText}; text-decoration:none; border-radius:6px; background-color:${BRAND.orange};">${label}</a>
 </td></tr></table>
 <p style="margin:0 0 16px 0; font-size:13px; line-height:20px; color:${BRAND.muted};">${fallbackLabel}<br>
 <a href="${u}" style="color:${BRAND.orange}; word-break:break-all;">${u}</a></p>`;

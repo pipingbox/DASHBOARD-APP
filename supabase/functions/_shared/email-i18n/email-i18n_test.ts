@@ -3,6 +3,7 @@
 import { assert, assertEquals, assertStringIncludes, assertThrows } from "jsr:@std/assert@1";
 import {
   ACTION_TEMPLATES,
+  BRAND,
   DEFAULT_EMAIL_LANGUAGE,
   LOCALES,
   NOTICE_TEMPLATES,
@@ -238,4 +239,48 @@ Deno.test("text/plain no contiene etiquetas HTML", () => {
     const r = renderActionEmail({ template: "recovery", lang, actionUrl: URL_OK, vars: ACTION_VARS });
     assert(!/<[a-z!/][^>]*>/i.test(r.text), `${lang}: HTML en texto plano`);
   }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Accesibilidad — regresión de contraste WCAG AA del botón (revisión del PO,
+// 2026-10-11): el botón debe usar texto oscuro, no blanco, sobre el naranja
+// corporativo, porque blanco/#E8611A solo da ~3.41:1 (insuficiente para AA
+// texto normal, mínimo 4.5:1).
+// ─────────────────────────────────────────────────────────────────────────────
+
+function srgbToLinear(channel: number): number {
+  const c = channel / 255;
+  return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function relativeLuminance(hex: string): number {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return 0.2126 * srgbToLinear(r) + 0.7152 * srgbToLinear(g) + 0.0722 * srgbToLinear(b);
+}
+
+function contrastRatio(hexA: string, hexB: string): number {
+  const la = relativeLuminance(hexA);
+  const lb = relativeLuminance(hexB);
+  const lighter = Math.max(la, lb);
+  const darker = Math.min(la, lb);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+Deno.test("contraste del botón cumple WCAG AA (texto normal ≥ 4.5:1)", () => {
+  const ratio = contrastRatio(BRAND.buttonText, BRAND.orange);
+  assert(ratio >= 4.5, `contraste botón ${ratio.toFixed(2)}:1 < 4.5:1 (AA)`);
+  // Documenta el valor exacto confirmado por el PO para #18181B/#E8611A.
+  assert(Math.abs(ratio - 5.1935) < 0.01, `contraste inesperado: ${ratio}`);
+  // El blanco previo quedaba por debajo del umbral AA: regresión explícita.
+  const whiteRatio = contrastRatio("#FFFFFF", BRAND.orange);
+  assert(whiteRatio < 4.5, "el blanco debería seguir fallando AA (control del test)");
+});
+
+Deno.test("renderActionEmail: el botón usa BRAND.buttonText, nunca blanco, sobre el naranja", () => {
+  const r = renderActionEmail({ template: "confirmation", lang: "en", actionUrl: URL_OK, vars: ACTION_VARS });
+  assertStringIncludes(r.html, `color:${BRAND.buttonText}`);
+  assert(!r.html.includes(`color:#FFFFFF; text-decoration:none; border-radius:6px; background-color:${BRAND.orange}`), "botón con texto blanco sobre naranja");
 });

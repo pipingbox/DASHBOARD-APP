@@ -23,7 +23,7 @@ import i18n, {
 
 /** Clave en user_metadata. Debe coincidir con `_shared/email-i18n/languages.ts`. */
 export const USER_METADATA_LANG_KEY = 'lang';
-/** Columna réplica en app_14da0f1941_profiles (sql/029). */
+/** Columna réplica en app_14da0f1941_profiles (sql/029a). */
 export const PROFILE_LANGUAGE_COLUMN = 'preferred_language';
 
 export function readUserLanguage(user: User | null | undefined): SupportedLanguageCode | null {
