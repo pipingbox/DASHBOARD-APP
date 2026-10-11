@@ -52,7 +52,7 @@ jobs:
             supabase/functions/cert-expiry-alerts/index.ts \
             supabase/functions/job-match-notify/index.ts \
             supabase/functions/workforce-match-notify/index.ts \
-            supabase/functions/app_14da0f1941_send_job_application_notification/index.reconstructed.ts
+            supabase/functions/app_14da0f1941_send_job_application_notification/index.maintainable.ts
 
       - name: Tests (11 idiomas, seguridad, firma, URL de verificación, modo de entrega)
         run: |
