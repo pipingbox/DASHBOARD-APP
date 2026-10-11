@@ -29,6 +29,7 @@
 //   - ALERT_WINDOW_DAYS (optional — default: 30)
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { renderActionEmail, resolveRecipientLanguage } from "../_shared/email-i18n/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -66,6 +67,7 @@ Deno.serve(async (req) => {
   const resendApiKey = Deno.env.get("RESEND_API_KEY");
   const fromEmail = Deno.env.get("ALERT_FROM_EMAIL") || "noreply@pipingbox.com";
   const windowDays = parseInt(Deno.env.get("ALERT_WINDOW_DAYS") || "30", 10);
+  const appBaseUrl = (Deno.env.get("APP_BASE_URL") || "https://pipingbox.com").replace(/\/$/, "");
 
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
     auth: { autoRefreshToken: false, persistSession: false },
@@ -136,10 +138,23 @@ Deno.serve(async (req) => {
     }
 
     const emailMap = new Map<string, string>();
+    // PB-I18N-EMAIL-001: user_metadata (fuente de verdad del idioma) por usuario.
+    const metaMap = new Map<string, Record<string, unknown> | null>();
     for (const u of authUsers?.users || []) {
       if (u.email) {
         emailMap.set(u.id, u.email);
       }
+      metaMap.set(u.id, (u.user_metadata as Record<string, unknown>) ?? null);
+    }
+
+    // PB-I18N-EMAIL-001: réplica preferred_language (fallback tras user_metadata).
+    const { data: langRows } = await supabase
+      .from("app_14da0f1941_profiles")
+      .select("user_id, preferred_language")
+      .in("user_id", userIds);
+    const profileLangMap = new Map<string, string | null>();
+    for (const r of (langRows || []) as { user_id: string; preferred_language: string | null }[]) {
+      profileLangMap.set(r.user_id, r.preferred_language);
     }
 
     // 5. Build expiring certs per user
@@ -175,29 +190,25 @@ Deno.serve(async (req) => {
         .map((c) => `- ${c.name} (expires ${c.expiry_date}, ${c.days_until_expiry} days)`)
         .join("\n");
 
-      const html = `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
-          <div style="background: #0a0a0a; padding: 24px; border-radius: 8px; border: 1px solid #27272a;">
-            <h1 style="color: #f59e0b; font-size: 18px; margin: 0 0 16px 0;">PipingBox — Certification Expiry Alert</h1>
-            <p style="color: #a1a1aa; font-size: 14px; line-height: 1.6;">
-              Hi ${user.full_name || "there"},
-            </p>
-            <p style="color: #a1a1aa; font-size: 14px; line-height: 1.6;">
-              The following certifications on your PipingBox profile are expiring within ${windowDays} days:
-            </p>
-            <pre style="background: #18181b; padding: 16px; border-radius: 6px; color: #e4e4e7; font-size: 13px; white-space: pre-wrap; margin: 16px 0;">${certList}</pre>
-            <p style="color: #a1a1aa; font-size: 14px; line-height: 1.6;">
-              Renew your certifications and update your profile to stay visible to recruiters and companies on PipingBox.
-            </p>
-            <a href="https://pipingbox.com/profile" style="display: inline-block; background: #f59e0b; color: #000; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: 600; margin-top: 8px;">
-              Update Profile
-            </a>
-            <p style="color: #52525b; font-size: 12px; margin-top: 24px;">
-              You received this email because you have certifications expiring soon on PipingBox.
-            </p>
-          </div>
-        </div>
-      `;
+      // PB-I18N-EMAIL-001: correo en el idioma del destinatario (nunca del actor).
+      const lang = resolveRecipientLanguage({
+        userMetadata: metaMap.get(user.user_id) ?? null,
+        profileLanguage: profileLangMap.get(user.user_id) ?? null,
+      });
+      const sortedCerts = [...user.certs].sort((a, b) => a.expiry_date.localeCompare(b.expiry_date));
+      const certName = sortedCerts.length === 1
+        ? sortedCerts[0].name
+        : `${sortedCerts[0].name} (+${sortedCerts.length - 1})`;
+      const rendered = renderActionEmail({
+        template: "cert_expiry",
+        lang: lang.lang,
+        actionUrl: `${appBaseUrl}/profile`,
+        vars: { certName, expiresOn: sortedCerts[0].expiry_date },
+        showExpiry: false,
+      });
+      const subject = rendered.subject;
+      const html = rendered.html;
+      const text = `${rendered.text}\n\n${certList}`;
 
       if (resendApiKey) {
         try {
@@ -210,8 +221,9 @@ Deno.serve(async (req) => {
             body: JSON.stringify({
               from: fromEmail,
               to: user.email,
-              subject: `PipingBox — ${user.certs.length} certification${user.certs.length !== 1 ? "s" : ""} expiring soon`,
+              subject,
               html,
+              text,
             }),
           });
 
