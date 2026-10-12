@@ -273,10 +273,10 @@ export function CertificationsSection() {
       return;
     }
 
-    // Mobile browsers often report empty or generic MIME types.
-    // Validate by extension as fallback when file.type is unreliable.
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/heic', 'image/heif'];
-    const allowedExtensions = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'heic', 'heif'];
+    // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — validate against Storage-supported
+    // formats BEFORE any transfer begins (PDF, PNG, JPEG/JPG only).
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+    const allowedExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
     const ext = (file.name.split('.').pop() || '').toLowerCase();
     const mimeOk = file.type && allowedTypes.includes(file.type);
     const extOk = allowedExtensions.includes(ext);
@@ -295,7 +295,15 @@ export function CertificationsSection() {
 
     if (!mimeOk && !extOk) {
       console.warn('[CertUpload] Rejected: invalid type and extension');
-      toast.error(t('workerProfile.certifications.invalidFileType'));
+      // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — clear message for unsupported formats
+      const unsupportedFormats = ['doc', 'docx', 'webp', 'heic', 'heif'];
+      if (unsupportedFormats.includes(ext)) {
+        toast.error(t('workerProfile.certifications.unsupportedFormat', {
+          defaultValue: `El formato .${ext} no está soportado. Por favor, convierte tu archivo a PDF, PNG o JPG.`
+        }));
+      } else {
+        toast.error(t('workerProfile.certifications.invalidFileType'));
+      }
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
@@ -880,7 +888,7 @@ export function CertificationsSection() {
             ref={fileInputRef}
             id="cert-file-upload-input"
             type="file"
-            accept="application/pdf,image/png,image/jpeg,image/jpg,image/webp,image/heic,image/heif"
+            accept="application/pdf,image/png,image/jpeg,image/jpg"
             className="sr-only"
             tabIndex={-1}
             onChange={(e) => {

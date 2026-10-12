@@ -67,7 +67,7 @@ export type DocumentUploadErrorCategory =
   | 'cancelled'
   | 'unknown';
 
-export type DocumentType = 'certificate' | 'cv';
+export type DocumentType = 'certificate' | 'cv' | 'document';
 
 /** i18n-agnostic failure reason; components map this to localized copy. */
 export type DocumentUploadFailureReason =

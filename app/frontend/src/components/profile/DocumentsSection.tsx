@@ -43,13 +43,21 @@ import type { WorkerDocument } from '@/lib/workerProfile';
 import { normalizeDocument } from '@/lib/workerProfile';
 import {
   isValidDocOrImageFile,
-  isHeicFile,
   validateFileSize,
   getFileExtension,
   formatFileSize,
   ACCEPT_DOCS_AND_IMAGES,
+  isSupportedByStorage,
+  getUnsupportedTypeMessage,
 } from '@/lib/fileUploadUtils';
-import { uploadWithTimeout } from '@/lib/uploadHelpers';
+import {
+  startResumableUpload,
+  UPLOAD_FAILURE_I18N,
+  formatBytes,
+  type DocumentUploadController,
+  type DocumentUploadProgress,
+} from '@/lib/resumableUpload';
+import { resolveFileMime } from '@/lib/uploadHelpers';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
 const DOCUMENT_TYPES = [
@@ -96,10 +104,19 @@ export function DocumentsSection() {
   const [items, setItems] = useState<WorkerDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<WorkerDocument | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<WorkerDocument | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — resumable (TUS) upload machine state.
+  const [uploadUi, setUploadUi] = useState<DocumentUploadProgress | null>(null);
+  const uploadControllerRef = useRef<DocumentUploadController | null>(null);
+  // Controller of a transport-completed upload whose canonical row has not
+  // been written yet (stays in VERIFYING until submit confirms or fails).
+  const pendingConfirmRef = useRef<DocumentUploadController | null>(null);
+  // Stable path per file selection so TUS can resume the same object.
+  const lastUploadAttemptRef = useRef<{ signature: string; path: string } | null>(null);
   // PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001: per-document opening state so a
   // pending open disables only its own button (no global loading state) and a
   // rapid double-click cannot fire a second signed-url request or open a
@@ -160,9 +177,29 @@ export function DocumentsSection() {
     setExpiresAt('');
     setIsVisible(true);
     setUploadError(null);
+    setUploadUi(null);
+    lastUploadAttemptRef.current = null;
+  };
+
+  // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — clean up any pending upload when
+  // the dialog closes without saving (orphan prevention).
+  const handleDialogClose = (open: boolean) => {
+    if (!open && !saving && !uploading) {
+      // Clean up uploaded object that was never attached to a DB row
+      if (storageBucket && storagePath && !editing) {
+        deleteStorageObject(storageBucket, storagePath).catch(() => undefined);
+      }
+      pendingConfirmRef.current?.failCanonical();
+      pendingConfirmRef.current = null;
+      resetForm();
+    }
+    if (!saving && !uploading) {
+      setDialogOpen(open);
+    }
   };
 
   const openAdd = () => {
+    setEditing(null);
     resetForm();
     setDialogOpen(true);
   };
@@ -212,6 +249,15 @@ export function DocumentsSection() {
     if (!user) return;
     setUploadError(null);
 
+    // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — validate against Storage-supported
+    // formats BEFORE any transfer begins (PDF, PNG, JPEG/JPG only).
+    if (!isSupportedByStorage(file)) {
+      const msg = getUnsupportedTypeMessage(file);
+      setUploadError(msg);
+      toast.error(msg);
+      return;
+    }
+
     // Validate file size
     const sizeError = validateFileSize(file, 10);
     if (sizeError) {
@@ -220,50 +266,42 @@ export function DocumentsSection() {
       return;
     }
 
-    // Validate file type (mobile-friendly: checks MIME + extension, includes HEIC)
-    if (!isValidDocOrImageFile(file)) {
-      const msg = t('workerProfile.documents.invalidType', { defaultValue: 'Tipo de archivo no soportado. Acepta: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.' });
-      setUploadError(msg);
-      toast.error(msg);
-      return;
-    }
-
-    // Inform about HEIC
-    if (isHeicFile(file)) {
-      toast.info(t('workerProfile.documents.heicNotice'));
-    }
-
     setUploading(true);
-    try {
-      const ext = getFileExtension(file.name) || 'pdf';
-      const path = `${user.id}/doc-${Date.now()}.${ext}`;
-      const bucketName = STORAGE_BUCKETS.workerDocuments;
+    setUploadUi(null);
 
-      console.log('[DocumentsSection] File upload starting:', {
-        bucket: bucketName,
-        path,
-        fileType: file.type,
-        fileSize: file.size,
-        fileName: file.name,
-      });
+    // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — TUS resumable upload via the
+    // shared uploader. The object path is stable per file selection: re-
+    // selecting the same file after a recoverable failure RESUMES from the
+    // previous offset instead of restarting the whole transfer.
+    const signature = `${file.name}|${file.size}|${file.lastModified}`;
+    const previousAttempt = lastUploadAttemptRef.current;
+    const ext = getFileExtension(file.name) || 'pdf';
+    const path =
+      previousAttempt && previousAttempt.signature === signature
+        ? previousAttempt.path
+        : `${user.id}/doc-${Date.now()}.${ext}`;
+    lastUploadAttemptRef.current = { signature, path };
+    const bucketName = STORAGE_BUCKETS.workerDocuments;
 
-      const { error } = await uploadWithTimeout(bucketName, path, file, {
-        upsert: false,
-        cacheControl: '3600',
-        timeoutMs: 120000,
-      });
-      if (error) {
-        console.error('[DocumentsSection] Upload error:', { bucket: bucketName, path, error: error.message });
-        const msg = t('workerProfile.documents.uploadFailed', { defaultValue: 'Error al subir: ' }) + error.message;
-        setUploadError(msg);
-        toast.error(msg);
-        setUploading(false);
-        return;
-      }
+    const controller = startResumableUpload(file, {
+      documentType: 'document',
+      bucket: bucketName,
+      path,
+      contentType: resolveFileMime(file),
+      route: '/profile',
+      onProgress: (p) => setUploadUi(p),
+    });
+    uploadControllerRef.current = controller;
 
-      console.log('[DocumentsSection] Upload success:', { bucket: bucketName, path });
+    const result = await controller.promise;
+    uploadControllerRef.current = null;
 
-      // PB-STORAGE-SECURITY-001 phase 2: persist the canonical location only.
+    if (result.ok) {
+      // Transport + verification HEAD confirmed. The canonical row is
+      // created on submit; until then the controller stays in VERIFYING
+      // and is confirmed/failed by the submit path.
+      pendingConfirmRef.current = controller;
+      setUploadUi(null);
       setFileUrl(null);
       setStorageBucket(bucketName);
       setStoragePath(path);
@@ -272,13 +310,27 @@ export function DocumentsSection() {
       setMimeType(file.type || null);
       setUploadError(null);
       toast.success(t('workerProfile.documents.fileUploaded', { defaultValue: 'File uploaded successfully' }));
-    } catch (err) {
-      console.error('[DocumentsSection] Upload unexpected error:', err);
-      const msg = t('workerProfile.documents.uploadFailed', { defaultValue: 'Error inesperado al subir el archivo' });
-      setUploadError(msg);
-      toast.error(msg);
+      setUploading(false);
+      return;
     }
+
+    setUploadUi(null);
     setUploading(false);
+    if ('reason' in result && result.reason === 'cancelled') {
+      // User-initiated cancel: no error banner, form preserved.
+      return;
+    }
+    if ('reason' in result) {
+      // Recoverable state: keep the dialog open so the user can retry with
+      // the same form data instead of losing it.
+      const message = t(UPLOAD_FAILURE_I18N[result.reason]);
+      setUploadError(message);
+      toast.error(message);
+    }
+  };
+
+  const cancelUpload = () => {
+    uploadControllerRef.current?.cancel();
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -323,12 +375,34 @@ export function DocumentsSection() {
 
       const { error } = await supabase.from(TABLES.workerDocuments).insert(payload);
       if (error) {
+        // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — canonical write failed: close
+        // the upload machine as a database failure and remove the freshly-
+        // created object (safe compensation — no orphan, no partial success).
+        pendingConfirmRef.current?.failCanonical();
+        if (pendingConfirmRef.current && storageBucket && storagePath) {
+          await deleteStorageObject(storageBucket, storagePath).catch(() => undefined);
+          setFileUrl(null);
+          setStorageBucket(null);
+          setStoragePath(null);
+          setFileName('');
+          setFileSize(null);
+          setMimeType(null);
+        }
+        pendingConfirmRef.current = null;
         toast.error(t('workerProfile.documents.saveFailed', { defaultValue: 'Failed to save document: ' }) + error.message);
         setSaving(false);
         return;
       }
+
+      // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — canonical write confirmed: only
+      // now the upload machine reaches SAVED and document_upload_completed
+      // is emitted.
+      pendingConfirmRef.current?.confirmSaved();
+      pendingConfirmRef.current = null;
+
       toast.success(t('workerProfile.documents.added', { defaultValue: 'Document added successfully' }));
       setDialogOpen(false);
+      resetForm();
       load();
       // Recalculate profile completion (non-blocking)
       if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
@@ -496,7 +570,7 @@ export function DocumentsSection() {
       </div>
 
       {/* Add Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={(open) => { if (!saving && !uploading) setDialogOpen(open); }}>
+      <Dialog open={dialogOpen} onOpenChange={handleDialogClose}>
         <DialogContent className="max-w-lg border-zinc-800 bg-[#0d0d0d]">
           <DialogHeader>
             <DialogTitle>{t('workerProfile.documents.addTitle', { defaultValue: 'Upload Document' })}</DialogTitle>
@@ -539,6 +613,11 @@ export function DocumentsSection() {
                       if (storageBucket && storagePath) {
                         await deleteStorageObject(storageBucket, storagePath);
                       }
+                      // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — the detached
+                      // upload never reached its canonical write: close the
+                      // machine.
+                      pendingConfirmRef.current?.failCanonical();
+                      pendingConfirmRef.current = null;
                       setFileUrl(null);
                       setStorageBucket(null);
                       setStoragePath(null);
@@ -581,6 +660,56 @@ export function DocumentsSection() {
                   />
                 </label>
               )}
+
+              {/* PB-DOCUMENT-UPLOAD-RELIABILITY-001 — resumable upload status:
+                  real progress, bytes transferred, cumulative time (never reset
+                  across retries), preparing/retrying/verifying states and an
+                  always-available cancel. */}
+              {uploading && uploadUi && (
+                <div className="mt-3 w-full space-y-1" data-testid="doc-upload-status">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+                    <div
+                      data-testid="doc-upload-progress-bar"
+                      className="h-full rounded-full bg-[#f59e0b] transition-all duration-300 ease-out"
+                      style={{ width: `${uploadUi.percent}%` }}
+                    />
+                  </div>
+                  <p className="text-center text-[11px] text-zinc-500" data-testid="doc-upload-status-line">
+                    {uploadUi.state === 'VERIFYING'
+                      ? t('common.upload.verifying', { defaultValue: 'Verifying file...' })
+                      : uploadUi.state === 'RETRYING'
+                        ? `${uploadUi.percent}% ${t('common.upload.retrying', { defaultValue: 'Retrying...' })}`
+                        : `${uploadUi.percent}% ${t('workerProfile.documents.uploading', { defaultValue: 'Uploading...' })}`}
+                    {uploadUi.state !== 'VERIFYING' && (
+                      <span className="ml-1 text-zinc-600">({Math.floor(uploadUi.elapsedMs / 1000)}s)</span>
+                    )}
+                    {uploadUi.state !== 'VERIFYING' && uploadUi.bytesTotal > 0 && (
+                      <span className="ml-1 text-zinc-600">
+                        {formatBytes(uploadUi.bytesUploaded)} / {formatBytes(uploadUi.bytesTotal)}
+                      </span>
+                    )}
+                  </p>
+                  {uploadUi.preparingFile && uploadUi.state !== 'VERIFYING' && (
+                    <p className="text-center text-[11px] text-zinc-400" data-testid="doc-upload-preparing">
+                      {t('common.upload.preparingFile', { defaultValue: 'Preparing file...' })}
+                    </p>
+                  )}
+                  {uploadUi.slowConnection && uploadUi.state !== 'VERIFYING' && (
+                    <p className="text-center text-[11px] text-amber-500/90">
+                      {t('workerProfile.documents.uploadSlowHint', { defaultValue: 'Slow connection; upload continues.' })}
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={cancelUpload}
+                    className="mx-auto block text-[11px] uppercase tracking-wider text-zinc-500 hover:text-red-400"
+                    data-testid="doc-upload-cancel"
+                  >
+                    {t('common.upload.cancel', { defaultValue: 'Cancel' })}
+                  </button>
+                </div>
+              )}
+
               {/* Upload error visible on mobile */}
               {uploadError && (
                 <div className="rounded border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
@@ -588,7 +717,7 @@ export function DocumentsSection() {
                 </div>
               )}
               <p className="text-[10px] text-zinc-600">
-                PDF, DOC, DOCX, JPG, PNG, WebP, HEIC — máx. 10 MB
+                PDF, PNG, JPG — máx. 10 MB
               </p>
             </div>
 
