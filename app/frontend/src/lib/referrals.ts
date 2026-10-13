@@ -490,67 +490,41 @@ export async function processStoredReferral(userId: string, userEmail?: string):
 
 /**
  * Verify a pending referral when conditions are met.
- * Conditions: email verified + profile has basic info (onboarding completed).
+ * Conditions are validated SERVER-SIDE by the pb_verify_referral_if_eligible
+ * RPC (email confirmed in Auth + onboarding complete or minimum activity).
+ * The browser can no longer flip status/verified_at directly (sql/033 closed
+ * the UPDATE grant); it only invokes the RPC and notifies on a positive,
+ * server-confirmed result.
  */
 export async function verifyReferralIfEligible(userId: string): Promise<void> {
   try {
-    // Check if user has a pending referral where they are the referred
-    const { data: pendingReferral } = await supabase
-      .from(TABLES.referrals)
-      .select('id, referrer_id')
-      .eq('referred_id', userId)
-      .eq('status', 'pending')
-      .maybeSingle();
+    const { data, error } = await supabase.rpc('pb_verify_referral_if_eligible');
 
-    if (!pendingReferral) return;
+    if (error) {
+      console.warn('[Referrals] verify RPC error:', error.message);
+      return;
+    }
 
-    // Check verification conditions:
-    // 1. Profile has full_name (onboarding completed)
-    // 2. Has at least one meaningful action (tool usage, cert, or experience)
-    const { data: profile } = await supabase
-      .from(TABLES.profiles)
-      .select('full_name, title, skills')
-      .eq('user_id', userId)
-      .single();
+    const outcome = data as {
+      ok?: boolean;
+      referral_id?: string | null;
+      referrer_id?: string | null;
+      already_verified?: boolean;
+      reason?: string;
+    } | null;
 
-    if (!profile?.full_name) return;
+    // Only notify when the RPC confirmed a fresh pending -> verified
+    // transition. already_verified and not_eligible outcomes are silent no-ops.
+    if (!outcome?.ok || outcome.already_verified || !outcome.referrer_id || !outcome.referral_id) {
+      return;
+    }
 
-    // Check for minimum activity
-    const { count: activityCount } = await supabase
-      .from(TABLES.toolUsage)
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId);
-
-    const { count: certCount } = await supabase
-      .from(TABLES.certifications)
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId);
-
-    const hasActivity = (activityCount ?? 0) >= 1 || (certCount ?? 0) >= 1;
-    const hasOnboarding = !!(profile.full_name && (profile.title || (profile.skills as string[] | null)?.length));
-
-    if (!hasOnboarding && !hasActivity) return;
-
-    // Verify the referral
-    await supabase
-      .from(TABLES.referrals)
-      .update({
-        status: 'verified',
-        verified_at: new Date().toISOString(),
-      })
-      .eq('id', pendingReferral.id);
-
-    // Notify referrer that the referral has been verified (PB-NOTIF-001 fix).
-    // The RPC re-validates the canonical state (status='verified' AND
-    // verified_at IS NOT NULL) server-side, so a browser-forged or failed
-    // local update cannot emit a false "verified" alert.
     try {
-      await notifyReferralVerified(pendingReferral.referrer_id, pendingReferral.id);
-      console.log('[Referrals] ✅ notifyReferralVerified sent to', pendingReferral.referrer_id);
+      await notifyReferralVerified(outcome.referrer_id, outcome.referral_id);
+      console.log('[Referrals] ✅ notifyReferralVerified sent to', outcome.referrer_id);
     } catch {
       // Non-critical
     }
-
   } catch {
     console.warn('[Referrals] Failed to verify referral');
   }
