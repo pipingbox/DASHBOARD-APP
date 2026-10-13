@@ -33,6 +33,17 @@ Matriz de pruebas rev.3: **778 PASS efectivos / 26 FAIL ambientales verificados 
 
 ## Fase 1 — Validación manual Safari iOS (GATE obligatorio, antes de cualquier acción)
 
+> **Estado 13/10/2026 15:22 UTC: BLOCKED — ejecución solicitada, entorno sin dispositivo.**
+> Verificado en el turno de ejecución: el entorno del agente es Linux aarch64
+> (gVisor) con Playwright 1.64.0 (Chromium únicamente); sin macOS/Xcode
+> (`/Applications` y `xcodebuild` inexistentes) y sin acceso a ninguna
+> plataforma de dispositivos reales (BrowserStack/Sauce/AWS Device Farm/LambdaTest:
+> ninguna credencial presente). Por instrucción explícita del propietario, la
+> prueba **no puede sustituirse** por Chromium ni por WebKit emulado (el motor
+> real de Safari/iOS, incluido su comportamiento de `navigator.locks` y freeze
+> de pestañas, solo existe en dispositivo Apple). Queda pendiente de ejecutor
+> humano con iPhone físico o acceso a una plataforma de dispositivos iOS.
+
 Única prueba BLOCKED pendiente. Requisito: iPhone real con iOS actualizado + Safari (o un servicio de dispositivos iOS si el equipo lo prefiere). Duración estimada: 45–60 min.
 
 **Cuenta:** sintética dedicada (`pb-ios-safari-*@pipingbox-test.example`), creada en QA o en la URL de preview del candidato — no en producción, y nunca la cuenta real del Issue #65.
