@@ -199,6 +199,7 @@ export default function Tools() {
             return (
               <button
                 key={tool.key}
+                data-tool-key={tool.key}
                 onClick={() => tool.implemented && setActive(tool.key)}
                 disabled={!tool.implemented}
                 className={`group relative flex flex-col items-center gap-3 rounded-xl border p-6 text-center transition-all duration-200 ${
