@@ -2,6 +2,8 @@
   "common": {
     "loading": "Ładowanie…",
     "retry": "Spróbuj ponownie",
+    "sessionCheckFailedTitle": "Nie udało się zweryfikować Twojej sesji",
+    "sessionCheckFailedDesc": "Nie wylogowano Cię. Sprawdź połączenie i spróbuj ponownie — Twoja praca jest bezpieczna.",
     "save": "Zapisz",
     "saving": "Zapisywanie…",
     "cancel": "Anuluj",

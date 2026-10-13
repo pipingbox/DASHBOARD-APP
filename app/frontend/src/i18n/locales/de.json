@@ -6,6 +6,8 @@
     "hoursAgo": "vor {{count}} Std",
     "daysAgo": "vor {{count}} T",
     "retry": "Erneut versuchen",
+    "sessionCheckFailedTitle": "Wir konnten Ihre Sitzung nicht überprüfen",
+    "sessionCheckFailedDesc": "Sie wurden nicht abgemeldet. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut — Ihre Arbeit ist sicher.",
     "save": "Speichern",
     "saving": "Speichern…",
     "cancel": "Abbrechen",

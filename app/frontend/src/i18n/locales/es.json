@@ -6,6 +6,8 @@
     "hoursAgo": "hace {{count}} h",
     "daysAgo": "hace {{count}} d",
     "retry": "Reintentar",
+    "sessionCheckFailedTitle": "No hemos podido verificar tu sesión",
+    "sessionCheckFailedDesc": "No has cerrado sesión. Comprueba tu conexión e inténtalo de nuevo: tu trabajo está a salvo.",
     "save": "Guardar",
     "saving": "Guardando…",
     "cancel": "Cancelar",

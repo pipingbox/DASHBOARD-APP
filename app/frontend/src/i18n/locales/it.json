@@ -2,6 +2,8 @@
   "common": {
     "loading": "Caricamento…",
     "retry": "Riprova",
+    "sessionCheckFailedTitle": "Non è stato possibile verificare la tua sessione",
+    "sessionCheckFailedDesc": "Non hai effettuato la disconnessione. Controlla la connessione e riprova: il tuo lavoro è al sicuro.",
     "save": "Salva",
     "saving": "Salvataggio…",
     "cancel": "Annulla",

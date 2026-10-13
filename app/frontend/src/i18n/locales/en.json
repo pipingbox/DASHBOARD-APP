@@ -2,6 +2,8 @@
   "common": {
     "loading": "Loading…",
     "retry": "Retry",
+    "sessionCheckFailedTitle": "We couldn't verify your session",
+    "sessionCheckFailedDesc": "You have not been signed out. Check your connection and try again — your work is safe.",
     "save": "Save",
     "saving": "Saving…",
     "cancel": "Cancel",

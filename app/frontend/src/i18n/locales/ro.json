@@ -2,6 +2,8 @@
   "common": {
     "loading": "Se încarcă…",
     "retry": "Reîncearcă",
+    "sessionCheckFailedTitle": "Nu am putut verifica sesiunea ta",
+    "sessionCheckFailedDesc": "Nu ai fost deconectat. Verifică conexiunea și încearcă din nou — munca ta este în siguranță.",
     "save": "Salvează",
     "saving": "Se salvează…",
     "cancel": "Anulează",

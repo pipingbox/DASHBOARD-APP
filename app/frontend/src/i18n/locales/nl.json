@@ -6,6 +6,8 @@
     "hoursAgo": "{{count}} u geleden",
     "daysAgo": "{{count}} d geleden",
     "retry": "Opnieuw proberen",
+    "sessionCheckFailedTitle": "We konden uw sessie niet verifiëren",
+    "sessionCheckFailedDesc": "U bent niet uitgelogd. Controleer uw verbinding en probeer het opnieuw — uw werk is veilig.",
     "save": "Opslaan",
     "saving": "Opslaan…",
     "cancel": "Annuleren",
