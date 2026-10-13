@@ -27,6 +27,7 @@ export interface ReferralsBootstrapOutcome {
   referral_code?: string | null;
   referrer_id?: string | null;
   attribution?: string;
+  referral_id?: string | null;
 }
 
 async function callReferralsBootstrap(storedCode?: string): Promise<ReferralsBootstrapOutcome | null> {
@@ -465,18 +466,14 @@ export async function processStoredReferral(userId: string, userEmail?: string):
     } catch { /* ignore */ }
 
     // Notify referrer that their referral has joined (PB-NOTIF-001 fix).
+    // The RPC derives the content server-side from the referral row id, so a
+    // forged name/title/URL from the browser cannot reach the referrer.
     try {
-      const { data: referredProfile } = await supabase
-        .from(TABLES.profiles)
-        .select('full_name')
-        .eq('user_id', userId)
-        .maybeSingle();
-      const displayName =
-        (referredProfile?.full_name as string | null)?.trim() ||
-        userEmail?.split('@')[0] ||
-        'Someone';
-      await notifyReferralJoined(referrerId, displayName);
-      console.log('[REFERRAL_RECOVERY] ✅ notifyReferralJoined sent to', referrerId);
+      const referralId = (result.referral_id as string | null) ?? null;
+      if (referralId) {
+        await notifyReferralJoined(referrerId, referralId);
+        console.log('[REFERRAL_RECOVERY] ✅ notifyReferralJoined sent to', referrerId);
+      }
     } catch {
       // Non-critical
     }
@@ -544,9 +541,11 @@ export async function verifyReferralIfEligible(userId: string): Promise<void> {
       .eq('id', pendingReferral.id);
 
     // Notify referrer that the referral has been verified (PB-NOTIF-001 fix).
+    // The RPC re-validates the canonical state (status='verified' AND
+    // verified_at IS NOT NULL) server-side, so a browser-forged or failed
+    // local update cannot emit a false "verified" alert.
     try {
-      const referredName = profile?.full_name?.trim() || 'A new member';
-      await notifyReferralVerified(pendingReferral.referrer_id, referredName);
+      await notifyReferralVerified(pendingReferral.referrer_id, pendingReferral.id);
       console.log('[Referrals] ✅ notifyReferralVerified sent to', pendingReferral.referrer_id);
     } catch {
       // Non-critical

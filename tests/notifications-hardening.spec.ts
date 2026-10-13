@@ -188,10 +188,14 @@ test.describe('PB-NOTIFICATIONS — sql/027 + sql/029 security matrix', () => {
 
   test('RPC REFERRAL_JOINED without referral row → error (relationship required)', async () => {
     const ctx = await rest(tokenA);
-    const res = await ctx.post(`/rest/v1/rpc/${RPC}`, { data: rpcPayload('REFERRAL_JOINED', uidB) });
+    // sql/032: referral types require related_entity_type='referral' and a real
+    // referral row id; a forged/missing source is rejected before any write.
+    const res = await ctx.post(`/rest/v1/rpc/${RPC}`, {
+      data: { ...rpcPayload('REFERRAL_JOINED', uidB), p_related_entity_type: 'referral', p_related_entity_id: '12345678-1234-1234-1234-123456789012' },
+    });
     const body = await res.text();
     expect([400, 403], `referral type without relationship must be rejected, got ${res.status()}`).toContain(res.status());
-    expect(body, 'error must mention the missing referral relationship').toContain('referral relationship');
+    expect(body, 'error must mention the missing authorized source').toContain('no authorized source');
     await ctx.dispose();
   });
 

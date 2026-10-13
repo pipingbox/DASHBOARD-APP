@@ -157,12 +157,12 @@ Deno.serve(async (req: Request) => {
     // referred_email must be the REFERRED user's email, not the caller's
     // (the caller may be an admin assigning on their behalf).
     const { data: referredAuth } = await adminClient.auth.admin.getUserById(referred_id);
-    const { error: insertErr } = await adminClient.from("app_14da0f1941_referrals").insert({
+    const { data: inserted, error: insertErr } = await adminClient.from("app_14da0f1941_referrals").insert({
       referrer_id,
       referred_id,
       referred_email: referredAuth?.user?.email ?? "",
       status: "pending",
-    });
+    }).select("id").maybeSingle();
 
     if (insertErr && insertErr.code !== "23505") {
       // Consistency: never leave the profile attributed without its row.
@@ -175,7 +175,13 @@ Deno.serve(async (req: Request) => {
       }
       return json({ error: "referral_insert_failed" }, 500);
     }
+
+    return json({
+      success: true,
+      attribution: weClaimed ? "confirmed" : "existing_same",
+      referral_id: inserted?.id ?? null,
+    });
   }
 
-  return json({ success: true, attribution: weClaimed ? "confirmed" : "existing_same" });
+  return json({ success: true, attribution: weClaimed ? "confirmed" : "existing_same", referral_id: existing.id });
 });

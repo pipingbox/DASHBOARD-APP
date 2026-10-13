@@ -174,14 +174,59 @@ test.describe('PB-NOTIFICATIONS-RPC-RELATION-HARDENING-001 QA-only security matr
     await verify('comment', ids.comment, 'community_comment', worker, third.uid, false);
   });
 
-  test('referral relationship continues to notify legitimately', async () => {
+  test('referral: legitimate JOINED, forged content derived server-side, VERIFIED state gate, replay, concurrency, forged actor/recipient', async () => {
     const before = await currentState();
     attempted.push({ source: ids.referral, actor: worker.uid, recipient: company.uid, type: 'REFERRAL_JOINED' });
-    const response = await call(api, '/rest/v1/rpc/pb_create_client_notification', payload('REFERRAL_JOINED', ids.referral, 'referral', company.uid), worker.token);
-    expect(response.status()).toBe(200);
-    const id = await response.json();
-    const result = await service.get(`/rest/v1/${TABLE}notifications?select=id,actor_id,user_id,type&id=eq.${id}`);
-    expect((await result.json())[0]).toMatchObject({ actor_id: worker.uid, user_id: company.uid, type: 'REFERRAL_JOINED' });
+    attempted.push({ source: ids.referral, actor: worker.uid, recipient: company.uid, type: 'REFERRAL_VERIFIED' });
+
+    // VERIFIED with pending referral must be denied (canonical state gate).
+    const premature = await call(api, '/rest/v1/rpc/pb_create_client_notification', payload('REFERRAL_VERIFIED', ids.referral, 'referral', company.uid), worker.token);
+    expect([400, 403], 'REFERRAL_VERIFIED on pending referral must be denied').toContain(premature.status());
+    expect(await currentState(), 'premature VERIFIED must not write').toEqual(before);
+
+    // JOINED legitimate: 200, content derived server-side (not client-forged).
+    const joined = await call(api, '/rest/v1/rpc/pb_create_client_notification', payload('REFERRAL_JOINED', ids.referral, 'referral', company.uid), worker.token);
+    expect(joined.status()).toBe(200);
+    const joinedId = await joined.json();
+    const joinedRow = await service.get(`/rest/v1/${TABLE}notifications?select=id,actor_id,user_id,type,title,action_url,related_entity_id&id=eq.${joinedId}`);
+    const [createdJoined] = await joinedRow.json();
+    expect(createdJoined).toMatchObject({ actor_id: worker.uid, user_id: company.uid, type: 'REFERRAL_JOINED', related_entity_id: ids.referral });
+    expect(createdJoined.title).not.toBe(title);
+    expect(createdJoined.title).toBe('Nuevo referido');
+    expect(createdJoined.action_url).toBe('/dashboard');
+
+    // Replay: same payload returns the same id (idempotency).
+    const replay = await call(api, '/rest/v1/rpc/pb_create_client_notification', payload('REFERRAL_JOINED', ids.referral, 'referral', company.uid), worker.token);
+    expect(replay.status()).toBe(200);
+    expect(await replay.json()).toBe(joinedId);
+
+    // Mark verified via service role, then VERIFIED is allowed and idempotent under concurrency.
+    await service.patch(`/rest/v1/${TABLE}referrals?id=eq.${ids.referral}`, { data: { status: 'verified', verified_at: new Date().toISOString() } });
+    const verifiedCalls = await Promise.all(
+      Array.from({ length: 6 }, () => call(api, '/rest/v1/rpc/pb_create_client_notification', payload('REFERRAL_VERIFIED', ids.referral, 'referral', company.uid), worker.token)),
+    );
+    const verifiedIds = new Set<string>();
+    for (const res of verifiedCalls) {
+      expect(res.status()).toBe(200);
+      verifiedIds.add(await res.json());
+    }
+    expect(verifiedIds.size, 'concurrent VERIFIED must resolve to a single notification').toBe(1);
+    const verifiedRow = await service.get(`/rest/v1/${TABLE}notifications?select=title,action_url&id=eq.${[...verifiedIds][0]}`);
+    expect((await verifiedRow.json())[0]).toMatchObject({ title: 'Referido verificado', action_url: '/dashboard' });
+
+    // Forged recipient (third party) and forged actor (company as referred) denied.
+    const forgedRecipient = await call(api, '/rest/v1/rpc/pb_create_client_notification', payload('REFERRAL_VERIFIED', ids.referral, 'referral', third.uid), worker.token);
+    expect([400, 403]).toContain(forgedRecipient.status());
+    const forgedActor = await call(api, '/rest/v1/rpc/pb_create_client_notification', payload('REFERRAL_VERIFIED', ids.referral, 'referral', company.uid), company.token);
+    expect([400, 403]).toContain(forgedActor.status());
+
+    // Direct INSERT into referrals by an authenticated user is denied (RLS service-only).
+    const directInsert = await api.post(`/rest/v1/${TABLE}referrals`, {
+      data: { referrer_id: company.uid, referred_id: worker.uid, status: 'pending' },
+      headers: { Authorization: `Bearer ${worker.token}`, Prefer: 'return=representation' },
+    });
+    expect([401, 403], 'authenticated direct INSERT into referrals must be denied').toContain(directInsert.status());
+
     expect(await currentState()).not.toEqual(before);
   });
 
