@@ -204,3 +204,157 @@ cambios. Orden recomendado:
 
 **Recomendación: NO-GO para merge automático.** Pendiente revisión expresa del
 usuario. NO MERGE / NO DEPLOY.
+
+---
+
+# Rev.2 — Respuesta a la revisión NO-GO de la PR #68 (13/10/2026)
+
+La revisión técnica del SHA `cae4f00` (NO-GO, 5 observaciones) queda abordada
+así. Todos los cambios están en la **misma rama**; producción intacta.
+
+## R2.1 Observación 1 (BLOQUEANTE) — 8 errores TypeScript en CI
+
+**Causa:** `withTimeout` estaba tipado `Promise<T>`; los builders de PostgREST
+son **thenables** (`PromiseLike`), no `Promise` nativos. Mi verificación local
+usaba el tsconfig raíz de referencias (que no chequea nada); el workflow
+`typecheck-regression` usa `tsc -p tsconfig.app.json`.
+
+**Corrección:** la firma acepta ahora `PromiseLike<T>`
+(`app/frontend/src/lib/withTimeout.ts`), preservando la inferencia.
+**Verificación:** `npm run typecheck` (comando exacto del workflow) → exit 0.
+El CI del SHA final debe terminar PASS (verificado tras el push, ver §R2.6).
+
+## R2.2 Observación 2 (P1) — seguridad cross-tab del bypass
+
+**Riesgo señalado:** dos pestañas en bypass podían refrescar concurrentemente;
+la continuacion perdedora (con estado leído ANTES del lock, token ya rotado)
+falla 400 y auth-js reacciona con `_removeSession()` — borrando los tokens
+frescos de la ganadora. Además `steal:true` podía interrumpir un holder
+legítimo simplemente lento.
+
+**Corrección — capa de coordinación advisory** (`app/frontend/src/lib/authLockCrossTab.ts`,
+nueva, ~290 líneas):
+
+1. **Heartbeat**: toda ejecución de la función bajo lock — sana o en bypass —
+   anuncia vida por `BroadcastChannel` (1 Hz) y `release` al terminar. La
+   vida se mide por tiempo LOCAL de recepción (sin sesgo de reloj).
+2. **Guardia de steal**: antes de `steal:true` se comprueba si existe un
+   holder vivo; si existe (aunque sea lento), la pestaña espera su release y
+   reintenta la adquisición NORMAL — el steal solo se alcanza sin holder vivo
+   (zombi real). Un holder remoto aún vivo tras el plazo deriva a la
+   contención serializada (nunca a robarle el lock).
+3. **Contención de bypass**: los bypass entre pestañas se serializan por
+   ronda de claims (ventana 150 ms, ganador determinista por
+   `(timestamp, id)` con eco de claims para pares que se suscriben tarde).
+   La pestaña **suplantada NO ejecuta su continuación** (potencialmente
+   obsoleta): recibe un `AuthRetryableFetchError` sintético — clase que
+   auth-js trata como reintentable y a la que **NO** responde con
+   `_removeSession()`. El siguiente intento lee los tokens frescos de la
+   ganadora. La contención misma-pestaña se serializa sin suplantar.
+4. **Liveness**: holder caído = sin heartbeat > 2,5 s; todo espera acotada
+   por presupuesto; sin `BroadcastChannel` degrada al comportamiento rev.1
+   (riesgo documentado, no silenciado).
+
+`resilientAuthLock` ejecuta ahora TODO (adquisición sana, steal y bypass)
+dentro de esta capa. **El lock exclusivo multi-pestaña sigue siendo el camino
+normal; nada se desactiva.**
+
+**Pruebas (nuevas):**
+- `tests/auth-lock-cross-tab.spec.ts` — **9/9 PASS**: holder anunciado +
+  espera de release; dos pestañas → exactamente una corre, la otra
+  `superseded`; pestaña sola corre tras la ventana; holder caído →
+  `superseded` y recuperación en la siguiente llamada; misma pestaña
+  serializada sin suplantar; degradación sin canal; integración con
+  `resilientAuthLock` (dos pestañas zombi → exactamente UNA continuación, la
+  perdedora lanza `AuthRetryableFetchError`); guardia de steal (nunca se
+  interrumpe un holder vivo remoto; acción estrictamente posterior al
+  release o suplantada); pestaña zombi sola → bypass sigue resolviendo.
+- `tests/auth-lock-multi-tab-e2e.spec.ts` — **1/1 PASS (E2E real,
+  Chromium)**: dos pestañas reales, `navigator.locks` colgado en ambas,
+  sesión EXPIRADA sembrada (ambas deciden refrescar el mismo token):
+  exactamente **1 POST de refresh** en toda la corrida, sesión **jamás
+  borrada** (access_token presente en ambas), la perdedora muestra el estado
+  recuperable y el Reintentar autentica **sin un segundo refresh**.
+
+## R2.3 Observación 3 (P1) — E2E de Finalizar onboarding en QA
+
+**Aprovisionamiento QA (solo QA):** GRANTs de tabla/secuencia a
+`service_role` (replicando producción, leídos del esquema) + despliegue de la
+edge `complete-onboarding` vía Management API. Verificado 200 con transición
+canónica real. Producción sin cambios.
+
+**Hallazgo relevante:** el RPC `pb_complete_onboarding` desplegado en QA
+**difiere del fuente del repo** (`sql/010`): puntúa `title 5 + location 5 +
+skills 10 + avatar 10 + bio 5` (sin `professional_title`, que no existe en la
+tabla QA) y el umbral `MARKETPLACE_READY` exige ≥ 50 Y visibilidad pública.
+Con los datos mínimos del wizard (Pipefitter + Piping + Madrid/Spain + avatar)
+se alcanza completion 30 → `PROFILE_COMPLETED`; el wizard pide marketplace
+con perfil público y el RPC concede `MARKETPLACE_READY`. Ambos estados
+terminales son válidos; el E2E acepta la pareja coherente.
+
+**Prueba:** `tests/onboarding-finish-e2e.spec.ts` — **1/1 PASS (~12 s)**:
+recorre los 8 pasos con datos mínimos + avatar sintético, Finish exige
+**2xx del profile write Y 2xx de la edge** (sin éxito falso), verificación
+**lado servidor** con el token del propio usuario (`AUTH_ONLY` → estado
+terminal canónico, `marketplace_ready` coherente, `profile_completion ≥ 30`,
+`title`/`location`/`avatar_url` persistidos), reload sin trampa del gate,
+borrado de la cuenta sintética al final. Queda desbloqueado el anterior
+BLOCKED "completar onboarding".
+
+## R2.4 Observación 4 (P2) — escrituras tardías inconsistentes
+
+**Riesgo señalado:** `withTimeout` no cancela la consulta; un UPDATE del
+wizard vencido podía confirmar TARDE y sobrescribir un reintento posterior.
+
+**Corrección — `ProfileWriteCoordinator`** (`app/frontend/src/lib/profileWriteCoordinator.ts`,
+nueva, ~155 líneas), integrada en el wizard (autosave, Finish y Postpone):
+
+1. **Single-flight por carril**: iniciar una escritura ABORTA la anterior en
+   vuelo (`AbortController` + `.abortSignal(signal)` de postgrest-js —
+   cancelación REAL del fetch subyacente).
+2. **Prioridad explícita**: Finish/Postpone aborta y suprime autosaves
+   mientras corre; un autosave durante una escritura explícita se DESCARTA
+   (nunca se envía — su payload es obsoleto por definición; el debounce se
+   rearma con la siguiente edición).
+3. **Acotada con cancelación**: timeout → abort de la petición; resultado
+   `timeout`/`superseded`/`dropped` = estado recuperable con el borrador
+   intacto; nunca éxito falso (solo 2xx sin `error` es `saved`).
+4. **Guard de generación**: la resolución tardía de una escritura abortada se
+   ignora aunque el thenable resuelva.
+
+**Pruebas:** `tests/profile-write-coordinator.spec.ts` — **8/8 PASS**:
+guardado limpio; error PostgREST reportado; timeout ABORTA la petición;
+suplantación aborta la anterior y su éxito tardío se ignora; la escritura
+   explícita aborta el autosave obsoleto ANTES de tocar la red; autosave
+   durante explícita se descarta sin enviarse; throw síncrono y rechazo de
+   promesa son `error` sin crashear. El E2E de postpone (1/1 PASS) ejercita
+   la integración real.
+
+## R2.5 Observación 5 — matriz de pruebas y conteos
+
+Ver §R2.6 (matriz final de la rev.2). iOS Safari sigue **BLOCKED** hasta
+prueba manual en dispositivo. Los timeouts PostgREST de producción siguen
+como **hipótesis paralela H1** (sin investigar en origen; recomendado revisar
+statement_timeout/logs antes del GO).
+
+### Hallazgos de QA ajenos a la rama (documentados, no corregidos salvo el locator)
+
+- `tools-dom-mutation` estaba **roto en `main`** desde el reconcile `a9fdd53`
+  (renombró la herramienta a "Calculadora de Injertos"/"Branch Connection
+  Calculator" y el locator `/branch|trazado|layout/` dejó de coincidir
+  jamás). Se corrigió el locator del spec en esta rama (comentario con
+  referencia); la app no cambió.
+- `schema-contract` espera que un PATCH de usuario escriba
+  `onboarding_status`/`marketplace_ready` — la política QA de **columnas
+  protegidas** (trigger P0001, preexistente) lo rechaza con 400. Contrato
+  del test desalineado con la política canónica; verificado directamente.
+- `referrals T1`: **0/6 perfiles de QA** tienen `referral_code` (bootstrap
+  de referidos no activo en QA). Preexistente.
+- `preview-smoke` (8): el `/api/config` local responde 500 (backend
+  inalcanzable desde el entorno; ruido conocido) y el smoke cuenta los
+  recursos fallidos como errores JS no capturados.
+- Namespace `qa*@pipingbox.com` (7 suites) y contratos del Worker de
+  producción (6) siguen BLOCKED como en la entrega anterior.
+- El build local de QA REQUIERE `VITE_POSTHOG_KEY`/`VITE_APP_VERSION`/
+  `VITE_APP_ENV`; sin ellos, posthog es no-op y las aserciones de wire
+  fallan (causó falsos FAIL en la primera pasada; corregido en la final).

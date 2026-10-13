@@ -130,12 +130,27 @@ function abortProofZombieLocks(calls: RequestRecord[], grants: Array<() => void>
   };
 }
 
+function isolatedCrossTab() {
+  return {
+    crossTabFactory: () => ({
+      runWithHolder: <T>(fn: () => Promise<T>) => fn(),
+      waitForHolder: async () => ({ hadHolder: false, remoteAlive: false, localAlive: false, cleared: true }),
+      contendBypass: async () => 'run' as const,
+      close: () => {},
+    }),
+  };
+}
+
 function makeDeps(locks: unknown, bypassed: string[]) {
   return {
     locks: locks as never,
     onBypass: (name: string) => {
       bypassed.push(name);
     },
+    // Isolated cross-tab coordinator: no BroadcastChannel, no holders — the
+    // single-tab ladder behavior under test stays identical to rev.1.
+    // Cross-tab coordination itself is covered by auth-lock-cross-tab.spec.
+    ...isolatedCrossTab(),
   };
 }
 
@@ -282,6 +297,7 @@ test.describe('resilientAuthLock — bounded cross-tab auth lock', () => {
       onBypass: (n) => bypassed.push(n),
       nowFn: () => now,
       poisonCooldownMs: 60_000,
+      ...isolatedCrossTab(),
     });
 
     await lock('lock:sb-ref-auth-token', 20, async () => 'poisoned');
@@ -317,6 +333,7 @@ test.describe('resilientAuthLock — bounded cross-tab auth lock', () => {
       onBypass: (n) => bypassed.push(n),
       nowFn: () => now,
       poisonCooldownMs: 60_000,
+      ...isolatedCrossTab(),
     });
 
     await lock('lock:sb-ref-auth-token', 20, async () => 'first');

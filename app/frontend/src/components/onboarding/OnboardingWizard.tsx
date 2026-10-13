@@ -9,6 +9,7 @@ import { ONBOARDING_STATUS, hasCompletedOnboarding } from '@/lib/onboarding';
 import { getTrafficProps } from '@/lib/jobs/attribution';
 import { trackEvent } from '@/lib/observability';
 import { withTimeout } from '@/lib/withTimeout';
+import { ProfileWriteCoordinator } from '@/lib/profileWriteCoordinator';
 import { isValidImageFile, isHeicFile, validateFileSize, getSafeImageExtension, ACCEPT_IMAGES } from '@/lib/fileUploadUtils';
 
 /* ─── Constants ─── */
@@ -160,6 +161,11 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   // Refs for debounce
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isMountedRef = useRef(true);
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.2 (obs.4): single-flight profile
+  // writes with real cancellation — no late write overwrites newer state.
+  const writeCoordinatorRef = useRef<ProfileWriteCoordinator | null>(null);
+  if (!writeCoordinatorRef.current) writeCoordinatorRef.current = new ProfileWriteCoordinator();
+  const writeCoordinator = writeCoordinatorRef.current;
 
   const progress = Math.round((step / TOTAL_STEPS) * 100);
 
@@ -330,25 +336,37 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       setSaveStatus('saving');
       try {
         const payload = buildSupabasePayload();
-        // Bounded write: a stalled PostgREST request must degrade to the
-        // recoverable error indicator, never to an indefinite "saving".
-        const writeRace = await withTimeout(
-          supabase
-            .from(TABLES.profiles)
-            .update(payload)
-            .eq('user_id', user.id),
-          AUTOSAVE_TIMEOUT_MS,
-        );
+        // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.2 (obs.4): serialized write.
+        // A new autosave ABORTS the previous one, an explicit Finish/Postpone
+        // aborts and suppresses autosaves, and a timeout ABORTS the request —
+        // no abandoned write can land late and overwrite newer state.
+        const outcome = await writeCoordinator.runAuto({
+          run: (signal) =>
+            supabase
+              .from(TABLES.profiles)
+              .update(payload)
+              .eq('user_id', user.id)
+              .abortSignal(signal),
+        }, AUTOSAVE_TIMEOUT_MS);
 
         if (!isMountedRef.current) return;
 
-        if (writeRace.timedOut) {
+        if (outcome.status === 'timeout') {
           reportSaveTimeout('autosave');
           setSaveStatus('error');
           return;
         }
+        if (outcome.status === 'dropped') {
+          // An explicit Finish/Postpone is in flight: it owns persistence;
+          // its own status indicator takes over from here.
+          return;
+        }
+        if (outcome.status === 'superseded') {
+          // A newer autosave or an explicit write owns the state now.
+          return;
+        }
 
-        const { error } = writeRace.value!;
+        const { error } = outcome;
 
         if (error) {
           setSaveStatus('error');
@@ -365,7 +383,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         if (isMountedRef.current) setSaveStatus('error');
       }
     }, AUTOSAVE_DEBOUNCE_MS);
-  }, [user, buildDraft, buildSupabasePayload, reportSaveTimeout]);
+  }, [user, buildDraft, buildSupabasePayload, reportSaveTimeout, writeCoordinator]);
 
   /* ─── Trigger autosave when form data changes ─── */
   useEffect(() => {
@@ -517,27 +535,30 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       // previous postponement signal.
       payload.onboarding_postponed_at = null;
 
-      const writeRace = await withTimeout(
-        supabase
-          .from(TABLES.profiles)
-          .update(payload)
-          .eq('user_id', user.id),
-        PROFILE_WRITE_TIMEOUT_MS,
-      );
+      // Explicit write: aborts any in-flight autosave, suppresses new ones
+      // while running, and a timeout ABORTS the request (no late commit
+      // overwriting newer state). The debounce timer is cancelled as well.
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      const writeOutcome = await writeCoordinator.runExplicit({
+        run: (signal) =>
+          supabase
+            .from(TABLES.profiles)
+            .update(payload)
+            .eq('user_id', user.id)
+            .abortSignal(signal),
+      }, PROFILE_WRITE_TIMEOUT_MS);
 
-      if (writeRace.timedOut) {
+      if (writeOutcome.status === 'timeout') {
         // Bounded write: recoverable — stay on the wizard, keep the draft.
         reportSaveTimeout('finish');
         setSaveStatus('error');
         setCompletionFailed(true);
         return;
       }
-
-      const { error } = writeRace.value!;
-
-      if (error) {
-        // Core data NOT saved: recoverable — stay on the wizard, keep the
-        // draft, let the user retry.
+      if (writeOutcome.status !== 'saved') {
+        // Core data NOT saved (PostgREST error, superseded or dropped):
+        // recoverable — stay on the wizard, keep the draft, let the user
+        // retry. The coordinator guarantees no abandoned write lands late.
         setSaveStatus('error');
         setCompletionFailed(true);
         return;
@@ -712,26 +733,28 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         ...buildSupabasePayload(),
         onboarding_postponed_at: new Date().toISOString(),
       };
-      // PB-AUTH-LOCK-ONBOARDING-STALL-001: bounded write — an unbounded hang
-      // here was the "cannot skip the onboarding" production symptom
-      // (`saving` never released, wizard unreachable).
-      const postponeRace = await withTimeout(
-        supabase
-          .from(TABLES.profiles)
-          .update(payload)
-          .eq('user_id', user.id),
-        PROFILE_WRITE_TIMEOUT_MS,
-      );
+      // PB-AUTH-LOCK-ONBOARDING-STALL-001: explicit serialized write — an
+      // unbounded hang here was the "cannot skip the onboarding" production
+      // symptom (`saving` never released), and an abandoned late write could
+      // overwrite newer state. Timeout ABORTS the request; any in-flight
+      // autosave is superseded.
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      const postponeOutcome = await writeCoordinator.runExplicit({
+        run: (signal) =>
+          supabase
+            .from(TABLES.profiles)
+            .update(payload)
+            .eq('user_id', user.id)
+            .abortSignal(signal),
+      }, PROFILE_WRITE_TIMEOUT_MS);
 
-      if (postponeRace.timedOut) {
+      if (postponeOutcome.status === 'timeout') {
         reportSaveTimeout('postpone');
         setSaveStatus('error');
         return;
       }
 
-      const { error } = postponeRace.value!;
-
-      if (error) {
+      if (postponeOutcome.status !== 'saved') {
         // Postponement could not be persisted: keep the wizard open with the
         // draft intact (recoverable, same contract as saveAndFinish) instead
         // of dropping the user back into the gate loop.

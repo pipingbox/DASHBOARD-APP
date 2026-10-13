@@ -122,7 +122,11 @@ test.describe('PB-UI-DOM-REMOVECHILD-RESIDUAL-001 /tools under translator-grade 
     // ── 2. Catalog → tool detail → back (full view swap) ────────────────
     await page.evaluate(() => {
       const cards = [...document.querySelectorAll('button.group')];
-      const card = cards.find((c) => /branch|trazado|layout/i.test(c.textContent ?? ''));
+      // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.2: the branch-layout tool was
+      // renamed by reconcile a9fdd53 ("Calculadora de Injertos" es /
+      // "Branch Connection Calculator" en) — this locator was stale on main
+      // and never matched, silently skipping the view-swap scenario.
+      const card = cards.find((c) => /injertos|branch/i.test(c.textContent ?? ''));
       if (card) card.click();
     });
     await page.waitForTimeout(1500);

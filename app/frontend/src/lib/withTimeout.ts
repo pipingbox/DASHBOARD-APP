@@ -15,7 +15,7 @@ export interface TimeoutRace<T> {
   timedOut: boolean;
 }
 
-export function withTimeout<T>(promise: Promise<T>, ms: number): Promise<TimeoutRace<T>> {
+export function withTimeout<T>(promise: PromiseLike<T>, ms: number): Promise<TimeoutRace<T>> {
   return new Promise((resolve) => {
     let settled = false;
     const id = setTimeout(() => {
@@ -23,6 +23,8 @@ export function withTimeout<T>(promise: Promise<T>, ms: number): Promise<Timeout
       settled = true;
       resolve({ value: undefined, timedOut: true });
     }, ms);
+    // PromiseLike: PostgREST builders are thenables, not native Promises —
+    // required by the strict CI typecheck (tsconfig.app.json).
     promise.then(
       (value) => {
         if (settled) return;

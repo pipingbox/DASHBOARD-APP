@@ -44,12 +44,21 @@
  * supabase-js.
  */
 
+import { AuthRetryableFetchError } from '@supabase/auth-js';
 import { trackEvent, getCorrelationId } from './observability';
+import {
+  createCrossTabLock,
+  HOLDER_WAIT_MS,
+  BYPASS_CONTENTION_BUDGET_MS,
+  type CrossTabLock,
+} from './authLockCrossTab';
 
 /** Hard cap for the steal attempt (step 2) before bypassing the lock. */
 export const AUTH_LOCK_STEAL_TIMEOUT_MS = 3_000;
 /** Fallback acquire deadline when the caller passes a non-positive timeout. */
 export const AUTH_LOCK_DEFAULT_ACQUIRE_MS = 5_000;
+/** Short re-acquire probe after a legitimate holder released the lock. */
+export const AUTH_LOCK_HOLDER_RETRY_MS = 1_000;
 /**
  * How long a lock name stays poisoned after a bypass (instant bypass window)
  * before the next acquisition re-probes the full ladder. The zombie state is
@@ -74,6 +83,12 @@ export interface ResilientAuthLockDeps {
   nowFn?: () => number;
   /** Cooldown override (ms) for tests. */
   poisonCooldownMs?: number;
+  /**
+   * Cross-tab coordination factory (heartbeat + steal guard + bypass
+   * contention). Injectable for tests; defaults to BroadcastChannel-backed
+   * coordination using the same injected timers/clock.
+   */
+  crossTabFactory?: (lockName: string) => CrossTabLock;
 }
 
 function defaultOnBypass(name: string): void {
@@ -116,6 +131,43 @@ export function createResilientAuthLock(deps: ResilientAuthLockDeps = {}) {
   // full ladder and either re-poisons or closes the circuit.
   const poisonedUntilByName = new Map<string, number>();
 
+  // Cross-tab coordinators, one per lock name (heartbeat + contention).
+  const crossTabByName = new Map<string, CrossTabLock>();
+  const crossTabFor = (name: string): CrossTabLock => {
+    let ct = crossTabByName.get(name);
+    if (!ct) {
+      ct =
+        deps.crossTabFactory?.(name) ??
+        createCrossTabLock(name, {
+          setTimeoutFn: deps.setTimeoutFn,
+          clearTimeoutFn: deps.clearTimeoutFn,
+          nowFn: deps.nowFn,
+        });
+      crossTabByName.set(name, ct);
+    }
+    return ct;
+  };
+
+  /**
+   * Bypass execution guarded by cross-tab contention (observación 2): only
+   * ONE tab runs its continuation; a superseded tab throws a synthetic
+   * AuthRetryableFetchError so auth-js treats the attempt as retryable and
+   * NEVER reacts with `_removeSession()` — a stale continuation (e.g. a
+   * refresh holding an already-rotated token) can therefore never wipe the
+   * newer tokens written by the winning tab.
+   */
+  const runBypass = async <T>(name: string, run: () => Promise<T | undefined>): Promise<T> => {
+    const ct = crossTabFor(name);
+    const verdict = await ct.contendBypass(BYPASS_CONTENTION_BUDGET_MS);
+    if (verdict === 'superseded') {
+      throw new AuthRetryableFetchError(
+        'pb-auth-lock: superseded by a concurrent tab (its fresher auth result wins)',
+        0,
+      );
+    }
+    return (await ct.runWithHolder(run)) as T;
+  };
+
   return async function resilientAuthLock<T>(
     name: string,
     acquireTimeout: number,
@@ -125,14 +177,17 @@ export function createResilientAuthLock(deps: ResilientAuthLockDeps = {}) {
     // lock; mirror that (single-tab assumption is the platform fallback).
     if (!locks) return fn();
 
+    const ct = crossTabFor(name);
+
     // -- Step 0: circuit breaker ------------------------------------------
     // The zombie state is permanent for the tab's lifetime and auth
     // operations NEST (getSession → refresh re-acquires the lock). Paying
     // the ~8 s ladder per nested call blows past the app's bootstrap
-    // deadline; bypass instantly while poisoned instead.
+    // deadline; bypass instantly while poisoned instead — still serialized
+    // across tabs by the advisory contention protocol.
     const poisonedUntil = poisonedUntilByName.get(name) ?? 0;
     if (poisonedUntil > nowFn()) {
-      return fn();
+      return runBypass(name, fn);
     }
 
     // Run-once guard + shared result: the abandoned acquire/steal request
@@ -154,41 +209,46 @@ export function createResilientAuthLock(deps: ResilientAuthLockDeps = {}) {
 
     const acquireMs = acquireTimeout > 0 ? acquireTimeout : AUTH_LOCK_DEFAULT_ACQUIRE_MS;
 
-    // -- Step 1: bounded exclusive acquire --------------------------------
+    // Bounded exclusive acquire, reusable (step 1 and the holder retry).
     // The AbortSignal alone is NOT a sufficient bound: in the demonstrated
     // zombie state (request queued by a document destroyed mid-flight),
     // Chromium never settles the poisoned queue entry — not even on abort.
     // Race the attempt against an independent timer, exactly like auth-js
-    // does for its own acquire timeout.
-    const ac = new AbortController();
-    const acquireAttempt = (async (): Promise<{ done: boolean; value?: T }> => {
-      try {
-        const value = (await locks.request(name, { mode: 'exclusive', signal: ac.signal }, async (lock) => {
-          if (!lock) return runOnce(); // non-spec browser: run unlocked
-          return runOnce();
-        })) as T | undefined;
-        return fnStarted ? { done: true, value } : { done: false };
-      } catch {
-        // AbortError (own deadline) or a lock-facility error (SecurityError
-        // in sandboxed iframes): both mean "acquire did not happen".
-        return { done: false };
-      }
-    })();
-
-    const step1Race = await new Promise<{ done: boolean; value?: T; hung: boolean }>((resolve) => {
-      const acquireTimer = setTimeoutFn(() => {
+    // does for its own acquire timeout. The granted execution heartbeats so
+    // other tabs can distinguish a live holder from a zombie (steal guard).
+    const boundedAcquire = (budgetMs: number) => {
+      const ac = new AbortController();
+      const attempt = (async (): Promise<{ done: boolean; value?: T }> => {
         try {
-          ac.abort();
+          const value = (await locks.request(name, { mode: 'exclusive', signal: ac.signal }, async (lock) => {
+            if (!lock) return runOnce(); // non-spec browser: run unlocked
+            return ct.runWithHolder(runOnce);
+          })) as T | undefined;
+          return fnStarted ? { done: true, value } : { done: false };
         } catch {
-          /* noop */
+          // AbortError (own deadline) or a lock-facility error (SecurityError
+          // in sandboxed iframes): both mean "acquire did not happen".
+          return { done: false };
         }
-        resolve({ done: false, hung: true });
-      }, acquireMs);
-      acquireAttempt.then((r) => {
-        clearTimeoutFn(acquireTimer);
-        resolve({ ...r, hung: false });
+      })();
+      return new Promise<{ done: boolean; value?: T; hung: boolean }>((resolve) => {
+        const timer = setTimeoutFn(() => {
+          try {
+            ac.abort();
+          } catch {
+            /* noop */
+          }
+          resolve({ done: false, hung: true });
+        }, budgetMs);
+        attempt.then((r) => {
+          clearTimeoutFn(timer);
+          resolve({ ...r, hung: false });
+        });
       });
-    });
+    };
+
+    // -- Step 1: bounded exclusive acquire --------------------------------
+    const step1Race = await boundedAcquire(acquireMs);
 
     if (!step1Race.hung && step1Race.done) {
       // A successful acquisition after a cooldown re-probe closes the
@@ -198,15 +258,39 @@ export function createResilientAuthLock(deps: ResilientAuthLockDeps = {}) {
     }
     if (fnStarted) return (await runOnce()) as T;
 
+    // -- Step 1b: steal guard ----------------------------------------------
+    // A failed acquire has TWO possible causes: a zombie queue entry (steal
+    // is appropriate) or a LEGITIMATE holder that is merely slow (steal
+    // would preempt it mid-flight — e.g. a refresh POST >5 s on a bad
+    // mobile network). Distinguish them via the advisory heartbeat: while a
+    // live holder exists, wait for its release and retry the NORMAL acquire
+    // instead of stealing. With no live holder, fall through immediately.
+    const probe = await ct.waitForHolder(HOLDER_WAIT_MS);
+    if (probe.hadHolder && probe.cleared) {
+      const retryRace = await boundedAcquire(AUTH_LOCK_HOLDER_RETRY_MS);
+      if (!retryRace.hung && retryRace.done) {
+        if (poisonedUntilByName.has(name)) poisonedUntilByName.delete(name);
+        return retryRace.value as T;
+      }
+      if (fnStarted) return (await runOnce()) as T;
+    } else if (!probe.cleared && probe.remoteAlive) {
+      // A remote tab is STILL running auth work under this lock: stealing
+      // would abort it, and running our continuation uncoordinated could
+      // overwrite its fresher result. Go straight to the serialized bypass
+      // contention, which will supersede us (retryable, no session wipe).
+      poisonedUntilByName.set(name, nowFn() + poisonCooldownMs);
+      return runBypass(name, runOnce);
+    }
+
     // -- Step 2: bounded steal --------------------------------------------
-    // Spec-compliant preemption of a genuinely orphaned holder. The steal
-    // request itself can queue behind the zombie entry, so it is raced
-    // against a hard cap too.
+    // Spec-compliant preemption of a genuinely orphaned holder — only
+    // reached when no live holder heartbeat exists. The steal request itself
+    // can queue behind the zombie entry, so it is raced against a hard cap.
     const stealAttempt = (async (): Promise<{ done: boolean; value?: T }> => {
       try {
         const value = (await locks.request(name, { mode: 'exclusive', steal: true }, async (lock) => {
           if (!lock) return runOnce();
-          return runOnce();
+          return ct.runWithHolder(runOnce);
         })) as T | undefined;
         return fnStarted ? { done: true, value } : { done: false };
       } catch {
@@ -230,10 +314,11 @@ export function createResilientAuthLock(deps: ResilientAuthLockDeps = {}) {
     // request must never execute fn a second time; if it already did, we
     // await that same result. Poison the name so NESTED acquisitions (e.g.
     // the token refresh inside getSession) bypass instantly instead of
-    // paying the ladder again.
+    // paying the ladder again. The execution itself is serialized across
+    // tabs by the advisory contention protocol (observación 2).
     poisonedUntilByName.set(name, nowFn() + poisonCooldownMs);
     onBypass(name);
-    return (await runOnce()) as T;
+    return runBypass(name, runOnce);
   };
 }
 
