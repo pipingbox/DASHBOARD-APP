@@ -477,7 +477,7 @@ export function CVUploadSection() {
       )}
 
       <p className="mt-2 text-[10px] text-zinc-600">
-        PDF — máx. 10 MB
+        PDF, DOC, DOCX — máx. 10 MB
       </p>
     </section>
   );

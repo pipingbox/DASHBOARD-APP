@@ -41,6 +41,7 @@ import type { WorkerCertification } from '@/lib/workerProfile';
 import { normalizeCertification } from '@/lib/workerProfile';
 import { syncCertificationReminders, deleteCertificationReminders } from '@/lib/certificationReminders';
 import { resolveFileMime } from '@/lib/uploadHelpers';
+import { isValidCertificateFile, ACCEPT_CERTIFICATES } from '@/lib/fileUploadUtils';
 import {
   startResumableUpload,
   UPLOAD_FAILURE_I18N,
@@ -273,13 +274,12 @@ export function CertificationsSection() {
       return;
     }
 
-    // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — validate against Storage-supported
-    // formats BEFORE any transfer begins (PDF, PNG, JPEG/JPG only).
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
-    const allowedExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
+    // PB-DOCUMENT-UPLOAD-RELIABILITY-001 rev. 2 — the certificates bucket
+    // (app_14da0f1941_certificates) has allowed_mime_types = NULL in Storage
+    // (no allowlist), so the ORIGINAL formats are preserved: PDF, PNG, JPG,
+    // WebP, HEIC/HEIF. Validation is centralized in isValidCertificateFile()
+    // so it stays testable and consistent with ACCEPT_CERTIFICATES.
     const ext = (file.name.split('.').pop() || '').toLowerCase();
-    const mimeOk = file.type && allowedTypes.includes(file.type);
-    const extOk = allowedExtensions.includes(ext);
 
     const resolvedMime = resolveFileMime(file);
 
@@ -288,22 +288,12 @@ export function CertificationsSection() {
       type: file.type || '(empty)',
       size: file.size,
       ext,
-      mimeOk,
-      extOk,
       resolvedMime,
     });
 
-    if (!mimeOk && !extOk) {
+    if (!isValidCertificateFile(file)) {
       console.warn('[CertUpload] Rejected: invalid type and extension');
-      // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — clear message for unsupported formats
-      const unsupportedFormats = ['doc', 'docx', 'webp', 'heic', 'heif'];
-      if (unsupportedFormats.includes(ext)) {
-        toast.error(t('workerProfile.certifications.unsupportedFormat', {
-          defaultValue: `El formato .${ext} no está soportado. Por favor, convierte tu archivo a PDF, PNG o JPG.`
-        }));
-      } else {
-        toast.error(t('workerProfile.certifications.invalidFileType'));
-      }
+      toast.error(t('workerProfile.certifications.invalidFileType'));
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
@@ -888,7 +878,7 @@ export function CertificationsSection() {
             ref={fileInputRef}
             id="cert-file-upload-input"
             type="file"
-            accept="application/pdf,image/png,image/jpeg,image/jpg"
+            accept={ACCEPT_CERTIFICATES}
             className="sr-only"
             tabIndex={-1}
             onChange={(e) => {

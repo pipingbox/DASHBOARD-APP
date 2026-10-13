@@ -2709,7 +2709,7 @@
       "credentialIdPlaceholder": "np. CW-2024-12345",
       "file": "Plik certyfikatu",
       "uploadFile": "Kliknij, aby przesłać certyfikat",
-      "fileHint": "PDF lub obraz (PNG, JPG). Maks. 10 MB.",
+      "fileHint": "PDF lub obraz (PNG, JPG, WebP, HEIC). Maks. 10 MB.",
       "invalidFileType": "Akceptowane są tylko pliki PDF i obrazy",
       "fileTooBig": "Plik musi mieć mniej niż 10 MB",
       "fileUploaded": "Plik certyfikatu przesłany",

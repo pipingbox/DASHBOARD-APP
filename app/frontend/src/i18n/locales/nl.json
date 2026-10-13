@@ -2695,7 +2695,7 @@
       "credentialIdPlaceholder": "bijv. CW-2024-12345",
       "file": "Certificaatbestand",
       "uploadFile": "Klik om certificaat te uploaden",
-      "fileHint": "PDF of afbeelding (PNG, JPG). Max 10MB.",
+      "fileHint": "PDF of afbeelding (PNG, JPG, WebP, HEIC). Max 10MB.",
       "invalidFileType": "Alleen PDF- en afbeeldingsbestanden worden geaccepteerd",
       "fileTooBig": "Bestand moet kleiner zijn dan 10MB",
       "fileUploaded": "Certificaatbestand geüpload",

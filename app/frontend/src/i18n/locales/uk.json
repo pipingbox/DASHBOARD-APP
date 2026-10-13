@@ -2709,7 +2709,7 @@
       "credentialIdPlaceholder": "напр. CW-2024-12345",
       "file": "Файл сертифіката",
       "uploadFile": "Натисніть, щоб завантажити сертифікат",
-      "fileHint": "PDF або зображення (PNG, JPG). Макс. 10 МБ.",
+      "fileHint": "PDF або зображення (PNG, JPG, WebP, HEIC). Макс. 10 МБ.",
       "invalidFileType": "Приймаються лише файли PDF і зображення",
       "fileTooBig": "Розмір файлу не має перевищувати 10 МБ",
       "fileUploaded": "Файл сертифіката завантажено",

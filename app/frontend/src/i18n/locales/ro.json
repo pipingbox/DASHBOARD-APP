@@ -2702,7 +2702,7 @@
       "credentialIdPlaceholder": "ex. CW-2024-12345",
       "file": "Fișierul certificatului",
       "uploadFile": "Apăsați pentru a încărca certificatul",
-      "fileHint": "PDF sau imagine (PNG, JPG). Max. 10 MB.",
+      "fileHint": "PDF sau imagine (PNG, JPG, WebP, HEIC). Max. 10 MB.",
       "invalidFileType": "Sunt acceptate doar fișiere PDF și imagini",
       "fileTooBig": "Fișierul trebuie să aibă sub 10 MB",
       "fileUploaded": "Fișierul certificatului a fost încărcat",

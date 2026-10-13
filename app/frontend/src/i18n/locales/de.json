@@ -2695,7 +2695,7 @@
       "credentialIdPlaceholder": "z. B. CW-2024-12345",
       "file": "Zertifikatsdatei",
       "uploadFile": "Klicken zum Hochladen",
-      "fileHint": "PDF oder Bild (PNG, JPG). Max 10MB.",
+      "fileHint": "PDF oder Bild (PNG, JPG, WebP, HEIC). Max 10MB.",
       "invalidFileType": "Nur PDF- und Bilddateien werden akzeptiert",
       "fileTooBig": "Datei muss kleiner als 10MB sein",
       "fileUploaded": "Zertifikatsdatei hochgeladen",

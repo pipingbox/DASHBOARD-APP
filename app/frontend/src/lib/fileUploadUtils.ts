@@ -2,90 +2,22 @@
  * Mobile-friendly file upload utilities.
  * Handles file type detection and validation.
  *
- * PB-DOCUMENT-UPLOAD-RELIABILITY-001: Formats restricted to those actually
- * supported by Supabase Storage bucket "worker-documents": PDF, PNG, JPEG/JPG.
- * DOC, DOCX, WebP, HEIC/HEIF are NOT supported by the bucket and must be
- * rejected before transfer with a clear message.
+ * PB-DOCUMENT-UPLOAD-RELIABILITY-001 (rev. 2): validations are ISOLATED PER
+ * BUCKET because each bucket has a different Storage configuration:
+ *
+ * - Avatars bucket (app_14da0f1941_avatars): no MIME allowlist in Storage.
+ *   Accepts JPEG, PNG, WebP, HEIC/HEIF (original behaviour restored).
+ * - Certificates bucket (app_14da0f1941_certificates): allowed_mime_types is
+ *   NULL in Storage (no allowlist). CV accepts PDF/DOC/DOCX; certifications
+ *   accept PDF/PNG/JPG/WebP/HEIC/HEIF (original behaviour restored).
+ * - Worker documents bucket (worker-documents): Storage allowlist restricts
+ *   to PDF, PNG, JPEG/JPG with a 10 MiB limit. Validation must reject
+ *   anything else BEFORE the transfer starts.
  */
 
-// Image MIME types supported by worker-documents bucket
-const IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
-
-// Document MIME types supported by worker-documents bucket
-const DOC_TYPES = ['application/pdf'];
-
-// All supported MIME types
-const SUPPORTED_TYPES = [...DOC_TYPES, ...IMAGE_TYPES];
-
-// Supported extensions (lowercase, no dot)
-const SUPPORTED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg'];
-
-/**
- * Check if a file is a valid image for upload.
- * PB-DOCUMENT-UPLOAD-RELIABILITY-001: Only JPEG and PNG are supported.
- */
-export function isValidImageFile(file: File): boolean {
-  // Check MIME type
-  if (IMAGE_TYPES.includes(file.type.toLowerCase())) return true;
-  // Some mobile browsers don't set MIME type correctly — check extension
-  const ext = getFileExtension(file.name);
-  return ['jpg', 'jpeg', 'png'].includes(ext);
-}
-
-/**
- * Check if a file is a valid document (PDF only).
- * PB-DOCUMENT-UPLOAD-RELIABILITY-001: Only PDF is supported by the bucket.
- */
-export function isValidDocumentFile(file: File): boolean {
-  if (DOC_TYPES.includes(file.type.toLowerCase())) return true;
-  const ext = getFileExtension(file.name);
-  return ext === 'pdf';
-}
-
-/**
- * Check if a file is a valid image or document for the documents section.
- * PB-DOCUMENT-UPLOAD-RELIABILITY-001: Only PDF, PNG, JPEG/JPG are supported.
- */
-export function isValidDocOrImageFile(file: File): boolean {
-  return isValidDocumentFile(file) || isValidImageFile(file);
-}
-
-/**
- * @deprecated HEIC/HEIF is not supported by the worker-documents bucket.
- * This function always returns false. Use isSupportedByStorage() instead.
- */
-export function isHeicFile(_file: File): boolean {
-  // PB-DOCUMENT-UPLOAD-RELIABILITY-001: HEIC is not supported by Storage.
-  // Always return false so no HEIC-specific handling is triggered.
-  return false;
-}
-
-/**
- * Check if a file type is supported by the worker-documents bucket.
- * Returns true if the file can be uploaded, false otherwise.
- */
-export function isSupportedByStorage(file: File): boolean {
-  // Check MIME type first
-  if (file.type && SUPPORTED_TYPES.includes(file.type.toLowerCase())) {
-    return true;
-  }
-  // Fallback to extension check for mobile browsers with empty MIME
-  const ext = getFileExtension(file.name);
-  return SUPPORTED_EXTENSIONS.includes(ext);
-}
-
-/**
- * Get a user-friendly error message for unsupported file types.
- */
-export function getUnsupportedTypeMessage(file: File): string {
-  const ext = getFileExtension(file.name);
-  const unsupportedFormats = ['doc', 'docx', 'webp', 'heic', 'heif'];
-
-  if (unsupportedFormats.includes(ext)) {
-    return `El formato .${ext} no está soportado. Por favor, convierte tu archivo a PDF, PNG o JPG.`;
-  }
-  return 'Tipo de archivo no soportado. Formatos aceptados: PDF, PNG, JPG.';
-}
+// ---------------------------------------------------------------------------
+// Shared helpers
+// ---------------------------------------------------------------------------
 
 /**
  * Get normalized file extension (lowercase, no dot).
@@ -94,26 +26,6 @@ export function getFileExtension(filename: string): string {
   const parts = filename.split('.');
   if (parts.length < 2) return '';
   return (parts.pop() || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-}
-
-/**
- * Get a safe extension for storage upload path.
- * PB-DOCUMENT-UPLOAD-RELIABILITY-001: Only jpg/png for images.
- */
-export function getSafeImageExtension(filename: string): string {
-  const ext = getFileExtension(filename);
-  if (['jpg', 'jpeg', 'png'].includes(ext)) return ext;
-  return 'jpg';
-}
-
-/**
- * Get a safe extension for document upload.
- * PB-DOCUMENT-UPLOAD-RELIABILITY-001: Only pdf for documents.
- */
-export function getSafeDocExtension(filename: string): string {
-  const ext = getFileExtension(filename);
-  if (ext === 'pdf') return ext;
-  return 'pdf';
 }
 
 /**
@@ -155,20 +67,210 @@ export function triggerFileInput(inputRef: React.RefObject<HTMLInputElement | nu
   input.click();
 }
 
-/**
- * Accept string for image file inputs (mobile-friendly).
- * PB-DOCUMENT-UPLOAD-RELIABILITY-001: Only JPEG and PNG supported.
- */
-export const ACCEPT_IMAGES = '.jpg,.jpeg,.png,image/jpeg,image/jpg,image/png';
+// ---------------------------------------------------------------------------
+// Avatars bucket (app_14da0f1941_avatars) — no Storage MIME allowlist.
+// Original formats restored: JPEG, PNG, WebP, HEIC/HEIF.
+// Used by AvatarUpload.tsx and OnboardingWizard.tsx.
+// ---------------------------------------------------------------------------
+
+const HEIC_TYPES = ['image/heic', 'image/heif', 'image/heic-sequence', 'image/heif-sequence'];
+
+const AVATAR_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', ...HEIC_TYPES];
 
 /**
- * Accept string for document file inputs (CV, etc.).
- * PB-DOCUMENT-UPLOAD-RELIABILITY-001: Only PDF supported.
+ * Accept string for avatar image file inputs (mobile-friendly).
+ * Includes HEIC/HEIF for iPhone compatibility (bucket has no MIME allowlist).
  */
-export const ACCEPT_DOCUMENTS = '.pdf,application/pdf';
+export const ACCEPT_IMAGES =
+  '.jpg,.jpeg,.png,.webp,.heic,.heif,image/jpeg,image/png,image/webp,image/heic,image/heif';
 
 /**
- * Accept string for documents + images (general documents section).
- * PB-DOCUMENT-UPLOAD-RELIABILITY-001: Only PDF, PNG, JPEG/JPG supported.
+ * Detect if the file is a HEIC/HEIF image (common on iPhone).
+ * Some mobile browsers report empty MIME type for HEIC files,
+ * so we also check the file extension.
  */
-export const ACCEPT_DOCS_AND_IMAGES = `${ACCEPT_DOCUMENTS},${ACCEPT_IMAGES}`;
+export function isHeicFile(file: File): boolean {
+  if (HEIC_TYPES.includes(file.type.toLowerCase())) return true;
+  const ext = getFileExtension(file.name);
+  return ['heic', 'heif'].includes(ext);
+}
+
+/**
+ * Check if a file is a valid avatar image for upload (including HEIC from
+ * mobile). The avatars bucket has no MIME allowlist, so the original
+ * JPEG/PNG/WebP/HEIC behaviour is preserved.
+ */
+export function isValidImageFile(file: File): boolean {
+  // Check MIME type
+  if (AVATAR_IMAGE_TYPES.includes(file.type.toLowerCase())) return true;
+  // Some mobile browsers don't set MIME type correctly — check extension
+  const ext = getFileExtension(file.name);
+  return ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'].includes(ext);
+}
+
+/**
+ * Get a safe extension for avatar image upload path.
+ * For HEIC files, we keep the original extension since Supabase stores them
+ * as-is (bucket has no MIME allowlist).
+ */
+export function getSafeImageExtension(filename: string): string {
+  const ext = getFileExtension(filename);
+  if (['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'].includes(ext)) return ext;
+  return 'jpg';
+}
+
+// ---------------------------------------------------------------------------
+// Certificates bucket (app_14da0f1941_certificates) — allowed_mime_types is
+// NULL in Storage (no allowlist). Original formats restored.
+// ---------------------------------------------------------------------------
+
+/**
+ * Accept string for CV file inputs: PDF, DOC, DOCX.
+ */
+export const ACCEPT_DOCUMENTS =
+  '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+const CV_DOC_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
+
+/**
+ * Check if a file is a valid CV document (PDF, DOC, DOCX).
+ * The certificates bucket has no MIME allowlist, so the original
+ * PDF/DOC/DOCX behaviour is preserved.
+ */
+export function isValidDocumentFile(file: File): boolean {
+  if (CV_DOC_TYPES.includes(file.type.toLowerCase())) return true;
+  const ext = getFileExtension(file.name);
+  return ['pdf', 'doc', 'docx'].includes(ext);
+}
+
+/**
+ * Get a safe extension for CV upload (pdf/doc/docx preserved).
+ */
+export function getSafeDocExtension(filename: string): string {
+  const ext = getFileExtension(filename);
+  if (['pdf', 'doc', 'docx'].includes(ext)) return ext;
+  return 'pdf';
+}
+
+const CERT_MIME_TYPES = [
+  'application/pdf',
+  'image/png',
+  'image/jpeg',
+  'image/jpg',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+];
+
+const CERT_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'heic', 'heif'];
+
+/**
+ * Accept string for certification file inputs: PDF, PNG, JPG, WebP, HEIC/HEIF.
+ */
+export const ACCEPT_CERTIFICATES =
+  '.pdf,.doc,.docx,.png,.jpg,.jpeg,.webp,.heic,.heif,application/pdf,image/png,image/jpeg,image/jpg,image/webp,image/heic,image/heif';
+
+/**
+ * Check if a file is valid for the certifications section.
+ * The certificates bucket has no MIME allowlist, so the original
+ * PDF/PNG/JPG/WebP/HEIC/HEIF behaviour is preserved.
+ */
+export function isValidCertificateFile(file: File): boolean {
+  if (file.type && CERT_MIME_TYPES.includes(file.type.toLowerCase())) return true;
+  const ext = getFileExtension(file.name);
+  return CERT_EXTENSIONS.includes(ext);
+}
+
+/**
+ * Check if a file is a valid image or document for buckets without an
+ * allowlist (legacy helper kept for compatibility with existing callers).
+ */
+export function isValidDocOrImageFile(file: File): boolean {
+  return isValidDocumentFile(file) || isValidImageFile(file);
+}
+
+// ---------------------------------------------------------------------------
+// Worker documents bucket (worker-documents) — Storage allowlist:
+// PDF, PNG, JPEG/JPG only, 10 MiB limit.
+// ---------------------------------------------------------------------------
+
+/**
+ * Accept string for worker document file inputs: PDF, PNG, JPG/JPEG only.
+ */
+export const ACCEPT_WORKER_DOCUMENTS =
+  '.pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg,image/jpg';
+
+/**
+ * @deprecated Alias kept for compatibility — use ACCEPT_WORKER_DOCUMENTS.
+ */
+export const ACCEPT_DOCS_AND_IMAGES = ACCEPT_WORKER_DOCUMENTS;
+
+// Allowed MIME types with their compatible extensions. A specific MIME and
+// the file extension must agree; if they contradict each other the file is
+// rejected (e.g. "photo.png" with image/heic, or "photo.heic" with image/png).
+const WORKER_DOC_MIME_TO_EXTENSIONS: Record<string, string[]> = {
+  'application/pdf': ['pdf'],
+  'image/png': ['png'],
+  'image/jpeg': ['jpg', 'jpeg'],
+  'image/jpg': ['jpg', 'jpeg'],
+};
+
+const WORKER_DOC_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg'];
+
+/**
+ * Check if a file is a valid image or document for the worker-documents
+ * bucket (PDF, PNG, JPEG/JPG only).
+ *
+ * Validation semantics (PB-DOCUMENT-UPLOAD-RELIABILITY-001 rev. 2):
+ * - If the MIME type is present and specific, it must be in the allowlist.
+ *   Extension fallback is NOT used in this case, so a ".png" file whose MIME
+ *   says image/heic is rejected.
+ * - If the MIME is allowed but the extension contradicts it (e.g. .heic with
+ *   image/png), the file is rejected as inconsistent.
+ * - Extension fallback only applies when the MIME is absent or generic
+ *   ("" or application/octet-stream), which happens on some mobile browsers.
+ */
+export function isValidWorkerDocumentFile(file: File): boolean {
+  return isSupportedByStorage(file);
+}
+
+/**
+ * Check if a file type is supported by the worker-documents bucket.
+ * See isValidWorkerDocumentFile for the exact MIME/extension semantics.
+ */
+export function isSupportedByStorage(file: File): boolean {
+  const mime = (file.type || '').toLowerCase();
+  const ext = getFileExtension(file.name);
+  const mimeIsGeneric = !mime || mime === 'application/octet-stream';
+
+  if (!mimeIsGeneric) {
+    const compatibleExtensions = WORKER_DOC_MIME_TO_EXTENSIONS[mime];
+    if (!compatibleExtensions) {
+      // Specific MIME outside the allowlist — never fall back to extension.
+      return false;
+    }
+    // If an extension is present it must be compatible with the MIME.
+    if (ext && !compatibleExtensions.includes(ext)) return false;
+    return true;
+  }
+
+  // Absent/generic MIME (some mobile browsers): extension decides.
+  return WORKER_DOC_EXTENSIONS.includes(ext);
+}
+
+/**
+ * Get a user-friendly error message for unsupported worker document types.
+ */
+export function getUnsupportedTypeMessage(file: File): string {
+  const ext = getFileExtension(file.name);
+  const unsupportedFormats = ['doc', 'docx', 'webp', 'heic', 'heif'];
+
+  if (unsupportedFormats.includes(ext)) {
+    return `El formato .${ext} no está soportado en esta sección. Por favor, convierte tu archivo a PDF, PNG o JPG.`;
+  }
+  return 'Tipo de archivo no soportado. Formatos aceptados: PDF, PNG, JPG.';
+}

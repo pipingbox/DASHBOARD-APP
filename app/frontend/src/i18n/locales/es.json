@@ -2702,7 +2702,7 @@
       "credentialIdPlaceholder": "ej. CW-2024-12345",
       "file": "Archivo de Certificado",
       "uploadFile": "Haz clic para subir certificado",
-      "fileHint": "PDF o imagen (PNG, JPG). Máx 10MB.",
+      "fileHint": "PDF o imagen (PNG, JPG, WebP, HEIC). Máx 10MB.",
       "invalidFileType": "Solo se aceptan archivos PDF e imágenes",
       "fileTooBig": "El archivo debe ser menor de 10MB",
       "fileUploaded": "Archivo de certificado subido",
