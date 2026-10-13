@@ -2,6 +2,8 @@
   "common": {
     "loading": "Se încarcă…",
     "retry": "Reîncearcă",
+    "sessionCheckFailedTitle": "Nu am putut verifica sesiunea ta",
+    "sessionCheckFailedDesc": "Nu ai fost deconectat. Verifică conexiunea și încearcă din nou — munca ta este în siguranță.",
     "save": "Salvează",
     "saving": "Se salvează…",
     "cancel": "Anulează",
@@ -2702,7 +2704,7 @@
       "credentialIdPlaceholder": "ex. CW-2024-12345",
       "file": "Fișierul certificatului",
       "uploadFile": "Apăsați pentru a încărca certificatul",
-      "fileHint": "PDF sau imagine (PNG, JPG). Max. 10 MB.",
+      "fileHint": "PDF sau imagine (PNG, JPG, WebP, HEIC). Max. 10 MB.",
       "invalidFileType": "Sunt acceptate doar fișiere PDF și imagini",
       "fileTooBig": "Fișierul trebuie să aibă sub 10 MB",
       "fileUploaded": "Fișierul certificatului a fost încărcat",

@@ -8,6 +8,7 @@ import { classifyAuthError, isNewSignupIdentity, type AuthErrorCode } from '@/li
 import { getTrafficProps } from '@/lib/jobs/attribution';
 import { ONBOARDING_STATUS } from '@/lib/onboarding';
 import { edgeFunctionUrl } from '@/lib/supabase';
+import { withTimeout } from '@/lib/withTimeout';
 import {
   identifyUser,
   resetObservabilityUser,
@@ -56,6 +57,12 @@ interface AuthContextValue {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  /**
+   * PB-AUTH-LOCK-ONBOARDING-STALL-001: true when the initial session check
+   * could not complete within its deadline. This is NOT a logout: the UI must
+   * offer a recoverable retry instead of redirecting to /login.
+   */
+  authUnavailable: boolean;
   signIn: (
     email: string,
     password: string,
@@ -85,6 +92,12 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 const PRIMARY_ADMIN_EMAIL = 'gaspardelhierromata@gmail.com';
+
+// PB-AUTH-LOCK-ONBOARDING-STALL-001 — bootstrap deadlines. The lock ladder
+// (5 s acquire + 3 s steal) resolves in ~8 s worst case; these caps sit
+// safely above it and only fire when something beyond the lock is broken.
+const SESSION_BOOTSTRAP_TIMEOUT_MS = 12_000;
+const PROFILE_BOOTSTRAP_TIMEOUT_MS = 20_000;
 
 /**
  * Complete the referral assignment via backend Edge Function.
@@ -160,6 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authUnavailable, setAuthUnavailable] = useState(false);
 
   const loadProfile = async (userId: string) => {
     const { data } = await supabase
@@ -534,21 +548,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     (async () => {
       try {
-        // Race getSession against an 8-second timeout to prevent infinite loading in iframes
-        const sessionResult = await Promise.race([
-          supabase.auth.getSession(),
-          new Promise<{ data: { session: null }; error: null }>((resolve) =>
-            setTimeout(() => resolve({ data: { session: null }, error: null }), 8000)
-          ),
-        ]);
+        // PB-AUTH-LOCK-ONBOARDING-STALL-001: bound the bootstrap getSession.
+        // The resilient auth lock (lib/resilientAuthLock) makes a permanent
+        // hang nearly impossible (worst case ~8 s: 5 s acquire + 3 s steal),
+        // so a deadline miss here means something is deeply wrong — but a
+        // timeout is NEVER proof of "no session". The previous behaviour
+        // (resolve session:null on timeout) produced silent logouts of real
+        // users; now the UI gets a recoverable `authUnavailable` state and
+        // keeps any session that arrives late via onAuthStateChange.
+        const race = await withTimeout(supabase.auth.getSession(), SESSION_BOOTSTRAP_TIMEOUT_MS);
 
         if (!mounted) return;
 
-        const initial = sessionResult.data.session;
+        if (race.timedOut) {
+          console.warn('[useAuth] Initial session check exceeded its deadline — NOT treating as logout.');
+          trackEvent('auth_session_resolution_timeout', {
+            route: window.location.pathname,
+            correlation_id: getCorrelationId(),
+          });
+          setAuthUnavailable(true);
+          return;
+        }
+
+        const initial = race.value?.data.session ?? null;
         setSession(initial);
         setUser(initial?.user ?? null);
         if (initial?.user) {
-          await ensureProfile(initial.user);
+          // Bound the profile bootstrap as well: a stalled PostgREST call
+          // must not hold the whole app on the loading screen. The shell
+          // renders with profile=null and refreshes recover later.
+          await withTimeout(ensureProfile(initial.user), PROFILE_BOOTSTRAP_TIMEOUT_MS);
         }
       } catch (err) {
         console.warn('Auth session initialization failed:', err);
@@ -562,11 +591,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     })();
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (event, next) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, next) => {
       setSession(next);
       setUser(next?.user ?? null);
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-        if (next?.user) await ensureProfile(next.user);
+        // A late INITIAL_SESSION resolves a prior bootstrap timeout.
+        if (next?.user) setAuthUnavailable(false);
+        // PB-AUTH-LOCK-ONBOARDING-STALL-001: NEVER await PostgREST work
+        // inside the auth-state callback. auth-js notifies subscribers while
+        // holding its internal lock queue, and every supabase-js REST call
+        // re-enters auth.getSession() for the token: awaiting ensureProfile
+        // here self-deadlocks the whole client (demonstrated in QA — boot
+        // stuck past the 12 s deadline with a perfectly healthy lock; the
+        // React state updated synchronously but the profile stayed empty).
+        // Detach + bound the refresh instead; the UI tolerates profile=null.
+        if (next?.user) {
+          const u = next.user;
+          void withTimeout(ensureProfile(u), PROFILE_BOOTSTRAP_TIMEOUT_MS).then(({ timedOut }) => {
+            if (timedOut) console.warn('[useAuth] Detached profile refresh exceeded its deadline.');
+          });
+        }
         // PB-OBSERVABILITY-001: link anonymous session to technical user id.
         if (next?.user) identifyUser(next.user.id);
       } else if (event === 'SIGNED_OUT') {
@@ -740,7 +784,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshProfile = async () => {
-    if (user) await loadProfile(user.id);
+    // Bounded (PB-AUTH-LOCK-ONBOARDING-STALL-001): callers await this inside
+    // finalize/postpone paths; a stalled read must not hold them hostage.
+    if (user) await withTimeout(loadProfile(user.id), PROFILE_BOOTSTRAP_TIMEOUT_MS);
   };
 
   return (
@@ -750,6 +796,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         profile,
         loading,
+        authUnavailable,
         signIn,
         signUp,
         signInWithGoogle,

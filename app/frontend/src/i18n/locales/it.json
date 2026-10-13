@@ -2,6 +2,8 @@
   "common": {
     "loading": "Caricamento…",
     "retry": "Riprova",
+    "sessionCheckFailedTitle": "Non è stato possibile verificare la tua sessione",
+    "sessionCheckFailedDesc": "Non hai effettuato la disconnessione. Controlla la connessione e riprova: il tuo lavoro è al sicuro.",
     "save": "Salva",
     "saving": "Salvataggio…",
     "cancel": "Annulla",
@@ -2702,7 +2704,7 @@
       "credentialIdPlaceholder": "es. CW-2024-12345",
       "file": "File Certificato",
       "uploadFile": "Clicchi per caricare il certificato",
-      "fileHint": "PDF o immagine (PNG, JPG). Max 10MB.",
+      "fileHint": "PDF o immagine (PNG, JPG, WebP, HEIC). Max 10MB.",
       "invalidFileType": "Sono accettati solo file PDF e immagine",
       "fileTooBig": "Il file deve essere inferiore a 10MB",
       "fileUploaded": "File certificato caricato",

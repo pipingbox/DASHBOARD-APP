@@ -2,6 +2,8 @@
   "common": {
     "loading": "Loading…",
     "retry": "Retry",
+    "sessionCheckFailedTitle": "We couldn't verify your session",
+    "sessionCheckFailedDesc": "You have not been signed out. Check your connection and try again — your work is safe.",
     "save": "Save",
     "saving": "Saving…",
     "cancel": "Cancel",
@@ -2695,7 +2697,7 @@
       "credentialIdPlaceholder": "e.g. CW-2024-12345",
       "file": "Certificate File",
       "uploadFile": "Click to upload certificate",
-      "fileHint": "PDF or image (PNG, JPG). Max 10MB.",
+      "fileHint": "PDF or image (PNG, JPG, WebP, HEIC). Max 10MB.",
       "invalidFileType": "Only PDF and image files are accepted",
       "fileTooBig": "File must be under 10MB",
       "fileUploaded": "Certificate file uploaded",

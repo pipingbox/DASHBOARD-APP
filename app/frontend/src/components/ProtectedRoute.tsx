@@ -1,10 +1,11 @@
 import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminPreview } from '@/contexts/AdminPreviewContext';
 import { hasRouteAccess, getDefaultRoute, getRoleLabel } from '@/lib/roles';
 import { isPrimaryAdmin as checkPrimaryAdmin } from '@/lib/admin';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlert, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // TD-02: moved to lib/admin.ts (reads VITE_PRIMARY_ADMIN_EMAIL env var).
@@ -17,7 +18,7 @@ interface Props {
 }
 
 export function ProtectedRoute({ children, adminOnly = false, allowedRoles }: Props) {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, authUnavailable } = useAuth();
   const location = useLocation();
 
   // Safely try to use AdminPreviewContext — it may not be available in all routes
@@ -45,6 +46,10 @@ export function ProtectedRoute({ children, adminOnly = false, allowedRoles }: Pr
   }
 
   if (!user) {
+    // PB-AUTH-LOCK-ONBOARDING-STALL-001: an unverifiable session (bootstrap
+    // deadline exceeded) is NOT a logout — offer a recoverable retry instead
+    // of bouncing the user to /login and losing their in-flight work.
+    if (authUnavailable) return <AuthUnavailableScreen />;
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -136,7 +141,7 @@ function AccessDenied({ role }: { role?: string | null }) {
 }
 
 export function GuestRoute({ children }: { children: ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, authUnavailable } = useAuth();
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
@@ -145,5 +150,39 @@ export function GuestRoute({ children }: { children: ReactNode }) {
     );
   }
   if (user) return <Navigate to="/dashboard" replace />;
+  // Session unverifiable ≠ logged out: same recoverable screen as protected routes.
+  if (authUnavailable) return <AuthUnavailableScreen />;
   return <>{children}</>;
+}
+
+/**
+ * PB-AUTH-LOCK-ONBOARDING-STALL-001 — recoverable screen shown when the
+ * initial session check could not complete (e.g. unresponsive browser lock
+ * facility). Explicitly tells the user they were NOT signed out and offers a
+ * retry. If a late session arrives via onAuthStateChange, `user` becomes set
+ * and the routes above render normally without any interaction.
+ */
+function AuthUnavailableScreen() {
+  const { t } = useTranslation();
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] p-6">
+      <div className="max-w-md w-full text-center space-y-6">
+        <div className="flex justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10 border border-amber-500/20">
+            <RefreshCw className="h-8 w-8 text-amber-400" />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-xl font-bold text-zinc-100">{t('common.sessionCheckFailedTitle')}</h1>
+          <p className="text-sm text-zinc-400">{t('common.sessionCheckFailedDesc')}</p>
+        </div>
+        <Button
+          onClick={() => window.location.reload()}
+          className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
+        >
+          {t('common.retry')}
+        </Button>
+      </div>
+    </div>
+  );
 }
