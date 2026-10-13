@@ -4,7 +4,7 @@
 **Issue:** pipingbox/DASHBOARD-APP#67
 **PR relacionada:** #66 (PB-DOCUMENT-UPLOAD-RELIABILITY-001) — se mantiene sin merge
 **Rama:** `pb-auth-lock-onboarding-stall-001` (base: `98c4a32`, head candidato de la PR #66)
-**SHA inicial:** `98c4a32` · **SHA rev.1:** `cae4f00` · **SHA rev.2 (candidato):** `70fdc2f`
+**SHA inicial:** `98c4a32` · **SHA rev.1:** `cae4f00` · **SHA rev.2:** `70fdc2f` · **Merge con main:** `10f3733` · **SHA rev.3 (código):** `25955aa`
 **Alcance:** diagnóstico + implementación + QA. **NO MERGE / NO DEPLOY sin GO explícito.**
 
 ---
@@ -413,3 +413,205 @@ Actions vuelva a crear runs (el head de la PR es `70fdc2f`).
 hasta: (a) gate TypeScript oficial en PASS sobre `70fdc2f` cuando Actions
 dispare, (b) validación manual iOS Safari, (c) decisión sobre H1. NO MERGE /
 NO DEPLOY.
+
+---
+
+# Rev.3 — Resolución de las 5 observaciones de la revisión 2 de la PR #68 (13/10/2026, tarde)
+
+**SHA rev.3 (código):** `25955aa` (sobre el merge con main `10f3733`).
+La PR #68 quedó **MERGEABLE/CLEAN** tras el merge; todos los cambios de la
+PR #66 se conservan (verificado: el merge-base real con main es `16682d0`;
+main solo trajo la PR #61 — notificaciones/catálogo — y **no toca** ningún
+archivo de subidas ni del lock de sesión).
+
+## R3.1 Observación 1 (BLOQUEANTE) — conflictos con main
+
+El único conflicto fue `tests/tools-dom-mutation.spec.ts`. Main (PR #61) ya
+había reparado el mismo locator roto de forma **superior** (atributo estable
+`data-tool-key`, independiente del locale, fallo ruidoso con locator real de
+Playwright). Se tomó el lado de `origin/main` completo; verificado que
+`data-tool-key={tool.key}` existe en `Tools.tsx:202`. El arreglo propio de la
+rama quedó obsoleto. Suite resultante: 1/1 PASS.
+
+## R3.2 Observación 2 (BLOQUEANTE) — TypeScript Regression Gate oficial
+
+**PASS oficial en `10f3733`** (run `TypeScript Regression Gate` del
+2026-10-13T13:11:42Z→13:12:28Z, listado vía API `actions/runs`; PR #68 en
+estado MERGEABLE/CLEAN con check verde).
+
+Causa raíz de los runs ausentes: **indeterminada (plataforma)**. La hipótesis
+previa de "cuota agotada" quedó descartada (el repo es público ⇒ Actions
+gratuito). Los pushes anteriores (`107b196`, `70fdc2f`, commit vacío,
+close/reopen) no dispararon runs por causa no atribuible; el push del merge
+`10f3733` sí disparó y pasó. El gate debe ejecutarse de nuevo sobre el head
+final de esta revisión (ver R3.6).
+
+## R3.3 Observación 3 (P1) — degradación segura sin BroadcastChannel + coordinación en segundo plano
+
+**Fail-closed implementado** (`authLockCrossTab.ts` + `resilientAuthLock.ts` +
+`observability.ts`):
+- `contendBypass` sin canal devuelve `'uncoordinated'` (antes `'run'` =
+  fail-open): un bypass sin coordinación entre pestañas es exactamente el
+  wipe de tokens por refresh concurrente que esta capa previene.
+- `runBypass` ante `'uncoordinated'` lanza `AuthRetryableFetchError`
+  sintético (reintentable, **sin** `_removeSession()`); el usuario ve la
+  pantalla auth-unavailable con Reintentar. Evento nuevo tipificado
+  `auth_lock_bypass_denied_uncoordinated` (propiedades `lock_path`,
+  `correlation_id`).
+- Trade-off documentado: una pestaña zombi sin canal ya no se autorecupera
+  vía bypass (conjunto casi vacío: navegadores con Web Locks pero sin
+  BroadcastChannel).
+
+**Throttling en segundo plano** (semántica decidida y verificada): el primer
+heartbeat del holder es síncrono al iniciar (sin timer), y un holder
+vivo-pero-atascado responde claims con eco `held` síncrono y suplanta
+contendientes hasta su `release`; un "cadáver" (event loop congelado, sin
+eco) deja de bloquear tras expirar el heartbeat (2,5 s). No se mitiga con
+wake-locks: un holder que no puede latir >2,5 s se considera muerto
+intencionalmente.
+
+**Pruebas:** `auth-lock-cross-tab` 12/12 (uncoordinated, background-throttling
+con la semántica real, tabs aisladas, integración fail-closed),
+`resilient-auth-lock` + `withTimeout` 32/32 → 44/44 PASS en las 4 suites unit
+de la rama. **E2E real multi-tab 2/2** contra QA con build `25955aa`:
+- Zombie `navigator.locks` + sesión expirada: la pestaña activa coordina y
+  autentica sola; la sesión sobrevive (sin wipe).
+- **Pestaña congelada real** vía CDP `Page.setWebLifecycleState(frozen)`:
+  la pestaña activa autentica con exactamente **1 refresh** mientras la peer
+  está suspendida; al reanudar, la congelada reusa la sesión fresca **sin
+  segunda rotación** y sin borrado de sesión.
+
+## R3.4 Observación 4 (P2) — escritura obsoleta pre-abort no puede sobrescribir
+
+### Defecto demostrado empíricamente (antes del fix)
+
+Sonda de proxy de reordenación contra **PostgreSQL QA real** (cuenta
+sintética desechable `pb-write-probe-*`): el cliente lanza el UPDATE obsoleto
+(#1), lo aborta inmediatamente (AbortController, lo que hace
+`ProfileWriteCoordinator` al superseder), escribe el payload fresco (#2,
+204), y el proxy libera después la petición #1 retenida. **Resultado: la
+escritura abortada se commit-eó DESPUÉS de la fresca y la sobrescribió**
+(`title`/`skills` obsoletos + `location` fresco — fila con campos mezclados
+de dos escrituras). Es exactamente el escenario de la observación: el abort
+del cliente no detiene una petición ya en la red.
+
+### Corrección — guardia CAS servidor-side
+
+- **Migración `sql/029-pb-profile-write-seq.sql`**: columna
+  `profile_write_seq bigint NOT NULL DEFAULT 0` (aditiva, sin backfill).
+  Aplicada a QA vía Management API ( tracked: `029-pb-profile-write-seq`) y
+  verificada: trigger `pb_profiles_privilege_guard` **no** la protege (solo
+  columnas de privilegio/estado), `authenticated` tiene grant UPDATE sobre
+  ella.
+- **`profileWriteGuard.ts`** (nuevo, lógica pura inyectable): el seq se
+  consume por **INTENTO** de escritura (monótono por pestaña, avanza aunque
+  la escritura se aborte) → una escritura nueva siempre lleva seq mayor que
+  cualquier escritura abortada anterior; UPDATE con guardia
+  `WHERE profile_write_seq < :next_seq` + `RETURNING profile_write_seq`;
+  **0 filas = superseded en el servidor** (nunca éxito falso): resync
+  (SELECT seq) + reintento único; perder dos veces = error recuperable.
+  Degradación segura: si la BD no tiene la columna (PGRST204), pasa a modo
+  legacy sin guardia — idéntico al comportamiento de main, el guardado jamás
+  se rompe.
+- **Cableado**: los tres writes del wizard (autosave, Finish, Postpone) van
+  por la guardia cuando hay usuario autenticado.
+- **Orden seguro de deploy**: migración PRIMERO, frontend después (acoplamiento
+  documentado; producción solo con GO).
+
+### Pruebas
+
+- **Unit 7/7** (`profile-write-guard.spec.ts`): escenario exacto de
+  reordenación (abort → write fresco → entrega tardía del obsoleto → fila
+  intacta), supersede cross-tab con resync+reintento único, doble derrota =
+  error (nunca éxito falso), degradación PGRST204, error de lectura no-204,
+  fila ausente, seq monotónico con una sola lectura.
+- **Integración 2/2 contra PostgreSQL QA real**
+  (`profile-write-guard-integration.spec.ts`, proxy de retención + cliente
+  supabase-js real + cuentas desechables):
+  1. El UPDATE obsoleto abortado, retenido en la red y entregado DESPUÉS
+     del write fresco, es rechazado por el CAS (0 filas): fila fresca
+     intacta, `profile_write_seq=2`.
+  2. Dos pestañas compiten con el mismo seq: el servidor arbitra limpio —
+     la perdedora resyncea, reintenta y gana; la fila queda con todos los
+     campos de UNA escritura, nunca mezcla.
+- Nota de comportamiento real descubierta: supabase-js **resuelve** (no
+  rechaza) las peticiones abortadas con `{ error: AbortError }`; la guardia
+  lo trata como error truthy (nunca éxito) y el coordinator lo mapea a
+  superseded.
+
+## R3.5 Observación 5 — iOS Safari y H1
+
+- **iOS Safari: BLOCKED** (sin dispositivo/emulador Apple en el entorno).
+  Se mantiene como pendiente de validación manual con checklist definido en
+  rev.2 §R2.5 (Get Latest PIN, flujo completo con Web Locks reales, freeze
+  en background).
+- **H1 (timeouts PostgREST)**: se mantiene como **hipótesis monitorizada**,
+  no causa demostrada del caso concreto. Esta revisión añade un dato: el
+  proxy de retención contra PostgREST QA mostró latencias normales (<1 s
+  con entrega controlada), sin evidencia de timeouts del gateway; H1 queda
+  para observación en producción (logs ya instrumentados via eventos de
+  timeout tipificados).
+
+## R3.6 Regresión post-reconciliación (build `25955aa`, Supabase QA real)
+
+**Integridad de las tres rutas:** onboarding **Finish** 1/1 PASS (transición
+canónica persistida y sobrevive reload, con la guardia CAS activa);
+**Postpone** 1/1 PASS (resolución acotada, persistencia, wizard reanuda);
+**CV** (upload → persistence → replace → remove, ZERO DIFF) **PASS 2×**
+consecutivas; documentos profesionales y PNG PASS.
+
+**Causa raíz del flaky de telemetría CV (rev.2) identificada:** la app emite
+ambos `document_upload_started` (verificado con sonda instrumentada), pero el
+lote del primer upload puede irse en el flush de `pagehide` durante el reload
+que hace el spec — invisible para la captura `page.on('request')` de
+Playwright. El spec pasa cuando el flush periódico (~9 s) dispara antes del
+reload (carrera ~50-70%). No es un defecto de la app; quedará como nota para
+endurecer la ventana de sondeo del spec en una iteración futura (fuera de
+alcance de esta revisión).
+
+**Desvío del entorno QA detectado y corregido (ajeno a la rama):**
+`pb_create_client_notification` había perdido el `REVOKE EXECUTE` de sql/027
+(ACL por defecto = PUBLIC; anon recibía 400 P0001 en vez de 401). Restaurado
+el ACL exacto de sql/027 vía migración trackeada
+(`pb_auth_lock_rev3_restore_027_rpc_acl`); verificado con curl anon → 401;
+`notifications-hardening` 11/11 PASS. Sin relación con los cambios de la
+rama (verificado por diff); la restauración re-aplica hardening ya revisado
+del repo, no lo relaja.
+
+**Matriz final rev.3 (todas las suites salvo `prod-stale-smoke`/
+`stale-crossdeploy`, excluidos como siempre en QA local):**
+
+| Resultado | Conteos |
+|-----------|---------|
+| **PASS** | **766 + 11 (notifications restauradas) + 1 (CV re-ejecutada) = 778 efectivos** |
+| FAIL ambientales/preexistentes (desglose abajo) | 26 |
+| Skipped (puertas de entorno dentro de los specs) | 11 |
+| Did not run (dependencias seriales tras los BLOCKED) | 26 |
+| **FAIL atribuibles a la rama** | **0** |
+
+Desglose de los 26 FAIL (todos con causa verificada, ninguno de la rama):
+preview-smoke ×8 (`/api/config` 500 local), public-routes/tool-landing ×6
+(contratos del Worker de producción), namespace `qa*@pipingbox.com` ×7
+(precondición de cuentas interna), `secure-file-access-broker` ×2
+(`E2E_WORKER_EMAIL` no disponible), schema-contract ×2 (columnas protegidas
+P0001 preexistente), referrals T1 ×1 (0/6 `referral_code`).
+
+**Nuevas suites rev.3:** `profile-write-guard` 7/7,
+`profile-write-guard-integration` 2/2 (QA real), `auth-lock-cross-tab` 12/12,
+E2E multi-tab 2/2 (incluida pestaña congelada), `onboarding-finish-e2e` 1/1
+con CAS activo. Todas las suites de rev.1/rev.2 siguen PASS.
+
+## R3.7 Recomendación de integración
+
+1. **Orden seguro:** migración `sql/029` → frontend PR #68 → PR #66 (o
+   conjuntas si se prefiere, respetando migración-primero). La PR #68 ya
+   incluye main; la PR #66 debe rebasarse sobre la #68 al fusionar.
+2. **GO para revisión/merge de la PR #68** tras: gate TypeScript oficial en
+   PASS sobre el head final de esta revisión (25955aa + informe) — el gate
+   de `10f3733` ya pasó y el diff posterior es el descrito en R3.3/R3.4
+   (typecheck local exit 0, 0 errores).
+3. **Pendientes fuera de esta revisión:** validación manual iOS Safari
+   (BLOCKED), decisión sobre H1, endurecimiento de la ventana de sondeo del
+   spec de telemetría CV.
+4. **NO MERGE / NO DEPLOY** sin GO explícito. Producción sin tocar; cuentas
+   reales sin tocar (solo cuentas sintéticas desechables).
