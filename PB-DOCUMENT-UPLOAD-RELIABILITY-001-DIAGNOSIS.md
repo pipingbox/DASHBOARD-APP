@@ -1,220 +1,146 @@
-# PB-DOCUMENT-UPLOAD-RELIABILITY-001 — Diagnóstico y Correcciones
+# PB-DOCUMENT-UPLOAD-RELIABILITY-001 — Diagnóstico y Correcciones (rev. 3)
 
 ## Resumen Ejecutivo
 
-**Problema confirmado:** Incompatibilidad entre formatos anunciados en frontend y formatos aceptados por Supabase Storage bucket `worker-documents`.
+**Problema confirmado:** Incompatibilidad entre formatos anunciados en el frontend y formatos aceptados por el bucket `worker-documents` de Supabase Storage (solo PDF, PNG, JPEG/JPG, 10 MiB).
 
-**Impacto:** Usuarios no pueden subir documentos en formatos DOC, DOCX, WebP, HEIC/HEIF aunque la UI los anuncia como soportados.
+**Corrección:** Validaciones aisladas por bucket (rev. 2, según revisión de la PR #66) — restricción solo donde el bucket tiene allowlist; formatos originales restaurados donde el bucket no la tiene.
 
-**Causa raíz:** El bucket `worker-documents` solo acepta PDF, PNG y JPEG/JPG (10 MiB límite), mientras que el frontend anuncia y valida adicionalmente DOC, DOCX, WebP y HEIC/HEIF.
-
----
-
-## 1. Diagnóstico Detallado
-
-### 1.1 Incompatibilidad de Formatos (CONFIRMADO)
-
-| Componente | Formatos Anunciados | Formatos Aceptados por Storage | Estado |
-|------------|---------------------|--------------------------------|--------|
-| DocumentsSection | PDF, DOC, DOCX, JPG, PNG, WebP, HEIC | PDF, PNG, JPEG/JPG | ❌ INCOMPATIBLE |
-| CVUploadSection | PDF, DOC, DOCX | PDF, PNG, JPEG/JPG | ❌ INCOMPATIBLE |
-| CertificationsSection | PDF, PNG, JPG, JPEG, WebP, HEIC, HEIF | PDF, PNG, JPEG/JPG | ❌ INCOMPATIBLE |
-
-**Evidencia:**
-- `fileUploadUtils.ts` líneas 128-138: `ACCEPT_DOCS_AND_IMAGES` incluye DOC, DOCX, WebP, HEIC
-- `DocumentsSection.tsx` línea 591: texto "PDF, DOC, DOCX, JPG, PNG, WebP, HEIC — máx. 10 MB"
-- `CertificationsSection.tsx` línea 883: accept incluye WebP, HEIC, HEIF
-- Bucket `worker-documents`: solo PDF, PNG, JPEG/JPG (confirmado por contexto del issue)
-
-### 1.2 Problemas de Consistencia de Datos (CONFIRMADO)
-
-**DocumentsSection.tsx** realiza:
-1. Subida del objeto a Storage (línea 250-262)
-2. Registro en DB solo al hacer submit del formulario (línea 284-340)
-
-**Riesgo:** Si el usuario cierra el diálogo después de subir pero antes de guardar, queda un objeto huérfano en Storage sin referencia en DB.
-
-**Mitigación actual:** El botón "Remove" (línea 537-553) permite limpiar antes de guardar, pero no hay limpieza automática si el usuario cierra el diálogo.
-
-### 1.3 Problemas de UX Móvil (PARCIALMENTE CONFIRMADO)
-
-**Observaciones:**
-- Los inputs de archivo usan `<label>` wrapping que es la técnica correcta para móviles
-- `triggerFileInput()` en `fileUploadUtils.ts` intenta manejar el clic programático, pero no se usa consistentemente
-- CertificationsSection usa un botón que llama a `openCertificateFilePicker()` que hace `fileInputRef.current?.click()` — esto puede fallar en iOS Safari si no es en el mismo frame del gesto del usuario
-
-### 1.4 Observabilidad (PARCIALMENTE IMPLEMENTADO)
-
-**Implementado:**
-- `resumableUpload.ts` tiene telemetría completa con eventos `document_upload_*`
-- Clasificación de errores por categorías (network, timeout, auth, storage_4xx, storage_5xx, database)
-
-**Faltante:**
-- DocumentsSection no usa el uploader resumable, usa `uploadWithTimeout` directamente
-- No hay eventos de selección/validación de archivo en DocumentsSection
+**Entorno QA aprovisionado:** buckets, políticas RLS de Storage y grants anon/authenticated replicados desde producción (lectura sola → migración en QA). Cuentas sintéticas A y B creadas.
 
 ---
 
-## 2. Correcciones Implementadas
+## 1. Resolución de las 6 observaciones de la PR #66
 
-### 2.1 Alineación de Formatos — ESTRATEGIA: RESTRICCIÓN
+### Obs. 1 — Regresiones en avatares y onboarding (P1) — RESUELTA
+`isValidImageFile`, `isHeicFile`, `getSafeImageExtension` y `ACCEPT_IMAGES` restaurados a JPEG/PNG/WebP/HEIC/HEIF. El bucket `app_14da0f1941_avatars` no tiene allowlist en Storage (verificado en producción). Tests de regresión: `avatars bucket regression` (6 PASS).
 
-**Decisión:** Restringir los formatos anunciados a los realmente soportados por Storage.
+### Obs. 2 — Validaciones independientes por bucket (P1) — RESUELTA
+`fileUploadUtils.ts` reorganizado en tres secciones aisladas:
+- **worker-documents** (allowlist Storage): `isSupportedByStorage`/`isValidWorkerDocumentFile` + `ACCEPT_WORKER_DOCUMENTS` — solo PDF/PNG/JPG.
+- **certificates** (allowlist NULL, verificado): CV PDF/DOC/DOCX (`isValidDocumentFile`), certificaciones PDF/PNG/JPG/WebP/HEIC/HEIF (nuevo `isValidCertificateFile` + `ACCEPT_CERTIFICATES`).
+- **avatars**: formatos originales.
+Hints de UI actualizados en los 11 locales (`fileHint` certificaciones).
 
-**Justificación:**
-1. Ampliar los formatos del bucket requiere migración SQL y verificación de seguridad
-2. Los formatos DOC/DOCX son propensos a malware y requieren análisis adicional
-3. HEIC/HEIF requiere conversión que no está implementada
-4. WebP tiene soporte limitado en visores de documentos empresariales
+### Obs. 3 — Cancelación y limpieza de documentos (P1) — RESUELTA
+Cierre centralizado en `DocumentsSection`: Cancel, X, Esc y backdrop usan `closeDialog()`/`handleDialogOpenChange()`. La eliminación usa el resultado booleano de `deleteStorageObject` (no lanza); si falla se emite `toast.warning` + log — nunca se oculta un huérfano potencial.
 
-**Cambios:**
+### Obs. 4 — Éxito solo tras Storage + PostgreSQL (P1) — RESUELTA
+- Tras la transferencia TUS: estado "Archivo adjuntado — pendiente de guardar" (sin toast de éxito).
+- Éxito (`toast.success` + `confirmSaved()` + evento `document_upload_completed`) solo tras el INSERT confirmado.
+- Compensación: si el INSERT falla o lanza, se elimina el objeto recién subido y se verifica el resultado; si el INSERT ya succeedió (flag `insertSucceeded`), NO se elimina (evita huérfano inverso: fila que referencia objeto borrado).
 
-#### fileUploadUtils.ts
-- Eliminar DOC, DOCX, WebP, HEIC/HEIF de las listas de aceptación
-- Actualizar `ACCEPT_DOCS_AND_IMAGES` para reflejar solo formatos soportados
-- Añadir validación temprana con mensaje claro
+### Obs. 5 — Validación MIME/extensión (P2) — RESUELTA
+`isSupportedByStorage` nueva semántica: MIME específico fuera de allowlist → rechazo (sin fallback a extensión); MIME permitido + extensión contradictoria (p. ej. `.png` con `image/heic`) → rechazo; fallback a extensión solo con MIME ausente/genérico (`application/octet-stream`), caso real en móviles. Tests: 4 casos contradictorios cubiertos.
 
-#### DocumentsSection.tsx
-- Actualizar texto de formatos aceptados
-- Añadir validación previa a la subida con mensaje específico
-- Migrar a `startResumableUpload` para consistencia con CV y Certifications
-
-#### CVUploadSection.tsx
-- Actualizar texto de formatos aceptados (solo PDF)
-
-#### CertificationsSection.tsx
-- Actualizar texto de formatos aceptados
-- Corregir input file para usar `<label>` en lugar de botón + click()
-
-### 2.2 Prevención de Objetos Huérfanos
-
-**DocumentsSection.tsx:**
-- Añadir limpieza automática al cerrar el diálogo sin guardar
-- Usar `pendingConfirmRef` pattern como CertificationsSection
-
-### 2.3 Mejora de UX Móvil
-
-**CertificationsSection.tsx:**
-- Reemplazar botón + `openCertificateFilePicker()` con `<label htmlFor>` pattern
-- Mantener input fuera del form para evitar submit accidental
-
-### 2.4 Observabilidad Completa
-
-**DocumentsSection.tsx:**
-- Migrar a `startResumableUpload` para tener telemetría consistente
-- Añadir eventos de selección y validación
+### Obs. 6 — Preparar QA y ejecutar E2E posibles (P6) — EJECUTADA (ver §3)
 
 ---
 
-## 3. Archivos Modificados
+## 2. Entorno QA aprovisionado (proyecto `uqfbilyfpflrlthnyijj`)
 
-| Archivo | Cambios |
-|---------|---------|
-| `src/lib/fileUploadUtils.ts` | Restringir formatos aceptados, actualizar constantes |
-| `src/components/profile/DocumentsSection.tsx` | Migrar a resumable upload, validación temprana, limpieza huérfanos |
-| `src/components/profile/CVUploadSection.tsx` | Actualizar texto formatos |
-| `src/components/profile/CertificationsSection.tsx` | Actualizar texto formatos, fix móvil |
-
----
-
-## 4. Pruebas QA
-
-### 4.1 Matriz de Pruebas
-
-| Prueba | Resultado Esperado | Estado |
-|--------|-------------------|--------|
-| PDF válido | Subida y guardado correctos | ✅ PASS (unit) |
-| JPG/PNG válido | Subida y guardado correctos | ✅ PASS (unit) |
-| DOC/DOCX | Rechazo claro antes de transferencia | ✅ PASS (unit) |
-| HEIC/WebP | Rechazo claro antes de transferencia | ✅ PASS (unit) |
-| Archivo >10 MB | Bloqueo previo | ✅ PASS (unit) |
-| Interrupción conexión | Error controlado o reanudación | ⏳ E2E pendiente (credenciales) |
-| Sesión expirada | Error identificable | ⏳ E2E pendiente (credenciales) |
-| Cancelación | Sin registros incompletos ni huérfanos | ⏳ E2E pendiente (credenciales) |
-| Doble clic | Sin duplicaciones | ⏳ E2E pendiente (credenciales) |
-| Error al guardar en DB | Sin éxito falso ni huérfanos | ⏳ E2E pendiente (credenciales) |
-| Actualización de página | Documento persistente | ⏳ E2E pendiente (credenciales) |
-| Acceso desde otra cuenta | Acceso denegado | ⏳ E2E pendiente (credenciales) |
-
-### 4.2 Tests Automáticos Ejecutados
-
-**Tests unitarios (PASS):**
-- `tests/document-upload-validation.spec.ts`: 29/29 PASS
-  - Validación de formatos soportados (PDF, PNG, JPEG)
-  - Rechazo de formatos no soportados (DOC, DOCX, WebP, HEIC, HEIF)
-  - Mensajes de error claros para formatos no soportados
-  - Validación de tamaño de archivo
-  - Constantes ACCEPT_* correctamente configuradas
-
-- `tests/resumable-upload.spec.ts`: 27/27 PASS
-  - Uploader TUS funcional
-  - Verificación de objeto después de subida
-  - Manejo de errores de red, timeout, autenticación
-  - Reanudación de subidas interrumpidas
-  - Telemetría sin PII
-
-**Tests E2E (BLOCKED - requieren credenciales):**
-- `tests/document-upload-e2e.spec.ts`: Requiere E2E_TEST_EMAIL/PASSWORD
-- `tests/secure-file-access-broker.spec.ts`: Requiere E2E_WORKER_EMAIL
-- `tests/documents-open-first-click.spec.ts`: Requiere credenciales
-- `tests/cv-upload-smoke.spec.ts`: Requiere credenciales
-- `tests/rls-security.spec.ts`: Requiere credenciales
-
-### 4.3 Entornos de Prueba
-
-- [ ] Android Chrome — E2E pendiente
-- [ ] iOS Safari — E2E pendiente
-- [x] Desktop Chrome — Build y tests unitarios PASS
-- [ ] Desktop Firefox — No ejecutado
-- [ ] Desktop Safari — No ejecutado
+- **Buckets**: `app_14da0f1941_avatars`, `app_14da0f1941_certificates` (allowlist NULL), `worker-documents` (PDF/PNG/JPG, 10 MiB), `feedback-screenshots` — replicando producción.
+- **Políticas Storage**: 18 políticas de propiedad por usuario (`{bucket}_owner_*`) equivalentes a producción, sin exponer `service_role`.
+- **Grants**: mapa completo anon/authenticated leído de `pg_class.relacl` de producción (solo lectura) y replicado (66 GRANTs). Esto resolvió los HTTP 403 iniciales.
+- **Cuentas sintéticas**: `pb-doc-e2e-synth@pipingbox-test.example` (A) y `pb-doc-e2e-synth-b@pipingbox-test.example` (B), perfiles `MARKETPLACE_READY`. Cero datos reales.
+- **Producción intacta**: solo consultas de lectura; cero mutaciones.
 
 ---
 
-## 5. Riesgos Residuales
+## 3. Pruebas ejecutadas (SHA candidato `b2245ad`, build local apuntando a QA)
 
-1. **Formatos restringidos:** Usuarios con documentos en DOC/DOCX deberán convertirlos a PDF antes de subir. Se recomienda comunicación clara.
+### 3.1 Tests automáticos — PASS
 
-2. **Objetos huérfanos históricos:** Pueden existir objetos huérfanos de subidas fallidas anteriores. Se recomienda script de limpieza periódica.
+| Suite | Resultado |
+|---|---|
+| `document-upload-e2e.spec.ts` (5 tests, Android Chrome emulado, TUS real contra QA) | **5/5 PASS** — incluye TUS happy path, interrupción de red con reanudación, PNG por uploader compartido, CV con verificación de columnas canónicas + persistencia + reemplazo + eliminación (ZERO DIFF), y regresión de stall |
+| `document-upload-validation.spec.ts` (validación por bucket) | **35/35 PASS** |
+| `resumable-upload.spec.ts` (uploader TUS) | **26/26 PASS** |
+| `cert-upload-ux.spec.ts` | **9/9 PASS** |
+| `documents-open-first-click.spec.ts` | **12/12 PASS** |
+| `certifications-open-first-click.spec.ts` | **8/8 PASS** |
+| `rls-worker-experiences.spec.ts` (aislamiento entre cuentas A y B) | **3/3 PASS** |
 
-3. **Conversión HEIC:** No implementada. Usuarios iPhone con fotos HEIC deberán convertir a JPG primero.
+Typecheck: PASS. Build de producción: PASS (bundle verificado: apunta a QA, cero referencias a producción).
 
-4. **E2E no ejecutados:** Las pruebas end-to-end con credenciales reales no se han podido ejecutar en este entorno. Se recomienda ejecutarlas en QA antes del merge.
+### 3.2 Matriz del plan de QA
+
+| Prueba | Resultado |
+|---|---|
+| PDF válido | PASS (E2E, TUS real) |
+| JPG/PNG válido | PASS (E2E PNG + unitarios JPG) |
+| DOC/DOCX | PASS — CV/certificados los aceptan (bucket sin allowlist); documentos profesionales los rechazan antes de transferir con mensaje claro (unitarios) |
+| HEIC/WebP | PASS — certificaciones/avatares los aceptan (restaurados); documentos profesionales los rechazan antes de transferir (unitarios) |
+| >10 MB | PASS (bloqueo previo, unitario) |
+| Interrupción de conexión | PASS (E2E: retry, background/return, resume con progreso previo, ZERO DIFF) |
+| Sesión expirada | PASS (unitario uploader: error `auth` tipificado) |
+| Cancelación | PASS (E2E cancel + cleanup; unitarios) |
+| Doble clic | PASS (uploader deshabilita input durante subida; unitario) |
+| Error al guardar en DB | PASS (compensación con verificación; sin éxito falso) |
+| Actualización de página | PASS (E2E: persistencia verificada vía REST tras reload) |
+| Acceso desde otra cuenta | PASS (RLS: A no ve datos de B, 3/3) |
+
+### 3.3 FAIL documentado — `cv-upload-smoke.spec.ts` (pre-existente, no causado por esta rama)
+
+- **Resultado local**: 1 PASS / 5 FAIL en 6 ejecuciones contra QA.
+- **Reproducido en `main` (16682d0)**: mismo build de main contra el mismo QA y Chromium local → 1 PASS / 4 FAIL. **No es regresión de esta rama.**
+- **Causa raíz (instrumentada)**: al hacer reload justo después de abrir/cerrar el popup de URL firmada, `navigator.locks` de Chromium retiene indefinidamente el lock `lock:sb-<ref>-auth-token` encolado por el documento destruido → `supabase.auth.getSession()` cuelga → el timeout de 8 s de `useAuth` resuelve `session: null` → logout silencioso aunque la sesión sigue intacta en localStorage (verificado con traces: `HELD_BY_OTHER` inmediato y a los 11 s tras reload; cero peticiones a Supabase tras reload).
+- **Intento de fix descartado con evidencia**: reintento de `getSession()` tras 1,5 s (commit ee70720) — el lock zombi es permanente, el reintento también cuelga y el arranque extendido (8 s → 17,5 s) rompía 2 tests E2E secuenciales que pasaban. Revertido (b2245ad).
+- **Seguimiento recomendado** (ticket nuevo): bootstrap de sesión sin locks (lectura directa de `localStorage` como fallback del timeout) o actualización de supabase-js/auth-js si incorpora mitigación del zombie lock. El workflow CI `storage-e2e.yml` ejecuta este test contra el origen desplegado, donde el timing difiere.
+- Nota: el flujo funcional del CV (subida, persistencia, view con URL firmada, replace, remove, ZERO DIFF) queda cubierto en **PASS** por `document-upload-e2e.spec.ts` (5/5).
+
+### 3.4 Entornos
+
+- Desktop/emulación Android Chrome (Playwright Chromium): PASS (arriba).
+- iOS Safari y Firefox reales: **no disponibles** en este entorno — requiere ejecución manual/dispositivos (BLOCKED, documentado).
+- Estado del fixture: un objeto sintético residual `.../cv-1791866340194.pdf` permanece en el bucket QA de certificados (eliminación directa bloqueada por diseño en Storage); inocuo, incluido en snapshots ZERO DIFF.
 
 ---
 
-## 6. Recomendación GO/NO-GO
+## 4. Seguridad
 
-**Estado:** ⏳ PENDIENTE DE PRUEBAS E2E EN QA
-
-**Criterios para GO:**
-- ✅ Todas las pruebas unitarias en PASS
-- ✅ Build de producción compila sin errores
-- ✅ TypeScript typecheck PASS
-- ⏳ Pruebas E2E en entorno QA con credenciales sintéticas
-- ⏳ Verificación manual en dispositivos móviles (Android Chrome, iOS Safari)
-- ⏳ Verificación de políticas RLS intactas
-- ⏳ Aprobación expresa del equipo de producto para la restricción de formatos
-
-**Recomendación:** NO MERGE hasta completar pruebas E2E en QA.
+- Buckets privados; políticas de propiedad replicadas (QA) sin tocar producción.
+- Sin `service_role` ni secretos en el frontend (la anon key de QA es pública y está protegida por RLS).
+- Telemetría PostHog sin PII (nombres de archivo, rutas y tokens excluidos; ya verificado por el suite resumable).
+- Cero mutaciones en producción; cero uso de cuentas reales.
 
 ---
 
-## 7. SHA y Archivos Modificados
+## 5. SHAs y archivos
 
-**SHA inicial:** `16682d0` (main antes de la rama)
-**SHA candidato:** Pendiente de commit
+- **SHA inicial:** `16682d0` (main)
+- **SHA candidato:** `b2245ad` (rama `pb-document-upload-reliability-001`)
+- Commits: `d94a5ab` (rev.2 correcciones), `ee70720` (fix experimental), `c44f7cf` (limpieza), `b2245ad` (revert del experimental).
 
 **Archivos modificados:**
+
 | Archivo | Cambios |
-|---------|---------|
-| `src/lib/fileUploadUtils.ts` | Restringir formatos aceptados a PDF/PNG/JPEG, añadir isSupportedByStorage() y getUnsupportedTypeMessage() |
-| `src/lib/resumableUpload.ts` | Añadir 'document' al tipo DocumentType |
-| `src/components/profile/DocumentsSection.tsx` | Migrar a resumable upload, validación temprana, limpieza huérfanos, UI de progreso |
-| `src/components/profile/CVUploadSection.tsx` | Actualizar texto formatos (solo PDF) |
-| `src/components/profile/CertificationsSection.tsx` | Actualizar formatos aceptados, mensaje error claro |
-| `tests/document-upload-validation.spec.ts` | Nuevo: 29 tests unitarios de validación |
+|---|---|
+| `src/lib/fileUploadUtils.ts` | Validaciones aisladas por bucket; semántica MIME/extensión; `ACCEPT_WORKER_DOCUMENTS`, `ACCEPT_CERTIFICATES`; `isSupportedByStorage` estricto |
+| `src/lib/resumableUpload.ts` | Tipo `DocumentType` + 'document' |
+| `src/components/profile/DocumentsSection.tsx` | TUS resumable; validación previa; cierre centralizado con limpieza; estado "pendiente de guardar"; compensación verificada; UI de progreso |
+| `src/components/profile/CVUploadSection.tsx` | Hint restaurado (PDF, DOC, DOCX) |
+| `src/components/profile/CertificationsSection.tsx` | Validación centralizada `isValidCertificateFile`; accept restaurado |
+| `src/i18n/locales/*.json` (11) | `fileHint` certificaciones alineado |
+| `tests/document-upload-validation.spec.ts` | 35 tests por bucket (incluye contradictorios y regresión avatar/CV) |
+| `sql/qa/qa-anon-authenticated-grants-PB-DOCUMENT-UPLOAD-RELIABILITY-001.sql` | Grants QA replicados de producción |
 
 ---
 
-*Documento generado: 2026-10-12*
-*Rama: pb-document-upload-reliability-001*
+## 6. Riesgos residuales
+
+1. **Lock zombi de navigator.locks (pre-existente)**: usuarios reales pueden experimentar logout silencioso tras cerrar un popup de documento y recargar. Seguimiento recomendado.
+2. **Objetos huérfanos históricos** en `worker-documents` de intentos anteriores — script de limpieza recomendado como tarea aparte.
+3. **Formatos restringidos en documentos profesionales**: DOC/DOCX → convertir a PDF; HEIC → JPG (solo en esa sección).
+4. **cv-upload-smoke flaky** en entornos locales (ver §3.3); CI contra origen desplegado es el gate autoritativo.
+5. **iOS Safari/Firefox reales** sin validar (no disponibles).
+
+---
+
+## 7. Recomendación
+
+**NO-GO para merge automático.** Revisión pendiente: la rev.3 cierra las 6 observaciones con evidencia; el único FAIL es un flaky pre-existente reproducido en `main` con causa raíz documentada. GO requiere: (a) aceptación del análisis del §3.3 o fix del lock zombi en ticket aparte, y (b) validación manual en iOS Safari.
+
+---
+
+*Rev. 3 — 2026-10-13 — rama `pb-document-upload-reliability-001` — SHA `b2245ad`*
