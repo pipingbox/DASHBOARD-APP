@@ -4,6 +4,9 @@ import { randomUUID } from 'node:crypto';
 const QA_REF = 'uqfbilyfpflrlthnyijj';
 const TABLE = 'app_14da0f1941_';
 const title = `RPC-RELATION-QA-${randomUUID()}`;
+// Server-derived content must differ from the client-supplied title so the
+// test can prove the RPC does not trust client-provided title/action_url.
+const fixtureTitle = `FIXTURE-${title}`;
 const ids: Record<string, string> = {};
 const attempted: { source: string; actor: string; recipient: string; type: string }[] = [];
 let api: APIRequestContext;
@@ -71,6 +74,7 @@ async function verify(type: string, source: string, kind: string, actor: { uid: 
     const [created] = await row.json();
     expect(created).toMatchObject({ actor_id: actor.uid, user_id: recipient, related_entity_type: kind, related_entity_id: source, message: null });
     expect(created.title).not.toBe(title);
+    expect(created.title).toBe(fixtureTitle);
     expect(created.action_url).not.toBe('/untrusted');
     const duplicate = await call(api, '/rest/v1/rpc/pb_create_client_notification', payload(type, source, kind, recipient), actor.token);
     expect(duplicate.status()).toBe(200);
@@ -113,14 +117,14 @@ test.describe('PB-NOTIFICATIONS-RPC-RELATION-HARDENING-001 QA-only security matr
     }
 
     ids.referral = await create('referrals', { referrer_id: company.uid, referred_id: worker.uid, status: 'pending' });
-    ids.channel = await create('community_channels', { slug: `qa-rpc-${randomUUID()}`, name: title, is_public: true, created_by: company.uid });
-    ids.post = await create('community_posts', { channel_id: ids.channel, user_id: company.uid, title, body: title });
-    ids.otherPost = await create('community_posts', { channel_id: ids.channel, user_id: third.uid, title, body: title });
+    ids.channel = await create('community_channels', { slug: `qa-rpc-${randomUUID()}`, name: fixtureTitle, is_public: true, created_by: company.uid });
+    ids.post = await create('community_posts', { channel_id: ids.channel, user_id: company.uid, title: fixtureTitle, body: fixtureTitle });
+    ids.otherPost = await create('community_posts', { channel_id: ids.channel, user_id: third.uid, title: fixtureTitle, body: fixtureTitle });
     ids.like = await create('community_post_likes', { post_id: ids.post, user_id: worker.uid });
-    ids.comment = await create('community_comments', { post_id: ids.post, user_id: worker.uid, body: title });
-    ids.otherComment = await create('community_comments', { post_id: ids.post, user_id: third.uid, body: title });
-    ids.job = await create('jobs', { title, company: title, posted_by: company.uid, company_user_id: company.uid, status: 'open' });
-    ids.otherJob = await create('jobs', { title, company: title, posted_by: third.uid, company_user_id: third.uid, status: 'open' });
+    ids.comment = await create('community_comments', { post_id: ids.post, user_id: worker.uid, body: fixtureTitle });
+    ids.otherComment = await create('community_comments', { post_id: ids.post, user_id: third.uid, body: fixtureTitle });
+    ids.job = await create('jobs', { title: fixtureTitle, company: fixtureTitle, posted_by: company.uid, company_user_id: company.uid, status: 'open' });
+    ids.otherJob = await create('jobs', { title: fixtureTitle, company: fixtureTitle, posted_by: third.uid, company_user_id: third.uid, status: 'open' });
     ids.invitation = await create('job_invitations', { company_user_id: company.uid, candidate_user_id: worker.uid, job_id: ids.job, status: 'pending' });
     ids.foreignInvitation = await create('job_invitations', { company_user_id: company.uid, candidate_user_id: worker.uid, job_id: ids.otherJob, status: 'pending' });
   });
