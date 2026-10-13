@@ -534,27 +534,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     (async () => {
       try {
-        // Race getSession against an 8-second timeout to prevent infinite
-        // loading in iframes. A single timeout loss does NOT mean there is
-        // no session: in Chromium, navigator.locks requests queued by a
-        // document destroyed mid-flight (e.g. reload right after opening a
-        // signed-URL popup) can delay getSession beyond the timeout. Retry
-        // once before concluding the user is signed out — the stale-lock
-        // window typically clears within seconds.
-        const getSessionWithTimeout = () =>
-          Promise.race([
-            supabase.auth.getSession(),
-            new Promise<{ data: { session: null }; error: null }>((resolve) =>
-              setTimeout(() => resolve({ data: { session: null }, error: null }), 8000)
-            ),
-          ]);
-
-        let sessionResult = await getSessionWithTimeout();
-        if (!sessionResult.data.session) {
-          await new Promise((r) => setTimeout(r, 1500));
-          if (!mounted) return;
-          sessionResult = await getSessionWithTimeout();
-        }
+        // Race getSession against an 8-second timeout to prevent infinite loading in iframes
+        const sessionResult = await Promise.race([
+          supabase.auth.getSession(),
+          new Promise<{ data: { session: null }; error: null }>((resolve) =>
+            setTimeout(() => resolve({ data: { session: null }, error: null }), 8000)
+          ),
+        ]);
 
         if (!mounted) return;
 
