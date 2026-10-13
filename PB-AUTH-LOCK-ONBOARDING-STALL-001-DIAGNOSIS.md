@@ -4,7 +4,7 @@
 **Issue:** pipingbox/DASHBOARD-APP#67
 **PR relacionada:** #66 (PB-DOCUMENT-UPLOAD-RELIABILITY-001) — se mantiene sin merge
 **Rama:** `pb-auth-lock-onboarding-stall-001` (base: `98c4a32`, head candidato de la PR #66)
-**SHA inicial:** `98c4a32` · **SHA candidato:** ver cabecera de la rama / PR
+**SHA inicial:** `98c4a32` · **SHA rev.1:** `cae4f00` · **SHA rev.2 (candidato):** `70fdc2f`
 **Alcance:** diagnóstico + implementación + QA. **NO MERGE / NO DEPLOY sin GO explícito.**
 
 ---
@@ -358,3 +358,58 @@ statement_timeout/logs antes del GO).
 - El build local de QA REQUIERE `VITE_POSTHOG_KEY`/`VITE_APP_VERSION`/
   `VITE_APP_ENV`; sin ellos, posthog es no-op y las aserciones de wire
   fallan (causó falsos FAIL en la primera pasada; corregido en la final).
+
+## R2.6 Matriz final rev.2 (SHA `70fdc2f`, build QA completo, Supabase QA real)
+
+**CI:** el workflow `TypeScript Regression Gate` NO llegó a ejecutarse para
+`107b196`/`70fdc2f` — GitHub no creó ningún run tras 3 disparadores (push,
+close/reopen de la PR, push de commit vacío); Actions habilitado, workflow
+activo, 0 runs en cola/progreso; último run creado 08:28Z (cae4f00).
+Compatible con cuota de Actions agotada o incidencia de plataforma.
+**Evidencia equivalente:** réplica del workflow en worktree prístino de
+`70fdc2f` (`tsc -p tsconfig.app.json --noEmit --skipLibCheck` — comando
+exacto del gate) → **exit 0, cero errores**; la rama no toca
+`package.json`/`package-lock.json`. El gate oficial debe re-ejecutarse cuando
+Actions vuelva a crear runs (el head de la PR es `70fdc2f`).
+
+**Regresión completa (todas las suites menos los smokes de producción
+`prod-stale-smoke`/`stale-crossdeploy`, excluidos como siempre en QA local):**
+
+| Resultado | Conteos |
+|-----------|---------|
+| **PASS** | **742** |
+| FAIL ambientales/preexistentes (desglose abajo) | 27 |
+| Skipped (puertas de entorno dentro de los specs) | 22 |
+| Did not run (dependencias seriales tras los BLOCKED) | 26 |
+| **FAIL atribuibles a la rama** | **0** |
+
+**Desglose de los 27 FAIL (todos con causa verificada, ninguno de la rama):**
+- `preview-smoke` ×8 — `/api/config` 500 local (backend inalcanzable; ruido
+  conocido; único request fallido verificado en `/`).
+- `public-routes`/`tool landing` ×6 — contratos HTTP del **Worker de
+  producción** (`pipingbox.com`); no ejercitables desde preview QA.
+- Namespace `qa*@pipingbox.com` ×7 (`completion-journey`, `workforce-activation`,
+  `onboarding/dashboard/profile-dom-mutation`, `observability-onboarding`,
+  `referral-aldo`) — precondición de cuentas interna no disponible.
+- `secure-file-access-broker` ×2 — requiere `E2E_WORKER_EMAIL` (fixture
+  determinista no disponible).
+- `schema-contract` ×2 — el test espera PATCH de usuario sobre columnas
+  protegidas (trigger P0001 preexistente lo rechaza; verificado directamente).
+- `referrals T1` ×1 — 0/6 perfiles de QA tienen `referral_code`.
+- `document-upload-e2e` CV ×1 — **flaky bajo carga** (aserción de wire
+  PostHog ≥ 2 `document_upload_started`; llegó 1). **PASS 2× en la misma
+  build** (tanda serial y re-ejecución aislada, 30,8 s, ZERO DIFF).
+
+**Nuevas pruebas de la rev.2:** `auth-lock-cross-tab` 9/9, 
+`profile-write-coordinator` 8/8, `auth-lock-multi-tab-e2e` 1/1 (E2E real
+2 pestañas), `onboarding-finish-e2e` 1/1 (canonical), locator de
+`tools-dom-mutation` reparado (1/1). Las suites de la rev.1 siguen PASS
+(`resilient-auth-lock` 17/17, `resumable-upload` 27/27,
+`document-upload-validation` 34/34, `cert-upload-ux`, `open-first-click` ×12 y ×8,
+`rls-worker-experiences` 8/8, `cv-upload-smoke`, `onboarding-postpone-e2e`,
+`auth-callback` 3/3, `library-e2e`, `observability-identity`).
+
+**Recomendación rev.2:** lista para **revisión**; NO-GO para merge automático
+hasta: (a) gate TypeScript oficial en PASS sobre `70fdc2f` cuando Actions
+dispare, (b) validación manual iOS Safari, (c) decisión sobre H1. NO MERGE /
+NO DEPLOY.
