@@ -39,8 +39,18 @@
  *   4. LIVENESS: a crashed holder stops heartbeating and is considered dead
  *      after HEARTBEAT_TIMEOUT_MS; every wait is bounded by a budget, after
  *      which a superseded tab fails transiently (recoverable) instead of
- *      hanging. When BroadcastChannel is unavailable the coordinator
- *      degrades to rev.1 behavior (documented residual risk).
+ *      hanging. BACKGROUND-TAB THROTTLING is a non-issue by design: the
+ *      FIRST heartbeat is posted synchronously when the holder starts (not
+ *      a timer), and a holder whose later heartbeats get clamped by the
+ *      browser (Chrome intensive throttling ≥1/min after 5 min background)
+ *      is by definition stuck beyond any legitimate auth operation — peers
+ *      treating it as dead after HEARTBEAT_TIMEOUT_MS is the intended
+ *      recovery, not a regression. A throttled CONTENDER only runs slower
+ *      (its claim window and poll stretch); determinism is preserved.
+ *      When BroadcastChannel is unavailable the coordinator reports
+ *      'uncoordinated' and the LOCK fails closed (rev.3, observación 3):
+ *      an uncoordinated bypass is exactly the concurrent-refresh wipe this
+ *      layer exists to prevent.
  *
  * Pure TypeScript with injectable channel/timers/clock — deterministic unit
  * tests; the real browser path is covered by a two-tab E2E.
@@ -105,11 +115,17 @@ export interface CrossTabLock {
   waitForHolder(maxMs: number): Promise<HolderProbe>;
   /**
    * Contend for the single bypass slot across tabs.
-   * 'run'        — this tab may execute the continuation.
-   * 'superseded' — ANOTHER TAB held/won during this call: our continuation
-   *                may be stale and must NOT run (caller throws retryable).
+   * 'run'           — this tab may execute the continuation.
+   * 'superseded'    — ANOTHER TAB held/won during this call: our continuation
+   *                   may be stale and must NOT run (caller throws retryable).
+   * 'uncoordinated' — NO BroadcastChannel: cross-tab coordination is
+   *                   impossible. The caller must FAIL CLOSED (retryable,
+   *                   never session-wiping) instead of running an
+   *                   uncoordinated refresh — two tabs bypassing with no
+   *                   channel is exactly the concurrent-refresh wipe this
+   *                   layer exists to prevent.
    */
-  contendBypass(budgetMs: number): Promise<'run' | 'superseded'>;
+  contendBypass(budgetMs: number): Promise<'run' | 'superseded' | 'uncoordinated'>;
   close(): void;
 }
 
@@ -241,9 +257,11 @@ export function createCrossTabLock(lockName: string, deps: CrossTabDeps = {}): C
     return { hadHolder: true, remoteAlive: remoteAlive(), localAlive: localAlive(), cleared: false };
   }
 
-  async function contendBypass(budgetMs: number): Promise<'run' | 'superseded'> {
-    // No channel: cross-tab coordination impossible → rev.1 behavior.
-    if (!channel) return 'run';
+  async function contendBypass(budgetMs: number): Promise<'run' | 'superseded' | 'uncoordinated'> {
+    // No channel: cross-tab coordination is impossible. Report honestly —
+    // the LOCK decides policy (fail-closed); the coordinator must never
+    // pretend it is safe to run uncoordinated (rev.3, observación 3).
+    if (!channel) return 'uncoordinated';
     const deadline = now() + budgetMs;
     let crossTab = false;
     while (now() < deadline) {

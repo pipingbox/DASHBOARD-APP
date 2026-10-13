@@ -178,4 +178,86 @@ test.describe('Auth lock — two zombie tabs, one expired session (obs.2)', () =
       await context.close();
     }
   });
+
+  test('a FROZEN background peer never wedges the active tab: coordination completes, session survives, frozen tab recovers on resume', async ({ browser }) => {
+    test.setTimeout(240_000);
+
+    const session = await passwordGrant();
+    const ref = new URL(SUPABASE_URL!).host.split('.')[0];
+    const storageKey = `sb-${ref}-auth-token`;
+    const expiredSession = JSON.stringify({
+      ...session,
+      expires_at: Math.floor(Date.now() / 1000) - 60,
+    });
+
+    let refreshPosts = 0;
+    const context = await browser.newContext();
+    try {
+      await context.route('**/auth/v1/token**', async (route) => {
+        if ((route.request().postData() ?? '').includes('refresh_token')) refreshPosts += 1;
+        await route.continue();
+      });
+
+      await context.addInitScript(
+        ({ storageKey: key, expiredSession: raw }) => {
+          try {
+            if (!localStorage.getItem('pb-lock-test-seeded')) {
+              localStorage.setItem(key, raw);
+              localStorage.setItem('pb-lock-test-seeded', '1');
+            }
+            localStorage.setItem('pipingbox_beta_dismissed', 'true');
+          } catch {
+            /* storage unavailable */
+          }
+          const zombie = {
+            request: () => new Promise(() => {}),
+            query: async () => ({ held: [], pending: [] }),
+          };
+          Object.defineProperty(window.navigator, 'locks', { value: zombie, configurable: true });
+        },
+        { storageKey, expiredSession },
+      );
+
+      // Tab A loads and is IMMEDIATELY frozen (Chrome page freeze: timers
+      // suspended, no heartbeats, no claim echoes — the worst background
+      // state a peer can be in).
+      const tabA = await context.newPage();
+      await tabA.goto('/profile', { waitUntil: 'commit' });
+      const cdpA = await tabA.context().newCDPSession(tabA);
+      await cdpA.send('Page.setWebLifecycleState', { state: 'frozen' });
+
+      // The ACTIVE tab must coordinate and authenticate on its own — the
+      // frozen peer cannot answer claims, so contention must complete
+      // within its budget instead of wedging.
+      const tabB = await context.newPage();
+      await tabB.goto('/profile');
+      expect(await waitForSettled(tabB, TEST_BUDGET_MS)).toBe('authed');
+
+      // Sequential (never concurrent) refreshes only: the frozen tab did
+      // nothing while suspended.
+      expect(refreshPosts, 'only the active tab may refresh while the peer is frozen').toBe(1);
+
+      // Resume the frozen tab: it reboots into the session the active tab
+      // refreshed (shared localStorage) and must authenticate WITHOUT
+      // another token rotation and WITHOUT a session wipe.
+      await cdpA.send('Page.setWebLifecycleState', { state: 'active' });
+      await tabA.reload({ waitUntil: 'domcontentloaded' });
+      expect(await waitForSettled(tabA, TEST_BUDGET_MS)).toBe('authed');
+      expect(refreshPosts, 'resume must reuse the fresh session, not re-refresh').toBe(1);
+
+      const stored = await tabA.evaluate((key) => {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return null;
+          const parsed = JSON.parse(raw) as { access_token?: string };
+          return typeof parsed.access_token === 'string' && parsed.access_token.length > 0;
+        } catch {
+          return null;
+        }
+      }, storageKey);
+      expect(stored, 'session must survive the freeze/resume cycle').toBe(true);
+    } finally {
+      await context.close();
+    }
+  });
 });

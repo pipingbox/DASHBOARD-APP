@@ -107,6 +107,9 @@ export const OBS_EVENT_NAMES = [
   'auth_lock_bypassed',
   'auth_session_resolution_timeout',
   'onboarding_save_timeout',
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.3 — bypass denied fail-closed when
+  // no BroadcastChannel is available (no cross-tab coordination possible).
+  'auth_lock_bypass_denied_uncoordinated',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -425,6 +428,7 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   // PB-AUTH-LOCK-ONBOARDING-STALL-001 — bounded auth/onboarding operations.
   auth_lock_bypassed: ['route', 'correlation_id'],
   auth_session_resolution_timeout: ['route', 'correlation_id'],
+  auth_lock_bypass_denied_uncoordinated: ['lock_path', 'correlation_id'],
   onboarding_save_timeout: ['account_type', 'operation', 'step'],
 };
 

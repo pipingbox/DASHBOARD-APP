@@ -184,12 +184,78 @@ test.describe('createCrossTabLock — advisory cross-tab coordination', () => {
     ).toBe(true);
   });
 
-  test('no BroadcastChannel: degraded mode runs immediately (documented residual)', async () => {
+  test('no BroadcastChannel: contendBypass reports uncoordinated (lock fails closed)', async () => {
     const a = createCrossTabLock(LOCK_NAME, { channelFactory: () => null, tabId: 'tab-A', ...T });
-    expect(await a.contendBypass(1_000)).toBe('run');
+    // The coordinator must NOT pretend it is safe to run: with no channel
+    // there is no cross-tab coordination, so the honest verdict is
+    // 'uncoordinated' and the LOCK decides to fail closed.
+    expect(await a.contendBypass(1_000)).toBe('uncoordinated');
     const probe = await a.waitForHolder(1_000);
     expect(probe.cleared).toBe(true);
     expect(probe.hadHolder).toBe(false);
+  });
+
+  test('background-tab throttling: a live-but-stuck holder suppresses contenders (claim echo); after release the contender wins; a heartbeat-expired corpse does not', async () => {
+    const bus = createFakeBus();
+    // Holder in a THROTTLED background tab: its setInterval is clamped
+    // (Chrome intensive throttling ≥1/min) — simulate with interval 1_000 ms
+    // while the liveness timeout is 200 ms. The synchronous FIRST heartbeat
+    // goes out, later ones are late; crucially the holder's EVENT LOOP is
+    // still alive, so it answers claims with a held echo (synchronous
+    // handler, not a timer).
+    const holder = createCrossTabLock(LOCK_NAME, {
+      channelFactory: bus.factory,
+      tabId: 'tab-holder',
+      heartbeatIntervalMs: 1_000, // clamped far beyond the liveness window
+      heartbeatTimeoutMs: 200,
+      claimWindowMs: 40,
+    });
+    const contender = createCrossTabLock(LOCK_NAME, {
+      channelFactory: bus.factory,
+      tabId: 'tab-contender',
+      heartbeatIntervalMs: 50,
+      heartbeatTimeoutMs: 200,
+      claimWindowMs: 40,
+    });
+
+    let releaseHolder!: (v: string) => void;
+    const holderRun = holder.runWithHolder(() => new Promise<string>((r) => (releaseHolder = r)));
+    await sleep(20); // first heartbeat travels; the NEXT one is >1 s away
+
+    // Round 1 — even with the throttled heartbeat expired, the holder is
+    // provably ALIVE: it echoes my claim with `held` (synchronous handler).
+    // Its continuation may still complete, so the contender must NOT run a
+    // concurrent continuation: verdict superseded (retryable, no wipe).
+    expect(await contender.contendBypass(3_000)).toBe('superseded');
+
+    // Round 2 — still suppressed while the holder is stuck-but-alive.
+    expect(await contender.contendBypass(3_000)).toBe('superseded');
+
+    // The holder finishes: its release frees the slot for the contender.
+    releaseHolder('holder-done');
+    expect(await holderRun).toBe('holder-done');
+    expect(await contender.contendBypass(3_000)).toBe('run');
+    const after = await contender.runWithHolder(async () => 'contender-done');
+    expect(after).toBe('contender-done');
+
+    // A heartbeat-expired CORPSE (frozen tab: event loop suspended, cannot
+    // echo claims, never releases) must NOT block contenders either.
+    const corpse = bus.factory(`pb-authlock:${LOCK_NAME}`);
+    corpse.post({ k: 'pb-authlock', n: LOCK_NAME, t: 'held', tab: 'tab-frozen', id: 'tab-frozen:x', ts: Date.now() });
+    await sleep(20);
+    const first = await contender.contendBypass(T.heartbeatTimeoutMs + 2_000);
+    expect(first).toBe('superseded'); // fresh heartbeat seen this round
+    await sleep(T.heartbeatTimeoutMs + 150); // corpse heartbeat now stale
+    expect(await contender.contendBypass(2_000)).toBe('run'); // no echo → proceed
+  });
+
+  test('isolated tabs: a lone contender with a private channel wins its own round', async () => {
+    // A channel that exists but carries no other tabs: the lone contender
+    // contends cleanly and runs. (A tab with NO channel reports
+    // 'uncoordinated' — covered above.)
+    const privateBus = createFakeBus();
+    const solo = createCrossTabLock(LOCK_NAME, { channelFactory: privateBus.factory, tabId: 'tab-B', ...T });
+    expect(await solo.contendBypass(2_000)).toBe('run');
   });
 });
 
@@ -288,5 +354,34 @@ test.describe('resilientAuthLock — cross-tab safety of the bypass', () => {
       crossTabFactory: crossTabFactoryFor(bus, 'tab-A'),
     });
     expect(await lock(LOCK_NAME, 30, async () => 'recovered')).toBe('recovered');
+  });
+
+  test('no BroadcastChannel: the bypass FAILS CLOSED (retryable, no continuation, no session wipe)', async () => {
+    const lock = createResilientAuthLock({
+      locks: hungLocks() as never,
+      onBypass: () => {},
+      // No channel factory → real default factory → typeof BroadcastChannel
+      // === 'undefined' in Node → null channel → contendBypass 'uncoordinated'.
+      crossTabFactory: (name: string) => createCrossTabLock(name, { channelFactory: () => null, tabId: 'tab-A' }),
+    });
+
+    let ran = false;
+    const result = await lock(LOCK_NAME, 30, async () => {
+      ran = true;
+      return 'must-not-run';
+    }).then(
+      (v) => ({ ok: v as string }),
+      (err: unknown) => ({ err: err as Error }),
+    );
+
+    // FAIL CLOSED: the potentially-stale continuation never ran, and the
+    // error is RETRYABLE (AuthRetryableFetchError) — auth-js will retry
+    // without removing the session; the user gets the recoverable
+    // auth-unavailable screen, never a silent logout or a wiped session.
+    expect(ran).toBe(false);
+    expect('err' in result && result.err.name).toBe('AuthRetryableFetchError');
+    expect(
+      'err' in result && result.err.message,
+    ).toContain('fail-closed');
   });
 });

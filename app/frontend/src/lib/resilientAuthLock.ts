@@ -165,6 +165,24 @@ export function createResilientAuthLock(deps: ResilientAuthLockDeps = {}) {
         0,
       );
     }
+    if (verdict === 'uncoordinated') {
+      // FAIL CLOSED (rev.3, observación 3): without BroadcastChannel there is
+      // no way to serialize bypasses across tabs, and an uncoordinated
+      // refresh is exactly the concurrent-refresh wipe this layer prevents.
+      // Degrade to a RECOVERABLE retryable error — auth-js retries without
+      // removing the session; the user sees the auth-unavailable screen with
+      // Reintentar instead of a silent logout or a wiped session. (Browsers
+      // WITHOUT navigator.locks never reach the bypass at all, so this only
+      // affects the near-empty set that has Web Locks but no BroadcastChannel.)
+      trackEvent('auth_lock_bypass_denied_uncoordinated', {
+        correlation_id: getCorrelationId(),
+        lock_path: name,
+      });
+      throw new AuthRetryableFetchError(
+        'pb-auth-lock: bypass denied — no cross-tab coordination channel available (fail-closed)',
+        0,
+      );
+    }
     return (await ct.runWithHolder(run)) as T;
   };
 

@@ -10,6 +10,7 @@ import { getTrafficProps } from '@/lib/jobs/attribution';
 import { trackEvent } from '@/lib/observability';
 import { withTimeout } from '@/lib/withTimeout';
 import { ProfileWriteCoordinator } from '@/lib/profileWriteCoordinator';
+import { ProfileWriteGuard, createSupabaseProfileUpdateAdapter } from '@/lib/profileWriteGuard';
 import { isValidImageFile, isHeicFile, validateFileSize, getSafeImageExtension, ACCEPT_IMAGES } from '@/lib/fileUploadUtils';
 
 /* ─── Constants ─── */
@@ -166,6 +167,23 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const writeCoordinatorRef = useRef<ProfileWriteCoordinator | null>(null);
   if (!writeCoordinatorRef.current) writeCoordinatorRef.current = new ProfileWriteCoordinator();
   const writeCoordinator = writeCoordinatorRef.current;
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.3 (obs.4): client-side abort does
+  // NOT stop a request already on the wire (demonstrated against QA: an
+  // aborted stale autosave committed AFTER the Finish write and left the row
+  // with mixed fields). Every wizard UPDATE now goes through a server-side
+  // CAS guard on profile_write_seq: a superseded/aborted write can match 0
+  // rows and is never reported as success. Per-tab guard (seq consumed per
+  // write INTENT), recreated if the authenticated user ever changes.
+  const writeGuardRef = useRef<{ userId: string; guard: ProfileWriteGuard } | null>(null);
+  if (user && writeGuardRef.current?.userId !== user.id) {
+    writeGuardRef.current = {
+      userId: user.id,
+      guard: new ProfileWriteGuard(
+        createSupabaseProfileUpdateAdapter(supabase, TABLES.profiles, user.id),
+      ),
+    };
+  }
+  const writeGuard = writeGuardRef.current?.guard ?? null;
 
   const progress = Math.round((step / TOTAL_STEPS) * 100);
 
@@ -340,13 +358,18 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         // A new autosave ABORTS the previous one, an explicit Finish/Postpone
         // aborts and suppresses autosaves, and a timeout ABORTS the request —
         // no abandoned write can land late and overwrite newer state.
+        // rev.3: abort alone is not enough on the wire — the update goes
+        // through the server-side CAS guard (profile_write_seq) so an
+        // aborted write that still lands can never overwrite newer state.
         const outcome = await writeCoordinator.runAuto({
           run: (signal) =>
-            supabase
-              .from(TABLES.profiles)
-              .update(payload)
-              .eq('user_id', user.id)
-              .abortSignal(signal),
+            writeGuard
+              ? writeGuard.update(payload, signal)
+              : supabase
+                  .from(TABLES.profiles)
+                  .update(payload)
+                  .eq('user_id', user.id)
+                  .abortSignal(signal),
         }, AUTOSAVE_TIMEOUT_MS);
 
         if (!isMountedRef.current) return;
@@ -383,7 +406,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         if (isMountedRef.current) setSaveStatus('error');
       }
     }, AUTOSAVE_DEBOUNCE_MS);
-  }, [user, buildDraft, buildSupabasePayload, reportSaveTimeout, writeCoordinator]);
+  }, [user, buildDraft, buildSupabasePayload, reportSaveTimeout, writeCoordinator, writeGuard]);
 
   /* ─── Trigger autosave when form data changes ─── */
   useEffect(() => {
@@ -538,14 +561,19 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       // Explicit write: aborts any in-flight autosave, suppresses new ones
       // while running, and a timeout ABORTS the request (no late commit
       // overwriting newer state). The debounce timer is cancelled as well.
+      // rev.3 (obs.4): server-side CAS guard on profile_write_seq — even if
+      // the aborted autosave is already on the wire and lands after this
+      // write, the guard rejects it (0 rows) instead of clobbering.
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       const writeOutcome = await writeCoordinator.runExplicit({
         run: (signal) =>
-          supabase
-            .from(TABLES.profiles)
-            .update(payload)
-            .eq('user_id', user.id)
-            .abortSignal(signal),
+          writeGuard
+            ? writeGuard.update(payload, signal)
+            : supabase
+                .from(TABLES.profiles)
+                .update(payload)
+                .eq('user_id', user.id)
+                .abortSignal(signal),
       }, PROFILE_WRITE_TIMEOUT_MS);
 
       if (writeOutcome.status === 'timeout') {
@@ -737,15 +765,18 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       // unbounded hang here was the "cannot skip the onboarding" production
       // symptom (`saving` never released), and an abandoned late write could
       // overwrite newer state. Timeout ABORTS the request; any in-flight
-      // autosave is superseded.
+      // autosave is superseded. rev.3 (obs.4): server-side CAS guard on
+      // profile_write_seq closes the wire-reorder window for good.
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       const postponeOutcome = await writeCoordinator.runExplicit({
         run: (signal) =>
-          supabase
-            .from(TABLES.profiles)
-            .update(payload)
-            .eq('user_id', user.id)
-            .abortSignal(signal),
+          writeGuard
+            ? writeGuard.update(payload, signal)
+            : supabase
+                .from(TABLES.profiles)
+                .update(payload)
+                .eq('user_id', user.id)
+                .abortSignal(signal),
       }, PROFILE_WRITE_TIMEOUT_MS);
 
       if (postponeOutcome.status === 'timeout') {
