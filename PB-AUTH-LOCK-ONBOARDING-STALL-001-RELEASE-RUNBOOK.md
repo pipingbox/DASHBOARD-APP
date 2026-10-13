@@ -1,7 +1,24 @@
 # PB-AUTH-LOCK-ONBOARDING-STALL-001 — Runbook de despliegue controlado (PR #68)
 
 **Fecha:** 13/10/2026 (rev.3 GO para preparar release)
-**Estado:** PREPARACIÓN. **NO MERGE / NO DEPLOY / NO MIGRACIÓN EN PRODUCCIÓN hasta GO explícito.**
+**Estado: EJECUTADO — RELEASE COMPLETADO (13/10/2026 15:47–16:10 UTC, con GO explícito del propietario).**
+
+> **Resultado del despliegue:** workflow "Deploy Cloudflare Workers Production",
+> run [38425102681](https://github.com/pipingbox/DASHBOARD-APP/actions/runs/38425102681),
+> `commit_sha = eff26f8274403cea86bf1c05306f74cd8c72f4f8` (main) → **SUCCESS**.
+> Gates integrados del workflow: Auth E2E production 7/7 PASS, RLS contract
+> PASS, public-route smoke PASS. Versión pública verificada:
+> `https://app.pipingbox.com/version.json` → `eff26f8…`.
+> Smoke post-deploy (Fase 6, cuentas sintéticas desechables): **8/8 PASS**
+> (login + sesión tras reload, onboarding completo → MARKETPLACE_READY con
+> edge 200, persistencia onboarding, CV TUS + persistencia, certificado +
+> persistencia, RLS A↔B + anon, postpone + reanudación, `profile_write_seq`
+> activo con seq=1). Cuentas y storage de smoke limpiados (0 filas).
+> Monitorización inicial: todos los servicios ACTIVE_HEALTHY; sondas Auth
+> 200/0,46 s · PostgREST 200/0,19–0,86 s · Storage 200/0,17 s · app 200/0,27 s.
+> Incidencia de plataforma: la API de logs de Supabase (Management API)
+> devolvía 502 durante el chequeo — usar el dashboard para la revisión 2 h/24 h.
+> Rollback NO ejecutado (ningún gate crítico falló); `sql/029` se conserva.
 
 **Artefactos:**
 - PR #68 (`pb-auth-lock-onboarding-stall-001`), head **`d69fa4a`** (código: `25955aa`), incluye main.
