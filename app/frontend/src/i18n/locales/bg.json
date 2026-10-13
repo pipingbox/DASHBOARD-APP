@@ -2,6 +2,8 @@
   "common": {
     "loading": "Зареждане…",
     "retry": "Опитай отново",
+    "sessionCheckFailedTitle": "Не успяхме да проверим вашата сесия",
+    "sessionCheckFailedDesc": "Не сте излезли от профила си. Проверете връзката си и опитайте отново — работата ви е в безопасност.",
     "save": "Запази",
     "saving": "Запазване…",
     "cancel": "Отказ",
@@ -2695,7 +2697,7 @@
       "credentialIdPlaceholder": "напр. CW-2024-12345",
       "file": "Файл на сертификата",
       "uploadFile": "Кликнете, за да качите сертификат",
-      "fileHint": "PDF или изображение (PNG, JPG). Макс. 10MB.",
+      "fileHint": "PDF или изображение (PNG, JPG, WebP, HEIC). Макс. 10MB.",
       "invalidFileType": "Приемат се само PDF и файлове с изображения",
       "fileTooBig": "Файлът трябва да е под 10MB",
       "fileUploaded": "Файлът на сертификата е качен",

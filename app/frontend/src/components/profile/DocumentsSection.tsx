@@ -42,14 +42,21 @@ import {
 import type { WorkerDocument } from '@/lib/workerProfile';
 import { normalizeDocument } from '@/lib/workerProfile';
 import {
-  isValidDocOrImageFile,
-  isHeicFile,
   validateFileSize,
   getFileExtension,
   formatFileSize,
-  ACCEPT_DOCS_AND_IMAGES,
+  ACCEPT_WORKER_DOCUMENTS,
+  isSupportedByStorage,
+  getUnsupportedTypeMessage,
 } from '@/lib/fileUploadUtils';
-import { uploadWithTimeout } from '@/lib/uploadHelpers';
+import {
+  startResumableUpload,
+  UPLOAD_FAILURE_I18N,
+  formatBytes,
+  type DocumentUploadController,
+  type DocumentUploadProgress,
+} from '@/lib/resumableUpload';
+import { resolveFileMime } from '@/lib/uploadHelpers';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 
 const DOCUMENT_TYPES = [
@@ -96,10 +103,19 @@ export function DocumentsSection() {
   const [items, setItems] = useState<WorkerDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<WorkerDocument | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<WorkerDocument | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — resumable (TUS) upload machine state.
+  const [uploadUi, setUploadUi] = useState<DocumentUploadProgress | null>(null);
+  const uploadControllerRef = useRef<DocumentUploadController | null>(null);
+  // Controller of a transport-completed upload whose canonical row has not
+  // been written yet (stays in VERIFYING until submit confirms or fails).
+  const pendingConfirmRef = useRef<DocumentUploadController | null>(null);
+  // Stable path per file selection so TUS can resume the same object.
+  const lastUploadAttemptRef = useRef<{ signature: string; path: string } | null>(null);
   // PB-PROFILE-DOCUMENT-OPEN-FIRST-CLICK-001: per-document opening state so a
   // pending open disables only its own button (no global loading state) and a
   // rapid double-click cannot fire a second signed-url request or open a
@@ -160,9 +176,52 @@ export function DocumentsSection() {
     setExpiresAt('');
     setIsVisible(true);
     setUploadError(null);
+    setUploadUi(null);
+    lastUploadAttemptRef.current = null;
+  };
+
+  // PB-DOCUMENT-UPLOAD-RELIABILITY-001 rev. 2 — single exit path for the
+  // add-document dialog. EVERY close route (Cancel button, X, Esc, backdrop)
+  // funnels through here so an uploaded-but-unsaved object is always cleaned
+  // up. Deletion failures are NOT hidden: a warning is surfaced because the
+  // object may remain as an orphan in Storage.
+  const closeDialog = () => {
+    if (saving || uploading) return;
+    // Clean up an uploaded object that was never attached to a DB row.
+    // deleteStorageObject returns false on failure (it does not throw), so
+    // the result is checked and a failure is surfaced, never hidden.
+    if (storageBucket && storagePath && !editing) {
+      void deleteStorageObject(storageBucket, storagePath).then((deleted) => {
+        if (!deleted) {
+          console.error('[DocumentsSection] orphan cleanup failed on close:', {
+            bucket: storageBucket,
+            path: storagePath,
+          });
+          toast.warning(
+            t('workerProfile.documents.orphanCleanupFailed', {
+              defaultValue:
+                'No se pudo eliminar el archivo subido del almacenamiento. Puede quedar un archivo temporal sin referencia.',
+            })
+          );
+        }
+      });
+    }
+    pendingConfirmRef.current?.failCanonical();
+    pendingConfirmRef.current = null;
+    resetForm();
+    setDialogOpen(false);
+  };
+
+  const handleDialogOpenChange = (open: boolean) => {
+    if (open) {
+      setDialogOpen(true);
+      return;
+    }
+    closeDialog();
   };
 
   const openAdd = () => {
+    setEditing(null);
     resetForm();
     setDialogOpen(true);
   };
@@ -212,6 +271,15 @@ export function DocumentsSection() {
     if (!user) return;
     setUploadError(null);
 
+    // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — validate against Storage-supported
+    // formats BEFORE any transfer begins (PDF, PNG, JPEG/JPG only).
+    if (!isSupportedByStorage(file)) {
+      const msg = getUnsupportedTypeMessage(file);
+      setUploadError(msg);
+      toast.error(msg);
+      return;
+    }
+
     // Validate file size
     const sizeError = validateFileSize(file, 10);
     if (sizeError) {
@@ -220,50 +288,42 @@ export function DocumentsSection() {
       return;
     }
 
-    // Validate file type (mobile-friendly: checks MIME + extension, includes HEIC)
-    if (!isValidDocOrImageFile(file)) {
-      const msg = t('workerProfile.documents.invalidType', { defaultValue: 'Tipo de archivo no soportado. Acepta: PDF, DOC, DOCX, JPG, PNG, WebP, HEIC.' });
-      setUploadError(msg);
-      toast.error(msg);
-      return;
-    }
-
-    // Inform about HEIC
-    if (isHeicFile(file)) {
-      toast.info(t('workerProfile.documents.heicNotice'));
-    }
-
     setUploading(true);
-    try {
-      const ext = getFileExtension(file.name) || 'pdf';
-      const path = `${user.id}/doc-${Date.now()}.${ext}`;
-      const bucketName = STORAGE_BUCKETS.workerDocuments;
+    setUploadUi(null);
 
-      console.log('[DocumentsSection] File upload starting:', {
-        bucket: bucketName,
-        path,
-        fileType: file.type,
-        fileSize: file.size,
-        fileName: file.name,
-      });
+    // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — TUS resumable upload via the
+    // shared uploader. The object path is stable per file selection: re-
+    // selecting the same file after a recoverable failure RESUMES from the
+    // previous offset instead of restarting the whole transfer.
+    const signature = `${file.name}|${file.size}|${file.lastModified}`;
+    const previousAttempt = lastUploadAttemptRef.current;
+    const ext = getFileExtension(file.name) || 'pdf';
+    const path =
+      previousAttempt && previousAttempt.signature === signature
+        ? previousAttempt.path
+        : `${user.id}/doc-${Date.now()}.${ext}`;
+    lastUploadAttemptRef.current = { signature, path };
+    const bucketName = STORAGE_BUCKETS.workerDocuments;
 
-      const { error } = await uploadWithTimeout(bucketName, path, file, {
-        upsert: false,
-        cacheControl: '3600',
-        timeoutMs: 120000,
-      });
-      if (error) {
-        console.error('[DocumentsSection] Upload error:', { bucket: bucketName, path, error: error.message });
-        const msg = t('workerProfile.documents.uploadFailed', { defaultValue: 'Error al subir: ' }) + error.message;
-        setUploadError(msg);
-        toast.error(msg);
-        setUploading(false);
-        return;
-      }
+    const controller = startResumableUpload(file, {
+      documentType: 'document',
+      bucket: bucketName,
+      path,
+      contentType: resolveFileMime(file),
+      route: '/profile',
+      onProgress: (p) => setUploadUi(p),
+    });
+    uploadControllerRef.current = controller;
 
-      console.log('[DocumentsSection] Upload success:', { bucket: bucketName, path });
+    const result = await controller.promise;
+    uploadControllerRef.current = null;
 
-      // PB-STORAGE-SECURITY-001 phase 2: persist the canonical location only.
+    if (result.ok) {
+      // Transport + verification HEAD confirmed. The canonical row is
+      // created on submit; until then the controller stays in VERIFYING
+      // and is confirmed/failed by the submit path.
+      pendingConfirmRef.current = controller;
+      setUploadUi(null);
       setFileUrl(null);
       setStorageBucket(bucketName);
       setStoragePath(path);
@@ -271,14 +331,36 @@ export function DocumentsSection() {
       setFileSize(file.size);
       setMimeType(file.type || null);
       setUploadError(null);
-      toast.success(t('workerProfile.documents.fileUploaded', { defaultValue: 'File uploaded successfully' }));
-    } catch (err) {
-      console.error('[DocumentsSection] Upload unexpected error:', err);
-      const msg = t('workerProfile.documents.uploadFailed', { defaultValue: 'Error inesperado al subir el archivo' });
-      setUploadError(msg);
-      toast.error(msg);
+      setUploading(false);
+      // PB-DOCUMENT-UPLOAD-RELIABILITY-001 rev. 2 — NO success toast here: the
+      // object exists in Storage but the canonical DB row is not written yet.
+      // Surface an "attached, pending save" state instead; final success is
+      // only reported after Storage AND PostgreSQL both confirm.
+      toast.info(
+        t('workerProfile.documents.fileAttachedPendingSave', {
+          defaultValue: 'Archivo adjuntado. Pulsa "Guardar" para completar el registro.',
+        })
+      );
+      return;
     }
+
+    setUploadUi(null);
     setUploading(false);
+    if ('reason' in result && result.reason === 'cancelled') {
+      // User-initiated cancel: no error banner, form preserved.
+      return;
+    }
+    if ('reason' in result) {
+      // Recoverable state: keep the dialog open so the user can retry with
+      // the same form data instead of losing it.
+      const message = t(UPLOAD_FAILURE_I18N[result.reason]);
+      setUploadError(message);
+      toast.error(message);
+    }
+  };
+
+  const cancelUpload = () => {
+    uploadControllerRef.current?.cancel();
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -289,6 +371,10 @@ export function DocumentsSection() {
       return;
     }
     setSaving(true);
+    // Outcome flag visible to the catch block: if the insert throws (network/
+    // timeout) with an unknown result, the compensation must still run; if it
+    // already succeeded we must NOT delete the referenced object.
+    let insertSucceeded = false;
 
     try {
       // Derive document_category from document_type for the DB
@@ -321,19 +407,87 @@ export function DocumentsSection() {
         is_visible: isVisible,
       };
 
+      // PB-DOCUMENT-UPLOAD-RELIABILITY-001 rev. 2 — remove the freshly-created
+      // object when the canonical write fails, and make a failed removal
+      // VISIBLE instead of silently hiding a potential orphan.
       const { error } = await supabase.from(TABLES.workerDocuments).insert(payload);
       if (error) {
+        pendingConfirmRef.current?.failCanonical();
+        pendingConfirmRef.current = null;
+        if (storageBucket && storagePath) {
+          // deleteStorageObject returns false on failure (does not throw):
+          // check the result so a potential orphan is never hidden.
+          const deleted = await deleteStorageObject(storageBucket, storagePath);
+          if (deleted) {
+            setFileUrl(null);
+            setStorageBucket(null);
+            setStoragePath(null);
+            setFileName('');
+            setFileSize(null);
+            setMimeType(null);
+          } else {
+            console.error('[DocumentsSection] compensation delete failed after DB error:', {
+              bucket: storageBucket,
+              path: storagePath,
+            });
+            toast.warning(
+              t('workerProfile.documents.orphanCleanupFailed', {
+                defaultValue:
+                  'No se pudo eliminar el archivo subido del almacenamiento. Puede quedar un archivo temporal sin referencia.',
+              })
+            );
+          }
+        }
         toast.error(t('workerProfile.documents.saveFailed', { defaultValue: 'Failed to save document: ' }) + error.message);
         setSaving(false);
         return;
       }
+      insertSucceeded = true;
+
+      // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — canonical write confirmed: only
+      // now the upload machine reaches SAVED and document_upload_completed
+      // is emitted, and only now the user sees a success message.
+      pendingConfirmRef.current?.confirmSaved();
+      pendingConfirmRef.current = null;
+
       toast.success(t('workerProfile.documents.added', { defaultValue: 'Document added successfully' }));
       setDialogOpen(false);
+      resetForm();
       load();
       // Recalculate profile completion (non-blocking)
       if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
     } catch (err) {
+      // PB-DOCUMENT-UPLOAD-RELIABILITY-001 rev. 2 — compensation also applies
+      // when the insert throws (network/timeout with unknown outcome). If the
+      // insert already succeeded we keep the object: deleting it would orphan
+      // a referenced row.
       console.error('Submit exception:', err);
+      if (!insertSucceeded) {
+        pendingConfirmRef.current?.failCanonical();
+        pendingConfirmRef.current = null;
+        if (storageBucket && storagePath) {
+          const deleted = await deleteStorageObject(storageBucket, storagePath);
+          if (deleted) {
+            setFileUrl(null);
+            setStorageBucket(null);
+            setStoragePath(null);
+            setFileName('');
+            setFileSize(null);
+            setMimeType(null);
+          } else {
+            console.error('[DocumentsSection] compensation delete failed after submit exception:', {
+              bucket: storageBucket,
+              path: storagePath,
+            });
+            toast.warning(
+              t('workerProfile.documents.orphanCleanupFailed', {
+                defaultValue:
+                  'No se pudo eliminar el archivo subido del almacenamiento. Puede quedar un archivo temporal sin referencia.',
+              })
+            );
+          }
+        }
+      }
       toast.error(t('workerProfile.documents.saveFailed', { defaultValue: 'Failed to save document' }));
     }
     setSaving(false);
@@ -496,7 +650,7 @@ export function DocumentsSection() {
       </div>
 
       {/* Add Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={(open) => { if (!saving && !uploading) setDialogOpen(open); }}>
+      <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
         <DialogContent className="max-w-lg border-zinc-800 bg-[#0d0d0d]">
           <DialogHeader>
             <DialogTitle>{t('workerProfile.documents.addTitle', { defaultValue: 'Upload Document' })}</DialogTitle>
@@ -524,33 +678,63 @@ export function DocumentsSection() {
                 {t('workerProfile.documents.file', { defaultValue: 'File' })} *
               </Label>
               {storagePath ? (
-                <div className="flex items-center justify-between border border-zinc-800 bg-zinc-950 p-3">
-                  <div className="flex items-center gap-2 text-sm text-zinc-300">
-                    {getMimeIcon(mimeType)}
-                    <span className="truncate max-w-[200px]">{fileName}</span>
-                    {fileSize && (
-                      <span className="text-[11px] text-zinc-600">({formatFileSize(fileSize)})</span>
-                    )}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between border border-zinc-800 bg-zinc-950 p-3">
+                    <div className="flex items-center gap-2 text-sm text-zinc-300">
+                      {getMimeIcon(mimeType)}
+                      <span className="truncate max-w-[200px]">{fileName}</span>
+                      {fileSize && (
+                        <span className="text-[11px] text-zinc-600">({formatFileSize(fileSize)})</span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        // Clean up the uploaded object before it is attached
+                        // to a DB row. A failed removal is surfaced (the
+                        // object could remain as an orphan), never hidden.
+                        let removed = true;
+                        if (storageBucket && storagePath) {
+                          removed = await deleteStorageObject(storageBucket, storagePath);
+                          if (!removed) {
+                            console.error('[DocumentsSection] remove before save failed:', {
+                              bucket: storageBucket,
+                              path: storagePath,
+                            });
+                            toast.warning(
+                              t('workerProfile.documents.orphanCleanupFailed', {
+                                defaultValue:
+                                  'No se pudo eliminar el archivo subido del almacenamiento. Puede quedar un archivo temporal sin referencia.',
+                              })
+                            );
+                          }
+                        }
+                        // PB-DOCUMENT-UPLOAD-RELIABILITY-001 — the detached
+                        // upload never reached its canonical write: close the
+                        // machine.
+                        pendingConfirmRef.current?.failCanonical();
+                        pendingConfirmRef.current = null;
+                        setFileUrl(null);
+                        setStorageBucket(null);
+                        setStoragePath(null);
+                        setFileName('');
+                        setFileSize(null);
+                        setMimeType(null);
+                        setUploadError(null);
+                      }}
+                      className="text-xs uppercase tracking-wider text-zinc-500 hover:text-red-400"
+                    >
+                      {t('common.remove', { defaultValue: 'Remove' })}
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      // Clean up the uploaded object before it is attached to a DB row.
-                      if (storageBucket && storagePath) {
-                        await deleteStorageObject(storageBucket, storagePath);
-                      }
-                      setFileUrl(null);
-                      setStorageBucket(null);
-                      setStoragePath(null);
-                      setFileName('');
-                      setFileSize(null);
-                      setMimeType(null);
-                      setUploadError(null);
-                    }}
-                    className="text-xs uppercase tracking-wider text-zinc-500 hover:text-red-400"
-                  >
-                    {t('common.remove', { defaultValue: 'Remove' })}
-                  </button>
+                  {/* PB-DOCUMENT-UPLOAD-RELIABILITY-001 rev. 2 — explicit
+                      "attached, pending save" state: the object is in Storage
+                      but the canonical DB row does not exist yet. */}
+                  <p className="text-[11px] text-amber-500/90" data-testid="doc-attached-pending-save">
+                    {t('workerProfile.documents.pendingSaveHint', {
+                      defaultValue: 'Archivo adjuntado — pendiente de guardar. El documento se registrará al pulsar "Guardar".',
+                    })}
+                  </p>
                 </div>
               ) : (
                 /* Mobile fix: Use <label> wrapping hidden input instead of button + programmatic click */
@@ -570,7 +754,7 @@ export function DocumentsSection() {
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept={ACCEPT_DOCS_AND_IMAGES}
+                    accept={ACCEPT_WORKER_DOCUMENTS}
                     className="hidden"
                     disabled={uploading}
                     onChange={(e) => {
@@ -581,6 +765,56 @@ export function DocumentsSection() {
                   />
                 </label>
               )}
+
+              {/* PB-DOCUMENT-UPLOAD-RELIABILITY-001 — resumable upload status:
+                  real progress, bytes transferred, cumulative time (never reset
+                  across retries), preparing/retrying/verifying states and an
+                  always-available cancel. */}
+              {uploading && uploadUi && (
+                <div className="mt-3 w-full space-y-1" data-testid="doc-upload-status">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+                    <div
+                      data-testid="doc-upload-progress-bar"
+                      className="h-full rounded-full bg-[#f59e0b] transition-all duration-300 ease-out"
+                      style={{ width: `${uploadUi.percent}%` }}
+                    />
+                  </div>
+                  <p className="text-center text-[11px] text-zinc-500" data-testid="doc-upload-status-line">
+                    {uploadUi.state === 'VERIFYING'
+                      ? t('common.upload.verifying', { defaultValue: 'Verifying file...' })
+                      : uploadUi.state === 'RETRYING'
+                        ? `${uploadUi.percent}% ${t('common.upload.retrying', { defaultValue: 'Retrying...' })}`
+                        : `${uploadUi.percent}% ${t('workerProfile.documents.uploading', { defaultValue: 'Uploading...' })}`}
+                    {uploadUi.state !== 'VERIFYING' && (
+                      <span className="ml-1 text-zinc-600">({Math.floor(uploadUi.elapsedMs / 1000)}s)</span>
+                    )}
+                    {uploadUi.state !== 'VERIFYING' && uploadUi.bytesTotal > 0 && (
+                      <span className="ml-1 text-zinc-600">
+                        {formatBytes(uploadUi.bytesUploaded)} / {formatBytes(uploadUi.bytesTotal)}
+                      </span>
+                    )}
+                  </p>
+                  {uploadUi.preparingFile && uploadUi.state !== 'VERIFYING' && (
+                    <p className="text-center text-[11px] text-zinc-400" data-testid="doc-upload-preparing">
+                      {t('common.upload.preparingFile', { defaultValue: 'Preparing file...' })}
+                    </p>
+                  )}
+                  {uploadUi.slowConnection && uploadUi.state !== 'VERIFYING' && (
+                    <p className="text-center text-[11px] text-amber-500/90">
+                      {t('workerProfile.documents.uploadSlowHint', { defaultValue: 'Slow connection; upload continues.' })}
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={cancelUpload}
+                    className="mx-auto block text-[11px] uppercase tracking-wider text-zinc-500 hover:text-red-400"
+                    data-testid="doc-upload-cancel"
+                  >
+                    {t('common.upload.cancel', { defaultValue: 'Cancel' })}
+                  </button>
+                </div>
+              )}
+
               {/* Upload error visible on mobile */}
               {uploadError && (
                 <div className="rounded border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
@@ -588,7 +822,7 @@ export function DocumentsSection() {
                 </div>
               )}
               <p className="text-[10px] text-zinc-600">
-                PDF, DOC, DOCX, JPG, PNG, WebP, HEIC — máx. 10 MB
+                PDF, PNG, JPG — máx. 10 MB
               </p>
             </div>
 
@@ -632,7 +866,7 @@ export function DocumentsSection() {
               <Button
                 type="button"
                 variant="ghost"
-                onClick={() => setDialogOpen(false)}
+                onClick={closeDialog}
                 disabled={saving || uploading}
                 className="text-zinc-400 hover:text-zinc-200"
               >

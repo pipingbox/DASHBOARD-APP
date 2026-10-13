@@ -8,6 +8,9 @@ import { cn } from '@/lib/utils';
 import { ONBOARDING_STATUS, hasCompletedOnboarding } from '@/lib/onboarding';
 import { getTrafficProps } from '@/lib/jobs/attribution';
 import { trackEvent } from '@/lib/observability';
+import { withTimeout } from '@/lib/withTimeout';
+import { ProfileWriteCoordinator } from '@/lib/profileWriteCoordinator';
+import { ProfileWriteGuard, createSupabaseProfileUpdateAdapter } from '@/lib/profileWriteGuard';
 import { isValidImageFile, isHeicFile, validateFileSize, getSafeImageExtension, ACCEPT_IMAGES } from '@/lib/fileUploadUtils';
 
 /* ─── Constants ─── */
@@ -53,6 +56,18 @@ const AVAILABILITY_OPTIONS = [
 
 const TOTAL_STEPS = 8;
 const AUTOSAVE_DEBOUNCE_MS = 800;
+
+// PB-AUTH-LOCK-ONBOARDING-STALL-001 — deadlines for every critical await in
+// the wizard. Before these caps, a stalled PostgREST write or a hung
+// getSession() (zombie auth lock) left `saving=true` forever: the user could
+// neither finish nor postpone the onboarding. Timeouts surface as the
+// existing recoverable error state (draft kept, retry offered) — never as a
+// silent dead end.
+const AUTOSAVE_TIMEOUT_MS = 15_000;
+const AVATAR_UPLOAD_TIMEOUT_MS = 30_000;
+const PROFILE_WRITE_TIMEOUT_MS = 20_000;
+const SESSION_READ_TIMEOUT_MS = 12_000;
+const COMPLETION_CALL_TIMEOUT_MS = 15_000;
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -147,6 +162,28 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   // Refs for debounce
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isMountedRef = useRef(true);
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.2 (obs.4): single-flight profile
+  // writes with real cancellation — no late write overwrites newer state.
+  const writeCoordinatorRef = useRef<ProfileWriteCoordinator | null>(null);
+  if (!writeCoordinatorRef.current) writeCoordinatorRef.current = new ProfileWriteCoordinator();
+  const writeCoordinator = writeCoordinatorRef.current;
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.3 (obs.4): client-side abort does
+  // NOT stop a request already on the wire (demonstrated against QA: an
+  // aborted stale autosave committed AFTER the Finish write and left the row
+  // with mixed fields). Every wizard UPDATE now goes through a server-side
+  // CAS guard on profile_write_seq: a superseded/aborted write can match 0
+  // rows and is never reported as success. Per-tab guard (seq consumed per
+  // write INTENT), recreated if the authenticated user ever changes.
+  const writeGuardRef = useRef<{ userId: string; guard: ProfileWriteGuard } | null>(null);
+  if (user && writeGuardRef.current?.userId !== user.id) {
+    writeGuardRef.current = {
+      userId: user.id,
+      guard: new ProfileWriteGuard(
+        createSupabaseProfileUpdateAdapter(supabase, TABLES.profiles, user.id),
+      ),
+    };
+  }
+  const writeGuard = writeGuardRef.current?.guard ?? null;
 
   const progress = Math.round((step / TOTAL_STEPS) * 100);
 
@@ -257,6 +294,11 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     };
   }, []);
 
+  /* ─── PB-AUTH-LOCK-ONBOARDING-STALL-001: closed-telemetry for bounded ops ─── */
+  const reportSaveTimeout = useCallback((operation: 'autosave' | 'finish' | 'postpone' | 'avatar' | 'status_read') => {
+    trackEvent('onboarding_save_timeout', { account_type: accountType, operation, step });
+  }, [accountType, step]);
+
   /* ─── Build current draft object ─── */
   const buildDraft = useCallback((): OnboardingDraft => ({
     accountType,
@@ -312,12 +354,42 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       setSaveStatus('saving');
       try {
         const payload = buildSupabasePayload();
-        const { error } = await supabase
-          .from(TABLES.profiles)
-          .update(payload)
-          .eq('user_id', user.id);
+        // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.2 (obs.4): serialized write.
+        // A new autosave ABORTS the previous one, an explicit Finish/Postpone
+        // aborts and suppresses autosaves, and a timeout ABORTS the request —
+        // no abandoned write can land late and overwrite newer state.
+        // rev.3: abort alone is not enough on the wire — the update goes
+        // through the server-side CAS guard (profile_write_seq) so an
+        // aborted write that still lands can never overwrite newer state.
+        const outcome = await writeCoordinator.runAuto({
+          run: (signal) =>
+            writeGuard
+              ? writeGuard.update(payload, signal)
+              : supabase
+                  .from(TABLES.profiles)
+                  .update(payload)
+                  .eq('user_id', user.id)
+                  .abortSignal(signal),
+        }, AUTOSAVE_TIMEOUT_MS);
 
         if (!isMountedRef.current) return;
+
+        if (outcome.status === 'timeout') {
+          reportSaveTimeout('autosave');
+          setSaveStatus('error');
+          return;
+        }
+        if (outcome.status === 'dropped') {
+          // An explicit Finish/Postpone is in flight: it owns persistence;
+          // its own status indicator takes over from here.
+          return;
+        }
+        if (outcome.status === 'superseded') {
+          // A newer autosave or an explicit write owns the state now.
+          return;
+        }
+
+        const { error } = outcome;
 
         if (error) {
           setSaveStatus('error');
@@ -334,7 +406,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         if (isMountedRef.current) setSaveStatus('error');
       }
     }, AUTOSAVE_DEBOUNCE_MS);
-  }, [user, buildDraft, buildSupabasePayload]);
+  }, [user, buildDraft, buildSupabasePayload, reportSaveTimeout, writeCoordinator, writeGuard]);
 
   /* ─── Trigger autosave when form data changes ─── */
   useEffect(() => {
@@ -419,9 +491,24 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       // every wizard avatar upload failed silently and profile_completion
       // lost its 10 avatar points.
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error: uploadErr } = await supabase.storage
-        .from(STORAGE_BUCKETS.avatars)
-        .upload(path, avatarFile, { upsert: true });
+      // Bounded upload: the storage SDK also goes through the auth lock; a
+      // hang must degrade to "avatar failed, form data safe", not block the
+      // whole finalization.
+      const uploadRace = await withTimeout(
+        supabase.storage
+          .from(STORAGE_BUCKETS.avatars)
+          .upload(path, avatarFile, { upsert: true }),
+        AVATAR_UPLOAD_TIMEOUT_MS,
+      );
+
+      if (uploadRace.timedOut) {
+        console.error('[Onboarding] Avatar upload timed out');
+        reportSaveTimeout('avatar');
+        setAvatarUploadError(t('onboarding.imageError'));
+        return null;
+      }
+
+      const { error: uploadErr } = uploadRace.value!;
 
       if (uploadErr) {
         console.error('[Onboarding] Avatar upload error:', uploadErr.message);
@@ -471,14 +558,35 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       // previous postponement signal.
       payload.onboarding_postponed_at = null;
 
-      const { error } = await supabase
-        .from(TABLES.profiles)
-        .update(payload)
-        .eq('user_id', user.id);
+      // Explicit write: aborts any in-flight autosave, suppresses new ones
+      // while running, and a timeout ABORTS the request (no late commit
+      // overwriting newer state). The debounce timer is cancelled as well.
+      // rev.3 (obs.4): server-side CAS guard on profile_write_seq — even if
+      // the aborted autosave is already on the wire and lands after this
+      // write, the guard rejects it (0 rows) instead of clobbering.
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      const writeOutcome = await writeCoordinator.runExplicit({
+        run: (signal) =>
+          writeGuard
+            ? writeGuard.update(payload, signal)
+            : supabase
+                .from(TABLES.profiles)
+                .update(payload)
+                .eq('user_id', user.id)
+                .abortSignal(signal),
+      }, PROFILE_WRITE_TIMEOUT_MS);
 
-      if (error) {
-        // Core data NOT saved: recoverable — stay on the wizard, keep the
-        // draft, let the user retry.
+      if (writeOutcome.status === 'timeout') {
+        // Bounded write: recoverable — stay on the wizard, keep the draft.
+        reportSaveTimeout('finish');
+        setSaveStatus('error');
+        setCompletionFailed(true);
+        return;
+      }
+      if (writeOutcome.status !== 'saved') {
+        // Core data NOT saved (PostgREST error, superseded or dropped):
+        // recoverable — stay on the wizard, keep the draft, let the user
+        // retry. The coordinator guarantees no abandoned write lands late.
         setSaveStatus('error');
         setCompletionFailed(true);
         return;
@@ -487,21 +595,39 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       // Backend-controlled fields: onboarding_status, marketplace_ready,
       // profile_completion. A 2xx from this call is REQUIRED to consider the
       // onboarding finalized; non-2xx must not be treated as success.
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
+      const sessionRace = await withTimeout(supabase.auth.getSession(), SESSION_READ_TIMEOUT_MS);
+      if (sessionRace.timedOut) {
+        // Session unreadable right now (e.g. contended auth lock): the core
+        // data IS saved; offer a retry instead of hanging on "saving".
+        reportSaveTimeout('finish');
+        setSaveStatus('error');
+        setCompletionFailed(true);
+        return;
+      }
+      const accessToken = sessionRace.value?.data.session?.access_token;
       if (!accessToken) {
         setSaveStatus('error');
         setCompletionFailed(true);
         return;
       }
-      const completionRes = await fetch(edgeFunctionUrl('complete-onboarding'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ marketplace_ready: profileVisibility === 'public' }),
-      });
+      const completionAbort = new AbortController();
+      const completionTimer = setTimeout(() => completionAbort.abort(), COMPLETION_CALL_TIMEOUT_MS);
+      let completionRes: Response;
+      try {
+        completionRes = await fetch(edgeFunctionUrl('complete-onboarding'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ marketplace_ready: profileVisibility === 'public' }),
+          signal: completionAbort.signal,
+        });
+      } catch (fetchErr) {
+        clearTimeout(completionTimer);
+        throw fetchErr;
+      }
+      clearTimeout(completionTimer);
       if (!completionRes.ok) {
         // Canonical finalization failed: core data is already saved, but the
         // onboarding is NOT complete. Do not clear the draft, do not emit
@@ -590,11 +716,22 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const emitCompletedIfCanonical = async (): Promise<boolean> => {
     if (!user) return false;
     try {
-      const { data } = await supabase
-        .from(TABLES.profiles)
-        .select('onboarding_status')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      // Bounded read (PB-AUTH-LOCK-ONBOARDING-STALL-001): this helper runs
+      // inside saveAndFinish / skipOnboarding; an unbounded stall here would
+      // hang the whole finalize/postpone path.
+      const readRace = await withTimeout(
+        supabase
+          .from(TABLES.profiles)
+          .select('onboarding_status')
+          .eq('user_id', user.id)
+          .maybeSingle(),
+        SESSION_READ_TIMEOUT_MS,
+      );
+      if (readRace.timedOut) {
+        reportSaveTimeout('status_read');
+        return false;
+      }
+      const { data } = readRace.value!;
       if (data && hasCompletedOnboarding(data.onboarding_status)) {
         // PB-JOBS-ATTRIBUTION-001: campaign attribution snapshot (traffic_* /
         // first_touch_*), persisted in localStorage since first landing.
@@ -624,12 +761,31 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         ...buildSupabasePayload(),
         onboarding_postponed_at: new Date().toISOString(),
       };
-      const { error } = await supabase
-        .from(TABLES.profiles)
-        .update(payload)
-        .eq('user_id', user.id);
+      // PB-AUTH-LOCK-ONBOARDING-STALL-001: explicit serialized write — an
+      // unbounded hang here was the "cannot skip the onboarding" production
+      // symptom (`saving` never released), and an abandoned late write could
+      // overwrite newer state. Timeout ABORTS the request; any in-flight
+      // autosave is superseded. rev.3 (obs.4): server-side CAS guard on
+      // profile_write_seq closes the wire-reorder window for good.
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      const postponeOutcome = await writeCoordinator.runExplicit({
+        run: (signal) =>
+          writeGuard
+            ? writeGuard.update(payload, signal)
+            : supabase
+                .from(TABLES.profiles)
+                .update(payload)
+                .eq('user_id', user.id)
+                .abortSignal(signal),
+      }, PROFILE_WRITE_TIMEOUT_MS);
 
-      if (error) {
+      if (postponeOutcome.status === 'timeout') {
+        reportSaveTimeout('postpone');
+        setSaveStatus('error');
+        return;
+      }
+
+      if (postponeOutcome.status !== 'saved') {
         // Postponement could not be persisted: keep the wizard open with the
         // draft intact (recoverable, same contract as saveAndFinish) instead
         // of dropping the user back into the gate loop.
@@ -641,17 +797,26 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       // onboarding_status / marketplace_ready / profile_completion from the
       // data actually saved. This path never asks for marketplace readiness.
       try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const accessToken = sessionData.session?.access_token;
+        const sessionRace = await withTimeout(supabase.auth.getSession(), SESSION_READ_TIMEOUT_MS);
+        const accessToken = sessionRace.value?.data.session?.access_token;
         if (accessToken) {
-          await fetch(edgeFunctionUrl('complete-onboarding'), {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({ marketplace_ready: false }),
-          });
+          // Bounded best-effort call: a stalled edge invocation must not hold
+          // the postpone path (its signal is already persisted).
+          const abort = new AbortController();
+          const timer = setTimeout(() => abort.abort(), COMPLETION_CALL_TIMEOUT_MS);
+          try {
+            await fetch(edgeFunctionUrl('complete-onboarding'), {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+              },
+              body: JSON.stringify({ marketplace_ready: false }),
+              signal: abort.signal,
+            });
+          } finally {
+            clearTimeout(timer);
+          }
         }
       } catch {
         // Non-blocking: the postponement signal is already persisted.

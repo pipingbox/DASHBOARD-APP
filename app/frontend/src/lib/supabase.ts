@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { resilientAuthLock } from './resilientAuthLock';
 
 // TD-01 (DEC-36): Supabase credentials are read from environment variables,
 // NOT hardcoded. The anon key is public by design (protected by RLS, DEC-07).
@@ -21,6 +22,10 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
+    // PB-AUTH-LOCK-ONBOARDING-STALL-001: bounded lock (exclusive → steal →
+    // run-once bypass) so a zombie navigator.locks entry can never hang
+    // getSession()/refresh forever. Normal-path semantics are unchanged.
+    lock: resilientAuthLock,
   },
 });
 

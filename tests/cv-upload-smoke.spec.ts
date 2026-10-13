@@ -64,8 +64,14 @@ test.describe('CV upload smoke test', () => {
 
     // Wait for the CV section to hydrate.
     // Anchor to the start of the section text to avoid matching the "AI Intelligence / AI CV" section.
+    // PB-AUTH-LOCK-ONBOARDING-STALL-001: a full navigation raced against the
+    // login page's in-flight auth-lock requests can orphan a queue entry
+    // (zombie lock). The bounded lock recovery (≤5 s acquire + ≤3 s steal,
+    // then run-once bypass) plus profile hydration can take ~10 s in that
+    // degraded state, so the hydration budget is 25 s. The assertion itself
+    // is unchanged: the section must REALLY render with the session intact.
     const cvSection = page.locator('section').filter({ hasText: /^CV\s*\/\s*Resume/i });
-    await expect(cvSection).toBeVisible({ timeout: 10_000 });
+    await expect(cvSection).toBeVisible({ timeout: 25_000 });
 
     // Generate a unique file name so we can detect it after refresh.
     const uniqueId = Date.now();
@@ -104,9 +110,13 @@ test.describe('CV upload smoke test', () => {
     await popup.close().catch(() => {});
 
     // Verify DB persistence by refreshing the page: the file name must survive reload.
+    // PB-AUTH-LOCK-ONBOARDING-STALL-001: closing the signed-URL popup can
+    // orphan an auth-lock queue entry; the reload then boots through the
+    // bounded lock recovery (~8 s worst case) before hydrating. Budget 25 s;
+    // the assertion still requires the file name to REALLY persist.
     await page.reload({ waitUntil: 'networkidle' });
     await expect(page).toHaveURL(/\/profile/, { timeout: 10_000 });
-    await expect(cvSection.getByText(fileName)).toBeVisible({ timeout: 10_000 });
+    await expect(cvSection.getByText(fileName)).toBeVisible({ timeout: 25_000 });
 
     // Get the current user so we can verify the Storage object directly.
     const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
