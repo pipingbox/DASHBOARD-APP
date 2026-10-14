@@ -1,0 +1,94 @@
+name: Documents Open REAL E2E (no interception)
+
+# PB-PROFILE-STABILITY-001 / FASE 1 — real integration E2E for the
+# "Abrir documento does nothing" defect (Fernando, Chrome on Windows).
+#
+# Unlike the hermetic documents-open-first-click spec (which intercepts
+# listing + sign), this runs tests/documents-open-real-sign.spec.ts with
+# ZERO interception on the Storage sign path: real login, real listing,
+# real createSignedUrl against production Supabase Storage, real popup
+# navigation, plus JS console/pageerror evidence capture.
+#
+# Fixtures: two permanent synthetic E2E accounts (owner with a PDF + PNG
+# fixture, and a stranger for the RLS negative) documented in the FASE-2
+# storage inventory. The spec creates/deletes nothing — zero residue.
+#
+# Manual-only (workflow_dispatch): targets production by default but any
+# https URL can be passed (e.g. a preview to validate a fix branch).
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Base URL under test (production by default; use a preview URL to validate a fix branch)'
+        required: false
+        default: 'https://pipingbox.com'
+        type: string
+      expected_sha:
+        description: 'Optional SHA-lock: fail unless /version.json serves exactly this build'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  documents-open-real-e2e:
+    name: Real documents-open E2E (sign not intercepted, JS evidence captured)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Own concurrency group: this targets production (or an explicit URL),
+    # NOT the shared preview Worker, so it must not join deploy-preview.
+    concurrency:
+      group: documents-open-real-e2e
+      cancel-in-progress: false
+    env:
+      PREVIEW_URL: ${{ inputs.target_url }}
+      EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
+      DOC_OPEN_E2E_EMAIL: ${{ secrets.DOC_OPEN_E2E_EMAIL }}
+      DOC_OPEN_E2E_PASSWORD: ${{ secrets.DOC_OPEN_E2E_PASSWORD }}
+      DOC_OPEN_E2E_OTHER_EMAIL: ${{ secrets.DOC_OPEN_E2E_OTHER_EMAIL }}
+      DOC_OPEN_E2E_OTHER_PASSWORD: ${{ secrets.DOC_OPEN_E2E_OTHER_PASSWORD }}
+      DOC_OPEN_E2E_ANON_KEY: ${{ secrets.DOC_OPEN_E2E_ANON_KEY }}
+
+    steps:
+      - name: Require DOC_OPEN_E2E secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for v in DOC_OPEN_E2E_EMAIL DOC_OPEN_E2E_PASSWORD DOC_OPEN_E2E_OTHER_EMAIL DOC_OPEN_E2E_OTHER_PASSWORD DOC_OPEN_E2E_ANON_KEY; do
+            if [ -z "${!v:-}" ]; then
+              echo "::error::secret-backed env $v is empty — configure the DOC_OPEN_E2E_* repository secrets first."
+              exit 1
+            fi
+          done
+
+      - name: Checkout tested ref
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run real documents-open E2E
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/documents-open-real-sign.spec.ts \
+            --config=playwright.config.ts \
+            --reporter=line
+
+      - name: Upload E2E artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: documents-open-real-e2e-results
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore
