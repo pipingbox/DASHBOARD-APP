@@ -122,3 +122,58 @@ Con cuentas 100% sintéticas desechables (borradas al final):
 - [ ] Preflight de duplicados re-verificado.
 
 **Excepción documentada:** Safari iOS **BLOCKED** (no PASS) — sin dispositivo real en el entorno del agente; excepción aceptada expresamente por el propietario en el release `eff26f8`. Se mantiene el mismo riesgo para este release.
+
+---
+
+## Registro de ejecución del release (14/10/2025 — GO explícito del propietario)
+
+**Resultado: RELEASE COMPLETADO — main `7695f438633042f92fac843ba4b11e9b0fb21898` en producción.**
+
+### Fase 0 — Preflight (read-only)
+- Historial: última migración `pb_profile_write_seq_cas_001` (029); 031/032/033 ausentes.
+- RPC vieja `pb_create_client_notification` (md5 `a219cee3…`), policies `allow_insert_referrals` (WITH CHECK true) y `allow_update_own_referrals` activas; `pb_verify_referral_if_eligible` ausente.
+- Duplicados que bloquearían los índices únicos: **0 filas**.
+- Backups WAL-G diarios COMPLETED (8 retenidos); PITR desactivado (granularidad ~24 h) — documentado.
+
+### Fase 1 — Migraciones SQL (todas registradas y verificadas)
+| Migración | Versión | Gate |
+|---|---|---|
+| 031 notifications-rpc-relation-hardening | 20261014055158 | RPC SECURITY DEFINER, anon EXECUTE=false, authenticated=true; índice `pb_client_notification_source_once` creado |
+| 032 notifications-referral-hardening | 20261014055329 | `allow_insert_referrals` eliminada → `allow_insert_referrals_service` (service_role); índice `pb_client_notification_referral_once` creado |
+| 032a reconcile | 20261014055722 | Re-aseguro idempotente; paridad semántica con QA verificada (normalización de comentarios/espacios → IDENTICAL; md5 difiere solo por formato, QA aplicó minificado) |
+| 033 referral-verification-rpc | 20261014055811 | `allow_update_own_referrals` eliminada; UPDATE revocado de authenticated/anon (auth_update=false, service_update=true, auth_select intacto, paridad exacta QA); RPC `pb_verify_referral_if_eligible` SECURITY DEFINER con grants correctos |
+| 033a reconcile | 20261014060148 | Re-aseguro idempotente; paridad semántica RPC verificación con QA → IDENTICAL |
+
+### Fase 2 — Edge Functions (con incidente resuelto)
+- **Incidente (resuelto en 8 min):** el primer despliegue v6 vía Management API devolvió el cuerpo sin los 4 primeros caracteres (`import` → `rt`) y ambas funciones quedaron en BOOT_ERROR (503). Detectado con sonda viva antes del merge; re-desplegado por la ruta multipart (v7) y verificado en vivo. Ventana de degradación: solo endpoints de referidos (registro/login/onboarding no afectados). Causa: manipulación del cuerpo por la ruta de actualización usada; mitigación: sonda de arranque obligatoria tras cada despliegue de función.
+- `referrals-apply` v7 ACTIVE (ezbr `ab73ce33…`), `referrals-bootstrap` v7 ACTIVE (ezbr `e537acd6…`), verify_jwt=true.
+- Sonda viva con cuenta sintética efímera: apply `{}` → 403 propio; bootstrap `{}` → 200 con `referral_id` en la respuesta; limpieza 0 filas residuales.
+
+### Fase 3 — Merge exclusivo
+- PR #63 marcada ready y fusionada con merge commit `7695f438633042f92fac843ba4b11e9b0fb21898` (gate `typecheck-regression` SUCCESS previo). Sin otras PR en el merge.
+
+### Fase 4 — Deploy producción
+- Workflow "Deploy Cloudflare Workers Production" run **38521323003** con `commit_sha=7695f43…` → **SUCCESS** (2m55s).
+- Gates integrados: deploy OK, Production RLS security contract OK, Production Auth E2E 7/7 OK, public-route contract OK.
+- Versión pública verificada: `/version.json` = `7695f438633042f92fac843ba4b11e9b0fb21898`.
+
+### Fase 5 — Smoke post-deploy (24/24 PASS, cuentas sintéticas, producción)
+Flujo real: A crea código → B se registra con código → atribución `confirmed` + `referral_id` → fila `pending`.
+- JOINED con contenido falsificado → título/URL derivados en servidor ("Nuevo referido", `/dashboard`) — forja ignorada.
+- Replay JOINED → mismo id (idempotente); VERIFIED en pending → rechazado ("no authorized source").
+- UPDATE directo PostgREST de `status`/`verified_at` → denegado, fila sigue `pending`; INSERT directo → 42501 RLS.
+- `like` con fuente inexistente → rechazado.
+- B completa perfil mínimo → `pb_verify_referral_if_eligible` → ok, `verified_at` del servidor, transición pending→verified; segunda llamada `already_verified` (sin re-escritura).
+- VERIFIED tras verificación → notificación "Referido verificado"; replay idempotente.
+- Aislamiento RLS: tercero lee 0 referidos y 0 notificaciones ajenas. Persistencia: A lee exactamente 2 notificaciones (sin duplicados).
+- Limpieza: 3 auth users, perfiles, referidos y notificaciones eliminados; verificación 0 filas residuales y 404 en auth admin (una cuenta requirió segundo intento por FK de notificaciones — resuelto).
+
+### Fase 6 — Monitorización inicial
+- Sondas: auth-health 200 (0,48 s), PostgREST tabla 200 (0,48 s), Storage 200 (0,15 s), app 200 (0,14 s), gateway EF 401 esperado sin JWT.
+- API de logs de Supabase: error de plataforma intermitente (igual que en el release anterior) — usar dashboard para las revisiones 2h/24h/72h.
+- Ventanas 2h/24h/72h: pendientes de revisión en dashboard por el propietario según umbrales de este runbook (errores auth, fallos de subida, timeouts PostgREST, BOOT_ERROR de funciones).
+
+### Rollback
+No ejecutado. Jerarquía vigente: (1) re-despliegue del frontend al SHA anterior `eff26f8` vía workflow_dispatch; (2) reversión SQL solo como último recurso (rollback registrado en cada migración). sql/029 (`profile_write_seq`) intacta.
+
+**Excepción mantenida:** Safari iOS BLOCKED (sin dispositivo real); aceptada expresamente por el propietario en el release `eff26f8`.
