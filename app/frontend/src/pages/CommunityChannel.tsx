@@ -242,10 +242,12 @@ export default function CommunityChannel() {
         ),
       );
     } else {
-      const { error: insErr } = await supabase
+      const { data: reaction, error: insErr } = await supabase
         .from(TABLES.communityPostLikes)
-        .insert({ post_id: post.id, user_id: user.id });
-      if (!insErr) {
+        .insert({ post_id: post.id, user_id: user.id })
+        .select('id')
+        .single();
+      if (!insErr && reaction) {
         setPosts((prev) =>
           prev.map((p) =>
             p.id === post.id
@@ -258,8 +260,8 @@ export default function CommunityChannel() {
           actorId: user.id,
           type: 'like',
           title: post.title ?? undefined,
-          relatedEntityType: 'community_post',
-          relatedEntityId: post.id,
+          relatedEntityType: 'community_like',
+          relatedEntityId: reaction.id,
           actionUrl: channelSlug ? `/community/${channelSlug}/post/${post.id}` : undefined,
           actorName: profile?.full_name ?? null,
         });

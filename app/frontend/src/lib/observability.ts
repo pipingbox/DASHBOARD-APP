@@ -101,6 +101,15 @@ export const OBS_EVENT_NAMES = [
   'stale_app_version_detected',
   'app_update_requested',
   'invalid_path_normalized',
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 — auth-lock circuit breaker and
+  // bounded critical operations. No PII: route + correlation id, closed
+  // `operation` enum for onboarding saves; never tokens, emails or UIDs.
+  'auth_lock_bypassed',
+  'auth_session_resolution_timeout',
+  'onboarding_save_timeout',
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.3 — bypass denied fail-closed when
+  // no BroadcastChannel is available (no cross-tab coordination possible).
+  'auth_lock_bypass_denied_uncoordinated',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -416,6 +425,11 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   stale_app_version_detected: ['route', 'target_version'],
   app_update_requested: ['route', 'recovery_action'],
   invalid_path_normalized: ['route_normalized'],
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 — bounded auth/onboarding operations.
+  auth_lock_bypassed: ['route', 'correlation_id'],
+  auth_session_resolution_timeout: ['route', 'correlation_id'],
+  auth_lock_bypass_denied_uncoordinated: ['lock_path', 'correlation_id'],
+  onboarding_save_timeout: ['account_type', 'operation', 'step'],
 };
 
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;
@@ -485,6 +499,15 @@ export const APP_UPDATE_RECOVERY_ACTIONS = [
   'update_app',
   'manual_reload',
   'none',
+] as const;
+// PB-AUTH-LOCK-ONBOARDING-STALL-001 — closed enum for the bounded onboarding
+// write paths (onboarding_save_timeout).
+export const ONBOARDING_SAVE_OPERATIONS = [
+  'autosave',
+  'finish',
+  'postpone',
+  'avatar',
+  'status_read',
 ] as const;
 /** Events whose error_category uses the DOCUMENT taxonomy (scoped check). */
 const DOC_ERROR_CATEGORY_EVENTS: ReadonlySet<ObsEventName> = new Set([
@@ -1124,6 +1147,10 @@ export function buildEventProps(
   }
   if ('recovery_action' in out && !APP_UPDATE_RECOVERY_ACTIONS.includes(out.recovery_action as never)) {
     delete out.recovery_action;
+  }
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 — closed onboarding operation enum.
+  if ('operation' in out && !ONBOARDING_SAVE_OPERATIONS.includes(out.operation as never)) {
+    delete out.operation;
   }
   // PB-DOCUMENT-INTAKE-001 — unified document intake closed enums.
   if ('document_type' in out && !DOC_TYPES.includes(out.document_type as never)) delete out.document_type;
