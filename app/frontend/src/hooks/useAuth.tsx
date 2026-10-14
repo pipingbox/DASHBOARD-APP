@@ -16,7 +16,13 @@ import {
   detectOrigin,
   getCorrelationId,
 } from '@/lib/observability';
-import i18n from '@/i18n';
+import i18n, { toSupportedCode, DEFAULT_LANGUAGE } from '@/i18n';
+import {
+  USER_METADATA_LANG_KEY,
+  PROFILE_LANGUAGE_COLUMN,
+  readUserLanguage,
+  applyUserLanguageFromSession,
+} from '@/lib/userLanguage';
 
 export interface Profile {
   id: string;
@@ -345,6 +351,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         availability_status: 'not_specified',
         // profile_completion, marketplace_ready y onboarding_status usan defaults de backend.
       };
+      // PB-I18N-EMAIL-001: réplica de user_metadata.lang (fuente de verdad).
+      // Sin valor en el servidor no se infiere nada (la columna queda NULL).
+      const metaLang = readUserLanguage(authUser);
+      if (metaLang) newProfile[PROFILE_LANGUAGE_COLUMN] = metaLang;
 
       // Clear stored account type after use
       try { localStorage.removeItem('pipingbox_account_type'); } catch { /* ignore */ }
@@ -577,6 +587,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(initial);
         setUser(initial?.user ?? null);
         if (initial?.user) {
+          // PB-I18N-EMAIL-001: la preferencia guardada en el servidor prevalece
+          // sobre la UI local (sincronización entre dispositivos). Síncrono y
+          // sin red: seguro antes del bootstrap del perfil.
+          applyUserLanguageFromSession(initial.user);
           // Bound the profile bootstrap as well: a stalled PostgREST call
           // must not hold the whole app on the loading screen. The shell
           // renders with profile=null and refreshes recover later.
@@ -598,6 +612,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(next);
       setUser(next?.user ?? null);
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        // PB-I18N-EMAIL-001: la preferencia guardada en el servidor prevalece
+        // sobre la UI local (sincronización entre dispositivos). Síncrono y
+        // sin red: seguro dentro del callback de auth.
+        if (next?.user) applyUserLanguageFromSession(next.user);
         // A late INITIAL_SESSION resolves a prior bootstrap timeout.
         if (next?.user) setAuthUnavailable(false);
         // PB-AUTH-LOCK-ONBOARDING-STALL-001: NEVER await PostgREST work
@@ -670,7 +688,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         emailRedirectTo: getAuthCallbackUrl('/dashboard', i18n.language, 'confirmation'),
-        data: { full_name: fullName, account_type: accountType || 'worker' },
+        data: {
+          full_name: fullName,
+          account_type: accountType || 'worker',
+          // PB-I18N-EMAIL-001: idioma elegido en la UI durante el registro,
+          // normalizado a languages.json. Lo lee el Send Email Auth Hook para
+          // localizar asunto y cuerpo del correo de confirmación.
+          [USER_METADATA_LANG_KEY]: toSupportedCode(i18n.resolvedLanguage || i18n.language) ?? DEFAULT_LANGUAGE,
+        },
       },
     });
     if (error) {
