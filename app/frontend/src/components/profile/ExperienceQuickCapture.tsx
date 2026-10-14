@@ -356,9 +356,13 @@ export function ExperienceQuickCapture({
                 className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
               >
                 {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {saving
-                  ? t('common.saving', 'Saving...')
-                  : t('profile.quickExperience.save', 'Save experience')}
+                {/* PB-PROFILE-STABILITY-001: span anchor — same translate-
+                    mutation crash class as the CertificationsSection submit. */}
+                <span>
+                  {saving
+                    ? t('common.saving', 'Saving...')
+                    : t('profile.quickExperience.save', 'Save experience')}
+                </span>
               </Button>
             )}
           </div>

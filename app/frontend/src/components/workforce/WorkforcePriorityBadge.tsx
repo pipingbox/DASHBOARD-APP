@@ -21,7 +21,9 @@ export function WorkforcePriorityBadge({ priority, showIcon = true }: WorkforceP
   return (
     <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider border rounded-sm ${config.color}`}>
       {showIcon && Icon && <Icon className="h-2.5 w-2.5" />}
-      {config.label}
+      {/* PB-PROFILE-STABILITY-001: span anchor — same translate-mutation
+          crash class as the CertificationsSection submit button. */}
+      <span>{config.label}</span>
     </span>
   );
 }

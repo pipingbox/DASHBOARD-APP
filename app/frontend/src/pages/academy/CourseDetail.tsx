@@ -332,9 +332,13 @@ export default function CourseDetail() {
                 className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold px-4 py-2 rounded-sm text-xs transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {checkoutBusy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                {checkoutBusy
-                  ? t('checkout.redirecting', 'Redirecting to checkout…')
-                  : t('academy.course.buyNow', 'Buy course')}
+                {/* PB-PROFILE-STABILITY-001: span anchor — same translate-
+                    mutation crash class as the CertificationsSection submit. */}
+                <span>
+                  {checkoutBusy
+                    ? t('checkout.redirecting', 'Redirecting to checkout…')
+                    : t('academy.course.buyNow', 'Buy course')}
+                </span>
               </button>
               {checkoutError && (
                 <p className="text-[10px] text-red-400">{checkoutError}</p>
