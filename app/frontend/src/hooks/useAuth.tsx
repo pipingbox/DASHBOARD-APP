@@ -128,7 +128,10 @@ async function completeReferralAssignment(
       return false;
     }
 
-    notifyReferralJoined(referrerId, userEmail?.split('@')[0] || 'Someone').catch(() => {});
+    const applyBody = await res.json().catch(() => null) as { referral_id?: string | null } | null;
+    if (applyBody?.referral_id) {
+      notifyReferralJoined(referrerId, applyBody.referral_id).catch(() => {});
+    }
 
     try {
       localStorage.setItem('pipingbox_last_referral_debug', JSON.stringify({

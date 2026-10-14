@@ -106,6 +106,7 @@ Deno.serve(async (req: Request) => {
 
   let attribution: Attribution = "none";
   let referrerId: string | null = null;
+  let referralId: string | null = null;
   const currentAttribution = (profile?.referred_by_user_id as string | null) ?? null;
 
   if (body.referral_code) {
@@ -192,14 +193,16 @@ Deno.serve(async (req: Request) => {
           }
 
           if (!existing) {
-            const { error: insertErr } = await adminClient
+            const { data: inserted, error: insertErr } = await adminClient
               .from("app_14da0f1941_referrals")
               .insert({
                 referrer_id: referrerId,
                 referred_id: user.id,
                 referred_email: user.email ?? "",
                 status: "pending",
-              });
+              })
+              .select("id")
+              .maybeSingle();
 
             if (insertErr && insertErr.code !== "23505") {
               // Consistency: never leave the profile attributed without its
@@ -213,6 +216,9 @@ Deno.serve(async (req: Request) => {
               }
               return json({ error: "referral_insert_failed", referral_code: code }, 500);
             }
+            referralId = inserted?.id ?? null;
+          } else {
+            referralId = existing.id;
           }
         }
       }
@@ -222,5 +228,6 @@ Deno.serve(async (req: Request) => {
     referral_code: code,
     referrer_id: referrerId,
     attribution,
+    referral_id: referralId,
   });
 });

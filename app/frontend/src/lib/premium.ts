@@ -77,11 +77,13 @@ export async function checkPremiumStatus(userId: string): Promise<PremiumStatus>
       .maybeSingle();
 
     // 2. Count verified/completed referrals from the relational source of truth.
+    //    'pending' referrals do NOT grant premium (PB-NOTIF-001 rev.4: a pending
+    //    or browser-forged referral must not unlock rewards).
     const { count: referralCount } = await supabase
       .from(TABLES.referrals)
       .select('*', { count: 'exact', head: true })
       .eq('referrer_id', userId)
-      .in('status', ['verified', 'completed', 'pending']);
+      .in('status', ['verified', 'completed']);
 
     const safeCount = referralCount ?? 0;
 

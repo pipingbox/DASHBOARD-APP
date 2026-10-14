@@ -1,4 +1,5 @@
 import { supabase, TABLES } from './supabase';
+import { trackEvent } from './observability';
 
 // ─── Notification Types ───
 export type NotificationType =
@@ -57,15 +58,15 @@ interface CreateNotificationArgs {
  * is no longer possible for cross-recipient rows (RLS restricts INSERT to
  * self-only). Cross-recipient creation goes through the narrowly scoped
  * pb_create_client_notification RPC, which (a) derives the actor from
- * auth.uid(), (b) allows only benign client types, and (c) requires a
- * verifiable business relationship for referral types.
+ * auth.uid(), (b) allows only client types, and (c) requires a
+ * verifiable business relationship for social, job, and referral types.
  */
 export async function createNotification(args: CreateNotificationArgs): Promise<void> {
   if (!args.recipientId) return;
   if (args.actorId && args.recipientId === args.actorId) return;
 
   try {
-    await supabase.rpc('pb_create_client_notification', {
+    const { error } = await supabase.rpc('pb_create_client_notification', {
       p_type: args.type,
       p_title: args.title ?? null,
       p_message: args.message ?? null,
@@ -74,8 +75,24 @@ export async function createNotification(args: CreateNotificationArgs): Promise<
       p_action_url: args.actionUrl ?? null,
       p_recipient_id: args.recipientId,
     });
-  } catch {
-    // Silently ignore — notification failure must not break core UX.
+    if (error) {
+      // PostgREST resolves with { data: null, error } on RPC failures; the
+      // catch below only fires on thrown/network errors. Surface both through
+      // sanitized telemetry (fail-open: never break the primary action).
+      trackEvent('app_error', {
+        error_name: 'notification_rpc_error',
+        error_message: `${args.type}: ${error.code ?? 'unknown'}`,
+        component_top: 'notifications',
+        origin: 'createNotification',
+      });
+    }
+  } catch (err) {
+    trackEvent('app_error', {
+      error_name: 'notification_rpc_exception',
+      error_message: `${args.type}: ${err instanceof Error ? err.name : 'unknown'}`,
+      component_top: 'notifications',
+      origin: 'createNotification',
+    });
   }
 }
 
@@ -104,26 +121,22 @@ export async function notifyProfileReady(userId: string): Promise<void> {
 }
 
 /** Notify referrer that their referral has joined */
-export async function notifyReferralJoined(referrerId: string, referralName: string): Promise<void> {
+export async function notifyReferralJoined(referrerId: string, referralId: string): Promise<void> {
   await createNotification({
     recipientId: referrerId,
     type: 'REFERRAL_JOINED',
-    title: 'Nuevo referido',
-    message: `Tu referido ${referralName} se ha registrado en PipingBox.`,
     relatedEntityType: 'referral',
-    actionUrl: '/dashboard',
+    relatedEntityId: referralId,
   });
 }
 
 /** Notify referrer that their referral has been verified */
-export async function notifyReferralVerified(referrerId: string, referralName: string): Promise<void> {
+export async function notifyReferralVerified(referrerId: string, referralId: string): Promise<void> {
   await createNotification({
     recipientId: referrerId,
     type: 'REFERRAL_VERIFIED',
-    title: 'Referido verificado',
-    message: `Tu referido ${referralName} ha completado su perfil mínimo.`,
     relatedEntityType: 'referral',
-    actionUrl: '/dashboard',
+    relatedEntityId: referralId,
   });
 }
 
