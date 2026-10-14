@@ -1097,11 +1097,11 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run REAL documents-open E2E — first click opens the real signed URL
+      - name: Run REAL profile-stability E2E — documents open (no interception) + certificate save under translate DOM mutation
         shell: bash
         run: |
           set -euo pipefail
-          npx playwright test tests/documents-open-real-sign.spec.ts \
+          npx playwright test tests/documents-open-real-sign.spec.ts tests/certifications-dom-mutation.spec.ts \
             --config=playwright.config.ts \
             --reporter=line
 

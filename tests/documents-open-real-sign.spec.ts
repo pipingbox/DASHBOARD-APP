@@ -36,8 +36,9 @@ const BUCKET = 'worker-documents';
 // the FASE-2 storage inventory as known synthetic E2E fixtures).
 const OWNER_ID = '8c628a5d-70e0-4a99-9d6f-53a1741f751b';
 const PDF_PATH = `${OWNER_ID}/e2e-fixture-pdf.pdf`;
-const PDF_NAME = 'E2E Fixture PDF.pdf';
-const PNG_NAME = 'E2E Fixture PNG.png';
+// The card heading renders file_name (not document_name).
+const PDF_NAME = 'e2e-fixture-pdf.pdf';
+const PNG_NAME = 'e2e-fixture-png.png';
 
 const SUPABASE_ORIGIN = 'https://mwdauubztjxkbrefirbg.supabase.co';
 
