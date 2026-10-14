@@ -42,9 +42,10 @@ const CERTS_TABLE = 'app_worker_certifications';
 const CERT_NAME_PREFIX = 'E2E Crash Cert';
 
 const TRANSLATE_SIM = `(() => {
-  const root = document.getElementById('root');
-  if (!root) return 0;
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  // document.body (NOT #root): the Radix dialog renders in a portal
+  // outside #root — scoping the walk to #root would never mutate the
+  // dialog's submit label, which is exactly the node under test.
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   const nodes = [];
   while (walker.nextNode()) if (walker.currentNode.nodeValue.trim()) nodes.push(walker.currentNode);
   for (const n of nodes) {

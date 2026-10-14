@@ -124,6 +124,10 @@ async function expectRealSignedOpen(page: Page, button: ReturnType<typeof openAc
 
 test.describe('PB-PROFILE-STABILITY-001 FASE 1 — real documents-open integration', () => {
   test.skip(!hasCreds, 'DOC_OPEN_E2E_* secrets not configured');
+  // Each scenario performs a full real login + profile load + real sign;
+  // the 30s default is too tight for production latency (B flaked at the
+  // limit with all assertions already green).
+  test.setTimeout(120_000);
 
   // SHA-lock: when EXPECTED_APP_VERSION is provided, the served bundle must
   // be exactly that build (prevents testing a stale deploy).
