@@ -270,6 +270,12 @@ export interface ClaimResult {
    * `fenced_out` sin tocar la fila.
    */
   claimId: string | null;
+  /**
+   * Fase de entrega (030d): 'pre_send' (SMTP aún no contactado) o
+   * 'send_started' (SMTP posiblemente contactado). Si el lease vence en
+   * 'send_started', el reclamo NO se retoma: pasa a 'ambiguous' terminal.
+   */
+  deliveryPhase: string | null;
 }
 
 /**
@@ -301,16 +307,60 @@ export async function claimNotification(
       attempts: 0,
       reason: `claim_unavailable:${error.code ?? "unknown"}`,
       claimId: null,
+      deliveryPhase: null,
     };
   }
   const row = Array.isArray(data) ? data[0] : data;
-  if (!row) return { claimed: false, state: null, attempts: 0, reason: "claim_empty_response", claimId: null };
+  if (!row) return { claimed: false, state: null, attempts: 0, reason: "claim_empty_response", claimId: null, deliveryPhase: null };
   return {
     claimed: row.claimed === true,
     state: row.state ?? null,
     attempts: typeof row.attempts === "number" ? row.attempts : 0,
     reason: row.reason ?? "unknown",
     claimId: typeof row.claim_id === "string" ? row.claim_id : null,
+    deliveryPhase: typeof row.delivery_phase === "string" ? row.delivery_phase : null,
+  };
+}
+
+export interface MarkPhaseResult {
+  marked: boolean;
+  deliveryPhase: string | null;
+  reason: string;
+}
+
+/**
+ * Punto de no retorno (030d): persiste la fase 'send_started' JUSTO ANTES de
+ * contactar con SMTP. A partir de aquí, si este proceso muere con el lease
+ * tomado, el reclamo NO se retoma (pasa a 'ambiguous'): la transmisión es
+ * posible pero no demostrada, y no se envía un duplicado. La fase es monótona
+ * y solo avanza si este proceso posee el intento vigente (fencing).
+ *
+ * Si la marca falla o es rechazada, el proceso NO debe contactar SMTP: sin la
+ * marca persistida, el vencimiento del lease permitiría retomar el reclamo y
+ * enviar un duplicado.
+ */
+export async function markSendStarted(
+  supabase: SupabaseClient,
+  applicationId: string,
+  claimId: string | null,
+): Promise<MarkPhaseResult> {
+  const { data, error } = await supabase.rpc(
+    "app_14da0f1941_marc_job_application_notification_phase",
+    {
+      p_application_id: applicationId,
+      p_claim_id: claimId,
+      p_phase: "send_started",
+    },
+  );
+  if (error) {
+    return { marked: false, deliveryPhase: null, reason: `mark_unavailable:${error.code ?? "unknown"}` };
+  }
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) return { marked: false, deliveryPhase: null, reason: "mark_empty_response" };
+  return {
+    marked: row.marked === true,
+    deliveryPhase: typeof row.delivery_phase === "string" ? row.delivery_phase : null,
+    reason: row.reason ?? "unknown",
   };
 }
 
@@ -596,6 +646,25 @@ export const handler = async (req: Request): Promise<Response> => {
         secure: smtp.secure,
         auth: { user: smtp.user!, pass: smtp.password! },
       });
+
+      // ── Punto de no retorno (030d) ─────────────────────────────────────────
+      // Persistimos 'send_started' ANTES de la primera llamada a SMTP. Si esta
+      // marca falla o es rechazada, NO contactamos SMTP: sin ella, el
+      // vencimiento del lease permitiría retomar el reclamo y enviar un
+      // duplicado. Una vez marcada, si este proceso muere con el correo
+      // posiblemente transmitido, el reclamo pasa a 'ambiguous' y jamás se
+      // reintenta automáticamente.
+      const phase = await markSendStarted(supabase, application.id, claim.claimId);
+      if (!phase.marked) {
+        console.error(JSON.stringify({
+          requestId,
+          action: "send_start_mark_failed",
+          reason: phase.reason,
+        }));
+        // No cerramos el reclamo ni tocamos SMTP. El lease vencerá; como la
+        // fase quedó en 'pre_send', el reclamo podrá retomarse con seguridad.
+        return json(200, { success: true, emailsSent: false, reason: `send_start_mark_failed:${phase.reason}` });
+      }
 
       const info = await transporter.sendMail({
         from: smtp.provider === "resend_smtp"

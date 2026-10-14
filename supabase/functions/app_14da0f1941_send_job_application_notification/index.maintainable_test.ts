@@ -25,6 +25,7 @@ import {
   finalizeNotification,
   isAllowedAlertRecipient,
   type JobRow,
+  markSendStarted,
   MAX_NOTIFICATION_ATTEMPTS,
   type ProfileRow,
   REPLAY_WINDOW_MS,
@@ -332,6 +333,52 @@ Deno.test("reclamo concedido devuelve el fencing token del intento", async () =>
   assertEquals(calls[0].args.p_application_id, APP_ID);
   assertEquals(calls[0].args.p_max_attempts, MAX_NOTIFICATION_ATTEMPTS);
   assertEquals(calls[0].args.p_lease_seconds, CLAIM_LEASE_SECONDS);
+});
+
+// ── Fase de entrega (030d) ──────────────────────────────────────────────────
+
+Deno.test("markSendStarted persiste el punto de no retorno con el fencing token", async () => {
+  const calls: Array<{ fn: string; args: Record<string, unknown> }> = [];
+  const CLAIM_TOKEN = "99999999-9999-9999-9999-999999999999";
+  const r = await markSendStarted(
+    fakeSupabase(
+      () => ({ data: [{ marked: true, delivery_phase: "send_started", reason: "marked" }], error: null }),
+      calls,
+    ),
+    APP_ID,
+    CLAIM_TOKEN,
+  );
+  assertEquals(r.marked, true);
+  assertEquals(r.deliveryPhase, "send_started");
+  assertEquals(calls[0].fn, "app_14da0f1941_marc_job_application_notification_phase");
+  assertEquals(calls[0].args.p_application_id, APP_ID);
+  assertEquals(calls[0].args.p_claim_id, CLAIM_TOKEN);
+  assertEquals(calls[0].args.p_phase, "send_started");
+});
+
+Deno.test("markSendStarted rechazado (fenced_out / already_marked) no avanza la fase", async () => {
+  // Si el lease venció y otro proceso retomó el reclamo, nuestro token es
+  // obsoleto: la RPC rechaza la marca y el proceso no debe contactar SMTP.
+  const r = await markSendStarted(
+    fakeSupabase(() => ({
+      data: [{ marked: false, delivery_phase: "pre_send", reason: "fenced_out" }],
+      error: null,
+    })),
+    APP_ID,
+    "88888888-8888-8888-8888-888888888888",
+  );
+  assertEquals(r.marked, false);
+  assertEquals(r.reason, "fenced_out");
+});
+
+Deno.test("markSendStarted con RPC no disponible no propaga excepción", async () => {
+  const r = await markSendStarted(
+    fakeSupabase(() => ({ data: null, error: { code: "PGRST202" } })),
+    APP_ID,
+    null,
+  );
+  assertEquals(r.marked, false);
+  assertStringIncludes(r.reason, "mark_unavailable");
 });
 
 Deno.test("reclamo denegado nunca entrega el token de otro intento", async () => {

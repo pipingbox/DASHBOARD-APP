@@ -23,6 +23,7 @@ const QA_REF = 'uqfbilyfpflrlthnyijj';
 const TABLE = 'app_14da0f1941_';
 const CLAIM = 'app_14da0f1941_claim_job_application_notification';
 const FINALIZE = 'app_14da0f1941_finalize_job_application_notification';
+const MARK_PHASE = 'app_14da0f1941_marc_job_application_notification_phase';
 const NOTIF_TABLE = `${TABLE}job_application_notifications`;
 const APPS_TABLE = `${TABLE}job_applications`;
 
@@ -40,6 +41,7 @@ interface ClaimResult {
   attempts: number;
   reason: string;
   claim_id: string | null;
+  delivery_phase: string | null;
 }
 
 async function rpcClaim(client: APIRequestContext, applicationId: string | null, opts?: { maxAttempts?: number; leaseSeconds?: number }) {
@@ -66,6 +68,13 @@ async function rpcFinalize(applicationId: string, claimId: string | null, state:
   return { status: res.status(), body: await res.json().catch(() => null) };
 }
 
+async function rpcMarkPhase(applicationId: string, claimId: string | null, phase: string) {
+  const res = await service.post(`/rest/v1/rpc/${MARK_PHASE}`, {
+    data: { p_application_id: applicationId, p_claim_id: claimId, p_phase: phase },
+  });
+  return { status: res.status(), body: await res.json().catch(() => null) };
+}
+
 async function createApplication(tag: string) {
   const res = await service.post(`/rest/v1/${APPS_TABLE}`, {
     data: {
@@ -86,7 +95,7 @@ async function notificationRow(applicationId: string) {
   const res = await service.get(`/rest/v1/${NOTIF_TABLE}?select=*&application_id=eq.${applicationId}`);
   const rows = await res.json();
   return rows[0] as
-    | { state: string; attempts: number; sent_at: string | null; message_id: string | null; last_error: string | null; claim_id: string }
+    | { state: string; attempts: number; sent_at: string | null; message_id: string | null; last_error: string | null; claim_id: string; delivery_phase: string }
     | undefined;
 }
 
@@ -346,5 +355,92 @@ test.describe('PB-I18N-EMAIL-001 rev.8 — reclamo atómico con fencing token (s
 
     const row = await notificationRow(appId);
     expect(row?.last_error).toHaveLength(500);
+  });
+
+  // ── Fase de entrega (030d) ─────────────────────────────────────────────────
+
+  test('FASE (rev.9): reclamo nuevo nace en pre_send; la marca send_started solo avanza con el token vigente', async () => {
+    const appId = await createApplication('phase-mark');
+    const c = await rpcClaim(service, appId);
+    expect(c.body?.[0]?.claimed).toBe(true);
+    expect(c.body?.[0]?.delivery_phase, 'un reclamo nuevo nace en pre_send').toBe('pre_send');
+    const token = c.body?.[0]?.claim_id as string;
+
+    // Un token ajeno no puede marcar la fase.
+    const wrong = await rpcMarkPhase(appId, crypto.randomUUID(), 'send_started');
+    expect(wrong.body?.[0]).toMatchObject({ marked: false, delivery_phase: 'pre_send', reason: 'fenced_out' });
+
+    // El poseedor del token sí puede marcar el punto de no retorno.
+    const mark = await rpcMarkPhase(appId, token, 'send_started');
+    expect(mark.body?.[0]).toMatchObject({ marked: true, delivery_phase: 'send_started', reason: 'marked' });
+    expect((await notificationRow(appId))?.delivery_phase).toBe('send_started');
+
+    // La fase es monótona: no se puede re-marcar ni volver atrás.
+    const again = await rpcMarkPhase(appId, token, 'send_started');
+    expect(again.body?.[0]).toMatchObject({ marked: false, delivery_phase: 'send_started', reason: 'already_marked' });
+
+    // Marcar con una fase inválida (p.ej. retroceder) es un error.
+    const back = await rpcMarkPhase(appId, token, 'pre_send');
+    expect(back.status).toBeGreaterThanOrEqual(400);
+    expect(JSON.stringify(back.body)).toContain('invalid_phase_transition');
+  });
+
+  test('FASE (rev.9) OBLIGATORIA: send_started → proceso muere → vence lease → 2º intento NO envía (ambiguous)', async () => {
+    const appId = await createApplication('phase-crash');
+
+    // Proceso 1: reclama, marca el punto de no retorno y "muere" (no finalize).
+    const c1 = await rpcClaim(service, appId, { leaseSeconds: 1 });
+    const token1 = c1.body?.[0]?.claim_id as string;
+    const mark = await rpcMarkPhase(appId, token1, 'send_started');
+    expect(mark.body?.[0]?.marked).toBe(true);
+    // (Aquí SMTP habría aceptado el correo y el proceso habría muerto.)
+
+    await sleep(1600); // el lease vence
+
+    // Proceso 2 intenta retomar el envío. OBLIGATORIO: ningún segundo envío.
+    const c2 = await rpcClaim(service, appId, { leaseSeconds: 60 });
+    expect(c2.body?.[0]).toMatchObject({
+      claimed: false,
+      state: 'ambiguous',
+      reason: 'ambiguous_requires_manual_review',
+      claim_id: null,
+    });
+
+    const row = await notificationRow(appId);
+    expect(row?.state).toBe('ambiguous');
+    expect(row?.delivery_phase).toBe('send_started');
+    expect(row?.attempts, 'nunca se incrementaron los intentos: no hubo retoma').toBe(1);
+    expect(row?.last_error).toBe('lease_expired_after_send_started_or_unknown_phase');
+
+    // Ni con el token original ni con otro puede nadie reclamar ni cerrar.
+    const again = await rpcClaim(service, appId);
+    expect(again.body?.[0]?.reason).toBe('ambiguous_requires_manual_review');
+    const late = await rpcFinalize(appId, token1, 'sent', { messageId: 'msg-tardio' });
+    expect(late.body?.[0]).toMatchObject({ finalized: false, state: 'ambiguous', reason: 'not_claimed' });
+    expect((await notificationRow(appId))?.message_id).toBeNull();
+  });
+
+  test('FASE (rev.9): vencimiento en pre_send (no-transmisión demostrada) SÍ permite retomar con seguridad', async () => {
+    const appId = await createApplication('phase-safe-retry');
+
+    // Proceso 1: reclama pero NUNCA marca send_started (murió antes de SMTP).
+    const c1 = await rpcClaim(service, appId, { leaseSeconds: 1 });
+    expect(c1.body?.[0]?.delivery_phase).toBe('pre_send');
+
+    await sleep(1600); // el lease vence en pre_send
+
+    // La no-transmisión está demostrada: el reclamo puede retomarse.
+    const c2 = await rpcClaim(service, appId, { leaseSeconds: 60 });
+    expect(c2.body?.[0]).toMatchObject({
+      claimed: true,
+      state: 'claimed',
+      attempts: 2,
+      reason: 'claimed',
+      delivery_phase: 'pre_send',
+    });
+    expect((await notificationRow(appId))?.state).toBe('claimed');
+
+    const ok = await rpcFinalize(appId, c2.body?.[0]?.claim_id ?? '', 'sent', { messageId: 'msg-safe-retry' });
+    expect(ok.body?.[0]?.finalized).toBe(true);
   });
 });
