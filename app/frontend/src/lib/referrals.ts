@@ -308,37 +308,43 @@ export async function validateReferralCode(code: string): Promise<string | null>
 
 /**
  * Get referral statistics for a user.
- * Primary source: profiles.referred_by_user_id (set by admin manual assignment or signup flow).
- * Fallback: also checks the referrals table for legacy entries.
+ *
+ * Canonical source of TRUTH for "verified": the referrals table with
+ * status 'verified' or 'completed'. A profile attributed via
+ * profiles.referred_by_user_id (admin assignment or signup flow) does NOT
+ * count as verified until its canonical referral row reaches verified/completed
+ * — a pending attribution must never unlock a reward (PB-NOTIF-001 rev.5,
+ * aligned with premium.ts).
+ *
+ * "total" remains the broader attribution count (profile-based + legacy rows),
+ * kept separate so the UI can still show total vs verified distinctly.
  */
 export async function getReferralStats(userId: string): Promise<ReferralStats> {
-  // Primary: count profiles where referred_by_user_id = current user
+  // Total attributed (any state): profiles pointing at this referrer.
   const { count: profileReferralCount } = await supabase
     .from(TABLES.profiles)
     .select('*', { count: 'exact', head: true })
     .eq('referred_by_user_id', userId);
 
-  // Fallback: count from legacy referrals table (verified only)
-  const { count: legacyVerifiedCount } = await supabase
+  // Canonical verified/completed rows (the ONLY source for rewards/levels).
+  const { count: verifiedCount } = await supabase
     .from(TABLES.referrals)
     .select('*', { count: 'exact', head: true })
     .eq('referrer_id', userId)
-    .eq('status', 'verified');
+    .in('status', ['verified', 'completed']);
 
-  // Use the higher count between profiles-based and legacy table
-  // This ensures both admin-assigned and organic referrals are counted
-  const profileCount = profileReferralCount ?? 0;
-  const legacyCount = legacyVerifiedCount ?? 0;
-  const verified = Math.max(profileCount, legacyCount);
-
-  // Total includes pending from legacy table + profile-based count
+  // Total across legacy rows (any status), for the broader total counter.
   const { count: legacyTotalCount } = await supabase
     .from(TABLES.referrals)
     .select('*', { count: 'exact', head: true })
     .eq('referrer_id', userId);
 
+  const profileCount = profileReferralCount ?? 0;
   const totalFromLegacy = legacyTotalCount ?? 0;
   const total = Math.max(profileCount, totalFromLegacy);
+
+  // verified/completed ONLY — never elevated by pending profile attributions.
+  const verified = verifiedCount ?? 0;
 
   // Determine current level and rewards
   let currentLevel = 0;
