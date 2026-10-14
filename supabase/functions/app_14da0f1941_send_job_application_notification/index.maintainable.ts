@@ -45,7 +45,10 @@
 //      antigüedad de la candidatura, así que N invocaciones en 15 min producen
 //      N correos. Aquí el envío se reclama de forma atómica en
 //      `app_14da0f1941_job_application_notifications` (`sql/030`) antes de
-//      tocar SMTP.
+//      tocar SMTP. Desde `sql/030c` el reclamo lleva un fencing token
+//      (`claim_id`): `finalize` solo cierra el intento vigente, de modo que un
+//      proceso lento no puede cerrar un reclamo que otro proceso retomó tras
+//      vencer su lease.
 //   2. RESULTADO AMBIGUO DEL PROVEEDOR. v13 devuelve 500 si `sendMail` lanza,
 //      sin dejar constancia de si el correo salió. Aquí se clasifica el fallo
 //      y el estado ambiguo es terminal: no se reintenta nunca en automático.
@@ -260,6 +263,13 @@ export interface ClaimResult {
   state: string | null;
   attempts: number;
   reason: string;
+  /**
+   * Fencing token del intento (030c). Solo lo recibe quien gana el reclamo;
+   * sin él, `finalize` no puede cerrar el reclamo. Un finalize con un token
+   * caducado (lease vencido y retomado por otro proceso) devuelve
+   * `fenced_out` sin tocar la fila.
+   */
+  claimId: string | null;
 }
 
 /**
@@ -290,29 +300,38 @@ export async function claimNotification(
       state: null,
       attempts: 0,
       reason: `claim_unavailable:${error.code ?? "unknown"}`,
+      claimId: null,
     };
   }
   const row = Array.isArray(data) ? data[0] : data;
-  if (!row) return { claimed: false, state: null, attempts: 0, reason: "claim_empty_response" };
+  if (!row) return { claimed: false, state: null, attempts: 0, reason: "claim_empty_response", claimId: null };
   return {
     claimed: row.claimed === true,
     state: row.state ?? null,
     attempts: typeof row.attempts === "number" ? row.attempts : 0,
     reason: row.reason ?? "unknown",
+    claimId: typeof row.claim_id === "string" ? row.claim_id : null,
   };
 }
 
+/**
+ * Cierra el reclamo con el fencing token correspondiente. Sin el token del
+ * intento vigente la RPC rechaza el cierre (`fenced_out`): un proceso lento no
+ * puede cerrar un reclamo que otro proceso retomó tras vencer su lease.
+ */
 export async function finalizeNotification(
   supabase: SupabaseClient,
   applicationId: string,
+  claimId: string | null,
   state: DeliveryOutcome,
   messageId: string | null,
   lastError: string | null,
 ): Promise<void> {
-  const { error } = await supabase.rpc(
+  const { data, error } = await supabase.rpc(
     "app_14da0f1941_finalize_job_application_notification",
     {
       p_application_id: applicationId,
+      p_claim_id: claimId,
       p_state: state,
       p_message_id: messageId,
       p_last_error: lastError,
@@ -322,6 +341,14 @@ export async function finalizeNotification(
     // El correo ya salió (o no): no se puede deshacer. Se registra para que el
     // reclamo huérfano sea visible; el lease vencerá y quedará trazado.
     console.error(JSON.stringify({ error: "finalize_failed", code: error.code ?? null }));
+    return;
+  }
+  const row = Array.isArray(data) ? data[0] : data;
+  if (row && row.finalized === false) {
+    // Cierre rechazado: lo más probable es que nuestro lease venciera y otro
+    // proceso retomara el envío. Queda trazado; nada más que hacer aquí (el
+    // estado lo posee el reclamo vigente, no este proceso).
+    console.log(JSON.stringify({ action: "finalize_rejected", reason: row.reason ?? "unknown" }));
   }
 }
 
@@ -513,7 +540,7 @@ export const handler = async (req: Request): Promise<Response> => {
         .eq("id", body.job_id)
         .maybeSingle();
       if (!job) {
-        await finalizeNotification(supabase, application.id, "failed", null, "no_matching_job");
+        await finalizeNotification(supabase, application.id, claim.claimId, "failed", null, "no_matching_job");
         return json(404, { error: "no_matching_job" });
       }
 
@@ -538,7 +565,7 @@ export const handler = async (req: Request): Promise<Response> => {
       if (!smtp.configured) {
         console.log(JSON.stringify({ requestId, warning: "SMTP not configured, skipping email" }));
         // Fallo limpio: el mensaje no salió, así que es reintentable.
-        await finalizeNotification(supabase, application.id, "failed", null, "smtp_not_configured");
+        await finalizeNotification(supabase, application.id, claim.claimId, "failed", null, "smtp_not_configured");
         return json(200, { success: true, emailsSent: false, reason: "SMTP not configured" });
       }
 
@@ -604,7 +631,7 @@ export const handler = async (req: Request): Promise<Response> => {
       }));
     }
 
-    await finalizeNotification(supabase, application.id, outcome, messageId, lastError);
+    await finalizeNotification(supabase, application.id, claim.claimId, outcome, messageId, lastError);
 
     if (outcome === "sent") {
       return json(200, { success: true, emailsSent: true });

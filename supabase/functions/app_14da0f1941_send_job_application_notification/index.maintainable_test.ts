@@ -307,21 +307,43 @@ Deno.test("classifySendInfo distingue aceptado de rechazado", () => {
 
 // ── Reclamo atómico (corrección de replay) ──────────────────────────────────
 
-Deno.test("reclamo concedido", async () => {
+Deno.test("reclamo concedido devuelve el fencing token del intento", async () => {
   const calls: Array<{ fn: string; args: Record<string, unknown> }> = [];
   const r = await claimNotification(
     fakeSupabase(
-      () => ({ data: [{ claimed: true, state: "claimed", attempts: 1, reason: "claimed" }], error: null }),
+      () => ({
+        data: [{
+          claimed: true,
+          state: "claimed",
+          attempts: 1,
+          reason: "claimed",
+          claim_id: "99999999-9999-9999-9999-999999999999",
+        }],
+        error: null,
+      }),
       calls,
     ),
     APP_ID,
   );
   assertEquals(r.claimed, true);
   assertEquals(r.attempts, 1);
+  assertEquals(r.claimId, "99999999-9999-9999-9999-999999999999");
   assertEquals(calls[0].fn, "app_14da0f1941_claim_job_application_notification");
   assertEquals(calls[0].args.p_application_id, APP_ID);
   assertEquals(calls[0].args.p_max_attempts, MAX_NOTIFICATION_ATTEMPTS);
   assertEquals(calls[0].args.p_lease_seconds, CLAIM_LEASE_SECONDS);
+});
+
+Deno.test("reclamo denegado nunca entrega el token de otro intento", async () => {
+  const r = await claimNotification(
+    fakeSupabase(() => ({
+      data: [{ claimed: false, state: "claimed", attempts: 1, reason: "in_progress_elsewhere", claim_id: null }],
+      error: null,
+    })),
+    APP_ID,
+  );
+  assertEquals(r.claimed, false);
+  assertEquals(r.claimId, null);
 });
 
 Deno.test("segunda invocación de la misma candidatura no reclama (anti-duplicado)", async () => {
@@ -389,18 +411,41 @@ Deno.test("respuesta vacía de la RPC falla cerrado", async () => {
   assertEquals(r.reason, "claim_empty_response");
 });
 
-Deno.test("finalize envía estado, messageId y error al cierre", async () => {
+Deno.test("finalize envía el fencing token, estado, messageId y error al cierre", async () => {
   const calls: Array<{ fn: string; args: Record<string, unknown> }> = [];
+  const CLAIM_TOKEN = "99999999-9999-9999-9999-999999999999";
   await finalizeNotification(
-    fakeSupabase(() => ({ data: [{ finalized: true }], error: null }), calls),
+    fakeSupabase(() => ({ data: [{ finalized: true, reason: "finalized" }], error: null }), calls),
     APP_ID,
+    CLAIM_TOKEN,
     "sent",
     "<abc@notify.pipingbox.com>",
     null,
   );
   assertEquals(calls[0].fn, "app_14da0f1941_finalize_job_application_notification");
+  // El token del intento viaja siempre: sin él la RPC no cierra nada.
+  assertEquals(calls[0].args.p_claim_id, CLAIM_TOKEN);
   assertEquals(calls[0].args.p_state, "sent");
   assertEquals(calls[0].args.p_message_id, "<abc@notify.pipingbox.com>");
+});
+
+Deno.test("finalize fenced_out (token caducado) se registra sin lanzar", async () => {
+  // Escenario rev.8: nuestro lease venció, otro proceso retomó el envío y la
+  // RPC rechaza nuestro cierre tardío. No debe propagar excepción: el estado
+  // lo posee el reclamo vigente.
+  const calls: Array<{ fn: string; args: Record<string, unknown> }> = [];
+  await finalizeNotification(
+    fakeSupabase(
+      () => ({ data: [{ finalized: false, state: "claimed", attempts: 2, reason: "fenced_out" }], error: null }),
+      calls,
+    ),
+    APP_ID,
+    "88888888-8888-8888-8888-888888888888",
+    "failed",
+    null,
+    "smtp timeout (tardío)",
+  );
+  assertEquals(calls[0].args.p_claim_id, "88888888-8888-8888-8888-888888888888");
 });
 
 Deno.test("fallo al cerrar el reclamo no propaga excepción", async () => {
@@ -409,6 +454,7 @@ Deno.test("fallo al cerrar el reclamo no propaga excepción", async () => {
   await finalizeNotification(
     fakeSupabase(() => ({ data: null, error: { code: "57014" } })),
     APP_ID,
+    null,
     "ambiguous",
     null,
     "timeout",
