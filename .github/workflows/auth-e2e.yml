@@ -1103,6 +1103,7 @@ jobs:
           set -euo pipefail
           npx playwright test tests/documents-open-real-sign.spec.ts tests/certifications-dom-mutation.spec.ts \
             --config=playwright.config.ts \
+            --workers=1 \
             --reporter=line
 
       - name: Upload E2E artifacts

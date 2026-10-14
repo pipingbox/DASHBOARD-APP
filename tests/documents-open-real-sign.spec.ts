@@ -96,23 +96,30 @@ function openAction(page: Page, docName: string) {
     .locator('button[aria-label="Abrir documento"], a[target="_blank"]');
 }
 
-/** Assert the popup landed on a REAL signed URL and Storage served it. */
+/** Assert the popup requested the REAL signed URL and Storage served it.
+ * NOTE: headless Chromium DOWNLOADS application/pdf instead of rendering
+ * it, which aborts the popup navigation (net::ERR_ABORTED) even though the
+ * signed URL was requested and served. The robust assertion is therefore
+ * the GET response (200, real token), not popup.waitForURL — a headed
+ * Chrome on Windows (Fernando's environment) renders the same response in
+ * its built-in PDF viewer. */
 async function expectRealSignedOpen(page: Page, button: ReturnType<typeof openAction>, log: JsErrorLog, fileName: string) {
   const popupPromise = page.waitForEvent('popup', { timeout: 15_000 });
   await button.click();
   const popup = await popupPromise;
-  // Real Storage sign → real token in the URL (never intercepted)
-  await popup.waitForURL(new RegExp(`/object/sign/${BUCKET}/.*[?&]token=`), { timeout: 20_000 });
-  expect(popup.url()).toContain(fileName);
-  // Storage actually SERVES the object: the popup document must load 200.
+  // Real Storage sign → real token in the requested URL (never intercepted)
   const served = await popup.waitForResponse(
-    (res) => res.url().includes(`/object/sign/${BUCKET}/`) && res.request().method() === 'GET',
-    { timeout: 20_000 },
+    (res) =>
+      res.url().includes(`/object/sign/${BUCKET}/`) &&
+      /[?&]token=/.test(res.url()) &&
+      res.request().method() === 'GET',
+    { timeout: 25_000 },
   );
+  expect(served.url()).toContain(fileName);
   expect(served.status(), 'Storage must serve the signed object').toBe(200);
   // No silent JS failure on the profile page during the open
   expect(log.pageerrors, 'no pageerror may fire during the open flow').toEqual([]);
-  await popup.close();
+  await popup.close().catch(() => undefined);
 }
 
 test.describe('PB-PROFILE-STABILITY-001 FASE 1 — real documents-open integration', () => {
@@ -157,9 +164,19 @@ test.describe('PB-PROFILE-STABILITY-001 FASE 1 — real documents-open integrati
     await page.evaluate(() => {
       (window as unknown as Record<string, unknown>).open = () => null;
     });
-    await openAction(page, PDF_NAME).click();
-    await page.waitForURL(new RegExp(`/object/sign/${BUCKET}/.*[?&]token=`), { timeout: 20_000 });
-    expect(page.url()).toContain('e2e-fixture-pdf.pdf');
+    // PNG fixture: images navigate inline (a PDF would be downloaded in
+    // headless, aborting the same-tab navigation we assert here).
+    const servedPromise = page.waitForResponse(
+      (res) =>
+        res.url().includes(`/object/sign/${BUCKET}/`) &&
+        /[?&]token=/.test(res.url()) &&
+        res.request().method() === 'GET',
+      { timeout: 25_000 },
+    );
+    await openAction(page, PNG_NAME).click();
+    const served = await servedPromise;
+    expect(served.url()).toContain('e2e-fixture-png.png');
+    expect(served.status(), 'Storage must serve the signed object in the same-tab fallback').toBe(200);
     expect(log.pageerrors, 'no pageerror during popup-blocked fallback').toEqual([]);
     console.log('[evidence] sign responses:', log.signResponses, '| console:', log.console, '| pageerrors:', log.pageerrors);
   });

@@ -137,11 +137,19 @@ test.describe('PB-PROFILE-STABILITY-001 FASE 3 — certificate save under transl
           .catch(() => false);
 
       // ── 2. Open the Add-certification dialog ─────────────────────────
+      // Scoped to the Certifications section heading: the page has several
+      // "Añadir" buttons (documents, experience...). After the font-wrap
+      // the label still matches via textContent.
       await page.evaluate(() => {
-        const btn = [...document.querySelectorAll('button')].find((b) =>
+        const sections = [...document.querySelectorAll('section')];
+        const certSection = sections.find((s) =>
+          /certificacion|certification/i.test(s.querySelector('h2')?.textContent ?? ''),
+        );
+        if (!certSection) throw new Error('certifications section not found');
+        const btn = [...certSection.querySelectorAll('button')].find((b) =>
           /a(ñ|n)adir|add/i.test(b.textContent ?? ''),
         );
-        if (!btn) throw new Error('add-certification button not found');
+        if (!btn) throw new Error('add-certification button not found in its section');
         btn.click();
       });
       await page.locator('#cert-file-upload-input').waitFor({ state: 'attached', timeout: 15_000 });
