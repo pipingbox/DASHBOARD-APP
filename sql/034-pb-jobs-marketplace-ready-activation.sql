@@ -681,6 +681,12 @@ DECLARE
   ];
   v_terminal text[] := ARRAY['hired','rejected','withdrawn'];
   v_applicant_ready boolean;
+  -- Comparaciones NULL-safe (fail-closed): con company_user_id NULL o perfil
+  -- inexistente la OR de sql/018 evaluaba a NULL y saltaba el forbidden.
+  v_is_admin boolean;
+  v_is_primary_admin boolean;
+  v_is_company boolean;
+  v_is_owner_withdraw boolean;
 BEGIN
   IF v_actor IS NULL THEN
     RETURN jsonb_build_object('ok', false, 'error', 'not_authenticated');
@@ -705,13 +711,16 @@ BEGIN
 
   -- Authorization: admin (role or primary admin email), jobs_moderator,
   -- or the company that owns the application. Workers can only withdraw
-  -- their own application.
-  IF NOT (
-    v_role IN ('admin', 'jobs_moderator')
-    OR (auth.jwt() ->> 'email') = 'gaspardelhierromata@gmail.com'
-    OR v_app.company_user_id = v_actor
-    OR (v_app.user_id = v_actor AND p_new_status = 'withdrawn')
-  ) THEN
+  -- their own application. Cada condición es un booleano estricto.
+  v_is_admin := coalesce(v_role IN ('admin', 'jobs_moderator'), false);
+  v_is_primary_admin := coalesce(
+    (auth.jwt() ->> 'email') = 'gaspardelhierromata@gmail.com', false);
+  v_is_company := v_app.company_user_id IS NOT NULL
+                  AND v_app.company_user_id = v_actor;
+  v_is_owner_withdraw := v_app.user_id = v_actor
+                         AND p_new_status = 'withdrawn';
+
+  IF NOT (v_is_admin OR v_is_primary_admin OR v_is_company OR v_is_owner_withdraw) THEN
     RETURN jsonb_build_object('ok', false, 'error', 'forbidden');
   END IF;
 
@@ -719,8 +728,7 @@ BEGIN
   -- 'pending_profile_validation' es un estado interno del sistema; solo
   -- admin/jobs_moderator puede fijarlo manualmente (correcciones).
   IF p_new_status = 'pending_profile_validation'
-     AND v_role NOT IN ('admin', 'jobs_moderator')
-     AND (auth.jwt() ->> 'email') <> 'gaspardelhierromata@gmail.com' THEN
+     AND NOT (v_is_admin OR v_is_primary_admin) THEN
     RETURN jsonb_build_object('ok', false, 'error', 'forbidden');
   END IF;
 
