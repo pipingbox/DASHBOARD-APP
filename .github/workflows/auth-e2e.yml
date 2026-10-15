@@ -1183,6 +1183,27 @@ jobs:
     steps:
       - name: Require expected_sha, source_ref == dispatch commit, DOC_OPEN_E2E secrets, exclusive mode
         shell: bash
+        # PB-PROFILE-STABILITY-001 security closure (command-injection fix):
+        # NO inputs./github. context is ever interpolated inside run:.
+        # Untrusted dispatch values reach Bash ONLY through step-level env:
+        # vars and are read with quoted expansion, so a hostile source_ref
+        # containing shell syntax stays inert data — it can never become
+        # script source. The raw SRC_REF value is intentionally NOT echoed
+        # either (anti log/annotation injection): only shape + equality
+        # against the dispatch commit are enforced.
+        env:
+          SRC_REF: ${{ inputs.source_ref }}
+          DISPATCH_SHA: ${{ github.sha }}
+          RUN_IDENTITY_E2E: ${{ inputs.run_identity_e2e }}
+          RUN_WFA_E2E: ${{ inputs.run_wfa_e2e }}
+          RUN_DASHBOARD_E2E: ${{ inputs.run_dashboard_e2e }}
+          RUN_CERT_UPLOAD_E2E: ${{ inputs.run_cert_upload_e2e }}
+          RUN_AUTH_CALLBACK_E2E: ${{ inputs.run_auth_callback_e2e }}
+          RUN_ONBOARDING_E2E: ${{ inputs.run_onboarding_e2e }}
+          RUN_REFERRAL_ALDO_E2E: ${{ inputs.run_referral_aldo_e2e }}
+          RUN_STALE_CROSSDEPLOY_E2E: ${{ inputs.run_stale_crossdeploy_e2e }}
+          RUN_PROD_STALE_SMOKE: ${{ inputs.run_prod_stale_smoke }}
+          RUN_DOCUMENTS_OPEN_E2E: ${{ inputs.run_documents_open_e2e }}
         run: |
           set -euo pipefail
           if [ -z "${EXPECTED_APP_VERSION:-}" ]; then
@@ -1195,11 +1216,10 @@ jobs:
           # DOC_OPEN_E2E_* credentials. Fail closed unless source_ref is
           # exactly the dispatch commit: the code executed with the
           # credentials is pinned to github.sha — the reviewed head of the
-          # branch the environment policy authorized.
-          SRC_REF="${{ inputs.source_ref }}"
-          DISPATCH_SHA="${{ github.sha }}"
-          if [[ ! "$DISPATCH_SHA" =~ ^[0-9a-fA-F]{40}$ ]] || [ "$SRC_REF" != "$DISPATCH_SHA" ]; then
-            echo "::error::source_ref ('$SRC_REF') must be exactly the dispatch commit '$DISPATCH_SHA'. Code run with the DOC_OPEN_E2E credentials is pinned to github.sha (the head of the branch-policy-authorized ref); re-dispatch passing source_ref=<exact commit SHA>."
+          # branch the environment policy authorized. SRC_REF/DISPATCH_SHA
+          # arrive via env: (quoted reads below), never as script text.
+          if [[ ! "$DISPATCH_SHA" =~ ^[0-9a-fA-F]{40}$ ]] || [[ ! "$SRC_REF" =~ ^[0-9a-fA-F]{40}$ ]] || [ "$SRC_REF" != "$DISPATCH_SHA" ]; then
+            echo "::error::inputs.source_ref rejected (raw value not echoed by design): it must be exactly the dispatch commit github.sha ('$DISPATCH_SHA'). Code run with the DOC_OPEN_E2E credentials is pinned to github.sha (the head of the branch-policy-authorized ref); re-dispatch passing source_ref=<exact 40-hex commit SHA>."
             exit 1
           fi
           for v in DOC_OPEN_E2E_EMAIL DOC_OPEN_E2E_PASSWORD DOC_OPEN_E2E_OTHER_EMAIL DOC_OPEN_E2E_OTHER_PASSWORD DOC_OPEN_E2E_ANON_KEY; do
@@ -1208,7 +1228,7 @@ jobs:
               exit 1
             fi
           done
-          for pair in "run_identity_e2e=${{ inputs.run_identity_e2e }}" "run_wfa_e2e=${{ inputs.run_wfa_e2e }}" "run_dashboard_e2e=${{ inputs.run_dashboard_e2e }}" "run_cert_upload_e2e=${{ inputs.run_cert_upload_e2e }}" "run_onboarding_e2e=${{ inputs.run_onboarding_e2e }}" "run_referral_aldo_e2e=${{ inputs.run_referral_aldo_e2e }}" "run_stale_crossdeploy_e2e=${{ inputs.run_stale_crossdeploy_e2e }}" "run_prod_stale_smoke=${{ inputs.run_prod_stale_smoke }}" "run_documents_open_e2e=${{ inputs.run_documents_open_e2e }}"; do
+          for pair in "run_identity_e2e=$RUN_IDENTITY_E2E" "run_wfa_e2e=$RUN_WFA_E2E" "run_dashboard_e2e=$RUN_DASHBOARD_E2E" "run_cert_upload_e2e=$RUN_CERT_UPLOAD_E2E" "run_auth_callback_e2e=$RUN_AUTH_CALLBACK_E2E" "run_onboarding_e2e=$RUN_ONBOARDING_E2E" "run_referral_aldo_e2e=$RUN_REFERRAL_ALDO_E2E" "run_stale_crossdeploy_e2e=$RUN_STALE_CROSSDEPLOY_E2E" "run_prod_stale_smoke=$RUN_PROD_STALE_SMOKE" "run_documents_open_e2e=$RUN_DOCUMENTS_OPEN_E2E"; do
             name="${pair%%=*}"
             value="${pair##*=}"
             if [ "$value" = "true" ]; then
