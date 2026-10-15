@@ -1035,9 +1035,124 @@ jobs:
           set -euo pipefail
           node tests/verify-p0-permissions.mjs
 
+  documents-open-real-validate:
+    name: PB-PROFILE-STABILITY-001 — validate target origin & SHA (no credentials)
+    # Security review points 1+2: fail-closed validation of target_url and
+    # of the served build BEFORE any job holding the DOC_OPEN_E2E_*
+    # credentials starts. This job has NO secrets: HTTPS-only allowlist of
+    # authorized PIPINGBOX origins, rejection of embedded credentials,
+    # non-default ports, paths/queries, deceptive hosts, and redirects to
+    # non-authorized origins; finally /version.json must serve EXACTLY the
+    # expected full SHA.
+    if: ${{ inputs.run_documents_open_real_e2e == true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TARGET_URL: ${{ inputs.target_url }}
+      EXPECTED_SHA: ${{ inputs.expected_sha }}
+    steps:
+      - name: Validate target_url allowlist, redirect chain and served SHA (fail closed)
+        shell: python
+        run: |
+          import json, os, re, sys, urllib.error, urllib.parse, urllib.request
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          ALLOWED_HOSTS = (
+              re.compile(r"^([a-z0-9-]+\.)?pipingbox\.com$"),
+              re.compile(r"^[a-z0-9-]+\.pipingbox\.workers\.dev$"),
+          )
+
+          def host_allowed(host):
+              return bool(host) and host.isascii() and any(p.match(host) for p in ALLOWED_HOSTS)
+
+          def split_and_validate(url):
+              try:
+                  u = urllib.parse.urlsplit(url)
+              except ValueError:
+                  fail(f"unparseable URL: {url!r}")
+              if u.scheme != "https":
+                  fail(f"target must be HTTPS, got scheme {u.scheme!r}: {url}")
+              if u.username is not None or u.password is not None:
+                  fail("URL with embedded credentials is forbidden")
+              host = (u.hostname or "").lower()
+              if not host_allowed(host):
+                  fail(f"host is not an authorized PIPINGBOX origin: {host!r} (allowed: pipingbox.com, *.pipingbox.com, *.pipingbox.workers.dev)")
+              try:
+                  port = u.port
+              except ValueError:
+                  fail(f"invalid port in URL: {url}")
+              if port is not None and port != 443:
+                  fail(f"non-default port is forbidden: {url}")
+              if u.path not in ("", "/"):
+                  fail(f"target must be a bare origin, got path {u.path!r}: {url}")
+              if u.query or u.fragment:
+                  fail(f"query/fragment are forbidden in the target: {url}")
+              return u
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+
+          def fetch_validated(url, what):
+              """GET without auto-redirect; EVERY hop (including each redirect
+              target) must stay HTTPS on an authorized origin. Returns the
+              final URL and response."""
+              hops = 0
+              while True:
+                  split_and_validate(url)
+                  req = urllib.request.Request(url, method="GET", headers={"User-Agent": "pb-documents-open-e2e-validator"})
+                  try:
+                      resp = urllib.request.build_opener(NoRedirect).open(req, timeout=20)
+                      return url, resp
+                  except urllib.error.HTTPError as e:
+                      if e.code in (301, 302, 303, 307, 308):
+                          loc = e.headers.get("Location")
+                          if not loc:
+                              fail(f"{what}: redirect without Location header at {url}")
+                          hops += 1
+                          if hops > 5:
+                              fail(f"{what}: more than 5 redirects starting at {url}")
+                          url = urllib.parse.urljoin(url, loc)
+                          print(f"redirect hop {hops}: -> {url}")
+                          continue
+                      fail(f"{what}: HTTP {e.code} fetching {url}")
+                  except Exception as e:
+                      fail(f"{what}: cannot reach {url}: {e}")
+
+          target = (os.environ.get("TARGET_URL") or "").strip()
+          expected = (os.environ.get("EXPECTED_SHA") or "").strip().lower()
+          if not re.fullmatch(r"[0-9a-f]{40}", expected):
+              fail(f"expected_sha must be a full 40-hex commit SHA, got {expected!r}")
+
+          final_url, _ = fetch_validated(target, "target_url")
+          vurl, resp = fetch_validated(final_url.rstrip("/") + "/version.json", "version.json")
+          try:
+              served = json.load(resp).get("version", "")
+          except Exception:
+              fail(f"version.json at {vurl} is not valid JSON")
+          if served.lower() != expected:
+              fail(f"served build mismatch: {vurl} serves {served!r}, expected {expected!r}")
+          print(f"target validated: {final_url} serves exactly {served}")
+
   documents-open-real-e2e:
     name: PB-PROFILE-STABILITY-001 REAL documents-open E2E (sign not intercepted)
     if: ${{ inputs.run_documents_open_real_e2e == true }}
+    # Point 2: credentials are only introduced AFTER the target origin and
+    # the served SHA have been validated by the credential-less job above.
+    needs: documents-open-real-validate
+    # Point 3: the DOC_OPEN_E2E_* credentials live ONLY in the protected
+    # GitHub environment "documents-open-real-e2e", whose deployment
+    # branch policy restricts which refs may run this job (main + the
+    # audited PR branch). Any other ref fails here WITHOUT ever receiving
+    # the secrets. (The earlier standalone documents-open-real-e2e.yml
+    # approach was folded into this dispatchable gate because standalone
+    # workflow files are not dispatchable until they reach the default
+    # branch; all controls live in this job pair.)
+    environment: documents-open-real-e2e
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -1067,7 +1182,7 @@ jobs:
           fi
           for v in DOC_OPEN_E2E_EMAIL DOC_OPEN_E2E_PASSWORD DOC_OPEN_E2E_OTHER_EMAIL DOC_OPEN_E2E_OTHER_PASSWORD DOC_OPEN_E2E_ANON_KEY; do
             if [ -z "${!v:-}" ]; then
-              echo "::error::secret-backed env $v is empty — configure the DOC_OPEN_E2E_* repository secrets first."
+              echo "::error::secret-backed env $v is empty — configure the DOC_OPEN_E2E_* secrets in the protected GitHub environment 'documents-open-real-e2e' first."
               exit 1
             fi
           done

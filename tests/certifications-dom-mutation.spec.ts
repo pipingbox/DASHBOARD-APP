@@ -116,12 +116,24 @@ test.describe('PB-PROFILE-STABILITY-001 FASE 3 — certificate save under transl
       JSON.parse(Buffer.from(jwt.split('.')[1], 'base64url').toString('utf8')).sub,
     );
 
+    // Security review point 5: the cleanup can ONLY ever delete the single
+    // record created by THIS test run —
+    //   - scoped to the synthetic owner account (user_id from the session
+    //     JWT), and
+    //   - scoped to the exact certification name of this run
+    //     (`E2E Crash Cert <Date.now()>`, unique per run — never a LIKE
+    //     prefix), with the canonical row id captured when known.
+    let createdCertId: string | null = null;
     const cleanup = async () => {
-      const res = await fetch(
-        `${restCtx.base}/rest/v1/${CERTS_TABLE}?user_id=eq.${ownerId}&certification_name=like.${encodeURIComponent(CERT_NAME_PREFIX)}*`,
-        { method: 'DELETE', headers: restHeaders, signal: AbortSignal.timeout(15_000) },
-      );
-      console.log('cleanup: DELETE synthetic certs -> HTTP', res.status);
+      const scope = createdCertId
+        ? `user_id=eq.${ownerId}&id=eq.${createdCertId}`
+        : `user_id=eq.${ownerId}&certification_name=eq.${encodeURIComponent(certName)}`;
+      const res = await fetch(`${restCtx.base}/rest/v1/${CERTS_TABLE}?${scope}`, {
+        method: 'DELETE',
+        headers: restHeaders,
+        signal: AbortSignal.timeout(15_000),
+      });
+      console.log(`cleanup: DELETE this-run synthetic certificate (${createdCertId ? 'by id' : 'by exact run-unique name'}) -> HTTP`, res.status);
     };
 
     try {
@@ -208,8 +220,10 @@ test.describe('PB-PROFILE-STABILITY-001 FASE 3 — certificate save under transl
         { headers: restHeaders, signal: AbortSignal.timeout(15_000) },
       );
       expect(res.ok, `canonical row fetch failed: HTTP ${res.status}`).toBeTruthy();
-      const rows = (await res.json()) as unknown[];
+      const rows = (await res.json()) as { id: string }[];
       expect(rows.length, 'the saved certificate must be persisted in app_worker_certifications').toBe(1);
+      // Capture the canonical id so the cleanup targets exactly this row.
+      createdCertId = rows[0].id;
 
       // And it renders in the list (the "appears on Retry" state must be
       // reached WITHOUT any retry).
