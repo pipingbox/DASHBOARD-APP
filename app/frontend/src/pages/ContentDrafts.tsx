@@ -88,7 +88,9 @@ function StatusBadge({ status }: { status: string }) {
       {status === 'approved' && <CheckCircle2 className="h-3 w-3" />}
       {status === 'published' && <Send className="h-3 w-3" />}
       {status === 'rejected' && <XCircle className="h-3 w-3" />}
-      {status}
+      {/* PB-PROFILE-STABILITY-001: span anchor — the conditional icon swap
+          above must never anchor at a translate-detached bare text node. */}
+      <span>{status}</span>
     </span>
   );
 }
