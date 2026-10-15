@@ -9,6 +9,8 @@ on:
     paths:
       - 'supabase/functions/_shared/email-i18n/**'
       - 'supabase/functions/_shared/email-provider.ts'
+      - 'supabase/functions/_shared/application-activation.ts'
+      - 'supabase/functions/_shared/application-activation_test.ts'
       - 'supabase/functions/_shared/standard-webhooks.ts'
       - 'supabase/functions/auth-send-email-hook/**'
       - 'supabase/functions/notification-dispatcher/**'
@@ -16,12 +18,15 @@ on:
       - 'supabase/functions/job-match-notify/**'
       - 'supabase/functions/workforce-match-notify/**'
       - 'supabase/functions/app_14da0f1941_send_job_application_notification/**'
+      - 'supabase/functions/job-application-profile-pending-email/**'
+      - 'supabase/functions/marketplace-ready-activation-email/**'
       - 'app/frontend/src/i18n/languages.json'
       - '.github/workflows/email-i18n-tests.yml'
   push:
     branches: [main]
     paths:
       - 'supabase/functions/_shared/email-i18n/**'
+      - 'supabase/functions/_shared/application-activation.ts'
       - 'supabase/functions/auth-send-email-hook/**'
 
 concurrency:
@@ -47,11 +52,15 @@ jobs:
             supabase/functions/_shared/email-provider.ts \
             supabase/functions/_shared/email-provider_test.ts \
             supabase/functions/_shared/standard-webhooks.ts \
+            supabase/functions/_shared/application-activation.ts \
+            supabase/functions/_shared/application-activation_test.ts \
             supabase/functions/auth-send-email-hook/index.ts \
             supabase/functions/notification-dispatcher/index.ts \
             supabase/functions/cert-expiry-alerts/index.ts \
             supabase/functions/job-match-notify/index.ts \
             supabase/functions/workforce-match-notify/index.ts \
+            supabase/functions/job-application-profile-pending-email/index.ts \
+            supabase/functions/marketplace-ready-activation-email/index.ts \
             supabase/functions/app_14da0f1941_send_job_application_notification/index.maintainable.ts
 
       - name: Tests (11 idiomas, seguridad, firma, URL de verificación, modo de entrega)
@@ -59,5 +68,6 @@ jobs:
           deno test --node-modules-dir=none --allow-read --allow-env \
             supabase/functions/_shared/email-i18n/ \
             supabase/functions/_shared/email-provider_test.ts \
+            supabase/functions/_shared/application-activation_test.ts \
             supabase/functions/auth-send-email-hook/ \
             supabase/functions/app_14da0f1941_send_job_application_notification/

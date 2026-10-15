@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import type { Job, JobTranslation } from '@/lib/jobs/types';
 import { trackEvent } from '@/lib/observability';
+import { handlePendingProfileAfterApply } from '@/lib/applicationPendingProfile';
 import {
   captureAttributionVisit,
   getFirstTouch,
@@ -217,7 +218,11 @@ export default function JobDetail() {
       applicationPayload.first_touch_content = firstTouch.utm_content ?? null;
     }
 
-    const { error } = await supabase.from(TABLES.jobApplications).insert(applicationPayload);
+    const { data: insertedApp, error } = await supabase
+      .from(TABLES.jobApplications)
+      .insert(applicationPayload)
+      .select('id, status')
+      .single();
     setApplying(false);
 
     if (error) {
@@ -234,6 +239,12 @@ export default function JobDetail() {
     // Funnel step 3: the application was successfully persisted.
     trackEvent('apply_submitted', funnelProps, { dedupeKey: job.id });
 
+    // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001: si el perfil aún no es
+    // Marketplace Ready, el backend guardó la candidatura como
+    // pending_profile_validation. Eventos + EMAIL 1 (idioma del usuario,
+    // idempotente en backend). Fail-open: nunca bloquea el apply.
+    const isPendingProfile = await handlePendingProfileAfterApply(insertedApp, job.id);
+
     // Recruitment notification (jobs@pipingbox.com). Loud on failure, never
     // blocks the application — same contract as the lead alert flow.
     const { data: mailData, error: mailErr } = await supabase.functions.invoke(
@@ -247,7 +258,15 @@ export default function JobDetail() {
       );
     }
 
-    toast.success(t('jobs.applicationSubmitted'));
+    if (isPendingProfile) {
+      // "Candidatura recibida — completa tu perfil para activarla." El
+      // mensaje NO transmite rechazo y aclara que puede seguir aplicando.
+      toast.info(t('jobs.applicationPendingProfileTitle'), {
+        description: t('jobs.applicationPendingProfileDescription'),
+      });
+    } else {
+      toast.success(t('jobs.applicationSubmitted'));
+    }
     setApplied(true);
   };
 

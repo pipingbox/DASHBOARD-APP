@@ -38,9 +38,24 @@ interface Application {
   created_at: string;
 }
 
-type StatusFilter = 'all' | 'applied' | 'reviewed' | 'interview' | 'shortlisted' | 'rejected' | 'hired';
+type StatusFilter =
+  | 'all'
+  | 'pending_profile_validation'
+  | 'applied'
+  | 'reviewed'
+  | 'interview'
+  | 'shortlisted'
+  | 'rejected'
+  | 'hired';
 
 const STATUS_KEYS: Record<string, { i18nKey: string; color: string; bg: string }> = {
+  // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 — "Aplicada · Perfil pendiente":
+  // la candidatura está registrada pero retenida hasta Marketplace Ready.
+  pending_profile_validation: {
+    i18nKey: 'applications.pendingProfile',
+    color: 'text-orange-400',
+    bg: 'bg-orange-500/10 border-orange-500/30',
+  },
   applied: { i18nKey: 'applications.applied', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
   reviewed: { i18nKey: 'applications.reviewed', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
   interview: { i18nKey: 'applications.interview', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/30' },
@@ -270,6 +285,12 @@ export default function Applications() {
                         {app.job_title}
                       </h3>
                     </div>
+
+                    {app.status === 'pending_profile_validation' && (
+                      <p className="text-xs text-orange-400/90">
+                        {t('applications.pendingProfileHint')}
+                      </p>
+                    )}
 
                     <div className="flex items-center gap-2 text-sm text-zinc-400">
                       <Building2 className="h-3.5 w-3.5 text-zinc-500" />

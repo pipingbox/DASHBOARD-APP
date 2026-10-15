@@ -2351,6 +2351,8 @@
     "applied": "Aplicat",
     "alreadyApplied": "Ați aplicat deja la acest post",
     "applicationSubmitted": "Aplicație trimisă",
+    "applicationPendingProfileTitle": "Candidatură primită — completează-ți profilul pentru a o activa",
+    "applicationPendingProfileDescription": "Poți continua să aplici, dar candidaturile tale vor putea fi prezentate companiilor doar după ce profilul tău este validat.",
     "remote": "La distanță",
     "applyNow": "Aplicați acum",
     "allOpenPositions": "Toate posturile deschise",
@@ -3289,6 +3291,7 @@
     "noCandidatesYet": "Niciun lucrător nu a aplicat încă la locurile dumneavoastră de muncă. Candidaturile vor apărea aici când lucrătorii aplică.",
     "noMatchingCandidates": "Niciun candidat nu corespunde filtrelor curente. Încercați să ajustați căutarea sau filtrul de stare.",
     "worker": "Lucrător",
+    "pendingProfile": "Aplicat · Profil în așteptare",
     "applied": "A aplicat",
     "reviewed": "Evaluat",
     "interview": "Interviu",
@@ -3660,6 +3663,8 @@
     "allActions": "Toate acțiunile"
   },
   "applications": {
+    "pendingProfile": "Aplicat · Profil în așteptare",
+    "pendingProfileHint": "Completează-ți profilul pentru a activa această candidatură pentru prezentarea către companii.",
     "applied": "Aplicat",
     "reviewed": "Analizată",
     "interview": "Interviu",

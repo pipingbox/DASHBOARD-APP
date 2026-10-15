@@ -8,8 +8,14 @@ export {
   safeUrl,
   renderActionEmail,
   renderNoticeEmail,
+  // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001
+  renderApplicationPendingProfileEmail,
+  renderMarketplaceReadyEmail,
+  PENDING_PROFILE_ITEM_KEYS,
   type ActionRenderInput,
   type NoticeRenderInput,
+  type ApplicationPendingProfileRenderInput,
+  type MarketplaceReadyRenderInput,
   type RenderedEmail,
   type Vars,
 } from "./render.ts";

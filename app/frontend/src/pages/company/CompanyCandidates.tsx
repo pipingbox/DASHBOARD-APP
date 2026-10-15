@@ -17,6 +17,7 @@ import {
   Calendar,
   Loader2,
   RefreshCw,
+  Hourglass,
 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -57,6 +58,10 @@ type ApplicationStatus = (typeof STATUS_OPTIONS)[number];
 function CandidateStatusBadge({ status }: { status: string }) {
   const { t } = useTranslation();
   const config: Record<string, { label: string; classes: string; icon: React.ElementType }> = {
+    // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 — "Aplicada · Perfil pendiente":
+    // visible para la empresa, pero no presentable (sent_to_client lo bloquea
+    // el backend si el perfil no es marketplace_ready).
+    pending_profile_validation: { label: t('companyCandidates.pendingProfile'), classes: 'bg-orange-500/10 text-orange-400 border-orange-500/30', icon: Hourglass },
     applied: { label: t('companyCandidates.applied'), classes: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30', icon: AlertCircle },
     reviewed: { label: t('companyCandidates.reviewed'), classes: 'bg-blue-500/10 text-blue-400 border-blue-500/30', icon: Eye },
     shortlisted: { label: t('companyCandidates.shortlisted'), classes: 'bg-amber-500/10 text-amber-400 border-amber-500/30', icon: Star },

@@ -2351,6 +2351,8 @@
     "applied": "Candidature envoyée",
     "alreadyApplied": "Vous avez déjà postulé à cette offre",
     "applicationSubmitted": "Candidature soumise",
+    "applicationPendingProfileTitle": "Candidature reçue — complétez votre profil pour l'activer",
+    "applicationPendingProfileDescription": "Vous pouvez continuer à postuler, mais vos candidatures ne pourront être présentées aux entreprises qu'une fois votre profil validé.",
     "remote": "Télétravail",
     "applyNow": "Postuler maintenant",
     "allOpenPositions": "Tous les postes ouverts",
@@ -3258,6 +3260,7 @@
     "noCandidatesYet": "Aucun travailleur n'a encore postulé à vos offres. Les candidatures apparaîtront ici.",
     "noMatchingCandidates": "Aucun candidat ne correspond à vos filtres actuels. Ajustez votre recherche ou filtre de statut.",
     "worker": "Travailleur",
+    "pendingProfile": "Postulé · Profil en attente",
     "applied": "Candidature envoyée",
     "reviewed": "Examiné",
     "interview": "Entretien",
@@ -3629,6 +3632,8 @@
     "allActions": "Toutes les actions"
   },
   "applications": {
+    "pendingProfile": "Postulé · Profil en attente",
+    "pendingProfileHint": "Complétez votre profil pour activer cette candidature en vue de sa présentation aux entreprises.",
     "applied": "Candidature envoyée",
     "reviewed": "Examiné",
     "interview": "Entretien",

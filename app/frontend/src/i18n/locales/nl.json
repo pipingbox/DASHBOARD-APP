@@ -2348,6 +2348,8 @@
     "applied": "Gesolliciteerd",
     "alreadyApplied": "Je hebt al op deze vacature gesolliciteerd",
     "applicationSubmitted": "Sollicitatie verstuurd",
+    "applicationPendingProfileTitle": "Sollicitatie ontvangen — voltooi je profiel om te activeren",
+    "applicationPendingProfileDescription": "Je kunt blijven solliciteren, maar je sollicitaties kunnen pas aan bedrijven worden gepresenteerd zodra je profiel is gevalideerd.",
     "remote": "Remote",
     "applyNow": "Nu solliciteren",
     "allOpenPositions": "Alle openstaande vacatures",
@@ -3251,6 +3253,7 @@
     "noCandidatesYet": "Er hebben nog geen werknemers op je vacatures gesolliciteerd. Sollicitaties verschijnen hier wanneer werknemers solliciteren.",
     "noMatchingCandidates": "Geen kandidaten voldoen aan je huidige filters. Pas je zoekopdracht of statusfilter aan.",
     "worker": "Werknemer",
+    "pendingProfile": "Gesolliciteerd · Profiel in behandeling",
     "applied": "Gesolliciteerd",
     "reviewed": "Beoordeeld",
     "interview": "Interview",
@@ -3622,6 +3625,8 @@
     "allActions": "Alle acties"
   },
   "applications": {
+    "pendingProfile": "Gesolliciteerd · Profiel in behandeling",
+    "pendingProfileHint": "Voltooi je profiel om deze sollicitatie te activeren voor presentatie aan bedrijven.",
     "applied": "Gesolliciteerd",
     "reviewed": "Beoordeeld",
     "interview": "Interview",

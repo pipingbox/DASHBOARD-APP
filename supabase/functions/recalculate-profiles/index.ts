@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { drainMarketplaceReadyActivations } from "../_shared/application-activation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -281,6 +282,32 @@ Deno.serve(async (req) => {
           };
         }
       }
+    }
+
+    // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001: si este recálculo provocó una
+    // transición marketplace_ready false -> true, el trigger de sql/034 activó
+    // las candidaturas pendientes del usuario y encoló el email en el outbox.
+    // Se drena aquí (usuario propio; en barridos de admin, global limitado).
+    // Fail-open: un fallo del email NO debe fallar el recálculo.
+    try {
+      const drainResults = await drainMarketplaceReadyActivations(
+        {
+          supabase: createClient(supabaseUrl, serviceRoleKey, {
+            auth: { autoRefreshToken: false, persistSession: false },
+          }),
+        },
+        { userId: targetUserId ?? undefined, limit: targetUserId ? 5 : 10 },
+      );
+      if (drainResults.length > 0) {
+        console.log(
+          `[recalculate-profiles] marketplace-ready drain: user=${targetUserId ?? "sweep"} processed=${drainResults.length}`,
+        );
+      }
+    } catch (drainErr) {
+      console.error(
+        "[recalculate-profiles] marketplace-ready drain failed (fail-open):",
+        drainErr instanceof Error ? drainErr.message : String(drainErr),
+      );
     }
 
     // The response no longer carries a list of profiles. It used to return up

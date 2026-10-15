@@ -2348,6 +2348,8 @@
     "applied": "Applied",
     "alreadyApplied": "You already applied to this role",
     "applicationSubmitted": "Application submitted",
+    "applicationPendingProfileTitle": "Application received — complete your profile to activate it",
+    "applicationPendingProfileDescription": "You can keep applying to jobs, but your applications cannot be presented to companies until your profile is validated.",
     "remote": "Remote",
     "applyNow": "Apply Now",
     "allOpenPositions": "All Open Positions",
@@ -3251,6 +3253,7 @@
     "noCandidatesYet": "No workers have applied to your jobs yet. Applications will appear here when workers apply.",
     "noMatchingCandidates": "No candidates match your current filters. Try adjusting your search or status filter.",
     "worker": "Worker",
+    "pendingProfile": "Applied · Profile pending",
     "applied": "Applied",
     "reviewed": "Reviewed",
     "interview": "Interview",
@@ -3622,6 +3625,8 @@
     "allActions": "All Actions"
   },
   "applications": {
+    "pendingProfile": "Applied · Profile pending",
+    "pendingProfileHint": "Complete your profile to activate this application for presentation to companies.",
     "applied": "Applied",
     "reviewed": "Reviewed",
     "interview": "Interview",
