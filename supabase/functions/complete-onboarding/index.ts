@@ -6,6 +6,10 @@
 // profile_completion (protected columns).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  createServiceClient,
+  drainMarketplaceReadyActivations,
+} from "../_shared/application-activation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -57,6 +61,28 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001: si pb_complete_onboarding provocó
+  // una transición marketplace_ready false -> true, el trigger de sql/034 ya
+  // activó las candidaturas pendientes y encoló el email en el outbox. Aquí se
+  // drena (máx. un email por transición, idempotente vía claim). Fail-open:
+  // un fallo del email NO debe fallar el onboarding.
+  try {
+    const drainResults = await drainMarketplaceReadyActivations(
+      { supabase: createServiceClient() },
+      { userId: user.id, limit: 5 },
+    );
+    if (drainResults.length > 0) {
+      console.log(
+        `[complete-onboarding] marketplace-ready drain: user=${user.id} processed=${drainResults.length}`,
+      );
+    }
+  } catch (drainErr) {
+    console.error(
+      "[complete-onboarding] marketplace-ready drain failed (fail-open):",
+      drainErr instanceof Error ? drainErr.message : String(drainErr),
     );
   }
 

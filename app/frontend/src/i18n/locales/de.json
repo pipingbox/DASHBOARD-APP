@@ -2348,6 +2348,8 @@
     "applied": "Beworben",
     "alreadyApplied": "Sie haben sich bereits auf diese Stelle beworben",
     "applicationSubmitted": "Bewerbung eingereicht",
+    "applicationPendingProfileTitle": "Bewerbung eingegangen — vervollständigen Sie Ihr Profil zur Aktivierung",
+    "applicationPendingProfileDescription": "Sie können sich weiterhin bewerben, aber Ihre Bewerbungen können erst den Unternehmen vorgelegt werden, wenn Ihr Profil validiert ist.",
     "remote": "Remote",
     "applyNow": "Jetzt bewerben",
     "allOpenPositions": "Alle offenen Stellen",
@@ -3251,6 +3253,7 @@
     "noCandidatesYet": "Noch keine Mitarbeiter haben sich auf Ihre Stellen beworben. Bewerbungen erscheinen hier, wenn Mitarbeiter sich bewerben.",
     "noMatchingCandidates": "Keine Kandidaten entsprechen Ihren aktuellen Filtern. Passen Sie Ihre Suche oder den Statusfilter an.",
     "worker": "Mitarbeiter",
+    "pendingProfile": "Beworben · Profil ausstehend",
     "applied": "Beworben",
     "reviewed": "Geprüft",
     "interview": "Interview",
@@ -3622,6 +3625,8 @@
     "allActions": "Alle Aktionen"
   },
   "applications": {
+    "pendingProfile": "Beworben · Profil ausstehend",
+    "pendingProfileHint": "Vervollständigen Sie Ihr Profil, um diese Bewerbung für die Vorlage bei Unternehmen zu aktivieren.",
     "applied": "Beworben",
     "reviewed": "Geprüft",
     "interview": "Interview",

@@ -32,6 +32,50 @@ export interface JobMatchStrings extends ActionTemplateStrings {
   body_no_company: string;
 }
 
+/** Elementos del perfil que pueden faltar para Marketplace Ready.
+ *  Espejo del cálculo de recalculate-profiles (pesos de profile_completion). */
+export type PendingProfileItemKey =
+  | "photo"
+  | "basic_details"
+  | "location"
+  | "years_experience"
+  | "skills"
+  | "bio"
+  | "cv"
+  | "experience"
+  | "certifications"
+  | "documents";
+
+/** PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 — EMAIL 1.
+ *  Concepto: "Candidatura recibida — completa tu perfil para activarla."
+ *  NO transmite rechazo. */
+export interface ApplicationPendingProfileStrings extends ActionTemplateStrings {
+  /** {jobTitle}. Variante del cuerpo cuando la oferta no indica empresa. */
+  body_no_company: string;
+  /** Intro de la lista de elementos pendientes (p.ej. "Te falta:"). */
+  pending_intro: string;
+  /** Etiquetas localizadas de cada elemento pendiente del perfil. */
+  pending_items: Record<PendingProfileItemKey, string>;
+}
+
+/** PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 — EMAIL 2.
+ *  Concepto: "Perfil validado — tus candidaturas ya pueden revisarse".
+ *  No hereda `body`: el cuerpo es body_single / body_multiple según nº de ofertas. */
+export interface MarketplaceReadyStrings {
+  subject: string;
+  preheader: string;
+  heading: string;
+  /** {jobTitle}. Cuerpo cuando hay exactamente una candidatura activada. */
+  body_single: string;
+  /** {count}. Cuerpo cuando hay varias candidaturas activadas. */
+  body_multiple: string;
+  /** Intro de la lista de ofertas activadas. */
+  activated_list_intro: string;
+  note: string;
+  button: string;
+  footer_reason: string;
+}
+
 export interface EmailCommonStrings {
   brand_tagline: string;
   /** "Si el botón no funciona, copia esta dirección en tu navegador:" */
@@ -70,6 +114,8 @@ export interface EmailTemplates {
   workforce_match: ActionTemplateStrings;       // {score} {workerType} {country}
   cert_expiry: ActionTemplateStrings;           // {certName} {expiresOn}
   lead_receipt: NoticeTemplateStrings;          // {name}
+  application_pending_profile: ApplicationPendingProfileStrings; // {jobTitle} {company}
+  marketplace_ready: MarketplaceReadyStrings;   // {jobTitle} / {count}
 }
 
 export type TemplateId = keyof EmailTemplates;
@@ -84,6 +130,14 @@ export const ACTION_TEMPLATES = [
   "confirmation", "recovery", "magic_link", "invite",
   "email_change_current", "email_change_new",
   "job_match", "workforce_match", "cert_expiry",
+] as const satisfies readonly TemplateId[];
+
+// PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 — plantillas con renderizador
+// dedicado (renderApplicationPendingProfileEmail / renderMarketplaceReadyEmail),
+// fuera del contrato genérico de renderActionEmail (lista pendiente / cuerpo
+// singular-plural). Se validan en application-activation_test.ts.
+export const DEDICATED_ACTION_TEMPLATES = [
+  "application_pending_profile", "marketplace_ready",
 ] as const satisfies readonly TemplateId[];
 
 export const NOTICE_TEMPLATES = [

@@ -2351,6 +2351,8 @@
     "applied": "Postulado",
     "alreadyApplied": "Ya te has postulado a esta vacante",
     "applicationSubmitted": "Candidatura enviada",
+    "applicationPendingProfileTitle": "Candidatura recibida — completa tu perfil para activarla",
+    "applicationPendingProfileDescription": "Puedes seguir aplicando a ofertas, pero tus candidaturas no podrán ser presentadas a las empresas hasta que tu perfil esté validado.",
     "remote": "Remoto",
     "applyNow": "Postularme",
     "allOpenPositions": "Todas las vacantes abiertas",
@@ -3258,6 +3260,7 @@
     "noCandidatesYet": "Aún no hay trabajadores postulados a tus vacantes. Las candidaturas aparecerán aquí cuando se postulen.",
     "noMatchingCandidates": "Ningún candidato coincide con tus filtros. Intenta ajustar tu búsqueda o filtro de estado.",
     "worker": "Trabajador",
+    "pendingProfile": "Aplicada · Perfil pendiente",
     "applied": "Postulado",
     "reviewed": "Revisado",
     "interview": "Entrevista",
@@ -3629,6 +3632,8 @@
     "allActions": "Todas las Acciones"
   },
   "applications": {
+    "pendingProfile": "Aplicada · Perfil pendiente",
+    "pendingProfileHint": "Completa tu perfil para activar esta candidatura y poder presentarla a las empresas.",
     "applied": "Postulado",
     "reviewed": "Revisado",
     "interview": "Entrevista",

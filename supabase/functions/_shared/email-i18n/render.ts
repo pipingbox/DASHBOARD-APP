@@ -19,9 +19,12 @@ import { getLocale } from "./locales.ts";
 import type {
   ActionTemplateId,
   ActionTemplateStrings,
+  ApplicationPendingProfileStrings,
   EmailLocale,
+  MarketplaceReadyStrings,
   NoticeTemplateId,
   NoticeTemplateStrings,
+  PendingProfileItemKey,
   TemplateId,
 } from "./types.ts";
 
@@ -111,6 +114,7 @@ interface LayoutParts {
   preheader: string;
   heading: string;
   bodyHtml: string;        // párrafos ya escapados
+  listHtml?: string;       // lista con viñetas (elementos pendientes / ofertas), ya escapada
   actionHtml?: string;     // botón + fallback, ya escapado
   codeHtml?: string;       // bloque de código OTP
   securityHtml: string;    // lista de avisos, ya escapada
@@ -122,6 +126,7 @@ interface LayoutParts {
 function layout(p: LayoutParts): string {
   const action = p.actionHtml ?? "";
   const code = p.codeHtml ?? "";
+  const list = p.listHtml ?? "";
   return `<!DOCTYPE html>
 <html lang="${p.lang}" dir="ltr" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -142,6 +147,7 @@ function layout(p: LayoutParts): string {
 <tr><td style="padding:32px 28px 8px 28px;">
   <h1 style="margin:0 0 16px 0; font-size:22px; line-height:28px; color:${BRAND.black};">${p.heading}</h1>
   ${p.bodyHtml}
+  ${list}
   ${code}
   ${action}
 </td></tr>
@@ -333,6 +339,187 @@ export function renderNoticeEmail(input: NoticeRenderInput): RenderedEmail {
   return {
     lang,
     template: input.template,
+    subject: T(t.subject),
+    html,
+    text: textLines.join("\n"),
+    missing: [...missing],
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PB-JOBS-MARKETPLACE-READY-ACTIVATION-001
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Claves canónicas de elementos pendientes del perfil (espejo de
+ *  recalculate-profiles). Cualquier clave desconocida se ignora y se
+ *  reporta en `missing`. */
+export const PENDING_PROFILE_ITEM_KEYS: readonly PendingProfileItemKey[] = [
+  "photo", "basic_details", "location", "years_experience", "skills",
+  "bio", "cv", "experience", "certifications", "documents",
+];
+
+export interface ApplicationPendingProfileRenderInput {
+  lang: EmailLanguage | string | null | undefined;
+  /** CTA directo a completar perfil (p.ej. APP_BASE_URL + /profile). */
+  actionUrl: string;
+  vars?: Vars;
+  /** Claves de elementos pendientes (photo, cv, …). */
+  pendingItems: readonly string[];
+}
+
+function bulletListHtml(introHtml: string, itemsHtml: string[]): string {
+  const lis = itemsHtml.map((i) =>
+    `<li style="margin:0 0 6px 0; font-size:15px; line-height:22px; color:${BRAND.text};">${i}</li>`
+  ).join("");
+  return `${paragraph(introHtml)}<ul style="margin:0 0 16px 0; padding-left:22px;">${lis}</ul>`;
+}
+
+export function renderApplicationPendingProfileEmail(
+  input: ApplicationPendingProfileRenderInput,
+): RenderedEmail {
+  const { locale, lang } = pickLocale(input.lang);
+  const t = locale.templates.application_pending_profile as ApplicationPendingProfileStrings;
+  const c = locale.common;
+  const vars = commonVars(input.vars);
+  const missing = new Set<string>();
+  const url = safeUrl(input.actionUrl);
+
+  const H = (s: string) => interpolate(s, vars, "html", missing);
+  const T = (s: string) => interpolate(s, vars, "text", missing);
+
+  const bodyTpl = !vars.company && t.body_no_company ? t.body_no_company : t.body;
+
+  // Lista de elementos pendientes: solo claves conocidas; el resto se
+  // reporta en `missing` para que el test de locales lo detecte.
+  const itemKeys = input.pendingItems.filter((k): k is PendingProfileItemKey =>
+    (PENDING_PROFILE_ITEM_KEYS as readonly string[]).includes(k)
+  );
+  for (const k of input.pendingItems) {
+    if (!(PENDING_PROFILE_ITEM_KEYS as readonly string[]).includes(k)) missing.add(`pending_item:${k}`);
+  }
+  const itemTexts = itemKeys.map((k) => t.pending_items[k]);
+
+  const securityItems = [
+    H(c.never_share),
+    H(c.support_prompt).replace(escapeHtml(BRAND.support), supportLink()),
+  ];
+
+  const html = layout({
+    lang,
+    preheader: H(t.preheader),
+    heading: H(t.heading),
+    bodyHtml: paragraph(H(bodyTpl)) + paragraph(H(t.note).replace(escapeHtml(BRAND.support), supportLink())),
+    listHtml: itemTexts.length > 0
+      ? bulletListHtml(H(t.pending_intro), itemTexts.map(escapeHtml))
+      : undefined,
+    actionHtml: button(H(t.button), url, H(c.button_fallback)),
+    securityHtml: `<p style="margin:0 0 8px 0;"><strong>${H(c.security_title)}</strong></p>` +
+      securityItems.map((s) => `<p style="margin:0 0 6px 0;">${s}</p>`).join(""),
+    footerReason: H(t.footer_reason),
+    footerNoReply: H(c.footer_no_reply).replace(escapeHtml(BRAND.support), supportLink()),
+    tagline: H(c.brand_tagline),
+  });
+
+  const textLines = [
+    `PIPINGBOX — ${T(t.heading)}`,
+    "",
+    T(bodyTpl),
+    "",
+    ...(itemTexts.length > 0 ? [T(t.pending_intro), ...itemTexts.map((i) => `- ${i}`), ""] : []),
+    `${T(t.button)}: ${url}`,
+    "",
+    T(t.note),
+    "",
+    `${T(c.security_title).toUpperCase()}`,
+    `- ${T(c.never_share)}`,
+    `- ${T(c.support_prompt)}`,
+    "",
+    T(t.footer_reason),
+    T(c.footer_no_reply),
+    `PIPINGBOX · ${T(c.brand_tagline)} · ${BRAND.site}`,
+  ];
+
+  return {
+    lang,
+    template: "application_pending_profile",
+    subject: T(t.subject),
+    html,
+    text: textLines.join("\n"),
+    missing: [...missing],
+  };
+}
+
+export interface MarketplaceReadyRenderInput {
+  lang: EmailLanguage | string | null | undefined;
+  /** CTA al listado de candidaturas del usuario. */
+  actionUrl: string;
+  vars?: Vars;
+  /** Títulos de las ofertas activadas (máx. recomendado 5; ya recortados por el llamador). */
+  jobTitles: string[];
+}
+
+export function renderMarketplaceReadyEmail(
+  input: MarketplaceReadyRenderInput,
+): RenderedEmail {
+  const { locale, lang } = pickLocale(input.lang);
+  const t = locale.templates.marketplace_ready as MarketplaceReadyStrings;
+  const c = locale.common;
+  const vars = commonVars(input.vars);
+  const missing = new Set<string>();
+  const url = safeUrl(input.actionUrl);
+
+  const H = (s: string) => interpolate(s, vars, "html", missing);
+  const T = (s: string) => interpolate(s, vars, "text", missing);
+
+  const count = input.jobTitles.length;
+  // 0 títulos (o 1): cuerpo single (con {jobTitle} opcional); ≥2: multiple.
+  const bodyTpl = count >= 2 ? t.body_multiple : t.body_single;
+
+  const securityItems = [
+    H(c.never_share),
+    H(c.support_prompt).replace(escapeHtml(BRAND.support), supportLink()),
+  ];
+
+  const html = layout({
+    lang,
+    preheader: H(t.preheader),
+    heading: H(t.heading),
+    bodyHtml: paragraph(H(bodyTpl)) + paragraph(H(t.note).replace(escapeHtml(BRAND.support), supportLink())),
+    listHtml: count >= 2
+      ? bulletListHtml(H(t.activated_list_intro), input.jobTitles.map(escapeHtml))
+      : undefined,
+    actionHtml: button(H(t.button), url, H(c.button_fallback)),
+    securityHtml: `<p style="margin:0 0 8px 0;"><strong>${H(c.security_title)}</strong></p>` +
+      securityItems.map((s) => `<p style="margin:0 0 6px 0;">${s}</p>`).join(""),
+    footerReason: H(t.footer_reason),
+    footerNoReply: H(c.footer_no_reply).replace(escapeHtml(BRAND.support), supportLink()),
+    tagline: H(c.brand_tagline),
+  });
+
+  const textLines = [
+    `PIPINGBOX — ${T(t.heading)}`,
+    "",
+    T(bodyTpl),
+    ...(count >= 2
+      ? ["", T(t.activated_list_intro), ...input.jobTitles.map((j) => `- ${j}`)]
+      : []),
+    "",
+    `${T(t.button)}: ${url}`,
+    "",
+    T(t.note),
+    "",
+    `${T(c.security_title).toUpperCase()}`,
+    `- ${T(c.never_share)}`,
+    `- ${T(c.support_prompt)}`,
+    "",
+    T(t.footer_reason),
+    T(c.footer_no_reply),
+    `PIPINGBOX · ${T(c.brand_tagline)} · ${BRAND.site}`,
+  ];
+
+  return {
+    lang,
+    template: "marketplace_ready",
     subject: T(t.subject),
     html,
     text: textLines.join("\n"),

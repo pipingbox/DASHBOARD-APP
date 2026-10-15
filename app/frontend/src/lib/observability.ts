@@ -62,6 +62,12 @@ export const OBS_EVENT_NAMES = [
   'job_viewed',
   'apply_started',
   'apply_submitted',
+  // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 — candidaturas retenidas por
+  // perfil no Marketplace Ready. application_pending_profile_validation
+  // marca la candidatura guardada en estado interno; el evento backend
+  // equivalente vive en job_application_events (to_status). NO PII.
+  'application_pending_profile_validation',
+  'email_profile_completion_requested',
   // PB-CERT-UPLOAD-UX-001 — certificate upload funnel (started → completed |
   // failed). Closed property enums (bucket/size_bucket/mime/error_category)
   // are validated in buildEventProps; no file names, paths, UIDs or signed
@@ -200,6 +206,10 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   job_viewed: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade', ...TRAFFIC_ATTRIBUTION_KEYS],
   apply_started: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade', ...TRAFFIC_ATTRIBUTION_KEYS],
   apply_submitted: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade', ...TRAFFIC_ATTRIBUTION_KEYS],
+  // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 — job_id (UUID técnico, mismo
+  // tratamiento que apply_submitted); status es enum cerrado sent|not_sent.
+  application_pending_profile_validation: ['job_id'],
+  email_profile_completion_requested: ['job_id', 'status'],
   onboarding_step_reached: ['step', 'account_type'],
   onboarding_completed: ['account_type', ...TRAFFIC_ATTRIBUTION_KEYS],
   onboarding_postponed: ['account_type'],

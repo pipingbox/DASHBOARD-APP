@@ -2351,6 +2351,8 @@
     "applied": "Candidato inviato",
     "alreadyApplied": "Ha già inviato la candidatura per questa posizione",
     "applicationSubmitted": "Candidatura inviata",
+    "applicationPendingProfileTitle": "Candidatura ricevuta — completa il profilo per attivarla",
+    "applicationPendingProfileDescription": "Puoi continuare a candidarti, ma le tue candidature potranno essere presentate alle aziende solo dopo che il tuo profilo sarà validato.",
     "remote": "Da remoto",
     "applyNow": "Candidati ora",
     "allOpenPositions": "Tutte le posizioni aperte",
@@ -3258,6 +3260,7 @@
     "noCandidatesYet": "Nessun lavoratore si è ancora candidato alle tue offerte. Le candidature compariranno qui non appena arriveranno.",
     "noMatchingCandidates": "Nessun candidato corrisponde ai filtri attuali. Prova a modificare la ricerca o il filtro per stato.",
     "worker": "Lavoratore",
+    "pendingProfile": "Candidato · Profilo in sospeso",
     "applied": "Candidato",
     "reviewed": "Esaminato",
     "interview": "Colloquio",
@@ -3629,6 +3632,8 @@
     "allActions": "Tutte le azioni"
   },
   "applications": {
+    "pendingProfile": "Candidato · Profilo in sospeso",
+    "pendingProfileHint": "Completa il tuo profilo per attivare questa candidatura per la presentazione alle aziende.",
     "applied": "Inviata",
     "reviewed": "Esaminata",
     "interview": "Colloquio",

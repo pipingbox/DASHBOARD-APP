@@ -2351,6 +2351,8 @@
     "applied": "Candidatado",
     "alreadyApplied": "Já se candidatou a esta vaga",
     "applicationSubmitted": "Candidatura enviada",
+    "applicationPendingProfileTitle": "Candidatura recebida — complete o seu perfil para a ativar",
+    "applicationPendingProfileDescription": "Pode continuar a candidatar-se, mas as suas candidaturas só poderão ser apresentadas às empresas depois de o seu perfil estar validado.",
     "remote": "Remoto",
     "applyNow": "Candidatar-me",
     "allOpenPositions": "Todas as vagas abertas",
@@ -3258,6 +3260,7 @@
     "noCandidatesYet": "Ainda sem trabalhadores candidatados às suas vagas. As candidaturas aparecerão aqui quando se candidatarem.",
     "noMatchingCandidates": "Nenhum candidato corresponde aos seus filtros. Tente ajustar a sua pesquisa ou filtro de estado.",
     "worker": "Trabalhador",
+    "pendingProfile": "Candidatado · Perfil pendente",
     "applied": "Candidatado",
     "reviewed": "Revisto",
     "interview": "Entrevista",
@@ -3629,6 +3632,8 @@
     "allActions": "Todas as Ações"
   },
   "applications": {
+    "pendingProfile": "Candidatado · Perfil pendente",
+    "pendingProfileHint": "Complete o seu perfil para ativar esta candidatura para apresentação às empresas.",
     "applied": "Candidatado",
     "reviewed": "Revisto",
     "interview": "Entrevista",

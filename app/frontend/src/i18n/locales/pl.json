@@ -2354,6 +2354,8 @@
     "applied": "Aplikacja wysłana",
     "alreadyApplied": "Już aplikowałeś(-aś) na to stanowisko",
     "applicationSubmitted": "Aplikacja została wysłana",
+    "applicationPendingProfileTitle": "Zgłoszenie przyjęte — uzupełnij profil, aby je aktywować",
+    "applicationPendingProfileDescription": "Możesz dalej aplikować, ale Twoje zgłoszenia będą mogły być przedstawiane firmom dopiero po walidacji Twojego profilu.",
     "remote": "Zdalnie",
     "applyNow": "Aplikuj teraz",
     "allOpenPositions": "Wszystkie otwarte stanowiska",
@@ -3296,6 +3298,7 @@
     "noCandidatesYet": "Żaden pracownik nie aplikował jeszcze na Twoje oferty. Aplikacje pojawią się tutaj, gdy pracownicy zaczną aplikować.",
     "noMatchingCandidates": "Żaden kandydat nie pasuje do bieżących filtrów. Zmień wyszukiwanie lub filtr statusu.",
     "worker": "Pracownik",
+    "pendingProfile": "Zgłoszono · Profil oczekuje",
     "applied": "Aplikował",
     "reviewed": "Sprawdzony",
     "interview": "Rozmowa",
@@ -3667,6 +3670,8 @@
     "allActions": "Wszystkie akcje"
   },
   "applications": {
+    "pendingProfile": "Zgłoszono · Profil oczekuje",
+    "pendingProfileHint": "Uzupełnij profil, aby aktywować to zgłoszenie do prezentacji firmom.",
     "applied": "Złożona",
     "reviewed": "Przejrzana",
     "interview": "Rozmowa",
