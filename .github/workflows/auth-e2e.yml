@@ -1181,12 +1181,25 @@ jobs:
       DOC_OPEN_E2E_ANON_KEY: ${{ secrets.DOC_OPEN_E2E_ANON_KEY }}
 
     steps:
-      - name: Require expected_sha, DOC_OPEN_E2E secrets and exclusive dispatch mode
+      - name: Require expected_sha, source_ref == dispatch commit, DOC_OPEN_E2E secrets, exclusive mode
         shell: bash
         run: |
           set -euo pipefail
           if [ -z "${EXPECTED_APP_VERSION:-}" ]; then
             echo "::error::expected_sha is required when run_documents_open_real_e2e=true (the served build must be traceable to the tested SHA)."
+            exit 1
+          fi
+          # Security closure: the environment branch policy only restricts
+          # the DISPATCH ref. inputs.source_ref (default 'main') could
+          # otherwise check out ARBITRARY unreferenced code to run with the
+          # DOC_OPEN_E2E_* credentials. Fail closed unless source_ref is
+          # exactly the dispatch commit: the code executed with the
+          # credentials is pinned to github.sha — the reviewed head of the
+          # branch the environment policy authorized.
+          SRC_REF="${{ inputs.source_ref }}"
+          DISPATCH_SHA="${{ github.sha }}"
+          if [[ ! "$DISPATCH_SHA" =~ ^[0-9a-fA-F]{40}$ ]] || [ "$SRC_REF" != "$DISPATCH_SHA" ]; then
+            echo "::error::source_ref ('$SRC_REF') must be exactly the dispatch commit '$DISPATCH_SHA'. Code run with the DOC_OPEN_E2E credentials is pinned to github.sha (the head of the branch-policy-authorized ref); re-dispatch passing source_ref=<exact commit SHA>."
             exit 1
           fi
           for v in DOC_OPEN_E2E_EMAIL DOC_OPEN_E2E_PASSWORD DOC_OPEN_E2E_OTHER_EMAIL DOC_OPEN_E2E_OTHER_PASSWORD DOC_OPEN_E2E_ANON_KEY; do
@@ -1204,10 +1217,16 @@ jobs:
             fi
           done
 
-      - name: Checkout exact tested app ref
+      - name: Checkout pinned dispatch commit (never inputs.source_ref)
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.source_ref }}
+          # PB-PROFILE-STABILITY-001 security closure: the code executed
+          # with the DOC_OPEN_E2E_* credentials is ALWAYS github.sha — the
+          # head commit of the ref the workflow was dispatched from, which
+          # the environment branch policy authorized. inputs.source_ref is
+          # validated (== github.sha) by the guard step above but is never
+          # used as the checkout ref here.
+          ref: ${{ github.sha }}
           fetch-depth: 0
 
       - name: Set up Node 22
