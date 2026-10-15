@@ -211,10 +211,11 @@ export async function sendApplicationPendingProfileEmail(
   if (authErr || !user?.email) return { kind: "skipped", applicationId: p.applicationId, reason: "user_email_unavailable" };
 
   // 5. Claim atómico (idempotencia anti-reintentos).
-  const { data: claim, error: claimErr } = await supabase.rpc(
+  const { data: claimData, error: claimErr } = await supabase.rpc(
     "app_14da0f1941_claim_application_profile_pending_email",
     { p_application_id: p.applicationId, p_max_attempts: MAX_ACTIVATION_ATTEMPTS, p_lease_seconds: ACTIVATION_LEASE_SECONDS },
-  ) as { data: { claimed: boolean; state: string; attempts: number; reason: string; claim_id: string | null; delivery_phase: string | null } | null; error: unknown };
+  );
+  const claim = firstRpcRow<ClaimRow>(claimData);
 
   if (claimErr || !claim) return { kind: "failed", applicationId: p.applicationId, reason: "claim_error" };
   if (!claim.claimed || !claim.claim_id) {
@@ -270,10 +271,11 @@ export async function sendApplicationPendingProfileEmail(
       },
     });
 
-    const { data: fin } = await supabase.rpc(
+    const { data: finData } = await supabase.rpc(
       "app_14da0f1941_finalize_application_profile_pending_email",
       { p_application_id: p.applicationId, p_claim_id: claimId, p_outcome: "sent", p_message_id: result.messageId ?? null },
-    ) as { data: { finalized: boolean } | null };
+    );
+    const fin = firstRpcRow<FinalizeRow>(finData);
 
     if (!fin?.finalized) {
       return { kind: "failed", applicationId: p.applicationId, reason: "finalize_rejected" };
@@ -297,9 +299,25 @@ export async function sendApplicationPendingProfileEmail(
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// EMAIL 2 — Marketplace Ready alcanzado (drenaje del outbox)
-// ─────────────────────────────────────────────────────────────────────────────
+// PostgREST devuelve ARRAY para funciones RETURNS TABLE; el fake de los tests
+// devuelve objeto. Normalizamos en un único punto.
+function firstRpcRow<T>(data: unknown): T | null {
+  if (Array.isArray(data)) return (data[0] ?? null) as T | null;
+  return (data ?? null) as T | null;
+}
+
+interface ClaimRow {
+  claimed: boolean;
+  state: string;
+  attempts: number;
+  reason: string;
+  claim_id: string | null;
+  delivery_phase: string | null;
+}
+
+interface FinalizeRow {
+  finalized: boolean;
+}
 
 interface ActivationRow {
   id: string;
@@ -348,10 +366,11 @@ async function processActivationRow(
 ): Promise<ActivationEmailOutcome> {
   const { supabase } = d;
 
-  const { data: claim, error: claimErr } = await supabase.rpc(
+  const { data: claimData, error: claimErr } = await supabase.rpc(
     "app_14da0f1941_claim_marketplace_ready_activation",
     { p_activation_id: row.id, p_max_attempts: MAX_ACTIVATION_ATTEMPTS, p_lease_seconds: ACTIVATION_LEASE_SECONDS },
-  ) as { data: { claimed: boolean; state: string; attempts: number; reason: string; claim_id: string | null; delivery_phase: string | null } | null; error: unknown };
+  );
+  const claim = firstRpcRow<ClaimRow>(claimData);
 
   if (claimErr || !claim) return { kind: "failed", activationId: row.id, reason: "claim_error" };
   if (!claim.claimed || !claim.claim_id) {
@@ -419,10 +438,11 @@ async function processActivationRow(
       },
     });
 
-    const { data: fin } = await supabase.rpc(
+    const { data: finData } = await supabase.rpc(
       "app_14da0f1941_finalize_marketplace_ready_activation",
       { p_activation_id: row.id, p_claim_id: claimId, p_outcome: "sent", p_message_id: result.messageId ?? null },
-    ) as { data: { finalized: boolean } | null };
+    );
+    const fin = firstRpcRow<FinalizeRow>(finData);
 
     if (!fin?.finalized) {
       return { kind: "failed", activationId: row.id, reason: "finalize_rejected" };

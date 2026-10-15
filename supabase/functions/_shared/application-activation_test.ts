@@ -109,6 +109,15 @@ function fakeSupabase(cfg: FakeConfig, calls?: RecordedCall[]): SupabaseClient {
     rpc: (fn: string, args: Record<string, unknown>) => {
       calls?.push({ fn, args });
       const r = cfg.rpc(fn, args);
+      // PostgREST devuelve ARRAY para funciones RETURNS TABLE (claim/finalize/
+      // marc). Envolvemos aquí para que los tests reflejen el runtime real y
+      // detecten regresiones de normalización en el módulo.
+      if (
+        r.data && typeof r.data === "object" && !Array.isArray(r.data) &&
+        /_(claim|finalize|marc)_/.test(`_${fn}`)
+      ) {
+        return Promise.resolve({ ...r, data: [r.data] });
+      }
       return Promise.resolve(r);
     },
   } as unknown as SupabaseClient;
