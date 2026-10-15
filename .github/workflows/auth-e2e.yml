@@ -1069,7 +1069,7 @@ jobs:
           def host_allowed(host):
               return bool(host) and host.isascii() and any(p.match(host) for p in ALLOWED_HOSTS)
 
-          def split_and_validate(url):
+          def split_and_validate(url, allow_path=False):
               try:
                   u = urllib.parse.urlsplit(url)
               except ValueError:
@@ -1087,23 +1087,32 @@ jobs:
                   fail(f"invalid port in URL: {url}")
               if port is not None and port != 443:
                   fail(f"non-default port is forbidden: {url}")
-              if u.path not in ("", "/"):
-                  fail(f"target must be a bare origin, got path {u.path!r}: {url}")
-              if u.query or u.fragment:
-                  fail(f"query/fragment are forbidden in the target: {url}")
+              if not allow_path:
+                  # The dispatch target itself (and every redirect hop while
+                  # resolving it) must be a BARE origin: paths and queries are
+                  # attack surface (open redirects, crafted routes).
+                  if u.path not in ("", "/"):
+                      fail(f"target must be a bare origin, got path {u.path!r}: {url}")
+                  if u.query or u.fragment:
+                      fail(f"query/fragment are forbidden in the target: {url}")
+              else:
+                  # Only the version.json asset fetch may carry a path/query
+                  # (redirects can add cache-busters); fragments stay banned.
+                  if u.fragment:
+                      fail(f"fragment is forbidden: {url}")
               return u
 
           class NoRedirect(urllib.request.HTTPRedirectHandler):
               def redirect_request(self, req, fp, code, msg, headers, newurl):
                   return None
 
-          def fetch_validated(url, what):
+          def fetch_validated(url, what, allow_path=False):
               """GET without auto-redirect; EVERY hop (including each redirect
               target) must stay HTTPS on an authorized origin. Returns the
               final URL and response."""
               hops = 0
               while True:
-                  split_and_validate(url)
+                  split_and_validate(url, allow_path=allow_path)
                   req = urllib.request.Request(url, method="GET", headers={"User-Agent": "pb-documents-open-e2e-validator"})
                   try:
                       resp = urllib.request.build_opener(NoRedirect).open(req, timeout=20)
@@ -1129,7 +1138,7 @@ jobs:
               fail(f"expected_sha must be a full 40-hex commit SHA, got {expected!r}")
 
           final_url, _ = fetch_validated(target, "target_url")
-          vurl, resp = fetch_validated(final_url.rstrip("/") + "/version.json", "version.json")
+          vurl, resp = fetch_validated(final_url.rstrip("/") + "/version.json", "version.json", allow_path=True)
           try:
               served = json.load(resp).get("version", "")
           except Exception:
