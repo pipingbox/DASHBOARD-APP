@@ -119,7 +119,15 @@ async function expectRealSignedOpen(page: Page, button: ReturnType<typeof openAc
   expect(served.status(), 'Storage must serve the signed object').toBe(200);
   // No silent JS failure on the profile page during the open
   expect(log.pageerrors, 'no pageerror may fire during the open flow').toEqual([]);
-  await popup.close().catch(() => undefined);
+  // Best-effort popup teardown, time-boxed: closing a popup that is still
+  // STREAMING the served object (PNG renders inline) can stall on Chromium —
+  // observed a 115s hang that blew the test budget AFTER every assertion had
+  // already passed. The test verdict comes from the assertions above; the
+  // context teardown in After Hooks reclaims any lingering popup.
+  await Promise.race([
+    popup.close().catch(() => undefined),
+    new Promise((resolve) => setTimeout(resolve, 5_000)),
+  ]);
 }
 
 test.describe('PB-PROFILE-STABILITY-001 FASE 1 — real documents-open integration', () => {
