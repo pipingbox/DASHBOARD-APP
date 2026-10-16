@@ -106,11 +106,14 @@ async function main() {
   const anonCall = await fn('phone-send-otp', null, { phone: '612345678', country_code: 'ES' });
   check('J1 anon edge function sin Authorization => 401', anonCall.status === 401, JSON.stringify(anonCall.body));
   const anonVerifs = await rest(`app_14da0f1941_phone_verifications?select=id`);
-  check('J2 anon select verifications => sin filas', Array.isArray(anonVerifs.data) && anonVerifs.data.length === 0, JSON.stringify(anonVerifs.data).slice(0, 200));
+  check('J2 anon select verifications => denied/sin filas',
+    anonVerifs.status >= 400 || (Array.isArray(anonVerifs.data) && anonVerifs.data.length === 0), JSON.stringify(anonVerifs.data).slice(0, 200));
   const anonEvents = await rest(`app_14da0f1941_phone_events?select=id`);
-  check('J3 anon select events => sin filas', Array.isArray(anonEvents.data) && anonEvents.data.length === 0);
+  check('J3 anon select events => denied/sin filas',
+    anonEvents.status >= 400 || (Array.isArray(anonEvents.data) && anonEvents.data.length === 0));
   const anonOutbox = await rest(`app_14da0f1941_phone_provider_outbox?select=id`);
-  check('J4 anon select outbox => sin filas', Array.isArray(anonOutbox.data) && anonOutbox.data.length === 0);
+  check('J4 anon select outbox => denied/sin filas',
+    anonOutbox.status >= 400 || (Array.isArray(anonOutbox.data) && anonOutbox.data.length === 0));
 
   // ── Caso A: usuario auth-only sin telefono ───────────────────────────────
   console.log('== A: sin telefono (auth-only, sin perfil) ==');

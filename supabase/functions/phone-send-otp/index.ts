@@ -14,7 +14,7 @@
 //     whatsapp_opt_in_changed (telefono enmascarado).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+import * as bcrypt from "https://deno.land/x/bcrypt@v0.2.4/mod.ts";
 import { normalizeToE164, generateOtpCode } from "../_shared/phone.ts";
 import {
   createPhoneVerificationProvider,

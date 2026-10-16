@@ -8,7 +8,7 @@
 // El consentimiento WhatsApp NO se otorga aqui: vive en phone-update-consent.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+import * as bcrypt from "https://deno.land/x/bcrypt@v0.2.4/mod.ts";
 import { recordPhoneEvent } from "../_shared/phone-events.ts";
 
 const corsHeaders = {
