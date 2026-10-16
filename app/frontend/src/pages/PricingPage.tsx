@@ -28,11 +28,11 @@ const PLANS: Plan[] = [
     period: '',
     description: 'For companies getting started',
     features: [
-      { text: '3 job posts / month', included: true },
+      { text: 'Job posting', included: true },
       { text: 'Basic worker search', included: true },
       { text: 'Company profile page', included: true },
-      { text: 'Certification verification', included: false },
-      { text: 'ATS (Applicant Tracking)', included: false },
+      { text: 'Candidate messaging', included: true },
+      { text: 'Candidate pipeline (ATS)', included: false },
       { text: 'Analytics dashboard', included: false },
     ],
     cta: 'Get started',
@@ -44,12 +44,12 @@ const PLANS: Plan[] = [
     period: '/month',
     description: 'For growing companies hiring regularly',
     features: [
-      { text: '15 job posts / month', included: true },
+      { text: 'Job posting', included: true },
       { text: 'Advanced worker search + filters', included: true },
-      { text: 'Certification verification', included: true },
-      { text: '2 recruiter accounts', included: true },
-      { text: 'ATS (Applicant Tracking)', included: false },
+      { text: 'Candidate pipeline (ATS)', included: true },
+      { text: 'Candidate certification profiles', included: true },
       { text: 'Analytics dashboard', included: false },
+      { text: 'Multi-recruiter enterprise dashboard', included: false },
     ],
     cta: 'Start free trial',
     ctaHref: 'mailto:hello@pipingbox.com?subject=PipingBox%20Professional',
@@ -63,16 +63,31 @@ const PLANS: Plan[] = [
     description: 'For large-scale industrial contractors',
     features: [
       { text: 'Unlimited job posts', included: true },
-      { text: 'Advanced search + saved filters', included: true },
-      { text: 'Certification verification + compliance reports', included: true },
-      { text: '10 recruiter accounts', included: true },
-      { text: 'ATS + candidate pipeline (Kanban)', included: true },
-      { text: 'Analytics dashboard + export', included: true },
+      { text: 'Advanced worker search + filters', included: true },
+      { text: 'Candidate certification profiles', included: true },
+      { text: 'Multi-recruiter enterprise dashboard', included: true },
+      { text: 'Workforce requests', included: true },
+      { text: 'Analytics dashboard', included: true },
     ],
     cta: 'Contact sales',
     ctaHref: 'mailto:hello@pipingbox.com?subject=PipingBox%20Enterprise',
   },
 ];
+
+/* PB-COMPANY-MVP-PHASE-0-001 (2026-10-16) — pricing-page truth pass.
+ *
+ * Every feature line above now maps to a capability that is live and verified, per
+ * brain/02-PRODUCT/COMPANY_PRODUCT_GAP_MATRIX.md. Removed as unverified promises:
+ * - "3 / 15 job posts per month": plan quotas are not enforced (entitlements not applied).
+ * - "Certification verification": the end-to-end verify workflow is not deployed; what
+ *   companies have today are candidate certification profiles (CandidateProfile).
+ * - "2 / 10 recruiter accounts": no team-account management exists. What exists is the
+ *   multi-recruiter enterprise dashboard aggregating across company users.
+ * - "Compliance reports", "Analytics dashboard + export", "saved filters", "(Kanban)":
+ *   not built.
+ * "Analytics dashboard" moved to Enterprise only: CompanyAnalytics/EnterpriseDashboard
+ * render real, vocabulary-correct metrics after this release.
+ * Prices remain resolved from the Stripe catalog (no public price literals — GO rule). */
 
 export default function PricingPage() {
   const { t } = useTranslation();

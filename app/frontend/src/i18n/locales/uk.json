@@ -3241,7 +3241,7 @@
     "workforceRequests": "Запити на робочу силу",
     "savedCandidates": "Збережені кандидати",
     "interviewsPending": "Заплановані співбесіди",
-    "hiresThisMonth": "Найнято цього місяця",
+    "hiresThisMonth": "Найнято",
     "recentActivity": "Остання активність",
     "events": "Подій: {{count}}",
     "noRecentActivity": "Немає останньої активності.",

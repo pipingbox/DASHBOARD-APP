@@ -75,8 +75,6 @@ export default function CompanyDashboard() {
       setLoading(true);
 
       const userId = profile?.user_id;
-      const now = new Date();
-      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
       // Fetch company-specific data
       const [jobsRes, appsRes, leadsRes] = await Promise.all([
@@ -87,7 +85,7 @@ export default function CompanyDashboard() {
           .limit(50),
         supabase
           .from(TABLES.jobApplications)
-          .select('id, created_at, applicant_name, job_title, status')
+          .select('id, created_at, applicant_name, job_title, status, job_id')
           .order('created_at', { ascending: false })
           .limit(50),
         supabase
@@ -100,22 +98,25 @@ export default function CompanyDashboard() {
       if (!mounted) return;
 
       const allJobs = (jobsRes.data || []) as JobItem[];
-      const allApps = (appsRes.data || []) as { id: string; created_at: string; applicant_name: string; job_title: string; status: string }[];
+      const allApps = (appsRes.data || []) as { id: string; created_at: string; applicant_name: string; job_title: string; status: string; job_id: string | null }[];
       const allLeads = (leadsRes.data || []) as { id: string; created_at: string; company_name: string; workers_needed: string; status: string; country: string }[];
 
       // Compute metrics
       const activeJobs = allJobs.filter((j) => j.status === 'open' || j.status === 'active' || !j.status).length;
-      const hiresThisMonth = allApps.filter(
-        (a) => a.status === 'hired' && new Date(a.created_at).toISOString() >= monthAgo
-      ).length;
+      // All-time hires, labelled honestly: the table records `previous_status` but no
+      // transition timestamp, so "hired this month" cannot be derived without lying
+      // about when the hire happened (PB-ENTERPRISE-STATUS-VOCABULARY-001 §1.4).
+      const hires = allApps.filter((a) => a.status === 'hired').length;
 
       setMetrics({
         activeJobs,
         totalApplications: allApps.length,
         workforceRequests: allLeads.length,
-        savedCandidates: allApps.filter((a) => a.status === 'shortlisted' || a.status === 'saved').length,
+        // `saved` is not a token the application state machine can ever write
+        // (sql/034 vocabulary); only canonical `shortlisted` counts.
+        savedCandidates: allApps.filter((a) => a.status === 'shortlisted').length,
         interviewsPending: allApps.filter((a) => a.status === 'interview').length,
-        hiresThisMonth,
+        hiresThisMonth: hires,
       });
 
       // Build activity feed
@@ -156,10 +157,12 @@ export default function CompanyDashboard() {
       items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       setActivity(items.slice(0, 12));
 
-      // Set jobs with application counts
+      // Set jobs with application counts. Matched by job_id, not by title: two jobs
+      // can share a title and titled matching silently miscounts both
+      // (PB-APPLICATION-COUNT-INTEGRITY-001 consumers).
       const jobsWithCounts = allJobs.slice(0, 5).map((j) => ({
         ...j,
-        applications_count: allApps.filter((a) => a.job_title === j.title).length,
+        applications_count: allApps.filter((a) => a.job_id === j.id).length,
       }));
       setJobs(jobsWithCounts);
 
