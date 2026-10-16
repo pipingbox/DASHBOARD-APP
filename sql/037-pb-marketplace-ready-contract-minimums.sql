@@ -50,25 +50,11 @@
 --   Consentimiento-> profile_visibility / cv_visible + declaración del wizard,
 --                    sin cambios respecto a sql/036.
 --
--- ─── NOTA TELÉFONO (BLOQUEANTE DOCUMENTADO) ─────────────────────────────────
--- El requisito de teléfono se implementa pero queda DESACTIVADO por defecto.
--- Motivo, verificado en producción el 2026-10-16:
---   * `app_14da0f1941_profiles` NO tiene ninguna columna de teléfono.
---   * La tabla `app_14da0f1941_phone_verifications` NO existe.
---   * Las edge functions phone-send-otp / phone-verify-otp /
---     phone-withdraw-consent de PB-PHONE-VERIFICATION-001 están desplegadas
---     contra esa columna y esa tabla inexistentes, y la UI vive detrás del flag
---     VITE_PHONE_VERIFICATION_ENABLED.
---   * La única fuente de teléfono que existe hoy es `auth.users.phone`, y está
---     vacía para el 100% de los perfiles (0 de 43 ready).
--- Activar el requisito hoy dejaría 0 perfiles Marketplace Ready y mandaría
--- TODA candidatura nueva a pending_profile_validation sin que el usuario tenga
--- forma de aportar el dato. Por eso `pb_marketplace_contract_phone_required()`
--- devuelve false y el predicado ya está escrito para cuando se active: basta
--- una migración de una línea cuando la captura esté operativa.
--- NO se crean columnas de teléfono aquí: esa es la migración pendiente de
--- PB-PHONE-VERIFICATION-001 y crearla a medias dejaría una fuente de verdad
--- vacía e inalimentable.
+-- ─── NOTA TELÉFONO (DEPENDENCIA DE DESPLIEGUE) ─────────────────────────────
+-- Aplicar sql/038 y desplegar primero la UX de captura/edicion de telefono.
+-- Esta migracion exige profiles.phone_e164 como minimo obligatorio.
+-- No desplegar sql/037 hasta tener QA completo y GO explicito para fase 2.
+-- El flujo OTP legado no esta operativo; OTP no forma parte del minimo.
 --
 -- ─── SEGURIDAD ──────────────────────────────────────────────────────────────
 --   * Todas las funciones SECURITY INVOKER, search_path=public, EXECUTE solo
@@ -94,13 +80,10 @@ STABLE
 SECURITY INVOKER
 SET search_path = public
 AS $$
-  -- Punto UNICO de lectura del telefono. Hoy la unica fuente existente en
-  -- produccion es auth.users.phone. Cuando PB-PHONE-VERIFICATION-001 despliegue
-  -- su migracion (profiles.phone_e164 + phone_verifications), reapuntar SOLO
-  -- esta funcion: ningun otro sitio lee el telefono para el contrato.
   SELECT EXISTS (
-    SELECT 1 FROM auth.users u
-    WHERE u.id = p_user_id AND coalesce(btrim(u.phone), '') <> ''
+    SELECT 1 FROM public.app_14da0f1941_profiles p
+    WHERE p.user_id = p_user_id
+      AND p.phone_e164 ~ '^\+[1-9][0-9]{7,14}$'
   );
 $$;
 
@@ -111,11 +94,7 @@ IMMUTABLE
 SECURITY INVOKER
 SET search_path = public
 AS $$
-  -- FALSE a proposito. No hay captura de telefono operativa en produccion
-  -- (0 de 43 perfiles ready tienen telefono en la unica fuente existente), de
-  -- modo que exigirlo dejaria 0 perfiles Marketplace Ready. Cambiar a TRUE en
-  -- una migracion propia cuando la captura este desplegada y medida.
-  SELECT false;
+  SELECT true;
 $$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -428,8 +407,7 @@ BEGIN
     SELECT * INTO m FROM public.pb_marketplace_minimums(r.user_id);
     v_consent := public.pb_marketplace_consent(r.profile_visibility, r.cv_visible, true);
     v_completion := public.pb_profile_completion_score(r.user_id);
-    v_new_ready := m.ok_minimums AND coalesce(v_consent, false)
-                   AND coalesce(v_completion, 0) >= 30;
+    v_new_ready := public.pb_marketplace_ready_for(r.user_id, true);
     v_new_status := public.pb_onboarding_status(v_completion, v_new_ready, r.full_name, r.title);
 
     v_fails := (CASE WHEN m.ok_cv THEN 0 ELSE 1 END)
@@ -505,9 +483,9 @@ GRANT EXECUTE ON FUNCTION public.pb_reconcile_marketplace_ready(boolean, text, i
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 7. COMMENT ON
 -- ─────────────────────────────────────────────────────────────────────────────
-COMMENT ON FUNCTION public.pb_marketplace_phone_present(uuid) IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: punto UNICO de lectura del telefono para el contrato. Hoy auth.users.phone; reapuntar a profiles.phone_e164 cuando PB-PHONE-VERIFICATION-001 despliegue su migracion.';
-COMMENT ON FUNCTION public.pb_marketplace_contract_phone_required() IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: palanca del requisito de telefono. FALSE porque no hay captura operativa en produccion (0 perfiles con telefono); activarla dejaria 0 perfiles Marketplace Ready.';
-COMMENT ON FUNCTION public.pb_marketplace_minimums(uuid) IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: minimos documentales del contrato (CV objeto en Storage, certificado/evidencia con archivo, disponibilidad definida, telefono si esta activado). Devuelve el detalle por requisito para UI, soporte y reconciliacion.';
+COMMENT ON FUNCTION public.pb_marketplace_phone_present(uuid) IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: fuente canonica unica profiles.phone_e164, despues de sql/038.';
+COMMENT ON FUNCTION public.pb_marketplace_contract_phone_required() IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: telefono obligatorio; aplicar despues de la captura real de sql/038 y con GO explicito.';
+COMMENT ON FUNCTION public.pb_marketplace_minimums(uuid) IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: minimos documentales (CV objeto en Storage, evidencia profesional con archivo, disponibilidad definida, telefono E.164 obligatorio). Detalle por requisito para reconciliacion.';
 COMMENT ON FUNCTION public.pb_marketplace_ready_for(uuid, boolean) IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: predicado canonico UNICO de marketplace_ready = minimos + consentimiento declarado y registrado + completion>=30. Lo usan pb_complete_onboarding, pb_recalculate_profile_state y la reconciliacion. El gate de Jobs sigue leyendo marketplace_ready.';
 COMMENT ON FUNCTION public.pb_reconcile_marketplace_ready(boolean, text, integer) IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: reconciliacion historica. Nace en dry-run, registra el estado previo en pb_marketplace_ready_reconcile_log, clasifica A-G, solo degrada, nunca promueve, no toca candidaturas ni envia emails.';
 
