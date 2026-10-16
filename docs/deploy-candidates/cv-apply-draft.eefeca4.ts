@@ -167,7 +167,8 @@ Deno.serve(async (req) => {
     if (column === "skills") {
       const incoming = Array.isArray(value) ? value.filter((s2) => typeof s2 === "string" && s2.trim() !== "") : [];
       if (!incoming.length) continue;
-      const existing2 = Array.isArray(profile["skills"]) ? profile["skills"] : [];
+      const alreadyPatched = Array.isArray(patch["skills"]) ? patch["skills"] : [];
+      const existing2 = alreadyPatched.length > 0 ? alreadyPatched : Array.isArray(profile["skills"]) ? profile["skills"] : [];
       const merged = [.../* @__PURE__ */ new Set([...existing2, ...incoming.map((s2) => s2.trim())])];
       if (merged.length !== existing2.length) {
         patch["skills"] = merged;
