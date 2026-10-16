@@ -377,6 +377,16 @@ BEGIN
     RETURN;
   END IF;
 
+  -- Transición perezosa (hallado en QA): una invitación pendiente ya caducada
+  -- por tiempo sigue ocupando el índice único pending_uniq e impediría invitar
+  -- de nuevo (23505). Se marca 'expired' antes de emitir la nueva.
+  UPDATE public.app_company_invitations
+  SET status = 'expired'
+  WHERE company_id = p_company_id
+    AND email_normalized = v_email
+    AND status = 'pending'
+    AND expires_at <= now();
+
   -- Token backend-only; solo se persiste el hash SHA-256.
   -- pgcrypto vive en el schema 'extensions': hay que cualificar SIEMPRE porque
   -- este RPC fija search_path='public','pg_temp' (sin extensions a propósito).

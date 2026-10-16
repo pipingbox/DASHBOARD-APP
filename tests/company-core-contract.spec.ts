@@ -142,6 +142,12 @@ test.describe('invitation security', () => {
     expect(SQL).toContain('already_pending boolean');
     expect(SQL).toContain('RETURN QUERY SELECT v_existing, NULL::text, true;');
   });
+
+  test('time-expired pending invitations are lazily retired before re-inviting (QA finding)', () => {
+    // A pending-but-expired row still holds the pending_uniq slot; without this
+    // transition a re-invite fails with 23505 duplicate key.
+    expect(SQL).toMatch(/SET status = 'expired'[\s\S]{0,200}expires_at <= now\(\)/);
+  });
 });
 
 test.describe('owner invariants', () => {
@@ -189,6 +195,14 @@ test.describe('rollback', () => {
     for (const table of TABLES) {
       expect(ROLLBACK).toContain(`DROP TABLE IF EXISTS public.${table};`);
     }
+  });
+
+  test('tables drop BEFORE membership helpers (policies reference them — QA finding)', () => {
+    const tablesPos = ROLLBACK.indexOf('DROP TABLE IF EXISTS public.app_companies;');
+    const helperPos = ROLLBACK.indexOf('DROP FUNCTION IF EXISTS public.pb_is_company_member(uuid);');
+    expect(tablesPos).toBeGreaterThan(-1);
+    expect(helperPos).toBeGreaterThan(-1);
+    expect(tablesPos).toBeLessThan(helperPos);
   });
 
   test('never touches legacy tables or audit history', () => {

@@ -24,13 +24,13 @@
 --   empresa originales siguen intactas en profiles/jobs/applications — y
 --   (b) el rollback está pensado para QA antes de que exista uso real del tenant.
 --
--- ORDEN
---   1. RPCs de gestión (usan helpers y tablas).
---   2. Función de auditoría pb_company_audit.
---   3. Funciones helper (las policies de las tablas las referencian; las
---      policies se eliminan con el DROP TABLE, pero dropear helpers antes de las
---      tablas es el orden siempre seguro).
---   4. Tablas (policies, índices y constraints se van con ellas).
+-- ORDEN (corregido tras prueba real de rollback en QA: las policies de las
+-- tablas referencian a los helpers, por lo que los helpers NO pueden dropearse
+-- antes que las tablas — Postgres lo rechaza con 2BP01 dependent objects).
+--   1. RPCs de gestión (dependen de helpers y tablas).
+--   2. Tablas (arrastran sus policies, que son las que referencian a los helpers).
+--   3. Funciones helper de membresía.
+--   4. Función de auditoría pb_company_audit.
 --
 -- IDEMPOTENTE: todo es IF EXISTS.
 -- EJECUCIÓN: Supabase SQL Editor (service role) o psql. Transacción única.
@@ -51,9 +51,11 @@ DROP FUNCTION IF EXISTS public.pb_company_transfer_ownership(uuid, uuid);
 DROP FUNCTION IF EXISTS public.pb_company_members(uuid);
 DROP FUNCTION IF EXISTS public.pb_company_my_context();
 
--- ── 2. Auditoría ─────────────────────────────────────────────────────────────
+-- ── 2. Tablas (arrastran las policies que referencian a los helpers) ─────────
 
-DROP FUNCTION IF EXISTS public.pb_company_audit(text, text, text, text);
+DROP TABLE IF EXISTS public.app_company_invitations;
+DROP TABLE IF EXISTS public.app_company_memberships;
+DROP TABLE IF EXISTS public.app_companies;
 
 -- ── 3. Helpers de membresía ──────────────────────────────────────────────────
 
@@ -61,11 +63,9 @@ DROP FUNCTION IF EXISTS public.pb_company_role(uuid);
 DROP FUNCTION IF EXISTS public.pb_is_company_member(uuid);
 DROP FUNCTION IF EXISTS public.pb_is_company_admin_or_owner(uuid);
 
--- ── 4. Tablas (policies, índices y constraints se eliminan con ellas) ────────
+-- ── 4. Auditoría ─────────────────────────────────────────────────────────────
 
-DROP TABLE IF EXISTS public.app_company_invitations;
-DROP TABLE IF EXISTS public.app_company_memberships;
-DROP TABLE IF EXISTS public.app_companies;
+DROP FUNCTION IF EXISTS public.pb_company_audit(text, text, text, text);
 
 COMMIT;
 
