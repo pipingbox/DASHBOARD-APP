@@ -79,6 +79,9 @@ const UID_B = 'b22ce000-0000-4000-8000-00000000000b';
 async function cleanupVerifications() {
   await svc(`app_14da0f1941_phone_verifications?user_id=eq.${UID_A}`, { method: 'DELETE' });
   await svc(`app_14da0f1941_phone_provider_outbox?user_id=eq.${UID_A}`, { method: 'DELETE' });
+  // FIX1: el throttle (ventana/cooldown) vive en phone_rate_limits; el reset
+  // QA tambien lo limpia para que cada seccion parta de ventana vacia.
+  await svc(`app_14da0f1941_phone_rate_limits?user_id=eq.${UID_A}`, { method: 'DELETE' });
 }
 
 async function lastCapturedCode() {
@@ -187,6 +190,15 @@ async function main() {
     profM?.whatsapp_job_alerts_opt_in === false && profM?.whatsapp_marketing_opt_in === false && profM?.whatsapp_service_opt_in === false);
   check('M3 whatsapp_opted_out_at con timestamp', profM?.whatsapp_opted_out_at !== null);
 
+  // ── FIX L3: re-opt-in CONSERVA la fecha de ultima retirada ───────────────
+  console.log('== L3: re-opt-in conserva opted_out_at ==');
+  const consL3 = await fn('phone-update-consent', tokA, { job_alerts_opt_in: true });
+  check('L3-1 re-opt-in ok', consL3.status === 200 && consL3.body.whatsapp_job_alerts_opt_in === true, JSON.stringify(consL3.body));
+  const profL3 = await getProfileA(tokA);
+  check('L3-2 opted_out_at conservado tras reactivar', profL3?.whatsapp_opted_out_at !== null && profL3?.whatsapp_opted_out_at === profM?.whatsapp_opted_out_at,
+    `M=${profM?.whatsapp_opted_out_at} L3=${profL3?.whatsapp_opted_out_at}`);
+  await fn('phone-update-consent', tokA, { job_alerts_opt_in: false });
+
   // ── Caso G: reenvio invalida el codigo anterior + cooldown ───────────────
   console.log('== G: reenvio OTP ==');
   await cleanupVerifications();
@@ -215,6 +227,9 @@ async function main() {
   check('E1 codigo expirado => code_expired', verE.status === 400 && verE.body.error === 'code_expired', JSON.stringify(verE.body));
   const profE = await getProfileA(tokA);
   check('E2 no verifica con expirado', profE?.phone_verified === true && profE?.phone_e164 === '+34612345678' ? profE.phone_verified_at !== null : profE?.phone_verified === false);
+  // FIX M1: el intento expirado TAMBIEN consume presupuesto del challenge.
+  const verifsE = await svc(`app_14da0f1941_phone_verifications?user_id=eq.${UID_A}&select=attempts&order=created_at.desc&limit=1`);
+  check('E3 expirado consume attempt (M1)', verifsE.data?.[0]?.attempts === 1, JSON.stringify(verifsE.data));
 
   // ── Caso F: demasiados intentos + rate limit de envios ───────────────────
   console.log('== F: max intentos + rate limit ==');
@@ -226,16 +241,20 @@ async function main() {
   }
   const verF = await fn('phone-verify-otp', tokA, { code: '999999' });
   check('F1 sexto intento => max_attempts_exceeded', verF.status === 400 && verF.body.error === 'max_attempts_exceeded', JSON.stringify(verF.body));
-  // Rate limit: 3 envios en la hora => 4o bloqueado
+  // Rate limit (FIX L1): la ventana vive en el throttle atomico. Se simula
+  // una ventana llena (send_count=3, max=3) y se comprueba el 429.
   await cleanupVerifications();
   await fn('phone-send-otp', tokA, { phone: '+34612345678', country_code: 'ES' });
-  await svc(`app_14da0f1941_phone_verifications?user_id=eq.${UID_A}&verified_at=is.null`, { method: 'PATCH', body: { expires_at: new Date(Date.now() - 61000).toISOString() } });
-  await svc(`app_14da0f1941_phone_verifications?user_id=eq.${UID_A}`, { method: 'PATCH', body: { created_at: new Date(Date.now() - 3500000).toISOString() } });
-  await fn('phone-send-otp', tokA, { phone: '+34612345678', country_code: 'ES' });
-  await svc(`app_14da0f1941_phone_verifications?user_id=eq.${UID_A}`, { method: 'PATCH', body: { created_at: new Date(Date.now() - 3000000).toISOString() } });
-  await fn('phone-send-otp', tokA, { phone: '+34612345678', country_code: 'ES' });
+  await svc(`app_14da0f1941_phone_rate_limits?user_id=eq.${UID_A}`, {
+    method: 'PATCH',
+    body: {
+      send_count: 3,
+      send_window_start: new Date().toISOString(),
+      last_send_at: new Date(Date.now() - 3600000).toISOString(),
+    },
+  });
   const sendF4 = await fn('phone-send-otp', tokA, { phone: '+34612345678', country_code: 'ES' });
-  check('F2 4o envio en la hora => rate_limit_exceeded', sendF4.status === 429 && sendF4.body.error === 'rate_limit_exceeded', JSON.stringify(sendF4.body));
+  check('F2 envio con ventana llena => rate_limit_exceeded', sendF4.status === 429 && sendF4.body.error === 'rate_limit_exceeded', JSON.stringify(sendF4.body));
 
   // ── Caso H: cambio de numero verificado ──────────────────────────────────
   console.log('== H: cambio de numero ==');
@@ -256,6 +275,101 @@ async function main() {
   const verH = await fn('phone-verify-otp', tokA, { code: codeH });
   check('H6 re-verificacion del nuevo numero ok', verH.status === 200 && verH.body.verified === true);
 
+  // ── FIX M1: gate de verificaciones BLOQUEA tras agotar la ventana ────────
+  console.log('== N-M1: verify rate limit con bloqueo efectivo ==');
+  await cleanupVerifications();
+  const sendM1 = await fn('phone-send-otp', tokA, { phone: '+32477123456', country_code: 'BE' });
+  check('M1-1 envio ok', sendM1.status === 200, JSON.stringify(sendM1.body));
+  const evsBefore = (await events()).length;
+  // Simular ventana de verify agotada (15/hora).
+  await svc(`app_14da0f1941_phone_rate_limits?user_id=eq.${UID_A}`, {
+    method: 'PATCH',
+    body: { verify_count: 15, verify_window_start: new Date().toISOString() },
+  });
+  const verM1 = await fn('phone-verify-otp', tokA, { code: '123456' });
+  check('M1-2 verify con ventana agotada => 429 verify_rate_limited',
+    verM1.status === 429 && verM1.body.error === 'verify_rate_limited', JSON.stringify(verM1.body));
+  const evsAfter = (await events()).length;
+  check('M1-3 el bloqueo NO escribe auditoria (sin escrituras ilimitadas)', evsAfter === evsBefore, `before=${evsBefore} after=${evsAfter}`);
+
+  // ── FIX M2: una fila provider='mock' SIN mock_enabled NO activa el mock ──
+  console.log('== N-M2: barrera anti-mock fail-safe ==');
+  await svc(`app_14da0f1941_phone_provider_config?id=eq.true`, { method: 'PATCH', body: { mock_enabled: false } });
+  await cleanupVerifications();
+  const sendM2 = await fn('phone-send-otp', tokA, { phone: '+32477123456', country_code: 'BE' });
+  check('M2-1 mock_enabled=false => 503 sms_provider_not_configured',
+    sendM2.status === 503 && sendM2.body.error === 'sms_provider_not_configured', JSON.stringify(sendM2.body));
+  await svc(`app_14da0f1941_phone_provider_config?id=eq.true`, { method: 'PATCH', body: { mock_enabled: true } });
+  await cleanupVerifications();
+  const sendM2b = await fn('phone-send-otp', tokA, { phone: '+32477123456', country_code: 'BE' });
+  check('M2-2 mock_enabled=true + ref QA => mock operativo de nuevo', sendM2b.status === 200, JSON.stringify(sendM2b.body));
+
+  // ── FIX L1: atomicidad bajo concurrencia (cooldown y ventana) ────────────
+  console.log('== N-L1: gates atomicos con solicitudes concurrentes ==');
+  await cleanupVerifications();
+  const concurrent1 = await Promise.all([
+    fn('phone-send-otp', tokA, { phone: '+32477123456', country_code: 'BE' }),
+    fn('phone-send-otp', tokA, { phone: '+32477123456', country_code: 'BE' }),
+    fn('phone-send-otp', tokA, { phone: '+32477123456', country_code: 'BE' }),
+  ]);
+  const ok1 = concurrent1.filter((r) => r.status === 200).length;
+  const cool1 = concurrent1.filter((r) => r.status === 429 && r.body.error === 'resend_cooldown').length;
+  check('L1-1 3 sends concurrentes => exactamente 1 exito y 2 cooldown',
+    ok1 === 1 && cool1 === 2, JSON.stringify(concurrent1.map((r) => [r.status, r.body.error])));
+  // Ventana casi llena: solo queda 1 envio de presupuesto; 3 concurrentes.
+  await svc(`app_14da0f1941_phone_rate_limits?user_id=eq.${UID_A}`, {
+    method: 'PATCH',
+    body: {
+      send_count: 2,
+      send_window_start: new Date().toISOString(),
+      last_send_at: new Date(Date.now() - 3600000).toISOString(),
+    },
+  });
+  const concurrent2 = await Promise.all([
+    fn('phone-send-otp', tokA, { phone: '+32477123456', country_code: 'BE' }),
+    fn('phone-send-otp', tokA, { phone: '+32477123456', country_code: 'BE' }),
+    fn('phone-send-otp', tokA, { phone: '+32477123456', country_code: 'BE' }),
+  ]);
+  const ok2 = concurrent2.filter((r) => r.status === 200).length;
+  const rejected2 = concurrent2.filter((r) => r.status === 429).length;
+  // Con 1 hueco y 3 concurrentes, EXACTAMENTE 1 pasa; el resto recibe 429
+  // (rate_limit_exceeded o resend_cooldown: el gate comprueba cooldown
+  // primero, y el ganador renueva last_send_at). La propiedad clave es la
+  // atomicidad: jamas pasan 2 con un solo hueco.
+  check('L1-2 3 concurrentes con 1 hueco => exactamente 1 exito y 2 rechazos 429',
+    ok2 === 1 && rejected2 === 2, JSON.stringify(concurrent2.map((r) => [r.status, r.body.error])));
+
+  // ── FIX L2: verified:true SOLO si persiste para numero/challenge vigente ─
+  console.log('== N-L2: carrera verify vs cambio de numero ==');
+  await cleanupVerifications();
+  const sendL2 = await fn('phone-send-otp', tokA, { phone: '+32477123456', country_code: 'BE' });
+  check('L2-1 envio ok', sendL2.status === 200, JSON.stringify(sendL2.body));
+  const codeL2 = (await lastCapturedCode()).captured_code;
+  // Simular carrera: el numero vigente del perfil cambia (service_role) tras
+  // emitir el OTP y antes del verify. El challenge sigue pendiente.
+  const racePatch = await svc(`app_14da0f1941_profiles?user_id=eq.${UID_A}`, {
+    method: 'PATCH',
+    body: { phone_e164: '+34699888777', phone_verified: false, phone_verified_at: null },
+  });
+  const raceSimulated = racePatch.status < 300 && Array.isArray(racePatch.data) && racePatch.data.length === 1;
+  if (raceSimulated) {
+    const verL2 = await fn('phone-verify-otp', tokA, { code: codeL2 });
+    check('L2-2 verify con numero vigente distinto => 409 verification_superseded',
+      verL2.status === 409 && verL2.body.error === 'verification_superseded', JSON.stringify(verL2.body));
+    const profL2 = await getProfileA(tokA);
+    check('L2-3 el numero NO queda verificado (sin verified:true falso)',
+      profL2?.phone_verified === false && profL2?.phone_e164 === '+34699888777', JSON.stringify({ v: profL2?.phone_verified, p: profL2?.phone_e164 }));
+    // Restaurar: el challenge quedo marcado verified_at pero el perfil no;
+    // cleanup total + reenvio deja el estado consistente para las secciones siguientes.
+    await cleanupVerifications();
+  } else {
+    // El guard bloquea el PATCH directo incluso a service_role: la carrera
+    // real via send-otp (cambio de numero invalida challenge y verificacion)
+    // ya esta cubierta por el caso H. Se reporta como SKIP, no como PASS.
+    console.log(`  SKIP L2-2/L2-3: PATCH service al perfil rechazado (status=${racePatch.status}); carrera cubierta por caso H`);
+    await cleanupVerifications();
+  }
+
   // ── Caso I: cross-user ───────────────────────────────────────────────────
   console.log('== I: cross-user (B no ve ni toca a A) ==');
   const readAasB = await rest(`app_14da0f1941_profiles?select=user_id,phone_e164&user_id=eq.${UID_A}`, tokB);
@@ -273,10 +387,11 @@ async function main() {
   const outboxAsB = await rest(`app_14da0f1941_phone_provider_outbox?select=id`, tokB);
   check('I5 B lee outbox => denied/sin filas',
     outboxAsB.status >= 400 || (Array.isArray(outboxAsB.data) && outboxAsB.data.length === 0));
-  // Guard: escritura directa de columnas protegidas por el propio usuario
+  // Guard: escritura directa de columnas protegidas por el propio usuario.
+  // Escalada real (false -> true): un no-op seria ignorado por el guard.
   const selfHack = await rest(`app_14da0f1941_profiles?user_id=eq.${UID_A}`, tokA, {
     method: 'PATCH',
-    body: { phone_verified: false },
+    body: { phone_verified: true },
   });
   check('I6 A intenta escribir phone_verified directo => guard lo rechaza', selfHack.status >= 400, `status=${selfHack.status} ${JSON.stringify(selfHack.data).slice(0, 120)}`);
   const selfHack2 = await rest(`app_14da0f1941_profiles?user_id=eq.${UID_A}`, tokA, {
@@ -307,6 +422,36 @@ async function main() {
   check('W2 telefono eliminado', profW?.phone_e164 === null && profW?.phone_present === false);
   check('W3 verificacion reseteada', profW?.phone_verified === false && profW?.phone_verified_at === null);
   check('W4 opt-ins false + opted_out_at', profW?.whatsapp_job_alerts_opt_in === false && profW?.whatsapp_opted_out_at !== null);
+
+  // ── FIX L4: retencion configurable (purga challenges y capturas QA) ──────
+  console.log('== N-L4: retencion con pb_phone_purge_retention ==');
+  const daysAgo = (d) => new Date(Date.now() - d * 86400000).toISOString();
+  // Challenge antiguo (40d) + reciente (1d); captura antigua (10d) + reciente (1d).
+  await svc(`app_14da0f1941_phone_verifications`, { method: 'POST', body: [
+    { user_id: UID_A, phone_e164: '+34612345678', otp_code_hash: 'ret-old', attempts: 0, expires_at: daysAgo(40), created_at: daysAgo(40) },
+    { user_id: UID_A, phone_e164: '+34612345678', otp_code_hash: 'ret-new', attempts: 0, expires_at: daysAgo(1), created_at: daysAgo(1) },
+  ] });
+  await svc(`app_14da0f1941_phone_provider_outbox`, { method: 'POST', body: [
+    { user_id: UID_A, to_phone: '+34612345678', body: 'old', captured_code: '111111', provider: 'mock', created_at: daysAgo(10) },
+    { user_id: UID_A, to_phone: '+34612345678', body: 'new', captured_code: '222222', provider: 'mock', created_at: daysAgo(1) },
+  ] });
+  const evsBeforePurge = (await events()).length;
+  const purge = await svc(`rpc/pb_phone_purge_retention`, { method: 'POST', body: {} });
+  check('L4-1 purge rpc ok', purge.status === 200 && purge.data?.phone_verifications_deleted >= 1 && purge.data?.phone_provider_outbox_deleted >= 1,
+    `status=${purge.status} ${JSON.stringify(purge.data)}`);
+  check('L4-2 retenciones configuradas leidas (30d/7d)',
+    purge.data?.phone_verifications_retention_days === 30 && purge.data?.phone_provider_outbox_retention_days === 7, JSON.stringify(purge.data));
+  const verifsAfter = await svc(`app_14da0f1941_phone_verifications?user_id=eq.${UID_A}&select=otp_code_hash`);
+  const hashes = (verifsAfter.data ?? []).map((r) => r.otp_code_hash);
+  check('L4-3 challenge antiguo purgado, reciente conservado',
+    !hashes.includes('ret-old') && hashes.includes('ret-new'), JSON.stringify(hashes));
+  const outboxAfter = await svc(`app_14da0f1941_phone_provider_outbox?user_id=eq.${UID_A}&select=body`);
+  const bodies = (outboxAfter.data ?? []).map((r) => r.body);
+  check('L4-4 captura antigua purgada, reciente conservada',
+    !bodies.includes('old') && bodies.includes('new'), JSON.stringify(bodies));
+  const evsAfterPurge = (await events()).length;
+  check('L4-5 la purga NUNCA toca phone_events (auditoria intacta)', evsAfterPurge === evsBeforePurge, `before=${evsBeforePurge} after=${evsAfterPurge}`);
+  await cleanupVerifications();
 
   console.log(`\n==== RESULT: ${passed} passed, ${failed} failed ====`);
   process.exit(failed > 0 ? 1 : 0);
