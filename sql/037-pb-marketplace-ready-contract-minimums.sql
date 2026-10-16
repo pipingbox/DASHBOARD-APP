@@ -8,7 +8,6 @@
 --   marketplace_ready = CV presente
 --                       AND al menos un certificado/evidencia profesional
 --                       AND disponibilidad definida
---                       AND teléfono presente            (ver NOTA TELÉFONO)
 --                       AND consentimiento declarado + registrado
 --                       AND profile_completion >= 30     (se conserva)
 --
@@ -33,12 +32,10 @@
 --                    tienen columnas de CV y los 15 tienen objeto real en
 --                    Storage; 0 dependen solo de URL legada, así que exigir el
 --                    objeto no descarta a nadie por un falso negativo.
---   Certificado   -> app_worker_certifications con archivo adjunto
---                    (storage_bucket+storage_path, file_url o
---                    certificate_file_url). Se acepta también
---                    app_worker_documents con archivo, porque hoy hay usuarios
---                    que subieron su VCA/homologación como documento
---                    profesional. NO se exige is_verified: en esta fase
+--   Certificado   -> app_worker_certifications o app_worker_documents con
+--                    objeto real asociado en storage.objects. Una URL o ruta
+--                    sin objeto persistente no cuenta como documentación.
+--                    NO se exige is_verified: en esta fase
 --                    Marketplace Ready significa "documentación aportada".
 --   Disponibilidad-> app_14da0f1941_profiles.availability_status, exigiendo
 --                    valor definido (ni NULL ni 'not_specified' ni cadena
@@ -50,25 +47,10 @@
 --   Consentimiento-> profile_visibility / cv_visible + declaración del wizard,
 --                    sin cambios respecto a sql/036.
 --
--- ─── NOTA TELÉFONO (BLOQUEANTE DOCUMENTADO) ─────────────────────────────────
--- El requisito de teléfono se implementa pero queda DESACTIVADO por defecto.
--- Motivo, verificado en producción el 2026-10-16:
---   * `app_14da0f1941_profiles` NO tiene ninguna columna de teléfono.
---   * La tabla `app_14da0f1941_phone_verifications` NO existe.
---   * Las edge functions phone-send-otp / phone-verify-otp /
---     phone-withdraw-consent de PB-PHONE-VERIFICATION-001 están desplegadas
---     contra esa columna y esa tabla inexistentes, y la UI vive detrás del flag
---     VITE_PHONE_VERIFICATION_ENABLED.
---   * La única fuente de teléfono que existe hoy es `auth.users.phone`, y está
---     vacía para el 100% de los perfiles (0 de 43 ready).
--- Activar el requisito hoy dejaría 0 perfiles Marketplace Ready y mandaría
--- TODA candidatura nueva a pending_profile_validation sin que el usuario tenga
--- forma de aportar el dato. Por eso `pb_marketplace_contract_phone_required()`
--- devuelve false y el predicado ya está escrito para cuando se active: basta
--- una migración de una línea cuando la captura esté operativa.
--- NO se crean columnas de teléfono aquí: esa es la migración pendiente de
--- PB-PHONE-VERIFICATION-001 y crearla a medias dejaría una fuente de verdad
--- vacía e inalimentable.
+-- ─── TELÉFONO OPCIONAL ──────────────────────────────────────────────────────
+-- El teléfono se captura en el PR independiente PB-PROFILE-PHONE-CANONICAL-001.
+-- Su ausencia se informa internamente, pero no impide Marketplace Ready,
+-- Jobs applied ni la presentación al cliente. Esta fase no depende de sql/038.
 --
 -- ─── SEGURIDAD ──────────────────────────────────────────────────────────────
 --   * Todas las funciones SECURITY INVOKER, search_path=public, EXECUTE solo
@@ -94,28 +76,11 @@ STABLE
 SECURITY INVOKER
 SET search_path = public
 AS $$
-  -- Punto UNICO de lectura del telefono. Hoy la unica fuente existente en
-  -- produccion es auth.users.phone. Cuando PB-PHONE-VERIFICATION-001 despliegue
-  -- su migracion (profiles.phone_e164 + phone_verifications), reapuntar SOLO
-  -- esta funcion: ningun otro sitio lee el telefono para el contrato.
   SELECT EXISTS (
-    SELECT 1 FROM auth.users u
-    WHERE u.id = p_user_id AND coalesce(btrim(u.phone), '') <> ''
+    SELECT 1 FROM public.app_14da0f1941_profiles p
+    WHERE p.user_id = p_user_id
+      AND coalesce(to_jsonb(p)->>'phone_e164', '') ~ '^\+[1-9][0-9]{7,14}$'
   );
-$$;
-
-CREATE OR REPLACE FUNCTION public.pb_marketplace_contract_phone_required()
-RETURNS boolean
-LANGUAGE sql
-IMMUTABLE
-SECURITY INVOKER
-SET search_path = public
-AS $$
-  -- FALSE a proposito. No hay captura de telefono operativa en produccion
-  -- (0 de 43 perfiles ready tienen telefono en la unica fuente existente), de
-  -- modo que exigirlo dejaria 0 perfiles Marketplace Ready. Cambiar a TRUE en
-  -- una migracion propia cuando la captura este desplegada y medida.
-  SELECT false;
 $$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -145,26 +110,22 @@ AS $$
           AND o.name = p.cv_storage_path
       ) AS ok_cv,
       -- Certificado o evidencia profesional CON archivo adjunto.
-      (EXISTS (
+      EXISTS (
         SELECT 1 FROM public.app_worker_certifications c
+        JOIN storage.objects o ON o.bucket_id = c.storage_bucket AND o.name = c.storage_path
         WHERE c.user_id = p_user_id
-          AND ((c.storage_bucket IS NOT NULL AND c.storage_path IS NOT NULL)
-               OR c.file_url IS NOT NULL
-               OR c.certificate_file_url IS NOT NULL)
       ) OR EXISTS (
         SELECT 1 FROM public.app_worker_documents d
+        JOIN storage.objects o ON o.bucket_id = d.storage_bucket AND o.name = d.storage_path
         WHERE d.user_id = p_user_id
-          AND ((d.storage_bucket IS NOT NULL AND d.storage_path IS NOT NULL)
-               OR d.file_url IS NOT NULL)
-      )) AS ok_certificate,
+      ) AS ok_certificate,
       public.pb_marketplace_phone_present(p_user_id) AS ok_phone,
       (p.availability_status IS NOT NULL
-       AND btrim(p.availability_status) NOT IN ('', 'not_specified')) AS ok_availability
+       AND btrim(p.availability_status) NOT IN ('', 'not_specified', 'unknown')) AS ok_availability
     FROM p
   )
   SELECT ev.ok_cv, ev.ok_certificate, ev.ok_phone, ev.ok_availability,
-         (ev.ok_cv AND ev.ok_certificate AND ev.ok_availability
-          AND (ev.ok_phone OR NOT public.pb_marketplace_contract_phone_required()))
+         (ev.ok_cv AND ev.ok_certificate AND ev.ok_availability)
   FROM ev;
 $$;
 
@@ -373,7 +334,8 @@ COMMENT ON TABLE public.pb_marketplace_ready_reconcile_log IS
 -- Reconciliación: clasifica y, solo si p_dry_run=false, degrada.
 --   * Idempotente: una segunda pasada no encuentra nada que cambiar.
 --   * Reversible: el estado previo queda en el log (ver rollback al final).
---   * Nunca toca candidaturas, outbox, claims ni envía emails.
+--   * Sin envíos ni claims; con sql/039 una aplicación real degrada
+--     candidaturas applied no presentadas y encola un email por usuario.
 --   * Nunca promueve false->true.
 CREATE OR REPLACE FUNCTION public.pb_reconcile_marketplace_ready(
   p_dry_run boolean DEFAULT true,
@@ -415,6 +377,9 @@ DECLARE
   v_f integer := 0;
   v_degraded integer := 0;
 BEGIN
+  IF NOT p_dry_run AND to_regclass('public.app_14da0f1941_marketplace_reconcile_emails') IS NULL THEN
+    RAISE EXCEPTION 'sql/039 must be applied before reconciliation';
+  END IF;
   FOR r IN
     SELECT user_id, full_name, title, profile_visibility, cv_visible,
            profile_completion, onboarding_status, marketplace_ready
@@ -423,21 +388,28 @@ BEGIN
     ORDER BY created_at
     LIMIT GREATEST(COALESCE(p_limit, 1000), 1)
   LOOP
+    IF NOT p_dry_run THEN
+      SELECT user_id, full_name, title, profile_visibility, cv_visible,
+             profile_completion, onboarding_status, marketplace_ready
+      INTO r
+      FROM public.app_14da0f1941_profiles
+      WHERE user_id = r.user_id AND marketplace_ready IS TRUE
+      FOR UPDATE;
+      IF NOT FOUND THEN CONTINUE; END IF;
+    END IF;
     v_evaluated := v_evaluated + 1;
 
     SELECT * INTO m FROM public.pb_marketplace_minimums(r.user_id);
     v_consent := public.pb_marketplace_consent(r.profile_visibility, r.cv_visible, true);
     v_completion := public.pb_profile_completion_score(r.user_id);
-    v_new_ready := m.ok_minimums AND coalesce(v_consent, false)
-                   AND coalesce(v_completion, 0) >= 30;
+    v_new_ready := public.pb_marketplace_ready_for(r.user_id, true);
     v_new_status := public.pb_onboarding_status(v_completion, v_new_ready, r.full_name, r.title);
 
     v_fails := (CASE WHEN m.ok_cv THEN 0 ELSE 1 END)
              + (CASE WHEN m.ok_certificate THEN 0 ELSE 1 END)
              + (CASE WHEN m.ok_availability THEN 0 ELSE 1 END)
              + (CASE WHEN coalesce(v_consent, false) THEN 0 ELSE 1 END)
-             + (CASE WHEN public.pb_marketplace_contract_phone_required()
-                          AND NOT m.ok_phone THEN 1 ELSE 0 END);
+             + (CASE WHEN coalesce(v_completion, 0) >= 30 THEN 0 ELSE 1 END);
 
     IF v_new_ready THEN
       v_class := 'A_stays_ready';     v_a := v_a + 1;
@@ -447,37 +419,41 @@ BEGIN
       v_class := 'B_cv';              v_b := v_b + 1;
     ELSIF NOT m.ok_certificate THEN
       v_class := 'C_certificate';     v_c := v_c + 1;
-    ELSIF public.pb_marketplace_contract_phone_required() AND NOT m.ok_phone THEN
-      v_class := 'D_phone';           v_d := v_d + 1;
     ELSIF NOT m.ok_availability THEN
       v_class := 'E_availability';    v_e := v_e + 1;
-    ELSE
+    ELSIF NOT coalesce(v_consent, false) THEN
       v_class := 'G_consent';         v_f := v_f + 1;
+    ELSE
+      v_class := 'H_completion';      v_f := v_f + 1;
     END IF;
 
-    INSERT INTO public.pb_marketplace_ready_reconcile_log (
-      batch_id, dry_run, user_id, prev_ready, prev_status, prev_completion,
-      new_ready, new_status, new_completion, fail_cv, fail_certificate,
-      fail_phone, fail_availability, fail_consent, class, applied
-    ) VALUES (
-      v_batch, p_dry_run, r.user_id, r.marketplace_ready, r.onboarding_status,
-      r.profile_completion, v_new_ready, v_new_status, v_completion,
-      NOT m.ok_cv, NOT m.ok_certificate, NOT m.ok_phone, NOT m.ok_availability,
-      NOT coalesce(v_consent, false), v_class,
-      (NOT p_dry_run) AND (r.marketplace_ready IS DISTINCT FROM v_new_ready
-                           OR r.onboarding_status IS DISTINCT FROM v_new_status
-                           OR r.profile_completion IS DISTINCT FROM v_completion)
-    );
+    IF NOT p_dry_run THEN
+      INSERT INTO public.pb_marketplace_ready_reconcile_log (
+        batch_id, dry_run, user_id, prev_ready, prev_status, prev_completion,
+        new_ready, new_status, new_completion, fail_cv, fail_certificate,
+        fail_phone, fail_availability, fail_consent, class, applied
+      ) VALUES (
+        v_batch, false, r.user_id, r.marketplace_ready, r.onboarding_status,
+        r.profile_completion, v_new_ready, v_new_status, v_completion,
+        NOT m.ok_cv, NOT m.ok_certificate, NOT m.ok_phone, NOT m.ok_availability,
+        NOT coalesce(v_consent, false), v_class,
+        (r.marketplace_ready IS DISTINCT FROM v_new_ready
+         OR r.onboarding_status IS DISTINCT FROM v_new_status
+         OR r.profile_completion IS DISTINCT FROM v_completion)
+      );
+    END IF;
 
     IF NOT p_dry_run
        AND (r.marketplace_ready IS DISTINCT FROM v_new_ready
             OR r.onboarding_status IS DISTINCT FROM v_new_status
             OR r.profile_completion IS DISTINCT FROM v_completion) THEN
+      PERFORM set_config('pb.marketplace_reconcile_batch', v_batch, true);
       UPDATE public.app_14da0f1941_profiles
       SET marketplace_ready  = v_new_ready,
           onboarding_status  = v_new_status,
           profile_completion = v_completion
       WHERE user_id = r.user_id;
+      PERFORM set_config('pb.marketplace_reconcile_batch', '', true);
       IF r.marketplace_ready IS DISTINCT FROM v_new_ready THEN
         v_degraded := v_degraded + 1;
       END IF;
@@ -493,8 +469,6 @@ END $$;
 -- ─────────────────────────────────────────────────────────────────────────────
 REVOKE ALL ON FUNCTION public.pb_marketplace_phone_present(uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.pb_marketplace_phone_present(uuid) TO service_role;
-REVOKE ALL ON FUNCTION public.pb_marketplace_contract_phone_required() FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.pb_marketplace_contract_phone_required() TO service_role;
 REVOKE ALL ON FUNCTION public.pb_marketplace_minimums(uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.pb_marketplace_minimums(uuid) TO service_role;
 REVOKE ALL ON FUNCTION public.pb_marketplace_ready_for(uuid, boolean) FROM PUBLIC, anon, authenticated;
@@ -505,11 +479,12 @@ GRANT EXECUTE ON FUNCTION public.pb_reconcile_marketplace_ready(boolean, text, i
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 7. COMMENT ON
 -- ─────────────────────────────────────────────────────────────────────────────
-COMMENT ON FUNCTION public.pb_marketplace_phone_present(uuid) IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: punto UNICO de lectura del telefono para el contrato. Hoy auth.users.phone; reapuntar a profiles.phone_e164 cuando PB-PHONE-VERIFICATION-001 despliegue su migracion.';
-COMMENT ON FUNCTION public.pb_marketplace_contract_phone_required() IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: palanca del requisito de telefono. FALSE porque no hay captura operativa en produccion (0 perfiles con telefono); activarla dejaria 0 perfiles Marketplace Ready.';
-COMMENT ON FUNCTION public.pb_marketplace_minimums(uuid) IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: minimos documentales del contrato (CV objeto en Storage, certificado/evidencia con archivo, disponibilidad definida, telefono si esta activado). Devuelve el detalle por requisito para UI, soporte y reconciliacion.';
+COMMENT ON FUNCTION public.pb_marketplace_phone_present(uuid) IS 'Indicador interno opcional phone_missing; lee phone_e164 si existe, sin afectar Marketplace Ready ni Jobs.';
+COMMENT ON FUNCTION public.pb_marketplace_minimums(uuid) IS 'Minimos para Marketplace Ready: CV real, documento profesional, disponibilidad informada. ok_phone es un indicador opcional.';
 COMMENT ON FUNCTION public.pb_marketplace_ready_for(uuid, boolean) IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: predicado canonico UNICO de marketplace_ready = minimos + consentimiento declarado y registrado + completion>=30. Lo usan pb_complete_onboarding, pb_recalculate_profile_state y la reconciliacion. El gate de Jobs sigue leyendo marketplace_ready.';
-COMMENT ON FUNCTION public.pb_reconcile_marketplace_ready(boolean, text, integer) IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: reconciliacion historica. Nace en dry-run, registra el estado previo en pb_marketplace_ready_reconcile_log, clasifica A-G, solo degrada, nunca promueve, no toca candidaturas ni envia emails.';
+COMMENT ON FUNCTION public.pb_reconcile_marketplace_ready(boolean, text, integer) IS 'PB-MARKETPLACE-READY-CONSISTENCY-001 fase 2: reconciliacion historica. Nace en dry-run, registra el estado previo en pb_marketplace_ready_reconcile_log, clasifica A-H, solo degrada, nunca promueve, y no envía emails directamente. Con sql/039 el downgrade aplica a candidaturas no presentadas.';
+
+DROP FUNCTION IF EXISTS public.pb_marketplace_contract_phone_required();
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 8. OPERACIÓN

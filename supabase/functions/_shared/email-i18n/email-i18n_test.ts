@@ -1,6 +1,7 @@
 // PB-I18N-EMAIL-001 — Tests de la capa de correos localizados.
 // Ejecutar: deno test --allow-read supabase/functions/_shared/email-i18n/
 import { assert, assertEquals, assertStringIncludes, assertThrows } from "jsr:@std/assert@1";
+import { renderMarketplaceReconciliationEmail } from "./reconciliation.ts";
 import {
   ACTION_TEMPLATES,
   BRAND,
@@ -277,6 +278,26 @@ Deno.test("contraste del botón cumple WCAG AA (texto normal ≥ 4.5:1)", () => 
   // El blanco previo quedaba por debajo del umbral AA: regresión explícita.
   const whiteRatio = contrastRatio("#FFFFFF", BRAND.orange);
   assert(whiteRatio < 4.5, "el blanco debería seguir fallando AA (control del test)");
+});
+
+Deno.test("reconciliación: idioma del destinatario, candidaturas conservadas y teléfono opcional", () => {
+  for (const lang of SUPPORTED_EMAIL_LANGUAGES) {
+    const resolved = resolveRecipientLanguage({ userMetadata: { lang }, profileLanguage: "es" });
+    const rendered = renderMarketplaceReconciliationEmail({
+      lang: resolved.lang,
+      actionUrl: "https://pipingbox.com/profile",
+      missing: ["cv", "certificate", "availability", "consent"],
+    });
+    assertEquals(rendered.lang, lang);
+    assertStringIncludes(rendered.html, `<html lang="${lang}"`);
+    assertStringIncludes(rendered.text, "https://pipingbox.com/profile");
+    assert(!rendered.text.toLowerCase().includes("phone"));
+    assertEquals((rendered.html.match(/<li>/g) ?? []).length, 4);
+  }
+  const es = renderMarketplaceReconciliationEmail({ lang: "es", actionUrl: "https://pipingbox.com/profile", missing: ["cv", "cv"] });
+  assertStringIncludes(es.text, "siguen registradas");
+  assertEquals((es.html.match(/<li>/g) ?? []).length, 1);
+  assertThrows(() => renderMarketplaceReconciliationEmail({ lang: "en", actionUrl: "javascript:1", missing: ["cv"] }));
 });
 
 Deno.test("renderActionEmail: el botón usa BRAND.buttonText, nunca blanco, sobre el naranja", () => {
