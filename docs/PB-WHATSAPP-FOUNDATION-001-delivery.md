@@ -125,7 +125,18 @@ Seguridad de FIX1 verificada por SQL en QA: RLS ON en `phone_rate_limits` y `pho
 
 **Preflight revalidado inmediatamente antes de escribir** (solo lectura): guard prod `md5=8e091376…` (versión previa al ticket, sin drift), 0 tablas/columnas/migraciones phone, pg_cron 1.6.4 instalado, sin job `pb-phone-purge-retention`, 21 funciones existentes sin phone-*, secretos sin `PHONE_VERIFICATION_MOCK_ALLOW_REFS` ni `PHONE_VERIFICATION_PROVIDER` (allowlist mock NO ampliable por env; allowlist hardcodeada solo-QA), SHA-256 completos de los 7 artefactos verificados contra `git show 6f7f5ba`.
 
-**Migraciones registradas en `supabase_migrations.schema_migrations` (prod)**: `pb_whatsapp_foundation_001_042_part1_columns`, `…_part2_constraints`, `…_part3_comments`, `…_part4_tables`, `…_part5_guard`, `…_part7_provider_config` (042 en 6 partes, mismo patrón que QA; el contenido agregado es byte-equivalente al archivo `sql/042` salvo comentarios inertes), `043-pb-whatsapp-foundation-001-fixpack1`, `044_pb_whatsapp_foundation_001_retention_cron`. (+3 entradas de evidencia del smoke: creación/comprobación/limpieza del usuario desechable.)
+**Migraciones registradas en `supabase_migrations.schema_migrations` (prod)**: `043-pb-whatsapp-foundation-001-fixpack1`, `044_pb_whatsapp_foundation_001_retention_cron` y 042 en 6 entradas (mismo patrón que QA, paridad intencional). **Aclaración de la nomenclatura part1..part7 / 6 entradas**: las entradas heredan el split hecho en QA y no siguen un único esquema de numeración. Mapeo exacto entrada → contenido de `sql/042`:
+
+| Entrada registrada | Contenido aplicado | Líneas del archivo |
+|---|---|---|
+| `…_042_part1_columns` | §1: 13 columnas + `phone_present` generada | 64–92 |
+| `…_042_part2_constraints` | Bloque de constraints (sin número de sección propio en el archivo) | 94–123 |
+| `…_042_part3_comments` | Bloque de COMMENT ON COLUMN | 125–146 |
+| `…_042_part4_tables` | **§2 + §3 + §4 fusionadas**: `phone_verifications` + `phone_events` + `phone_provider_outbox` | 148–228 |
+| `…_042_part5_guard` | §5: guard extendido (el "5" sigue la numeración propia del archivo) | 271–451 |
+| `…_042_part7_provider_config` | Tabla `phone_provider_config` (ubicada entre outbox y guard) | 230–269 |
+
+El salto part5→part7 **no es una omisión**: al fusionar las tres tablas en `part4_tables` (que habrían ocupado las posiciones lógicas 4, 5 y 6 si cada tabla fuera una parte propia), `provider_config` conservó la posición secuencial 7 del esquema de split original. **No existe part6 porque `phone_provider_outbox` ya se aplicó dentro de `part4_tables`.** Completitud verificada por objetos, no solo por bytes: 13 columnas, 6 tablas phone (4 de 042 + 2 de 043), 4 constraints, 2 policies, guard byte-idéntico a QA y `ops_config` con 2 semillas — todo presente en prod; además la unión de las partes es byte-equivalente al archivo salvo comentarios inertes del banner. (+3 entradas de evidencia del smoke: creación/comprobación/limpieza del usuario desechable.)
 
 **Edge Functions desplegadas desde URL raw del SHA candidato** (`verify_jwt=true`, todas `ACTIVE`, versión 1; `ezbr_sha256` = hash del bundle servido por la plataforma):
 
