@@ -275,7 +275,10 @@ REVOKE ALL ON FUNCTION public.pb_cv_draft_owner_update_guard()
 -- ─── 5. Grants de tabla (mínimos) ────────────────────────────────────────────
 -- authenticated: SELECT (RLS filtra por propietario) + UPDATE en drafts
 -- (trigger guard congela todo salvo el estado de revisión). events: solo
--- SELECT. anon: nada. service_role hereda acceso completo por bypass de RLS.
+-- SELECT. anon: nada.
+-- service_role: explícito (patrón sql/039) — Edge Functions cv-extract y
+-- cv-apply-draft escriben vía PostgREST con la service key; nunca confiar
+-- en default privileges del rol que aplica la migración.
 
 REVOKE ALL ON public.app_cv_extraction_drafts FROM anon;
 GRANT SELECT, UPDATE ON public.app_cv_extraction_drafts TO authenticated;
@@ -284,8 +287,12 @@ REVOKE INSERT, DELETE, TRUNCATE ON public.app_cv_extraction_drafts FROM authenti
 REVOKE ALL ON public.app_cv_extraction_events FROM anon, authenticated;
 GRANT SELECT ON public.app_cv_extraction_events TO authenticated;
 
+GRANT SELECT, INSERT, UPDATE ON public.app_cv_extraction_drafts TO service_role;
+GRANT SELECT, INSERT ON public.app_cv_extraction_events TO service_role;
+
 -- secuencia de events: solo lectura no la necesita; el INSERT es service_role.
 REVOKE ALL ON SEQUENCE public.app_cv_extraction_events_id_seq FROM anon, authenticated;
+GRANT USAGE ON SEQUENCE public.app_cv_extraction_events_id_seq TO service_role;
 
 -- ─── 6. Verificación post-aplicación ─────────────────────────────────────────
 -- Ejecutar y esperar exactamente estos resultados (cualquier desviación aborta):

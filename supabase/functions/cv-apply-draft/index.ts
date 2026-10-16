@@ -322,7 +322,9 @@ Deno.serve(async (req: Request) => {
     if (column === 'years_experience') {
       const n = typeof value === 'number' ? value : parseInt(String(value), 10);
       if (!Number.isFinite(n) || n < 0 || n > 60) continue;
-      if (isEmptyProfileValue(profile[column])) {
+      // 0 es el DEFAULT de la columna, no un dato confirmado por el usuario:
+      // un perfil nuevo no debe chocar con los años extraídos del CV (§4).
+      if (isEmptyProfileValue(profile[column]) || profile[column] === 0) {
         patch[column] = n;
         fieldsConfirmed++;
       } else if (profile[column] !== n) {
