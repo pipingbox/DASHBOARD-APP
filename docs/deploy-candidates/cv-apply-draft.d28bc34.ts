@@ -193,11 +193,12 @@ Deno.serve(async (req) => {
     }
     if (column === "willing_to_travel" || column === "willing_to_relocate") {
       if (value !== true) continue;
-      if (profile[column] !== true) {
-        if (isEmptyProfileValue(profile[column])) {
-          patch[column] = true;
-          fieldsConfirmed++;
-        } else if (decision.overwrite === true) {
+      const defaultFalse = column === "willing_to_relocate";
+      if (isEmptyProfileValue(profile[column]) || defaultFalse && profile[column] === false) {
+        patch[column] = true;
+        fieldsConfirmed++;
+      } else if (profile[column] !== true) {
+        if (decision.overwrite === true) {
           patch[column] = true;
           fieldsConfirmed++;
         } else {
