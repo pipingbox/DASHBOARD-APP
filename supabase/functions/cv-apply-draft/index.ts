@@ -179,6 +179,20 @@ function isEmptyProfileValue(v: Scalar | undefined): boolean {
   return false;
 }
 
+/**
+ * Fechas del CV con precisión mes/año ("2019-03") o año ("2019") → DATE.
+ * Las columnas start_date/end_date son DATE: sin normalizar, un CV con
+ * "03/2019 - Actualmente" rompería el INSERT.
+ */
+function toDbDate(v?: string | null): string | null {
+  if (typeof v !== 'string' || !v.trim()) return null;
+  const s = v.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  if (/^\d{4}-\d{2}$/.test(s)) return `${s}-01`;
+  if (/^\d{4}$/.test(s)) return `${s}-01-01`;
+  return null;
+}
+
 function normalizeAvailability(value: Scalar): { availability_status: string; available_from: string | null } | null {
   if (typeof value !== 'string' || !value.trim()) return null;
   const v = value.trim().toLowerCase();
@@ -410,10 +424,12 @@ Deno.serve(async (req: Request) => {
     // §5: solo con datos suficientes.
     if (!merged.position?.trim() && !merged.company_name?.trim()) continue;
     const candidate = {
-      company_name: merged.company_name?.trim() || null,
+      // company_name es NOT NULL en la tabla: cadena vacía cuando el CV no
+      // la declara explícitamente (el guard de arriba exige position).
+      company_name: merged.company_name?.trim() || '',
       position: merged.position?.trim() || '',
-      start_date: merged.start_date ?? null,
-      end_date: merged.end_date ?? null,
+      start_date: toDbDate(merged.start_date),
+      end_date: merged.currently_working === true ? null : toDbDate(merged.end_date),
     };
     if (existing.some((e) => isSameExperience(e, candidate)) ||
         experiencesToInsert.some((e) => isSameExperience(e as typeof candidate, candidate))) {
