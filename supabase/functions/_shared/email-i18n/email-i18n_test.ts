@@ -12,6 +12,7 @@ import {
   escapeHtml,
   getLocale,
   normalizeEmailLanguage,
+  renderApplicationPendingProfileEmail,
   renderActionEmail,
   renderNoticeEmail,
   resolveRecipientLanguage,
@@ -298,6 +299,33 @@ Deno.test("reconciliación: idioma del destinatario, candidaturas conservadas y 
   assertStringIncludes(es.text, "siguen registradas");
   assertEquals((es.html.match(/<li>/g) ?? []).length, 1);
   assertThrows(() => renderMarketplaceReconciliationEmail({ lang: "en", actionUrl: "javascript:1", missing: ["cv"] }));
+});
+
+Deno.test("teléfono ausente aparece solo como recomendación en los dos correos", () => {
+  for (const lang of SUPPORTED_EMAIL_LANGUAGES) {
+    const reconciliation = renderMarketplaceReconciliationEmail({
+      lang, actionUrl: "https://pipingbox.com/profile", missing: ["cv"], phoneMissing: true,
+    });
+    const pending = renderApplicationPendingProfileEmail({
+      lang, actionUrl: "https://pipingbox.com/profile", pendingItems: ["cv"], phoneMissing: true,
+    });
+    for (const email of [reconciliation, pending]) {
+      assertStringIncludes(email.text, "WhatsApp");
+      assertStringIncludes(email.text, "https://pipingbox.com/profile");
+      assert(!email.text.includes("WhatsApp is now available"));
+      assertEquals((email.html.match(/<li/g) ?? []).length, 1);
+    }
+    const withPhone = renderMarketplaceReconciliationEmail({
+      lang, actionUrl: "https://pipingbox.com/profile", missing: ["cv"], phoneMissing: false,
+    });
+    assert(!withPhone.text.includes("WhatsApp"));
+  }
+  const es = renderMarketplaceReconciliationEmail({
+    lang: "es", actionUrl: "https://pipingbox.com/profile", missing: ["cv"], phoneMissing: true,
+  });
+  assertStringIncludes(es.text, "Sube un CV válido");
+  assertStringIncludes(es.text, "Recomendado: añade tu número de teléfono");
+  assert(es.text.indexOf("Sube un CV válido") < es.text.indexOf("Recomendado:"));
 });
 
 Deno.test("renderActionEmail: el botón usa BRAND.buttonText, nunca blanco, sobre el naranja", () => {

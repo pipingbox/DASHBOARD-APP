@@ -19,6 +19,7 @@
 import { assert, assertEquals, assertStringIncludes } from "https://deno.land/std@0.224.0/assert/mod.ts";
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import type { EmailMessage, EmailProvider, EmailSendResult } from "./email-provider.ts";
+import { drainMarketplaceReconciliationEmails } from "./marketplace-reconciliation-email.ts";
 import {
   computePendingProfileItems,
   drainMarketplaceReadyActivations,
@@ -36,6 +37,7 @@ interface FakeConfig {
   applications: Row[];
   profiles: Row[];
   activations: Row[];
+  reconcileEmails?: Row[];
   /** auth.users por id: { email, user_metadata }. */
   authUsers: Record<
     string,
@@ -75,6 +77,11 @@ function fakeSupabase(cfg: FakeConfig, calls?: RecordedCall[]): SupabaseClient {
         for (const [c, vals] of filters) out = applyIn(out, c, vals);
         return { data: out[0] ?? null, error: null };
       },
+      single: async () => {
+        let out = rows;
+        for (const [c, vals] of filters) out = applyIn(out, c, vals);
+        return { data: out[0] ?? null, error: null };
+      },
       then: (resolve: (v: unknown) => unknown, reject: (e: unknown) => unknown) => {
         let out = rows;
         for (const [c, vals] of filters) out = applyIn(out, c, vals);
@@ -88,6 +95,7 @@ function fakeSupabase(cfg: FakeConfig, calls?: RecordedCall[]): SupabaseClient {
     [JOB_APPLICATIONS_TABLE]: cfg.applications,
     [PROFILES_TABLE]: cfg.profiles,
     [MARKETPLACE_READY_ACTIVATIONS_TABLE]: cfg.activations,
+    app_14da0f1941_marketplace_reconcile_emails: cfg.reconcileEmails ?? [],
     app_worker_experiences: Object.entries(cfg.counts ?? {}).flatMap(([uid, c]) =>
       Array.from({ length: c.experiences }, () => ({ user_id: uid }))),
     app_worker_certifications: Object.entries(cfg.counts ?? {}).flatMap(([uid, c]) =>
@@ -178,8 +186,11 @@ function baseProfile(overrides: Row = {}): Row {
 }
 
 /** rpc por defecto: claim OK + finalize OK. */
-function defaultRpcCalls(state: Record<string, { state?: string; reason?: string; missing?: string[] }> = {}) {
+function defaultRpcCalls(state: Record<string, { state?: string; reason?: string; missing?: string[]; phonePresent?: boolean }> = {}) {
   return (fn: string, args: Record<string, unknown>) => {
+    if (fn === "pb_marketplace_phone_present") {
+      return { data: state[`${fn}:${args.p_user_id}`]?.phonePresent ?? true, error: null };
+    }
     if (fn === "pb_marketplace_missing_requirements") {
       return { data: state[`${fn}:${args.p_user_id}`]?.missing ?? ["certificate", "availability"], error: null };
     }
@@ -297,8 +308,9 @@ Deno.test("G2: pending → email enviado una vez, con claim/fase/finalize correc
   // Orden del protocolo: claim → marc send_started → send → finalize sent.
   assertEquals(calls[0].fn, "app_14da0f1941_claim_application_profile_pending_email");
   assertEquals(calls[1].fn, "pb_marketplace_missing_requirements");
-  assertEquals(calls[2].fn, "app_14da0f1941_marc_application_profile_pending_email_phase");
-  assertEquals(calls[2].args.p_phase, "send_started");
+  assertEquals(calls[2].fn, "pb_marketplace_phone_present");
+  assertEquals(calls[3].fn, "app_14da0f1941_marc_application_profile_pending_email_phase");
+  assertEquals(calls[3].args.p_phase, "send_started");
   const fin = calls[calls.length - 1];
   assertEquals(fin.fn, "app_14da0f1941_finalize_application_profile_pending_email");
   assertEquals(fin.args.p_outcome, "sent");
@@ -324,6 +336,89 @@ Deno.test("EMAIL 1 enumera exactamente los faltantes canónicos en captura", asy
     assertEquals(provider.sent.length, 1);
     assertStringIncludes(provider.sent[0].text!, label);
     for (const item of allLabels) assertEquals(provider.sent[0].text!.includes(item), missing.includes(["cv", "certificate", "availability", "consent"][allLabels.indexOf(item)]));
+  }
+});
+
+Deno.test("EMAIL 1 recomienda teléfono ausente sin añadirlo a los requisitos", async () => {
+  for (const phonePresent of [false, true]) {
+    const provider = new RecordingProvider();
+    const supabase = fakeSupabase({
+      applications: [baseApplication()], profiles: [baseProfile()], activations: [],
+      authUsers: { [UID]: { email: "qa@example.invalid", user_metadata: { lang: "es" } } },
+      rpc: defaultRpcCalls({
+        [`pb_marketplace_missing_requirements:${UID}`]: { missing: ["cv"] },
+        [`pb_marketplace_phone_present:${UID}`]: { phonePresent },
+      }),
+    });
+    const result = await sendApplicationPendingProfileEmail({ supabase, emailProvider: provider }, { applicationId: APP_ID, userId: UID });
+    assertEquals(result.kind, "sent");
+    assertStringIncludes(provider.sent[0].text!, "Sube un CV válido");
+    assertEquals(provider.sent[0].text!.includes("Recomendado: añade tu número de teléfono"), !phonePresent);
+    assertEquals(provider.sent[0].capture?.meta?.pending_items, ["cv"]);
+  }
+});
+
+Deno.test("EMAIL 1 conserva faltantes múltiples y no recomienda teléfono presente no verificado", async () => {
+  for (const { missing, phonePresent } of [
+    { missing: ["certificate"], phonePresent: true },
+    { missing: ["cv", "certificate", "availability", "consent", "completion"], phonePresent: false },
+  ]) {
+    const provider = new RecordingProvider();
+    const supabase = fakeSupabase({
+      applications: [baseApplication()], profiles: [baseProfile()], activations: [],
+      authUsers: { [UID]: { email: "qa@example.invalid", user_metadata: { lang: "es" } } },
+      rpc: defaultRpcCalls({
+        [`pb_marketplace_missing_requirements:${UID}`]: { missing },
+        [`pb_marketplace_phone_present:${UID}`]: { phonePresent },
+      }),
+    });
+    assertEquals((await sendApplicationPendingProfileEmail({ supabase, emailProvider: provider }, { applicationId: APP_ID, userId: UID })).kind, "sent");
+    const message = provider.sent[0];
+    assertEquals(message.capture?.meta?.pending_items, missing);
+    assertEquals((message.html?.match(/<li/g) ?? []).length, missing.length);
+    assertEquals(message.text!.includes("Recomendado: añade tu número de teléfono"), !phonePresent);
+    assert(!message.text!.includes("teléfono verificado"));
+    assertStringIncludes(message.text!, "/profile");
+  }
+});
+
+Deno.test("reconciliación envía una vez por candidato y el teléfono queda recomendado", async () => {
+  for (const phonePresent of [false, true]) {
+    const provider = new RecordingProvider();
+    const calls: RecordedCall[] = [];
+    const row = { user_id: UID, batch_id: "qa-batch", state: "pending" };
+    const supabase = fakeSupabase({
+      applications: [baseApplication(), baseApplication({ id: APP2_ID })],
+      profiles: [baseProfile({ preferred_language: "de" })], activations: [],
+      reconcileEmails: [row],
+      authUsers: { [UID]: { email: "qa@example.invalid", user_metadata: { lang: "es" } } },
+      rpc: (fn, args) => {
+        if (fn === "pb_claim_marketplace_reconcile_email") {
+          return { data: row.state === "sent" ? { claimed: false, reason: "already_sent" } : { claimed: true, claim_id: "qa-claim" }, error: null };
+        }
+        if (fn === "pb_marketplace_missing_requirements") return { data: ["cv", "certificate"], error: null };
+        if (fn === "pb_marketplace_phone_present") return { data: phonePresent, error: null };
+        if (fn === "pb_mark_marketplace_reconcile_email_send") return { data: true, error: null };
+        if (fn === "pb_finalize_marketplace_reconcile_email") {
+          if (args.p_outcome === "sent") row.state = "sent";
+          return { data: true, error: null };
+        }
+        return { data: null, error: { message: `unexpected rpc ${fn}` } };
+      },
+    }, calls);
+    assertEquals(await drainMarketplaceReconciliationEmails({ supabase, emailProvider: provider }, "qa-batch"), [{ userId: UID, outcome: "sent" }]);
+    assertEquals(provider.sent.length, 1);
+    const message = provider.sent[0];
+    assertStringIncludes(message.text!, "Sube un CV válido");
+    assertStringIncludes(message.text!, "Sube un certificado o documento profesional");
+    assertStringIncludes(message.text!, "/profile");
+    assertEquals(message.capture?.lang, "es");
+    assertEquals((message.html?.match(/<li/g) ?? []).length, 2);
+    assertEquals(message.text!.includes("Recomendado: añade tu número de teléfono"), !phonePresent);
+    assertEquals(message.capture?.meta?.missing, ["cv", "certificate"]);
+    assertEquals(await drainMarketplaceReconciliationEmails({ supabase, emailProvider: provider }, "qa-batch"), []);
+    assertEquals(provider.sent.length, 1);
+    assertEquals(calls.filter((call) => call.fn === "pb_finalize_marketplace_reconcile_email" && call.args.p_outcome === "sent").length, 1);
   }
 });
 

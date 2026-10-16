@@ -16,7 +16,7 @@
 
 import { DEFAULT_EMAIL_LANGUAGE, type EmailLanguage } from "./languages.ts";
 import { getLocale } from "./locales.ts";
-import { marketplaceRequirementLabel, type Requirement } from "./reconciliation.ts";
+import { marketplacePhoneRecommendation, marketplaceRequirementLabel, type Requirement } from "./reconciliation.ts";
 import type {
   ActionTemplateId,
   ActionTemplateStrings,
@@ -366,6 +366,7 @@ export interface ApplicationPendingProfileRenderInput {
   vars?: Vars;
   /** Claves de elementos pendientes (photo, cv, …). */
   pendingItems: readonly string[];
+  phoneMissing?: boolean;
 }
 
 function bulletListHtml(introHtml: string, itemsHtml: string[]): string {
@@ -398,6 +399,8 @@ export function renderApplicationPendingProfileEmail(
     if (!(required as readonly string[]).includes(key)) missing.add(`pending_item:${key}`);
   }
   const itemTexts = itemKeys.map((key) => marketplaceRequirementLabel(lang, key));
+  const phone = input.phoneMissing ? marketplacePhoneRecommendation(lang) : null;
+  const phoneHtml = phone ? `<h2 style="font-size:16px;">${escapeHtml(phone.heading)}</h2>${paragraph(escapeHtml(phone.body))}` : "";
 
   const securityItems = [
     H(c.never_share),
@@ -409,9 +412,9 @@ export function renderApplicationPendingProfileEmail(
     preheader: H(t.preheader),
     heading: H(t.heading),
     bodyHtml: paragraph(H(bodyTpl)) + paragraph(H(t.note).replace(escapeHtml(BRAND.support), supportLink())),
-    listHtml: itemTexts.length > 0
+    listHtml: (itemTexts.length > 0
       ? bulletListHtml(H(t.pending_intro), itemTexts.map(escapeHtml))
-      : undefined,
+      : "") + phoneHtml,
     actionHtml: button(H(t.button), url, H(c.button_fallback)),
     securityHtml: `<p style="margin:0 0 8px 0;"><strong>${H(c.security_title)}</strong></p>` +
       securityItems.map((s) => `<p style="margin:0 0 6px 0;">${s}</p>`).join(""),
@@ -426,6 +429,7 @@ export function renderApplicationPendingProfileEmail(
     T(bodyTpl),
     "",
     ...(itemTexts.length > 0 ? [T(t.pending_intro), ...itemTexts.map((i) => `- ${i}`), ""] : []),
+    ...(phone ? [phone.heading, phone.body, ""] : []),
     `${T(t.button)}: ${url}`,
     "",
     T(t.note),

@@ -18,17 +18,37 @@ const COPY: Record<EmailLanguage, Copy> = {
   bg: { subject: "PIPINGBOX · Попълнете профила си, за да продължите", heading: "Кандидатурите ви остават регистрирани", body: "Кандидатурите ви не са отхвърлени. Попълнете профила си, за да могат да бъдат разгледани преди евентуално представяне на клиент.", pending: "Липсваща информация:", button: "Попълнете профила", footer: "Получавате това съобщение, защото профилът ви в PIPINGBOX се нуждае от допълнителна информация.", requirements: { cv: "Качете валидна автобиография", certificate: "Качете професионален сертификат или документ", availability: "Посочете наличността си", consent: "Потвърдете съгласието и видимостта", completion: "Попълнете минималните данни в профила" } },
 };
 
+const PHONE_RECOMMENDATION: Record<EmailLanguage, { heading: string; body: string }> = {
+  en: { heading: "Recommended: add your phone number", body: "This helps PIPINGBOX or a recruiter reach you quickly about offers and prepares for future WhatsApp communications. It is optional; WhatsApp is not available yet and will require phone verification." },
+  es: { heading: "Recomendado: añade tu número de teléfono", body: "Facilita que PIPINGBOX o un recruiter te contacte rápidamente sobre ofertas y prepara futuras comunicaciones por WhatsApp. Es opcional; WhatsApp aún no está disponible y requerirá verificar el número." },
+  pt: { heading: "Recomendado: adicione o seu número de telefone", body: "Ajuda a PIPINGBOX ou um recrutador a contactá-lo rapidamente sobre ofertas e prepara futuras comunicações por WhatsApp. É opcional; o WhatsApp ainda não está disponível e exigirá a verificação do número." },
+  fr: { heading: "Recommandé : ajoutez votre numéro de téléphone", body: "Cela facilite un contact rapide de PIPINGBOX ou d'un recruteur au sujet des offres et prépare de futures communications WhatsApp. C'est facultatif ; WhatsApp n'est pas encore disponible et nécessitera la vérification du numéro." },
+  de: { heading: "Empfohlen: Telefonnummer hinzufügen", body: "So können PIPINGBOX oder Recruiter Sie bei Stellenangeboten schneller erreichen; dies bereitet künftige WhatsApp-Nachrichten vor. Die Angabe ist freiwillig; WhatsApp ist noch nicht verfügbar und erfordert eine Verifizierung der Nummer." },
+  it: { heading: "Consigliato: aggiungi il tuo numero di telefono", body: "Aiuta PIPINGBOX o un recruiter a contattarti rapidamente per le offerte e prepara le future comunicazioni WhatsApp. È facoltativo; WhatsApp non è ancora disponibile e richiederà la verifica del numero." },
+  nl: { heading: "Aanbevolen: voeg je telefoonnummer toe", body: "Zo kunnen PIPINGBOX of recruiters je snel bereiken over vacatures en ben je voorbereid op toekomstige WhatsApp-berichten. Het is optioneel; WhatsApp is nog niet beschikbaar en vereist verificatie van je nummer." },
+  pl: { heading: "Zalecane: dodaj numer telefonu", body: "Ułatwia to PIPINGBOX lub rekruterowi szybki kontakt w sprawie ofert i przygotowuje do przyszłej komunikacji przez WhatsApp. Jest opcjonalny; WhatsApp nie jest jeszcze dostępny i będzie wymagał weryfikacji numeru." },
+  ro: { heading: "Recomandat: adaugă numărul de telefon", body: "Ajută PIPINGBOX sau un recrutor să te contacteze rapid pentru oferte și pregătește viitoare comunicări prin WhatsApp. Este opțional; WhatsApp nu este încă disponibil și va necesita verificarea numărului." },
+  uk: { heading: "Рекомендовано: додайте номер телефону", body: "Це допоможе PIPINGBOX або рекрутеру швидше зв’язатися з вами щодо вакансій і підготує майбутні повідомлення WhatsApp. Це необов’язково; WhatsApp поки недоступний і вимагатиме підтвердження номера." },
+  bg: { heading: "Препоръчително: добавете телефонен номер", body: "Така PIPINGBOX или рекрутер ще могат бързо да се свържат с вас за оферти и ще сте подготвени за бъдещи съобщения по WhatsApp. Това е по избор; WhatsApp все още не е активен и ще изисква потвърждение на номера." },
+};
+
 export function marketplaceRequirementLabel(lang: EmailLanguage, requirement: Requirement): string {
   return COPY[lang].requirements[requirement];
 }
 
-export function renderMarketplaceReconciliationEmail(input: { lang: EmailLanguage; actionUrl: string; missing: readonly Requirement[] }) {
+export function marketplacePhoneRecommendation(lang: EmailLanguage) {
+  return PHONE_RECOMMENDATION[lang];
+}
+
+export function renderMarketplaceReconciliationEmail(input: { lang: EmailLanguage; actionUrl: string; missing: readonly Requirement[]; phoneMissing?: boolean }) {
   const copy = COPY[input.lang];
   const url = safeUrl(input.actionUrl);
   const pending = [...new Set(input.missing)].map((key) => copy.requirements[key]);
   const lines = pending.map((item) => `- ${item}`);
   const list = pending.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-  const html = `<!doctype html><html lang="${input.lang}"><head><meta charset="utf-8"></head><body style="background:#F3F4F6;color:#1F2937;font-family:Arial,sans-serif"><main style="max-width:600px;margin:auto;background:white;padding:28px"><header style="background:${BRAND.black};color:white;padding:16px;font-size:22px">PIPING<span style="color:${BRAND.orange}">BOX</span></header><h1>${escapeHtml(copy.heading)}</h1><p>${escapeHtml(copy.body)}</p><p>${escapeHtml(copy.pending)}</p><ul>${list}</ul><a href="${escapeHtml(url)}" style="display:inline-block;background:${BRAND.orange};color:${BRAND.buttonText};padding:14px 24px">${escapeHtml(copy.button)}</a><p>${escapeHtml(copy.footer)}</p></main></body></html>`;
-  const text = [copy.heading, "", copy.body, "", copy.pending, ...lines, "", `${copy.button}: ${url}`, "", copy.footer].join("\n");
+  const phone = input.phoneMissing ? marketplacePhoneRecommendation(input.lang) : null;
+  const phoneHtml = phone ? `<h2>${escapeHtml(phone.heading)}</h2><p>${escapeHtml(phone.body)}</p>` : "";
+  const html = `<!doctype html><html lang="${input.lang}"><head><meta charset="utf-8"></head><body style="background:#F3F4F6;color:#1F2937;font-family:Arial,sans-serif"><main style="max-width:600px;margin:auto;background:white;padding:28px"><header style="background:${BRAND.black};color:white;padding:16px;font-size:22px">PIPING<span style="color:${BRAND.orange}">BOX</span></header><h1>${escapeHtml(copy.heading)}</h1><p>${escapeHtml(copy.body)}</p><p>${escapeHtml(copy.pending)}</p><ul>${list}</ul>${phoneHtml}<a href="${escapeHtml(url)}" style="display:inline-block;background:${BRAND.orange};color:${BRAND.buttonText};padding:14px 24px">${escapeHtml(copy.button)}</a><p>${escapeHtml(copy.footer)}</p></main></body></html>`;
+  const text = [copy.heading, "", copy.body, "", copy.pending, ...lines, ...(phone ? ["", phone.heading, phone.body] : []), "", `${copy.button}: ${url}`, "", copy.footer].join("\n");
   return { lang: input.lang, subject: copy.subject, html, text };
 }

@@ -234,6 +234,9 @@ export async function sendApplicationPendingProfileEmail(
       throw new Error("canonical_requirements_unavailable");
     }
     const pendingItems: string[] = missingData;
+    const { data: phonePresent, error: phoneError } = await supabase.rpc(
+      "pb_marketplace_phone_present", { p_user_id: p.userId },
+    );
 
     // 7. Idioma en tiempo de envío (resolver canónico I18N).
     const lang: ResolvedLanguage = resolveRecipientLanguage({
@@ -247,6 +250,7 @@ export async function sendApplicationPendingProfileEmail(
       actionUrl: `${appBaseUrl(d)}/profile`,
       vars: { jobTitle: app.job_title ?? "", company: app.company_name ?? "" },
       pendingItems,
+      phoneMissing: !phoneError && phonePresent === false,
     });
 
     const provider = d.emailProvider ?? createEmailProvider();

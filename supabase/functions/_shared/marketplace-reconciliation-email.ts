@@ -56,6 +56,9 @@ export async function drainMarketplaceReconciliationEmails(deps: Dependencies, b
         throw new Error("missing_reasons_unavailable");
       }
       const missing: Requirement[] = missingData;
+      const { data: phonePresent, error: phoneError } = await supabase.rpc(
+        "pb_marketplace_phone_present", { p_user_id: row.user_id },
+      );
 
       const lang = resolveRecipientLanguage({
         userMetadata: authData.user.user_metadata ?? null,
@@ -65,6 +68,7 @@ export async function drainMarketplaceReconciliationEmails(deps: Dependencies, b
         lang: lang.lang,
         actionUrl: `${(deps.appBaseUrl ?? Deno.env.get("APP_BASE_URL") ?? "https://pipingbox.com").replace(/\/$/, "")}/profile`,
         missing,
+        phoneMissing: !phoneError && phonePresent === false,
       });
       const { data: marked, error: markError } = await supabase.rpc("pb_mark_marketplace_reconcile_email_send", {
         p_user_id: row.user_id, p_claim_id: claimId,
