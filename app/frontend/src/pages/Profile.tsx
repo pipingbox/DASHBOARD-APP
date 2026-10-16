@@ -17,7 +17,7 @@ import { CertificationsSection } from '@/components/profile/CertificationsSectio
 import { CVUploadSection } from '@/components/profile/CVUploadSection';
 import { DocumentsSection } from '@/components/profile/DocumentsSection';
 import { AvailabilityMobilitySection } from '@/components/profile/AvailabilityMobilitySection';
-import { AICVExtraction } from '@/components/profile/AICVExtraction';
+import { CVReviewBanner } from '@/components/profile/CVReviewBanner';
 import { MatchReadyBanner } from '@/components/profile/MatchReadyBanner';
 import { PhoneVerificationSection } from '@/components/profile/PhoneVerificationSection';
 import { notifyProfileSuggestions } from '@/lib/notifications';
@@ -510,8 +510,8 @@ export default function Profile() {
       {/* Certifications */}
       <CertificationsSection />
 
-      {/* AI CV Extraction */}
-      <AICVExtraction />
+      {/* AI CV Extraction → PB-CV-AUTO-PROFILE-001: draft pending review */}
+      <CVReviewBanner />
 
       {/* Professional Documents */}
       <DocumentsSection />

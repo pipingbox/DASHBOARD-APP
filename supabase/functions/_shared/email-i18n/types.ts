@@ -116,6 +116,11 @@ export interface EmailTemplates {
   lead_receipt: NoticeTemplateStrings;          // {name}
   application_pending_profile: ApplicationPendingProfileStrings; // {jobTitle} {company}
   marketplace_ready: MarketplaceReadyStrings;   // {jobTitle} / {count}
+  // PB-CV-AUTO-PROFILE-001 — CV recibido y perfil preparado para revisión.
+  // Concepto (ticket §11): "Hemos recibido tu CV y hemos preparado tu perfil
+  // profesional. Revisa los datos." JAMÁS afirma validación, disponibilidad
+  // para empresas ni certificados verificados.
+  cv_review_pending: ActionTemplateStrings;     // {name}
 }
 
 export type TemplateId = keyof EmailTemplates;
@@ -130,6 +135,7 @@ export const ACTION_TEMPLATES = [
   "confirmation", "recovery", "magic_link", "invite",
   "email_change_current", "email_change_new",
   "job_match", "workforce_match", "cert_expiry",
+  "cv_review_pending",
 ] as const satisfies readonly TemplateId[];
 
 // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 — plantillas con renderizador

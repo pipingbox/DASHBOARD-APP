@@ -193,6 +193,15 @@ const pt: EmailLocale = {
       button: "Ver as minhas candidaturas",
       footer_reason: "Recebe esta mensagem porque o seu perfil PIPINGBOX alcançou Marketplace Ready.",
     },
+    cv_review_pending: {
+      subject: "PIPINGBOX · Recebemos o seu CV — reveja o seu perfil",
+      preheader: "Preparámos o seu perfil profissional a partir do seu CV.",
+      heading: "O seu perfil profissional está pronto para revisão",
+      body: "Olá: recebemos o seu CV e preparamos o seu perfil profissional a partir dele. Reveja os dados para que a PIPINGBOX possa considerá-lo para oportunidades compatíveis.",
+      button: "Rever o meu perfil",
+      note: "Ainda nada foi publicado: os dados extraídos só fazem parte do seu perfil depois de os rever e confirmar. As certificações mencionadas no seu CV são registadas como declaradas, não verificadas.",
+      footer_reason: "Recebe esta mensagem porque a PIPINGBOX recebeu um CV associado à sua conta.",
+    },
   },
 };
 

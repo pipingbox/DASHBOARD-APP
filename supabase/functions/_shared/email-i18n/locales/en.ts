@@ -193,6 +193,15 @@ const en: EmailLocale = {
       button: "View my applications",
       footer_reason: "You are receiving this message because your PIPINGBOX profile reached Marketplace Ready.",
     },
+    cv_review_pending: {
+      subject: "PIPINGBOX · We received your CV — review your profile",
+      preheader: "We prepared your professional profile from your CV.",
+      heading: "Your professional profile is ready to review",
+      body: "Hello! We received your CV and prepared your professional profile from it. Review the data so PIPINGBOX can consider you for compatible opportunities.",
+      button: "Review my profile",
+      note: "Nothing has been published yet: the extracted data only becomes part of your profile after you review and confirm it. Certifications mentioned in your CV are recorded as declared, not verified.",
+      footer_reason: "You are receiving this message because PIPINGBOX received a CV associated with your account.",
+    },
   },
 };
 
