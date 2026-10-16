@@ -1,10 +1,10 @@
 # PB-WHATSAPP-FOUNDATION-001 — Entrega: PHONE + OTP + CONSENT FOUNDATION
 
-**Estado: IMPLEMENTADO + QA PASS — NO PROD DEPLOY — NO WHATSAPP REAL**
+**Estado: MERGED A MAIN (`6f7f5ba`) + INFRA DESPLEGADA EN PRODUCCIÓN (2026-10-16 ~21:05 UTC) — smoke prod 10/10 PASS — feature OFF, provider vacío, SIN envíos reales. Pendiente: provider real (ticket aparte) y verificación de la 1ª ventana del job (03:17 UTC).**
 
-Rama: `feat/pb-whatsapp-foundation-001`
-SHA candidato: `ebec9591c152afbc2f7329b71434ced6fdcecd0a`
-Proyecto QA: `uqfbilyfpflrlthnyijj` (PipingBox (QA)) — PRODUCCIÓN `mwdauubztjxkbrefirbg` **sin tocar**.
+Rama: `feat/pb-whatsapp-foundation-001` (mergeada, PR #80, merge commit `6f7f5bad762aee9e8104fd7636b2293bf6e00b0d`)
+SHA candidato: `ebec9591c152afbc2f7329b71434ced6fdcecd0a` (superseded; candidato final = merge commit)
+Proyecto QA: `uqfbilyfpflrlthnyijj` (PipingBox (QA)) — PRODUCCIÓN `mwdauubztjxkbrefirbg`: **infra desplegada 2026-10-16 (ver §12)**.
 
 ---
 
@@ -121,15 +121,50 @@ Seguridad de FIX1 verificada por SQL en QA: RLS ON en `phone_rate_limits` y `pho
 - Hallazgo de QA corregido: `deno.land/x/bcrypt` usa Web Worker → pin `@v0.2.4` + API sync.
 - **Job de retención ACTIVO en QA** (`sql/044-pb-whatsapp-foundation-001-retention-cron.sql`, aplicado por Management API): pg_cron habilitado y `pb-phone-purge-retention` programado **diario 03:17 UTC** (`17 3 * * *`), `active=true`, comando `SELECT public.pb_phone_purge_retention();`. Verificado en `cron.job` (jobid 1) y con ejecución manual del comando exacto del job: `{phone_verifications_deleted: 0, phone_provider_outbox_deleted: 0, retention 30d/7d}` (0 borrados esperado: los datos QA son recientes). El job corre como `postgres` (superusuario), por lo que ejecuta la función SECURITY INVOKER pese al REVOKE de PUBLIC. Rollback: `cron.unschedule('pb-phone-purge-retention')`.
 
-## 13. Para GO producción (pendiente, fuera de este ticket)
+## 12a. Despliegue PRODUCCIÓN ejecutado (2026-10-16, GO del PO sobre SHA `6f7f5ba`)
 
-1. Migraciones 042 + 043 + 044 a producción (`mwdauubztjxkbrefirbg`) — 044 activa el job pg_cron de retención (ya activo en QA).
-2. NO sembrar `phone_provider_config` en producción (tabla vacía ⇒ provider no configurado ⇒ 503 controlado hasta el ticket del provider real). Aunque alguien la sembrara, la barrera M2 (ref fuera de allowlist) lo impediría.
+**Preflight revalidado inmediatamente antes de escribir** (solo lectura): guard prod `md5=8e091376…` (versión previa al ticket, sin drift), 0 tablas/columnas/migraciones phone, pg_cron 1.6.4 instalado, sin job `pb-phone-purge-retention`, 21 funciones existentes sin phone-*, secretos sin `PHONE_VERIFICATION_MOCK_ALLOW_REFS` ni `PHONE_VERIFICATION_PROVIDER` (allowlist mock NO ampliable por env; allowlist hardcodeada solo-QA), SHA-256 completos de los 7 artefactos verificados contra `git show 6f7f5ba`.
+
+**Migraciones registradas en `supabase_migrations.schema_migrations` (prod)**: `pb_whatsapp_foundation_001_042_part1_columns`, `…_part2_constraints`, `…_part3_comments`, `…_part4_tables`, `…_part5_guard`, `…_part7_provider_config` (042 en 6 partes, mismo patrón que QA; el contenido agregado es byte-equivalente al archivo `sql/042` salvo comentarios inertes), `043-pb-whatsapp-foundation-001-fixpack1`, `044_pb_whatsapp_foundation_001_retention_cron`. (+3 entradas de evidencia del smoke: creación/comprobación/limpieza del usuario desechable.)
+
+**Edge Functions desplegadas desde URL raw del SHA candidato** (`verify_jwt=true`, todas `ACTIVE`, versión 1; `ezbr_sha256` = hash del bundle servido por la plataforma):
+
+| slug | versión | ezbr_sha256 (16) |
+|---|---|---|
+| `phone-send-otp` | 1 | `7bf193a9…` |
+| `phone-verify-otp` | 1 | `69fc6c7c…` |
+| `phone-update-consent` | 1 | `d36bc0dd…` |
+| `phone-withdraw-consent` | 1 | `c98557c1…` |
+
+**Job de retención**: `pb-phone-purge-retention` **PROGRAMADO** (jobid 2, `17 3 * * *`, active=true) — **ejecución automática PENDIENTE**: la primera ventana es 2026-10-17 03:17 UTC; verificar entonces en `cron.job_run_details` (status `succeeded`).
+
+**Smoke producción — 10/10 PASS** (usuario desechable `pb-phone-prod-smoke@pipingbox-qa.test`, script `/tmp/phone-prod-smoke.mjs`):
+- S1 `phone-send-otp` con anon key → **401** (verify_jwt).
+- S2 con JWT usuario → **503 `sms_provider_not_configured`**; cero escrituras (provider comprobado antes del gate y del INSERT; `phone_provider_config` sigue **vacía**). Mock/capture bloqueado: sin fila + allowlist solo-QA + sin env de ampliación.
+- S2b aislamiento REST `phone_verifications` → 200 con **0 filas** (sin policies para cliente).
+- S3 `phone-verify-otp` sin challenge → **400 `no_pending_verification`** (corrección documentada del preflight: el gate de verify SÍ consume cuota aunque no exista challenge — por diseño M1; la fila de rate limit se eliminó en la limpieza).
+- S4 `phone-update-consent` sin teléfono verificado → **400 `phone_required`** (variante válida del gate: exige teléfono y verificación).
+- S4b `phone-withdraw-consent` → **200 `{removed:true}`**.
+- S6a perfil del smoke: privilegiadas normalizadas (`phone_verified=false`, opt-ins false, `phone_e164=NULL`, `marketplace_ready=false`) — el trigger INSERT normaliza.
+- S6b UPDATE `full_name` (permitida) → **200**; S6d revertido → **200**.
+- S6c UPDATE `phone_verified=true` → **400 P0001 "Columna protegida: phone_verified."** (guard extendido activo).
+- Marketplace: guard prod **byte-idéntico a QA** (comparación `pg_get_functiondef` completa; el md5 difiere del estado previo solo por las secciones phone añadidas); `pb_marketplace_missing_requirements` ejecutada como postgres → `['cv','certificate','availability','consent','completion']` (correcto para el usuario vacío). Nota: la RPC es **service_role-only por diseño preexistente** (paridad QA/prod verificada; un smoke anterior asumió erróneamente que era llamable por el cliente).
+- Advisors: sin lints nuevos sobre objetos phone/whatsapp — las 4 tablas sin policies (outbox/provider_config/rate_limits/ops_config) siguen el patrón deny-by-default ya presente en el proyecto (mismo caso que el lint preexistente de `job_application_notifications`); ninguna función phone es SECURITY DEFINER ejecutable por `authenticated` (verificado por SQL).
+
+**Desviaciones respecto al preflight** (todas de expectativas del smoke, no del sistema): (1) `phone-verify-otp` sin challenge consume cuota del gate (M1 by design); (2) `pb_marketplace_missing_requirements` no es llamable por clientes (preexistente, paridad QA); (3) DELETE de profiles por REST denegado por RLS (sin policy DELETE, by design) — la limpieza se hizo por SQL; (4) el contrato de request usa `phone`/`service_opt_in|job_alerts_opt_in|marketing_opt_in` (no `phone_number_raw`/`whatsapp_*`).
+
+**Limpieza**: usuario desechable + perfil + phone_events + rate_limits eliminados (verificado: 0 filas residuales en las 5 tablas; `ops_config` conserva sus 2 semillas). Signup por API no dejó filas reales (respuesta ofuscada anti-enumeración).
+
+## 13. Pendiente tras el despliegue de infra
+
+1. ~~Migraciones 042 + 043 + 044 a producción~~ — **HECHO (§12a)**.
+2. NO sembrar `phone_provider_config` en producción — **cumplido** (vacía, verificado).
 3. Ticket separado: provider real (WhatsApp Cloud API / Twilio / Vonage) implementando `PhoneVerificationProvider`.
-4. Secret `PHONE_VERIFICATION_PROVIDER` cuando la plataforma lo permita (hoy el fallback DB es el camino auditable).
-5. Verificar tras aplicar 044: `cron.job` con `pb-phone-purge-retention` activo (misma programación que QA, diario 03:17 UTC).
-6. Criterios de validación post-deploy producción: (a) `phone-send-otp` devuelve 503 `sms_provider_not_configured`; (b) advisors sin lints nuevos en tablas/rpcs phone; (c) E2E smoke de auth/Marketplace intacto; (d) rollback = revertir funciones + migraciones, conservando datos (§11).
+4. Secret `PHONE_VERIFICATION_PROVIDER` cuando la plataforma lo permita.
+5. ~~Verificar `cron.job`~~ — HECHO (programado). **Pendiente**: confirmar primera ejecución automática en `cron.job_run_details` tras 2026-10-17 03:17 UTC.
+6. Activación del flag `VITE_PHONE_VERIFICATION_ENABLED` en frontend: pendiente del provider real y de GO explícito del PO.
+7. Criterios de validación post-deploy: (a) 503 controlado — **verificado (S2)**; (b) advisors sin lints nuevos — **verificado**; (c) auth/Marketplace intactos — **verificado (S6, RPC exec)**; (d) rollback = §11 (vigente).
 
 ## 14. GO/NO-GO
 
-**GO para merge a main (desarrollo/QA).** NO-GO para deploy a producción y para conectar WhatsApp real, conforme a la autorización del PO. Evidencia completa en secciones 10/10bis y `docs/qa-phone-e2e-results.txt`. Los 6 hallazgos de la revisión (M1, M2, L1–L4) quedan corregidos y verificados en QA con pruebas de regresión específicas.
+**GO para merge a main (desarrollo/QA)** — ejecutado (PR #80, merge `6f7f5ba`). **GO de infra producción ejecutado** (§12a) con NO-GO mantenido para provider real y activación de la feature en frontend, pendientes de ticket aparte. Evidencia completa en secciones 10/10bis/12a y `docs/qa-phone-e2e-results.txt`. Los 6 hallazgos de la revisión (M1, M2, L1–L4) quedan corregidos y verificados en QA con pruebas de regresión específicas.
