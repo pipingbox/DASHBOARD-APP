@@ -215,12 +215,21 @@ test.describe('D6 — a company with zero jobs is a legitimate empty state', () 
 
     expect(distinctCandidates).toBe(0);
     expect(hires).toBe(0);
+    // Canonical funnel shape since PB-COMPANY-MVP-PHASE-0-001: every bucket of
+    // the sql/034 vocabulary plus legacy `cancelled` and `unknown`.
     expect(funnel).toEqual({
       applications: 0,
+      pendingProfileValidation: 0,
+      qualified: 0,
+      reviewed: 0,
       shortlisted: 0,
-      interviewed: 0,
-      offered: 0,
+      sentToClient: 0,
+      interview: 0,
       hired: 0,
+      rejected: 0,
+      withdrawn: 0,
+      cancelled: 0,
+      unknown: 0,
     });
   });
 
@@ -322,12 +331,18 @@ test.describe('status vocabulary is left untouched', () => {
     expect(source).not.toContain('fulfilled');
   });
 
-  test('the workforce pipeline still reads raw statuses', () => {
+  test('the workforce pipeline reads statuses through the company projection', () => {
     const source = readCode(DASHBOARD);
 
-    // Unchanged by this ticket: repairing the query must not silently redefine the funnel.
-    for (const status of ['draft', 'open', 'in_progress', 'fulfilled', 'cancelled']) {
-      expect(source).toContain(`w.status === '${status}'`);
+    // PB-COMPANY-MVP-PHASE-0-001 supersedes the raw draft/open/fulfilled reads:
+    // those tokens never existed in production, so four of five pipeline rows
+    // were zero by construction. The pipeline now projects through
+    // workforce-admin's canonical machine, same as the workforce page.
+    expect(source).toContain('getCompanyStatusConfig');
+    for (const status of ['draft', 'fulfilled']) {
+      expect(source, `pipeline must not count token '${status}'`).not.toContain(
+        `w.status === '${status}'`
+      );
     }
   });
 });

@@ -29,6 +29,7 @@ import {
 } from '@/lib/resumableUpload';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { hasStoredCv } from '@/lib/filePresence';
+import { requestCvExtraction } from '@/lib/cvDrafts';
 import {
   openSecureFileInNewTab,
   extractStoragePathAndBucket,
@@ -215,6 +216,15 @@ export function CVUploadSection() {
     toast.success(t('workerProfile.cv.uploaded'));
     // Recalculate profile completion (non-blocking)
     recalculateAndSaveProfileCompletion(user.id).catch(() => {});
+    // PB-CV-AUTO-PROFILE-001 — draft-first extraction (non-blocking): the
+    // pending-review banner appears on the profile once the draft exists.
+    // The upload itself already succeeded: a failed extraction must never
+    // surface as an upload error (ticket §14).
+    requestCvExtraction(bucketName, path).then((res) => {
+      if (res?.status === 'completed' || res?.status === 'retried') {
+        toast.info(t('cvReview.extractionReady'));
+      }
+    }).catch(() => { /* fire-and-forget */ });
   };
 
   const cancelUpload = () => {

@@ -127,6 +127,8 @@ export const SPA_ROUTE_CONTRACT: RouteRule[] = [
   { pattern: '/dashboard', visibility: 'PROTECTED', kind: 'EXACT' },
   { pattern: '/onboarding', visibility: 'PROTECTED', kind: 'EXACT', note: 'PB-GROWTH-GATE-ONBOARDING-001: resume entry for postponed onboarding' },
   { pattern: '/profile', visibility: 'PROTECTED', kind: 'EXACT' },
+  // PB-CV-AUTO-PROFILE-001 — CV draft review (draft-first confirmation flow).
+  { pattern: '/profile/cv-review', visibility: 'PROTECTED', kind: 'EXACT', note: 'PB-CV-AUTO-PROFILE-001: review CV-extracted profile draft' },
   { pattern: '/applications', visibility: 'PROTECTED', kind: 'EXACT' },
   { pattern: '/messages', visibility: 'PROTECTED', kind: 'EXACT' },
   { pattern: '/content-drafts', visibility: 'PROTECTED', kind: 'EXACT' },

@@ -126,6 +126,12 @@ export const OBS_EVENT_NAMES = [
   'whatsapp_jobs_opt_in',
   'whatsapp_marketing_opt_in',
   'whatsapp_opt_out',
+  // PB-CV-AUTO-PROFILE-001 — CV → perfil. El funnel backend (started/
+  // completed/failed/retried/already_processed/confirmed + contadores) vive
+  // en app_cv_extraction_events; el cliente solo emite el paso de apertura
+  // de revisión. Props: enums cerrados y contadores; sin contenido del CV
+  // ni PII.
+  'cv_profile_review_started',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -460,6 +466,9 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   whatsapp_jobs_opt_in: ['value'],
   whatsapp_marketing_opt_in: ['value'],
   whatsapp_opt_out: [],
+  // PB-CV-AUTO-PROFILE-001 — draft identifiers and closed-enum counters;
+  // never CV content or PII.
+  cv_profile_review_started: ['draft_id', 'source_channel', 'fields_count', 'experiences_count'],
 };
 
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;

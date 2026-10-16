@@ -193,6 +193,15 @@ const nl: EmailLocale = {
       button: "Bekijk mijn sollicitaties",
       footer_reason: "Je ontvangt dit bericht omdat je PIPINGBOX-profiel Marketplace Ready heeft bereikt.",
     },
+    cv_review_pending: {
+      subject: "PIPINGBOX · We hebben je CV ontvangen — bekijk je profiel",
+      preheader: "We hebben je professionele profiel opgesteld op basis van je CV.",
+      heading: "Je professionele profiel staat klaar om te bekijken",
+      body: "Hallo! We hebben je CV ontvangen en daar je professionele profiel uit opgesteld. Bekijk de gegevens zodat PIPINGBOX je in overweging kan nemen voor passende opdrachten.",
+      button: "Bekijk mijn profiel",
+      note: "Er is nog niets gepubliceerd: de geëxtraheerde gegevens worden pas onderdeel van je profiel nadat je ze hebt bekeken en bevestigd. Certificaten die in je CV worden genoemd, worden geregistreerd als aangegeven, niet als geverifieerd.",
+      footer_reason: "Je ontvangt dit bericht omdat PIPINGBOX een CV heeft ontvangen dat aan jouw account is gekoppeld.",
+    },
   },
 };
 
