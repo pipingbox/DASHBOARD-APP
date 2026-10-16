@@ -16,6 +16,7 @@
 
 import { DEFAULT_EMAIL_LANGUAGE, type EmailLanguage } from "./languages.ts";
 import { getLocale } from "./locales.ts";
+import { marketplaceRequirementLabel, type Requirement } from "./reconciliation.ts";
 import type {
   ActionTemplateId,
   ActionTemplateStrings,
@@ -389,15 +390,14 @@ export function renderApplicationPendingProfileEmail(
 
   const bodyTpl = !vars.company && t.body_no_company ? t.body_no_company : t.body;
 
-  // Lista de elementos pendientes: solo claves conocidas; el resto se
-  // reporta en `missing` para que el test de locales lo detecte.
-  const itemKeys = input.pendingItems.filter((k): k is PendingProfileItemKey =>
-    (PENDING_PROFILE_ITEM_KEYS as readonly string[]).includes(k)
+  const required = ["cv", "certificate", "availability", "consent", "completion"] as const satisfies readonly Requirement[];
+  const itemKeys = input.pendingItems.filter((key): key is Requirement =>
+    (required as readonly string[]).includes(key)
   );
-  for (const k of input.pendingItems) {
-    if (!(PENDING_PROFILE_ITEM_KEYS as readonly string[]).includes(k)) missing.add(`pending_item:${k}`);
+  for (const key of input.pendingItems) {
+    if (!(required as readonly string[]).includes(key)) missing.add(`pending_item:${key}`);
   }
-  const itemTexts = itemKeys.map((k) => t.pending_items[k]);
+  const itemTexts = itemKeys.map((key) => marketplaceRequirementLabel(lang, key));
 
   const securityItems = [
     H(c.never_share),

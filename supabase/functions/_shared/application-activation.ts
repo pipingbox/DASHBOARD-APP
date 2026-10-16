@@ -149,6 +149,7 @@ interface ApplicationRow {
 interface ProfileRow extends ProfileForItems {
   user_id: string;
   marketplace_ready?: boolean | null;
+  marketplace_consent_declared?: boolean | null;
   preferred_language?: string | null;
 }
 
@@ -193,7 +194,7 @@ export async function sendApplicationPendingProfileEmail(
   const { data: profile } = await supabase
     .from(PROFILES_TABLE)
     .select(
-      "user_id, marketplace_ready, preferred_language, full_name, title, company, location, years_experience, skills, bio, avatar_url, cv_storage_bucket, cv_storage_path, cv_file_url, cv_url",
+      "user_id, marketplace_ready, marketplace_consent_declared, preferred_language, full_name, title, company, location, years_experience, skills, bio, avatar_url, cv_storage_bucket, cv_storage_path, cv_file_url, cv_url",
     )
     .eq("user_id", p.userId)
     .maybeSingle() as { data: ProfileRow | null; error: unknown };
@@ -224,17 +225,15 @@ export async function sendApplicationPendingProfileEmail(
   const claimId = claim.claim_id;
 
   try {
-    // 6. Elementos pendientes (espejo de recalculate-profiles).
-    const [{ count: expCount }, { count: certCount }, { count: docCount }] = await Promise.all([
-      supabase.from("app_worker_experiences").select("id", { count: "exact", head: true }).eq("user_id", p.userId),
-      supabase.from("app_worker_certifications").select("id", { count: "exact", head: true }).eq("user_id", p.userId),
-      supabase.from("app_worker_documents").select("id", { count: "exact", head: true }).eq("user_id", p.userId),
-    ]);
-    const pendingItems = computePendingProfileItems(profile, {
-      experiences: expCount ?? 0,
-      certifications: certCount ?? 0,
-      documents: docCount ?? 0,
-    });
+    const { data: missingData, error: missingError } = await supabase.rpc(
+      "pb_marketplace_missing_requirements",
+      { p_user_id: p.userId, p_declared_consent: profile.marketplace_consent_declared === true },
+    );
+    if (missingError || !Array.isArray(missingData) || missingData.length === 0 ||
+        !missingData.every((requirement) => typeof requirement === "string")) {
+      throw new Error("canonical_requirements_unavailable");
+    }
+    const pendingItems: string[] = missingData;
 
     // 7. Idioma en tiempo de envío (resolver canónico I18N).
     const lang: ResolvedLanguage = resolveRecipientLanguage({

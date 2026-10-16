@@ -1,9 +1,8 @@
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { resolveRecipientLanguage } from "./email-i18n/languages.ts";
-import { renderMarketplaceReconciliationEmail } from "./email-i18n/reconciliation.ts";
+import { renderMarketplaceReconciliationEmail, type Requirement } from "./email-i18n/reconciliation.ts";
 import { createEmailProvider, type EmailProvider } from "./email-provider.ts";
 
-type MissingRequirement = "cv" | "certificate" | "availability" | "consent" | "completion";
 type OutboxRow = { user_id: string; batch_id: string; state: string };
 
 type Dependencies = { supabase: SupabaseClient; emailProvider?: EmailProvider; appBaseUrl?: string };
@@ -48,20 +47,15 @@ export async function drainMarketplaceReconciliationEmails(deps: Dependencies, b
 
       const { data: authData, error: authError } = await supabase.auth.admin.getUserById(row.user_id);
       if (authError || !authData.user?.email) throw new Error("email_unavailable");
-      const { data: minimums, error: minimumsError } = await supabase.rpc("pb_marketplace_minimums", { p_user_id: row.user_id });
-      const minimum = Array.isArray(minimums) ? minimums[0] : minimums;
-      if (minimumsError || !minimum) throw new Error("minimums_unavailable");
-      const { data: consent, error: consentError } = await supabase.rpc("pb_marketplace_consent", {
-        p_profile_visibility: profile.profile_visibility, p_cv_visible: profile.cv_visible, p_declared: true,
-      });
-      if (consentError) throw new Error("consent_unavailable");
-      const missing: MissingRequirement[] = [];
-      if (!minimum.ok_cv) missing.push("cv");
-      if (!minimum.ok_certificate) missing.push("certificate");
-      if (!minimum.ok_availability) missing.push("availability");
-      if (consent !== true) missing.push("consent");
-      if ((profile.profile_completion ?? 0) < 30) missing.push("completion");
-      if (missing.length === 0) throw new Error("missing_reasons_unavailable");
+      const { data: missingData, error: missingError } = await supabase.rpc(
+        "pb_marketplace_missing_requirements", { p_user_id: row.user_id, p_declared_consent: true },
+      );
+      const requirements = ["cv", "certificate", "availability", "consent", "completion"] as const;
+      if (missingError || !Array.isArray(missingData) || missingData.length === 0 ||
+          !missingData.every((key) => (requirements as readonly string[]).includes(key))) {
+        throw new Error("missing_reasons_unavailable");
+      }
+      const missing: Requirement[] = missingData;
 
       const lang = resolveRecipientLanguage({
         userMetadata: authData.user.user_metadata ?? null,

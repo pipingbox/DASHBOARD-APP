@@ -178,8 +178,11 @@ function baseProfile(overrides: Row = {}): Row {
 }
 
 /** rpc por defecto: claim OK + finalize OK. */
-function defaultRpcCalls(state: Record<string, { state?: string; reason?: string }> = {}) {
+function defaultRpcCalls(state: Record<string, { state?: string; reason?: string; missing?: string[] }> = {}) {
   return (fn: string, args: Record<string, unknown>) => {
+    if (fn === "pb_marketplace_missing_requirements") {
+      return { data: state[`${fn}:${args.p_user_id}`]?.missing ?? ["certificate", "availability"], error: null };
+    }
     if (fn === "app_14da0f1941_claim_application_profile_pending_email") {
       const s = state[`${fn}:${args.p_application_id}`];
       if (s?.state) {
@@ -285,20 +288,43 @@ Deno.test("G2: pending → email enviado una vez, con claim/fase/finalize correc
   assertStringIncludes(msg.text!, "NO ha sido rechazada");
   assertStringIncludes(msg.text!, "Pipe Welder");
   assertStringIncludes(msg.text!, "BASF");
-  // Elementos pendientes calculados: counts = exp 2, certs 0, docs 0.
-  assertStringIncludes(msg.text!, "Certificaciones");
-  assertStringIncludes(msg.text!, "Documentos");
-  assert(!msg.text!.includes("Experiencia laboral"), "no listarlo si tiene experiencias");
-  assert(!msg.text!.includes("Foto de perfil"), "la foto no debe listarse si existe");
+  assertStringIncludes(msg.text!, "Sube un certificado o documento profesional");
+  assertStringIncludes(msg.text!, "Indica tu disponibilidad");
+  assert(!msg.text!.includes("Documentos"));
+  assert(!msg.text!.includes("Foto de perfil"));
   // CTA al perfil.
   assertStringIncludes(msg.text!, "/profile");
   // Orden del protocolo: claim → marc send_started → send → finalize sent.
   assertEquals(calls[0].fn, "app_14da0f1941_claim_application_profile_pending_email");
-  assertEquals(calls[1].fn, "app_14da0f1941_marc_application_profile_pending_email_phase");
-  assertEquals(calls[1].args.p_phase, "send_started");
+  assertEquals(calls[1].fn, "pb_marketplace_missing_requirements");
+  assertEquals(calls[2].fn, "app_14da0f1941_marc_application_profile_pending_email_phase");
+  assertEquals(calls[2].args.p_phase, "send_started");
   const fin = calls[calls.length - 1];
   assertEquals(fin.fn, "app_14da0f1941_finalize_application_profile_pending_email");
   assertEquals(fin.args.p_outcome, "sent");
+});
+
+Deno.test("EMAIL 1 enumera exactamente los faltantes canónicos en captura", async () => {
+  const cases = [
+    { missing: ["cv"], label: "Sube un CV válido" },
+    { missing: ["certificate"], label: "Sube un certificado o documento profesional" },
+    { missing: ["availability"], label: "Indica tu disponibilidad" },
+    { missing: ["cv", "certificate", "availability", "consent"], label: "Confirma el consentimiento y la visibilidad" },
+  ];
+  const allLabels = ["Sube un CV válido", "Sube un certificado o documento profesional", "Indica tu disponibilidad", "Confirma el consentimiento y la visibilidad"];
+  for (const { missing, label } of cases) {
+    const provider = new RecordingProvider();
+    const supabase = fakeSupabase({
+      applications: [baseApplication()], profiles: [baseProfile()], activations: [],
+      authUsers: { [UID]: { email: "qa@example.invalid", user_metadata: { lang: "es" } } },
+      rpc: defaultRpcCalls({ [`pb_marketplace_missing_requirements:${UID}`]: { missing } }),
+    });
+    const result = await sendApplicationPendingProfileEmail({ supabase, emailProvider: provider }, { applicationId: APP_ID, userId: UID });
+    assertEquals(result.kind, "sent");
+    assertEquals(provider.sent.length, 1);
+    assertStringIncludes(provider.sent[0].text!, label);
+    for (const item of allLabels) assertEquals(provider.sent[0].text!.includes(item), missing.includes(["cv", "certificate", "availability", "consent"][allLabels.indexOf(item)]));
+  }
 });
 
 // ─── Grupo 3: dos ofertas → dos emails, cada una con su claim ───────────────

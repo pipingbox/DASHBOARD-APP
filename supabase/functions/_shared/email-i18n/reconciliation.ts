@@ -1,7 +1,7 @@
 import { type EmailLanguage } from "./languages.ts";
 import { BRAND, escapeHtml, safeUrl } from "./render.ts";
 
-type Requirement = "cv" | "certificate" | "availability" | "consent" | "completion";
+export type Requirement = "cv" | "certificate" | "availability" | "consent" | "completion";
 type Copy = { subject: string; heading: string; body: string; pending: string; button: string; footer: string; requirements: Record<Requirement, string> };
 
 const COPY: Record<EmailLanguage, Copy> = {
@@ -17,6 +17,10 @@ const COPY: Record<EmailLanguage, Copy> = {
   uk: { subject: "PIPINGBOX · Заповніть профіль, щоб продовжити", heading: "Ваші заявки залишаються зареєстрованими", body: "Ваші заявки не відхилено. Заповніть профіль, щоб їх можна було розглянути перед можливим представленням клієнту.", pending: "Бракує інформації:", button: "Заповнити профіль", footer: "Ви отримали це повідомлення, оскільки ваш профіль PIPINGBOX потребує додаткової інформації.", requirements: { cv: "Завантажте чинне резюме", certificate: "Завантажте професійний сертифікат або документ", availability: "Вкажіть доступність", consent: "Підтвердьте згоду та видимість", completion: "Заповніть мінімальні дані профілю" } },
   bg: { subject: "PIPINGBOX · Попълнете профила си, за да продължите", heading: "Кандидатурите ви остават регистрирани", body: "Кандидатурите ви не са отхвърлени. Попълнете профила си, за да могат да бъдат разгледани преди евентуално представяне на клиент.", pending: "Липсваща информация:", button: "Попълнете профила", footer: "Получавате това съобщение, защото профилът ви в PIPINGBOX се нуждае от допълнителна информация.", requirements: { cv: "Качете валидна автобиография", certificate: "Качете професионален сертификат или документ", availability: "Посочете наличността си", consent: "Потвърдете съгласието и видимостта", completion: "Попълнете минималните данни в профила" } },
 };
+
+export function marketplaceRequirementLabel(lang: EmailLanguage, requirement: Requirement): string {
+  return COPY[lang].requirements[requirement];
+}
 
 export function renderMarketplaceReconciliationEmail(input: { lang: EmailLanguage; actionUrl: string; missing: readonly Requirement[] }) {
   const copy = COPY[input.lang];
