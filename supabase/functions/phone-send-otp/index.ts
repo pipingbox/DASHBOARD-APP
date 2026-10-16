@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
   const phoneE164 = normalized.e164;
 
   // Provider configurado? Si no hay transporte, no tiene sentido escribir nada.
-  const provider = createPhoneVerificationProvider(supabase);
+  const provider = await createPhoneVerificationProvider(supabase);
   if (!provider.isConfigured()) {
     return json({ error: PHONE_PROVIDER_NOT_CONFIGURED }, 503);
   }

@@ -83,10 +83,27 @@ class UnconfiguredProvider implements PhoneVerificationProvider {
 }
 
 // deno-lint-ignore no-explicit-any
-export function createPhoneVerificationProvider(
+export async function createPhoneVerificationProvider(
   supabase: SupabaseClient<any, any, any>,
-): PhoneVerificationProvider {
-  const selected = (Deno.env.get("PHONE_VERIFICATION_PROVIDER") || "").toLowerCase();
+): Promise<PhoneVerificationProvider> {
+  let selected = (Deno.env.get("PHONE_VERIFICATION_PROVIDER") || "").toLowerCase();
+
+  if (!selected) {
+    // Fallback auditable en BBDD (tabla service_role-only, 1 fila). Se usa
+    // cuando la plataforma no permite fijar secrets; la fila 'mock' SOLO se
+    // siembra en QA. En produccion la tabla queda vacia => unconfigured.
+    try {
+      const { data } = await supabase
+        .from("app_14da0f1941_phone_provider_config")
+        .select("provider")
+        .eq("id", true)
+        .maybeSingle();
+      selected = (data?.provider || "").toLowerCase();
+    } catch {
+      selected = "";
+    }
+  }
+
   if (selected === "mock") {
     return new MockCaptureProvider(supabase);
   }

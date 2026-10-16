@@ -248,7 +248,25 @@ REVOKE ALL ON public.app_14da0f1941_phone_provider_outbox FROM PUBLIC, anon, aut
 GRANT SELECT, INSERT, DELETE ON public.app_14da0f1941_phone_provider_outbox TO service_role;
 
 COMMENT ON TABLE public.app_14da0f1941_phone_provider_outbox IS
-  'PB-WHATSAPP-FOUNDATION-001: captura del PhoneVerificationProvider MOCK (transporte simulado del SMS; contiene el codigo porque ES el canal). SOLO QA con PHONE_VERIFICATION_PROVIDER=mock; prohibido habilitarlo en produccion. No legible por authenticated/anon.';
+  'PB-WHATSAPP-FOUNDATION-001: captura del PhoneVerificationProvider MOCK (transporte simulado del SMS; contiene el codigo porque ES el canal). SOLO QA con provider=mock; prohibido habilitarlo en produccion. No legible por authenticated/anon.';
+
+-- Config del provider (1 fila, service_role-only). El secret de entorno
+-- PHONE_VERIFICATION_PROVIDER tiene prioridad; esta tabla es el fallback
+-- auditable. La fila 'mock' se siembra SOLO en QA (semilla fuera de esta
+-- migracion); en produccion la tabla queda vacia => provider no configurado.
+CREATE TABLE IF NOT EXISTS public.app_14da0f1941_phone_provider_config (
+  id boolean PRIMARY KEY DEFAULT true CHECK (id),
+  provider text NOT NULL CHECK (provider IN ('mock', 'twilio', 'vonage', 'whatsapp-cloud', 'unconfigured')),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.app_14da0f1941_phone_provider_config ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON public.app_14da0f1941_phone_provider_config FROM PUBLIC, anon, authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.app_14da0f1941_phone_provider_config TO service_role;
+
+COMMENT ON TABLE public.app_14da0f1941_phone_provider_config IS
+  'PB-WHATSAPP-FOUNDATION-001: seleccion del PhoneVerificationProvider (fallback del secret de entorno). 1 fila. mock solo en QA; prohibido en produccion. No legible por authenticated/anon.';
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 5. GUARD DE PRIVILEGIOS: proteger phone_*/whatsapp_* como backend-controlled
