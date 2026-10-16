@@ -98,7 +98,7 @@ test.describe('PB-CV-AUTO-PROFILE-001 — RLS/security', () => {
 
     test('SELECT is scoped: zero foreign drafts visible', async () => {
       const api = await pwRequest.newContext({ baseURL: SUPABASE_URL });
-      const { token } = await login(api);
+      const { token, userId: ownerUserId } = await login(api);
       const auth = {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${token}`,
@@ -111,7 +111,7 @@ test.describe('PB-CV-AUTO-PROFILE-001 — RLS/security', () => {
       const ownJson = await own.json();
       // Every visible row must belong to the QA identity — never anyone else.
       for (const row of ownJson) {
-        expect(row.user_id, 'RLS must scope rows to the owner').toBe(userId);
+        expect(row.user_id, 'RLS must scope rows to the owner').toBe(ownerUserId);
       }
 
       // Explicit foreign filter: must return zero rows (cross-user denied).
