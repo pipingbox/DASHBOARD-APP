@@ -38,7 +38,7 @@
 // intacto) y marca el draft extraction_failed con error_code cerrado; el
 // usuario puede completar su perfil manualmente y reintentar con seguridad.
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { extractCv } from '../_shared/cv-extraction/engine.ts';
 import { CV_EXTRACTION_ERROR_CODES, type CvExtractionErrorCode } from '../_shared/cv-extraction/types.ts';
 import { extractText, sha256Hex } from '../_shared/cv-extraction/textExtract.ts';
@@ -110,7 +110,7 @@ function isKnownErrorCode(code: string): code is CvExtractionErrorCode {
 }
 
 async function emitEvent(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   userId: string,
   eventType: string,
   extra: Record<string, unknown> = {},
@@ -125,7 +125,7 @@ async function emitEvent(
 
 /** Busca el auth user con ese email (case-insensitive). 0/1 resultado. */
 async function findUserByEmail(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   email: string,
 ): Promise<'ambiguous' | { id: string; lang: string | null; profileLang: string | null } | null> {
   const target = email.trim().toLowerCase();
