@@ -1,0 +1,89 @@
+== Sign in QA users ==
+  ok
+== J: anon denied ==
+  PASS J1 anon edge function sin Authorization => 401
+  PASS J2 anon select verifications => denied/sin filas
+  PASS J3 anon select events => denied/sin filas
+  PASS J4 anon select outbox => denied/sin filas
+== A: sin telefono (auth-only, sin perfil) ==
+  PASS A1 sin perfil o phone_present=false
+  PASS A2 sin perfil o phone_verified=false
+== B: anadir numero valido ==
+  PASS B1 send-otp => sent:true
+  PASS B2 phone_present=true
+  PASS B3 phone_verified=false
+  PASS B4 e164 canonico con +
+  PASS B5 phone_number_raw guardado
+  PASS B6 auth-only: perfil creado sin onboarding (AUTH_ONLY)
+  PASS B7 auth-only: marketplace_ready=false
+  PASS B8 mock capture: codigo de 6 digitos en outbox
+== D: OTP incorrecto ==
+  PASS D1 verify con codigo erroneo => invalid_code
+  PASS D2 sigue sin verificar
+== C: OTP correcto ==
+  PASS C1 verify => verified:true
+  PASS C2 phone_verified=true
+  PASS C3 phone_verified_at != null
+  PASS C4 metodo sms_otp
+== K: Marketplace Ready inalterado ==
+  PASS K1 marketplace_ready sigue false
+  PASS K2 onboarding_status sigue AUTH_ONLY
+  PASS K3 profile_completion=0
+  PASS K4 contract version no tocada
+== L: opt-in requiere verificacion ==
+== L: opt-in con telefono verificado ==
+  PASS L1 job_alerts on => ok
+  PASS L2 marketing on => ok
+  PASS L3 jobs=true, marketing=true, service=false (separados)
+  PASS L4 consent_at registrado
+  PASS L5 consent_version registrada
+== M: opt-out ==
+  PASS M1 revocacion ok
+  PASS M2 todos los opt-ins false
+  PASS M3 whatsapp_opted_out_at con timestamp
+== G: reenvio OTP ==
+  PASS G0 resend mismo numero => ok
+  PASS G1 reenvio inmediato => cooldown 429
+  PASS G2 segundo envio ok
+  PASS G3 codigo anterior invalido tras reenvio
+== E: OTP expirado ==
+  PASS E0 envio ok
+  PASS E1 codigo expirado => code_expired
+  PASS E2 no verifica con expirado
+== F: max intentos + rate limit ==
+  PASS F0 envio ok
+  PASS F1 sexto intento => max_attempts_exceeded
+  PASS F2 4o envio en la hora => rate_limit_exceeded
+== H: cambio de numero ==
+  PASS H0 envio a numero nuevo => ok
+  PASS H1 nuevo e164 presente
+  PASS H2 verificacion invalidada
+  PASS H3 opt-ins NO heredados (todos false)
+  PASS H4 revocacion fechada
+  PASS H5 opt-in sin verificar => phone_not_verified
+  PASS H6 re-verificacion del nuevo numero ok
+== I: cross-user (B no ve ni toca a A) ==
+  PASS I1 B lee perfil de A => sin filas
+  PASS I2 B actualiza telefono de A => denegado/sin efecto
+  PASS I3 B lee verifications de A => sin filas
+  PASS I4 B lee events de A => sin filas
+  PASS I5 B lee outbox => denied/sin filas
+  PASS I6 A intenta escribir phone_verified directo => guard lo rechaza
+  PASS I7 A intenta escribir opt-in directo => guard lo rechaza
+== Auditoria ==
+  PASS AUD evento phone_added registrado
+  PASS AUD evento phone_changed registrado
+  PASS AUD evento verification_started registrado
+  PASS AUD evento verification_failed registrado
+  PASS AUD evento phone_verified registrado
+  PASS AUD evento whatsapp_opt_in_changed registrado
+  PASS AUD todos los telefonos enmascarados (+34******678)
+  PASS AUD ningun codigo OTP en events
+  PASS AUD ningun numero completo en events
+== Withdraw (baja completa) ==
+  PASS W1 withdraw ok
+  PASS W2 telefono eliminado
+  PASS W3 verificacion reseteada
+  PASS W4 opt-ins false + opted_out_at
+
+==== RESULT: 69 passed, 0 failed ====

@@ -159,7 +159,8 @@ async function main() {
   check('K1 marketplace_ready sigue false', profC?.marketplace_ready === false);
   check('K2 onboarding_status sigue AUTH_ONLY', profC?.onboarding_status === 'AUTH_ONLY');
   check('K3 profile_completion=0', profC?.profile_completion === 0);
-  check('K4 contract version no tocada', profC?.marketplace_contract_version === null || profC?.marketplace_contract_version === 0);
+  check('K4 contract version no tocada', profC?.marketplace_contract_version === profB?.marketplace_contract_version,
+    `B=${profB?.marketplace_contract_version} C=${profC?.marketplace_contract_version}`);
 
   // ── Consentimiento antes de verificado (con numero nuevo, caso H parcial) ─
   console.log('== L: opt-in requiere verificacion ==');
@@ -270,7 +271,8 @@ async function main() {
   const eventsAasB = await rest(`app_14da0f1941_phone_events?select=id&user_id=eq.${UID_A}`, tokB);
   check('I4 B lee events de A => sin filas', Array.isArray(eventsAasB.data) && eventsAasB.data.length === 0);
   const outboxAsB = await rest(`app_14da0f1941_phone_provider_outbox?select=id`, tokB);
-  check('I5 B lee outbox => sin filas', Array.isArray(outboxAsB.data) && outboxAsB.data.length === 0);
+  check('I5 B lee outbox => denied/sin filas',
+    outboxAsB.status >= 400 || (Array.isArray(outboxAsB.data) && outboxAsB.data.length === 0));
   // Guard: escritura directa de columnas protegidas por el propio usuario
   const selfHack = await rest(`app_14da0f1941_profiles?user_id=eq.${UID_A}`, tokA, {
     method: 'PATCH',

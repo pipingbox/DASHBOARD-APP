@@ -52,7 +52,7 @@ const COUNTRY_OPTIONS = COUNTRY_PHONE_OPTIONS.map((c) => ({
  * PB-WHATSAPP-FOUNDATION-001
  *
  * Estados separados (ticket §1): phone_present != phone_verified != opt-in.
- * phone_*/whatsapp_* son backend-controlled: el frontend SOLO llama a las
+ * Las columnas phone y whatsapp son backend-controlled: el frontend SOLO llama a las
  * Edge Functions phone-send-otp, phone-verify-otp, phone-update-consent y
  * phone-withdraw-consent; nunca escribe esas columnas por PostgREST.
  */
