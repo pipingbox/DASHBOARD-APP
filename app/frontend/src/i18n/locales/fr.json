@@ -106,7 +106,9 @@
     "companyDocumentation": "Gestion Documentaire Industrielle",
     "companySection": "Entreprise",
     "companySettings": "Paramètres",
-    "companyWorkspace": "Espace Entreprise"
+    "companyWorkspace": "Espace Entreprise",
+    "companyTenant": "Mon entreprise",
+    "companyTeam": "Équipe"
   },
   "notifications": {
     "title": "Notifications",
@@ -4416,5 +4418,103 @@
     "copyAllFacebook": "Copier tous les liens Facebook",
     "copied": "Copié",
     "note": "Les paramètres UTM ne contiennent que des identifiants génériques de campagne, jamais de données personnelles."
+  },
+  "companyCore": {
+    "loading": "Chargement…",
+    "switcher": {
+      "label": "Entreprise active"
+    },
+    "roles": {
+      "owner": "Propriétaire",
+      "admin": "Administrateur",
+      "recruiter": "Recruteur",
+      "viewer": "Lecture seule"
+    },
+    "verification": {
+      "unverified": "Non vérifiée",
+      "pending": "Vérification en cours",
+      "verified": "Vérifiée",
+      "rejected": "Vérification refusée"
+    },
+    "create": {
+      "title": "Configurez votre entreprise",
+      "description": "Créez l'espace de votre entreprise pour inviter votre équipe. Créer une entreprise ne la vérifie pas.",
+      "nameLabel": "Nom de l'entreprise",
+      "countryLabel": "Pays (facultatif)",
+      "submit": "Créer l'entreprise",
+      "submitting": "Création…"
+    },
+    "view": {
+      "title": "Mon entreprise",
+      "description": "Aperçu de l'espace de votre entreprise.",
+      "verificationTitle": "Statut de vérification",
+      "teamTitle": "Équipe",
+      "teamDescription": "Membres, rôles et invitations",
+      "yourRoleTitle": "Votre rôle"
+    },
+    "team": {
+      "title": "Équipe",
+      "description": "Membres de {{company}}",
+      "noCompany": "Vous ne faites partie d'aucune entreprise pour le moment.",
+      "createLink": "Configurez votre entreprise",
+      "membersTitle": "Membres",
+      "unnamedMember": "Membre sans nom",
+      "you": "vous",
+      "confirmRemove": "Retirer ce membre ? Son accès est révoqué immédiatement.",
+      "confirmTransfer": "Transférer la propriété ? Vous deviendrez administrateur.",
+      "transferTitle": "Transférer la propriété",
+      "removeTitle": "Retirer le membre",
+      "leaveTitle": "Quitter l'entreprise"
+    },
+    "invite": {
+      "title": "Inviter un membre",
+      "emailLabel": "Adresse e-mail",
+      "roleLabel": "Rôle",
+      "submit": "Créer l'invitation",
+      "submitting": "Création…",
+      "created": "Invitation créée. Partagez ce lien à usage unique :",
+      "alreadyPending": "Une invitation est déjà en attente pour cette adresse e-mail.",
+      "copy": "Copier",
+      "copied": "Lien copié",
+      "emailNotice": "L'envoi par e-mail n'est pas encore activé — partagez le lien manuellement avec la personne invitée."
+    },
+    "invitations": {
+      "title": "Invitations",
+      "revoke": "Révoquer",
+      "expires": "expire le {{date}}",
+      "status": {
+        "pending": "en attente",
+        "accepted": "acceptée",
+        "rejected": "refusée",
+        "revoked": "révoquée",
+        "expired": "expirée"
+      }
+    },
+    "accept": {
+      "title": "Invitation d'entreprise",
+      "sessionRequired": "Pour répondre à cette invitation, connectez-vous ou inscrivez-vous avec l'adresse e-mail invitée, puis rouvrez ce lien.",
+      "signIn": "Se connecter",
+      "register": "S'inscrire",
+      "question": "Voulez-vous rejoindre cette entreprise ?",
+      "accept": "Accepter",
+      "reject": "Refuser",
+      "processing": "Traitement…",
+      "success": "Vous avez rejoint l'entreprise. Redirection…",
+      "rejected": "Invitation refusée."
+    },
+    "errors": {
+      "not_authenticated": "Vous devez être connecté.",
+      "forbidden": "Vous n'avez pas la permission pour cette action.",
+      "not_found": "Introuvable.",
+      "invalid_name": "Nom d'entreprise invalide.",
+      "invalid_email": "Adresse e-mail invalide.",
+      "invalid_role": "Rôle invalide.",
+      "invalid_or_expired": "Cette invitation est invalide, expirée ou déjà utilisée.",
+      "email_mismatch": "Cette invitation a été envoyée à une autre adresse e-mail. Connectez-vous avec l'adresse invitée.",
+      "not_active": "L'adhésion n'est pas active.",
+      "last_owner": "L'entreprise doit conserver au moins un propriétaire.",
+      "cannot_transfer_to_self": "Vous ne pouvez pas transférer la propriété à vous-même.",
+      "unknown": "Une erreur est survenue. Veuillez réessayer."
+    }
   }
 }

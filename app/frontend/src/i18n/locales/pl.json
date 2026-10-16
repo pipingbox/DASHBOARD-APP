@@ -106,7 +106,9 @@
     "companyDocumentation": "Zarządzanie dokumentacją przemysłową",
     "companySection": "Firma",
     "companySettings": "Ustawienia",
-    "companyWorkspace": "Obszar roboczy firmy"
+    "companyWorkspace": "Obszar roboczy firmy",
+    "companyTenant": "Moja firma",
+    "companyTeam": "Zespół"
   },
   "notifications": {
     "title": "Powiadomienia",
@@ -4423,5 +4425,103 @@
     "copyAllFacebook": "Kopiuj wszystkie linki Facebook",
     "copied": "Skopiowano",
     "note": "Parametry UTM zawierają wyłącznie ogólne identyfikatory kampanii, nigdy dane osobowe."
+  },
+  "companyCore": {
+    "loading": "Ładowanie…",
+    "switcher": {
+      "label": "Aktywna firma"
+    },
+    "roles": {
+      "owner": "Właściciel",
+      "admin": "Administrator",
+      "recruiter": "Rekruter",
+      "viewer": "Tylko odczyt"
+    },
+    "verification": {
+      "unverified": "Nieweryfikowana",
+      "pending": "Weryfikacja w toku",
+      "verified": "Zweryfikowana",
+      "rejected": "Weryfikacja odrzucona"
+    },
+    "create": {
+      "title": "Skonfiguruj swoją firmę",
+      "description": "Utwórz przestrzeń swojej firmy, aby zaprosić zespół. Utworzenie firmy nie weryfikuje jej.",
+      "nameLabel": "Nazwa firmy",
+      "countryLabel": "Kraj (opcjonalnie)",
+      "submit": "Utwórz firmę",
+      "submitting": "Tworzenie…"
+    },
+    "view": {
+      "title": "Moja firma",
+      "description": "Przegląd przestrzeni Twojej firmy.",
+      "verificationTitle": "Status weryfikacji",
+      "teamTitle": "Zespół",
+      "teamDescription": "Członkowie, role i zaproszenia",
+      "yourRoleTitle": "Twoja rola"
+    },
+    "team": {
+      "title": "Zespół",
+      "description": "Członkowie firmy {{company}}",
+      "noCompany": "Nie należysz jeszcze do żadnej firmy.",
+      "createLink": "Skonfiguruj swoją firmę",
+      "membersTitle": "Członkowie",
+      "unnamedMember": "Członek bez nazwy",
+      "you": "ty",
+      "confirmRemove": "Usunąć tego członka? Jego dostęp zostanie natychmiast cofnięty.",
+      "confirmTransfer": "Przenieść własność? Staniesz się administratorem.",
+      "transferTitle": "Przenieś własność",
+      "removeTitle": "Usuń członka",
+      "leaveTitle": "Opuść firmę"
+    },
+    "invite": {
+      "title": "Zaproś członka",
+      "emailLabel": "Adres e-mail",
+      "roleLabel": "Rola",
+      "submit": "Utwórz zaproszenie",
+      "submitting": "Tworzenie…",
+      "created": "Zaproszenie utworzone. Udostępnij ten jednorazowy link:",
+      "alreadyPending": "Dla tego adresu e-mail istnieje już oczekujące zaproszenie.",
+      "copy": "Kopiuj",
+      "copied": "Link skopiowany",
+      "emailNotice": "Wysyłka e-maili nie jest jeszcze włączona — udostępnij link ręcznie zaproszonej osobie."
+    },
+    "invitations": {
+      "title": "Zaproszenia",
+      "revoke": "Cofnij",
+      "expires": "wygasa {{date}}",
+      "status": {
+        "pending": "oczekujące",
+        "accepted": "zaakceptowane",
+        "rejected": "odrzucone",
+        "revoked": "cofnięte",
+        "expired": "wygasłe"
+      }
+    },
+    "accept": {
+      "title": "Zaproszenie do firmy",
+      "sessionRequired": "Aby odpowiedzieć na to zaproszenie, zaloguj się lub zarejestruj z zaproszonego adresu e-mail, a następnie otwórz ten link ponownie.",
+      "signIn": "Zaloguj się",
+      "register": "Zarejestruj się",
+      "question": "Chcesz dołączyć do tej firmy?",
+      "accept": "Zaakceptuj",
+      "reject": "Odrzuć",
+      "processing": "Przetwarzanie…",
+      "success": "Dołączyłeś do firmy. Przekierowywanie…",
+      "rejected": "Zaproszenie odrzucone."
+    },
+    "errors": {
+      "not_authenticated": "Musisz być zalogowany.",
+      "forbidden": "Nie masz uprawnień do tej akcji.",
+      "not_found": "Nie znaleziono.",
+      "invalid_name": "Nieprawidłowa nazwa firmy.",
+      "invalid_email": "Nieprawidłowy adres e-mail.",
+      "invalid_role": "Nieprawidłowa rola.",
+      "invalid_or_expired": "To zaproszenie jest nieprawidłowe, wygasło lub zostało już użyte.",
+      "email_mismatch": "To zaproszenie zostało wysłane na inny adres e-mail. Zaloguj się zaproszonym adresem.",
+      "not_active": "Członkostwo nie jest aktywne.",
+      "last_owner": "Firma musi zachować co najmniej jednego właściciela.",
+      "cannot_transfer_to_self": "Nie możesz przenieść własności na siebie.",
+      "unknown": "Coś poszło nie tak. Spróbuj ponownie."
+    }
   }
 }

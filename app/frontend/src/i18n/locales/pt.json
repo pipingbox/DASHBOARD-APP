@@ -106,7 +106,9 @@
     "companyDocumentation": "Gestão Documental Industrial",
     "companySection": "Empresa",
     "companySettings": "Configurações",
-    "companyWorkspace": "Ambiente da Empresa"
+    "companyWorkspace": "Ambiente da Empresa",
+    "companyTenant": "A minha empresa",
+    "companyTeam": "Equipa"
   },
   "notifications": {
     "title": "Notificações",
@@ -4416,5 +4418,103 @@
     "copyAllFacebook": "Copiar todos os links do Facebook",
     "copied": "Copiado",
     "note": "Os parâmetros UTM contêm apenas identificadores genéricos de campanha, nunca dados pessoais."
+  },
+  "companyCore": {
+    "loading": "A carregar…",
+    "switcher": {
+      "label": "Empresa ativa"
+    },
+    "roles": {
+      "owner": "Proprietário",
+      "admin": "Administrador",
+      "recruiter": "Recrutador",
+      "viewer": "Somente leitura"
+    },
+    "verification": {
+      "unverified": "Não verificada",
+      "pending": "Verificação pendente",
+      "verified": "Verificada",
+      "rejected": "Verificação rejeitada"
+    },
+    "create": {
+      "title": "Configure a sua empresa",
+      "description": "Crie o espaço da sua empresa para convidar a sua equipa. Criar uma empresa não a verifica.",
+      "nameLabel": "Nome da empresa",
+      "countryLabel": "País (opcional)",
+      "submit": "Criar empresa",
+      "submitting": "A criar…"
+    },
+    "view": {
+      "title": "A minha empresa",
+      "description": "Visão geral do espaço da sua empresa.",
+      "verificationTitle": "Estado de verificação",
+      "teamTitle": "Equipa",
+      "teamDescription": "Membros, funções e convites",
+      "yourRoleTitle": "A sua função"
+    },
+    "team": {
+      "title": "Equipa",
+      "description": "Membros de {{company}}",
+      "noCompany": "Ainda não pertence a nenhuma empresa.",
+      "createLink": "Configure a sua empresa",
+      "membersTitle": "Membros",
+      "unnamedMember": "Membro sem nome",
+      "you": "você",
+      "confirmRemove": "Remover este membro? O acesso é revogado imediatamente.",
+      "confirmTransfer": "Transferir a propriedade? Passará a administrador.",
+      "transferTitle": "Transferir propriedade",
+      "removeTitle": "Remover membro",
+      "leaveTitle": "Sair da empresa"
+    },
+    "invite": {
+      "title": "Convidar um membro",
+      "emailLabel": "E-mail",
+      "roleLabel": "Função",
+      "submit": "Criar convite",
+      "submitting": "A criar…",
+      "created": "Convite criado. Partilhe esta ligação de utilização única:",
+      "alreadyPending": "Já existe um convite pendente para este e-mail.",
+      "copy": "Copiar",
+      "copied": "Ligação copiada",
+      "emailNotice": "O envio por e-mail ainda não está ativo — partilhe a ligação manualmente com a pessoa convidada."
+    },
+    "invitations": {
+      "title": "Convites",
+      "revoke": "Revogar",
+      "expires": "expira em {{date}}",
+      "status": {
+        "pending": "pendente",
+        "accepted": "aceite",
+        "rejected": "rejeitado",
+        "revoked": "revogado",
+        "expired": "expirado"
+      }
+    },
+    "accept": {
+      "title": "Convite de empresa",
+      "sessionRequired": "Para responder a este convite, inicie sessão ou registe-se com o e-mail convidado e reabra esta ligação.",
+      "signIn": "Iniciar sessão",
+      "register": "Registar",
+      "question": "Pretende juntar-se a esta empresa?",
+      "accept": "Aceitar",
+      "reject": "Rejeitar",
+      "processing": "A processar…",
+      "success": "Juntou-se à empresa. A redirecionar…",
+      "rejected": "Convite rejeitado."
+    },
+    "errors": {
+      "not_authenticated": "Tem de iniciar sessão.",
+      "forbidden": "Não tem permissão para esta ação.",
+      "not_found": "Não encontrado.",
+      "invalid_name": "Nome de empresa inválido.",
+      "invalid_email": "E-mail inválido.",
+      "invalid_role": "Função inválida.",
+      "invalid_or_expired": "Este convite é inválido, expirou ou já foi utilizado.",
+      "email_mismatch": "Este convite foi enviado para outro e-mail. Inicie sessão com o e-mail convidado.",
+      "not_active": "A adesão não está ativa.",
+      "last_owner": "A empresa tem de manter pelo menos um proprietário.",
+      "cannot_transfer_to_self": "Não pode transferir a propriedade para si próprio.",
+      "unknown": "Algo falhou. Tente novamente."
+    }
   }
 }
