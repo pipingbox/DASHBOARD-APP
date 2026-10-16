@@ -322,9 +322,15 @@ Deno.serve(async (req: Request) => {
 
     if (column === 'skills') {
       // Merge (unión) de skills: del perfil + del CV, sin duplicados.
+      // skills, welding_processes y disciplinas convergen en la MISMA
+      // columna: cada merge debe partir del patch acumulado, no del valor
+      // original del perfil (si no, el último merge pisa a los anteriores).
       const incoming = Array.isArray(value) ? value.filter((s): s is string => typeof s === 'string' && s.trim() !== '') : [];
       if (!incoming.length) continue;
-      const existing = Array.isArray(profile['skills']) ? (profile['skills'] as string[]) : [];
+      const alreadyPatched = Array.isArray(patch['skills']) ? (patch['skills'] as string[]) : [];
+      const existing = alreadyPatched.length > 0
+        ? alreadyPatched
+        : (Array.isArray(profile['skills']) ? (profile['skills'] as string[]) : []);
       const merged = [...new Set([...existing, ...incoming.map((s) => s.trim())])];
       if (merged.length !== existing.length) {
         patch['skills'] = merged;
