@@ -354,11 +354,16 @@ Deno.serve(async (req: Request) => {
 
     if (column === 'willing_to_travel' || column === 'willing_to_relocate') {
       if (value !== true) continue; // solo afirmaciones explícitas
-      if (profile[column] !== true) {
-        if (isEmptyProfileValue(profile[column])) {
-          patch[column] = true;
-          fieldsConfirmed++;
-        } else if (decision.overwrite === true) {
+      // willing_to_relocate: DEFAULT false de la columna = dato NO confirmado
+      // por el usuario (§4); una afirmación explícita del CV lo añade sin
+      // conflicto. willing_to_travel: DEFAULT true — un false en el perfil
+      // SÍ es una decisión explícita del usuario y debe pedir overwrite.
+      const defaultFalse = column === 'willing_to_relocate';
+      if (isEmptyProfileValue(profile[column]) || (defaultFalse && profile[column] === false)) {
+        patch[column] = true;
+        fieldsConfirmed++;
+      } else if (profile[column] !== true) {
+        if (decision.overwrite === true) {
           patch[column] = true;
           fieldsConfirmed++;
         } else {
