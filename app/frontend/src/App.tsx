@@ -47,6 +47,7 @@ import CommunityPost from './pages/CommunityPost';
 import Companies from './pages/Companies';
 import RequestWorkers from './pages/RequestWorkers';
 import Profile from './pages/Profile';
+import CVReview from './pages/CVReview';
 import InstructorDashboard from './pages/InstructorDashboard';
 import PublicWorkerProfile from './pages/PublicWorkerProfile';
 import Admin from './pages/Admin';
@@ -392,6 +393,8 @@ const AppRoutes = () => {
       element={withPublicShell(<RequestWorkers />)}
     />
     <Route path="/profile" element={withShell(<Profile />)} />
+    {/* PB-CV-AUTO-PROFILE-001 — revisión del perfil preparado a partir del CV. */}
+    <Route path="/profile/cv-review" element={withShell(<CVReview />)} />
     <Route
       path="/applications"
       element={withShellRoles(<Applications />, ['admin', 'worker'])}
