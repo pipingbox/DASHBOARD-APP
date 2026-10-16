@@ -147,17 +147,55 @@ function formatE164ForDisplay(e164: string, countryCode: string): string {
 // La logica de negocio NO depende de Meta/Twilio/etc: solo de esta interfaz.
 //
 // Providers:
-//   * "mock" (PHONE_VERIFICATION_PROVIDER=mock): capture provider SOLO QA.
-//     Escribe el "SMS" en app_14da0f1941_phone_provider_outbox (transporte
-//     simulado; el codigo viaja en el mensaje porque ES el canal, igual que
-//     un SMS real). La tabla no es legible por authenticated/anon y el
-//     provider esta prohibido en produccion (ver rollback del ticket).
+//   * "mock" (capture provider SOLO QA). Escribe el "SMS" en
+//     app_14da0f1941_phone_provider_outbox (transporte simulado; el codigo
+//     viaja en el mensaje porque ES el canal, igual que un SMS real). La
+//     tabla no es legible por authenticated/anon.
+//     Barrera tecnica M2 (fail-safe): activarlo exige LAS TRES condiciones:
+//       1) provider seleccionado = 'mock' (env o fila de config);
+//       2) config.mock_enabled = true (una fila provider='mock' NO basta);
+//       3) project ref actual en MOCK_ALLOWED_REFS (solo QA).
+//     En produccion el ref nunca coincide => mock imposible aunque la fila
+//     exista. Cualquier duda => unconfigured (503 controlado, nunca logs).
 //   * cualquier otro valor / ausencia: provider no configurado. El caller
 //     devuelve sms_provider_not_configured. NUNCA hay fallback a console/logs:
 //     el OTP jamas se escribe en logs.
 //
 // El provider real (WhatsApp Cloud API / Twilio / Vonage) es una entrega
 // posterior: se anadira un case nuevo aqui sin tocar las edge functions.
+
+// ── inlined: ./phone-mock-guard.ts (from _shared/phone-verification-provider.ts) ──
+// _shared/phone-mock-guard.ts
+// PB-WHATSAPP-FOUNDATION-001 FIX1 (M2): barrera tecnica anti-mock fail-safe.
+//
+// Modulo PURO (sin dependencias externas) para que sea testeable unitariamente
+// en Deno y en Node (strip-types). El provider mock/capture SOLO puede vivir
+// en proyectos QA explicitamente listados; en cualquier otro (produccion
+// incluida) es imposible activarlo aunque alguien inserte la fila en la tabla
+// phone_provider_config: una fila provider='mock' NO basta.
+
+// Project refs permitidos (QA). Overridable por env solo si la plataforma lo
+// permite; el default es la lista QA hardcodeada (no es secreto: es un ref).
+const MOCK_ALLOWED_REFS = (
+  (typeof Deno !== "undefined" && Deno.env?.get("PHONE_VERIFICATION_MOCK_ALLOW_REFS")) ||
+  "uqfbilyfpflrlthnyijj"
+).split(",").map((s) => s.trim()).filter(Boolean);
+
+/** Extrae el project ref de una SUPABASE_URL (https://<ref>.supabase.co). */
+function projectRefFromSupabaseUrl(url: string): string {
+  const match = (url || "").match(/^https?:\/\/([a-z0-9]+)\.supabase\.co/i);
+  return match ? match[1] : "";
+}
+
+/**
+ * El mock solo esta permitido con mock_enabled explicito Y ref en allowlist.
+ * Fail-safe por omision: cualquier dato ausente/desconocido => false.
+ */
+function isMockProviderAllowed(mockEnabled: boolean, projectRef: string): boolean {
+  if (!mockEnabled) return false;
+  if (!projectRef) return false;
+  return MOCK_ALLOWED_REFS.includes(projectRef);
+}
 
 
 interface PhoneVerificationSendInput {
@@ -223,29 +261,39 @@ class UnconfiguredProvider implements PhoneVerificationProvider {
   }
 }
 
+// Project refs donde el mock puede existir (QA) y decision fail-safe:
+// ver _shared/phone-mock-guard.ts (modulo puro, testeado unitariamente).
+
 // deno-lint-ignore no-explicit-any
 async function createPhoneVerificationProvider(
   supabase: SupabaseClient<any, any, any>,
 ): Promise<PhoneVerificationProvider> {
   let selected = (Deno.env.get("PHONE_VERIFICATION_PROVIDER") || "").toLowerCase();
+  let mockEnabled = false;
 
-  if (!selected) {
-    // Fallback auditable en BBDD (tabla service_role-only, 1 fila). Se usa
-    // cuando la plataforma no permite fijar secrets; la fila 'mock' SOLO se
-    // siembra en QA. En produccion la tabla queda vacia => unconfigured.
-    try {
-      const { data } = await supabase
-        .from("app_14da0f1941_phone_provider_config")
-        .select("provider")
-        .eq("id", true)
-        .maybeSingle();
+  // Config auditable en BBDD (tabla service_role-only, 1 fila). M2: una fila
+  // provider='mock' YA NO BASTA para activar el mock; se exige ademas
+  // mock_enabled=true (columna con default false) y el project ref permitido.
+  try {
+    const { data } = await supabase
+      .from("app_14da0f1941_phone_provider_config")
+      .select("provider, mock_enabled")
+      .eq("id", true)
+      .maybeSingle();
+    mockEnabled = data?.mock_enabled === true;
+    if (!selected) {
       selected = (data?.provider || "").toLowerCase();
-    } catch {
-      selected = "";
     }
+  } catch {
+    mockEnabled = false;
   }
 
   if (selected === "mock") {
+    // Barrera 2/3 (M2): mock_enabled explicito + ref en allowlist.
+    // Cualquier fallo => UnconfiguredProvider (503 controlado, nunca logs).
+    if (!isMockProviderAllowed(mockEnabled, projectRefFromSupabaseUrl(Deno.env.get("SUPABASE_URL") || ""))) {
+      return new UnconfiguredProvider();
+    }
     return new MockCaptureProvider(supabase);
   }
   // "twilio" | "vonage" | "whatsapp-cloud": entrega futura (ticket provider real).
@@ -371,34 +419,28 @@ Deno.serve(async (req) => {
     return json({ error: PHONE_PROVIDER_NOT_CONFIGURED }, 503);
   }
 
-  // Rate limit: challenges creados en la ultima hora.
-  const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const { data: recentOtps, error: countError } = await supabase
-    .from("app_14da0f1941_phone_verifications")
-    .select("id, created_at")
-    .eq("user_id", user.id)
-    .gte("created_at", hourAgo)
-    .order("created_at", { ascending: false });
+  // Rate limit por hora + cooldown de reenvio ATOMICOS (FIX L1): el gate es
+  // una RPC con SELECT ... FOR UPDATE sobre la fila de throttle del usuario,
+  // por lo que solicitudes concurrentes se serializan y no pueden sobrepasar
+  // ni la ventana ni el cooldown (el count-then-insert anterior era TOCTOU).
+  const { data: gate, error: gateError } = await supabase.rpc("pb_phone_send_gate", {
+    p_user_id: user.id,
+    p_max_per_window: maxPerHour,
+    p_window_seconds: 3600,
+    p_cooldown_seconds: resendCooldownSeconds,
+  });
 
-  if (countError) {
-    return json({ error: countError.message }, 500);
+  if (gateError) {
+    return json({ error: gateError.message }, 500);
   }
 
-  const recent = recentOtps || [];
-  if (recent.length >= maxPerHour) {
-    return json({ error: "rate_limit_exceeded" }, 429);
-  }
-
-  // Cooldown de reenvio sobre el challenge mas reciente.
-  if (recent.length > 0) {
-    const lastCreatedAt = new Date(recent[0].created_at).getTime();
-    const elapsedSeconds = (Date.now() - lastCreatedAt) / 1000;
-    if (elapsedSeconds < resendCooldownSeconds) {
-      return json({
-        error: "resend_cooldown",
-        retry_after_seconds: Math.ceil(resendCooldownSeconds - elapsedSeconds),
-      }, 429);
+  if (!gate?.allowed) {
+    const reason = gate?.reason || "rate_limit_exceeded";
+    const body429: Record<string, unknown> = { error: reason };
+    if (typeof gate?.retry_after_seconds === "number") {
+      body429.retry_after_seconds = gate.retry_after_seconds;
     }
+    return json(body429, 429);
   }
 
   // Invalidar OTPs pendientes anteriores (un reenvio mata al codigo previo).

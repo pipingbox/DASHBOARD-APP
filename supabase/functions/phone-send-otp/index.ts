@@ -83,34 +83,28 @@ Deno.serve(async (req) => {
     return json({ error: PHONE_PROVIDER_NOT_CONFIGURED }, 503);
   }
 
-  // Rate limit: challenges creados en la ultima hora.
-  const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const { data: recentOtps, error: countError } = await supabase
-    .from("app_14da0f1941_phone_verifications")
-    .select("id, created_at")
-    .eq("user_id", user.id)
-    .gte("created_at", hourAgo)
-    .order("created_at", { ascending: false });
+  // Rate limit por hora + cooldown de reenvio ATOMICOS (FIX L1): el gate es
+  // una RPC con SELECT ... FOR UPDATE sobre la fila de throttle del usuario,
+  // por lo que solicitudes concurrentes se serializan y no pueden sobrepasar
+  // ni la ventana ni el cooldown (el count-then-insert anterior era TOCTOU).
+  const { data: gate, error: gateError } = await supabase.rpc("pb_phone_send_gate", {
+    p_user_id: user.id,
+    p_max_per_window: maxPerHour,
+    p_window_seconds: 3600,
+    p_cooldown_seconds: resendCooldownSeconds,
+  });
 
-  if (countError) {
-    return json({ error: countError.message }, 500);
+  if (gateError) {
+    return json({ error: gateError.message }, 500);
   }
 
-  const recent = recentOtps || [];
-  if (recent.length >= maxPerHour) {
-    return json({ error: "rate_limit_exceeded" }, 429);
-  }
-
-  // Cooldown de reenvio sobre el challenge mas reciente.
-  if (recent.length > 0) {
-    const lastCreatedAt = new Date(recent[0].created_at).getTime();
-    const elapsedSeconds = (Date.now() - lastCreatedAt) / 1000;
-    if (elapsedSeconds < resendCooldownSeconds) {
-      return json({
-        error: "resend_cooldown",
-        retry_after_seconds: Math.ceil(resendCooldownSeconds - elapsedSeconds),
-      }, 429);
+  if (!gate?.allowed) {
+    const reason = gate?.reason || "rate_limit_exceeded";
+    const body429: Record<string, unknown> = { error: reason };
+    if (typeof gate?.retry_after_seconds === "number") {
+      body429.retry_after_seconds = gate.retry_after_seconds;
     }
+    return json(body429, 429);
   }
 
   // Invalidar OTPs pendientes anteriores (un reenvio mata al codigo previo).

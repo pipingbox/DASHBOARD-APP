@@ -110,10 +110,12 @@ Deno.serve(async (req) => {
   };
 
   // Revocacion efectiva: todos a false habiendo habido algun opt-in activo.
+  // FIX L3: whatsapp_opted_out_at es la fecha de la ULTIMA retirada efectiva
+  // y se CONSERVA al reactivar un opt-in (semantica historica, no de estado).
+  // El estado actual lo dan siempre los tres flags booleanos; opted_out_at
+  // solo registra cuando ocurrio la ultima revocacion (auditable, GDPR).
   if (!anyOn && wasOn) {
     update.whatsapp_opted_out_at = now;
-  } else if (anyOn) {
-    update.whatsapp_opted_out_at = null;
   }
 
   const { error: updateError } = await supabase

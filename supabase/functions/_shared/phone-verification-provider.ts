@@ -5,11 +5,16 @@
 // La logica de negocio NO depende de Meta/Twilio/etc: solo de esta interfaz.
 //
 // Providers:
-//   * "mock" (PHONE_VERIFICATION_PROVIDER=mock): capture provider SOLO QA.
-//     Escribe el "SMS" en app_14da0f1941_phone_provider_outbox (transporte
-//     simulado; el codigo viaja en el mensaje porque ES el canal, igual que
-//     un SMS real). La tabla no es legible por authenticated/anon y el
-//     provider esta prohibido en produccion (ver rollback del ticket).
+//   * "mock" (capture provider SOLO QA). Escribe el "SMS" en
+//     app_14da0f1941_phone_provider_outbox (transporte simulado; el codigo
+//     viaja en el mensaje porque ES el canal, igual que un SMS real). La
+//     tabla no es legible por authenticated/anon.
+//     Barrera tecnica M2 (fail-safe): activarlo exige LAS TRES condiciones:
+//       1) provider seleccionado = 'mock' (env o fila de config);
+//       2) config.mock_enabled = true (una fila provider='mock' NO basta);
+//       3) project ref actual en MOCK_ALLOWED_REFS (solo QA).
+//     En produccion el ref nunca coincide => mock imposible aunque la fila
+//     exista. Cualquier duda => unconfigured (503 controlado, nunca logs).
 //   * cualquier otro valor / ausencia: provider no configurado. El caller
 //     devuelve sms_provider_not_configured. NUNCA hay fallback a console/logs:
 //     el OTP jamas se escribe en logs.
@@ -18,6 +23,10 @@
 // posterior: se anadira un case nuevo aqui sin tocar las edge functions.
 
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  isMockProviderAllowed,
+  projectRefFromSupabaseUrl,
+} from "./phone-mock-guard.ts";
 
 export interface PhoneVerificationSendInput {
   /** Destinatario canonico E.164 con '+'. */
@@ -82,29 +91,39 @@ class UnconfiguredProvider implements PhoneVerificationProvider {
   }
 }
 
+// Project refs donde el mock puede existir (QA) y decision fail-safe:
+// ver _shared/phone-mock-guard.ts (modulo puro, testeado unitariamente).
+
 // deno-lint-ignore no-explicit-any
 export async function createPhoneVerificationProvider(
   supabase: SupabaseClient<any, any, any>,
 ): Promise<PhoneVerificationProvider> {
   let selected = (Deno.env.get("PHONE_VERIFICATION_PROVIDER") || "").toLowerCase();
+  let mockEnabled = false;
 
-  if (!selected) {
-    // Fallback auditable en BBDD (tabla service_role-only, 1 fila). Se usa
-    // cuando la plataforma no permite fijar secrets; la fila 'mock' SOLO se
-    // siembra en QA. En produccion la tabla queda vacia => unconfigured.
-    try {
-      const { data } = await supabase
-        .from("app_14da0f1941_phone_provider_config")
-        .select("provider")
-        .eq("id", true)
-        .maybeSingle();
+  // Config auditable en BBDD (tabla service_role-only, 1 fila). M2: una fila
+  // provider='mock' YA NO BASTA para activar el mock; se exige ademas
+  // mock_enabled=true (columna con default false) y el project ref permitido.
+  try {
+    const { data } = await supabase
+      .from("app_14da0f1941_phone_provider_config")
+      .select("provider, mock_enabled")
+      .eq("id", true)
+      .maybeSingle();
+    mockEnabled = data?.mock_enabled === true;
+    if (!selected) {
       selected = (data?.provider || "").toLowerCase();
-    } catch {
-      selected = "";
     }
+  } catch {
+    mockEnabled = false;
   }
 
   if (selected === "mock") {
+    // Barrera 2/3 (M2): mock_enabled explicito + ref en allowlist.
+    // Cualquier fallo => UnconfiguredProvider (503 controlado, nunca logs).
+    if (!isMockProviderAllowed(mockEnabled, projectRefFromSupabaseUrl(Deno.env.get("SUPABASE_URL") || ""))) {
+      return new UnconfiguredProvider();
+    }
     return new MockCaptureProvider(supabase);
   }
   // "twilio" | "vonage" | "whatsapp-cloud": entrega futura (ticket provider real).

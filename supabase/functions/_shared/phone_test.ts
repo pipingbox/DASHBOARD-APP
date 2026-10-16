@@ -12,6 +12,7 @@ import {
   generateOtpCode,
   formatE164ForDisplay,
 } from "./phone.ts";
+import { isMockProviderAllowed, projectRefFromSupabaseUrl } from "./phone-mock-guard.ts";
 
 // ─── normalizeToE164 ────────────────────────────────────────────────────────
 
@@ -90,4 +91,34 @@ Deno.test("generateOtpCode: 6 digitos, rango valido, formato estable", () => {
 Deno.test("formatE164ForDisplay: separa prefijo y nacional", () => {
   assert.equal(formatE164ForDisplay("+34612345678", "ES"), "+34 612345678");
   assert.equal(formatE164ForDisplay("34612345678", "ES"), "+34 612345678");
+});
+
+// ─── isMockProviderAllowed (FIX M2: barrera anti-mock fail-safe) ────────────
+
+Deno.test("M2: fila provider='mock' sin mock_enabled NO activa el mock", () => {
+  // Una sola fila provider='mock' ya no basta: mock_enabled=false => denegado.
+  assert.equal(isMockProviderAllowed(false, "uqfbilyfpflrlthnyijj"), false);
+});
+
+Deno.test("M2: mock_enabled en proyecto NO permitido (prod) NO activa el mock", () => {
+  // Aunque alguien inserte provider='mock' + mock_enabled=true en produccion,
+  // el ref no esta en la allowlist => fail-safe.
+  assert.equal(isMockProviderAllowed(true, "mwdauubztjxkbrefirbg"), false);
+});
+
+Deno.test("M2: mock solo con mock_enabled=true Y ref permitido (QA)", () => {
+  assert.equal(isMockProviderAllowed(true, "uqfbilyfpflrlthnyijj"), true);
+});
+
+Deno.test("M2: ref vacio o desconocido siempre deniega (fail-safe por omision)", () => {
+  assert.equal(isMockProviderAllowed(true, ""), false);
+  assert.equal(isMockProviderAllowed(true, "aaaaaaaaaaaaaaaaaaaa"), false);
+  assert.equal(isMockProviderAllowed(false, ""), false);
+});
+
+Deno.test("M2: projectRefFromSupabaseUrl extrae el ref o devuelve vacio", () => {
+  assert.equal(projectRefFromSupabaseUrl("https://uqfbilyfpflrlthnyijj.supabase.co"), "uqfbilyfpflrlthnyijj");
+  assert.equal(projectRefFromSupabaseUrl("https://mwdauubztjxkbrefirbg.supabase.co"), "mwdauubztjxkbrefirbg");
+  assert.equal(projectRefFromSupabaseUrl(""), "");
+  assert.equal(projectRefFromSupabaseUrl("http://localhost:54321"), "");
 });
