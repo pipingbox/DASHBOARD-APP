@@ -193,6 +193,15 @@ const de: EmailLocale = {
       button: "Meine Bewerbungen ansehen",
       footer_reason: "Sie erhalten diese Nachricht, weil Ihr PIPINGBOX-Profil Marketplace Ready erreicht hat.",
     },
+    cv_review_pending: {
+      subject: "PIPINGBOX · Wir haben Ihren Lebenslauf erhalten — prüfen Sie Ihr Profil",
+      preheader: "Wir haben Ihr Berufsprofil anhand Ihres Lebenslaufs erstellt.",
+      heading: "Ihr Berufsprofil ist zur Prüfung bereit",
+      body: "Hallo! Wir haben Ihren Lebenslauf erhalten und daraus Ihr Berufsprofil erstellt. Prüfen Sie die Angaben, damit PIPINGBOX Sie für passende Projekte berücksichtigen kann.",
+      button: "Mein Profil prüfen",
+      note: "Es wurde noch nichts veröffentlicht: Die extrahierten Daten werden erst nach Ihrer Prüfung und Bestätigung Teil Ihres Profils. Im Lebenslauf genannte Zertifikate werden als angegeben, nicht als verifiziert erfasst.",
+      footer_reason: "Sie erhalten diese Nachricht, weil PIPINGBOX einen mit Ihrem Konto verknüpften Lebenslauf erhalten hat.",
+    },
   },
 };
 

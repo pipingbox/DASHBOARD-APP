@@ -193,6 +193,15 @@ const ro: EmailLocale = {
       button: "Vezi candidaturile mele",
       footer_reason: "Primești acest mesaj pentru că profilul tău PIPINGBOX a atins Marketplace Ready.",
     },
+    cv_review_pending: {
+      subject: "PIPINGBOX · Am primit CV-ul tău — verifică-ți profilul",
+      preheader: "Ți-am pregătit profilul profesionist pe baza CV-ului.",
+      heading: "Profilul tău profesionist este gata de verificat",
+      body: "Salut! Am primit CV-ul tău și ți-am pregătit profilul profesionist pe baza lui. Verifică datele pentru ca PIPINGBOX să te poată lua în calcul pentru oportunități compatibile.",
+      button: "Verifică-mi profilul",
+      note: "Nu s-a publicat încă nimic: datele extrase fac parte din profilul tău doar după ce le verifici și le confirmi. Certificările menționate în CV sunt înregistrate ca declarate, nu verificate.",
+      footer_reason: "Primești acest mesaj pentru că PIPINGBOX a primit un CV asociat contului tău.",
+    },
   },
 };
 
