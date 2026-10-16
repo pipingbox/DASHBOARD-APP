@@ -52,11 +52,40 @@ export interface Profile {
   marketplace_ready: boolean;
   profile_visibility: string | null;
   availability_status: string | null;
+  // PB-WHATSAPP-FOUNDATION-001 — fuente canonica de telefono + consentimiento.
+  // phone_present != phone_verified != whatsapp opt-in (estados distintos).
+  phone_number_raw: string | null;
   phone_e164: string | null;
   phone_country_code: string | null;
+  phone_present: boolean;
+  phone_verified: boolean;
   phone_verified_at: string | null;
-  whatsapp_opt_in: boolean | null;
+  phone_verification_method: string | null;
+  whatsapp_service_opt_in: boolean;
+  whatsapp_job_alerts_opt_in: boolean;
+  whatsapp_marketing_opt_in: boolean;
+  whatsapp_consent_at: string | null;
+  whatsapp_consent_version: string | null;
+  whatsapp_opted_out_at: string | null;
 }
+
+// PB-WHATSAPP-FOUNDATION-001 — defaults seguros para perfiles sinteticos
+// locales (mismo estado inicial que garantiza el guard de BBDD).
+export const PHONE_PROFILE_DEFAULTS = {
+  phone_number_raw: null,
+  phone_e164: null,
+  phone_country_code: null,
+  phone_present: false,
+  phone_verified: false,
+  phone_verified_at: null,
+  phone_verification_method: null,
+  whatsapp_service_opt_in: false,
+  whatsapp_job_alerts_opt_in: false,
+  whatsapp_marketing_opt_in: false,
+  whatsapp_consent_at: null,
+  whatsapp_consent_version: null,
+  whatsapp_opted_out_at: null,
+} as const;
 
 interface AuthContextValue {
   session: Session | null;
@@ -246,10 +275,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             marketplace_ready: true,
             profile_visibility: 'public',
             availability_status: 'available',
-            phone_e164: null,
-            phone_country_code: null,
-            phone_verified_at: null,
-            whatsapp_opt_in: false,
+            ...PHONE_PROFILE_DEFAULTS,
           });
           return;
         }
@@ -429,10 +455,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               marketplace_ready: false,
               profile_visibility: null,
               availability_status: 'not_specified',
-              phone_e164: null,
-              phone_country_code: null,
-              phone_verified_at: null,
-              whatsapp_opt_in: false,
+              ...PHONE_PROFILE_DEFAULTS,
             });
             // DON'T clear referral code — Dashboard recovery will try again
             return;
@@ -513,10 +536,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           marketplace_ready: true,
           profile_visibility: 'public',
           availability_status: 'available',
-          phone_e164: null,
-          phone_country_code: null,
-          phone_verified_at: null,
-          whatsapp_opt_in: false,
+          ...PHONE_PROFILE_DEFAULTS,
         });
       } else {
         setProfile({
@@ -546,10 +566,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           marketplace_ready: false,
           profile_visibility: null,
           availability_status: 'not_specified',
-          phone_e164: null,
-          phone_country_code: null,
-          phone_verified_at: null,
-          whatsapp_opt_in: false,
+          ...PHONE_PROFILE_DEFAULTS,
         });
       }
       // DON'T clear referral code on failure — let Dashboard recovery handle it

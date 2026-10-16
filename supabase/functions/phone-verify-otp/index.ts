@@ -1,15 +1,28 @@
 // Edge Function: phone-verify-otp
-// Purpose: Verify OTP and mark phone as verified.
-// PB-PHONE-VERIFICATION-001
+// PB-WHATSAPP-FOUNDATION-001 (evoluciona PB-PHONE-VERIFICATION-001)
+//
+// Valida el codigo OTP del challenge pendiente mas reciente:
+//   * expiracion corta, max intentos, anti brute-force;
+//   * exito => phone_verified=true + phone_verified_at + metodo en el perfil;
+//   * fallo => attempts+1 y auditoria verification_failed (sin el codigo).
+// El consentimiento WhatsApp NO se otorga aqui: vive en phone-update-consent.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+import { recordPhoneEvent } from "../_shared/phone-events.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
+
+function json(body: Record<string, unknown>, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -25,21 +38,15 @@ Deno.serve(async (req) => {
 
   const authHeader = req.headers.get("authorization");
   if (!authHeader) {
-    return new Response(
-      JSON.stringify({ error: "Unauthorized" }),
-      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return json({ error: "Unauthorized" }, 401);
   }
 
   const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
   if (userError || !user) {
-    return new Response(
-      JSON.stringify({ error: "Unauthorized" }),
-      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return json({ error: "Unauthorized" }, 401);
   }
 
-  let body: { code?: string; whatsapp_opt_in?: boolean } = {};
+  let body: { code?: string } = {};
   try {
     body = await req.json();
   } catch {
@@ -48,10 +55,7 @@ Deno.serve(async (req) => {
 
   const code = (body.code || "").trim();
   if (!code || code.length !== 6) {
-    return new Response(
-      JSON.stringify({ error: "Invalid code" }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return json({ error: "invalid_code" }, 400);
   }
 
   const { data: rows, error: fetchError } = await supabase
@@ -63,33 +67,33 @@ Deno.serve(async (req) => {
     .limit(1);
 
   if (fetchError) {
-    return new Response(
-      JSON.stringify({ error: fetchError.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return json({ error: fetchError.message }, 500);
   }
 
   if (!rows || rows.length === 0) {
-    return new Response(
-      JSON.stringify({ error: "No pending verification" }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return json({ error: "no_pending_verification" }, 400);
   }
 
   const record = rows[0];
 
   if (new Date(record.expires_at) < new Date()) {
-    return new Response(
-      JSON.stringify({ error: "Code expired" }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    await recordPhoneEvent(supabase, {
+      userId: user.id,
+      event: "verification_failed",
+      phoneE164: record.phone_e164,
+      metadata: { reason: "expired" },
+    });
+    return json({ error: "code_expired" }, 400);
   }
 
   if (record.attempts >= record.max_attempts) {
-    return new Response(
-      JSON.stringify({ error: "Max attempts exceeded" }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    await recordPhoneEvent(supabase, {
+      userId: user.id,
+      event: "verification_failed",
+      phoneE164: record.phone_e164,
+      metadata: { reason: "max_attempts" },
+    });
+    return json({ error: "max_attempts_exceeded" }, 400);
   }
 
   const valid = await bcrypt.compare(code, record.otp_code_hash);
@@ -100,10 +104,14 @@ Deno.serve(async (req) => {
       .update({ attempts: record.attempts + 1 })
       .eq("id", record.id);
 
-    return new Response(
-      JSON.stringify({ error: "Invalid code" }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    await recordPhoneEvent(supabase, {
+      userId: user.id,
+      event: "verification_failed",
+      phoneE164: record.phone_e164,
+      metadata: { reason: "invalid_code", attempt: record.attempts + 1, max_attempts: record.max_attempts },
+    });
+
+    return json({ error: "invalid_code" }, 400);
   }
 
   const now = new Date().toISOString();
@@ -113,25 +121,26 @@ Deno.serve(async (req) => {
     .update({ verified_at: now, attempts: record.attempts + 1 })
     .eq("id", record.id);
 
-  const whatsappOptIn = body.whatsapp_opt_in === true;
-  const profileUpdate: Record<string, unknown> = {
-    phone_e164: record.phone_e164,
-    phone_verified_at: now,
-  };
-
-  if (whatsappOptIn) {
-    profileUpdate.whatsapp_opt_in = true;
-    profileUpdate.whatsapp_opt_in_at = now;
-    profileUpdate.whatsapp_opt_in_source = "profile_settings";
-  }
-
-  await supabase
+  const { error: profileError } = await supabase
     .from("app_14da0f1941_profiles")
-    .update(profileUpdate)
+    .update({
+      phone_e164: record.phone_e164,
+      phone_verified: true,
+      phone_verified_at: now,
+      phone_verification_method: "sms_otp",
+    })
     .eq("user_id", user.id);
 
-  return new Response(
-    JSON.stringify({ verified: true, phone_e164: record.phone_e164 }),
-    { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-  );
+  if (profileError) {
+    return json({ error: profileError.message }, 500);
+  }
+
+  await recordPhoneEvent(supabase, {
+    userId: user.id,
+    event: "phone_verified",
+    phoneE164: record.phone_e164,
+    metadata: { method: "sms_otp" },
+  });
+
+  return json({ verified: true }, 200);
 });

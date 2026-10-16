@@ -116,6 +116,16 @@ export const OBS_EVENT_NAMES = [
   // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.3 — bypass denied fail-closed when
   // no BroadcastChannel is available (no cross-tab coordination possible).
   'auth_lock_bypass_denied_uncoordinated',
+  // PB-WHATSAPP-FOUNDATION-001 — phone + OTP + WhatsApp consent funnel.
+  // NO PII: nunca phone_e164 ni codigo OTP; solo enums cerrados
+  // (error_category) y booleanos de consentimiento.
+  'phone_added',
+  'phone_verification_started',
+  'phone_verification_completed',
+  'phone_verification_failed',
+  'whatsapp_jobs_opt_in',
+  'whatsapp_marketing_opt_in',
+  'whatsapp_opt_out',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -440,6 +450,16 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   auth_session_resolution_timeout: ['route', 'correlation_id'],
   auth_lock_bypass_denied_uncoordinated: ['lock_path', 'correlation_id'],
   onboarding_save_timeout: ['account_type', 'operation', 'step'],
+  // PB-WHATSAPP-FOUNDATION-001 — phone/WhatsApp funnel. error_category es un
+  // enum cerrado (PHONE_VERIFICATION_ERROR_CATEGORIES); value es booleano de
+  // consentimiento. Nunca numero de telefono ni OTP.
+  phone_added: [],
+  phone_verification_started: [],
+  phone_verification_completed: [],
+  phone_verification_failed: ['error_category'],
+  whatsapp_jobs_opt_in: ['value'],
+  whatsapp_marketing_opt_in: ['value'],
+  whatsapp_opt_out: [],
 };
 
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;
@@ -529,6 +549,23 @@ const DOC_ERROR_CATEGORY_EVENTS: ReadonlySet<ObsEventName> = new Set([
 const AUTH_CALLBACK_ERROR_CATEGORY_EVENTS: ReadonlySet<ObsEventName> = new Set([
   'auth_callback_failed',
   'auth_callback_timeout',
+]);
+// PB-WHATSAPP-FOUNDATION-001 — closed error taxonomy for the phone OTP
+// funnel (scoped to phone events; never the OTP code nor the number).
+export const PHONE_VERIFICATION_ERROR_CATEGORIES = [
+  'invalid_phone',
+  'invalid_code',
+  'code_expired',
+  'max_attempts',
+  'rate_limited',
+  'resend_cooldown',
+  'provider_unavailable',
+  'no_pending',
+  'not_verified',
+  'unknown',
+] as const;
+const PHONE_ERROR_CATEGORY_EVENTS: ReadonlySet<ObsEventName> = new Set([
+  'phone_verification_failed',
 ]);
 /** Build stamps: 40-hex git SHA, short SHA, semver or 'dev'. Closed shape. */
 const VERSION_STAMP_RE = /^(?:[0-9a-f]{7,40}|v?\d+(?:\.\d+){0,2}(?:[-.][A-Za-z0-9.]+)?|dev|[A-Za-z0-9][A-Za-z0-9._-]{0,63})$/;
@@ -1146,6 +1183,13 @@ export function buildEventProps(
     ) {
       delete out.error_category;
     }
+    // PB-WHATSAPP-FOUNDATION-001 — phone OTP funnel taxonomy.
+    if (
+      PHONE_ERROR_CATEGORY_EVENTS.has(name) &&
+      !PHONE_VERIFICATION_ERROR_CATEGORIES.includes(out.error_category as never)
+    ) {
+      delete out.error_category;
+    }
   }
   // PB-AUTH-CALLBACK-STALE-APP-001 — build stamps and recovery enums.
   if ('target_version' in out) {
@@ -1177,6 +1221,8 @@ export function buildEventProps(
     delete out.extraction_status;
   }
   if ('resumed' in out && typeof out.resumed !== 'boolean') delete out.resumed;
+  // PB-WHATSAPP-FOUNDATION-001 — consent flags are booleans, never strings.
+  if ('value' in out && typeof out.value !== 'boolean') delete out.value;
   if ('attempt_number' in out && (typeof out.attempt_number !== 'number' || out.attempt_number < 1 || out.attempt_number > 8)) {
     delete out.attempt_number;
   }
