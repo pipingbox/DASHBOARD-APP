@@ -60,6 +60,14 @@ function isEmptyProfileValue(v) {
   if (Array.isArray(v)) return v.length === 0;
   return false;
 }
+function toDbDate(v) {
+  if (typeof v !== "string" || !v.trim()) return null;
+  const s = v.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  if (/^\d{4}-\d{2}$/.test(s)) return `${s}-01`;
+  if (/^\d{4}$/.test(s)) return `${s}-01-01`;
+  return null;
+}
 function normalizeAvailability(value) {
   if (typeof value !== "string" || !value.trim()) return null;
   const v = value.trim().toLowerCase();
@@ -237,10 +245,12 @@ Deno.serve(async (req) => {
     const merged = decision.action === "edit" && decision.patch ? { ...proposal, ...decision.patch } : proposal;
     if (!merged.position?.trim() && !merged.company_name?.trim()) continue;
     const candidate = {
-      company_name: merged.company_name?.trim() || null,
+      // company_name es NOT NULL en la tabla: cadena vacía cuando el CV no
+      // la declara explícitamente (el guard de arriba exige position).
+      company_name: merged.company_name?.trim() || "",
       position: merged.position?.trim() || "",
-      start_date: merged.start_date ?? null,
-      end_date: merged.end_date ?? null
+      start_date: toDbDate(merged.start_date),
+      end_date: merged.currently_working === true ? null : toDbDate(merged.end_date)
     };
     if (existing.some((e) => isSameExperience(e, candidate)) || experiencesToInsert.some((e) => isSameExperience(e, candidate))) {
       experiencesMerged++;
