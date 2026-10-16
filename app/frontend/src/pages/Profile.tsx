@@ -20,6 +20,7 @@ import { AvailabilityMobilitySection } from '@/components/profile/AvailabilityMo
 import { AICVExtraction } from '@/components/profile/AICVExtraction';
 import { MatchReadyBanner } from '@/components/profile/MatchReadyBanner';
 import { PhoneVerificationSection } from '@/components/profile/PhoneVerificationSection';
+import { ProfilePhoneSection } from '@/components/profile/ProfilePhoneSection';
 import { notifyProfileSuggestions } from '@/lib/notifications';
 import { ProfileCompleteness } from '@/components/profile/ProfileCompleteness';
 import { generateCV } from '@/lib/generateCV';
@@ -493,10 +494,11 @@ export default function Profile() {
       {/* Availability & Mobility — has its own save/load from DB */}
       <AvailabilityMobilitySection />
 
-      {/* Phone Verification */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {import.meta.env.VITE_PHONE_VERIFICATION_ENABLED === 'true' ? (
         <PhoneVerificationSection />
-      </div>
+      ) : (
+        <ProfilePhoneSection />
+      )}
 
       {/* CV Upload — saves directly to DB + calls refreshProfile */}
       <CVUploadSection />
