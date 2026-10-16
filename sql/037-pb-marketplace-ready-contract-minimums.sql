@@ -108,15 +108,18 @@ AS $$
         SELECT 1 FROM storage.objects o
         WHERE o.bucket_id = p.cv_storage_bucket
           AND o.name = p.cv_storage_path
+          AND o.owner_id = p_user_id::text
       ) AS ok_cv,
       -- Certificado o evidencia profesional CON archivo adjunto.
       EXISTS (
         SELECT 1 FROM public.app_worker_certifications c
         JOIN storage.objects o ON o.bucket_id = c.storage_bucket AND o.name = c.storage_path
+          AND o.owner_id = p_user_id::text
         WHERE c.user_id = p_user_id
       ) OR EXISTS (
         SELECT 1 FROM public.app_worker_documents d
         JOIN storage.objects o ON o.bucket_id = d.storage_bucket AND o.name = d.storage_path
+          AND o.owner_id = p_user_id::text
         WHERE d.user_id = p_user_id
       ) AS ok_certificate,
       public.pb_marketplace_phone_present(p_user_id) AS ok_phone,
