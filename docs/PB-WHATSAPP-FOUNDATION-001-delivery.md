@@ -99,7 +99,7 @@ No se tocan: `pb_marketplace_missing_requirements`, contrato v2, `marketplace_re
 | **L1** rate limit/cooldown TOCTOU | Gate `pb_phone_send_gate` con `SELECT ... FOR UPDATE` (tabla `phone_rate_limits`): ventana + cooldown atómicos | E2E L1-1/2 con `Promise.all` concurrente: exactamente 1 éxito por hueco, resto 429 |
 | **L2** `verified:true` sin comprobar persistencia | Verify en 2 pasos condicionales: claim del challenge `WHERE verified_at IS NULL` (409 `verification_already_consumed` si otro ganó) y update del perfil `WHERE phone_e164 = <del challenge>` (409 `verification_superseded` si un cambio de número ganó la carrera; upsert solo si el perfil no existe) | E2E L2-1..3 (carrera simulada: 409 y número NO verificado) |
 | **L3** re-opt-in borraba `whatsapp_opted_out_at` | Se conserva la fecha de la última retirada al reactivar. Semántica documentada: `opted_out_at` es histórico (última revocación efectiva); el estado actual lo dan siempre los 3 flags | E2E L3-1/2 (timestamp idéntico tras re-opt-in) |
-| **L4** sin retención | `phone_ops_config` (service_role-only) + RPC `pb_phone_purge_retention()`: challenges 30 días (ciclo real de minutos; trazabilidad razonable sin acumular hashes), capturas QA 7 días (contienen el OTP efímero; solo existen con mock). **Nunca** purga `phone_events` ni consentimiento. En producción se programará con pg_cron (plan §13) | E2E L4-1..5 (borra antiguos, conserva recientes, auditoría intacta) |
+| **L4** sin retención | `phone_ops_config` (service_role-only) + RPC `pb_phone_purge_retention()`: challenges 30 días (ciclo real de minutos; trazabilidad razonable sin acumular hashes), capturas QA 7 días (contienen el OTP efímero; solo existen con mock). **Nunca** purga `phone_events` ni consentimiento. **Job periódico activo en QA** (`sql/044`, pg_cron — ver §12); producción pendiente (plan §13) | E2E L4-1..5 (borra antiguos, conserva recientes, auditoría intacta) + job pg_cron verificado (§12) |
 
 Seguridad de FIX1 verificada por SQL en QA: RLS ON en `phone_rate_limits` y `phone_ops_config` (sin policies ni grants para clientes, como `phone_provider_outbox/config`), `EXECUTE` de las 3 RPCs revocado de PUBLIC/anon/authenticated (grant solo a `service_role`), sin `SECURITY DEFINER` nuevo.
 
@@ -110,7 +110,8 @@ Seguridad de FIX1 verificada por SQL en QA: RLS ON en `phone_rate_limits` y `pho
 3. **Datos:** **conservar** columnas phone/whatsapp y tablas de eventos/verifications (histórico de consentimiento). No se borra consentimiento de forma destructiva.
 4. Marketplace Ready y Jobs no se ven afectados en ningún paso.
 5. Rollback de FIX1 si fuera necesario (sin tocar datos): revertir el despliegue de las 3 Edge Functions a la versión previa del bundle; las tablas/RPCs de 043 son aditivas e inertes sin las funciones nuevas.
-6. Si se quisiera retirar el schema (NO recomendado ni parte del rollback estándar): migración de DROP separada con aprobación explícita del PO.
+6. Job de retención: `SELECT cron.unschedule('pb-phone-purge-retention');` (no toca datos).
+7. Si se quisiera retirar el schema (NO recomendado ni parte del rollback estándar): migración de DROP separada con aprobación explícita del PO.
 
 ## 12. Notas de despliegue (QA ya aplicado)
 
@@ -118,14 +119,15 @@ Seguridad de FIX1 verificada por SQL en QA: RLS ON en `phone_rate_limits` y `pho
 - Provider QA = `mock` con `mock_enabled=true` (fila sembrada en `phone_provider_config`; solo QA, no está en el repo).
 - Build frontend requiere `.env.local` con `VITE_SUPABASE_*` dummy para el prerender (patrón ya existente en el worktree main; el archivo está gitignored).
 - Hallazgo de QA corregido: `deno.land/x/bcrypt` usa Web Worker → pin `@v0.2.4` + API sync.
+- **Job de retención ACTIVO en QA** (`sql/044-pb-whatsapp-foundation-001-retention-cron.sql`, aplicado por Management API): pg_cron habilitado y `pb-phone-purge-retention` programado **diario 03:17 UTC** (`17 3 * * *`), `active=true`, comando `SELECT public.pb_phone_purge_retention();`. Verificado en `cron.job` (jobid 1) y con ejecución manual del comando exacto del job: `{phone_verifications_deleted: 0, phone_provider_outbox_deleted: 0, retention 30d/7d}` (0 borrados esperado: los datos QA son recientes). El job corre como `postgres` (superusuario), por lo que ejecuta la función SECURITY INVOKER pese al REVOKE de PUBLIC. Rollback: `cron.unschedule('pb-phone-purge-retention')`.
 
 ## 13. Para GO producción (pendiente, fuera de este ticket)
 
-1. Merge del PR y migraciones 042 + 043 a producción (`mwdauubztjxkbrefirbg`).
+1. Migraciones 042 + 043 + 044 a producción (`mwdauubztjxkbrefirbg`) — 044 activa el job pg_cron de retención (ya activo en QA).
 2. NO sembrar `phone_provider_config` en producción (tabla vacía ⇒ provider no configurado ⇒ 503 controlado hasta el ticket del provider real). Aunque alguien la sembrara, la barrera M2 (ref fuera de allowlist) lo impediría.
 3. Ticket separado: provider real (WhatsApp Cloud API / Twilio / Vonage) implementando `PhoneVerificationProvider`.
 4. Secret `PHONE_VERIFICATION_PROVIDER` cuando la plataforma lo permita (hoy el fallback DB es el camino auditable).
-5. Programar `pb_phone_purge_retention()` con pg_cron (p.ej. diario) en producción.
+5. Verificar tras aplicar 044: `cron.job` con `pb-phone-purge-retention` activo (misma programación que QA, diario 03:17 UTC).
 6. Criterios de validación post-deploy producción: (a) `phone-send-otp` devuelve 503 `sms_provider_not_configured`; (b) advisors sin lints nuevos en tablas/rpcs phone; (c) E2E smoke de auth/Marketplace intacto; (d) rollback = revertir funciones + migraciones, conservando datos (§11).
 
 ## 14. GO/NO-GO
