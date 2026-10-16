@@ -12,6 +12,7 @@ on:
       - 'supabase/functions/_shared/application-activation.ts'
       - 'supabase/functions/_shared/application-activation_test.ts'
       - 'supabase/functions/_shared/standard-webhooks.ts'
+      - 'supabase/functions/_shared/cv-extraction/**'
       - 'supabase/functions/auth-send-email-hook/**'
       - 'supabase/functions/notification-dispatcher/**'
       - 'supabase/functions/cert-expiry-alerts/**'
@@ -20,6 +21,8 @@ on:
       - 'supabase/functions/app_14da0f1941_send_job_application_notification/**'
       - 'supabase/functions/job-application-profile-pending-email/**'
       - 'supabase/functions/marketplace-ready-activation-email/**'
+      - 'supabase/functions/cv-extract/**'
+      - 'supabase/functions/cv-apply-draft/**'
       - 'app/frontend/src/i18n/languages.json'
       - '.github/workflows/email-i18n-tests.yml'
   push:
@@ -45,7 +48,7 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Typecheck (email-i18n, hook, provider, dispatcher, cert-expiry, match-notify)
+      - name: Typecheck (email-i18n, hook, provider, dispatcher, cert-expiry, match-notify, cv-extraction)
         run: |
           deno check --node-modules-dir=none \
             supabase/functions/_shared/email-i18n/mod.ts \
@@ -54,6 +57,10 @@ jobs:
             supabase/functions/_shared/standard-webhooks.ts \
             supabase/functions/_shared/application-activation.ts \
             supabase/functions/_shared/application-activation_test.ts \
+            supabase/functions/_shared/cv-extraction/engine.ts \
+            supabase/functions/_shared/cv-extraction/textExtract.ts \
+            supabase/functions/cv-extract/index.ts \
+            supabase/functions/cv-apply-draft/index.ts \
             supabase/functions/auth-send-email-hook/index.ts \
             supabase/functions/notification-dispatcher/index.ts \
             supabase/functions/cert-expiry-alerts/index.ts \
@@ -63,11 +70,12 @@ jobs:
             supabase/functions/marketplace-ready-activation-email/index.ts \
             supabase/functions/app_14da0f1941_send_job_application_notification/index.maintainable.ts
 
-      - name: Tests (11 idiomas, seguridad, firma, URL de verificación, modo de entrega)
+      - name: Tests (11 idiomas, seguridad, firma, URL de verificación, modo de entrega, CV engine)
         run: |
           deno test --node-modules-dir=none --allow-read --allow-env \
             supabase/functions/_shared/email-i18n/ \
             supabase/functions/_shared/email-provider_test.ts \
             supabase/functions/_shared/application-activation_test.ts \
+            supabase/functions/_shared/cv-extraction/ \
             supabase/functions/auth-send-email-hook/ \
             supabase/functions/app_14da0f1941_send_job_application_notification/
