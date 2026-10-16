@@ -1,17 +1,28 @@
 // Edge Function: phone-withdraw-consent
-// Purpose: Remove phone number and all WhatsApp/SMS consent atomically.
-// PB-PHONE-VERIFICATION-001
+// PB-WHATSAPP-FOUNDATION-001 (evoluciona PB-PHONE-VERIFICATION-001)
 //
-// phone_e164, phone_verified_at and consent fields are backend-controlled.
-// The frontend must call this function instead of updating profiles directly.
+// Baja completa: elimina el telefono y TODO el consentimiento WhatsApp de
+// forma atomica, invalida los OTP pendientes y fecha la revocacion
+// (whatsapp_opted_out_at). El historico queda en phone_events (append-only).
+//
+// phone_e164, phone_verified* y los campos de consentimiento son
+// backend-controlled: el frontend DEBE usar esta funcion.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { recordPhoneEvent } from "../_shared/phone-events.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
+
+function json(body: Record<string, unknown>, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -27,48 +38,72 @@ Deno.serve(async (req) => {
 
   const authHeader = req.headers.get("authorization");
   if (!authHeader) {
-    return new Response(
-      JSON.stringify({ error: "Unauthorized" }),
-      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return json({ error: "Unauthorized" }, 401);
   }
 
   const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
   if (userError || !user) {
-    return new Response(
-      JSON.stringify({ error: "Unauthorized" }),
-      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return json({ error: "Unauthorized" }, 401);
   }
 
-  // Invalidate any pending OTP for this user.
+  const { data: profile } = await supabase
+    .from("app_14da0f1941_profiles")
+    .select("phone_e164, whatsapp_service_opt_in, whatsapp_job_alerts_opt_in, whatsapp_marketing_opt_in")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  // Invalidar cualquier OTP pendiente.
   await supabase
     .from("app_14da0f1941_phone_verifications")
     .update({ expires_at: new Date().toISOString() })
     .eq("user_id", user.id)
     .is("verified_at", null);
 
+  const now = new Date().toISOString();
+
   const { error } = await supabase
     .from("app_14da0f1941_profiles")
     .update({
+      phone_number_raw: null,
       phone_e164: null,
       phone_country_code: null,
+      phone_verified: false,
       phone_verified_at: null,
-      whatsapp_opt_in: false,
-      whatsapp_opt_in_at: null,
-      whatsapp_opt_in_source: null,
+      phone_verification_method: null,
+      whatsapp_service_opt_in: false,
+      whatsapp_job_alerts_opt_in: false,
+      whatsapp_marketing_opt_in: false,
+      whatsapp_consent_at: null,
+      whatsapp_consent_version: null,
+      whatsapp_opted_out_at: now,
     })
     .eq("user_id", user.id);
 
   if (error) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return json({ error: error.message }, 500);
   }
 
-  return new Response(
-    JSON.stringify({ removed: true }),
-    { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-  );
+  if (profile?.phone_e164) {
+    await recordPhoneEvent(supabase, {
+      userId: user.id,
+      event: "phone_changed",
+      phoneE164: profile.phone_e164,
+      metadata: { removed: true },
+    });
+  }
+
+  const hadConsent = profile
+    ? (profile.whatsapp_service_opt_in || profile.whatsapp_job_alerts_opt_in || profile.whatsapp_marketing_opt_in)
+    : false;
+
+  if (hadConsent) {
+    await recordPhoneEvent(supabase, {
+      userId: user.id,
+      event: "whatsapp_opt_in_changed",
+      phoneE164: profile?.phone_e164 ?? null,
+      metadata: { revoked: true, service: false, job_alerts: false, marketing: false },
+    });
+  }
+
+  return json({ removed: true }, 200);
 });

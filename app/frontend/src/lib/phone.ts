@@ -1,6 +1,7 @@
 // Frontend E.164 phone normalization.
-// PB-PHONE-VERIFICATION-001
+// PB-PHONE-VERIFICATION-001 / PB-WHATSAPP-FOUNDATION-001
 // Debe mantenerse sincronizado con supabase/functions/_shared/phone.ts.
+// La forma canonica incluye '+' inicial (ej. "+34612345678").
 
 export interface CountryPhoneMetadata {
   code: string;
@@ -28,6 +29,7 @@ export const COUNTRY_PHONE_METADATA: Record<string, CountryPhoneMetadata> =
 
 export interface NormalizeResult {
   valid: boolean;
+  /** Canonico E.164 CON '+' inicial (ej. "+34612345678"). */
   e164?: string;
   countryCode?: string;
   error?: string;
@@ -61,14 +63,15 @@ export function normalizeToE164(
 
   return {
     valid: true,
-    e164: `${meta.prefix}${digits}`,
+    e164: `+${meta.prefix}${digits}`,
     countryCode: meta.code,
   };
 }
 
 export function formatE164ForDisplay(e164: string, countryCode: string): string {
   const meta = COUNTRY_PHONE_METADATA[countryCode.toUpperCase()];
-  if (!meta || !e164.startsWith(meta.prefix)) return e164;
-  const national = e164.slice(meta.prefix.length);
+  const digits = e164.replace(/\D/g, '');
+  if (!meta || !digits.startsWith(meta.prefix)) return e164;
+  const national = digits.slice(meta.prefix.length);
   return `+${meta.prefix} ${national}`;
 }
