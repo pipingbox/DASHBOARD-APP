@@ -2798,6 +2798,14 @@
     "applyError": "Une erreur s'est produite. Veuillez réessayer.",
     "dismissed": "Brouillon écarté. Vous pouvez compléter votre profil manuellement."
   },
+  "certExtract": {
+    "analyzing": "Analyse du document…",
+    "prefilled": "Nous avons lu le document et pré-rempli le formulaire. Vérifiez les données avant d'enregistrer.",
+    "noDataFound": "Nous n'avons pas trouvé de données de certificat dans le document. Veuillez remplir le formulaire manuellement.",
+    "manualFallback": "Nous n'avons pas pu lire les données automatiquement. Le document est enregistré — veuillez compléter les informations manuellement.",
+    "verifyField": "vérifiez cette donnée",
+    "conflict": "Certaines données sont en conflit avec l'enregistrement existant. Vérifiez-les et réessayez."
+  },
   "profileCompleteness": {
     "title": "Complétude du profil",
     "motivation": "Complétez votre profil pour vous démarquer auprès des recruteurs et augmenter vos chances d'embauche.",

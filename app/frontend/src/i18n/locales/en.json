@@ -2791,6 +2791,14 @@
     "applyError": "Something went wrong. Please try again.",
     "dismissed": "Draft discarded. You can complete your profile manually."
   },
+  "certExtract": {
+    "analyzing": "Analyzing the document…",
+    "prefilled": "We read the document and pre-filled the form. Review the data before saving.",
+    "noDataFound": "We couldn't find certificate data in the document. Please fill in the form manually.",
+    "manualFallback": "We couldn't read the data automatically. The document is saved — please complete the details manually.",
+    "verifyField": "verify this data",
+    "conflict": "Some data conflicts with the existing record. Review it and try again."
+  },
   "profileCompleteness": {
     "title": "Profile Completeness",
     "motivation": "Complete your profile to stand out to recruiters and increase your chances of being hired.",

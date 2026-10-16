@@ -48,7 +48,7 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Typecheck (email-i18n, hook, provider, dispatcher, cert-expiry, match-notify, cv-extraction)
+      - name: Typecheck (email-i18n, hook, provider, dispatcher, cert-expiry, match-notify, cv-extraction, cert-extraction)
         run: |
           deno check --node-modules-dir=none \
             supabase/functions/_shared/email-i18n/mod.ts \
@@ -59,8 +59,11 @@ jobs:
             supabase/functions/_shared/application-activation_test.ts \
             supabase/functions/_shared/cv-extraction/engine.ts \
             supabase/functions/_shared/cv-extraction/textExtract.ts \
+            supabase/functions/_shared/cv-extraction/certEngine.ts \
             supabase/functions/cv-extract/index.ts \
             supabase/functions/cv-apply-draft/index.ts \
+            supabase/functions/cert-extract/index.ts \
+            supabase/functions/cert-apply-draft/index.ts \
             supabase/functions/auth-send-email-hook/index.ts \
             supabase/functions/notification-dispatcher/index.ts \
             supabase/functions/cert-expiry-alerts/index.ts \
