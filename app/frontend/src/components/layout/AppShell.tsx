@@ -76,6 +76,9 @@ const COMPANY_NAV_WORKSPACE = [
 
 const COMPANY_NAV_SETTINGS = [
   { to: '/company/profile', label: 'Perfil de Empresa', icon: Building2, i18nKey: 'nav.companyProfile' },
+  // PB-CE-COMPANY-CORE-001 — company tenant + team accounts.
+  { to: '/company/tenant', label: 'Mi Empresa', icon: Building2, i18nKey: 'nav.companyTenant' },
+  { to: '/company/team', label: 'Equipo', icon: Users, i18nKey: 'nav.companyTeam' },
   { to: '/company/settings', label: 'Configuración', icon: Settings, i18nKey: 'nav.companySettings' },
   { to: '/company/billing', label: 'Facturación / Planes', icon: CreditCard, i18nKey: 'nav.companyBilling' },
 ];
@@ -95,6 +98,9 @@ const NAV_ITEMS = [
   { to: '/company/profile', label: 'Company Profile', icon: Building2, i18nKey: 'nav.companyProfile' },
   { to: '/company/analytics', label: 'Analytics', icon: BarChart3, i18nKey: 'nav.companyAnalytics' },
   { to: '/company/settings', label: 'Settings', icon: Settings, i18nKey: 'nav.companySettings' },
+  // PB-CE-COMPANY-CORE-001 — company tenant + team accounts.
+  { to: '/company/tenant', label: 'My Company', icon: Building2, i18nKey: 'nav.companyTenant' },
+  { to: '/company/team', label: 'Team', icon: Users, i18nKey: 'nav.companyTeam' },
   { to: '/company/billing', label: 'Billing', icon: CreditCard, i18nKey: 'nav.companyBilling' },
 ];
 

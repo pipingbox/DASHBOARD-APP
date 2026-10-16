@@ -116,6 +116,17 @@ export const OBS_EVENT_NAMES = [
   // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.3 — bypass denied fail-closed when
   // no BroadcastChannel is available (no cross-tab coordination possible).
   'auth_lock_bypass_denied_uncoordinated',
+  // PB-CE-COMPANY-CORE-001 — company tenant + team accounts. Only technical
+  // UUIDs (company/membership/invitation) and the closed role enum; never
+  // emails, names, tokens, fiscal numbers or any other personal data.
+  'company_created',
+  'company_invite_sent',
+  'company_invite_accepted',
+  'company_invite_revoked',
+  'company_member_role_changed',
+  'company_member_removed',
+  'company_owner_transferred',
+  'company_context_selected',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -440,6 +451,15 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   auth_session_resolution_timeout: ['route', 'correlation_id'],
   auth_lock_bypass_denied_uncoordinated: ['lock_path', 'correlation_id'],
   onboarding_save_timeout: ['account_type', 'operation', 'step'],
+  // PB-CE-COMPANY-CORE-001 — closed schema: technical UUIDs + role enum only.
+  company_created: ['company_id'],
+  company_invite_sent: ['company_id', 'invitation_id', 'role'],
+  company_invite_accepted: ['membership_id'],
+  company_invite_revoked: ['company_id', 'invitation_id'],
+  company_member_role_changed: ['company_id', 'membership_id', 'role'],
+  company_member_removed: ['company_id', 'membership_id'],
+  company_owner_transferred: ['company_id', 'membership_id'],
+  company_context_selected: ['company_id', 'role'],
 };
 
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;
@@ -583,6 +603,9 @@ export const JOB_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a
 export const OBS_INTERNAL_SDK_EVENTS = ['$web_vitals', '$identify'] as const;
 
 const ACCOUNT_TYPES = ['worker', 'company'] as const;
+
+// PB-CE-COMPANY-CORE-001 — closed role enum for company team events.
+const COMPANY_ROLES = ['owner', 'admin', 'recruiter', 'viewer'] as const;
 const DEVICE_TYPES = ['mobile', 'tablet', 'desktop'] as const;
 const AUTH_PROVIDERS = ['email', 'google'] as const;
 const AUTH_STATUSES = [
@@ -1111,7 +1134,14 @@ export function buildEventProps(
       }
       // PB-JOBS-PILOT-003 — job UUIDs are kept raw (technical id, our
       // taxonomy); sanitizeValue would redact them as "long tokens".
-      if (key === 'job_id') {
+      // PB-CE-COMPANY-CORE-001 — same treatment for company/membership/
+      // invitation UUIDs (technical ids, never personal data).
+      if (
+        key === 'job_id' ||
+        key === 'company_id' ||
+        key === 'membership_id' ||
+        key === 'invitation_id'
+      ) {
         if (JOB_ID_RE.test(raw)) out[key] = raw;
         continue;
       }
@@ -1203,6 +1233,10 @@ export function buildEventProps(
   }
   if ('account_type' in out && !ACCOUNT_TYPES.includes(out.account_type as never)) {
     delete out.account_type;
+  }
+  // PB-CE-COMPANY-CORE-001 — company role closed enum.
+  if ('role' in out && !COMPANY_ROLES.includes(out.role as never)) {
+    delete out.role;
   }
   if ('device_type' in out && !DEVICE_TYPES.includes(out.device_type as never)) {
     delete out.device_type;

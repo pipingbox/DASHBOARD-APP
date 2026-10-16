@@ -147,6 +147,19 @@ export const SPA_ROUTE_CONTRACT: RouteRule[] = [
   { pattern: '/company/settings', visibility: 'COMPANY', kind: 'EXACT' },
   { pattern: '/company/billing', visibility: 'COMPANY', kind: 'EXACT' },
 
+  // ─── PB-CE-COMPANY-CORE-001 — company tenant + team accounts ──────────────
+  // Open to any authenticated user (an invited teammate may hold a worker
+  // profile); authorization is enforced server-side by pb_company_* RPCs.
+  { pattern: '/company/tenant', visibility: 'PROTECTED', kind: 'EXACT' },
+  { pattern: '/company/team', visibility: 'PROTECTED', kind: 'EXACT' },
+  {
+    pattern: '/company-invite/:token',
+    visibility: 'PROTECTED',
+    kind: 'DYNAMIC',
+    validate: (_path, params) => /^[0-9a-f]{64}$/i.test(params.token ?? ''),
+    note: 'single-use invite link (SHA-256 hex token); session optional, page prompts sign-in',
+  },
+
   // ─── ADMIN exact routes ────────────────────────────────────────────────────
   { pattern: '/admin', visibility: 'ADMIN', kind: 'EXACT' },
 

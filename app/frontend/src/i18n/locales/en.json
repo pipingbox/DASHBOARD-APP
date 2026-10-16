@@ -106,6 +106,8 @@
     "companyDocumentation": "Industrial Document Management",
     "companySection": "Company",
     "companySettings": "Settings",
+    "companyTenant": "My Company",
+    "companyTeam": "Team",
     "companyWorkspace": "Company Workspace"
   },
   "notifications": {
@@ -4409,5 +4411,103 @@
     "copyAllFacebook": "Copy all Facebook links",
     "copied": "Copied",
     "note": "UTM parameters contain only generic campaign identifiers — never personal data."
+  },
+  "companyCore": {
+    "loading": "Loading…",
+    "switcher": {
+      "label": "Active company"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "recruiter": "Recruiter",
+      "viewer": "Viewer"
+    },
+    "verification": {
+      "unverified": "Not verified",
+      "pending": "Verification pending",
+      "verified": "Verified",
+      "rejected": "Verification rejected"
+    },
+    "create": {
+      "title": "Set up your company",
+      "description": "Create your company workspace to invite your team. Creating a company does not verify it.",
+      "nameLabel": "Company name",
+      "countryLabel": "Country (optional)",
+      "submit": "Create company",
+      "submitting": "Creating…"
+    },
+    "view": {
+      "title": "My company",
+      "description": "Overview of your company workspace.",
+      "verificationTitle": "Verification status",
+      "teamTitle": "Team",
+      "teamDescription": "Members, roles and invitations",
+      "yourRoleTitle": "Your role"
+    },
+    "team": {
+      "title": "Team",
+      "description": "Members of {{company}}",
+      "noCompany": "You don't belong to any company yet.",
+      "createLink": "Set up your company",
+      "membersTitle": "Members",
+      "unnamedMember": "Unnamed member",
+      "you": "you",
+      "confirmRemove": "Remove this member? Their access is revoked immediately.",
+      "confirmTransfer": "Transfer ownership? You will become an admin.",
+      "transferTitle": "Transfer ownership",
+      "removeTitle": "Remove member",
+      "leaveTitle": "Leave company"
+    },
+    "invite": {
+      "title": "Invite a member",
+      "emailLabel": "Email",
+      "roleLabel": "Role",
+      "submit": "Create invitation",
+      "submitting": "Creating…",
+      "created": "Invitation created. Share this single-use link:",
+      "alreadyPending": "There is already a pending invitation for this email.",
+      "copy": "Copy",
+      "copied": "Link copied",
+      "emailNotice": "Email delivery is not enabled yet — share the link manually with the invitee."
+    },
+    "invitations": {
+      "title": "Invitations",
+      "revoke": "Revoke",
+      "expires": "expires {{date}}",
+      "status": {
+        "pending": "pending",
+        "accepted": "accepted",
+        "rejected": "rejected",
+        "revoked": "revoked",
+        "expired": "expired"
+      }
+    },
+    "accept": {
+      "title": "Company invitation",
+      "sessionRequired": "To respond to this invitation, sign in or register with the invited email address, then reopen this link.",
+      "signIn": "Sign in",
+      "register": "Register",
+      "question": "Do you want to join this company?",
+      "accept": "Accept",
+      "reject": "Reject",
+      "processing": "Processing…",
+      "success": "You have joined the company. Redirecting…",
+      "rejected": "Invitation rejected."
+    },
+    "errors": {
+      "not_authenticated": "You must be signed in.",
+      "forbidden": "You don't have permission for this action.",
+      "not_found": "Not found.",
+      "invalid_name": "Invalid company name.",
+      "invalid_email": "Invalid email address.",
+      "invalid_role": "Invalid role.",
+      "invalid_or_expired": "This invitation is invalid, expired or already used.",
+      "email_mismatch": "This invitation was sent to a different email address. Sign in with the invited email.",
+      "not_active": "The membership is not active.",
+      "last_owner": "The company must keep at least one owner.",
+      "cannot_transfer_to_self": "You cannot transfer ownership to yourself.",
+      "unknown": "Something went wrong. Please try again."
+    }
   }
 }
