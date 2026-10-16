@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
     return json({ error: "max_attempts_exceeded" }, 400);
   }
 
-  const valid = await bcrypt.compare(code, record.otp_code_hash);
+  const valid = bcrypt.compareSync(code, record.otp_code_hash); // sync: sin Web Worker en edge runtime
 
   if (!valid) {
     await supabase

@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
     .is("verified_at", null);
 
   const code = generateOtpCode();
-  const hash = await bcrypt.hash(code);
+  const hash = bcrypt.hashSync(code); // sync: el edge runtime no tiene Web Worker (ticket PB-WHATSAPP-FOUNDATION-001)
   const expiresAt = new Date(Date.now() + otpTtlMinutes * 60 * 1000).toISOString();
 
   const { error: insertError } = await supabase
