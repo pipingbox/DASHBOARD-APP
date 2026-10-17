@@ -28,6 +28,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import Onboarding from './pages/Onboarding';
+import MarketplaceV3Wizard from './pages/MarketplaceV3Wizard';
 import CompanyDashboard from './pages/CompanyDashboard';
 import EnterpriseDashboard from './pages/EnterpriseDashboard';
 import Academy from './pages/Academy';
@@ -217,6 +218,8 @@ const AppRoutes = () => {
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/dashboard" element={withShell(<Dashboard />)} />
     <Route path="/onboarding" element={withGateOnly(<Onboarding />)} />
+    {/* PR-V3-02: wizard de aceptación del contrato Marketplace Ready v3 */}
+    <Route path="/marketplace/v3" element={withShell(<MarketplaceV3Wizard />)} />
     <Route
       path="/company-dashboard"
       element={withShellRoles(<CompanyDashboard />, ['admin', 'company'])}

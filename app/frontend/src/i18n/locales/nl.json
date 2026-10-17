@@ -4487,5 +4487,25 @@
     "copyAllFacebook": "Alle Facebook-links kopiëren",
     "copied": "Gekopieerd",
     "note": "UTM-parameters bevatten alleen algemene campagne-identificaties, nooit persoonsgegevens."
+  },
+  "marketplaceV3": {
+    "title": "Marketplace Ready activeren",
+    "subtitle": "Controleer de vereisten en accepteer de Marketplace-voorwaarden om uw profiel zichtbaar te maken voor bedrijven.",
+    "requirementsTitle": "Vereisten voor Marketplace Ready",
+    "requirements": {
+      "cv": "CV geüpload en toegankelijk",
+      "profession": "Beroep of vakgebied opgegeven",
+      "location": "Werklocatie of regio",
+      "availability": "Beschikbaarheid opgegeven"
+    },
+    "certificatesOptional": "Certificaten zijn optioneel: ze verbeteren uw profiel maar zijn niet vereist voor de Marketplace.",
+    "consentText": "Door te accepteren stemt u ermee in dat PIPINGBOX uw professionele profiel presenteert aan geverifieerde bedrijven volgens de Marketplace-voorwaarden (versie v3-2026-10-17). Uw originele CV en contactgegevens worden nooit zonder uw toestemming getoond.",
+    "consentCheckbox": "Ik heb de Marketplace-voorwaarden (v3) gelezen en accepteer ze.",
+    "acceptCta": "Accepteren en activeren",
+    "resultReady": "Uw profiel is Marketplace Ready. Bedrijven kunnen u nu vinden.",
+    "resultNotEligible": "Toestemming geregistreerd. Vul de ontbrekende vereisten aan om Marketplace Ready te activeren.",
+    "resultLegacy": "Uw profiel is beschermd onder de vorige voorwaarden. Er zijn geen wijzigingen toegepast.",
+    "resultError": "De acceptatie kon niet worden voltooid. Probeer het opnieuw.",
+    "completeProfileLink": "Vul uw profiel aan"
   }
 }

@@ -4494,5 +4494,25 @@
     "copyAllFacebook": "Copiază toate linkurile de Facebook",
     "copied": "Copiat",
     "note": "Parametrii UTM conțin doar identificatori generici de campanie, niciodată date personale."
+  },
+  "marketplaceV3": {
+    "title": "Activează Marketplace Ready",
+    "subtitle": "Verifică cerințele și acceptă condițiile Marketplace pentru ca profilul tău să fie vizibil companiilor.",
+    "requirementsTitle": "Cerințe Marketplace Ready",
+    "requirements": {
+      "cv": "CV încărcat și accesibil",
+      "profession": "Profesie sau meserie indicată",
+      "location": "Locația sau regiunea de lucru",
+      "availability": "Disponibilitate declarată"
+    },
+    "certificatesOptional": "Certificatele sunt opționale: îți îmbunătățesc profilul, dar nu sunt obligatorii pentru Marketplace.",
+    "consentText": "Prin acceptare, autorizezi PIPINGBOX să prezinte profilul tău profesional companiilor verificate conform condițiilor Marketplace (versiunea v3-2026-10-17). CV-ul tău original și datele de contact nu sunt afișate niciodată fără autorizarea ta.",
+    "consentCheckbox": "Am citit și accept condițiile Marketplace (v3).",
+    "acceptCta": "Acceptă și activează",
+    "resultReady": "Profilul tău este Marketplace Ready. Companiile te pot găsi acum.",
+    "resultNotEligible": "Consimțământ înregistrat. Completează cerințele rămase pentru a activa Marketplace Ready.",
+    "resultLegacy": "Profilul tău este protejat de condițiile anterioare. Nu s-au aplicat modificări.",
+    "resultError": "Acceptarea nu a putut fi finalizată. Încearcă din nou.",
+    "completeProfileLink": "Completează-ți profilul"
   }
 }

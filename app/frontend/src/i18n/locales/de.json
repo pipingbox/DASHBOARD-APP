@@ -4487,5 +4487,25 @@
     "copyAllFacebook": "Alle Facebook-Links kopieren",
     "copied": "Kopiert",
     "note": "UTM-Parameter enthalten nur generische Kampagnen-IDs, niemals personenbezogene Daten."
+  },
+  "marketplaceV3": {
+    "title": "Marketplace Ready aktivieren",
+    "subtitle": "Prüfen Sie die Anforderungen und akzeptieren Sie die Marketplace-Bedingungen, damit Ihr Profil für Unternehmen sichtbar wird.",
+    "requirementsTitle": "Anforderungen für Marketplace Ready",
+    "requirements": {
+      "cv": "Lebenslauf hochgeladen und zugänglich",
+      "profession": "Beruf oder Fachrichtung angegeben",
+      "location": "Arbeitsort oder Region",
+      "availability": "Verfügbarkeit angegeben"
+    },
+    "certificatesOptional": "Zertifikate sind optional: Sie verbessern Ihr Profil, sind aber für den Marketplace nicht erforderlich.",
+    "consentText": "Mit Ihrer Zustimmung darf PIPINGBOX Ihr Berufsprofil verifizierten Unternehmen gemäß den Marketplace-Bedingungen (Version v3-2026-10-17) präsentieren. Ihr ursprünglicher Lebenslauf und Ihre Kontaktdaten werden niemals ohne Ihre Zustimmung angezeigt.",
+    "consentCheckbox": "Ich habe die Marketplace-Bedingungen (v3) gelesen und akzeptiere sie.",
+    "acceptCta": "Akzeptieren und aktivieren",
+    "resultReady": "Ihr Profil ist Marketplace Ready. Unternehmen können Sie jetzt finden.",
+    "resultNotEligible": "Zustimmung gespeichert. Vervollständigen Sie die fehlenden Anforderungen, um Marketplace Ready zu aktivieren.",
+    "resultLegacy": "Ihr Profil ist durch die vorherigen Bedingungen geschützt. Es wurden keine Änderungen vorgenommen.",
+    "resultError": "Die Zustimmung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.",
+    "completeProfileLink": "Vervollständigen Sie Ihr Profil"
   }
 }

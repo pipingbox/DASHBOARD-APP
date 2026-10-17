@@ -4494,5 +4494,25 @@
     "copyAllFacebook": "Copiar todos los enlaces de Facebook",
     "copied": "Copiado",
     "note": "Los parámetros UTM contienen solo identificadores genéricos de campaña, nunca datos personales."
+  },
+  "marketplaceV3": {
+    "title": "Activar Marketplace Ready",
+    "subtitle": "Revisa los requisitos y acepta las condiciones del Marketplace para que tu perfil sea visible para las empresas.",
+    "requirementsTitle": "Requisitos de Marketplace Ready",
+    "requirements": {
+      "cv": "CV subido y accesible",
+      "profession": "Profesión u oficio indicado",
+      "location": "Ubicación o región de trabajo",
+      "availability": "Disponibilidad declarada"
+    },
+    "certificatesOptional": "Los certificados son opcionales: mejoran tu perfil, pero no son obligatorios para entrar en el Marketplace.",
+    "consentText": "Al aceptar, autorizas a PIPINGBOX a presentar tu perfil profesional a empresas verificadas según las condiciones del Marketplace (versión v3-2026-10-17). Tu CV original y tus datos de contacto nunca se muestran sin tu autorización.",
+    "consentCheckbox": "He leído y acepto las condiciones del Marketplace (v3).",
+    "acceptCta": "Aceptar y activar",
+    "resultReady": "Tu perfil es Marketplace Ready. Las empresas ya pueden encontrarte.",
+    "resultNotEligible": "Consentimiento registrado. Completa los requisitos pendientes para activar Marketplace Ready.",
+    "resultLegacy": "Tu perfil está protegido por las condiciones anteriores. No se aplicaron cambios.",
+    "resultError": "No se pudo completar la aceptación. Inténtalo de nuevo.",
+    "completeProfileLink": "Completa tu perfil"
   }
 }
