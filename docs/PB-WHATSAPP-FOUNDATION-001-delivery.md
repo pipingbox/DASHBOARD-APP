@@ -1,6 +1,6 @@
 # PB-WHATSAPP-FOUNDATION-001 — Entrega: PHONE + OTP + CONSENT FOUNDATION
 
-**Estado: MERGED A MAIN (`6f7f5ba`) + INFRA DESPLEGADA EN PRODUCCIÓN (2026-10-16 ~21:05 UTC) — smoke prod 10/10 PASS — feature OFF, provider vacío, SIN envíos reales. Pendiente: provider real (ticket aparte) y verificación de la 1ª ventana del job (03:17 UTC).**
+**Estado: MERGED A MAIN (`6f7f5ba`) + INFRA DESPLEGADA EN PRODUCCIÓN (2026-10-16 ~21:05 UTC) — smoke prod 10/10 PASS — feature OFF, provider vacío, SIN envíos reales — cron 1ª ejecución VERIFICADA (2026-10-17 03:17 UTC, succeeded). Pendiente: provider real (ticket aparte).**
 
 Rama: `feat/pb-whatsapp-foundation-001` (mergeada, PR #80, merge commit `6f7f5bad762aee9e8104fd7636b2293bf6e00b0d`)
 SHA candidato: `ebec9591c152afbc2f7329b71434ced6fdcecd0a` (superseded; candidato final = merge commit)
@@ -147,7 +147,29 @@ El salto part5→part7 **no es una omisión**: al fusionar las tres tablas en `p
 | `phone-update-consent` | 1 | `d36bc0dd…` |
 | `phone-withdraw-consent` | 1 | `c98557c1…` |
 
-**Job de retención**: `pb-phone-purge-retention` **PROGRAMADO** (jobid 2, `17 3 * * *`, active=true) — **ejecución automática PENDIENTE**: la primera ventana es 2026-10-17 03:17 UTC; verificar entonces en `cron.job_run_details` (status `succeeded`).
+**Job de retención**: `pb-phone-purge-retention` **EJECUTADO Y VERIFICADO** (jobid 2, `17 3 * * *`, active=true).
+
+**Primera ejecución automática — 2026-10-17 03:17 UTC — PASS:**
+
+| Campo | Valor |
+|---|---|
+| jobid | 2 |
+| runid | 536 |
+| status | **succeeded** |
+| return_message | `1 row` (pg_cron registra el conteo de filas devueltas por el SELECT; la función retornó 1 fila JSONB) |
+| start_time | `2026-10-17 03:17:00.2596+00` |
+| end_time | `2026-10-17 03:17:00.29127+00` |
+| duración | ~31 ms |
+
+**Alcance verificado (read-only, mismo instante):**
+
+| Tabla | Filas | En alcance de purga |
+|---|---|---|
+| `app_14da0f1941_phone_verifications` | 0 | Sí (challenges >30 días) |
+| `app_14da0f1941_phone_provider_outbox` | 0 | Sí (capturas QA >7 días) |
+| `app_14da0f1941_phone_events` | 0 | **No** (auditoría, nunca purgada) |
+
+0 borrados esperado y confirmado: todos los datos de producción son recientes (infra desplegada 2026-10-16). `phone_events` (auditoría) intacta por diseño. Automatización 181 auto-eliminada tras esta verificación.
 
 **Smoke producción — 10/10 PASS** (usuario desechable `pb-phone-prod-smoke@pipingbox-qa.test`, script `/tmp/phone-prod-smoke.mjs`):
 - S1 `phone-send-otp` con anon key → **401** (verify_jwt).
@@ -172,7 +194,7 @@ El salto part5→part7 **no es una omisión**: al fusionar las tres tablas en `p
 2. NO sembrar `phone_provider_config` en producción — **cumplido** (vacía, verificado).
 3. Ticket separado: provider real (WhatsApp Cloud API / Twilio / Vonage) implementando `PhoneVerificationProvider`.
 4. Secret `PHONE_VERIFICATION_PROVIDER` cuando la plataforma lo permita.
-5. ~~Verificar `cron.job`~~ — HECHO (programado). **Pendiente**: confirmar primera ejecución automática en `cron.job_run_details` tras 2026-10-17 03:17 UTC.
+5. ~~Verificar `cron.job`~~ — HECHO (programado). ~~Confirmar primera ejecución automática~~ — **HECHO (§12a): runid=536, status=succeeded, 2026-10-17 03:17 UTC, ~31 ms, 0 borrados (datos recientes), phone_events intacta.**
 6. Activación del flag `VITE_PHONE_VERIFICATION_ENABLED` en frontend: pendiente del provider real y de GO explícito del PO.
 7. Criterios de validación post-deploy: (a) 503 controlado — **verificado (S2)**; (b) advisors sin lints nuevos — **verificado**; (c) auth/Marketplace intactos — **verificado (S6, RPC exec)**; (d) rollback = §11 (vigente).
 
