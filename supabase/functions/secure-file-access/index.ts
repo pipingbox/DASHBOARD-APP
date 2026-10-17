@@ -2,31 +2,43 @@
 // Purpose: Broker signed URLs for CV, documents and certifications.
 //
 // PB-STORAGE-SECURITY-001
+// PB-SEC-01 (PB-MARKETPLACE-V3-RECRUITMENT-001 TRACK B):
+//   - Company actors NO LONGER receive the original CV during search and
+//     shortlist (403 cv_original_not_available). The protected professional
+//     profile (ficha) replaces it; original CV only after the candidate's
+//     explicit acceptance (TRACK D, not yet built).
+//   - Company deliveries of documents/certifications are PROXIED through this
+//     function: no signed URL is ever issued to a company. A 15-minute URL is
+//     not revocation; a proxied stream leaves no reusable link at all.
+//   - Signed URLs for owner/admin drop from 1h to 15 minutes.
+//   - Every grant and every denial is written to the append-only audit table
+//     app_14da0f1941_file_access_log (RLS closed, service_role insert only).
 //
 // Security:
 //   - Authenticates the caller via JWT (no anon access).
 //   - Owner always has access to their own files.
 //   - Admin/jobs_moderator have access.
-//   - Company access is granted ONLY when the candidate applied to a job
-//     owned by the company user, AND the file is explicitly visible.
-//   - Uses service_role to create short-lived signed URLs; the key never
-//     leaves the Edge Function.
+//   - Company access requires an explicit relationship to the candidate and
+//     explicit visibility consent, and is served only by proxy.
+//   - Uses service_role to read storage; the key never leaves the function.
 //   - Never returns raw legacy public URLs.
 //   - Storage path integrity: bucket allowlist, object must exist, owner
 //     must match owner_user_id, path must be inside the owner's namespace.
 //
 // Fail-closed: any role other than owner / admin / jobs_moderator / company
-// is denied, and the final deny happens before createSignedUrl().
+// is denied, and the final deny happens before any storage access.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-correlation-id",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const SIGNED_URL_EXPIRY_SECONDS = 60 * 60; // 1 hour
+const SIGNED_URL_EXPIRY_SECONDS = 15 * 60; // 15 minutes (PB-SEC-01)
+
+const AUDIT_TABLE = "app_14da0f1941_file_access_log";
 
 interface AccessRequest {
   owner_user_id: string;
@@ -68,6 +80,54 @@ function errorResponse(status: number, message: string) {
   );
 }
 
+interface AuditEntry {
+  actor_user_id: string;
+  actor_role: string;
+  owner_user_id: string;
+  file_type: string;
+  record_id?: string | null;
+  bucket?: string | null;
+  object_path?: string | null;
+  decision: "granted" | "denied";
+  reason: string;
+  delivery?: "signed_url" | "proxy" | null;
+  correlation_id: string;
+}
+
+/**
+ * Append-only audit of every access decision. Logging failures are reported
+ * but never change the access decision that was already taken (the row is
+ * forensic evidence, not an authorization input).
+ */
+async function auditAccess(
+  supabase: ReturnType<typeof createClient>,
+  entry: AuditEntry,
+) {
+  try {
+    const { error } = await supabase.from(AUDIT_TABLE).insert({
+      actor_user_id: entry.actor_user_id,
+      actor_role: entry.actor_role,
+      owner_user_id: entry.owner_user_id,
+      file_type: entry.file_type,
+      record_id: entry.record_id ?? null,
+      bucket: entry.bucket ?? null,
+      object_path: entry.object_path ?? null,
+      decision: entry.decision,
+      reason: entry.reason,
+      delivery: entry.delivery ?? null,
+      correlation_id: entry.correlation_id,
+    });
+    if (error) {
+      console.error("[secure-file-access] audit insert failed:", error.message);
+    }
+  } catch (err) {
+    console.error(
+      "[secure-file-access] audit insert exception:",
+      err instanceof Error ? err.message : String(err),
+    );
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -79,6 +139,8 @@ Deno.serve(async (req) => {
   const supabase = createClient(supabaseUrl, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
+
+  const correlationId = req.headers.get("x-correlation-id") ?? crypto.randomUUID();
 
   const authHeader = req.headers.get("authorization");
   if (!authHeader) {
@@ -121,9 +183,30 @@ Deno.serve(async (req) => {
   const isPrivileged = viewerRole === "admin" || viewerRole === "jobs_moderator";
   const isCompany = viewerRole === "company";
 
+  const auditBase = {
+    actor_user_id: viewerUserId,
+    actor_role: viewerRole,
+    owner_user_id,
+    file_type,
+    record_id: record_id ?? null,
+    correlation_id: correlationId,
+  };
+
+  const deny = async (reason: string, status: number, message: string) => {
+    await auditAccess(supabase, { ...auditBase, decision: "denied", reason });
+    return errorResponse(status, message);
+  };
+
   // Fall-closed: only owner, privileged or company may proceed.
   if (!isOwner && !isPrivileged && !isCompany) {
-    return errorResponse(403, "Access denied");
+    return deny("role_not_allowed", 403, "Access denied");
+  }
+
+  // PB-SEC-01: companies never receive the original CV during search and
+  // shortlist. The protected professional profile replaces it; access to the
+  // original CV requires the candidate's explicit acceptance (TRACK D).
+  if (isCompany && file_type === "cv") {
+    return deny("cv_original_not_available", 403, "cv_original_not_available");
   }
 
   let fileRecord: FileRecord | null = null;
@@ -149,14 +232,14 @@ Deno.serve(async (req) => {
   }
 
   if (!fileRecord) {
-    return errorResponse(404, "File not found");
+    return deny("not_found", 404, "File not found");
   }
 
   // Company access requires an explicit relationship to the candidate and
   // explicit visibility consent.
   if (isCompany) {
     if (!fileRecord.visibleToCompany) {
-      return errorResponse(403, "File not visible to companies");
+      return deny("not_visible_to_companies", 403, "File not visible to companies");
     }
     let allowed = false;
     try {
@@ -164,25 +247,25 @@ Deno.serve(async (req) => {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       console.error("[secure-file-access] company authorization error:", message);
-      return errorResponse(403, "Company authorization failed");
+      return deny("company_authorization_error", 403, "Company authorization failed");
     }
     if (!allowed) {
-      return errorResponse(403, "Company not authorized to access this candidate");
+      return deny("cross_tenant", 403, "Company not authorized to access this candidate");
     }
   }
 
   // Final deny gate: never sign unless authorization was explicitly granted.
   if (!isOwner && !isPrivileged && !isCompany) {
-    return errorResponse(403, "Access denied");
+    return deny("role_not_allowed", 403, "Access denied");
   }
 
   // Bucket allowlist and owner-namespace check before calling the backend RPC.
   const allowedBuckets = ALLOWED_BUCKETS[file_type];
   if (!allowedBuckets || !allowedBuckets.includes(fileRecord.bucket)) {
-    return errorResponse(403, "Bucket not allowed for file type");
+    return deny("bucket_not_allowed", 403, "Bucket not allowed for file type");
   }
   if (!fileRecord.path.startsWith(`${owner_user_id}/`)) {
-    return errorResponse(403, "Path does not belong to owner namespace");
+    return deny("path_namespace_mismatch", 403, "Path does not belong to owner namespace");
   }
 
   // Storage path integrity: a backend-only RPC confirms the object exists and
@@ -201,7 +284,7 @@ Deno.serve(async (req) => {
       "[secure-file-access] ownership RPC returned error:",
       ownershipError.message,
     );
-    return errorResponse(403, "Storage ownership verification failed");
+    return deny("ownership_verification_failed", 403, "Storage ownership verification failed");
   }
 
   if (ownershipOk !== true) {
@@ -211,10 +294,49 @@ Deno.serve(async (req) => {
       fileRecord.bucket,
       fileRecord.path,
     );
-    return errorResponse(
-      403,
-      "Storage object not found or ownership mismatch",
-    );
+    return deny("ownership_mismatch", 403, "Storage object not found or ownership mismatch");
+  }
+
+  // PB-SEC-01: company deliveries are proxied through this function. No
+  // signed URL is issued to a company: a 15-minute URL is not revocation,
+  // while a proxied stream leaves no reusable link, carries a neutral
+  // filename and can be refused at any moment.
+  if (isCompany) {
+    const { data: fileData, error: downloadError } = await supabase.storage
+      .from(fileRecord.bucket)
+      .download(fileRecord.path);
+
+    if (downloadError || !fileData) {
+      console.error("[secure-file-access] proxy download error:", downloadError?.message);
+      await auditAccess(supabase, {
+        ...auditBase,
+        bucket: fileRecord.bucket,
+        object_path: fileRecord.path,
+        decision: "denied",
+        reason: "proxy_download_failed",
+      });
+      return errorResponse(500, "Failed to retrieve file");
+    }
+
+    await auditAccess(supabase, {
+      ...auditBase,
+      bucket: fileRecord.bucket,
+      object_path: fileRecord.path,
+      decision: "granted",
+      reason: "company_authorized",
+      delivery: "proxy",
+    });
+
+    const isPdf = fileRecord.path.toLowerCase().endsWith(".pdf");
+    return new Response(fileData, {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": isPdf ? "application/pdf" : "application/octet-stream",
+        "Content-Disposition": `inline; filename="pipingbox-${file_type}.pdf"`,
+        "Cache-Control": "no-store",
+      },
+    });
   }
 
   const { data: signedData, error: signedError } = await supabase.storage
@@ -225,6 +347,15 @@ Deno.serve(async (req) => {
     console.error("[secure-file-access] signed url error:", signedError?.message);
     return errorResponse(500, "Failed to create signed URL");
   }
+
+  await auditAccess(supabase, {
+    ...auditBase,
+    bucket: fileRecord.bucket,
+    object_path: fileRecord.path,
+    decision: "granted",
+    reason: isOwner ? "owner" : "privileged",
+    delivery: "signed_url",
+  });
 
   return new Response(
     JSON.stringify({ signedUrl: signedData.signedUrl, expiresIn: SIGNED_URL_EXPIRY_SECONDS }),

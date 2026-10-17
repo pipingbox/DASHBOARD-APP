@@ -236,6 +236,8 @@ async function assertSignedUrl(label: string, data: any, error: any) {
   }
   expect(data.signedUrl).toMatch(/[?&]token=/);
   expect(data.signedUrl).not.toMatch(/\/object\/public\//);
+  // PB-SEC-01: owner/admin signed URLs must be short-lived (15 minutes).
+  expect(data.expiresIn, `${label}: expiresIn must be the PB-SEC-01 15-minute TTL`).toBe(15 * 60);
 }
 
 /**
@@ -265,6 +267,30 @@ async function assertDenied(label: string, data: any, error: any): Promise<strin
 
   console.log(`[broker-e2e] ${label} -> ${status} "${reason}"`);
   return reason;
+}
+
+/**
+ * PB-SEC-01 — company deliveries are proxied through the broker: the response
+ * is the file binary itself (a Blob for supabase-js), never a signed URL. A
+ * 15-minute URL is not revocation; a proxied stream leaves no reusable link.
+ * This helper asserts the proxy contract and rejects any response that smells
+ * like a URL (JSON body, signedUrl field, token query string).
+ */
+async function assertBrokerProxiedFile(label: string, data: any, error: any): Promise<void> {
+  if (error) {
+    throw new Error(await describeFailure(`${label}: expected proxied file`, data, error));
+  }
+  expect(data, `${label}: expected a Blob response`).toBeTruthy();
+  const isBlob = typeof Blob !== 'undefined' && data instanceof Blob;
+  if (!isBlob) {
+    const serialized = typeof data === 'string' ? data : JSON.stringify(data);
+    throw new Error(
+      `${label}: expected binary Blob (proxy delivery), got ${typeof data}: ${serialized?.slice(0, 200)}`,
+    );
+  }
+  expect((data as Blob).size, `${label}: proxied file must not be empty`).toBeGreaterThan(0);
+  expect(JSON.stringify(data), `${label}: proxy response must not contain a signedUrl`).not.toContain('signedUrl');
+  console.log(`[broker-e2e] ${label} -> proxied Blob (${(data as Blob).size} bytes, no signed URL issued)`);
 }
 
 async function cleanupFixtures(): Promise<string[]> {
@@ -681,48 +707,20 @@ test.describe('secure-file-access broker', () => {
     await client.supabase.auth.signOut();
   });
 
-  test('authorized company can retrieve a signed URL for a visible CV', async () => {
+  test('authorized company is denied the original CV even when it is visible (PB-SEC-01)', async () => {
     const client = await signIn(COMPANY_AUTH_EMAIL!, COMPANY_AUTH_PASSWORD!);
-
-    // Gate run #2 returned 403 "Company not authorized to access this candidate"
-    // while the fixture read-back showed the exact row isCompanyAuthorized()
-    // looks for. That narrows the failure to relationship resolution, so replay
-    // the broker's first query from here to tell "the data is wrong" apart from
-    // "the broker cannot see correct data".
-    //
-    // The broker runs this with service_role; this client is the company under
-    // RLS, so an empty result is only conclusive when paired with the error.
-    const probe = await client.supabase
-      .from('app_14da0f1941_job_applications')
-      .select('id, user_id, company_user_id')
-      .eq('user_id', fixture.workerId)
-      .eq('company_user_id', client.user.id)
-      .limit(1);
-
-    console.log(
-      '[broker-e2e] relationship probe (as company, under RLS):\n' +
-      `  viewer id (jwt):      ${client.user.id}\n` +
-      `  fixture company id:   ${fixture.authorizedCompanyId ?? '(unset)'}\n` +
-      `  candidate id queried: ${fixture.workerId}\n` +
-      `  rows:  ${probe.data ? JSON.stringify(probe.data) : '(none)'}\n` +
-      `  error: ${probe.error?.message ?? '(none)'}`,
-    );
-
-    // If the JWT identity differs from the id used to build the fixture, the
-    // broker is right to reject and the fixture is the defect.
-    if (fixture.authorizedCompanyId && client.user.id !== fixture.authorizedCompanyId) {
-      throw new Error(
-        `Company JWT identity (${client.user.id}) differs from the id used to build the ` +
-        `authorization fixture (${fixture.authorizedCompanyId}). The broker rejection is ` +
-        'correct; the fixture is invalid.',
-      );
-    }
 
     const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
       body: { owner_user_id: fixture.workerId, file_type: 'cv' },
     });
 
-    await assertSignedUrl('authorized company CV', data, error);
+    // PB-SEC-01: companies never receive the original CV during search and
+    // shortlist, regardless of relationship history or cv_visible. The
+    // protected professional profile replaces it until the candidate accepts
+    // contact (TRACK D). The exact denial reason is asserted so a silent
+    // re-opening of the original-CV path fails this gate loudly.
+    const reason = await assertDenied('authorized company original CV', data, error);
+    expect(reason, 'denial reason must be cv_original_not_available').toBe('cv_original_not_available');
     await client.supabase.auth.signOut();
   });
 
@@ -899,7 +897,7 @@ test.describe('secure-file-access broker', () => {
     await client.supabase.auth.signOut();
   });
 
-  test('a CV with no legacy URL is still signed for the owner and the authorized company', async () => {
+  test('a CV with no legacy URL is still signed for the owner and denied to the authorized company (PB-SEC-01)', async () => {
     const owner = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
     const { error: clearError } = await owner.supabase
       .from('app_14da0f1941_profiles')
@@ -927,7 +925,8 @@ test.describe('secure-file-access broker', () => {
     const companyAccess = await company.supabase.functions.invoke('secure-file-access', {
       body: { owner_user_id: fixture.workerId, file_type: 'cv' },
     });
-    await assertSignedUrl('authorized company canonical CV', companyAccess.data, companyAccess.error);
+    const reason = await assertDenied('authorized company canonical CV', companyAccess.data, companyAccess.error);
+    expect(reason, 'denial reason must be cv_original_not_available').toBe('cv_original_not_available');
     await company.supabase.auth.signOut();
   });
 
@@ -973,7 +972,7 @@ test.describe('secure-file-access broker', () => {
     await client.supabase.auth.signOut();
   });
 
-  test('authorized company can retrieve a visible historical document', async () => {
+  test('authorized company receives a visible historical document by proxy, never by signed URL (PB-SEC-01)', async () => {
     const client = await signIn(COMPANY_AUTH_EMAIL!, COMPANY_AUTH_PASSWORD!);
     const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
       body: {
@@ -983,7 +982,7 @@ test.describe('secure-file-access broker', () => {
       },
     });
 
-    await assertSignedUrl('authorized company historical document', data, error);
+    await assertBrokerProxiedFile('authorized company historical document', data, error);
     await client.supabase.auth.signOut();
   });
 
