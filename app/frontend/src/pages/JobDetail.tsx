@@ -16,7 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import type { Job, JobTranslation } from '@/lib/jobs/types';
 import { trackEvent } from '@/lib/observability';
-import { handlePendingProfileAfterApply } from '@/lib/applicationPendingProfile';
+import { handlePendingProfileAfterApply, drainActivationEmailsAfterApply } from '@/lib/applicationPendingProfile';
 import {
   captureAttributionVisit,
   getFirstTouch,
@@ -244,6 +244,10 @@ export default function JobDetail() {
     // pending_profile_validation. Eventos + EMAIL 1 (idioma del usuario,
     // idempotente en backend). Fail-open: nunca bloquea el apply.
     const isPendingProfile = await handlePendingProfileAfterApply(insertedApp, job.id);
+
+    // PB-JOBS-MARKETPLACE-READY-RECOVERY-001: drain self-service del EMAIL 2
+    // (idempotente, fail-open). Cubre promociones del gate durante el INSERT.
+    await drainActivationEmailsAfterApply();
 
     // Recruitment notification (jobs@pipingbox.com). Loud on failure, never
     // blocks the application — same contract as the lead alert flow.

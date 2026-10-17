@@ -225,15 +225,53 @@ export async function sendApplicationPendingProfileEmail(
   const claimId = claim.claim_id;
 
   try {
+    // Requisitos canónicos con outcomes EXPLÍCITOS (PB-JOBS-MARKETPLACE-
+    // READY-RECOVERY-001): un fallo técnico del RPC y una lista vacía son
+    // situaciones distintas y no se mezclan.
     const { data: missingData, error: missingError } = await supabase.rpc(
       "pb_marketplace_missing_requirements",
       { p_user_id: p.userId, p_declared_consent: profile.marketplace_consent_declared === true },
     );
-    if (missingError || !Array.isArray(missingData) || missingData.length === 0 ||
+    if (missingError || !Array.isArray(missingData) ||
         !missingData.every((requirement) => typeof requirement === "string")) {
-      throw new Error("canonical_requirements_unavailable");
+      // A. Fallo REAL del RPC canónico: fail-safe, no se inventan faltantes.
+      // El claim queda 'failed' y reintentable.
+      throw new Error("canonical_query_failed");
     }
     const pendingItems: string[] = missingData;
+
+    if (pendingItems.length === 0) {
+      // C. El predicado canónico responde que NO falta nada pero el flag
+      // persistido sigue false (estado obsoleto). NO enviar un email pidiendo
+      // requisitos inexistentes: sincronizar por el camino canónico
+      // (promoción consent-gated). Si procede, el trigger de sql/034 activa
+      // las candidaturas pending → applied y el drain entrega el EMAIL 2
+      // (claim por activation_id: exactamente una vez).
+      const { data: syncData, error: syncError } = await supabase.rpc(
+        "pb_sync_marketplace_ready_state",
+        { p_user_id: p.userId, p_batch_id: "email1-eligible-state-stale" },
+      );
+      const sync = firstRpcRow<{ out_status: string; out_activated_count: number }>(syncData);
+      if (!syncError && sync?.out_status === "promoted") {
+        try {
+          await drainMarketplaceReadyActivations(d, { userId: p.userId, limit: 50 });
+        } catch {
+          // Fail-open: el outbox persiste y lo drena la siguiente invocación
+          // con drain (complete-onboarding / recalculate-profiles / retry).
+        }
+        await supabase.rpc("app_14da0f1941_finalize_application_profile_pending_email", {
+          p_application_id: p.applicationId,
+          p_claim_id: claimId,
+          p_outcome: "failed",
+          p_last_error: "eligible_state_stale_activated",
+        }).then(undefined, undefined);
+        return { kind: "skipped", applicationId: p.applicationId, reason: "eligible_state_stale_activated" };
+      }
+      // Diferencia NO explicada entre predicado y flag (p. ej. consentimiento
+      // retirado en carrera, o perfil legacy): fail-safe, sin email y sin
+      // faltantes inventados. Claim 'failed' auditable y reintentable.
+      throw new Error(`eligible_state_stale:${sync?.out_status ?? "sync_unavailable"}`);
+    }
     const { data: phonePresent, error: phoneError } = await supabase.rpc(
       "pb_marketplace_phone_present", { p_user_id: p.userId },
     );
