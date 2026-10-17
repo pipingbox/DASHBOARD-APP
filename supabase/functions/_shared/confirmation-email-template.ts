@@ -10,6 +10,8 @@
 // Diseño: plantilla responsive aprobada de PipingBox (negro/blanco/naranja,
 // logotipo horizontal oficial), botón CONFIRMĂ CONTUL → /login.
 
+import { renderEmailHeader } from "./email-header.ts";
+
 export const CONFIRMATION_RO_TEMPLATE_ID = "confirmation_ro_v1";
 export const CONFIRMATION_RO_SUBJECT = "Acțiune necesară: confirmă adresa de e-mail pentru contul PipingBox";
 
@@ -46,14 +48,7 @@ export function renderConfirmationRoHtml(name: string): string {
       <td align="center" style="padding:24px 12px;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px; max-width:100%;">
 
-          <!-- Header: logo sobre negro -->
-          <tr>
-            <td align="center" style="padding:24px 24px 20px 24px; background-color:#000000; border-bottom:2px solid #f59e0b;">
-              <img src="https://pipingbox.com/assets/logos/logo-horizontal.png"
-                   alt="PipingBox" width="180"
-                   style="display:block; width:180px; max-width:60%; height:auto; border:0;" />
-            </td>
-          </tr>
+          ${renderEmailHeader()}
 
           <!-- Saludo + diagnóstico -->
           <tr>

@@ -8,6 +8,12 @@ on:
   pull_request:
     paths:
       - 'supabase/functions/_shared/email-i18n/**'
+      - 'supabase/functions/_shared/email-header.ts'
+      - 'supabase/functions/_shared/confirmation-email-template.ts'
+      - 'supabase/functions/_shared/recovery-email-template.ts'
+      - 'supabase/functions/_shared/daily-report-core.ts'
+      - 'supabase/functions/app_14da0f1941_send_lead_notification/**'
+      - 'app/frontend/public/assets/logos/logo-horizontal-email.png'
       - 'supabase/functions/_shared/email-provider.ts'
       - 'supabase/functions/_shared/application-activation.ts'
       - 'supabase/functions/_shared/application-activation_test.ts'
@@ -24,6 +30,7 @@ on:
       - 'supabase/functions/welcome-email/**'
       - 'supabase/functions/_shared/welcome-email.ts'
       - 'scripts/welcome-email-previews.ts'
+      - 'scripts/email-brand-previews.ts'
       - 'sql/046-pb-welcome-email-001.sql'
       - 'supabase/functions/cv-extract/**'
       - 'supabase/functions/cv-apply-draft/**'
@@ -33,6 +40,8 @@ on:
     branches: [main]
     paths:
       - 'supabase/functions/_shared/email-i18n/**'
+      - 'supabase/functions/_shared/email-header.ts'
+      - 'app/frontend/public/assets/logos/logo-horizontal-email.png'
       - 'supabase/functions/_shared/application-activation.ts'
       - 'supabase/functions/_shared/welcome-email.ts'
       - 'supabase/functions/welcome-email/**'
@@ -58,6 +67,11 @@ jobs:
         run: |
           deno check --node-modules-dir=none \
             supabase/functions/_shared/email-i18n/mod.ts \
+            supabase/functions/_shared/email-header_test.ts \
+            supabase/functions/_shared/email-header.ts \
+            supabase/functions/_shared/confirmation-email-template.ts \
+            supabase/functions/_shared/recovery-email-template.ts \
+            supabase/functions/_shared/daily-report-core.ts \
             supabase/functions/_shared/email-provider.ts \
             supabase/functions/_shared/email-provider_test.ts \
             supabase/functions/_shared/standard-webhooks.ts \
@@ -80,12 +94,14 @@ jobs:
             supabase/functions/_shared/welcome-email.ts \
             supabase/functions/welcome-email/index.ts \
             scripts/welcome-email-previews.ts \
+            scripts/email-brand-previews.ts \
             supabase/functions/app_14da0f1941_send_job_application_notification/index.maintainable.ts
 
       - name: Tests (11 idiomas, seguridad, firma, URL de verificación, modo de entrega, CV engine, bienvenida)
         run: |
           deno test --node-modules-dir=none --allow-read --allow-env \
             supabase/functions/_shared/email-i18n/ \
+            supabase/functions/_shared/email-header_test.ts \
             supabase/functions/_shared/email-provider_test.ts \
             supabase/functions/_shared/application-activation_test.ts \
             supabase/functions/_shared/cv-extraction/ \

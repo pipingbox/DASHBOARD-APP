@@ -11,6 +11,7 @@ import {
   assertStringIncludes,
   assertThrows,
 } from "https://deno.land/std@0.224.0/assert/mod.ts";
+import { EMAIL_LOGO_URL } from "../email-header.ts";
 import { BRAND, renderWelcomeEmail, WELCOME_ROUTES } from "./render.ts";
 import type { WelcomeVariant } from "./render.ts";
 import { SUPPORTED_EMAIL_LANGUAGES as EMAIL_LANGUAGES } from "./languages.ts";
@@ -277,11 +278,17 @@ Deno.test("welcome: numeración industrial de secciones (6 profesional / 7 empre
 // Seguridad del HTML y texto plano
 // ─────────────────────────────────────────────────────────────────────────────
 
-Deno.test("welcome: sin imágenes remotas, scripts, iframes ni tracking", () => {
+Deno.test("welcome: sólo la imagen oficial, sin scripts, iframes ni tracking", () => {
   for (const lang of EMAIL_LANGUAGES) {
     for (const variant of VARIANTS) {
       const { html } = renderWelcomeEmail({ variant, lang, appBaseUrl: APP });
-      assert(!/<img\b/i.test(html), `${lang}/${variant}: contiene <img>`);
+      const images = [...html.matchAll(/<img\b[^>]*>/gi)].map(([tag]) => tag);
+      assertEquals(images.length, 1, `${lang}/${variant}: una única cabecera oficial`);
+      assertStringIncludes(images[0], `src="${EMAIL_LOGO_URL}"`);
+      assertStringIncludes(images[0], 'alt="PIPINGBOX"');
+      assertStringIncludes(images[0], 'max-width:100%');
+      assert(!images[0].includes("?"), `${lang}/${variant}: imagen con identificador/tracking`);
+      assert(!html.includes("PIPING<span"), `${lang}/${variant}: wordmark reconstruido`);
       assert(!/<script\b/i.test(html), `${lang}/${variant}: contiene <script>`);
       assert(!/<iframe\b/i.test(html), `${lang}/${variant}: contiene <iframe>`);
       // Atributo de evento inline: `on<evento>=` precedido de espacio (no

@@ -3,6 +3,7 @@
 // No envía nada, no toca la base de datos y no necesita red. Uso:
 //   deno run --node-modules-dir=none --allow-read --allow-write \
 //     scripts/welcome-email-previews.ts <dir-salida>
+import { EMAIL_LOGO_URL } from "../supabase/functions/_shared/email-header.ts";
 import {
   renderWelcomeEmail,
   SUPPORTED_EMAIL_LANGUAGES,
@@ -13,6 +14,8 @@ import type { WelcomeVariant } from "../supabase/functions/_shared/email-i18n/mo
 const out = Deno.args[0] ?? "./welcome-previews";
 const appBaseUrl = Deno.args[1] ?? "https://pipingbox.com";
 await Deno.mkdir(out, { recursive: true });
+const logo = new URL("../app/frontend/public/assets/logos/logo-horizontal-email.png", import.meta.url);
+await Deno.copyFile(logo, `${out}/logo-horizontal-email.png`);
 
 const VARIANTS: WelcomeVariant[] = ["worker", "company"];
 const LABEL: Record<WelcomeVariant, string> = {
@@ -28,7 +31,7 @@ for (const lang of SUPPORTED_EMAIL_LANGUAGES) {
   for (const variant of VARIANTS) {
     const r = renderWelcomeEmail({ variant, lang, appBaseUrl });
     const base = `welcome_${variant}.${lang}`;
-    await Deno.writeTextFile(`${out}/${base}.html`, r.html);
+    await Deno.writeTextFile(`${out}/${base}.html`, r.html.replaceAll(EMAIL_LOGO_URL, "./logo-horizontal-email.png"));
     await Deno.writeTextFile(`${out}/${base}.txt`, r.text);
     subjects.push(r.subject);
     cards.push(
@@ -67,6 +70,7 @@ await Deno.writeTextFile(
 <h1>PIPINGBOX · correo de bienvenida — previews</h1>
 <p class="m">PB-WELCOME-EMAIL-001 · 2 variantes × ${SUPPORTED_EMAIL_LANGUAGES.length} idiomas
  · base pública <code>${appBaseUrl}</code> · sin envíos reales.</p>
+<p class="m">El HTML de preview usa el PNG optimizado local; los correos enviados usarán ${EMAIL_LOGO_URL} una vez publicado.</p>
 <p class="m">Rutas enlazadas — profesional: <code>${
     Object.values(WELCOME_ROUTES.worker).join("</code> <code>")
   }</code><br>empresa: <code>${

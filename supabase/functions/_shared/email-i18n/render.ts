@@ -14,6 +14,7 @@
 // (contraste AA 5.19:1; corregido en revisión del PO, 2026-10-11 — el texto
 // blanco previo daba solo 3.41:1), `lang`/`charset=utf-8` en <html>.
 
+import { renderEmailHeader } from "../email-header.ts";
 import { DEFAULT_EMAIL_LANGUAGE, type EmailLanguage } from "./languages.ts";
 import { getLocale } from "./locales.ts";
 import { marketplacePhoneRecommendation, marketplaceRequirementLabel, type Requirement } from "./reconciliation.ts";
@@ -145,9 +146,7 @@ function layout(p: LayoutParts): string {
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:${BRAND.bg};">
 <tr><td align="center" style="padding:24px 12px;">
 <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px; width:100%; background-color:#FFFFFF; border-radius:8px; overflow:hidden;">
-<tr><td style="background-color:${BRAND.black}; padding:20px 28px;">
-  <span style="font-size:22px; font-weight:bold; letter-spacing:2px; color:#FFFFFF;">PIPING<span style="color:${BRAND.orange};">BOX</span></span>
-</td></tr>
+${renderEmailHeader()}
 <tr><td style="padding:32px 28px 8px 28px;">
   <h1 style="margin:0 0 16px 0; font-size:22px; line-height:28px; color:${BRAND.black};">${p.heading}</h1>
   ${p.bodyHtml}
@@ -649,9 +648,7 @@ function welcomeLayout(p: WelcomeLayoutParts): string {
 <table role="presentation" class="pb-outer" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:${BRAND.bg};">
 <tr><td align="center" style="padding:24px 12px;">
 <table role="presentation" class="pb-card" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px; width:100%; background-color:#FFFFFF; border-radius:8px; overflow:hidden;">
-<tr><td style="background-color:${BRAND.black}; padding:20px 28px;">
-  <span style="font-size:22px; font-weight:bold; letter-spacing:2px; color:#FFFFFF;">PIPING<span style="color:${BRAND.orange};">BOX</span></span>
-</td></tr>
+${renderEmailHeader()}
 <tr><td class="pb-pad" style="padding:32px 28px 4px 28px;">
   <h1 class="pb-h1" style="margin:0 0 16px 0; font-size:24px; line-height:30px; color:${BRAND.black};">${p.heading}</h1>
   ${p.introHtml}

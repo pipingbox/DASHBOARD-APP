@@ -68,6 +68,7 @@
 //   debe usar `_shared/email-i18n` con el idioma del destinatario.
 // ═══════════════════════════════════════════════════════════════════════════════
 
+import { renderEmailHeader } from "../_shared/email-header.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 import nodemailer from "npm:nodemailer";
@@ -478,6 +479,7 @@ export function buildAdminHtml(params: {
 
   return `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #0a0a0a; color: #e4e4e7; border: 1px solid #27272a;">
+      ${renderEmailHeader("block")}
       <div style="border-bottom: 1px solid #27272a; padding-bottom: 16px; margin-bottom: 24px;">
         <h1 style="margin: 0; font-size: 20px; color: #E8611A;">New Job Application</h1>
         <p style="margin: 4px 0 0; font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 0.1em;">PIPINGBOX Jobs Pipeline</p>
