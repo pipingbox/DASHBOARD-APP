@@ -2805,6 +2805,15 @@
     "applyError": "Er ging iets mis. Probeer het opnieuw.",
     "dismissed": "Concept verworpen. Je kunt je profiel handmatig invullen."
   },
+  "certExtract": {
+    "analyzing": "Document wordt geanalyseerd…",
+    "prefilled": "We hebben het document gelezen en het formulier ingevuld. Controleer de gegevens voordat je opslaat.",
+    "noDataFound": "We hebben geen certificaatgegevens in het document gevonden. Vul het formulier handmatig in.",
+    "manualFallback": "We konden de gegevens niet automatisch lezen. Het document is opgeslagen — vul de gegevens handmatig in.",
+    "verifyField": "controleer dit gegeven",
+    "conflict": "Sommige gegevens conflicteren met de bestaande registratie. Controleer ze en probeer opnieuw.",
+    "verifiedProtected": "Dit certificaat is geverifieerd. De gegevens kunnen hier niet worden gewijzigd — gebruik het verlengingsproces om het bij te werken."
+  },
   "profileCompleteness": {
     "title": "Profielvolledigheid",
     "motivation": "Vul je profiel aan om op te vallen bij recruiters en je kansen op aanname te vergroten.",

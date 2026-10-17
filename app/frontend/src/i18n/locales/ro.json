@@ -2812,6 +2812,15 @@
     "applyError": "Ceva n-a mers. Încearcă din nou.",
     "dismissed": "Ciorna a fost eliminată. Îți poți completa profilul manual."
   },
+  "certExtract": {
+    "analyzing": "Se analizează documentul…",
+    "prefilled": "Am citit documentul și am completat formularul. Verifică datele înainte de a salva.",
+    "noDataFound": "Nu am găsit date ale certificatului în document. Completează formularul manual.",
+    "manualFallback": "Nu am putut citi datele automat. Documentul este salvat — completează datele manual.",
+    "verifyField": "verifică această dată",
+    "conflict": "Unele date intră în conflict cu înregistrarea existentă. Verifică-le și încearcă din nou.",
+    "verifiedProtected": "Această certificare este verificată. Datele ei nu pot fi modificate aici — folosește procesul de reînnoire pentru a o actualiza."
+  },
   "profileCompleteness": {
     "title": "Completitudinea profilului",
     "motivation": "Completați-vă profilul pentru a ieși în evidență în fața recrutorilor și pentru a vă crește șansele de angajare.",

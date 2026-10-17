@@ -2819,6 +2819,15 @@
     "applyError": "Coś poszło nie tak. Spróbuj ponownie.",
     "dismissed": "Wersja robocza odrzucona. Możesz uzupełnić profil ręcznie."
   },
+  "certExtract": {
+    "analyzing": "Analizowanie dokumentu…",
+    "prefilled": "Przeczytaliśmy dokument i wstępnie wypełniliśmy formularz. Sprawdź dane przed zapisaniem.",
+    "noDataFound": "Nie znaleźliśmy danych certyfikatu w dokumencie. Wypełnij formularz ręcznie.",
+    "manualFallback": "Nie udało się odczytać danych automatycznie. Dokument jest zapisany — uzupełnij dane ręcznie.",
+    "verifyField": "sprawdź tę daną",
+    "conflict": "Niektóre dane są sprzeczne z istniejącym wpisem. Sprawdź je i spróbuj ponownie.",
+    "verifiedProtected": "Ten certyfikat jest zweryfikowany. Jego danych nie można tutaj zmienić — użyj procesu odnowienia, aby go zaktualizować."
+  },
   "profileCompleteness": {
     "title": "Kompletność profilu",
     "motivation": "Uzupełnij swój profil, aby wyróżnić się w oczach rekruterów i zwiększyć szanse na zatrudnienie.",

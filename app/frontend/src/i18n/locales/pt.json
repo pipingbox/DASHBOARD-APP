@@ -2812,6 +2812,15 @@
     "applyError": "Algo correu mal. Tente novamente.",
     "dismissed": "Rascunho descartado. Pode completar o seu perfil manualmente."
   },
+  "certExtract": {
+    "analyzing": "A analisar o documento…",
+    "prefilled": "Lemos o documento e pré-preenchemos o formulário. Reveja os dados antes de guardar.",
+    "noDataFound": "Não encontrámos dados do certificado no documento. Preencha o formulário manualmente.",
+    "manualFallback": "Não conseguimos ler os dados automaticamente. O documento está guardado — complete os dados manualmente.",
+    "verifyField": "verifique este dado",
+    "conflict": "Alguns dados entram em conflito com o registo existente. Reveja-os e tente novamente.",
+    "verifiedProtected": "Esta certificação está verificada. Os seus dados não podem ser alterados aqui — utilize o processo de renovação para a atualizar."
+  },
   "profileCompleteness": {
     "title": "Perfil Completo",
     "motivation": "Complete o seu perfil para se destacar perante os recrutadores e aumentar as suas hipóteses de ser contratado.",

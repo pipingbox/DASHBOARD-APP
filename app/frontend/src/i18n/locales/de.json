@@ -2805,6 +2805,15 @@
     "applyError": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
     "dismissed": "Entwurf verworfen. Sie können Ihr Profil manuell vervollständigen."
   },
+  "certExtract": {
+    "analyzing": "Dokument wird analysiert…",
+    "prefilled": "Wir haben das Dokument gelesen und das Formular vorausgefüllt. Bitte prüfen Sie die Daten vor dem Speichern.",
+    "noDataFound": "Wir konnten keine Zertifikatsdaten im Dokument finden. Bitte füllen Sie das Formular manuell aus.",
+    "manualFallback": "Wir konnten die Daten nicht automatisch lesen. Das Dokument ist gespeichert — bitte ergänzen Sie die Angaben manuell.",
+    "verifyField": "prüfen Sie diesen Wert",
+    "conflict": "Einige Daten stehen im Konflikt mit dem vorhandenen Eintrag. Bitte prüfen und erneut versuchen.",
+    "verifiedProtected": "Dieses Zertifikat ist verifiziert. Seine Daten können hier nicht geändert werden — nutzen Sie den Verlängerungsprozess, um es zu aktualisieren."
+  },
   "profileCompleteness": {
     "title": "Profilvollständigkeit",
     "motivation": "Vervollständigen Sie Ihr Profil, um bei Recruitern aufzufallen und Ihre Einstellungschancen zu erhöhen.",
