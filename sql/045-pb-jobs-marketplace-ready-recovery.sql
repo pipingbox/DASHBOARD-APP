@@ -72,7 +72,9 @@ CREATE OR REPLACE FUNCTION public.pb_sync_marketplace_ready_state(
   p_user_id  uuid,
   p_batch_id text DEFAULT NULL
 )
-RETURNS TABLE(status text, marketplace_ready boolean, activated_count integer)
+-- Nombres OUT prefijados (out_*): evita la colisión 42702 entre parámetros
+-- de RETURNS TABLE y columnas homónimas de app_14da0f1941_profiles.
+RETURNS TABLE(out_status text, out_marketplace_ready boolean, out_activated_count integer)
 LANGUAGE plpgsql
 SECURITY INVOKER
 SET search_path = public
@@ -288,9 +290,9 @@ BEGIN
     v_evaluated := v_evaluated + 1;
     BEGIN
       SELECT * INTO v_res FROM public.pb_sync_marketplace_ready_state(r.user_id, p_batch_id);
-      IF v_res.status = 'promoted' THEN        v_promoted := v_promoted + 1;
-      ELSIF v_res.status = 'already_ready' THEN v_already  := v_already + 1;
-      ELSIF v_res.status = 'legacy_protected' THEN v_legacy := v_legacy + 1;
+      IF v_res.out_status = 'promoted' THEN        v_promoted := v_promoted + 1;
+      ELSIF v_res.out_status = 'already_ready' THEN v_already  := v_already + 1;
+      ELSIF v_res.out_status = 'legacy_protected' THEN v_legacy := v_legacy + 1;
       ELSE                                      v_not      := v_not + 1;
       END IF;
     EXCEPTION WHEN OTHERS THEN

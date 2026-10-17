@@ -838,7 +838,7 @@ Deno.test("R2: lista vacía + sync promoted → eligible_state_stale_activated: 
     rpc: (fn, args) => {
       if (fn === "pb_marketplace_missing_requirements") return { data: [], error: null };
       if (fn === "pb_sync_marketplace_ready_state") {
-        return { data: { status: "promoted", marketplace_ready: true, activated_count: 1 }, error: null };
+        return { data: { out_status: "promoted", out_marketplace_ready: true, out_activated_count: 1 }, error: null };
       }
       return defaultRpcCalls()(fn, args);
     },
@@ -867,7 +867,7 @@ Deno.test("R3: lista vacía + sync sin promover (consent_required) → fail-safe
     rpc: (fn, args) => {
       if (fn === "pb_marketplace_missing_requirements") return { data: [], error: null };
       if (fn === "pb_sync_marketplace_ready_state") {
-        return { data: { status: "consent_required", marketplace_ready: false, activated_count: 0 }, error: null };
+        return { data: { out_status: "consent_required", out_marketplace_ready: false, out_activated_count: 0 }, error: null };
       }
       return defaultRpcCalls()(fn, args);
     },

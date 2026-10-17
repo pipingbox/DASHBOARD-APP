@@ -251,8 +251,8 @@ export async function sendApplicationPendingProfileEmail(
         "pb_sync_marketplace_ready_state",
         { p_user_id: p.userId, p_batch_id: "email1-eligible-state-stale" },
       );
-      const sync = firstRpcRow<{ status: string; activated_count: number }>(syncData);
-      if (!syncError && sync?.status === "promoted") {
+      const sync = firstRpcRow<{ out_status: string; out_activated_count: number }>(syncData);
+      if (!syncError && sync?.out_status === "promoted") {
         try {
           await drainMarketplaceReadyActivations(d, { userId: p.userId, limit: 50 });
         } catch {
@@ -270,7 +270,7 @@ export async function sendApplicationPendingProfileEmail(
       // Diferencia NO explicada entre predicado y flag (p. ej. consentimiento
       // retirado en carrera, o perfil legacy): fail-safe, sin email y sin
       // faltantes inventados. Claim 'failed' auditable y reintentable.
-      throw new Error(`eligible_state_stale:${sync?.status ?? "sync_unavailable"}`);
+      throw new Error(`eligible_state_stale:${sync?.out_status ?? "sync_unavailable"}`);
     }
     const { data: phonePresent, error: phoneError } = await supabase.rpc(
       "pb_marketplace_phone_present", { p_user_id: p.userId },
