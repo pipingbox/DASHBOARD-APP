@@ -20,7 +20,10 @@ create table if not exists public.app_14da0f1941_file_access_log (
   file_type text not null check (file_type in ('cv', 'document', 'certification')),
   record_id text,
   bucket text,
-  object_path text,
+  -- PB-SEC-01b (P1b): SHA-256 hex of the object path. Filenames may embed
+  -- personal names; the hash preserves exact joinability (recomputable from
+  -- storage.objects) without storing them. Raw paths are never written.
+  object_path_hash text,
   decision text not null check (decision in ('granted', 'denied')),
   reason text not null,
   delivery text check (delivery in ('signed_url', 'proxy')),

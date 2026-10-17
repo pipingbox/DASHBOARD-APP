@@ -14,12 +14,27 @@
 //   - Every grant and every denial is written to the append-only audit table
 //     app_14da0f1941_file_access_log (RLS closed, service_role insert only).
 //
+// PB-SEC-01b (PO review P1a/P1b/P1c):
+//   - P1a: a company account must be VERIFIED (company_verified=true and
+//     company_status='verified') before any documental privilege; pending or
+//     rejected companies are denied before any file resolution. Terminal
+//     relationships (hired/rejected/withdrawn applications) are expired and
+//     no longer grant access.
+//   - P1b: deliveries are fail-closed on audit: if the access row cannot be
+//     durably written, the file is NOT delivered (503 audit_unavailable).
+//     Object paths are stored hashed (SHA-256) to keep filenames out of the
+//     audit trail while preserving joinability.
+//   - P1c: proxied responses carry the REAL content type (storage object
+//     metadata via a backend-only RPC) and a neutral filename with the real
+//     extension instead of a forced .pdf.
+//
 // Security:
 //   - Authenticates the caller via JWT (no anon access).
 //   - Owner always has access to their own files.
 //   - Admin/jobs_moderator have access.
-//   - Company access requires an explicit relationship to the candidate and
-//     explicit visibility consent, and is served only by proxy.
+//   - Company access requires a verified account, an active relationship to
+//     the candidate and explicit visibility consent, and is served only by
+//     proxy.
 //   - Uses service_role to read storage; the key never leaves the function.
 //   - Never returns raw legacy public URLs.
 //   - Storage path integrity: bucket allowlist, object must exist, owner
@@ -73,9 +88,9 @@ const ALLOWED_BUCKETS: Record<string, readonly string[]> = {
   document: ["worker-documents", "app_14da0f1941_certificates"],
 };
 
-function errorResponse(status: number, message: string) {
+function errorResponse(status: number, message: string, reason?: string) {
   return new Response(
-    JSON.stringify({ error: message }),
+    JSON.stringify({ error: message, ...(reason ? { reason } : {}) }),
     { status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
   );
 }
@@ -94,15 +109,23 @@ interface AuditEntry {
   correlation_id: string;
 }
 
+/** SHA-256 hex of the object path: keeps filenames (which may embed personal
+ * names) out of the audit trail while preserving exact joinability. */
+async function hashObjectPath(path: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(path));
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 /**
- * Append-only audit of every access decision. Logging failures are reported
- * but never change the access decision that was already taken (the row is
- * forensic evidence, not an authorization input).
+ * Append-only audit of every access decision. Returns true when the row was
+ * durably written. Deliveries are fail-closed on this evidence: a grant that
+ * cannot be recorded is NOT delivered (503 audit_unavailable). Denials are
+ * already safe decisions, so a logging failure there is only reported.
  */
 async function auditAccess(
   supabase: ReturnType<typeof createClient>,
   entry: AuditEntry,
-) {
+): Promise<boolean> {
   try {
     const { error } = await supabase.from(AUDIT_TABLE).insert({
       actor_user_id: entry.actor_user_id,
@@ -111,7 +134,7 @@ async function auditAccess(
       file_type: entry.file_type,
       record_id: entry.record_id ?? null,
       bucket: entry.bucket ?? null,
-      object_path: entry.object_path ?? null,
+      object_path_hash: entry.object_path ? await hashObjectPath(entry.object_path) : null,
       decision: entry.decision,
       reason: entry.reason,
       delivery: entry.delivery ?? null,
@@ -119,12 +142,15 @@ async function auditAccess(
     });
     if (error) {
       console.error("[secure-file-access] audit insert failed:", error.message);
+      return false;
     }
+    return true;
   } catch (err) {
     console.error(
       "[secure-file-access] audit insert exception:",
       err instanceof Error ? err.message : String(err),
     );
+    return false;
   }
 }
 
@@ -166,10 +192,10 @@ Deno.serve(async (req) => {
 
   const viewerUserId = user.id;
 
-  // Fetch viewer profile for role.
+  // Fetch viewer profile for role and (for companies) verification state.
   const { data: viewerProfile, error: viewerProfileError } = await supabase
     .from("app_14da0f1941_profiles")
-    .select("role")
+    .select("role, company_verified, company_status")
     .eq("user_id", viewerUserId)
     .single();
 
@@ -194,7 +220,7 @@ Deno.serve(async (req) => {
 
   const deny = async (reason: string, status: number, message: string) => {
     await auditAccess(supabase, { ...auditBase, decision: "denied", reason });
-    return errorResponse(status, message);
+    return errorResponse(status, message, reason);
   };
 
   // Fall-closed: only owner, privileged or company may proceed.
@@ -207,6 +233,13 @@ Deno.serve(async (req) => {
   // original CV requires the candidate's explicit acceptance (TRACK D).
   if (isCompany && file_type === "cv") {
     return deny("cv_original_not_available", 403, "cv_original_not_available");
+  }
+
+  // PB-SEC-01b (P1a): no documental privilege for companies pending
+  // verification. The gate runs before any file resolution so a pending or
+  // rejected account learns nothing about the candidate's files.
+  if (isCompany && !(viewerProfile.company_verified === true && viewerProfile.company_status === "verified")) {
+    return deny("company_not_verified", 403, "company_not_verified");
   }
 
   let fileRecord: FileRecord | null = null;
@@ -241,15 +274,18 @@ Deno.serve(async (req) => {
     if (!fileRecord.visibleToCompany) {
       return deny("not_visible_to_companies", 403, "File not visible to companies");
     }
-    let allowed = false;
+    let relation: CompanyRelation = "none";
     try {
-      allowed = await isCompanyAuthorized(supabase, viewerUserId, owner_user_id);
+      relation = await getCompanyRelation(supabase, viewerUserId, owner_user_id);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       console.error("[secure-file-access] company authorization error:", message);
       return deny("company_authorization_error", 403, "Company authorization failed");
     }
-    if (!allowed) {
+    if (relation === "expired") {
+      return deny("relationship_expired", 403, "Company relationship expired");
+    }
+    if (relation !== "active") {
       return deny("cross_tenant", 403, "Company not authorized to access this candidate");
     }
   }
@@ -318,7 +354,9 @@ Deno.serve(async (req) => {
       return errorResponse(500, "Failed to retrieve file");
     }
 
-    await auditAccess(supabase, {
+    // P1b fail-closed: the delivery only happens after the access row is
+    // durably written. Bytes fetched server-side are discarded on failure.
+    const audited = await auditAccess(supabase, {
       ...auditBase,
       bucket: fileRecord.bucket,
       object_path: fileRecord.path,
@@ -326,14 +364,23 @@ Deno.serve(async (req) => {
       reason: "company_authorized",
       delivery: "proxy",
     });
+    if (!audited) {
+      return errorResponse(503, "audit_unavailable");
+    }
 
-    const isPdf = fileRecord.path.toLowerCase().endsWith(".pdf");
+    // P1c: real content type from storage object metadata (backend-only RPC),
+    // with an extension-map fallback; neutral filename carries the REAL
+    // extension instead of a forced .pdf.
+    const meta = await getStorageObjectMeta(supabase, fileRecord.bucket, fileRecord.path, owner_user_id);
+    const contentType = meta?.mimetype || mimeFromExtension(fileRecord.path) || "application/octet-stream";
+    const extension = extensionForMime(contentType) || extensionFromPath(fileRecord.path) || "bin";
+
     return new Response(fileData, {
       status: 200,
       headers: {
         ...corsHeaders,
-        "Content-Type": isPdf ? "application/pdf" : "application/octet-stream",
-        "Content-Disposition": `inline; filename="pipingbox-${file_type}.pdf"`,
+        "Content-Type": contentType,
+        "Content-Disposition": `inline; filename="pipingbox-${file_type}.${extension}"`,
         "Cache-Control": "no-store",
       },
     });
@@ -348,7 +395,9 @@ Deno.serve(async (req) => {
     return errorResponse(500, "Failed to create signed URL");
   }
 
-  await auditAccess(supabase, {
+  // P1b fail-closed: no signed URL leaves this function without a durable
+  // access row. A created-but-undelivered URL expires unused in 15 minutes.
+  const audited = await auditAccess(supabase, {
     ...auditBase,
     bucket: fileRecord.bucket,
     object_path: fileRecord.path,
@@ -356,6 +405,9 @@ Deno.serve(async (req) => {
     reason: isOwner ? "owner" : "privileged",
     delivery: "signed_url",
   });
+  if (!audited) {
+    return errorResponse(503, "audit_unavailable");
+  }
 
   return new Response(
     JSON.stringify({ signedUrl: signedData.signedUrl, expiresIn: SIGNED_URL_EXPIRY_SECONDS }),
@@ -475,20 +527,44 @@ function resolveBucketAndPath(
   return { bucket: null, path: null };
 }
 
-async function isCompanyAuthorized(
+type CompanyRelation = "active" | "expired" | "none";
+
+// Application statuses that end the company<->candidate relationship for
+// document access purposes (same terminal set as sql/034).
+const TERMINAL_APPLICATION_STATUSES: readonly string[] = ["hired", "rejected", "withdrawn"];
+
+/**
+ * PB-SEC-01b (P1a): tri-state relationship between a verified company account
+ * and a candidate.
+ *   - "active":  a live (non-terminal) application or workforce assignment.
+ *   - "expired": relationships exist but ALL are terminal — distinguishable
+ *     in the audit trail from a company that never had any relationship.
+ *   - "none":    no relationship at all.
+ *
+ * Interim policy while per-document / per-company / scope / duration grants
+ * do not exist: only "active" grants access, every decision is audited, and
+ * every delivery is proxied.
+ */
+async function getCompanyRelation(
   supabase: ReturnType<typeof createClient>,
   companyUserId: string,
   candidateUserId: string,
-): Promise<boolean> {
+): Promise<CompanyRelation> {
+  let sawTerminal = false;
+
   // Direct application to a job owned by this company user.
   const { data: directApps } = await supabase
     .from("app_14da0f1941_job_applications")
-    .select("id")
+    .select("status")
     .eq("user_id", candidateUserId)
-    .eq("company_user_id", companyUserId)
-    .limit(1);
+    .eq("company_user_id", companyUserId);
 
-  if (directApps && directApps.length > 0) return true;
+  if (directApps && directApps.length > 0) {
+    if (directApps.some((a: { status: string }) => !TERMINAL_APPLICATION_STATUSES.includes(a.status))) {
+      return "active";
+    }
+    sawTerminal = true;
+  }
 
   // Application to any job posted by this company user.
   const { data: companyJobs } = await supabase
@@ -500,12 +576,16 @@ async function isCompanyAuthorized(
     const jobIds = companyJobs.map((j: { id: string }) => j.id);
     const { data: jobApps } = await supabase
       .from("app_14da0f1941_job_applications")
-      .select("id")
+      .select("status")
       .eq("user_id", candidateUserId)
-      .in("job_id", jobIds)
-      .limit(1);
+      .in("job_id", jobIds);
 
-    if (jobApps && jobApps.length > 0) return true;
+    if (jobApps && jobApps.length > 0) {
+      if (jobApps.some((a: { status: string }) => !TERMINAL_APPLICATION_STATUSES.includes(a.status))) {
+        return "active";
+      }
+      sawTerminal = true;
+    }
   }
 
   // Workforce assignment relationship (company recruiter view).
@@ -526,8 +606,65 @@ async function isCompanyAuthorized(
       .eq("company_id", companyUserId)
       .limit(1);
 
-    if (matchingRequests && matchingRequests.length > 0) return true;
+    if (matchingRequests && matchingRequests.length > 0) return "active";
   }
 
-  return false;
+  return sawTerminal ? "expired" : "none";
+}
+
+/** Backend-only RPC: real MIME of the storage object (service_role only). */
+async function getStorageObjectMeta(
+  supabase: ReturnType<typeof createClient>,
+  bucket: string,
+  path: string,
+  ownerUserId: string,
+): Promise<{ mimetype: string | null } | null> {
+  const { data, error } = await supabase.rpc("pb_get_storage_object_meta", {
+    p_bucket_name: bucket,
+    p_path: path,
+    p_owner_user_id: ownerUserId,
+  });
+  if (error) {
+    console.error("[secure-file-access] object meta RPC error:", error.message);
+    return null;
+  }
+  const row = Array.isArray(data) ? data[0] : data;
+  return row ?? null;
+}
+
+const EXTENSION_MIME_MAP: Record<string, string> = {
+  pdf: "application/pdf",
+  doc: "application/msword",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  gif: "image/gif",
+  txt: "text/plain",
+};
+
+const MIME_EXTENSION_MAP: Record<string, string> = {
+  "application/pdf": "pdf",
+  "application/msword": "doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "text/plain": "txt",
+};
+
+function extensionFromPath(path: string): string | null {
+  const match = path.toLowerCase().match(/\.([a-z0-9]+)$/);
+  return match && EXTENSION_MIME_MAP[match[1]] ? match[1] : null;
+}
+
+function mimeFromExtension(path: string): string | null {
+  const ext = extensionFromPath(path);
+  return ext ? EXTENSION_MIME_MAP[ext] : null;
+}
+
+function extensionForMime(mimetype: string): string | null {
+  return MIME_EXTENSION_MAP[mimetype] ?? null;
 }
