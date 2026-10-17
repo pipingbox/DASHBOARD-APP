@@ -138,6 +138,17 @@ $$;
 COMMENT ON FUNCTION public.pb_marketplace_ready_for_v3(uuid, boolean) IS
   'PR-V3-01: predicado booleano del contrato v3.';
 
+-- Misma matriz de permisos que el predicado v2: solo service_role (los
+-- consumidores son Edge Functions y el sync canonico; no se exponen al
+-- cliente). Las funciones recien creadas heredan EXECUTE a PUBLIC por
+-- defecto de PostgreSQL y hay que cerrarlo explicitamente.
+REVOKE ALL ON FUNCTION public.pb_marketplace_minimums_v3(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.pb_marketplace_minimums_v3(uuid) TO service_role;
+REVOKE ALL ON FUNCTION public.pb_marketplace_missing_requirements_v3(uuid, boolean) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.pb_marketplace_missing_requirements_v3(uuid, boolean) TO service_role;
+REVOKE ALL ON FUNCTION public.pb_marketplace_ready_for_v3(uuid, boolean) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.pb_marketplace_ready_for_v3(uuid, boolean) TO service_role;
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 2. Despacho por versión del perfil (punto de entrada de las Edge Functions)
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -167,6 +178,9 @@ END $$;
 
 COMMENT ON FUNCTION public.pb_marketplace_missing_requirements_for(uuid, boolean) IS
   'PR-V3-01: despacha los requisitos faltantes al predicado de la version de contrato declarada por el perfil (v3 -> v3, resto -> v2 historico). Punto de entrada canonico de las Edge Functions de email.';
+
+REVOKE ALL ON FUNCTION public.pb_marketplace_missing_requirements_for(uuid, boolean) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.pb_marketplace_missing_requirements_for(uuid, boolean) TO service_role;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3. Contrato versionado: CHECK [1,2] → [1,2,3]
