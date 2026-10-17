@@ -328,6 +328,39 @@ Deno.test("teléfono ausente aparece solo como recomendación en los dos correos
   assert(es.text.indexOf("Sube un CV válido") < es.text.indexOf("Recomendado:"));
 });
 
+Deno.test("PR-V3-01: claves v3 (profession, location) renderizan en los 11 idiomas", () => {
+  // EMAIL 1 (application_pending_profile) y reconciliacion deben aceptar las
+  // claves del contrato v3 sin marcarlas como desconocidas.
+  for (const lang of SUPPORTED_EMAIL_LANGUAGES) {
+    const pending = renderApplicationPendingProfileEmail({
+      lang,
+      actionUrl: "https://pipingbox.com/profile",
+      pendingItems: ["cv", "profession", "location", "availability", "consent"],
+    });
+    assertEquals((pending.html.match(/<li/g) ?? []).length, 5,
+      `${lang}: expected 5 rendered requirement items`);
+    const reconciliation = renderMarketplaceReconciliationEmail({
+      lang, actionUrl: "https://pipingbox.com/profile",
+      missing: ["profession", "location"],
+    });
+    assertEquals((reconciliation.html.match(/<li/g) ?? []).length, 2,
+      `${lang}: expected 2 rendered requirement items`);
+  }
+  // Comprobaciones puntuales de traduccion.
+  const esPending = renderApplicationPendingProfileEmail({
+    lang: "es", actionUrl: "https://pipingbox.com/profile",
+    pendingItems: ["profession", "location"],
+  });
+  assertStringIncludes(esPending.text, "profesión u oficio");
+  assertStringIncludes(esPending.text, "región o ubicación");
+  const enPending = renderApplicationPendingProfileEmail({
+    lang: "en", actionUrl: "https://pipingbox.com/profile",
+    pendingItems: ["profession", "location"],
+  });
+  assertStringIncludes(enPending.text, "profession or trade");
+  assertStringIncludes(enPending.text, "work region or location");
+});
+
 Deno.test("renderActionEmail: el botón usa BRAND.buttonText, nunca blanco, sobre el naranja", () => {
   const r = renderActionEmail({ template: "confirmation", lang: "en", actionUrl: URL_OK, vars: ACTION_VARS });
   assertStringIncludes(r.html, `color:${BRAND.buttonText}`);

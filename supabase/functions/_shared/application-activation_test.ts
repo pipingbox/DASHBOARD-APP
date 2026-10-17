@@ -191,7 +191,7 @@ function defaultRpcCalls(state: Record<string, { state?: string; reason?: string
     if (fn === "pb_marketplace_phone_present") {
       return { data: state[`${fn}:${args.p_user_id}`]?.phonePresent ?? true, error: null };
     }
-    if (fn === "pb_marketplace_missing_requirements") {
+    if (fn === "pb_marketplace_missing_requirements_for") {
       return { data: state[`${fn}:${args.p_user_id}`]?.missing ?? ["certificate", "availability"], error: null };
     }
     if (fn === "app_14da0f1941_claim_application_profile_pending_email") {
@@ -307,7 +307,7 @@ Deno.test("G2: pending → email enviado una vez, con claim/fase/finalize correc
   assertStringIncludes(msg.text!, "/profile");
   // Orden del protocolo: claim → marc send_started → send → finalize sent.
   assertEquals(calls[0].fn, "app_14da0f1941_claim_application_profile_pending_email");
-  assertEquals(calls[1].fn, "pb_marketplace_missing_requirements");
+  assertEquals(calls[1].fn, "pb_marketplace_missing_requirements_for");
   assertEquals(calls[2].fn, "pb_marketplace_phone_present");
   assertEquals(calls[3].fn, "app_14da0f1941_marc_application_profile_pending_email_phase");
   assertEquals(calls[3].args.p_phase, "send_started");
@@ -329,7 +329,7 @@ Deno.test("EMAIL 1 enumera exactamente los faltantes canónicos en captura", asy
     const supabase = fakeSupabase({
       applications: [baseApplication()], profiles: [baseProfile()], activations: [],
       authUsers: { [UID]: { email: "qa@example.invalid", user_metadata: { lang: "es" } } },
-      rpc: defaultRpcCalls({ [`pb_marketplace_missing_requirements:${UID}`]: { missing } }),
+      rpc: defaultRpcCalls({ [`pb_marketplace_missing_requirements_for:${UID}`]: { missing } }),
     });
     const result = await sendApplicationPendingProfileEmail({ supabase, emailProvider: provider }, { applicationId: APP_ID, userId: UID });
     assertEquals(result.kind, "sent");
@@ -346,7 +346,7 @@ Deno.test("EMAIL 1 recomienda teléfono ausente sin añadirlo a los requisitos",
       applications: [baseApplication()], profiles: [baseProfile()], activations: [],
       authUsers: { [UID]: { email: "qa@example.invalid", user_metadata: { lang: "es" } } },
       rpc: defaultRpcCalls({
-        [`pb_marketplace_missing_requirements:${UID}`]: { missing: ["cv"] },
+        [`pb_marketplace_missing_requirements_for:${UID}`]: { missing: ["cv"] },
         [`pb_marketplace_phone_present:${UID}`]: { phonePresent },
       }),
     });
@@ -368,7 +368,7 @@ Deno.test("EMAIL 1 conserva faltantes múltiples y no recomienda teléfono prese
       applications: [baseApplication()], profiles: [baseProfile()], activations: [],
       authUsers: { [UID]: { email: "qa@example.invalid", user_metadata: { lang: "es" } } },
       rpc: defaultRpcCalls({
-        [`pb_marketplace_missing_requirements:${UID}`]: { missing },
+        [`pb_marketplace_missing_requirements_for:${UID}`]: { missing },
         [`pb_marketplace_phone_present:${UID}`]: { phonePresent },
       }),
     });
@@ -396,7 +396,7 @@ Deno.test("reconciliación envía una vez por candidato y el teléfono queda rec
         if (fn === "pb_claim_marketplace_reconcile_email") {
           return { data: row.state === "sent" ? { claimed: false, reason: "already_sent" } : { claimed: true, claim_id: "qa-claim" }, error: null };
         }
-        if (fn === "pb_marketplace_missing_requirements") return { data: ["cv", "certificate"], error: null };
+        if (fn === "pb_marketplace_missing_requirements_for") return { data: ["cv", "certificate"], error: null };
         if (fn === "pb_marketplace_phone_present") return { data: phonePresent, error: null };
         if (fn === "pb_mark_marketplace_reconcile_email_send") return { data: true, error: null };
         if (fn === "pb_finalize_marketplace_reconcile_email") {
@@ -810,7 +810,7 @@ Deno.test("R1: fallo REAL del RPC canónico → canonical_query_failed, sin emai
     activations: [],
     authUsers: { [UID]: { email: "jan@example.com" } },
     rpc: (fn, args) => {
-      if (fn === "pb_marketplace_missing_requirements") {
+      if (fn === "pb_marketplace_missing_requirements_for") {
         return { data: null, error: { message: "relation does not exist" } };
       }
       return defaultRpcCalls()(fn, args);
@@ -836,7 +836,7 @@ Deno.test("R2: lista vacía + sync promoted → eligible_state_stale_activated: 
     activations: [{ id: ACT_ID, user_id: UID, activated_count: 1, activated_job_titles: ["Pipe Welder"], state: "pending" }],
     authUsers: { [UID]: { email: "jan@example.com" } },
     rpc: (fn, args) => {
-      if (fn === "pb_marketplace_missing_requirements") return { data: [], error: null };
+      if (fn === "pb_marketplace_missing_requirements_for") return { data: [], error: null };
       if (fn === "pb_sync_marketplace_ready_state") {
         return { data: { out_status: "promoted", out_marketplace_ready: true, out_activated_count: 1 }, error: null };
       }
@@ -865,7 +865,7 @@ Deno.test("R3: lista vacía + sync sin promover (consent_required) → fail-safe
     activations: [],
     authUsers: { [UID]: { email: "jan@example.com" } },
     rpc: (fn, args) => {
-      if (fn === "pb_marketplace_missing_requirements") return { data: [], error: null };
+      if (fn === "pb_marketplace_missing_requirements_for") return { data: [], error: null };
       if (fn === "pb_sync_marketplace_ready_state") {
         return { data: { out_status: "consent_required", out_marketplace_ready: false, out_activated_count: 0 }, error: null };
       }
@@ -886,7 +886,7 @@ Deno.test("R4: lista vacía + error del sync → eligible_state_stale:sync_unava
     activations: [],
     authUsers: { [UID]: { email: "jan@example.com" } },
     rpc: (fn, args) => {
-      if (fn === "pb_marketplace_missing_requirements") return { data: [], error: null };
+      if (fn === "pb_marketplace_missing_requirements_for") return { data: [], error: null };
       if (fn === "pb_sync_marketplace_ready_state") return { data: null, error: { message: "permission denied" } };
       return defaultRpcCalls()(fn, args);
     },
@@ -905,7 +905,7 @@ Deno.test("R5: RPC con items no-string → canonical_query_failed (no inventa fa
     activations: [],
     authUsers: { [UID]: { email: "jan@example.com" } },
     rpc: (fn, args) => {
-      if (fn === "pb_marketplace_missing_requirements") {
+      if (fn === "pb_marketplace_missing_requirements_for") {
         return { data: [{ bogus: true }], error: null };
       }
       return defaultRpcCalls()(fn, args);
@@ -926,7 +926,7 @@ Deno.test("R6: lista vacía + sync contract_version_required (PO review P1: exig
     activations: [],
     authUsers: { [UID]: { email: "jan@example.com" } },
     rpc: (fn, args) => {
-      if (fn === "pb_marketplace_missing_requirements") return { data: [], error: null };
+      if (fn === "pb_marketplace_missing_requirements_for") return { data: [], error: null };
       if (fn === "pb_sync_marketplace_ready_state") {
         return { data: { out_status: "contract_version_required", out_marketplace_ready: false, out_activated_count: 0 }, error: null };
       }
@@ -950,7 +950,7 @@ Deno.test("R7: lista vacía + sync forbidden (PO review P1: actor != perfil) →
     activations: [],
     authUsers: { [UID]: { email: "jan@example.com" } },
     rpc: (fn, args) => {
-      if (fn === "pb_marketplace_missing_requirements") return { data: [], error: null };
+      if (fn === "pb_marketplace_missing_requirements_for") return { data: [], error: null };
       if (fn === "pb_sync_marketplace_ready_state") return { data: null, error: { message: "forbidden" } };
       return defaultRpcCalls()(fn, args);
     },
