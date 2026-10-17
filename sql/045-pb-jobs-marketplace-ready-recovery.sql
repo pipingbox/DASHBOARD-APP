@@ -164,6 +164,7 @@ BEGIN
 END $$;
 
 REVOKE ALL ON FUNCTION public.pb_sync_marketplace_ready_state(uuid, text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.pb_sync_marketplace_ready_state(uuid, text) TO service_role;
 
 COMMENT ON FUNCTION public.pb_sync_marketplace_ready_state(uuid, text) IS
   'PB-JOBS-MARKETPLACE-READY-RECOVERY-001: sincroniza el flag persistido con el predicado canonico (solo promocion, consent-gated, auditada). Nunca degrada. La promocion activa candidaturas pending y encola EMAIL 2 via el trigger de sql/034.';
@@ -301,6 +302,7 @@ BEGIN
 END $$;
 
 REVOKE ALL ON FUNCTION public.pb_sync_stale_marketplace_ready(text, integer) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.pb_sync_stale_marketplace_ready(text, integer) TO service_role;
 
 COMMENT ON FUNCTION public.pb_sync_stale_marketplace_ready(text, integer) IS
   'PB-JOBS-MARKETPLACE-READY-RECOVERY-001: barrido idempotente de perfiles stale (flag false, predicado true, consentimiento declarado). Promueve por el camino canonico y audita en reconcile_log. No envia emails: EMAIL 2 sale por el outbox/drain existente.';
