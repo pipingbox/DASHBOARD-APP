@@ -28,10 +28,14 @@
 --      dispara el trigger existente de sql/034: candidaturas pending →
 --      applied + outbox EMAIL 2 (nunca sent_to_client).
 --   2. app_14da0f1941_sync_ready_for_application — envoltorio SECURITY
---      DEFINER estrecho para el gate de candidaturas. El INSERT de una
+--      DEFINER estrecho para el gate de candidaturas. Autorización
+--      EXPLÍCITA (PO review P1): un usuario autenticado solo puede
+--      sincronizar/consultar su propio perfil (p_user_id = auth.uid(),
+--      rechazo 28000/42501 sin efectos secundarios). Exentos: service_role
+--      y acceso directo sin JWT (postgres/admin). Además, el INSERT de una
 --      candidatura exige user_id = auth.uid() (RLS applications_worker_
---      insert_own), así que el actor y el destinatario de la sincronización
---      son por construcción el mismo usuario. Fail-closed: cualquier error
+--      insert_own), así que en el gate el actor y el destinatario son por
+--      construcción el mismo usuario. Fail-closed: cualquier error del sync
 --      deja el flag persistido intacto y el gate decide como antes de 045.
 --   3. Gate BEFORE INSERT (sql/034) actualizado: sincroniza por el camino
 --      canónico ANTES de decidir el estado inicial de la candidatura.
@@ -48,7 +52,8 @@
 --     (REVOKE de PUBLIC/anon/authenticated).
 --   * app_14da0f1941_sync_ready_for_application: SECURITY DEFINER,
 --     search_path fijado, sin SQL dinámico, EXECUTE solo authenticated
---     (anon revocado). El guard pb_profiles_privilege_guard (sql/036)
+--     (anon revocado), con verificación explícita actor = p_user_id
+--     (PO review P1). El guard pb_profiles_privilege_guard (sql/036)
 --     sigue siendo el único camino de escritura del trío canónico: la
 --     promoción se ejecuta como propietario de la función (supabase_admin),
 --     igual que pb_complete_onboarding desde el service_role.
@@ -112,6 +117,14 @@ BEGIN
   -- Legacy v1: protegido hasta la reconciliación autorizada (sql/037).
   IF v_profile.marketplace_contract_version = 1 THEN
     RETURN QUERY SELECT 'legacy_protected'::text, FALSE, 0;
+    RETURN;
+  END IF;
+
+  -- PO review P1 (2026-10-17): la promoción EXIGE expresamente contrato v2
+  -- declarado. No basta con excluir v1: NULL o cualquier otra versión no
+  -- reconocida también bloquean la promoción (sin efectos secundarios).
+  IF v_profile.marketplace_contract_version IS DISTINCT FROM 2 THEN
+    RETURN QUERY SELECT 'contract_version_required'::text, FALSE, 0;
     RETURN;
   END IF;
 
@@ -180,14 +193,37 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
+DECLARE
+  v_claims     text := NULLIF(current_setting('request.jwt.claims', true), '');
+  v_is_service boolean;
+  v_actor      uuid;
 BEGIN
   IF p_user_id IS NULL THEN RETURN NULL; END IF;
+
+  -- Autorización EXPLÍCITA (PO review P1, 2026-10-17): un usuario
+  -- autenticado solo puede sincronizar/consultar SU PROPIO perfil a través
+  -- de este envoltorio. Rechazo explícito ANTES de cualquier efecto
+  -- secundario. Actores canónicos exentos del match 1:1:
+  --   * acceso directo a la base sin JWT (postgres/admin; patrón sql/004);
+  --   * service_role (actor backend canónico; patrón sql/036/042).
+  v_is_service := v_claims IS NULL
+                  OR COALESCE(v_claims::jsonb ->> 'role', '') = 'service_role';
+
+  IF NOT v_is_service THEN
+    v_actor := auth.uid();
+    IF v_actor IS NULL THEN
+      RAISE EXCEPTION 'not_authenticated' USING ERRCODE = '28000';
+    END IF;
+    IF v_actor IS DISTINCT FROM p_user_id THEN
+      RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501';
+    END IF;
+  END IF;
 
   BEGIN
     PERFORM public.pb_sync_marketplace_ready_state(p_user_id, 'application-gate');
   EXCEPTION WHEN OTHERS THEN
-    -- Fail-closed: ante cualquier fallo el flag persistido decide (conducta
-    -- pre-045). La candidatura NO se pierde ni se bloquea.
+    -- Fail-closed: ante cualquier fallo del sync el flag persistido decide
+    -- (conducta pre-045). La candidatura NO se pierde ni se bloquea.
     RETURN (SELECT marketplace_ready FROM public.app_14da0f1941_profiles WHERE user_id = p_user_id);
   END;
 
@@ -198,7 +234,7 @@ REVOKE ALL ON FUNCTION public.app_14da0f1941_sync_ready_for_application(uuid) FR
 GRANT EXECUTE ON FUNCTION public.app_14da0f1941_sync_ready_for_application(uuid) TO authenticated;
 
 COMMENT ON FUNCTION public.app_14da0f1941_sync_ready_for_application(uuid) IS
-  'PB-JOBS-MARKETPLACE-READY-RECOVERY-001: sincronizacion canonica en el gate de candidaturas. Actor = propietario de la candidatura por RLS (user_id = auth.uid()). Fail-closed al flag persistido.';
+  'PB-JOBS-MARKETPLACE-READY-RECOVERY-001: sincronizacion canonica en el gate de candidaturas. Autorizacion explicita: actor autenticado = propietario (match 1:1, rechazo forbidden); exentos service_role y acceso directo sin JWT. Fail-closed al flag persistido.';
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3. Gate BEFORE INSERT: decidir el estado inicial con estado canónico

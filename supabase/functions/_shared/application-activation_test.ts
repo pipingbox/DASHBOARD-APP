@@ -916,3 +916,47 @@ Deno.test("R5: RPC con items no-string → canonical_query_failed (no inventa fa
   if (r.kind === "failed") assertEquals(r.reason, "canonical_query_failed");
   assertEquals(provider.sent.length, 0);
 });
+
+Deno.test("R6: lista vacía + sync contract_version_required (PO review P1: exigir v2) → fail-safe sin email", async () => {
+  const provider = new RecordingProvider();
+  const calls: RecordedCall[] = [];
+  const supabase = fakeSupabase({
+    applications: [baseApplication()],
+    profiles: [baseProfile()],
+    activations: [],
+    authUsers: { [UID]: { email: "jan@example.com" } },
+    rpc: (fn, args) => {
+      if (fn === "pb_marketplace_missing_requirements") return { data: [], error: null };
+      if (fn === "pb_sync_marketplace_ready_state") {
+        return { data: { out_status: "contract_version_required", out_marketplace_ready: false, out_activated_count: 0 }, error: null };
+      }
+      return defaultRpcCalls()(fn, args);
+    },
+  }, calls);
+  const r = await sendApplicationPendingProfileEmail({ supabase, emailProvider: provider }, { applicationId: APP_ID, userId: UID });
+  assertEquals(r.kind, "failed");
+  if (r.kind === "failed") assertEquals(r.reason, "eligible_state_stale:contract_version_required");
+  assertEquals(provider.sent.length, 0);
+  const fin = calls.find((c) => c.fn === "app_14da0f1941_finalize_application_profile_pending_email");
+  assertEquals(fin?.args.p_outcome, "failed");
+  assertEquals(fin?.args.p_last_error, "eligible_state_stale:contract_version_required");
+});
+
+Deno.test("R7: lista vacía + sync forbidden (PO review P1: actor != perfil) → fail-safe sin email", async () => {
+  const provider = new RecordingProvider();
+  const supabase = fakeSupabase({
+    applications: [baseApplication()],
+    profiles: [baseProfile()],
+    activations: [],
+    authUsers: { [UID]: { email: "jan@example.com" } },
+    rpc: (fn, args) => {
+      if (fn === "pb_marketplace_missing_requirements") return { data: [], error: null };
+      if (fn === "pb_sync_marketplace_ready_state") return { data: null, error: { message: "forbidden" } };
+      return defaultRpcCalls()(fn, args);
+    },
+  });
+  const r = await sendApplicationPendingProfileEmail({ supabase, emailProvider: provider }, { applicationId: APP_ID, userId: UID });
+  assertEquals(r.kind, "failed");
+  if (r.kind === "failed") assertEquals(r.reason, "eligible_state_stale:sync_unavailable");
+  assertEquals(provider.sent.length, 0);
+});
