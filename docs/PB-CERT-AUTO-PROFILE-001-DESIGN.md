@@ -294,6 +294,42 @@ Fixtures sintéticos (generador PDF minimal reutilizado de
 11. Idiomas: ES/EN/DE funcionales + cobertura estructural del resto.
 12. `deno check` (funciones) + `npm run typecheck` (frontend) + build completo.
 
+### 11b. QA de las correcciones de la revisión PO (SHA 704af20)
+
+Pruebas reales en base de datos contra la función desplegada (v2, RPC
+`pb_cert_apply_draft`), cuentas sintéticas y limpieza verificada:
+
+Suite de concurrencia y protección (30/30 PASS):
+
+- Dos confirmaciones simultáneas del MISMO draft (`Promise.all`):
+  exactamente una `confirmed` + una `already_confirmed`; UNA certificación;
+  UN evento `cert_review_confirmed`; draft cerrado y vinculado.
+- Reintento secuencial tras confirmación → `already_confirmed`, sin nueva
+  certificación.
+- Conflicto sin `overwrite` → 409 con `conflicts[]` y cero escrituras
+  parciales (dato intacto); con `overwrite` explícito → aplica.
+- Dos drafts distintos aplicando en paralelo sobre el MISMO registro
+  destino: ambos confirman, misma fila, estado final coherente (uno de los
+  dos valores, nunca mezclado), una sola fila.
+- Certificación verificada (`is_verified=true`): cambio de campo de
+  acreditación CON `overwrite` → bloqueado (`verified_cert_protected` 409);
+  datos y verificación intactos; no-op (valores idénticos) → permitido con
+  0 campos escritos.
+- Cross-user: B no puede aplicar el draft de A (404, draft intacto).
+
+Suite de contrato v2 (15/15 PASS):
+
+- INSERT nuevo → `is_verified=false`, `verified_at=null`, documento vinculado.
+- Fechas no-ISO (`03/2023`, basura) → descartadas, nunca escritas.
+- `reject_linked:true` → cert NUEVA pese al vínculo propuesto.
+- Target cross-user → 403, cert y draft intactos.
+
+Specs RLS Playwright ejecutados con entorno real (4/4 PASS cada uno, sin
+skips): `cert-auto-profile-rls.spec.ts` y `cv-auto-profile-rls.spec.ts`
+(regresión CV intacta). Los tests requieren `VITE_SUPABASE_URL`,
+`VITE_SUPABASE_ANON_KEY`, `E2E_TEST_EMAIL/PASSWORD`; sin entorno se
+auto-skipan y NO cuentan como PASS.
+
 ## 12. Impacto en entorno compartido
 
 QA y producción comparten el proyecto Supabase `mwdauubztjxkbrefirbg`.
@@ -303,6 +339,14 @@ impacto cero sobre el flujo actual de certificados hasta que el frontend se
 despliegue. Las Edge Functions nuevas (`cert-extract`, `cert-apply-draft`) son
 aditivas; nada las invoca hasta el deploy del frontend. Rollback: DROP de las
 dos tablas + borrar las dos funciones (documentado en la migración).
+
+sql/044 (corrección PO) añade SOLO la función `pb_cert_apply_draft`
+(CREATE OR REPLACE, aditiva) y no toca tablas/políticas. `cert-apply-draft`
+v2 ya está desplegada en el entorno compartido (QA); producción no la sirve
+hasta el deploy del frontend. Rollback de 044: `DROP FUNCTION
+public.pb_cert_apply_draft(uuid, uuid, jsonb, uuid, boolean);` + redeploy del
+bundle v1 (`docs/deploy-candidates/cert-apply-draft.36f3f92.ts`). El formato
+de datos no cambia entre v1 y v2: el rollback es seguro y sin pérdida.
 
 ## 13. Entrega
 
