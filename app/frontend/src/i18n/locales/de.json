@@ -2797,7 +2797,8 @@
     "noDataFound": "Wir konnten keine Zertifikatsdaten im Dokument finden. Bitte füllen Sie das Formular manuell aus.",
     "manualFallback": "Wir konnten die Daten nicht automatisch lesen. Das Dokument ist gespeichert — bitte ergänzen Sie die Angaben manuell.",
     "verifyField": "prüfen Sie diesen Wert",
-    "conflict": "Einige Daten stehen im Konflikt mit dem vorhandenen Eintrag. Bitte prüfen und erneut versuchen."
+    "conflict": "Einige Daten stehen im Konflikt mit dem vorhandenen Eintrag. Bitte prüfen und erneut versuchen.",
+    "verifiedProtected": "Dieses Zertifikat ist verifiziert. Seine Daten können hier nicht geändert werden — nutzen Sie den Verlängerungsprozess, um es zu aktualisieren."
   },
   "profileCompleteness": {
     "title": "Profilvollständigkeit",

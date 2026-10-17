@@ -2811,7 +2811,8 @@
     "noDataFound": "Nie znaleźliśmy danych certyfikatu w dokumencie. Wypełnij formularz ręcznie.",
     "manualFallback": "Nie udało się odczytać danych automatycznie. Dokument jest zapisany — uzupełnij dane ręcznie.",
     "verifyField": "sprawdź tę daną",
-    "conflict": "Niektóre dane są sprzeczne z istniejącym wpisem. Sprawdź je i spróbuj ponownie."
+    "conflict": "Niektóre dane są sprzeczne z istniejącym wpisem. Sprawdź je i spróbuj ponownie.",
+    "verifiedProtected": "Ten certyfikat jest zweryfikowany. Jego danych nie można tutaj zmienić — użyj procesu odnowienia, aby go zaktualizować."
   },
   "profileCompleteness": {
     "title": "Kompletność profilu",

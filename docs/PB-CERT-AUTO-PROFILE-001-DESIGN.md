@@ -169,24 +169,55 @@ Reglas duras:
 - Fecha futura de emisión ⇒ low.
 - El motor NO tiene extractores de datos personales sensibles.
 
-## 7. Flujo de aplicación (cert-apply-draft)
+## 7. Flujo de aplicación (cert-apply-draft v2 — atómico transaccional)
+
+**Corrección de la revisión PO (PR #83):** toda la lógica de aplicación vive
+en la función PostgreSQL `pb_cert_apply_draft` (sql/044), ejecutada como UNA
+transacción. La Edge Function es un wrapper fino (autenticación + RPC).
+
+**Concurrencia e idempotencia (en base de datos):**
+
+- `SELECT ... FOR UPDATE` sobre el draft: dos confirmaciones simultáneas del
+  mismo draft se serializan; la primera confirma, la segunda ve
+  `review_confirmed` y recibe `already_confirmed` sin reescribir nada.
+  Imposible crear dos certificaciones del mismo draft.
+- `SELECT ... FOR UPDATE` sobre la certificación destino: updates
+  concurrentes al mismo registro (p. ej. dos drafts vinculados a la misma
+  certificación) se serializan; nunca hay escritura parcial entrelazada.
+- Cierre del draft + métrica en la misma transacción.
+
+**Protección de certificaciones verificadas:** los cinco campos extraíbles
+(`certification_name`, `issuing_organization`, `credential_id`,
+`issue_date`, `expiry_date`) forman parte de la acreditación. Un registro con
+`is_verified=true` NO puede modificarlos por esta vía — ni rellenando huecos
+ni con `overwrite` explícito — porque conservaría una verificación que nunca
+cubrió los datos nuevos. Solo se admite el no-op (valor idéntico). Los
+cambios sobre una certificación verificada requieren el circuito canónico
+(renovación / re-verificación). El vínculo del documento
+(`storage_bucket`/`storage_path`) sí puede completarse si falta: es un
+metadato, no un dato de acreditación.
 
 Entrada: `draft_id` + decisiones del usuario por campo
 (`accept` / valor editado / `reject`) + `target_certification_id` opcional
 + `overwrite` por campo.
 
-1. Valida propiedad del draft (user_id = auth.uid()) y estado `pending_review`.
-2. Resuelve destino:
-   - `target_certification_id` dado → debe ser fila del propio usuario (si no,
-     403). UPDATE de esa fila.
-   - Sin target → INSERT nuevo con `is_verified=false`, `verified_at=null`,
-     `storage_bucket`/`storage_path` del draft (documento vinculado).
-3. UPDATE: para cada columna con valor existente distinto del propuesto, exige
-   `overwrite:true`; si falta, 409 con `conflicts[]` y NO escribe nada
-   (transacción única, sin escritura parcial). `is_verified`/`verified_at`
-   jamás en el payload.
-4. Marca el draft `review_confirmed` + `reviewed_at`, registra eventos.
-5. Respuesta: `{ certification_id, applied_fields[], conflicts[] }`.
+1. Valida autenticación (JWT) → `p_user_id` derivado del token, nunca del body.
+2. RPC atómico:
+   - bloquea el draft; verifica propiedad (cross-user = 404) y estado
+     `pending_review` (o `already_confirmed` idempotente);
+   - resuelve destino (explícito > vínculo propuesto salvo rechazo); target
+     ajeno = 403; bloquea el destino;
+   - resuelve campo a campo SIN escribir: hueco → fill; igual → no-op;
+     distinto → exige `overwrite` (si no, conflicto); verificado + cambio →
+     `verified_cert_protected`; fechas solo ISO completas;
+   - conflicto o protección → respuesta con la lista y CERO escrituras
+     (el patch se calcula completo antes de escribir nada);
+   - INSERT nuevo: `is_verified=false`, `verified_at=null`,
+     `storage_bucket`/`storage_path` del draft. UPDATE: solo campos
+     decididos + documento si falta; `is_verified`/`verified_at` JAMÁS en
+     ningún SET;
+   - cierra el draft (`review_confirmed`) + evento de métrica.
+3. Respuesta: `{ certification_id, applied_fields, conflicts?, protected_fields? }`.
 
 El apply NO llama a `pb_recalculate_profile_state`: las certificaciones no
 alimentan ese RPC (verificado: el RPC canónico no lee

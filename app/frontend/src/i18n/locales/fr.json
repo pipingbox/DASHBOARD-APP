@@ -2804,7 +2804,8 @@
     "noDataFound": "Nous n'avons pas trouvé de données de certificat dans le document. Veuillez remplir le formulaire manuellement.",
     "manualFallback": "Nous n'avons pas pu lire les données automatiquement. Le document est enregistré — veuillez compléter les informations manuellement.",
     "verifyField": "vérifiez cette donnée",
-    "conflict": "Certaines données sont en conflit avec l'enregistrement existant. Vérifiez-les et réessayez."
+    "conflict": "Certaines données sont en conflit avec l'enregistrement existant. Vérifiez-les et réessayez.",
+    "verifiedProtected": "Ce certificat est vérifié. Ses données ne peuvent pas être modifiées ici — utilisez le processus de renouvellement pour le mettre à jour."
   },
   "profileCompleteness": {
     "title": "Complétude du profil",

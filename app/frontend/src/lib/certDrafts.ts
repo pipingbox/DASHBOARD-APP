@@ -111,6 +111,7 @@ export interface ApplyCertDraftResult {
   linked_existing?: boolean;
   fields_confirmed_count?: number;
   conflicts?: { field: string; existing_value: string | null; proposed_value: string }[];
+  protected_fields?: string[];
   error?: string;
 }
 
@@ -125,11 +126,14 @@ export async function applyCertDraft(input: ApplyCertDraftInput): Promise<ApplyC
     },
   });
   if (error) {
-    // El conflicto llega como 409 con cuerpo JSON.
+    // El conflicto y la protección de verificados llegan como 409 con cuerpo.
     try {
       const payload = await error.context?.json?.();
       if (payload?.error === 'conflict') {
         return { ok: false, error: 'conflict', conflicts: payload.conflicts };
+      }
+      if (payload?.error === 'verified_cert_protected') {
+        return { ok: false, error: 'verified_cert_protected', protected_fields: payload.protected_fields };
       }
     } catch { /* sin cuerpo */ }
     return { ok: false, error: 'apply_failed' };

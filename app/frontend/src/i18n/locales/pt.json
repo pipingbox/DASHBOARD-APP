@@ -2804,7 +2804,8 @@
     "noDataFound": "Não encontrámos dados do certificado no documento. Preencha o formulário manualmente.",
     "manualFallback": "Não conseguimos ler os dados automaticamente. O documento está guardado — complete os dados manualmente.",
     "verifyField": "verifique este dado",
-    "conflict": "Alguns dados entram em conflito com o registo existente. Reveja-os e tente novamente."
+    "conflict": "Alguns dados entram em conflito com o registo existente. Reveja-os e tente novamente.",
+    "verifiedProtected": "Esta certificação está verificada. Os seus dados não podem ser alterados aqui — utilize o processo de renovação para a atualizar."
   },
   "profileCompleteness": {
     "title": "Perfil Completo",

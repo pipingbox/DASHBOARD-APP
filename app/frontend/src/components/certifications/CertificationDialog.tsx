@@ -239,6 +239,10 @@ export function CertificationDialog({
       if (!result.ok) {
         if (result.error === 'conflict' && result.conflicts?.length) {
           toast.error(t('certExtract.conflict'));
+        } else if (result.error === 'verified_cert_protected') {
+          // Certificación verificada: los cambios requieren el circuito
+          // canónico (renovación), no la extracción.
+          toast.error(t('certExtract.verifiedProtected'));
         } else {
           toast.error(t('profile.certificationDialog.certAddFailed'));
         }
