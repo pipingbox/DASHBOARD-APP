@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 import { TrustMetricsSection } from '@/components/jobs/TrustMetricsSection';
 import { FilterPanel } from '@/components/jobs/FilterPanel';
 import { JobCard, JobSkeleton } from '@/components/jobs/JobCard';
-import { handlePendingProfileAfterApply } from '@/lib/applicationPendingProfile';
+import { handlePendingProfileAfterApply, drainActivationEmailsAfterApply } from '@/lib/applicationPendingProfile';
 import {
   DISCIPLINE_MAP,
   getCountry,
@@ -211,6 +211,10 @@ export default function Jobs() {
     // candidatura nace pending_profile_validation (decisión backend).
     // Fail-open: nunca bloquea el apply.
     const isPendingProfile = await handlePendingProfileAfterApply(insertedApp, job.id);
+
+    // PB-JOBS-MARKETPLACE-READY-RECOVERY-001: drain self-service del EMAIL 2
+    // (idempotente, fail-open). Cubre promociones del gate durante el INSERT.
+    await drainActivationEmailsAfterApply();
 
     // PB-JOBS-PILOT-FOLLOWUP-002: fire the recruitment email notification
     // (jobs@pipingbox.com). The application IS stored regardless of the email
