@@ -77,6 +77,9 @@ inspector_port = 8083
 [functions.auth-send-email-hook]
 verify_jwt = false
 
+[functions.welcome-email]
+verify_jwt = false
+
 [functions.notification-dispatcher]
 verify_jwt = true
 

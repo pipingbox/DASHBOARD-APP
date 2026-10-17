@@ -173,16 +173,16 @@ ${renderEmailHeader()}
 }
 
 function paragraph(htmlText: string): string {
-  return `<p style="margin:0 0 16px 0; font-size:16px; line-height:24px; color:${BRAND.text};">${htmlText}</p>`;
+  return `<p class="pb-text" style="margin:0 0 16px 0; font-size:16px; line-height:24px; color:${BRAND.text};">${htmlText}</p>`;
 }
 
 function button(label: string, url: string, fallbackLabel: string): string {
   const u = escapeHtml(url);
   return `<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:8px 0 20px 0;">
-<tr><td align="center" bgcolor="${BRAND.orange}" style="border-radius:6px;">
+<tr><td class="pb-btn" align="center" bgcolor="${BRAND.orange}" style="border-radius:6px;">
   <a href="${u}" target="_blank" rel="noopener" style="display:inline-block; padding:14px 28px; font-size:16px; font-weight:bold; color:${BRAND.buttonText}; text-decoration:none; border-radius:6px; background-color:${BRAND.orange};">${label}</a>
 </td></tr></table>
-<p style="margin:0 0 16px 0; font-size:13px; line-height:20px; color:${BRAND.muted};">${fallbackLabel}<br>
+<p class="pb-muted" style="margin:0 0 16px 0; font-size:13px; line-height:20px; color:${BRAND.muted};">${fallbackLabel}<br>
 <a href="${u}" style="color:${BRAND.orange}; word-break:break-all;">${u}</a></p>`;
 }
 

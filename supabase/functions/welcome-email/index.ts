@@ -17,7 +17,7 @@
 // Este endpoint no activa la feature ni encola nada por su cuenta: si el flag
 // de sql/046 está desactivado no hay filas que drenar, así que responde vacío.
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
   createServiceClient,
   drainWelcomeEmails,
@@ -38,11 +38,32 @@ function json(body: unknown, status = 200) {
   });
 }
 
-Deno.serve(async (req) => {
+export async function handleWelcomeRequest(
+  req: Request,
+  clients: { service: () => SupabaseClient; user: (authHeader: string) => SupabaseClient } = {
+    service: createServiceClient,
+    user: (authHeader) => createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: authHeader } },
+      auth: { autoRefreshToken: false, persistSession: false },
+    }),
+  },
+): Promise<Response> {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   try {
+    const cronKey = req.headers.get("X-Cron-Key");
+    if (cronKey !== null) {
+      if (!cronKey) return json({ error: "unauthorized" }, 401);
+      const admin = clients.service();
+      const { data: verified, error: verifyError } = await admin.rpc("app_14da0f1941_verify_welcome_cron_key", { p_candidate: cronKey });
+      if (verifyError || verified !== true) return json({ error: "unauthorized" }, 401);
+      const { error: recoverError } = await admin.rpc("app_14da0f1941_recover_missing_welcome_emails", { p_limit: WELCOME_DEFAULT_DRAIN_LIMIT });
+      if (recoverError) return json({ error: "recovery_failed" }, 503);
+      const result = await drainWelcomeEmails({ supabase: admin });
+      return json({ ok: true, mode: "scheduled", ...result });
+    }
+
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) return json({ error: "unauthorized" }, 401);
 
@@ -50,10 +71,7 @@ Deno.serve(async (req) => {
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     if (!supabaseUrl || !anonKey) return json({ error: "missing_env" }, 500);
 
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
+    const userClient = clients.user(authHeader);
     const { data: userData, error: userError } = await userClient.auth.getUser();
     const caller = userData?.user;
     if (userError || !caller) return json({ error: "unauthorized" }, 401);
@@ -65,7 +83,7 @@ Deno.serve(async (req) => {
       // Body opcional: sin cuerpo, el usuario drena su propia fila.
     }
 
-    const admin = createServiceClient();
+    const admin = clients.service();
 
     // Rol desde la fuente canónica (service_role), nunca desde el JWT.
     const { data: callerProfile } = await admin
@@ -91,8 +109,10 @@ Deno.serve(async (req) => {
 
     const result = await drainWelcomeEmails({ supabase: admin }, { userId: targetUserId });
     return json({ ok: true, mode: "single", ...result });
-  } catch (err) {
-    console.error("[welcome-email] unexpected error", err instanceof Error ? err.message : err);
+  } catch {
+    console.error("[welcome-email] unexpected error");
     return json({ error: "internal_error" }, 500);
   }
-});
+}
+
+if (import.meta.main) Deno.serve((req) => handleWelcomeRequest(req));

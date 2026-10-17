@@ -612,6 +612,8 @@ for (const fn of [
   "app_14da0f1941_finalize_welcome_email(uuid, uuid, text, text, text, text, text)",
   "app_14da0f1941_set_welcome_email_enabled(boolean, text)",
   "app_14da0f1941_list_pending_welcome_emails(integer, integer)",
+  "app_14da0f1941_log_welcome_email_event(text, text, text, text, text)",
+  "app_14da0f1941_recover_missing_welcome_emails(integer)",
 ]) {
   for (const role of ["anon", "authenticated"]) {
     check(
@@ -717,6 +719,115 @@ check(
         "before_floor";
   })(),
 );
+
+console.log("\n── GRUPO 12 · Corte, reactivación, fencing y sweep sin pestaña ──");
+const uCut = await newUser({ account_type: "company", lang: "es" });
+await confirm(uCut);
+const cutClaim = (await client.queryObject<ClaimRow>(
+  `SELECT * FROM public.app_14da0f1941_claim_welcome_email($1::uuid, 3, 120)`, [uCut],
+)).rows[0];
+await setEnabled(false);
+check("12.1 mark con flag OFF rechaza transmisión", !(await client.queryObject<{ marked: boolean }>(
+  `SELECT * FROM public.app_14da0f1941_mark_welcome_email_phase($1::uuid,$2::uuid,'send_started')`,
+  [uCut, cutClaim.claim_id],
+)).rows[0].marked);
+check("12.2 claim y listado con flag OFF no seleccionan pendientes/claims previos",
+  !(await client.queryObject<ClaimRow>(`SELECT * FROM public.app_14da0f1941_claim_welcome_email($1::uuid,3,120)`, [uCut])).rows[0].claimed &&
+  (await one<bigint>(`SELECT count(*) FROM public.app_14da0f1941_list_pending_welcome_emails(200,3) WHERE user_id=$1::uuid`, [uCut])) === 0n);
+await setEnabled(true);
+check("12.3 la reactivación no selecciona claims ni pendientes de la época anterior",
+  !(await client.queryObject<ClaimRow>(`SELECT * FROM public.app_14da0f1941_claim_welcome_email($1::uuid,3,120)`, [uCut])).rows[0].claimed &&
+  (await one<bigint>(`SELECT count(*) FROM public.app_14da0f1941_list_pending_welcome_emails(200,3) WHERE user_id=$1::uuid`, [uCut])) === 0n &&
+  !(await client.queryObject<{ marked: boolean }>(`SELECT * FROM public.app_14da0f1941_mark_welcome_email_phase($1::uuid,$2::uuid,'send_started')`, [uCut, cutClaim.claim_id])).rows[0].marked);
+
+const uPhase = await newUser({ account_type: "company", lang: "es" });
+await confirm(uPhase);
+const phaseClaim = (await client.queryObject<ClaimRow>(`SELECT * FROM public.app_14da0f1941_claim_welcome_email($1::uuid,3,120)`, [uPhase])).rows[0];
+check("12.4 no se puede finalizar sent sin mark", !(await client.queryObject<{ finalized: boolean }>(
+  `SELECT * FROM public.app_14da0f1941_finalize_welcome_email($1::uuid,$2::uuid,'sent')`,
+  [uPhase, phaseClaim.claim_id],
+)).rows[0].finalized);
+check("12.5 no se permite retroceder send_started a pre_send", !(await client.queryObject<{ marked: boolean }>(
+  `SELECT * FROM public.app_14da0f1941_mark_welcome_email_phase($1::uuid,$2::uuid,'pre_send')`,
+  [uPhase, phaseClaim.claim_id],
+)).rows[0].marked);
+await client.queryArray(`SELECT public.app_14da0f1941_mark_welcome_email_phase($1::uuid,$2::uuid,'send_started')`, [uPhase, phaseClaim.claim_id]);
+check("12.6 timeout tras send_started no puede terminar failed/reintentable", !(await client.queryObject<{ finalized: boolean }>(
+  `SELECT * FROM public.app_14da0f1941_finalize_welcome_email($1::uuid,$2::uuid,'failed',NULL,'smtp_timeout')`,
+  [uPhase, phaseClaim.claim_id],
+)).rows[0].finalized);
+check("12.7 sin tipo resuelto, conserva company previamente encolado", (await (async () => {
+  await client.queryArray(`SELECT public.app_14da0f1941_finalize_welcome_email($1::uuid,$2::uuid,'ambiguous',NULL,'smtp_timeout',NULL,NULL)`, [uPhase, phaseClaim.claim_id]);
+  return one<string>(`SELECT account_type FROM public.app_14da0f1941_welcome_emails WHERE user_id=$1::uuid`, [uPhase]);
+})()) === "company");
+
+const uExpired = await newUser({ account_type: "worker" });
+await confirm(uExpired);
+const expClaim = (await client.queryObject<ClaimRow>(`SELECT * FROM public.app_14da0f1941_claim_welcome_email($1::uuid,1,120)`, [uExpired])).rows[0];
+await client.queryArray(`SELECT public.app_14da0f1941_mark_welcome_email_phase($1::uuid,$2::uuid,'send_started')`, [uExpired, expClaim.claim_id]);
+await client.queryArray(`UPDATE public.app_14da0f1941_welcome_emails SET lease_expires_at=now()-interval '1 hour' WHERE user_id=$1::uuid`, [uExpired]);
+await setEnabled(false);
+await client.queryArray(`SELECT * FROM public.app_14da0f1941_list_pending_welcome_emails(1,1)`);
+check("12.8 sweep mantiene send_started vencidos aun apagado y con max attempts",
+  (await one<string>(`SELECT state FROM public.app_14da0f1941_welcome_emails WHERE user_id=$1::uuid`, [uExpired])) === "ambiguous");
+await setEnabled(true);
+const uLost = await newUser({ account_type: "worker", lang: "en" });
+await confirm(uLost);
+await client.queryArray(`DELETE FROM public.app_14da0f1941_welcome_emails WHERE user_id=$1::uuid`, [uLost]);
+check("12.9 confirmación nueva + cierre de pestaña: cron recupera fila sin sesión",
+  (await one<number>(`SELECT public.app_14da0f1941_recover_missing_welcome_emails(200)`)) === 1 &&
+  (await one<string>(`SELECT state FROM public.app_14da0f1941_welcome_emails WHERE user_id=$1::uuid`, [uLost])) === "pending");
+check("12.10 recuperación es idempotente", (await one<number>(`SELECT public.app_14da0f1941_recover_missing_welcome_emails(200)`)) === 0);
+const lostClaim = (await client.queryObject<ClaimRow>(`SELECT * FROM public.app_14da0f1941_claim_welcome_email($1::uuid,3,120)`, [uLost])).rows[0];
+const lostMark = (await client.queryObject<{ marked: boolean }>(`SELECT * FROM public.app_14da0f1941_mark_welcome_email_phase($1::uuid,$2::uuid,'send_started')`, [uLost,lostClaim.claim_id])).rows[0];
+const lostFinish = (await client.queryObject<{ finalized: boolean; state: string }>(`SELECT * FROM public.app_14da0f1941_finalize_welcome_email($1::uuid,$2::uuid,'sent','capture:test')`, [uLost,lostClaim.claim_id])).rows[0];
+check("12.11 recorrido automático recuperado → claim → mark → sent registrado", lostClaim.claimed && lostMark.marked && lostFinish.finalized && lostFinish.state === "sent");
+await client.queryArray(`SELECT public.app_14da0f1941_log_welcome_email_event('delivery_failed','company','es','sweep','pii@example.test')`);
+check("12.12 el logger no persiste texto libre del proveedor", (await one<bigint>(
+  `SELECT count(*) FROM public.app_14da0f1941_welcome_email_events WHERE detail LIKE '%@%'`,
+)) === 0n);
+
+console.log("\n── GRUPO 13 · Cron: Vault y autorización en PostgreSQL ──");
+await client.queryArray(`
+CREATE SCHEMA IF NOT EXISTS vault;
+CREATE TABLE IF NOT EXISTS vault.secrets (name text PRIMARY KEY, value text NOT NULL);
+CREATE OR REPLACE VIEW vault.decrypted_secrets AS SELECT name, value AS decrypted_secret FROM vault.secrets;
+CREATE OR REPLACE FUNCTION vault.create_secret(p_value text, p_name text, p_description text)
+RETURNS uuid LANGUAGE plpgsql AS $$ BEGIN
+  INSERT INTO vault.secrets(name,value) VALUES (p_name,p_value);
+  RETURN gen_random_uuid();
+END $$;
+CREATE SCHEMA IF NOT EXISTS cron;
+CREATE TABLE IF NOT EXISTS cron.job (jobname text PRIMARY KEY, schedule text NOT NULL, command text NOT NULL);
+CREATE OR REPLACE FUNCTION cron.schedule(p_name text, p_schedule text, p_command text)
+RETURNS bigint LANGUAGE plpgsql AS $$ BEGIN
+  INSERT INTO cron.job VALUES(p_name,p_schedule,p_command);
+  RETURN 1;
+END $$;
+CREATE OR REPLACE FUNCTION cron.unschedule(p_name text)
+RETURNS boolean LANGUAGE plpgsql AS $$ BEGIN
+  DELETE FROM cron.job WHERE jobname=p_name;
+  RETURN true;
+END $$;
+`);
+const cronSql = await Deno.readTextFile(new URL("../sql/047-pb-welcome-email-cron.sql", import.meta.url));
+await client.queryArray(cronSql);
+await client.queryArray(cronSql);
+check("13.1 cron idempotente, sólo un job autenticado con Vault", (await one<bigint>(
+  `SELECT count(*) FROM cron.job WHERE jobname='pb-welcome-email' AND command LIKE '%X-Cron-Key%'
+   AND command LIKE '%vault.decrypted_secrets%' AND schedule='* * * * *'`,
+)) === 1n);
+check("13.2 verificador rechaza clave inválida", (await one<boolean>(
+  `SELECT public.app_14da0f1941_verify_welcome_cron_key('invalid')`,
+)) === false);
+check("13.3 verificador admite únicamente la clave almacenada en Vault", (await one<boolean>(
+  `SELECT public.app_14da0f1941_verify_welcome_cron_key((SELECT value FROM vault.secrets WHERE name='welcome-email-cron-key'))`,
+)) === true);
+check("13.4 verificador sólo ejecutable por service_role", (await one<boolean>(
+  `SELECT has_function_privilege('service_role','public.app_14da0f1941_verify_welcome_cron_key(text)','EXECUTE')`,
+)) === true && (await one<boolean>(
+  `SELECT has_function_privilege('authenticated','public.app_14da0f1941_verify_welcome_cron_key(text)','EXECUTE')`,
+)) === false);
 
 // ─────────────────────────────────────────────────────────────────────────────
 console.log(`\n${"═".repeat(70)}`);

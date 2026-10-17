@@ -76,8 +76,8 @@ function normalizeVariant(value: unknown): WelcomeVariant {
 
 /** Códigos de error normalizados: nunca se persiste el texto crudo del
  *  proveedor, que puede contener la dirección del destinatario. */
-function normalizeSendError(err: unknown): string {
-  const raw = err instanceof Error ? err.message : String(err ?? "unknown");
+function classifySendError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : String(err ?? "");
   const lower = raw.toLowerCase();
   if (lower.includes("timeout") || lower.includes("etimedout")) return "smtp_timeout";
   if (lower.includes("econnrefused") || lower.includes("econnreset")) return "smtp_connection_refused";
@@ -86,7 +86,7 @@ function normalizeSendError(err: unknown): string {
   if (lower.includes("rate") || lower.includes("429")) return "provider_rate_limited";
   if (lower.includes("invalid") && lower.includes("recipient")) return "invalid_recipient";
   if (lower.includes("not configured") || lower.includes("noop")) return "provider_not_configured";
-  return `send_error_${lower.replace(/[^a-z0-9]+/g, "_").slice(0, 40)}`;
+  return "smtp_result_unknown";
 }
 
 interface ClaimResult {
@@ -144,37 +144,48 @@ export async function drainWelcomeEmail(
   const finalize = async (
     outcome: "sent" | "failed" | "ambiguous" | "skipped",
     extra: { messageId?: string; error?: string; variant?: WelcomeVariant; lang?: string },
-  ) => {
-    const { error } = await supabase.rpc("app_14da0f1941_finalize_welcome_email", {
-      p_user_id: userId,
-      p_claim_id: claimId,
-      p_outcome: outcome,
-      p_message_id: extra.messageId ?? null,
-      p_last_error: extra.error ?? null,
-      p_account_type: extra.variant ?? null,
-      p_lang: extra.lang ?? null,
-    });
-    if (error) console.error("[welcome-email] finalize failed", { outcome, code: error.code });
+  ): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.rpc("app_14da0f1941_finalize_welcome_email", {
+        p_user_id: userId,
+        p_claim_id: claimId,
+        p_outcome: outcome,
+        p_message_id: extra.messageId ?? null,
+        p_last_error: extra.error ?? null,
+        p_account_type: extra.variant ?? null,
+        p_lang: extra.lang ?? null,
+      });
+      const row = Array.isArray(data) ? data[0] : data;
+      if (error || row?.finalized !== true) {
+        console.error("[welcome-email] finalize failed", { outcome, code: error?.code ?? "not_finalized" });
+        return false;
+      }
+      return true;
+    } catch {
+      console.error("[welcome-email] finalize failed", { outcome, code: "rpc_unavailable" });
+      return false;
+    }
   };
 
+  let transmissionStarted = false;
   try {
     // ── Resolución del destinatario (Admin API: nunca datos del cliente) ────
     const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(userId);
     const user = authUser?.user;
     if (authError || !user) {
-      await finalize("failed", { error: "auth_user_not_found" });
-      return { userId, outcome: "failed", reason: "auth_user_not_found", attempts: claim.attempts };
+      const finalized = await finalize("failed", { error: "auth_user_not_found" });
+      return { userId, outcome: finalized ? "failed" : "ambiguous", reason: "auth_user_not_found", attempts: claim.attempts };
     }
 
     // Defensa en profundidad: la RPC ya exige confirmación real, pero se
     // vuelve a comprobar aquí para no enviar nunca a un email sin confirmar.
     if (!user.email_confirmed_at) {
-      await finalize("skipped", { error: "email_not_confirmed" });
-      return { userId, outcome: "skipped", reason: "email_not_confirmed" };
+      const finalized = await finalize("skipped", { error: "email_not_confirmed" });
+      return { userId, outcome: finalized ? "skipped" : "ambiguous", reason: "email_not_confirmed" };
     }
     if (!user.email) {
-      await finalize("skipped", { error: "missing_recipient_email" });
-      return { userId, outcome: "skipped", reason: "missing_recipient_email" };
+      const finalized = await finalize("skipped", { error: "missing_recipient_email" });
+      return { userId, outcome: finalized ? "skipped" : "ambiguous", reason: "missing_recipient_email" };
     }
 
     const metadata = (user.user_metadata ?? {}) as Record<string, unknown>;
@@ -207,18 +218,22 @@ export async function drainWelcomeEmail(
       });
     }
 
-    // ── Punto de no retorno: se marca send_started ANTES de enviar ──────────
-    const { error: phaseError } = await supabase.rpc("app_14da0f1941_mark_welcome_email_phase", {
+    const provider = d.emailProvider ?? createEmailProvider();
+    if (!provider.isConfigured()) {
+      const finalized = await finalize("failed", { error: "provider_not_configured", variant, lang: resolved.lang });
+      return { userId, outcome: finalized ? "failed" : "ambiguous", reason: "provider_not_configured" };
+    }
+    const { data: phaseData, error: phaseError } = await supabase.rpc("app_14da0f1941_mark_welcome_email_phase", {
       p_user_id: userId,
       p_claim_id: claimId,
       p_phase: "send_started",
     });
-    if (phaseError) {
-      await finalize("failed", { error: "phase_rpc_error", variant, lang: resolved.lang });
-      return { userId, outcome: "failed", reason: "phase_rpc_error", variant, lang: resolved.lang };
+    const phase = Array.isArray(phaseData) ? phaseData[0] : phaseData;
+    if (phaseError || phase?.marked !== true) {
+      const finalized = await finalize("failed", { error: "phase_rpc_error", variant, lang: resolved.lang });
+      return { userId, outcome: finalized ? "failed" : "ambiguous", reason: "phase_rpc_error" };
     }
-
-    const provider = d.emailProvider ?? createEmailProvider();
+    transmissionStarted = true;
     try {
       const result = await provider.send({
         to: user.email,
@@ -236,10 +251,18 @@ export async function drainWelcomeEmail(
         },
       });
 
-      await finalize("sent", { messageId: result.messageId, variant, lang: resolved.lang });
+      if (result.accepted === 0 && (result.rejected ?? 0) > 0) {
+        const finalized = await finalize("failed", { error: "smtp_not_accepted", variant, lang: resolved.lang });
+        return { userId, outcome: finalized ? "failed" : "ambiguous", reason: "smtp_not_accepted" };
+      }
+      if (result.accepted !== 1 || (result.rejected ?? 0) !== 0) {
+        const finalized = await finalize("ambiguous", { error: "smtp_result_unknown", variant, lang: resolved.lang });
+        return { userId, outcome: "ambiguous", reason: finalized ? "smtp_result_unknown" : "finalize_unconfirmed" };
+      }
+      const finalized = await finalize("sent", { messageId: result.messageId, variant, lang: resolved.lang });
       return {
         userId,
-        outcome: "sent",
+        outcome: finalized ? "sent" : "ambiguous",
         variant,
         lang: rendered.lang,
         langSource: resolved.source,
@@ -248,21 +271,22 @@ export async function drainWelcomeEmail(
         provider: result.provider,
       };
     } catch (sendErr) {
-      const code = normalizeSendError(sendErr);
-      await finalize("failed", { error: code, variant, lang: resolved.lang });
+      const code = classifySendError(sendErr);
+      const finalized = await finalize("ambiguous", { error: code, variant, lang: resolved.lang });
       return {
         userId,
-        outcome: "failed",
-        reason: code,
+        outcome: "ambiguous",
+        reason: finalized ? code : "finalize_unconfirmed",
         variant,
         lang: rendered.lang,
         attempts: claim.attempts,
       };
     }
-  } catch (err) {
-    const code = normalizeSendError(err);
-    await finalize("failed", { error: code });
-    return { userId, outcome: "failed", reason: code, attempts: claim.attempts };
+  } catch {
+    const finalized = await finalize(transmissionStarted ? "ambiguous" : "failed", {
+      error: transmissionStarted ? "smtp_result_unknown" : "pre_send_error",
+    });
+    return { userId, outcome: transmissionStarted || !finalized ? "ambiguous" : "failed", reason: "drain_error", attempts: claim.attempts };
   }
 }
 

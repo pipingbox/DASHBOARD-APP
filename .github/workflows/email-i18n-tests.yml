@@ -19,6 +19,11 @@ on:
       - 'supabase/functions/_shared/application-activation_test.ts'
       - 'supabase/functions/_shared/standard-webhooks.ts'
       - 'supabase/functions/_shared/cv-extraction/**'
+      - 'supabase/functions/_shared/welcome-email*'
+      - 'supabase/config.toml'
+      - 'scripts/prepare-native-auth-branding*'
+      - 'sql/047-pb-welcome-email-cron.sql'
+      - 'qa/welcome-email-sql-qa.ts'
       - 'supabase/functions/auth-send-email-hook/**'
       - 'supabase/functions/notification-dispatcher/**'
       - 'supabase/functions/cert-expiry-alerts/**'
@@ -45,6 +50,12 @@ on:
       - 'supabase/functions/_shared/application-activation.ts'
       - 'supabase/functions/_shared/welcome-email.ts'
       - 'supabase/functions/welcome-email/**'
+      - 'sql/046-pb-welcome-email-001.sql'
+      - 'supabase/functions/_shared/welcome-email*'
+      - 'supabase/config.toml'
+      - 'scripts/prepare-native-auth-branding*'
+      - 'sql/047-pb-welcome-email-cron.sql'
+      - 'qa/welcome-email-sql-qa.ts'
       - 'supabase/functions/auth-send-email-hook/**'
 
 concurrency:
@@ -92,7 +103,11 @@ jobs:
             supabase/functions/job-application-profile-pending-email/index.ts \
             supabase/functions/marketplace-ready-activation-email/index.ts \
             supabase/functions/_shared/welcome-email.ts \
+            supabase/functions/_shared/welcome-email_test.ts \
             supabase/functions/welcome-email/index.ts \
+            supabase/functions/welcome-email/index_test.ts \
+            scripts/prepare-native-auth-branding.ts \
+            scripts/prepare-native-auth-branding_test.ts \
             scripts/welcome-email-previews.ts \
             scripts/email-brand-previews.ts \
             supabase/functions/app_14da0f1941_send_job_application_notification/index.maintainable.ts
@@ -102,8 +117,32 @@ jobs:
           deno test --node-modules-dir=none --allow-read --allow-env \
             supabase/functions/_shared/email-i18n/ \
             supabase/functions/_shared/email-header_test.ts \
+            supabase/functions/_shared/welcome-email_test.ts \
+            supabase/functions/welcome-email/index_test.ts \
+            scripts/prepare-native-auth-branding_test.ts \
             supabase/functions/_shared/email-provider_test.ts \
             supabase/functions/_shared/application-activation_test.ts \
             supabase/functions/_shared/cv-extraction/ \
             supabase/functions/auth-send-email-hook/ \
             supabase/functions/app_14da0f1941_send_job_application_notification/
+
+  welcome-sql:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: SQL de bienvenida en PostgreSQL real
+        run: deno run --allow-env --allow-net --allow-read qa/welcome-email-sql-qa.ts

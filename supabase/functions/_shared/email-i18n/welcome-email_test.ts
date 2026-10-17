@@ -250,6 +250,17 @@ Deno.test("welcome: responsive y compatible con modo oscuro", () => {
   }
 });
 
+Deno.test("welcome: estilos oscuros y móviles enlazan clases realmente presentes", () => {
+  for (const variant of VARIANTS) {
+    const { html } = renderWelcomeEmail({ variant, lang: "es", appBaseUrl: APP });
+    assert(/<p class="pb-text"[^>]*>/.test(html), `${variant}: intro sin pb-text`);
+    assert(/<p class="pb-muted"[^>]*>/.test(html), `${variant}: fallback sin pb-muted`);
+    assert(/<td class="pb-btn"[^>]*>\s*<a /.test(html), `${variant}: CTA sin pb-btn`);
+    assertStringIncludes(html, ".pb-text { color:#E4E4E7 !important; }");
+    assertStringIncludes(html, ".pb-btn a { display:block !important; text-align:center !important; }");
+  }
+});
+
 Deno.test("welcome: todas las secciones del contenido aparecen renderizadas", () => {
   for (const lang of EMAIL_LANGUAGES) {
     const t = LOCALES[lang].templates.welcome_worker;

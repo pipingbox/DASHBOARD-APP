@@ -163,18 +163,29 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
 BEGIN
-  -- `detail` se recorta a 120 caracteres: es un código de diagnóstico, no un
-  -- volcado del proveedor, y así se evita filtrar texto con PII por accidente.
   INSERT INTO public.app_14da0f1941_welcome_email_events
     (event, account_type, lang, source, detail)
   VALUES
-    (left(p_event, 64), left(p_account_type, 16), left(p_lang, 8),
-     left(p_source, 24), left(p_detail, 120));
+    (CASE WHEN p_event IN ('enqueued','enqueue_error','delivery_sent','delivery_failed',
+      'delivery_ambiguous','delivery_skipped','feature_enabled','feature_disabled')
+      THEN p_event ELSE 'enqueue_error' END,
+     CASE WHEN p_account_type IN ('worker','company') THEN p_account_type END,
+     CASE WHEN p_lang ~ '^[a-z]{2}$' THEN p_lang END,
+     CASE WHEN p_source IN ('auth_trigger','gate_rpc','sweep','admin') THEN p_source END,
+     CASE WHEN p_detail IN ('auth_trigger_error','lease_expired_after_send_started_or_unknown_phase',
+       'auth_user_not_found','email_not_confirmed','missing_recipient_email','phase_rpc_error',
+       'smtp_not_accepted','smtp_timeout','smtp_connection_refused','smtp_host_unresolved',
+       'smtp_auth_failed','provider_rate_limited','invalid_recipient','provider_not_configured',
+       'smtp_result_unknown','send_error_unknown','pre_send_error','feature_disabled')
+       THEN p_detail ELSE NULL END);
 END;
 $$;
 
 COMMENT ON FUNCTION public.app_14da0f1941_log_welcome_email_event(text, text, text, text, text) IS
   'PB-WELCOME-EMAIL-001: registra un evento agregado sin PII del correo de bienvenida.';
+
+REVOKE ALL ON FUNCTION public.app_14da0f1941_log_welcome_email_event(text, text, text, text, text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.app_14da0f1941_log_welcome_email_event(text, text, text, text, text) TO service_role;
 
 -- ══════════════════════════════════════════════════════════════════════════════
 -- 4. Encolado canónico (lo usan el trigger de auth, el gate y el sweep)
@@ -324,7 +335,7 @@ EXCEPTION
   WHEN others THEN
     BEGIN
       PERFORM public.app_14da0f1941_log_welcome_email_event(
-        'enqueue_error', NULL, NULL, 'auth_trigger', left(SQLSTATE, 16)
+        'enqueue_error', NULL, NULL, 'auth_trigger', 'auth_trigger_error'
       );
     EXCEPTION WHEN others THEN
       NULL;
@@ -409,6 +420,12 @@ BEGIN
     RETURN;
   END IF;
 
+  IF NOT EXISTS (SELECT 1 FROM public.app_14da0f1941_welcome_email_config cfg
+                 WHERE cfg.id AND cfg.enabled AND cfg.enabled_at IS NOT NULL) THEN
+    RETURN QUERY SELECT false, NULL::text, 0, 'feature_disabled', NULL::uuid, NULL::text, NULL::text, NULL::text;
+    RETURN;
+  END IF;
+
   -- Paso A: un lease caducado cuya fase es 'send_started' (o desconocida) pasa
   -- a 'ambiguous'. La transmisión pudo ocurrir sin que llegáramos a
   -- confirmarla, así que se prohíbe el reintento y se marca para revisión
@@ -443,6 +460,8 @@ BEGIN
       )
     )
     AND public.app_14da0f1941_welcome_emails.attempts < p_max_attempts
+    AND EXISTS (SELECT 1 FROM public.app_14da0f1941_welcome_email_config cfg
+                WHERE cfg.id AND cfg.enabled AND public.app_14da0f1941_welcome_emails.confirmed_at >= cfg.enabled_at)
   RETURNING * INTO v_row;
 
   IF v_row.user_id IS NOT NULL THEN
@@ -502,9 +521,15 @@ AS $$
 DECLARE
   v_row public.app_14da0f1941_welcome_emails;
 BEGIN
-  IF p_user_id IS NULL OR p_claim_id IS NULL
-     OR p_phase NOT IN ('pre_send','send_started') THEN
+  IF p_user_id IS NULL OR p_claim_id IS NULL OR p_phase <> 'send_started' THEN
     RETURN QUERY SELECT false, NULL::text, 'invalid_arguments'::text;
+    RETURN;
+  END IF;
+
+  PERFORM 1 FROM public.app_14da0f1941_welcome_email_config cfg
+  WHERE cfg.id AND cfg.enabled AND cfg.enabled_at IS NOT NULL FOR SHARE;
+  IF NOT FOUND THEN
+    RETURN QUERY SELECT false, NULL::text, 'feature_disabled'::text;
     RETURN;
   END IF;
 
@@ -514,6 +539,10 @@ BEGIN
   WHERE user_id = p_user_id
     AND claim_id = p_claim_id
     AND public.app_14da0f1941_welcome_emails.state = 'claimed'
+    AND public.app_14da0f1941_welcome_emails.delivery_phase = 'pre_send'
+    AND public.app_14da0f1941_welcome_emails.lease_expires_at > now()
+    AND public.app_14da0f1941_welcome_emails.confirmed_at >=
+        (SELECT cfg.enabled_at FROM public.app_14da0f1941_welcome_email_config cfg WHERE cfg.id)
   RETURNING * INTO v_row;
 
   IF v_row.user_id IS NULL THEN
@@ -564,18 +593,24 @@ BEGIN
   SET state        = v_state,
       sent_at      = CASE WHEN p_outcome = 'sent' THEN now() ELSE sent_at END,
       message_id   = CASE WHEN p_outcome = 'sent' THEN p_message_id ELSE message_id END,
-      last_error   = CASE WHEN p_outcome = 'sent' THEN NULL ELSE left(p_last_error, 500) END,
-      -- Se consolida lo realmente resuelto en tiempo de envío (el perfil puede
-      -- haber corregido el tipo de cuenta o el idioma tras el encolado).
-      account_type = coalesce(
-        public.app_14da0f1941_welcome_normalize_account_type(p_account_type),
-        public.app_14da0f1941_welcome_emails.account_type
-      ),
+      last_error   = CASE WHEN p_outcome = 'sent' THEN NULL
+        WHEN p_last_error IN ('auth_user_not_found','email_not_confirmed','missing_recipient_email',
+          'phase_rpc_error','smtp_not_accepted','smtp_timeout','smtp_connection_refused',
+          'smtp_host_unresolved','smtp_auth_failed','provider_rate_limited','invalid_recipient',
+          'provider_not_configured','smtp_result_unknown','send_error_unknown',
+          'pre_send_error','feature_disabled') THEN p_last_error ELSE 'send_error_unknown' END,
+      account_type = CASE WHEN p_account_type IN ('worker','company')
+        THEN p_account_type ELSE public.app_14da0f1941_welcome_emails.account_type END,
       lang         = coalesce(nullif(trim(p_lang), ''), public.app_14da0f1941_welcome_emails.lang),
       updated_at   = now()
   WHERE user_id = p_user_id
     AND claim_id = p_claim_id
     AND public.app_14da0f1941_welcome_emails.state = 'claimed'
+    AND (CASE WHEN p_outcome IN ('sent','ambiguous')
+          THEN public.app_14da0f1941_welcome_emails.delivery_phase = 'send_started'
+          WHEN p_outcome = 'failed' AND p_last_error = 'smtp_not_accepted'
+          THEN public.app_14da0f1941_welcome_emails.delivery_phase = 'send_started'
+          ELSE public.app_14da0f1941_welcome_emails.delivery_phase = 'pre_send' END)
   RETURNING * INTO v_row;
 
   IF v_row.user_id IS NULL THEN
@@ -610,21 +645,29 @@ CREATE FUNCTION public.app_14da0f1941_list_pending_welcome_emails(
   p_max_attempts integer DEFAULT 3
 )
 RETURNS TABLE (user_id uuid, state text, attempts integer, account_type text, lang text)
-LANGUAGE sql
+LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
-  SELECT w.user_id, w.state, w.attempts, w.account_type, w.lang
+BEGIN
+  UPDATE public.app_14da0f1941_welcome_emails w
+  SET state = 'ambiguous', last_error = 'lease_expired_after_send_started_or_unknown_phase',
+      updated_at = now()
+  WHERE w.state = 'claimed' AND w.lease_expires_at < now()
+    AND w.delivery_phase IS DISTINCT FROM 'pre_send';
+
+  RETURN QUERY SELECT w.user_id, w.state, w.attempts, w.account_type, w.lang
   FROM public.app_14da0f1941_welcome_emails w
-  WHERE w.attempts < greatest(coalesce(p_max_attempts, 3), 1)
+  JOIN public.app_14da0f1941_welcome_email_config cfg ON cfg.id
+  WHERE cfg.enabled AND w.confirmed_at >= cfg.enabled_at
+    AND w.attempts < greatest(coalesce(p_max_attempts, 3), 1)
     AND (
       w.state IN ('pending','failed')
-      -- 'claimed' con lease caducado en pre_send: no se transmitió nada, es
-      -- seguro recuperarlo. 'ambiguous' y 'sent' quedan EXCLUIDOS siempre.
       OR (w.state = 'claimed' AND w.lease_expires_at < now() AND w.delivery_phase = 'pre_send')
     )
   ORDER BY w.created_at
   LIMIT greatest(least(coalesce(p_limit, 20), 200), 1);
+END;
 $$;
 
 COMMENT ON FUNCTION public.app_14da0f1941_list_pending_welcome_emails(integer, integer) IS
@@ -634,6 +677,35 @@ REVOKE ALL ON FUNCTION public.app_14da0f1941_list_pending_welcome_emails(integer
 REVOKE ALL ON FUNCTION public.app_14da0f1941_list_pending_welcome_emails(integer, integer) FROM anon;
 REVOKE ALL ON FUNCTION public.app_14da0f1941_list_pending_welcome_emails(integer, integer) FROM authenticated;
 GRANT EXECUTE ON FUNCTION public.app_14da0f1941_list_pending_welcome_emails(integer, integer) TO service_role;
+
+CREATE OR REPLACE FUNCTION public.app_14da0f1941_recover_missing_welcome_emails(p_limit integer DEFAULT 20)
+RETURNS integer
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_user record;
+  v_recovered integer := 0;
+BEGIN
+  FOR v_user IN
+    SELECT u.id FROM auth.users u
+    JOIN public.app_14da0f1941_welcome_email_config cfg ON cfg.id
+    WHERE cfg.enabled AND u.email_confirmed_at >= cfg.enabled_at
+      AND NOT EXISTS (SELECT 1 FROM public.app_14da0f1941_welcome_emails w WHERE w.user_id = u.id)
+    ORDER BY u.email_confirmed_at, u.id
+    LIMIT greatest(least(coalesce(p_limit, 20), 200), 1)
+  LOOP
+    IF public.app_14da0f1941_enqueue_welcome_email(v_user.id::text, 'sweep') = 'enqueued' THEN
+      v_recovered := v_recovered + 1;
+    END IF;
+  END LOOP;
+  RETURN v_recovered;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.app_14da0f1941_recover_missing_welcome_emails(integer) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.app_14da0f1941_recover_missing_welcome_emails(integer) TO service_role;
 
 -- ══════════════════════════════════════════════════════════════════════════════
 -- 9. Interruptor de producción y rollback inmediato
