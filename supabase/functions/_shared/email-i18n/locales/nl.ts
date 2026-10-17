@@ -202,6 +202,105 @@ const nl: EmailLocale = {
       note: "Er is nog niets gepubliceerd: de geëxtraheerde gegevens worden pas onderdeel van je profiel nadat je ze hebt bekeken en bevestigd. Certificaten die in je CV worden genoemd, worden geregistreerd als aangegeven, niet als geverifieerd.",
       footer_reason: "Je ontvangt dit bericht omdat PIPINGBOX een CV heeft ontvangen dat aan jouw account is gekoppeld.",
     },
+    // ── PB-WELCOME-EMAIL-001 ────────────────────────────────────────────────
+    welcome_worker: {
+      subject: "PIPINGBOX · Welkom! Je volgende kans begint hier",
+      preheader: "Je account is bevestigd. Voltooi je professionele profiel en ontdek industriële kansen.",
+      heading: "Welkom bij PIPINGBOX 🧡",
+      intro: "Je account is bevestigd. Nu begint het belangrijkste deel.",
+      ecosystem: "PIPINGBOX is een internationaal digitaal ecosysteem voor professionals en bedrijven in industriële montage, piping, lassen en onderhoud.",
+      button: "Mijn profiel voltooien",
+      profile: {
+        heading: "Voltooi je professionele profiel",
+        body: "Je ervaring is waardevol: zorg ervoor dat bedrijven die kunnen zien. Voeg je specialismen, werkervaring, beschikbaarheid en CV toe. Een actueel profiel helpt ons om kansen te vinden die bij jouw vakmanschap passen.",
+      },
+      opportunities: {
+        heading: "Vacatures en intelligente matching",
+        body: "Ontdek vacatures uit de industriële sector. Ons matchingsysteem verbindt stap voor stap ervaring, vaardigheden, locatie en beschikbaarheid met wat bedrijven zoeken, zodat je eenvoudig en efficiënt relevante kansen vindt.",
+      },
+      comms: {
+        heading: "Communicatie en meldingen",
+        body: "Blijf op de hoogte van de activiteit in je account en van de beschikbare kansen. We werken aan nieuwe WhatsApp-meldingen voor gebruikers die dat kanaal vrijwillig activeren: operationele berichten over je account staan los van optionele communicatie, en geen enkel optioneel kanaal wordt ingeschakeld zonder jouw uitdrukkelijke toestemming.",
+      },
+      tools: {
+        heading: "Hub met professionele tools",
+        body: "Ontdek onze technische tools, gespecialiseerd in piping, lassen en prefabricage. We blijven nieuwe hulpmiddelen ontwikkelen om het werk van industriële vakmensen eenvoudiger te maken.",
+      },
+      academy: {
+        heading: "PIPINGBOX Academie",
+        body: "Bekijk de VCA-voorbereidingsmaterialen die nu beschikbaar zijn. We werken eraan om nieuwe cursussen en opleidingsinhoud toe te voegen zodra die worden gepubliceerd.",
+      },
+      community: {
+        heading: "Onze community groeit",
+        body: "We bouwen aan een plek om vakmensen met elkaar te verbinden, kennis te delen en nieuwe samenwerkingskansen te creëren.",
+      },
+      beta: {
+        heading: "Je maakt deel uit van onze BETA-versie",
+        body: "PIPINGBOX blijft zich ontwikkelen. Heb je een fout gevonden? Heb je een suggestie? Wil je graag een nieuwe tool? We horen graag jouw mening.",
+      },
+      beta_cta: "Laat het ons weten via {support}.",
+      closing: "We werken aan een uniek ecosysteem dat vakmensen, bedrijven, tools en kansen in de industriële montage samenbrengt. Bedankt dat je deel uitmaakt van PIPINGBOX.",
+      signature: "Het PIPINGBOX-team",
+      account_type_notice: "Heb je bij je registratie het verkeerde accounttype gekozen? Schrijf naar {support} en ons team bekijkt jouw geval handmatig.",
+      links_intro: "Snelle links:",
+      link_profile: "Mijn profiel",
+      link_opportunities: "Vacatures",
+      link_tools: "Hulpmiddelen",
+      link_academy: "Academie",
+      link_community: "Vakgemeenschap",
+      footer_reason: "Je ontvangt dit bericht omdat je net je e-mailadres bij PIPINGBOX hebt bevestigd.",
+    },
+    welcome_company: {
+      subject: "PIPINGBOX · Welkom! Bouw aan je industriële team",
+      preheader: "Je bedrijfsaccount is bevestigd. Voltooi je bedrijfsprofiel en bereid je eerste industriële vacature voor.",
+      heading: "Welkom bij PIPINGBOX 🧡",
+      intro: "Je bedrijfsaccount is bevestigd. Nu begint het belangrijkste deel.",
+      ecosystem: "PIPINGBOX is een internationaal digitaal ecosysteem voor professionals en bedrijven in industriële montage, piping, lassen en onderhoud.",
+      button: "Bedrijfsprofiel voltooien",
+      profile: {
+        heading: "Voltooi je bedrijfsprofiel",
+        body: "Je bedrijfsprofiel is het eerste wat vakmensen zien. Voeg je bedrijfsgegevens, activiteiten, locaties en de industriële specialismen toe die je doorgaans nodig hebt, zodat je vacatures bij de juiste profielen terechtkomen.",
+      },
+      opportunities: {
+        heading: "Vacatures plaatsen en industriële behoeften beheren",
+        body: "Plaats vacatures en registreer je personeelsbehoefte om gekwalificeerde vakmensen in piping, lassen, montage en onderhoud te bereiken. Vacatures plaatsen en kandidaten beoordelen kan vandaag al; geavanceerde automatische matching en conversationele voorselectie zijn nog in ontwikkeling.",
+      },
+      verification: {
+        heading: "Bedrijfsverificatie en beperkte functies",
+        body: "Sommige functies zijn voorbehouden aan geverifieerde bedrijven. Zolang je bedrijf niet is geverifieerd, kun je je profiel voltooien en je vacatures voorbereiden, terwijl publicatie en toegang tot de contactgegevens van kandidaten onderworpen blijven aan beoordeling door ons team. We laten je precies weten wat er nodig is en tijdens de bèta worden geen kosten in rekening gebracht.",
+      },
+      comms: {
+        heading: "Communicatie en meldingen",
+        body: "Blijf op de hoogte van de activiteit in je account en de status van je vacatures. We werken aan nieuwe WhatsApp-meldingen voor accounts die dat kanaal vrijwillig activeren: operationele berichten staan los van optionele communicatie, en geen enkel optioneel kanaal wordt ingeschakeld zonder jouw uitdrukkelijke toestemming.",
+      },
+      tools: {
+        heading: "Hub met professionele tools",
+        body: "Ontdek onze technische tools, gespecialiseerd in piping, lassen en prefabricage. Je technische team kan ze gebruiken terwijl wij nieuwe hulpmiddelen blijven ontwikkelen.",
+      },
+      academy: {
+        heading: "PIPINGBOX Academie",
+        body: "Bekijk de VCA-voorbereidingsmaterialen die nu beschikbaar zijn voor je teams. We werken eraan om nieuwe cursussen en opleidingsinhoud toe te voegen zodra die worden gepubliceerd.",
+      },
+      community: {
+        heading: "Onze community groeit",
+        body: "We bouwen aan een plek om bedrijven en vakmensen met elkaar te verbinden, kennis te delen en nieuwe samenwerkingskansen in de industriële sector te creëren.",
+      },
+      beta: {
+        heading: "Je maakt deel uit van onze BETA-versie",
+        body: "PIPINGBOX blijft zich ontwikkelen. Heb je een fout gevonden? Heb je een suggestie? Mis je een functie die nog niet bestaat? We horen graag jouw mening.",
+      },
+      beta_cta: "Laat het ons weten via {support}.",
+      closing: "We werken aan een uniek ecosysteem dat vakmensen, bedrijven, tools en kansen in de industriële montage samenbrengt. Bedankt dat je deel uitmaakt van PIPINGBOX.",
+      signature: "Het PIPINGBOX-team",
+      account_type_notice: "Heb je je per ongeluk als bedrijf geregistreerd of moet dit een professioneel account zijn? Schrijf naar {support} en ons team bekijkt het handmatig.",
+      links_intro: "Snelle links:",
+      link_profile: "Bedrijfsprofiel",
+      link_opportunities: "Vacature plaatsen",
+      link_tools: "Hulpmiddelen",
+      link_academy: "Academie",
+      link_community: "Vakgemeenschap",
+      footer_reason: "Je ontvangt dit bericht omdat je net het e-mailadres van je PIPINGBOX-bedrijfsaccount hebt bevestigd.",
+    },
   },
 };
 

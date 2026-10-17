@@ -27,6 +27,9 @@ import type {
   NoticeTemplateStrings,
   PendingProfileItemKey,
   TemplateId,
+  WelcomeCompanyStrings,
+  WelcomeSectionStrings,
+  WelcomeTemplateId,
 } from "./types.ts";
 
 export const BRAND = {
@@ -524,6 +527,309 @@ export function renderMarketplaceReadyEmail(
   return {
     lang,
     template: "marketplace_ready",
+    subject: T(t.subject),
+    html,
+    text: textLines.join("\n"),
+    missing: [...missing],
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PB-WELCOME-EMAIL-001 — correo de bienvenida tras confirmación real
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type WelcomeVariant = "worker" | "company";
+
+/** Rutas internas REALES del SPA, verificadas contra `app/frontend/src/App.tsx`
+ *  y `SPA_ROUTE_CONTRACT.ts`. No se enlaza ninguna ruta inexistente ni ninguna
+ *  función todavía no publicada. */
+export const WELCOME_ROUTES = {
+  worker: {
+    profile: "/profile",
+    opportunities: "/jobs",
+    tools: "/tools",
+    academy: "/academy",
+    community: "/community",
+  },
+  company: {
+    profile: "/company/profile",
+    opportunities: "/company/post-job",
+    tools: "/tools",
+    academy: "/academy",
+    community: "/community",
+  },
+} as const;
+
+/** Orden de secciones por variante. `beta` se maqueta aparte (bloque destacado). */
+const WELCOME_SECTION_ORDER = {
+  worker: ["profile", "opportunities", "comms", "tools", "academy", "community"],
+  company: ["profile", "opportunities", "verification", "comms", "tools", "academy", "community"],
+} as const;
+
+/** Secciones con acceso directo; el resto son puramente informativas.
+ *  `comms` y `verification` NO llevan enlace a propósito: no deben inducir
+ *  ninguna activación de consentimiento ni de verificación automática. */
+const WELCOME_SECTION_LINK: Partial<Record<string, keyof typeof WELCOME_ROUTES["worker"]>> = {
+  profile: "profile",
+  opportunities: "opportunities",
+  tools: "tools",
+  academy: "academy",
+  community: "community",
+};
+
+export interface WelcomeRenderInput {
+  variant: WelcomeVariant;
+  lang: EmailLanguage | string | null | undefined;
+  /** Base pública de la app (APP_BASE_URL); se valida http/https. */
+  appBaseUrl: string;
+  vars?: Vars;
+}
+
+/** Une una ruta interna con la base pública preservando subrutas de la base. */
+function appUrl(base: string, path: string): string {
+  const b = safeUrl(base);
+  const root = b.endsWith("/") ? b : `${b}/`;
+  return safeUrl(new URL(path.replace(/^\/+/, ""), root).toString());
+}
+
+interface WelcomeLayoutParts {
+  lang: EmailLanguage;
+  preheader: string;
+  heading: string;
+  introHtml: string;
+  actionHtml: string;
+  sectionsHtml: string;
+  betaHtml: string;
+  closingHtml: string;
+  linksHtml: string;
+  noticeHtml: string;
+  footerReason: string;
+  footerSupport: string;
+  tagline: string;
+}
+
+/** Maquetación dedicada del correo de bienvenida.
+ *
+ *  Compatible con modo oscuro: `color-scheme` + `@media (prefers-color-scheme:
+ *  dark)` con overrides explícitos por clase (`pb-*`). Los clientes que
+ *  ignoran `<style>` (Gmail web con CSS recortado) siguen viendo la versión
+ *  clara con colores inline, que es legible por sí misma. */
+function welcomeLayout(p: WelcomeLayoutParts): string {
+  return `<!DOCTYPE html>
+<html lang="${p.lang}" dir="ltr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<title>${p.heading}</title>
+<style>
+:root { color-scheme: light dark; supported-color-schemes: light dark; }
+@media only screen and (max-width:620px) {
+  .pb-pad { padding-left:18px !important; padding-right:18px !important; }
+  .pb-h1 { font-size:20px !important; line-height:26px !important; }
+  .pb-btn a { display:block !important; text-align:center !important; }
+}
+@media (prefers-color-scheme: dark) {
+  .pb-body, .pb-outer { background-color:#0B0B0B !important; }
+  .pb-card { background-color:#17171A !important; }
+  .pb-h1, .pb-h2 { color:#FFFFFF !important; }
+  .pb-text { color:#E4E4E7 !important; }
+  .pb-muted { color:#A1A1AA !important; }
+  .pb-sep { border-color:#2E2E33 !important; }
+  .pb-note { background-color:#1F1813 !important; }
+  .pb-link { color:#FF8A4C !important; }
+  .pb-badge { background-color:#2A1C12 !important; color:#FF8A4C !important; }
+}
+</style>
+</head>
+<body class="pb-body" style="margin:0; padding:0; background-color:${BRAND.bg}; font-family:'Inter','Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:${BRAND.text};">
+<div style="display:none; max-height:0; overflow:hidden; opacity:0;">${p.preheader}</div>
+<table role="presentation" class="pb-outer" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:${BRAND.bg};">
+<tr><td align="center" style="padding:24px 12px;">
+<table role="presentation" class="pb-card" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px; width:100%; background-color:#FFFFFF; border-radius:8px; overflow:hidden;">
+<tr><td style="background-color:${BRAND.black}; padding:20px 28px;">
+  <span style="font-size:22px; font-weight:bold; letter-spacing:2px; color:#FFFFFF;">PIPING<span style="color:${BRAND.orange};">BOX</span></span>
+</td></tr>
+<tr><td class="pb-pad" style="padding:32px 28px 4px 28px;">
+  <h1 class="pb-h1" style="margin:0 0 16px 0; font-size:24px; line-height:30px; color:${BRAND.black};">${p.heading}</h1>
+  ${p.introHtml}
+  ${p.actionHtml}
+</td></tr>
+<tr><td class="pb-pad" style="padding:4px 28px 0 28px;">
+  ${p.sectionsHtml}
+</td></tr>
+<tr><td class="pb-pad" style="padding:8px 28px 8px 28px;">
+  ${p.betaHtml}
+</td></tr>
+<tr><td class="pb-pad" style="padding:8px 28px 0 28px;">
+  ${p.closingHtml}
+</td></tr>
+<tr><td class="pb-pad" style="padding:8px 28px 20px 28px;">
+  ${p.linksHtml}
+</td></tr>
+<tr><td class="pb-pad pb-sep" style="padding:16px 28px 24px 28px; border-top:1px solid ${BRAND.border};">
+  <p class="pb-muted" style="margin:0 0 8px 0; font-size:12px; line-height:18px; color:${BRAND.muted};">${p.noticeHtml}</p>
+  <p class="pb-muted" style="margin:0 0 8px 0; font-size:12px; line-height:18px; color:${BRAND.muted};">${p.footerReason}</p>
+  <p class="pb-muted" style="margin:0 0 8px 0; font-size:12px; line-height:18px; color:${BRAND.muted};">${p.footerSupport}</p>
+  <p class="pb-muted" style="margin:0; font-size:12px; line-height:18px; color:${BRAND.muted};"><strong class="pb-h2" style="color:${BRAND.black};">PIPINGBOX</strong> · ${p.tagline} · <a class="pb-link" href="${BRAND.site}" style="color:${BRAND.orange}; text-decoration:none;">pipingbox.com</a></p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
+/** Sección con badge numerado naranja (iconografía industrial sin imágenes:
+ *  cero dependencias externas, cero tracking, idéntico en todos los clientes). */
+function welcomeSection(
+  index: number,
+  headingHtml: string,
+  bodyHtml: string,
+  link: { label: string; url: string } | null,
+): string {
+  const n = String(index).padStart(2, "0");
+  const linkHtml = link
+    ? `<p style="margin:0;"><a class="pb-link" href="${escapeHtml(link.url)}" target="_blank" rel="noopener" style="color:${BRAND.orange}; font-size:15px; font-weight:bold; text-decoration:none;">${link.label} &rarr;</a></p>`
+    : "";
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 22px 0;">
+<tr>
+  <td width="44" valign="top" style="width:44px; padding:2px 12px 0 0;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr>
+      <td class="pb-badge" align="center" width="32" height="32" bgcolor="#FFF1E8" style="width:32px; height:32px; border-radius:6px; background-color:#FFF1E8; font-size:13px; font-weight:bold; color:${BRAND.orange}; font-family:'Inter','Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${n}</td>
+    </tr></table>
+  </td>
+  <td valign="top">
+    <h2 class="pb-h2" style="margin:0 0 6px 0; font-size:17px; line-height:24px; color:${BRAND.black};">${headingHtml}</h2>
+    <p class="pb-text" style="margin:0 0 8px 0; font-size:15px; line-height:23px; color:${BRAND.text};">${bodyHtml}</p>
+    ${linkHtml}
+  </td>
+</tr></table>`;
+}
+
+export function renderWelcomeEmail(input: WelcomeRenderInput): RenderedEmail {
+  const { locale, lang } = pickLocale(input.lang);
+  const template: WelcomeTemplateId = input.variant === "company" ? "welcome_company" : "welcome_worker";
+  const t = locale.templates[template] as WelcomeCompanyStrings;
+  const c = locale.common;
+  const vars = commonVars(input.vars);
+  const missing = new Set<string>();
+
+  const H = (s: string) => interpolate(s, vars, "html", missing);
+  const T = (s: string) => interpolate(s, vars, "text", missing);
+  const withSupport = (s: string) => H(s).replace(escapeHtml(BRAND.support), supportLink());
+
+  const routes = WELCOME_ROUTES[input.variant];
+  const urls = {
+    profile: appUrl(input.appBaseUrl, routes.profile),
+    opportunities: appUrl(input.appBaseUrl, routes.opportunities),
+    tools: appUrl(input.appBaseUrl, routes.tools),
+    academy: appUrl(input.appBaseUrl, routes.academy),
+    community: appUrl(input.appBaseUrl, routes.community),
+  };
+
+  const order = WELCOME_SECTION_ORDER[input.variant] as readonly string[];
+  const sections = order.map((key) => {
+    const s = (t as unknown as Record<string, WelcomeSectionStrings>)[key];
+    const linkKey = WELCOME_SECTION_LINK[key];
+    const label = (t as unknown as Record<string, string>)[`link_${key}`];
+    return {
+      key,
+      heading: s.heading,
+      body: s.body,
+      link: linkKey && label ? { label, url: urls[linkKey] } : null,
+    };
+  });
+
+  const sectionsHtml = sections
+    .map((s, i) =>
+      welcomeSection(
+        i + 1,
+        H(s.heading),
+        H(s.body),
+        s.link ? { label: H(s.link.label), url: s.link.url } : null,
+      )
+    )
+    .join("");
+
+  const betaHtml = `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="pb-note" style="border-left:4px solid ${BRAND.orange}; background-color:#FFF7F2;">
+<tr><td style="padding:16px 18px;">
+  <p class="pb-h2" style="margin:0 0 6px 0; font-size:16px; font-weight:bold; color:${BRAND.black};">${H(t.beta.heading)}</p>
+  <p class="pb-text" style="margin:0 0 8px 0; font-size:15px; line-height:23px; color:${BRAND.text};">${H(t.beta.body)}</p>
+  <p class="pb-text" style="margin:0; font-size:15px; line-height:23px; color:${BRAND.text};">${withSupport(t.beta_cta)}</p>
+</td></tr></table>`;
+
+  const closingHtml = `<p class="pb-text" style="margin:0 0 14px 0; font-size:15px; line-height:23px; color:${BRAND.text};">${H(t.closing)}</p>
+<p class="pb-text" style="margin:0; font-size:15px; line-height:23px; color:${BRAND.text};"><strong>${H(t.signature)}</strong></p>`;
+
+  const linkItems: Array<[string, string]> = [
+    [H(t.link_profile), urls.profile],
+    [H(t.link_opportunities), urls.opportunities],
+    [H(t.link_tools), urls.tools],
+    [H(t.link_academy), urls.academy],
+    [H(t.link_community), urls.community],
+  ];
+  const linksHtml = `<p class="pb-muted" style="margin:0 0 8px 0; font-size:13px; line-height:20px; color:${BRAND.muted};">${H(t.links_intro)}</p>
+<p class="pb-muted" style="margin:0; font-size:13px; line-height:22px; color:${BRAND.muted};">${
+    linkItems
+      .map(([label, url]) =>
+        `<a class="pb-link" href="${escapeHtml(url)}" target="_blank" rel="noopener" style="color:${BRAND.orange}; text-decoration:none;">${label}</a>`
+      )
+      .join(" &nbsp;·&nbsp; ")
+  }</p>`;
+
+  const html = welcomeLayout({
+    lang,
+    preheader: H(t.preheader),
+    heading: H(t.heading),
+    introHtml: paragraph(H(t.intro)) + paragraph(H(t.ecosystem)),
+    actionHtml: button(H(t.button), urls.profile, H(c.button_fallback)),
+    sectionsHtml,
+    betaHtml,
+    closingHtml,
+    linksHtml,
+    noticeHtml: withSupport(t.account_type_notice),
+    footerReason: H(t.footer_reason),
+    footerSupport: withSupport(c.support_prompt),
+    tagline: H(c.brand_tagline),
+  });
+
+  const textLines = [
+    `PIPINGBOX — ${T(t.heading)}`,
+    "",
+    T(t.intro),
+    "",
+    T(t.ecosystem),
+    "",
+    `${T(t.button)}: ${urls.profile}`,
+    "",
+    ...sections.flatMap((s, i) => [
+      `${String(i + 1).padStart(2, "0")}. ${T(s.heading)}`,
+      T(s.body),
+      ...(s.link ? [`${T(s.link.label)}: ${s.link.url}`] : []),
+      "",
+    ]),
+    T(t.beta.heading).toUpperCase(),
+    T(t.beta.body),
+    T(t.beta_cta),
+    "",
+    T(t.closing),
+    T(t.signature),
+    "",
+    T(t.links_intro),
+    ...linkItems.map(([, url], i) => `- ${T([t.link_profile, t.link_opportunities, t.link_tools, t.link_academy, t.link_community][i])}: ${url}`),
+    "",
+    T(t.account_type_notice),
+    T(t.footer_reason),
+    T(c.support_prompt),
+    `PIPINGBOX · ${T(c.brand_tagline)} · ${BRAND.site}`,
+  ];
+
+  return {
+    lang,
+    template,
     subject: T(t.subject),
     html,
     text: textLines.join("\n"),

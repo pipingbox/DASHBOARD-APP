@@ -202,6 +202,105 @@ const it: EmailLocale = {
       note: "Non è ancora stato pubblicato nulla: i dati estratti entrano nel tuo profilo solo dopo la tua revisione e conferma. Le certificazioni indicate nel CV vengono registrate come dichiarate, non verificate.",
       footer_reason: "Ricevi questo messaggio perché PIPINGBOX ha ricevuto un CV associato al tuo account.",
     },
+    // ── PB-WELCOME-EMAIL-001 ────────────────────────────────────────────────
+    welcome_worker: {
+      subject: "PIPINGBOX · Benvenuto! La tua prossima opportunità inizia qui",
+      preheader: "Il tuo account è confermato. Completa il tuo profilo professionale e inizia a scoprire opportunità industriali.",
+      heading: "Benvenuto su PIPINGBOX 🧡",
+      intro: "Il tuo account è confermato. Ora inizia la parte importante.",
+      ecosystem: "PIPINGBOX è un ecosistema digitale internazionale per professionisti e aziende del montaggio industriale, piping, saldatura e manutenzione.",
+      button: "Completa il mio profilo",
+      profile: {
+        heading: "Completa il tuo profilo professionale",
+        body: "La tua esperienza ha valore: fai in modo che le aziende possano conoscerla. Aggiungi le tue specializzazioni, l'esperienza, la disponibilità e il CV. Un profilo aggiornato ci aiuta a individuare opportunità in linea con le tue capacità.",
+      },
+      opportunities: {
+        heading: "Opportunità di lavoro e matching intelligente",
+        body: "Scopri le offerte di lavoro del settore industriale. Il nostro sistema di matching collega progressivamente esperienza, competenze, località e disponibilità alle esigenze delle aziende, così puoi trovare opportunità rilevanti in modo semplice ed efficiente.",
+      },
+      comms: {
+        heading: "Comunicazione e notifiche",
+        body: "Resta informato sull'attività del tuo account e sulle opportunità disponibili. Stiamo preparando nuovi avvisi via WhatsApp per gli utenti che attivano volontariamente quel canale: le comunicazioni operative del tuo account sono indipendenti da quelle opzionali e nessun canale opzionale viene attivato senza il tuo consenso esplicito.",
+      },
+      tools: {
+        heading: "Hub di strumenti professionali",
+        body: "Scopri i nostri strumenti tecnici specializzati in piping, saldatura e prefabbricazione. Continuiamo a sviluppare nuove utilità per facilitare il lavoro dei professionisti del settore industriale.",
+      },
+      academy: {
+        heading: "Accademia PIPINGBOX",
+        body: "Esplora le risorse di preparazione VCA attualmente disponibili. Continuiamo a lavorare per aggiungere nuovi corsi e contenuti formativi man mano che vengono pubblicati.",
+      },
+      community: {
+        heading: "La nostra comunità sta crescendo",
+        body: "Stiamo costruendo uno spazio per mettere in contatto professionisti, condividere conoscenze e creare nuove opportunità di collaborazione.",
+      },
+      beta: {
+        heading: "Fai parte della nostra versione BETA",
+        body: "PIPINGBOX continua a evolversi. Hai trovato un errore? Hai un suggerimento? Ti piacerebbe avere un nuovo strumento? La tua opinione ci interessa.",
+      },
+      beta_cta: "Raccontacelo scrivendo a {support}.",
+      closing: "Lavoriamo per costruire un ecosistema unico che colleghi lavoratori, aziende, strumenti e opportunità nel montaggio industriale. Grazie per far parte di PIPINGBOX.",
+      signature: "Il team PIPINGBOX",
+      account_type_notice: "Hai scelto il tipo di account sbagliato durante la registrazione? Scrivi a {support} e il nostro team esaminerà il tuo caso manualmente.",
+      links_intro: "Accessi rapidi:",
+      link_profile: "Il mio profilo",
+      link_opportunities: "Offerte di lavoro",
+      link_tools: "Strumenti",
+      link_academy: "Accademia",
+      link_community: "Comunità",
+      footer_reason: "Ricevi questo messaggio perché hai appena confermato il tuo indirizzo e-mail su PIPINGBOX.",
+    },
+    welcome_company: {
+      subject: "PIPINGBOX · Benvenuto! Inizia a costruire il tuo team industriale",
+      preheader: "Il tuo account aziendale è confermato. Completa il profilo dell'azienda e prepara la tua prima offerta industriale.",
+      heading: "Benvenuto su PIPINGBOX 🧡",
+      intro: "Il tuo account aziendale è confermato. Ora inizia la parte importante.",
+      ecosystem: "PIPINGBOX è un ecosistema digitale internazionale per professionisti e aziende del montaggio industriale, piping, saldatura e manutenzione.",
+      button: "Completa il profilo aziendale",
+      profile: {
+        heading: "Completa il profilo della tua azienda",
+        body: "Il profilo della tua azienda è la prima cosa che vedono i professionisti. Aggiungi i dati societari, la tua attività, le tue sedi e le specializzazioni industriali di cui hai bisogno abitualmente, così le tue offerte raggiungono i profili giusti.",
+      },
+      opportunities: {
+        heading: "Pubblicazione di offerte e gestione delle esigenze industriali",
+        body: "Pubblica offerte di lavoro e registra le tue esigenze di personale per raggiungere professionisti qualificati in piping, saldatura, montaggio e manutenzione. La pubblicazione delle offerte e l'esame dei candidati sono già disponibili; il matching automatico avanzato e la preselezione conversazionale sono ancora in sviluppo.",
+      },
+      verification: {
+        heading: "Verifica dell'azienda e funzioni riservate",
+        body: "Alcune funzioni sono riservate alle aziende verificate. Finché la tua azienda non è verificata puoi completare il profilo e preparare le tue offerte, mentre la pubblicazione e l'accesso ai dati di contatto dei candidati restano soggetti all'esame del nostro team. Ti indicheremo esattamente cosa serve e durante la beta non viene addebitato nulla.",
+      },
+      comms: {
+        heading: "Comunicazione e notifiche",
+        body: "Resta informato sull'attività del tuo account e sullo stato delle tue offerte. Stiamo preparando nuovi avvisi via WhatsApp per gli account che attivano volontariamente quel canale: le comunicazioni operative sono indipendenti da quelle opzionali e nessun canale opzionale viene attivato senza il tuo consenso esplicito.",
+      },
+      tools: {
+        heading: "Hub di strumenti professionali",
+        body: "Scopri i nostri strumenti tecnici specializzati in piping, saldatura e prefabbricazione. Il tuo team tecnico può utilizzarli mentre continuiamo a sviluppare nuove utilità.",
+      },
+      academy: {
+        heading: "Accademia PIPINGBOX",
+        body: "Esplora le risorse di preparazione VCA attualmente disponibili per i tuoi team. Continuiamo a lavorare per aggiungere nuovi corsi e contenuti formativi man mano che vengono pubblicati.",
+      },
+      community: {
+        heading: "La nostra comunità sta crescendo",
+        body: "Stiamo costruendo uno spazio per mettere in contatto aziende e professionisti, condividere conoscenze e creare nuove opportunità di collaborazione nel settore industriale.",
+      },
+      beta: {
+        heading: "Fai parte della nostra versione BETA",
+        body: "PIPINGBOX continua a evolversi. Hai trovato un errore? Hai un suggerimento? Ti serve una funzione che ancora non esiste? La tua opinione ci interessa.",
+      },
+      beta_cta: "Raccontacelo scrivendo a {support}.",
+      closing: "Lavoriamo per costruire un ecosistema unico che colleghi lavoratori, aziende, strumenti e opportunità nel montaggio industriale. Grazie per far parte di PIPINGBOX.",
+      signature: "Il team PIPINGBOX",
+      account_type_notice: "Ti sei registrato come azienda per errore o dovrebbe essere un account professionale? Scrivi a {support} e il nostro team lo esaminerà manualmente.",
+      links_intro: "Accessi rapidi:",
+      link_profile: "Profilo aziendale",
+      link_opportunities: "Pubblica un'offerta",
+      link_tools: "Strumenti",
+      link_academy: "Accademia",
+      link_community: "Comunità",
+      footer_reason: "Ricevi questo messaggio perché hai appena confermato l'indirizzo e-mail del tuo account aziendale PIPINGBOX.",
+    },
   },
 };
 

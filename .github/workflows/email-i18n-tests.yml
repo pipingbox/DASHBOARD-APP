@@ -21,6 +21,10 @@ on:
       - 'supabase/functions/app_14da0f1941_send_job_application_notification/**'
       - 'supabase/functions/job-application-profile-pending-email/**'
       - 'supabase/functions/marketplace-ready-activation-email/**'
+      - 'supabase/functions/welcome-email/**'
+      - 'supabase/functions/_shared/welcome-email.ts'
+      - 'scripts/welcome-email-previews.ts'
+      - 'sql/046-pb-welcome-email-001.sql'
       - 'supabase/functions/cv-extract/**'
       - 'supabase/functions/cv-apply-draft/**'
       - 'app/frontend/src/i18n/languages.json'
@@ -30,6 +34,8 @@ on:
     paths:
       - 'supabase/functions/_shared/email-i18n/**'
       - 'supabase/functions/_shared/application-activation.ts'
+      - 'supabase/functions/_shared/welcome-email.ts'
+      - 'supabase/functions/welcome-email/**'
       - 'supabase/functions/auth-send-email-hook/**'
 
 concurrency:
@@ -48,7 +54,7 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Typecheck (email-i18n, hook, provider, dispatcher, cert-expiry, match-notify, cv-extraction, cert-extraction)
+      - name: Typecheck (email-i18n, hook, provider, dispatcher, cert-expiry, match-notify, cv-extraction, cert-extraction, welcome)
         run: |
           deno check --node-modules-dir=none \
             supabase/functions/_shared/email-i18n/mod.ts \
@@ -71,9 +77,12 @@ jobs:
             supabase/functions/workforce-match-notify/index.ts \
             supabase/functions/job-application-profile-pending-email/index.ts \
             supabase/functions/marketplace-ready-activation-email/index.ts \
+            supabase/functions/_shared/welcome-email.ts \
+            supabase/functions/welcome-email/index.ts \
+            scripts/welcome-email-previews.ts \
             supabase/functions/app_14da0f1941_send_job_application_notification/index.maintainable.ts
 
-      - name: Tests (11 idiomas, seguridad, firma, URL de verificación, modo de entrega, CV engine)
+      - name: Tests (11 idiomas, seguridad, firma, URL de verificación, modo de entrega, CV engine, bienvenida)
         run: |
           deno test --node-modules-dir=none --allow-read --allow-env \
             supabase/functions/_shared/email-i18n/ \

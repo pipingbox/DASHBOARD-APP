@@ -202,6 +202,105 @@ const pt: EmailLocale = {
       note: "Ainda nada foi publicado: os dados extraídos só fazem parte do seu perfil depois de os rever e confirmar. As certificações mencionadas no seu CV são registadas como declaradas, não verificadas.",
       footer_reason: "Recebe esta mensagem porque a PIPINGBOX recebeu um CV associado à sua conta.",
     },
+    // ── PB-WELCOME-EMAIL-001 ────────────────────────────────────────────────
+    welcome_worker: {
+      subject: "PIPINGBOX · Bem-vindo! A sua próxima oportunidade começa aqui",
+      preheader: "A sua conta está confirmada. Complete o seu perfil profissional e comece a descobrir oportunidades industriais.",
+      heading: "Bem-vindo à PIPINGBOX 🧡",
+      intro: "A sua conta está confirmada. Agora começa o mais importante.",
+      ecosystem: "A PIPINGBOX é um ecossistema digital internacional para profissionais e empresas da montagem industrial, piping, soldadura e manutenção.",
+      button: "Completar o meu perfil",
+      profile: {
+        heading: "Complete o seu perfil profissional",
+        body: "A sua experiência tem valor: faça com que as empresas a possam conhecer. Acrescente as suas especialidades, experiência, disponibilidade e CV. Um perfil atualizado ajuda-nos a identificar oportunidades relacionadas com as suas capacidades.",
+      },
+      opportunities: {
+        heading: "Oportunidades de emprego e matching inteligente",
+        body: "Descubra ofertas de emprego do setor industrial. O nosso sistema de matching liga progressivamente experiência, competências, localização e disponibilidade às necessidades das empresas, para que encontre oportunidades relevantes de forma simples e eficiente.",
+      },
+      comms: {
+        heading: "Comunicação e notificações",
+        body: "Mantenha-se informado sobre a atividade da sua conta e as oportunidades disponíveis. Estamos a preparar novos alertas por WhatsApp para utilizadores que ativem voluntariamente esse canal: as comunicações operacionais da sua conta são independentes das comunicações opcionais e nenhum canal opcional é ativado sem o seu consentimento expresso.",
+      },
+      tools: {
+        heading: "Hub de ferramentas profissionais",
+        body: "Explore as nossas ferramentas técnicas especializadas em piping, soldadura e pré-fabricação. Continuamos a desenvolver novos utilitários para facilitar o trabalho dos profissionais industriais.",
+      },
+      academy: {
+        heading: "Academia PIPINGBOX",
+        body: "Explore os recursos de preparação VCA atualmente disponíveis. Continuamos a trabalhar para acrescentar novos cursos e conteúdos formativos à medida que forem publicados.",
+      },
+      community: {
+        heading: "A nossa comunidade está a crescer",
+        body: "Estamos a construir um espaço para ligar profissionais, partilhar conhecimento e criar novas oportunidades de colaboração.",
+      },
+      beta: {
+        heading: "Faz parte da nossa versão BETA",
+        body: "A PIPINGBOX continua a evoluir. Encontrou um erro? Tem uma sugestão? Gostaria de dispor de uma nova ferramenta? A sua opinião interessa-nos.",
+      },
+      beta_cta: "Conte-nos em {support}.",
+      closing: "Trabalhamos para construir um ecossistema único que liga trabalhadores, empresas, ferramentas e oportunidades na montagem industrial. Obrigado por fazer parte da PIPINGBOX.",
+      signature: "Equipa PIPINGBOX",
+      account_type_notice: "Escolheu o tipo de conta errado ao registar-se? Escreva para {support} e a nossa equipa analisará o seu caso manualmente.",
+      links_intro: "Acessos rápidos:",
+      link_profile: "O meu perfil",
+      link_opportunities: "Ofertas de emprego",
+      link_tools: "Ferramentas",
+      link_academy: "Academia",
+      link_community: "Comunidade",
+      footer_reason: "Recebe esta mensagem porque acabou de confirmar o seu endereço de e-mail na PIPINGBOX.",
+    },
+    welcome_company: {
+      subject: "PIPINGBOX · Bem-vindo! Comece a construir a sua equipa industrial",
+      preheader: "A sua conta de empresa está confirmada. Complete o perfil da empresa e prepare a sua primeira oferta industrial.",
+      heading: "Bem-vindo à PIPINGBOX 🧡",
+      intro: "A sua conta de empresa está confirmada. Agora começa o mais importante.",
+      ecosystem: "A PIPINGBOX é um ecossistema digital internacional para profissionais e empresas da montagem industrial, piping, soldadura e manutenção.",
+      button: "Completar o perfil da empresa",
+      profile: {
+        heading: "Complete o perfil da sua empresa",
+        body: "O perfil da sua empresa é o primeiro que os profissionais vêem. Acrescente os dados da sua empresa, a sua atividade, as suas localizações e as especialidades industriais de que necessita habitualmente, para que as suas ofertas cheguem aos perfis adequados.",
+      },
+      opportunities: {
+        heading: "Publicação de ofertas e gestão de necessidades industriais",
+        body: "Publique ofertas de emprego e registe as suas necessidades de pessoal para chegar a profissionais qualificados em piping, soldadura, montagem e manutenção. A publicação de ofertas e a análise de candidatos já estão disponíveis; o matching automático avançado e a triagem conversacional continuam em desenvolvimento.",
+      },
+      verification: {
+        heading: "Verificação de empresa e funções restritas",
+        body: "Algumas funções estão reservadas a empresas verificadas. Enquanto a sua empresa não estiver verificada pode completar o perfil e preparar as suas ofertas, enquanto a publicação e o acesso aos dados de contacto dos candidatos continuam sujeitos à análise da nossa equipa. Indicaremos exatamente o que é necessário e nada é cobrado durante a beta.",
+      },
+      comms: {
+        heading: "Comunicação e notificações",
+        body: "Mantenha-se informado sobre a atividade da sua conta e o estado das suas ofertas. Estamos a preparar novos alertas por WhatsApp para contas que ativem voluntariamente esse canal: as comunicações operacionais são independentes das opcionais e nenhum canal opcional é ativado sem o seu consentimento expresso.",
+      },
+      tools: {
+        heading: "Hub de ferramentas profissionais",
+        body: "Explore as nossas ferramentas técnicas especializadas em piping, soldadura e pré-fabricação. A sua equipa técnica pode utilizá-las enquanto continuamos a desenvolver novos utilitários.",
+      },
+      academy: {
+        heading: "Academia PIPINGBOX",
+        body: "Explore os recursos de preparação VCA atualmente disponíveis para as suas equipas. Continuamos a trabalhar para acrescentar novos cursos e conteúdos formativos à medida que forem publicados.",
+      },
+      community: {
+        heading: "A nossa comunidade está a crescer",
+        body: "Estamos a construir um espaço para ligar empresas e profissionais, partilhar conhecimento e criar novas oportunidades de colaboração no setor industrial.",
+      },
+      beta: {
+        heading: "Faz parte da nossa versão BETA",
+        body: "A PIPINGBOX continua a evoluir. Encontrou um erro? Tem uma sugestão? Precisa de uma função que ainda não existe? A sua opinião interessa-nos.",
+      },
+      beta_cta: "Conte-nos em {support}.",
+      closing: "Trabalhamos para construir um ecossistema único que liga trabalhadores, empresas, ferramentas e oportunidades na montagem industrial. Obrigado por fazer parte da PIPINGBOX.",
+      signature: "Equipa PIPINGBOX",
+      account_type_notice: "Registou-se como empresa por engano ou deveria ser uma conta profissional? Escreva para {support} e a nossa equipa analisará o caso manualmente.",
+      links_intro: "Acessos rápidos:",
+      link_profile: "Perfil da empresa",
+      link_opportunities: "Publicar oferta",
+      link_tools: "Ferramentas",
+      link_academy: "Academia",
+      link_community: "Comunidade",
+      footer_reason: "Recebe esta mensagem porque acabou de confirmar o endereço de e-mail da sua conta de empresa na PIPINGBOX.",
+    },
   },
 };
 

@@ -202,6 +202,105 @@ const ro: EmailLocale = {
       note: "Nu s-a publicat încă nimic: datele extrase fac parte din profilul tău doar după ce le verifici și le confirmi. Certificările menționate în CV sunt înregistrate ca declarate, nu verificate.",
       footer_reason: "Primești acest mesaj pentru că PIPINGBOX a primit un CV asociat contului tău.",
     },
+    // ── PB-WELCOME-EMAIL-001 ────────────────────────────────────────────────
+    welcome_worker: {
+      subject: "PIPINGBOX · Bine ai venit! Următoarea ta oportunitate începe aici",
+      preheader: "Contul tău este confirmat. Completează-ți profilul profesionist și începe să descoperi oportunități industriale.",
+      heading: "Bine ai venit pe PIPINGBOX 🧡",
+      intro: "Contul tău este confirmat. Acum începe partea importantă.",
+      ecosystem: "PIPINGBOX este un ecosistem digital internațional pentru profesioniști și companii din montajul industrial, piping, sudură și mentenanță.",
+      button: "Completează-mi profilul",
+      profile: {
+        heading: "Completează-ți profilul profesionist",
+        body: "Experiența ta are valoare: fă în așa fel încât companiile să o poată cunoaște. Adaugă-ți specializările, experiența, disponibilitatea și CV-ul. Un profil actualizat ne ajută să identificăm oportunități legate de competențele tale.",
+      },
+      opportunities: {
+        heading: "Oportunități de muncă și matching inteligent",
+        body: "Descoperă ofertele de muncă din sectorul industrial. Sistemul nostru de matching corelează treptat experiența, competențele, locația și disponibilitatea cu nevoile companiilor, ca să găsești oportunități relevante simplu și eficient.",
+      },
+      comms: {
+        heading: "Comunicare și notificări",
+        body: "Rămâi informat despre activitatea contului tău și despre oportunitățile disponibile. Pregătim noi alerte prin WhatsApp pentru utilizatorii care activează voluntar acel canal: comunicările operaționale ale contului tău sunt independente de cele opționale, iar niciun canal opțional nu se activează fără consimțământul tău expres.",
+      },
+      tools: {
+        heading: "Hub de instrumente profesionale",
+        body: "Descoperă instrumentele noastre tehnice specializate în piping, sudură și prefabricare. Continuăm să dezvoltăm utilitare noi pentru a ușura munca profesioniștilor din industrie.",
+      },
+      academy: {
+        heading: "Academia PIPINGBOX",
+        body: "Explorează resursele de pregătire VCA disponibile în prezent. Continuăm să lucrăm pentru a adăuga noi cursuri și materiale de formare pe măsură ce sunt publicate.",
+      },
+      community: {
+        heading: "Comunitatea noastră crește",
+        body: "Construim un spațiu pentru a pune în legătură profesioniști, a face schimb de cunoștințe și a crea noi oportunități de colaborare.",
+      },
+      beta: {
+        heading: "Faci parte din versiunea noastră BETA",
+        body: "PIPINGBOX continuă să evolueze. Ai găsit o eroare? Ai o sugestie? Ți-ar plăcea să ai un instrument nou? Ne interesează părerea ta.",
+      },
+      beta_cta: "Spune-ne la {support}.",
+      closing: "Lucrăm pentru a construi un ecosistem unic care să lege lucrătorii, companiile, instrumentele și oportunitățile din montajul industrial. Îți mulțumim că faci parte din PIPINGBOX.",
+      signature: "Echipa PIPINGBOX",
+      account_type_notice: "Ai ales tipul greșit de cont la înregistrare? Scrie la {support} și echipa noastră îți va analiza cazul manual.",
+      links_intro: "Accese rapide:",
+      link_profile: "Profilul meu",
+      link_opportunities: "Oferte de muncă",
+      link_tools: "Instrumente",
+      link_academy: "Academie",
+      link_community: "Comunitate",
+      footer_reason: "Primești acest mesaj pentru că ți-ai confirmat chiar acum adresa de e-mail pe PIPINGBOX.",
+    },
+    welcome_company: {
+      subject: "PIPINGBOX · Bine ai venit! Începe să îți construiești echipa industrială",
+      preheader: "Contul companiei tale este confirmat. Completează profilul companiei și pregătește-ți prima ofertă industrială.",
+      heading: "Bine ai venit pe PIPINGBOX 🧡",
+      intro: "Contul companiei tale este confirmat. Acum începe partea importantă.",
+      ecosystem: "PIPINGBOX este un ecosistem digital internațional pentru profesioniști și companii din montajul industrial, piping, sudură și mentenanță.",
+      button: "Completează profilul companiei",
+      profile: {
+        heading: "Completează profilul companiei tale",
+        body: "Profilul companiei tale este primul lucru pe care îl văd profesioniștii. Adaugă datele firmei, activitatea, locațiile și specializările industriale de care ai nevoie în mod obișnuit, pentru ca ofertele tale să ajungă la profilurile potrivite.",
+      },
+      opportunities: {
+        heading: "Publicarea ofertelor și gestionarea nevoilor industriale",
+        body: "Publică oferte de muncă și înregistrează-ți nevoile de personal pentru a ajunge la profesioniști calificați în piping, sudură, montaj și mentenanță. Publicarea ofertelor și analiza candidaților sunt deja disponibile; matchingul automat avansat și preselecția conversațională sunt încă în dezvoltare.",
+      },
+      verification: {
+        heading: "Verificarea companiei și funcții restricționate",
+        body: "Unele funcții sunt rezervate companiilor verificate. Până când compania ta este verificată poți completa profilul și pregăti ofertele, în timp ce publicarea și accesul la datele de contact ale candidaților rămân supuse analizei echipei noastre. Îți vom spune exact ce este necesar și nu se percepe nimic în perioada beta.",
+      },
+      comms: {
+        heading: "Comunicare și notificări",
+        body: "Rămâi informat despre activitatea contului tău și despre starea ofertelor tale. Pregătim noi alerte prin WhatsApp pentru conturile care activează voluntar acel canal: comunicările operaționale sunt independente de cele opționale, iar niciun canal opțional nu se activează fără consimțământul tău expres.",
+      },
+      tools: {
+        heading: "Hub de instrumente profesionale",
+        body: "Descoperă instrumentele noastre tehnice specializate în piping, sudură și prefabricare. Echipa ta tehnică le poate folosi în timp ce noi continuăm să dezvoltăm utilitare noi.",
+      },
+      academy: {
+        heading: "Academia PIPINGBOX",
+        body: "Explorează resursele de pregătire VCA disponibile în prezent pentru echipele tale. Continuăm să lucrăm pentru a adăuga noi cursuri și materiale de formare pe măsură ce sunt publicate.",
+      },
+      community: {
+        heading: "Comunitatea noastră crește",
+        body: "Construim un spațiu pentru a pune în legătură companii și profesioniști, a face schimb de cunoștințe și a crea noi oportunități de colaborare în sectorul industrial.",
+      },
+      beta: {
+        heading: "Faci parte din versiunea noastră BETA",
+        body: "PIPINGBOX continuă să evolueze. Ai găsit o eroare? Ai o sugestie? Ai nevoie de o funcție care încă nu există? Ne interesează părerea ta.",
+      },
+      beta_cta: "Spune-ne la {support}.",
+      closing: "Lucrăm pentru a construi un ecosistem unic care să lege lucrătorii, companiile, instrumentele și oportunitățile din montajul industrial. Îți mulțumim că faci parte din PIPINGBOX.",
+      signature: "Echipa PIPINGBOX",
+      account_type_notice: "Te-ai înregistrat ca firmă din greșeală sau ar trebui să fie un cont profesionist? Scrie la {support} și echipa noastră va analiza manual situația.",
+      links_intro: "Accese rapide:",
+      link_profile: "Profilul companiei",
+      link_opportunities: "Publică o ofertă",
+      link_tools: "Instrumente",
+      link_academy: "Academie",
+      link_community: "Comunitate",
+      footer_reason: "Primești acest mesaj pentru că ai confirmat chiar acum adresa de e-mail a contului de companie PIPINGBOX.",
+    },
   },
 };
 
