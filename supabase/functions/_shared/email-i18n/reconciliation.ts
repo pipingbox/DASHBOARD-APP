@@ -18,6 +18,20 @@ const COPY: Record<EmailLanguage, Copy> = {
   bg: { subject: "PIPINGBOX · Попълнете профила си, за да продължите", heading: "Кандидатурите ви остават регистрирани", body: "Кандидатурите ви не са отхвърлени. Попълнете профила си, за да могат да бъдат разгледани преди евентуално представяне на клиент.", pending: "Липсваща информация:", button: "Попълнете профила", footer: "Получавате това съобщение, защото профилът ви в PIPINGBOX се нуждае от допълнителна информация.", requirements: { cv: "Качете валидна автобиография", certificate: "Качете професионален сертификат или документ", availability: "Посочете наличността си", consent: "Потвърдете съгласието и видимостта", completion: "Попълнете минималните данни в профила" } },
 };
 
+const SINGULAR: Record<EmailLanguage, { heading: string; body: string }> = {
+  en: { heading: "Your application is still registered", body: "Your application has not been rejected. Before it can be reviewed for presentation to a client, please complete your profile." },
+  es: { heading: "Tu candidatura sigue registrada", body: "Tu candidatura no ha sido rechazada. Para poder revisarla y valorar su presentación a un cliente, completa tu perfil." },
+  pt: { heading: "A sua candidatura continua registada", body: "A sua candidatura não foi rejeitada. Para ser analisada antes de uma possível apresentação ao cliente, complete o seu perfil." },
+  fr: { heading: "Votre candidature est toujours enregistrée", body: "Votre candidature n'a pas été refusée. Pour qu'elle puisse être examinée avant une éventuelle présentation au client, complétez votre profil." },
+  de: { heading: "Ihre Bewerbung bleibt gespeichert", body: "Ihre Bewerbung wurde nicht abgelehnt. Vervollständigen Sie Ihr Profil, damit sie vor einer möglichen Vorstellung beim Kunden geprüft werden kann." },
+  it: { heading: "La tua candidatura resta registrata", body: "La tua candidatura non è stata respinta. Completa il profilo affinché possa essere esaminata prima di una possibile presentazione al cliente." },
+  nl: { heading: "Je sollicitatie blijft geregistreerd", body: "Je sollicitatie is niet afgewezen. Vul je profiel aan zodat deze kan worden beoordeeld voor een eventuele voordracht aan een klant." },
+  pl: { heading: "Twoje zgłoszenie nadal jest zapisane", body: "Twoje zgłoszenie nie zostało odrzucone. Uzupełnij profil, aby można je było sprawdzić przed ewentualnym przedstawieniem klientowi." },
+  ro: { heading: "Candidatura ta rămâne înregistrată", body: "Candidatura ta nu a fost respinsă. Completează profilul pentru a putea fi evaluată înaintea unei eventuale prezentări către client." },
+  uk: { heading: "Вашу заявку зареєстровано", body: "Вашу заявку не відхилено. Заповніть профіль, щоб її можна було розглянути перед можливим представленням клієнту." },
+  bg: { heading: "Кандидатурата ви остава регистрирана", body: "Кандидатурата ви не е отхвърлена. Попълнете профила си, за да може да бъде разгледана преди евентуално представяне на клиент." },
+};
+
 const PHONE_RECOMMENDATION: Record<EmailLanguage, { heading: string; body: string }> = {
   en: { heading: "Recommended: add your phone number", body: "This helps PIPINGBOX or a recruiter reach you quickly about offers and prepares for future WhatsApp communications. It is optional; WhatsApp is not available yet and will require phone verification." },
   es: { heading: "Recomendado: añade tu número de teléfono", body: "Facilita que PIPINGBOX o un recruiter te contacte rápidamente sobre ofertas y prepara futuras comunicaciones por WhatsApp. Es opcional; WhatsApp aún no está disponible y requerirá verificar el número." },
@@ -40,15 +54,17 @@ export function marketplacePhoneRecommendation(lang: EmailLanguage) {
   return PHONE_RECOMMENDATION[lang];
 }
 
-export function renderMarketplaceReconciliationEmail(input: { lang: EmailLanguage; actionUrl: string; missing: readonly Requirement[]; phoneMissing?: boolean }) {
+export function renderMarketplaceReconciliationEmail(input: { lang: EmailLanguage; actionUrl: string; missing: readonly Requirement[]; applicationCount: number; phoneMissing?: boolean }) {
+  if (!Number.isSafeInteger(input.applicationCount) || input.applicationCount < 1) throw new RangeError("applicationCount must be positive");
   const copy = COPY[input.lang];
+  const context = input.applicationCount === 1 ? SINGULAR[input.lang] : copy;
   const url = safeUrl(input.actionUrl);
   const pending = [...new Set(input.missing)].map((key) => copy.requirements[key]);
   const lines = pending.map((item) => `- ${item}`);
   const list = pending.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
   const phone = input.phoneMissing ? marketplacePhoneRecommendation(input.lang) : null;
   const phoneHtml = phone ? `<h2>${escapeHtml(phone.heading)}</h2><p>${escapeHtml(phone.body)}</p>` : "";
-  const html = `<!doctype html><html lang="${input.lang}"><head><meta charset="utf-8"></head><body style="background:#F3F4F6;color:#1F2937;font-family:Arial,sans-serif"><main style="max-width:600px;margin:auto;background:white;padding:28px"><header style="background:${BRAND.black};color:white;padding:16px;font-size:22px">PIPING<span style="color:${BRAND.orange}">BOX</span></header><h1>${escapeHtml(copy.heading)}</h1><p>${escapeHtml(copy.body)}</p><p>${escapeHtml(copy.pending)}</p><ul>${list}</ul>${phoneHtml}<a href="${escapeHtml(url)}" style="display:inline-block;background:${BRAND.orange};color:${BRAND.buttonText};padding:14px 24px">${escapeHtml(copy.button)}</a><p>${escapeHtml(copy.footer)}</p></main></body></html>`;
-  const text = [copy.heading, "", copy.body, "", copy.pending, ...lines, ...(phone ? ["", phone.heading, phone.body] : []), "", `${copy.button}: ${url}`, "", copy.footer].join("\n");
+  const html = `<!doctype html><html lang="${input.lang}"><head><meta charset="utf-8"></head><body style="background:#F3F4F6;color:#1F2937;font-family:Arial,sans-serif"><span style="display:none;max-height:0;overflow:hidden">${escapeHtml(context.heading)}</span><main style="max-width:600px;margin:auto;background:white;padding:28px"><header style="background:${BRAND.black};color:white;padding:16px;font-size:22px">PIPING<span style="color:${BRAND.orange}">BOX</span></header><h1>${escapeHtml(context.heading)}</h1><p>${escapeHtml(context.body)}</p><p>${escapeHtml(copy.pending)}</p><ul>${list}</ul>${phoneHtml}<a href="${escapeHtml(url)}" style="display:inline-block;background:${BRAND.orange};color:${BRAND.buttonText};padding:14px 24px">${escapeHtml(copy.button)}</a><p>${escapeHtml(copy.footer)}</p></main></body></html>`;
+  const text = [context.heading, "", context.body, "", copy.pending, ...lines, ...(phone ? ["", phone.heading, phone.body] : []), "", `${copy.button}: ${url}`, "", copy.footer].join("\n");
   return { lang: input.lang, subject: copy.subject, html, text };
 }

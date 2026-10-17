@@ -382,11 +382,11 @@ Deno.test("EMAIL 1 conserva faltantes múltiples y no recomienda teléfono prese
   }
 });
 
-Deno.test("reconciliación envía una vez por candidato y el teléfono queda recomendado", async () => {
-  for (const phonePresent of [false, true]) {
+Deno.test("reconciliación mantiene un correo por candidato para 1, 2 o 5 candidaturas", async () => {
+  for (const count of [1, 2, 5]) for (const phonePresent of [false, true]) {
     const provider = new RecordingProvider();
     const calls: RecordedCall[] = [];
-    const row = { user_id: UID, batch_id: "qa-batch", state: "pending" };
+    const row = { user_id: UID, batch_id: "qa-batch", state: "pending", downgraded_count: count };
     const supabase = fakeSupabase({
       applications: [baseApplication(), baseApplication({ id: APP2_ID })],
       profiles: [baseProfile({ preferred_language: "de" })], activations: [],
@@ -416,6 +416,8 @@ Deno.test("reconciliación envía una vez por candidato y el teléfono queda rec
     assertEquals((message.html?.match(/<li/g) ?? []).length, 2);
     assertEquals(message.text!.includes("Recomendado: añade tu número de teléfono"), !phonePresent);
     assertEquals(message.capture?.meta?.missing, ["cv", "certificate"]);
+    assertEquals(message.capture?.meta?.downgraded_count, count);
+    assertStringIncludes(message.text!, count === 1 ? "Tu candidatura sigue registrada" : "Tus candidaturas siguen registradas");
     assertEquals(await drainMarketplaceReconciliationEmails({ supabase, emailProvider: provider }, "qa-batch"), []);
     assertEquals(provider.sent.length, 1);
     assertEquals(calls.filter((call) => call.fn === "pb_finalize_marketplace_reconcile_email" && call.args.p_outcome === "sent").length, 1);

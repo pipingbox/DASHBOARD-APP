@@ -3,7 +3,7 @@ import { resolveRecipientLanguage } from "./email-i18n/languages.ts";
 import { renderMarketplaceReconciliationEmail, type Requirement } from "./email-i18n/reconciliation.ts";
 import { createEmailProvider, type EmailProvider } from "./email-provider.ts";
 
-type OutboxRow = { user_id: string; batch_id: string; state: string };
+type OutboxRow = { user_id: string; batch_id: string; state: string; downgraded_count: number };
 
 type Dependencies = { supabase: SupabaseClient; emailProvider?: EmailProvider; appBaseUrl?: string };
 
@@ -11,7 +11,7 @@ export async function drainMarketplaceReconciliationEmails(deps: Dependencies, b
   const { supabase } = deps;
   const { data: rows, error } = await supabase
     .from("app_14da0f1941_marketplace_reconcile_emails")
-    .select("user_id, batch_id, state")
+    .select("user_id, batch_id, state, downgraded_count")
     .eq("batch_id", batchId)
     .in("state", ["pending", "failed", "claimed"])
     .order("created_at", { ascending: true })
@@ -68,6 +68,7 @@ export async function drainMarketplaceReconciliationEmails(deps: Dependencies, b
         lang: lang.lang,
         actionUrl: `${(deps.appBaseUrl ?? Deno.env.get("APP_BASE_URL") ?? "https://pipingbox.com").replace(/\/$/, "")}/profile`,
         missing,
+        applicationCount: row.downgraded_count,
         phoneMissing: !phoneError && phonePresent === false,
       });
       const { data: marked, error: markError } = await supabase.rpc("pb_mark_marketplace_reconcile_email_send", {
@@ -81,7 +82,7 @@ export async function drainMarketplaceReconciliationEmails(deps: Dependencies, b
         html: rendered.html,
         text: rendered.text,
         capture: { source: "marketplace-reconciliation-email", template: "marketplace_reconciliation",
-          lang: lang.lang, langSource: lang.source, meta: { batch_id: row.batch_id, missing } },
+          lang: lang.lang, langSource: lang.source, meta: { batch_id: row.batch_id, missing, downgraded_count: row.downgraded_count } },
       });
       const { data: finalized, error: finalizeError } = await supabase.rpc("pb_finalize_marketplace_reconcile_email", {
         p_user_id: row.user_id, p_claim_id: claimId, p_outcome: "sent", p_message_id: delivery.messageId ?? null,
