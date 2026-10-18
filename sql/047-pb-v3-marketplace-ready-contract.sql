@@ -193,7 +193,23 @@ ALTER TABLE public.app_14da0f1941_profiles
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 4. Sincronización canónica generalizada (promoción consent-gated por versión)
+--
+-- PB-RELEASE-002: esta redefinición PRESERVA el gate interno de sql/045. La
+-- tabla se reasegura aquí de forma idempotente para que el archivo sea
+-- auto-contenido dentro del orden obligatorio 045 → 047.
 -- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.pb_marketplace_sync_gate (
+  gate_key    text PRIMARY KEY,
+  gate_value  text NOT NULL,
+  updated_at  timestamptz NOT NULL DEFAULT now(),
+  updated_by  text
+);
+ALTER TABLE public.pb_marketplace_sync_gate ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.pb_marketplace_sync_gate FROM anon, authenticated;
+INSERT INTO public.pb_marketplace_sync_gate (gate_key, gate_value, updated_by)
+VALUES ('sync_mode', 'off', 'pb-release-002-seed')
+ON CONFLICT (gate_key) DO NOTHING;
+
 CREATE OR REPLACE FUNCTION public.pb_sync_marketplace_ready_state(
   p_user_id  uuid,
   p_batch_id text DEFAULT NULL
@@ -212,6 +228,15 @@ DECLARE
 BEGIN
   IF p_user_id IS NULL THEN
     RETURN QUERY SELECT 'missing_user_id'::text, NULL::boolean, 0;
+    RETURN;
+  END IF;
+
+  -- PB-RELEASE-002: gate interno (idéntico a sql/045). Con sync_mode <> 'on'
+  -- ningún actor promociona: trigger, wrapper, sweep ni Edge Functions
+  -- service_role. Sin locks ni efectos secundarios.
+  IF (SELECT gate_value FROM public.pb_marketplace_sync_gate
+       WHERE gate_key = 'sync_mode') IS DISTINCT FROM 'on' THEN
+    RETURN QUERY SELECT 'sync_gate_closed'::text, FALSE, 0;
     RETURN;
   END IF;
 
