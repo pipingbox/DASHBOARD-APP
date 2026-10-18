@@ -4513,6 +4513,9 @@
     "resultNotEligible": "Consimțământ înregistrat. Completează cerințele rămase pentru a activa Marketplace Ready.",
     "resultLegacy": "Profilul tău este protejat de condițiile anterioare. Nu s-au aplicat modificări.",
     "resultError": "Acceptarea nu a putut fi finalizată. Încearcă din nou.",
-    "completeProfileLink": "Completează-ți profilul"
+    "completeProfileLink": "Completează-ți profilul",
+    "contractVersion": "Versiunea contractului: {{version}} · Limba: {{lang}}",
+    "resultAccountType": "Această acțiune este disponibilă doar pentru conturile profesionale.",
+    "goDashboard": "Mergi la panoul tău"
   }
 }

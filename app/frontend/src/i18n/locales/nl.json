@@ -4506,6 +4506,9 @@
     "resultNotEligible": "Toestemming geregistreerd. Vul de ontbrekende vereisten aan om Marketplace Ready te activeren.",
     "resultLegacy": "Uw profiel is beschermd onder de vorige voorwaarden. Er zijn geen wijzigingen toegepast.",
     "resultError": "De acceptatie kon niet worden voltooid. Probeer het opnieuw.",
-    "completeProfileLink": "Vul uw profiel aan"
+    "completeProfileLink": "Vul uw profiel aan",
+    "contractVersion": "Contractversie: {{version}} · Taal: {{lang}}",
+    "resultAccountType": "Deze actie is alleen beschikbaar voor professionele accounts.",
+    "goDashboard": "Ga naar uw dashboard"
   }
 }

@@ -4520,6 +4520,9 @@
     "resultNotEligible": "Zgoda zapisana. Uzupełnij brakujące wymagania, aby aktywować Marketplace Ready.",
     "resultLegacy": "Twój profil jest chroniony wcześniejszymi warunkami. Nie wprowadzono zmian.",
     "resultError": "Nie udało się zakończyć akceptacji. Spróbuj ponownie.",
-    "completeProfileLink": "Uzupełnij swój profil"
+    "completeProfileLink": "Uzupełnij swój profil",
+    "contractVersion": "Wersja umowy: {{version}} · Język: {{lang}}",
+    "resultAccountType": "Ta czynność jest dostępna tylko dla kont zawodowych.",
+    "goDashboard": "Przejdź do panelu"
   }
 }

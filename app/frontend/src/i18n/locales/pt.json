@@ -4513,6 +4513,9 @@
     "resultNotEligible": "Consentimento registado. Complete os requisitos pendentes para ativar o Marketplace Ready.",
     "resultLegacy": "O seu perfil está protegido pelas condições anteriores. Não foram aplicadas alterações.",
     "resultError": "Não foi possível concluir a aceitação. Tente novamente.",
-    "completeProfileLink": "Complete o seu perfil"
+    "completeProfileLink": "Complete o seu perfil",
+    "contractVersion": "Versão do contrato: {{version}} · Idioma: {{lang}}",
+    "resultAccountType": "Esta ação está disponível apenas para contas profissionais.",
+    "goDashboard": "Ir para o seu painel"
   }
 }

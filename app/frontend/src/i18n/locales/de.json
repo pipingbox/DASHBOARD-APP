@@ -4506,6 +4506,9 @@
     "resultNotEligible": "Zustimmung gespeichert. Vervollständigen Sie die fehlenden Anforderungen, um Marketplace Ready zu aktivieren.",
     "resultLegacy": "Ihr Profil ist durch die vorherigen Bedingungen geschützt. Es wurden keine Änderungen vorgenommen.",
     "resultError": "Die Zustimmung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.",
-    "completeProfileLink": "Vervollständigen Sie Ihr Profil"
+    "completeProfileLink": "Vervollständigen Sie Ihr Profil",
+    "contractVersion": "Vertragsversion: {{version}} · Sprache: {{lang}}",
+    "resultAccountType": "Diese Aktion ist nur für professionelle Konten verfügbar.",
+    "goDashboard": "Zum Dashboard"
   }
 }

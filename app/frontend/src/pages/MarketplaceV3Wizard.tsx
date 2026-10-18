@@ -1,217 +1,279 @@
-/**
- * PR-V3-02 — PB-MARKETPLACE-V3-RECRUITMENT-001 / TRACK C
- * Wizard de aceptación del contrato Marketplace Ready v3.
- *
- * Contrato del componente:
- *   - Muestra los requisitos v3 (CV, profesión, ubicación, disponibilidad) con
- *     su estado, derivado de datos canónicos del perfil (nunca de flags
- *     editables por el usuario como marketplace_ready).
- *   - El consentimiento NUNCA está premarcado. Aceptar llama al RPC canónico
- *     pb_accept_marketplace_contract_v3 (actor = auth.uid() por diseño; sin
- *     parámetro de sujeto). La versión del texto es constante de servidor
- *     (v3-2026-10-17) — el cliente no envía wording.
- *   - Certificados: opcionales (informativo, no bloqueante).
- *   - Reintentos seguros: already_accepted se muestra como estado final
- *     idempotente, sin acciones destructivas.
- */
-
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Circle, Loader2, ShieldCheck } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { CheckCircle2, XCircle, Loader2, FileText, ShieldCheck } from 'lucide-react';
 
 type RequirementKey = 'cv' | 'profession' | 'location' | 'availability';
-type AcceptOutcome =
-  | 'promoted'
-  | 'not_eligible'
-  | 'already_accepted'
-  | 'already_ready'
-  | 'legacy_protected'
-  | 'consent_required'
-  | 'contract_version_required'
-  | 'consent_v3_required'
-  | 'error';
 
-interface AcceptRow {
-  out_status: AcceptOutcome;
-  out_marketplace_ready: boolean | null;
+interface CanonicalRequirements {
+  ok_cv: boolean;
+  ok_profession: boolean;
+  ok_location: boolean;
+  ok_availability: boolean;
+  ok_minimums: boolean;
+  already_ready: boolean;
+  consent_version: number | null;
+  account_type: string | null;
+  contract_lang: string;
+  text_version: string;
+  canonical_hash: string;
+  body_md: string;
+}
+
+interface AcceptResult {
+  out_status: string;
+  out_marketplace_ready: boolean;
   out_activated_count: number;
 }
 
-interface ProfileRequirements {
-  hasCv: boolean;
-  hasProfession: boolean;
-  hasLocation: boolean;
-  hasAvailability: boolean;
-  contractVersion: number | null;
-  consentVersion: number | null;
-  marketplaceReady: boolean;
-}
-
-const MarketplaceV3Wizard = () => {
-  const { t } = useTranslation();
+/**
+ * PR-V3-02 (ronda 3): wizard de aceptación del contrato Marketplace Ready v3.
+ *
+ * P1 ronda 3:
+ *  - Los requisitos se consumen del RPC canónico pb_marketplace_v3_requirements
+ *    (predicado de sql/047: exige objeto Storage REAL con owner correcto y
+ *    excluye availability 'not_specified'/'unknown'). El frontend NO duplica
+ *    las reglas SQL ni deriva nada de columnas editables.
+ *  - El texto contractual mostrado es la versión PRESERVADA en backend
+ *    (pb_marketplace_contract_texts, con hash SHA-256). La versión que se
+ *    muestra es exactamente la que registra la aceptación.
+ *  - La restricción por tipo de cuenta vive en el RPC (account_type=worker);
+ *    este componente solo refleja el resultado (account_type_not_allowed).
+ */
+export default function MarketplaceV3Wizard() {
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const { user } = useAuth();
+
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
+  const [canonical, setCanonical] = useState<CanonicalRequirements | null>(null);
   const [consentChecked, setConsentChecked] = useState(false);
-  const [outcome, setOutcome] = useState<AcceptOutcome | null>(null);
-  const [reqs, setReqs] = useState<ProfileRequirements | null>(null);
+  const [result, setResult] = useState<AcceptResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const loadRequirements = useCallback(async () => {
-    if (!user?.id) return;
-    setLoading(true);
-    try {
-      const { data: profile } = await supabase
-        .from('app_14da0f1941_profiles')
-        .select(
-          'title, location, availability_status, cv_storage_path, marketplace_ready, marketplace_contract_version, marketplace_consent_version',
-        )
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      setReqs({
-        hasCv: !!profile?.cv_storage_path?.trim(),
-        hasProfession: !!profile?.title?.trim(),
-        hasLocation: !!profile?.location?.trim(),
-        hasAvailability: !!profile?.availability_status?.trim(),
-        contractVersion: profile?.marketplace_contract_version ?? null,
-        consentVersion: profile?.marketplace_consent_version ?? null,
-        marketplaceReady: profile?.marketplace_ready === true,
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.id]);
+  const lang = (i18n.language || 'es').split('-')[0];
 
   useEffect(() => {
-    void loadRequirements();
-  }, [loadRequirements]);
-
-  const requirements = useMemo(() => {
-    if (!reqs) return [];
-    const list: { key: RequirementKey; met: boolean }[] = [
-      { key: 'cv', met: reqs.hasCv },
-      { key: 'profession', met: reqs.hasProfession },
-      { key: 'location', met: reqs.hasLocation },
-      { key: 'availability', met: reqs.hasAvailability },
-    ];
-    return list;
-  }, [reqs]);
-
-  const alreadyAccepted =
-    (reqs?.contractVersion === 3 && reqs?.consentVersion === 3) ||
-    outcome === 'already_accepted';
+    let mounted = true;
+    async function load() {
+      try {
+        const { data, error: rpcError } = await supabase.rpc('pb_marketplace_v3_requirements', {
+          p_lang: lang,
+        });
+        if (rpcError) throw rpcError;
+        const row = (data as CanonicalRequirements[] | null)?.[0] ?? null;
+        if (mounted) setCanonical(row);
+      } catch (e) {
+        if (mounted) setError((e as Error).message);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+    if (user) load();
+    return () => {
+      mounted = false;
+    };
+  }, [user, lang]);
 
   const handleAccept = async () => {
-    if (!consentChecked || accepting) return;
+    if (!consentChecked || !user) return;
     setAccepting(true);
+    setError(null);
     try {
-      const { data, error } = await supabase.rpc('pb_accept_marketplace_contract_v3');
-      if (error) {
-        setOutcome('error');
-        return;
-      }
-      const row: AcceptRow | undefined = Array.isArray(data) ? data[0] : data;
-      setOutcome((row?.out_status as AcceptOutcome) ?? 'error');
-      await loadRequirements();
+      const { data, error: rpcError } = await supabase.rpc('pb_accept_marketplace_contract_v3', {
+        p_lang: canonical?.contract_lang ?? lang,
+      });
+      if (rpcError) throw rpcError;
+      const row = (data as AcceptResult[] | null)?.[0] ?? null;
+      setResult(row);
+    } catch (e) {
+      setError((e as Error).message);
     } finally {
       setAccepting(false);
     }
   };
 
-  const readyNow =
-    reqs?.marketplaceReady === true || outcome === 'promoted' || outcome === 'already_ready';
+  if (!user) return null;
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[#E8611A]" />
+      </div>
+    );
+  }
+
+  const requirements: { key: RequirementKey; ok: boolean }[] = canonical
+    ? [
+        { key: 'cv', ok: canonical.ok_cv },
+        { key: 'profession', ok: canonical.ok_profession },
+        { key: 'location', ok: canonical.ok_location },
+        { key: 'availability', ok: canonical.ok_availability },
+      ]
+    : [];
+
+  const allMet = canonical?.ok_minimums ?? false;
+  const alreadyConsented = canonical?.consent_version === 3;
+  // P1 ronda 3 (5-8): la restricción por tipo de cuenta vive en el RPC de
+  // aceptación; el wizard la refleja DE ENTRADA (sin invitar a una empresa a
+  // aceptar condiciones de candidato). Nunca se convierte una cuenta
+  // empresarial en candidata Marketplace Ready.
+  const accountBlocked = canonical != null && canonical.account_type !== 'worker';
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-2xl">
+            <ShieldCheck className="h-6 w-6 text-[#E8611A]" />
             {t('marketplaceV3.title')}
           </CardTitle>
           <CardDescription>{t('marketplaceV3.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {loading ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {t('common.loading')}
-            </div>
+          {error && (
+            <Alert variant="destructive">
+              <XCircle className="h-4 w-4" />
+              <AlertTitle>{t('marketplaceV3.resultError')}</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {result ? (
+            <ResultView result={result} />
+          ) : accountBlocked ? (
+            <Alert variant="destructive">
+              <ShieldCheck className="h-4 w-4" />
+              <AlertTitle>{t('marketplaceV3.resultAccountType')}</AlertTitle>
+            </Alert>
           ) : (
             <>
-              <section className="space-y-2">
-                <h3 className="text-sm font-medium">{t('marketplaceV3.requirementsTitle')}</h3>
-                <ul className="space-y-1.5">
+              {/* Requisitos canónicos (resultado backend, no derivado en cliente) */}
+              <div>
+                <h3 className="mb-3 font-semibold">{t('marketplaceV3.requirementsTitle')}</h3>
+                <ul className="space-y-2">
                   {requirements.map((req) => (
                     <li key={req.key} className="flex items-center gap-2 text-sm">
-                      {req.met ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      {req.ok ? (
+                        <CheckCircle2 className="h-5 w-5 text-green-600" />
                       ) : (
-                        <Circle className="h-4 w-4 text-muted-foreground" />
+                        <XCircle className="h-5 w-5 text-muted-foreground" />
                       )}
-                      <span className={req.met ? '' : 'text-muted-foreground'}>
+                      <span className={req.ok ? '' : 'text-muted-foreground'}>
                         {t(`marketplaceV3.requirements.${req.key}`)}
                       </span>
                     </li>
                   ))}
                 </ul>
-                <p className="text-xs text-muted-foreground">
+                <p className="mt-3 text-sm text-muted-foreground">
                   {t('marketplaceV3.certificatesOptional')}
                 </p>
-              </section>
+              </div>
 
-              <section className="space-y-3 rounded-md border p-4">
-                <p className="text-sm">{t('marketplaceV3.consentText')}</p>
-                <label className="flex items-start gap-2 text-sm">
-                  <Checkbox
-                    checked={consentChecked}
-                    onCheckedChange={(v) => setConsentChecked(v === true)}
-                    disabled={alreadyAccepted || accepting}
-                  />
-                  <span>{t('marketplaceV3.consentCheckbox')}</span>
-                </label>
-              </section>
+              {/* Texto contractual preservado (versión que realmente se acepta) */}
+              <div className="rounded-md border bg-muted/40 p-4">
+                <div className="mb-2 flex items-center gap-2 text-sm font-medium">
+                  <FileText className="h-4 w-4 text-[#E8611A]" />
+                  {t('marketplaceV3.consentText')}
+                </div>
+                {canonical?.body_md && (
+                  <div className="max-h-64 overflow-y-auto whitespace-pre-wrap rounded bg-background p-3 text-sm leading-relaxed">
+                    {canonical.body_md}
+                  </div>
+                )}
+                {canonical && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {t('marketplaceV3.contractVersion', {
+                      version: canonical.text_version,
+                      lang: canonical.contract_lang,
+                    })}
+                  </p>
+                )}
+              </div>
 
-              {readyNow ? (
-                <p className="text-sm font-medium text-green-700">
-                  {t('marketplaceV3.resultReady')}
-                </p>
-              ) : outcome === 'not_eligible' ? (
-                <p className="text-sm text-muted-foreground">
-                  {t('marketplaceV3.resultNotEligible')}
-                </p>
-              ) : outcome === 'legacy_protected' ? (
-                <p className="text-sm text-muted-foreground">
-                  {t('marketplaceV3.resultLegacy')}
-                </p>
-              ) : outcome === 'error' ? (
-                <p className="text-sm text-destructive">{t('marketplaceV3.resultError')}</p>
-              ) : null}
+              {/* Consentimiento: nunca premarcado; deshabilitado si ya consintió */}
+              <label className="flex cursor-pointer items-start gap-3">
+                <Checkbox
+                  checked={consentChecked}
+                  onCheckedChange={(v) => setConsentChecked(v === true)}
+                  disabled={alreadyConsented}
+                  aria-label={t('marketplaceV3.consentCheckbox')}
+                />
+                <span className="text-sm leading-snug">{t('marketplaceV3.consentCheckbox')}</span>
+              </label>
 
-              {!alreadyAccepted && !readyNow && (
-                <Button onClick={handleAccept} disabled={!consentChecked || accepting}>
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={handleAccept}
+                  disabled={!consentChecked || accepting || alreadyConsented}
+                  className="bg-[#E8611A] hover:bg-[#c94f12]"
+                >
                   {accepting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {t('marketplaceV3.acceptCta')}
                 </Button>
-              )}
-
-              <p className="text-xs text-muted-foreground">
-                <Link to="/profile" className="underline">
-                  {t('marketplaceV3.completeProfileLink')}
-                </Link>
-              </p>
+                {!allMet && (
+                  <Button variant="outline" onClick={() => navigate('/profile')}>
+                    {t('marketplaceV3.completeProfileLink')}
+                  </Button>
+                )}
+              </div>
             </>
           )}
         </CardContent>
       </Card>
     </div>
   );
-};
+}
 
-export default MarketplaceV3Wizard;
+function ResultView({ result }: { result: AcceptResult }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const status = result.out_status;
+  const isReady = result.out_marketplace_ready === true;
+
+  let title: string;
+  let tone: 'success' | 'info' | 'warn';
+  if (isReady || status === 'promoted' || status === 'already_ready') {
+    title = t('marketplaceV3.resultReady');
+    tone = 'success';
+  } else if (status === 'legacy_protected') {
+    title = t('marketplaceV3.resultLegacy');
+    tone = 'info';
+  } else if (status === 'account_type_not_allowed') {
+    title = t('marketplaceV3.resultAccountType');
+    tone = 'warn';
+  } else {
+    title = t('marketplaceV3.resultNotEligible');
+    tone = 'info';
+  }
+
+  return (
+    <Alert variant={tone === 'warn' ? 'destructive' : 'default'}>
+      {tone === 'success' ? (
+        <CheckCircle2 className="h-4 w-4 text-green-600" />
+      ) : (
+        <ShieldCheck className="h-4 w-4" />
+      )}
+      <AlertTitle>{title}</AlertTitle>
+      <AlertDescription className="mt-2">
+        {status === 'account_type_not_allowed' ? null : (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(isReady ? '/dashboard' : '/profile')}
+          >
+            {isReady ? t('marketplaceV3.goDashboard') : t('marketplaceV3.completeProfileLink')}
+          </Button>
+        )}
+      </AlertDescription>
+    </Alert>
+  );
+}
