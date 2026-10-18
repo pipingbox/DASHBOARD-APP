@@ -69,9 +69,16 @@ PASS). `service_role` no se ve afectado.
 
 Para `authenticated`, INSERT y UPDATE exigen simultáneamente:
 1. `bucket_id` correcto;
-2. `owner_id = auth.uid()` (columna canónica; `owner` está deprecado y no se
-   usa en las nuevas policies);
+2. `owner_id = auth.uid()::text` (columna canónica; `owner` está deprecado
+   y no se usa en las nuevas policies). NOTA de tipos verificada en el
+   proyecto: `storage.objects.owner` es uuid, `storage.objects.owner_id` es
+   text — de ahí el cast `::text`;
 3. `(storage.foldername(name))[1] = auth.uid()::text` (carpeta propia).
+
+El API de Storage establece `owner` y `owner_id` desde el `sub` del JWT en
+upload y copy de usuario (verificado en QA a nivel de fila); con
+service_role (sin `sub`) quedan NULL, pero service_role hace bypass de RLS
+y no se ve afectado.
 
 UPDATE con USING y WITH CHECK idénticos: impide actualizar objetos ajenos y
 mover/renombrar objetos propios a carpetas ajenas (el move/copy interno del
@@ -161,10 +168,77 @@ COMMIT;
 Nota: el rollback reintroduce el defecto P2 documentado; usar solo ante
 regresión funcional bloqueante y con GO del PO.
 
-## 7. Resultados QA
+## 7. Resultados QA (ejecutados 2026-10-18 sobre la branch aislada)
 
-(pendiente de ejecución sobre la branch aislada — se completa antes del
-merge)
+Entorno: database branch efímera `pb-storage-path-ownership-qa`
+(ref `zyfylkkzybnadgzrjlgs`, sin datos reales ni PII) del proyecto
+`mwdauubztjxkbrefirbg`. Estado ANTES recreado exactamente desde el snapshot
+§2 (16 policies de los 2 buckets + buckets). sql/053 aplicado después.
+
+### Fase BEFORE (reproducción del defecto, 4/4)
+
+- upload propio ALLOWED;
+- **B crea objeto en carpeta de A: ALLOWED en certificates** (defecto
+  presente);
+- **B crea objeto en carpeta de A: ALLOWED en worker-documents** (defecto
+  presente).
+
+La branch replica fielmente el defecto de producción.
+
+### Fase AFTER (matriz completa, todas PASS)
+
+| # | Caso | Resultado | Evidencia |
+|---|---|---|---|
+| 1 | upload propio (certs + worker-docs) | ALLOWED | 200 |
+| 2 | read/list/sign/update(PUT) propio | ALLOWED | 200; list devuelve nombre relativo al prefix |
+| 3 | INSERT nuevo en carpeta ajena (certs) | **DENIED** | 403 "new row violates row-level security policy" |
+| 3b | INSERT nuevo en carpeta ajena (worker-docs) | **DENIED** | 403 RLS |
+| 4 | upsert de objeto existente ajeno (ambos buckets) | **DENIED** | 403 RLS |
+| 5 | move hacia carpeta ajena | **DENIED** | 403 RLS |
+| 5b | copy hacia carpeta ajena | **DENIED** | 403 RLS (route `POST /object/copy`, body `{bucketId, sourceKey, destinationKey}`) |
+| 5c | move propio dentro de carpeta propia | ALLOWED | 200 + objeto legible por el owner |
+| 5d | copy propio dentro de carpeta propia | ALLOWED | 200; fila resultante con owner=owner_id=auth.uid() |
+| 6 | read/list/sign/delete cross-user | **DENIED** | 403/404/0 items; objeto intacto tras delete de B |
+| 7 | anon (read/list/upload) | **DENIED** | 403/404/0 items |
+| 8 | service_role (upload/read/delete) | ALLOWED | 200/200/200; borrado verificado en BD |
+| 9 | flujo CV: upload CV a carpeta propia + signed URL 200 | PASS | 200 |
+| 10 | flujo certificados: upload + signed URL 200 | PASS | 200 |
+| 10b | flujo worker-documents: upload + signed URL 200 | PASS | 200 |
+| 11 | cero residuos DB/Storage | PASS | SQL: 0 filas con id en ambos buckets; usuarios sintéticos eliminados |
+
+Notas de evidencia:
+- Todas las denegaciones críticas (3/3b/4/5/5b) devuelven 403 con mensaje
+  explícito "new row violates row-level security policy" (RLS, no error de
+  validación).
+- B intentando copiar el objeto de A recibe 404 (no ve el origen): no hay
+  vector de copy cross-user.
+- Los objetos subidos por service_role quedan con owner/owner_id NULL (sin
+  `sub` en el JWT) — irrelevante para RLS (bypass) y coherente con
+  producción (los 202+48 objetos existentes los subieron usuarios).
+- scoping: la extracción (cv-extract/cert-apply-draft) se ejecuta con
+  service_role (bypass RLS, sin cambio con esta migración); la superficie
+  de storage de usuario del flujo (upload/read/sign/delete en carpeta
+  propia) queda íntegramente cubierta por la matriz.
+
+### Advisors (ejecutados sobre mwdauubztjxkbrefirbg, 2026-10-18)
+
+- Buckets: `app_14da0f1941_certificates`, `worker-documents` y
+  `feedback-screenshots` privados; `app_14da0f1941_avatars` público por
+  diseño (avatares públicos con policy de carpeta por uid). Sin hallazgos
+  de advisor aplicables a esta migración.
+- Observaciones preexistentes fuera de alcance (no tocadas):
+  advisor "RLS enabled sin policies" sobre
+  `app_14da0f1941_job_application_notifications` y advisor de funciones
+  SECURITY DEFINER ejecutables por authenticated. Se registran como
+  observaciones; requieren análisis separado.
+
+### Regresión
+
+- Specs RLS de tablas de aplicación (cert+CV 8/8 PASS reales, 0 skips,
+  2026-10-18 sobre producción): sin cambio — sql/053 no toca policies de
+  tablas de aplicación.
+- Producción no se modifica en este PR (QA y prod comparten proyecto;
+  aplicar 053 requiere GO explícito del PO; ver §8).
 
 ## 8. Despliegue y aplicación
 

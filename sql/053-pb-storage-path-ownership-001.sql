@@ -74,7 +74,7 @@ CREATE POLICY certificates_authenticated_insert ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (
     bucket_id = 'app_14da0f1941_certificates'
-    AND owner_id = auth.uid()
+    AND owner_id = auth.uid()::text
     AND (storage.foldername(name))[1] = auth.uid()::text
   );
 
@@ -88,12 +88,12 @@ CREATE POLICY certificates_authenticated_update ON storage.objects
   FOR UPDATE TO authenticated
   USING (
     bucket_id = 'app_14da0f1941_certificates'
-    AND owner_id = auth.uid()
+    AND owner_id = auth.uid()::text
     AND (storage.foldername(name))[1] = auth.uid()::text
   )
   WITH CHECK (
     bucket_id = 'app_14da0f1941_certificates'
-    AND owner_id = auth.uid()
+    AND owner_id = auth.uid()::text
     AND (storage.foldername(name))[1] = auth.uid()::text
   );
 
@@ -106,7 +106,7 @@ CREATE POLICY worker_documents_authenticated_insert ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (
     bucket_id = 'worker-documents'
-    AND owner_id = auth.uid()
+    AND owner_id = auth.uid()::text
     AND (storage.foldername(name))[1] = auth.uid()::text
   );
 
@@ -114,12 +114,12 @@ CREATE POLICY worker_documents_authenticated_update ON storage.objects
   FOR UPDATE TO authenticated
   USING (
     bucket_id = 'worker-documents'
-    AND owner_id = auth.uid()
+    AND owner_id = auth.uid()::text
     AND (storage.foldername(name))[1] = auth.uid()::text
   )
   WITH CHECK (
     bucket_id = 'worker-documents'
-    AND owner_id = auth.uid()
+    AND owner_id = auth.uid()::text
     AND (storage.foldername(name))[1] = auth.uid()::text
   );
 
