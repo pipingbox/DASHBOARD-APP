@@ -28,6 +28,13 @@
 //     metadata via a backend-only RPC) and a neutral filename with the real
 //     extension instead of a forced .pdf.
 //
+// PB-SEC-01c (PO RELEASE DECISION 002): operational kill-switch.
+//   Setting SECURE_FILE_ACCESS_FAILSAFE=1 makes the broker fail-closed for
+//   every non-owner, non-admin actor (companies included), while preserving
+//   legitimate owner access, admin recovery and the append-only audit trail.
+//   This is the safe contingency path: the previous vulnerable version of
+//   this function is NEVER redeployed as a rollback.
+//
 // Security:
 //   - Authenticates the caller via JWT (no anon access).
 //   - Owner always has access to their own files.
@@ -226,6 +233,16 @@ Deno.serve(async (req) => {
   // Fall-closed: only owner, privileged or company may proceed.
   if (!isOwner && !isPrivileged && !isCompany) {
     return deny("role_not_allowed", 403, "Access denied");
+  }
+
+  // PB-SEC-01c: operational kill-switch (safe rollback contingency). With the
+  // failsafe armed, every non-owner, non-privileged actor is denied BEFORE
+  // any file resolution. Owner and admin access stay available so the
+  // candidate keeps legitimate access to their own files and authorized
+  // documents remain recoverable in a controlled way. The denial is audited
+  // like any other decision; the audit table is never dropped.
+  if (!isOwner && !isPrivileged && Deno.env.get("SECURE_FILE_ACCESS_FAILSAFE") === "1") {
+    return deny("broker_failsafe_active", 403, "broker_failsafe_active");
   }
 
   // PB-SEC-01: companies never receive the original CV during search and
