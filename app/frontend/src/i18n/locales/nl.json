@@ -4509,6 +4509,8 @@
     "completeProfileLink": "Vul uw profiel aan",
     "contractVersion": "Contractversie: {{version}} · Taal: {{lang}}",
     "resultAccountType": "Deze actie is alleen beschikbaar voor professionele accounts.",
-    "goDashboard": "Ga naar uw dashboard"
+    "goDashboard": "Ga naar uw dashboard",
+    "contractNotActive": "Voorwaarden nog niet actief",
+    "contractNotActiveBody": "De Marketplace v3-voorwaarden worden juridisch beoordeeld en zijn nog niet geactiveerd. Zodra ze beschikbaar zijn, kunt u ze hier accepteren."
   }
 }

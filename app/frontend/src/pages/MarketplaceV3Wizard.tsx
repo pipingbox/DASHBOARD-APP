@@ -20,6 +20,10 @@ interface CanonicalRequirements {
   already_ready: boolean;
   consent_version: number | null;
   account_type: string | null;
+  role: string | null;
+  account_allowed: boolean;
+  acceptance_open: boolean;
+  text_status: string | null;
   contract_lang: string;
   text_version: string;
   canonical_hash: string;
@@ -33,7 +37,7 @@ interface AcceptResult {
 }
 
 /**
- * PR-V3-02 (ronda 3): wizard de aceptación del contrato Marketplace Ready v3.
+ * PR-V3-02 (rondas 3-4): wizard de aceptación del contrato Marketplace Ready v3.
  *
  * P1 ronda 3:
  *  - Los requisitos se consumen del RPC canónico pb_marketplace_v3_requirements
@@ -125,7 +129,18 @@ export default function MarketplaceV3Wizard() {
   // aceptación; el wizard la refleja DE ENTRADA (sin invitar a una empresa a
   // aceptar condiciones de candidato). Nunca se convierte una cuenta
   // empresarial en candidata Marketplace Ready.
-  const accountBlocked = canonical != null && canonical.account_type !== 'worker';
+  // P1 ronda 4: política canónica de cuenta (account_type Y role) calculada
+  // en backend; el wizard solo refleja el resultado.
+  const accountBlocked = canonical != null && canonical.account_allowed === false;
+  // P1 ronda 4: gate jurídica fail-closed. Con el contrato en DRAFT o la
+  // activación técnica cerrada (acceptance_open=false) no se ofrece el acto
+  // de aceptación: ningún texto no aprobado genera consentimientos.
+  const contractBlocked =
+    canonical != null &&
+    !accountBlocked &&
+    !canonical.already_ready &&
+    canonical.consent_version !== 3 &&
+    canonical.acceptance_open === false;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
@@ -152,6 +167,12 @@ export default function MarketplaceV3Wizard() {
             <Alert variant="destructive">
               <ShieldCheck className="h-4 w-4" />
               <AlertTitle>{t('marketplaceV3.resultAccountType')}</AlertTitle>
+            </Alert>
+          ) : contractBlocked ? (
+            <Alert>
+              <FileText className="h-4 w-4" />
+              <AlertTitle>{t('marketplaceV3.contractNotActive')}</AlertTitle>
+              <AlertDescription>{t('marketplaceV3.contractNotActiveBody')}</AlertDescription>
             </Alert>
           ) : (
             <>
@@ -250,6 +271,9 @@ function ResultView({ result }: { result: AcceptResult }) {
   } else if (status === 'account_type_not_allowed') {
     title = t('marketplaceV3.resultAccountType');
     tone = 'warn';
+  } else if (status === 'contract_not_active') {
+    title = t('marketplaceV3.contractNotActive');
+    tone = 'warn';
   } else {
     title = t('marketplaceV3.resultNotEligible');
     tone = 'info';
@@ -264,7 +288,7 @@ function ResultView({ result }: { result: AcceptResult }) {
       )}
       <AlertTitle>{title}</AlertTitle>
       <AlertDescription className="mt-2">
-        {status === 'account_type_not_allowed' ? null : (
+        {status === 'account_type_not_allowed' || status === 'contract_not_active' ? null : (
           <Button
             variant="outline"
             size="sm"

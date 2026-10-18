@@ -4516,6 +4516,8 @@
     "completeProfileLink": "Completa tu perfil",
     "contractVersion": "Versión del contrato: {{version}} · Idioma: {{lang}}",
     "resultAccountType": "Esta acción solo está disponible para cuentas profesionales.",
-    "goDashboard": "Ir a tu panel"
+    "goDashboard": "Ir a tu panel",
+    "contractNotActive": "Condiciones todavía no activas",
+    "contractNotActiveBody": "Las condiciones del Marketplace v3 están en revisión jurídica y todavía no están activadas. Cuando estén disponibles podrás aceptarlas desde aquí."
   }
 }

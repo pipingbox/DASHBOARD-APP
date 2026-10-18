@@ -4523,6 +4523,8 @@
     "completeProfileLink": "Uzupełnij swój profil",
     "contractVersion": "Wersja umowy: {{version}} · Język: {{lang}}",
     "resultAccountType": "Ta czynność jest dostępna tylko dla kont zawodowych.",
-    "goDashboard": "Przejdź do panelu"
+    "goDashboard": "Przejdź do panelu",
+    "contractNotActive": "Warunki jeszcze nieaktywne",
+    "contractNotActiveBody": "Warunki Marketplace v3 są w trakcie przeglądu prawnego i nie są jeszcze aktywowane. Gdy będą dostępne, będziesz mógł je tutaj zaakceptować."
   }
 }

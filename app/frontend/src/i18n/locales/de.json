@@ -4509,6 +4509,8 @@
     "completeProfileLink": "Vervollständigen Sie Ihr Profil",
     "contractVersion": "Vertragsversion: {{version}} · Sprache: {{lang}}",
     "resultAccountType": "Diese Aktion ist nur für professionelle Konten verfügbar.",
-    "goDashboard": "Zum Dashboard"
+    "goDashboard": "Zum Dashboard",
+    "contractNotActive": "Bedingungen noch nicht aktiv",
+    "contractNotActiveBody": "Die Marketplace-v3-Bedingungen befinden sich in rechtlicher Prüfung und sind noch nicht aktiviert. Sobald sie verfügbar sind, können Sie sie hier annehmen."
   }
 }

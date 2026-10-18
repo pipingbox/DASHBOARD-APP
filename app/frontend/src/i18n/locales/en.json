@@ -4509,6 +4509,8 @@
     "completeProfileLink": "Complete your profile",
     "contractVersion": "Contract version: {{version}} · Language: {{lang}}",
     "resultAccountType": "This action is only available for professional accounts.",
-    "goDashboard": "Go to your dashboard"
+    "goDashboard": "Go to your dashboard",
+    "contractNotActive": "Terms not yet active",
+    "contractNotActiveBody": "The Marketplace v3 terms are under legal review and are not activated yet. You will be able to accept them here once available."
   }
 }

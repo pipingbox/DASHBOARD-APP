@@ -4523,6 +4523,8 @@
     "completeProfileLink": "Заповніть свій профіль",
     "contractVersion": "Версія договору: {{version}} · Мова: {{lang}}",
     "resultAccountType": "Ця дія доступна лише для професійних акаунтів.",
-    "goDashboard": "До вашої панелі"
+    "goDashboard": "До вашої панелі",
+    "contractNotActive": "Умови ще не активні",
+    "contractNotActiveBody": "Умови Marketplace v3 перебувають на юридичній перевірці і ще не активовані. Ви зможете прийняти їх тут, коли вони стануть доступними."
   }
 }

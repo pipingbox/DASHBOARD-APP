@@ -4509,6 +4509,8 @@
     "completeProfileLink": "Попълнете профила си",
     "contractVersion": "Версия на договора: {{version}} · Език: {{lang}}",
     "resultAccountType": "Това действие е достъпно само за професионални акаунти.",
-    "goDashboard": "Към вашето табло"
+    "goDashboard": "Към вашето табло",
+    "contractNotActive": "Условията все още не са активни",
+    "contractNotActiveBody": "Условията на Marketplace v3 са в правна проверка и все още не са активирани. Ще можете да ги приемете тук, когато станат достъпни."
   }
 }

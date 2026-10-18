@@ -4516,6 +4516,8 @@
     "completeProfileLink": "Completează-ți profilul",
     "contractVersion": "Versiunea contractului: {{version}} · Limba: {{lang}}",
     "resultAccountType": "Această acțiune este disponibilă doar pentru conturile profesionale.",
-    "goDashboard": "Mergi la panoul tău"
+    "goDashboard": "Mergi la panoul tău",
+    "contractNotActive": "Condițiile nu sunt încă active",
+    "contractNotActiveBody": "Condițiile Marketplace v3 sunt în curs de revizuire juridică și nu sunt încă activate. Le vei putea accepta aici când vor fi disponibile."
   }
 }
