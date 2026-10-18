@@ -1080,18 +1080,38 @@ test.describe('secure-file-access broker', () => {
 
   test('PB-SEC-01b: proxied JPEG keeps its real MIME and extension (no forced .pdf)', async () => {
     const client = await signIn(COMPANY_AUTH_EMAIL!, COMPANY_AUTH_PASSWORD!);
-    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
-      body: {
+    const token = (await client.supabase.auth.getSession()).data.session?.access_token;
+    expect(token, 'authorized company session token').toBeTruthy();
+
+    // Direct HTTP call: functions.invoke coerces image/jpeg to TEXT via its
+    // content-type heuristic (only octet-stream/pdf become Blobs), which would
+    // corrupt binary proxy deliveries in the assertion layer. The broker
+    // contract is HTTP-level: real content type + real extension + raw bytes.
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/secure-file-access`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_ANON_KEY!,
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         owner_user_id: fixture.workerId,
         file_type: 'document',
         record_id: fixture.jpgDocumentId,
-      },
+      }),
     });
 
-    await assertBrokerProxiedFile('authorized company JPEG document', data, error);
-    const blob = data as Blob;
-    expect(blob.type, 'proxy must carry the real content type').toBe('image/jpeg');
-    const head = new Uint8Array(await blob.slice(0, 2).arrayBuffer());
+    expect(response.status, 'authorized company JPEG document must be proxied').toBe(200);
+    expect(
+      response.headers.get('content-type'),
+      'proxy must carry the real content type',
+    ).toContain('image/jpeg');
+    expect(
+      response.headers.get('content-disposition') ?? '',
+      'neutral filename must keep the real extension (no forced .pdf)',
+    ).toMatch(/pipingbox-document\.jpe?g/);
+    const head = new Uint8Array(await response.arrayBuffer());
+    expect(head.byteLength, 'proxied JPEG must not be empty').toBeGreaterThan(2);
     expect(head[0], 'JPEG SOI marker').toBe(0xff);
     expect(head[1], 'JPEG SOI marker').toBe(0xd8);
     await client.supabase.auth.signOut();
