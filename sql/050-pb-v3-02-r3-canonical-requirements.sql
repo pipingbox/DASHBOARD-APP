@@ -9,7 +9,7 @@
 --      muestra es la versión que se registra: el RPC de aceptación valida
 --      que el idioma solicitado existe y toma la versión/canonical_hash de
 --      ESTA tabla (no de una constante suelta). BORRADOR no jurídico:
---      is_legal_final=false hasta revisión del abogado y GO PO.
+--      borrador hasta revisión del abogado y GO PO (ciclo de vida status, sql/051).
 --   2. pb_marketplace_v3_requirements(p_lang) — RPC canónico PÚBLICO para el
 --      wizard: devuelve el resultado del predicado canónico v3 (que ya exige
 --      objeto Storage real con owner correcto y excluye availability
@@ -42,13 +42,12 @@ CREATE TABLE IF NOT EXISTS public.pb_marketplace_contract_texts (
   text_version     text    NOT NULL,
   body_md          text    NOT NULL,
   canonical_hash   text    NOT NULL,
-  is_legal_final   boolean NOT NULL DEFAULT false,
   created_at       timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (contract_version, lang)
 );
 
 COMMENT ON TABLE public.pb_marketplace_contract_texts IS
-  'PR-V3-02 ronda 3: versiones preservadas del texto del contrato marketplace por idioma. canonical_hash = SHA-256 del body; la versión mostrada es la versión registrada. is_legal_final=false hasta revisión del abogado y GO PO (borrador, sin activación comercial).';
+  'PR-V3-02 ronda 3: versiones preservadas del texto del contrato marketplace por idioma. canonical_hash = SHA-256 del body; la versión mostrada es la versión registrada. Estado jurídico gestionado por el ciclo de vida status (sql/051): draft hasta revisión del abogado y GO PO (borrador, sin activación comercial).';
 
 ALTER TABLE public.pb_marketplace_contract_texts ENABLE ROW LEVEL SECURITY;
 
@@ -71,8 +70,12 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- resto de locales registran su propia versión (misma text_version v3) con su
 -- traducción. El wizard muestra el texto del idioma resuelto del usuario y
 -- registra exactamente esa versión.
-INSERT INTO public.pb_marketplace_contract_texts (contract_version, lang, text_version, body_md, canonical_hash, is_legal_final)
-SELECT 3, l.lang, 'v3-2026-10-17', l.body, encode(digest(l.body, 'sha256'), 'hex'), false
+-- Inmutable (ronda 5): el seed NUNCA sobrescribe un texto ya versionado.
+-- is_legal_final fue retirada del modelo (sql/051 la sustituye por el ciclo
+-- de vida status); este INSERT no la referencia para que la migración sea
+-- reejecutable tanto antes como después de 051.
+INSERT INTO public.pb_marketplace_contract_texts (contract_version, lang, text_version, body_md, canonical_hash)
+SELECT 3, l.lang, 'v3-2026-10-17', l.body, encode(digest(l.body, 'sha256'), 'hex')
 FROM (VALUES
   ('es', '# Condiciones del Marketplace PIPINGBOX (v3 — BORRADOR)
 
