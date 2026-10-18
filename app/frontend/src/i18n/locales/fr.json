@@ -4518,6 +4518,9 @@
     "resultAccountType": "Cette action est réservée aux comptes professionnels.",
     "goDashboard": "Aller à votre tableau de bord",
     "contractNotActive": "Conditions pas encore actives",
-    "contractNotActiveBody": "Les conditions du Marketplace v3 sont en cours de révision juridique et ne sont pas encore activées. Vous pourrez les accepter ici dès qu'elles seront disponibles."
+    "contractNotActiveBody": "Les conditions du Marketplace v3 sont en cours de révision juridique et ne sont pas encore activées. Vous pourrez les accepter ici dès qu'elles seront disponibles.",
+    "contractChanged": "Les conditions ont changé",
+    "contractChangedBody": "Les conditions du Marketplace ont été mises à jour pendant que vous les consultiez. Par sécurité, aucune acceptation n'a été enregistrée. Veuillez relire la version actuelle avant d'accepter.",
+    "reviewAgainCta": "Relire la version actuelle"
   }
 }

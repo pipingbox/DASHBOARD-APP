@@ -4518,6 +4518,9 @@
     "resultAccountType": "Această acțiune este disponibilă doar pentru conturile profesionale.",
     "goDashboard": "Mergi la panoul tău",
     "contractNotActive": "Condițiile nu sunt încă active",
-    "contractNotActiveBody": "Condițiile Marketplace v3 sunt în curs de revizuire juridică și nu sunt încă activate. Le vei putea accepta aici când vor fi disponibile."
+    "contractNotActiveBody": "Condițiile Marketplace v3 sunt în curs de revizuire juridică și nu sunt încă activate. Le vei putea accepta aici când vor fi disponibile.",
+    "contractChanged": "Condițiile s-au schimbat",
+    "contractChangedBody": "Condițiile Marketplace au fost actualizate în timp ce le analizai. Din motive de securitate, nu a fost înregistrată nicio acceptare. Te rugăm să revezi versiunea actuală înainte de a accepta.",
+    "reviewAgainCta": "Revezi versiunea actuală"
   }
 }

@@ -54,12 +54,18 @@ ALTER TABLE public.pb_marketplace_contract_texts ENABLE ROW LEVEL SECURITY;
 
 -- Lectura del propio texto que se va a aceptar: cualquier autenticado puede
 -- LEER el contrato (transparencia del acto); escritura solo backend.
+-- Idempotente (ronda 5): DROP previo para permitir reejecución de la migración.
+DROP POLICY IF EXISTS pb_contract_texts_read ON public.pb_marketplace_contract_texts;
 CREATE POLICY pb_contract_texts_read ON public.pb_marketplace_contract_texts
   FOR SELECT TO authenticated USING (true);
 
 REVOKE ALL ON public.pb_marketplace_contract_texts FROM PUBLIC, anon;
 GRANT SELECT ON public.pb_marketplace_contract_texts TO authenticated;
 GRANT INSERT, UPDATE, SELECT ON public.pb_marketplace_contract_texts TO service_role;
+
+-- digest() requiere pgcrypto (ya presente en Supabase; se asegura ANTES del
+-- seed que lo utiliza — ronda 5: orden de dependencias para instalación limpia).
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- 11 idiomas del producto. El cuerpo canónico es el texto funcional ES; el
 -- resto de locales registran su propia versión (misma text_version v3) con su
@@ -190,14 +196,11 @@ Versiunea textului: v3-2026-10-17.'),
 
 Версія тексту: v3-2026-10-17.')
 ) AS l(lang, body)
-ON CONFLICT (contract_version, lang) DO UPDATE
-  SET text_version = EXCLUDED.text_version,
-      body_md = EXCLUDED.body_md,
-      canonical_hash = EXCLUDED.canonical_hash,
-      is_legal_final = EXCLUDED.is_legal_final;
-
--- digest() requiere pgcrypto (ya presente en Supabase; se asegura).
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+-- Inmutable (ronda 5): el seed NUNCA sobrescribe un texto ya versionado.
+-- DO NOTHING sin lista de columnas: compatible tanto con la PK original
+-- (contract_version, lang) como con la PK (text_version, lang) instalada por
+-- sql/051, y con cualquier índice único adicional.
+ON CONFLICT DO NOTHING;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 2. RPC canónico público: requisitos v3 + texto del contrato para el wizard

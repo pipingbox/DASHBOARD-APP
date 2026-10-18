@@ -4511,6 +4511,9 @@
     "resultAccountType": "Deze actie is alleen beschikbaar voor professionele accounts.",
     "goDashboard": "Ga naar uw dashboard",
     "contractNotActive": "Voorwaarden nog niet actief",
-    "contractNotActiveBody": "De Marketplace v3-voorwaarden worden juridisch beoordeeld en zijn nog niet geactiveerd. Zodra ze beschikbaar zijn, kunt u ze hier accepteren."
+    "contractNotActiveBody": "De Marketplace v3-voorwaarden worden juridisch beoordeeld en zijn nog niet geactiveerd. Zodra ze beschikbaar zijn, kunt u ze hier accepteren.",
+    "contractChanged": "De voorwaarden zijn gewijzigd",
+    "contractChangedBody": "De Marketplace-voorwaarden zijn bijgewerkt terwijl u ze bekeek. Voor uw veiligheid is er geen akkoord geregistreerd. Lees de huidige versie voordat u akkoord gaat.",
+    "reviewAgainCta": "Huidige versie bekijken"
   }
 }

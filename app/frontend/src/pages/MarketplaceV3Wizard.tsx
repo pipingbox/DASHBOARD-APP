@@ -61,6 +61,7 @@ export default function MarketplaceV3Wizard() {
   const [consentChecked, setConsentChecked] = useState(false);
   const [result, setResult] = useState<AcceptResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   const lang = (i18n.language || 'es').split('-')[0];
 
@@ -84,15 +85,22 @@ export default function MarketplaceV3Wizard() {
     return () => {
       mounted = false;
     };
-  }, [user, lang]);
+  }, [user, lang, reloadKey]);
 
+  // P1 ronda 5: la aceptación declara la versión EXACTA y el hash SHA-256
+  // completo del texto mostrado (servidos por el RPC canónico). Si el
+  // contrato cambió entre visualización y aceptación, el backend responde
+  // contract_changed_review_required y el wizard vuelve a cargar el texto
+  // vigente para una nueva revisión.
   const handleAccept = async () => {
-    if (!consentChecked || !user) return;
+    if (!consentChecked || !user || !canonical) return;
     setAccepting(true);
     setError(null);
     try {
       const { data, error: rpcError } = await supabase.rpc('pb_accept_marketplace_contract_v3', {
-        p_lang: canonical?.contract_lang ?? lang,
+        p_lang: canonical.contract_lang ?? lang,
+        p_text_version: canonical.text_version,
+        p_hash: canonical.canonical_hash,
       });
       if (rpcError) throw rpcError;
       const row = (data as AcceptResult[] | null)?.[0] ?? null;
@@ -102,6 +110,13 @@ export default function MarketplaceV3Wizard() {
     } finally {
       setAccepting(false);
     }
+  };
+
+  const handleReviewAgain = () => {
+    setResult(null);
+    setConsentChecked(false);
+    setLoading(true);
+    setReloadKey((k) => k + 1);
   };
 
   if (!user) return null;
@@ -162,7 +177,7 @@ export default function MarketplaceV3Wizard() {
           )}
 
           {result ? (
-            <ResultView result={result} />
+            <ResultView result={result} onReviewAgain={handleReviewAgain} />
           ) : accountBlocked ? (
             <Alert variant="destructive">
               <ShieldCheck className="h-4 w-4" />
@@ -253,12 +268,36 @@ export default function MarketplaceV3Wizard() {
   );
 }
 
-function ResultView({ result }: { result: AcceptResult }) {
+function ResultView({
+  result,
+  onReviewAgain,
+}: {
+  result: AcceptResult;
+  onReviewAgain: () => void;
+}) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const status = result.out_status;
   const isReady = result.out_marketplace_ready === true;
+
+  // P1 ronda 5: el texto cambió entre visualización y aceptación (o la
+  // versión ya no es la vigente). Sin efectos: se ofrece revisar el texto
+  // actual antes de consentir.
+  if (status === 'contract_changed_review_required') {
+    return (
+      <Alert>
+        <FileText className="h-4 w-4" />
+        <AlertTitle>{t('marketplaceV3.contractChanged')}</AlertTitle>
+        <AlertDescription className="mt-2 space-y-3">
+          <p>{t('marketplaceV3.contractChangedBody')}</p>
+          <Button variant="outline" size="sm" onClick={onReviewAgain}>
+            {t('marketplaceV3.reviewAgainCta')}
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   let title: string;
   let tone: 'success' | 'info' | 'warn';

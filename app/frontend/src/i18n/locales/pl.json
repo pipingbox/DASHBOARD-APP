@@ -4525,6 +4525,9 @@
     "resultAccountType": "Ta czynność jest dostępna tylko dla kont zawodowych.",
     "goDashboard": "Przejdź do panelu",
     "contractNotActive": "Warunki jeszcze nieaktywne",
-    "contractNotActiveBody": "Warunki Marketplace v3 są w trakcie przeglądu prawnego i nie są jeszcze aktywowane. Gdy będą dostępne, będziesz mógł je tutaj zaakceptować."
+    "contractNotActiveBody": "Warunki Marketplace v3 są w trakcie przeglądu prawnego i nie są jeszcze aktywowane. Gdy będą dostępne, będziesz mógł je tutaj zaakceptować.",
+    "contractChanged": "Warunki uległy zmianie",
+    "contractChangedBody": "Warunki Marketplace zostały zaktualizowane podczas ich przeglądania. Ze względów bezpieczeństwa nie zarejestrowano akceptacji. Przed zaakceptowaniem zapoznaj się z aktualną wersją.",
+    "reviewAgainCta": "Przejrzyj aktualną wersję"
   }
 }

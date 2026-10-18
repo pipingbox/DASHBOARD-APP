@@ -4511,6 +4511,9 @@
     "resultAccountType": "Diese Aktion ist nur für professionelle Konten verfügbar.",
     "goDashboard": "Zum Dashboard",
     "contractNotActive": "Bedingungen noch nicht aktiv",
-    "contractNotActiveBody": "Die Marketplace-v3-Bedingungen befinden sich in rechtlicher Prüfung und sind noch nicht aktiviert. Sobald sie verfügbar sind, können Sie sie hier annehmen."
+    "contractNotActiveBody": "Die Marketplace-v3-Bedingungen befinden sich in rechtlicher Prüfung und sind noch nicht aktiviert. Sobald sie verfügbar sind, können Sie sie hier annehmen.",
+    "contractChanged": "Die Bedingungen haben sich geändert",
+    "contractChangedBody": "Die Marketplace-Bedingungen wurden aktualisiert, während Sie sie geprüft haben. Zu Ihrer Sicherheit wurde keine Zustimmung registriert. Bitte prüfen Sie die aktuelle Version, bevor Sie zustimmen.",
+    "reviewAgainCta": "Aktuelle Version prüfen"
   }
 }

@@ -4511,6 +4511,9 @@
     "resultAccountType": "This action is only available for professional accounts.",
     "goDashboard": "Go to your dashboard",
     "contractNotActive": "Terms not yet active",
-    "contractNotActiveBody": "The Marketplace v3 terms are under legal review and are not activated yet. You will be able to accept them here once available."
+    "contractNotActiveBody": "The Marketplace v3 terms are under legal review and are not activated yet. You will be able to accept them here once available.",
+    "contractChanged": "The terms have changed",
+    "contractChangedBody": "The Marketplace terms were updated while you were reviewing them. For your security, no acceptance has been recorded. Please review the current version before accepting.",
+    "reviewAgainCta": "Review the current version"
   }
 }
