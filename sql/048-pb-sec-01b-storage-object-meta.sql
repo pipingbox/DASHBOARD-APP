@@ -45,3 +45,21 @@ comment on function public.pb_get_storage_object_meta(text, text, uuid) is
 revoke all on function public.pb_get_storage_object_meta(text, text, uuid) from public;
 revoke all on function public.pb_get_storage_object_meta(text, text, uuid) from anon, authenticated;
 grant execute on function public.pb_get_storage_object_meta(text, text, uuid) to service_role;
+
+-- PB-RELEASE-002 (PO RELEASE DECISION 002, gate E2E): la RPC hermana
+-- pb_verify_storage_object_ownership (SECURITY DEFINER, usada por el broker)
+-- debe ser backend-only. En produccion ya lo esta; esta seccion lo fija de
+-- forma idempotente para cualquier entorno que aplique 048 (QA quedo con el
+-- default PUBLIC EXECUTE en una sesion experimental).
+do $$
+begin
+  if exists (
+    select 1 from pg_proc
+    where oid = 'public.pb_verify_storage_object_ownership(text, text, uuid)'::regprocedure
+  ) then
+    revoke all on function public.pb_verify_storage_object_ownership(text, text, uuid) from public;
+    revoke all on function public.pb_verify_storage_object_ownership(text, text, uuid) from anon, authenticated;
+    grant execute on function public.pb_verify_storage_object_ownership(text, text, uuid) to service_role;
+  end if;
+end;
+$$;
