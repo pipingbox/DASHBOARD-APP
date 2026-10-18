@@ -28,7 +28,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
-import { getBrokerSignedUrl, hasStoredCv, hasStoredRecordFile } from '@/lib/storageHelpers';
+import { getBrokerFileUrl, hasStoredCv, hasStoredRecordFile } from '@/lib/storageHelpers';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminPreview } from '@/contexts/AdminPreviewContext';
 import { Button } from '@/components/ui/button';
@@ -495,17 +495,17 @@ export default function CandidateProfile() {
 
   const getViewerSignedUrlForCV = async (): Promise<string | null> => {
     if (!userId) return null;
-    return getBrokerSignedUrl({ owner_user_id: userId, file_type: 'cv' });
+    return getBrokerFileUrl({ owner_user_id: userId, file_type: 'cv' });
   };
 
   const getViewerSignedUrlForCert = async (cert: WorkerCertification): Promise<string | null> => {
     if (!userId) return null;
-    return getBrokerSignedUrl({ owner_user_id: userId, file_type: 'certification', record_id: cert.id });
+    return getBrokerFileUrl({ owner_user_id: userId, file_type: 'certification', record_id: cert.id });
   };
 
   const getViewerSignedUrlForDocument = async (doc: WorkerDocument): Promise<string | null> => {
     if (!userId) return null;
-    return getBrokerSignedUrl({ owner_user_id: userId, file_type: 'document', record_id: doc.id });
+    return getBrokerFileUrl({ owner_user_id: userId, file_type: 'document', record_id: doc.id });
   };
 
   const handlePreviewCV = async () => {
@@ -646,7 +646,12 @@ export default function CandidateProfile() {
   }
 
   const candidateHasCv = hasStoredCv(profile);
-  const showCV = candidateHasCv && (isAdminViewer || profile.cv_visible);
+  // PB-SEC-01: the original CV is only shown to the owner and to privileged
+  // viewers. Company viewers never see the original CV during search and
+  // shortlist — the protected professional profile replaces it until the
+  // candidate explicitly accepts contact (TRACK D).
+  const isCompanyViewer = effectiveRole === 'company' && !isAdminViewer && user?.id !== profile.user_id;
+  const showCV = candidateHasCv && !isCompanyViewer && (isAdminViewer || user?.id === profile.user_id || profile.cv_visible);
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
@@ -806,6 +811,11 @@ export default function CandidateProfile() {
           <p className="flex items-center gap-2 text-xs text-zinc-500">
             <FileText className="h-3.5 w-3.5" />
             No CV uploaded yet.
+          </p>
+        ) : isCompanyViewer ? (
+          <p className="flex items-center gap-2 text-xs text-zinc-500">
+            <Shield className="h-3.5 w-3.5" />
+            The original CV is protected. It will be shared only if the candidate accepts your contact request.
           </p>
         ) : !profile.cv_visible && !isAdminViewer ? (
           <p className="flex items-center gap-2 text-xs text-zinc-500">
