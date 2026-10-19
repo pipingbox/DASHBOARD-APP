@@ -2810,7 +2810,9 @@
     "conflictPrompt": "Unele date diferă de profilul tău. Alege valoarea păstrată.",
     "retryProfileNotReady": "Profilul tău este în pregătire. Încearcă din nou în câteva secunde.",
     "applyError": "Ceva n-a mers. Încearcă din nou.",
-    "dismissed": "Ciorna a fost eliminată. Îți poți completa profilul manual."
+    "dismissed": "Ciorna a fost eliminată. Îți poți completa profilul manual.",
+    "extractionFoundTitle": "Am găsit informații profesionale în CV-ul tău.",
+    "extractionFoundDesc": "Verifică-le pentru a-ți completa profilul — durează 1-2 minute."
   },
   "certExtract": {
     "analyzing": "Se analizează documentul…",
@@ -2943,7 +2945,22 @@
     "view": "Vizualizați",
     "download": "Descărcați",
     "cvPreviewFailed": "Linkul de previzualizare a CV-ului nu a putut fi generat",
-    "previewFailed": "Linkul de previzualizare nu a putut fi generat"
+    "previewFailed": "Linkul de previzualizare nu a putut fi generat",
+    "cvExtraction": {
+      "title": "Extracție CV",
+      "not_processed": "Neprocesat",
+      "processing": "Se procesează",
+      "pending_review": "În așteptarea revizuirii candidatului",
+      "review_confirmed": "Confirmat",
+      "extraction_failed": "Extracție eșuată",
+      "dismissed": "Respins",
+      "fieldsExperiences": "{{fields}} câmpuri · {{experiences}} experiențe",
+      "experienceExplicit": "Experiență din CV: {{years}} ani",
+      "experienceDerived": "Experiență derivată: {{years}} ani",
+      "discrepant": "discrepanță explicită/derivată — necesită revizuire",
+      "processed": "Procesat: {{date}}",
+      "confirmed": "Confirmat: {{date}}"
+    }
   },
   "inviteToJob": {
     "buttonLabel": "Invitați la un job",

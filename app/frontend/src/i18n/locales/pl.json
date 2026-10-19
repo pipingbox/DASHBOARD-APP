@@ -2817,7 +2817,9 @@
     "conflictPrompt": "Niektóre dane różnią się od Twojego profilu. Wybierz, którą wartość zachować.",
     "retryProfileNotReady": "Twój profil jest przygotowywany. Spróbuj ponownie za kilka sekund.",
     "applyError": "Coś poszło nie tak. Spróbuj ponownie.",
-    "dismissed": "Wersja robocza odrzucona. Możesz uzupełnić profil ręcznie."
+    "dismissed": "Wersja robocza odrzucona. Możesz uzupełnić profil ręcznie.",
+    "extractionFoundTitle": "Znaleźliśmy informacje zawodowe w Twoim CV.",
+    "extractionFoundDesc": "Sprawdź je, aby uzupełnić profil — zajmie to 1-2 minuty."
   },
   "certExtract": {
     "analyzing": "Analizowanie dokumentu…",
@@ -2950,7 +2952,22 @@
     "view": "Zobacz",
     "download": "Pobierz",
     "cvPreviewFailed": "Nie udało się wygenerować linku do podglądu CV",
-    "previewFailed": "Nie udało się wygenerować linku do podglądu"
+    "previewFailed": "Nie udało się wygenerować linku do podglądu",
+    "cvExtraction": {
+      "title": "Ekstrakcja CV",
+      "not_processed": "Nieprzetworzone",
+      "processing": "Przetwarzanie",
+      "pending_review": "Oczekuje na weryfikację kandydata",
+      "review_confirmed": "Potwierdzone",
+      "extraction_failed": "Ekstrakcja nieudana",
+      "dismissed": "Odrzucone",
+      "fieldsExperiences": "{{fields}} pól · {{experiences}} doświadczeń",
+      "experienceExplicit": "Doświadczenie z CV: {{years}} lat",
+      "experienceDerived": "Doświadczenie wyliczone: {{years}} lat",
+      "discrepant": "rozbieżność jawnie/deklarowana — wymaga weryfikacji",
+      "processed": "Przetworzone: {{date}}",
+      "confirmed": "Potwierdzone: {{date}}"
+    }
   },
   "inviteToJob": {
     "buttonLabel": "Zaproś do oferty",

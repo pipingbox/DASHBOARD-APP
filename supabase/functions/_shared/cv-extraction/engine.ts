@@ -55,6 +55,10 @@ import {
   type ProposedCertification,
   type ProposedExperience,
 } from './types.ts';
+import {
+  classifyExplicitDerived,
+  deriveExperienceMonths,
+} from './experienceDerivation.ts';
 
 // ─── Normalización del texto de entrada ──────────────────────────────────────
 
@@ -630,8 +634,58 @@ export function extractCv(input: ExtractionInput): ExtractionResult {
     }
   }
 
-  const years = extractYearsExperience(normalizedAll);
-  if (years !== null) fields.push(field(ctx, 'years_experience', years, 'high'));
+  // PB-CV-EXPERIENCE-DERIVATION-001 — years_experience:
+  // 1. valor explícito del CV (frase literal) = referencia principal;
+  // 2. valor derivado de las fechas de las experiencias (intervalos
+  //    fusionados, floor(meses/12)) cuando NO hay explícito, marcado con
+  //    provenance 'derived_from_experience_dates';
+  // 3. discrepancia material explícito vs derivado baja el explícito a
+  //    low confidence + metadata de discrepancia (revisión explícita
+  //    obligatoria, jamás sobrescritura silenciosa); zona intermedia →
+  //    medium. Umbral centralizado en experienceDerivation.ts.
+  const experiences = extractExperiences(lines);
+  const explicitYears = extractYearsExperience(normalizedAll);
+  const derivation = deriveExperienceMonths(experiences, ctx.now);
+  if (explicitYears !== null) {
+    let confidence: Confidence = 'high';
+    let consistency: 'coherent' | 'uncertain' | 'discrepant' | undefined;
+    if (derivation !== null) {
+      consistency = classifyExplicitDerived(explicitYears, derivation.derivedYears);
+      if (consistency === 'discrepant') confidence = 'low';
+      else if (consistency === 'uncertain') confidence = 'medium';
+    }
+    const yearsField = field(ctx, 'years_experience', explicitYears, confidence);
+    yearsField.provenance = 'cv_text';
+    if (derivation !== null) {
+      yearsField.derivation = {
+        total_months: derivation.totalMonths,
+        derived_years: derivation.derivedYears,
+        intervals_used: derivation.intervalsUsed,
+        intervals_total: derivation.intervalsTotal,
+        explicit_years: explicitYears,
+        consistency,
+      };
+    }
+    fields.push(yearsField);
+  } else if (derivation !== null && derivation.derivedYears >= 1) {
+    // Sin frase explícita: proponer el valor derivado de las fechas.
+    // Confianza high solo con precisión de mes completa y todos los
+    // intervalos utilizables; si no, medium. Nunca se emite una propuesta
+    // low ni <1 año (no aporta al campo entero).
+    const confidence: Confidence =
+      derivation.fullPrecision && derivation.intervalsUsed === derivation.intervalsTotal
+        ? 'high'
+        : 'medium';
+    const yearsField = field(ctx, 'years_experience', derivation.derivedYears, confidence);
+    yearsField.provenance = 'derived_from_experience_dates';
+    yearsField.derivation = {
+      total_months: derivation.totalMonths,
+      derived_years: derivation.derivedYears,
+      intervals_used: derivation.intervalsUsed,
+      intervals_total: derivation.intervalsTotal,
+    };
+    fields.push(yearsField);
+  }
 
   const skills = matchDictionary(normalizedAll, SKILL_DICTIONARY);
   if (skills.length) fields.push(field(ctx, 'skills', skills, 'medium'));
@@ -664,7 +718,7 @@ export function extractCv(input: ExtractionInput): ExtractionResult {
   return {
     language: detectLanguage(text),
     fields,
-    experiences: extractExperiences(lines),
+    experiences,
     certifications,
   };
 }

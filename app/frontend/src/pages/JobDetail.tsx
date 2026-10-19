@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
+import { CVReviewBanner } from '@/components/profile/CVReviewBanner';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -491,6 +492,18 @@ export default function JobDetail() {
             {!applied && !applying && <ArrowRight className="ml-1.5 h-3.5 w-3.5" />}
           </Button>
         </div>
+
+        {/* PB-CV-EXPERIENCE-DERIVATION-001 (FASE 4.2) — tras aplicar, si hay
+            un draft de CV pendiente se muestra inmediatamente el aviso con
+            CTA a /profile/cv-review. El banner se oculta solo si no hay
+            draft pendiente; nunca bloquea la candidatura. */}
+        {applied && (
+          <div className="p-5 md:p-8 pt-0 md:pt-0 border-t border-zinc-800/80">
+            <div className="pt-5">
+              <CVReviewBanner />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
