@@ -240,6 +240,62 @@ Notas de evidencia:
 - Producción no se modifica en este PR (QA y prod comparten proyecto;
   aplicar 053 requiere GO explícito del PO; ver §8).
 
+## 7bis. QA ronda 2 (2026-10-19) — arnés automatizado + re-acreditación
+
+Contexto: re-acreditación tras integrar `origin/main` (PR #85 ya merged:
+`sql/046`/`sql/048` + hardening de `secure-file-access`) en la rama de este
+PR. Merge limpio sin conflictos.
+
+### Re-verificación del estado real (READ-ONLY sobre mwdauubztjxkbrefirbg)
+
+- `pg_policies` sobre `storage.objects`: **28 policies, idénticas al
+  snapshot §2** (los 8 agujeros/duplicados siguen presentes; nadie ha
+  cambiado policies desde 2026-10-18). La migración sigue siendo válida
+  contra el estado vivo.
+- Compatibilidad de datos existentes re-verificada:
+  `app_14da0f1941_certificates` **213 objetos** (eran 202; +11 desde el QA
+  original) y `worker-documents` **54** (eran 48; +6), con **0** owner_id
+  NULL, **0** foldername ≠ owner_id y **0** owner ≠ owner_id. Todo objeto
+  nuevo subido desde el QA original también cumple el contrato de 053.
+- `sql/046` (audit log) y `sql/048` (`pb_get_storage_object_meta`,
+  `pb_verify_storage_object_ownership`) **no crean ni modifican policies de
+  `storage.objects`**: operan como SECURITY DEFINER service_role (bypass
+  RLS). Sin interacción con 053.
+
+### Arnés automatizado (nuevo artefacto del PR)
+
+`sql/qa/qa-storage-path-ownership-PB-STORAGE-PATH-OWNERSHIP-001.sql`:
+matriz BEFORE/AFTER autocontenida y autolimpiable, ejecutable contra
+cualquier proyecto Supabase de desarrollo con esquema `storage` real (NO
+ejecutar contra mwdauubztjxkbrefirbg). Recrea el estado ANTES exacto (16
+policies de los 2 buckets), reproduce el defecto, aplica el espejo exacto de
+sql/053 y verifica la matriz a nivel SQL con usuarios sintéticos A/B
+(`auth.uid()` dirigido por `request.jwt.claims`, igual que PostgREST),
+incluyendo verificación de cero residuos al final.
+
+Ejecutado el 2026-10-19 sobre un proyecto Supabase de desarrollo aislado
+del workspace (PostgreSQL 15.18, esquema storage real): **22/22 PASS**
+(4 BEFORE + 18 AFTER), 0 residuos verificados.
+
+| Fase | Casos | Resultado |
+|---|---|---|
+| BEFORE | B1-B4 (controles positivos + defecto reproducido en ambos buckets) | 4/4 PASS |
+| AFTER | A1-A18 (upload propio ambos buckets; INSERT/upsert/rename/move cross-user DENIED 42501; escape de namespace propio DENIED; spoof de owner_id DENIED; SELECT/DELETE cross-user 0 filas; anon DENIED; service_role ALLOWED; rename/metadata propios ALLOWED) | 18/18 PASS |
+
+### Hallazgo de la ronda 2 (fuera de alcance, documentado)
+
+- **A18**: las policies DELETE preexistentes son owner-only sin restricción
+  de path (`certificates_owner_delete`: `owner = auth.uid()`). El atacante B
+  **puede borrar su propio objeto huérfano** en carpeta ajena (auto-limpieza
+  del ataque), mientras que **A no puede verlo ni borrarlo** (owner-only
+  SELECT/DELETE). Comportamiento preexistente, fuera del alcance de 053
+  (INSERT/UPDATE); en producción hay 0 objetos huérfanos verificados (§4).
+  Se registra como riesgo residual menor: la limpieza de un objeto huérfano
+  futuro requeriría service_role/admin.
+- **A17**: tras 053, un objeto huérfano (owner=B, carpeta=A) deja de ser
+  actualizable incluso por su propio owner (el WITH CHECK exige carpeta
+  propia): el defecto no permite persistir modificaciones.
+
 ## 8. Despliegue y aplicación
 
 1. Merge del PR (requiere GO).
