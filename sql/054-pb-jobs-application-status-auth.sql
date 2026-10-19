@@ -192,12 +192,19 @@ COMMIT;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- ROLLBACK (manual, no destructivo — NO ejecutar salvo incidente):
+-- Restaura EXCLUSIVAMENTE los permisos del baseline de producción verificado
+-- el 19/10/2026 (pg_class.relacl): authenticated=arwdm sobre
+-- app_14da0f1941_job_applications. anon NO tenía UPDATE/DELETE en el baseline
+-- y NO se le conceden en el rollback (cero escaladas de privilegios).
 --   BEGIN;
 --   DROP TRIGGER IF EXISTS app_14da0f1941_job_applications_guard_write
 --     ON public.app_14da0f1941_job_applications;
 --   DROP FUNCTION IF EXISTS public.app_14da0f1941_guard_application_write();
 --   GRANT UPDATE, DELETE ON TABLE public.app_14da0f1941_job_applications TO authenticated;
---   GRANT UPDATE, DELETE ON TABLE public.app_14da0f1941_job_applications TO anon;
+--   -- Verificación del rollback (debe devolver exactamente el baseline):
+--   --   SELECT relacl::text FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+--   --   WHERE n.nspname='public' AND c.relname='app_14da0f1941_job_applications';
+--   --   → anon NO debe aparecer con UPDATE/DELETE; authenticated sí (arwd...).
 --   NOTIFY pgrst, 'reload schema';
 --   COMMIT;
 -- Nota: el rollback reabre la exposición documentada (E1/E2/E3/E6). Alternativa

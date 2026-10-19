@@ -73,6 +73,22 @@ test.describe('PB-JOBS-APPLICATION-STATUS-AUTH-001 — sql/054 canonical guard',
     expect(SQL).toContain('ROLLBACK');
     expect(SQL).toContain('DROP TRIGGER IF EXISTS app_14da0f1941_job_applications_guard_write');
   });
+
+  test('rollback restores EXACTLY the production baseline ACL (no anon grants)', () => {
+    // Baseline verificado en producción (pg_class.relacl, 19/10/2026):
+    // authenticated=arwdm; anon SIN UPDATE/DELETE.
+    const rollbackBlock = SQL.slice(SQL.indexOf('ROLLBACK (manual'));
+    expect(rollbackBlock).toContain('GRANT UPDATE, DELETE ON TABLE public.app_14da0f1941_job_applications TO authenticated');
+    // Cero escaladas: el rollback nunca debe conceder UPDATE/DELETE a anon.
+    expect(rollbackBlock).not.toContain('TO anon');
+  });
+
+  test('rollback documents the ACL verification query (grants before/after)', () => {
+    const rollbackBlock = SQL.slice(SQL.indexOf('ROLLBACK (manual'));
+    expect(rollbackBlock).toContain('pg_class');
+    expect(rollbackBlock).toContain('relacl');
+    expect(rollbackBlock).toContain('anon NO debe aparecer con UPDATE/DELETE');
+  });
 });
 
 test.describe('PB-JOBS-APPLICATION-STATUS-AUTH-001 — worker withdraw uses canonical RPC', () => {
