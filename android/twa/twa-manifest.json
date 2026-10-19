@@ -1,0 +1,69 @@
+{
+  "packageId": "com.pipingbox.tools",
+  "host": "pipingbox.com",
+  "name": "PIPINGBOX Industrial Tools",
+  "launcherName": "PIPINGBOX Tools",
+  "display": "standalone",
+  "themeColor": "#0B0B0D",
+  "themeColorDark": "#0B0B0D",
+  "navigationColor": "#0B0B0D",
+  "navigationColorDark": "#0B0B0D",
+  "navigationDividerColor": "#0B0B0D",
+  "navigationDividerColorDark": "#0B0B0D",
+  "backgroundColor": "#0B0B0D",
+  "enableNotifications": false,
+  "startUrl": "/tools?pb_app=android",
+  "iconUrl": "http://127.0.0.1:8791/icon-512.png",
+  "maskableIconUrl": "http://127.0.0.1:8791/icon-maskable-512.png",
+  "monochromeIconUrl": "http://127.0.0.1:8791/icon-monochrome-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "pipingbox-tools-upload"
+  },
+  "appVersionName": "0.1.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Branch layout",
+      "shortName": "Branch",
+      "url": "/tools?t=branch-layout&pb_app=android",
+      "chosenIconUrl": "http://127.0.0.1:8791/icon-512.png"
+    },
+    {
+      "name": "Pipe offsets",
+      "shortName": "Offsets",
+      "url": "/tools?t=pipe-offset&pb_app=android",
+      "chosenIconUrl": "http://127.0.0.1:8791/icon-512.png"
+    },
+    {
+      "name": "Stud bolts",
+      "shortName": "Bolts",
+      "url": "/tools?t=bolts-nuts&pb_app=android",
+      "chosenIconUrl": "http://127.0.0.1:8791/icon-512.png"
+    },
+    {
+      "name": "Unit converter",
+      "shortName": "Units",
+      "url": "/tools?t=unit-converter&pb_app=android",
+      "chosenIconUrl": "http://127.0.0.1:8791/icon-512.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://pipingbox.com/site.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://pipingbox.com/",
+  "minSdkVersion": 24,
+  "orientation": "portrait",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "appVersion": "0.1.0"
+}

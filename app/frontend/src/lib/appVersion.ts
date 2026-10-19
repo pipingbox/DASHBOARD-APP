@@ -1,10 +1,13 @@
 /**
  * PB-AUTH-CALLBACK-STALE-APP-001 (Fase 3) — stale app version detection.
  *
- * There is NO service worker (proven during discovery: no registration code,
- * no sw.js asset is served — only a web manifest for install identity). A
- * stale app is therefore a long-lived tab still running an old in-memory
- * bundle: content-hashed assets mean a plain reload always fetches the new
+ * There is NO app-shell service worker on the web channel (proven during
+ * discovery: no registration code, no sw.js asset was served — only a web
+ * manifest for install identity). PB-ANDROID-PLAYSTORE-001 later added a
+ * navigation-only offline-fallback worker registered EXCLUSIVELY from the
+ * Android TWA channel; it never caches index.html, bundles or /version.json,
+ * so this detection model is unchanged. A stale app is therefore a
+ * long-lived tab still running an old in-memory bundle: content-hashed assets mean a plain reload always fetches the new
  * index.html → new bundle. This module detects the mismatch against
  * /version.json (generated at build with the deployed SHA) and drives a
  * CONTROLLED, user-initiated, loop-safe update.

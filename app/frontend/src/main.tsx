@@ -3,6 +3,7 @@ import App from './App.tsx';
 import './index.css';
 import './i18n';
 import { loadRuntimeConfig } from './lib/config.ts';
+import { registerOfflineFallback } from './lib/registerOfflineFallback.ts';
 
 // TD-13 (CODE_STANDARDS §13 #4): Silence verbose console methods in production.
 // In production builds, console.log/debug/info become no-ops to prevent
@@ -40,6 +41,10 @@ async function initializeApp() {
 
   // Render the app
   createRoot(document.getElementById('root')!).render(<App />);
+
+  // PB-ANDROID-PLAYSTORE-001: offline fallback page for the Android TWA only.
+  // No-op on the web channel (no service worker is registered there).
+  registerOfflineFallback();
 }
 
 // Initialize the app

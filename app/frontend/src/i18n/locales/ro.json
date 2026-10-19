@@ -1067,6 +1067,7 @@
     }
   },
   "tools": {
+    "androidExportUnavailable": "Exporturile Premium nu sunt disponibile în aplicația Android. Calculatoarele rămân gratuite.",
     "eyebrow": "Instrumente",
     "title": "Calculatoare și utilitare de inginerie",
     "description": "Instrumente rapide și precise pentru munca zilnică în domeniul conductelor. Datele introduse sunt salvate în istoricul dumneavoastră.",

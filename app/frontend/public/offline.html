@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0B0B0D" />
+    <title>PIPINGBOX — Offline</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { margin: 0; height: 100%; background: #0B0B0D; color: #F5F7FA; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+      main { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 32px 24px; box-sizing: border-box; }
+      img { width: 96px; height: 96px; margin-bottom: 24px; }
+      h1 { font-size: 22px; margin: 0 0 8px; }
+      p { color: #A3A9B3; font-size: 15px; line-height: 1.5; max-width: 420px; margin: 0 0 24px; }
+      button { background: #E8611A; color: #0B0B0D; border: 0; border-radius: 12px; padding: 14px 28px; font-size: 16px; font-weight: 600; min-height: 48px; min-width: 200px; }
+      button:active { filter: brightness(0.9); }
+      .brand { margin-top: 32px; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #6B7280; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/assets/favicons/favicon-192.png" alt="" />
+      <h1 data-i18n="title">You are offline</h1>
+      <p data-i18n="body">PIPINGBOX Industrial Tools needs a connection to load the calculators. Reconnect and try again.</p>
+      <button type="button" onclick="location.reload()" data-i18n="retry">Retry</button>
+      <div class="brand">PIPINGBOX</div>
+    </main>
+    <script>
+      (function () {
+        var copy = {
+          es: ['Sin conexión', 'PIPINGBOX Industrial Tools necesita conexión para cargar las calculadoras. Reconecta e inténtalo de nuevo.', 'Reintentar'],
+          en: ['You are offline', 'PIPINGBOX Industrial Tools needs a connection to load the calculators. Reconnect and try again.', 'Retry'],
+          pt: ['Sem ligação', 'O PIPINGBOX Industrial Tools precisa de ligação para carregar as calculadoras. Volte a ligar-se e tente novamente.', 'Tentar novamente'],
+          nl: ['Je bent offline', 'PIPINGBOX Industrial Tools heeft een verbinding nodig om de rekentools te laden. Maak opnieuw verbinding en probeer het nogmaals.', 'Opnieuw proberen'],
+          fr: ['Vous êtes hors ligne', 'PIPINGBOX Industrial Tools a besoin d’une connexion pour charger les calculateurs. Reconnectez-vous et réessayez.', 'Réessayer'],
+          de: ['Sie sind offline', 'PIPINGBOX Industrial Tools benötigt eine Verbindung, um die Rechner zu laden. Verbinden Sie sich erneut und versuchen Sie es noch einmal.', 'Erneut versuchen'],
+          it: ['Sei offline', 'PIPINGBOX Industrial Tools richiede una connessione per caricare i calcolatori. Riconnettiti e riprova.', 'Riprova'],
+          pl: ['Brak połączenia', 'PIPINGBOX Industrial Tools wymaga połączenia, aby załadować kalkulatory. Połącz się ponownie i spróbuj jeszcze raz.', 'Spróbuj ponownie'],
+          ro: ['Ești offline', 'PIPINGBOX Industrial Tools are nevoie de conexiune pentru a încărca calculatoarele. Reconectează-te și încearcă din nou.', 'Reîncearcă'],
+          bg: ['Няма връзка', 'PIPINGBOX Industrial Tools изисква връзка, за да зареди калкулаторите. Свържете се отново и опитайте пак.', 'Опитай отново'],
+          uk: ['Ви офлайн', 'PIPINGBOX Industrial Tools потребує з’єднання для завантаження калькуляторів. Підключіться знову та спробуйте ще раз.', 'Спробувати ще раз'],
+        };
+        var lang = 'en';
+        try { lang = (localStorage.getItem('pipingbox_language') || navigator.language || 'en').slice(0, 2).toLowerCase(); } catch (e) {}
+        var c = copy[lang] || copy.en;
+        document.documentElement.lang = lang;
+        document.querySelector('[data-i18n="title"]').textContent = c[0];
+        document.querySelector('[data-i18n="body"]').textContent = c[1];
+        document.querySelector('[data-i18n="retry"]').textContent = c[2];
+      })();
+    </script>
+  </body>
+</html>

@@ -1067,6 +1067,7 @@
     }
   },
   "tools": {
+    "androidExportUnavailable": "Le esportazioni Premium non sono disponibili nell’app Android. Le calcolatrici restano gratuite.",
     "eyebrow": "Centro Tecnico",
     "title": "Centro Tecnico PipingBox",
     "description": "Il centro tecnico di riferimento per i professionisti del piping. Calcolatori, strumenti di fabbricazione, libreria visiva dei componenti e utilità di ispezione — tutto in un unico posto.",

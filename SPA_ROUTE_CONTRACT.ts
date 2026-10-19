@@ -219,6 +219,9 @@ export const STATIC_WELL_KNOWN_PATHS = new Set([
   '/site.webmanifest',
   '/.well-known/assetlinks.json',
   '/sw.js',
+  // PB-ANDROID-PLAYSTORE-001: offline fallback page precached by sw.js
+  // (registered only from the Android TWA channel).
+  '/offline.html',
   // PB-AUTH-CALLBACK-STALE-APP-001: build-stamp endpoint for stale-version
   // detection; the Worker serves it with Cache-Control: no-store.
   '/version.json',

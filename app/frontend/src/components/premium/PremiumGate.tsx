@@ -18,6 +18,7 @@ import type { PremiumStatus } from '@/lib/premium';
 import { PREMIUM_FEATURES } from '@/lib/premium';
 import { redirectToCheckout } from '@/lib/stripe';
 import { getNetPriceCents, formatNetPriceEur, EXCL_VAT_NOTE } from '@/lib/academy/pricing';
+import { isAndroidTwa } from '@/lib/appChannel';
 
 /**
  * PremiumGate — paywall modal for premium features.
@@ -48,6 +49,7 @@ export function PremiumGate({ open, onClose, feature, featureDescription, status
   const [vcaPrice, setVcaPrice] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isAndroidTwa()) return;
     let cancelled = false;
     (async () => {
       const monthly = await getNetPriceCents('premium_tools_monthly');
@@ -67,6 +69,19 @@ export function PremiumGate({ open, onClose, feature, featureDescription, status
   }, []);
 
   if (!open) return null;
+
+  if (isAndroidTwa()) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+        <div className="absolute inset-0 bg-black/70" />
+        <div className="relative w-full max-w-lg rounded-xl border border-zinc-800 bg-[#0a0a0a] p-6" onClick={(event) => event.stopPropagation()}>
+          <button type="button" onClick={onClose} aria-label={t('common.close')} className="absolute right-4 top-4 min-h-11 min-w-11 text-zinc-400"><X className="mx-auto h-5 w-5" /></button>
+          <h3 className="pr-12 text-base font-bold text-zinc-100">{feature}</h3>
+          <p className="mt-3 text-sm text-zinc-400">{t('tools.androidExportUnavailable')}</p>
+        </div>
+      </div>
+    );
+  }
 
   const referralProgress = status.referralLevel ?? 0;
   const referralTarget = 3;

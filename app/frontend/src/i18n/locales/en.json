@@ -1064,6 +1064,7 @@
     }
   },
   "tools": {
+    "androidExportUnavailable": "Premium exports are not available in the Android app. Calculators remain free to use.",
     "landing": {
       "shared": {
         "methodology": "Methodology",

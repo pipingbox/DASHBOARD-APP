@@ -1067,6 +1067,7 @@
     }
   },
   "tools": {
+    "androidExportUnavailable": "As exportações Premium não estão disponíveis na aplicação Android. As calculadoras continuam gratuitas.",
     "eyebrow": "Tools",
     "title": "Calculadoras e utilitários de engenharia",
     "description": "Ferramentas rápidas e precisas para o trabalho diário em tubagem. Os seus dados ficam guardados no histórico.",

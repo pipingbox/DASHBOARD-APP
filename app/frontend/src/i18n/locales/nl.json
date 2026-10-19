@@ -1064,6 +1064,7 @@
     }
   },
   "tools": {
+    "androidExportUnavailable": "Premium-exports zijn niet beschikbaar in de Android-app. De rekentools blijven gratis.",
     "eyebrow": "Tools",
     "title": "Engineering-calculators en hulpmiddelen",
     "description": "Snelle, gerichte tools voor dagelijks pijpwerk. Je invoer wordt opgeslagen in je historie.",
