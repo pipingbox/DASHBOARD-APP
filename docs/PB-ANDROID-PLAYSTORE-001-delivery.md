@@ -2,9 +2,9 @@
 
 **Estado: GO DESARROLLO EJECUTADO — PROYECTO TWA + AAB DE PRUEBA GENERADOS — NO-GO PUBLICACIÓN / NO MERGE / NO DEPLOY / NO CUENTAS / NO PAGOS**
 
-Rama: `feat/pb-android-playstore-001` (base `main` = `54632cee` merge PR #85).
+Rama: `feat/pb-android-playstore-001` (base `main` = `54632cee` merge PR #85). Commit F0: `76aedfe`. PR **draft #89** (`typecheck-regression` PASS).
 Carpeta Android: `android/twa/` (Bubblewrap). Assets de marca: `android/assets/`.
-Documentos hermanos: `docs/PB-ANDROID-PLAYSTORE-001-play-listing.md` (ficha, privacidad, Data Safety), `docs/PB-ANDROID-PLAYSTORE-001-qa.md` (evidencias).
+Documentos hermanos: `docs/PB-ANDROID-PLAYSTORE-001-play-listing.md` (ficha, privacidad, Data Safety); evidencias QA en §K de este documento.
 
 ---
 
