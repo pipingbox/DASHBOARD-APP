@@ -100,17 +100,22 @@ export default function Applications() {
 
   const withdrawApplication = async (id: string) => {
     setWithdrawingId(id);
-    const { error } = await supabase
-      .from(TABLES.jobApplications)
-      .delete()
-      .eq('id', id)
-      .eq('user_id', user!.id);
+    // PB-JOBS-APPLICATION-STATUS-AUTH-001: el retiro pasa por el RPC canónico
+    // (status='withdrawn'), no por DELETE directo. Conserva la fila y el
+    // historial ATS; el canal directo de escritura está cerrado (sql/054).
+    const { data, error } = await supabase.rpc('app_update_application_status', {
+      p_application_id: id,
+      p_new_status: 'withdrawn',
+    });
 
-    if (error) {
+    const ok = !error && (data as { ok?: boolean } | null)?.ok === true;
+    if (!ok) {
       toast.error(t('applications.withdrawFailed'));
     } else {
       toast.success(t('applications.withdrawSuccess'));
-      setApplications((prev) => prev.filter((a) => a.id !== id));
+      setApplications((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: 'withdrawn' } : a)),
+      );
     }
     setWithdrawingId(null);
   };
