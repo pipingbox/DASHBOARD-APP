@@ -39,12 +39,16 @@
 --      deja el flag persistido intacto y el gate decide como antes de 045.
 --   3. Gate BEFORE INSERT (sql/034) actualizado: sincroniza por el camino
 --      canónico ANTES de decidir el estado inicial de la candidatura.
---   4. pb_sync_stale_marketplace_ready — barrido idempotente de
---      auto-reparación (recovery/self-healing). No se auto-ejecuta: requiere
---      invocación service_role con batch explícito. Cada promoción queda
---      auditada en pb_marketplace_ready_reconcile_log (class
---      'stale_sync_promoted', sin PII) y el EMAIL 2 sale por el outbox/drain
---      existente, no por este barrido.
+--   4. pb_sync_stale_marketplace_ready — recovery DIRIGIDO por lote
+--      explícito de user_ids (PO FASE 2, 2026-10-20: el barrido global
+--      anterior fue RECHAZADO). No se auto-ejecuta: requiere invocación
+--      service_role con batch_id + lista explícita derivada del dry-run
+--      aprobado. Exige >=1 candidatura pending real por usuario en el
+--      momento de ejecutar (skipped en otro caso) y revalida todos los
+--      requisitos canónicos. Cada promoción queda auditada en
+--      pb_marketplace_ready_reconcile_log (class 'stale_sync_promoted',
+--      sin PII) y el EMAIL 2 sale por el outbox/drain existente, no por
+--      esta función.
 --
 -- Seguridad:
 --   * pb_sync_marketplace_ready_state / pb_sync_stale_marketplace_ready:
@@ -279,11 +283,33 @@ COMMENT ON FUNCTION public.app_14da0f1941_set_application_initial_status() IS
   'PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 + RECOVERY-001: estado inicial de candidatura tras sincronizar canonically el flag (fail-closed).';
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 4. Barrido idempotente de auto-reparación (recovery / self-healing)
+-- 4. Recovery DIRIGIDO por lote explícito de usuarios (PO FASE 2, 2026-10-20)
+--
+-- Contrato (sustituye al barrido global, rechazado por el PO):
+--   * p_user_ids: lista EXPLÍCITA derivada del dry-run aprobado. Sin lista no
+--     hay ejecución; jamás se recorre la tabla de perfiles.
+--   * Todo usuario del lote debe tener AL MENOS UNA candidatura real en
+--     pending_profile_validation EN EL MOMENTO DE EJECUTAR (revalidación
+--     backend). Quien no la tenga queda skipped con outcome explícito
+--     ('no_pending_applications'): este recovery de Jobs NO promueve
+--     perfiles elegibles sin candidaturas pendientes.
+--   * pb_sync_marketplace_ready_state revalida TODOS los requisitos
+--     canónicos en el momento de ejecutar (contrato v2, consentimiento
+--     declarado, predicado pb_marketplace_ready_for). Quien ya no cumpla
+--     queda skipped con su outcome (not_eligible / consent_required /
+--     contract_version_required / legacy_protected).
+--   * Fail-closed: cualquier error por usuario se contabiliza y NO aborta
+--     el lote; ningún usuario se promociona parcialmente.
+--   * Idempotente: re-ejecutar el mismo lote no re-promueve
+--     (already_ready), no duplica eventos, no duplica outbox, no duplica
+--     EMAIL 2 (claim por activation_id en el drain existente).
+--   * Auditado: cada promoción queda en pb_marketplace_ready_reconcile_log
+--     (class 'stale_sync_promoted', batch_id = p_batch_id, sin PII).
+--   * No envía emails: EMAIL 2 sale por el outbox/drain existente.
 -- ─────────────────────────────────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.pb_sync_stale_marketplace_ready(
   p_batch_id text,
-  p_limit    integer DEFAULT 500
+  p_user_ids uuid[]
 )
 RETURNS TABLE(
   evaluated        integer,
@@ -291,6 +317,7 @@ RETURNS TABLE(
   already_ready    integer,
   not_eligible     integer,
   legacy_protected integer,
+  no_pending       integer,
   errors           integer
 )
 LANGUAGE plpgsql
@@ -298,13 +325,15 @@ SECURITY INVOKER
 SET search_path = public
 AS $$
 DECLARE
-  r       record;
-  v_res   record;
+  v_uid     uuid;
+  v_res     record;
+  v_pending integer;
   v_evaluated integer := 0;
   v_promoted  integer := 0;
   v_already   integer := 0;
   v_not       integer := 0;
   v_legacy    integer := 0;
+  v_nopend    integer := 0;
   v_err       integer := 0;
 BEGIN
   -- Batch explicito obligatorio: toda reparacion queda auditada y
@@ -313,19 +342,33 @@ BEGIN
     RAISE EXCEPTION 'batch_id explicito requerido';
   END IF;
 
-  FOR r IN
-    SELECT p.user_id
-    FROM public.app_14da0f1941_profiles p
-    WHERE p.marketplace_ready IS NOT TRUE
-      AND p.marketplace_contract_version = 2
-      AND p.marketplace_consent_declared IS TRUE
-      AND public.pb_marketplace_ready_for(p.user_id, TRUE)
-    ORDER BY p.created_at
-    LIMIT GREATEST(COALESCE(p_limit, 500), 1)
+  -- Lote explicito obligatorio (PO FASE 2): sin lista de usuarios no hay
+  -- ejecucion. Un array vacio es un NO-OP valido (0 evaluados), no un error.
+  IF p_user_ids IS NULL THEN
+    RAISE EXCEPTION 'user_ids explicito requerido (lote derivado del dry-run aprobado)';
+  END IF;
+
+  FOREACH v_uid IN ARRAY p_user_ids
   LOOP
+    IF v_uid IS NULL THEN
+      CONTINUE;
+    END IF;
     v_evaluated := v_evaluated + 1;
     BEGIN
-      SELECT * INTO v_res FROM public.pb_sync_marketplace_ready_state(r.user_id, p_batch_id);
+      -- Gate de alcance Jobs: al menos una candidatura pending REAL en el
+      -- momento de ejecutar. Sin ella, el usuario NO es objetivo de este
+      -- recovery (aunque sea elegible): skipped explicito.
+      SELECT count(*) INTO v_pending
+      FROM public.app_14da0f1941_job_applications
+      WHERE user_id = v_uid
+        AND status = 'pending_profile_validation';
+
+      IF v_pending = 0 THEN
+        v_nopend := v_nopend + 1;
+        CONTINUE;
+      END IF;
+
+      SELECT * INTO v_res FROM public.pb_sync_marketplace_ready_state(v_uid, p_batch_id);
       IF v_res.out_status = 'promoted' THEN        v_promoted := v_promoted + 1;
       ELSIF v_res.out_status = 'already_ready' THEN v_already  := v_already + 1;
       ELSIF v_res.out_status = 'legacy_protected' THEN v_legacy := v_legacy + 1;
@@ -336,11 +379,15 @@ BEGIN
     END;
   END LOOP;
 
-  RETURN QUERY SELECT v_evaluated, v_promoted, v_already, v_not, v_legacy, v_err;
+  RETURN QUERY SELECT v_evaluated, v_promoted, v_already, v_not, v_legacy, v_nopend, v_err;
 END $$;
 
-REVOKE ALL ON FUNCTION public.pb_sync_stale_marketplace_ready(text, integer) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.pb_sync_stale_marketplace_ready(text, integer) TO service_role;
+REVOKE ALL ON FUNCTION public.pb_sync_stale_marketplace_ready(text, uuid[]) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.pb_sync_stale_marketplace_ready(text, uuid[]) TO service_role;
 
-COMMENT ON FUNCTION public.pb_sync_stale_marketplace_ready(text, integer) IS
-  'PB-JOBS-MARKETPLACE-READY-RECOVERY-001: barrido idempotente de perfiles stale (flag false, predicado true, consentimiento declarado). Promueve por el camino canonico y audita en reconcile_log. No envia emails: EMAIL 2 sale por el outbox/drain existente.';
+-- La firma anterior (text, integer) queda RETIRADA: su contrato de barrido
+-- global fue rechazado por el PO y no debe quedar invocable.
+DROP FUNCTION IF EXISTS public.pb_sync_stale_marketplace_ready(text, integer);
+
+COMMENT ON FUNCTION public.pb_sync_stale_marketplace_ready(text, uuid[]) IS
+  'PB-JOBS-MARKETPLACE-READY-RECOVERY-001 (PO FASE 2): recovery DIRIGIDO por lote explicito de user_ids derivado del dry-run aprobado. Exige >=1 candidatura pending real por usuario en el momento de ejecutar (skipped no_pending_applications en otro caso) y revalida todos los requisitos canonicos via pb_sync_marketplace_ready_state. Idempotente, fail-closed, auditado en reconcile_log. No envia emails: EMAIL 2 sale por el outbox/drain existente.';
