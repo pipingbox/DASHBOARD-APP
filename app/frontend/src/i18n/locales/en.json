@@ -2803,7 +2803,9 @@
     "conflictPrompt": "Some data differs from your profile. Choose which value to keep.",
     "retryProfileNotReady": "Your profile is being prepared. Try again in a few seconds.",
     "applyError": "Something went wrong. Please try again.",
-    "dismissed": "Draft discarded. You can complete your profile manually."
+    "dismissed": "Draft discarded. You can complete your profile manually.",
+    "extractionFoundTitle": "We found professional information in your CV.",
+    "extractionFoundDesc": "Review it to complete your profile — it takes 1-2 minutes."
   },
   "certExtract": {
     "analyzing": "Analyzing the document…",
@@ -2936,7 +2938,22 @@
     "view": "View",
     "download": "Download",
     "cvPreviewFailed": "Failed to generate CV preview link",
-    "previewFailed": "Failed to generate preview link"
+    "previewFailed": "Failed to generate preview link",
+    "cvExtraction": {
+      "title": "CV Extraction",
+      "not_processed": "Not processed",
+      "processing": "Processing",
+      "pending_review": "Pending candidate review",
+      "review_confirmed": "Confirmed",
+      "extraction_failed": "Extraction failed",
+      "dismissed": "Dismissed",
+      "fieldsExperiences": "{{fields}} fields · {{experiences}} experiences",
+      "experienceExplicit": "CV experience: {{years}} years",
+      "experienceDerived": "Derived experience: {{years}} years",
+      "discrepant": "explicit/derived discrepancy — review needed",
+      "processed": "Processed: {{date}}",
+      "confirmed": "Confirmed: {{date}}"
+    }
   },
   "inviteToJob": {
     "buttonLabel": "Invite to Job",

@@ -2803,7 +2803,9 @@
     "conflictPrompt": "Einige Angaben weichen von Ihrem Profil ab. Wählen Sie, welcher Wert erhalten bleibt.",
     "retryProfileNotReady": "Ihr Profil wird vorbereitet. Versuchen Sie es in wenigen Sekunden erneut.",
     "applyError": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
-    "dismissed": "Entwurf verworfen. Sie können Ihr Profil manuell vervollständigen."
+    "dismissed": "Entwurf verworfen. Sie können Ihr Profil manuell vervollständigen.",
+    "extractionFoundTitle": "Wir haben berufliche Informationen in Ihrem Lebenslauf gefunden.",
+    "extractionFoundDesc": "Prüfen Sie sie, um Ihr Profil zu vervollständigen — dauert 1-2 Minuten."
   },
   "certExtract": {
     "analyzing": "Dokument wird analysiert…",
@@ -2936,7 +2938,22 @@
     "view": "Ansehen",
     "download": "Herunterladen",
     "cvPreviewFailed": "Vorschaulink für den Lebenslauf konnte nicht erstellt werden",
-    "previewFailed": "Vorschaulink konnte nicht erstellt werden"
+    "previewFailed": "Vorschaulink konnte nicht erstellt werden",
+    "cvExtraction": {
+      "title": "CV-Extraktion",
+      "not_processed": "Nicht verarbeitet",
+      "processing": "Verarbeitung",
+      "pending_review": "Wartet auf Überprüfung durch Kandidaten",
+      "review_confirmed": "Bestätigt",
+      "extraction_failed": "Extraktion fehlgeschlagen",
+      "dismissed": "Verworfen",
+      "fieldsExperiences": "{{fields}} Felder · {{experiences}} Erfahrungen",
+      "experienceExplicit": "CV-Erfahrung: {{years}} Jahre",
+      "experienceDerived": "Abgeleitete Erfahrung: {{years}} Jahre",
+      "discrepant": "explizite/abgeleitete Abweichung — Überprüfung erforderlich",
+      "processed": "Verarbeitet: {{date}}",
+      "confirmed": "Bestätigt: {{date}}"
+    }
   },
   "inviteToJob": {
     "buttonLabel": "Zur Stelle einladen",

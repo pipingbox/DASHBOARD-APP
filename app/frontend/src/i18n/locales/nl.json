@@ -2803,7 +2803,9 @@
     "conflictPrompt": "Sommige gegevens wijken af van je profiel. Kies welke waarde je behoudt.",
     "retryProfileNotReady": "Je profiel wordt voorbereid. Probeer het over enkele seconden opnieuw.",
     "applyError": "Er ging iets mis. Probeer het opnieuw.",
-    "dismissed": "Concept verworpen. Je kunt je profiel handmatig invullen."
+    "dismissed": "Concept verworpen. Je kunt je profiel handmatig invullen.",
+    "extractionFoundTitle": "We hebben professionele informatie in je cv gevonden.",
+    "extractionFoundDesc": "Controleer deze om je profiel aan te vullen — het kost 1-2 minuten."
   },
   "certExtract": {
     "analyzing": "Document wordt geanalyseerd…",
@@ -2936,7 +2938,22 @@
     "view": "Bekijken",
     "download": "Downloaden",
     "cvPreviewFailed": "Voorvertoningslink voor cv genereren mislukt",
-    "previewFailed": "Voorvertoningslink genereren mislukt"
+    "previewFailed": "Voorvertoningslink genereren mislukt",
+    "cvExtraction": {
+      "title": "CV-extractie",
+      "not_processed": "Niet verwerkt",
+      "processing": "Verwerken",
+      "pending_review": "Wacht op beoordeling kandidaat",
+      "review_confirmed": "Bevestigd",
+      "extraction_failed": "Extractie mislukt",
+      "dismissed": "Genegeerd",
+      "fieldsExperiences": "{{fields}} velden · {{experiences}} ervaringen",
+      "experienceExplicit": "CV-ervaring: {{years}} jaar",
+      "experienceDerived": "Afgeleide ervaring: {{years}} jaar",
+      "discrepant": "expliciet/afgeleid verschil — beoordeling vereist",
+      "processed": "Verwerkt: {{date}}",
+      "confirmed": "Bevestigd: {{date}}"
+    }
   },
   "inviteToJob": {
     "buttonLabel": "Uitnodigen voor vacature",

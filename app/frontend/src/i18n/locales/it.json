@@ -2810,7 +2810,9 @@
     "conflictPrompt": "Alcuni dati differiscono dal tuo profilo. Scegli quale valore mantenere.",
     "retryProfileNotReady": "Il tuo profilo è in preparazione. Riprova tra qualche secondo.",
     "applyError": "Qualcosa è andato storto. Riprova.",
-    "dismissed": "Bozza scartata. Puoi completare il tuo profilo manualmente."
+    "dismissed": "Bozza scartata. Puoi completare il tuo profilo manualmente.",
+    "extractionFoundTitle": "Abbiamo trovato informazioni professionali nel tuo CV.",
+    "extractionFoundDesc": "Rivedile per completare il tuo profilo — ci vogliono 1-2 minuti."
   },
   "certExtract": {
     "analyzing": "Analisi del documento…",
@@ -2943,7 +2945,22 @@
     "view": "Visualizza",
     "download": "Scarica",
     "cvPreviewFailed": "Impossibile generare il link di anteprima del CV",
-    "previewFailed": "Impossibile generare il link di anteprima"
+    "previewFailed": "Impossibile generare il link di anteprima",
+    "cvExtraction": {
+      "title": "Estrazione CV",
+      "not_processed": "Non elaborato",
+      "processing": "Elaborazione",
+      "pending_review": "In attesa di revisione del candidato",
+      "review_confirmed": "Confermato",
+      "extraction_failed": "Estrazione fallita",
+      "dismissed": "Ignorato",
+      "fieldsExperiences": "{{fields}} campi · {{experiences}} esperienze",
+      "experienceExplicit": "Esperienza dal CV: {{years}} anni",
+      "experienceDerived": "Esperienza derivata: {{years}} anni",
+      "discrepant": "discrepanza esplicita/derivata — richiede revisione",
+      "processed": "Elaborato: {{date}}",
+      "confirmed": "Confermato: {{date}}"
+    }
   },
   "inviteToJob": {
     "buttonLabel": "Invita a Lavoro",

@@ -2810,7 +2810,9 @@
     "conflictPrompt": "Certaines données diffèrent de votre profil. Choisissez la valeur à conserver.",
     "retryProfileNotReady": "Votre profil est en préparation. Réessayez dans quelques secondes.",
     "applyError": "Une erreur s'est produite. Veuillez réessayer.",
-    "dismissed": "Brouillon écarté. Vous pouvez compléter votre profil manuellement."
+    "dismissed": "Brouillon écarté. Vous pouvez compléter votre profil manuellement.",
+    "extractionFoundTitle": "Nous avons trouvé des informations professionnelles dans votre CV.",
+    "extractionFoundDesc": "Vérifiez-les pour compléter votre profil — cela prend 1-2 minutes."
   },
   "certExtract": {
     "analyzing": "Analyse du document…",
@@ -2943,7 +2945,22 @@
     "view": "Voir",
     "download": "Télécharger",
     "cvPreviewFailed": "Échec de la génération du lien d'aperçu du CV",
-    "previewFailed": "Échec de la génération du lien d'aperçu"
+    "previewFailed": "Échec de la génération du lien d'aperçu",
+    "cvExtraction": {
+      "title": "Extraction de CV",
+      "not_processed": "Non traité",
+      "processing": "Traitement",
+      "pending_review": "En attente de révision du candidat",
+      "review_confirmed": "Confirmé",
+      "extraction_failed": "Extraction échouée",
+      "dismissed": "Ignoré",
+      "fieldsExperiences": "{{fields}} champs · {{experiences}} expériences",
+      "experienceExplicit": "Expérience du CV : {{years}} ans",
+      "experienceDerived": "Expérience dérivée : {{years}} ans",
+      "discrepant": "écart explicite/dérivé — révision requise",
+      "processed": "Traité : {{date}}",
+      "confirmed": "Confirmé : {{date}}"
+    }
   },
   "inviteToJob": {
     "buttonLabel": "Inviter à un poste",

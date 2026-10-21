@@ -84,6 +84,9 @@ function log(fields: Record<string, unknown>): void {
     'fn', 'mode', 'event', 'status', 'error_code', 'draft_id', 'correlation_id',
     'fields_count', 'experiences_count', 'certifications_count', 'attempt',
     'email_sent', 'lang',
+    // PB-CV-EXPERIENCE-DERIVATION-001 — agregados de experiencia, sin PII.
+    'years_experience_source', 'experience_intervals_count',
+    'experience_total_months_derived', 'experience_explicit_derived_conflict',
   ];
   const safe = Object.fromEntries(
     allowed.filter((k) => fields[k] !== undefined).map((k) => [k, fields[k]]),
@@ -377,17 +380,34 @@ Deno.serve(async (req: Request) => {
     }),
   );
 
+  // PB-CV-EXPERIENCE-DERIVATION-001 — métricas agregadas (FASE 8), sin PII:
+  // solo fuente del campo, contadores de intervalos, meses totales y flag
+  // de conflicto explícito/derivado. Jamás fechas, empresas ni puestos.
+  const yearsField = result.fields.find((f) => f.field === 'years_experience');
+  const yearsSource: 'explicit' | 'derived' | 'none' = yearsField
+    ? (yearsField.provenance === 'derived_from_experience_dates' ? 'derived' : 'explicit')
+    : 'none';
+  const explicitDerivedConflict = yearsField?.derivation?.consistency === 'discrepant';
+
   await emitEvent(serviceClient, userId, 'cv_extraction_completed', {
     draft_id: draftId,
     fields_extracted_count: result.fields.length,
     experiences_extracted_count: result.experiences.length,
     certifications_proposed_count: result.certifications.length,
+    years_experience_source: yearsSource,
+    experience_intervals_count: yearsField?.derivation?.intervals_used ?? null,
+    experience_total_months_derived: yearsField?.derivation?.total_months ?? null,
+    experience_explicit_derived_conflict: explicitDerivedConflict,
   });
 
   log({
     fn: 'cv-extract', mode: channel, event: 'extraction_completed', draft_id: draftId,
     fields_count: result.fields.length, experiences_count: result.experiences.length,
     certifications_count: result.certifications.length, attempt, correlation_id: correlationId,
+    years_experience_source: yearsSource,
+    experience_intervals_count: yearsField?.derivation?.intervals_used ?? null,
+    experience_total_months_derived: yearsField?.derivation?.total_months ?? null,
+    experience_explicit_derived_conflict: explicitDerivedConflict,
   });
 
   // ── Email de recuperación SOLO en flujo soporte (ticket §11) ─────────────
