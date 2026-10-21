@@ -1064,6 +1064,7 @@
     }
   },
   "tools": {
+    "androidExportUnavailable": "Premium-Exporte sind in der Android-App nicht verfügbar. Die Rechner bleiben kostenlos.",
     "eyebrow": "Tools",
     "title": "Engineering-Rechner und Werkzeuge",
     "description": "Schnelle, fokussierte Werkzeuge für den Rohrleitungsalltag. Ihre Eingaben werden in Ihrem Verlauf gespeichert.",

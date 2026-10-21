@@ -1,5 +1,6 @@
 import { supabase, TABLES } from '@/lib/supabase';
 import { SUPPLY_CONSENT_VERSION } from '@/lib/academy/consent';
+import { isAndroidTwa } from '@/lib/appChannel';
 
 /**
  * Stripe checkout helpers (PB-STRIPE-001 Fase 5).
@@ -70,6 +71,7 @@ export async function startCheckout(
   metadata?: Record<string, string>,
   options?: { supplyConsent?: boolean },
 ): Promise<CheckoutResult> {
+  if (isAndroidTwa()) return { ok: false, reason: 'not_available' };
   const keys = Array.isArray(productKeys) ? productKeys : [productKeys];
 
   const { data: sessionData } = await supabase.auth.getSession();

@@ -23,6 +23,7 @@
 // NOTE: relative import (not '@/') so Playwright specs can import this module
 // without Vite alias resolution — same pattern as workforceReadiness.ts.
 import { logger } from './logger';
+import { getAppChannel } from './appChannel';
 
 // ---------------------------------------------------------------------------
 // Closed taxonomy
@@ -132,6 +133,17 @@ export const OBS_EVENT_NAMES = [
   // de revisión. Props: enums cerrados y contadores; sin contenido del CV
   // ni PII.
   'cv_profile_review_started',
+  // PB-ANDROID-PLAYSTORE-001 — free tools funnel shared by web and the
+  // Android TWA. app_open is NOT a separate event: page_viewed already covers
+  // it and every event carries the `app_channel` super-property
+  // (web | android_twa) so Android traffic can be segmented without
+  // duplicating events. tool_key is a closed enum (TOOL_KEYS); never inputs,
+  // results or free text.
+  'tool_opened',
+  'calculation_completed',
+  'calculation_error',
+  'registration_cta_clicked',
+  'job_portal_cta_clicked',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -469,7 +481,39 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   // PB-CV-AUTO-PROFILE-001 — draft identifiers and closed-enum counters;
   // never CV content or PII.
   cv_profile_review_started: ['draft_id', 'source_channel', 'fields_count', 'experiences_count'],
+  // PB-ANDROID-PLAYSTORE-001 — tools funnel. tool_key closed enum; route is
+  // the normalized path; cta_location is a closed enum of UI placements.
+  tool_opened: ['tool_key', 'route'],
+  calculation_completed: ['tool_key', 'route'],
+  calculation_error: ['tool_key', 'route', 'error_category'],
+  registration_cta_clicked: ['route', 'cta_location'],
+  job_portal_cta_clicked: ['route', 'cta_location'],
 };
+
+// PB-ANDROID-PLAYSTORE-001 — closed enums for the tools funnel. Must stay in
+// sync with the `key` values of TOOLS in pages/Tools.tsx (the Android app only
+// lists implemented tools). Values are our taxonomy, never user input.
+export const TOOL_KEYS = [
+  'branch-layout',
+  'elbow-cut',
+  'pipe-offset',
+  'accessories-library',
+  'bolts-nuts',
+  'flanges',
+  'mitered-elbow',
+  'pipe-comb',
+  'pipe-dimensions',
+  'pressure-drop',
+  'unit-converter',
+  'wall-thickness',
+  'color-lookup',
+  'thermal-expansion',
+  'reynolds',
+] as const;
+export type ToolKey = (typeof TOOL_KEYS)[number];
+export const CALCULATION_ERROR_CATEGORIES = ['invalid_input', 'out_of_range', 'engine_error'] as const;
+export const CTA_LOCATIONS = ['tools_header', 'tools_footer', 'tool_result', 'app_shell'] as const;
+const CALCULATION_ERROR_CATEGORY_EVENTS = new Set<ObsEventName>(['calculation_error']);
 
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;
 export type ObsOrigin = (typeof OBS_ORIGINS)[number];
@@ -1199,7 +1243,17 @@ export function buildEventProps(
     ) {
       delete out.error_category;
     }
+    // PB-ANDROID-PLAYSTORE-001 — calculation error taxonomy.
+    if (
+      CALCULATION_ERROR_CATEGORY_EVENTS.has(name) &&
+      !CALCULATION_ERROR_CATEGORIES.includes(out.error_category as never)
+    ) {
+      delete out.error_category;
+    }
   }
+  // PB-ANDROID-PLAYSTORE-001 — tools funnel closed enums.
+  if ('tool_key' in out && !TOOL_KEYS.includes(out.tool_key as never)) delete out.tool_key;
+  if ('cta_location' in out && !CTA_LOCATIONS.includes(out.cta_location as never)) delete out.cta_location;
   // PB-AUTH-CALLBACK-STALE-APP-001 — build stamps and recovery enums.
   if ('target_version' in out) {
     // Keep raw (validated closed shape): a SHA is our build identity, not a
@@ -1303,6 +1357,9 @@ export function trackEvent(
     // build SHA.
     safeProps.environment = getEnvironment();
     safeProps.app_version = getAppVersion();
+    // PB-ANDROID-PLAYSTORE-001: channel is attached per event too (not only as
+    // a super-property) so queued pre-init events keep it.
+    safeProps.app_channel = getAppChannel();
     if (!initialized || !client) {
       if (queue.length < MAX_QUEUE) queue.push({ name, props: safeProps });
       return;
@@ -1335,6 +1392,9 @@ function registerSuperProperties(): void {
       app_version: getAppVersion(),
       environment: getEnvironment(),
       origin: detectOrigin(),
+      // PB-ANDROID-PLAYSTORE-001: web | android_twa — segments Android traffic
+      // in every report without duplicating events.
+      app_channel: getAppChannel(),
     });
   } catch (err) {
     logger.warn('[obs] register failed (swallowed)', err);

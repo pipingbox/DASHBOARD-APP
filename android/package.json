@@ -1,0 +1,13 @@
+{
+  "name": "pipingbox-industrial-tools-android",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "assets": "node assets/generate-assets.mjs",
+    "update": "node scripts/update-twa.mjs"
+  },
+  "devDependencies": {
+    "@bubblewrap/cli": "1.27.0",
+    "sharp": "0.35.5"
+  }
+}

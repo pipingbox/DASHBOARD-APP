@@ -1,0 +1,26 @@
+# PB-ANDROID-PLAYSTORE-001 — Android TWA project ignores.
+# Signing material must NEVER enter Git (PO rule §13). Upload/app signing keys
+# live in the PO's password manager / Play Console only.
+*.keystore
+*.jks
+*.pem
+*.pepk
+*.pass
+keystore.properties
+
+# Gradle / build output
+.gradle/
+build/
+app/build/
+app/release/
+app/debug/
+*.apk
+*.aab
+*.idsig
+local.properties
+.cxx/
+captures/
+
+# IDE
+.idea/
+*.iml

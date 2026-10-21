@@ -1070,6 +1070,7 @@
     }
   },
   "tools": {
+    "androidExportUnavailable": "Eksporty Premium nie są dostępne w aplikacji na Androida. Kalkulatory pozostają bezpłatne.",
     "eyebrow": "Narzędzia",
     "title": "Kalkulatory inżynierskie i narzędzia",
     "description": "Szybkie, wyspecjalizowane narzędzia do codziennej pracy z rurociągami. Wprowadzone dane są zapisywane w twojej historii.",

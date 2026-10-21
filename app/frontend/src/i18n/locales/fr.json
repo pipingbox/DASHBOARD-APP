@@ -1067,6 +1067,7 @@
     }
   },
   "tools": {
+    "androidExportUnavailable": "Les exportations Premium ne sont pas disponibles dans l’application Android. Les calculateurs restent gratuits.",
     "eyebrow": "Outils",
     "title": "Calculateurs et utilitaires d'ingénierie",
     "description": "Outils rapides et ciblés pour le travail quotidien en tuyauterie. Vos entrées sont sauvegardées dans votre historique.",

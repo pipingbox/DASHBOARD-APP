@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Wrench,
@@ -29,6 +29,8 @@ import { usePremium } from '@/hooks/usePremium';
 import { supabase, TABLES } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { redirectToCheckout } from '@/lib/stripe';
+import { isAndroidTwa } from '@/lib/appChannel';
+import { trackEvent, type ToolKey } from '@/lib/observability';
 import ElbowCutTool from '@/components/tools/ElbowCutTool';
 import NewElbowCutTool from '@/tools/prefabrication/elbow-cut/ElbowCutTool';
 import BranchLayoutTool from '@/components/tools/BranchLayoutTool';
@@ -74,6 +76,11 @@ export default function Tools() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { status: premiumStatus } = usePremium();
+  // PB-ANDROID-PLAYSTORE-001: inside the Android TWA the catalog only lists
+  // operative tools and never links to an external checkout (Google Play
+  // Payments policy). Web behaviour is unchanged.
+  const androidApp = isAndroidTwa();
+  const visibleTools = androidApp ? TOOLS.filter((tool) => tool.implemented) : TOOLS;
 
   // The open tool lives in the URL so a tool can be linked, bookmarked and
   // shared, and so the back button leaves the tool instead of the page. It was
@@ -91,6 +98,11 @@ export default function Tools() {
       { replace: false },
     );
   };
+  // Emitted on every tool activation, including deep links and Android app
+  // shortcuts (/tools?t=<key>), so Android usage per tool is measurable.
+  useEffect(() => {
+    if (active) trackEvent('tool_opened', { tool_key: active as ToolKey, route: '/tools' });
+  }, [active]);
   const [d, setD] = useState('168.3');
   const [p, setP] = useState('5');
   const [s, setS] = useState('138');
@@ -121,10 +133,12 @@ export default function Tools() {
     const Y = Number(y);
     if (!D || !P || !S) {
       toast.error(t('tools.fillRequired'));
+      trackEvent('calculation_error', { tool_key: 'wall-thickness', route: '/tools', error_category: 'invalid_input' });
       return;
     }
     const tValue = (P * D) / (2 * (S + P * Y));
     setResult(t('tools.resultThickness', { value: tValue.toFixed(3) }));
+    trackEvent('calculation_completed', { tool_key: 'wall-thickness', route: '/tools' });
 
     if (user) {
       setSaving(true);
@@ -152,8 +166,9 @@ export default function Tools() {
           description={t('tools.description')}
         />
 
-        {/* Upgrade banner — visible only for non-premium users */}
-        {!premiumStatus.isPremium && (
+        {/* Upgrade banner — visible only for non-premium users on the web.
+            Never rendered inside the Android app (PB-ANDROID-PLAYSTORE-001). */}
+        {!androidApp && !premiumStatus.isPremium && (
           <div className="rounded-xl border border-[#f59e0b]/30 bg-[#f59e0b]/5 px-5 py-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
@@ -194,7 +209,7 @@ export default function Tools() {
 
         {/* Card Grid Catalog */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {TOOLS.map((tool) => {
+          {visibleTools.map((tool) => {
             const Icon = tool.icon;
             return (
               <button
