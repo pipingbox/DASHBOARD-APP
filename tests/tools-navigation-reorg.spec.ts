@@ -14,7 +14,9 @@ test.describe('PB-TOOLS-NAV-REORG-001', () => {
     if (await beta.count()) await beta.click();
 
     await expect(page.locator('[data-testid^="tools-section-"]')).toHaveCount(7);
-    await expect(page.locator('h3')).toContainText(['Pipe Offset', 'Mitered Elbow', 'Pipe Comb', 'Two-elbow offset']);
+    for (const [label] of canonicalTools) {
+      await expect(page.getByRole('heading', { name: label, exact: true })).toBeVisible();
+    }
 
     for (const [label, key] of canonicalTools) {
       await page.goto('/tools');
