@@ -162,8 +162,14 @@ test('H: 20+ mm/in cycles — both phases verified each cycle', async ({ page })
   const mmBtn = page.locator('[data-testid="two-elbow-offset-unit-mm"]');
   for (let i = 0; i < 20; i++) {
     await inBtn.click();
-    /* Imperial phase: canonical mm values re-rendered as inches. */
-    await expect(page.locator('#teo-initial-spacing')).toHaveValue('7.874');
+    /* Imperial phase: canonical mm values re-rendered as inches with the
+       precision the engine actually uses. 200 mm is not an exact inch
+       value, so the faithful text carries the digits needed to reproduce
+       it within 1e-6 mm (updated 2026-10-22: the previous "7.874"
+       expectation encoded the lossy 4-decimal text, which reparsed to
+       199.9996 mm — the defect fixed in two-elbow-offset-fields.ts).
+       152.4 mm is exactly 6 in, so it stays short. */
+    await expect(page.locator('#teo-initial-spacing')).toHaveValue('7.87401575');
     await expect(page.locator('#teo-clr')).toHaveValue('6');
     await expect(row(page, '2').locator('td').nth(3)).toHaveText('11.136 in'); /* 282.84 mm */
     await mmBtn.click();

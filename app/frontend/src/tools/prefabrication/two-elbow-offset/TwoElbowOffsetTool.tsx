@@ -16,13 +16,15 @@ import { listNps, getElbowRadius } from '@/tools/core/standards';
 import { fromMm } from '@/tools/core/units';
 import { mapEngineError, type UnitSystem } from '../shared';
 import {
-  createLengthField,
   lengthFieldOnEdit,
-  lengthFieldOnUnitChange,
   lengthFieldIsValid,
   parseDecimalInput,
   type LengthFieldState,
 } from '../pipe-comb/number-input';
+import {
+  createEditableLengthField,
+  editableLengthFieldOnUnitChange,
+} from './two-elbow-offset-fields';
 import { presentTwoElbowOffset } from './two-elbow-offset-model';
 import { buildTwoElbowOffsetDiagram, type TwoElbowOffsetDiagramModel } from './two-elbow-offset-diagram';
 import TwoElbowOffsetDiagramView from './TwoElbowOffsetDiagram';
@@ -90,9 +92,9 @@ export default function TwoElbowOffsetTool() {
   const [elbowAngle, setElbowAngle] = useState('45');
   // Canonical physical values (mm, full precision). Unit toggles only
   // re-render display text; they never rewrite these values.
-  const [initialField, setInitialField] = useState<LengthFieldState>(() => createLengthField(200, 'mm'));
-  const [finalField, setFinalField] = useState<LengthFieldState>(() => createLengthField(400, 'mm'));
-  const [clrField, setClrField] = useState<LengthFieldState>(() => createLengthField(152.4, 'mm'));
+  const [initialField, setInitialField] = useState<LengthFieldState>(() => createEditableLengthField(200, 'mm'));
+  const [finalField, setFinalField] = useState<LengthFieldState>(() => createEditableLengthField(400, 'mm'));
+  const [clrField, setClrField] = useState<LengthFieldState>(() => createEditableLengthField(152.4, 'mm'));
 
   // Catalog CLR resolver (standards elbow-radius table, Weldbend p.26
   // provenance): choosing NPS + elbow type writes the CLR field once.
@@ -104,17 +106,18 @@ export default function TwoElbowOffsetTool() {
   useEffect(() => {
     // P4 policy (GO): empty stays empty and invalid text stays invalid
     // through a unit toggle — the last valid value is never resurrected.
-    // number-input.ts (frozen) keeps the canonical value on invalid edits,
-    // so the toggle here must skip re-rendering when the text is not valid.
-    setInitialField((f) => (lengthFieldIsValid(f) ? lengthFieldOnUnitChange(f, unit) : { ...f, unit }));
-    setFinalField((f) => (lengthFieldIsValid(f) ? lengthFieldOnUnitChange(f, unit) : { ...f, unit }));
-    setClrField((f) => (lengthFieldIsValid(f) ? lengthFieldOnUnitChange(f, unit) : { ...f, unit }));
+    // Valid text is re-rendered by the P4-local faithful formatter, so the
+    // visible number always agrees with the value fed to the engine
+    // (review finding 2026-10-22: 400.004 mm used to redisplay as "400").
+    setInitialField((f) => editableLengthFieldOnUnitChange(f, unit));
+    setFinalField((f) => editableLengthFieldOnUnitChange(f, unit));
+    setClrField((f) => editableLengthFieldOnUnitChange(f, unit));
   }, [unit]);
 
   const applyCatalogSelection = (nextNps: string, nextType: 'LR' | 'SR') => {
     const radius = getElbowRadius(nextNps, nextType);
     if (radius !== undefined) {
-      setClrField(createLengthField(radius, unit));
+      setClrField(createEditableLengthField(radius, unit));
       setClrSource('catalog');
     } else {
       // Non-tabulated combination: clear the field instead of silently

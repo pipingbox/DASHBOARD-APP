@@ -14,6 +14,13 @@ import { expect, test, type Page } from '@playwright/test';
  * Finding 4 — positive values never rendered as "0": precision extends so
  * 0.004 mm renders as "0.004 mm" / "0.0002 in", while true zero (tangent
  * elbows, reference line) keeps its distinct meaning.
+ *
+ * Finding (2026-10-22 preview review) — editable field coherence: the
+ * EDITABLE length fields must never hide a fraction the engine uses. The
+ * shared read-only formatter rounded mm to 2 decimals, so Df = 400.004 mm
+ * redisplayed as "400" after a mm -> in -> mm round trip while the result
+ * stayed 0.004 mm / displaced. R4a2-R4a4 inspect the field values, not only
+ * the results, and pin the adopted imperial precision.
  */
 
 const TOOL_ES = '/tools?t=two-elbow-offset&lng=es';
@@ -133,9 +140,12 @@ test('R2f: manual CLR entry after missing data — explicit custom provenance', 
   await expect(page.getByTestId('two-elbow-offset-clr-source')).toContainText('Custom CLR');
   await expect(row(page, '2')).toBeVisible();
   await expect(row(page, '2').locator('td').nth(4)).toHaveText('41.42 mm'); /* 100·tan22.5° */
-  /* Unit change keeps custom provenance and converts the text. */
+  /* Unit change keeps custom provenance and converts the text. The inch
+     text carries the precision needed to reproduce 100 mm within 1e-6 mm
+     (updated 2026-10-22: the previous "3.937" expectation encoded the lossy
+     4-decimal text, which reparsed to 99.9998 mm). */
   await page.locator('[data-testid="two-elbow-offset-unit-in"]').click();
-  await expect(page.locator('#teo-clr')).toHaveValue('3.937');
+  await expect(page.locator('#teo-clr')).toHaveValue('3.9370079');
   await expect(page.getByTestId('two-elbow-offset-clr-source')).toContainText('Custom CLR');
   await expect(row(page, '2').locator('td').nth(4)).toHaveText('1.631 in'); /* 41.4214 mm */
   await page.locator('[data-testid="two-elbow-offset-unit-mm"]').click();
@@ -275,16 +285,125 @@ test('R4a: 0.004 mm straight cut renders as non-zero (mm and in)', async ({ page
   /* Review reproduction: N=2, Di=200, Df=400.004, theta=90, CLR=100. */
   await fill(page, { count: '2', angle: '90', initial: '200', final: '400.004', clr: '100' });
   const cut = row(page, '2').locator('td').nth(5);
+  const status = row(page, '2').locator('td').nth(7);
   /* Engine: straightCutLengthMm = 0.004, status displaced — the display
      must preserve the non-zero character in table AND diagram dimension. */
   await expect(cut).toHaveText('0.004 mm');
-  await expect(row(page, '2').locator('td').nth(7)).toHaveText('Desplazada');
+  await expect(status).toHaveText('Desplazada');
   await expect(page.locator('[data-testid="two-elbow-offset-diagram"]')).toContainText('Tramo recto 0.004 mm');
   /* mm -> in -> mm: still non-zero in both unit systems. */
   await page.locator('[data-testid="two-elbow-offset-unit-in"]').click();
   await expect(cut).toHaveText('0.0002 in');
   await page.locator('[data-testid="two-elbow-offset-unit-mm"]').click();
   await expect(cut).toHaveText('0.004 mm');
+});
+
+test('R4a2: the editable field never hides a fraction the engine uses (2026-10-22 finding)', async ({ page }) => {
+  await openTool(page, TOOL_ES);
+  /* Reported defect: after mm -> in -> mm the field redisplayed "400" while
+     the engine kept 400.004 mm, so the visible input contradicted the
+     result and retyping the visible value silently changed the geometry.
+     This test inspects the FIELDS, not only the results. */
+  await fill(page, { count: '2', angle: '90', initial: '200', final: '400.004', clr: '100' });
+  const dfField = page.locator('#teo-final-spacing');
+  const cut = row(page, '2').locator('td').nth(5);
+  const status = row(page, '2').locator('td').nth(7);
+
+  await expect(dfField).toHaveValue('400.004');
+  await expect(cut).toHaveText('0.004 mm');
+  await expect(status).toHaveText('Desplazada');
+
+  /* mm -> in: the inch text must be faithful, not the lossy "15.7482". */
+  await page.locator('[data-testid="two-elbow-offset-unit-in"]').click();
+  const inchText = await dfField.inputValue();
+  expect(inchText).not.toBe('15.7482');
+  /* Adopted imperial precision: enough digits to reproduce 400.004 mm
+     within 1e-6 mm (see two-elbow-offset-fields.ts). */
+  expect(inchText).toBe('15.748189');
+  expect(Math.abs(Number(inchText) * 25.4 - 400.004)).toBeLessThanOrEqual(1e-6);
+  await expect(cut).toHaveText('0.0002 in');
+  /* The other fields keep their own faithful inch representation. */
+  await expect(page.locator('#teo-initial-spacing')).toHaveValue('7.87401575');
+  await expect(page.locator('#teo-clr')).toHaveValue('3.9370079');
+
+  /* in -> mm: the fraction is visible again. This is the regression. */
+  await page.locator('[data-testid="two-elbow-offset-unit-mm"]').click();
+  await expect(dfField).toHaveValue('400.004');
+  await expect(cut).toHaveText('0.004 mm');
+  await expect(status).toHaveText('Desplazada');
+  await expect(page.locator('#teo-initial-spacing')).toHaveValue('200');
+  await expect(page.locator('#teo-clr')).toHaveValue('100');
+
+  /* Retyping what is visible, with trailing zeros, must not change anything. */
+  await dfField.fill('400.0040');
+  await expect(cut).toHaveText('0.004 mm');
+  await expect(status).toHaveText('Desplazada');
+
+  /* And the value the field shows is the value the engine used: retyping the
+     displayed text verbatim reproduces the same result. */
+  await dfField.fill(await dfField.inputValue());
+  await expect(cut).toHaveText('0.004 mm');
+  await expect(status).toHaveText('Desplazada');
+
+  /* Only a real edit to a different number changes the geometry: typing the
+     rounded "400" is now an explicit user decision, not a hidden one. */
+  await dfField.fill('400');
+  await expect(cut).toHaveText('0 mm');
+  await expect(status).toHaveText('Codos tangentes');
+});
+
+test('R4a3: tangent 45 degree case survives a unit round trip', async ({ page }) => {
+  await openTool(page, TOOL_ES);
+  /* delta = 2·R·tan(22.5°)·sin(45°) with R=100 -> exact tangent elbows.
+     Six decimals in the field must survive mm -> in -> mm. */
+  await fill(page, { count: '2', angle: '45', initial: '500', final: '558.578644', clr: '100' });
+  const dfField = page.locator('#teo-final-spacing');
+  const cut = row(page, '2').locator('td').nth(5);
+  const status = row(page, '2').locator('td').nth(7);
+
+  await expect(dfField).toHaveValue('558.578644');
+  await expect(cut).toHaveText('0 mm');
+  await expect(status).toHaveText('Codos tangentes');
+
+  await page.locator('[data-testid="two-elbow-offset-unit-in"]').click();
+  const inchText = await dfField.inputValue();
+  expect(Math.abs(Number(inchText) * 25.4 - 558.578644)).toBeLessThanOrEqual(1e-6);
+  await expect(status).toHaveText('Codos tangentes');
+
+  await page.locator('[data-testid="two-elbow-offset-unit-mm"]').click();
+  await expect(dfField).toHaveValue('558.578644');
+  await expect(cut).toHaveText('0 mm');
+  await expect(status).toHaveText('Codos tangentes');
+  /* The true zero stays distinguishable from the 0.004 mm case above. */
+  await expect(row(page, '1').locator('td').nth(5)).toHaveText('—');
+  await expect(row(page, '1').locator('td').nth(7)).toHaveText('Referencia (recta)');
+});
+
+test('R4a4: empty, invalid and cleared CLR fields survive a unit toggle', async ({ page }) => {
+  await openTool(page, TOOL_ES);
+  /* The faithful formatter must not resurrect the last valid value. */
+  await fill(page, { final: '' });
+  await page.locator('[data-testid="two-elbow-offset-unit-in"]').click();
+  await expect(page.locator('#teo-final-spacing')).toHaveValue('');
+  await expect(page.locator('[data-testid^="two-elbow-offset-row-"]')).toHaveCount(0);
+
+  await fill(page, { final: 'abc' });
+  await page.locator('[data-testid="two-elbow-offset-unit-mm"]').click();
+  await expect(page.locator('#teo-final-spacing')).toHaveValue('abc');
+  await expect(page.locator('[data-testid^="two-elbow-offset-row-"]')).toHaveCount(0);
+
+  /* Untabulated catalog combination clears the CLR; a toggle keeps it clear. */
+  await fill(page, { final: '400' });
+  await selectNps(page, '1/2"');
+  await selectElbowType(page, 'SR');
+  await expect(page.locator('#teo-clr')).toHaveValue('');
+  await page.locator('[data-testid="two-elbow-offset-unit-in"]').click();
+  await expect(page.locator('#teo-clr')).toHaveValue('');
+  await expect(page.locator('[data-testid^="two-elbow-offset-row-"]')).toHaveCount(0);
+  /* Recovery: a tabulated combination refills the field in the active unit. */
+  await selectElbowType(page, 'LR');
+  await expect(page.locator('#teo-clr')).toHaveValue('1.5');
+  await expect(page.locator('[data-testid^="two-elbow-offset-row-"]')).not.toHaveCount(0);
 });
 
 test('R4b: true zero keeps its distinct meaning (tangent elbows)', async ({ page }) => {
