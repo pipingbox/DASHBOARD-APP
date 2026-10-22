@@ -27,6 +27,7 @@ export interface ReferralsBootstrapOutcome {
   referral_code?: string | null;
   referrer_id?: string | null;
   attribution?: string;
+  referral_id?: string | null;
 }
 
 async function callReferralsBootstrap(storedCode?: string): Promise<ReferralsBootstrapOutcome | null> {
@@ -307,37 +308,43 @@ export async function validateReferralCode(code: string): Promise<string | null>
 
 /**
  * Get referral statistics for a user.
- * Primary source: profiles.referred_by_user_id (set by admin manual assignment or signup flow).
- * Fallback: also checks the referrals table for legacy entries.
+ *
+ * Canonical source of TRUTH for "verified": the referrals table with
+ * status 'verified' or 'completed'. A profile attributed via
+ * profiles.referred_by_user_id (admin assignment or signup flow) does NOT
+ * count as verified until its canonical referral row reaches verified/completed
+ * — a pending attribution must never unlock a reward (PB-NOTIF-001 rev.5,
+ * aligned with premium.ts).
+ *
+ * "total" remains the broader attribution count (profile-based + legacy rows),
+ * kept separate so the UI can still show total vs verified distinctly.
  */
 export async function getReferralStats(userId: string): Promise<ReferralStats> {
-  // Primary: count profiles where referred_by_user_id = current user
+  // Total attributed (any state): profiles pointing at this referrer.
   const { count: profileReferralCount } = await supabase
     .from(TABLES.profiles)
     .select('*', { count: 'exact', head: true })
     .eq('referred_by_user_id', userId);
 
-  // Fallback: count from legacy referrals table (verified only)
-  const { count: legacyVerifiedCount } = await supabase
+  // Canonical verified/completed rows (the ONLY source for rewards/levels).
+  const { count: verifiedCount } = await supabase
     .from(TABLES.referrals)
     .select('*', { count: 'exact', head: true })
     .eq('referrer_id', userId)
-    .eq('status', 'verified');
+    .in('status', ['verified', 'completed']);
 
-  // Use the higher count between profiles-based and legacy table
-  // This ensures both admin-assigned and organic referrals are counted
-  const profileCount = profileReferralCount ?? 0;
-  const legacyCount = legacyVerifiedCount ?? 0;
-  const verified = Math.max(profileCount, legacyCount);
-
-  // Total includes pending from legacy table + profile-based count
+  // Total across legacy rows (any status), for the broader total counter.
   const { count: legacyTotalCount } = await supabase
     .from(TABLES.referrals)
     .select('*', { count: 'exact', head: true })
     .eq('referrer_id', userId);
 
+  const profileCount = profileReferralCount ?? 0;
   const totalFromLegacy = legacyTotalCount ?? 0;
   const total = Math.max(profileCount, totalFromLegacy);
+
+  // verified/completed ONLY — never elevated by pending profile attributions.
+  const verified = verifiedCount ?? 0;
 
   // Determine current level and rewards
   let currentLevel = 0;
@@ -465,18 +472,14 @@ export async function processStoredReferral(userId: string, userEmail?: string):
     } catch { /* ignore */ }
 
     // Notify referrer that their referral has joined (PB-NOTIF-001 fix).
+    // The RPC derives the content server-side from the referral row id, so a
+    // forged name/title/URL from the browser cannot reach the referrer.
     try {
-      const { data: referredProfile } = await supabase
-        .from(TABLES.profiles)
-        .select('full_name')
-        .eq('user_id', userId)
-        .maybeSingle();
-      const displayName =
-        (referredProfile?.full_name as string | null)?.trim() ||
-        userEmail?.split('@')[0] ||
-        'Someone';
-      await notifyReferralJoined(referrerId, displayName);
-      console.log('[REFERRAL_RECOVERY] ✅ notifyReferralJoined sent to', referrerId);
+      const referralId = (result.referral_id as string | null) ?? null;
+      if (referralId) {
+        await notifyReferralJoined(referrerId, referralId);
+        console.log('[REFERRAL_RECOVERY] ✅ notifyReferralJoined sent to', referrerId);
+      }
     } catch {
       // Non-critical
     }
@@ -493,65 +496,41 @@ export async function processStoredReferral(userId: string, userEmail?: string):
 
 /**
  * Verify a pending referral when conditions are met.
- * Conditions: email verified + profile has basic info (onboarding completed).
+ * Conditions are validated SERVER-SIDE by the pb_verify_referral_if_eligible
+ * RPC (email confirmed in Auth + onboarding complete or minimum activity).
+ * The browser can no longer flip status/verified_at directly (sql/033 closed
+ * the UPDATE grant); it only invokes the RPC and notifies on a positive,
+ * server-confirmed result.
  */
 export async function verifyReferralIfEligible(userId: string): Promise<void> {
   try {
-    // Check if user has a pending referral where they are the referred
-    const { data: pendingReferral } = await supabase
-      .from(TABLES.referrals)
-      .select('id, referrer_id')
-      .eq('referred_id', userId)
-      .eq('status', 'pending')
-      .maybeSingle();
+    const { data, error } = await supabase.rpc('pb_verify_referral_if_eligible');
 
-    if (!pendingReferral) return;
+    if (error) {
+      console.warn('[Referrals] verify RPC error:', error.message);
+      return;
+    }
 
-    // Check verification conditions:
-    // 1. Profile has full_name (onboarding completed)
-    // 2. Has at least one meaningful action (tool usage, cert, or experience)
-    const { data: profile } = await supabase
-      .from(TABLES.profiles)
-      .select('full_name, title, skills')
-      .eq('user_id', userId)
-      .single();
+    const outcome = data as {
+      ok?: boolean;
+      referral_id?: string | null;
+      referrer_id?: string | null;
+      already_verified?: boolean;
+      reason?: string;
+    } | null;
 
-    if (!profile?.full_name) return;
+    // Only notify when the RPC confirmed a fresh pending -> verified
+    // transition. already_verified and not_eligible outcomes are silent no-ops.
+    if (!outcome?.ok || outcome.already_verified || !outcome.referrer_id || !outcome.referral_id) {
+      return;
+    }
 
-    // Check for minimum activity
-    const { count: activityCount } = await supabase
-      .from(TABLES.toolUsage)
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId);
-
-    const { count: certCount } = await supabase
-      .from(TABLES.certifications)
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId);
-
-    const hasActivity = (activityCount ?? 0) >= 1 || (certCount ?? 0) >= 1;
-    const hasOnboarding = !!(profile.full_name && (profile.title || (profile.skills as string[] | null)?.length));
-
-    if (!hasOnboarding && !hasActivity) return;
-
-    // Verify the referral
-    await supabase
-      .from(TABLES.referrals)
-      .update({
-        status: 'verified',
-        verified_at: new Date().toISOString(),
-      })
-      .eq('id', pendingReferral.id);
-
-    // Notify referrer that the referral has been verified (PB-NOTIF-001 fix).
     try {
-      const referredName = profile?.full_name?.trim() || 'A new member';
-      await notifyReferralVerified(pendingReferral.referrer_id, referredName);
-      console.log('[Referrals] ✅ notifyReferralVerified sent to', pendingReferral.referrer_id);
+      await notifyReferralVerified(outcome.referrer_id, outcome.referral_id);
+      console.log('[Referrals] ✅ notifyReferralVerified sent to', outcome.referrer_id);
     } catch {
       // Non-critical
     }
-
   } catch {
     console.warn('[Referrals] Failed to verify referral');
   }

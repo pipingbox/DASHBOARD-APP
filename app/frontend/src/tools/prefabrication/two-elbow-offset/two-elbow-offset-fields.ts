@@ -107,6 +107,52 @@ export function createEditableLengthField(initialMm: number, unit: 'mm' | 'in'):
  * resurrect the last valid value (P4 GO policy). Valid text is re-rendered
  * with the faithful representation above.
  */
+/**
+ * P4 user edit (review residual, 2026-10-22; contract adjusted 2026-10-23).
+ *
+ * Two distinct outcomes, decided by NUMERIC EQUIVALENCE between the previous
+ * VISIBLE text and the newly typed text — never by a tolerance against the
+ * canonical value (a tolerance there made the outcome depend on history:
+ * editing to "100.0000005" kept tangency from canonical 100 but broke it
+ * from canonical 101, with the same final text).
+ *
+ * 1. REPRESENTATIONAL-ONLY EDIT — the previous visible text (`field.text`,
+ *    exactly as the user last saw it, never regenerated from the canonical)
+ *    and the new raw BOTH parse, under the SAME unit, to the SAME number
+ *    (adding a trailing zero, "100" -> "100,00", reformatted decimals).
+ *    The canonical value is kept: nothing the engine consumes changed.
+ *
+ * 2. REAL NUMERIC EDIT — anything else: the two texts parse to different
+ *    numbers, the unit changed, or the previous text was empty/invalid.
+ *    The canonical value is replaced once (single conversion) and the
+ *    engine recalculates, exactly as before.
+ *
+ * Comparing the two PARSED texts (instead of the canonical value) makes the
+ * outcome history-independent: the same final visible text always yields
+ * the same canonical value, whatever was typed before.
+ *
+ * Empty/invalid text keeps the frozen contracts: the text is kept as typed
+ * and the canonical value is untouched, so a toggle never resurrects a
+ * stale value.
+ */
+export function editableLengthFieldOnEdit(
+  field: LengthFieldState,
+  raw: string,
+  unit: 'mm' | 'in',
+): LengthFieldState {
+  const parsed = parseLengthInputToMm(raw, unit);
+  if (parsed === null) {
+    return { text: raw, canonicalMm: field.canonicalMm, unit };
+  }
+  if (field.canonicalMm !== null && field.unit === unit) {
+    const previous = parseLengthInputToMm(field.text, unit);
+    if (previous !== null && previous === parsed) {
+      return { text: raw, canonicalMm: field.canonicalMm, unit };
+    }
+  }
+  return { text: raw, canonicalMm: parsed, unit };
+}
+
 export function editableLengthFieldOnUnitChange(
   field: LengthFieldState,
   newUnit: 'mm' | 'in',

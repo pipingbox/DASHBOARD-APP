@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { drainMarketplaceReadyActivations } from "../_shared/application-activation.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,81 +8,28 @@ const corsHeaders = {
 };
 
 /**
- * Centralized Profile Completion Calculation (Server-Side)
+ * Canonical profile state recalculation.
  *
- * Weight distribution (total = 100%):
- *   Photo:          10%
- *   Full Name:       5%
- *   Position/Title:  5%
- *   Company:         5%
- *   Location:        5%
- *   Years Exp:       5%
- *   Skills:         10%
- *   Bio:            10%
- *   CV:             15%
- *   Experience:     15%
- *   Certification:  10%
- *   Documents:       5%
+ * PB-MARKETPLACE-READY-CONSISTENCY-001: this function used to carry its own
+ * TypeScript copy of the completion formula (12 weights), the consent predicate
+ * and the status ladder. That copy was the second implementation of the
+ * contract and the source of a real production divergence:
+ *
+ *   - the RPC `pb_complete_onboarding` required the wizard's explicit consent
+ *     (p_marketplace_ready) AND the consent recorded in the profile columns;
+ *   - this function derived consent from `profile_visibility` / `cv_visible`
+ *     alone, so a global sweep could PROMOTE marketplace_ready to true for a
+ *     user whose wizard had never finished. That is exactly what happened on
+ *     2026-09-11 and produced the inconsistency investigated in the RCA.
+ *
+ * The formula now lives once, in SQL (`pb_profile_completion_score`,
+ * `pb_marketplace_consent_columns`, `pb_onboarding_status`) and this function
+ * delegates to `pb_recalculate_profile_state`, which maintains or degrades
+ * marketplace_ready but never promotes it. Promotion stays exclusive to
+ * `pb_complete_onboarding`.
+ *
+ * The 30-point threshold and the 12 weights are unchanged by this ticket.
  */
-/**
- * Whether the profile has a CV, for completion scoring.
- *
- * PB-STORAGE-SECURITY-001: the canonical location is cv_storage_bucket +
- * cv_storage_path. `cv_file_url` used to be the only signal, so once writers stop
- * emitting public URLs every newly uploaded CV would silently lose these 15
- * points, dragging profile_completion, marketplace_ready and matching with it.
- *
- * `cv_url` is a separate, user-supplied external link and still counts.
- *
- * The legacy URL stays as a fallback until historical records are backfilled.
- */
-function hasCv(profile: any): boolean {
-  const hasCanonicalCv = Boolean(profile.cv_storage_bucket && profile.cv_storage_path);
-  return hasCanonicalCv || Boolean(profile.cv_file_url) || Boolean(profile.cv_url);
-}
-
-function calculateCompletion(profile: any, expCount: number, certCount: number, docCount: number): number {
-  let score = 0;
-  if (profile.avatar_url && profile.avatar_url.trim().length > 0) score += 10;
-  if (profile.full_name && profile.full_name.trim().length > 0) score += 5;
-  if (profile.title && profile.title.trim().length > 0) score += 5;
-  if (profile.company && profile.company.trim().length > 0) score += 5;
-  if (profile.location && profile.location.trim().length > 0) score += 5;
-  if (profile.years_experience && profile.years_experience > 0) score += 5;
-  if (profile.skills && Array.isArray(profile.skills) && profile.skills.length > 0) score += 10;
-  if (profile.bio && profile.bio.trim().length > 10) score += 10;
-  if (hasCv(profile)) score += 15;
-  if (expCount > 0) score += 15;
-  if (certCount > 0) score += 10;
-  if (docCount > 0) score += 5;
-  return score;
-}
-
-/**
- * Whether the user consented to being discoverable in the marketplace.
- *
- * PB-ADMIN-ONBOARDING-SCHEMA-001: `marketplace_ready` is NOT a derived completeness flag.
- * Setting it true exposes the worker's personal data to companies, so it must never be
- * inferred from profile_completion alone. The user's choice is recorded by the onboarding
- * wizard in profile_visibility / cv_visible and has to be respected here.
- */
-function consentsToMarketplace(profile: any): boolean {
-  if (profile.profile_visibility === "public") return true;
-  if (profile.profile_visibility == null && profile.cv_visible === true) return true;
-  return false;
-}
-
-function getOnboardingStatus(
-  profile: any,
-  completion: number,
-  consents: boolean,
-): string {
-  // A complete profile that opted out is PROFILE_COMPLETED, not MARKETPLACE_READY:
-  // it is finished, it is simply not published.
-  if (completion >= 30) return consents ? "MARKETPLACE_READY" : "PROFILE_COMPLETED";
-  if (profile.full_name && profile.title) return "PROFILE_STARTED";
-  return "AUTH_ONLY";
-}
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -163,134 +111,66 @@ Deno.serve(async (req) => {
       targetUserId = caller.id;
     }
 
-    // Fetch profiles
-    let profilesQuery = `${supabaseUrl}/rest/v1/app_14da0f1941_profiles?select=id,user_id,full_name,title,company,location,years_experience,skills,bio,avatar_url,cv_storage_bucket,cv_storage_path,cv_file_url,cv_url,profile_visibility,cv_visible`;
-    if (targetUserId) {
-      profilesQuery += `&user_id=eq.${targetUserId}`;
-    } else {
-      profilesQuery += `&limit=2000`;
-    }
-
-    const profilesRes = await fetch(profilesQuery, {
-      headers: {
-        "apikey": serviceRoleKey,
-        "Authorization": `Bearer ${serviceRoleKey}`,
-        "Content-Type": "application/json",
-      },
+    // Single canonical write path: SECURITY INVOKER RPC, EXECUTE granted to
+    // service_role only. No formula, no consent predicate and no status ladder
+    // live in this file any more.
+    const { data, error } = await supabaseAdmin.rpc("pb_recalculate_profile_state", {
+      p_user_id: targetUserId,
     });
 
-    if (!profilesRes.ok) {
-      const errText = await profilesRes.text();
-      console.error("recalculate-profiles: profiles fetch failed", errText);
-      return json({ error: "profiles_fetch_failed" }, 500);
+    if (error) {
+      console.error("recalculate-profiles: rpc failed", error.message);
+      return json({ error: "recalculation_failed" }, 500);
     }
 
-    const profiles: any[] = await profilesRes.json();
+    const result = Array.isArray(data) ? data[0] : data;
+    const processed: number = result?.processed ?? 0;
+    const changed: number = result?.changed ?? 0;
 
-    if (profiles.length === 0) {
+    if (processed === 0) {
       return json({ message: "No profiles found to recalculate", updated: 0 });
     }
 
-    const userIds = profiles.map((p: any) => p.user_id);
-
-    // Fetch experience counts
-    const expCountMap = new Map<string, number>();
-    const expUrl = `${supabaseUrl}/rest/v1/app_worker_experiences?select=user_id&user_id=in.(${userIds.join(",")})`;
-    const expRes = await fetch(expUrl, {
-      headers: {
-        "apikey": serviceRoleKey,
-        "Authorization": `Bearer ${serviceRoleKey}`,
-      },
-    });
-    if (expRes.ok) {
-      const exps: any[] = await expRes.json();
-      for (const e of exps) {
-        expCountMap.set(e.user_id, (expCountMap.get(e.user_id) || 0) + 1);
-      }
-    }
-
-    // Fetch certification counts
-    const certCountMap = new Map<string, number>();
-    const certUrl = `${supabaseUrl}/rest/v1/app_worker_certifications?select=user_id&user_id=in.(${userIds.join(",")})`;
-    const certRes = await fetch(certUrl, {
-      headers: {
-        "apikey": serviceRoleKey,
-        "Authorization": `Bearer ${serviceRoleKey}`,
-      },
-    });
-    if (certRes.ok) {
-      const certs: any[] = await certRes.json();
-      for (const c of certs) {
-        certCountMap.set(c.user_id, (certCountMap.get(c.user_id) || 0) + 1);
-      }
-    }
-
-    // Fetch document counts
-    const docCountMap = new Map<string, number>();
-    const docUrl = `${supabaseUrl}/rest/v1/app_worker_documents?select=user_id&user_id=in.(${userIds.join(",")})`;
-    const docRes = await fetch(docUrl, {
-      headers: {
-        "apikey": serviceRoleKey,
-        "Authorization": `Bearer ${serviceRoleKey}`,
-      },
-    });
-    if (docRes.ok) {
-      const docs: any[] = await docRes.json();
-      for (const d of docs) {
-        docCountMap.set(d.user_id, (docCountMap.get(d.user_id) || 0) + 1);
-      }
-    }
-
-    // Calculate and update each profile
-    let updatedCount = 0;
-    let callerResult: Record<string, unknown> | null = null;
-
-    for (const profile of profiles) {
-      const expCount = expCountMap.get(profile.user_id) || 0;
-      const certCount = certCountMap.get(profile.user_id) || 0;
-      const docCount = docCountMap.get(profile.user_id) || 0;
-
-      const completion = calculateCompletion(profile, expCount, certCount, docCount);
-      const consents = consentsToMarketplace(profile);
-      const onboardingStatus = getOnboardingStatus(profile, completion, consents);
-      const marketplaceReady = completion >= 30 && consents;
-
-      const updateUrl = `${supabaseUrl}/rest/v1/app_14da0f1941_profiles?user_id=eq.${profile.user_id}`;
-      const updateRes = await fetch(updateUrl, {
-        method: "PATCH",
-        headers: {
-          "apikey": serviceRoleKey,
-          "Authorization": `Bearer ${serviceRoleKey}`,
-          "Content-Type": "application/json",
-          "Prefer": "return=minimal",
+    // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001: el drenaje del outbox de
+    // activaciones se mantiene aunque este camino ya no pueda promover
+    // marketplace_ready: puede haber activaciones pendientes encoladas por el
+    // wizard. Fail-open: un fallo del email NO debe fallar el recálculo.
+    try {
+      const drainResults = await drainMarketplaceReadyActivations(
+        {
+          supabase: createClient(supabaseUrl, serviceRoleKey, {
+            auth: { autoRefreshToken: false, persistSession: false },
+          }),
         },
-        body: JSON.stringify({
-          profile_completion: completion,
-          onboarding_status: onboardingStatus,
-          marketplace_ready: marketplaceReady,
-        }),
-      });
-
-      if (updateRes.ok) {
-        updatedCount++;
-        if (profile.user_id === caller.id) {
-          callerResult = {
-            profile_completion: completion,
-            onboarding_status: onboardingStatus,
-            marketplace_ready: marketplaceReady,
-          };
-        }
+        { userId: targetUserId ?? undefined, limit: targetUserId ? 5 : 10 },
+      );
+      if (drainResults.length > 0) {
+        console.log(
+          `[recalculate-profiles] marketplace-ready drain: user=${targetUserId ?? "sweep"} processed=${drainResults.length}`,
+        );
       }
+    } catch (drainErr) {
+      console.error(
+        "[recalculate-profiles] marketplace-ready drain failed (fail-open):",
+        drainErr instanceof Error ? drainErr.message : String(drainErr),
+      );
     }
 
-    // The response no longer carries a list of profiles. It used to return up
-    // to 50 rows with user_id and full_name, which turned every call into a
-    // personal-data dump. Callers get counts, plus their own result when it
-    // applies.
+    // The response carries counts only, plus the caller's own result when it
+    // applies. `updated` now means "rows actually modified" instead of "rows
+    // rewritten", so it can legitimately be lower than total_profiles.
+    const callerResult = targetUserId === caller.id && result
+      ? {
+        profile_completion: result.caller_completion,
+        onboarding_status: result.caller_status,
+        marketplace_ready: result.caller_marketplace_ready,
+      }
+      : null;
+
     return json({
-      message: `Recalculation complete. Updated ${updatedCount}/${profiles.length} profiles.`,
-      updated: updatedCount,
-      total_profiles: profiles.length,
+      message: `Recalculation complete. Updated ${changed}/${processed} profiles.`,
+      updated: changed,
+      total_profiles: processed,
       ...(callerResult ? { profile: callerResult } : {}),
     });
   } catch (err) {

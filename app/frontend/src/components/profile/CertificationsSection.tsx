@@ -41,6 +41,7 @@ import type { WorkerCertification } from '@/lib/workerProfile';
 import { normalizeCertification } from '@/lib/workerProfile';
 import { syncCertificationReminders, deleteCertificationReminders } from '@/lib/certificationReminders';
 import { resolveFileMime } from '@/lib/uploadHelpers';
+import { isValidCertificateFile, ACCEPT_CERTIFICATES } from '@/lib/fileUploadUtils';
 import {
   startResumableUpload,
   UPLOAD_FAILURE_I18N,
@@ -273,13 +274,12 @@ export function CertificationsSection() {
       return;
     }
 
-    // Mobile browsers often report empty or generic MIME types.
-    // Validate by extension as fallback when file.type is unreliable.
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/heic', 'image/heif'];
-    const allowedExtensions = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'heic', 'heif'];
+    // PB-DOCUMENT-UPLOAD-RELIABILITY-001 rev. 2 — the certificates bucket
+    // (app_14da0f1941_certificates) has allowed_mime_types = NULL in Storage
+    // (no allowlist), so the ORIGINAL formats are preserved: PDF, PNG, JPG,
+    // WebP, HEIC/HEIF. Validation is centralized in isValidCertificateFile()
+    // so it stays testable and consistent with ACCEPT_CERTIFICATES.
     const ext = (file.name.split('.').pop() || '').toLowerCase();
-    const mimeOk = file.type && allowedTypes.includes(file.type);
-    const extOk = allowedExtensions.includes(ext);
 
     const resolvedMime = resolveFileMime(file);
 
@@ -288,12 +288,10 @@ export function CertificationsSection() {
       type: file.type || '(empty)',
       size: file.size,
       ext,
-      mimeOk,
-      extOk,
       resolvedMime,
     });
 
-    if (!mimeOk && !extOk) {
+    if (!isValidCertificateFile(file)) {
       console.warn('[CertUpload] Rejected: invalid type and extension');
       toast.error(t('workerProfile.certifications.invalidFileType'));
       return;
@@ -880,7 +878,7 @@ export function CertificationsSection() {
             ref={fileInputRef}
             id="cert-file-upload-input"
             type="file"
-            accept="application/pdf,image/png,image/jpeg,image/jpg,image/webp,image/heic,image/heif"
+            accept={ACCEPT_CERTIFICATES}
             className="sr-only"
             tabIndex={-1}
             onChange={(e) => {
@@ -1110,11 +1108,19 @@ export function CertificationsSection() {
                 className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
               >
                 {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {saving
-                  ? t('common.saving')
-                  : editing
-                    ? t('common.update')
-                    : t('common.create')}
+                {/* PB-PROFILE-STABILITY-001: span anchor — same crash class as
+                    PB-UI-DOM-INSERTBEFORE-001. The bare label below made the
+                    saving commit insert the spinner anchored at a translate-
+                    detached text node -> NotFoundError -> "Algo ha ido mal"
+                    while the INSERT had already succeeded server-side (the
+                    certificate then "appeared on Retry"). */}
+                <span>
+                  {saving
+                    ? t('common.saving')
+                    : editing
+                      ? t('common.update')
+                      : t('common.create')}
+                </span>
               </Button>
             </div>
           </form>
@@ -1152,7 +1158,9 @@ export function CertificationsSection() {
               className="bg-red-600 text-white hover:bg-red-700"
             >
               {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {t('common.delete')}
+              {/* PB-PROFILE-STABILITY-001: span anchor — same translate-mutation
+                  crash class as the submit button above. */}
+              <span>{t('common.delete')}</span>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

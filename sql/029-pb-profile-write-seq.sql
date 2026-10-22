@@ -1,0 +1,71 @@
+-- ══════════════════════════════════════════════════════════════════════════════
+-- PB-AUTH-LOCK-ONBOARDING-STALL-001 (rev.3, observación 4) — secuencia de
+-- escritura CAS para el perfil: una escritura obsoleta ABORTADA en el cliente
+-- nunca puede sobrescribir una escritura posterior.
+--
+-- ROOT CAUSE que resuelve (demostrada empíricamente contra PostgreSQL QA el
+-- 2026-10-13 con sonda de proxy de reordenación, cuenta sintética
+-- pb-write-probe-*@pipingbox-test.example):
+--   ProfileWriteCoordinator aborta en el cliente la petición superseded
+--   (AbortController + .abortSignal), PERO un fetch abortado ya pudo salir por
+--   la red. El servidor puede recibir y COMMIT-ear ese UPDATE DESPUÉS de una
+--   escritura más nueva. Sonda real: title/skills del autosave obsoleto
+--   sobrescribieron los del Finish, dejando además la fila INCOHERENTE
+--   (title/skills obsoletos + location fresco — mezcla de campos de dos
+--   escrituras distintas).
+--
+-- SOLUCIÓN (compare-and-set en la base de datos, airtight bajo row lock):
+--   * `profile_write_seq` sube monótonamente con cada INTENTO de escritura del
+--     wizard (se consume aunque la escritura se aborte), de modo que una
+--     escritura nueva de la MISMA pestaña siempre lleva un seq mayor que
+--     cualquier escritura abortada anterior.
+--   * El UPDATE del wizard lleva `WHERE profile_write_seq < :next_seq`
+--     (guardia CAS). Si el servidor ya aplicó un seq mayor (otra pestaña, o
+--     la escritura abortada llegó tarde), el UPDATE afecta a 0 filas y el
+--     cliente NO lo interpreta como éxito: resincroniza (SELECT seq), reintenta
+--     una vez con seq fresco y, si vuelve a perder, reporta error recuperable.
+--
+-- POR QUÉ UNA COLUMNA Y NO updated_at / versionado por trigger:
+--   * `updated_at` la mantiene un trigger con clock del servidor: no es
+--     predecible por el cliente y no sirve de guardia optimista.
+--   * El CAS en la propia sentencia UPDATE (WHERE atómico + row lock) es la
+--     única garantía real de ordenación frente a reordenaciones de red.
+--
+-- SEGURIDAD:
+--   * Migración aditiva y no destructiva (NOT NULL DEFAULT 0, sin backfill
+--     necesario: 0 = nunca escrita por el wizard).
+--   * Sin cambios de RLS: la policy de UPDATE propia del perfil ya permite
+--     escribir columnas no protegidas. `profiles_privilege_guard` NO la lista
+--     como protegida (verificar post-aplicación, paso 2 abajo); no confiere
+--     marketplace_ready, onboarding_status ni completion.
+--   * Backend (RPC pb_complete_onboarding, triggers de recálculo) no usa esta
+--     columna: es exclusiva de la ordenación de escrituras del wizard.
+--
+-- ACOPLAMIENTE DEPLOY (aceptado y documentado):
+--   * Orden seguro: aplicar esta migración ANTES de desplegar el frontend que
+--     usa la guardia. Si el frontend nuevo llega a una BD sin la columna,
+--     PostgREST responde PGRST204 y el cliente degrada a escritura sin
+--     guardia (comportamiento actual de main) — nunca rompe el guardado.
+--   * BD con la columna + frontend viejo: la columna permanece a 0, inocua.
+-- ══════════════════════════════════════════════════════════════════════════════
+
+ALTER TABLE public.app_14da0f1941_profiles
+  ADD COLUMN IF NOT EXISTS profile_write_seq bigint NOT NULL DEFAULT 0;
+
+COMMENT ON COLUMN public.app_14da0f1941_profiles.profile_write_seq IS
+  'PB-AUTH-LOCK-ONBOARDING-STALL-001: secuencia monotónica de escrituras del wizard (CAS). El UPDATE del cliente exige profile_write_seq < next_seq; 0 filas = superseded (reintento único tras resync). No la toca el backend.';
+
+-- ── Verificación post-aplicación ─────────────────────────────────────────────
+-- 1) SELECT column_name, data_type, is_nullable, column_default
+--    FROM information_schema.columns
+--    WHERE table_schema = 'public'
+--      AND table_name = 'app_14da0f1941_profiles'
+--      AND column_name = 'profile_write_seq';
+--    -> 1 fila: bigint / NO / 0
+-- 2) El privilege guard NO debe listarla como protegida:
+--    SELECT pg_get_triggerdef(oid) FROM pg_trigger
+--    WHERE tgrelid = 'public.app_14da0f1941_profiles'::regclass AND NOT tgisinternal;
+--    (profiles_privilege_guard: su lista de columnas protegidas no incluye
+--     profile_write_seq; un UPDATE propio autenticado con la columna debe pasar.)
+-- 3) CAS humo (service_role): UPDATE con WHERE profile_write_seq < 0 debe
+--    afectar a 0 filas aunque el SET traiga la columna.

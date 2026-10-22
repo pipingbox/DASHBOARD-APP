@@ -67,7 +67,7 @@ export type DocumentUploadErrorCategory =
   | 'cancelled'
   | 'unknown';
 
-export type DocumentType = 'certificate' | 'cv';
+export type DocumentType = 'certificate' | 'cv' | 'document';
 
 /** i18n-agnostic failure reason; components map this to localized copy. */
 export type DocumentUploadFailureReason =
@@ -312,6 +312,10 @@ const DEFAULT_NO_BYTES_MS = 15_000;
 const DEFAULT_STALL_MS = 60_000;
 const DEFAULT_TOTAL_MS = 600_000;
 const SLOW_HINT_MS = 30_000;
+// PB-AUTH-LOCK-ONBOARDING-STALL-001: cap on the pre-transfer session
+// acquisition (zombie auth-lock defence). Above the lock ladder's ~8 s
+// worst case so legitimate slow starts are never cut.
+const SESSION_ACQUIRE_TIMEOUT_MS = 15_000;
 
 export function startResumableUpload(
   file: File,
@@ -525,13 +529,39 @@ export function startResumableUpload(
     setState('PREPARING');
     emitProgress();
 
-    let session: { accessToken: string | null };
-    try {
-      session = await deps.getSession();
-    } catch {
-      finishFailure('auth', 'authExpired');
+    // PB-AUTH-LOCK-ONBOARDING-STALL-001: bound the session acquisition.
+    // Before this guard, getSession() was awaited BEFORE any watchdog was
+    // armed — a hung auth lock (zombie navigator.locks entry) left the
+    // upload at 0% forever. The resilient auth lock bounds the worst case
+    // to ~8 s; this race is the second line of defence and turns a hang
+    // into a recoverable, telemetry-classified failure.
+    const sessionRace = await new Promise<{ value?: { accessToken: string | null }; timedOut: boolean }>((resolve) => {
+      let done = false;
+      const timer = deps.setTimeoutFn(() => {
+        if (done) return;
+        done = true;
+        resolve({ timedOut: true });
+      }, SESSION_ACQUIRE_TIMEOUT_MS);
+      deps.getSession().then(
+        (value) => {
+          if (done) return;
+          done = true;
+          deps.clearTimeoutFn(timer);
+          resolve({ value, timedOut: false });
+        },
+        () => {
+          if (done) return;
+          done = true;
+          deps.clearTimeoutFn(timer);
+          resolve({ timedOut: true });
+        },
+      );
+    });
+    if (sessionRace.timedOut || !sessionRace.value) {
+      finishFailure('auth', 'timedOut');
       return;
     }
+    const session = sessionRace.value;
     if (!session.accessToken) {
       finishFailure('auth', 'authExpired');
       return;

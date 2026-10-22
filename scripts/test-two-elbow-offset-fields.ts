@@ -26,12 +26,14 @@
 import {
   formatEditableLengthForUnit,
   createEditableLengthField,
+  editableLengthFieldOnEdit,
   editableLengthFieldOnUnitChange,
   ROUND_TRIP_TOLERANCE_MM,
   BASE_DECIMALS,
   MAX_DECIMALS,
 } from '../app/frontend/src/tools/prefabrication/two-elbow-offset/two-elbow-offset-fields.ts';
 import { parseLengthInputToMm } from '../app/frontend/src/tools/prefabrication/pipe-comb/number-input.ts';
+import { solvePipeComb } from '../app/frontend/src/tools/core/geometry/pipe-comb.ts';
 import { formatLengthForUnit } from '../app/frontend/src/tools/prefabrication/pipe-comb/number-input.ts';
 
 let passed = 0;
@@ -197,6 +199,126 @@ function eq(actual: unknown, expected: unknown, label: string): void {
     eq(field.text, firstText, `6.x ${canonical} mm text is identical after 5 round trips`);
     eq(field.canonicalMm, canonical, `6.x ${canonical} mm canonical value is identical after 5 round trips`);
   }
+}
+
+
+/* ------------------------------------------------------------------ *
+ * 7. Representational-only vs real numeric edits (review residual
+ *    2026-10-22): CLR = 100 mm in inches reads "3.9370079"; appending a
+ *    trailing zero must NOT tip tangent elbows over the boundary, while
+ *    a genuine numeric change must still recalculate.
+ * ------------------------------------------------------------------ */
+{
+  console.log('\n7. Representational-only edits vs real numeric edits');
+
+  // The reproduced preview sequence: mm -> in -> append "0" -> engine.
+  let field = createEditableLengthField(100, 'mm');
+  field = editableLengthFieldOnUnitChange(field, 'in');
+  eq(field.text, '3.9370079', '7.1 CLR 100 mm renders as 3.9370079 in');
+
+  const afterZero = editableLengthFieldOnEdit(field, '3.93700790', 'in');
+  eq(afterZero.text, '3.93700790', '7.2 the typed text is preserved verbatim');
+  eq(afterZero.canonicalMm, 100, '7.3 appending a zero keeps the canonical value (tangent elbows survive)');
+  check(
+    solvePipeComb({ lineCount: 2, initialSpacingMm: 200, finalSpacingMm: 400, elbowAngleDeg: 90, clrMm: afterZero.canonicalMm }).success !== false,
+    '7.4 engine still solves the tangent geometry after the representational edit',
+  );
+
+  // A real numeric change afterwards must still convert and recalculate.
+  const afterRealEdit = editableLengthFieldOnEdit(afterZero, '3.937', 'in');
+  check(afterRealEdit.canonicalMm !== 100, '7.5 a real numeric edit replaces the canonical value');
+  check(
+    Math.abs(afterRealEdit.canonicalMm! - parseLengthInputToMm('3.937', 'in')!) <= 1e-12,
+    '7.6 the new canonical equals the parsed text exactly (single conversion)',
+  );
+
+  // Real edit in mm is likewise unaffected by the representation rule.
+  const mmField = createEditableLengthField(100, 'mm');
+  const mmRealEdit = editableLengthFieldOnEdit(mmField, '100.01', 'mm');
+  eq(mmRealEdit.canonicalMm, 100.01, '7.7 editing 100 -> 100.01 mm is a real change and recalculates');
+
+  // Representation-only in mm: 100 -> "100.00" keeps the canonical.
+  const mmRepr = editableLengthFieldOnEdit(mmField, '100.00', 'mm');
+  eq(mmRepr.canonicalMm, 100, '7.8 100 -> "100.00" is representational only');
+
+  // The rule is unit-aware: pasting the SAME digits after a unit change is
+  // a real change (different physical value), not representational.
+  const inField = createEditableLengthField(100, 'in'); // canonical 100 mm, text in inches
+  const sameDigitsOtherUnit = editableLengthFieldOnEdit(inField, '3.9370079', 'mm');
+  check(
+    Math.abs(sameDigitsOtherUnit.canonicalMm! - 3.9370079) <= 1e-12,
+    '7.9 text parsed under the field unit; a unit switch never pretends digits keep meaning',
+  );
+
+  // Frozen contracts intact: empty and invalid edits never touch canonical.
+  const emptyEdit = editableLengthFieldOnEdit(field, '', 'in');
+  eq(emptyEdit.canonicalMm, 100, '7.10 clearing the text keeps the canonical value (validity is derived from text)');
+  const invalidEdit = editableLengthFieldOnEdit(field, '3,937.0079', 'in');
+  eq(invalidEdit.canonicalMm, 100, '7.11 ambiguous separators leave the canonical value untouched');
+  eq(invalidEdit.text, '3,937.0079', '7.12 invalid text is preserved verbatim for correction');
+
+  // The original 400.004 mm finding still behaves: representational edits
+  // keep the fraction, real edits keep working.
+  const f400 = createEditableLengthField(400.004, 'mm');
+  const f400in = editableLengthFieldOnUnitChange(f400, 'in');
+  eq(f400in.text, '15.748189', '7.13 400.004 mm renders as 15.748189 in');
+  const f400z = editableLengthFieldOnEdit(f400in, '15.7481890', 'in');
+  eq(f400z.canonicalMm, 400.004, '7.14 trailing zero keeps 400.004 mm canonical');
+  const f400back = editableLengthFieldOnUnitChange(f400z, 'mm');
+  eq(f400back.text, '400.004', '7.15 and renders back as 400.004 mm');
+}
+
+/* ------------------------------------------------------------------ *
+ * 8. History independence of the edit contract (review of 9f420c0).
+ *    The representational exception compares the PREVIOUS VISIBLE TEXT
+ *    with the new raw via the parser — never the canonical value — so
+ *    the same final text always yields the same canonical value and the
+ *    same engine verdict, whatever was typed before.
+ * ------------------------------------------------------------------ */
+{
+  console.log('\n8. History-independent edit contract');
+
+  // The review counterexample: 100 -> 100.0000005 mm and 101 -> 100.0000005
+  // mm must land on the SAME canonical value and field state.
+  const from100 = editableLengthFieldOnEdit(createEditableLengthField(100, 'mm'), '100.0000005', 'mm');
+  const from101 = editableLengthFieldOnEdit(createEditableLengthField(101, 'mm'), '100.0000005', 'mm');
+  eq(from100.canonicalMm, 100.0000005, '8.1 100 -> 100.0000005 mm is a real numeric edit (no tolerance keeps 100)');
+  eq(from101.canonicalMm, 100.0000005, '8.2 101 -> 100.0000005 mm is a real numeric edit');
+  check(
+    from100.canonicalMm === from101.canonicalMm && from100.text === from101.text && from100.unit === from101.unit,
+    '8.3 the final field state is identical regardless of history',
+  );
+  const solveFrom100 = solvePipeComb({ lineCount: 2, initialSpacingMm: 200, finalSpacingMm: 400, elbowAngleDeg: 90, clrMm: from100.canonicalMm });
+  const solveFrom101 = solvePipeComb({ lineCount: 2, initialSpacingMm: 200, finalSpacingMm: 400, elbowAngleDeg: 90, clrMm: from101.canonicalMm });
+  check(
+    solveFrom100.success === false && (solveFrom100 as { code?: string }).code === 'negative_cut' &&
+      solveFrom101.success === false && (solveFrom101 as { code?: string }).code === 'negative_cut',
+    '8.4 both histories produce the same engine verdict (negative_cut)',
+  );
+
+  // 3.9370079 -> 3.93700791 (one digit more) is a REAL numeric change.
+  let field = createEditableLengthField(100, 'mm');
+  field = editableLengthFieldOnUnitChange(field, 'in');
+  eq(field.text, '3.9370079', '8.5 CLR 100 mm renders as 3.9370079 in (setup)');
+  const realEdit = editableLengthFieldOnEdit(field, '3.93700791', 'in');
+  check(realEdit.canonicalMm !== 100, '8.6 3.9370079 -> 3.93700791 is a real numeric edit');
+  check(
+    realEdit.canonicalMm !== null && Math.abs(realEdit.canonicalMm! - parseLengthInputToMm('3.93700791', 'in')!) <= 1e-12,
+    '8.7 the canonical is the parsed new text (single conversion)',
+  );
+
+  // Separator variants of the SAME number stay representational.
+  const commaEdit = editableLengthFieldOnEdit(field, '3,9370079', 'in');
+  eq(commaEdit.canonicalMm, 100, '8.8 comma decimal of the same number is representational only');
+
+  // Previous text empty or invalid: NO representational exception — the
+  // edit converts and replaces the canonical value.
+  const cleared = { text: '', canonicalMm: 100, unit: 'in' as const };
+  const retyped = editableLengthFieldOnEdit(cleared, '3.9370079', 'in');
+  check(retyped.canonicalMm !== null && retyped.canonicalMm !== 100, '8.9 retyping after clearing is a real edit (no exception from empty text)');
+  const invalidPrev = { text: 'abc', canonicalMm: 100, unit: 'in' as const };
+  const afterInvalid = editableLengthFieldOnEdit(invalidPrev, '3.9370079', 'in');
+  check(afterInvalid.canonicalMm !== null && afterInvalid.canonicalMm !== 100, '8.10 previous invalid text gets no representational exception');
 }
 
 /* ------------------------------------------------------------------ */

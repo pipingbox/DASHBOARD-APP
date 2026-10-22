@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { TrustMetricsSection } from '@/components/jobs/TrustMetricsSection';
 import { FilterPanel } from '@/components/jobs/FilterPanel';
 import { JobCard, JobSkeleton } from '@/components/jobs/JobCard';
+import { handlePendingProfileAfterApply, drainActivationEmailsAfterApply } from '@/lib/applicationPendingProfile';
 import {
   DISCIPLINE_MAP,
   getCountry,
@@ -189,7 +190,11 @@ export default function Jobs() {
       applicationPayload.company_user_id = jobRecord.company_user_id;
     }
 
-    const { error } = await supabase.from(TABLES.jobApplications).insert(applicationPayload);
+    const { data: insertedApp, error } = await supabase
+      .from(TABLES.jobApplications)
+      .insert(applicationPayload)
+      .select('id, status')
+      .single();
     setApplyingId(null);
 
     if (error) {
@@ -201,6 +206,15 @@ export default function Jobs() {
       }
       return;
     }
+
+    // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001: eventos + EMAIL 1 cuando la
+    // candidatura nace pending_profile_validation (decisión backend).
+    // Fail-open: nunca bloquea el apply.
+    const isPendingProfile = await handlePendingProfileAfterApply(insertedApp, job.id);
+
+    // PB-JOBS-MARKETPLACE-READY-RECOVERY-001: drain self-service del EMAIL 2
+    // (idempotente, fail-open). Cubre promociones del gate durante el INSERT.
+    await drainActivationEmailsAfterApply();
 
     // PB-JOBS-PILOT-FOLLOWUP-002: fire the recruitment email notification
     // (jobs@pipingbox.com). The application IS stored regardless of the email
@@ -216,7 +230,14 @@ export default function Jobs() {
       );
     }
 
-    toast.success(t('jobs.applicationSubmitted'));
+    if (isPendingProfile) {
+      // "Candidatura recibida — completa tu perfil para activarla."
+      toast.info(t('jobs.applicationPendingProfileTitle'), {
+        description: t('jobs.applicationPendingProfileDescription'),
+      });
+    } else {
+      toast.success(t('jobs.applicationSubmitted'));
+    }
     setAppliedKeys((s) => new Set(s).add(jobKey));
   };
 

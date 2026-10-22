@@ -406,6 +406,54 @@ test('R4a4: empty, invalid and cleared CLR fields survive a unit toggle', async 
   await expect(page.locator('[data-testid^="two-elbow-offset-row-"]')).not.toHaveCount(0);
 });
 
+test('R4a5: appending a trailing zero to the visible CLR keeps tangent elbows (2026-10-22 residual)', async ({ page }) => {
+  await openTool(page, TOOL_ES);
+  /* Reproduced preview sequence: N=2, 90°, Di=200, Df=400, CLR=100 mm
+     (exact tangent boundary). Switching to inches renders CLR as
+     "3.9370079"; appending one zero is representational only and must
+     preserve the canonical 100 mm — the tangent result survives. */
+  await fill(page, { count: '2', angle: '90', initial: '200', final: '400', clr: '100' });
+  const clr = page.locator('#teo-clr');
+  const cut = row(page, '2').locator('td').nth(5);
+  const status = row(page, '2').locator('td').nth(7);
+
+  await expect(cut).toHaveText('0 mm');
+  await expect(status).toHaveText('Codos tangentes');
+
+  await page.locator('[data-testid="two-elbow-offset-unit-in"]').click();
+  await expect(clr).toHaveValue('3.9370079');
+  await expect(status).toHaveText('Codos tangentes');
+
+  /* Representational-only edit: append "0" — text preserved, result kept. */
+  await clr.fill('3.93700790');
+  await expect(clr).toHaveValue('3.93700790');
+  await expect(page.locator('[data-testid="two-elbow-offset-diagram"]')).toHaveCount(1);
+  /* Still inches here: the table renders in the active unit. */
+  await expect(cut).toHaveText('0 in');
+  await expect(status).toHaveText('Codos tangentes');
+
+  /* A real numeric edit afterwards still converts and recalculates:
+     "3.93700792" (100.000001 mm, a digit more) crosses the tangent
+     boundary and the engine reports the negative cut explicitly. */
+  await clr.fill('3.93700792');
+  await expect(clr).toHaveValue('3.93700792');
+  await expect(page.locator('[data-testid="two-elbow-offset-diagram"]')).toHaveCount(0);
+  await expect(page.getByText(/corte/i).first()).toBeVisible();
+
+  /* The original 400.004 mm finding stays fixed in the same session
+     (same geometry as R4a2: 90°, 200 -> 400.004). */
+  await page.locator('[data-testid="two-elbow-offset-unit-mm"]').click();
+  await fill(page, { count: '2', angle: '90', initial: '200', final: '400.004', clr: '100' });
+  const df = page.locator('#teo-final-spacing');
+  await expect(df).toHaveValue('400.004');
+  await expect(row(page, '2').locator('td').nth(5)).toHaveText('0.004 mm');
+  await page.locator('[data-testid="two-elbow-offset-unit-in"]').click();
+  await expect(df).toHaveValue('15.748189');
+  await page.locator('[data-testid="two-elbow-offset-unit-mm"]').click();
+  await expect(df).toHaveValue('400.004');
+  await expect(row(page, '2').locator('td').nth(5)).toHaveText('0.004 mm');
+});
+
 test('R4b: true zero keeps its distinct meaning (tangent elbows)', async ({ page }) => {
   await openTool(page, TOOL_ES);
   /* delta = 2·R·tan(theta/2)·sin(theta) with R=100, theta=45°. */

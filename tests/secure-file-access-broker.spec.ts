@@ -10,6 +10,27 @@ import path from 'node:path';
  * minimum authorization relationship it needs, runs exactly 9 tests with zero
  * skips, and restores/deletes every temporary fixture in afterAll.
  *
+ * PB-SEC-01b (PO review P1a-P1d) adds:
+ *   - a company verification gate: every company fixture used for GRANT tests
+ *     (E2E_COMPANY_AUTHORIZED_*, and E2E_COMPANY_UNAUTHORIZED_* when it is
+ *     expected to reach cross_tenant) must be seeded with
+ *     company_verified=true and company_status='verified'. That flag is
+ *     admin-only (service_role cannot self-set it, sql/036), so CI seeding
+ *     must run as postgres/supabase_admin SQL, e.g.:
+ *       update public.app_14da0f1941_profiles
+ *       set company_verified=true, company_status='verified'
+ *       where user_id = '<company user id>';
+ *   - machine-readable denial reasons (`reason` field in the error body);
+ *   - real-MIME proxy checks via a self-seeded JPEG document;
+ *   - opt-in negatives for an UNVERIFIED company and an EXPIRED relationship,
+ *     enabled only when the extra fixture accounts are provided:
+ *       E2E_COMPANY_UNVERIFIED_EMAIL / E2E_COMPANY_UNVERIFIED_PASSWORD
+ *         (a company account left unverified, WITH a relationship to worker A)
+ *       E2E_COMPANY_EXPIRED_EMAIL / E2E_COMPANY_EXPIRED_PASSWORD
+ *         (a verified company whose only application from worker A is in a
+ *          terminal status, e.g. rejected)
+ *     These two tests skip (with a note) when the accounts are absent.
+ *
  * Verifies that the `secure-file-access` Edge Function:
  *   - allows owners to access their own files;
  *   - allows an explicitly related company to access a visible CV;
@@ -36,6 +57,10 @@ const COMPANY_AUTH_EMAIL = process.env.E2E_COMPANY_AUTHORIZED_EMAIL;
 const COMPANY_AUTH_PASSWORD = process.env.E2E_COMPANY_AUTHORIZED_PASSWORD;
 const COMPANY_UNAUTH_EMAIL = process.env.E2E_COMPANY_UNAUTHORIZED_EMAIL;
 const COMPANY_UNAUTH_PASSWORD = process.env.E2E_COMPANY_UNAUTHORIZED_PASSWORD;
+const COMPANY_UNVERIFIED_EMAIL = process.env.E2E_COMPANY_UNVERIFIED_EMAIL;
+const COMPANY_UNVERIFIED_PASSWORD = process.env.E2E_COMPANY_UNVERIFIED_PASSWORD;
+const COMPANY_EXPIRED_EMAIL = process.env.E2E_COMPANY_EXPIRED_EMAIL;
+const COMPANY_EXPIRED_PASSWORD = process.env.E2E_COMPANY_EXPIRED_PASSWORD;
 const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL;
 const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD;
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -72,6 +97,8 @@ interface BrokerFixture {
   historicalDocumentId?: string;
   probeDocumentPath?: string;
   probeDocumentId?: string;
+  jpgDocumentPath?: string;
+  jpgDocumentId?: string;
   certInCertsPath?: string;
   certInCertsId?: string;
   certInDocsPath?: string;
@@ -236,6 +263,8 @@ async function assertSignedUrl(label: string, data: any, error: any) {
   }
   expect(data.signedUrl).toMatch(/[?&]token=/);
   expect(data.signedUrl).not.toMatch(/\/object\/public\//);
+  // PB-SEC-01: owner/admin signed URLs must be short-lived (15 minutes).
+  expect(data.expiresIn, `${label}: expiresIn must be the PB-SEC-01 15-minute TTL`).toBe(15 * 60);
 }
 
 /**
@@ -267,6 +296,30 @@ async function assertDenied(label: string, data: any, error: any): Promise<strin
   return reason;
 }
 
+/**
+ * PB-SEC-01 — company deliveries are proxied through the broker: the response
+ * is the file binary itself (a Blob for supabase-js), never a signed URL. A
+ * 15-minute URL is not revocation; a proxied stream leaves no reusable link.
+ * This helper asserts the proxy contract and rejects any response that smells
+ * like a URL (JSON body, signedUrl field, token query string).
+ */
+async function assertBrokerProxiedFile(label: string, data: any, error: any): Promise<void> {
+  if (error) {
+    throw new Error(await describeFailure(`${label}: expected proxied file`, data, error));
+  }
+  expect(data, `${label}: expected a Blob response`).toBeTruthy();
+  const isBlob = typeof Blob !== 'undefined' && data instanceof Blob;
+  if (!isBlob) {
+    const serialized = typeof data === 'string' ? data : JSON.stringify(data);
+    throw new Error(
+      `${label}: expected binary Blob (proxy delivery), got ${typeof data}: ${serialized?.slice(0, 200)}`,
+    );
+  }
+  expect((data as Blob).size, `${label}: proxied file must not be empty`).toBeGreaterThan(0);
+  expect(JSON.stringify(data), `${label}: proxy response must not contain a signedUrl`).not.toContain('signedUrl');
+  console.log(`[broker-e2e] ${label} -> proxied Blob (${(data as Blob).size} bytes, no signed URL issued)`);
+}
+
 async function cleanupFixtures(): Promise<string[]> {
   const failures: string[] = [];
   const attempt = async (label: string, fn: () => Promise<void>) => {
@@ -296,6 +349,7 @@ async function cleanupFixtures(): Promise<string[]> {
       for (const [table, id, label] of [
         ['app_worker_documents', fixture.historicalDocumentId, 'historical document row'],
         ['app_worker_documents', fixture.probeDocumentId, 'probe document row'],
+        ['app_worker_documents', fixture.jpgDocumentId, 'JPEG document row'],
         ['app_worker_certifications', fixture.certInCertsId, 'certificates-bucket certification row'],
         ['app_worker_certifications', fixture.certInDocsId, 'documents-bucket certification row'],
       ] as const) {
@@ -318,6 +372,7 @@ async function cleanupFixtures(): Promise<string[]> {
 
       const docBucketPaths = [
         fixture.probeDocumentPath,
+        fixture.jpgDocumentPath,
         fixture.certInDocsPath,
       ].filter(Boolean) as string[];
       if (docBucketPaths.length > 0) {
@@ -502,10 +557,12 @@ test.describe('secure-file-access broker', () => {
        * so Storage writes the correct owner_id and the ownership RPC passes. */
       const historicalDocumentName = `e2e-broker-${RUN_TOKEN}-historical-document.pdf`;
       const probeDocumentName = `e2e-broker-${RUN_TOKEN}-probe-document.pdf`;
+      const jpgDocumentName = `e2e-broker-${RUN_TOKEN}-probe-image.jpg`;
       const certInCertsName = `e2e-broker-${RUN_TOKEN}-cert-in-certificates.pdf`;
       const certInDocsName = `e2e-broker-${RUN_TOKEN}-cert-in-documents.pdf`;
       fixture.historicalDocumentPath = `${worker.user.id}/${historicalDocumentName}`;
       fixture.probeDocumentPath = `${worker.user.id}/${probeDocumentName}`;
+      fixture.jpgDocumentPath = `${worker.user.id}/${jpgDocumentName}`;
       fixture.certInCertsPath = `${worker.user.id}/${certInCertsName}`;
       fixture.certInDocsPath = `${worker.user.id}/${certInDocsName}`;
 
@@ -513,6 +570,17 @@ test.describe('secure-file-access broker', () => {
       // bucket, exactly like the 16 records that predate the bucket split.
       await uploadFixture(worker.supabase, CV_BUCKET, fixture.historicalDocumentPath, 'historical document');
       await uploadFixture(worker.supabase, WORKER_FILES_BUCKET, fixture.probeDocumentPath, 'probe document');
+      // PB-SEC-01b (P1c): non-PDF fixture to pin the real-MIME proxy contract.
+      {
+        const jpeg = new Blob(
+          [new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0, 16, 0x4a, 0x46, 0x49, 0x46, 0, 1, 1, 1, 0, 72, 0, 72, 0, 0, 0xff, 0xd9])],
+          { type: 'image/jpeg' },
+        );
+        const { error: jpgError } = await worker.supabase.storage
+          .from(WORKER_FILES_BUCKET)
+          .upload(fixture.jpgDocumentPath, jpeg, { contentType: 'image/jpeg', upsert: false });
+        throwIfError('Upload probe JPEG document', jpgError);
+      }
       await uploadFixture(worker.supabase, CV_BUCKET, fixture.certInCertsPath, 'certification in certificates');
       await uploadFixture(worker.supabase, WORKER_FILES_BUCKET, fixture.certInDocsPath, 'certification in documents');
 
@@ -521,6 +589,7 @@ test.describe('secure-file-access broker', () => {
         bucket: string,
         path: string,
         label: string,
+        mimeType = 'application/pdf',
       ) => {
         const { data, error } = await worker.supabase
           .from('app_worker_documents')
@@ -529,7 +598,7 @@ test.describe('secure-file-access broker', () => {
             document_name: label,
             document_type: 'qa_fixture',
             file_name: name,
-            mime_type: 'application/pdf',
+            mime_type: mimeType,
             notes: `${FIXTURE_TAG} ${RUN_TOKEN}`,
             is_visible: true,
             visible_to_companies: true,
@@ -578,6 +647,10 @@ test.describe('secure-file-access broker', () => {
       fixture.probeDocumentId = await insertDocument(
         probeDocumentName, WORKER_FILES_BUCKET, fixture.probeDocumentPath,
         'QA Canonical Document',
+      );
+      fixture.jpgDocumentId = await insertDocument(
+        jpgDocumentName, WORKER_FILES_BUCKET, fixture.jpgDocumentPath,
+        'QA JPEG Document', 'image/jpeg',
       );
       fixture.certInCertsId = await insertCertification(
         certInCertsName, CV_BUCKET, fixture.certInCertsPath,
@@ -681,48 +754,20 @@ test.describe('secure-file-access broker', () => {
     await client.supabase.auth.signOut();
   });
 
-  test('authorized company can retrieve a signed URL for a visible CV', async () => {
+  test('authorized company is denied the original CV even when it is visible (PB-SEC-01)', async () => {
     const client = await signIn(COMPANY_AUTH_EMAIL!, COMPANY_AUTH_PASSWORD!);
-
-    // Gate run #2 returned 403 "Company not authorized to access this candidate"
-    // while the fixture read-back showed the exact row isCompanyAuthorized()
-    // looks for. That narrows the failure to relationship resolution, so replay
-    // the broker's first query from here to tell "the data is wrong" apart from
-    // "the broker cannot see correct data".
-    //
-    // The broker runs this with service_role; this client is the company under
-    // RLS, so an empty result is only conclusive when paired with the error.
-    const probe = await client.supabase
-      .from('app_14da0f1941_job_applications')
-      .select('id, user_id, company_user_id')
-      .eq('user_id', fixture.workerId)
-      .eq('company_user_id', client.user.id)
-      .limit(1);
-
-    console.log(
-      '[broker-e2e] relationship probe (as company, under RLS):\n' +
-      `  viewer id (jwt):      ${client.user.id}\n` +
-      `  fixture company id:   ${fixture.authorizedCompanyId ?? '(unset)'}\n` +
-      `  candidate id queried: ${fixture.workerId}\n` +
-      `  rows:  ${probe.data ? JSON.stringify(probe.data) : '(none)'}\n` +
-      `  error: ${probe.error?.message ?? '(none)'}`,
-    );
-
-    // If the JWT identity differs from the id used to build the fixture, the
-    // broker is right to reject and the fixture is the defect.
-    if (fixture.authorizedCompanyId && client.user.id !== fixture.authorizedCompanyId) {
-      throw new Error(
-        `Company JWT identity (${client.user.id}) differs from the id used to build the ` +
-        `authorization fixture (${fixture.authorizedCompanyId}). The broker rejection is ` +
-        'correct; the fixture is invalid.',
-      );
-    }
 
     const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
       body: { owner_user_id: fixture.workerId, file_type: 'cv' },
     });
 
-    await assertSignedUrl('authorized company CV', data, error);
+    // PB-SEC-01: companies never receive the original CV during search and
+    // shortlist, regardless of relationship history or cv_visible. The
+    // protected professional profile replaces it until the candidate accepts
+    // contact (TRACK D). The exact denial reason is asserted so a silent
+    // re-opening of the original-CV path fails this gate loudly.
+    const reason = await assertDenied('authorized company original CV', data, error);
+    expect(reason, 'denial reason must be cv_original_not_available').toBe('cv_original_not_available');
     await client.supabase.auth.signOut();
   });
 
@@ -899,7 +944,7 @@ test.describe('secure-file-access broker', () => {
     await client.supabase.auth.signOut();
   });
 
-  test('a CV with no legacy URL is still signed for the owner and the authorized company', async () => {
+  test('a CV with no legacy URL is still signed for the owner and denied to the authorized company (PB-SEC-01)', async () => {
     const owner = await signIn(WORKER_EMAIL!, WORKER_PASSWORD!);
     const { error: clearError } = await owner.supabase
       .from('app_14da0f1941_profiles')
@@ -927,7 +972,8 @@ test.describe('secure-file-access broker', () => {
     const companyAccess = await company.supabase.functions.invoke('secure-file-access', {
       body: { owner_user_id: fixture.workerId, file_type: 'cv' },
     });
-    await assertSignedUrl('authorized company canonical CV', companyAccess.data, companyAccess.error);
+    const reason = await assertDenied('authorized company canonical CV', companyAccess.data, companyAccess.error);
+    expect(reason, 'denial reason must be cv_original_not_available').toBe('cv_original_not_available');
     await company.supabase.auth.signOut();
   });
 
@@ -973,7 +1019,7 @@ test.describe('secure-file-access broker', () => {
     await client.supabase.auth.signOut();
   });
 
-  test('authorized company can retrieve a visible historical document', async () => {
+  test('authorized company receives a visible historical document by proxy, never by signed URL (PB-SEC-01)', async () => {
     const client = await signIn(COMPANY_AUTH_EMAIL!, COMPANY_AUTH_PASSWORD!);
     const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
       body: {
@@ -983,7 +1029,7 @@ test.describe('secure-file-access broker', () => {
       },
     });
 
-    await assertSignedUrl('authorized company historical document', data, error);
+    await assertBrokerProxiedFile('authorized company historical document', data, error);
     await client.supabase.auth.signOut();
   });
 
@@ -999,6 +1045,122 @@ test.describe('secure-file-access broker', () => {
 
     await assertDenied('unauthorized company historical document', data, error);
     await client.supabase.auth.signOut();
+  });
+
+  /* PB-SEC-01b (PO review P1a-P1d) ----------------------------------------
+   * - Denials expose a machine-readable `reason` alongside the message.
+   * - Proxied deliveries carry the REAL content type and a neutral filename
+   *   with the real extension (no forced .pdf).
+   * - Unverified companies get company_not_verified before any resolution.
+   * - Terminal relationships get relationship_expired.
+   * ---------------------------------------------------------------------- */
+
+  test('PB-SEC-01b: company denial exposes the machine-readable reason cross_tenant', async () => {
+    const client = await signIn(COMPANY_UNAUTH_EMAIL!, COMPANY_UNAUTH_PASSWORD!);
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.probeDocumentId,
+      },
+    });
+
+    expect(error, 'cross-tenant company must be denied').toBeTruthy();
+    const status = (error as any)?.context?.status;
+    expect(status, 'cross-tenant company must be 403').toBe(403);
+    let body: any = null;
+    try {
+      body = await (error as any)?.context?.json?.();
+    } catch {
+      try { body = JSON.parse(await (error as any)?.context?.text?.()); } catch { body = null; }
+    }
+    expect(body?.reason, 'denial body must expose the machine reason').toBe('cross_tenant');
+    await client.supabase.auth.signOut();
+  });
+
+  test('PB-SEC-01b: proxied JPEG keeps its real MIME and extension (no forced .pdf)', async () => {
+    const client = await signIn(COMPANY_AUTH_EMAIL!, COMPANY_AUTH_PASSWORD!);
+    const token = (await client.supabase.auth.getSession()).data.session?.access_token;
+    expect(token, 'authorized company session token').toBeTruthy();
+
+    // Direct HTTP call: functions.invoke coerces image/jpeg to TEXT via its
+    // content-type heuristic (only octet-stream/pdf become Blobs), which would
+    // corrupt binary proxy deliveries in the assertion layer. The broker
+    // contract is HTTP-level: real content type + real extension + raw bytes.
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/secure-file-access`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_ANON_KEY!,
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.jpgDocumentId,
+      }),
+    });
+
+    expect(response.status, 'authorized company JPEG document must be proxied').toBe(200);
+    expect(
+      response.headers.get('content-type'),
+      'proxy must carry the real content type',
+    ).toContain('image/jpeg');
+    expect(
+      response.headers.get('content-disposition') ?? '',
+      'neutral filename must keep the real extension (no forced .pdf)',
+    ).toMatch(/pipingbox-document\.jpe?g/);
+    const head = new Uint8Array(await response.arrayBuffer());
+    expect(head.byteLength, 'proxied JPEG must not be empty').toBeGreaterThan(2);
+    expect(head[0], 'JPEG SOI marker').toBe(0xff);
+    expect(head[1], 'JPEG SOI marker').toBe(0xd8);
+    await client.supabase.auth.signOut();
+  });
+
+  test('PB-SEC-01b: unverified company is denied before any file resolution', async ({} , testInfo) => {
+    test.skip(
+      !COMPANY_UNVERIFIED_EMAIL || !COMPANY_UNVERIFIED_PASSWORD,
+      'E2E_COMPANY_UNVERIFIED_EMAIL/PASSWORD not configured: seed an unverified company account WITH a relationship to worker A',
+    );
+    const client = await signIn(COMPANY_UNVERIFIED_EMAIL!, COMPANY_UNVERIFIED_PASSWORD!);
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.probeDocumentId,
+      },
+    });
+
+    expect(error, 'unverified company must be denied').toBeTruthy();
+    expect((error as any)?.context?.status, 'unverified company must be 403').toBe(403);
+    let body: any = null;
+    try { body = JSON.parse(await (error as any)?.context?.text?.()); } catch { body = null; }
+    expect(body?.reason).toBe('company_not_verified');
+    await client.supabase.auth.signOut();
+    void testInfo;
+  });
+
+  test('PB-SEC-01b: expired (terminal) company relationship no longer grants access', async ({} , testInfo) => {
+    test.skip(
+      !COMPANY_EXPIRED_EMAIL || !COMPANY_EXPIRED_PASSWORD,
+      'E2E_COMPANY_EXPIRED_EMAIL/PASSWORD not configured: seed a verified company whose only application from worker A is terminal (rejected/hired/withdrawn)',
+    );
+    const client = await signIn(COMPANY_EXPIRED_EMAIL!, COMPANY_EXPIRED_PASSWORD!);
+    const { data, error } = await client.supabase.functions.invoke('secure-file-access', {
+      body: {
+        owner_user_id: fixture.workerId,
+        file_type: 'document',
+        record_id: fixture.probeDocumentId,
+      },
+    });
+
+    expect(error, 'expired relationship must be denied').toBeTruthy();
+    expect((error as any)?.context?.status, 'expired relationship must be 403').toBe(403);
+    let body: any = null;
+    try { body = JSON.parse(await (error as any)?.context?.text?.()); } catch { body = null; }
+    expect(body?.reason).toBe('relationship_expired');
+    await client.supabase.auth.signOut();
+    void testInfo;
   });
 
   test('a second worker is denied a historical document', async () => {

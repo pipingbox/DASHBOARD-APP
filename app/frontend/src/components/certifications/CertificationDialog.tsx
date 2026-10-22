@@ -14,10 +14,17 @@ import { Label } from '@/components/ui/label';
 import { supabase, TABLES, STORAGE_BUCKETS } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Loader2, FileText, Upload, RefreshCw } from 'lucide-react';
+import { Loader2, FileText, Upload, RefreshCw, AlertTriangle, ScanSearch } from 'lucide-react';
 import type { Certification } from '@/lib/certifications';
 import { getSecureFileUrl } from '@/lib/storageHelpers';
 import { hasStoredRecordFile } from '@/lib/filePresence';
+import {
+  applyCertDraft,
+  getDraftByStoragePath,
+  requestCertExtraction,
+  type CertDraft,
+  type CertFieldName,
+} from '@/lib/certDrafts';
 
 interface CertificationDialogProps {
   open: boolean;
@@ -51,6 +58,12 @@ export function CertificationDialog({
   const [storageBucket, setStorageBucket] = useState<string | null>(null);
   const [storagePath, setStoragePath] = useState<string | null>(null);
 
+  // PB-CERT-AUTO-PROFILE-001: draft de extracción del documento subido.
+  const [extracting, setExtracting] = useState(false);
+  const [certDraft, setCertDraft] = useState<CertDraft | null>(null);
+  // Confianza por campo (para el distintivo "verifica este dato").
+  const [fieldConfidence, setFieldConfidence] = useState<Partial<Record<CertFieldName, 'high' | 'medium' | 'low'>>>({});
+
   useEffect(() => {
     if (!open) return;
     if (editing) {
@@ -83,6 +96,10 @@ export function CertificationDialog({
       setStorageBucket(null);
       setStoragePath(null);
     }
+    // PB-CERT-AUTO-PROFILE-001: reset del estado de extracción al abrir.
+    setCertDraft(null);
+    setFieldConfidence({});
+    setExtracting(false);
   }, [open, editing, renewMode]);
 
   /** Never open the stored object through a public URL. */
@@ -140,6 +157,45 @@ export function CertificationDialog({
     setStoragePath(path);
     setUploading(false);
     toast.success(t('profile.certificationDialog.fileUploaded'));
+
+    // PB-CERT-AUTO-PROFILE-001: tras la subida, intentar la extracción
+    // DRAFT FIRST. Solo PDF con texto nativo en fase 1; imagen/scan →
+    // fallback manual honesto (mensaje, nunca "extracción completada").
+    if (file.type === 'application/pdf') {
+      setExtracting(true);
+      setCertDraft(null);
+      setFieldConfidence({});
+      try {
+        const resp = await requestCertExtraction(bucketName, path);
+        if (resp && (resp.status === 'completed' || resp.status === 'retried' || resp.status === 'already_processed') && resp.draft_id) {
+          const draft = await getDraftByStoragePath(path);
+          if (draft && draft.extraction_status === 'pending_review' && draft.extracted_fields.length > 0) {
+            setCertDraft(draft);
+            const conf: Partial<Record<CertFieldName, 'high' | 'medium' | 'low'>> = {};
+            for (const f of draft.extracted_fields) {
+              conf[f.field] = f.confidence;
+              // Pre-rellena SOLO huecos (nunca pisa lo ya escrito/confirmado).
+              if (f.field === 'certification_name') setName((prev) => (prev.trim() ? prev : f.value));
+              if (f.field === 'issuing_organization') setIssuer((prev) => (prev.trim() ? prev : f.value));
+              if (f.field === 'credential_id') setCredentialId((prev) => (prev.trim() ? prev : f.value));
+              if (f.field === 'issue_date') setIssueDate((prev) => (prev.trim() ? prev : f.value));
+              if (f.field === 'expiry_date') setExpiryDate((prev) => (prev.trim() ? prev : f.value));
+            }
+            setFieldConfidence(conf);
+            toast.success(t('certExtract.prefilled'));
+          } else if (draft && draft.extraction_status === 'pending_review') {
+            // Extracción OK pero sin campos explícitos: formulario en blanco.
+            toast.info(t('certExtract.noDataFound'));
+          }
+        } else if (resp && resp.status === 'extraction_failed') {
+          // Fallback manual honesto: el documento se conserva; el usuario
+          // completa los datos. NO se presenta como extracción.
+          toast.info(t('certExtract.manualFallback'));
+        }
+      } finally {
+        setExtracting(false);
+      }
+    }
   };
 
   const submit = async (e: FormEvent) => {
@@ -150,6 +206,57 @@ export function CertificationDialog({
       return;
     }
     setSaving(true);
+
+    // PB-CERT-AUTO-PROFILE-001: si hay un draft pendiente del documento
+    // subido, la confirmación va por cert-apply-draft (única vía draft →
+    // registro canónico; respeta conflictos 409 y nunca toca is_verified).
+    if (certDraft && certDraft.extraction_status === 'pending_review') {
+      const decisions: { field: CertFieldName; action: 'accept' | 'edit'; value?: string }[] = [];
+      const push = (field: CertFieldName, formValue: string) => {
+        const extracted = certDraft.extracted_fields.find((f) => f.field === field);
+        const v = formValue.trim();
+        if (!v) return;
+        if (extracted && extracted.value === v) {
+          decisions.push({ field, action: 'accept' });
+        } else {
+          // Valor editado por el usuario (o ausente en el draft): edit.
+          decisions.push({ field, action: 'edit', value: v });
+        }
+      };
+      push('certification_name', name);
+      push('issuing_organization', issuer);
+      push('credential_id', credentialId);
+      push('issue_date', issueDate);
+      push('expiry_date', expiryDate);
+
+      const result = await applyCertDraft({
+        draftId: certDraft.id,
+        fields: decisions,
+        // Alta nueva: sin target. Edición de una existente: target explícito.
+        targetCertificationId: editing?.id ?? null,
+      });
+      setSaving(false);
+      if (!result.ok) {
+        if (result.error === 'conflict' && result.conflicts?.length) {
+          toast.error(t('certExtract.conflict'));
+        } else if (result.error === 'verified_cert_protected') {
+          // Certificación verificada: los cambios requieren el circuito
+          // canónico (renovación), no la extracción.
+          toast.error(t('certExtract.verifiedProtected'));
+        } else {
+          toast.error(t('profile.certificationDialog.certAddFailed'));
+        }
+        return;
+      }
+      toast.success(
+        editing
+          ? t('profile.certificationDialog.certUpdated')
+          : t('profile.certificationDialog.certAdded'),
+      );
+      onSaved();
+      onOpenChange(false);
+      return;
+    }
 
     let qrDataUrl: string | null = null;
     if (verificationUrl.trim()) {
@@ -220,6 +327,19 @@ export function CertificationDialog({
     ? t('certActions.renewDescription')
     : t('profile.certificationDialog.description');
 
+  // PB-CERT-AUTO-PROFILE-001: distintivo de confianza junto al label.
+  // Solo "low" muestra aviso explícito (revisión obligatoria); high/medium
+  // no añaden ruido visual.
+  const confidenceBadge = (field: CertFieldName) => {
+    if (fieldConfidence[field] !== 'low') return null;
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] normal-case tracking-normal text-amber-400">
+        <AlertTriangle className="h-3 w-3" />
+        {t('certExtract.verifyField')}
+      </span>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl border-zinc-800 bg-[#0d0d0d]">
@@ -242,10 +362,17 @@ export function CertificationDialog({
             </div>
           )}
 
+          {extracting && (
+            <div className="flex items-center gap-2 border border-zinc-800 bg-zinc-950 p-3">
+              <ScanSearch className="h-4 w-4 animate-pulse text-[#f59e0b]" />
+              <p className="text-xs text-zinc-400">{t('certExtract.analyzing')}</p>
+            </div>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wider text-zinc-400">
-                {t('profile.certificationDialog.certName')} *
+                {t('profile.certificationDialog.certName')} * {confidenceBadge('certification_name')}
               </Label>
               <Input
                 value={name}
@@ -257,7 +384,7 @@ export function CertificationDialog({
             </div>
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wider text-zinc-400">
-                {t('profile.certificationDialog.issuer')} *
+                {t('profile.certificationDialog.issuer')} * {confidenceBadge('issuing_organization')}
               </Label>
               <Input
                 value={issuer}
@@ -269,7 +396,7 @@ export function CertificationDialog({
             </div>
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wider text-zinc-400">
-                {t('profile.certificationDialog.credentialId')}
+                {t('profile.certificationDialog.credentialId')} {confidenceBadge('credential_id')}
               </Label>
               <Input
                 value={credentialId}
@@ -299,7 +426,7 @@ export function CertificationDialog({
                 className={`text-xs uppercase tracking-wider ${renewMode ? 'text-emerald-400' : 'text-zinc-400'}`}
               >
                 {t('profile.certificationDialog.issueDate')}{' '}
-                {renewMode && '*'}
+                {renewMode && '*'} {confidenceBadge('issue_date')}
               </Label>
               <Input
                 type="date"
@@ -313,7 +440,7 @@ export function CertificationDialog({
                 className={`text-xs uppercase tracking-wider ${renewMode ? 'text-emerald-400' : 'text-zinc-400'}`}
               >
                 {t('profile.certificationDialog.expiryDate')}{' '}
-                {renewMode && '*'}
+                {renewMode && '*'} {confidenceBadge('expiry_date')}
               </Label>
               <Input
                 type="date"

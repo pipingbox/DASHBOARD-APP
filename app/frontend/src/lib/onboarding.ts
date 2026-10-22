@@ -61,10 +61,14 @@ export function shouldShowOnboardingWizard(input: OnboardingGateInput): boolean 
 }
 
 /**
- * Canonical marketplace-readiness threshold.
+ * Marketplace-readiness threshold, for display only.
  *
- * Mirrors the `recalculate-profiles` edge function, which is the source of truth:
- * a profile is marketplace-ready once its completion reaches 30%.
+ * PB-MARKETPLACE-READY-CONSISTENCY-001: the source of truth is SQL
+ * (`pb_profile_completion_score` + `pb_marketplace_consent` +
+ * `pb_complete_onboarding`, threshold 30). This constant mirrors it so the
+ * wizard can preview progress; it is NOT authoritative, and completion alone
+ * does not make a profile ready — publishing also requires the user's explicit
+ * consent. Never gate access or derive `marketplace_ready` from this value.
  */
 export const MARKETPLACE_READY_MIN_COMPLETION = 30;
 

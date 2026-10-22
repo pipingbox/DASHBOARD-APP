@@ -1,0 +1,30 @@
+-- ══════════════════════════════════════════════════════════════════════════════
+-- PB-I18N-EMAIL-001 — Corrección de sql/030: GRANT SELECT a service_role.
+--
+-- MOTIVO
+--   sql/030 revocó todos los privilegios de la tabla a PUBLIC/anon/
+--   authenticated, pero los privilegios por defecto del esquema no cubrían a
+--   service_role en este proyecto: la tabla quedó ilegible incluso para el
+--   rol de servicio (42501 permission denied). Detectado por la matriz QA de
+--   la rev.7 al leer el registro de reclamos.
+--
+--   El diseño exige visibilidad del registro para auditoría y para la
+--   resolución manual del estado 'ambiguous' (que es terminal a propósito).
+--   Sin SELECT, esa revisión manual sería imposible desde el rol de servicio.
+--
+-- MODELO DE SEGURIDAD (sin cambios)
+--   · anon / authenticated / PUBLIC: sin ningún privilegio (RLS sin políticas).
+--   · service_role: SELECT para auditoría. Las ESCRITURAS siguen siendo
+--     exclusivas de las RPCs SECURITY DEFINER (claim/finalize): ni siquiera
+--     la clave de servicio puede insertar, actualizar ni borrar filas por
+--     PostgREST. La resolución manual de 'ambiguous' se hace como postgres
+--     desde el editor SQL, según el runbook.
+--
+-- ORDEN: 030 → 030a → 030b. Reproducible en entorno limpio y convergente
+--   con QA, donde 030 y 030a ya constan en el historial.
+--
+-- ROLLBACK:
+--   REVOKE SELECT ON public.app_14da0f1941_job_application_notifications FROM service_role;
+-- ══════════════════════════════════════════════════════════════════════════════
+
+GRANT SELECT ON public.app_14da0f1941_job_application_notifications TO service_role;

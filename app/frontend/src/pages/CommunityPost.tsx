@@ -176,10 +176,12 @@ export default function CommunityPost() {
         like_count: Math.max(0, (post.like_count ?? 1) - 1),
       });
     } else {
-      const { error: insErr } = await supabase
+      const { data: reaction, error: insErr } = await supabase
         .from(TABLES.communityPostLikes)
-        .insert({ post_id: post.id, user_id: user.id });
-      if (!insErr) {
+        .insert({ post_id: post.id, user_id: user.id })
+        .select('id')
+        .single();
+      if (!insErr && reaction) {
         setPost({
           ...post,
           liked_by_me: true,
@@ -190,8 +192,8 @@ export default function CommunityPost() {
           actorId: user.id,
           type: 'like',
           title: post.title ?? undefined,
-          relatedEntityType: 'community_post',
-          relatedEntityId: post.id,
+          relatedEntityType: 'community_like',
+          relatedEntityId: reaction.id,
           actionUrl: channelSlug ? `/community/${channelSlug}/post/${post.id}` : undefined,
           actorName: profile?.full_name ?? null,
         });
@@ -293,7 +295,7 @@ export default function CommunityPost() {
       return;
     }
     setSubmittingComment(true);
-    const { error: insErr } = await supabase
+    const { data: comment, error: insErr } = await supabase
       .from(TABLES.communityComments)
       .insert({
         post_id: post.id,
@@ -303,8 +305,8 @@ export default function CommunityPost() {
       .select('id')
       .single();
     setSubmittingComment(false);
-    if (insErr) {
-      toast.error(t('community.failedToPostComment'), { description: insErr.message });
+    if (insErr || !comment) {
+      toast.error(t('community.failedToPostComment'), { description: insErr?.message });
       return;
     }
     void createNotification({
@@ -312,8 +314,8 @@ export default function CommunityPost() {
       actorId: user.id,
       type: 'comment',
       title: post.title ?? undefined,
-      relatedEntityType: 'community_post',
-      relatedEntityId: post.id,
+      relatedEntityType: 'community_comment',
+      relatedEntityId: comment.id,
       actionUrl: channelSlug ? `/community/${channelSlug}/post/${post.id}` : undefined,
       actorName: profile?.full_name ?? null,
     });

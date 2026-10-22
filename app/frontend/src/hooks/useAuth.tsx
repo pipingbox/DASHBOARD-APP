@@ -8,6 +8,7 @@ import { classifyAuthError, isNewSignupIdentity, type AuthErrorCode } from '@/li
 import { getTrafficProps } from '@/lib/jobs/attribution';
 import { ONBOARDING_STATUS } from '@/lib/onboarding';
 import { edgeFunctionUrl } from '@/lib/supabase';
+import { withTimeout } from '@/lib/withTimeout';
 import {
   identifyUser,
   resetObservabilityUser,
@@ -15,7 +16,13 @@ import {
   detectOrigin,
   getCorrelationId,
 } from '@/lib/observability';
-import i18n from '@/i18n';
+import i18n, { toSupportedCode, DEFAULT_LANGUAGE } from '@/i18n';
+import {
+  USER_METADATA_LANG_KEY,
+  PROFILE_LANGUAGE_COLUMN,
+  readUserLanguage,
+  applyUserLanguageFromSession,
+} from '@/lib/userLanguage';
 
 export interface Profile {
   id: string;
@@ -45,17 +52,52 @@ export interface Profile {
   marketplace_ready: boolean;
   profile_visibility: string | null;
   availability_status: string | null;
+  // PB-WHATSAPP-FOUNDATION-001 — fuente canonica de telefono + consentimiento.
+  // phone_present != phone_verified != whatsapp opt-in (estados distintos).
+  phone_number_raw: string | null;
   phone_e164: string | null;
   phone_country_code: string | null;
+  phone_present: boolean;
+  phone_verified: boolean;
   phone_verified_at: string | null;
-  whatsapp_opt_in: boolean | null;
+  phone_verification_method: string | null;
+  whatsapp_service_opt_in: boolean;
+  whatsapp_job_alerts_opt_in: boolean;
+  whatsapp_marketing_opt_in: boolean;
+  whatsapp_consent_at: string | null;
+  whatsapp_consent_version: string | null;
+  whatsapp_opted_out_at: string | null;
 }
+
+// PB-WHATSAPP-FOUNDATION-001 — defaults seguros para perfiles sinteticos
+// locales (mismo estado inicial que garantiza el guard de BBDD).
+export const PHONE_PROFILE_DEFAULTS = {
+  phone_number_raw: null,
+  phone_e164: null,
+  phone_country_code: null,
+  phone_present: false,
+  phone_verified: false,
+  phone_verified_at: null,
+  phone_verification_method: null,
+  whatsapp_service_opt_in: false,
+  whatsapp_job_alerts_opt_in: false,
+  whatsapp_marketing_opt_in: false,
+  whatsapp_consent_at: null,
+  whatsapp_consent_version: null,
+  whatsapp_opted_out_at: null,
+} as const;
 
 interface AuthContextValue {
   session: Session | null;
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  /**
+   * PB-AUTH-LOCK-ONBOARDING-STALL-001: true when the initial session check
+   * could not complete within its deadline. This is NOT a logout: the UI must
+   * offer a recoverable retry instead of redirecting to /login.
+   */
+  authUnavailable: boolean;
   signIn: (
     email: string,
     password: string,
@@ -86,6 +128,12 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 const PRIMARY_ADMIN_EMAIL = 'gaspardelhierromata@gmail.com';
 
+// PB-AUTH-LOCK-ONBOARDING-STALL-001 — bootstrap deadlines. The lock ladder
+// (5 s acquire + 3 s steal) resolves in ~8 s worst case; these caps sit
+// safely above it and only fire when something beyond the lock is broken.
+const SESSION_BOOTSTRAP_TIMEOUT_MS = 12_000;
+const PROFILE_BOOTSTRAP_TIMEOUT_MS = 20_000;
+
 /**
  * Complete the referral assignment via backend Edge Function.
  * This is the SINGLE source of truth for referral processing.
@@ -115,7 +163,10 @@ async function completeReferralAssignment(
       return false;
     }
 
-    notifyReferralJoined(referrerId, userEmail?.split('@')[0] || 'Someone').catch(() => {});
+    const applyBody = await res.json().catch(() => null) as { referral_id?: string | null } | null;
+    if (applyBody?.referral_id) {
+      notifyReferralJoined(referrerId, applyBody.referral_id).catch(() => {});
+    }
 
     try {
       localStorage.setItem('pipingbox_last_referral_debug', JSON.stringify({
@@ -160,6 +211,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authUnavailable, setAuthUnavailable] = useState(false);
 
   const loadProfile = async (userId: string) => {
     const { data } = await supabase
@@ -223,10 +275,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             marketplace_ready: true,
             profile_visibility: 'public',
             availability_status: 'available',
-            phone_e164: null,
-            phone_country_code: null,
-            phone_verified_at: null,
-            whatsapp_opt_in: false,
+            ...PHONE_PROFILE_DEFAULTS,
           });
           return;
         }
@@ -328,6 +377,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         availability_status: 'not_specified',
         // profile_completion, marketplace_ready y onboarding_status usan defaults de backend.
       };
+      // PB-I18N-EMAIL-001: réplica de user_metadata.lang (fuente de verdad).
+      // Sin valor en el servidor no se infiere nada (la columna queda NULL).
+      const metaLang = readUserLanguage(authUser);
+      if (metaLang) newProfile[PROFILE_LANGUAGE_COLUMN] = metaLang;
 
       // Clear stored account type after use
       try { localStorage.removeItem('pipingbox_account_type'); } catch { /* ignore */ }
@@ -402,10 +455,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               marketplace_ready: false,
               profile_visibility: null,
               availability_status: 'not_specified',
-              phone_e164: null,
-              phone_country_code: null,
-              phone_verified_at: null,
-              whatsapp_opt_in: false,
+              ...PHONE_PROFILE_DEFAULTS,
             });
             // DON'T clear referral code — Dashboard recovery will try again
             return;
@@ -486,10 +536,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           marketplace_ready: true,
           profile_visibility: 'public',
           availability_status: 'available',
-          phone_e164: null,
-          phone_country_code: null,
-          phone_verified_at: null,
-          whatsapp_opt_in: false,
+          ...PHONE_PROFILE_DEFAULTS,
         });
       } else {
         setProfile({
@@ -519,10 +566,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           marketplace_ready: false,
           profile_visibility: null,
           availability_status: 'not_specified',
-          phone_e164: null,
-          phone_country_code: null,
-          phone_verified_at: null,
-          whatsapp_opt_in: false,
+          ...PHONE_PROFILE_DEFAULTS,
         });
       }
       // DON'T clear referral code on failure — let Dashboard recovery handle it
@@ -534,21 +578,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     (async () => {
       try {
-        // Race getSession against an 8-second timeout to prevent infinite loading in iframes
-        const sessionResult = await Promise.race([
-          supabase.auth.getSession(),
-          new Promise<{ data: { session: null }; error: null }>((resolve) =>
-            setTimeout(() => resolve({ data: { session: null }, error: null }), 8000)
-          ),
-        ]);
+        // PB-AUTH-LOCK-ONBOARDING-STALL-001: bound the bootstrap getSession.
+        // The resilient auth lock (lib/resilientAuthLock) makes a permanent
+        // hang nearly impossible (worst case ~8 s: 5 s acquire + 3 s steal),
+        // so a deadline miss here means something is deeply wrong — but a
+        // timeout is NEVER proof of "no session". The previous behaviour
+        // (resolve session:null on timeout) produced silent logouts of real
+        // users; now the UI gets a recoverable `authUnavailable` state and
+        // keeps any session that arrives late via onAuthStateChange.
+        const race = await withTimeout(supabase.auth.getSession(), SESSION_BOOTSTRAP_TIMEOUT_MS);
 
         if (!mounted) return;
 
-        const initial = sessionResult.data.session;
+        if (race.timedOut) {
+          console.warn('[useAuth] Initial session check exceeded its deadline — NOT treating as logout.');
+          trackEvent('auth_session_resolution_timeout', {
+            route: window.location.pathname,
+            correlation_id: getCorrelationId(),
+          });
+          setAuthUnavailable(true);
+          return;
+        }
+
+        const initial = race.value?.data.session ?? null;
         setSession(initial);
         setUser(initial?.user ?? null);
         if (initial?.user) {
-          await ensureProfile(initial.user);
+          // PB-I18N-EMAIL-001: la preferencia guardada en el servidor prevalece
+          // sobre la UI local (sincronización entre dispositivos). Síncrono y
+          // sin red: seguro antes del bootstrap del perfil.
+          applyUserLanguageFromSession(initial.user);
+          // Bound the profile bootstrap as well: a stalled PostgREST call
+          // must not hold the whole app on the loading screen. The shell
+          // renders with profile=null and refreshes recover later.
+          await withTimeout(ensureProfile(initial.user), PROFILE_BOOTSTRAP_TIMEOUT_MS);
         }
       } catch (err) {
         console.warn('Auth session initialization failed:', err);
@@ -562,11 +625,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     })();
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (event, next) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, next) => {
       setSession(next);
       setUser(next?.user ?? null);
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-        if (next?.user) await ensureProfile(next.user);
+        // PB-I18N-EMAIL-001: la preferencia guardada en el servidor prevalece
+        // sobre la UI local (sincronización entre dispositivos). Síncrono y
+        // sin red: seguro dentro del callback de auth.
+        if (next?.user) applyUserLanguageFromSession(next.user);
+        // A late INITIAL_SESSION resolves a prior bootstrap timeout.
+        if (next?.user) setAuthUnavailable(false);
+        // PB-AUTH-LOCK-ONBOARDING-STALL-001: NEVER await PostgREST work
+        // inside the auth-state callback. auth-js notifies subscribers while
+        // holding its internal lock queue, and every supabase-js REST call
+        // re-enters auth.getSession() for the token: awaiting ensureProfile
+        // here self-deadlocks the whole client (demonstrated in QA — boot
+        // stuck past the 12 s deadline with a perfectly healthy lock; the
+        // React state updated synchronously but the profile stayed empty).
+        // Detach + bound the refresh instead; the UI tolerates profile=null.
+        if (next?.user) {
+          const u = next.user;
+          void withTimeout(ensureProfile(u), PROFILE_BOOTSTRAP_TIMEOUT_MS).then(({ timedOut }) => {
+            if (timedOut) console.warn('[useAuth] Detached profile refresh exceeded its deadline.');
+          });
+        }
         // PB-OBSERVABILITY-001: link anonymous session to technical user id.
         if (next?.user) identifyUser(next.user.id);
       } else if (event === 'SIGNED_OUT') {
@@ -623,7 +705,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         emailRedirectTo: getAuthCallbackUrl('/dashboard', i18n.language, 'confirmation'),
-        data: { full_name: fullName, account_type: accountType || 'worker' },
+        data: {
+          full_name: fullName,
+          account_type: accountType || 'worker',
+          // PB-I18N-EMAIL-001: idioma elegido en la UI durante el registro,
+          // normalizado a languages.json. Lo lee el Send Email Auth Hook para
+          // localizar asunto y cuerpo del correo de confirmación.
+          [USER_METADATA_LANG_KEY]: toSupportedCode(i18n.resolvedLanguage || i18n.language) ?? DEFAULT_LANGUAGE,
+        },
       },
     });
     if (error) {
@@ -740,7 +829,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshProfile = async () => {
-    if (user) await loadProfile(user.id);
+    // Bounded (PB-AUTH-LOCK-ONBOARDING-STALL-001): callers await this inside
+    // finalize/postpone paths; a stalled read must not hold them hostage.
+    if (user) await withTimeout(loadProfile(user.id), PROFILE_BOOTSTRAP_TIMEOUT_MS);
   };
 
   return (
@@ -750,6 +841,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         profile,
         loading,
+        authUnavailable,
         signIn,
         signUp,
         signInWithGoogle,

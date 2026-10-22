@@ -96,6 +96,11 @@ on:
         required: false
         default: false
         type: boolean
+      run_documents_open_real_e2e:
+        description: 'Run ONLY the PB-PROFILE-STABILITY-001 REAL documents-open E2E (documents-open-real-sign, ZERO interception on the Storage sign path; dedicated DOC_OPEN_E2E_* synthetic production accounts) — the 7/7 auth gate and the other specs are skipped for this dispatch'
+        required: false
+        default: false
+        type: boolean
       expected_env:
         description: 'Expected PostHog environment of the target deployment (preview|production); the SHA-locked specs assert it in pre-flight'
         required: false
@@ -107,7 +112,7 @@ jobs:
     name: Auth E2E — require 7/7 PASS
     # Gate 6: the onboarding E2E needs a truly isolated window (same QA
     # account, same preview Worker) — skip the auth gate for that dispatch.
-    if: ${{ inputs.run_onboarding_e2e != true && inputs.run_wfa_e2e != true && inputs.run_dashboard_e2e != true && inputs.run_cert_upload_e2e != true && inputs.run_referral_aldo_e2e != true && inputs.run_auth_callback_e2e != true && inputs.run_stale_crossdeploy_e2e != true && inputs.run_prod_stale_smoke != true && inputs.run_documents_open_e2e != true }}
+    if: ${{ inputs.run_onboarding_e2e != true && inputs.run_wfa_e2e != true && inputs.run_dashboard_e2e != true && inputs.run_cert_upload_e2e != true && inputs.run_referral_aldo_e2e != true && inputs.run_auth_callback_e2e != true && inputs.run_stale_crossdeploy_e2e != true && inputs.run_prod_stale_smoke != true && inputs.run_documents_open_e2e != true && inputs.run_documents_open_real_e2e != true }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -1029,3 +1034,246 @@ jobs:
         run: |
           set -euo pipefail
           node tests/verify-p0-permissions.mjs
+
+  documents-open-real-validate:
+    name: PB-PROFILE-STABILITY-001 — validate target origin & SHA (no credentials)
+    # Security review points 1+2: fail-closed validation of target_url and
+    # of the served build BEFORE any job holding the DOC_OPEN_E2E_*
+    # credentials starts. This job has NO secrets: HTTPS-only allowlist of
+    # authorized PIPINGBOX origins, rejection of embedded credentials,
+    # non-default ports, paths/queries, deceptive hosts, and redirects to
+    # non-authorized origins; finally /version.json must serve EXACTLY the
+    # expected full SHA.
+    if: ${{ inputs.run_documents_open_real_e2e == true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TARGET_URL: ${{ inputs.target_url }}
+      EXPECTED_SHA: ${{ inputs.expected_sha }}
+    steps:
+      - name: Validate target_url allowlist, redirect chain and served SHA (fail closed)
+        shell: python
+        run: |
+          import json, os, re, sys, urllib.error, urllib.parse, urllib.request
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              sys.exit(1)
+
+          ALLOWED_HOSTS = (
+              re.compile(r"^([a-z0-9-]+\.)?pipingbox\.com$"),
+              re.compile(r"^[a-z0-9-]+\.pipingbox\.workers\.dev$"),
+          )
+
+          def host_allowed(host):
+              return bool(host) and host.isascii() and any(p.match(host) for p in ALLOWED_HOSTS)
+
+          def split_and_validate(url, allow_path=False):
+              try:
+                  u = urllib.parse.urlsplit(url)
+              except ValueError:
+                  fail(f"unparseable URL: {url!r}")
+              if u.scheme != "https":
+                  fail(f"target must be HTTPS, got scheme {u.scheme!r}: {url}")
+              if u.username is not None or u.password is not None:
+                  fail("URL with embedded credentials is forbidden")
+              host = (u.hostname or "").lower()
+              if not host_allowed(host):
+                  fail(f"host is not an authorized PIPINGBOX origin: {host!r} (allowed: pipingbox.com, *.pipingbox.com, *.pipingbox.workers.dev)")
+              try:
+                  port = u.port
+              except ValueError:
+                  fail(f"invalid port in URL: {url}")
+              if port is not None and port != 443:
+                  fail(f"non-default port is forbidden: {url}")
+              if not allow_path:
+                  # The dispatch target itself (and every redirect hop while
+                  # resolving it) must be a BARE origin: paths and queries are
+                  # attack surface (open redirects, crafted routes).
+                  if u.path not in ("", "/"):
+                      fail(f"target must be a bare origin, got path {u.path!r}: {url}")
+                  if u.query or u.fragment:
+                      fail(f"query/fragment are forbidden in the target: {url}")
+              else:
+                  # Only the version.json asset fetch may carry a path/query
+                  # (redirects can add cache-busters); fragments stay banned.
+                  if u.fragment:
+                      fail(f"fragment is forbidden: {url}")
+              return u
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+
+          def fetch_validated(url, what, allow_path=False):
+              """GET without auto-redirect; EVERY hop (including each redirect
+              target) must stay HTTPS on an authorized origin. Returns the
+              final URL and response."""
+              hops = 0
+              while True:
+                  split_and_validate(url, allow_path=allow_path)
+                  req = urllib.request.Request(url, method="GET", headers={"User-Agent": "pb-documents-open-e2e-validator"})
+                  try:
+                      resp = urllib.request.build_opener(NoRedirect).open(req, timeout=20)
+                      return url, resp
+                  except urllib.error.HTTPError as e:
+                      if e.code in (301, 302, 303, 307, 308):
+                          loc = e.headers.get("Location")
+                          if not loc:
+                              fail(f"{what}: redirect without Location header at {url}")
+                          hops += 1
+                          if hops > 5:
+                              fail(f"{what}: more than 5 redirects starting at {url}")
+                          url = urllib.parse.urljoin(url, loc)
+                          print(f"redirect hop {hops}: -> {url}")
+                          continue
+                      fail(f"{what}: HTTP {e.code} fetching {url}")
+                  except Exception as e:
+                      fail(f"{what}: cannot reach {url}: {e}")
+
+          target = (os.environ.get("TARGET_URL") or "").strip()
+          expected = (os.environ.get("EXPECTED_SHA") or "").strip().lower()
+          if not re.fullmatch(r"[0-9a-f]{40}", expected):
+              fail(f"expected_sha must be a full 40-hex commit SHA, got {expected!r}")
+
+          final_url, _ = fetch_validated(target, "target_url")
+          vurl, resp = fetch_validated(final_url.rstrip("/") + "/version.json", "version.json", allow_path=True)
+          try:
+              served = json.load(resp).get("version", "")
+          except Exception:
+              fail(f"version.json at {vurl} is not valid JSON")
+          if served.lower() != expected:
+              fail(f"served build mismatch: {vurl} serves {served!r}, expected {expected!r}")
+          print(f"target validated: {final_url} serves exactly {served}")
+
+  documents-open-real-e2e:
+    name: PB-PROFILE-STABILITY-001 REAL documents-open E2E (sign not intercepted)
+    if: ${{ inputs.run_documents_open_real_e2e == true }}
+    # Point 2: credentials are only introduced AFTER the target origin and
+    # the served SHA have been validated by the credential-less job above.
+    needs: documents-open-real-validate
+    # Point 3: the DOC_OPEN_E2E_* credentials live ONLY in the protected
+    # GitHub environment "documents-open-real-e2e", whose deployment
+    # branch policy restricts which refs may run this job (main + the
+    # audited PR branch). Any other ref fails here WITHOUT ever receiving
+    # the secrets. (The earlier standalone documents-open-real-e2e.yml
+    # approach was folded into this dispatchable gate because standalone
+    # workflow files are not dispatchable until they reach the default
+    # branch; all controls live in this job pair.)
+    environment: documents-open-real-e2e
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Own concurrency group: this targets production (or any explicit URL)
+    # with the dedicated DOC_OPEN_E2E_* synthetic accounts, NOT the shared
+    # QA account or the preview Worker, so it must not join deploy-preview.
+    concurrency:
+      group: documents-open-real-e2e
+      cancel-in-progress: false
+    env:
+      PREVIEW_URL: ${{ inputs.target_url }}
+      EXPECTED_APP_VERSION: ${{ inputs.expected_sha }}
+      DOC_OPEN_E2E_EMAIL: ${{ secrets.DOC_OPEN_E2E_EMAIL }}
+      DOC_OPEN_E2E_PASSWORD: ${{ secrets.DOC_OPEN_E2E_PASSWORD }}
+      DOC_OPEN_E2E_OTHER_EMAIL: ${{ secrets.DOC_OPEN_E2E_OTHER_EMAIL }}
+      DOC_OPEN_E2E_OTHER_PASSWORD: ${{ secrets.DOC_OPEN_E2E_OTHER_PASSWORD }}
+      DOC_OPEN_E2E_ANON_KEY: ${{ secrets.DOC_OPEN_E2E_ANON_KEY }}
+
+    steps:
+      - name: Require expected_sha, source_ref == dispatch commit, DOC_OPEN_E2E secrets, exclusive mode
+        shell: bash
+        # PB-PROFILE-STABILITY-001 security closure (command-injection fix):
+        # NO inputs./github. context is ever interpolated inside run:.
+        # Untrusted dispatch values reach Bash ONLY through step-level env:
+        # vars and are read with quoted expansion, so a hostile source_ref
+        # containing shell syntax stays inert data — it can never become
+        # script source. The raw SRC_REF value is intentionally NOT echoed
+        # either (anti log/annotation injection): only shape + equality
+        # against the dispatch commit are enforced.
+        env:
+          SRC_REF: ${{ inputs.source_ref }}
+          DISPATCH_SHA: ${{ github.sha }}
+          RUN_IDENTITY_E2E: ${{ inputs.run_identity_e2e }}
+          RUN_WFA_E2E: ${{ inputs.run_wfa_e2e }}
+          RUN_DASHBOARD_E2E: ${{ inputs.run_dashboard_e2e }}
+          RUN_CERT_UPLOAD_E2E: ${{ inputs.run_cert_upload_e2e }}
+          RUN_AUTH_CALLBACK_E2E: ${{ inputs.run_auth_callback_e2e }}
+          RUN_ONBOARDING_E2E: ${{ inputs.run_onboarding_e2e }}
+          RUN_REFERRAL_ALDO_E2E: ${{ inputs.run_referral_aldo_e2e }}
+          RUN_STALE_CROSSDEPLOY_E2E: ${{ inputs.run_stale_crossdeploy_e2e }}
+          RUN_PROD_STALE_SMOKE: ${{ inputs.run_prod_stale_smoke }}
+          RUN_DOCUMENTS_OPEN_E2E: ${{ inputs.run_documents_open_e2e }}
+        run: |
+          set -euo pipefail
+          if [ -z "${EXPECTED_APP_VERSION:-}" ]; then
+            echo "::error::expected_sha is required when run_documents_open_real_e2e=true (the served build must be traceable to the tested SHA)."
+            exit 1
+          fi
+          # Security closure: the environment branch policy only restricts
+          # the DISPATCH ref. inputs.source_ref (default 'main') could
+          # otherwise check out ARBITRARY unreferenced code to run with the
+          # DOC_OPEN_E2E_* credentials. Fail closed unless source_ref is
+          # exactly the dispatch commit: the code executed with the
+          # credentials is pinned to github.sha — the reviewed head of the
+          # branch the environment policy authorized. SRC_REF/DISPATCH_SHA
+          # arrive via env: (quoted reads below), never as script text.
+          if [[ ! "$DISPATCH_SHA" =~ ^[0-9a-fA-F]{40}$ ]] || [[ ! "$SRC_REF" =~ ^[0-9a-fA-F]{40}$ ]] || [ "$SRC_REF" != "$DISPATCH_SHA" ]; then
+            echo "::error::inputs.source_ref rejected (raw value not echoed by design): it must be exactly the dispatch commit github.sha ('$DISPATCH_SHA'). Code run with the DOC_OPEN_E2E credentials is pinned to github.sha (the head of the branch-policy-authorized ref); re-dispatch passing source_ref=<exact 40-hex commit SHA>."
+            exit 1
+          fi
+          for v in DOC_OPEN_E2E_EMAIL DOC_OPEN_E2E_PASSWORD DOC_OPEN_E2E_OTHER_EMAIL DOC_OPEN_E2E_OTHER_PASSWORD DOC_OPEN_E2E_ANON_KEY; do
+            if [ -z "${!v:-}" ]; then
+              echo "::error::secret-backed env $v is empty — configure the DOC_OPEN_E2E_* secrets in the protected GitHub environment 'documents-open-real-e2e' first."
+              exit 1
+            fi
+          done
+          for pair in "run_identity_e2e=$RUN_IDENTITY_E2E" "run_wfa_e2e=$RUN_WFA_E2E" "run_dashboard_e2e=$RUN_DASHBOARD_E2E" "run_cert_upload_e2e=$RUN_CERT_UPLOAD_E2E" "run_auth_callback_e2e=$RUN_AUTH_CALLBACK_E2E" "run_onboarding_e2e=$RUN_ONBOARDING_E2E" "run_referral_aldo_e2e=$RUN_REFERRAL_ALDO_E2E" "run_stale_crossdeploy_e2e=$RUN_STALE_CROSSDEPLOY_E2E" "run_prod_stale_smoke=$RUN_PROD_STALE_SMOKE" "run_documents_open_e2e=$RUN_DOCUMENTS_OPEN_E2E"; do
+            name="${pair%%=*}"
+            value="${pair##*=}"
+            if [ "$value" = "true" ]; then
+              echo "::error::run_documents_open_real_e2e and ${name} are mutually exclusive (isolated window required)."
+              exit 1
+            fi
+          done
+
+      - name: Checkout pinned dispatch commit (never inputs.source_ref)
+        uses: actions/checkout@v4
+        with:
+          # PB-PROFILE-STABILITY-001 security closure: the code executed
+          # with the DOC_OPEN_E2E_* credentials is ALWAYS github.sha — the
+          # head commit of the ref the workflow was dispatched from, which
+          # the environment branch policy authorized. inputs.source_ref is
+          # validated (== github.sha) by the guard step above but is never
+          # used as the checkout ref here.
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run REAL profile-stability E2E — documents open (no interception) + certificate save under translate DOM mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx playwright test tests/documents-open-real-sign.spec.ts tests/certifications-dom-mutation.spec.ts \
+            --config=playwright.config.ts \
+            --workers=1 \
+            --reporter=line
+
+      - name: Upload E2E artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: documents-open-real-e2e-results
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore

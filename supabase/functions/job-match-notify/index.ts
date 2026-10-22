@@ -255,6 +255,17 @@ Deno.serve(async (req) => {
         title: "Nueva oferta compatible",
         message: `${result.score}% de compatibilidad con "${job.title}"${companyName ? ` en ${companyName}` : ""}.`,
         action_url: `/jobs/${job.id}`,
+        // PB-I18N-EMAIL-001: datos estructurados para que notification-dispatcher
+        // renderice el correo en el idioma del DESTINATARIO (title/message
+        // siguen usándose para in_app y WhatsApp sin cambios).
+        email_template: {
+          template: "job_match",
+          vars: {
+            score: result.score,
+            jobTitle: job.title,
+            company: companyName ?? "",
+          },
+        },
         metadata: {
           score: result.score,
           breakdown: result.breakdown,

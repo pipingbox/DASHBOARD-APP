@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import nodemailer from "npm:nodemailer";
+import { renderNoticeEmail, resolveRecipientLanguage } from "../_shared/email-i18n/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -93,6 +94,10 @@ serve(async (req: Request) => {
     }
 
     const { company_name, email } = body;
+    // PB-I18N-EMAIL-001: idioma declarado por la UI del lead (destinatario
+    // externo, sin cuenta). Se normaliza a los 11 códigos; cualquier otro → 'en'.
+    // Solo afecta al idioma del acuse; ningún otro dato del body llega al correo.
+    const leadLang = resolveRecipientLanguage({ requested: typeof body.lang === "string" ? body.lang : null });
 
     if (!company_name || !email) {
       return new Response(
@@ -293,43 +298,14 @@ serve(async (req: Request) => {
 
     console.log(JSON.stringify({ requestId, action: "admin_email_sent", to: "jobs@pipingbox.com", leadId: lead.id, provider: providerName }));
 
-    const companyHtml = `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #ffffff; color: #18181b;">
-        <div style="text-align: center; margin-bottom: 32px;">
-          <h1 style="margin: 0; font-size: 24px; color: #18181b;">PipingBox</h1>
-          <p style="margin: 4px 0 0; font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 0.15em;">Industrial Workforce Solutions</p>
-        </div>
-        <div style="background: #f4f4f5; border-left: 3px solid #f59e0b; padding: 16px 20px; margin-bottom: 24px;">
-          <h2 style="margin: 0 0 4px; font-size: 16px; color: #18181b;">Request Received ✓</h2>
-          <p style="margin: 0; font-size: 14px; color: #52525b;">Your workforce request has been successfully submitted.</p>
-        </div>
-        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
-          Dear ${safe.contact_person},
-        </p>
-        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
-          Thank you for reaching out to PipingBox. We have received your request for <strong>${safe.workers_needed}</strong>${safe.number_of_workers ? ` (${safe.number_of_workers} workers)` : ""} in <strong>${safe.country}</strong>.
-        </p>
-        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
-          Our recruitment team will review your requirements and get back to you within <strong>24–48 hours</strong> with a tailored proposal including candidate profiles and availability.
-        </p>
-        <div style="background: #fefce8; border: 1px solid #fef08a; padding: 16px; margin: 24px 0;">
-          <p style="margin: 0; font-size: 13px; color: #854d0e;"><strong>What happens next:</strong></p>
-          <ol style="margin: 8px 0 0; padding-left: 20px; font-size: 13px; color: #854d0e; line-height: 1.8;">
-            <li>Our team reviews your specific requirements</li>
-            <li>We source matching candidates from our network</li>
-            <li>You receive qualified candidate profiles</li>
-            <li>We handle all deployment logistics</li>
-          </ol>
-        </div>
-        <p style="font-size: 14px; color: #3f3f46; line-height: 1.6;">
-          If you have any urgent questions, please contact us directly at <a href="mailto:jobs@pipingbox.com" style="color: #f59e0b;">jobs@pipingbox.com</a>.
-        </p>
-        <div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid #e4e4e7; text-align: center;">
-          <p style="margin: 0; font-size: 12px; color: #a1a1aa;">PipingBox · Industrial Workforce Solutions</p>
-          <p style="margin: 4px 0 0; font-size: 11px; color: #d4d4d8;">Connecting skilled professionals with industrial projects worldwide</p>
-        </div>
-      </div>
-    `;
+    // PB-I18N-EMAIL-001: acuse al lead en su idioma (identidad PIPINGBOX).
+    const leadReceipt = renderNoticeEmail({
+      template: "lead_receipt",
+      lang: leadLang.lang,
+      vars: { name: safe.contact_person || safe.company_name },
+      showNotYou: false,
+    });
+    const companyHtml = leadReceipt.html;
 
     // Sent to the address stored on the lead row, never to an address taken
     // from the request body.
@@ -343,8 +319,9 @@ serve(async (req: Request) => {
         from: fromField,
         to: lead.email,
         replyTo,
-        subject: "PipingBox Workforce Request Received",
+        subject: leadReceipt.subject,
         html: companyHtml,
+        text: leadReceipt.text,
       });
     } catch (confirmError: any) {
       console.error(

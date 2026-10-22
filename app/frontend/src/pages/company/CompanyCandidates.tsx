@@ -17,6 +17,7 @@ import {
   Calendar,
   Loader2,
   RefreshCw,
+  Hourglass,
 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -53,10 +54,34 @@ const STATUS_OPTIONS = [
 
 type ApplicationStatus = (typeof STATUS_OPTIONS)[number];
 
+// PB-JOBS-COMPANY-WITHDRAWN-SEMANTICS-001: 'withdrawn' es una retirada
+// iniciada por el CANDIDATO y está reservada al Worker (backend la deniega
+// para company). La empresa que no continúa usa 'rejected'. 'withdrawn' se
+// conserva como filtro/badge de solo lectura, nunca como acción empresarial.
+const COMPANY_ACTION_OPTIONS = STATUS_OPTIONS.filter(
+  (s) => s !== 'withdrawn'
+) as readonly Exclude<ApplicationStatus, 'withdrawn'>[];
+
+// Etiquetas i18n del vocabulario de estados (11 locales, clave única por estado).
+const STATUS_LABEL_KEYS: Record<ApplicationStatus, string> = {
+  applied: 'companyCandidates.applied',
+  reviewed: 'companyCandidates.reviewed',
+  shortlisted: 'companyCandidates.shortlisted',
+  sent_to_client: 'companyCandidates.sentToClient',
+  interview: 'companyCandidates.interview',
+  hired: 'companyCandidates.hired',
+  rejected: 'companyCandidates.rejected',
+  withdrawn: 'companyCandidates.withdrawn',
+};
+
 /* ─── Status Badge ─── */
 function CandidateStatusBadge({ status }: { status: string }) {
   const { t } = useTranslation();
   const config: Record<string, { label: string; classes: string; icon: React.ElementType }> = {
+    // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 — "Aplicada · Perfil pendiente":
+    // visible para la empresa, pero no presentable (sent_to_client lo bloquea
+    // el backend si el perfil no es marketplace_ready).
+    pending_profile_validation: { label: t('companyCandidates.pendingProfile'), classes: 'bg-orange-500/10 text-orange-400 border-orange-500/30', icon: Hourglass },
     applied: { label: t('companyCandidates.applied'), classes: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30', icon: AlertCircle },
     reviewed: { label: t('companyCandidates.reviewed'), classes: 'bg-blue-500/10 text-blue-400 border-blue-500/30', icon: Eye },
     shortlisted: { label: t('companyCandidates.shortlisted'), classes: 'bg-amber-500/10 text-amber-400 border-amber-500/30', icon: Star },
@@ -399,11 +424,23 @@ export default function CompanyCandidates() {
                   disabled={updatingId === app.id}
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-sm px-2 py-1.5 text-xs text-zinc-300 outline-none focus:border-[#f59e0b]/50 transition-colors disabled:opacity-50"
                 >
-                  {STATUS_OPTIONS.map((s) => (
+                  {/*
+                    PB-JOBS-COMPANY-WITHDRAWN-SEMANTICS-001: 'withdrawn' no es
+                    una acción empresarial — el select solo ofrece estados del
+                    pipeline de company. Si la candidatura ya está withdrawn
+                    (retirada por el worker), se muestra como opción marcada de
+                    solo lectura para no falsear el valor del control.
+                  */}
+                  {COMPANY_ACTION_OPTIONS.map((s) => (
                     <option key={s} value={s}>
-                      {s.charAt(0).toUpperCase() + s.slice(1)}
+                      {t(STATUS_LABEL_KEYS[s])}
                     </option>
                   ))}
+                  {app.status === 'withdrawn' && (
+                    <option value="withdrawn">
+                      {t('companyCandidates.withdrawn')}
+                    </option>
+                  )}
                 </select>
               </div>
 

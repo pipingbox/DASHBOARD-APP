@@ -11,11 +11,13 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
+import { CVReviewBanner } from '@/components/profile/CVReviewBanner';
 import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import type { Job, JobTranslation } from '@/lib/jobs/types';
 import { trackEvent } from '@/lib/observability';
+import { handlePendingProfileAfterApply, drainActivationEmailsAfterApply } from '@/lib/applicationPendingProfile';
 import {
   captureAttributionVisit,
   getFirstTouch,
@@ -217,7 +219,11 @@ export default function JobDetail() {
       applicationPayload.first_touch_content = firstTouch.utm_content ?? null;
     }
 
-    const { error } = await supabase.from(TABLES.jobApplications).insert(applicationPayload);
+    const { data: insertedApp, error } = await supabase
+      .from(TABLES.jobApplications)
+      .insert(applicationPayload)
+      .select('id, status')
+      .single();
     setApplying(false);
 
     if (error) {
@@ -234,6 +240,16 @@ export default function JobDetail() {
     // Funnel step 3: the application was successfully persisted.
     trackEvent('apply_submitted', funnelProps, { dedupeKey: job.id });
 
+    // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001: si el perfil aún no es
+    // Marketplace Ready, el backend guardó la candidatura como
+    // pending_profile_validation. Eventos + EMAIL 1 (idioma del usuario,
+    // idempotente en backend). Fail-open: nunca bloquea el apply.
+    const isPendingProfile = await handlePendingProfileAfterApply(insertedApp, job.id);
+
+    // PB-JOBS-MARKETPLACE-READY-RECOVERY-001: drain self-service del EMAIL 2
+    // (idempotente, fail-open). Cubre promociones del gate durante el INSERT.
+    await drainActivationEmailsAfterApply();
+
     // Recruitment notification (jobs@pipingbox.com). Loud on failure, never
     // blocks the application — same contract as the lead alert flow.
     const { data: mailData, error: mailErr } = await supabase.functions.invoke(
@@ -247,7 +263,15 @@ export default function JobDetail() {
       );
     }
 
-    toast.success(t('jobs.applicationSubmitted'));
+    if (isPendingProfile) {
+      // "Candidatura recibida — completa tu perfil para activarla." El
+      // mensaje NO transmite rechazo y aclara que puede seguir aplicando.
+      toast.info(t('jobs.applicationPendingProfileTitle'), {
+        description: t('jobs.applicationPendingProfileDescription'),
+      });
+    } else {
+      toast.success(t('jobs.applicationSubmitted'));
+    }
     setApplied(true);
   };
 
@@ -468,6 +492,18 @@ export default function JobDetail() {
             {!applied && !applying && <ArrowRight className="ml-1.5 h-3.5 w-3.5" />}
           </Button>
         </div>
+
+        {/* PB-CV-EXPERIENCE-DERIVATION-001 (FASE 4.2) — tras aplicar, si hay
+            un draft de CV pendiente se muestra inmediatamente el aviso con
+            CTA a /profile/cv-review. El banner se oculta solo si no hay
+            draft pendiente; nunca bloquea la candidatura. */}
+        {applied && (
+          <div className="p-5 md:p-8 pt-0 md:pt-0 border-t border-zinc-800/80">
+            <div className="pt-5">
+              <CVReviewBanner />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

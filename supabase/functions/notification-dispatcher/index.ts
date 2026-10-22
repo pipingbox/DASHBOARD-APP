@@ -19,6 +19,7 @@
 
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { createEmailProvider } from "../_shared/email-provider.ts";
+import { renderActionEmail, resolveRecipientLanguage } from "../_shared/email-i18n/mod.ts";
 import { createWhatsAppProvider } from "../_shared/whatsapp-provider.ts";
 
 const corsHeaders = {
@@ -39,6 +40,11 @@ interface QueueRow {
     message: string;
     action_url?: string;
     metadata?: Record<string, unknown>;
+    /** PB-I18N-EMAIL-001: plantilla estructurada para correo localizado. */
+    email_template?: {
+      template: "job_match" | "workforce_match";
+      vars: Record<string, string | number | null | undefined>;
+    };
   };
   attempts: number;
   max_attempts: number;
@@ -49,6 +55,12 @@ interface UserIdentity {
   id: string;
   email: string | null;
   phone_e164: string | null;
+}
+
+/** Identidad mínima del destinatario resuelta vía Auth Admin API. */
+interface RecipientIdentity {
+  email: string | null;
+  userMetadata: Record<string, unknown> | null;
 }
 
 function backoffMinutes(attempt: number): number {
@@ -64,6 +76,7 @@ Deno.serve(async (req) => {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const batchSize = parseInt(Deno.env.get("DISPATCHER_BATCH_SIZE") || "500", 10);
   const maxPerChannelDay = parseInt(Deno.env.get("DISPATCHER_MAX_PER_CHANNEL_DAY") || "10", 10);
+  const appBaseUrl = (Deno.env.get("APP_BASE_URL") || "https://pipingbox.com").replace(/\/$/, "");
 
   const supabase = createClient(supabaseUrl, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
@@ -97,7 +110,7 @@ Deno.serve(async (req) => {
 
   const { data: profiles } = await supabase
     .from("app_14da0f1941_profiles")
-    .select("user_id, phone_e164, phone_verified_at, whatsapp_opt_in")
+    .select("user_id, phone_e164, phone_verified_at, whatsapp_opt_in, preferred_language")
     .in("user_id", userIds);
 
   const { data: prefs } = await supabase
@@ -127,14 +140,17 @@ Deno.serve(async (req) => {
     sentCountByUserChannel.set(key, s.sent_count);
   }
 
-  // 4. Lazy email resolver via Auth Admin API.
-  const emailCache = new Map<string, string | null>();
-  async function getUserEmail(userId: string): Promise<string | null> {
-    if (emailCache.has(userId)) return emailCache.get(userId)!;
+  // 4. Lazy identity resolver via Auth Admin API (email + user_metadata.lang).
+  const identityCache = new Map<string, RecipientIdentity>();
+  async function getRecipientIdentity(userId: string): Promise<RecipientIdentity> {
+    const cached = identityCache.get(userId);
+    if (cached) return cached;
     const { data, error } = await supabase.auth.admin.getUserById(userId);
-    const email = error || !data.user ? null : data.user.email ?? null;
-    emailCache.set(userId, email);
-    return email;
+    const identity: RecipientIdentity = error || !data.user
+      ? { email: null, userMetadata: null }
+      : { email: data.user.email ?? null, userMetadata: (data.user.user_metadata as Record<string, unknown>) ?? null };
+    identityCache.set(userId, identity);
+    return identity;
   }
 
   // 5. Process each row
@@ -208,14 +224,48 @@ Deno.serve(async (req) => {
         if (!emailProvider.isConfigured()) {
           throw new Error("email_provider_not_configured");
         }
-        const email = await getUserEmail(row.candidate_user_id);
+        const identity = await getRecipientIdentity(row.candidate_user_id);
+        const email = identity.email;
         if (!email) {
           throw new Error("candidate_email_missing");
         }
+        // PB-I18N-EMAIL-001: idioma del DESTINATARIO (nunca del actor):
+        // user_metadata.lang → profiles.preferred_language → 'en'.
+        const lang = resolveRecipientLanguage({
+          userMetadata: identity.userMetadata,
+          profileLanguage: profile?.preferred_language ?? null,
+        });
+        const tpl = row.payload.email_template;
+        let subject = row.payload.title;
+        let text: string = row.payload.message;
+        let html: string | undefined;
+        let templateName = "legacy_payload";
+        if (tpl && (tpl.template === "job_match" || tpl.template === "workforce_match")) {
+          const rendered = renderActionEmail({
+            template: tpl.template,
+            lang: lang.lang,
+            actionUrl: `${appBaseUrl}${row.payload.action_url || "/dashboard"}`,
+            vars: tpl.vars,
+            showExpiry: false,
+          });
+          subject = rendered.subject;
+          text = rendered.text;
+          html = rendered.html;
+          templateName = rendered.template;
+        }
         const result = await emailProvider.send({
           to: email,
-          subject: row.payload.title,
-          text: row.payload.message,
+          subject,
+          text,
+          html,
+          fromName: "PIPINGBOX",
+          capture: {
+            source: "notification-dispatcher",
+            template: templateName,
+            lang: lang.lang,
+            langSource: lang.source,
+            meta: { opportunity_type: row.opportunity_type, queue_id: row.id },
+          },
         });
         deliveryStatus = "sent";
         provider = result.provider;

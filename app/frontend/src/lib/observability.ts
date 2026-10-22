@@ -62,6 +62,12 @@ export const OBS_EVENT_NAMES = [
   'job_viewed',
   'apply_started',
   'apply_submitted',
+  // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 — candidaturas retenidas por
+  // perfil no Marketplace Ready. application_pending_profile_validation
+  // marca la candidatura guardada en estado interno; el evento backend
+  // equivalente vive en job_application_events (to_status). NO PII.
+  'application_pending_profile_validation',
+  'email_profile_completion_requested',
   // PB-CERT-UPLOAD-UX-001 — certificate upload funnel (started → completed |
   // failed). Closed property enums (bucket/size_bucket/mime/error_category)
   // are validated in buildEventProps; no file names, paths, UIDs or signed
@@ -101,6 +107,31 @@ export const OBS_EVENT_NAMES = [
   'stale_app_version_detected',
   'app_update_requested',
   'invalid_path_normalized',
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 — auth-lock circuit breaker and
+  // bounded critical operations. No PII: route + correlation id, closed
+  // `operation` enum for onboarding saves; never tokens, emails or UIDs.
+  'auth_lock_bypassed',
+  'auth_session_resolution_timeout',
+  'onboarding_save_timeout',
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 rev.3 — bypass denied fail-closed when
+  // no BroadcastChannel is available (no cross-tab coordination possible).
+  'auth_lock_bypass_denied_uncoordinated',
+  // PB-WHATSAPP-FOUNDATION-001 — phone + OTP + WhatsApp consent funnel.
+  // NO PII: nunca phone_e164 ni codigo OTP; solo enums cerrados
+  // (error_category) y booleanos de consentimiento.
+  'phone_added',
+  'phone_verification_started',
+  'phone_verification_completed',
+  'phone_verification_failed',
+  'whatsapp_jobs_opt_in',
+  'whatsapp_marketing_opt_in',
+  'whatsapp_opt_out',
+  // PB-CV-AUTO-PROFILE-001 — CV → perfil. El funnel backend (started/
+  // completed/failed/retried/already_processed/confirmed + contadores) vive
+  // en app_cv_extraction_events; el cliente solo emite el paso de apertura
+  // de revisión. Props: enums cerrados y contadores; sin contenido del CV
+  // ni PII.
+  'cv_profile_review_started',
 ] as const;
 
 export type ObsEventName = (typeof OBS_EVENT_NAMES)[number];
@@ -191,6 +222,10 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   job_viewed: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade', ...TRAFFIC_ATTRIBUTION_KEYS],
   apply_started: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade', ...TRAFFIC_ATTRIBUTION_KEYS],
   apply_submitted: ['job_id', 'source_language', 'rendered_locale', 'country', 'trade', ...TRAFFIC_ATTRIBUTION_KEYS],
+  // PB-JOBS-MARKETPLACE-READY-ACTIVATION-001 — job_id (UUID técnico, mismo
+  // tratamiento que apply_submitted); status es enum cerrado sent|not_sent.
+  application_pending_profile_validation: ['job_id'],
+  email_profile_completion_requested: ['job_id', 'status'],
   onboarding_step_reached: ['step', 'account_type'],
   onboarding_completed: ['account_type', ...TRAFFIC_ATTRIBUTION_KEYS],
   onboarding_postponed: ['account_type'],
@@ -416,6 +451,24 @@ const EVENT_PROP_KEYS: Record<ObsEventName, readonly string[]> = {
   stale_app_version_detected: ['route', 'target_version'],
   app_update_requested: ['route', 'recovery_action'],
   invalid_path_normalized: ['route_normalized'],
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 — bounded auth/onboarding operations.
+  auth_lock_bypassed: ['route', 'correlation_id'],
+  auth_session_resolution_timeout: ['route', 'correlation_id'],
+  auth_lock_bypass_denied_uncoordinated: ['lock_path', 'correlation_id'],
+  onboarding_save_timeout: ['account_type', 'operation', 'step'],
+  // PB-WHATSAPP-FOUNDATION-001 — phone/WhatsApp funnel. error_category es un
+  // enum cerrado (PHONE_VERIFICATION_ERROR_CATEGORIES); value es booleano de
+  // consentimiento. Nunca numero de telefono ni OTP.
+  phone_added: [],
+  phone_verification_started: [],
+  phone_verification_completed: [],
+  phone_verification_failed: ['error_category'],
+  whatsapp_jobs_opt_in: ['value'],
+  whatsapp_marketing_opt_in: ['value'],
+  whatsapp_opt_out: [],
+  // PB-CV-AUTO-PROFILE-001 — draft identifiers and closed-enum counters;
+  // never CV content or PII.
+  cv_profile_review_started: ['draft_id', 'source_channel', 'fields_count', 'experiences_count'],
 };
 
 export const OBS_ORIGINS = ['direct', 'referral', 'organic', 'campaign'] as const;
@@ -486,6 +539,15 @@ export const APP_UPDATE_RECOVERY_ACTIONS = [
   'manual_reload',
   'none',
 ] as const;
+// PB-AUTH-LOCK-ONBOARDING-STALL-001 — closed enum for the bounded onboarding
+// write paths (onboarding_save_timeout).
+export const ONBOARDING_SAVE_OPERATIONS = [
+  'autosave',
+  'finish',
+  'postpone',
+  'avatar',
+  'status_read',
+] as const;
 /** Events whose error_category uses the DOCUMENT taxonomy (scoped check). */
 const DOC_ERROR_CATEGORY_EVENTS: ReadonlySet<ObsEventName> = new Set([
   'cert_upload_failed',
@@ -496,6 +558,23 @@ const DOC_ERROR_CATEGORY_EVENTS: ReadonlySet<ObsEventName> = new Set([
 const AUTH_CALLBACK_ERROR_CATEGORY_EVENTS: ReadonlySet<ObsEventName> = new Set([
   'auth_callback_failed',
   'auth_callback_timeout',
+]);
+// PB-WHATSAPP-FOUNDATION-001 — closed error taxonomy for the phone OTP
+// funnel (scoped to phone events; never the OTP code nor the number).
+export const PHONE_VERIFICATION_ERROR_CATEGORIES = [
+  'invalid_phone',
+  'invalid_code',
+  'code_expired',
+  'max_attempts',
+  'rate_limited',
+  'resend_cooldown',
+  'provider_unavailable',
+  'no_pending',
+  'not_verified',
+  'unknown',
+] as const;
+const PHONE_ERROR_CATEGORY_EVENTS: ReadonlySet<ObsEventName> = new Set([
+  'phone_verification_failed',
 ]);
 /** Build stamps: 40-hex git SHA, short SHA, semver or 'dev'. Closed shape. */
 const VERSION_STAMP_RE = /^(?:[0-9a-f]{7,40}|v?\d+(?:\.\d+){0,2}(?:[-.][A-Za-z0-9.]+)?|dev|[A-Za-z0-9][A-Za-z0-9._-]{0,63})$/;
@@ -1113,6 +1192,13 @@ export function buildEventProps(
     ) {
       delete out.error_category;
     }
+    // PB-WHATSAPP-FOUNDATION-001 — phone OTP funnel taxonomy.
+    if (
+      PHONE_ERROR_CATEGORY_EVENTS.has(name) &&
+      !PHONE_VERIFICATION_ERROR_CATEGORIES.includes(out.error_category as never)
+    ) {
+      delete out.error_category;
+    }
   }
   // PB-AUTH-CALLBACK-STALE-APP-001 — build stamps and recovery enums.
   if ('target_version' in out) {
@@ -1124,6 +1210,10 @@ export function buildEventProps(
   }
   if ('recovery_action' in out && !APP_UPDATE_RECOVERY_ACTIONS.includes(out.recovery_action as never)) {
     delete out.recovery_action;
+  }
+  // PB-AUTH-LOCK-ONBOARDING-STALL-001 — closed onboarding operation enum.
+  if ('operation' in out && !ONBOARDING_SAVE_OPERATIONS.includes(out.operation as never)) {
+    delete out.operation;
   }
   // PB-DOCUMENT-INTAKE-001 — unified document intake closed enums.
   if ('document_type' in out && !DOC_TYPES.includes(out.document_type as never)) delete out.document_type;
@@ -1140,6 +1230,8 @@ export function buildEventProps(
     delete out.extraction_status;
   }
   if ('resumed' in out && typeof out.resumed !== 'boolean') delete out.resumed;
+  // PB-WHATSAPP-FOUNDATION-001 — consent flags are booleans, never strings.
+  if ('value' in out && typeof out.value !== 'boolean') delete out.value;
   if ('attempt_number' in out && (typeof out.attempt_number !== 'number' || out.attempt_number < 1 || out.attempt_number > 8)) {
     delete out.attempt_number;
   }

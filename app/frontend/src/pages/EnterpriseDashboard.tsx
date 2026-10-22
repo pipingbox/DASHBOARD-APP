@@ -6,9 +6,11 @@ import { supabase, TABLES } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import {
   deriveApplicationMetrics,
+  funnelAccountsForAllApplications,
   type EnterpriseApplicationRow,
   type HiringFunnel,
 } from '@/lib/enterpriseMetrics';
+import { getCompanyStatusConfig } from '@/lib/workforce-admin';
 import {
   Briefcase,
   Users,
@@ -36,14 +38,27 @@ import {
  *
  * Differences vs CompanyDashboard:
  * - Aggregates across ALL company users (not just current user)
- * - Workforce pipeline overview (open requests by status)
+ * - Workforce pipeline overview (requests by company-facing status)
  * - Team activity (recruiters + their actions)
- * - Hiring funnel (applications -> interviews -> hires)
+ * - Hiring funnel (applications by canonical status)
  * - Bulk job metrics
  * - Certification coverage stats for shortlisted candidates
  *
  * Access: role = 'admin' OR (account_type = 'company' AND plan = 'enterprise')
  * Future: proper enterprise role check once DEC-37 is implemented.
+ *
+ * PB-COMPANY-MVP-PHASE-0-001 (2026-10-16):
+ * - Hiring funnel counts the canonical vocabulary of app_update_application_status
+ *   (sql/034): pending_profile_validation / applied / reviewed / shortlisted /
+ *   sent_to_client / interview / hired, plus rejected / withdrawn / legacy cancelled.
+ *   The previous tokens `interviewed` and `offered` matched no row that can ever
+ *   exist (PB-ENTERPRISE-STATUS-VOCABULARY-001).
+ * - Workforce pipeline uses the company-facing projection from workforce-admin
+ *   (NEW / IN_PROGRESS / COMPLETED / ON_HOLD / CANCELLED) instead of
+ *   draft/open/in_progress/fulfilled, of which only `cancelled` ever existed.
+ * - Application counts derive from real job_applications rows, not from
+ *   jobs.applications_count (unmaintained until PB-APPLICATION-COUNT-INTEGRITY-001
+ *   ships its trigger; production today stores 0 for every job).
  */
 
 interface EnterpriseMetrics {
@@ -57,21 +72,27 @@ interface EnterpriseMetrics {
   totalRecruiters: number;
 }
 
+/**
+ * Company-facing workforce pipeline, same projection the company workforce page
+ * uses (workforce-admin.ts). `unclassified` collects tokens outside the machine
+ * so they surface instead of vanishing.
+ */
 interface WorkforcePipeline {
-  draft: number;
-  open: number;
-  in_progress: number;
-  fulfilled: number;
+  new: number;
+  inProgress: number;
+  completed: number;
+  onHold: number;
   cancelled: number;
+  unclassified: number;
 }
 
 interface JobRow {
   id: string;
   title: string;
   location: string | null;
-  applications_count: number;
   status: string;
   created_at: string;
+  posted_by: string | null;
 }
 
 interface RecruiterRow {
@@ -80,6 +101,21 @@ interface RecruiterRow {
   applications_received: number;
   last_active: string | null;
 }
+
+const EMPTY_FUNNEL: HiringFunnel = {
+  applications: 0,
+  pendingProfileValidation: 0,
+  qualified: 0,
+  reviewed: 0,
+  shortlisted: 0,
+  sentToClient: 0,
+  interview: 0,
+  hired: 0,
+  rejected: 0,
+  withdrawn: 0,
+  cancelled: 0,
+  unknown: 0,
+};
 
 export default function EnterpriseDashboard() {
   const { t } = useTranslation();
@@ -99,22 +135,17 @@ export default function EnterpriseDashboard() {
   });
 
   const [pipeline, setPipeline] = useState<WorkforcePipeline>({
-    draft: 0,
-    open: 0,
-    in_progress: 0,
-    fulfilled: 0,
+    new: 0,
+    inProgress: 0,
+    completed: 0,
+    onHold: 0,
     cancelled: 0,
+    unclassified: 0,
   });
 
-  const [topJobs, setTopJobs] = useState<JobRow[]>([]);
+  const [topJobs, setTopJobs] = useState<(JobRow & { applicationCount: number })[]>([]);
   const [recruiters, setRecruiters] = useState<RecruiterRow[]>([]);
-  const [funnel, setFunnel] = useState<HiringFunnel>({
-    applications: 0,
-    shortlisted: 0,
-    interviewed: 0,
-    offered: 0,
-    hired: 0,
-  });
+  const [funnel, setFunnel] = useState<HiringFunnel>(EMPTY_FUNNEL);
 
   const fetchDashboard = useCallback(async () => {
     if (!user) return;
@@ -127,7 +158,7 @@ export default function EnterpriseDashboard() {
       // Fetch all jobs for this company (scoped by posted_by email — TD-06 approach)
       const { data: jobs, error: jobsError } = await supabase
         .from(TABLES.jobs)
-        .select('id, title, location, applications_count, status, created_at, posted_by')
+        .select('id, title, location, status, created_at, posted_by')
         .eq('posted_by', companyEmail)
         .order('created_at', { ascending: false });
 
@@ -135,10 +166,6 @@ export default function EnterpriseDashboard() {
 
       const allJobs = jobs || [];
       const activeJobs = allJobs.filter((j: JobRow) => j.status === 'active');
-      const totalApplications = allJobs.reduce(
-        (sum: number, j: JobRow) => sum + (j.applications_count || 0),
-        0
-      );
 
       // Fetch workforce requests
       const { data: wfData, error: wfError } = await supabase
@@ -150,12 +177,24 @@ export default function EnterpriseDashboard() {
 
       const wfRows = (wfData || []) as { status: string }[];
       const wfPipeline: WorkforcePipeline = {
-        draft: wfRows.filter((w) => w.status === 'draft').length,
-        open: wfRows.filter((w) => w.status === 'open').length,
-        in_progress: wfRows.filter((w) => w.status === 'in_progress').length,
-        fulfilled: wfRows.filter((w) => w.status === 'fulfilled').length,
-        cancelled: wfRows.filter((w) => w.status === 'cancelled').length,
+        new: 0,
+        inProgress: 0,
+        completed: 0,
+        onHold: 0,
+        cancelled: 0,
+        unclassified: 0,
       };
+      wfRows.forEach((w) => {
+        // Company-facing projection: internal granularity (reviewing, sourcing,
+        // candidates_proposed) collapses the same way the workforce page does.
+        const value = getCompanyStatusConfig(w.status).value;
+        if (value === 'NEW') wfPipeline.new += 1;
+        else if (value === 'IN_PROGRESS') wfPipeline.inProgress += 1;
+        else if (value === 'COMPLETED') wfPipeline.completed += 1;
+        else if (value === 'ON_HOLD') wfPipeline.onHold += 1;
+        else if (value === 'CANCELLED') wfPipeline.cancelled += 1;
+        else wfPipeline.unclassified += 1;
+      });
 
       // A company with zero jobs is a legitimate empty state, not a failure. Resolve it
       // here instead of issuing downstream queries with an empty job-id set, so the result
@@ -164,10 +203,12 @@ export default function EnterpriseDashboard() {
       let appRows: EnterpriseApplicationRow[] = [];
 
       if (jobIds.length > 0) {
-        // One fetch serves the funnel, the distinct-candidate count and the hires metric.
+        // One fetch serves the funnel, the distinct-candidate count, the hires metric
+        // and every per-job / per-recruiter application count. `job_id` is included
+        // so counts derive from real rows instead of jobs.applications_count.
         const { data: appsData, error: appsError } = await supabase
           .from(TABLES.jobApplications)
-          .select('id, user_id, status')
+          .select('id, user_id, status, job_id')
           .in('job_id', jobIds);
 
         if (appsError) throw appsError;
@@ -177,11 +218,23 @@ export default function EnterpriseDashboard() {
 
       // "Total Candidates" counts distinct workers, and hires are counted over all
       // applications: the table has no transition timestamp to build a month window from.
-      // See PB-ENTERPRISE-STATUS-VOCABULARY-001.
+      // See PB-ENTERPRISE-STATUS-VOCABULARY-001 (D7).
       const { funnel: hiringFunnel, distinctCandidates, hires } =
         deriveApplicationMetrics(appRows);
 
-      const interviewsScheduled = hiringFunnel.interviewed;
+      if (!funnelAccountsForAllApplications(hiringFunnel)) {
+        // Cannot happen by construction; guarded so a future edit that drops a
+        // bucket fails loudly instead of publishing numbers that do not add up.
+        throw new Error('Application funnel does not reconcile with total applications');
+      }
+
+      const interviewsScheduled = hiringFunnel.interview;
+
+      // Real per-job application counts, derived from the rows fetched above.
+      const countByJob = new Map<string, number>();
+      appRows.forEach((row) => {
+        if (row.job_id) countByJob.set(row.job_id, (countByJob.get(row.job_id) || 0) + 1);
+      });
 
       // Fetch distinct recruiters (posted_by emails) for this company
       const distinctEmails = Array.from(
@@ -193,7 +246,7 @@ export default function EnterpriseDashboard() {
         distinctEmails.map(async (email) => {
           const jobsByRecruiter = allJobs.filter((j: { posted_by: string | null }) => j.posted_by === email);
           const appsByRecruiter = jobsByRecruiter.reduce(
-            (sum: number, j: JobRow) => sum + (j.applications_count || 0),
+            (sum: number, j: JobRow) => sum + (countByJob.get(j.id) || 0),
             0
           );
           return {
@@ -207,7 +260,7 @@ export default function EnterpriseDashboard() {
 
       setMetrics({
         totalActiveJobs: activeJobs.length,
-        totalApplications,
+        totalApplications: appRows.length,
         totalWorkforceRequests: wfRows.length,
         totalCandidates: distinctCandidates,
         interviewsScheduled,
@@ -220,7 +273,11 @@ export default function EnterpriseDashboard() {
 
       setPipeline(wfPipeline);
       setFunnel(hiringFunnel);
-      setTopJobs(activeJobs.slice(0, 5) as JobRow[]);
+      setTopJobs(
+        activeJobs
+          .slice(0, 5)
+          .map((j: JobRow) => ({ ...j, applicationCount: countByJob.get(j.id) || 0 }))
+      );
       setRecruiters(recruiterRows);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to load enterprise dashboard';
@@ -258,6 +315,11 @@ export default function EnterpriseDashboard() {
   const funnelConversion = funnel.applications > 0
     ? ((funnel.hired / funnel.applications) * 100).toFixed(1)
     : '0.0';
+
+  // Applications that left the pipeline without an outcome the funnel displays as a
+  // stage: legacy `cancelled`, explicit rejected/withdrawn, and unmapped tokens.
+  const closedApplications =
+    funnel.rejected + funnel.withdrawn + funnel.cancelled + funnel.unknown;
 
   return (
     <div className="space-y-6">
@@ -316,10 +378,23 @@ export default function EnterpriseDashboard() {
 
           <div className="space-y-3">
             <FunnelBar label="Applications" value={funnel.applications} max={funnel.applications} color="bg-blue-500" />
+            <FunnelBar label="Qualified (Marketplace Ready)" value={funnel.qualified} max={funnel.applications} color="bg-sky-500" />
             <FunnelBar label="Shortlisted" value={funnel.shortlisted} max={funnel.applications} color="bg-amber-500" />
-            <FunnelBar label="Interviewed" value={funnel.interviewed} max={funnel.applications} color="bg-purple-500" />
-            <FunnelBar label="Offered" value={funnel.offered} max={funnel.applications} color="bg-cyan-500" />
+            <FunnelBar label="Interview" value={funnel.interview} max={funnel.applications} color="bg-purple-500" />
             <FunnelBar label="Hired" value={funnel.hired} max={funnel.applications} color="bg-green-500" />
+          </div>
+
+          {/* Every application row must be visible somewhere: pending-validation and
+              closed counts complete the distribution so the numbers add up. */}
+          <div className="border-t border-zinc-800/60 pt-3 space-y-1.5">
+            <p className="text-[10px] uppercase tracking-wider text-zinc-600">
+              Not in review pipeline
+            </p>
+            <MutedRow label="Pending profile validation" value={funnel.pendingProfileValidation} />
+            <MutedRow label="Rejected / Withdrawn / Cancelled" value={closedApplications - funnel.unknown} />
+            {funnel.unknown > 0 && (
+              <MutedRow label="Unclassified status" value={funnel.unknown} />
+            )}
           </div>
         </div>
 
@@ -331,11 +406,14 @@ export default function EnterpriseDashboard() {
           </div>
 
           <div className="space-y-2">
-            <PipelineRow label="Draft" count={pipeline.draft} color="text-zinc-400" />
-            <PipelineRow label="Open" count={pipeline.open} color="text-blue-400" />
-            <PipelineRow label="In Progress" count={pipeline.in_progress} color="text-amber-400" />
-            <PipelineRow label="Fulfilled" count={pipeline.fulfilled} color="text-green-400" />
+            <PipelineRow label="New" count={pipeline.new} color="text-blue-400" />
+            <PipelineRow label="In Progress" count={pipeline.inProgress} color="text-indigo-400" />
+            <PipelineRow label="Completed" count={pipeline.completed} color="text-green-400" />
+            <PipelineRow label="On Hold" count={pipeline.onHold} color="text-amber-400" />
             <PipelineRow label="Cancelled" count={pipeline.cancelled} color="text-red-400" />
+            {pipeline.unclassified > 0 && (
+              <PipelineRow label="Unclassified" count={pipeline.unclassified} color="text-zinc-500" />
+            )}
           </div>
 
           <Link
@@ -384,7 +462,7 @@ export default function EnterpriseDashboard() {
                   </div>
                   <span className="ml-3 flex items-center gap-1 text-[11px] text-zinc-400">
                     <Users className="h-3 w-3" />
-                    {job.applications_count || 0}
+                    {job.applicationCount}
                   </span>
                 </div>
               ))}
@@ -482,6 +560,15 @@ function FunnelBar({
       <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
         <div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${pct}%` }} />
       </div>
+    </div>
+  );
+}
+
+function MutedRow({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="flex items-center justify-between text-[11px]">
+      <span className="text-zinc-500">{label}</span>
+      <span className="text-zinc-400">{value}</span>
     </div>
   );
 }

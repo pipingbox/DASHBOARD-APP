@@ -5,6 +5,7 @@ import {
   SupportedLanguageCode,
   changeAppLanguage,
 } from '@/i18n';
+import { persistUserLanguage } from '@/lib/userLanguage';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,6 +60,10 @@ export function LanguageSelector({ className }: { className?: string }) {
               onSelect={(e) => {
                 e.preventDefault();
                 changeAppLanguage(lang.code);
+                // PB-I18N-EMAIL-001: con sesión activa, persiste la preferencia
+                // en el servidor (user_metadata.lang + réplica en perfil) para
+                // que los correos salgan en este idioma. Sin sesión no hace nada.
+                void persistUserLanguage(lang.code);
               }}
               className={cn(
                 'flex cursor-pointer items-center gap-3 text-sm',
