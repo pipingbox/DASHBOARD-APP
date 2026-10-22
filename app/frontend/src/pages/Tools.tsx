@@ -16,6 +16,7 @@ import {
   Crown,
   Loader2,
   MoveDiagonal,
+  MoveHorizontal,
   Shapes,
   AlignJustify,
 } from 'lucide-react';
@@ -42,6 +43,7 @@ import AccessoriesLibrary from '@/components/tools/AccessoriesLibrary';
 import OffsetTool from '@/tools/prefabrication/offsets/OffsetTool';
 import MiteredElbowTool from '@/tools/prefabrication/miters/MiteredElbowTool';
 import PipeCombTool from '@/tools/prefabrication/pipe-comb/PipeCombTool';
+import TwoElbowOffsetTool from '@/tools/prefabrication/two-elbow-offset/TwoElbowOffsetTool';
 
 interface ToolDef {
   key: string;
@@ -61,6 +63,7 @@ const TOOLS: ToolDef[] = [
   { key: 'flanges', nameKey: 'tools.flanges.name', descKey: 'tools.flanges.desc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'mitered-elbow', nameKey: 'tools.prefab.miteredElbow.title', descKey: 'tools.prefab.miteredElbow.noteGeometry', icon: Shapes, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'pipe-comb', nameKey: 'tools.prefab.pipeComb.title', descKey: 'tools.prefab.pipeComb.noteGeometry', icon: AlignJustify, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'two-elbow-offset', nameKey: 'tools.prefab.twoElbowOffset.title', descKey: 'tools.prefab.twoElbowOffset.subtitle', icon: MoveHorizontal, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'pipe-dimensions', nameKey: 'tools.pipeDim.name', descKey: 'tools.pipeDim.subtitle', icon: Table2, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'pressure-drop', nameKey: 'tools.pressureDrop.name', descKey: 'tools.pressureDrop.subtitle', icon: Gauge, categoryKey: 'tools.categoryHydraulics', implemented: true },
   { key: 'unit-converter', nameKey: 'tools.unitConverter', descKey: 'tools.unitConverterDesc', icon: Calculator, categoryKey: 'tools.categoryUtility', implemented: true },
@@ -274,6 +277,8 @@ export default function Tools() {
           <MiteredElbowTool />
         ) : active === 'pipe-comb' ? (
           <PipeCombTool />
+        ) : active === 'two-elbow-offset' ? (
+          <TwoElbowOffsetTool />
         ) : active === 'branch-layout' ? (
           <BranchLayoutTool />
         ) : active === 'unit-converter' ? (
