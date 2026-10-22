@@ -107,6 +107,47 @@ export function createEditableLengthField(initialMm: number, unit: 'mm' | 'in'):
  * resurrect the last valid value (P4 GO policy). Valid text is re-rendered
  * with the faithful representation above.
  */
+/**
+ * P4 user edit (review residual, 2026-10-22).
+ *
+ * Two distinct outcomes, without any generic fuzzy tolerance:
+ *
+ * 1. REPRESENTATIONAL-ONLY EDIT — the text changes but parses back to the
+ *    existing canonical value within ROUND_TRIP_TOLERANCE_MM (adding a
+ *    trailing zero, reformatting the same number). The canonical value is
+ *    kept, so a borderline geometry (e.g. tangent elbows at CLR = 100 mm
+ *    displayed as "3.9370079" in) is never tipped over the boundary by the
+ *    decimal representation alone. The tolerance is 1e-6 mm = 1 nm, the
+ *    same ida-y-vuelta bound the formatter itself guarantees: the visible
+ *    text still agrees with the value fed to the engine within that bound.
+ *
+ * 2. REAL NUMERIC EDIT — the parsed value differs from the canonical value
+ *    by more than the tolerance: the canonical value is replaced once
+ *    (single conversion) and the engine recalculates, exactly as before.
+ *
+ * Empty/invalid text keeps the frozen contracts: the text is kept as typed
+ * and the canonical value is untouched, so a toggle never resurrects a
+ * stale value.
+ */
+export function editableLengthFieldOnEdit(
+  field: LengthFieldState,
+  raw: string,
+  unit: 'mm' | 'in',
+): LengthFieldState {
+  const parsed = parseLengthInputToMm(raw, unit);
+  if (parsed === null) {
+    return { text: raw, canonicalMm: field.canonicalMm, unit };
+  }
+  if (
+    field.canonicalMm !== null &&
+    field.unit === unit &&
+    Math.abs(parsed - field.canonicalMm) <= ROUND_TRIP_TOLERANCE_MM
+  ) {
+    return { text: raw, canonicalMm: field.canonicalMm, unit };
+  }
+  return { text: raw, canonicalMm: parsed, unit };
+}
+
 export function editableLengthFieldOnUnitChange(
   field: LengthFieldState,
   newUnit: 'mm' | 'in',

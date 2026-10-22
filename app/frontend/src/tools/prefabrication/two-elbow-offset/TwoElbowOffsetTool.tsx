@@ -16,13 +16,13 @@ import { listNps, getElbowRadius } from '@/tools/core/standards';
 import { fromMm } from '@/tools/core/units';
 import { mapEngineError, type UnitSystem } from '../shared';
 import {
-  lengthFieldOnEdit,
   lengthFieldIsValid,
   parseDecimalInput,
   type LengthFieldState,
 } from '../pipe-comb/number-input';
 import {
   createEditableLengthField,
+  editableLengthFieldOnEdit,
   editableLengthFieldOnUnitChange,
 } from './two-elbow-offset-fields';
 import { presentTwoElbowOffset } from './two-elbow-offset-model';
@@ -259,7 +259,7 @@ export default function TwoElbowOffsetTool() {
           <Input
             id="teo-initial-spacing"
             value={initialField.text}
-            onChange={(e) => setInitialField((f) => lengthFieldOnEdit(f, e.target.value, unit))}
+            onChange={(e) => setInitialField((f) => editableLengthFieldOnEdit(f, e.target.value, unit))}
             aria-invalid={fieldInvalid(initialField)}
             className="bg-[#0E1117] border-[#232A36]"
           />
@@ -271,7 +271,7 @@ export default function TwoElbowOffsetTool() {
           <Input
             id="teo-final-spacing"
             value={finalField.text}
-            onChange={(e) => setFinalField((f) => lengthFieldOnEdit(f, e.target.value, unit))}
+            onChange={(e) => setFinalField((f) => editableLengthFieldOnEdit(f, e.target.value, unit))}
             aria-invalid={fieldInvalid(finalField)}
             className="bg-[#0E1117] border-[#232A36]"
           />
@@ -284,7 +284,7 @@ export default function TwoElbowOffsetTool() {
             id="teo-clr"
             value={clrField.text}
             onChange={(e) => {
-              setClrField((f) => lengthFieldOnEdit(f, e.target.value, unit));
+              setClrField((f) => editableLengthFieldOnEdit(f, e.target.value, unit));
               // Any manual edit is an explicit user choice: it no longer
               // belongs to the catalog selection.
               setClrSource((prev) => (prev === 'untabulated' && e.target.value === '' ? prev : 'custom'));
