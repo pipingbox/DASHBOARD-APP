@@ -108,22 +108,28 @@ export function createEditableLengthField(initialMm: number, unit: 'mm' | 'in'):
  * with the faithful representation above.
  */
 /**
- * P4 user edit (review residual, 2026-10-22).
+ * P4 user edit (review residual, 2026-10-22; contract adjusted 2026-10-23).
  *
- * Two distinct outcomes, without any generic fuzzy tolerance:
+ * Two distinct outcomes, decided by NUMERIC EQUIVALENCE between the previous
+ * VISIBLE text and the newly typed text — never by a tolerance against the
+ * canonical value (a tolerance there made the outcome depend on history:
+ * editing to "100.0000005" kept tangency from canonical 100 but broke it
+ * from canonical 101, with the same final text).
  *
- * 1. REPRESENTATIONAL-ONLY EDIT — the text changes but parses back to the
- *    existing canonical value within ROUND_TRIP_TOLERANCE_MM (adding a
- *    trailing zero, reformatting the same number). The canonical value is
- *    kept, so a borderline geometry (e.g. tangent elbows at CLR = 100 mm
- *    displayed as "3.9370079" in) is never tipped over the boundary by the
- *    decimal representation alone. The tolerance is 1e-6 mm = 1 nm, the
- *    same ida-y-vuelta bound the formatter itself guarantees: the visible
- *    text still agrees with the value fed to the engine within that bound.
+ * 1. REPRESENTATIONAL-ONLY EDIT — the previous visible text (`field.text`,
+ *    exactly as the user last saw it, never regenerated from the canonical)
+ *    and the new raw BOTH parse, under the SAME unit, to the SAME number
+ *    (adding a trailing zero, "100" -> "100,00", reformatted decimals).
+ *    The canonical value is kept: nothing the engine consumes changed.
  *
- * 2. REAL NUMERIC EDIT — the parsed value differs from the canonical value
- *    by more than the tolerance: the canonical value is replaced once
- *    (single conversion) and the engine recalculates, exactly as before.
+ * 2. REAL NUMERIC EDIT — anything else: the two texts parse to different
+ *    numbers, the unit changed, or the previous text was empty/invalid.
+ *    The canonical value is replaced once (single conversion) and the
+ *    engine recalculates, exactly as before.
+ *
+ * Comparing the two PARSED texts (instead of the canonical value) makes the
+ * outcome history-independent: the same final visible text always yields
+ * the same canonical value, whatever was typed before.
  *
  * Empty/invalid text keeps the frozen contracts: the text is kept as typed
  * and the canonical value is untouched, so a toggle never resurrects a
@@ -138,12 +144,11 @@ export function editableLengthFieldOnEdit(
   if (parsed === null) {
     return { text: raw, canonicalMm: field.canonicalMm, unit };
   }
-  if (
-    field.canonicalMm !== null &&
-    field.unit === unit &&
-    Math.abs(parsed - field.canonicalMm) <= ROUND_TRIP_TOLERANCE_MM
-  ) {
-    return { text: raw, canonicalMm: field.canonicalMm, unit };
+  if (field.canonicalMm !== null && field.unit === unit) {
+    const previous = parseLengthInputToMm(field.text, unit);
+    if (previous !== null && previous === parsed) {
+      return { text: raw, canonicalMm: field.canonicalMm, unit };
+    }
   }
   return { text: raw, canonicalMm: parsed, unit };
 }

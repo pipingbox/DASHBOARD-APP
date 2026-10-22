@@ -268,6 +268,59 @@ function eq(actual: unknown, expected: unknown, label: string): void {
   eq(f400back.text, '400.004', '7.15 and renders back as 400.004 mm');
 }
 
+/* ------------------------------------------------------------------ *
+ * 8. History independence of the edit contract (review of 9f420c0).
+ *    The representational exception compares the PREVIOUS VISIBLE TEXT
+ *    with the new raw via the parser — never the canonical value — so
+ *    the same final text always yields the same canonical value and the
+ *    same engine verdict, whatever was typed before.
+ * ------------------------------------------------------------------ */
+{
+  console.log('\n8. History-independent edit contract');
+
+  // The review counterexample: 100 -> 100.0000005 mm and 101 -> 100.0000005
+  // mm must land on the SAME canonical value and field state.
+  const from100 = editableLengthFieldOnEdit(createEditableLengthField(100, 'mm'), '100.0000005', 'mm');
+  const from101 = editableLengthFieldOnEdit(createEditableLengthField(101, 'mm'), '100.0000005', 'mm');
+  eq(from100.canonicalMm, 100.0000005, '8.1 100 -> 100.0000005 mm is a real numeric edit (no tolerance keeps 100)');
+  eq(from101.canonicalMm, 100.0000005, '8.2 101 -> 100.0000005 mm is a real numeric edit');
+  check(
+    from100.canonicalMm === from101.canonicalMm && from100.text === from101.text && from100.unit === from101.unit,
+    '8.3 the final field state is identical regardless of history',
+  );
+  const solveFrom100 = solvePipeComb({ lineCount: 2, initialSpacingMm: 200, finalSpacingMm: 400, elbowAngleDeg: 90, clrMm: from100.canonicalMm });
+  const solveFrom101 = solvePipeComb({ lineCount: 2, initialSpacingMm: 200, finalSpacingMm: 400, elbowAngleDeg: 90, clrMm: from101.canonicalMm });
+  check(
+    solveFrom100.success === false && (solveFrom100 as { code?: string }).code === 'negative_cut' &&
+      solveFrom101.success === false && (solveFrom101 as { code?: string }).code === 'negative_cut',
+    '8.4 both histories produce the same engine verdict (negative_cut)',
+  );
+
+  // 3.9370079 -> 3.93700791 (one digit more) is a REAL numeric change.
+  let field = createEditableLengthField(100, 'mm');
+  field = editableLengthFieldOnUnitChange(field, 'in');
+  eq(field.text, '3.9370079', '8.5 CLR 100 mm renders as 3.9370079 in (setup)');
+  const realEdit = editableLengthFieldOnEdit(field, '3.93700791', 'in');
+  check(realEdit.canonicalMm !== 100, '8.6 3.9370079 -> 3.93700791 is a real numeric edit');
+  check(
+    realEdit.canonicalMm !== null && Math.abs(realEdit.canonicalMm! - parseLengthInputToMm('3.93700791', 'in')!) <= 1e-12,
+    '8.7 the canonical is the parsed new text (single conversion)',
+  );
+
+  // Separator variants of the SAME number stay representational.
+  const commaEdit = editableLengthFieldOnEdit(field, '3,9370079', 'in');
+  eq(commaEdit.canonicalMm, 100, '8.8 comma decimal of the same number is representational only');
+
+  // Previous text empty or invalid: NO representational exception — the
+  // edit converts and replaces the canonical value.
+  const cleared = { text: '', canonicalMm: 100, unit: 'in' as const };
+  const retyped = editableLengthFieldOnEdit(cleared, '3.9370079', 'in');
+  check(retyped.canonicalMm !== null && retyped.canonicalMm !== 100, '8.9 retyping after clearing is a real edit (no exception from empty text)');
+  const invalidPrev = { text: 'abc', canonicalMm: 100, unit: 'in' as const };
+  const afterInvalid = editableLengthFieldOnEdit(invalidPrev, '3.9370079', 'in');
+  check(afterInvalid.canonicalMm !== null && afterInvalid.canonicalMm !== 100, '8.10 previous invalid text gets no representational exception');
+}
+
 /* ------------------------------------------------------------------ */
 
 console.log(`\ntwo-elbow-offset fields: ${passed} passed, ${failed} failed`);
