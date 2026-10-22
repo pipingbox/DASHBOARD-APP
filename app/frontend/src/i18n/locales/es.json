@@ -1135,6 +1135,7 @@
     "reynolds": "Número de Reynolds",
     "flangeRating": "Consulta de rating de bridas",
     "categoryFabrication": "Fabricación",
+    "familyOffsets": "Quiebros y desplazamientos",
     "elbowCut": {
       "name": "Calculadora de Corte de Codos",
       "subtitle": "Calcula dónde cortar un codo estándar para obtener cualquier ángulo",

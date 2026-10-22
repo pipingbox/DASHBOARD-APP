@@ -1437,6 +1437,7 @@
       "pdfDownloaded": "PDF baixado — imprima a 100% / tamanho real, sem ajustar à página"
     },
     "categoryFabrication": "Fabricação",
+    "familyOffsets": "Desvios e deslocamentos",
     "elbowCut": {
       "arcNeutral": "Arco neutro (C-C):",
       "name": "Calculadora de corte de curva",

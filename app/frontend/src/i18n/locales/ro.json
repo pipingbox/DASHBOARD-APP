@@ -1135,6 +1135,7 @@
     "reynolds": "Numărul Reynolds",
     "flangeRating": "Căutare rating flanșe",
     "categoryFabrication": "Fabricație",
+    "familyOffsets": "Deviere și deplasări",
     "elbowCut": {
       "name": "Calculator de tăiere a coturilor",
       "subtitle": "Calculați unde să tăiați un cot standard pentru a obține orice unghi",

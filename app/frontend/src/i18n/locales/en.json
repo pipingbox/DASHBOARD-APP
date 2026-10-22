@@ -1204,6 +1204,7 @@
     "reynolds": "Reynolds Number",
     "flangeRating": "Flange Rating Lookup",
     "categoryFabrication": "Fabrication",
+    "familyOffsets": "Offsets and displacements",
     "elbowCut": {
       "name": "Elbow Cut Calculator",
       "subtitle": "Calculate where to cut a standard elbow to get any angle",

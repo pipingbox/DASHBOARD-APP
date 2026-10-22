@@ -1434,6 +1434,7 @@
       "pdfDownloaded": "PDF gedownload — print op 100% / werkelijke grootte, niet aanpassen aan pagina"
     },
     "categoryFabrication": "Fabricage",
+    "familyOffsets": "Verspringingen en verplaatsingen",
     "elbowCut": {
       "arcNeutral": "Neutrale boog (C-C):",
       "name": "Bochtsnij-calculator",

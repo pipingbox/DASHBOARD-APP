@@ -1437,6 +1437,7 @@
       "pdfDownloaded": "PDF téléchargé — imprimez à 100 % / taille réelle, sans ajustement à la page"
     },
     "categoryFabrication": "Fabrication",
+    "familyOffsets": "Décalages et déplacements",
     "elbowCut": {
       "arcNeutral": "Arc neutre (C-C) :",
       "name": "Calculateur de coupe de coude",

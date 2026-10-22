@@ -1434,6 +1434,7 @@
       "pdfDownloaded": "PDF heruntergeladen — mit 100 % / Originalgröße drucken, nicht an Seite anpassen"
     },
     "categoryFabrication": "Fertigung",
+    "familyOffsets": "Versätze und Verlagerungen",
     "elbowCut": {
       "arcNeutral": "Neutraler Bogen (C-C):",
       "name": "Bogenschnitt-Rechner",

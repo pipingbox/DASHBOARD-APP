@@ -1135,6 +1135,7 @@
     "reynolds": "Numero di Reynolds",
     "flangeRating": "Ricerca Flange Rating",
     "categoryFabrication": "Fabbricazione",
+    "familyOffsets": "Svasi e spostamenti",
     "elbowCut": {
       "name": "Calcolatore di taglio curve",
       "subtitle": "Calcola dove tagliare una curva standard per ottenere qualsiasi angolo",
