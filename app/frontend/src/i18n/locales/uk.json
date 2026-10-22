@@ -1870,6 +1870,7 @@
       },
       "offset": {
         "title": "Зміщення труби",
+        "cardSubtitle": "Зсуви з відводами, без відводів та перевірка розмірів",
         "tabWithElbows": "З колінами",
         "tabWithoutElbows": "Без колін",
         "tabVerify": "Перевірка",

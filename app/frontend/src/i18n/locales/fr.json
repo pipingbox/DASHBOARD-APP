@@ -1706,6 +1706,7 @@
       },
       "offset": {
         "title": "Saut de tuyauterie",
+        "cardSubtitle": "Décalages avec coudes, sans coudes et vérification des mesures",
         "tabWithElbows": "Avec coudes",
         "tabWithoutElbows": "Sans coudes",
         "tabVerify": "Vérifier",

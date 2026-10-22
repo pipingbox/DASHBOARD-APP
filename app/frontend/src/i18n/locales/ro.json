@@ -1867,6 +1867,7 @@
       },
       "offset": {
         "title": "Decalaj țeavă",
+        "cardSubtitle": "Deviere cu coturi, fără coturi și verificarea măsurilor",
         "tabWithElbows": "Cu coturi",
         "tabWithoutElbows": "Fără coturi",
         "tabVerify": "Verificare",

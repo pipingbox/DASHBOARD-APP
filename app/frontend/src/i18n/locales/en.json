@@ -1929,6 +1929,7 @@
       },
       "offset": {
         "title": "Pipe Offset",
+        "cardSubtitle": "Offsets with elbows, without elbows and measure verification",
         "tabWithElbows": "With elbows",
         "tabWithoutElbows": "Without elbows",
         "tabVerify": "Verify",

@@ -1706,6 +1706,7 @@
       },
       "offset": {
         "title": "Desvio de tubagem",
+        "cardSubtitle": "Desvios com cotovelos, sem cotovelos e verificação de medidas",
         "tabWithElbows": "Com curvas",
         "tabWithoutElbows": "Sem curvas",
         "tabVerify": "Verificar",

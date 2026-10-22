@@ -80,7 +80,7 @@ const SECTION_ORDER: string[] = [
 const TOOLS: ToolDef[] = [
   { key: 'branch-layout', nameKey: 'tools.branchLayout.name', descKey: 'tools.branchLayout.subtitle', icon: GitBranch, categoryKey: 'tools.categoryFabrication', implemented: true, schematic: 'branch-layout' },
   { key: 'elbow-cut', nameKey: 'tools.elbowCut.name', descKey: 'tools.elbowCut.subtitle', icon: Scissors, categoryKey: 'tools.categoryFabrication', implemented: true, schematic: 'elbow-cut' },
-  { key: 'pipe-offset', nameKey: 'tools.prefab.offset.title', descKey: 'tools.prefab.offset.tabWithElbows', icon: MoveDiagonal, categoryKey: 'tools.familyOffsets', implemented: true, schematic: 'pipe-offset' },
+  { key: 'pipe-offset', nameKey: 'tools.prefab.offset.title', descKey: 'tools.prefab.offset.cardSubtitle', icon: MoveDiagonal, categoryKey: 'tools.familyOffsets', implemented: true, schematic: 'pipe-offset' },
   { key: 'accessories-library', nameKey: 'tools.accessoriesLibrary.title', descKey: 'tools.accessoriesLibraryDesc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'bolts-nuts', nameKey: 'tools.bolts.name', descKey: 'tools.bolts.desc', icon: Wrench, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'flanges', nameKey: 'tools.flanges.name', descKey: 'tools.flanges.desc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },

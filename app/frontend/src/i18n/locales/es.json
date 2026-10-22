@@ -1860,6 +1860,7 @@
       },
       "offset": {
         "title": "Quiebro de tubería",
+        "cardSubtitle": "Quiebros con codos, sin codos y comprobación de medidas",
         "tabWithElbows": "Con codos",
         "tabWithoutElbows": "Sin codos",
         "tabVerify": "Comprobar",

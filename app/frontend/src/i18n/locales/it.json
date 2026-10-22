@@ -1860,6 +1860,7 @@
       },
       "offset": {
         "title": "Dislivello tubazione",
+        "cardSubtitle": "Svasi con gomiti, senza gomiti e verifica delle misure",
         "tabWithElbows": "Con curve",
         "tabWithoutElbows": "Senza curve",
         "tabVerify": "Verifica",
