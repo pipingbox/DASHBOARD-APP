@@ -1,0 +1,1312 @@
+{
+  "1": {
+    "sections": [
+      {
+        "title": "Überblick über die Arbeitsschutzgesetzgebung",
+        "paragraphs": [
+          "Die Arbeitsschutzgesetzgebung (Sicherheit und Gesundheitsschutz), in den Niederlanden auch als ARBO-Gesetzgebung bekannt, beschreibt die Rechte und Pflichten sowohl der Arbeitgeber als auch der Arbeitnehmer im Bereich Sicherheit und Gesundheitsschutz am Arbeitsplatz.",
+          "Die Gesetzgebung gilt für ALLE Orte, an denen gearbeitet wird, und betrifft Arbeitgeber und Arbeitnehmer gleichermaßen."
+        ],
+        "bullets": [
+          "ARBO = Arbeitsbedingungen (Sicherheit und Gesundheitsschutz bei der Arbeit)",
+          "Umfasst: Gesundheit, Sicherheit und Wohlbefinden",
+          "Gilt ausnahmslos für alle Arbeitsplätze",
+          "Sowohl Arbeitgeber als auch Arbeitnehmer tragen Verantwortung"
+        ]
+      },
+      {
+        "title": "Grundprinzipien der Arbeitsschutzgesetzgebung",
+        "paragraphs": [
+          "Die Gesetzgebung beruht auf mehreren Grundannahmen, die eine umfassende Sicherheit am Arbeitsplatz gewährleisten."
+        ],
+        "bullets": [
+          "Unterstützung durch Fachleute oder Fachdienste (Präventionsbeauftragte)",
+          "Zusammenarbeit mehrerer Arbeitgeber an einem Standort",
+          "Beratung und Zusammenarbeit mit den Arbeitnehmervertretern",
+          "Die Risikoinventarisierung und -bewertung (RI&E) ist verpflichtend"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Die Arbeitsschutzgesetzgebung bezieht sich NICHT auf die Objekt- und Werksicherheit (Security), sondern ausschließlich auf Gesundheit, Sicherheit und Wohlbefinden."
+        }
+      },
+      {
+        "title": "Die Arbeitsinspektion",
+        "paragraphs": [
+          "Die Arbeitsinspektion (Aufsichtsbehörde) überwacht die Einhaltung der Arbeitsschutzgesetzgebung und verfügt über weitreichende Durchsetzungsbefugnisse."
+        ],
+        "bullets": [
+          "Kann ein Arbeitsverbot verhängen (Einstellung der Arbeiten)",
+          "Kann Bußgelder für Verstöße verhängen",
+          "Kann Untersuchungen in Unternehmen durchführen",
+          "Kann keine Arbeitnehmer entlassen – das ist Aufgabe des Arbeitgebers"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Die Aufsichtsbehörde kann die Arbeiten sofort STOPPEN lassen, wenn eine ernste Gefahr für die Beschäftigten besteht."
+        }
+      },
+      {
+        "title": "CE-Kennzeichnung und Arbeitszeit",
+        "paragraphs": [
+          "Die CE-Kennzeichnung zeigt an, dass ein Produkt die europäischen Mindestanforderungen erfüllt. Sie muss vom Hersteller oder Importeur angebracht werden.",
+          "Die Arbeitszeitgesetzgebung legt Höchstarbeitszeiten und Mindestruhezeiten fest, um eine Gefährdung von Sicherheit und Gesundheit zu verhindern, und fördert die Möglichkeit, Arbeit und Betreuungsaufgaben miteinander zu vereinbaren."
+        ],
+        "bullets": [
+          "CE-Kennzeichnung = europäische Mindestanforderungen an die Sicherheit",
+          "Muss auf jedem in Verkehr gebrachten und verwendeten Arbeitsmittel vorhanden sein",
+          "Die Arbeitszeitgesetzgebung schützt vor Überlastung",
+          "Fördert die Vereinbarkeit von Beruf und Privatleben"
+        ]
+      }
+    ]
+  },
+  "2": {
+    "sections": [
+      {
+        "title": "Risiko verstehen",
+        "paragraphs": [
+          "Risiko ist definiert als die Kombination aus Wahrscheinlichkeit und Auswirkung. Diese Formel hilft uns, Gefahren am Arbeitsplatz zu quantifizieren und zu priorisieren."
+        ],
+        "bullets": [
+          "Risiko = Wahrscheinlichkeit x Auswirkung",
+          "Höhere Wahrscheinlichkeit ODER größere Auswirkung = höheres Risiko",
+          "Die Gefährdungsbeurteilung hilft, Sicherheitsmaßnahmen zu priorisieren",
+          "Sowohl unsichere Zustände als auch unsichere Handlungen tragen zum Risiko bei"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Risiko = Wahrscheinlichkeit x Auswirkung. Dies ist die grundlegende Formel für alle Gefährdungsbeurteilungen im Arbeitsschutz."
+        }
+      },
+      {
+        "title": "Gefahrenquellen",
+        "paragraphs": [
+          "Gefahren am Arbeitsplatz gehen von vielen Quellen aus, darunter Arbeitsmittel, Stoffe und menschliches Verhalten. Probleme zu Hause gelten NICHT als Gefahrenquelle am Arbeitsplatz."
+        ],
+        "bullets": [
+          "Arbeitsmittel und Maschinen",
+          "Gefahrstoffe",
+          "Lärm und Strahlung",
+          "Arbeitsmethoden und Verfahren",
+          "Menschliches Verhalten bei der Arbeit"
+        ]
+      },
+      {
+        "title": "Präventionsmethoden",
+        "paragraphs": [
+          "Prävention lässt sich erreichen, indem sowohl unsichere Zustände ALS AUCH unsichere Handlungen verhindert werden. Der beste Umgang mit unsicheren Zuständen besteht darin, die Ursache vollständig zu beseitigen."
+        ],
+        "bullets": [
+          "Gefahr an der Quelle beseitigen",
+          "Kollektive Schutzmaßnahmen einsetzen",
+          "Persönliche Schutzausrüstung (PSA) anwenden",
+          "Information und Schulung bereitstellen"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Ein unsicherer Zustand liegt vor, wenn Arbeiten ausgeführt werden, OHNE dass die Bedingungen für sicheres Arbeiten eingehalten werden, was zu einem Unfall führen kann."
+        }
+      },
+      {
+        "title": "RI&E und LMRA",
+        "paragraphs": [
+          "Die Risikoinventarisierung und -bewertung (RI&E) erfolgt in drei Schritten: 1) Gefahren ermitteln, 2) Risiken inventarisieren, 3) Risiken bewerten. LMRA steht für Last Minute Risk Analysis (Risikoanalyse in letzter Minute) – eine kurze Sicherheitsprüfung vor Arbeitsbeginn."
+        ],
+        "bullets": [
+          "RI&E: systematische Gefährdungsbeurteilung des Arbeitsplatzes",
+          "LMRA: Risikoanalyse in letzter Minute vor jeder Tätigkeit",
+          "Die Arbeitsplanung legt die sicheren Arbeitsmethoden fest",
+          "Beide sind unverzichtbare Werkzeuge der Prävention"
+        ]
+      }
+    ]
+  },
+  "3": {
+    "sections": [
+      {
+        "title": "Unfallursachen",
+        "paragraphs": [
+          "Nach Lateiner spielen bei Unfällen drei Faktoren eine Rolle: Hintergrund, menschliches Versagen und unsichere Zustände/Vorgänge. Die beiden direkten Ursachen sind unsichere Handlungen und unsichere Zustände."
+        ],
+        "bullets": [
+          "Hintergrundfaktoren (organisatorisch, persönlich)",
+          "Menschliches Versagen (personenbezogene Faktoren)",
+          "Unsichere Zustände (Umgebungsbedingungen)",
+          "Unsichere Handlungen (verhaltensbezogene Faktoren)"
+        ]
+      },
+      {
+        "title": "Personenbezogene Faktoren",
+        "paragraphs": [
+          "Zu den personenbezogenen Faktoren, die zu Vorfällen führen können, gehören mangelnde Aufmerksamkeit und mangelnde Erfahrung. Unzureichende Planung ist KEIN personenbezogener Faktor – sie ist ein organisatorischer Faktor."
+        ],
+        "bullets": [
+          "Unzureichende Aufmerksamkeit oder Konzentration",
+          "Unzureichende Erfahrung oder Schulung",
+          "Körperliche Einschränkungen",
+          "Müdigkeit oder Krankheit"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Unzureichende PLANUNG ist ein organisatorischer Faktor, kein personenbezogener Faktor."
+        }
+      },
+      {
+        "title": "Meldung und Untersuchung",
+        "paragraphs": [
+          "Alle Unfälle und Beinaheunfälle müssen erfasst werden. Unfälle müssen dem direkten Vorgesetzten gemeldet werden. Das Einsatzunternehmen (Entleiher) ist für die Unfalluntersuchung verantwortlich."
+        ],
+        "bullets": [
+          "Dem direkten Vorgesetzten melden",
+          "ALLE Unfälle und Beinaheunfälle erfassen",
+          "Der Abschlussbericht muss enthalten: Analyse, Schlussfolgerungen, Empfehlungen",
+          "Die Untersuchung ermittelt die Grundursachen für die Prävention"
+        ]
+      },
+      {
+        "title": "Präventionsmaßnahmen",
+        "paragraphs": [
+          "Das Erstellen von Verfahrensanweisungen für das Vorgehen bei Unfällen ist eine Maßnahme im Bereich Organisation. Präventionsmaßnahmen zielen auf drei Bereiche ab: Umgebung, Organisation und Mensch."
+        ],
+        "bullets": [
+          "Organisatorische Maßnahmen: Verfahren, Schulung",
+          "Umgebungsbezogene Maßnahmen: technische Schutzmaßnahmen",
+          "Personenbezogene Maßnahmen: Bewusstsein, Kompetenz",
+          "Kontinuierliche Verbesserung anhand der Untersuchungsergebnisse"
+        ]
+      }
+    ]
+  },
+  "4": {
+    "sections": [
+      {
+        "title": "Ursachen unsicheren Verhaltens",
+        "paragraphs": [
+          "Unsicheres Verhalten hat erkennbare Ursachen, darunter fehlende Vorbildfunktion und Unwilligkeit. Gut formulierte Ziele sind KEINE Ursache für unsicheres Verhalten – sie fördern vielmehr die Sicherheit."
+        ],
+        "bullets": [
+          "Fehlende Vorbildfunktion (mangelhafte Führung)",
+          "Unwilligkeit (nicht sicher arbeiten wollen)",
+          "Unfähigkeit (nicht wissen, wie)",
+          "Fehlendes Bewusstsein"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Gut formulierte Ziele FÖRDERN sicheres Verhalten – sie sind keine Ursache für unsicheres Verhalten."
+        }
+      },
+      {
+        "title": "Rolle des Vorgesetzten",
+        "paragraphs": [
+          "Der Vorgesetzte ist für die Sicherheit entscheidend, weil er über die erforderlichen Informationen zu den Beschäftigten, zur Arbeit und zu den Umständen verfügt. Klarheit über den Vorrang sicheren Arbeitens ist das zentrale Element der Unternehmenspolitik, das das Verhalten beeinflusst."
+        ],
+        "bullets": [
+          "Verfügt über Informationen zu Beschäftigten, Arbeit und Umständen",
+          "Geht mit gutem Beispiel für sicheres Arbeiten voran",
+          "Schafft Klarheit über die Sicherheitsprioritäten",
+          "Überwacht und korrigiert unsicheres Verhalten"
+        ]
+      },
+      {
+        "title": "Regeln für sicheres Verhalten",
+        "paragraphs": [
+          "Sich selbst gegenüber kritisch zu sein, ist eine allgemeine Regel für sicheres Arbeiten. Sie sollten sowohl an Ihre eigene Sicherheit ALS AUCH an die der anderen denken."
+        ],
+        "bullets": [
+          "Seien Sie sich selbst gegenüber kritisch",
+          "Denken Sie auch an die Sicherheit der anderen",
+          "Melden Sie unsichere Zustände sofort",
+          "Greifen Sie ein, wenn Sie unsichere Handlungen beobachten",
+          "Achten Sie auf persönliche Hygiene, Ordnung und Sauberkeit"
+        ]
+      },
+      {
+        "title": "Alkohol und Drogen",
+        "paragraphs": [
+          "Alkohol und Drogen führen zu eingeschränkter oder problematischer Arbeitsleistung. Bei chronisch problematischem Konsum wird erwartet, dass Hilfe gesucht wird."
+        ],
+        "bullets": [
+          "Führen zu verminderter Konzentration und Urteilsfähigkeit",
+          "Nulltoleranz am Arbeitsplatz",
+          "Suchen Sie bei chronisch problematischem Konsum Hilfe",
+          "Informieren Sie den Vorgesetzten über jegliche Probleme"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Alkohol und Drogen führen zu EINGESCHRÄNKTER oder PROBLEMATISCHER Arbeitsleistung. Arbeiten Sie niemals unter ihrem Einfluss."
+        }
+      }
+    ]
+  },
+  "5": {
+    "sections": [
+      {
+        "title": "Pflichten des Arbeitgebers",
+        "paragraphs": [
+          "Arbeitgeber müssen über Gefahren bei der Arbeit informieren und unterweisen. Dies ist eine grundlegende Pflicht nach der Arbeitsschutzgesetzgebung."
+        ],
+        "bullets": [
+          "Über Gefahren am Arbeitsplatz informieren",
+          "Unterweisung und Schulung bereitstellen",
+          "Sichere Arbeitsbedingungen gewährleisten",
+          "Risikoinventarisierung und -bewertung durchführen",
+          "Persönliche Schutzausrüstung bereitstellen"
+        ]
+      },
+      {
+        "title": "Pflichten des Arbeitnehmers",
+        "paragraphs": [
+          "Arbeitnehmer müssen gefährliche Situationen oder Risiken für Sicherheit und Gesundheit dem Verantwortlichen/Vorgesetzten melden. Sie haben außerdem das Recht, die Arbeit zu unterbrechen, wenn eine unmittelbare und ernste Gefahr auftritt."
+        ],
+        "bullets": [
+          "Gefährliche Situationen dem Vorgesetzten melden",
+          "PSA korrekt verwenden",
+          "Sicherheitsanweisungen befolgen",
+          "Recht, die Arbeit bei unmittelbarer Gefahr einzustellen"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Arbeitnehmer haben das RECHT, die Arbeit zu unterbrechen, wenn eine unmittelbare und ernste Gefahr für Menschen auftritt."
+        }
+      },
+      {
+        "title": "Betriebsrat und SCC",
+        "paragraphs": [
+          "An der Beratung im Betriebsrat sind Vertreter des Arbeitgebers und der Arbeitnehmer beteiligt. SCC* konzentriert sich auf die direkte Sicherheitskontrolle, während SCC** zusätzlich die Sicherheitsstrukturen einbezieht."
+        ],
+        "bullets": [
+          "Betriebsrat: Vertreter des Arbeitgebers + der Arbeitnehmer",
+          "SCC* = direkte Sicherheitskontrolle",
+          "SCC** = Sicherheitskontrolle + Sicherheitsstrukturen",
+          "Arbeitsplatzbegehungen erhöhen das Sicherheitsbewusstsein"
+        ]
+      },
+      {
+        "title": "Zeitarbeitsverhältnisse",
+        "paragraphs": [
+          "Bei der Zeitarbeit besteht ein Dreiecksverhältnis zwischen dem Zeitarbeitsunternehmen (Verleiher), dem Einsatzunternehmen (Entleiher) und dem Zeitarbeitnehmer. Der tatsächliche Arbeitgeber (das Einsatzunternehmen) ist für die Arbeitsbedingungen verantwortlich."
+        ],
+        "bullets": [
+          "Dreiecksverhältnis: Zeitarbeitsunternehmen - Einsatzunternehmen - Arbeitnehmer",
+          "Das Einsatzunternehmen ist für die Arbeitsbedingungen verantwortlich",
+          "Das Zeitarbeitsunternehmen ist für die Arbeitsunfallversicherung verantwortlich",
+          "Gemeinsame Pflicht zur Weitergabe von Informationen"
+        ]
+      }
+    ]
+  },
+  "6": {
+    "sections": [
+      {
+        "title": "Allgemeine Sicherheitsregeln",
+        "paragraphs": [
+          "Allgemeine Sicherheitsregeln müssen schriftlich festgehalten werden und richten sich unter anderem an Zeitarbeitnehmer. Das Verfahren zur Meldung eines Brandes fällt unter die allgemeinen Sicherheitsregeln."
+        ],
+        "bullets": [
+          "Müssen schriftlich festgehalten werden",
+          "Richten sich an alle Beschäftigten, einschließlich Zeitarbeitskräften",
+          "Umfassen die Verfahren zur Brandmeldung",
+          "Müssen für Muttersprachler verständlich sein"
+        ]
+      },
+      {
+        "title": "Spezifische Sicherheitsregeln",
+        "paragraphs": [
+          "Spezifische Sicherheitsregeln beziehen sich auf bestimmte Gefahren wie Belüftung und das Befahren enger Räume. Sie beziehen sich NICHT auf Mittagspausen."
+        ],
+        "bullets": [
+          "Beziehen sich auf bestimmte Gefahren",
+          "Umfassen die Anforderungen an die Belüftung",
+          "Umfassen das Befahren enger Räume",
+          "Umfassen NICHT die Mittagspausen"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Spezifische Sicherheitsregeln müssen für Muttersprachler verständlich sein – Sprachverständnis ist für die Sicherheit unerlässlich."
+        }
+      },
+      {
+        "title": "Arbeitsfreigaben",
+        "paragraphs": [
+          "Eine Arbeitsfreigabe (Erlaubnisschein) muss die Maßnahmen beschreiben, die vom Aussteller und vom Inhaber der Freigabe zu treffen sind. Sie legt fest, welche Tätigkeiten wo und wie ausgeführt werden – aber NICHT, warum."
+        ],
+        "bullets": [
+          "Beschreibt die Maßnahmen für Aussteller und Inhaber",
+          "Gibt an, was, wo und wie",
+          "Muss NICHT angeben, warum",
+          "Führt die gesamte erforderliche PSA auf",
+          "Legt die operativen Maßnahmen für die Beschäftigten fest"
+        ]
+      },
+      {
+        "title": "Anschlussflansche",
+        "paragraphs": [
+          "Ein Anschlussflansch erfüllt einen doppelten Zweck: das Absperren von Zuleitungen zu Behältern, Tanks oder Anlagen UND das Trennen von Rohrleitungsabschnitten."
+        ],
+        "bullets": [
+          "Zuleitungen absperren",
+          "Rohrleitungsabschnitte trennen",
+          "Entscheidend für Freischaltverfahren",
+          "Teil der sicheren Arbeitsvorbereitung"
+        ]
+      }
+    ]
+  },
+  "7": {
+    "sections": [
+      {
+        "title": "Betriebliche Ersthelfer und Notfallhelfer",
+        "paragraphs": [
+          "Die Mitglieder der betrieblichen Notfallorganisation (BHV) haben spezifische Aufgaben, darunter das Löschen von Entstehungsbränden sowie die Begrenzung von Sach- und Personenschäden."
+        ],
+        "bullets": [
+          "Entstehungsbrände löschen",
+          "Sach- und Personenschäden begrenzen",
+          "Personal evakuieren",
+          "Erste Hilfe leisten",
+          "Rettungskräfte einweisen"
+        ]
+      },
+      {
+        "title": "Betrieblicher Notfallplan",
+        "paragraphs": [
+          "Ein betrieblicher Notfallplan beschreibt die für Notfallsituationen vorbereiteten Maßnahmen und Vorkehrungen. Sein Zweck ist es, die Auswirkungen möglicher Notfallsituationen zu begrenzen."
+        ],
+        "bullets": [
+          "Beschreibt die vorbereiteten Maßnahmen und Vorkehrungen",
+          "Begrenzt die Auswirkungen von Notfällen",
+          "Deckt alle Arten von Notfallsituationen ab",
+          "Muss regelmäßig geübt und aktualisiert werden"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Zu den Notfallsituationen gehören: Unfälle, Brand, Explosion, unkontrolliertes Austreten von Stoffen, Unwetter, Naturkatastrophen, soziale Unruhen und Terroranschläge."
+        }
+      },
+      {
+        "title": "Phasen der Notfallbewältigung",
+        "paragraphs": [
+          "Die Notfallbewältigung hat festgelegte Phasen. Die Erstalarmierung beschreibt, wie ein Notfall gemeldet werden kann und welche Informationen übermittelt werden müssen. Hinweis: Eine Phase der Zweitalarmierung gibt es nicht."
+        ],
+        "bullets": [
+          "Erstalarmierung: wie gemeldet wird und was mitzuteilen ist",
+          "Einsatz: Maßnahmen des Notfallteams",
+          "Beendigung: wird von einer befugten Person erklärt",
+          "Wiederherstellung: Rückkehr zum Normalbetrieb"
+        ]
+      },
+      {
+        "title": "Evakuierung und Erste Hilfe",
+        "paragraphs": [
+          "Die richtige Reihenfolge bei der Evakuierung lautet: 1) Arbeit einstellen, 2) keine Aufzüge benutzen, 3) sich am Sammelplatz melden. Erste-Hilfe-Material muss immer verfügbar sein."
+        ],
+        "bullets": [
+          "Arbeit sofort einstellen",
+          "Keine Aufzüge oder Lastenaufzüge benutzen",
+          "Anwesenheit am Sammelplatz melden",
+          "Erste-Hilfe-Material immer verfügbar",
+          "Geschulte Mitglieder der Notfallorganisation erforderlich"
+        ]
+      }
+    ]
+  },
+  "8": {
+    "sections": [
+      {
+        "title": "Erkennen von Gefahrstoffen",
+        "paragraphs": [
+          "Gefahrstoffe sind Stoffe, die eine Gefahr für die Gesundheit und/oder die Umwelt darstellen. Sie werden mit einem quadratischen Gefahrensymbol gekennzeichnet, schwarz auf orangefarbenem Hintergrund. Die R-Sätze auf den Etiketten geben die Risiken an."
+        ],
+        "bullets": [
+          "Gefahrensymbol: schwarz auf orangefarbenem Hintergrund",
+          "R-Sätze = Risikosätze (benennen die Gefahren)",
+          "S-Sätze = Sicherheitssätze (Vorsichtsmaßnahmen)",
+          "Das Sicherheitsdatenblatt (SDB/MSDS) liefert die vollständigen Informationen"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Die R-Sätze nennen Ihnen die RISIKEN. Die S-Sätze nennen Ihnen die SICHERHEITSMASSNAHMEN. Die Zahlen der Gefahrenraute reichen von 0 bis 4."
+        }
+      },
+      {
+        "title": "Sauerstoff und Belüftung",
+        "paragraphs": [
+          "Unter normalen Bedingungen beträgt der Sauerstoffanteil in der Luft 21%. Mangelnde Belüftung kann dazu führen, dass die Sauerstoffkonzentration zu niedrig wird und Erstickungsgefahr entsteht."
+        ],
+        "bullets": [
+          "Normaler Sauerstoffgehalt: 21%",
+          "Unter 19%: Gefahrenbereich",
+          "Mangelnde Belüftung verringert den Sauerstoff",
+          "Gasflaschen: weiße Flaschenschulter = Sauerstoff"
+        ]
+      },
+      {
+        "title": "Kohlenmonoxid und Asbest",
+        "paragraphs": [
+          "Kohlenmonoxid verhindert, dass Sauerstoff ins Blut aufgenommen wird. Asbestexposition kann ein Mesotheliom verursachen. Die Neuverwendung und Verarbeitung von Asbest ist NICHT erlaubt."
+        ],
+        "bullets": [
+          "CO: Sauerstoff wird nicht mehr ins Blut aufgenommen",
+          "Asbest: verursacht Mesotheliom",
+          "Vorkommen in Dacheindeckungen, Wandverkleidungen, Ofenmauerwerk",
+          "NICHT in neu gebauten Häusern enthalten",
+          "Neuverwendung/Verarbeitung ist verboten"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Kohlenmonoxid ist geruchlos und farblos – ohne Messgeräte können Sie es nicht wahrnehmen. Es verhindert die Sauerstoffaufnahme im Blut."
+        }
+      },
+      {
+        "title": "Biologische Arbeitsstoffe und Lagerung",
+        "paragraphs": [
+          "Biologische Arbeitsstoffe können in der Landwirtschaft und in kontaminiertem Boden vorkommen. Impfungen sind eine Vorsichtsmaßnahme. Gasflaschen müssen bei der Lagerung ordnungsgemäß gesichert werden."
+        ],
+        "bullets": [
+          "Biologische Arbeitsstoffe: Landwirtschaft, kontaminierter Boden",
+          "Impfungen als Vorsichtsmaßnahme",
+          "Gasflaschen: ordnungsgemäß sichern",
+          "Organische Lösemittel: entzündbar/leicht entzündbar",
+          "Leckagen: fachgerechte Beseitigung des ausgelaufenen Produkts"
+        ]
+      }
+    ]
+  },
+  "9": {
+    "sections": [
+      {
+        "title": "Grundlagen des Feuers",
+        "paragraphs": [
+          "Feuer benötigt Brennstoff, Sauerstoff und eine Zündquelle. Für einen Brand oder eine Explosion ist ein brennbarer Stoff erforderlich. Sauerstoffüberschuss erleichtert die Entzündung brennbarer Stoffe."
+        ],
+        "bullets": [
+          "Brennstoff: das Material, das brennt",
+          "Sauerstoff: normalerweise 21% in der Luft",
+          "Zündquelle: Funke, Flamme, Hitze",
+          "Sauerstoffüberschuss = leichtere Entzündung"
+        ]
+      },
+      {
+        "title": "Brandklassen",
+        "table": {
+          "headers": [
+            "Klasse",
+            "Stoffe",
+            "Beispiele"
+          ],
+          "rows": [
+            [
+              "A",
+              "Feste Stoffe",
+              "Holz, Papier, Kunststoff, Textilien"
+            ],
+            [
+              "B",
+              "Flüssigkeiten",
+              "Benzin, Öl, Alkohol, Farbe"
+            ],
+            [
+              "C",
+              "Gase",
+              "Methan, Propan, Butan, Acetylen"
+            ],
+            [
+              "D",
+              "Metalle",
+              "Magnesium, Aluminium, Natrium"
+            ]
+          ]
+        },
+        "callout": {
+          "type": "danger",
+          "text": "NIEMALS Wasser bei Bränden der Klasse B (Flüssigkeiten) einsetzen! Brennende Flüssigkeiten spritzen, schwimmen auf dem Wasser und breiten den Brand aus."
+        }
+      },
+      {
+        "title": "Explosionen und Flammpunkt",
+        "paragraphs": [
+          "Eine Explosion ist ein sich sehr schnell entwickelnder Brand, der eine Druckwelle freisetzt. Die Explosionsgrenze ist die höchste bzw. niedrigste Konzentration eines Gases in der Luft, bei der eine Explosion auftreten kann. Der Flammpunkt ist die niedrigste Temperatur einer Flüssigkeit, bei der sich ihre Dämpfe entzünden lassen."
+        ],
+        "bullets": [
+          "Explosion = schneller Brand + Druckwelle",
+          "Explosionsgrenze: Grenzwerte der Gaskonzentration",
+          "Flammpunkt: niedrigste Zündtemperatur der Dämpfe einer Flüssigkeit",
+          "Das Ex-Zeichen kennzeichnet einen explosionsgefährdeten Bereich"
+        ]
+      },
+      {
+        "title": "Löschmethoden",
+        "paragraphs": [
+          "Wird ein Brand entdeckt, ist er zuerst zu melden. Löschdecken entziehen den Sauerstoff. Kohlendioxid verdrängt den Sauerstoff, kann jedoch eine erstickende Atmosphäre erzeugen und Erfrierungen verursachen. Sand entzieht den Sauerstoff. Bei der Behandlung von Verbrennungen mindestens 15 Minuten lang mit Wasser kühlen."
+        ],
+        "bullets": [
+          "Erste Maßnahme: den Brand MELDEN",
+          "Löschdecken: entziehen den Sauerstoff",
+          "CO2: verdrängt den Sauerstoff (Erstickungsgefahr + Erfrierungen)",
+          "Sand: entzieht den Sauerstoff",
+          "Verbrennungen: mindestens 15 Minuten kühlen",
+          "Die Brandwache bei Heißarbeiten erfordert eine spezielle Schulung"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Bei der Behandlung von Verbrennungen: mindestens 15 MINUTEN lang mit Wasser kühlen. Nicht 5, nicht 10 – mindestens fünfzehn Minuten."
+        }
+      }
+    ]
+  },
+  "10": {
+    "sections": [
+      {
+        "title": "Sicherheit bei Handwerkzeugen",
+        "paragraphs": [
+          "Meißel dürfen keine Grate an der Schneide aufweisen. Bei Hämmern muss der Stiel fest im Hammerkopf gesichert sein. Beim Arbeiten mit Messern eine ausziehbare Klinge nicht zu weit herausschieben."
+        ],
+        "bullets": [
+          "Meißel: keine Grate an der Schneide",
+          "Hämmer: Stiel fest im Hammerkopf gesichert",
+          "Messer: Klinge nicht zu weit ausfahren",
+          "Sägen: das Sägeblatt muss gut gespannt sein",
+          "Kleine Werkstücke: müssen eingespannt werden"
+        ]
+      },
+      {
+        "title": "Elektrowerkzeuge und Maschinen",
+        "paragraphs": [
+          "Elektrische Handwerkzeuge für 230 Volt müssen schutzisoliert (doppelt isoliert) sein. Ein Totmannschalter stoppt die Maschine sofort, wenn der Griff losgelassen wird. Der Not-Halt ist die schnellste Möglichkeit, eine Maschine zu stoppen."
+        ],
+        "bullets": [
+          "230V-Werkzeuge: müssen doppelt isoliert sein",
+          "Totmannschalter: stoppt beim Loslassen",
+          "Not-Halt: schnellste Methode zum Stoppen",
+          "Regelmäßige Prüfung für alle Maschinen vorgeschrieben",
+          "Niemals Handschuhe an rotierenden Teilen tragen"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Tragen Sie NIEMALS Handschuhe beim Arbeiten an Maschinen mit rotierenden Teilen – der Handschuh und Ihre Hand können in die Maschine eingezogen werden."
+        }
+      },
+      {
+        "title": "Kreissägen und Schleifmaschinen",
+        "paragraphs": [
+          "Eine Tischkreissäge muss eine Schutzhaube für das Sägeblatt haben, die an einem stabilen Ständer befestigt ist. Ein Spaltkeil wird bei der Handkreissäge verwendet. Schleifscheiben müssen den Herstellernamen tragen."
+        ],
+        "bullets": [
+          "Tischkreissäge: Sägeblattschutzhaube an stabilem Ständer",
+          "Spaltkeil: für die Handkreissäge",
+          "Schleifscheibe: muss den Herstellernamen tragen",
+          "Kettensäge: erfordert spezielle Schnittschutzhose und -handschuhe aus Fasergewebe",
+          "Nagler/Tacker: Schutz gegen unbeabsichtigtes Auslösen"
+        ]
+      },
+      {
+        "title": "Gabelstapler und Fahrzeuge",
+        "paragraphs": [
+          "Ein Hubwagen hat eine Hubhöhe von 20 cm. Gabelstaplerfahrer müssen eine geprüfte Befähigung besitzen UND einen Sicherheitsgurt benutzen. Das Gegengewicht darf nicht erhöht werden."
+        ],
+        "bullets": [
+          "Hubwagen: 20 cm Hubhöhe",
+          "Gabelstapler: geprüfte Befähigung + Sicherheitsgurt vorgeschrieben",
+          "Gegengewicht darf nicht erhöht werden",
+          "Keine Mitfahrer ohne speziellen Sitz",
+          "Druckluftwerkzeuge: Luftzufuhr nach Gebrauch absperren"
+        ]
+      }
+    ]
+  },
+  "11": {
+    "sections": [
+      {
+        "title": "Gefahren bei Abbrucharbeiten",
+        "paragraphs": [
+          "Abbrucharbeiten bergen zahlreiche Gefahren, darunter die Instabilität der Abbruchfront UND herausragende Bauteile. Beide sind gleichermaßen gefährlich."
+        ],
+        "bullets": [
+          "Instabilität der Abbruchfront",
+          "Herausragende Bauteile",
+          "Herabfallende Trümmer und Materialien",
+          "Staub und Gefahrstoffe",
+          "Einsturzgefahr der Tragstruktur"
+        ]
+      },
+      {
+        "title": "Sicherheitsmaßnahmen",
+        "paragraphs": [
+          "Bei Abbrucharbeiten ist eine Absturzsicherung vorgeschrieben. Beim Entfernen von Keramikfasern keine Schuttrutsche verwenden, um die Ausbreitung der Fasern zu verhindern."
+        ],
+        "bullets": [
+          "Absturzsicherung ist vorgeschrieben",
+          "Keine Schuttrutsche für Keramikfasern verwenden",
+          "Jederzeit geeignete PSA tragen",
+          "Kontrollierte Abbruchreihenfolge",
+          "Sperrzonen für Unbeteiligte"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Beim Entfernen von Keramikfasern: KEINE Schuttrutsche verwenden. So wird die gefährliche Ausbreitung der Fasern in die Luft verhindert."
+        }
+      },
+      {
+        "title": "Planung und Verfahren",
+        "paragraphs": [
+          "Alle Abbrucharbeiten erfordern eine sorgfältige Planung, eine angemessene Gefährdungsbeurteilung und klare Verfahren für jede Phase des Abbruchprozesses."
+        ],
+        "bullets": [
+          "Gefährdungsbeurteilung vor Arbeitsbeginn",
+          "Klar geplante Abbruchreihenfolge",
+          "Notfallverfahren festgelegt",
+          "Regelmäßige Prüfung der Standsicherheit",
+          "Angemessene Verfahren für die Abfallentsorgung"
+        ]
+      }
+    ]
+  },
+  "12": {
+    "sections": [
+      {
+        "title": "Sicherheit beim Gasschweißen",
+        "paragraphs": [
+          "Beim Gasschweißen mit Sauerstoff und Acetylen müssen die Flaschen stehend oder in einem Winkel von mindestens 30 Grad gelagert werden. Der Flammenrückschlag ist ein erhebliches Risiko beim Gasschweißen."
+        ],
+        "bullets": [
+          "Acetylenflaschen: stehend oder mindestens 30 Grad",
+          "Flammenrückschlag ist ein großes Risiko",
+          "Anschlüsse auf Leckagen prüfen",
+          "Rückschlagsicherungen verwenden",
+          "Sauerstoff und Brenngas getrennt lagern"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Acetylenflaschen müssen stehend oder in einem Winkel von mindestens 30 Grad gelagert werden. Legen Sie sie niemals flach hin."
+        }
+      },
+      {
+        "title": "Elektroschweißen",
+        "paragraphs": [
+          "Elektroschweißen erfordert einen umfassenden persönlichen Schutz sowie Schweißervorhänge, um Personen in der Nähe vor UV- und Infrarotstrahlung zu schützen. Eine Hornhautverbrennung durch Wärmestrahlung ist KEIN Risiko – das Verblitzen durch Infrarotstrahlung IST eines."
+        ],
+        "bullets": [
+          "Schweißermaske, Schürze, Schutzkleidung, Sicherheitsschuhe",
+          "Schweißervorhänge zum Schutz vor UV-/Infrarotstrahlung",
+          "Risiko: Verblitzen durch Infrarotstrahlung",
+          "Risiko: Lungenbeschwerden durch Schweißrauch",
+          "KEIN Risiko: Hornhautverbrennung durch Wärmestrahlung"
+        ]
+      },
+      {
+        "title": "Verfahren für Heißarbeiten",
+        "paragraphs": [
+          "Alle Schweiß-, Schneid- und Brennarbeiten erfordern die entsprechenden Erlaubnisscheine, Brandwachen und Sicherheitsmaßnahmen, um Brände und Explosionen zu verhindern."
+        ],
+        "bullets": [
+          "Erlaubnisschein für Heißarbeiten erforderlich",
+          "Brandwache während und nach der Arbeit",
+          "Brennbare Materialien aus dem Bereich entfernen",
+          "Auf explosionsfähige Atmosphären prüfen",
+          "Ausreichende Belüftung unerlässlich"
+        ]
+      }
+    ]
+  },
+  "13": {
+    "sections": [
+      {
+        "title": "Warum sorgfältige Erdarbeiten wichtig sind",
+        "paragraphs": [
+          "Sorgfältige Erdarbeiten sind wichtig für die Versorgungssicherheit der Versorgungsunternehmen. Die Beschädigung unterirdischer Leitungen kann schwere Vorfälle verursachen."
+        ],
+        "bullets": [
+          "Sicherheit der Versorgung",
+          "Gasleitungen: Erstickungsgefahr bei Beschädigung",
+          "Unter Spannung stehende Kabel: Gefahr eines tödlichen Stromschlags",
+          "Wasserleitungen: Überflutungsgefahr",
+          "Kommunikationskabel: Unterbrechung des Dienstes"
+        ]
+      },
+      {
+        "title": "Regeln für sichere Erdarbeiten",
+        "paragraphs": [
+          "Vor dem Aushub muss die Lage von Kabeln und Leitungen durch Suchschlitze innerhalb von 1,5 Metern bestimmt werden. Jede abweichende Lage oder Beschädigung muss dem Verantwortlichen gemeldet werden."
+        ],
+        "bullets": [
+          "Suchschlitze innerhalb von 1,5 m der erwarteten Lage",
+          "Melden Sie Abweichungen oder Beschädigungen sofort",
+          "Graben Sie in der Nähe bekannter Leitungen von Hand",
+          "Verwenden Sie Kabel- und Leitungssuchgeräte",
+          "Befolgen Sie die Vorgaben des Versorgungsunternehmens"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Explosionsgefahr ist NICHT unmittelbar ein Risiko des Aushubs selbst – Ersticken (Gas) und tödlicher Stromschlag (Kabel) SIND jedoch unmittelbare Risiken."
+        }
+      },
+      {
+        "title": "Arbeiten in Baugruben",
+        "paragraphs": [
+          "Bei Arbeiten in oder in der Nähe einer Baugrube sind ein wirksamer Verbau und geeignete Böschungen unerlässlich, um einen Einsturz zu verhindern."
+        ],
+        "bullets": [
+          "Wirksamer Verbau erforderlich",
+          "Geeignete Böschungen",
+          "Absturzsicherung an der Kante für die oben arbeitenden Personen",
+          "Sichere Zu- und Ausgangswege",
+          "Regelmäßige Prüfung der Standsicherheit"
+        ]
+      }
+    ]
+  },
+  "14": {
+    "sections": [
+      {
+        "title": "Gesetzliche Anforderungen",
+        "paragraphs": [
+          "Ab 2,5 Metern Höhe muss der Arbeitgeber die gesetzlich vorgeschriebenen Maßnahmen zur Vermeidung von Absturzrisiken treffen. Der Auffanggurt ist die Maßnahme, die die Gefahr für alle auf einem Flachdach arbeitenden Personen verringert."
+        ],
+        "bullets": [
+          "2,5 Meter: gesetzliche Maßnahmen erforderlich",
+          "Auffanggurt für Arbeiten auf Flachdächern",
+          "Kollektiver Schutz hat Vorrang vor individuellem Schutz",
+          "Gefährdungsbeurteilung für alle Arbeiten in der Höhe"
+        ]
+      },
+      {
+        "title": "Leitern",
+        "paragraphs": [
+          "Prüfen Sie vor der Benutzung, ob die Leiter in einem Winkel von etwa 75 Grad aufgestellt ist. Leitern werden für kleinere Tätigkeiten und zum Überbrücken von Höhenunterschieden verwendet. Die Reichweite von höchstens einer Armlänge ist eine zentrale Regel."
+        ],
+        "bullets": [
+          "Winkel: etwa 75 Grad",
+          "Verwendung für kleinere Tätigkeiten + Überbrücken von Höhenunterschieden",
+          "Reichweite höchstens eine Armlänge",
+          "Drei Kontaktpunkte beim Aufsteigen",
+          "Oben sichern oder von einer Person festhalten lassen"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Eine Leiter muss in einem Winkel von etwa 75 Grad aufgestellt werden. Zu steil = Umkippen nach hinten. Zu flach = Wegrutschen des Leiterfußes."
+        }
+      },
+      {
+        "title": "Gerüste",
+        "paragraphs": [
+          "Fahrgerüste müssen von innen bestiegen werden. Personen auf einem Hängegerüst müssen einen Auffanggurt benutzen. Bodenöffnungen sollten vorzugsweise mit festem Material abgedeckt werden."
+        ],
+        "bullets": [
+          "Fahrgerüst: von innen besteigen",
+          "Hängegerüst: Auffanggurt erforderlich",
+          "Bodenöffnungen: mit festem Material abdecken",
+          "Seitenschutz an allen offenen Seiten",
+          "Regelmäßige Prüfung der Gerüstbauteile"
+        ]
+      },
+      {
+        "title": "Boden- und Wandöffnungen",
+        "paragraphs": [
+          "Zu den Gefahren gehören das Getroffenwerden durch herabfallende Gegenstände und das Durchstürzen durch Öffnungen. Das Verschließen einer großen Bodenöffnung ist KEINE Gefahr – es ist eine Sicherheitsmaßnahme."
+        ],
+        "bullets": [
+          "Durchstürzen durch Öffnungen",
+          "Getroffenwerden durch hindurchfallende Gegenstände",
+          "Decken Sie Öffnungen mit festem Material ab",
+          "Verwenden Sie Seitenschutz, wo eine Abdeckung nicht möglich ist",
+          "Kennzeichnen Sie alle Öffnungen deutlich"
+        ]
+      }
+    ]
+  },
+  "15": {
+    "sections": [
+      {
+        "title": "Grundlegende Gefahren",
+        "paragraphs": [
+          "Ein Laie darf NIEMALS an unter Spannung stehenden elektrischen Anlagen arbeiten, auch nicht mit Erlaubnis einer Fachkraft. Die größte Gefahr beim Stromfluss durch den Körper ist der Stromfluss durch das Herz. Ein tödlicher Stromschlag wird durch die Nutzung von Elektrizität verursacht."
+        ],
+        "bullets": [
+          "Laien: NIEMALS an unter Spannung stehenden Anlagen",
+          "Größte Gefahr: Stromfluss durch das Herz",
+          "Fehlende Erdung verursacht Unfälle",
+          "Stromstärke und Einwirkdauer bestimmen die Verletzung",
+          "Die Hautdicke hat KEINEN Einfluss auf die Verletzung"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Ein Laie darf NIEMALS an unter Spannung stehenden elektrischen Anlagen arbeiten – auch nicht mit Erlaubnis einer Fachkraft."
+        }
+      },
+      {
+        "title": "Sichere Spannungen",
+        "table": {
+          "headers": [
+            "Art",
+            "Maximale sichere Spannung",
+            "Anwendung"
+          ],
+          "rows": [
+            [
+              "Gleichstrom",
+              "120V",
+              "Enge Räume"
+            ],
+            [
+              "Wechselstrom",
+              "50V",
+              "Enge Räume"
+            ],
+            [
+              "Fehlerstrom-Schutzschalter",
+              "30 mA",
+              "Baustellen"
+            ]
+          ]
+        },
+        "callout": {
+          "type": "info",
+          "text": "In engen Räumen: max. 120V DC oder max. 50V AC. Baustellenverteiler benötigen einen Fehlerstromschutz von 30 mA."
+        }
+      },
+      {
+        "title": "Statische Elektrizität und Kurzschlüsse",
+        "paragraphs": [
+          "Ein Kurzschluss entsteht, wenn zwei Teile mit unterschiedlichen Spannungen in direkten Kontakt kommen. Zu den Gefahren statischer Elektrizität gehören Funken und Schäden an elektronischen Geräten. Bei Arbeiten mit statischer Elektrizität werden antistatische Schuhe getragen."
+        ],
+        "bullets": [
+          "Kurzschluss: unterschiedliche Spannungen in Kontakt",
+          "Statische Elektrizität: Funken + Geräteschäden",
+          "Antistatische Schuhe bei Arbeiten mit statischer Elektrizität",
+          "Statische Elektrizität tritt in sauerstoffarmen Räumen NICHT auf",
+          "Kabeltrommeln: immer vollständig abwickeln"
+        ]
+      },
+      {
+        "title": "Sicherheit von Kabeln und Geräten",
+        "paragraphs": [
+          "Kabeltrommeln müssen vollständig abgewickelt werden, um Überhitzung und Brand zu verhindern. Stromkabel können überlastet werden. Prüfen Sie Geräte vor der Benutzung immer durch Sichtkontrolle und melden Sie Schäden."
+        ],
+        "bullets": [
+          "Kabeltrommeln vollständig abwickeln (Brandgefahr)",
+          "Überlastung ist die Hauptgefahr bei Kabeln",
+          "Sichtkontrolle vor jeder Benutzung",
+          "Schäden melden – nicht benutzen",
+          "Gerüste müssen geerdet sein"
+        ]
+      }
+    ]
+  },
+  "16": {
+    "sections": [
+      {
+        "title": "Was ist ein enger Raum?",
+        "paragraphs": [
+          "Ein enger Raum weist Merkmale wie ausreichenden Arbeitsraum, aber schlechte Belüftung und begrenzten Zugang auf. Lagerbehälter, Tanks und Schweißzelte in der Nähe tiefer Baugruben sind Beispiele dafür."
+        ],
+        "bullets": [
+          "Begrenzter Zu- und Ausgang",
+          "Schlechte natürliche Belüftung",
+          "Nicht für den dauerhaften Aufenthalt ausgelegt",
+          "Beispiele: Tanks, Behälter, Silos, Kanäle",
+          "NICHT nur enge, kleine oder feuchte Räume"
+        ]
+      },
+      {
+        "title": "Gefahren und Messungen",
+        "paragraphs": [
+          "Ersticken tritt durch eine unzureichende Sauerstoffkonzentration ein. Messungen müssen von einer sachkundigen Person durchgeführt werden – nicht vom Vorgesetzten oder von der im Raum arbeitenden Person."
+        ],
+        "bullets": [
+          "Ersticken: unzureichender Sauerstoff (unter 19%)",
+          "Messungen ausschließlich durch eine sachkundige Person",
+          "Prüfen Sie Sauerstoff, brennbare Gase und giftige Gase",
+          "Kontinuierliche Überwachung während der Arbeit",
+          "Sichere Spannung: 120V DC in engen Räumen"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Erstickungsgefahr: verursacht durch eine UNZUREICHENDE Sauerstoffkonzentration. Ein hoher Sauerstoffgehalt ist eine Brandgefahr, keine Erstickungsgefahr."
+        }
+      },
+      {
+        "title": "Sicherungsposten und Aufsicht",
+        "paragraphs": [
+          "Ein Sicherungsposten ist Pflicht, solange sich jemand im geschlossenen Raum befindet. Der ständige Sicherungsposten muss über eine nachweislich geprüfte Sachkunde verfügen. Die Aufenthaltsdauer muss so kurz wie möglich sein."
+        ],
+        "bullets": [
+          "Sicherungsposten: während der gesamten Zeit Pflicht",
+          "Sicherungsposten: geprüfte Sachkunde erforderlich",
+          "Aufenthalt so kurz wie möglich",
+          "Alarmierung der Rettungsdienste bei Gefahr",
+          "Kommunikation jederzeit aufrechterhalten"
+        ]
+      },
+      {
+        "title": "Elektrische Sicherheit in engen Räumen",
+        "paragraphs": [
+          "Die sichere Spannung in engen Räumen mit leitfähigen Wänden beträgt 120V Gleichstrom. Schalten Sie Geräte ordnungsgemäß spannungsfrei und verwenden Sie sichere Spannungen."
+        ],
+        "bullets": [
+          "Maximal 120V DC in leitfähigen Räumen",
+          "Maximal 50V AC",
+          "Vor dem Einstieg ordnungsgemäß spannungsfrei schalten",
+          "Verwenden Sie nach Möglichkeit akkubetriebene Werkzeuge",
+          "Fehlerstromschutz unverzichtbar"
+        ]
+      }
+    ]
+  },
+  "17": {
+    "sections": [
+      {
+        "title": "Hebezeuge",
+        "paragraphs": [
+          "Hebezeuge können Lasten sowohl vertikal als auch horizontal bewegen. Beispiele sind Turmdrehkrane und Brückenkrane. Ein Hubwagen ist KEIN Hebezeug."
+        ],
+        "bullets": [
+          "Turmdrehkrane",
+          "Brückenkrane (Laufkrane)",
+          "Mobilkrane",
+          "KEINE Hubwagen",
+          "Können Lasten vertikal UND horizontal bewegen"
+        ]
+      },
+      {
+        "title": "Anschlagmittel",
+        "paragraphs": [
+          "Eine Hebebandschlinge ist ein Anschlagmittel. Zwei Schlingen an einem Stahlring werden als zweisträngiges Gehänge bezeichnet. Stahlseile dürfen nicht geknotet werden und sollten bei starkem Rost nicht mehr verwendet werden."
+        ],
+        "bullets": [
+          "Hebebandschlinge = Anschlagmittel",
+          "Zweisträngiges Gehänge: 2 Schlingen an einem Stahlring",
+          "Stahlseile: niemals knoten",
+          "Ketten: Kantenschutz an scharfen Kanten verwenden",
+          "Kranprüfbuch: dokumentiert alle Prüfungen"
+        ]
+      },
+      {
+        "title": "Sicherheitsmaßnahmen",
+        "paragraphs": [
+          "Zu den allgemeinen Gefahren gehören das Herabfallen der Last und das Umkippen des Hebezeugs. Abstützungen werden bei Hebezeugen eingesetzt, um ein Umkippen zu verhindern. Der Betrieb muss oberhalb von Windstärke 5 eingestellt werden."
+        ],
+        "bullets": [
+          "Gefahren: Herabfallen der Last, Umkippen des Hebezeugs",
+          "Abstützungen verhindern das Umkippen",
+          "Betrieb oberhalb von Windstärke 5 einstellen",
+          "Herstellerangaben zur Windstärke befolgen",
+          "Niemals unter schwebenden Lasten aufhalten"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Hebearbeiten müssen oberhalb von Windstärke 5 eingestellt werden. Prüfen Sie immer die Anweisungen des Kranherstellers zu den spezifischen Windstärkegrenzen."
+        }
+      }
+    ]
+  },
+  "18": {
+    "sections": [
+      {
+        "title": "Arten von Strahlung",
+        "paragraphs": [
+          "Infrarotstrahlung ist nichtionisierende Strahlung. Nichtionisierende Strahlung ist schwächer als ionisierende Strahlung. Der entscheidende Unterschied besteht darin, dass ionisierende Strahlung Ionen im Körpergewebe erzeugen kann."
+        ],
+        "bullets": [
+          "Ionisierend: Röntgenstrahlen, Gammastrahlen, Kernstrahlung",
+          "Nichtionisierend: Infrarot, UV, Radiowellen, Mikrowellen",
+          "Nichtionisierende ist SCHWÄCHER als ionisierende",
+          "Ionisierende erzeugt Ionen im Gewebe (gefährlicher)"
+        ]
+      },
+      {
+        "title": "Sicherheitsmaßnahmen",
+        "paragraphs": [
+          "Bei ionisierender Strahlung: so großen Abstand wie möglich halten UND den Bereich absperren. Bei nichtionisierender Strahlung: die Anweisungen auf den Geräten befolgen und die Einwirkdauergrenzen einhalten."
+        ],
+        "bullets": [
+          "Ionisierend: Abstand + Abschirmung + Zeit",
+          "Bereich rund um ionisierende Quellen absperren",
+          "Nichtionisierend: Geräteanweisungen befolgen",
+          "Grenzen der Nutzungsdauer einhalten",
+          "Ärztliche Untersuchung für Beschäftigte mit ionisierender Strahlung"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Beschäftigte, die mit ionisierenden Strahlenquellen arbeiten, müssen sich ärztlichen Untersuchungen unterziehen. Der Strahlenschutzbeauftragte überwacht die Strahlensicherheit und -hygiene."
+        }
+      },
+      {
+        "title": "Verantwortlichkeiten",
+        "paragraphs": [
+          "Die Überwachung der Strahlensicherheit und -hygiene ist Aufgabe des Strahlenschutzbeauftragten – nicht des Vorgesetzten oder des Notfallteams."
+        ],
+        "bullets": [
+          "Strahlenschutzbeauftragter: überwacht Sicherheit und Hygiene",
+          "Ärztliche Untersuchungen: Pflicht für strahlenexponierte Beschäftigte",
+          "Vorgesetzter: stellt die Einhaltung der Regeln sicher",
+          "Notfallteam: bearbeitet Strahlungsvorfälle"
+        ]
+      }
+    ]
+  },
+  "19": {
+    "sections": [
+      {
+        "title": "Bedingungen der Arbeitsumgebung",
+        "paragraphs": [
+          "Die Arbeitsumgebung wird durch Vibrationen, Beleuchtung, Temperatur und Lärm bestimmt. Der Vorgesetzte bestimmt NICHT die Bedingungen der Arbeitsumgebung – seine Aufgabe ist die Führung von Menschen."
+        ],
+        "bullets": [
+          "Vibrationen (Hand-Arm und Ganzkörper)",
+          "Beleuchtungsstärke",
+          "Temperatur und Luftfeuchtigkeit",
+          "Lärmpegel",
+          "NICHT durch den Vorgesetzten bestimmt"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Der VORGESETZTE bestimmt nicht die Bedingungen der Arbeitsumgebung. Diese werden durch physikalische Faktoren wie Vibrationen, Beleuchtung und Temperatur bestimmt."
+        }
+      },
+      {
+        "title": "Vibrationen und körperliche Belastung",
+        "paragraphs": [
+          "Zu den physikalischen Vibrationen gehören Hand-Arm-Vibrationen durch mechanische Werkzeuge und Ganzkörper-Vibrationen durch Fahrzeuge. Hautinfektionen werden NICHT durch Vibrationen verursacht. Die körperliche Belastung hängt von der Arbeitsposition/Körperhaltung UND von den auszuführenden Bewegungen ab."
+        ],
+        "bullets": [
+          "Hand-Arm: durch mechanische Handwerkzeuge",
+          "Ganzkörper: durch Fahrzeuge, Anlagen, Böden",
+          "NICHT verursacht: Hautinfektionen",
+          "Körperliche Belastung: Körperhaltung + Bewegungen",
+          "Pausen verhindern Überlastung"
+        ]
+      },
+      {
+        "title": "Manuelles Heben",
+        "paragraphs": [
+          "Das empfohlene Höchstgewicht für manuelles Heben beträgt 25 kg. Richtige Körperhaltung: mit geradem Rücken heben, die Knie beugen und die Last so nah wie möglich am Körper halten."
+        ],
+        "bullets": [
+          "Maximal 25 kg beim manuellen Heben",
+          "Gerader Rücken + Knie beugen",
+          "Last nah am Körper halten",
+          "Den Hebevorgang vor Beginn planen",
+          "Bei schweren/unhandlichen Lasten Hilfe holen"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Höchstgewicht beim manuellen Heben: 25 kg. Heben Sie immer mit GERADEM RÜCKEN und GEBEUGTEN KNIEN und halten Sie die Last NAH am Körper."
+        }
+      },
+      {
+        "title": "Sitzende und stehende Arbeit",
+        "paragraphs": [
+          "Die optimale Sitzposition umfasst eine gute Oberschenkelabstützung UND eine Entlastung der Schultern. Als Richtlinie gilt, eine optimale Position sicherzustellen, die Haltung aber regelmäßig zu wechseln. Stehen ist NICHT zu bevorzugen, wenn Kräfte von mehr als 30N aufgebracht werden müssen."
+        ],
+        "bullets": [
+          "Gute Oberschenkelabstützung auf der Sitzfläche",
+          "Entlastung der Schultern (Armstützen)",
+          "Haltung regelmäßig wechseln",
+          "Stehen: bevorzugt bei Tätigkeiten mit großer Reichweite",
+          "Stehen: NICHT bevorzugt bei Kräften über 30N"
+        ]
+      }
+    ]
+  },
+  "20": {
+    "sections": [
+      {
+        "title": "Auswirkungen von Lärm",
+        "paragraphs": [
+          "Übermäßig lauter Lärm erhöht das Risiko am Arbeitsplatz, da er Warnsignale überdeckt und die Konzentration verringert. Die Exposition gegenüber übermäßigem Lärm führt zu Konzentrationsverlust."
+        ],
+        "bullets": [
+          "Erhöht das Risiko am Arbeitsplatz",
+          "Führt zu Konzentrationsverlust",
+          "Überdeckt Warnsignale",
+          "Kann dauerhafte Gehörschäden verursachen",
+          "Gemessen in Dezibel (dB)"
+        ]
+      },
+      {
+        "title": "Physik des Schalls",
+        "paragraphs": [
+          "Zwei gleiche Schallquellen zusammen erhöhen den Schallpegel um 3 dB. Eine Verdoppelung des Abstands ergibt eine Verringerung um etwa 6 dB(A). Tonhöhe und Lautstärke bestimmen, ob Lärm schädlich ist."
+        ],
+        "bullets": [
+          "Zwei gleiche Quellen: +3 dB",
+          "Doppelter Abstand: -6 dB(A)",
+          "Schädigende Faktoren: Tonhöhe und Lautstärke",
+          "Dauerhafter Hörverlust: Schwierigkeiten beim Telefonieren",
+          "Maßeinheit: Dezibel (dB)"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Zwei gleiche Schallquellen = +3 dB. Doppelter Abstand = -6 dB(A). Dies sind Schlüsselzahlen für die Prüfung."
+        }
+      },
+      {
+        "title": "Rangfolge der Lärmbekämpfung",
+        "paragraphs": [
+          "Die richtige Reihenfolge lautet: 1) an der Quelle reduzieren, 2) die Quelle abschirmen, 3) Schallschwingungen dämpfen, 4) persönlichen Gehörschutz verwenden. Ab 80 dB(A) muss der Arbeitgeber eine Gehöruntersuchung anbieten und Gehörschutz zur Verfügung stellen."
+        ],
+        "bullets": [
+          "1. An der Quelle reduzieren",
+          "2. Die Quelle abschirmen",
+          "3. Schallschwingungen dämpfen",
+          "4. Persönlicher Gehörschutz (letztes Mittel)",
+          "Ab 80 dB(A): Gehöruntersuchung + Gehörschutz verfügbar",
+          "Ab 85 dB(A): Gehörschutz verpflichtend"
+        ]
+      }
+    ]
+  },
+  "21": {
+    "sections": [
+      {
+        "title": "Allgemeine Anforderungen an PSA",
+        "paragraphs": [
+          "Jede PSA muss geprüft sein. Schutzhelme aus Metall sollten in der Industrie nicht getragen werden, da sie Strom leiten können. PSA ist die letzte Verteidigungslinie nach technischen und organisatorischen Maßnahmen."
+        ],
+        "bullets": [
+          "Muss geprüft und zertifiziert sein",
+          "Metallhelme leiten Strom",
+          "Letzte Verteidigungslinie",
+          "Muss richtig passen",
+          "Regelmäßige Prüfung erforderlich"
+        ]
+      },
+      {
+        "title": "Kopf- und Augenschutz",
+        "paragraphs": [
+          "Die Innenausstattung eines Schutzhelms nimmt Stöße auf und verteilt sie über den Kopf. Korbbrillen schützen vor Säurespritzern. Schweißerschutzmasken schützen vor Infrarotstrahlung, während Schutzbrillen vor umherfliegenden Teilchen schützen."
+        ],
+        "bullets": [
+          "Helm-Innenausstattung: nimmt Stöße auf und verteilt sie",
+          "Gefahren für den Kopf: Anstoßen + herabfallende Gegenstände",
+          "Korbbrille: Schutz vor Säurespritzern",
+          "Schweißerschutzmaske: Schutz vor Infrarotstrahlung",
+          "Schutzbrille: Schutz vor umherfliegenden Teilchen"
+        ]
+      },
+      {
+        "title": "Atem- und Gehörschutz",
+        "paragraphs": [
+          "Eine Staubfiltermaske schützt bei Abbruch- und Stemmarbeiten. Eine Mund-Nasen-Bedeckung wirkt nur gegen Partikel, nicht gegen Gase oder Dämpfe. Umgebungsluftunabhängiger Atemschutz ist bei hohen/unbekannten Konzentrationen oder bei weniger als 19% Sauerstoff erforderlich. Gehörschutz ist oberhalb von 85 dB(A) verpflichtend."
+        ],
+        "bullets": [
+          "Staubfilter: Abbruch- und Stemmarbeiten",
+          "Mund-Nasen-Bedeckung: nur Partikel, KEINE Gase",
+          "Umgebungsluftunabhängig: hohe Konzentrationen oder Sauerstoffmangel",
+          "Gehörschutz: verpflichtend oberhalb von 85 dB(A)",
+          "Zu wenig Sauerstoff = Atemgefährdung"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Eine Mund-Nasen-Bedeckung wirkt NUR gegen Partikel. Sie schützt NICHT gegen Gase oder Dämpfe. Verwenden Sie bei chemischen Gefahren geeigneten Atemschutz."
+        }
+      },
+      {
+        "title": "Körper- und Absturzschutz",
+        "paragraphs": [
+          "Warnkleidung macht den Träger sichtbar. Ausrutschen ist eine Gefahr für Füße und Beine. Absturzschutzausrüstung, die bereits einen Sturz aufgefangen hat, DARF NICHT wiederverwendet werden."
+        ],
+        "bullets": [
+          "Warnkleidung: Sichtbarkeit",
+          "Rutschgefahr: Füße und Beine",
+          "Handschutz: Handschuhe mit verlängerter Stulpe für Handgelenk/Arm",
+          "Absturzschutz: nach einem aufgefangenen Sturz nicht wiederverwenden",
+          "Auffanggurt: muss passen und richtig eingestellt sein"
+        ]
+      }
+    ]
+  },
+  "22": {
+    "sections": [
+      {
+        "title": "Kategorien von Sicherheitszeichen",
+        "paragraphs": [
+          "Sicherheitszeichen werden nach Form, Farbe und Bedeutung eingeteilt. Jede Kategorie hat ein eindeutiges Erscheinungsbild, um ein sofortiges Erkennen sicherzustellen."
+        ],
+        "table": {
+          "headers": [
+            "Art",
+            "Form",
+            "Farbe",
+            "Bedeutung"
+          ],
+          "rows": [
+            [
+              "Gebot",
+              "Rund",
+              "Blau + weißes Symbol",
+              "Muss getan werden"
+            ],
+            [
+              "Warnung",
+              "Dreieckig",
+              "Gelb + schwarzer Rand/schwarzes Symbol",
+              "Vorsicht, Gefahr"
+            ],
+            [
+              "Verbot",
+              "Rund",
+              "Weiß + roter Rand + roter Querbalken",
+              "Darf nicht getan werden"
+            ],
+            [
+              "Rettung",
+              "Quadratisch/rechteckig",
+              "Grün + weißes Symbol",
+              "Sicherer Zustand"
+            ],
+            [
+              "Brandschutzeinrichtungen",
+              "Quadratisch/rechteckig",
+              "Rot + weißes Symbol",
+              "Standort von Brandbekämpfungsmitteln"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "Warn- und Gebotszeichen",
+        "paragraphs": [
+          "Warnzeichen sind dreieckig und gelb mit schwarzem Rand – sie bedeuten Vorsicht/Gefahr. Gebotszeichen sind rund und blau mit einem weißen Symbol. Die Gestaltung muss für alle Beschäftigten unabhängig von ihrer Sprache verständlich sein."
+        ],
+        "bullets": [
+          "Warnung: dreieckig, gelb, schwarzer Rand = GEFAHR",
+          "Gebot: rund, blau, weißes Symbol = MUSS GETAN WERDEN",
+          "Die Gestaltung muss für ALLE Beschäftigten verständlich sein",
+          "Sprachunabhängige Kommunikation",
+          "Wo möglich auf Augenhöhe angebracht"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Sicherheitszeichen müssen so gestaltet sein, dass ihre Bedeutung für ALLE Beschäftigten verständlich ist – unabhängig von der Sprache. Deshalb werden Piktogramme verwendet."
+        }
+      },
+      {
+        "title": "Verbots- und Rettungszeichen",
+        "paragraphs": [
+          "Ein Verbotszeichen ist rund und weiß mit rotem Rand und rotem Querbalken. Rettungszeichen sind quadratisch/rechteckig und grün mit weißen Symbolen. Zeichen für Brandschutzeinrichtungen sind quadratisch/rechteckig und rot mit weißen Symbolen."
+        ],
+        "bullets": [
+          "Verbot: weißer Kreis, roter Rand, roter Querbalken",
+          "Rettung/Flucht: grünes Rechteck, weißes Symbol",
+          "Brandschutzeinrichtungen: rotes Rechteck, weißes Symbol",
+          "Brandschutzzeichen zeigen sowohl den Weg als auch den Standort",
+          "Gelbe/weiße Streifen: Verkehrswege und Stapelflächen"
+        ]
+      },
+      {
+        "title": "Bodenmarkierungen",
+        "paragraphs": [
+          "Gelbe oder weiße Streifen werden zur Markierung von Verkehrswegen und Stapelflächen verwendet. Sie helfen, den Verkehrsfluss zu ordnen und sichere Bereiche am Arbeitsplatz auszuweisen."
+        ],
+        "bullets": [
+          "Gelbe/weiße Streifen: Verkehrswege und Stapelflächen",
+          "Markierungen sichtbar halten und instand halten",
+          "Markierte Bereiche nicht blockieren",
+          "Regelmäßige Prüfung des Zustands der Markierungen"
+        ]
+      }
+    ]
+  }
+}

@@ -15,7 +15,7 @@ import {
   Users,
   Clock,
 } from 'lucide-react';
-import { ACADEMY_CONTENT_LANGUAGES, useSyllabus } from '@/lib/academy/content';
+import { syllabusLanguages, useSyllabus } from '@/lib/academy/content';
 
 /* ─── SCC Course Content (Official Syllabus) ───
  * Based on official SCC Stiftung syllabus (SCC 2026).
@@ -38,7 +38,7 @@ import { ACADEMY_CONTENT_LANGUAGES, useSyllabus } from '@/lib/academy/content';
  */
 
 /** Languages the study material is actually available in (English + Layer 3). */
-const COURSE_LANGUAGES = ['en', ...ACADEMY_CONTENT_LANGUAGES];
+const COURSE_LANGUAGES = syllabusLanguages('scc');
 
 const MODULE_ICONS: Record<string, React.ElementType> = {
   Shield,

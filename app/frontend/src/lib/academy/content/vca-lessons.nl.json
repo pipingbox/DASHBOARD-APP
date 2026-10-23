@@ -1,0 +1,1312 @@
+{
+  "1": {
+    "sections": [
+      {
+        "title": "Overzicht van de arbowetgeving",
+        "paragraphs": [
+          "De wetgeving op het gebied van veiligheid en gezondheid, in Nederland ook bekend als de arbowetgeving, beschrijft de rechten en plichten van zowel werkgevers als werknemers op het gebied van veiligheid en gezondheid op de werkplek.",
+          "De wetgeving geldt voor ALLE locaties waar werk wordt uitgevoerd en is in gelijke mate van toepassing op werkgevers en werknemers."
+        ],
+        "bullets": [
+          "ARBO = arbeidsomstandigheden (veiligheid en gezondheid op het werk)",
+          "Omvat: gezondheid, veiligheid en welzijn",
+          "Geldt voor alle werkplekken zonder uitzondering",
+          "Zowel werkgever als werknemer hebben verantwoordelijkheden"
+        ]
+      },
+      {
+        "title": "Kernbeginselen van de arbowetgeving",
+        "paragraphs": [
+          "De wetgeving is gebaseerd op een aantal fundamentele uitgangspunten die een volledige veiligheid op de werkplek waarborgen."
+        ],
+        "bullets": [
+          "Ondersteuning door deskundigen of diensten (preventiemedewerkers)",
+          "Samenwerking tussen meerdere werkgevers op één locatie",
+          "Overleg en samenwerking met werknemersvertegenwoordigers",
+          "De risico-inventarisatie en -evaluatie (RI&E) is verplicht"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "De arbowetgeving heeft GEEN betrekking op beveiliging (security), maar uitsluitend op gezondheid, veiligheid en welzijn."
+        }
+      },
+      {
+        "title": "De Arbeidsinspectie",
+        "paragraphs": [
+          "De Arbeidsinspectie (inspectiedienst) houdt toezicht op de naleving van de arbowetgeving en beschikt over ruime handhavingsbevoegdheden."
+        ],
+        "bullets": [
+          "Kan een werkverbod opleggen (stillegging van het werk)",
+          "Kan boetes opleggen bij overtredingen",
+          "Kan onderzoeken uitvoeren bij bedrijven",
+          "Kan geen werknemers ontslaan: dat is de rol van de werkgever"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "De inspectiedienst kan het werk onmiddellijk laten STILLEGGEN als er ernstig gevaar bestaat voor werknemers."
+        }
+      },
+      {
+        "title": "CE-markering en arbeidstijden",
+        "paragraphs": [
+          "De CE-markering geeft aan dat een artikel voldoet aan de Europese minimumeisen. Zij moet worden aangebracht door de fabrikant of de importeur.",
+          "De arbeidstijdenwetgeving legt de maximale arbeidstijden en de minimale rusttijden vast om te voorkomen dat de veiligheid en gezondheid in gevaar komen, en bevordert de mogelijkheid om werk en zorgtaken te combineren."
+        ],
+        "bullets": [
+          "CE-markering = Europese minimumeisen voor veiligheid",
+          "Moet aanwezig zijn op elk arbeidsmiddel dat op de markt wordt gebracht en wordt gebruikt",
+          "De arbeidstijdenwetgeving beschermt tegen overbelasting door te lang werken",
+          "Bevordert het evenwicht tussen werk en privéleven"
+        ]
+      }
+    ]
+  },
+  "2": {
+    "sections": [
+      {
+        "title": "Inzicht in risico",
+        "paragraphs": [
+          "Risico wordt gedefinieerd als de combinatie van kans en effect. Deze formule helpt ons om gevaren op de werkplek te kwantificeren en prioriteiten te stellen."
+        ],
+        "bullets": [
+          "Risico = Kans x Effect",
+          "Grotere kans OF groter effect = groter risico",
+          "De risico-inventarisatie en -evaluatie helpt bij het prioriteren van veiligheidsmaatregelen",
+          "Zowel onveilige situaties als onveilige handelingen dragen bij aan het risico"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Risico = Kans x Effect. Dit is de basisformule voor alle risicobeoordelingen op het gebied van veiligheid op de werkplek."
+        }
+      },
+      {
+        "title": "Gevarenbronnen",
+        "paragraphs": [
+          "Gevaren op de werkplek komen uit meerdere bronnen, waaronder arbeidsmiddelen, stoffen en menselijk gedrag. Problemen thuis worden NIET beschouwd als een gevarenbron op de werkplek."
+        ],
+        "bullets": [
+          "Arbeidsmiddelen en machines",
+          "Gevaarlijke stoffen",
+          "Lawaai en straling",
+          "Werkmethoden en procedures",
+          "Menselijk gedrag op het werk"
+        ]
+      },
+      {
+        "title": "Preventiemethoden",
+        "paragraphs": [
+          "Preventie kan worden aangepakt door zowel onveilige situaties ALS onveilige handelingen te voorkomen. De beste manier om met onveilige situaties om te gaan is de oorzaak volledig weg te nemen."
+        ],
+        "bullets": [
+          "Het gevaar bij de bron wegnemen",
+          "Collectieve beschermingsmaatregelen toepassen",
+          "Persoonlijke beschermingsmiddelen (PBM) gebruiken",
+          "Voorlichting en opleiding geven"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Een onveilige situatie is een situatie waarin werk wordt uitgevoerd ZONDER dat aan de voorwaarden voor veilig werken wordt voldaan, wat tot een ongeval kan leiden."
+        }
+      },
+      {
+        "title": "RI&E en LMRA",
+        "paragraphs": [
+          "De risico-inventarisatie en -evaluatie (RI&E) bestaat uit drie stappen: 1) gevaren herkennen, 2) de risico's inventariseren, 3) de risico's evalueren. LMRA staat voor Last Minute Risk Analysis (laatste-minuut-risicoanalyse): een snelle veiligheidscontrole vóór de start van het werk."
+        ],
+        "bullets": [
+          "RI&E: systematische beoordeling van de risico's op de werkplek",
+          "LMRA: laatste-minuut-risicoanalyse vóór elke taak",
+          "De werkvoorbereiding bepaalt de veilige werkmethoden",
+          "Beide zijn essentiële hulpmiddelen voor preventie"
+        ]
+      }
+    ]
+  },
+  "3": {
+    "sections": [
+      {
+        "title": "Oorzaken van ongevallen",
+        "paragraphs": [
+          "Volgens Lateiner spelen drie factoren een rol bij ongevallen: achtergrond, menselijk falen en onveilige situaties/handelingen. De twee directe oorzaken zijn onveilige handelingen en onveilige situaties."
+        ],
+        "bullets": [
+          "Achtergrondfactoren (organisatorisch, persoonlijk)",
+          "Menselijk falen (persoonsgebonden factoren)",
+          "Onveilige situaties (omgevingsomstandigheden)",
+          "Onveilige handelingen (gedragsfactoren)"
+        ]
+      },
+      {
+        "title": "Persoonsgebonden factoren",
+        "paragraphs": [
+          "Persoonsgebonden factoren die tot incidenten kunnen leiden zijn onder meer onvoldoende aandacht en onvoldoende ervaring. Onvoldoende planning is GEEN persoonsgebonden factor: het is een organisatorische factor."
+        ],
+        "bullets": [
+          "Onvoldoende aandacht of concentratie",
+          "Onvoldoende ervaring of opleiding",
+          "Lichamelijke beperkingen",
+          "Vermoeidheid of ziekte"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Onvoldoende PLANNING is een organisatorische factor, geen persoonsgebonden factor."
+        }
+      },
+      {
+        "title": "Melding en onderzoek",
+        "paragraphs": [
+          "Alle ongevallen en bijna-ongevallen moeten worden geregistreerd. Ongevallen moeten worden gemeld aan de directe leidinggevende. De inlenende onderneming is verantwoordelijk voor het ongevallenonderzoek."
+        ],
+        "bullets": [
+          "Melden aan de directe leidinggevende",
+          "ALLE ongevallen en bijna-ongevallen registreren",
+          "Het eindrapport moet bevatten: analyse, conclusies en aanbevelingen",
+          "Het onderzoek brengt de basisoorzaken in kaart met het oog op preventie"
+        ]
+      },
+      {
+        "title": "Preventiemaatregelen",
+        "paragraphs": [
+          "Het opstellen van procedures voor het handelen bij ongevallen is een maatregel gericht op de organisatie. Preventiemaatregelen richten zich op drie gebieden: omgeving, organisatie en mens."
+        ],
+        "bullets": [
+          "Organisatorische maatregelen: procedures, opleiding",
+          "Omgevingsmaatregelen: technische beheersmaatregelen",
+          "Menselijke maatregelen: bewustwording, vakbekwaamheid",
+          "Continue verbetering op basis van de bevindingen van onderzoeken"
+        ]
+      }
+    ]
+  },
+  "4": {
+    "sections": [
+      {
+        "title": "Oorzaken van onveilig gedrag",
+        "paragraphs": [
+          "Onveilig gedrag heeft aanwijsbare oorzaken, waaronder een gebrek aan voorbeeldfunctie en onwil. Goed geformuleerde doelstellingen zijn GEEN oorzaak van onveilig gedrag; zij bevorderen juist de veiligheid."
+        ],
+        "bullets": [
+          "Gebrek aan voorbeeldfunctie (slecht leiderschap)",
+          "Onwil (niet veilig willen werken)",
+          "Onkunde (niet weten hoe)",
+          "Gebrek aan bewustzijn"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Goed geformuleerde doelstellingen BEVORDEREN veilig gedrag; zij zijn geen oorzaak van onveilig gedrag."
+        }
+      },
+      {
+        "title": "Rol van de leidinggevende",
+        "paragraphs": [
+          "De leidinggevende is van cruciaal belang voor de veiligheid, omdat hij over de benodigde informatie beschikt over de werknemers, het werk en de omstandigheden. Duidelijkheid over de prioriteit van veilig werken is het belangrijkste beleidselement dat het gedrag beïnvloedt."
+        ],
+        "bullets": [
+          "Beschikt over informatie over werknemers, werk en omstandigheden",
+          "Geeft het voorbeeld voor veilig werken",
+          "Zorgt voor duidelijkheid over de veiligheidsprioriteiten",
+          "Houdt toezicht op onveilig gedrag en corrigeert dit"
+        ]
+      },
+      {
+        "title": "Regels voor veilig gedrag",
+        "paragraphs": [
+          "Kritisch zijn ten opzichte van uzelf is een algemene regel voor veilig werken. U moet denken aan zowel uw eigen veiligheid ALS die van anderen."
+        ],
+        "bullets": [
+          "Wees kritisch ten opzichte van uzelf",
+          "Denk ook aan de veiligheid van anderen",
+          "Meld onveilige situaties onmiddellijk",
+          "Grijp in wanneer u onveilige handelingen ziet",
+          "Zorg voor persoonlijke hygiëne, orde en netheid"
+        ]
+      },
+      {
+        "title": "Alcohol en drugs",
+        "paragraphs": [
+          "Alcohol en drugs leiden tot verminderd of problematisch functioneren op het werk. Bij chronisch problematisch gebruik wordt verwacht dat de betrokkene hulp zoekt."
+        ],
+        "bullets": [
+          "Veroorzaken verminderde concentratie en verminderd beoordelingsvermogen",
+          "Nultolerantie op de werkplek",
+          "Zoek hulp bij chronisch problematisch gebruik",
+          "Informeer de leidinggevende over eventuele problemen"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Alcohol en drugs leiden tot VERMINDERD of PROBLEMATISCH functioneren op het werk. Werk nooit onder invloed."
+        }
+      }
+    ]
+  },
+  "5": {
+    "sections": [
+      {
+        "title": "Verplichtingen van de werkgever",
+        "paragraphs": [
+          "Werkgevers moeten voorlichting en instructie geven over de gevaren op het werk. Dit is een fundamentele verplichting op grond van de arbowetgeving."
+        ],
+        "bullets": [
+          "Voorlichting geven over de gevaren op de werkplek",
+          "Instructie en opleiding geven",
+          "Zorgen voor veilige arbeidsomstandigheden",
+          "De risico-inventarisatie en -evaluatie uitvoeren",
+          "Persoonlijke beschermingsmiddelen verstrekken"
+        ]
+      },
+      {
+        "title": "Verplichtingen van de werknemer",
+        "paragraphs": [
+          "Werknemers moeten gevaarlijke situaties of risico's voor de veiligheid en gezondheid melden aan de verantwoordelijke/leidinggevende. Zij hebben ook het recht het werk te onderbreken bij onmiddellijk en ernstig gevaar."
+        ],
+        "bullets": [
+          "Gevaarlijke situaties melden aan de leidinggevende",
+          "PBM correct gebruiken",
+          "Veiligheidsinstructies opvolgen",
+          "Recht om het werk stil te leggen bij onmiddellijk gevaar"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Werknemers hebben het RECHT het werk te onderbreken als er onmiddellijk en ernstig gevaar voor personen ontstaat."
+        }
+      },
+      {
+        "title": "Ondernemingsraad en SCC",
+        "paragraphs": [
+          "Bij het overleg in de ondernemingsraad zijn vertegenwoordigers van de werkgever en van de werknemers betrokken. SCC* richt zich op de directe beheersing van de veiligheid, terwijl SCC** daarnaast ook de veiligheidsstructuren omvat."
+        ],
+        "bullets": [
+          "Ondernemingsraad: vertegenwoordigers van werkgever + werknemers",
+          "SCC* = directe beheersing van de veiligheid",
+          "SCC** = beheersing van de veiligheid + veiligheidsstructuren",
+          "Werkplekinspecties vergroten het veiligheidsbewustzijn"
+        ]
+      },
+      {
+        "title": "Tijdelijke arbeidsrelaties",
+        "paragraphs": [
+          "Bij uitzendwerk bestaat er een driehoeksrelatie tussen het uitzendbureau, de inlenende onderneming en de uitzendkracht. De feitelijke werkgever (de inlenende onderneming) is verantwoordelijk voor de arbeidsomstandigheden."
+        ],
+        "bullets": [
+          "Driehoeksrelatie: uitzendbureau - inlenende onderneming - uitzendkracht",
+          "De inlenende onderneming is verantwoordelijk voor de arbeidsomstandigheden",
+          "Het uitzendbureau is verantwoordelijk voor de arbeidsongevallenverzekering",
+          "Gedeelde plicht om informatie door te geven"
+        ]
+      }
+    ]
+  },
+  "6": {
+    "sections": [
+      {
+        "title": "Algemene veiligheidsregels",
+        "paragraphs": [
+          "Algemene veiligheidsregels moeten schriftelijk worden vastgelegd en zijn onder meer bestemd voor uitzendkrachten. De procedure voor het melden van een brand valt onder de algemene veiligheidsregels."
+        ],
+        "bullets": [
+          "Moeten schriftelijk worden vastgelegd",
+          "Bestemd voor alle werknemers, inclusief tijdelijk personeel",
+          "Omvatten de procedures voor het melden van brand",
+          "Moeten begrijpelijk zijn voor moedertaalsprekers"
+        ]
+      },
+      {
+        "title": "Specifieke veiligheidsregels",
+        "paragraphs": [
+          "Specifieke veiligheidsregels hebben betrekking op bijzondere gevaren, zoals ventilatie en het betreden van besloten ruimten. Zij hebben GEEN betrekking op lunchpauzes."
+        ],
+        "bullets": [
+          "Hebben betrekking op specifieke gevaren",
+          "Omvatten de eisen voor ventilatie",
+          "Omvatten het betreden van besloten ruimten",
+          "Hebben GEEN betrekking op lunchpauzes"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Specifieke veiligheidsregels moeten begrijpelijk zijn voor moedertaalsprekers: taalbegrip is essentieel voor de veiligheid."
+        }
+      },
+      {
+        "title": "Werkvergunningen",
+        "paragraphs": [
+          "Een werkvergunning moet de maatregelen beschrijven die de verstrekker en de houder van de vergunning moeten nemen. Zij vermeldt welke werkzaamheden worden uitgevoerd, waar en hoe, maar NIET waarom."
+        ],
+        "bullets": [
+          "Beschrijft de maatregelen voor verstrekker en houder",
+          "Vermeldt wat, waar en hoe",
+          "Hoeft NIET te vermelden waarom",
+          "Vermeldt alle vereiste PBM",
+          "Legt de operationele maatregelen voor de werknemers vast"
+        ]
+      },
+      {
+        "title": "Steekflenzen",
+        "paragraphs": [
+          "Een steekflens heeft een dubbele functie: het afsluiten van toevoerleidingen naar vaten, tanks of installaties EN het scheiden van leidinggedeelten."
+        ],
+        "bullets": [
+          "Toevoerleidingen afsluiten",
+          "Leidinggedeelten scheiden",
+          "Essentieel bij veiligstellingsprocedures",
+          "Onderdeel van een veilige werkvoorbereiding"
+        ]
+      }
+    ]
+  },
+  "7": {
+    "sections": [
+      {
+        "title": "Bedrijfshulpverleners",
+        "paragraphs": [
+          "Bedrijfshulpverleners (BHV) hebben specifieke taken, waaronder het blussen van beginnende branden en het beperken van schade en letsel."
+        ],
+        "bullets": [
+          "Beginnende branden blussen",
+          "Schade en letsel beperken",
+          "Personeel evacueren",
+          "Eerste hulp verlenen",
+          "Hulpdiensten begeleiden"
+        ]
+      },
+      {
+        "title": "Bedrijfsnoodplan",
+        "paragraphs": [
+          "Een bedrijfsnoodplan beschrijft de maatregelen en voorzieningen die voor noodsituaties zijn voorbereid. Het doel is de gevolgen van mogelijke noodsituaties te beperken."
+        ],
+        "bullets": [
+          "Beschrijft de voorbereide maatregelen en voorzieningen",
+          "Beperkt de gevolgen van noodsituaties",
+          "Dekt alle soorten noodsituaties",
+          "Moet regelmatig worden geoefend en bijgewerkt"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Noodsituaties omvatten: ongevallen, brand, explosie, ongecontroleerd vrijkomen van stoffen, slecht weer, natuurrampen, maatschappelijke onrust en terroristische aanslagen."
+        }
+      },
+      {
+        "title": "Fasen van de noodbeheersing",
+        "paragraphs": [
+          "De beheersing van een noodsituatie kent vaste fasen. De eerste alarmering beschrijft hoe een noodsituatie kan worden gemeld en welke informatie moet worden doorgegeven. Let op: er bestaat geen fase van tweede alarmering."
+        ],
+        "bullets": [
+          "Eerste alarmering: hoe melden en wat doorgeven",
+          "Bestrijding: optreden van het noodteam",
+          "Beëindiging: afgekondigd door een bevoegde persoon",
+          "Herstel: terugkeer naar de normale bedrijfsvoering"
+        ]
+      },
+      {
+        "title": "Evacuatie en eerste hulp",
+        "paragraphs": [
+          "De juiste evacuatievolgorde is: 1) Stop het werk, 2) Gebruik geen liften, 3) Meld uw aanwezigheid op de verzamelplaats. Eerstehulpmiddelen moeten altijd beschikbaar zijn."
+        ],
+        "bullets": [
+          "Stop het werk onmiddellijk",
+          "Gebruik geen liften of goederenliften",
+          "Meld uw aanwezigheid op de verzamelplaats",
+          "Eerstehulpmiddelen altijd beschikbaar",
+          "Opgeleide bedrijfshulpverleners vereist"
+        ]
+      }
+    ]
+  },
+  "8": {
+    "sections": [
+      {
+        "title": "Gevaarlijke stoffen herkennen",
+        "paragraphs": [
+          "Gevaarlijke stoffen zijn stoffen die een gevaar vormen voor de gezondheid en/of het milieu. Ze worden aangeduid met een vierkant gevaarsymbool, zwart op een oranje achtergrond. R-zinnen op etiketten geven de risico's aan."
+        ],
+        "bullets": [
+          "Gevaarsymbool: zwart op oranje achtergrond",
+          "R-zinnen = risicozinnen (benoemen de gevaren)",
+          "S-zinnen = veiligheidszinnen (voorzorgsmaatregelen)",
+          "Het veiligheidsinformatieblad (VIB/MSDS) geeft de volledige informatie"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "R-zinnen geven u de RISICO'S aan. S-zinnen geven u de VEILIGHEIDSMAATREGELEN aan. De cijfers van de gevarenruit lopen van 0 tot 4."
+        }
+      },
+      {
+        "title": "Zuurstof en ventilatie",
+        "paragraphs": [
+          "Onder normale omstandigheden bevat de lucht 21% zuurstof. Gebrek aan ventilatie kan ervoor zorgen dat de zuurstofconcentratie te laag wordt, met verstikkingsgevaar als gevolg."
+        ],
+        "bullets": [
+          "Normaal zuurstofgehalte: 21%",
+          "Onder 19%: gevarenzone",
+          "Gebrek aan ventilatie verlaagt het zuurstofgehalte",
+          "Gasflessen: witte schouder = zuurstof"
+        ]
+      },
+      {
+        "title": "Koolmonoxide en asbest",
+        "paragraphs": [
+          "Koolmonoxide verhindert dat zuurstof in het bloed wordt opgenomen. Blootstelling aan asbest kan mesothelioom veroorzaken. Nieuw gebruik en bewerking van asbest zijn NIET toegestaan."
+        ],
+        "bullets": [
+          "CO: zuurstof wordt niet meer in het bloed opgenomen",
+          "Asbest: veroorzaakt mesothelioom",
+          "Aanwezig in dakbedekking, wandbekleding en ovenmetselwerk",
+          "NIET aanwezig in nieuwbouwwoningen",
+          "Nieuw gebruik/bewerking is verboden"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Koolmonoxide is geurloos en kleurloos: u kunt het zonder meetinstrumenten niet waarnemen. Het verhindert de opname van zuurstof in het bloed."
+        }
+      },
+      {
+        "title": "Biologische agentia en opslag",
+        "paragraphs": [
+          "Biologische agentia kunnen voorkomen in de landbouw en in verontreinigde grond. Vaccinaties zijn een voorzorgsmaatregel. Gasflessen moeten bij opslag goed worden vastgezet."
+        ],
+        "bullets": [
+          "Biologische agentia: landbouw, verontreinigde grond",
+          "Vaccinatie als voorzorgsmaatregel",
+          "Gasflessen: goed vastzetten",
+          "Organische oplosmiddelen: ontvlambaar/licht ontvlambaar",
+          "Lekkages: gemorst product laten verwijderen door deskundig personeel"
+        ]
+      }
+    ]
+  },
+  "9": {
+    "sections": [
+      {
+        "title": "Grondbeginselen van brand",
+        "paragraphs": [
+          "Voor brand zijn brandstof, zuurstof en een ontstekingsbron nodig. Voor een brand of explosie is een brandbare stof vereist. Een overmaat aan zuurstof maakt het ontsteken van brandbare stoffen gemakkelijker."
+        ],
+        "bullets": [
+          "Brandstof: het materiaal dat brandt",
+          "Zuurstof: normaal 21% in de lucht",
+          "Ontstekingsbron: vonk, vlam, hitte",
+          "Overmaat aan zuurstof = gemakkelijker ontsteken"
+        ]
+      },
+      {
+        "title": "Brandklassen",
+        "table": {
+          "headers": [
+            "Klasse",
+            "Materialen",
+            "Voorbeelden"
+          ],
+          "rows": [
+            [
+              "A",
+              "Vaste stoffen",
+              "Hout, papier, kunststof, textiel"
+            ],
+            [
+              "B",
+              "Vloeistoffen",
+              "Benzine, olie, alcohol, verf"
+            ],
+            [
+              "C",
+              "Gassen",
+              "Methaan, propaan, butaan, acetyleen"
+            ],
+            [
+              "D",
+              "Metalen",
+              "Magnesium, aluminium, natrium"
+            ]
+          ]
+        },
+        "callout": {
+          "type": "danger",
+          "text": "Gebruik NOOIT water bij branden van klasse B (vloeistoffen)! Brandende vloeistoffen spatten en drijven op water, waardoor de brand zich verspreidt."
+        }
+      },
+      {
+        "title": "Explosies en vlampunt",
+        "paragraphs": [
+          "Een explosie is een zeer snel verlopende verbranding die een drukgolf veroorzaakt. De explosiegrens is de hoogste of laagste concentratie van een gas in de lucht waarbij een explosie kan optreden. Het vlampunt is de laagste temperatuur van een vloeistof waarbij de damp kan worden ontstoken."
+        ],
+        "bullets": [
+          "Explosie = snelle verbranding + drukgolf",
+          "Explosiegrens: grenzen van de gasconcentratie",
+          "Vlampunt: laagste ontstekingstemperatuur voor de damp van een vloeistof",
+          "Het Ex-bord geeft een zone met explosiegevaar aan"
+        ]
+      },
+      {
+        "title": "Blusmethoden",
+        "paragraphs": [
+          "Wanneer een brand wordt ontdekt, meldt u deze eerst. Blusdekens sluiten zuurstof af. Koolstofdioxide verdrijft zuurstof, maar kan een verstikkende atmosfeer veroorzaken en bevriezingswonden geven. Zand sluit zuurstof af. Bij het behandelen van brandwonden spoelt u minimaal 15 minuten met water."
+        ],
+        "bullets": [
+          "Eerste actie: de brand MELDEN",
+          "Blusdekens: sluiten zuurstof af",
+          "CO2: verdrijft zuurstof (verstikkingsgevaar + bevriezingswonden)",
+          "Zand: sluit zuurstof af",
+          "Brandwonden: minimaal 15 minuten spoelen",
+          "Brandwacht bij heet werk vereist een specifieke opleiding"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Bij het behandelen van brandwonden: spoel minimaal 15 MINUTEN met water. Geen 5, geen 10, maar minimaal vijftien minuten."
+        }
+      }
+    ]
+  },
+  "10": {
+    "sections": [
+      {
+        "title": "Veilig werken met handgereedschap",
+        "paragraphs": [
+          "Beitels mogen geen bramen op de snijkant hebben. Hamers moeten een steel hebben die stevig in de hamerkop is bevestigd. Schuif bij het werken met messen een uitschuifbaar mes niet te ver uit."
+        ],
+        "bullets": [
+          "Beitels: geen bramen op de snijkant",
+          "Hamers: steel vast in de hamerkop",
+          "Messen: het mes niet te ver uitschuiven",
+          "Zagen: het zaagblad moet goed gespannen zijn",
+          "Kleine werkstukken: moeten worden ingeklemd"
+        ]
+      },
+      {
+        "title": "Elektrisch gereedschap en machines",
+        "paragraphs": [
+          "Elektrisch handgereedschap voor 230 volt moet dubbel geïsoleerd zijn. Een dodemansknop stopt de machine onmiddellijk zodra de handgreep wordt losgelaten. De noodstop is de snelste manier om een machine te stoppen."
+        ],
+        "bullets": [
+          "Gereedschap van 230V: moet dubbel geïsoleerd zijn",
+          "Dodemansknop: stopt bij loslaten",
+          "Noodstop: snelste manier om te stoppen",
+          "Periodieke keuring vereist voor alle machines",
+          "Draag nooit handschoenen bij draaiende delen"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Draag NOOIT handschoenen bij het werken met machines met draaiende delen: de handschoen en uw hand kunnen in de machine worden meegetrokken."
+        }
+      },
+      {
+        "title": "Cirkelzagen en slijpmachines",
+        "paragraphs": [
+          "Een tafelcirkelzaag moet een beschermkap hebben die aan een stevig frame is bevestigd. Een spouwmes wordt gebruikt bij een handcirkelzaag. Op slijpschijven moet de naam van de fabrikant staan."
+        ],
+        "bullets": [
+          "Tafelcirkelzaag: beschermkap op een stevig frame",
+          "Spouwmes: voor de handcirkelzaag",
+          "Slijpschijf: naam van de fabrikant moet erop staan",
+          "Kettingzaag: vereist speciale vezelbroek en -handschoenen",
+          "Spijker-/nietpistool: beveiliging tegen ongewenst afgaan"
+        ]
+      },
+      {
+        "title": "Heftrucks en voertuigen",
+        "paragraphs": [
+          "Een palletwagen heeft een hefhoogte van 20 cm. Heftruckchauffeurs moeten over aantoonbare deskundigheid beschikken EN een veiligheidsgordel gebruiken. U mag het contragewicht niet vergroten."
+        ],
+        "bullets": [
+          "Palletwagen: 20 cm hefhoogte",
+          "Heftruck: aantoonbare deskundigheid + veiligheidsgordel vereist",
+          "Contragewicht mag niet worden vergroot",
+          "Geen passagiers zonder speciale zitplaats",
+          "Pneumatisch gereedschap: luchttoevoer afsluiten na gebruik"
+        ]
+      }
+    ]
+  },
+  "11": {
+    "sections": [
+      {
+        "title": "Gevaren bij sloopwerk",
+        "paragraphs": [
+          "Sloopwerk brengt meerdere gevaren met zich mee, waaronder instabiliteit van het sloopfront EN uitstekende delen van de constructie. Beide zijn even gevaarlijk."
+        ],
+        "bullets": [
+          "Instabiliteit van het sloopfront",
+          "Uitstekende delen van de constructie",
+          "Vallend puin en materiaal",
+          "Stof en gevaarlijke stoffen",
+          "Risico op instorting van de constructie"
+        ]
+      },
+      {
+        "title": "Veiligheidsmaatregelen",
+        "paragraphs": [
+          "Bij sloopwerk is een valbeveiliging verplicht. Gebruik bij het verwijderen van keramische vezels geen stortkoker, om verspreiding van de vezels te voorkomen."
+        ],
+        "bullets": [
+          "Valbeveiliging is verplicht",
+          "Geen stortkoker gebruiken voor keramische vezels",
+          "Altijd de juiste PBM",
+          "Gecontroleerde sloopvolgorde",
+          "Afgezette zones voor onbevoegden"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Bij het verwijderen van keramische vezels: gebruik GEEN stortkoker. Zo voorkomt u gevaarlijke verspreiding van vezels in de lucht."
+        }
+      },
+      {
+        "title": "Planning en procedures",
+        "paragraphs": [
+          "Al het sloopwerk vereist een zorgvuldige planning, een goede risico-inventarisatie en -evaluatie en duidelijke procedures voor elke fase van het sloopproces."
+        ],
+        "bullets": [
+          "Risico-inventarisatie en -evaluatie vóór aanvang",
+          "Duidelijk geplande sloopvolgorde",
+          "Noodprocedures aanwezig",
+          "Regelmatige controle van de constructieve stabiliteit",
+          "Juiste procedures voor afvalverwerking"
+        ]
+      }
+    ]
+  },
+  "12": {
+    "sections": [
+      {
+        "title": "Veilig autogeen lassen",
+        "paragraphs": [
+          "Bij autogeen lassen met zuurstof en acetyleen moeten de flessen rechtop of onder een hoek van minimaal 30 graden worden opgeslagen. Vlamterugslag is een belangrijk risico van autogeen lassen."
+        ],
+        "bullets": [
+          "Acetyleenflessen: rechtop of onder minimaal 30 graden",
+          "Vlamterugslag is een groot risico",
+          "Controleer de aansluitingen op lekkage",
+          "Gebruik vlamdovers (terugslagbeveiliging)",
+          "Sla zuurstof en brandgas gescheiden op"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Acetyleenflessen moeten rechtop of onder een hoek van minimaal 30 graden worden opgeslagen. Leg ze nooit plat."
+        }
+      },
+      {
+        "title": "Elektrisch lassen",
+        "paragraphs": [
+          "Elektrisch lassen vereist volledige persoonlijke bescherming en lasgordijnen om personen in de omgeving te beschermen tegen uv- en infraroodstraling. Verbranding van het hoornvlies door warmtestraling is GEEN risico; verblinding door infraroodstraling WEL."
+        ],
+        "bullets": [
+          "Laskap, schort, kleding, veiligheidsschoenen",
+          "Lasgordijnen ter bescherming tegen uv-/infraroodstraling",
+          "Risico: verblinding door infraroodstraling",
+          "Risico: longklachten door lasrook",
+          "GEEN risico: verbranding van het hoornvlies door warmtestraling"
+        ]
+      },
+      {
+        "title": "Procedures voor heet werk",
+        "paragraphs": [
+          "Alle las-, snij- en brandwerkzaamheden vereisen de juiste vergunningen, brandwachten en veiligheidsmaatregelen om brand en explosies te voorkomen."
+        ],
+        "bullets": [
+          "Werkvergunning voor heet werk vereist",
+          "Brandwacht tijdens en na het werk",
+          "Brandbare materialen uit de omgeving verwijderen",
+          "Controleren op explosieve atmosferen",
+          "Voldoende ventilatie is essentieel"
+        ]
+      }
+    ]
+  },
+  "13": {
+    "sections": [
+      {
+        "title": "Waarom zorgvuldig graven belangrijk is",
+        "paragraphs": [
+          "Zorgvuldig graven is belangrijk voor de leveringszekerheid van de nutsbedrijven. Beschadiging van ondergrondse kabels en leidingen kan ernstige incidenten veroorzaken."
+        ],
+        "bullets": [
+          "Leveringszekerheid van de nutsvoorzieningen",
+          "Gasleidingen: verstikkingsgevaar bij beschadiging",
+          "Kabels onder spanning: gevaar voor elektrocutie",
+          "Waterleidingen: gevaar voor overstroming",
+          "Communicatiekabels: onderbreking van de dienstverlening"
+        ]
+      },
+      {
+        "title": "Regels voor veilig graven",
+        "paragraphs": [
+          "Voor het graven moet de ligging van kabels en leidingen worden vastgesteld met proefsleuven binnen 1,5 meter. Elke afwijkende ligging of beschadiging moet aan de verantwoordelijke worden gemeld."
+        ],
+        "bullets": [
+          "Proefsleuven binnen 1,5 m van de verwachte ligging",
+          "Meld afwijkingen of beschadigingen onmiddellijk",
+          "Graaf met de hand in de buurt van bekende kabels en leidingen",
+          "Gebruik detectieapparatuur voor kabels en leidingen",
+          "Volg de aanwijzingen van het nutsbedrijf"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Explosiegevaar is NIET rechtstreeks een risico van het graven zelf, maar verstikking (gas) en elektrocutie (kabels) zijn WEL directe risico's."
+        }
+      },
+      {
+        "title": "Werken in sleuven",
+        "paragraphs": [
+          "Bij werken in of bij een sleuf zijn doeltreffende stempeling en passende taludvoorzieningen essentieel om instorting te voorkomen."
+        ],
+        "bullets": [
+          "Doeltreffende stempeling verplicht",
+          "Passende taludvoorzieningen",
+          "Randbeveiliging voor werknemers bovenaan",
+          "Veilige toegangs- en vluchtwegen",
+          "Regelmatige controle van de stabiliteit"
+        ]
+      }
+    ]
+  },
+  "14": {
+    "sections": [
+      {
+        "title": "Wettelijke vereisten",
+        "paragraphs": [
+          "Vanaf 2,5 meter hoogte moet de werkgever de wettelijk verplichte maatregelen nemen om valgevaar te voorkomen. Een veiligheidsharnas is de maatregel die het gevaar vermindert voor iedereen die op een plat dak werkt."
+        ],
+        "bullets": [
+          "2,5 meter: wettelijke maatregelen verplicht",
+          "Veiligheidsharnas bij werken op een plat dak",
+          "Collectieve bescherming gaat voor op individuele bescherming",
+          "Risico-inventarisatie en -evaluatie voor alle werken op hoogte"
+        ]
+      },
+      {
+        "title": "Ladders",
+        "paragraphs": [
+          "Controleer voor gebruik of de ladder onder een hoek van ongeveer 75 graden is opgesteld. Ladders worden gebruikt voor het uitvoeren van kleine werkzaamheden en het overbruggen van hoogteverschillen. Een reikwijdte van maximaal één armlengte is een kernregel."
+        ],
+        "bullets": [
+          "Hoek: ongeveer 75 graden",
+          "Gebruik voor kleine werkzaamheden + overbruggen van hoogteverschillen",
+          "Reikwijdte: maximaal één armlengte",
+          "Drie steunpunten bij het klimmen",
+          "Bovenaan vastzetten of door iemand laten vasthouden"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Een ladder moet onder een hoek van ongeveer 75 graden worden opgesteld. Te steil = achterover kantelen. Te vlak = onderaan wegglijden."
+        }
+      },
+      {
+        "title": "Steigers",
+        "paragraphs": [
+          "Rolsteigers moeten langs de binnenzijde worden beklommen. Personen op een hangsteiger moeten een veiligheidsharnas gebruiken. Vloeropeningen worden bij voorkeur afgedekt met stevig materiaal."
+        ],
+        "bullets": [
+          "Rolsteiger: langs de binnenzijde beklimmen",
+          "Hangsteiger: veiligheidsharnas verplicht",
+          "Vloeropeningen: afdekken met stevig materiaal",
+          "Leuningen aan alle open zijden",
+          "Regelmatige keuring van de steigeronderdelen"
+        ]
+      },
+      {
+        "title": "Vloer- en wandopeningen",
+        "paragraphs": [
+          "Tot de gevaren behoren geraakt worden door vallende voorwerpen en door openingen vallen. Het afsluiten van een grote vloeropening is GEEN gevaar: het is een veiligheidsmaatregel."
+        ],
+        "bullets": [
+          "Door openingen vallen",
+          "Geraakt worden door voorwerpen die door openingen vallen",
+          "Dek openingen af met stevig materiaal",
+          "Plaats leuningen waar afdekken niet mogelijk is",
+          "Markeer alle openingen duidelijk"
+        ]
+      }
+    ]
+  },
+  "15": {
+    "sections": [
+      {
+        "title": "Fundamentele gevaren",
+        "paragraphs": [
+          "Een leek mag NOOIT aan elektrische installaties onder spanning werken, ook niet met toestemming van een deskundige. Het grootste gevaar van stroom door het lichaam is stroomdoorgang door het hart. Elektrocutie wordt veroorzaakt door het gebruik van elektriciteit."
+        ],
+        "bullets": [
+          "Leken: NOOIT aan installaties onder spanning",
+          "Grootste gevaar: stroom door het hart",
+          "Ontbrekende aarding veroorzaakt ongevallen",
+          "Stroomsterkte en inwerkingsduur bepalen het letsel",
+          "De huiddikte heeft GEEN invloed op het letsel"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Een leek mag NOOIT aan elektrische installaties onder spanning werken, zelfs niet met toestemming van een deskundige."
+        }
+      },
+      {
+        "title": "Veilige spanningen",
+        "table": {
+          "headers": [
+            "Type",
+            "Maximale veilige spanning",
+            "Toepassing"
+          ],
+          "rows": [
+            [
+              "Gelijkstroom",
+              "120V",
+              "Besloten ruimten"
+            ],
+            [
+              "Wisselstroom",
+              "50V",
+              "Besloten ruimten"
+            ],
+            [
+              "Aardlekschakelaar",
+              "30 mA",
+              "Bouwplaatsen"
+            ]
+          ]
+        },
+        "callout": {
+          "type": "info",
+          "text": "In besloten ruimten: max. 120V gelijkspanning (DC) of max. 50V wisselspanning (AC). Bouwkasten op bouwplaatsen hebben een aardlekbeveiliging van 30 mA nodig."
+        }
+      },
+      {
+        "title": "Statische elektriciteit en kortsluiting",
+        "paragraphs": [
+          "Kortsluiting ontstaat wanneer twee delen met een verschillende spanning rechtstreeks met elkaar in contact komen. Gevaren van statische elektriciteit zijn onder meer vonken en schade aan elektronische apparatuur. Bij werken met statische elektriciteit worden antistatische schoenen gedragen."
+        ],
+        "bullets": [
+          "Kortsluiting: verschillende spanningen in contact",
+          "Statisch: vonken + schade aan apparatuur",
+          "Antistatische schoenen bij werken met statische elektriciteit",
+          "Statische elektriciteit ontstaat NIET in ruimten met weinig zuurstof",
+          "Kabelhaspels: altijd volledig afrollen"
+        ]
+      },
+      {
+        "title": "Veiligheid van kabels en apparatuur",
+        "paragraphs": [
+          "Kabelhaspels moeten volledig worden afgerold om oververhitting en brand te voorkomen. Voedingskabels kunnen overbelast raken. Controleer apparatuur altijd visueel voor gebruik en meld beschadigingen."
+        ],
+        "bullets": [
+          "Rol kabelhaspels volledig af (brandgevaar)",
+          "Overbelasting is het belangrijkste gevaar bij kabels",
+          "Visuele controle voor elk gebruik",
+          "Meld beschadigingen: niet gebruiken",
+          "Steigers moeten geaard zijn"
+        ]
+      }
+    ]
+  },
+  "16": {
+    "sections": [
+      {
+        "title": "Wat is een besloten ruimte?",
+        "paragraphs": [
+          "Een besloten ruimte heeft kenmerken zoals voldoende werkruimte, maar slechte ventilatie en een beperkte toegang. Opslagreservoirs, tanks en lastenten bij diepe sleuven zijn voorbeelden."
+        ],
+        "bullets": [
+          "Beperkte toegang en uitgang",
+          "Slechte natuurlijke ventilatie",
+          "Niet ontworpen voor permanent verblijf",
+          "Voorbeelden: tanks, reservoirs, silo's, riolen",
+          "NIET alleen nauwe, kleine of natte ruimten"
+        ]
+      },
+      {
+        "title": "Gevaren en metingen",
+        "paragraphs": [
+          "Verstikking ontstaat door een onvoldoende zuurstofconcentratie. Metingen moeten worden uitgevoerd door een deskundig persoon, niet door de leidinggevende of de werknemer in de ruimte."
+        ],
+        "bullets": [
+          "Verstikking: onvoldoende zuurstof (minder dan 19%)",
+          "Metingen uitsluitend door een deskundig persoon",
+          "Controleer zuurstof, brandbare gassen en giftige gassen",
+          "Continue bewaking tijdens het werk",
+          "Veilige spanning: 120V DC in besloten ruimten"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Verstikkingsgevaar: veroorzaakt door een ONVOLDOENDE zuurstofconcentratie. Een te hoog zuurstofgehalte is een brandrisico, geen verstikkingsrisico."
+        }
+      },
+      {
+        "title": "Mangatwacht en toezicht",
+        "paragraphs": [
+          "Een mangatwacht is verplicht zolang er iemand in de besloten ruimte aanwezig is. De permanente mangatwacht moet over aantoonbaar getoetste deskundigheid beschikken. De verblijfsduur moet zo kort mogelijk zijn."
+        ],
+        "bullets": [
+          "Mangatwacht: verplicht gedurende de hele tijd",
+          "Mangatwacht: getoetste deskundigheid vereist",
+          "Verblijf zo kort mogelijk",
+          "Hulpdiensten waarschuwen bij gevaar",
+          "Communicatie te allen tijde in stand houden"
+        ]
+      },
+      {
+        "title": "Elektrische veiligheid in besloten ruimten",
+        "paragraphs": [
+          "De veilige spanning in besloten ruimten met geleidende wanden is 120V gelijkspanning. Schakel de elektriciteit van apparatuur correct af en gebruik veilige spanningen."
+        ],
+        "bullets": [
+          "Maximaal 120V DC in geleidende ruimten",
+          "Maximaal 50V AC",
+          "Schakel de elektriciteit correct af voor het betreden",
+          "Gebruik waar mogelijk accugereedschap",
+          "Aardlekbeveiliging is onontbeerlijk"
+        ]
+      }
+    ]
+  },
+  "17": {
+    "sections": [
+      {
+        "title": "Hijswerktuigen",
+        "paragraphs": [
+          "Hijswerktuigen kunnen lasten zowel verticaal als horizontaal verplaatsen. Voorbeelden zijn torenkranen en loopkranen. Een palletwagen is GEEN hijswerktuig."
+        ],
+        "bullets": [
+          "Torenkranen",
+          "Loopkranen (bovenloopkranen)",
+          "Mobiele kranen",
+          "GEEN palletwagens",
+          "Kunnen lasten verticaal EN horizontaal verplaatsen"
+        ]
+      },
+      {
+        "title": "Hijsgereedschap",
+        "paragraphs": [
+          "Een hijsband is hijsgereedschap. Twee stroppen aan een stalen ring worden een tweesprong genoemd. Staalkabels mogen niet geknoopt worden en mogen niet worden gebruikt als ze sterk verroest zijn."
+        ],
+        "bullets": [
+          "Hijsband = hijsgereedschap",
+          "Tweesprong: 2 stroppen aan een stalen ring",
+          "Staalkabels: nooit knopen",
+          "Kettingen: gebruik hoekbeschermers op scherpe randen",
+          "Kraanboek: registreert alle keuringen"
+        ]
+      },
+      {
+        "title": "Veiligheidsmaatregelen",
+        "paragraphs": [
+          "Algemene gevaren zijn onder meer het vallen van de last en het omvallen van het hijswerktuig. Stempels worden bij hijswerktuigen gebruikt om omvallen te voorkomen. Boven windkracht 5 moeten de werkzaamheden worden gestaakt."
+        ],
+        "bullets": [
+          "Gevaren: vallende last, omvallend hijswerktuig",
+          "Stempels voorkomen omvallen",
+          "Staak de werkzaamheden boven windkracht 5",
+          "Volg de instructies van de fabrikant over de windkracht",
+          "Sta nooit onder een hangende last"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Hijswerkzaamheden moeten boven windkracht 5 worden gestaakt. Raadpleeg altijd de instructies van de kraanfabrikant voor de specifieke windkrachtgrenzen."
+        }
+      }
+    ]
+  },
+  "18": {
+    "sections": [
+      {
+        "title": "Soorten straling",
+        "paragraphs": [
+          "Infraroodstraling is niet-ioniserende straling. Niet-ioniserende straling is zwakker dan ioniserende straling. Het belangrijkste verschil is dat ioniserende straling ionen kan vormen in lichaamsweefsel."
+        ],
+        "bullets": [
+          "Ioniserend: röntgenstraling, gammastraling, nucleair",
+          "Niet-ioniserend: infrarood, UV, radiogolven, microgolven",
+          "Niet-ioniserend is ZWAKKER dan ioniserend",
+          "Ioniserend vormt ionen in weefsel (gevaarlijker)"
+        ]
+      },
+      {
+        "title": "Veiligheidsmaatregelen",
+        "paragraphs": [
+          "Bij ioniserende straling: blijf zo ver mogelijk uit de buurt EN zet het gebied af. Bij niet-ioniserende straling: volg de instructies op de toestellen en respecteer de maximale gebruiksduur."
+        ],
+        "bullets": [
+          "Ioniserend: afstand + afscherming + tijd",
+          "Zet het gebied rond ioniserende bronnen af",
+          "Niet-ioniserend: volg de instructies van het toestel",
+          "Respecteer de grenzen voor de gebruiksduur",
+          "Medisch onderzoek voor werknemers die met ioniserende straling werken"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Werknemers die met bronnen van ioniserende straling werken, moeten medisch worden onderzocht. De stralingsdeskundige bewaakt de stralingsveiligheid en -hygiëne."
+        }
+      },
+      {
+        "title": "Verantwoordelijkheden",
+        "paragraphs": [
+          "Het bewaken van de stralingsveiligheid en -hygiëne is de taak van de stralingsdeskundige, niet van de leidinggevende of het bedrijfsnoodteam."
+        ],
+        "bullets": [
+          "Stralingsdeskundige: bewaakt veiligheid en hygiëne",
+          "Medisch onderzoek: verplicht voor werknemers die met straling werken",
+          "Leidinggevende: zorgt dat de regels worden nageleefd",
+          "Bedrijfsnoodteam: handelt stralingsincidenten af"
+        ]
+      }
+    ]
+  },
+  "19": {
+    "sections": [
+      {
+        "title": "Omstandigheden van de werkomgeving",
+        "paragraphs": [
+          "De werkomgeving wordt bepaald door trillingen, verlichting, temperatuur en lawaai. De leidinggevende bepaalt de omstandigheden van de werkomgeving NIET: zijn taak is het aansturen van mensen."
+        ],
+        "bullets": [
+          "Trillingen (hand-arm en lichaam)",
+          "Verlichtingsniveaus",
+          "Temperatuur en luchtvochtigheid",
+          "Geluidsniveaus",
+          "NIET bepaald door de leidinggevende"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "De LEIDINGGEVENDE bepaalt de omstandigheden van de werkomgeving niet. Dat doen fysieke factoren zoals trillingen, verlichting en temperatuur."
+        }
+      },
+      {
+        "title": "Trillingen en fysieke belasting",
+        "paragraphs": [
+          "Fysieke trillingen omvatten hand-armtrillingen van mechanisch gereedschap en lichaamstrillingen van voertuigen. Huidinfecties worden NIET veroorzaakt door trillingen. De fysieke belasting wordt beïnvloed door de werkpositie of werkhouding EN door de bewegingen die moeten worden gemaakt."
+        ],
+        "bullets": [
+          "Hand-arm: van mechanisch handgereedschap",
+          "Lichaam: van voertuigen, installaties en vloeren",
+          "NIET veroorzaakt: huidinfecties",
+          "Fysieke belasting: houding + bewegingen",
+          "Pauzes voorkomen overbelasting"
+        ]
+      },
+      {
+        "title": "Handmatig tillen",
+        "paragraphs": [
+          "Het aanbevolen maximumgewicht voor handmatig tillen is 25 kg. Juiste houding: til met een rechte rug, buig de knieën en houd de last zo dicht mogelijk bij het lichaam."
+        ],
+        "bullets": [
+          "Maximaal 25 kg bij handmatig tillen",
+          "Rechte rug + knieën buigen",
+          "Houd de last dicht bij het lichaam",
+          "Plan het tillen voordat u begint",
+          "Vraag hulp bij zware of onhandige lasten"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Maximum bij handmatig tillen: 25 kg. Til altijd met een RECHTE RUG en GEBOGEN KNIEËN en houd de last DICHT bij uw lichaam."
+        }
+      },
+      {
+        "title": "Zittend en staand werk",
+        "paragraphs": [
+          "De optimale zithouding omvat een goede ondersteuning van de bovenbenen EN ontlasting van de schouders. Een richtlijn is te zorgen voor een optimale houding, maar regelmatig van houding te wisselen. Staand werken heeft NIET de voorkeur wanneer krachten van meer dan 30N moeten worden uitgeoefend."
+        ],
+        "bullets": [
+          "Goede ondersteuning van de bovenbenen op de zitting",
+          "Ontlasting van de schouders (armsteunen)",
+          "Wissel regelmatig van houding",
+          "Staan: voorkeur bij taken waarbij u moet reiken",
+          "Staan: NIET de voorkeur bij krachten boven 30N"
+        ]
+      }
+    ]
+  },
+  "20": {
+    "sections": [
+      {
+        "title": "Gevolgen van lawaai",
+        "paragraphs": [
+          "Te hard lawaai verhoogt het risico op de werkplek, doordat het waarschuwingssignalen overstemt en de concentratie vermindert. Blootstelling aan te veel lawaai veroorzaakt concentratieverlies."
+        ],
+        "bullets": [
+          "Verhoogt het risico op de werkplek",
+          "Veroorzaakt concentratieverlies",
+          "Overstemt waarschuwingssignalen",
+          "Kan blijvende gehoorschade veroorzaken",
+          "Wordt gemeten in decibel (dB)"
+        ]
+      },
+      {
+        "title": "Geluidsfysica",
+        "paragraphs": [
+          "Twee gelijke geluidsbronnen samen verhogen het geluidsniveau met 3 dB. Een verdubbeling van de afstand geeft een vermindering van ongeveer 6 dB(A). Toonhoogte en sterkte bepalen of lawaai schadelijk is."
+        ],
+        "bullets": [
+          "Twee gelijke bronnen: +3 dB",
+          "Dubbele afstand: -6 dB(A)",
+          "Schadelijke factoren: toonhoogte en sterkte",
+          "Blijvend gehoorverlies: moeite met telefoneren",
+          "Meeteenheid: decibel (dB)"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Twee gelijke geluidsbronnen = +3 dB. Dubbele afstand = -6 dB(A). Dit zijn sleutelgetallen voor het examen."
+        }
+      },
+      {
+        "title": "Hiërarchie van lawaaibeheersing",
+        "paragraphs": [
+          "De juiste volgorde is: 1) de bron verminderen, 2) de bron afschermen, 3) geluidstrillingen dempen, 4) persoonlijke gehoorbescherming gebruiken. Vanaf 80 dB(A) moet de werkgever een gehooronderzoek aanbieden en gehoorbescherming ter beschikking stellen."
+        ],
+        "bullets": [
+          "1. Verminderen aan de bron",
+          "2. De bron afschermen",
+          "3. Geluidstrillingen dempen",
+          "4. Persoonlijke gehoorbescherming (laatste redmiddel)",
+          "Vanaf 80 dB(A): gehooronderzoek + bescherming beschikbaar",
+          "Vanaf 85 dB(A): gehoorbescherming verplicht"
+        ]
+      }
+    ]
+  },
+  "21": {
+    "sections": [
+      {
+        "title": "Algemene eisen voor PBM",
+        "paragraphs": [
+          "Alle PBM moeten getest zijn. Metalen veiligheidshelmen mogen in de industrie niet worden gedragen, omdat ze elektriciteit kunnen geleiden. PBM zijn de laatste verdedigingslinie, na technische en organisatorische maatregelen."
+        ],
+        "bullets": [
+          "Moeten getest en gecertificeerd zijn",
+          "Metalen helmen geleiden elektriciteit",
+          "Laatste verdedigingslinie",
+          "Moeten goed passen",
+          "Regelmatige inspectie vereist"
+        ]
+      },
+      {
+        "title": "Hoofd- en oogbescherming",
+        "paragraphs": [
+          "Het binnenwerk van een veiligheidshelm vangt schokken op en verdeelt ze over het hoofd. Een ruimzichtbril beschermt tegen zuurspatten. Lasmaskers beschermen tegen infraroodstraling, terwijl een veiligheidsbril beschermt tegen wegspringende deeltjes."
+        ],
+        "bullets": [
+          "Binnenwerk van de helm: vangt de schok op en verdeelt die",
+          "Gevaren voor het hoofd: stoten + vallende voorwerpen",
+          "Ruimzichtbril: bescherming tegen zuurspatten",
+          "Lasmasker: bescherming tegen infraroodstraling",
+          "Veiligheidsbril: bescherming tegen wegspringende deeltjes"
+        ]
+      },
+      {
+        "title": "Adem- en gehoorbescherming",
+        "paragraphs": [
+          "Een stoffiltermasker beschermt bij breek- en hakwerk. Een neus-mondmasker beschermt alleen tegen deeltjes, niet tegen gassen of dampen. Onafhankelijke adembescherming is nodig bij hoge of onbekende concentraties of bij minder dan 19% zuurstof. Gehoorbescherming is verplicht boven 85 dB(A)."
+        ],
+        "bullets": [
+          "Stoffilter: breek- en hakwerk",
+          "Neus-mondmasker: alleen deeltjes, GEEN gassen",
+          "Onafhankelijke adembescherming: hoge concentraties of weinig zuurstof",
+          "Gehoorbescherming: verplicht boven 85 dB(A)",
+          "Te weinig zuurstof = gevaar bij het ademen"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Een neus-mondmasker beschermt ALLEEN tegen deeltjes. Het beschermt NIET tegen gassen of dampen. Gebruik bij chemische gevaren de juiste adembescherming."
+        }
+      },
+      {
+        "title": "Lichaams- en valbescherming",
+        "paragraphs": [
+          "Signaalkleding maakt de drager zichtbaar. Uitglijden is een gevaar voor voeten en benen. Valbeveiligingsmiddelen die een val hebben opgevangen, mogen NIET opnieuw worden gebruikt."
+        ],
+        "bullets": [
+          "Signaalkleding: zichtbaarheid",
+          "Gevaar voor uitglijden: voeten en benen",
+          "Handbescherming: handschoenen met lange kap voor pols/arm",
+          "Valbeveiliging: niet hergebruiken na het opvangen van een val",
+          "Veiligheidsharnas: moet passen en goed afgesteld zijn"
+        ]
+      }
+    ]
+  },
+  "22": {
+    "sections": [
+      {
+        "title": "Categorieën van borden",
+        "paragraphs": [
+          "Veiligheidsborden worden ingedeeld naar vorm, kleur en betekenis. Elke categorie heeft een duidelijk herkenbaar uiterlijk, zodat ze onmiddellijk worden herkend."
+        ],
+        "table": {
+          "headers": [
+            "Type",
+            "Vorm",
+            "Kleur",
+            "Betekenis"
+          ],
+          "rows": [
+            [
+              "Gebod",
+              "Rond",
+              "Blauw + wit symbool",
+              "Moet worden gedaan"
+            ],
+            [
+              "Waarschuwing",
+              "Driehoekig",
+              "Geel + zwarte rand/symbool",
+              "Voorzichtig, gevaar"
+            ],
+            [
+              "Verbod",
+              "Rond",
+              "Wit + rode rand + rode diagonaal",
+              "Mag niet worden gedaan"
+            ],
+            [
+              "Redding",
+              "Vierkant/rechthoekig",
+              "Groen + wit symbool",
+              "Veilige situatie"
+            ],
+            [
+              "Brandbestrijdingsmiddelen",
+              "Vierkant/rechthoekig",
+              "Rood + wit symbool",
+              "Locatie van blusmiddelen"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "Waarschuwings- en gebodsborden",
+        "paragraphs": [
+          "Waarschuwingsborden zijn driehoekig en geel met een zwarte rand: ze betekenen voorzichtig/gevaar. Gebodsborden zijn rond en blauw met een wit symbool. Het ontwerp moet duidelijk zijn voor alle werknemers, ongeacht hun taal."
+        ],
+        "bullets": [
+          "Waarschuwing: driehoekig, geel, zwarte rand = GEVAAR",
+          "Gebod: rond, blauw, wit symbool = MOET WORDEN GEDAAN",
+          "Het ontwerp moet duidelijk zijn voor ALLE werknemers",
+          "Taalonafhankelijke communicatie",
+          "Waar mogelijk op ooghoogte geplaatst"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Borden moeten zo ontworpen zijn dat hun betekenis duidelijk is voor ALLE werknemers, ongeacht hun taal. Daarom worden pictogrammen gebruikt."
+        }
+      },
+      {
+        "title": "Verbods- en reddingsborden",
+        "paragraphs": [
+          "Een verbodsbord is rond en wit, met een rode rand en een rode diagonaal. Reddingsborden zijn vierkant/rechthoekig, groen en met witte symbolen. Borden voor brandbestrijdingsmiddelen zijn vierkant/rechthoekig, rood en met witte symbolen."
+        ],
+        "bullets": [
+          "Verbod: witte cirkel, rode rand, rode diagonaal",
+          "Redding/vluchtweg: groene rechthoek, wit symbool",
+          "Brandbestrijdingsmiddelen: rode rechthoek, wit symbool",
+          "Brandborden geven zowel de route als de locatie aan",
+          "Gele/witte strepen: doorgangen en stapelzones"
+        ]
+      },
+      {
+        "title": "Vloermarkeringen",
+        "paragraphs": [
+          "Gele of witte strepen worden gebruikt voor het markeren van doorgangen en stapelzones. Ze helpen de verkeersstromen te ordenen en veilige zones op de werkplek af te bakenen."
+        ],
+        "bullets": [
+          "Gele/witte strepen: doorgangen en stapelzones",
+          "Houd markeringen zichtbaar en in goede staat",
+          "Blokkeer gemarkeerde zones niet",
+          "Regelmatige inspectie van de staat van de markeringen"
+        ]
+      }
+    ]
+  }
+}

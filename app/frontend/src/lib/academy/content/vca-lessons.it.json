@@ -1,0 +1,1312 @@
+{
+  "1": {
+    "sections": [
+      {
+        "title": "Panoramica della legislazione in materia di salute e sicurezza",
+        "paragraphs": [
+          "La legislazione in materia di salute e sicurezza sul lavoro (SSL), nota nei Paesi Bassi come legislazione ARBO, descrive i diritti e gli obblighi sia dei datori di lavoro sia dei lavoratori in materia di salute e sicurezza sul luogo di lavoro.",
+          "La legislazione si applica a TUTTI i luoghi in cui viene svolto un lavoro e riguarda in egual misura datori di lavoro e lavoratori."
+        ],
+        "bullets": [
+          "ARBO = condizioni di lavoro (salute e sicurezza sul lavoro)",
+          "Riguarda: salute, sicurezza e benessere",
+          "Si applica a tutti i luoghi di lavoro senza eccezioni",
+          "Sia il datore di lavoro sia il lavoratore hanno delle responsabilità"
+        ]
+      },
+      {
+        "title": "Principi fondamentali della legislazione in materia di salute e sicurezza",
+        "paragraphs": [
+          "La legislazione si fonda su diversi presupposti fondamentali che garantiscono una sicurezza completa sul luogo di lavoro."
+        ],
+        "bullets": [
+          "Supporto fornito da esperti o servizi (addetti alla prevenzione)",
+          "Collaborazione tra più datori di lavoro in uno stesso luogo",
+          "Consultazione e collaborazione con i rappresentanti dei lavoratori",
+          "L'inventario e la valutazione dei rischi (RI&E) sono obbligatori"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "La legislazione in materia di salute e sicurezza NON riguarda la sicurezza patrimoniale (vigilanza/security), ma esclusivamente la salute, la sicurezza e il benessere."
+        }
+      },
+      {
+        "title": "L'Ispettorato del lavoro",
+        "paragraphs": [
+          "L'Ispettorato del lavoro (servizio di ispezione) vigila sul rispetto della legislazione in materia di salute e sicurezza e dispone di ampi poteri sanzionatori."
+        ],
+        "bullets": [
+          "Può imporre un ordine di divieto di lavoro (sospensione dei lavori)",
+          "Può imporre sanzioni pecuniarie per le violazioni",
+          "Può svolgere indagini presso le aziende",
+          "Non può licenziare i lavoratori: questo è un compito del datore di lavoro"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Il servizio di ispezione può far SOSPENDERE immediatamente i lavori in presenza di un pericolo grave per i lavoratori."
+        }
+      },
+      {
+        "title": "Marcatura CE e orario di lavoro",
+        "paragraphs": [
+          "La marcatura CE indica che un articolo soddisfa i requisiti minimi europei. Deve essere apposta dal fabbricante o dall'importatore.",
+          "La legislazione sull'orario di lavoro stabilisce le ore massime di lavoro e le ore minime di riposo per evitare che la sicurezza e la salute vengano messe in pericolo, e favorisce la possibilità di conciliare il lavoro con i compiti di cura."
+        ],
+        "bullets": [
+          "Marcatura CE = requisiti minimi europei di sicurezza",
+          "Deve essere presente su ogni attrezzatura commercializzata e utilizzata",
+          "La legislazione sull'orario di lavoro protegge dal sovraccarico di lavoro",
+          "Favorisce l'equilibrio tra vita lavorativa e vita privata"
+        ]
+      }
+    ]
+  },
+  "2": {
+    "sections": [
+      {
+        "title": "Comprendere il rischio",
+        "paragraphs": [
+          "Il rischio è definito come la combinazione di probabilità ed effetto. Questa formula ci aiuta a quantificare e a stabilire le priorità dei pericoli sul luogo di lavoro."
+        ],
+        "bullets": [
+          "Rischio = Probabilità x Effetto",
+          "Maggiore probabilità O maggiore effetto = rischio maggiore",
+          "La valutazione dei rischi aiuta a stabilire le priorità delle misure di sicurezza",
+          "Sia le situazioni pericolose sia le azioni pericolose contribuiscono al rischio"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Rischio = Probabilità x Effetto. Questa è la formula fondamentale di tutte le valutazioni dei rischi nella sicurezza sul lavoro."
+        }
+      },
+      {
+        "title": "Fonti di pericolo",
+        "paragraphs": [
+          "I pericoli sul luogo di lavoro provengono da molteplici fonti, tra cui le attrezzature, le sostanze e il comportamento umano. I problemi domestici NON sono considerati una fonte di pericolo sul luogo di lavoro."
+        ],
+        "bullets": [
+          "Attrezzature e macchinari",
+          "Sostanze pericolose",
+          "Rumore e radiazioni",
+          "Metodi e procedure di lavoro",
+          "Comportamento umano sul lavoro"
+        ]
+      },
+      {
+        "title": "Metodi di prevenzione",
+        "paragraphs": [
+          "La prevenzione può essere affrontata evitando sia le situazioni pericolose SIA le azioni pericolose. Il modo migliore per affrontare le situazioni pericolose è eliminare completamente la causa."
+        ],
+        "bullets": [
+          "Eliminare il pericolo alla fonte",
+          "Utilizzare misure di protezione collettiva",
+          "Applicare i dispositivi di protezione individuale (DPI)",
+          "Fornire informazione e formazione"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Una situazione pericolosa è quella in cui il lavoro viene svolto SENZA rispettare le condizioni per lavorare in sicurezza, il che può provocare un infortunio."
+        }
+      },
+      {
+        "title": "RI&E e LMRA",
+        "paragraphs": [
+          "L'inventario e la valutazione dei rischi (RI&E) seguono tre fasi: 1) identificare i pericoli, 2) redigere un inventario dei rischi, 3) valutare i rischi. LMRA significa Last Minute Risk Analysis (analisi dei rischi dell'ultimo minuto): una rapida verifica di sicurezza prima di iniziare il lavoro."
+        ],
+        "bullets": [
+          "RI&E: valutazione sistematica dei rischi del luogo di lavoro",
+          "LMRA: analisi dei rischi dell'ultimo minuto prima di ogni compito",
+          "La pianificazione del lavoro determina i metodi di lavoro sicuri",
+          "Entrambi sono strumenti essenziali per la prevenzione"
+        ]
+      }
+    ]
+  },
+  "3": {
+    "sections": [
+      {
+        "title": "Cause degli infortuni",
+        "paragraphs": [
+          "Secondo Lateiner, tre fattori intervengono negli infortuni: il contesto di fondo, l'errore umano e le situazioni/operazioni pericolose. Le due cause dirette sono le azioni pericolose e le situazioni pericolose."
+        ],
+        "bullets": [
+          "Fattori di fondo (organizzativi, personali)",
+          "Errore umano (fattori legati alla persona)",
+          "Situazioni pericolose (condizioni ambientali)",
+          "Azioni pericolose (fattori comportamentali)"
+        ]
+      },
+      {
+        "title": "Fattori legati alla persona",
+        "paragraphs": [
+          "Tra i fattori legati alla persona che possono provocare incidenti vi sono l'attenzione insufficiente e l'esperienza insufficiente. La pianificazione insufficiente NON è un fattore legato alla persona: è un fattore organizzativo."
+        ],
+        "bullets": [
+          "Attenzione o concentrazione insufficienti",
+          "Esperienza o formazione insufficienti",
+          "Limitazioni fisiche",
+          "Affaticamento o malattia"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "La PIANIFICAZIONE insufficiente è un fattore organizzativo, non un fattore legato alla persona."
+        }
+      },
+      {
+        "title": "Segnalazione e indagine",
+        "paragraphs": [
+          "Tutti gli infortuni e i mancati infortuni devono essere registrati. Gli infortuni devono essere segnalati al preposto diretto. L'azienda utilizzatrice è responsabile delle indagini sugli infortuni."
+        ],
+        "bullets": [
+          "Segnalare al preposto diretto",
+          "Registrare TUTTI gli infortuni e i mancati infortuni",
+          "Il rapporto finale deve includere: analisi, conclusioni e raccomandazioni",
+          "L'indagine individua le cause profonde ai fini della prevenzione"
+        ]
+      },
+      {
+        "title": "Misure di prevenzione",
+        "paragraphs": [
+          "Elaborare procedure di intervento in caso di infortunio è una misura rivolta all'organizzazione. Le misure di prevenzione si concentrano su tre ambiti: l'ambiente, l'organizzazione e le persone."
+        ],
+        "bullets": [
+          "Misure organizzative: procedure, formazione",
+          "Misure sull'ambiente: controlli tecnici",
+          "Misure sulle persone: sensibilizzazione, competenza",
+          "Miglioramento continuo a partire dai risultati delle indagini"
+        ]
+      }
+    ]
+  },
+  "4": {
+    "sections": [
+      {
+        "title": "Cause del comportamento pericoloso",
+        "paragraphs": [
+          "Il comportamento pericoloso ha cause identificabili, tra cui la mancanza di esemplarità e la mancanza di volontà. Obiettivi ben formulati NON sono una causa di comportamento pericoloso; al contrario, favoriscono la sicurezza."
+        ],
+        "bullets": [
+          "Mancanza di esemplarità (leadership carente)",
+          "Mancanza di volontà (non voler lavorare in sicurezza)",
+          "Incapacità (non sapere come fare)",
+          "Mancanza di consapevolezza"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Obiettivi ben formulati FAVORISCONO il comportamento sicuro; non sono una causa di comportamento pericoloso."
+        }
+      },
+      {
+        "title": "Ruolo del preposto",
+        "paragraphs": [
+          "Il preposto è fondamentale per la sicurezza perché dispone delle informazioni necessarie sui lavoratori, sul lavoro e sulle circostanze. La chiarezza sulla priorità del lavoro sicuro è l'elemento chiave della politica aziendale che influenza il comportamento."
+        ],
+        "bullets": [
+          "Dispone di informazioni sui lavoratori, sul lavoro e sulle circostanze",
+          "Dà l'esempio di lavoro sicuro",
+          "Fornisce chiarezza sulle priorità di sicurezza",
+          "Controlla e corregge il comportamento pericoloso"
+        ]
+      },
+      {
+        "title": "Regole per un comportamento sicuro",
+        "paragraphs": [
+          "Essere critici verso se stessi è una regola generale per lavorare in sicurezza. Lei deve pensare sia alla propria sicurezza SIA a quella degli altri."
+        ],
+        "bullets": [
+          "Sia critico verso se stesso",
+          "Pensi anche alla sicurezza degli altri",
+          "Segnali immediatamente le situazioni pericolose",
+          "Intervenga quando vede azioni pericolose",
+          "Mantenga l'igiene personale, l'ordine e la pulizia"
+        ]
+      },
+      {
+        "title": "Alcol e droghe",
+        "paragraphs": [
+          "Alcol e droghe provocano un rendimento ridotto o problematico sul lavoro. In caso di uso problematico cronico, ci si aspetta che la persona cerchi aiuto."
+        ],
+        "bullets": [
+          "Provocano una riduzione della concentrazione e della capacità di giudizio",
+          "Tolleranza zero sul luogo di lavoro",
+          "Cerchi aiuto in caso di uso problematico cronico",
+          "Informi il preposto di qualsiasi problema"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Alcol e droghe provocano un rendimento RIDOTTO o PROBLEMATICO sul lavoro. Non lavori mai sotto il loro effetto."
+        }
+      }
+    ]
+  },
+  "5": {
+    "sections": [
+      {
+        "title": "Obblighi del datore di lavoro",
+        "paragraphs": [
+          "I datori di lavoro devono fornire informazione e istruzioni sui pericoli presenti sul lavoro. Si tratta di un obbligo fondamentale previsto dalla legislazione in materia di salute e sicurezza."
+        ],
+        "bullets": [
+          "Fornire informazioni sui pericoli del luogo di lavoro",
+          "Fornire istruzioni e formazione",
+          "Garantire condizioni di lavoro sicure",
+          "Effettuare l'inventario e la valutazione dei rischi",
+          "Fornire i dispositivi di protezione individuale"
+        ]
+      },
+      {
+        "title": "Obblighi del lavoratore",
+        "paragraphs": [
+          "I lavoratori devono segnalare al responsabile/preposto le situazioni pericolose o i rischi per la salute e la sicurezza. Hanno inoltre il diritto di interrompere il lavoro in caso di pericolo grave e immediato."
+        ],
+        "bullets": [
+          "Segnalare le situazioni pericolose al preposto",
+          "Utilizzare correttamente i DPI",
+          "Seguire le istruzioni di sicurezza",
+          "Diritto di sospendere il lavoro in caso di pericolo immediato"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "I lavoratori hanno il DIRITTO di interrompere il lavoro in caso di pericolo grave e immediato per le persone."
+        }
+      },
+      {
+        "title": "Consiglio aziendale e SCC",
+        "paragraphs": [
+          "La consultazione nel consiglio aziendale coinvolge i rappresentanti del datore di lavoro e dei lavoratori. SCC* si concentra sul controllo diretto della sicurezza, mentre SCC** include anche le strutture di sicurezza."
+        ],
+        "bullets": [
+          "Consiglio aziendale: rappresentanti del datore di lavoro + dei lavoratori",
+          "SCC* = controllo diretto della sicurezza",
+          "SCC** = controllo della sicurezza + strutture di sicurezza",
+          "Le ispezioni del luogo di lavoro aumentano la consapevolezza in materia di sicurezza"
+        ]
+      },
+      {
+        "title": "Rapporti di lavoro temporaneo",
+        "paragraphs": [
+          "Nel lavoro temporaneo esiste un rapporto triangolare tra l'agenzia per il lavoro, l'azienda utilizzatrice e il lavoratore somministrato. Il datore di lavoro effettivo (l'azienda utilizzatrice) è responsabile delle condizioni di lavoro."
+        ],
+        "bullets": [
+          "Rapporto triangolare: agenzia - azienda utilizzatrice - lavoratore",
+          "L'azienda utilizzatrice è responsabile delle condizioni di lavoro",
+          "L'agenzia è responsabile dell'assicurazione contro gli infortuni sul lavoro",
+          "Dovere condiviso di trasmettere le informazioni"
+        ]
+      }
+    ]
+  },
+  "6": {
+    "sections": [
+      {
+        "title": "Norme generali di sicurezza",
+        "paragraphs": [
+          "Le norme generali di sicurezza devono essere messe per iscritto e sono destinate, tra gli altri, ai lavoratori somministrati. La procedura per segnalare un incendio rientra tra le norme generali di sicurezza."
+        ],
+        "bullets": [
+          "Devono essere messe per iscritto",
+          "Destinate a tutti i lavoratori, compreso il personale temporaneo",
+          "Comprendono le procedure di segnalazione degli incendi",
+          "Devono essere comprensibili per i madrelingua"
+        ]
+      },
+      {
+        "title": "Norme specifiche di sicurezza",
+        "paragraphs": [
+          "Le norme specifiche di sicurezza riguardano pericoli particolari, come la ventilazione e l'ingresso negli spazi confinati. NON riguardano le pause pranzo."
+        ],
+        "bullets": [
+          "Riguardano pericoli specifici",
+          "Comprendono i requisiti di ventilazione",
+          "Comprendono l'ingresso negli spazi confinati",
+          "NON comprendono le pause pranzo"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Le norme specifiche di sicurezza devono essere comprensibili per i madrelingua: la comprensione della lingua è essenziale per la sicurezza."
+        }
+      },
+      {
+        "title": "Permessi di lavoro",
+        "paragraphs": [
+          "Un permesso di lavoro deve descrivere le misure che devono essere adottate dall'emittente e dal titolare del permesso. Indica quali attività verranno svolte, dove e come, ma NON perché."
+        ],
+        "bullets": [
+          "Descrive le misure per l'emittente e il titolare",
+          "Indica cosa, dove e come",
+          "NON deve indicare perché",
+          "Elenca tutti i DPI necessari",
+          "Definisce le misure operative per i lavoratori"
+        ]
+      },
+      {
+        "title": "Flange di collegamento",
+        "paragraphs": [
+          "Una flangia di collegamento svolge una doppia funzione: intercettare le linee di alimentazione verso recipienti, serbatoi o impianti, E separare tratti di tubazione."
+        ],
+        "bullets": [
+          "Intercettare le linee di alimentazione",
+          "Separare tratti di tubazione",
+          "Fondamentale nelle procedure di isolamento",
+          "Parte della preparazione sicura del lavoro"
+        ]
+      }
+    ]
+  },
+  "7": {
+    "sections": [
+      {
+        "title": "Addetti alla gestione delle emergenze",
+        "paragraphs": [
+          "Gli addetti alla gestione delle emergenze (BHV) hanno compiti specifici, tra cui estinguere gli incendi allo stadio iniziale e limitare i danni e le lesioni."
+        ],
+        "bullets": [
+          "Estinguere gli incendi allo stadio iniziale",
+          "Limitare i danni e le lesioni",
+          "Evacuare il personale",
+          "Prestare il primo soccorso",
+          "Guidare i servizi di emergenza"
+        ]
+      },
+      {
+        "title": "Piano di emergenza aziendale",
+        "paragraphs": [
+          "Il piano di emergenza aziendale descrive le misure e i mezzi predisposti per le situazioni di emergenza. Il suo scopo è limitare le conseguenze delle possibili situazioni di emergenza."
+        ],
+        "bullets": [
+          "Descrive le misure e i mezzi predisposti",
+          "Limita le conseguenze delle emergenze",
+          "Copre tutti i tipi di situazioni di emergenza",
+          "Deve essere provato e aggiornato con regolarità"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Le situazioni di emergenza comprendono: infortuni, incendio, esplosione, fuoriuscita incontrollata di sostanze, maltempo, catastrofi naturali, disordini sociali e attentati terroristici."
+        }
+      },
+      {
+        "title": "Fasi della gestione dell'emergenza",
+        "paragraphs": [
+          "La gestione dell'emergenza ha fasi definite. Il primo allarme descrive come può essere segnalata un'emergenza e quali informazioni devono essere comunicate. Attenzione: non esiste una fase di secondo allarme."
+        ],
+        "bullets": [
+          "Primo allarme: come segnalare e cosa comunicare",
+          "Risposta: interventi della squadra di emergenza",
+          "Cessazione: dichiarata da una persona autorizzata",
+          "Ripristino: ritorno alla normale attività"
+        ]
+      },
+      {
+        "title": "Evacuazione e primo soccorso",
+        "paragraphs": [
+          "La sequenza corretta di evacuazione è: 1) Interrompere il lavoro, 2) Non utilizzare gli ascensori, 3) Presentarsi al punto di raccolta. Il materiale di primo soccorso deve essere sempre disponibile."
+        ],
+        "bullets": [
+          "Interrompere immediatamente il lavoro",
+          "Non utilizzare ascensori né montacarichi",
+          "Presentarsi al punto di raccolta",
+          "Materiale di primo soccorso sempre disponibile",
+          "Sono richiesti addetti alle emergenze formati"
+        ]
+      }
+    ]
+  },
+  "8": {
+    "sections": [
+      {
+        "title": "Identificazione delle sostanze pericolose",
+        "paragraphs": [
+          "Le sostanze pericolose sono materiali che costituiscono un pericolo per la salute e/o l'ambiente. Sono contrassegnate da un simbolo di pericolo quadrato, nero su fondo arancione. Le frasi R sulle etichette indicano i rischi."
+        ],
+        "bullets": [
+          "Simbolo di pericolo: nero su fondo arancione",
+          "Frasi R = frasi di rischio (identificano i pericoli)",
+          "Frasi S = frasi di sicurezza (precauzioni)",
+          "La scheda di dati di sicurezza (SDS/MSDS) fornisce le informazioni complete"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Le frasi R Le indicano i RISCHI. Le frasi S Le indicano le misure di SICUREZZA. I numeri del rombo di pericolo vanno da 0 a 4."
+        }
+      },
+      {
+        "title": "Ossigeno e ventilazione",
+        "paragraphs": [
+          "In condizioni normali, l'ossigeno nell'aria è al 21%. La mancanza di ventilazione può far scendere eccessivamente la concentrazione di ossigeno, creando un pericolo di asfissia."
+        ],
+        "bullets": [
+          "Livello normale di ossigeno: 21%",
+          "Sotto il 19%: zona di pericolo",
+          "La mancanza di ventilazione riduce l'ossigeno",
+          "Bombole di gas: ogiva bianca = ossigeno"
+        ]
+      },
+      {
+        "title": "Monossido di carbonio e amianto",
+        "paragraphs": [
+          "Il monossido di carbonio impedisce al sangue di assorbire l'ossigeno. L'esposizione all'amianto può provocare il mesotelioma. Il nuovo impiego e la lavorazione dell'amianto NON sono consentiti."
+        ],
+        "bullets": [
+          "CO: il sangue non assorbe più l'ossigeno",
+          "Amianto: provoca il mesotelioma",
+          "Presente in coperture, rivestimenti di pareti, muratura refrattaria dei forni",
+          "NON presente nelle abitazioni di nuova costruzione",
+          "Il nuovo impiego e la lavorazione sono vietati"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Il monossido di carbonio è inodore e incolore: non può rilevarlo senza strumenti. Impedisce l'assorbimento dell'ossigeno nel sangue."
+        }
+      },
+      {
+        "title": "Agenti biologici e stoccaggio",
+        "paragraphs": [
+          "Gli agenti biologici possono essere presenti in agricoltura e nei terreni contaminati. Le vaccinazioni sono una misura preventiva. Le bombole di gas devono essere fissate correttamente durante lo stoccaggio."
+        ],
+        "bullets": [
+          "Agenti biologici: agricoltura, terreni contaminati",
+          "Vaccinazioni come misura preventiva",
+          "Bombole di gas: fissarle correttamente",
+          "Solventi organici: infiammabili/altamente infiammabili",
+          "Perdite: rimozione del prodotto sversato da parte di personale specializzato"
+        ]
+      }
+    ]
+  },
+  "9": {
+    "sections": [
+      {
+        "title": "Fondamenti dell'incendio",
+        "paragraphs": [
+          "Il fuoco richiede combustibile, ossigeno e una fonte di innesco. Perché si verifichi un incendio o un'esplosione è necessaria una sostanza infiammabile. L'eccesso di ossigeno facilita l'innesco delle sostanze infiammabili."
+        ],
+        "bullets": [
+          "Combustibile: il materiale che brucia",
+          "Ossigeno: normalmente il 21% dell'aria",
+          "Fonte di innesco: scintilla, fiamma, calore",
+          "Eccesso di ossigeno = innesco più facile"
+        ]
+      },
+      {
+        "title": "Classi di incendio",
+        "table": {
+          "headers": [
+            "Classe",
+            "Materiali",
+            "Esempi"
+          ],
+          "rows": [
+            [
+              "A",
+              "Materiali solidi",
+              "Legno, carta, plastica, tessuti"
+            ],
+            [
+              "B",
+              "Liquidi",
+              "Benzina, olio, alcol, vernice"
+            ],
+            [
+              "C",
+              "Gas",
+              "Metano, propano, butano, acetilene"
+            ],
+            [
+              "D",
+              "Metalli",
+              "Magnesio, alluminio, sodio"
+            ]
+          ]
+        },
+        "callout": {
+          "type": "danger",
+          "text": "Non usi MAI acqua sugli incendi di Classe B (liquidi)! I liquidi in fiamme schizzano e galleggiano sull'acqua, propagando l'incendio."
+        }
+      },
+      {
+        "title": "Esplosioni e punto di infiammabilità",
+        "paragraphs": [
+          "Un'esplosione è un incendio che si sviluppa molto rapidamente e libera un'onda di pressione. Il limite di esplosività è la concentrazione massima o minima di un gas nell'aria alla quale può verificarsi un'esplosione. Il punto di infiammabilità è la temperatura più bassa di un liquido alla quale i suoi vapori possono infiammarsi."
+        ],
+        "bullets": [
+          "Esplosione = incendio rapido + onda di pressione",
+          "Limite di esplosività: soglie di concentrazione del gas",
+          "Punto di infiammabilità: temperatura minima di innesco dei vapori di un liquido",
+          "Il segnale Ex indica una zona a rischio di esplosione"
+        ]
+      },
+      {
+        "title": "Metodi di estinzione",
+        "paragraphs": [
+          "Quando si rileva un incendio, la prima cosa da fare è segnalarlo. Le coperte antincendio sottraggono l'ossigeno. L'anidride carbonica sposta l'ossigeno, ma può creare un'atmosfera asfissiante e causare lesioni da congelamento. La sabbia sottrae l'ossigeno. Nel trattamento delle bruciature, sciacquare con acqua per almeno 15 minuti."
+        ],
+        "bullets": [
+          "Prima azione: SEGNALARE l'incendio",
+          "Coperte antincendio: sottraggono l'ossigeno",
+          "CO2: sposta l'ossigeno (rischio di asfissia + lesioni da congelamento)",
+          "Sabbia: sottrae l'ossigeno",
+          "Bruciature: sciacquare per almeno 15 minuti",
+          "La sorveglianza dei lavori a caldo richiede una formazione specifica"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Nel trattamento delle bruciature: sciacqui con acqua per almeno 15 MINUTI. Non 5, non 10: quindici minuti come minimo."
+        }
+      }
+    ]
+  },
+  "10": {
+    "sections": [
+      {
+        "title": "Sicurezza con gli utensili manuali",
+        "paragraphs": [
+          "Gli scalpelli non devono presentare bave sul tagliente. I martelli devono avere il manico ben fissato alla testa. Quando si lavora con i coltelli, non far uscire troppo una lama estensibile."
+        ],
+        "bullets": [
+          "Scalpelli: nessuna bava sul tagliente",
+          "Martelli: manico fissato alla testa",
+          "Coltelli: non far uscire troppo la lama",
+          "Seghe: la lama deve essere ben tesa",
+          "Pezzi piccoli: devono essere bloccati con morsetti"
+        ]
+      },
+      {
+        "title": "Utensili elettrici e macchine",
+        "paragraphs": [
+          "Gli utensili elettrici manuali a 230 volt devono avere il doppio isolamento. L'interruttore a uomo presente arresta immediatamente la macchina quando si rilascia l'impugnatura. L'arresto di emergenza è il modo più rapido per fermare una macchina."
+        ],
+        "bullets": [
+          "Utensili a 230V: devono avere il doppio isolamento",
+          "Interruttore a uomo presente: si arresta al rilascio",
+          "Arresto di emergenza: metodo di arresto più rapido",
+          "Ispezione periodica obbligatoria per tutte le macchine",
+          "Non indossare mai guanti in presenza di parti rotanti"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Non indossi MAI guanti quando lavora con macchine dotate di parti rotanti: il guanto e la Sua mano possono essere trascinati all'interno della macchina."
+        }
+      },
+      {
+        "title": "Seghe circolari e smerigliatrici",
+        "paragraphs": [
+          "Una sega circolare da banco deve avere una protezione della lama fissata a un supporto robusto. Il cuneo divisore si utilizza con la sega circolare portatile. I dischi abrasivi devono riportare il nome del fabbricante."
+        ],
+        "bullets": [
+          "Sega circolare da banco: protezione della lama su supporto robusto",
+          "Cuneo divisore: per la sega circolare portatile",
+          "Disco abrasivo: deve riportare il nome del fabbricante",
+          "Motosega: richiede pantaloni e guanti speciali in fibra",
+          "Chiodatrice/graffatrice: protezione contro l'azionamento accidentale"
+        ]
+      },
+      {
+        "title": "Carrelli elevatori e veicoli",
+        "paragraphs": [
+          "Un transpallet ha un'altezza di sollevamento di 20 cm. I conducenti di carrelli elevatori devono possedere una competenza verificata tramite esame E usare la cintura di sicurezza. Non è possibile aumentare il contrappeso."
+        ],
+        "bullets": [
+          "Transpallet: 20 cm di altezza di sollevamento",
+          "Carrello elevatore: competenza verificata + cintura di sicurezza obbligatorie",
+          "Non è possibile aumentare il contrappeso",
+          "Nessun passeggero senza sedile apposito",
+          "Utensili pneumatici: chiudere l'alimentazione dell'aria dopo l'uso"
+        ]
+      }
+    ]
+  },
+  "11": {
+    "sections": [
+      {
+        "title": "Pericoli durante la demolizione",
+        "paragraphs": [
+          "I lavori di demolizione presentano molteplici pericoli, tra cui l'instabilità del fronte di demolizione E le parti sporgenti della costruzione. Entrambi sono ugualmente pericolosi."
+        ],
+        "bullets": [
+          "Instabilità del fronte di demolizione",
+          "Parti sporgenti della costruzione",
+          "Caduta di detriti e materiali",
+          "Polveri e sostanze pericolose",
+          "Rischio di collasso strutturale"
+        ]
+      },
+      {
+        "title": "Misure di sicurezza",
+        "paragraphs": [
+          "Durante i lavori di demolizione è obbligatorio un dispositivo anticaduta. Nella rimozione di fibre ceramiche, non utilizzare uno scivolo per macerie, per evitare la dispersione delle fibre."
+        ],
+        "bullets": [
+          "Il dispositivo anticaduta è obbligatorio",
+          "Non utilizzare uno scivolo per macerie per le fibre ceramiche",
+          "DPI adeguati in ogni momento",
+          "Sequenze di demolizione controllate",
+          "Zone di esclusione per il personale non addetto"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Nella rimozione di fibre ceramiche: NON utilizzi uno scivolo per macerie. In questo modo si evita la pericolosa dispersione di fibre nell'aria."
+        }
+      },
+      {
+        "title": "Pianificazione e procedure",
+        "paragraphs": [
+          "Tutti i lavori di demolizione richiedono una pianificazione accurata, un'adeguata valutazione dei rischi e procedure chiare per ogni fase del processo di demolizione."
+        ],
+        "bullets": [
+          "Valutazione dei rischi prima di iniziare",
+          "Sequenza di demolizione chiaramente pianificata",
+          "Procedure di emergenza predisposte",
+          "Controlli periodici della stabilità strutturale",
+          "Procedure adeguate di gestione dei rifiuti"
+        ]
+      }
+    ]
+  },
+  "12": {
+    "sections": [
+      {
+        "title": "Sicurezza nella saldatura a gas",
+        "paragraphs": [
+          "Nella saldatura a gas con ossigeno e acetilene, le bombole devono essere stoccate in posizione verticale o con un'inclinazione di almeno 30 gradi. Il ritorno di fiamma è un rischio significativo della saldatura a gas."
+        ],
+        "bullets": [
+          "Bombole di acetilene: in verticale o con un minimo di 30 gradi",
+          "Il ritorno di fiamma è un rischio grave",
+          "Verificare che i raccordi non presentino perdite",
+          "Utilizzare valvole di sicurezza contro il ritorno di fiamma",
+          "Stoccare separatamente l'ossigeno e il gas combustibile"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Le bombole di acetilene devono essere stoccate in posizione verticale o con un'inclinazione di almeno 30 gradi. Non le adagi mai in orizzontale."
+        }
+      },
+      {
+        "title": "Saldatura elettrica",
+        "paragraphs": [
+          "La saldatura elettrica richiede una protezione personale completa e tende per saldatura per proteggere le persone vicine dalle radiazioni UV e infrarosse. La bruciatura della cornea per radiazione termica NON è un rischio; l'abbagliamento per radiazione infrarossa lo È."
+        ],
+        "bullets": [
+          "Maschera per saldatura, grembiule, indumenti, calzature di sicurezza",
+          "Tende per saldatura per la protezione da UV/infrarossi",
+          "Rischio: abbagliamento per radiazione infrarossa",
+          "Rischio: disturbi polmonari dovuti ai fumi di saldatura",
+          "NON è un rischio: bruciatura della cornea per radiazione termica"
+        ]
+      },
+      {
+        "title": "Procedure per i lavori a caldo",
+        "paragraphs": [
+          "Tutte le operazioni di saldatura, taglio e ossitaglio richiedono i relativi permessi, la sorveglianza antincendio e misure di sicurezza per prevenire incendi ed esplosioni."
+        ],
+        "bullets": [
+          "Permesso per lavori a caldo obbligatorio",
+          "Sorveglianza antincendio durante e dopo il lavoro",
+          "Rimuovere i materiali infiammabili dall'area",
+          "Verificare la presenza di atmosfere esplosive",
+          "Una ventilazione adeguata è essenziale"
+        ]
+      }
+    ]
+  },
+  "13": {
+    "sections": [
+      {
+        "title": "Perché è importante scavare con cautela",
+        "paragraphs": [
+          "Scavare con cautela è importante per garantire la continuità di erogazione delle aziende di pubblici servizi. Danneggiare i sottoservizi interrati può provocare incidenti gravi."
+        ],
+        "bullets": [
+          "Continuità di erogazione dei servizi",
+          "Tubazioni del gas: rischio di asfissia in caso di danneggiamento",
+          "Cavi in tensione: rischio di folgorazione",
+          "Condotte idriche: rischio di inondazione",
+          "Cavi di telecomunicazione: interruzione del servizio"
+        ]
+      },
+      {
+        "title": "Regole per uno scavo sicuro",
+        "paragraphs": [
+          "Prima di scavare, la posizione di cavi e tubazioni deve essere determinata mediante saggi di scavo entro 1,5 metri. Qualsiasi posizione diversa o danneggiamento deve essere segnalato al responsabile."
+        ],
+        "bullets": [
+          "Saggi di scavo entro 1,5 m dalla posizione prevista",
+          "Segnali immediatamente qualsiasi differenza o danneggiamento",
+          "Scavi a mano in prossimità di sottoservizi noti",
+          "Utilizzi apparecchiature di localizzazione di cavi e tubazioni",
+          "Segua le indicazioni dell'azienda di pubblici servizi"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Il pericolo di esplosione NON è direttamente un rischio dello scavo in sé, ma l'asfissia (gas) e la folgorazione (cavi) SONO rischi diretti."
+        }
+      },
+      {
+        "title": "Lavori negli scavi",
+        "paragraphs": [
+          "Quando si lavora in uno scavo o nelle sue vicinanze, un'armatura efficace e scarpate adeguate sono essenziali per prevenire il franamento."
+        ],
+        "bullets": [
+          "Armatura efficace obbligatoria",
+          "Scarpate adeguate",
+          "Protezione dei bordi per i lavoratori in superficie",
+          "Vie di accesso e di uscita sicure",
+          "Ispezioni periodiche della stabilità"
+        ]
+      }
+    ]
+  },
+  "14": {
+    "sections": [
+      {
+        "title": "Requisiti di legge",
+        "paragraphs": [
+          "A partire da 2,5 metri di altezza, il datore di lavoro deve adottare le misure previste dalla legge per prevenire i rischi di caduta. L'imbracatura di sicurezza è la misura che riduce il pericolo per tutte le persone che lavorano su un tetto piano."
+        ],
+        "bullets": [
+          "2,5 metri: misure di legge obbligatorie",
+          "Imbracatura di sicurezza per i lavori su tetti piani",
+          "Protezione collettiva preferibile a quella individuale",
+          "Valutazione dei rischi per tutti i lavori in quota"
+        ]
+      },
+      {
+        "title": "Scale portatili",
+        "paragraphs": [
+          "Prima dell'uso, verifichi che la scala sia posizionata con un angolo di circa 75 gradi. Le scale portatili si utilizzano per svolgere attività di breve durata e superare dislivelli. Lo sbraccio massimo pari alla lunghezza di un braccio è una regola fondamentale."
+        ],
+        "bullets": [
+          "Angolo: circa 75 gradi",
+          "Uso per attività di breve durata + superamento di dislivelli",
+          "Sbraccio massimo: la lunghezza di un braccio",
+          "Tre punti di appoggio durante la salita",
+          "La fissi in sommità o chieda a qualcuno di trattenerla"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "La scala portatile deve essere posizionata a circa 75 gradi. Troppo verticale = ribaltamento all'indietro. Troppo inclinata = scivolamento della base."
+        }
+      },
+      {
+        "title": "Ponteggi",
+        "paragraphs": [
+          "Sui ponteggi mobili su ruote (trabattelli) si sale dall'interno. Le persone su un ponteggio sospeso devono utilizzare l'imbracatura di sicurezza. Le aperture nel pavimento devono essere coperte preferibilmente con materiale solido."
+        ],
+        "bullets": [
+          "Trabattello: salga dall'interno",
+          "Ponteggio sospeso: imbracatura di sicurezza obbligatoria",
+          "Aperture nel pavimento: le copra con materiale solido",
+          "Parapetti su tutti i lati aperti",
+          "Ispezione periodica dei componenti del ponteggio"
+        ]
+      },
+      {
+        "title": "Aperture nei pavimenti e nelle pareti",
+        "paragraphs": [
+          "I pericoli comprendono l'essere colpiti da oggetti in caduta e la caduta attraverso le aperture. Chiudere una grande apertura nel pavimento NON è un pericolo: è una misura di sicurezza."
+        ],
+        "bullets": [
+          "Caduta attraverso le aperture",
+          "Urto da oggetti che cadono attraverso le aperture",
+          "Copra le aperture con materiale solido",
+          "Installi parapetti dove non è possibile coprirle",
+          "Segnali chiaramente tutte le aperture"
+        ]
+      }
+    ]
+  },
+  "15": {
+    "sections": [
+      {
+        "title": "Pericoli fondamentali",
+        "paragraphs": [
+          "Una persona non qualificata non può MAI lavorare su impianti elettrici in tensione, neppure con l'autorizzazione di un esperto. Il pericolo maggiore del passaggio di corrente attraverso il corpo è il passaggio attraverso il cuore. La folgorazione è causata dall'uso dell'elettricità."
+        ],
+        "bullets": [
+          "Persone non qualificate: MAI su impianti in tensione",
+          "Pericolo maggiore: passaggio di corrente attraverso il cuore",
+          "La mancanza di messa a terra causa infortuni",
+          "L'intensità e la durata della corrente determinano la lesione",
+          "Lo spessore della pelle NON influisce sulla lesione"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Una persona non qualificata non può MAI lavorare su impianti elettrici in tensione, neppure con l'autorizzazione di un esperto."
+        }
+      },
+      {
+        "title": "Tensioni di sicurezza",
+        "table": {
+          "headers": [
+            "Tipo",
+            "Tensione massima di sicurezza",
+            "Applicazione"
+          ],
+          "rows": [
+            [
+              "Corrente continua",
+              "120V",
+              "Spazi confinati"
+            ],
+            [
+              "Corrente alternata",
+              "50V",
+              "Spazi confinati"
+            ],
+            [
+              "Interruttore differenziale",
+              "30 mA",
+              "Cantieri edili"
+            ]
+          ]
+        },
+        "callout": {
+          "type": "info",
+          "text": "Negli spazi confinati: max 120V CC o max 50V CA. I quadri elettrici di cantiere necessitano di protezione differenziale da 30 mA."
+        }
+      },
+      {
+        "title": "Elettricità statica e cortocircuiti",
+        "paragraphs": [
+          "Un cortocircuito si verifica quando due parti a tensioni diverse entrano in contatto diretto. I pericoli dell'elettricità statica comprendono scintille e danni alle apparecchiature elettroniche. Quando si lavora con l'elettricità statica si indossano calzature antistatiche."
+        ],
+        "bullets": [
+          "Cortocircuito: tensioni diverse in contatto",
+          "Statica: scintille + danni alle apparecchiature",
+          "Calzature antistatiche per i lavori con elettricità statica",
+          "La statica NON si genera in locali poveri di ossigeno",
+          "Avvolgicavo: li svolga sempre completamente"
+        ]
+      },
+      {
+        "title": "Sicurezza di cavi e apparecchiature",
+        "paragraphs": [
+          "Gli avvolgicavo devono essere svolti completamente per evitare il surriscaldamento e l'incendio. I cavi di alimentazione possono essere sovraccaricati. Controlli sempre visivamente le apparecchiature prima dell'uso e segnali qualsiasi danno."
+        ],
+        "bullets": [
+          "Svolga completamente gli avvolgicavo (rischio di incendio)",
+          "Il sovraccarico è il principale pericolo dei cavi",
+          "Controllo visivo prima di ogni uso",
+          "Segnali i danni: non utilizzi l'apparecchiatura",
+          "I ponteggi devono essere messi a terra"
+        ]
+      }
+    ]
+  },
+  "16": {
+    "sections": [
+      {
+        "title": "Che cos'è uno spazio confinato?",
+        "paragraphs": [
+          "Uno spazio confinato è caratterizzato da uno spazio di lavoro sufficiente ma da una ventilazione scarsa e da un accesso limitato. Ne sono esempi i serbatoi di stoccaggio, le cisterne e le tende di saldatura in prossimità di scavi profondi."
+        ],
+        "bullets": [
+          "Accesso e uscita limitati",
+          "Ventilazione naturale scarsa",
+          "Non progettato per l'occupazione continua",
+          "Esempi: cisterne, serbatoi, sili, fognature",
+          "NON sono solo spazi stretti, piccoli o umidi"
+        ]
+      },
+      {
+        "title": "Pericoli e misurazioni",
+        "paragraphs": [
+          "L'asfissia si verifica per una concentrazione insufficiente di ossigeno. Le misurazioni devono essere eseguite da una persona esperta, non dal preposto né dal lavoratore che si trova all'interno dello spazio."
+        ],
+        "bullets": [
+          "Asfissia: ossigeno insufficiente (al di sotto del 19%)",
+          "Misurazioni esclusivamente da parte di una persona esperta",
+          "Controlli ossigeno, gas infiammabili e gas tossici",
+          "Monitoraggio continuo durante il lavoro",
+          "Tensione di sicurezza: 120V CC negli spazi confinati"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Pericolo di asfissia: causato da una concentrazione INSUFFICIENTE di ossigeno. Un eccesso di ossigeno è un rischio di incendio, non di asfissia."
+        }
+      },
+      {
+        "title": "Sorvegliante al passo d'uomo e supervisione",
+        "paragraphs": [
+          "Il sorvegliante al passo d'uomo è obbligatorio per tutto il tempo in cui qualcuno si trova all'interno dello spazio chiuso. Il sorvegliante permanente deve possedere una competenza verificata in modo dimostrabile. La durata della permanenza deve essere la più breve possibile."
+        ],
+        "bullets": [
+          "Sorvegliante al passo d'uomo: obbligatorio per tutta la durata",
+          "Sorvegliante: competenza verificata obbligatoria",
+          "Permanenza la più breve possibile",
+          "Allerta dei servizi di emergenza in caso di pericolo",
+          "Comunicazione mantenuta in ogni momento"
+        ]
+      },
+      {
+        "title": "Sicurezza elettrica negli spazi confinati",
+        "paragraphs": [
+          "La tensione di sicurezza negli spazi confinati con pareti conduttrici è di 120V in corrente continua. Scolleghi correttamente l'alimentazione elettrica delle apparecchiature e utilizzi tensioni di sicurezza."
+        ],
+        "bullets": [
+          "Massimo 120V CC negli spazi conduttori",
+          "Massimo 50V CA",
+          "Scolleghi correttamente l'alimentazione elettrica prima di entrare",
+          "Utilizzi utensili a batteria ove possibile",
+          "Protezione differenziale indispensabile"
+        ]
+      }
+    ]
+  },
+  "17": {
+    "sections": [
+      {
+        "title": "Apparecchi di sollevamento",
+        "paragraphs": [
+          "Gli apparecchi di sollevamento possono movimentare i carichi sia in verticale sia in orizzontale. Ne sono esempi le gru a torre e i carriponte. Un transpallet NON è un apparecchio di sollevamento."
+        ],
+        "bullets": [
+          "Gru a torre",
+          "Carriponte (gru a ponte)",
+          "Gru mobili",
+          "NON i transpallet",
+          "Possono movimentare i carichi in verticale E in orizzontale"
+        ]
+      },
+      {
+        "title": "Accessori di sollevamento",
+        "paragraphs": [
+          "Una fascia di sollevamento è un accessorio di sollevamento. Due brache fissate a un anello di acciaio si chiamano braca a due tiranti. Le funi di acciaio non devono essere annodate né utilizzate quando sono molto arrugginite."
+        ],
+        "bullets": [
+          "Fascia di sollevamento = accessorio di sollevamento",
+          "Braca a due tiranti: 2 brache su un anello di acciaio",
+          "Funi di acciaio: non le annodi mai",
+          "Catene: utilizzi paraspigoli sugli spigoli vivi",
+          "Registro della gru: riporta tutte le ispezioni"
+        ]
+      },
+      {
+        "title": "Misure di sicurezza",
+        "paragraphs": [
+          "I pericoli generali comprendono la caduta del carico e il ribaltamento dell'apparecchio di sollevamento. Gli stabilizzatori si utilizzano con gli apparecchi di sollevamento per evitare il ribaltamento. Le operazioni devono essere sospese oltre forza 5 di vento."
+        ],
+        "bullets": [
+          "Pericoli: caduta del carico, ribaltamento dell'apparecchio",
+          "Gli stabilizzatori evitano il ribaltamento",
+          "Sospenda le operazioni oltre forza 5 di vento",
+          "Segua le istruzioni del fabbricante sulla forza del vento",
+          "Non sosti mai sotto carichi sospesi"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Le operazioni di sollevamento devono essere sospese oltre forza 5 di vento. Consulti sempre le istruzioni del fabbricante della gru per i limiti specifici di forza del vento."
+        }
+      }
+    ]
+  },
+  "18": {
+    "sections": [
+      {
+        "title": "Tipi di radiazioni",
+        "paragraphs": [
+          "La radiazione infrarossa è una radiazione non ionizzante. Le radiazioni non ionizzanti sono più deboli delle radiazioni ionizzanti. La differenza fondamentale è che le radiazioni ionizzanti possono creare ioni nei tessuti del corpo."
+        ],
+        "bullets": [
+          "Ionizzanti: raggi X, raggi gamma, nucleare",
+          "Non ionizzanti: infrarossi, UV, onde radio, microonde",
+          "Le non ionizzanti sono PIÙ DEBOLI delle ionizzanti",
+          "Le ionizzanti creano ioni nei tessuti (più pericolose)"
+        ]
+      },
+      {
+        "title": "Misure di sicurezza",
+        "paragraphs": [
+          "Per le radiazioni ionizzanti: si tenga il più lontano possibile E delimiti la zona. Per le radiazioni non ionizzanti: segua le istruzioni riportate sugli apparecchi e rispetti i limiti di durata."
+        ],
+        "bullets": [
+          "Ionizzanti: distanza + schermatura + tempo",
+          "Delimiti la zona intorno alle sorgenti ionizzanti",
+          "Non ionizzanti: segua le istruzioni dell'apparecchio",
+          "Rispetti i limiti di durata di utilizzo",
+          "Visita medica per i lavoratori esposti a radiazioni ionizzanti"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "I lavoratori che operano con sorgenti di radiazioni ionizzanti devono sottoporsi a visite mediche. L'esperto di radioprotezione sorveglia la sicurezza e l'igiene radiologiche."
+        }
+      },
+      {
+        "title": "Responsabilità",
+        "paragraphs": [
+          "Sorvegliare la sicurezza e l'igiene radiologiche è compito dell'esperto di radioprotezione, non del preposto né della squadra di emergenza."
+        ],
+        "bullets": [
+          "Esperto di radioprotezione: sorveglia la sicurezza e l'igiene",
+          "Visite mediche: obbligatorie per i lavoratori esposti a radiazioni",
+          "Preposto: garantisce il rispetto delle regole",
+          "Squadra di emergenza: gestisce gli incidenti radiologici"
+        ]
+      }
+    ]
+  },
+  "19": {
+    "sections": [
+      {
+        "title": "Condizioni dell'ambiente di lavoro",
+        "paragraphs": [
+          "L'ambiente di lavoro è determinato da vibrazioni, illuminazione, temperatura e rumore. Il preposto NON determina le condizioni dell'ambiente di lavoro: il suo compito è dirigere le persone."
+        ],
+        "bullets": [
+          "Vibrazioni (mano-braccio e corpo intero)",
+          "Livelli di illuminazione",
+          "Temperatura e umidità",
+          "Livelli di rumore",
+          "NON determinate dal preposto"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Il PREPOSTO non determina le condizioni dell'ambiente di lavoro. Le determinano fattori fisici come vibrazioni, illuminazione e temperatura."
+        }
+      },
+      {
+        "title": "Vibrazioni e carico fisico",
+        "paragraphs": [
+          "Le vibrazioni fisiche comprendono le vibrazioni mano-braccio prodotte dagli utensili meccanici e le vibrazioni trasmesse al corpo intero prodotte dai veicoli. Le infezioni della pelle NON sono causate dalle vibrazioni. Il carico fisico dipende dalla posizione o postura di lavoro E dai movimenti che devono essere eseguiti."
+        ],
+        "bullets": [
+          "Mano-braccio: da utensili meccanici portatili",
+          "Corpo intero: da veicoli, impianti, pavimenti",
+          "NON causate dalle vibrazioni: infezioni della pelle",
+          "Carico fisico: postura + movimenti",
+          "Le pause prevengono il sovraccarico"
+        ]
+      },
+      {
+        "title": "Movimentazione manuale dei carichi",
+        "paragraphs": [
+          "Il peso massimo consigliato per il sollevamento manuale è di 25 kg. Postura corretta: sollevare con la schiena dritta, piegare le ginocchia e tenere il carico il più vicino possibile al corpo."
+        ],
+        "bullets": [
+          "Massimo 25 kg per il sollevamento manuale",
+          "Schiena dritta + ginocchia piegate",
+          "Tenere il carico vicino al corpo",
+          "Pianificare il sollevamento prima di iniziare",
+          "Chiedere aiuto per carichi pesanti o difficili da maneggiare"
+        ],
+        "callout": {
+          "type": "warning",
+          "text": "Massimo per il sollevamento manuale: 25 kg. Sollevare sempre con la SCHIENA DRITTA e le GINOCCHIA PIEGATE, tenendo il carico VICINO al corpo."
+        }
+      },
+      {
+        "title": "Lavoro in posizione seduta e in piedi",
+        "paragraphs": [
+          "La posizione seduta ottimale comprende un buon appoggio delle cosce E lo scarico delle spalle. Una regola pratica è garantire una posizione ottimale, cambiando però posizione regolarmente. Lavorare in piedi NON è preferibile quando devono essere applicate forze superiori a 30N."
+        ],
+        "bullets": [
+          "Buon appoggio delle cosce sul sedile",
+          "Scarico delle spalle (braccioli)",
+          "Cambiare posizione regolarmente",
+          "In piedi: preferibile per compiti che richiedono di allungarsi",
+          "In piedi: NON preferibile per forze superiori a 30N"
+        ]
+      }
+    ]
+  },
+  "20": {
+    "sections": [
+      {
+        "title": "Effetti del rumore",
+        "paragraphs": [
+          "Un rumore eccessivamente forte aumenta il rischio sul luogo di lavoro, poiché maschera i segnali di avvertimento e riduce la concentrazione. L'esposizione a un rumore eccessivo provoca perdita di concentrazione."
+        ],
+        "bullets": [
+          "Aumenta il rischio sul luogo di lavoro",
+          "Provoca perdita di concentrazione",
+          "Maschera i segnali di avvertimento",
+          "Può causare danni permanenti all'udito",
+          "Si misura in decibel (dB)"
+        ]
+      },
+      {
+        "title": "Fisica del suono",
+        "paragraphs": [
+          "Due sorgenti sonore uguali insieme aumentano il livello sonoro di 3 dB. Raddoppiare la distanza comporta una riduzione di circa 6 dB(A). Tonalità e intensità determinano se il rumore è dannoso."
+        ],
+        "bullets": [
+          "Due sorgenti uguali: +3 dB",
+          "Distanza doppia: -6 dB(A)",
+          "Fattori di nocività: tonalità e intensità",
+          "Perdita permanente dell'udito: difficoltà nelle conversazioni telefoniche",
+          "Unità di misura: decibel (dB)"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "Due sorgenti sonore uguali = +3 dB. Distanza doppia = -6 dB(A). Sono valori chiave per l'esame."
+        }
+      },
+      {
+        "title": "Gerarchia delle misure contro il rumore",
+        "paragraphs": [
+          "L'ordine corretto è: 1) ridurre alla sorgente, 2) schermare la sorgente, 3) smorzare le vibrazioni sonore, 4) utilizzare la protezione individuale dell'udito. A partire da 80 dB(A), il datore di lavoro deve offrire un esame audiometrico e mettere a disposizione la protezione dell'udito."
+        ],
+        "bullets": [
+          "1. Ridurre alla sorgente",
+          "2. Schermare la sorgente",
+          "3. Smorzare le vibrazioni sonore",
+          "4. Protezione individuale dell'udito (ultima risorsa)",
+          "Da 80 dB(A): esame audiometrico + protezione disponibile",
+          "Da 85 dB(A): protezione dell'udito obbligatoria"
+        ]
+      }
+    ]
+  },
+  "21": {
+    "sections": [
+      {
+        "title": "Requisiti generali dei DPI",
+        "paragraphs": [
+          "Tutti i DPI devono essere collaudati. Gli elmetti di sicurezza metallici non devono essere indossati in ambito industriale perché possono condurre l'elettricità. I DPI sono l'ultima linea di difesa, dopo le misure tecniche e organizzative."
+        ],
+        "bullets": [
+          "Devono essere collaudati e certificati",
+          "Gli elmetti metallici conducono l'elettricità",
+          "Ultima linea di difesa",
+          "Devono calzare correttamente",
+          "È richiesta un'ispezione periodica"
+        ]
+      },
+      {
+        "title": "Protezione della testa e degli occhi",
+        "paragraphs": [
+          "La bardatura interna di un elmetto di sicurezza assorbe gli urti e li distribuisce sulla testa. Gli occhiali di sicurezza a maschera proteggono dagli schizzi di acido. Le maschere per saldatura proteggono dalle radiazioni infrarosse, mentre gli occhiali proteggono dalla proiezione di particelle."
+        ],
+        "bullets": [
+          "Bardatura interna dell'elmetto: assorbe e distribuisce l'urto",
+          "Pericoli per la testa: urti + caduta di oggetti",
+          "Occhiali a maschera: protezione dagli schizzi di acido",
+          "Maschera per saldatura: protezione dalle radiazioni infrarosse",
+          "Occhiali di sicurezza: protezione dalla proiezione di particelle"
+        ]
+      },
+      {
+        "title": "Protezione delle vie respiratorie e dell'udito",
+        "paragraphs": [
+          "Una maschera con filtro antipolvere protegge nei lavori di demolizione e scalpellatura. Una mascherina che copre naso e bocca protegge solo dalle particelle, non da gas o vapori. Un autorespiratore è necessario in caso di concentrazioni elevate o sconosciute oppure con meno del 19% di ossigeno. La protezione dell'udito è obbligatoria oltre 85 dB(A)."
+        ],
+        "bullets": [
+          "Filtro antipolvere: demolizione e scalpellatura",
+          "Mascherina naso/bocca: solo particelle, NON gas",
+          "Autorespiratore: concentrazioni elevate o ossigeno insufficiente",
+          "Protezione dell'udito: obbligatoria oltre 85 dB(A)",
+          "Ossigeno troppo basso = pericolo per la respirazione"
+        ],
+        "callout": {
+          "type": "danger",
+          "text": "Una mascherina che copre naso e bocca protegge SOLO dalle particelle. NON protegge da gas o vapori. Utilizzare un dispositivo di protezione delle vie respiratorie adeguato in presenza di rischi chimici."
+        }
+      },
+      {
+        "title": "Protezione del corpo e contro le cadute",
+        "paragraphs": [
+          "L'abbigliamento ad alta visibilità rende visibile chi lo indossa. Lo scivolamento è un pericolo per piedi e gambe. I dispositivi di protezione contro le cadute che hanno già arrestato una caduta NON POSSONO essere riutilizzati."
+        ],
+        "bullets": [
+          "Abbigliamento ad alta visibilità: visibilità",
+          "Pericolo di scivolamento: piedi e gambe",
+          "Protezione delle mani: guanti con manichetta lunga per polso/braccio",
+          "Protezione contro le cadute: non riutilizzare dopo l'arresto di una caduta",
+          "Imbracatura di sicurezza: deve calzare ed essere regolata correttamente"
+        ]
+      }
+    ]
+  },
+  "22": {
+    "sections": [
+      {
+        "title": "Categorie di segnali",
+        "paragraphs": [
+          "I segnali di sicurezza sono classificati in base a forma, colore e significato. Ogni categoria ha un aspetto distinto per garantirne il riconoscimento immediato."
+        ],
+        "table": {
+          "headers": [
+            "Tipo",
+            "Forma",
+            "Colore",
+            "Significato"
+          ],
+          "rows": [
+            [
+              "Prescrizione",
+              "Rotonda",
+              "Blu + simbolo bianco",
+              "Obbligo di fare"
+            ],
+            [
+              "Avvertimento",
+              "Triangolare",
+              "Giallo + bordo/simbolo nero",
+              "Attenzione, pericolo"
+            ],
+            [
+              "Divieto",
+              "Rotonda",
+              "Bianco + bordo rosso + barra diagonale rossa",
+              "Divieto di fare"
+            ],
+            [
+              "Salvataggio",
+              "Quadrata/rettangolare",
+              "Verde + simbolo bianco",
+              "Situazione di sicurezza"
+            ],
+            [
+              "Attrezzature antincendio",
+              "Quadrata/rettangolare",
+              "Rosso + simbolo bianco",
+              "Ubicazione dei mezzi antincendio"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "Segnali di avvertimento e di prescrizione",
+        "paragraphs": [
+          "I segnali di avvertimento sono triangolari e gialli con bordo nero: significano attenzione/pericolo. I segnali di prescrizione sono rotondi e blu con un simbolo bianco. Il disegno deve essere chiaro per tutti i lavoratori, indipendentemente dalla lingua."
+        ],
+        "bullets": [
+          "Avvertimento: triangolare, giallo, bordo nero = PERICOLO",
+          "Prescrizione: rotondo, blu, simbolo bianco = OBBLIGO",
+          "Il disegno deve essere chiaro per TUTTI i lavoratori",
+          "Comunicazione indipendente dalla lingua",
+          "Collocati ad altezza degli occhi ove possibile"
+        ],
+        "callout": {
+          "type": "info",
+          "text": "I segnali devono essere progettati in modo che il loro significato sia chiaro per TUTTI i lavoratori, indipendentemente dalla lingua. Per questo motivo si utilizzano i pittogrammi."
+        }
+      },
+      {
+        "title": "Segnali di divieto e di salvataggio",
+        "paragraphs": [
+          "Un segnale di divieto è circolare e bianco, con bordo rosso e una barra diagonale rossa. I segnali di salvataggio sono quadrati/rettangolari, verdi e con simboli bianchi. I segnali delle attrezzature antincendio sono quadrati/rettangolari, rossi e con simboli bianchi."
+        ],
+        "bullets": [
+          "Divieto: cerchio bianco, bordo rosso, barra diagonale rossa",
+          "Salvataggio/evacuazione: rettangolo verde, simbolo bianco",
+          "Attrezzature antincendio: rettangolo rosso, simbolo bianco",
+          "I segnali antincendio indicano sia il percorso sia l'ubicazione",
+          "Strisce gialle/bianche: corsie di passaggio e aree di stoccaggio"
+        ]
+      },
+      {
+        "title": "Segnaletica a pavimento",
+        "paragraphs": [
+          "Le strisce gialle o bianche si utilizzano per delimitare le corsie di passaggio e le aree di stoccaggio. Aiutano a organizzare la circolazione e a delimitare le zone sicure sul luogo di lavoro."
+        ],
+        "bullets": [
+          "Strisce gialle/bianche: corsie di passaggio e aree di stoccaggio",
+          "Mantenere la segnaletica visibile e in buono stato",
+          "Non ostruire le aree delimitate",
+          "Ispezione periodica dello stato della segnaletica"
+        ]
+      }
+    ]
+  }
+}

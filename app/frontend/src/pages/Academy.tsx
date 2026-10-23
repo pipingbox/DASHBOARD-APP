@@ -196,8 +196,8 @@ export default function Academy() {
         <div className="flex items-center gap-3">
           <Shield className="h-5 w-5 text-[#f59e0b]" />
           <div>
-            <p className="text-sm font-semibold text-zinc-200">Book Your Official VCA Exam</p>
-            <p className="text-xs text-zinc-500">Browse exam centers and book your reservation</p>
+            <p className="text-sm font-semibold text-zinc-200">{t('academy.bookVcaExamCta')}</p>
+            <p className="text-xs text-zinc-500">{t('academy.bookVcaExamCtaHint')}</p>
           </div>
         </div>
         <ChevronRight className="h-4 w-4 text-[#f59e0b]" />

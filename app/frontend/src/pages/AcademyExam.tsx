@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useVcaContent } from '@/lib/academy/content';
+import { SUPPORTED_LANGUAGES } from '@/i18n';
 import {
   VCAQuestion,
   QuestionAnswer,
@@ -414,6 +415,7 @@ function ReviewSingleChoice({
   question: SingleChoiceQuestion;
   answer: QuestionAnswer | undefined;
 }) {
+  const { t } = useTranslation();
   const userAnswer = answer as string | undefined;
   return (
     <div className="ml-7 space-y-1 text-xs">
@@ -433,7 +435,7 @@ function ReviewSingleChoice({
         );
       })}
       {!userAnswer && (
-        <p className="text-zinc-600 italic">Not answered</p>
+        <p className="text-zinc-600 italic">{t('academy.examNoAnswer', 'Not answered')}</p>
       )}
     </div>
   );
@@ -605,7 +607,9 @@ export default function AcademyExam() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { questions: localizedQuestions } = useVcaContent();
+  // PB-VCA-I18N-11-001: `ready` is false while the active language still shows the
+  // English fallback; the exam must never freeze a snapshot of untranslated questions.
+  const { questions: localizedQuestions, lang: contentLang, ready: contentReady, error: contentError } = useVcaContent();
 
   const type: ExamType = examType === 'volvca' ? 'volvca' : 'bvca';
   const config = EXAM_CONFIG[type];
@@ -693,6 +697,7 @@ export default function AcademyExam() {
 
   // Select questions on exam start
   const startExam = useCallback(() => {
+    if (!contentReady) return;
     const pool = localizedQuestions.filter(q =>
       type === 'bvca' ? q.isBVCA : q.isVOLVCA
     );
@@ -717,7 +722,7 @@ export default function AcademyExam() {
     startTimeRef.current = Date.now();
     warningShownRef.current = false;
     setPhase('exam');
-  }, [type, config, localizedQuestions]);
+  }, [type, config, localizedQuestions, contentReady]);
 
   // Timer — uses handleSubmitRef.current to avoid stale closure
   useEffect(() => {
@@ -850,7 +855,11 @@ export default function AcademyExam() {
 
           {/* Language note */}
           <div className="border border-zinc-800/50 bg-zinc-900/30 rounded-lg p-4 mb-6 text-xs text-zinc-500 space-y-1">
-            <p>{t('academy.examLanguageNote', 'This simulator uses English questions.')}</p>
+            <p>
+              {t('academy.examLanguageNote', 'This simulator uses questions in {{language}}.', {
+                language: SUPPORTED_LANGUAGES.find((l) => l.code === contentLang)?.label ?? contentLang.toUpperCase(),
+              })}
+            </p>
             <p>
               {type === 'bvca'
                 ? t('academy.examLanguageBVCA', 'The official B-VCA exam is available in up to 20 languages at exam centers.')
@@ -870,12 +879,24 @@ export default function AcademyExam() {
               <span className="text-sm text-zinc-300">{t('academy.examUnderstand', 'I understand the exam rules')}</span>
             </label>
 
+            {contentError && (
+              <div role="alert" className="rounded-lg border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-200">
+                <p>{t('academy.examContentLoadError')}</p>
+                <Button type="button" variant="outline" onClick={() => window.location.reload()} className="mt-3 border-rose-500/50">
+                  {t('academy.examContentRetry')}
+                </Button>
+              </div>
+            )}
             <Button
               onClick={startExam}
-              disabled={!rulesAccepted}
+              disabled={!rulesAccepted || !contentReady}
               className="w-full bg-[#f59e0b] hover:bg-[#d97706] text-black font-medium disabled:opacity-50"
             >
-              {t('academy.examStart', 'Start Exam')}
+              {contentError
+                ? t('academy.examContentUnavailable')
+                : contentReady
+                  ? t('academy.examStart', 'Start Exam')
+                  : t('academy.examLoadingContent', 'Loading questions…')}
             </Button>
           </div>
         </div>
