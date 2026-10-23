@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import {
   FileText,
   Upload,
@@ -29,6 +30,7 @@ import {
 } from '@/lib/resumableUpload';
 import { recalculateAndSaveProfileCompletion } from '@/lib/profileCompletion';
 import { hasStoredCv } from '@/lib/filePresence';
+import { requestCvExtraction } from '@/lib/cvDrafts';
 import {
   openSecureFileInNewTab,
   extractStoragePathAndBucket,
@@ -37,11 +39,16 @@ import {
 
 export function CVUploadSection() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { user, profile, refreshProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [removing, setRemoving] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  // PB-CV-EXPERIENCE-DERIVATION-001 (FASE 4.1) — CTA prominente inmediato
+  // cuando la extracción del CV recién subido termina: lleva a la revisión
+  // del draft para evitar que el usuario suba el CV y no complete la revisión.
+  const [extractionReady, setExtractionReady] = useState(false);
   // PB-DOCUMENT-INTAKE-001 — resumable (TUS) upload machine state for the UI.
   const [uploadUi, setUploadUi] = useState<DocumentUploadProgress | null>(null);
   const uploadControllerRef = useRef<DocumentUploadController | null>(null);
@@ -109,6 +116,7 @@ export function CVUploadSection() {
 
     setUploading(true);
     setUploadUi(null);
+    setExtractionReady(false);
 
     // PB-DOCUMENT-INTAKE-001 — TUS resumable upload via the shared uploader.
     // The object path is stable per file selection: re-selecting the same
@@ -215,6 +223,17 @@ export function CVUploadSection() {
     toast.success(t('workerProfile.cv.uploaded'));
     // Recalculate profile completion (non-blocking)
     recalculateAndSaveProfileCompletion(user.id).catch(() => {});
+    // PB-CV-AUTO-PROFILE-001 — draft-first extraction (non-blocking): the
+    // pending-review banner appears on the profile once the draft exists.
+    // The upload itself already succeeded: a failed extraction must never
+    // surface as an upload error (ticket §14).
+    requestCvExtraction(bucketName, path).then((res) => {
+      if (res?.status === 'completed' || res?.status === 'retried') {
+        toast.info(t('cvReview.extractionReady'));
+        // FASE 4.1 — CTA prominente: el draft está listo para revisar.
+        setExtractionReady(true);
+      }
+    }).catch(() => { /* fire-and-forget */ });
   };
 
   const cancelUpload = () => {
@@ -466,6 +485,31 @@ export function CVUploadSection() {
           >
             {t('common.upload.cancel')}
           </button>
+        </div>
+      )}
+
+      {/* PB-CV-EXPERIENCE-DERIVATION-001 (FASE 4.1) — extracción completada:
+          CTA prominente hacia la revisión del draft (1-2 min), para que el
+          usuario no suba el CV y abandone sin confirmar. */}
+      {extractionReady && (
+        <div
+          className="mt-4 rounded border border-[#f59e0b]/40 bg-[#f59e0b]/10 p-4"
+          data-testid="cv-extraction-ready-cta"
+        >
+          <p className="text-sm font-medium text-amber-300">
+            {t('cvReview.extractionFoundTitle')}
+          </p>
+          <p className="mt-1 text-xs text-amber-200/80">
+            {t('cvReview.extractionFoundDesc')}
+          </p>
+          <Button
+            type="button"
+            onClick={() => navigate('/profile/cv-review')}
+            className="mt-3 bg-[#f59e0b] text-black hover:bg-amber-400"
+            data-testid="cv-extraction-review-cta"
+          >
+            {t('cvReview.reviewCta')}
+          </Button>
         </div>
       )}
 

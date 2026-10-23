@@ -28,7 +28,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { supabase, TABLES } from '@/lib/supabase';
-import { getBrokerSignedUrl, hasStoredCv, hasStoredRecordFile } from '@/lib/storageHelpers';
+import { getBrokerFileUrl, hasStoredCv, hasStoredRecordFile } from '@/lib/storageHelpers';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminPreview } from '@/contexts/AdminPreviewContext';
 import { Button } from '@/components/ui/button';
@@ -100,6 +100,24 @@ interface CandidateApplication {
   created_at: string;
 }
 
+// PB-CV-EXPERIENCE-DERIVATION-001 (FASE 5) — resumen compacto del estado de
+// extracción del CV para recruitment. Solo metadatos agregados del RPC
+// pb_cv_extraction_status_for_candidate (admin-only): jamás texto del CV,
+// campos extraídos ni rutas de storage.
+interface CvExtractionStatus {
+  extraction_status: string;
+  processed_at?: string | null;
+  reviewed_at?: string | null;
+  error_code?: string | null;
+  attempt_count?: number | null;
+  fields_count?: number | null;
+  experiences_count?: number | null;
+  years_experience_value?: number | null;
+  years_experience_provenance?: string | null;
+  years_experience_confidence?: string | null;
+  years_experience_consistency?: string | null;
+}
+
 export default function CandidateProfile() {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
@@ -117,6 +135,9 @@ export default function CandidateProfile() {
   const [previewFile, setPreviewFile] = useState<FilePreviewData | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  // FASE 5 — estado de extracción de CV (recruitment/admin). null = sin dato
+  // (viewer no admin, RPC no disponible todavía o error silenciado).
+  const [cvExtraction, setCvExtraction] = useState<CvExtractionStatus | null>(null);
 
   // Safely get admin preview context
   let effectiveRole = viewerProfile?.role || 'worker';
@@ -251,6 +272,11 @@ export default function CandidateProfile() {
           fetchExperiences(actualUserId),
           fetchDocuments(actualUserId),
           fetchWorkerDocs(actualUserId),
+          // FASE 5 — bloque CV Extraction (recruitment): el RPC exige
+          // app_is_admin(); un viewer no-admin recibiría 42501, así que se
+          // llama solo para admin y cualquier fallo se silencia (la ficha
+          // nunca debe romperse por este bloque auxiliar).
+          ...(isAdminViewer ? [fetchCvExtractionStatus(actualUserId)] : []),
         ]);
       } else {
         await fetchProfileFallback(candidateUserId);
@@ -259,6 +285,25 @@ export default function CandidateProfile() {
       await fetchProfileFallback(candidateUserId);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // PB-CV-EXPERIENCE-DERIVATION-001 (FASE 5) — lectura admin-only del estado
+  // de extracción del CV vía RPC dedicado. Fail-open: si la migración aún no
+  // está aplicada o el RPC deniega, el bloque simplemente no se renderiza.
+  const fetchCvExtractionStatus = async (candidateUserId: string) => {
+    try {
+      const { data, error } = await supabase.rpc(
+        'pb_cv_extraction_status_for_candidate',
+        { p_candidate_user_id: candidateUserId },
+      );
+      if (error || !data) {
+        setCvExtraction(null);
+        return;
+      }
+      setCvExtraction(data as CvExtractionStatus);
+    } catch {
+      setCvExtraction(null);
     }
   };
 
@@ -495,17 +540,17 @@ export default function CandidateProfile() {
 
   const getViewerSignedUrlForCV = async (): Promise<string | null> => {
     if (!userId) return null;
-    return getBrokerSignedUrl({ owner_user_id: userId, file_type: 'cv' });
+    return getBrokerFileUrl({ owner_user_id: userId, file_type: 'cv' });
   };
 
   const getViewerSignedUrlForCert = async (cert: WorkerCertification): Promise<string | null> => {
     if (!userId) return null;
-    return getBrokerSignedUrl({ owner_user_id: userId, file_type: 'certification', record_id: cert.id });
+    return getBrokerFileUrl({ owner_user_id: userId, file_type: 'certification', record_id: cert.id });
   };
 
   const getViewerSignedUrlForDocument = async (doc: WorkerDocument): Promise<string | null> => {
     if (!userId) return null;
-    return getBrokerSignedUrl({ owner_user_id: userId, file_type: 'document', record_id: doc.id });
+    return getBrokerFileUrl({ owner_user_id: userId, file_type: 'document', record_id: doc.id });
   };
 
   const handlePreviewCV = async () => {
@@ -646,7 +691,12 @@ export default function CandidateProfile() {
   }
 
   const candidateHasCv = hasStoredCv(profile);
-  const showCV = candidateHasCv && (isAdminViewer || profile.cv_visible);
+  // PB-SEC-01: the original CV is only shown to the owner and to privileged
+  // viewers. Company viewers never see the original CV during search and
+  // shortlist — the protected professional profile replaces it until the
+  // candidate explicitly accepts contact (TRACK D).
+  const isCompanyViewer = effectiveRole === 'company' && !isAdminViewer && user?.id !== profile.user_id;
+  const showCV = candidateHasCv && !isCompanyViewer && (isAdminViewer || user?.id === profile.user_id || profile.cv_visible);
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
@@ -807,6 +857,11 @@ export default function CandidateProfile() {
             <FileText className="h-3.5 w-3.5" />
             No CV uploaded yet.
           </p>
+        ) : isCompanyViewer ? (
+          <p className="flex items-center gap-2 text-xs text-zinc-500">
+            <Shield className="h-3.5 w-3.5" />
+            The original CV is protected. It will be shared only if the candidate accepts your contact request.
+          </p>
         ) : !profile.cv_visible && !isAdminViewer ? (
           <p className="flex items-center gap-2 text-xs text-zinc-500">
             <EyeOff className="h-3.5 w-3.5" />
@@ -814,6 +869,67 @@ export default function CandidateProfile() {
           </p>
         ) : null}
       </div>
+
+      {/* PB-CV-EXPERIENCE-DERIVATION-001 (FASE 5) — CV Extraction
+          (recruitment/admin): estado compacto del pipeline de extracción,
+          para distinguir fallo / pendiente del candidato / confirmado.
+          Solo metadatos agregados; jamás texto del CV ni PII adicional. */}
+      {isAdminViewer && cvExtraction && (
+        <div className="border border-zinc-800 bg-[#0d0d0d] rounded-sm p-6" data-testid="cv-extraction-status">
+          <h3 className="text-[10px] uppercase tracking-wider text-zinc-600 font-medium mb-3 flex items-center gap-1.5">
+            <ListChecks className="h-3 w-3" />
+            {t('candidateProfile.cvExtraction.title')}
+          </h3>
+          <p className="text-sm text-zinc-200" data-testid="cv-extraction-status-value">
+            {t(`candidateProfile.cvExtraction.${cvExtraction.extraction_status}`, {
+              defaultValue: cvExtraction.extraction_status,
+            })}
+          </p>
+          {cvExtraction.extraction_status !== 'not_processed' && (
+            <div className="mt-1.5 space-y-1 text-xs text-zinc-500">
+              {cvExtraction.fields_count != null && cvExtraction.experiences_count != null && (
+                <p>
+                  {t('candidateProfile.cvExtraction.fieldsExperiences', {
+                    fields: cvExtraction.fields_count,
+                    experiences: cvExtraction.experiences_count,
+                  })}
+                </p>
+              )}
+              {cvExtraction.years_experience_value != null && (
+                <p>
+                  {cvExtraction.years_experience_provenance === 'derived_from_experience_dates'
+                    ? t('candidateProfile.cvExtraction.experienceDerived', {
+                        years: cvExtraction.years_experience_value,
+                      })
+                    : t('candidateProfile.cvExtraction.experienceExplicit', {
+                        years: cvExtraction.years_experience_value,
+                      })}
+                  {cvExtraction.years_experience_confidence
+                    ? ` · ${cvExtraction.years_experience_confidence}`
+                    : ''}
+                  {cvExtraction.years_experience_consistency === 'discrepant'
+                    ? ` · ${t('candidateProfile.cvExtraction.discrepant')}`
+                    : ''}
+                </p>
+              )}
+              {cvExtraction.processed_at && (
+                <p>
+                  {t('candidateProfile.cvExtraction.processed', {
+                    date: new Date(cvExtraction.processed_at).toLocaleDateString(),
+                  })}
+                </p>
+              )}
+              {cvExtraction.reviewed_at && (
+                <p>
+                  {t('candidateProfile.cvExtraction.confirmed', {
+                    date: new Date(cvExtraction.reviewed_at).toLocaleDateString(),
+                  })}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Work Experience */}
       {experiences.length > 0 && (

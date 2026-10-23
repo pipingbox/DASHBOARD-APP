@@ -1,0 +1,2024 @@
+{
+  "m1q1": {
+    "questionText": "Welche Maßnahme kann die Aufsichtsbehörde ergreifen?",
+    "optionA": "Eine Besprechung einberufen, um die Arbeitsbedingungen zu erörtern.",
+    "optionB": "Ein Bußgeld verhängen.",
+    "optionC": "Eine Gesundheitsuntersuchung durchführen.",
+    "explanation": "Die Aufsichtsbehörde (Arbeitsinspektion) kann Gesundheitsuntersuchungen durchführen, Arbeiten stilllegen und Bußgelder verhängen. Das Organisieren von Besprechungen gehört nicht zu ihren Durchsetzungsbefugnissen.",
+    "officialRef": "Modul 1 — Gesetzgebung",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q2": {
+    "questionText": "Was ist das Ziel der Arbeitsschutzgesetzgebung?",
+    "optionA": "Die bestmöglichen Arbeitsbedingungen zu schaffen.",
+    "optionB": "Die Zahl der Arbeitsunfälle zu verringern.",
+    "optionC": "Das Betriebsklima zu verbessern.",
+    "explanation": "Das Hauptziel der Arbeitsschutzgesetzgebung ist es, allen Arbeitnehmern die bestmöglichen Arbeitsbedingungen zu bieten, einschließlich Gesundheit, Sicherheit und Wohlbefinden.",
+    "officialRef": "Modul 1 — Gesetzgebung",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q3": {
+    "questionText": "Welche der folgenden Maßnahmen kann die Aufsichtsbehörde ergreifen?",
+    "optionA": "Einen oder mehrere Arbeitnehmer entlassen lassen.",
+    "optionB": "Die Arbeiten stilllegen lassen.",
+    "optionC": "Ärztliche Untersuchungen durchführen.",
+    "explanation": "Die Aufsichtsbehörde kann Arbeiten bei unmittelbar drohender Gefahr stilllegen. Sie kann keine Arbeitnehmer entlassen – das ist Sache des Arbeitgebers.",
+    "officialRef": "Modul 1 — Gesetzgebung",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q4": {
+    "questionText": "Was bedeutet die CE-Kennzeichnung auf einem Produkt?",
+    "optionA": "Das Produkt erfüllt die europäischen Mindestanforderungen.",
+    "optionB": "Das Produkt darf nur innerhalb der EU gehandelt werden.",
+    "optionC": "Der Hersteller erfüllt das europäische Arbeitsschutzgesetz.",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q5": {
+    "questionText": "Was ist eines der Ziele des Umweltmanagementgesetzes?",
+    "optionA": "Die Abfallströme während des gesamten Produktionsprozesses zu kontrollieren.",
+    "optionB": "Die Umwelt vor schädlichen betrieblichen Tätigkeiten zu schützen.",
+    "optionC": "Den Menschen vor Gefahrstoffen zu schützen.",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q6": {
+    "questionText": "Was beschreibt die ARBO-Regelung?",
+    "optionA": "Die ARBO-Regelung beschreibt die Arbeitsbedingungen (Sicherheit und Gesundheitsschutz bei der Arbeit).",
+    "optionB": "Die ARBO-Regelung beschreibt die Fälle, in denen die Arbeitsinspektion informiert werden muss.",
+    "optionC": "Die ARBO-Regelung beschreibt die Risiken beim Umgang mit Gefahrstoffen.",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q7": {
+    "questionText": "Was ist der Anwendungsbereich der Arbeitsschutzgesetzgebung?",
+    "optionA": "Rechte und Pflichten von Arbeitgeber und Arbeitnehmer in Bezug auf Sicherheit und Gesundheit zu Hause.",
+    "optionB": "Rechte und Pflichten von Arbeitgeber und Arbeitnehmer in Bezug auf Sicherheit und Gesundheit am Arbeitsplatz.",
+    "optionC": "Rechte und Pflichten des Arbeitnehmers in Bezug auf Sicherheit und Gesundheit.",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q8": {
+    "questionText": "An welchen Orten gilt die Arbeitsschutzgesetzgebung?",
+    "optionA": "An allen Orten, an denen gearbeitet wird.",
+    "optionB": "An allen Orten, an denen nicht gearbeitet wird.",
+    "optionC": "An allen Orten mit besonderen Arbeitsbedingungen.",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q9": {
+    "questionText": "Die Arbeitsschutzgesetzgebung gilt für:",
+    "optionA": "Den Arbeitgeber.",
+    "optionB": "Die Arbeitnehmer.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q10": {
+    "questionText": "Die Arbeitsschutzgesetzgebung bezieht sich nicht auf:",
+    "optionA": "Gesundheit",
+    "optionB": "Wohlbefinden",
+    "optionC": "Objektschutz (Bewachung)",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q11": {
+    "questionText": "Die Arbeitsschutzgesetzgebung gilt für:",
+    "optionA": "Den Arbeitgeber",
+    "optionB": "Den Arbeitnehmer",
+    "optionC": "Beide Antworten sind richtig",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q12": {
+    "questionText": "Was ist kein Grundprinzip der Arbeitsschutzgesetzgebung?",
+    "optionA": "Unterstützung durch Fachleute oder Fachdienste.",
+    "optionB": "Die verschiedenen Arbeitnehmer müssen nicht zusammenarbeiten.",
+    "optionC": "Beratung und Zusammenarbeit mit den Arbeitnehmern.",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q13": {
+    "questionText": "Was ist eine wichtige Aufgabe der Präventionsfachleute?",
+    "optionA": "Bei der Gefährdungsbeurteilung (Erfassung und Bewertung der Risiken) mitwirken.",
+    "optionB": "Arbeitgeber überwachen.",
+    "optionC": "Ärztliche Untersuchungen durchführen.",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q14": {
+    "questionText": "Wichtige Ziele der Arbeitszeitgesetzgebung sind:",
+    "optionA": "Die Höchstarbeitszeiten und Mindestruhezeiten festzulegen.",
+    "optionB": "Die Vereinbarkeit von Arbeit und Betreuungsaufgaben zu fördern.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Gesetzgebung"
+  },
+  "m1q15": {
+    "questionText": "Grundsätze der CE-Kennzeichnung sind:",
+    "optionA": "Die CE-Kennzeichnung muss vom Hersteller und vom Importeur angebracht werden.",
+    "optionB": "Die CE-Kennzeichnung ist nicht für jedes Arbeitsmittel erforderlich.",
+    "optionC": "Die CE-Kennzeichnung muss vom Hersteller oder vom Importeur angebracht werden.",
+    "moduleName": "Gesetzgebung"
+  },
+  "m2q1": {
+    "questionText": "Wie wird der Begriff Risiko beschrieben?",
+    "optionA": "Risiko = Wahrscheinlichkeit X Auswirkung.",
+    "optionB": "Risiko = Gefahr X Wahrscheinlichkeit.",
+    "optionC": "Risiko = Auswirkung X Gefahr.",
+    "explanation": "Das Risiko wird als Wahrscheinlichkeit × Auswirkung (Folge) berechnet. Eine hohe Wahrscheinlichkeit eines geringfügigen Ereignisses kann dasselbe Risiko ergeben wie eine geringe Wahrscheinlichkeit eines katastrophalen Ereignisses.",
+    "officialRef": "Modul 2 — Gefahren, Risiken und Prävention",
+    "moduleName": "Gefahren, Risiken und Prävention"
+  },
+  "m2q2": {
+    "questionText": "Gefahren am Arbeitsplatz sind:",
+    "optionA": "Lärm.",
+    "optionB": "Strahlung.",
+    "optionC": "Beide Antworten sind richtig.",
+    "explanation": "Sowohl Lärm als auch Strahlung sind nach der Arbeitsschutzgesetzgebung anerkannte Gefahren am Arbeitsplatz. Sie können langfristige Gesundheitsschäden verursachen, auch ohne sofort sichtbare Verletzung.",
+    "officialRef": "Modul 2 — Gefahren, Risiken und Prävention",
+    "moduleName": "Gefahren, Risiken und Prävention"
+  },
+  "m2q3": {
+    "questionText": "Was ist keine Quelle von Gefahren und Risiken am Arbeitsplatz?",
+    "optionA": "Arbeitsmittel.",
+    "optionB": "Verhalten des Arbeitnehmers.",
+    "optionC": "Probleme zu Hause.",
+    "moduleName": "Gefahren, Risiken und Prävention"
+  },
+  "m2q4": {
+    "questionText": "Wie kann Prävention in der Praxis angegangen werden?",
+    "optionA": "Durch Vermeiden unsicherer Situationen.",
+    "optionB": "Durch Vermeiden unsicherer Handlungen.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Gefahren, Risiken und Prävention"
+  },
+  "m2q5": {
+    "questionText": "Was ist eine unsichere Situation?",
+    "optionA": "Eine Situation, die die Bedingungen für sicheres Arbeiten erfüllt.",
+    "optionB": "Eine Situation, in der Personen die durch Gebotszeichen vorgeschriebene PSA nicht tragen.",
+    "optionC": "Eine Situation, die die Bedingungen für sicheres Arbeiten nicht erfüllt und zu einem Unfall führen kann.",
+    "moduleName": "Gefahren, Risiken und Prävention"
+  },
+  "m2q6": {
+    "questionText": "Welche Handlung ist eine unsichere Handlung?",
+    "optionA": "Mit Arbeitsfreigaben arbeiten, wo diese vorgeschrieben sind.",
+    "optionB": "Werkzeuge falsch verwenden.",
+    "optionC": "Die vorgeschriebene PSA verwenden.",
+    "moduleName": "Gefahren, Risiken und Prävention"
+  },
+  "m2q7": {
+    "questionText": "Wie geht man am besten mit unsicheren Situationen um?",
+    "optionA": "Die Ursache beseitigen.",
+    "optionB": "Andere herbeirufen.",
+    "optionC": "Andere warnen.",
+    "moduleName": "Gefahren, Risiken und Prävention"
+  },
+  "m2q8": {
+    "questionText": "Die einzelnen Schritte einer RI&E (Erfassung und Bewertung der Risiken) sind:",
+    "optionA": "1. Risiken bewerten / 2. Gefahren ermitteln / 3. Erfassung erstellen",
+    "optionB": "1. Gefahren ermitteln / 2. Risiken erfassen / 3. Risiken bewerten",
+    "optionC": "1. Gefahren ermitteln / 2. Risiken bewerten / 3. Erfassung erstellen",
+    "moduleName": "Gefahren, Risiken und Prävention"
+  },
+  "m2q9": {
+    "questionText": "Wofür steht LMRA?",
+    "optionA": "Labour Market Regulatory Authority (Regulierungsbehörde für den Arbeitsmarkt).",
+    "optionB": "Last Minute Risk Analysis (Risikoanalyse in letzter Minute).",
+    "optionC": "Last Minor Random Analysis (letzte geringfügige Zufallsanalyse).",
+    "moduleName": "Gefahren, Risiken und Prävention"
+  },
+  "m2q10": {
+    "questionText": "Was ist das Ziel der Arbeitsplanung?",
+    "optionA": "Die für den Abschluss der Arbeit benötigte Zeit zu bestimmen.",
+    "optionB": "Eine Arbeitsmethode festzulegen, die sicher ist und keine Gesundheitsschäden verursacht.",
+    "optionC": "Einen Weg zu bestimmen, die Arbeit so schnell wie möglich abzuschließen.",
+    "moduleName": "Gefahren, Risiken und Prävention"
+  },
+  "m2q11": {
+    "questionText": "Was ist eine Maßnahme des Zeitarbeitsunternehmens (Vermittlers) bei Tätigkeiten mit hohem Risiko?",
+    "optionA": "Vereinbarungen mit dem Entleihunternehmen über die Information des Leiharbeitnehmers.",
+    "optionB": "Information des Leiharbeitnehmers über die Tätigkeiten mit hohem Risiko.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Gefahren, Risiken und Prävention"
+  },
+  "m3q1": {
+    "questionText": "Was ist die Ursache der meisten Unfälle?",
+    "optionA": "Menschliches Versagen.",
+    "optionB": "Schlechte Arbeitsbedingungen.",
+    "optionC": "Mangelnde Wartung der Werkzeuge.",
+    "explanation": "Unsicheres Verhalten (menschliches Versagen, Abkürzungen) ist die Hauptursache von Arbeitsunfällen. Technische Ausfälle und Umgebungsfaktoren tragen ebenfalls bei, jedoch seltener.",
+    "officialRef": "Modul 3 — Unfälle: Ursachen und Prävention",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m3q2": {
+    "questionText": "Welche Faktoren spielen nach Lateiner bei Unfällen eine Rolle?",
+    "optionA": "Hintergrund, menschliches Versagen sowie unsichere Situationen und Handlungen.",
+    "optionB": "Das unmittelbare Umfeld, menschliches Versagen und unsichere Situationen.",
+    "optionC": "Umwelt, menschliches Versagen und unsichere Situationen.",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m3q3": {
+    "questionText": "Das Erstellen von Verfahren für das Vorgehen bei Unfällen ist eine Maßnahme, die sich richtet auf:",
+    "optionA": "Das Umfeld.",
+    "optionB": "Die Organisation.",
+    "optionC": "Den Menschen.",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m3q4": {
+    "questionText": "Welche Teile muss der Abschlussbericht einer Unfalluntersuchung enthalten?",
+    "optionA": "Skizzen des Unfalls, Zeugenaussagen und getroffene Maßnahmen.",
+    "optionB": "Analyse, Schlussfolgerungen und Empfehlungen.",
+    "optionC": "Gesprächsprotokolle, relevante Unterlagen und Fotos.",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m3q5": {
+    "questionText": "Die beiden direkten Ursachen eines Unfalls oder Vorfalls sind:",
+    "optionA": "Unsichere Handlungen oder defekte Arbeitsmittel.",
+    "optionB": "Unsichere Handlungen oder unsichere Situationen.",
+    "optionC": "Menschliches Versagen oder defekte Arbeitsmittel.",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m3q6": {
+    "questionText": "Was ist kein personenbezogener Faktor, der zu einem Vorfall führen kann?",
+    "optionA": "Unzureichende Planung.",
+    "optionB": "Unzureichende Aufmerksamkeit.",
+    "optionC": "Unzureichende Erfahrung.",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m3q7": {
+    "questionText": "Welcher Person muss ein Unfall gemeldet werden?",
+    "optionA": "Der Arbeitsinspektion.",
+    "optionB": "Ihren unmittelbaren Kollegen.",
+    "optionC": "Dem direkten Vorgesetzten.",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m3q8": {
+    "questionText": "Was muss bei allen Unfällen und Beinaheunfällen getan werden?",
+    "optionA": "Mehr PSA bereitstellen.",
+    "optionB": "Das Ereignis dokumentieren.",
+    "optionC": "Die Faktoren ermitteln, die die Unfälle verursacht haben.",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m3q9": {
+    "questionText": "Wer ist für die Unfalluntersuchungen verantwortlich?",
+    "optionA": "Das Entleihunternehmen.",
+    "optionB": "Das Zeitarbeitsunternehmen.",
+    "optionC": "Die Arbeitsinspektion.",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m3q10": {
+    "questionText": "Wer ist für die krankheitsbedingte Abwesenheit verantwortlich?",
+    "optionA": "Das Entleihunternehmen.",
+    "optionB": "Das Zeitarbeitsunternehmen.",
+    "optionC": "Die Arbeitsinspektion.",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m3q11": {
+    "questionText": "Was ist das Ziel des Gesetzes über den Anspruch auf Leistungen bei dauerhafter Erwerbsunfähigkeit?",
+    "optionA": "Die Wiedereingliederung neuer Arbeitnehmer zu verbessern.",
+    "optionB": "Die Wiedereingliederung erkrankter Arbeitnehmer innerhalb oder außerhalb des Unternehmens zu verbessern.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m3q12": {
+    "questionText": "Was ist eine Pflicht des Zeitarbeitsunternehmens im Rahmen des Gesetzes über Leistungen bei Erwerbsunfähigkeit?",
+    "optionA": "Beide Antworten sind richtig.",
+    "optionB": "Bei Nachlässigkeit kann die Lohnfortzahlungspflicht um ein Jahr verlängert werden.",
+    "optionC": "Einen Maßnahmenplan für die Wiedereingliederung zu erstellen und umzusetzen.",
+    "moduleName": "Unfälle: Ursachen und Prävention"
+  },
+  "m4q1": {
+    "questionText": "Was ist eine Ursache für einen Sturz- oder Stolperunfall?",
+    "optionA": "Ein ebener, rutschhemmender Boden.",
+    "optionB": "Lose Kabel und Seile.",
+    "optionC": "Ein aufgeräumter Arbeitsplatz.",
+    "moduleName": "Sicheres Verhalten"
+  },
+  "m4q2": {
+    "questionText": "Was ist keine Ursache für unsicheres Verhalten?",
+    "optionA": "Fehlende Vorbildfunktion.",
+    "optionB": "Unwilligkeit (nicht wollen).",
+    "optionC": "Gut formulierte Ziele.",
+    "moduleName": "Sicheres Verhalten"
+  },
+  "m4q3": {
+    "questionText": "Welches Element der Unternehmenspolitik beeinflusst das menschliche Verhalten in Richtung sicheres Arbeiten?",
+    "optionA": "Eine Sanktionspolitik.",
+    "optionB": "Klarheit über den Vorrang des sicheren Arbeitens.",
+    "optionC": "Eine Politik, die auf gut funktionierende Maschinen ausgerichtet ist.",
+    "moduleName": "Sicheres Verhalten"
+  },
+  "m4q4": {
+    "questionText": "Warum ist die Rolle des Vorgesetzten für das menschliche Verhalten wichtig?",
+    "optionA": "Der Vorgesetzte ist ein Vorbild.",
+    "optionB": "Der Vorgesetzte lässt die Arbeitnehmer die Arbeitsmethode bestimmen.",
+    "optionC": "Der Vorgesetzte verfügt über die erforderlichen Informationen zu Arbeitnehmern, Arbeit und Umständen.",
+    "moduleName": "Sicheres Verhalten"
+  },
+  "m4q5": {
+    "questionText": "Eine allgemeine Verhaltensregel für sicheres Arbeiten ist?",
+    "optionA": "Sich selbst gegenüber kritisch sein.",
+    "optionB": "Arbeitnehmer sollen nicht eingreifen, sondern dem Vorgesetzten Bericht erstatten.",
+    "optionC": "Meinungen aufschreiben und ablegen.",
+    "moduleName": "Sicheres Verhalten"
+  },
+  "m4q6": {
+    "questionText": "Welches Verhalten fördert sicheres Arbeiten nicht?",
+    "optionA": "Auf persönliche Hygiene, Ordnung und Sauberkeit achten.",
+    "optionB": "Nur an die eigene Gesundheit und Sicherheit denken.",
+    "optionC": "Unsichere Situationen melden und angemessen eingreifen.",
+    "moduleName": "Sicheres Verhalten"
+  },
+  "m4q7": {
+    "questionText": "Der Einfluss von Alkohol und Drogen auf sicheres Arbeiten führt zu:",
+    "optionA": "Verminderter oder problematischer Arbeitsleistung.",
+    "optionB": "Keinen Verhaltensänderungen.",
+    "optionC": "Guter Einschätzung von Situationen.",
+    "moduleName": "Sicheres Verhalten"
+  },
+  "m4q8": {
+    "questionText": "Was wird in Bezug auf Alkohol- und Drogenkonsum für sicheres Arbeiten erwartet?",
+    "optionA": "Der Konsum ist erlaubt, wenn die Vorgesetzten davon wissen.",
+    "optionB": "Bei chronisch problematischem Konsum Hilfe suchen.",
+    "optionC": "Der Vorgesetzte muss über gelegentlichen Konsum nicht informiert werden.",
+    "moduleName": "Sicheres Verhalten"
+  },
+  "m4q9": {
+    "questionText": "Welche Aufgabe hat der Vermittler bei der Förderung sicheren Arbeitens?",
+    "optionA": "Beide Antworten sind richtig.",
+    "optionB": "Information der Zeitarbeitskraft über die Notwendigkeit sicheren Arbeitens.",
+    "optionC": "Überprüfung der Grundkenntnisse im Bereich Sicherheit und Gesundheitsschutz.",
+    "moduleName": "Sicheres Verhalten"
+  },
+  "m5q1": {
+    "questionText": "Welche Pflichten haben Arbeitgeber nach den Arbeitsschutzvorschriften?",
+    "optionA": "Information und Unterweisung über die Gefahren bei der Arbeit bereitstellen.",
+    "optionB": "Gefährliche Situationen dem Vorgesetzten melden.",
+    "optionC": "Die staatliche Arbeitsschutzinspektion hinzuziehen.",
+    "explanation": "Arbeitnehmer haben das Recht, unsichere Arbeit ohne Angst vor Repressalien zu verweigern. Dies ist ein Grundrecht nach den Arbeitsschutzvorschriften.",
+    "officialRef": "Modul 5 — Aufgaben, Rechte und Pflichten",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q2": {
+    "questionText": "Welche Pflichten haben Arbeitnehmer nach dem Arbeitsschutzgesetz?",
+    "optionA": "Die Arbeitsinspektion hinzuziehen.",
+    "optionB": "Gefährliche Situationen dem Vorgesetzten/Aufsichtführenden melden.",
+    "optionC": "Informationen über die Gefahren bei der Arbeit bereitstellen.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q3": {
+    "questionText": "Wann haben Arbeitnehmer das Recht, ihre Arbeit zu unterbrechen?",
+    "optionA": "Wenn keine PSA verfügbar ist.",
+    "optionB": "Wenn die Arbeitsinspektion zu einer Untersuchung kommt.",
+    "optionC": "Wenn eine unmittelbare und erhebliche Gefahr für Menschen entsteht.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q4": {
+    "questionText": "Wer nimmt an der Beratung im Betriebsrat teil?",
+    "optionA": "Abteilungsleitung und Arbeitnehmer.",
+    "optionB": "Alle Arbeitnehmer, einschließlich Zeitarbeitskräfte.",
+    "optionC": "Arbeitgeber und Arbeitnehmervertreter.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q5": {
+    "questionText": "Was ist der Unterschied zwischen der SCC*- und der SCC**-Zertifizierung?",
+    "optionA": "SCC* konzentriert sich auf Sicherheitsstrukturen; SCC** umfasst zusätzlich den Umweltschutz.",
+    "optionB": "SCC* konzentriert sich auf die direkte Sicherheitssteuerung; SCC** umfasst zusätzlich die Sicherheitsstrukturen.",
+    "optionC": "SCC* konzentriert sich auf das Qualitätsmanagement; SCC** umfasst zusätzlich das Management der Arbeitsbedingungen.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q6": {
+    "questionText": "Was muss man bei unmittelbarer Gefahr tun?",
+    "optionA": "Die Risiken beseitigen, die die Gefahr verursacht haben.",
+    "optionB": "Weiterarbeiten, bis jemand Ihnen sagt, dass Sie aufhören sollen.",
+    "optionC": "Die Arbeit einstellen und/oder die eigene Sicherheit gewährleisten.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q7": {
+    "questionText": "Was ist ein Vorteil von Arbeitsplatzbegehungen?",
+    "optionA": "Sie geben einen guten Einblick in die Sicherheitslage.",
+    "optionB": "Sie erhöhen das Sicherheitsbewusstsein.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q8": {
+    "questionText": "Eine gesetzliche Verantwortung im Bereich Sicherheit und Gesundheitsschutz ist:",
+    "optionA": "Das Zeitarbeitsunternehmen ist für die Arbeitsunfallversicherung zuständig.",
+    "optionB": "Das Entleihunternehmen hat spezifische Aufgaben.",
+    "optionC": "Die Beziehungen zwischen Entleihunternehmen, Zeitarbeitskraft und Arbeitsinspektion.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q9": {
+    "questionText": "Der Unterschied zwischen dem formellen und dem tatsächlichen Arbeitgeber ist:",
+    "optionA": "Der tatsächliche Arbeitgeber ist derjenige, unter dessen Weisung die Zeitarbeitskraft arbeitet.",
+    "optionB": "Beide Antworten sind richtig.",
+    "optionC": "Der formelle Arbeitgeber stellt den Arbeitnehmer tatsächlich an.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q10": {
+    "questionText": "Wer ist bei Zeitarbeit für die Arbeitsbedingungen verantwortlich?",
+    "optionA": "Der Zeitarbeitgeber übergibt die persönlichen Arbeitsbedingungen an das Entleihunternehmen.",
+    "optionB": "Das Zeitarbeitsunternehmen ist verantwortlich.",
+    "optionC": "Der tatsächliche Arbeitgeber (das Entleihunternehmen) ist verantwortlich.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q11": {
+    "questionText": "Eine gesetzliche Verantwortung im Bereich Sicherheit und Gesundheitsschutz ist geregelt als:",
+    "optionA": "Eine besondere Beziehung: Agentur, Entleihunternehmen, Arbeitsinspektion und Arbeitnehmer.",
+    "optionB": "Eine Dreiecksbeziehung: Agentur, Entleihunternehmen und Arbeitnehmer.",
+    "optionC": "Das Entleihunternehmen ist für die Pflicht zur Informationsweitergabe verantwortlich.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q12": {
+    "questionText": "Ein wichtiger Arbeitsschutzaspekt bei der Zuweisung einer Zeitarbeitskraft ist:",
+    "optionA": "Das Anfordern der erforderlichen Arbeitsschutzunterlagen.",
+    "optionB": "Das Verfahren für Anfragen und die Dokumentation der Arbeitsschutzvereinbarungen.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q13": {
+    "questionText": "Was muss mit dem Entleihunternehmen bezüglich der arbeitsmedizinischen Untersuchung besprochen werden?",
+    "optionA": "Für welche Tätigkeiten eine arbeitsmedizinische Untersuchung erforderlich ist.",
+    "optionB": "Die arbeitsmedizinische Untersuchung durch den Vorgesetzten.",
+    "optionC": "Die Bereitstellung von Informationen über die erforderliche gesundheitliche Eignung.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q14": {
+    "questionText": "Bestandteile, die die Akte der Zeitarbeitskraft enthalten muss, sind:",
+    "optionA": "Tätigkeitsbezogene Einschränkungen.",
+    "optionB": "Kopie eines Ausweisdokuments.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q15": {
+    "questionText": "Was ist kein notwendiger Schwerpunkt, wenn das Entleihunternehmen eine Anfrage stellt?",
+    "optionA": "Die erforderliche gesundheitliche Eignung.",
+    "optionB": "Wer die Unterweisung zur PSA durchführt.",
+    "optionC": "Der Besitz eines gültigen VOL-SCC-Zertifikats.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q16": {
+    "questionText": "Was muss getan werden, um die Vereinbarungen mit dem Entleihunternehmen zu überprüfen?",
+    "optionA": "Eine förmliche Vorstellung bei den Kollegen.",
+    "optionB": "Empfang im Unternehmen; Treffen mit dem Vorgesetzten.",
+    "optionC": "Die Zeitarbeitskraft muss ihre eigene PSA mitbringen.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q17": {
+    "questionText": "Ein Aspekt, auf den bei der Bewertung der Zeitarbeit zu achten ist, ist:",
+    "optionA": "Die Ausgabe von PSA und Arbeitskleidung.",
+    "optionB": "Einrichtungen wie Umkleideraum, Kantine und Sanitäranlagen.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q18": {
+    "questionText": "Was ist bei Arbeitsschutzbesprechungen innerhalb des Zeitarbeitsunternehmens wichtig?",
+    "optionA": "Die Beteiligung der Arbeitsinspektion.",
+    "optionB": "Die Beteiligung der Kollegen.",
+    "optionC": "Die Beteiligung der Geschäftsleitung und der Vorgesetzten.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m5q19": {
+    "questionText": "Wie ist die Zeitarbeitskraft in SGU-Besprechungen eingebunden?",
+    "optionA": "Die Zeitarbeitskraft muss an den SGU-Besprechungen im Entleihunternehmen teilnehmen.",
+    "optionB": "Der Vermittler informiert den Arbeitnehmer über das Bestehen von SGU-Besprechungen.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Aufgaben, Rechte, Pflichten und Mitsprache"
+  },
+  "m6q1": {
+    "questionText": "Das Verfahren zur Meldung eines Brandes gehört zu den:",
+    "optionA": "SCC-Verfahren.",
+    "optionB": "Allgemeinen Sicherheitsregeln.",
+    "optionC": "Spezifischen Sicherheitsregeln.",
+    "moduleName": "Verfahren, Anweisungen und Kennzeichnung"
+  },
+  "m6q2": {
+    "questionText": "Was muss in einer Arbeitsfreigabe beschrieben werden?",
+    "optionA": "Die relevanten Kontrollpunkte aus dem SCC.",
+    "optionB": "Die Anzahl der Arbeitnehmer mit IER-Diplom.",
+    "optionC": "Die vom Aussteller und vom Inhaber der Freigabe zu treffenden Maßnahmen.",
+    "moduleName": "Verfahren, Anweisungen und Kennzeichnung"
+  },
+  "m6q3": {
+    "questionText": "Allgemeine Sicherheitsregeln sind bestimmt für:",
+    "optionA": "Eine Abteilung des Unternehmens.",
+    "optionB": "Zeitarbeitskräfte.",
+    "optionC": "Auftragnehmer und Nachunternehmer.",
+    "moduleName": "Verfahren, Anweisungen und Kennzeichnung"
+  },
+  "m6q4": {
+    "questionText": "Allgemeine Sicherheitsregeln:",
+    "optionA": "Müssen schriftlich festgehalten werden.",
+    "optionB": "Sind werkzeugspezifische Regeln zur Verwendung.",
+    "optionC": "Müssen in einer einzigen Sprache verfasst sein.",
+    "moduleName": "Verfahren, Anweisungen und Kennzeichnung"
+  },
+  "m6q5": {
+    "questionText": "Spezifische Sicherheitsregeln beziehen sich nicht auf:",
+    "optionA": "Mittagspausen.",
+    "optionB": "Belüftung.",
+    "optionC": "Das Befahren enger Räume.",
+    "moduleName": "Verfahren, Anweisungen und Kennzeichnung"
+  },
+  "m6q6": {
+    "questionText": "Eine Richtlinie zu spezifischen Sicherheitsregeln lautet:",
+    "optionA": "Sie sollten auch von Muttersprachlern verstanden werden.",
+    "optionB": "Sie müssen allen Arbeitnehmern bekannt gegeben werden.",
+    "optionC": "Nach ihrer Erläuterung kann man davon ausgehen, dass jeder weiß, was sie bedeuten.",
+    "moduleName": "Verfahren, Anweisungen und Kennzeichnung"
+  },
+  "m6q7": {
+    "questionText": "Eine Funktion eines Anschlussflansches ist:",
+    "optionA": "Zuleitungen zu Behältern, Tanks oder Anlagen abzusperren.",
+    "optionB": "Rohrabschnitte voneinander zu trennen.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Verfahren, Anweisungen und Kennzeichnung"
+  },
+  "m6q8": {
+    "questionText": "Was ist kein Abschnitt der Arbeitsfreigabe zu den beantragten Tätigkeiten?",
+    "optionA": "Wie die Tätigkeiten ausgeführt werden.",
+    "optionB": "Wo die Tätigkeiten ausgeführt werden.",
+    "optionC": "Warum die Tätigkeiten ausgeführt werden.",
+    "moduleName": "Verfahren, Anweisungen und Kennzeichnung"
+  },
+  "m6q9": {
+    "questionText": "Was ist ein Abschnitt der Arbeitsfreigabe zu den Maßnahmen des ausführenden Mitarbeiters?",
+    "optionA": "Hier müssen alle PSA-Teile aufgeführt werden.",
+    "optionB": "Die Maßnahmen, die die ausführenden Mitarbeiter treffen müssen, um sicher zu arbeiten.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Verfahren, Anweisungen und Kennzeichnung"
+  },
+  "m6q10": {
+    "questionText": "Was beinhaltet die Pflicht zur Informationsweitergabe?",
+    "optionA": "Beide Antworten sind richtig.",
+    "optionB": "Die Agentur muss Informationen über den Arbeitsplatz weitergeben.",
+    "optionC": "Entleihunternehmen und Agentur haben eine gemeinsame Informationspflicht.",
+    "moduleName": "Verfahren, Anweisungen und Kennzeichnung"
+  },
+  "m7q1": {
+    "questionText": "Welche Aufgabe gehört zur Rolle der Notfallhelfer?",
+    "optionA": "Löschen eines Entstehungsbrandes sowie Begrenzung von Schäden und Verletzungen.",
+    "optionB": "Mitwirkung im Unfalluntersuchungsteam.",
+    "optionC": "Durchführung von Gasmessungen.",
+    "moduleName": "Vorbereitung auf Notfälle"
+  },
+  "m7q2": {
+    "questionText": "Was versteht man unter einer Notfallsituation?",
+    "optionA": "Notfallsituationen durch Unfälle, Brand, Explosion oder unkontrolliertes Austreten von Stoffen.",
+    "optionB": "Bedrohung durch Unwetter, Naturkatastrophen, soziale Unruhen oder Terroranschläge.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Vorbereitung auf Notfälle"
+  },
+  "m7q3": {
+    "questionText": "Ein betrieblicher Notfallplan ist:",
+    "optionA": "Eine Beschreibung der für Notfallsituationen vorbereiteten Maßnahmen und Vorkehrungen.",
+    "optionB": "Eine Liste von Maßnahmen, mit denen sichere Arbeitsbedingungen gewährleistet werden.",
+    "optionC": "Eine Liste von Maßnahmen, die Arbeitnehmer vor Arbeitsbeginn vorbereiten müssen.",
+    "moduleName": "Vorbereitung auf Notfälle"
+  },
+  "m7q4": {
+    "questionText": "Die Auswirkungen möglicher Notfallsituationen zu begrenzen ist der Zweck:",
+    "optionA": "Der Gesamtheit der Arbeitsbedingungen.",
+    "optionB": "Eines (internen) betrieblichen Notfallplans.",
+    "optionC": "Des Notfallteams.",
+    "moduleName": "Vorbereitung auf Notfälle"
+  },
+  "m7q5": {
+    "questionText": "Was ist keine Phase bei der Bewältigung von Notfallsituationen?",
+    "optionA": "Erstalarm.",
+    "optionB": "Zweitalarm.",
+    "optionC": "Beendigung.",
+    "moduleName": "Vorbereitung auf Notfälle"
+  },
+  "m7q6": {
+    "questionText": "Der Erstalarm in Notfallsituationen ist:",
+    "optionA": "Eine Liste von Möglichkeiten, Personen zu alarmieren.",
+    "optionB": "Eine Beschreibung, auf welchen Wegen ein Notfall gemeldet werden kann und welche Informationen übermittelt werden müssen.",
+    "optionC": "Eine laute Glocke, die signalisiert, dass ein Notfall vorliegt.",
+    "moduleName": "Vorbereitung auf Notfälle"
+  },
+  "m7q7": {
+    "questionText": "Ein Bestandteil der Beendigung der Notfallsituation ist:",
+    "optionA": "Die Art und Weise, wie die Beendigung bekannt gegeben wird.",
+    "optionB": "Wer befugt ist, den Notfall für beendet zu erklären.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Vorbereitung auf Notfälle"
+  },
+  "m7q8": {
+    "questionText": "Eine der Mindestanforderungen für die Erste Hilfe ist:",
+    "optionA": "Ausgebildete Mitglieder des Notfallteams.",
+    "optionB": "Jederzeit verfügbares Erste-Hilfe-Material.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Vorbereitung auf Notfälle"
+  },
+  "m7q9": {
+    "questionText": "Welche Reihenfolge ist bei einem Evakuierungssignal richtig?",
+    "optionA": "1: Arbeit einstellen / 2: Keine Aufzüge benutzen / 3: Zum Sammelplatz gehen.",
+    "optionB": "1: Arbeit einstellen / 2: Keine Aufzüge benutzen / 3: Anwesenheit am Sammelplatz melden.",
+    "optionC": "1: Arbeit einstellen / 2: Anwesenheit melden / 3: Quer zur Windrichtung evakuieren.",
+    "moduleName": "Vorbereitung auf Notfälle"
+  },
+  "m8q1": {
+    "questionText": "Wie erkennen Sie am Etikett, welche Risiken ein gefährliches Produkt birgt?",
+    "optionA": "An den S-Sätzen.",
+    "optionB": "An den M-Sätzen.",
+    "optionC": "An den R-Sätzen.",
+    "explanation": "Ein SDB (Sicherheitsdatenblatt) liefert wesentliche Informationen über Gefahrstoffe: Zusammensetzung, Gefahren, Erste Hilfe, Handhabung, Lagerung und Entsorgung.",
+    "officialRef": "Modul 8 — Gefahrstoffe",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q2": {
+    "questionText": "Was zeigt die gelbe Fläche der rautenförmigen Gefahrenkennzeichnung an?",
+    "optionA": "Reaktivitätsgefahr.",
+    "optionB": "Gesundheitsgefahr.",
+    "optionC": "Brandgefahr.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q3": {
+    "questionText": "Welche giftige Wirkung hat Kohlenmonoxid?",
+    "optionA": "Lähmung Ihres Geruchssinns.",
+    "optionB": "Sauerstoff wird nicht mehr ins Blut aufgenommen.",
+    "optionC": "Eine reizende Wirkung auf die Atemwege.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q4": {
+    "questionText": "Welche Informationen enthält ein Sicherheitsdatenblatt für einen Stoff?",
+    "optionA": "Informationen über die Schritte für Arbeiten in einem engen Raum.",
+    "optionB": "Informationen über die für den Umgang mit dem Produkt erforderlichen Freigaben.",
+    "optionC": "Informationen über die Gefahren und die Sicherheitsmaßnahmen, die Sie treffen müssen.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q5": {
+    "questionText": "Unter normalen Bedingungen beträgt der Sauerstoffanteil in der Luft:",
+    "optionA": "21%.",
+    "optionB": "19%.",
+    "optionC": "25%.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q6": {
+    "questionText": "Fehlende Belüftung:",
+    "optionA": "Beseitigt den Sauerstoffmangel.",
+    "optionB": "Kann zu einer zu niedrigen Sauerstoffkonzentration führen.",
+    "optionC": "Verursacht Atembeschwerden.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q7": {
+    "questionText": "Eine weiße Schulter an einer Gasflasche bedeutet:",
+    "optionA": "Kohlendioxid.",
+    "optionB": "Luft.",
+    "optionC": "Sauerstoff.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q8": {
+    "questionText": "Bei der Lagerung von Gasflaschen:",
+    "optionA": "Müssen diese ordnungsgemäß gegen Umfallen gesichert werden.",
+    "optionB": "Sollten diese in speziellen Kellerräumen aufbewahrt werden.",
+    "optionC": "Sollten diese für einen leichten Zugriff in der Nähe des Arbeitsplatzes abgestellt werden.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q9": {
+    "questionText": "Was versteht man unter Gefahrstoffen?",
+    "optionA": "Stoffe, die leicht explodieren, wenn sie mit einer hohen Sauerstoffkonzentration vermischt werden.",
+    "optionB": "Stoffe, die eine Gefahr für die Gesundheit und/oder die Umwelt darstellen.",
+    "optionC": "Stoffe, die vor der Verwendung eine besondere Schulung erfordern.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q10": {
+    "questionText": "Gefahrstoffe am Arbeitsplatz werden gekennzeichnet mit:",
+    "optionA": "Einem quadratischen Gefahrensymbol, schwarz auf rotem Hintergrund.",
+    "optionB": "Einem quadratischen Gefahrensymbol, schwarz auf orangefarbenem Hintergrund.",
+    "optionC": "Einem quadratischen Gefahrensymbol, schwarz auf gelbem Hintergrund.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q11": {
+    "questionText": "Die Impfung ist eine Vorsorgemaßnahme für die Arbeit mit:",
+    "optionA": "Biologischen Arbeitsstoffen.",
+    "optionB": "Entzündbaren Stoffen.",
+    "optionC": "Reizenden Stoffen.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q12": {
+    "questionText": "Biologische Arbeitsstoffe können vorkommen in:",
+    "optionA": "Der Landwirtschaft.",
+    "optionB": "Kontaminiertem Boden.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q13": {
+    "questionText": "Die fachgerechte Beseitigung von ausgelaufenem Produkt ist eine vorbeugende Maßnahme gegen:",
+    "optionA": "Brände.",
+    "optionB": "Herabfallende Gegenstände.",
+    "optionC": "Leckagen.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q14": {
+    "questionText": "Was ist keine Ursache für Leckagen?",
+    "optionA": "Beschädigung (z. B. Anfahren durch einen Gabelstapler).",
+    "optionB": "Ein fehlerhaftes Vorgehen beim Umfüllen von Behältern.",
+    "optionC": "Die korrekte Montage von Flanschen.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q15": {
+    "questionText": "Ausrutschen ist eine Folge von:",
+    "optionA": "Umweltverschmutzung.",
+    "optionB": "Leckagen.",
+    "optionC": "Der Verwendung von Gefahrstoffen.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q16": {
+    "questionText": "Die Gefahr organischer Lösemittel ist, dass sie Folgendes sind:",
+    "optionA": "Entzündbar oder leicht entzündbar.",
+    "optionB": "Ätzend.",
+    "optionC": "Reizend.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q17": {
+    "questionText": "Ein Beispiel für zyklische Verbindungen ist:",
+    "optionA": "Zink.",
+    "optionB": "Phenol.",
+    "optionC": "Terpentinersatz (White Spirit).",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q18": {
+    "questionText": "Das Risiko eines Mesothelioms ist eine gesundheitliche Auswirkung im Zusammenhang mit:",
+    "optionA": "Benzol.",
+    "optionB": "Terpentinersatz (White Spirit).",
+    "optionC": "Asbest.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q19": {
+    "questionText": "Was ist kein möglicher Fundort von Asbest?",
+    "optionA": "In neu gebauten Häusern.",
+    "optionB": "Dachbaustoffe und Wandverkleidungen.",
+    "optionC": "In und hinter der Ausmauerung von Öfen und Kesseln.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q20": {
+    "questionText": "Was ist keine gesetzliche Vorschrift in Bezug auf Asbest?",
+    "optionA": "Die neue Verwendung und Verarbeitung von Asbest ist erlaubt.",
+    "optionB": "Asbesthaltige Abfälle müssen getrennt gesammelt werden.",
+    "optionC": "Wo die Gefahr des Kontakts mit Asbest besteht, wird eine spezielle Kennzeichnung angebracht.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q21": {
+    "questionText": "Ein Grundsatz der regelmäßigen arbeitsmedizinischen Untersuchung ist:",
+    "optionA": "Festzustellen, ob der Kandidat weiterhin für die Arbeit mit Stoffen geeignet ist.",
+    "optionB": "Festzustellen, ob der Kandidat weiterhin für die Arbeit mit dem Gefahrstoff geeignet ist.",
+    "optionC": "Die Häufigkeit hängt vom Arbeitnehmer ab.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q22": {
+    "questionText": "Die Sicherheitshinweise auf den neuen Kennzeichnungsetiketten beschreiben:",
+    "optionA": "Die Maßnahmen zur Vermeidung von Veränderungen der Arbeitsbedingungen.",
+    "optionB": "Die Maßnahmen zur Vermeidung von Risiken beim Umgang mit dem Produkt.",
+    "optionC": "Die Maßnahmen zur Vermeidung von Bränden.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q23": {
+    "questionText": "Die Zahlen auf einer Gefahrenraute reichen von:",
+    "optionA": "1 bis 5.",
+    "optionB": "0 bis 4.",
+    "optionC": "0 bis 5.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m8q24": {
+    "questionText": "Die Maßnahmen zur Vermeidung von Risiken beim Umgang mit dem Produkt sind beschrieben in:",
+    "optionA": "Den H-Sätzen.",
+    "optionB": "Den R-Sätzen.",
+    "optionC": "Den S-Sätzen.",
+    "moduleName": "Gefahrstoffe"
+  },
+  "m9q1": {
+    "questionText": "Was ist ein Nachteil beim Löschen eines Brandes mit Wasser?",
+    "optionA": "Das brennende Material kann heftig mit Wasser reagieren.",
+    "optionB": "Die Einsatzkräfte werden durch Rauch behindert.",
+    "optionC": "Der Einsatz von Wasser ist verhältnismäßig teuer.",
+    "explanation": "Das Branddreieck erfordert Brennstoff, Sauerstoff und Wärme (Zündquelle). Wird eines dieser Elemente entfernt, wird der Brand gelöscht oder verhindert.",
+    "officialRef": "Modul 9 — Brand und Explosion",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q2": {
+    "questionText": "Was müssen Sie wissen, bevor Sie einen Brand löschen?",
+    "optionA": "Wie lange es bereits brennt.",
+    "optionB": "Wie hoch die Temperatur ist.",
+    "optionC": "Welcher Stoff brennt.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q3": {
+    "questionText": "Was muss zuerst getan werden, wenn ein Brand entdeckt wird?",
+    "optionA": "Ihn wenn möglich selbst löschen.",
+    "optionB": "Personen in Sicherheit bringen.",
+    "optionC": "Den Brand melden.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q4": {
+    "questionText": "Was bedeutet eine Explosionsgrenze?",
+    "optionA": "Die höchste/niedrigste Temperatur eines Feststoffs, bei der eine Explosion auftreten kann.",
+    "optionB": "Die höchste/niedrigste Konzentration eines Gases in der Luft, bei der eine Explosion auftreten kann.",
+    "optionC": "Die höchste/niedrigste Konzentration von Metallen, bei der eine Explosion auftreten kann.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q5": {
+    "questionText": "Was versteht man unter dem Flammpunkt?",
+    "optionA": "Die höchste/niedrigste Konzentration von Gas und Luft für eine Explosion.",
+    "optionB": "Die höchste/niedrigste Temperatur eines Feststoffs für eine Explosion.",
+    "optionC": "Die niedrigste Temperatur einer Flüssigkeit, bei der sich ihre Dämpfe entzünden lassen.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q6": {
+    "questionText": "Welche Auswirkung kann ein Sauerstoffüberschuss bei einem Brand haben?",
+    "optionA": "Leichtere Entzündung entzündbarer Stoffe.",
+    "optionB": "Längeres Brennen.",
+    "optionC": "Ersticken des Feuers.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q7": {
+    "questionText": "Ein entzündbarer Stoff:",
+    "optionA": "Ist für einen Brand oder eine Explosion erforderlich.",
+    "optionB": "Ist immer ein Gas.",
+    "optionC": "Verursacht immer einen Brand oder eine Explosion.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q8": {
+    "questionText": "Was ist eine Explosion?",
+    "optionA": "Ein Brand, der durch einen entzündbaren Stoff verursacht wird.",
+    "optionB": "Ein sich sehr schnell ausbreitender Brand, der eine Druckwelle freisetzt.",
+    "optionC": "Ein Brand der Klasse C.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q9": {
+    "questionText": "Welche Stoffe sind an einem Brand der Klasse A beteiligt?",
+    "optionA": "Gase.",
+    "optionB": "Flüssigkeiten.",
+    "optionC": "Feste Stoffe.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q10": {
+    "questionText": "Das Schild, das einen explosionsgefährdeten Bereich kennzeichnet:",
+    "optionA": "Zeigt die Buchstaben Ex.",
+    "optionB": "Zeigt die Buchstaben Er.",
+    "optionC": "Zeigt ein Feuersymbol.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q11": {
+    "questionText": "Ein explosionsgefährdeter Bereich ist ein Bereich:",
+    "optionA": "In dem besondere Maßnahmen getroffen werden müssen, um die Zündung explosionsfähiger Gemische zu verhindern.",
+    "optionB": "In dem die Bildung eines explosionsfähigen Gemisches nicht möglich ist.",
+    "optionC": "In dem keine besonderen Maßnahmen getroffen werden dürfen.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q12": {
+    "questionText": "Eine Anforderung an die Brandwache bei Heißarbeiten ist:",
+    "optionA": "Mindestens fünf Jahre Erfahrung mit Feuer.",
+    "optionB": "Eine spezielle Schulung.",
+    "optionC": "Mindestens ein Jahr Erfahrung mit Feuer.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q13": {
+    "questionText": "Bei der Behandlung von Verbrennungen:",
+    "optionA": "Mindestens 5 Minuten lang mit Wasser spülen.",
+    "optionB": "Mindestens 15 Minuten lang mit Wasser spülen.",
+    "optionC": "Mindestens 10 Minuten lang mit Wasser spülen.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q14": {
+    "questionText": "Beim Löschen eines Brandes darf man nicht:",
+    "optionA": "Wachsam bleiben, auch wenn das Feuer gelöscht erscheint.",
+    "optionB": "Jederzeit die eigene Sicherheit gewährleisten.",
+    "optionC": "Einfach weggehen, wenn das Feuer gelöscht ist.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q15": {
+    "questionText": "Löschdecken:",
+    "optionA": "Kühlen.",
+    "optionB": "Verdrängen Sauerstoff.",
+    "optionC": "Schließen Sauerstoff aus.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q16": {
+    "questionText": "Ein Nachteil beim Löschen mit einer Löschdecke ist:",
+    "optionA": "Die Gefahr von Kälteverbrennungen.",
+    "optionB": "Man muss sehr nah an den Brandherd heran.",
+    "optionC": "Verunreinigung.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q17": {
+    "questionText": "Ein Nachteil beim Löschen mit Kohlendioxid ist:",
+    "optionA": "Es kann eine erstickende Atmosphäre entstehen.",
+    "optionB": "Die Gefahr von Kälteverbrennungen aufgrund der niedrigen Temperatur.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m9q18": {
+    "questionText": "Eine Löscheigenschaft von Sand ist:",
+    "optionA": "Sand verdrängt Sauerstoff.",
+    "optionB": "Sand schließt Sauerstoff aus.",
+    "optionC": "Sand hat eine kühlende Wirkung.",
+    "moduleName": "Brand und Explosion"
+  },
+  "m10q1": {
+    "questionText": "Worauf müssen Sie beim Arbeiten mit Meißeln achten?",
+    "optionA": "Nur Meißel ohne Grat an der Schneide verwenden.",
+    "optionB": "Nur Meißel verwenden, die geprüft wurden.",
+    "optionC": "Nur Meißel mit der richtigen Festigkeit verwenden.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q2": {
+    "questionText": "Warum dürfen Sie an Maschinen mit rotierenden Teilen niemals Handschuhe tragen?",
+    "optionA": "Weil Ihre Hände nicht mit den rotierenden Teilen in Berührung kommen.",
+    "optionB": "Weil die Maschine beschädigt werden kann.",
+    "optionC": "Weil der Handschuh und Ihre Hand in die Maschine eingezogen werden können.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q3": {
+    "questionText": "Was bedeutet sicheres Arbeiten mit Säulenbohrmaschinen?",
+    "optionA": "Den Spaltkeil verwenden.",
+    "optionB": "Das Werkstück sicher einspannen.",
+    "optionC": "Beim Bohren Gegendruck ausüben.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q4": {
+    "questionText": "Womit müssen Hämmer ausgestattet sein, um Unfälle zu verhindern?",
+    "optionA": "Mit einem Kunststoffstiel.",
+    "optionB": "Mit einem Metallstiel.",
+    "optionC": "Mit einem Stiel, der fest im Hammerkopf gesichert ist.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q5": {
+    "questionText": "Welchen Zweck hat ein Totmannschalter an einem Druckluftwerkzeug?",
+    "optionA": "Er ermöglicht dem Bediener, Pausen einzulegen.",
+    "optionB": "Das Werkzeug in die Aufwärmstellung zu bringen.",
+    "optionC": "Die Maschine sofort zu stoppen, wenn der Griff losgelassen wird.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q6": {
+    "questionText": "Was muss an einer Tischkreissäge vorhanden sein?",
+    "optionA": "Eine Glasscheibe.",
+    "optionB": "Eine Schutzhaube für das Sägeblatt, die an einer stabilen Halterung befestigt ist.",
+    "optionC": "Ein Rückschlagschutz.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q7": {
+    "questionText": "Elektrische Handwerkzeuge für 230 Volt:",
+    "optionA": "Müssen doppelt isoliert sein.",
+    "optionB": "Müssen mit einer Schutzerdung versehen sein.",
+    "optionC": "Dürfen nur von einer ausreichend unterwiesenen Person benutzt werden.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q8": {
+    "questionText": "Eine regelmäßige Prüfung muss durchgeführt werden:",
+    "optionA": "An Maschinen und Elektrowerkzeugen.",
+    "optionB": "Jede Woche.",
+    "optionC": "Um sicherzustellen, dass jedem Arbeitnehmer seine Arbeit gefällt.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q9": {
+    "questionText": "Eine Maschine kommt so schnell wie möglich zum Stillstand, wenn:",
+    "optionA": "Der Not-Halt betätigt wird.",
+    "optionB": "Der Bediengriff losgelassen wird.",
+    "optionC": "Die rotierenden Teile blockiert werden.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q10": {
+    "questionText": "Was ist ein Hubwagen?",
+    "optionA": "Ein Fahrzeug zum Transport von Personen.",
+    "optionB": "Ein Fahrzeug zum Bewegen von Lasten über verschiedene Höhen.",
+    "optionC": "Ein Fahrzeug mit einer Hubhöhe von 20 cm.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q11": {
+    "questionText": "Eine Anforderung an einen Gabelstaplerfahrer ist:",
+    "optionA": "Die Benutzung des Sicherheitsgurts.",
+    "optionB": "Der Besitz der durch Prüfung nachgewiesenen Fachkunde.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q12": {
+    "questionText": "Was ist keine Sicherheitsmaßnahme für Gabelstapler?",
+    "optionA": "Keine Mitfahrer mitnehmen, wenn kein spezieller Sitz vorhanden ist.",
+    "optionB": "Das Gegengewicht kann bei Bedarf erhöht werden.",
+    "optionC": "Keine der beiden Antworten ist eine Sicherheitsmaßnahme.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q13": {
+    "questionText": "Beim Arbeiten mit Sägen gilt:",
+    "optionA": "Das Sägeblatt muss gut gespannt sein.",
+    "optionB": "Das Sägeblatt darf nicht zu scharf sein.",
+    "optionC": "Der Bediener muss eine geeignete Schulung absolviert haben.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q14": {
+    "questionText": "Beim Arbeiten mit Messern gilt:",
+    "optionA": "Die Zähne müssen nach vorne zeigen.",
+    "optionB": "Eine ausziehbare Klinge nicht zu weit herausschieben.",
+    "optionC": "Die Klinge muss gut gespannt sein.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q15": {
+    "questionText": "Beim Arbeiten mit kleinen Werkstücken gilt:",
+    "optionA": "Man muss sie mit einer Hand festhalten.",
+    "optionB": "Man muss das Werkstück einspannen.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q16": {
+    "questionText": "Hosen und Handschuhe aus Spezialfasern werden verwendet beim:",
+    "optionA": "Arbeiten mit einer Kettensäge.",
+    "optionB": "Arbeiten mit Schraubendrehern.",
+    "optionC": "Arbeiten mit Hämmern.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q17": {
+    "questionText": "Ein Nagler/Tacker muss haben:",
+    "optionA": "Einen zusätzlichen Griff an der Seite.",
+    "optionB": "Eine Sicherung gegen unbeabsichtigtes Auslösen.",
+    "optionC": "Eine durchsichtige Schutzscheibe.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q18": {
+    "questionText": "Ein Spaltkeil wird verwendet bei:",
+    "optionA": "Einer Handkreissäge.",
+    "optionB": "Einer Kettensäge.",
+    "optionC": "Einem Schraubendreher.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q19": {
+    "questionText": "Welche Angabe muss auf einer Schleifscheibe vorhanden sein?",
+    "optionA": "Die minimal zulässige Drehzahl.",
+    "optionB": "Der Name des Herstellers.",
+    "optionC": "Der Benutzer der Scheibe.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q20": {
+    "questionText": "Beim Arbeiten mit druckluftbetriebenen Handwerkzeugen muss man:",
+    "optionA": "Die Druckluftzufuhr nach Gebrauch absperren.",
+    "optionB": "Beim Einsatz vibrierender Werkzeuge regelmäßig Pausen einlegen.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m10q21": {
+    "questionText": "Was ist beim Arbeiten mit Schleifböcken keine mögliche Gefahr?",
+    "optionA": "Gesundheitsbeschwerden durch Einatmen gefährlicher Stäube.",
+    "optionB": "Der Spaltkeil kann sich lösen.",
+    "optionC": "Getroffen oder erfasst werden durch bewegliche Teile.",
+    "moduleName": "Arbeitsmittel"
+  },
+  "m11q1": {
+    "questionText": "Was ist eine Gefahr bei Abbrucharbeiten?",
+    "optionA": "Instabilität der Abbruchfront.",
+    "optionB": "Herausragende Bauteile.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Abbrucharbeiten"
+  },
+  "m11q2": {
+    "questionText": "Bei Abbrucharbeiten muss man haben:",
+    "optionA": "Eine Auffangeinrichtung.",
+    "optionB": "Ausreichende Pausenzeiten.",
+    "optionC": "So wenig Pausen wie möglich.",
+    "moduleName": "Abbrucharbeiten"
+  },
+  "m11q3": {
+    "questionText": "Was muss man beim Entfernen von Keramikfasern tun?",
+    "optionA": "Alles in kleine Stücke zerbrechen.",
+    "optionB": "Keine Schuttrutsche verwenden.",
+    "optionC": "Ihren Arbeitsoverall tragen.",
+    "moduleName": "Abbrucharbeiten"
+  },
+  "m12q1": {
+    "questionText": "Was muss man beim Gasschweißen mit Sauerstoff und Acetylen beachten?",
+    "optionA": "Acetylenflaschen werden stehend oder mit einer Neigung von mindestens 25 Grad gelagert.",
+    "optionB": "Acetylenflaschen werden stehend oder mit einer Neigung von mindestens 30 Grad gelagert.",
+    "optionC": "Acetylenflaschen werden stehend oder mit einer Neigung von mindestens 40 Grad gelagert.",
+    "moduleName": "Schweißen, Schneiden und Brennen"
+  },
+  "m12q2": {
+    "questionText": "Was ist ein Risiko beim Gasschweißen?",
+    "optionA": "Luft ist schwerer als Propan.",
+    "optionB": "Flammenrückschlag.",
+    "optionC": "Die Flaschen stehen nicht unter Druck.",
+    "moduleName": "Schweißen, Schneiden und Brennen"
+  },
+  "m12q3": {
+    "questionText": "Was ist eine Sicherheitsmaßnahme beim Elektroschweißen?",
+    "optionA": "Persönlicher Schutz: Schweißmaske, Schürze, Kleidung, Sicherheitsschuhe.",
+    "optionB": "Schweißvorhänge zum Schutz vor UV- und Infrarotstrahlung.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Schweißen, Schneiden und Brennen"
+  },
+  "m12q4": {
+    "questionText": "Was ist kein Risiko beim Elektroschweißen?",
+    "optionA": "Blendung durch Infrarotstrahlung.",
+    "optionB": "Verbrennung der Hornhaut durch Wärmestrahlung.",
+    "optionC": "Lungenbeschwerden durch Einatmen von Schweißrauch.",
+    "moduleName": "Schweißen, Schneiden und Brennen"
+  },
+  "m13q1": {
+    "questionText": "Warum ist es wichtig, sorgfältig zu graben?",
+    "optionA": "Wirtschaftlicher Gewinn.",
+    "optionB": "Versorgungssicherheit der Versorgungsunternehmen.",
+    "optionC": "Die Baugrube kann einstürzen.",
+    "moduleName": "Erdarbeiten und Arbeiten in Baugruben"
+  },
+  "m13q2": {
+    "questionText": "Was ist kein Risiko bei Erdarbeiten?",
+    "optionA": "Erstickung durch Beschädigung von Gasleitungen.",
+    "optionB": "Stromschlag durch Beschädigung spannungsführender Kabel.",
+    "optionC": "Explosionsgefahr.",
+    "moduleName": "Erdarbeiten und Arbeiten in Baugruben"
+  },
+  "m13q3": {
+    "questionText": "Was ist eine Regel für sorgfältiges Graben?",
+    "optionA": "Jede abweichende Lage oder Beschädigung dem Verantwortlichen melden.",
+    "optionB": "Erst graben, nachdem die Lage der Kabel durch Suchschlitze innerhalb von 1,5 m festgestellt wurde.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Erdarbeiten und Arbeiten in Baugruben"
+  },
+  "m13q4": {
+    "questionText": "Beim Arbeiten in oder nahe einer Baugrube müssen Sie:",
+    "optionA": "Eine Leiter aufstellen.",
+    "optionB": "An gefährlichen Stellen Absperrungen verwenden.",
+    "optionC": "Für wirksamen Verbau und Böschungen sorgen.",
+    "moduleName": "Erdarbeiten und Arbeiten in Baugruben"
+  },
+  "m14q1": {
+    "questionText": "Ab welcher Höhe muss der Arbeitgeber Maßnahmen zur Absturzsicherung treffen?",
+    "optionA": "Ab 3,5 Metern.",
+    "optionB": "Ab 1,5 Metern.",
+    "optionC": "Ab 2,5 Metern.",
+    "explanation": "Arbeiten in Höhen über 2 Metern erfordern Maßnahmen zur Absturzsicherung. Die Rangfolge lautet: zuerst kollektiver Schutz (Geländer), dann persönlicher Schutz (Auffanggurt).",
+    "officialRef": "Modul 14 — Arbeiten in der Höhe",
+    "moduleName": "Arbeiten in der Höhe"
+  },
+  "m14q2": {
+    "questionText": "Welche Sicherheitsmaßnahme verringert die Absturzgefahr auf einem Flachdach?",
+    "optionA": "Ein Dachrandsicherungssystem.",
+    "optionB": "Laufbohlen.",
+    "optionC": "Ein Auffanggurt.",
+    "moduleName": "Arbeiten in der Höhe"
+  },
+  "m14q3": {
+    "questionText": "Was muss geprüft werden, bevor eine Leiter benutzt werden darf?",
+    "optionA": "Ob die Leiter nicht länger als 12 Meter ist.",
+    "optionB": "Ob sie in einem Winkel von etwa 75 Grad aufgestellt ist.",
+    "optionC": "Ob die Holme unten Stahlkappen haben.",
+    "moduleName": "Arbeiten in der Höhe"
+  },
+  "m14q4": {
+    "questionText": "Was müssen Personen auf einem Hängegerüst benutzen?",
+    "optionA": "Einen einziehbaren Gurt.",
+    "optionB": "Einen Nierengurt.",
+    "optionC": "Einen Auffanggurt.",
+    "moduleName": "Arbeiten in der Höhe"
+  },
+  "m14q5": {
+    "questionText": "Von welcher Seite muss ein Fahrgerüst bestiegen werden?",
+    "optionA": "Von vorne.",
+    "optionB": "Von innen.",
+    "optionC": "Von hinten.",
+    "moduleName": "Arbeiten in der Höhe"
+  },
+  "m14q6": {
+    "questionText": "Was sollten Sie bei einer Bodenöffnung vorzugsweise tun?",
+    "optionA": "Während der Arbeit Abstand halten.",
+    "optionB": "Sie mit festem Material abdecken.",
+    "optionC": "Einen Auffanggurt tragen, der an einem Sicherungsseil befestigt ist.",
+    "moduleName": "Arbeiten in der Höhe"
+  },
+  "m14q7": {
+    "questionText": "Was ist keine Gefahr beim Arbeiten in der Nähe von Wand- und Bodenöffnungen?",
+    "optionA": "Von einem Gegenstand getroffen werden, der durch eine Öffnung fällt.",
+    "optionB": "Durch eine Bodenöffnung stürzen.",
+    "optionC": "Eine große Bodenöffnung schließen.",
+    "moduleName": "Arbeiten in der Höhe"
+  },
+  "m14q8": {
+    "questionText": "Eine Leiter wird verwendet für:",
+    "optionA": "Für die Ausführung kleinerer Arbeiten.",
+    "optionB": "Das Überbrücken einer bestimmten Höhe.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Arbeiten in der Höhe"
+  },
+  "m14q9": {
+    "questionText": "Die Reichweite von höchstens einer Armlänge ist eine Regel für das Arbeiten mit:",
+    "optionA": "Säulenbohrmaschinen.",
+    "optionB": "Leitern.",
+    "optionC": "Tischsägen.",
+    "moduleName": "Arbeiten in der Höhe"
+  },
+  "m15q1": {
+    "questionText": "Darf ein Laie an unter Spannung stehenden elektrischen Anlagen arbeiten?",
+    "optionA": "Ja, sofern der Laie über 21 Jahre alt ist.",
+    "optionB": "Ja, aber nur, wenn die Fachkraft ständig verfügbar ist.",
+    "optionC": "Nein, niemals.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q2": {
+    "questionText": "Was macht ein Fehlerstrom-Schutzschalter?",
+    "optionA": "Er leitet Hochspannungsstrom in den Erdungsleiter ab.",
+    "optionB": "Er schaltet die Stromversorgung bei einem bestimmten Fehlerstrom ab.",
+    "optionC": "Er wirkt wie eine künstliche Erdung.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q3": {
+    "questionText": "Welche Sicherheitsspannung müssen Sie in einem engen Raum verwenden?",
+    "optionA": "Gleichstrom (max. 50V) oder Wechselstrom (max. 130V).",
+    "optionB": "Gleichstrom (max. 12V) oder Wechselstrom (max. 120V).",
+    "optionC": "Gleichstrom (max. 120V) oder Wechselstrom (max. 50V).",
+    "moduleName": "Elektrizität"
+  },
+  "m15q4": {
+    "questionText": "Was kann Unfälle durch Elektrizität verursachen?",
+    "optionA": "Das Fehlen einer Erdung.",
+    "optionB": "Das Drücken des Not-Aus-Schalters.",
+    "optionC": "Das Durchbrennen einer Sicherung.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q5": {
+    "questionText": "Was ist die größte Gefahr bei Stromfluss durch den Körper?",
+    "optionA": "Die Schreckreaktion.",
+    "optionB": "Das Entstehen von Verbrennungen.",
+    "optionC": "Stromfluss durch das Herz.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q6": {
+    "questionText": "Ein tödlicher Stromschlag ist eine Gefahr im Zusammenhang mit:",
+    "optionA": "Dem Umgang mit Gefahrstoffen.",
+    "optionB": "Dem Umgang mit Elektrizität.",
+    "optionC": "Dem Umgang mit brennbaren Stoffen.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q7": {
+    "questionText": "Verletzungen durch elektrischen Strom hängen nicht ab von:",
+    "optionA": "Der Stromstärke.",
+    "optionB": "Der Dauer des Stromflusses durch den Körper.",
+    "optionC": "Der Dicke der Haut.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q8": {
+    "questionText": "Die Stärke des Stroms durch den Körper hängt ab von:",
+    "optionA": "Dem Widerstand des Untergrunds, ohne das Schuhwerk.",
+    "optionB": "Der Spannung.",
+    "optionC": "Ihrem Lebensstil.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q9": {
+    "questionText": "Wie entsteht ein Kurzschluss?",
+    "optionA": "Wenn zwei Teile mit unterschiedlicher Spannung in direkten Kontakt kommen.",
+    "optionB": "Wenn zwei Teile mit gleicher Spannung in direkten Kontakt kommen.",
+    "optionC": "Wenn eine elektrische Leitung nicht geerdet ist.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q10": {
+    "questionText": "Das Entstehen und die Größe eines Lichtbogens werden bestimmt durch:",
+    "optionA": "Die Stromstärke.",
+    "optionB": "Die Potenzialdifferenz zwischen den Teilen.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q11": {
+    "questionText": "Antistatische Schuhe werden getragen beim:",
+    "optionA": "Arbeiten in engen Räumen.",
+    "optionB": "Arbeiten mit statischer Elektrizität.",
+    "optionC": "Arbeiten mit Leitern.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q12": {
+    "questionText": "Eine Gefahr statischer Elektrizität ist:",
+    "optionA": "Eine Entladung kann einen Funken verursachen.",
+    "optionB": "Empfindliche elektronische Geräte können beschädigt werden.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q13": {
+    "questionText": "In welcher Situation tritt keine statische Elektrizität auf?",
+    "optionA": "In Räumen mit niedrigem Sauerstoffgehalt.",
+    "optionB": "Bei Flüssigkeiten, die durch ein Kunststoffrohr fließen oder gerührt werden.",
+    "optionC": "Beim Gehen über einen Kunststoff-Bodenbelag.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q14": {
+    "questionText": "Was ist keine Schutzart für Gehäuse?",
+    "optionA": "Doppelte Isolierung schützt gegen das Eindringen von Staub und Feuchtigkeit.",
+    "optionB": "Schutz gegen Stöße und herabfallende Gegenstände.",
+    "optionC": "Schutz gegen das Eindringen von Feuchtigkeit.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q15": {
+    "questionText": "Eine Gefahr bei der Verwendung von Stromkabeln und Verlängerungskabeln ist:",
+    "optionA": "Die Stromkabel sind zu kurz.",
+    "optionB": "Stolpern über Kabel.",
+    "optionC": "Überlastung des Kabels.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q16": {
+    "questionText": "Bei Verwendung einer Kabeltrommel muss man:",
+    "optionA": "Das Kabel vollständig von der Trommel abwickeln.",
+    "optionB": "Sie nicht in engen Räumen verwenden.",
+    "optionC": "Sie niemals vollständig von der Trommel abwickeln.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q17": {
+    "questionText": "Wenn eine Kabeltrommel nicht vollständig abgerollt ist:",
+    "optionA": "Kann sie statische Elektrizität verursachen.",
+    "optionB": "Kann sie sehr heiß werden und einen Brand verursachen.",
+    "optionC": "Kann sie elektrische Funken verursachen.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q18": {
+    "questionText": "Der Schutzwert des Fehlerstrom-Schutzschalters für Baustellen beträgt:",
+    "optionA": "300 mA.",
+    "optionB": "25 mA.",
+    "optionC": "30 mA.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q19": {
+    "questionText": "Eine Sicherheitsmaßnahme vor der Arbeit mit elektrischen Betriebsmitteln ist:",
+    "optionA": "Sichtprüfung auf Schäden und Abweichungen.",
+    "optionB": "Schäden melden und beschädigte Betriebsmittel nicht verwenden.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Elektrizität"
+  },
+  "m15q20": {
+    "questionText": "Beim Einsatz von Elektrizität:",
+    "optionA": "Müssen Gerüste auf Gummimatten gestellt werden.",
+    "optionB": "Müssen Gerüste geerdet werden.",
+    "optionC": "Muss bei Gerüsten nichts Besonderes beachtet werden.",
+    "moduleName": "Elektrizität"
+  },
+  "m16q1": {
+    "questionText": "Was ist ein Merkmal eines engen Raums?",
+    "optionA": "Schlechter Zugang.",
+    "optionB": "Gute Beleuchtung.",
+    "optionC": "Ausreichend Arbeitsraum.",
+    "moduleName": "Enge Räume"
+  },
+  "m16q2": {
+    "questionText": "Ist ein Sicherungsposten am Einstieg bei Arbeiten in einem geschlossenen Raum vorgeschrieben?",
+    "optionA": "Ja, aber er darf gehen, sobald die Messungen abgeschlossen sind.",
+    "optionB": "Nein, es sei denn, dies ist in der Zulassung des Auftragnehmers angegeben.",
+    "optionC": "Ja, solange sich jemand im geschlossenen Raum befindet.",
+    "moduleName": "Enge Räume"
+  },
+  "m16q3": {
+    "questionText": "Wie kann in einem engen Raum Erstickungsgefahr entstehen?",
+    "optionA": "Durch Defekte in der elektrischen Anlage.",
+    "optionB": "Durch hohe Sauerstoffkonzentrationen.",
+    "optionC": "Durch eine unzureichende Sauerstoffkonzentration.",
+    "moduleName": "Enge Räume"
+  },
+  "m16q4": {
+    "questionText": "Welche der folgenden Spannungen ist sicher?",
+    "optionA": "120 Volt Wechselstrom.",
+    "optionB": "240 Volt Gleichstrom.",
+    "optionC": "120 Volt Gleichstrom.",
+    "moduleName": "Enge Räume"
+  },
+  "m16q5": {
+    "questionText": "Was ist kein Beispiel für einen engen Raum?",
+    "optionA": "Lagerbehälter oder Tanks.",
+    "optionB": "Schweißzelte in oder in der Nähe von tiefen Baugruben.",
+    "optionC": "Eng, klein, nass, rutschig und wenig Bewegungsfreiheit.",
+    "moduleName": "Enge Räume"
+  },
+  "m16q6": {
+    "questionText": "Eine Regel für die Durchführung von Messungen in einem engen Raum lautet:",
+    "optionA": "Die Messungen müssen vom Vorgesetzten durchgeführt werden.",
+    "optionB": "Die Messungen müssen vom Arbeitnehmer im Raum durchgeführt werden.",
+    "optionC": "Die Messungen müssen von einer sachkundigen Person durchgeführt werden.",
+    "moduleName": "Enge Räume"
+  },
+  "m16q7": {
+    "questionText": "Bei der Überwachung eines engen Raums ist Folgendes zu beachten:",
+    "optionA": "Bei Einsturzgefahr darf keine Kommunikation stattfinden.",
+    "optionB": "Die Rettungsdienste alarmieren, wenn die Person in Gefahr ist.",
+    "optionC": "Der Sicherungsposten sollte während der Überwachung andere Arbeiten erledigen.",
+    "moduleName": "Enge Räume"
+  },
+  "m16q8": {
+    "questionText": "Der ständige Sicherungsposten muss:",
+    "optionA": "Anwesend sein, wenn entzündbare Materialien vorhanden sind.",
+    "optionB": "Die ganze Zeit vor Ort sein.",
+    "optionC": "Über nachweislich geprüfte Sachkunde verfügen.",
+    "moduleName": "Enge Räume"
+  },
+  "m16q9": {
+    "questionText": "Die Aufenthaltsdauer in einem engen Raum:",
+    "optionA": "Hängt davon ab, wo sich der enge Raum befindet.",
+    "optionB": "Muss so kurz wie möglich sein.",
+    "optionC": "Spielt keine Rolle.",
+    "moduleName": "Enge Räume"
+  },
+  "m16q10": {
+    "questionText": "Eine Sicherheitsmaßnahme zur Verringerung der Stromschlaggefahr in einem engen Raum ist:",
+    "optionA": "Beide Antworten sind richtig.",
+    "optionB": "Betriebsmittel auf korrekte Weise spannungsfrei schalten.",
+    "optionC": "In engen Räumen mit leitfähigen Wänden Schutzkleinspannung verwenden.",
+    "moduleName": "Enge Räume"
+  },
+  "m17q1": {
+    "questionText": "Wann müssen Hebearbeiten eingestellt werden?",
+    "optionA": "Beachten Sie die Angaben des Kranherstellers zur Windstärke.",
+    "optionB": "Ab Windstärke 4.",
+    "optionC": "Ab Windstärke 5.",
+    "moduleName": "Hebearbeiten"
+  },
+  "m17q2": {
+    "questionText": "Was ist ein Anschlagmittel?",
+    "optionA": "Eine Schlinge.",
+    "optionB": "Ein Haltegurt.",
+    "optionC": "Ein Auffanggurt.",
+    "moduleName": "Hebearbeiten"
+  },
+  "m17q3": {
+    "questionText": "Wie nennt man zwei Schlingen an einem Stahlring?",
+    "optionA": "Ein Zweistrang-Gehänge.",
+    "optionB": "Ein Schlingenpaar.",
+    "optionC": "Ein Duo.",
+    "moduleName": "Hebearbeiten"
+  },
+  "m17q4": {
+    "questionText": "Was wird im Kranbuch festgehalten?",
+    "optionA": "Welche Prüfbescheinigungen vorgeschrieben sind.",
+    "optionB": "Welche Gewichte über welche Entfernung bewegt werden dürfen.",
+    "optionC": "Welche Prüfungen ein Kran durchlaufen hat.",
+    "moduleName": "Hebearbeiten"
+  },
+  "m17q5": {
+    "questionText": "Welche Aussage über Ketten ist RICHTIG?",
+    "optionA": "Bei Ketten über scharfe Kanten verwendet man Kantenschützer.",
+    "optionB": "Ketten mit gedehnten Gliedern dürfen verwendet werden, wenn das Gewicht die Grenze nicht überschreitet.",
+    "optionC": "Ketten dürfen niemals verlängert werden.",
+    "moduleName": "Hebearbeiten"
+  },
+  "m17q6": {
+    "questionText": "Was ist kein Beispiel für ein Hebezeug?",
+    "optionA": "Ein Turmdrehkran.",
+    "optionB": "Ein Brückenkran.",
+    "optionC": "Ein Hubwagen.",
+    "moduleName": "Hebearbeiten"
+  },
+  "m17q7": {
+    "questionText": "Was kann man mit Hebezeugen tun?",
+    "optionA": "Lasten vertikal bewegen.",
+    "optionB": "Lasten horizontal bewegen.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Hebearbeiten"
+  },
+  "m17q8": {
+    "questionText": "Eine allgemeine Gefahr bei der Arbeit mit Hebemitteln ist:",
+    "optionA": "Herabfallen der Last.",
+    "optionB": "Umkippen des Hebezeugs.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Hebearbeiten"
+  },
+  "m17q9": {
+    "questionText": "Abstützungen werden bei der Arbeit mit folgenden Mitteln eingesetzt:",
+    "optionA": "Ständerbohrmaschinen.",
+    "optionB": "Gefahrstoffen.",
+    "optionC": "Hebezeugen.",
+    "moduleName": "Hebearbeiten"
+  },
+  "m17q10": {
+    "questionText": "Stahlseile:",
+    "optionA": "Dürfen nicht verknotet werden.",
+    "optionB": "Sollten in einem feuchten Raum gelagert werden.",
+    "optionC": "Dürfen auch bei starkem Rost noch verwendet werden.",
+    "moduleName": "Hebearbeiten"
+  },
+  "m18q1": {
+    "questionText": "Was ist Infrarotstrahlung?",
+    "optionA": "Nichtionisierende Strahlung.",
+    "optionB": "Ionisierende Strahlung.",
+    "optionC": "Natürliche Hintergrundstrahlung.",
+    "moduleName": "Strahlung"
+  },
+  "m18q2": {
+    "questionText": "Eine Sicherheitsmaßnahme gegen ionisierende Strahlung ist:",
+    "optionA": "So weit wie möglich Abstand halten.",
+    "optionB": "Den Bereich um die Quelle absperren.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Strahlung"
+  },
+  "m18q3": {
+    "questionText": "Eine ärztliche Untersuchung ist Pflicht für Arbeitnehmer, die:",
+    "optionA": "Über einen kurzen Zeitraum mit Gefahrstoffen arbeiten.",
+    "optionB": "Mit Geräten oder Stoffen arbeiten, die ionisierende Strahlung abgeben.",
+    "optionC": "Gelegentlich krank sind.",
+    "moduleName": "Strahlung"
+  },
+  "m18q4": {
+    "questionText": "Die Überwachung von Strahlenschutz und Strahlenhygiene ist Aufgabe von:",
+    "optionA": "Dem Vorgesetzten.",
+    "optionB": "Dem Strahlenschutzbeauftragten.",
+    "optionC": "Der Notfallmannschaft.",
+    "moduleName": "Strahlung"
+  },
+  "m18q5": {
+    "questionText": "Was ist der Unterschied zwischen ionisierender und nichtionisierender Strahlung?",
+    "optionA": "Nichtionisierende Strahlung ist die einzige Strahlung, die Ionen erzeugt.",
+    "optionB": "Nichtionisierende Strahlung ist schwächer als ionisierende Strahlung.",
+    "optionC": "Nichtionisierende Strahlung ist stärker als ionisierende Strahlung.",
+    "moduleName": "Strahlung"
+  },
+  "m18q6": {
+    "questionText": "Eine Sicherheitsmaßnahme, um Gesundheitsschäden durch nichtionisierende Strahlung zu vermeiden, ist:",
+    "optionA": "Auf die Hinweise an den Geräten achten.",
+    "optionB": "Die Anweisungen zur Nutzungsdauer einhalten.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Strahlung"
+  },
+  "m19q1": {
+    "questionText": "Was bestimmt nicht die Bedingungen der Arbeitsumgebung?",
+    "optionA": "Der Vorgesetzte.",
+    "optionB": "Die Vibrationen.",
+    "optionC": "Die Beleuchtung.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q2": {
+    "questionText": "Eine Art körperlicher Vibrationen ist:",
+    "optionA": "Hand-Arm-Vibrationen durch mechanische Werkzeuge.",
+    "optionB": "Ganzkörper-Vibrationen durch ein Fahrzeug oder einen sich bewegenden Boden.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q3": {
+    "questionText": "Was ist keine Gesundheitsbeschwerde durch Vibrationen auf den Körper?",
+    "optionA": "Hautinfektionen.",
+    "optionB": "Muskelschmerzen.",
+    "optionC": "Müdigkeit.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q4": {
+    "questionText": "Die Aufrechterhaltung des Flüssigkeitshaushalts ist eine Schutzmaßnahme:",
+    "optionA": "Bei der Arbeit mit Gefahrstoffen.",
+    "optionB": "Um Brände zu verhindern.",
+    "optionC": "Um den Arbeitskomfort sicherzustellen.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q5": {
+    "questionText": "Ein Faktor, der die körperliche Belastung beeinflusst, ist:",
+    "optionA": "Die Arbeitsposition/Körperhaltung.",
+    "optionB": "Beide Antworten sind richtig.",
+    "optionC": "Die Bewegungen, die ausgeführt werden müssen.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q6": {
+    "questionText": "Eine Funktion der Pause während der Arbeit ist:",
+    "optionA": "Ein nettes informelles Gespräch mit Kollegen zu führen.",
+    "optionB": "Überlastung vorzubeugen.",
+    "optionC": "Genügend Zeit für das Mittagessen zu haben.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q7": {
+    "questionText": "Chronische Müdigkeit ist eine Gesundheitsgefahr:",
+    "optionA": "Durch Überstunden einmal im Monat.",
+    "optionB": "Durch statische Belastung.",
+    "optionC": "Durch die Arbeit mit Gefahrstoffen.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q8": {
+    "questionText": "Das Verhältnis zu Ihren Kollegen:",
+    "optionA": "Beeinflusst die Arbeitszeitregelung.",
+    "optionB": "Sollte immer positiv sein.",
+    "optionC": "Beeinflusst die psychische Belastung.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q9": {
+    "questionText": "Die richtige Körperhaltung beim manuellen Heben und Tragen ist:",
+    "optionA": "Die Last so nah wie möglich am Körper halten.",
+    "optionB": "Mit geradem Rücken und gebeugten Knien heben.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q10": {
+    "questionText": "Was ist keine Bedingung, unter der stehende Arbeit zu bevorzugen ist?",
+    "optionA": "Wenn häufig nach unten, nach oben oder weit entfernt gegriffen werden muss.",
+    "optionB": "Wenn Kräfte über 30 N (3,0 kg) aufgebracht werden müssen.",
+    "optionC": "Wenn nicht genügend Beinraum vorhanden ist.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q11": {
+    "questionText": "Die optimale Sitzposition bei der Arbeit ist:",
+    "optionA": "Gute Auflage der Oberschenkel auf der Sitzfläche.",
+    "optionB": "Entlastung der Schultern, zum Beispiel durch Armstützen.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q12": {
+    "questionText": "Was ist eine Richtlinie für richtiges Sitzen bei der Arbeit?",
+    "optionA": "Für eine optimale Sitzposition sorgen.",
+    "optionB": "In der optimalen Position so lange wie möglich so weiterarbeiten.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q13": {
+    "questionText": "Das empfohlene Höchstgewicht von 25 kg ist eine Sicherheitsmaßnahme für:",
+    "optionA": "Heben im Sitzen.",
+    "optionB": "Manuelles Heben.",
+    "optionC": "Heben mit einem Kran.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m19q14": {
+    "questionText": "Die richtige Körperhaltung beim manuellen Heben ist:",
+    "optionA": "Mit geradem Rücken und gebeugten Knien heben.",
+    "optionB": "Die Last so nah wie möglich am Körper halten.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Der ergonomische Arbeitsplatz"
+  },
+  "m20q1": {
+    "questionText": "Welche Auswirkung hat übermäßig lauter Lärm am Arbeitsplatz?",
+    "optionA": "Er erhöht das Risiko am Arbeitsplatz.",
+    "optionB": "Wenn Gehörschutz getragen wird, hat lauter Lärm keine Auswirkung.",
+    "optionC": "Man kann härter arbeiten, da man sich nicht unterhalten kann.",
+    "moduleName": "Lärm am Arbeitsplatz"
+  },
+  "m20q2": {
+    "questionText": "Welche Faktoren bestimmen, ob Lärm schädlich ist?",
+    "optionA": "Einwirkdauer und Widerstandsfähigkeit der Gehörknöchelchen.",
+    "optionB": "Tonhöhe und Stärke des Lärms.",
+    "optionC": "Abstand und Wärmeentwicklung im Ohr.",
+    "moduleName": "Lärm am Arbeitsplatz"
+  },
+  "m20q3": {
+    "questionText": "Zwei gleich starke Schallquellen zusammen erhöhen den Schallpegel um:",
+    "optionA": "3 dB.",
+    "optionB": "6 dB.",
+    "optionC": "9 dB.",
+    "moduleName": "Lärm am Arbeitsplatz"
+  },
+  "m20q4": {
+    "questionText": "Die Einwirkung von übermäßigem Lärm führt zu:",
+    "optionA": "Weißen Fingern.",
+    "optionB": "Dauerhaften Hirnschäden.",
+    "optionC": "Konzentrationsverlust.",
+    "moduleName": "Lärm am Arbeitsplatz"
+  },
+  "m20q5": {
+    "questionText": "Eine Verdoppelung des Abstands zur Lärmquelle bewirkt eine Verringerung um etwa:",
+    "optionA": "3 dB(A).",
+    "optionB": "6 dB(A).",
+    "optionC": "9 dB(A).",
+    "moduleName": "Lärm am Arbeitsplatz"
+  },
+  "m20q6": {
+    "questionText": "Schwierigkeiten beim Telefonieren sind ein Symptom für:",
+    "optionA": "Einen vorübergehenden Hörverlust.",
+    "optionB": "Eine laute Umgebung.",
+    "optionC": "Einen dauerhaften Hörverlust.",
+    "moduleName": "Lärm am Arbeitsplatz"
+  },
+  "m20q7": {
+    "questionText": "Die Maßeinheit für den Schall(druck)pegel ist:",
+    "optionA": "Das Lumen.",
+    "optionB": "Das Dezibel.",
+    "optionC": "Die Amplitude.",
+    "moduleName": "Lärm am Arbeitsplatz"
+  },
+  "m20q8": {
+    "questionText": "Die richtige Reihenfolge zur Bekämpfung von übermäßigem Lärm ist:",
+    "optionA": "1. Quelle reduzieren / 2. Gehörschutz tragen / 3. Lärm dämpfen / 4. Abschirmen",
+    "optionB": "1. Gehörschutz tragen / 2. Abschirmen / 3. Lärm dämpfen / 4. Quelle reduzieren",
+    "optionC": "1. Quelle reduzieren / 2. Abschirmen / 3. Lärm dämpfen / 4. Gehörschutz tragen",
+    "moduleName": "Lärm am Arbeitsplatz"
+  },
+  "m20q9": {
+    "questionText": "Welche Maßnahmen muss der Arbeitgeber bei diesen Schallpegeln ergreifen?",
+    "optionA": "Ab 85 dB(A): Anbieten einer Hörprüfung und von Gehörschutz.",
+    "optionB": "Ab 80 dB(A): Anbieten einer Hörprüfung und von Gehörschutz.",
+    "optionC": "Ab 75 dB(A): Anbieten einer Hörprüfung und von Gehörschutz.",
+    "moduleName": "Lärm am Arbeitsplatz"
+  },
+  "m21q1": {
+    "questionText": "Warum sollten in der Industrie keine Schutzhelme aus Metall getragen werden?",
+    "optionA": "Ein Metallhelm kann den Kopf verletzen.",
+    "optionB": "Ein Metallhelm kann herabfallende Gegenstände nicht ausreichend abfedern.",
+    "optionC": "Ein Metallhelm kann Strom leiten.",
+    "explanation": "PSA ist in der Maßnahmenhierarchie immer das letzte Mittel. Sie schützt nur den Träger und setzt die richtige Anwendung voraus. Kollektive Maßnahmen sind immer vorzuziehen.",
+    "officialRef": "Modul 21 — Persönliche Schutzausrüstung",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q2": {
+    "questionText": "Bei welchen Tätigkeiten ist eine Staubfiltermaske ein geeigneter Atemschutz?",
+    "optionA": "Beim Spritzlackieren.",
+    "optionB": "Beim Schweißen.",
+    "optionC": "Beim Abbrechen und Aufhacken.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q3": {
+    "questionText": "In welchen Situationen bietet eine Korbbrille guten Schutz?",
+    "optionA": "Bei Tätigkeiten, bei denen Säurespritzer auftreten.",
+    "optionB": "Bei Arbeiten über Kopf.",
+    "optionC": "Bei Arbeiten in engen Räumen.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q4": {
+    "questionText": "Beim Arbeiten mit einem Lärmpegel über 85 dB(A):",
+    "optionA": "Wird Gehörschutz empfohlen.",
+    "optionB": "Kann der Arbeitnehmer selbst entscheiden, ob er Gehörschutz trägt.",
+    "optionC": "Ist Gehörschutz Pflicht.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q5": {
+    "questionText": "PSA muss:",
+    "optionA": "In einer Einheitsgröße verfügbar sein.",
+    "optionB": "An jedem Arbeitsplatz vor Ort vorhanden sein.",
+    "optionC": "Geprüft sein.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q6": {
+    "questionText": "Der Unterschied zwischen einer Schutzbrille und einem Schweißerschutzschild:",
+    "optionA": "Schweißerschutzschilde schützen vor Infrarotstrahlung; Schutzbrillen schützen vor umherfliegenden Teilchen.",
+    "optionB": "Schutzbrillen schützen vor UV-Strahlung; Schweißerschutzschilde schützen vor umherfliegenden Teilchen.",
+    "optionC": "Schutzbrillen bedecken das gesamte Gesicht, Schweißerschutzschilde nicht.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q7": {
+    "questionText": "Eine zu niedrige Sauerstoffkonzentration ist eine Gefahr für:",
+    "optionA": "Die Umwelt.",
+    "optionB": "Brände.",
+    "optionC": "Die Atmung.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q8": {
+    "questionText": "Umluftunabhängiger Atemschutz muss verwendet werden:",
+    "optionA": "Wenn hohe und unbekannte Konzentrationen von Gefahrstoffen vorliegen.",
+    "optionB": "Wenn weniger als 19% Sauerstoff in der Luft sind.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q9": {
+    "questionText": "Was ist keine Regel für die Verwendung von Absturzsicherungen?",
+    "optionA": "Auffanggurte müssen gut sitzen und auf den Träger eingestellt sein.",
+    "optionB": "Absturzsicherungen, die bereits einen Sturz aufgefangen haben, dürfen wiederverwendet werden.",
+    "optionC": "Sicherungsseile dürfen nicht verschmutzt sein.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q10": {
+    "questionText": "Warnkleidung wird getragen:",
+    "optionA": "Bei niedrigen Temperaturen.",
+    "optionB": "Um den Träger sichtbar zu machen.",
+    "optionC": "Gegen Verschmutzung, beim Schweißen und Schleifen.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q11": {
+    "questionText": "Ausrutschen ist eine Gefahr für:",
+    "optionA": "Hände und Arme.",
+    "optionB": "Füße und Beine.",
+    "optionC": "Kopf und Gesicht.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q12": {
+    "questionText": "Verschiedene Formen des Hand- und Armschutzes sind:",
+    "optionA": "Handschuhe mit rutschfester Sohle.",
+    "optionB": "Handschuhe mit verlängertem Handgelenk- und/oder Armschutz.",
+    "optionC": "Stahlkappe zum Schutz der Finger vor schweren herabfallenden Gegenständen.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q13": {
+    "questionText": "Eine wesentliche Eigenschaft eines Schutzhelms ist:",
+    "optionA": "Innenausstattung: nimmt einen Stoß auf und verteilt ihn über den Kopf.",
+    "optionB": "Helmschale: nimmt einen Stoß auf und verteilt ihn über den Kopf.",
+    "optionC": "Innenausstattung: robust genug, um herabfallende Gegenstände aufzuhalten.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q14": {
+    "questionText": "Gefahren für den Kopf bei der Arbeit sind:",
+    "optionA": "Anstoßen.",
+    "optionB": "Herabfallende Gegenstände.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m21q15": {
+    "questionText": "Eine Mund-Nasen-Maske wird verwendet:",
+    "optionA": "Gegen Partikel und Gase oder Dämpfe.",
+    "optionB": "Um das gesamte Gesicht zu bedecken.",
+    "optionC": "Nur gegen Partikel, nicht gegen Gase oder Dämpfe.",
+    "moduleName": "Persönliche Schutzausrüstung"
+  },
+  "m22q1": {
+    "questionText": "Welche Merkmale hat ein Gebotszeichen?",
+    "optionA": "Es ist rund, blau und hat ein weißes Symbol.",
+    "optionB": "Es ist dreieckig und gelb mit einem schwarzen Symbol.",
+    "optionC": "Es ist rechteckig und grün mit einem weißen Symbol.",
+    "moduleName": "Sicherheitskennzeichnung und Markierungen"
+  },
+  "m22q2": {
+    "questionText": "Welche Anforderungen gelten für Warnzeichen am Arbeitsplatz?",
+    "optionA": "Die Gestaltung muss für alle verständlich sein.",
+    "optionB": "Sie müssen in sicherer Höhe angebracht werden.",
+    "optionC": "Sie tragen vorzugsweise Text in niederländischer Sprache.",
+    "moduleName": "Sicherheitskennzeichnung und Markierungen"
+  },
+  "m22q3": {
+    "questionText": "Eine Gruppe von Sicherheitszeichen ist:",
+    "optionA": "Gebotszeichen.",
+    "optionB": "Erste-Hilfe-Zeichen.",
+    "optionC": "Ausgangszeichen.",
+    "moduleName": "Sicherheitskennzeichnung und Markierungen"
+  },
+  "m22q4": {
+    "questionText": "Ein Zeichen, das etwas verbietet, ist:",
+    "optionA": "Ein rundes rotes Zeichen mit weißem Rand und rotem Querbalken.",
+    "optionB": "Ein dreieckiges gelbes Zeichen mit schwarzem Rand.",
+    "optionC": "Ein rundes weißes Zeichen mit rotem Rand und rotem Querbalken.",
+    "moduleName": "Sicherheitskennzeichnung und Markierungen"
+  },
+  "m22q5": {
+    "questionText": "Ein dreieckiges gelbes Zeichen mit schwarzem Rand ist die Gestaltung eines:",
+    "optionA": "Rettungszeichens.",
+    "optionB": "Warnzeichens.",
+    "optionC": "Gebotszeichens.",
+    "moduleName": "Sicherheitskennzeichnung und Markierungen"
+  },
+  "m22q6": {
+    "questionText": "Die allgemeine Bedeutung von Warnzeichen ist:",
+    "optionA": "Etwas verbieten.",
+    "optionB": "Der Weg zu Rettungseinrichtungen.",
+    "optionC": "Achtung, Gefahr.",
+    "moduleName": "Sicherheitskennzeichnung und Markierungen"
+  },
+  "m22q7": {
+    "questionText": "Ein quadratisches oder rechteckiges grünes Zeichen mit weißem Symbol steht für:",
+    "optionA": "Gebotszeichen.",
+    "optionB": "Warnzeichen.",
+    "optionC": "Rettungszeichen.",
+    "moduleName": "Sicherheitskennzeichnung und Markierungen"
+  },
+  "m22q8": {
+    "questionText": "Brandschutzeinrichtungen befinden sich bei Zeichen, die folgendermaßen aussehen:",
+    "optionA": "Quadratisch/rechteckig und grün mit weißem Symbol.",
+    "optionB": "Quadratisch/rechteckig und rot mit weißem Symbol.",
+    "optionC": "Quadratisch/rechteckig und schwarz mit weißem Symbol.",
+    "moduleName": "Sicherheitskennzeichnung und Markierungen"
+  },
+  "m22q9": {
+    "questionText": "Die allgemeine Bedeutung der Brandschutzzeichen:",
+    "optionA": "Zeigen an, wo sich die Ausrüstung befindet: den Weg dorthin.",
+    "optionB": "Zeigen an, wo sich die Ausrüstung befindet: den Standort selbst.",
+    "optionC": "Beide Antworten sind richtig.",
+    "moduleName": "Sicherheitskennzeichnung und Markierungen"
+  },
+  "m22q10": {
+    "questionText": "Gelbe oder weiße Streifen werden verwendet für:",
+    "optionA": "Die Markierung der obersten und untersten Treppenstufe.",
+    "optionB": "Die Markierung von Verkehrswegen und Lagerflächen.",
+    "optionC": "Gebotszeichen.",
+    "moduleName": "Sicherheitskennzeichnung und Markierungen"
+  },
+  "mc001": {
+    "questionText": "Welche der folgenden Ausrüstungen sind bei Arbeiten in Höhen über 2 Metern Pflicht?",
+    "explanation": "Arbeiten in der Höhe erfordern mindestens Absturzsicherung (Auffanggurt + Verbindungsmittel), Kopfschutz und Fußschutz. Warnkleidung und Gehörschutz hängen von der jeweiligen Arbeitsumgebung ab.",
+    "officialRef": "Modul 14 — Arbeiten in der Höhe",
+    "moduleName": "Arbeiten in der Höhe",
+    "options": {
+      "a": "Auffanggurt mit Verbindungsmittel",
+      "b": "Schutzhelm",
+      "c": "Sicherheitsstiefel mit Stahlkappe",
+      "d": "Warnweste",
+      "e": "Gehörschutz"
+    }
+  },
+  "mc002": {
+    "questionText": "Welche der folgenden Stoffe sind nach der REACH-Verordnung als Gefahrstoffe eingestuft?",
+    "explanation": "Asbest, Benzol und Quarzstaub sind alle als Gefahrstoffe mit strengen Expositionsgrenzwerten eingestuft. Trinkwasser und Druckluft sind nach REACH nicht als gefährlich eingestuft.",
+    "officialRef": "Modul 8 — Gefahrstoffe",
+    "moduleName": "Gefahrstoffe",
+    "options": {
+      "a": "Asbestfasern",
+      "b": "Benzol",
+      "c": "Trinkwasser",
+      "d": "Quarzstaub",
+      "e": "Druckluft"
+    }
+  },
+  "mc003": {
+    "questionText": "Welche der folgenden Methoden sind geeignete Maßnahmen zur Brandverhütung am Arbeitsplatz?",
+    "explanation": "Brandverhütung bedeutet, Zündquellen zu entfernen, brennbare Stoffe ordnungsgemäß zu lagern und ausreichend zu lüften. Wasser darf bei verschütteten Chemikalien nicht eingesetzt werden (kann diese verteilen oder mit ihnen reagieren). Feuerlöscher müssen zugänglich sein und dürfen nicht weggeschlossen werden.",
+    "officialRef": "Modul 9 — Brand und Explosion",
+    "moduleName": "Brand und Explosion",
+    "options": {
+      "a": "Zündquellen in der Nähe brennbarer Materialien entfernen",
+      "b": "Entzündbare Flüssigkeiten in zugelassenen Sicherheitsschränken lagern",
+      "c": "Die Lüftung verstärken, um entzündbare Dämpfe zu verdünnen",
+      "d": "Alle verschütteten Chemikalien mit Wasser beseitigen",
+      "e": "Feuerlöscher weggeschlossen aufbewahren, um Missbrauch zu verhindern"
+    }
+  },
+  "tf001": {
+    "questionText": "Geben Sie an, ob jede der folgenden Aussagen zu Gefahrstoffen richtig oder falsch ist:",
+    "explanation": "Das SDB muss gemäß REACH-Verordnung verfügbar sein. Originalbehälter verhindern Verwechslungen. Chemische Abfälle müssen über spezielle Entsorgungswege entsorgt werden. Sowohl Flüssigkeiten als auch Gase können eine Lüftung erforderlich machen.",
+    "officialRef": "Modul 8 — Gefahrstoffe",
+    "moduleName": "Gefahrstoffe",
+    "statements": {
+      "s1": "Ein SDB (Sicherheitsdatenblatt) muss vor Ort immer verfügbar sein",
+      "s2": "Gefahrstoffe müssen in ihren Originalbehältern gelagert werden",
+      "s3": "Sie können chemische Abfälle über den normalen Hausmüll entsorgen",
+      "s4": "Eine Lüftung ist nur bei Flüssigkeiten erforderlich, nicht bei Gasen"
+    }
+  },
+  "tf002": {
+    "questionText": "Geben Sie an, ob jede der folgenden Aussagen zur PSA richtig oder falsch ist:",
+    "explanation": "PSA ist in der Maßnahmenhierarchie das letzte Mittel, nicht das erste. Der Arbeitgeber muss PSA kostenlos zur Verfügung stellen. Beschädigte PSA muss ersetzt werden. Die CE-Kennzeichnung bestätigt die Konformität mit den EU-Sicherheitsnormen.",
+    "officialRef": "Modul 21 — Persönliche Schutzausrüstung",
+    "moduleName": "Persönliche Schutzausrüstung",
+    "statements": {
+      "s1": "PSA ist die erste Verteidigungslinie in der Maßnahmenhierarchie",
+      "s2": "Der Arbeitgeber ist dafür verantwortlich, PSA kostenlos zur Verfügung zu stellen",
+      "s3": "Beschädigte PSA muss sofort ersetzt werden",
+      "s4": "PSA mit CE-Kennzeichnung erfüllt die europäischen Mindestsicherheitsanforderungen"
+    }
+  },
+  "tf003": {
+    "questionText": "Geben Sie an, ob jede der folgenden Aussagen zum Arbeiten in engen Räumen richtig oder falsch ist:",
+    "explanation": "Das Befahren eines engen Raums erfordert immer eine Arbeitsfreigabe. Die Freimessung der Atmosphäre ist unabhängig von sichtbaren Gefahren Pflicht (Sauerstoffmangel ist unsichtbar). Ein Sicherungsposten und Rettungsausrüstung sind immer erforderlich.",
+    "officialRef": "Modul 16 — Enge Räume",
+    "moduleName": "Enge Räume",
+    "statements": {
+      "s1": "Vor dem Betreten eines engen Raums ist immer eine Arbeitsfreigabe erforderlich",
+      "s2": "Eine Freimessung der Atmosphäre ist nur bei einer sichtbaren Gefahr erforderlich",
+      "s3": "Ein Sicherungsposten muss außerhalb des engen Raums anwesend sein",
+      "s4": "Rettungsausrüstung muss vor dem Betreten verfügbar sein"
+    }
+  },
+  "ord001": {
+    "questionText": "Bringen Sie die Stufen der Maßnahmenhierarchie (von der Beseitigung bis zum letzten Mittel) in die richtige Reihenfolge, beginnend mit der bevorzugten Maßnahme:",
+    "explanation": "Die Maßnahmenhierarchie verläuft von Beseitigung → Substitution → technische Maßnahmen → organisatorische Maßnahmen → PSA. PSA ist immer das letzte Mittel, weil sie von der richtigen Anwendung durch die einzelne Person abhängt.",
+    "officialRef": "Modul 3 — Risikoprävention",
+    "moduleName": "Unfälle: Ursachen und Prävention",
+    "items": {
+      "i1": "Organisatorische Maßnahmen (Verfahren, Schulung)",
+      "i2": "Beseitigung der Gefahr",
+      "i3": "Persönliche Schutzausrüstung (PSA)",
+      "i4": "Substitution (Ersatz durch weniger Gefährliches)",
+      "i5": "Technische Maßnahmen (physische Barrieren)"
+    }
+  },
+  "ord002": {
+    "questionText": "Bringen Sie die Schritte beim Vorgehen bei verschütteten Chemikalien in die richtige Reihenfolge:",
+    "explanation": "Bei verschütteten Chemikalien: zuerst den Bereich räumen und andere warnen, dann den Stoff anhand des SDB identifizieren, anschließend mit der richtigen PSA und geeigneten Materialien beseitigen und zuletzt den Vorfall melden.",
+    "officialRef": "Modul 8 — Gefahrstoffe",
+    "moduleName": "Gefahrstoffe",
+    "items": {
+      "i1": "Vorgesetzten informieren und Vorfallbericht ausfüllen",
+      "i2": "Den unmittelbaren Bereich räumen und andere warnen",
+      "i3": "Mit geeigneten Bindemitteln und PSA beseitigen",
+      "i4": "Den Stoff anhand des SDB identifizieren"
+    }
+  },
+  "ord003": {
+    "questionText": "Bringen Sie die Schritte zur Benutzung eines Feuerlöschers (PASS-Technik) in die richtige Reihenfolge:",
+    "explanation": "Die PASS-Technik: Sicherungsstift ziehen → auf den Brandherd zielen → Hebel drücken → hin und her schwenken. Zielen Sie immer auf den Brandherd, nicht auf die Flammen.",
+    "officialRef": "Modul 9 — Brand und Explosion",
+    "moduleName": "Brand und Explosion",
+    "items": {
+      "i1": "Den Hebel drücken, um das Löschmittel abzugeben",
+      "i2": "Den Sicherungsstift ziehen",
+      "i3": "Am Brandherd hin und her schwenken",
+      "i4": "Mit der Düse auf den Brandherd zielen"
+    }
+  },
+  "mat001": {
+    "questionText": "Ordnen Sie jedem Feuerlöschertyp die Brandklasse zu, für die er ausgelegt ist:",
+    "explanation": "Wasser: nur feste Stoffe der Klasse A. Schaum: Flüssigkeiten der Klasse B (und A). CO₂: Elektrobrände (Klasse C) — verdrängt den Sauerstoff, ohne Rückstände zu hinterlassen. Trockenpulver: vielseitig (A, B, C), hinterlässt aber Rückstände.",
+    "officialRef": "Modul 9 — Brand und Explosion",
+    "moduleName": "Brand und Explosion",
+    "leftItems": {
+      "l1": "Wasserlöscher",
+      "l2": "CO₂-Löscher",
+      "l3": "Schaumlöscher",
+      "l4": "Pulverlöscher"
+    },
+    "rightItems": {
+      "r1": "Klasse A — Feste Stoffe (Holz, Papier)",
+      "r2": "Klasse B — Entzündbare Flüssigkeiten (Benzin, Öl)",
+      "r3": "Klasse C — Elektrobrände",
+      "r4": "Brände der Klassen A, B und C (Mehrzweck)"
+    }
+  },
+  "mat002": {
+    "questionText": "Ordnen Sie jeder Sicherheitsfarbe ihre Bedeutung zu:",
+    "explanation": "Farbcodierung nach ISO 7010: Rot = Verbot/Brandschutz, Gelb = Warnung, Blau = Gebot, Grün = Gefahrlosigkeit/Notfall. Diese Farben sind EU-weit standardisiert.",
+    "officialRef": "Modul 22 — Sicherheitskennzeichnung und Markierungen",
+    "moduleName": "Sicherheitskennzeichnung und Markierungen",
+    "leftItems": {
+      "l1": "Rot",
+      "l2": "Gelb / Bernsteingelb",
+      "l3": "Blau",
+      "l4": "Grün"
+    },
+    "rightItems": {
+      "r1": "Verbot oder Brandschutzeinrichtungen",
+      "r2": "Warnung / Vorsicht",
+      "r3": "Gebotene Handlung (muss getan werden)",
+      "r4": "Gefahrlosigkeit / Fluchtweg"
+    }
+  },
+  "mat003": {
+    "questionText": "Ordnen Sie jeder Art von PSA die Gefahr zu, vor der sie in erster Linie schützt:",
+    "explanation": "Jede Art von PSA wird ihrer Hauptgefahr zugeordnet. Kapselgehörschützer schützen vor Lärm. FFP3-Atemschutzmasken schützen vor Feinstaub. Korbbrillen schützen die Augen. Anti-Vibrations-Handschuhe verringern das HAVS-Risiko durch Elektrowerkzeuge.",
+    "officialRef": "Modul 21 — Persönliche Schutzausrüstung",
+    "moduleName": "Persönliche Schutzausrüstung",
+    "leftItems": {
+      "l1": "Kapselgehörschützer / Gehörschutzstöpsel",
+      "l2": "Atemschutzmaske (FFP3-Maske)",
+      "l3": "Korbbrille",
+      "l4": "Anti-Vibrations-Handschuhe"
+    },
+    "rightItems": {
+      "r1": "Lärmbedingter Hörverlust",
+      "r2": "Einatmen von Feinstaub und Aerosolen",
+      "r3": "Chemikalienspritzer oder umherfliegende Teilchen in die Augen",
+      "r4": "Hand-Arm-Vibrationssyndrom (HAVS)"
+    }
+  }
+}

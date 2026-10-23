@@ -16,6 +16,7 @@ import {
   Crown,
   Loader2,
   MoveDiagonal,
+  MoveHorizontal,
   Shapes,
   AlignJustify,
 } from 'lucide-react';
@@ -42,6 +43,8 @@ import AccessoriesLibrary from '@/components/tools/AccessoriesLibrary';
 import OffsetTool from '@/tools/prefabrication/offsets/OffsetTool';
 import MiteredElbowTool from '@/tools/prefabrication/miters/MiteredElbowTool';
 import PipeCombTool from '@/tools/prefabrication/pipe-comb/PipeCombTool';
+import TwoElbowOffsetTool from '@/tools/prefabrication/two-elbow-offset/TwoElbowOffsetTool';
+import { ToolSchematic, type ToolSchematicId } from '@/components/tools/ToolSchematics';
 
 interface ToolDef {
   key: string;
@@ -50,17 +53,40 @@ interface ToolDef {
   icon: React.ComponentType<{ className?: string }>;
   categoryKey: string;
   implemented: boolean;
+  /** Optional catalog schematic: replaces the generic icon so each
+   *  prefabrication card shows the geometry family it solves. */
+  schematic?: ToolSchematicId;
 }
 
+/**
+ * PB-TOOLS-NAV-REORG-001 — catalog sections.
+ *
+ * One main location per tool: every card still opens its canonical module
+ * through the same `?t=<key>` link, and the options that live inside a
+ * module (e.g. the offset tabs Con codos / Sin codos / Comprobar) stay
+ * inside it instead of becoming duplicate calculators. "Peine de tuberías"
+ * and "Desplazamiento con dos codos" remain separate tools.
+ */
+const SECTION_ORDER: string[] = [
+  'tools.familyOffsets',
+  'tools.categoryFabrication',
+  'tools.categoryReference',
+  'tools.categoryDesign',
+  'tools.categoryStress',
+  'tools.categoryHydraulics',
+  'tools.categoryUtility',
+];
+
 const TOOLS: ToolDef[] = [
-  { key: 'branch-layout', nameKey: 'tools.branchLayout.name', descKey: 'tools.branchLayout.subtitle', icon: GitBranch, categoryKey: 'tools.categoryFabrication', implemented: true },
-  { key: 'elbow-cut', nameKey: 'tools.elbowCut.name', descKey: 'tools.elbowCut.subtitle', icon: Scissors, categoryKey: 'tools.categoryFabrication', implemented: true },
-  { key: 'pipe-offset', nameKey: 'tools.prefab.offset.title', descKey: 'tools.prefab.offset.tabWithElbows', icon: MoveDiagonal, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'branch-layout', nameKey: 'tools.branchLayout.name', descKey: 'tools.branchLayout.subtitle', icon: GitBranch, categoryKey: 'tools.categoryFabrication', implemented: true, schematic: 'branch-layout' },
+  { key: 'elbow-cut', nameKey: 'tools.elbowCut.name', descKey: 'tools.elbowCut.subtitle', icon: Scissors, categoryKey: 'tools.categoryFabrication', implemented: true, schematic: 'elbow-cut' },
+  { key: 'pipe-offset', nameKey: 'tools.prefab.offset.title', descKey: 'tools.prefab.offset.cardSubtitle', icon: MoveDiagonal, categoryKey: 'tools.familyOffsets', implemented: true, schematic: 'pipe-offset' },
   { key: 'accessories-library', nameKey: 'tools.accessoriesLibrary.title', descKey: 'tools.accessoriesLibraryDesc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'bolts-nuts', nameKey: 'tools.bolts.name', descKey: 'tools.bolts.desc', icon: Wrench, categoryKey: 'tools.categoryFabrication', implemented: true },
   { key: 'flanges', nameKey: 'tools.flanges.name', descKey: 'tools.flanges.desc', icon: CircuitBoard, categoryKey: 'tools.categoryReference', implemented: true },
-  { key: 'mitered-elbow', nameKey: 'tools.prefab.miteredElbow.title', descKey: 'tools.prefab.miteredElbow.noteGeometry', icon: Shapes, categoryKey: 'tools.categoryFabrication', implemented: true },
-  { key: 'pipe-comb', nameKey: 'tools.prefab.pipeComb.title', descKey: 'tools.prefab.pipeComb.noteGeometry', icon: AlignJustify, categoryKey: 'tools.categoryFabrication', implemented: true },
+  { key: 'mitered-elbow', nameKey: 'tools.prefab.miteredElbow.title', descKey: 'tools.prefab.miteredElbow.noteGeometry', icon: Shapes, categoryKey: 'tools.familyOffsets', implemented: true, schematic: 'mitered-elbow' },
+  { key: 'pipe-comb', nameKey: 'tools.prefab.pipeComb.title', descKey: 'tools.prefab.pipeComb.noteGeometry', icon: AlignJustify, categoryKey: 'tools.categoryFabrication', implemented: true, schematic: 'pipe-comb' },
+  { key: 'two-elbow-offset', nameKey: 'tools.prefab.twoElbowOffset.title', descKey: 'tools.prefab.twoElbowOffset.subtitle', icon: MoveHorizontal, categoryKey: 'tools.familyOffsets', implemented: true, schematic: 'two-elbow-offset' },
   { key: 'pipe-dimensions', nameKey: 'tools.pipeDim.name', descKey: 'tools.pipeDim.subtitle', icon: Table2, categoryKey: 'tools.categoryReference', implemented: true },
   { key: 'pressure-drop', nameKey: 'tools.pressureDrop.name', descKey: 'tools.pressureDrop.subtitle', icon: Gauge, categoryKey: 'tools.categoryHydraulics', implemented: true },
   { key: 'unit-converter', nameKey: 'tools.unitConverter', descKey: 'tools.unitConverterDesc', icon: Calculator, categoryKey: 'tools.categoryUtility', implemented: true },
@@ -192,56 +218,79 @@ export default function Tools() {
           </div>
         )}
 
-        {/* Card Grid Catalog */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {TOOLS.map((tool) => {
-            const Icon = tool.icon;
-            return (
-              <button
-                key={tool.key}
-                data-tool-key={tool.key}
-                onClick={() => tool.implemented && setActive(tool.key)}
-                disabled={!tool.implemented}
-                className={`group relative flex flex-col items-center gap-3 rounded-xl border p-6 text-center transition-all duration-200 ${
-                  tool.implemented
-                    ? 'border-[#232A36] bg-[#151A22] hover:border-[#FF8C00]/50 hover:bg-[#151A22]/80 hover:shadow-lg hover:shadow-[#FF8C00]/5 cursor-pointer'
-                    : 'border-[#232A36]/50 bg-[#151A22]/50 opacity-50 cursor-not-allowed'
-                }`}
-              >
-                {/* Icon */}
-                <div className={`flex h-14 w-14 items-center justify-center rounded-xl transition-colors ${
-                  tool.implemented
-                    ? 'bg-[#FF8C00]/10 text-[#FF8C00] group-hover:bg-[#FF8C00]/20'
-                    : 'bg-[#232A36] text-[#A3A9B3]'
-                }`}>
-                  <Icon className="h-7 w-7" />
-                </div>
-
-                {/* Name */}
-                <h3 className="text-sm font-semibold text-[#F5F7FA]">
-                  {t(tool.nameKey)}
-                </h3>
-
-                {/* Description */}
-                <p className="text-[11px] text-[#A3A9B3] leading-relaxed">
-                  {t(tool.descKey, { defaultValue: t(tool.categoryKey) })}
-                </p>
-
-                {/* Category badge */}
-                <span className="mt-auto text-[9px] uppercase tracking-[0.2em] text-[#A3A9B3]/60 border border-[#232A36] rounded-full px-2 py-0.5">
-                  {t(tool.categoryKey)}
+        {/* Card Grid Catalog — grouped by family (PB-TOOLS-NAV-REORG-001).
+            Same cards, same links, same visual identity: the only change is
+            that each family gets a labelled section and the prefabrication
+            tools show their own schematic instead of a generic icon. */}
+        {SECTION_ORDER.map((sectionKey) => {
+          const sectionTools = TOOLS.filter((tool) => tool.categoryKey === sectionKey);
+          if (sectionTools.length === 0) return null;
+          return (
+            <section key={sectionKey} className="space-y-4" data-testid={`tools-section-${sectionKey.split('.').pop()}`}>
+              <div className="flex items-baseline justify-between border-b border-[#232A36]/60 pb-2">
+                <h2 className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#A3A9B3]">
+                  {t(sectionKey)}
+                </h2>
+                <span className="text-[10px] text-[#A3A9B3]/60">
+                  {sectionTools.length}
                 </span>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {sectionTools.map((tool) => {
+                  const Icon = tool.icon;
+                  return (
+                    <button
+                      key={tool.key}
+                      data-tool-key={tool.key}
+                      onClick={() => tool.implemented && setActive(tool.key)}
+                      disabled={!tool.implemented}
+                      className={`group relative flex flex-col items-center gap-3 rounded-xl border p-6 text-center transition-all duration-200 ${
+                        tool.implemented
+                          ? 'border-[#232A36] bg-[#151A22] hover:border-[#FF8C00]/50 hover:bg-[#151A22]/80 hover:shadow-lg hover:shadow-[#FF8C00]/5 cursor-pointer'
+                          : 'border-[#232A36]/50 bg-[#151A22]/50 opacity-50 cursor-not-allowed'
+                      }`}
+                    >
+                      {/* Icon / schematic — same slot, same size, same tones */}
+                      <div className={`flex h-14 w-14 items-center justify-center rounded-xl transition-colors ${
+                        tool.implemented
+                          ? 'bg-[#FF8C00]/10 text-[#FF8C00] group-hover:bg-[#FF8C00]/20'
+                          : 'bg-[#232A36] text-[#A3A9B3]'
+                      }`}>
+                        {tool.schematic ? (
+                          <ToolSchematic id={tool.schematic} className="h-8 w-8" />
+                        ) : (
+                          <Icon className="h-7 w-7" />
+                        )}
+                      </div>
 
-                {/* Coming soon badge */}
-                {!tool.implemented && (
-                  <span className="absolute top-3 right-3 text-[8px] uppercase tracking-wider bg-[#232A36] text-[#A3A9B3] px-2 py-0.5 rounded">
-                    {t('tools.comingSoon')}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+                      {/* Name */}
+                      <h3 className="text-sm font-semibold text-[#F5F7FA]">
+                        {t(tool.nameKey)}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="text-[11px] text-[#A3A9B3] leading-relaxed">
+                        {t(tool.descKey, { defaultValue: t(tool.categoryKey) })}
+                      </p>
+
+                      {/* Category badge */}
+                      <span className="mt-auto text-[9px] uppercase tracking-[0.2em] text-[#A3A9B3]/60 border border-[#232A36] rounded-full px-2 py-0.5">
+                        {t(tool.categoryKey)}
+                      </span>
+
+                      {/* Coming soon badge */}
+                      {!tool.implemented && (
+                        <span className="absolute top-3 right-3 text-[8px] uppercase tracking-wider bg-[#232A36] text-[#A3A9B3] px-2 py-0.5 rounded">
+                          {t('tools.comingSoon')}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })}
       </div>
     );
   }
@@ -274,6 +323,8 @@ export default function Tools() {
           <MiteredElbowTool />
         ) : active === 'pipe-comb' ? (
           <PipeCombTool />
+        ) : active === 'two-elbow-offset' ? (
+          <TwoElbowOffsetTool />
         ) : active === 'branch-layout' ? (
           <BranchLayoutTool />
         ) : active === 'unit-converter' ? (

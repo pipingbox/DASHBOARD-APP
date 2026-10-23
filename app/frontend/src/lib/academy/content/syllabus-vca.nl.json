@@ -1,0 +1,297 @@
+[
+  {
+    "id": "m1-legal",
+    "iconKey": "Shield",
+    "officialRef": "VCA 2026 §1",
+    "title": "Module 1: Wetgeving en regelgeving",
+    "lessons": [
+      {
+        "title": "1.1 Belgische en Europese veiligheidswetgeving",
+        "duration": "15 min",
+        "topics": [
+          "De Codex over Welzijn op het Werk",
+          "EU-kaderrichtlijn 89/391/EEC",
+          "Rechten en plichten van de werknemer",
+          "Verantwoordelijkheden van de werkgever"
+        ]
+      },
+      {
+        "title": "1.2 Het VCA-systeem en de certificering",
+        "duration": "10 min",
+        "topics": [
+          "Wat is VCA?",
+          "B-VCA versus VOL-VCA",
+          "Geldigheid (10 jaar)",
+          "Beheer door SSVV/BESACC"
+        ]
+      },
+      {
+        "title": "1.3 ARAB en CODELCO",
+        "duration": "12 min",
+        "topics": [
+          "Het Algemeen Reglement voor de Arbeidsbescherming (ARAB)",
+          "De Commissie voor Welzijn op het Werk",
+          "Melden van ongevallen"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m2-risk",
+    "iconKey": "AlertTriangle",
+    "officialRef": "VCA 2026 §2",
+    "title": "Module 2: Risicoanalyse en preventie",
+    "lessons": [
+      {
+        "title": "2.1 Risico's herkennen",
+        "duration": "20 min",
+        "topics": [
+          "Wat is een risico?",
+          "Gevaar versus risico",
+          "Risicomatrix",
+          "Taakrisicoanalyse (JSA)"
+        ]
+      },
+      {
+        "title": "2.2 Arbeidshygiënische strategie (hiërarchie van maatregelen)",
+        "duration": "15 min",
+        "topics": [
+          "Eliminatie",
+          "Vervanging",
+          "Technische maatregelen",
+          "Organisatorische maatregelen",
+          "PBM (laatste redmiddel)"
+        ]
+      },
+      {
+        "title": "2.3 Werkvergunningensysteem",
+        "duration": "12 min",
+        "topics": [
+          "Vergunning voor heet werk",
+          "Vergunning voor betreden van besloten ruimten",
+          "Vergrendelen en labelen (LOTO)",
+          "Vergunning voor werken op hoogte"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m3-ppe",
+    "iconKey": "HardHat",
+    "officialRef": "VCA 2026 §3",
+    "title": "Module 3: Persoonlijke beschermingsmiddelen",
+    "lessons": [
+      {
+        "title": "3.1 Verplichte PBM op industriële sites",
+        "duration": "10 min",
+        "topics": [
+          "Veiligheidshelm (EN 397)",
+          "Veiligheidsbril (EN 166)",
+          "Veiligheidsschoenen (EN ISO 20345)",
+          "Signalisatievest met hoge zichtbaarheid (EN 20471)",
+          "Veiligheidshandschoenen (EN 388)"
+        ]
+      },
+      {
+        "title": "3.2 Adembescherming",
+        "duration": "15 min",
+        "topics": [
+          "FFP1-/FFP2-/FFP3-maskers",
+          "Halfgelaats- en volgelaatsmaskers",
+          "Onafhankelijke ademlucht (SCBA) voor besloten ruimten",
+          "Filterkeuze (A, B, E, K, P)"
+        ]
+      },
+      {
+        "title": "3.3 Gehoorbescherming en valbeveiliging",
+        "duration": "10 min",
+        "topics": [
+          "Oordoppen versus oorkappen (SNR-waarde)",
+          "Harnas (EN 361)",
+          "Vanglijnen en levenslijnen",
+          "Verankeringspunten (EN 795)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m4-fire",
+    "iconKey": "Flame",
+    "officialRef": "VCA 2026 §4",
+    "title": "Module 4: Brand- en explosieveiligheid",
+    "lessons": [
+      {
+        "title": "4.1 Branddriehoek en brandklassen",
+        "duration": "12 min",
+        "topics": [
+          "Branddriehoek (warmte, brandstof, zuurstof)",
+          "Brandklassen A/B/C/D/F",
+          "Soorten blustoestellen (water, schuim, CO2, poeder)",
+          "PASS-methode"
+        ]
+      },
+      {
+        "title": "4.2 ATEX-zones",
+        "duration": "15 min",
+        "topics": [
+          "Zone 0/1/2 (gas)",
+          "Zone 20/21/22 (stof)",
+          "Apparatuurcategorieën (1/2/3)",
+          "Heet werk in ATEX-zones"
+        ]
+      },
+      {
+        "title": "4.3 Evacuatieprocedures",
+        "duration": "10 min",
+        "topics": [
+          "Alarmsignalen",
+          "Evacuatiewegen",
+          "Verzamelplaatsen",
+          "Telling van het personeel op de verzamelplaats"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m5-electrical",
+    "iconKey": "Zap",
+    "officialRef": "VCA 2026 §5",
+    "title": "Module 5: Elektrische veiligheid",
+    "lessons": [
+      {
+        "title": "5.1 Elektrische gevaren",
+        "duration": "15 min",
+        "topics": [
+          "Elektrische schok",
+          "Vlamboog",
+          "Stapspanning",
+          "Bevoegdheidsniveaus BA4/BA5"
+        ]
+      },
+      {
+        "title": "5.2 Vergrendelen en labelen (LOTO)",
+        "duration": "12 min",
+        "topics": [
+          "LOTO-procedure in 6 stappen",
+          "Afsluiten van energiebronnen",
+          "Controle op nulenergie (spanningsloosheid)",
+          "Groepsvergrendeling"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m6-height",
+    "iconKey": "Wind",
+    "officialRef": "VCA 2026 §6",
+    "title": "Module 6: Werken op hoogte",
+    "lessons": [
+      {
+        "title": "6.1 Valgevaren en preventie",
+        "duration": "15 min",
+        "topics": [
+          "Definitie (>2 m)",
+          "Leuningen en kantplanken",
+          "Vangnetten",
+          "Valbeveiligingssystemen"
+        ]
+      },
+      {
+        "title": "6.2 Veilig werken met steigers",
+        "duration": "12 min",
+        "topics": [
+          "Steigerkaarten (groen/rood/geel)",
+          "Keuringseisen",
+          "Belastingsklassen",
+          "Bevoegd persoon"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-chemical",
+    "iconKey": "Droplets",
+    "officialRef": "VCA 2026 §7",
+    "title": "Module 7: Gevaarlijke stoffen",
+    "lessons": [
+      {
+        "title": "7.1 CLP/GHS-indeling",
+        "duration": "15 min",
+        "topics": [
+          "Gevarenpictogrammen",
+          "H-zinnen en P-zinnen",
+          "Signaalwoorden (Gevaar/Waarschuwing)",
+          "Veiligheidsinformatiebladen (VIB)"
+        ]
+      },
+      {
+        "title": "7.2 Asbest en silica",
+        "duration": "12 min",
+        "topics": [
+          "Soorten asbest (wit/bruin/blauw)",
+          "REACH-verordening",
+          "Kwartsstof (RESPIRE-SILICE)",
+          "Grenswaarden voor blootstelling"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-ergonomics",
+    "iconKey": "Eye",
+    "officialRef": "VCA 2026 §8",
+    "title": "Module 8: Ergonomie en manueel hanteren van lasten",
+    "lessons": [
+      {
+        "title": "8.1 Tiltechnieken",
+        "duration": "10 min",
+        "topics": [
+          "Juiste tilhouding",
+          "Tillen met meerdere personen",
+          "Mechanische hulpmiddelen",
+          "Gewichtslimieten (25 kg mannen / 12,5 kg vrouwen)"
+        ]
+      },
+      {
+        "title": "8.2 Beeldschermwerk en houding",
+        "duration": "8 min",
+        "topics": [
+          "Afstand tot het beeldscherm",
+          "Instellen van de stoel",
+          "Pauzes (5 min/uur)",
+          "Voorkomen van vermoeide ogen"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m9-accidents",
+    "iconKey": "ClipboardList",
+    "officialRef": "VCA 2026 §9",
+    "title": "Module 9: Ongevallen en eerste hulp",
+    "lessons": [
+      {
+        "title": "9.1 Melden van ongevallen",
+        "duration": "12 min",
+        "topics": [
+          "Melden van bijna-ongevallen",
+          "Ongevallenonderzoek",
+          "Analyse van de basisoorzaken",
+          "Corrigerende maatregelen"
+        ]
+      },
+      {
+        "title": "9.2 Basis eerste hulp",
+        "duration": "15 min",
+        "topics": [
+          "DRABC-protocol",
+          "Reanimatie (30:2)",
+          "Stabiele zijligging",
+          "Stelpen van bloedingen",
+          "Behandeling van brandwonden",
+          "Oogspoeling"
+        ]
+      }
+    ]
+  }
+]

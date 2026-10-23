@@ -61,3 +61,32 @@ export async function handlePendingProfileAfterApply(
   trackEvent('email_profile_completion_requested', { job_id: jobId, status: emailStatus });
   return true;
 }
+
+/**
+ * PB-JOBS-MARKETPLACE-READY-RECOVERY-001: tras cualquier apply exitoso,
+ * drenar el outbox de activación (EMAIL 2). El gate de candidaturas puede
+ * haber promovido el perfil durante el INSERT (sincronización canónica del
+ * estado stale), lo que activa candidaturas pending y encola el EMAIL 2.
+ * Este drain self-service es idempotente (claim por activation_id) y
+ * fail-open: si falla, el outbox persiste y lo drena la siguiente
+ * invocación (wizard / retry / siguiente apply).
+ */
+export async function drainActivationEmailsAfterApply(): Promise<void> {
+  try {
+    const { error } = await supabase.functions.invoke(
+      'marketplace-ready-activation-email',
+      { body: {} },
+    );
+    if (error) {
+      console.error(
+        '[applicationPendingProfile] activation drain failed (fail-open):',
+        error.message,
+      );
+    }
+  } catch (err) {
+    console.error(
+      '[applicationPendingProfile] activation drain invoke error (fail-open):',
+      err instanceof Error ? err.message : String(err),
+    );
+  }
+}

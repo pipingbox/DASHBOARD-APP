@@ -60,6 +60,45 @@ export async function getBrokerSignedUrl(options: {
 }
 
 /**
+ * PB-SEC-01 — Brokered file URL that works for BOTH delivery mechanisms.
+ *
+ * Owner/admin viewers receive a short-lived signed URL (JSON). Company
+ * viewers receive the file PROXIED through the Edge Function (binary body,
+ * neutral filename, no reusable link): supabase-js surfaces that as a Blob,
+ * which we turn into a local object URL.
+ *
+ * Returns null if the viewer is not authorized, the file is not visible, or
+ * the broker refuses the request (e.g. company asking for an original CV:
+ * 403 cv_original_not_available).
+ */
+export async function getBrokerFileUrl(options: {
+  owner_user_id: string;
+  file_type: 'cv' | 'document' | 'certification';
+  record_id?: string;
+}): Promise<string | null> {
+  const { data, error } = await supabase.functions.invoke('secure-file-access', {
+    body: options,
+  });
+
+  if (error) {
+    console.error('[storageHelpers] Broker file access failed:', error?.message);
+    return null;
+  }
+
+  if (typeof Blob !== 'undefined' && data instanceof Blob) {
+    if (data.size === 0) return null;
+    return URL.createObjectURL(data);
+  }
+
+  if (data?.signedUrl) {
+    return data.signedUrl as string;
+  }
+
+  console.error('[storageHelpers] Broker file access failed:', data?.error || 'unexpected response');
+  return null;
+}
+
+/**
  * PB-GROWTH-GATE-PROFILE-E2E-001 — open a private file on the FIRST click.
  *
  * Shared popup-safe pattern (first deployed for DocumentsSection in

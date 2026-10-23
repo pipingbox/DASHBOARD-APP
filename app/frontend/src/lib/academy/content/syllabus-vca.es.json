@@ -1,0 +1,297 @@
+[
+  {
+    "id": "m1-legal",
+    "iconKey": "Shield",
+    "officialRef": "VCA 2026 §1",
+    "title": "Módulo 1: Legislación y normativa",
+    "lessons": [
+      {
+        "title": "1.1 Legislación belga y europea en materia de seguridad",
+        "duration": "15 min",
+        "topics": [
+          "Codex over Welzijn op het Werk (Código sobre el bienestar en el trabajo)",
+          "Directiva marco de la UE 89/391/EEC",
+          "Derechos y obligaciones del trabajador",
+          "Responsabilidades del empresario"
+        ]
+      },
+      {
+        "title": "1.2 El sistema VCA y la certificación",
+        "duration": "10 min",
+        "topics": [
+          "¿Qué es el VCA?",
+          "B-VCA frente a VOL-VCA",
+          "Validez (10 años)",
+          "Gobernanza de SSVV/BESACC"
+        ]
+      },
+      {
+        "title": "1.3 ARAB y CODELCO",
+        "duration": "12 min",
+        "topics": [
+          "Algemeen Reglement voor de Arbeidsbescherming (Reglamento general de protección laboral)",
+          "Commissie voor Welzijn op het Werk (Comisión para el bienestar en el trabajo)",
+          "Notificación de accidentes"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m2-risk",
+    "iconKey": "AlertTriangle",
+    "officialRef": "VCA 2026 §2",
+    "title": "Módulo 2: Análisis de riesgos y prevención",
+    "lessons": [
+      {
+        "title": "2.1 Identificación de riesgos",
+        "duration": "20 min",
+        "topics": [
+          "¿Qué es un riesgo?",
+          "Peligro frente a riesgo",
+          "Matriz de riesgos",
+          "Análisis de seguridad del trabajo (JSA)"
+        ]
+      },
+      {
+        "title": "2.2 Jerarquía de las medidas de control",
+        "duration": "15 min",
+        "topics": [
+          "Eliminación",
+          "Sustitución",
+          "Medidas técnicas",
+          "Medidas organizativas",
+          "EPI (último recurso)"
+        ]
+      },
+      {
+        "title": "2.3 Sistema de permisos de trabajo",
+        "duration": "12 min",
+        "topics": [
+          "Permiso de trabajos en caliente",
+          "Permiso de entrada en espacios confinados",
+          "Bloqueo y etiquetado (LOTO)",
+          "Permiso de trabajos en altura"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m3-ppe",
+    "iconKey": "HardHat",
+    "officialRef": "VCA 2026 §3",
+    "title": "Módulo 3: Equipos de protección individual",
+    "lessons": [
+      {
+        "title": "3.1 EPI obligatorios en instalaciones industriales",
+        "duration": "10 min",
+        "topics": [
+          "Casco de seguridad (EN 397)",
+          "Gafas de seguridad (EN 166)",
+          "Calzado de seguridad (EN ISO 20345)",
+          "Chaleco de alta visibilidad (EN 20471)",
+          "Guantes de protección (EN 388)"
+        ]
+      },
+      {
+        "title": "3.2 Protección respiratoria",
+        "duration": "15 min",
+        "topics": [
+          "Mascarillas FFP1/FFP2/FFP3",
+          "Medias máscaras y máscaras completas",
+          "Equipo de respiración autónomo (SCBA) para espacios confinados",
+          "Selección de filtros (A, B, E, K, P)"
+        ]
+      },
+      {
+        "title": "3.3 Protección auditiva y anticaídas",
+        "duration": "10 min",
+        "topics": [
+          "Tapones frente a orejeras (índice SNR)",
+          "Arnés anticaídas (EN 361)",
+          "Elementos de amarre y líneas de vida",
+          "Puntos de anclaje (EN 795)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m4-fire",
+    "iconKey": "Flame",
+    "officialRef": "VCA 2026 §4",
+    "title": "Módulo 4: Seguridad contra incendios y explosiones",
+    "lessons": [
+      {
+        "title": "4.1 Triángulo del fuego y clases de fuego",
+        "duration": "12 min",
+        "topics": [
+          "Triángulo del fuego (calor, combustible, oxígeno)",
+          "Clases A/B/C/D/F",
+          "Tipos de extintores (agua, espuma, CO2, polvo)",
+          "Método PASS"
+        ]
+      },
+      {
+        "title": "4.2 Zonas ATEX",
+        "duration": "15 min",
+        "topics": [
+          "Zonas 0/1/2 (gases)",
+          "Zonas 20/21/22 (polvo)",
+          "Categorías de equipos (1/2/3)",
+          "Trabajos en caliente en zonas ATEX"
+        ]
+      },
+      {
+        "title": "4.3 Procedimientos de evacuación",
+        "duration": "10 min",
+        "topics": [
+          "Señales de alarma",
+          "Vías de evacuación",
+          "Puntos de reunión",
+          "Recuento de personal en el punto de reunión"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m5-electrical",
+    "iconKey": "Zap",
+    "officialRef": "VCA 2026 §5",
+    "title": "Módulo 5: Seguridad eléctrica",
+    "lessons": [
+      {
+        "title": "5.1 Riesgos eléctricos",
+        "duration": "15 min",
+        "topics": [
+          "Descarga eléctrica",
+          "Arco eléctrico",
+          "Tensión de paso",
+          "Niveles de autorización BA4/BA5"
+        ]
+      },
+      {
+        "title": "5.2 Bloqueo y etiquetado (LOTO)",
+        "duration": "12 min",
+        "topics": [
+          "Procedimiento LOTO en 6 pasos",
+          "Aislamiento de las fuentes de energía",
+          "Verificación de energía cero",
+          "Bloqueo de grupo"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m6-height",
+    "iconKey": "Wind",
+    "officialRef": "VCA 2026 §6",
+    "title": "Módulo 6: Trabajos en altura",
+    "lessons": [
+      {
+        "title": "6.1 Riesgos de caída y su prevención",
+        "duration": "15 min",
+        "topics": [
+          "Definición (>2 m)",
+          "Barandillas y rodapiés",
+          "Redes de seguridad",
+          "Sistemas anticaídas"
+        ]
+      },
+      {
+        "title": "6.2 Seguridad en andamios",
+        "duration": "12 min",
+        "topics": [
+          "Tarjetas de andamio (verde/roja/amarilla)",
+          "Requisitos de inspección",
+          "Clases de carga",
+          "Persona competente"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-chemical",
+    "iconKey": "Droplets",
+    "officialRef": "VCA 2026 §7",
+    "title": "Módulo 7: Sustancias peligrosas",
+    "lessons": [
+      {
+        "title": "7.1 Clasificación CLP/GHS",
+        "duration": "15 min",
+        "topics": [
+          "Pictogramas de peligro",
+          "Frases H y frases P",
+          "Palabras de advertencia (Peligro/Atención)",
+          "Fichas de datos de seguridad (FDS)"
+        ]
+      },
+      {
+        "title": "7.2 Amianto y sílice",
+        "duration": "12 min",
+        "topics": [
+          "Tipos de amianto (blanco/marrón/azul)",
+          "Reglamento REACH",
+          "Polvo de sílice (RESPIRE-SILICE)",
+          "Límites de exposición"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-ergonomics",
+    "iconKey": "Eye",
+    "officialRef": "VCA 2026 §8",
+    "title": "Módulo 8: Ergonomía y manipulación manual de cargas",
+    "lessons": [
+      {
+        "title": "8.1 Técnicas de levantamiento",
+        "duration": "10 min",
+        "topics": [
+          "Postura correcta al levantar cargas",
+          "Levantamiento en equipo",
+          "Ayudas mecánicas",
+          "Límites de peso (25 kg hombres / 12,5 kg mujeres)"
+        ]
+      },
+      {
+        "title": "8.2 Trabajo con pantallas y postura",
+        "duration": "8 min",
+        "topics": [
+          "Distancia a la pantalla",
+          "Ajuste de la silla",
+          "Pausas (5 min/hora)",
+          "Prevención de la fatiga visual"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m9-accidents",
+    "iconKey": "ClipboardList",
+    "officialRef": "VCA 2026 §9",
+    "title": "Módulo 9: Accidentes y primeros auxilios",
+    "lessons": [
+      {
+        "title": "9.1 Notificación de accidentes",
+        "duration": "12 min",
+        "topics": [
+          "Notificación de incidentes sin daños (casi accidentes)",
+          "Investigación de accidentes",
+          "Análisis de causas raíz",
+          "Acciones correctivas"
+        ]
+      },
+      {
+        "title": "9.2 Primeros auxilios básicos",
+        "duration": "15 min",
+        "topics": [
+          "Protocolo DRABC",
+          "RCP (30:2)",
+          "Posición lateral de seguridad",
+          "Control de hemorragias",
+          "Tratamiento de quemaduras",
+          "Lavado ocular"
+        ]
+      }
+    ]
+  }
+]

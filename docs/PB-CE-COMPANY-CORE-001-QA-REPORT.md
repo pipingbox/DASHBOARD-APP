@@ -25,8 +25,8 @@ de correo reutilizable es `_shared/email-provider.ts` con i18n de 11 locales.
 
 ## 3. Artefactos y SHA
 
-Forward: `sql/041-pb-ce-company-core-001.sql`.  
-Rollback: `sql/041b-pb-ce-company-core-rollback.sql`.  
+Forward: `sql/058-pb-ce-company-core-001.sql` (renumerado desde `041` en la reconciliación con main del 2026-10-23 por colisión de numeración con `sql/041-pb-cv-auto-profile.sql`; contenido byte-idéntico al validado en QA).  
+Rollback: `sql/058b-pb-ce-company-core-rollback.sql` (renumerado desde `041b`; contenido byte-idéntico).  
 Frontend: `companyCore.ts`, `CompanyTenant`, `CompanyTeam`, `InviteAccept`,
 selector multiempresa e i18n de 11 locales.
 

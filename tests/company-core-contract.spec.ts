@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 /**
  * PB-CE-COMPANY-CORE-001 — Company tenant + team accounts security contract.
  *
- * This suite pins the backend contract of sql/041 (and its rollback sql/041b)
+ * This suite pins the backend contract of sql/058 (and its rollback sql/058b)
  * plus the frontend wiring, without a browser or a live database:
  *
  *  1. Three new tables with RLS ENABLE + FORCE.
@@ -26,8 +26,8 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const readCode = (rel: string) => readFileSync(join(ROOT, rel), 'utf8');
 
-const SQL = readCode('sql/041-pb-ce-company-core-001.sql');
-const ROLLBACK = readCode('sql/041b-pb-ce-company-core-rollback.sql');
+const SQL = readCode('sql/058-pb-ce-company-core-001.sql');
+const ROLLBACK = readCode('sql/058b-pb-ce-company-core-rollback.sql');
 const CLIENT = readCode('app/frontend/src/lib/companyCore.ts');
 const OBS = readCode('app/frontend/src/lib/observability.ts');
 const EN = JSON.parse(readCode('app/frontend/src/i18n/locales/en.json'));
