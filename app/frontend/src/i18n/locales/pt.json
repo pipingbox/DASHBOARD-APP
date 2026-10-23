@@ -1521,7 +1521,6 @@
       "pdfDownloaded": "PDF baixado — imprima a 100% / tamanho real, sem ajustar à página"
     },
     "categoryFabrication": "Fabricação",
-    "familyOffsets": "Desvios e deslocamentos",
     "elbowCut": {
       "arcNeutral": "Arco neutro (C-C):",
       "name": "Calculadora de corte de curva",
@@ -1790,7 +1789,6 @@
       },
       "offset": {
         "title": "Desvio de tubagem",
-        "cardSubtitle": "Desvios com cotovelos, sem cotovelos e verificação de medidas",
         "tabWithElbows": "Com curvas",
         "tabWithoutElbows": "Sem curvas",
         "tabVerify": "Verificar",
@@ -1812,7 +1810,8 @@
         "straightCut": "Corte reto",
         "centerToCenter": "Centro a centro",
         "diagonal": "H (diagonal)",
-        "cutAngleEnd": "Ângulo de corte por extremidade"
+        "cutAngleEnd": "Ângulo de corte por extremidade",
+        "cardSubtitle": "Desvios com cotovelos, sem cotovelos e verificação de medidas"
       },
       "miteredElbow": {
         "title": "Curva segmentada",
@@ -2076,6 +2075,29 @@
           }
         }
       },
+      "errors": {
+        "line_count_range": "O número de linhas deve ser um inteiro entre {{min}} e {{max}}",
+        "spacing_positive": "O espaçamento entre eixos deve ser um comprimento positivo e finito ({{field}})",
+        "elbow_angle_range": "O ângulo da curva deve estar entre 0° e {{max}}°",
+        "clr_positive": "O CLR deve ser um raio positivo e finito",
+        "per_line_specs_count": "As especificações por linha devem corresponder ao número de linhas",
+        "per_line_clr_invalid": "Linha {{line}}: o CLR por linha deve ser um raio positivo e finito",
+        "advance_invalid": "Linha {{line}}: o avanço calculado é inválido",
+        "negative_cut": "O comprimento de corte reto é negativo ({{value}} mm): o raio da curva é demasiado grande para esta geometria",
+        "ab_positive": "{{field}} deve ser um comprimento positivo e finito",
+        "angle_mismatch": "A geometria requer uma curva de {{required}}°; a curva selecionada de {{selected}}° é incompatível para um desvio 2D de linhas paralelas",
+        "verify_two_values": "Forneça exatamente dois valores de A, B, H ou θ",
+        "verify_h_smaller": "H não pode ser menor que {{side}}",
+        "verify_invalid": "Não foi possível resolver o triângulo de verificação",
+        "segments_min": "N deve ser um inteiro ≥ {{min}} peças retas",
+        "total_angle_range": "O ângulo total deve estar entre 0° e {{max}}°",
+        "radius_positive": "O raio deve ser um comprimento positivo e finito",
+        "od_positive": "O OD deve ser um comprimento positivo e finito",
+        "radius_gt_half_od": "O raio ({{radius}} mm) deve ser maior que OD/2 ({{halfOd}} mm)",
+        "piece_lengths_invalid": "Os comprimentos de peça calculados são inválidos",
+        "clr_gt_half_od": "O CLR deve ser maior que OD/2",
+        "beta_range": "O ângulo de corte deve estar entre 0° e {{max}}°"
+      },
       "twoElbowOffset": {
         "title": "Deslocamento com dois cotovelos",
         "subtitle": "Deslocamento de linhas paralelas com dois cotovelos: avanço, percurso e trecho reto intermédio.",
@@ -2122,29 +2144,6 @@
         "clrSourceCatalog": "CLR resolvido do catálogo: NPS {{combo}}.",
         "clrSourceCustom": "CLR personalizado; não provém do catálogo.",
         "clrMissing": "O catálogo desta ferramenta não tem CLR tabulado para NPS {{combo}}. Introduz um CLR para calcular."
-      },
-      "errors": {
-        "line_count_range": "O número de linhas deve ser um inteiro entre {{min}} e {{max}}",
-        "spacing_positive": "O espaçamento entre eixos deve ser um comprimento positivo e finito ({{field}})",
-        "elbow_angle_range": "O ângulo da curva deve estar entre 0° e {{max}}°",
-        "clr_positive": "O CLR deve ser um raio positivo e finito",
-        "per_line_specs_count": "As especificações por linha devem corresponder ao número de linhas",
-        "per_line_clr_invalid": "Linha {{line}}: o CLR por linha deve ser um raio positivo e finito",
-        "advance_invalid": "Linha {{line}}: o avanço calculado é inválido",
-        "negative_cut": "O comprimento de corte reto é negativo ({{value}} mm): o raio da curva é demasiado grande para esta geometria",
-        "ab_positive": "{{field}} deve ser um comprimento positivo e finito",
-        "angle_mismatch": "A geometria requer uma curva de {{required}}°; a curva selecionada de {{selected}}° é incompatível para um desvio 2D de linhas paralelas",
-        "verify_two_values": "Forneça exatamente dois valores de A, B, H ou θ",
-        "verify_h_smaller": "H não pode ser menor que {{side}}",
-        "verify_invalid": "Não foi possível resolver o triângulo de verificação",
-        "segments_min": "N deve ser um inteiro ≥ {{min}} peças retas",
-        "total_angle_range": "O ângulo total deve estar entre 0° e {{max}}°",
-        "radius_positive": "O raio deve ser um comprimento positivo e finito",
-        "od_positive": "O OD deve ser um comprimento positivo e finito",
-        "radius_gt_half_od": "O raio ({{radius}} mm) deve ser maior que OD/2 ({{halfOd}} mm)",
-        "piece_lengths_invalid": "Os comprimentos de peça calculados são inválidos",
-        "clr_gt_half_od": "O CLR deve ser maior que OD/2",
-        "beta_range": "O ângulo de corte deve estar entre 0° e {{max}}°"
       }
     },
     "tabPipeDimensions": "Dimensões do tubo",
@@ -2468,7 +2467,8 @@
       "pdfSeam": "costura",
       "pdfWrapNote": "Enrolar: X ao longo da circunferência, Y desde a extremidade quadrada do lado do cotovelo.",
       "pdfClosure": "fecho"
-    }
+    },
+    "familyOffsets": "Desvios e deslocamentos"
   },
   "jobs": {
     "eyebrow": "Jobs",
@@ -4628,6 +4628,34 @@
     "copyAllFacebook": "Copiar todos os links do Facebook",
     "copied": "Copiado",
     "note": "Os parâmetros UTM contêm apenas identificadores genéricos de campanha, nunca dados pessoais."
+  },
+  "marketplaceV3": {
+    "title": "Ativar Marketplace Ready",
+    "subtitle": "Reveja os requisitos e aceite as condições do Marketplace para tornar o seu perfil visível às empresas.",
+    "requirementsTitle": "Requisitos do Marketplace Ready",
+    "requirements": {
+      "cv": "CV carregado e acessível",
+      "profession": "Profissão ou ofício indicado",
+      "location": "Local ou região de trabalho",
+      "availability": "Disponibilidade declarada"
+    },
+    "certificatesOptional": "Os certificados são opcionais: melhoram o seu perfil, mas não são obrigatórios para entrar no Marketplace.",
+    "consentText": "Ao aceitar, autoriza a PIPINGBOX a apresentar o seu perfil profissional a empresas verificadas de acordo com as condições do Marketplace (versão v3-2026-10-17). O seu CV original e os seus dados de contacto nunca são mostrados sem a sua autorização.",
+    "consentCheckbox": "Li e aceito as condições do Marketplace (v3).",
+    "acceptCta": "Aceitar e ativar",
+    "resultReady": "O seu perfil está Marketplace Ready. As empresas já podem encontrá-lo.",
+    "resultNotEligible": "Consentimento registado. Complete os requisitos pendentes para ativar o Marketplace Ready.",
+    "resultLegacy": "O seu perfil está protegido pelas condições anteriores. Não foram aplicadas alterações.",
+    "resultError": "Não foi possível concluir a aceitação. Tente novamente.",
+    "completeProfileLink": "Complete o seu perfil",
+    "contractVersion": "Versão do contrato: {{version}} · Idioma: {{lang}}",
+    "resultAccountType": "Esta ação está disponível apenas para contas profissionais.",
+    "goDashboard": "Ir para o seu painel",
+    "contractNotActive": "Condições ainda não ativas",
+    "contractNotActiveBody": "As condições do Marketplace v3 estão em revisão jurídica e ainda não estão ativadas. Poderá aceitá-las aqui quando estiverem disponíveis.",
+    "contractChanged": "As condições mudaram",
+    "contractChangedBody": "As condições do Marketplace foram atualizadas enquanto as revia. Por segurança, não foi registada nenhuma aceitação. Reveja a versão atual antes de aceitar.",
+    "reviewAgainCta": "Rever a versão atual"
   },
   "companyCore": {
     "loading": "A carregar…",

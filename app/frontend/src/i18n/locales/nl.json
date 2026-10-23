@@ -1518,7 +1518,6 @@
       "pdfDownloaded": "PDF gedownload — print op 100% / werkelijke grootte, niet aanpassen aan pagina"
     },
     "categoryFabrication": "Fabricage",
-    "familyOffsets": "Verspringingen en verplaatsingen",
     "elbowCut": {
       "arcNeutral": "Neutrale boog (C-C):",
       "name": "Bochtsnij-calculator",
@@ -1787,7 +1786,6 @@
       },
       "offset": {
         "title": "Buissprong",
-        "cardSubtitle": "Verspringingen met bochten, zonder bochten en maatcontrole",
         "tabWithElbows": "Met bochten",
         "tabWithoutElbows": "Zonder bochten",
         "tabVerify": "Controleren",
@@ -1809,7 +1807,8 @@
         "straightCut": "Rechte snede",
         "centerToCenter": "Hart-op-hart",
         "diagonal": "H (diagonaal)",
-        "cutAngleEnd": "Snijhoek per uiteinde"
+        "cutAngleEnd": "Snijhoek per uiteinde",
+        "cardSubtitle": "Verspringingen met bochten, zonder bochten en maatcontrole"
       },
       "miteredElbow": {
         "title": "Gesegmenteerde bocht",
@@ -2073,6 +2072,29 @@
           }
         }
       },
+      "errors": {
+        "line_count_range": "Het aantal leidingen moet een geheel getal tussen {{min}} en {{max}} zijn",
+        "spacing_positive": "De hart-op-hartafstand moet een positieve eindige lengte zijn ({{field}})",
+        "elbow_angle_range": "De bochthoek moet tussen 0° en {{max}}° liggen",
+        "clr_positive": "CLR moet een positieve eindige radius zijn",
+        "per_line_specs_count": "De specificaties per leiding moeten overeenkomen met het aantal leidingen",
+        "per_line_clr_invalid": "Leiding {{line}}: CLR per leiding moet een positieve eindige radius zijn",
+        "advance_invalid": "Leiding {{line}}: berekende aanloop is ongeldig",
+        "negative_cut": "Rechte snijlengte is negatief ({{value}} mm): de bochtradius is te groot voor deze geometrie",
+        "ab_positive": "{{field}} moet een positieve eindige lengte zijn",
+        "angle_mismatch": "De geometrie vereist een bocht van {{required}}°; de gekozen bocht van {{selected}}° is onverenigbaar voor een 2D-parallelsprong",
+        "verify_two_values": "Geef exact twee waarden van A, B, H of θ op",
+        "verify_h_smaller": "H kan niet kleiner zijn dan {{side}}",
+        "verify_invalid": "Kan de controledriehoek niet oplossen",
+        "segments_min": "N moet een geheel getal ≥ {{min}} rechte stukken zijn",
+        "total_angle_range": "De totale hoek moet tussen 0° en {{max}}° liggen",
+        "radius_positive": "De radius moet een positieve eindige lengte zijn",
+        "od_positive": "OD moet een positieve eindige lengte zijn",
+        "radius_gt_half_od": "Radius ({{radius}} mm) moet groter zijn dan OD/2 ({{halfOd}} mm)",
+        "piece_lengths_invalid": "Berekende stuklengtes zijn ongeldig",
+        "clr_gt_half_od": "CLR moet groter zijn dan OD/2",
+        "beta_range": "De snijhoek moet tussen 0° en {{max}}° liggen"
+      },
       "twoElbowOffset": {
         "title": "Verschuiving met twee knieën",
         "subtitle": "Verschuiving van parallelle leidingen met twee knieën: voorschot, weg en recht tussenstuk.",
@@ -2119,29 +2141,6 @@
         "clrSourceCatalog": "CLR uit de catalogus: NPS {{combo}}.",
         "clrSourceCustom": "Eigen CLR; niet uit de catalogus.",
         "clrMissing": "De catalogus van deze tool heeft geen getabuleerde CLR voor NPS {{combo}}. Voer een CLR in om te berekenen."
-      },
-      "errors": {
-        "line_count_range": "Het aantal leidingen moet een geheel getal tussen {{min}} en {{max}} zijn",
-        "spacing_positive": "De hart-op-hartafstand moet een positieve eindige lengte zijn ({{field}})",
-        "elbow_angle_range": "De bochthoek moet tussen 0° en {{max}}° liggen",
-        "clr_positive": "CLR moet een positieve eindige radius zijn",
-        "per_line_specs_count": "De specificaties per leiding moeten overeenkomen met het aantal leidingen",
-        "per_line_clr_invalid": "Leiding {{line}}: CLR per leiding moet een positieve eindige radius zijn",
-        "advance_invalid": "Leiding {{line}}: berekende aanloop is ongeldig",
-        "negative_cut": "Rechte snijlengte is negatief ({{value}} mm): de bochtradius is te groot voor deze geometrie",
-        "ab_positive": "{{field}} moet een positieve eindige lengte zijn",
-        "angle_mismatch": "De geometrie vereist een bocht van {{required}}°; de gekozen bocht van {{selected}}° is onverenigbaar voor een 2D-parallelsprong",
-        "verify_two_values": "Geef exact twee waarden van A, B, H of θ op",
-        "verify_h_smaller": "H kan niet kleiner zijn dan {{side}}",
-        "verify_invalid": "Kan de controledriehoek niet oplossen",
-        "segments_min": "N moet een geheel getal ≥ {{min}} rechte stukken zijn",
-        "total_angle_range": "De totale hoek moet tussen 0° en {{max}}° liggen",
-        "radius_positive": "De radius moet een positieve eindige lengte zijn",
-        "od_positive": "OD moet een positieve eindige lengte zijn",
-        "radius_gt_half_od": "Radius ({{radius}} mm) moet groter zijn dan OD/2 ({{halfOd}} mm)",
-        "piece_lengths_invalid": "Berekende stuklengtes zijn ongeldig",
-        "clr_gt_half_od": "CLR moet groter zijn dan OD/2",
-        "beta_range": "De snijhoek moet tussen 0° en {{max}}° liggen"
       }
     },
     "tabPipeDimensions": "Pijpafmetingen",
@@ -2465,7 +2464,8 @@
       "pdfSeam": "naad",
       "pdfWrapNote": "Wikkelen: X langs de omtrek, Y vanaf het kwadratische uiteinde aan de bochtzijde.",
       "pdfClosure": "sluiting"
-    }
+    },
+    "familyOffsets": "Verspringingen en verplaatsingen"
   },
   "jobs": {
     "eyebrow": "Vacatures",
@@ -4621,6 +4621,34 @@
     "copyAllFacebook": "Alle Facebook-links kopiëren",
     "copied": "Gekopieerd",
     "note": "UTM-parameters bevatten alleen algemene campagne-identificaties, nooit persoonsgegevens."
+  },
+  "marketplaceV3": {
+    "title": "Marketplace Ready activeren",
+    "subtitle": "Controleer de vereisten en accepteer de Marketplace-voorwaarden om uw profiel zichtbaar te maken voor bedrijven.",
+    "requirementsTitle": "Vereisten voor Marketplace Ready",
+    "requirements": {
+      "cv": "CV geüpload en toegankelijk",
+      "profession": "Beroep of vakgebied opgegeven",
+      "location": "Werklocatie of regio",
+      "availability": "Beschikbaarheid opgegeven"
+    },
+    "certificatesOptional": "Certificaten zijn optioneel: ze verbeteren uw profiel maar zijn niet vereist voor de Marketplace.",
+    "consentText": "Door te accepteren stemt u ermee in dat PIPINGBOX uw professionele profiel presenteert aan geverifieerde bedrijven volgens de Marketplace-voorwaarden (versie v3-2026-10-17). Uw originele CV en contactgegevens worden nooit zonder uw toestemming getoond.",
+    "consentCheckbox": "Ik heb de Marketplace-voorwaarden (v3) gelezen en accepteer ze.",
+    "acceptCta": "Accepteren en activeren",
+    "resultReady": "Uw profiel is Marketplace Ready. Bedrijven kunnen u nu vinden.",
+    "resultNotEligible": "Toestemming geregistreerd. Vul de ontbrekende vereisten aan om Marketplace Ready te activeren.",
+    "resultLegacy": "Uw profiel is beschermd onder de vorige voorwaarden. Er zijn geen wijzigingen toegepast.",
+    "resultError": "De acceptatie kon niet worden voltooid. Probeer het opnieuw.",
+    "completeProfileLink": "Vul uw profiel aan",
+    "contractVersion": "Contractversie: {{version}} · Taal: {{lang}}",
+    "resultAccountType": "Deze actie is alleen beschikbaar voor professionele accounts.",
+    "goDashboard": "Ga naar uw dashboard",
+    "contractNotActive": "Voorwaarden nog niet actief",
+    "contractNotActiveBody": "De Marketplace v3-voorwaarden worden juridisch beoordeeld en zijn nog niet geactiveerd. Zodra ze beschikbaar zijn, kunt u ze hier accepteren.",
+    "contractChanged": "De voorwaarden zijn gewijzigd",
+    "contractChangedBody": "De Marketplace-voorwaarden zijn bijgewerkt terwijl u ze bekeek. Voor uw veiligheid is er geen akkoord geregistreerd. Lees de huidige versie voordat u akkoord gaat.",
+    "reviewAgainCta": "Huidige versie bekijken"
   },
   "companyCore": {
     "loading": "Laden…",

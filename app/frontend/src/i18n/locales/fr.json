@@ -1521,7 +1521,6 @@
       "pdfDownloaded": "PDF téléchargé — imprimez à 100 % / taille réelle, sans ajustement à la page"
     },
     "categoryFabrication": "Fabrication",
-    "familyOffsets": "Décalages et déplacements",
     "elbowCut": {
       "arcNeutral": "Arc neutre (C-C) :",
       "name": "Calculateur de coupe de coude",
@@ -1790,7 +1789,6 @@
       },
       "offset": {
         "title": "Saut de tuyauterie",
-        "cardSubtitle": "Décalages avec coudes, sans coudes et vérification des mesures",
         "tabWithElbows": "Avec coudes",
         "tabWithoutElbows": "Sans coudes",
         "tabVerify": "Vérifier",
@@ -1812,7 +1810,8 @@
         "straightCut": "Coupe droite",
         "centerToCenter": "Axe à axe",
         "diagonal": "H (diagonale)",
-        "cutAngleEnd": "Angle de coupe par extrémité"
+        "cutAngleEnd": "Angle de coupe par extrémité",
+        "cardSubtitle": "Décalages avec coudes, sans coudes et vérification des mesures"
       },
       "miteredElbow": {
         "title": "Coude à segments",
@@ -2076,6 +2075,29 @@
           }
         }
       },
+      "errors": {
+        "line_count_range": "Le nombre de lignes doit être un entier entre {{min}} et {{max}}",
+        "spacing_positive": "L'écartement des axes doit être une longueur positive et finie ({{field}})",
+        "elbow_angle_range": "L'angle du coude doit être compris entre 0° et {{max}}°",
+        "clr_positive": "Le CLR doit être un rayon positif et fini",
+        "per_line_specs_count": "Les spécifications par ligne doivent correspondre au nombre de lignes",
+        "per_line_clr_invalid": "Ligne {{line}} : le CLR par ligne doit être un rayon positif et fini",
+        "advance_invalid": "Ligne {{line}} : l'avance calculée est invalide",
+        "negative_cut": "La longueur de coupe droite est négative ({{value}} mm) : le rayon du coude est trop grand pour cette géométrie",
+        "ab_positive": "{{field}} doit être une longueur positive et finie",
+        "angle_mismatch": "La géométrie exige un coude de {{required}}° ; le coude sélectionné de {{selected}}° est incompatible pour un saut 2D de lignes parallèles",
+        "verify_two_values": "Fournir exactement deux valeurs parmi A, B, H ou θ",
+        "verify_h_smaller": "H ne peut pas être inférieur à {{side}}",
+        "verify_invalid": "Impossible de résoudre le triangle de vérification",
+        "segments_min": "N doit être un entier ≥ {{min}} pièces droites",
+        "total_angle_range": "L'angle total doit être compris entre 0° et {{max}}°",
+        "radius_positive": "Le rayon doit être une longueur positive et finie",
+        "od_positive": "L'OD doit être une longueur positive et finie",
+        "radius_gt_half_od": "Le rayon ({{radius}} mm) doit être supérieur à OD/2 ({{halfOd}} mm)",
+        "piece_lengths_invalid": "Les longueurs de pièces calculées sont invalides",
+        "clr_gt_half_od": "Le CLR doit être supérieur à OD/2",
+        "beta_range": "L'angle de coupe doit être compris entre 0° et {{max}}°"
+      },
       "twoElbowOffset": {
         "title": "Décalage à deux coudes",
         "subtitle": "Décalage de lignes parallèles avec deux coudes : avancement, parcours et segment droit intermédiaire.",
@@ -2122,29 +2144,6 @@
         "clrSourceCatalog": "CLR résolu du catalogue : NPS {{combo}}.",
         "clrSourceCustom": "CLR personnalisé ; ne provient pas du catalogue.",
         "clrMissing": "Le catalogue de cet outil n'a pas de CLR tabulé pour NPS {{combo}}. Saisissez un CLR pour calculer."
-      },
-      "errors": {
-        "line_count_range": "Le nombre de lignes doit être un entier entre {{min}} et {{max}}",
-        "spacing_positive": "L'écartement des axes doit être une longueur positive et finie ({{field}})",
-        "elbow_angle_range": "L'angle du coude doit être compris entre 0° et {{max}}°",
-        "clr_positive": "Le CLR doit être un rayon positif et fini",
-        "per_line_specs_count": "Les spécifications par ligne doivent correspondre au nombre de lignes",
-        "per_line_clr_invalid": "Ligne {{line}} : le CLR par ligne doit être un rayon positif et fini",
-        "advance_invalid": "Ligne {{line}} : l'avance calculée est invalide",
-        "negative_cut": "La longueur de coupe droite est négative ({{value}} mm) : le rayon du coude est trop grand pour cette géométrie",
-        "ab_positive": "{{field}} doit être une longueur positive et finie",
-        "angle_mismatch": "La géométrie exige un coude de {{required}}° ; le coude sélectionné de {{selected}}° est incompatible pour un saut 2D de lignes parallèles",
-        "verify_two_values": "Fournir exactement deux valeurs parmi A, B, H ou θ",
-        "verify_h_smaller": "H ne peut pas être inférieur à {{side}}",
-        "verify_invalid": "Impossible de résoudre le triangle de vérification",
-        "segments_min": "N doit être un entier ≥ {{min}} pièces droites",
-        "total_angle_range": "L'angle total doit être compris entre 0° et {{max}}°",
-        "radius_positive": "Le rayon doit être une longueur positive et finie",
-        "od_positive": "L'OD doit être une longueur positive et finie",
-        "radius_gt_half_od": "Le rayon ({{radius}} mm) doit être supérieur à OD/2 ({{halfOd}} mm)",
-        "piece_lengths_invalid": "Les longueurs de pièces calculées sont invalides",
-        "clr_gt_half_od": "Le CLR doit être supérieur à OD/2",
-        "beta_range": "L'angle de coupe doit être compris entre 0° et {{max}}°"
       }
     },
     "tabPipeDimensions": "Dimensions de tuyau",
@@ -2468,7 +2467,8 @@
       "pdfSeam": "couture",
       "pdfWrapNote": "Enveloppement : X le long de la circonférence, Y depuis le bout carré côté coude.",
       "pdfClosure": "fermeture"
-    }
+    },
+    "familyOffsets": "Décalages et déplacements"
   },
   "jobs": {
     "eyebrow": "Offres",
@@ -4628,6 +4628,34 @@
     "copyAllFacebook": "Copier tous les liens Facebook",
     "copied": "Copié",
     "note": "Les paramètres UTM ne contiennent que des identifiants génériques de campagne, jamais de données personnelles."
+  },
+  "marketplaceV3": {
+    "title": "Activer Marketplace Ready",
+    "subtitle": "Vérifiez les conditions requises et acceptez les conditions du Marketplace pour rendre votre profil visible aux entreprises.",
+    "requirementsTitle": "Conditions Marketplace Ready",
+    "requirements": {
+      "cv": "CV téléchargé et accessible",
+      "profession": "Profession ou métier indiqué",
+      "location": "Lieu ou région de travail",
+      "availability": "Disponibilité déclarée"
+    },
+    "certificatesOptional": "Les certificats sont facultatifs : ils améliorent votre profil mais ne sont pas obligatoires pour rejoindre le Marketplace.",
+    "consentText": "En acceptant, vous autorisez PIPINGBOX à présenter votre profil professionnel à des entreprises vérifiées selon les conditions du Marketplace (version v3-2026-10-17). Votre CV original et vos coordonnées ne sont jamais affichés sans votre autorisation.",
+    "consentCheckbox": "J'ai lu et j'accepte les conditions du Marketplace (v3).",
+    "acceptCta": "Accepter et activer",
+    "resultReady": "Votre profil est Marketplace Ready. Les entreprises peuvent désormais vous trouver.",
+    "resultNotEligible": "Consentement enregistré. Complétez les conditions manquantes pour activer Marketplace Ready.",
+    "resultLegacy": "Votre profil est protégé par les conditions précédentes. Aucune modification n'a été appliquée.",
+    "resultError": "Impossible de finaliser l'acceptation. Veuillez réessayer.",
+    "completeProfileLink": "Complétez votre profil",
+    "contractVersion": "Version du contrat : {{version}} · Langue : {{lang}}",
+    "resultAccountType": "Cette action est réservée aux comptes professionnels.",
+    "goDashboard": "Aller à votre tableau de bord",
+    "contractNotActive": "Conditions pas encore actives",
+    "contractNotActiveBody": "Les conditions du Marketplace v3 sont en cours de révision juridique et ne sont pas encore activées. Vous pourrez les accepter ici dès qu'elles seront disponibles.",
+    "contractChanged": "Les conditions ont changé",
+    "contractChangedBody": "Les conditions du Marketplace ont été mises à jour pendant que vous les consultiez. Par sécurité, aucune acceptation n'a été enregistrée. Veuillez relire la version actuelle avant d'accepter.",
+    "reviewAgainCta": "Relire la version actuelle"
   },
   "companyCore": {
     "loading": "Chargement…",

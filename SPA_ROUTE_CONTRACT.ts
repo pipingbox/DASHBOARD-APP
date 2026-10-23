@@ -126,6 +126,7 @@ export const SPA_ROUTE_CONTRACT: RouteRule[] = [
   // ─── PROTECTED exact routes ────────────────────────────────────────────────
   { pattern: '/dashboard', visibility: 'PROTECTED', kind: 'EXACT' },
   { pattern: '/onboarding', visibility: 'PROTECTED', kind: 'EXACT', note: 'PB-GROWTH-GATE-ONBOARDING-001: resume entry for postponed onboarding' },
+  { pattern: '/marketplace/v3', visibility: 'PROTECTED', kind: 'EXACT', note: 'PR-V3-02 PB-MARKETPLACE-V3-RECRUITMENT-001: Marketplace Ready v3 contract acceptance wizard' },
   { pattern: '/profile', visibility: 'PROTECTED', kind: 'EXACT' },
   // PB-CV-AUTO-PROFILE-001 — CV draft review (draft-first confirmation flow).
   { pattern: '/profile/cv-review', visibility: 'PROTECTED', kind: 'EXACT', note: 'PB-CV-AUTO-PROFILE-001: review CV-extracted profile draft' },

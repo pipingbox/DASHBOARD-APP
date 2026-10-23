@@ -1518,7 +1518,6 @@
       "pdfDownloaded": "PDF heruntergeladen — mit 100 % / Originalgröße drucken, nicht an Seite anpassen"
     },
     "categoryFabrication": "Fertigung",
-    "familyOffsets": "Versätze und Verlagerungen",
     "elbowCut": {
       "arcNeutral": "Neutraler Bogen (C-C):",
       "name": "Bogenschnitt-Rechner",
@@ -1787,7 +1786,6 @@
       },
       "offset": {
         "title": "Rohrversatz",
-        "cardSubtitle": "Versätze mit Bögen, ohne Bögen und Maßprüfung",
         "tabWithElbows": "Mit Bögen",
         "tabWithoutElbows": "Ohne Bögen",
         "tabVerify": "Prüfen",
@@ -1809,7 +1807,8 @@
         "straightCut": "Gerader Schnitt",
         "centerToCenter": "Mitte zu Mitte",
         "diagonal": "H (Diagonale)",
-        "cutAngleEnd": "Schnittwinkel pro Ende"
+        "cutAngleEnd": "Schnittwinkel pro Ende",
+        "cardSubtitle": "Versätze mit Bögen, ohne Bögen und Maßprüfung"
       },
       "miteredElbow": {
         "title": "Segmentbogen",
@@ -2073,6 +2072,29 @@
           }
         }
       },
+      "errors": {
+        "line_count_range": "Die Leitungsanzahl muss eine ganze Zahl zwischen {{min}} und {{max}} sein",
+        "spacing_positive": "Der Mittenabstand muss eine positive endliche Länge sein ({{field}})",
+        "elbow_angle_range": "Der Bogenwinkel muss zwischen 0° und {{max}}° liegen",
+        "clr_positive": "CLR muss ein positiver endlicher Radius sein",
+        "per_line_specs_count": "Die Angaben pro Leitung müssen zur Leitungsanzahl passen",
+        "per_line_clr_invalid": "Leitung {{line}}: CLR pro Leitung muss ein positiver endlicher Radius sein",
+        "advance_invalid": "Leitung {{line}}: berechneter Vorlauf ist ungültig",
+        "negative_cut": "Gerade Schnittlänge ist negativ ({{value}} mm): der Bogenradius ist zu groß für diese Geometrie",
+        "ab_positive": "{{field}} muss eine positive endliche Länge sein",
+        "angle_mismatch": "Die Geometrie erfordert einen {{required}}°-Bogen; der gewählte {{selected}}°-Bogen ist für einen 2D-Parallelversatz unverträglich",
+        "verify_two_values": "Genau zwei Werte von A, B, H oder θ angeben",
+        "verify_h_smaller": "H kann nicht kleiner als {{side}} sein",
+        "verify_invalid": "Prüfdreieck konnte nicht gelöst werden",
+        "segments_min": "N muss eine ganze Zahl ≥ {{min}} gerade Stücke sein",
+        "total_angle_range": "Der Gesamtwinkel muss zwischen 0° und {{max}}° liegen",
+        "radius_positive": "Der Radius muss eine positive endliche Länge sein",
+        "od_positive": "OD muss eine positive endliche Länge sein",
+        "radius_gt_half_od": "Radius ({{radius}} mm) muss größer als OD/2 ({{halfOd}} mm) sein",
+        "piece_lengths_invalid": "Berechnete Stücklängen sind ungültig",
+        "clr_gt_half_od": "CLR muss größer als OD/2 sein",
+        "beta_range": "Der Schnittwinkel muss zwischen 0° und {{max}}° liegen"
+      },
       "twoElbowOffset": {
         "title": "Versatz mit zwei Bögen",
         "subtitle": "Parallelversatz mit zwei Bögen: Vorschub, Weg und gerades Zwischenstück.",
@@ -2119,29 +2141,6 @@
         "clrSourceCatalog": "CLR aus dem Katalog: NPS {{combo}}.",
         "clrSourceCustom": "Eigener CLR; nicht aus dem Katalog.",
         "clrMissing": "Der Katalog dieses Tools enthält keinen tabellierten CLR für NPS {{combo}}. Gib einen CLR ein, um zu rechnen."
-      },
-      "errors": {
-        "line_count_range": "Die Leitungsanzahl muss eine ganze Zahl zwischen {{min}} und {{max}} sein",
-        "spacing_positive": "Der Mittenabstand muss eine positive endliche Länge sein ({{field}})",
-        "elbow_angle_range": "Der Bogenwinkel muss zwischen 0° und {{max}}° liegen",
-        "clr_positive": "CLR muss ein positiver endlicher Radius sein",
-        "per_line_specs_count": "Die Angaben pro Leitung müssen zur Leitungsanzahl passen",
-        "per_line_clr_invalid": "Leitung {{line}}: CLR pro Leitung muss ein positiver endlicher Radius sein",
-        "advance_invalid": "Leitung {{line}}: berechneter Vorlauf ist ungültig",
-        "negative_cut": "Gerade Schnittlänge ist negativ ({{value}} mm): der Bogenradius ist zu groß für diese Geometrie",
-        "ab_positive": "{{field}} muss eine positive endliche Länge sein",
-        "angle_mismatch": "Die Geometrie erfordert einen {{required}}°-Bogen; der gewählte {{selected}}°-Bogen ist für einen 2D-Parallelversatz unverträglich",
-        "verify_two_values": "Genau zwei Werte von A, B, H oder θ angeben",
-        "verify_h_smaller": "H kann nicht kleiner als {{side}} sein",
-        "verify_invalid": "Prüfdreieck konnte nicht gelöst werden",
-        "segments_min": "N muss eine ganze Zahl ≥ {{min}} gerade Stücke sein",
-        "total_angle_range": "Der Gesamtwinkel muss zwischen 0° und {{max}}° liegen",
-        "radius_positive": "Der Radius muss eine positive endliche Länge sein",
-        "od_positive": "OD muss eine positive endliche Länge sein",
-        "radius_gt_half_od": "Radius ({{radius}} mm) muss größer als OD/2 ({{halfOd}} mm) sein",
-        "piece_lengths_invalid": "Berechnete Stücklängen sind ungültig",
-        "clr_gt_half_od": "CLR muss größer als OD/2 sein",
-        "beta_range": "Der Schnittwinkel muss zwischen 0° und {{max}}° liegen"
       }
     },
     "tabPipeDimensions": "Rohrabmessungen",
@@ -2465,7 +2464,8 @@
       "pdfSeam": "Naht",
       "pdfWrapNote": "Umlagegen: X entlang des Umfangs, Y vom quadratischen Ende auf der Bogenseite.",
       "pdfClosure": "Schluss"
-    }
+    },
+    "familyOffsets": "Versätze und Verlagerungen"
   },
   "jobs": {
     "eyebrow": "Stellen",
@@ -4621,6 +4621,34 @@
     "copyAllFacebook": "Alle Facebook-Links kopieren",
     "copied": "Kopiert",
     "note": "UTM-Parameter enthalten nur generische Kampagnen-IDs, niemals personenbezogene Daten."
+  },
+  "marketplaceV3": {
+    "title": "Marketplace Ready aktivieren",
+    "subtitle": "Prüfen Sie die Anforderungen und akzeptieren Sie die Marketplace-Bedingungen, damit Ihr Profil für Unternehmen sichtbar wird.",
+    "requirementsTitle": "Anforderungen für Marketplace Ready",
+    "requirements": {
+      "cv": "Lebenslauf hochgeladen und zugänglich",
+      "profession": "Beruf oder Fachrichtung angegeben",
+      "location": "Arbeitsort oder Region",
+      "availability": "Verfügbarkeit angegeben"
+    },
+    "certificatesOptional": "Zertifikate sind optional: Sie verbessern Ihr Profil, sind aber für den Marketplace nicht erforderlich.",
+    "consentText": "Mit Ihrer Zustimmung darf PIPINGBOX Ihr Berufsprofil verifizierten Unternehmen gemäß den Marketplace-Bedingungen (Version v3-2026-10-17) präsentieren. Ihr ursprünglicher Lebenslauf und Ihre Kontaktdaten werden niemals ohne Ihre Zustimmung angezeigt.",
+    "consentCheckbox": "Ich habe die Marketplace-Bedingungen (v3) gelesen und akzeptiere sie.",
+    "acceptCta": "Akzeptieren und aktivieren",
+    "resultReady": "Ihr Profil ist Marketplace Ready. Unternehmen können Sie jetzt finden.",
+    "resultNotEligible": "Zustimmung gespeichert. Vervollständigen Sie die fehlenden Anforderungen, um Marketplace Ready zu aktivieren.",
+    "resultLegacy": "Ihr Profil ist durch die vorherigen Bedingungen geschützt. Es wurden keine Änderungen vorgenommen.",
+    "resultError": "Die Zustimmung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.",
+    "completeProfileLink": "Vervollständigen Sie Ihr Profil",
+    "contractVersion": "Vertragsversion: {{version}} · Sprache: {{lang}}",
+    "resultAccountType": "Diese Aktion ist nur für professionelle Konten verfügbar.",
+    "goDashboard": "Zum Dashboard",
+    "contractNotActive": "Bedingungen noch nicht aktiv",
+    "contractNotActiveBody": "Die Marketplace-v3-Bedingungen befinden sich in rechtlicher Prüfung und sind noch nicht aktiviert. Sobald sie verfügbar sind, können Sie sie hier annehmen.",
+    "contractChanged": "Die Bedingungen haben sich geändert",
+    "contractChangedBody": "Die Marketplace-Bedingungen wurden aktualisiert, während Sie sie geprüft haben. Zu Ihrer Sicherheit wurde keine Zustimmung registriert. Bitte prüfen Sie die aktuelle Version, bevor Sie zustimmen.",
+    "reviewAgainCta": "Aktuelle Version prüfen"
   },
   "companyCore": {
     "loading": "Wird geladen…",

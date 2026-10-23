@@ -48,7 +48,7 @@ export async function drainMarketplaceReconciliationEmails(deps: Dependencies, b
       const { data: authData, error: authError } = await supabase.auth.admin.getUserById(row.user_id);
       if (authError || !authData.user?.email) throw new Error("email_unavailable");
       const { data: missingData, error: missingError } = await supabase.rpc(
-        "pb_marketplace_missing_requirements", { p_user_id: row.user_id, p_declared_consent: true },
+        "pb_marketplace_missing_requirements_for", { p_user_id: row.user_id, p_declared_consent: true },
       );
       const requirements = ["cv", "certificate", "availability", "consent", "completion"] as const;
       if (missingError || !Array.isArray(missingData) || missingData.length === 0 ||

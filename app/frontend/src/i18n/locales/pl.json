@@ -1222,7 +1222,6 @@
     "reynolds": "Liczba Reynoldsa",
     "flangeRating": "Wyszukiwarka klas kołnierzy",
     "categoryFabrication": "Prefabrykacja",
-    "familyOffsets": "Odsunięcia i przesunięcia",
     "elbowCut": {
       "name": "Kalkulator cięcia kolan",
       "subtitle": "Oblicz, gdzie przeciąć standardowe kolano, aby uzyskać dowolny kąt",
@@ -1954,7 +1953,6 @@
       },
       "offset": {
         "title": "Przesunięcie rury",
-        "cardSubtitle": "Odsunięcia z kolankami, bez kolanek i weryfikacja wymiarów",
         "tabWithElbows": "Z kolanami",
         "tabWithoutElbows": "Bez kolan",
         "tabVerify": "Weryfikacja",
@@ -1976,7 +1974,8 @@
         "straightCut": "Cięcie proste",
         "centerToCenter": "Oś do osi",
         "diagonal": "H (przekątna)",
-        "cutAngleEnd": "Kąt cięcia na koniec"
+        "cutAngleEnd": "Kąt cięcia na koniec",
+        "cardSubtitle": "Odsunięcia z kolankami, bez kolanek i weryfikacja wymiarów"
       },
       "miteredElbow": {
         "title": "Kolano segmentowe",
@@ -2240,6 +2239,29 @@
           }
         }
       },
+      "errors": {
+        "line_count_range": "Liczba linii musi być liczbą całkowitą od {{min}} do {{max}}",
+        "spacing_positive": "Rozstaw osi musi być dodatnią skończoną długością ({{field}})",
+        "elbow_angle_range": "Kąt kolana musi mieścić się w zakresie od 0° do {{max}}°",
+        "clr_positive": "CLR musi być dodatnim skończonym promieniem",
+        "per_line_specs_count": "Specyfikacje dla linii muszą odpowiadać liczbie linii",
+        "per_line_clr_invalid": "Linia {{line}}: CLR dla linii musi być dodatnim skończonym promieniem",
+        "advance_invalid": "Linia {{line}}: obliczony posuw jest nieprawidłowy",
+        "negative_cut": "Długość cięcia prostego jest ujemna ({{value}} mm): promień kolana jest zbyt duży dla tej geometrii",
+        "ab_positive": "{{field}} musi być dodatnią skończoną długością",
+        "angle_mismatch": "Geometria wymaga kolana {{required}}°; wybrane kolano {{selected}}° jest niezgodne dla przesunięcia 2D linii równoległych",
+        "verify_two_values": "Podaj dokładnie dwie z wartości A, B, H lub θ",
+        "verify_h_smaller": "H nie może być mniejsze niż {{side}}",
+        "verify_invalid": "Nie można rozwiązać trójkąta weryfikacyjnego",
+        "segments_min": "N musi być liczbą całkowitą ≥ {{min}} prostych segmentów",
+        "total_angle_range": "Kąt całkowity musi mieścić się w zakresie od 0° do {{max}}°",
+        "radius_positive": "Promień musi być dodatnią skończoną długością",
+        "od_positive": "OD musi być dodatnią skończoną długością",
+        "radius_gt_half_od": "Promień ({{radius}} mm) musi być większy niż OD/2 ({{halfOd}} mm)",
+        "piece_lengths_invalid": "Obliczone długości segmentów są nieprawidłowe",
+        "clr_gt_half_od": "CLR musi być większy niż OD/2",
+        "beta_range": "Kąt cięcia musi mieścić się w zakresie od 0° do {{max}}°"
+      },
       "twoElbowOffset": {
         "title": "Przesunięcie dwoma kolankami",
         "subtitle": "Przesunięcie równoległych linii dwoma kolankami: wyprzedzenie, droga i odcinek prosty.",
@@ -2286,29 +2308,6 @@
         "clrSourceCatalog": "CLR z katalogu: NPS {{combo}}.",
         "clrSourceCustom": "CLR własny; nie pochodzi z katalogu.",
         "clrMissing": "Katalog tego narzędzia nie ma zestawionego CLR dla NPS {{combo}}. Wprowadź CLR, aby obliczyć."
-      },
-      "errors": {
-        "line_count_range": "Liczba linii musi być liczbą całkowitą od {{min}} do {{max}}",
-        "spacing_positive": "Rozstaw osi musi być dodatnią skończoną długością ({{field}})",
-        "elbow_angle_range": "Kąt kolana musi mieścić się w zakresie od 0° do {{max}}°",
-        "clr_positive": "CLR musi być dodatnim skończonym promieniem",
-        "per_line_specs_count": "Specyfikacje dla linii muszą odpowiadać liczbie linii",
-        "per_line_clr_invalid": "Linia {{line}}: CLR dla linii musi być dodatnim skończonym promieniem",
-        "advance_invalid": "Linia {{line}}: obliczony posuw jest nieprawidłowy",
-        "negative_cut": "Długość cięcia prostego jest ujemna ({{value}} mm): promień kolana jest zbyt duży dla tej geometrii",
-        "ab_positive": "{{field}} musi być dodatnią skończoną długością",
-        "angle_mismatch": "Geometria wymaga kolana {{required}}°; wybrane kolano {{selected}}° jest niezgodne dla przesunięcia 2D linii równoległych",
-        "verify_two_values": "Podaj dokładnie dwie z wartości A, B, H lub θ",
-        "verify_h_smaller": "H nie może być mniejsze niż {{side}}",
-        "verify_invalid": "Nie można rozwiązać trójkąta weryfikacyjnego",
-        "segments_min": "N musi być liczbą całkowitą ≥ {{min}} prostych segmentów",
-        "total_angle_range": "Kąt całkowity musi mieścić się w zakresie od 0° do {{max}}°",
-        "radius_positive": "Promień musi być dodatnią skończoną długością",
-        "od_positive": "OD musi być dodatnią skończoną długością",
-        "radius_gt_half_od": "Promień ({{radius}} mm) musi być większy niż OD/2 ({{halfOd}} mm)",
-        "piece_lengths_invalid": "Obliczone długości segmentów są nieprawidłowe",
-        "clr_gt_half_od": "CLR musi być większy niż OD/2",
-        "beta_range": "Kąt cięcia musi mieścić się w zakresie od 0° do {{max}}°"
       }
     },
     "landing": {
@@ -2471,7 +2470,8 @@
       "pdfSeam": "szew",
       "pdfWrapNote": "Owinienie: X wzdłuż obwodu, Y od kwadratowego końca po stronie kolana.",
       "pdfClosure": "zamknięcie"
-    }
+    },
+    "familyOffsets": "Odsunięcia i przesunięcia"
   },
   "jobs": {
     "eyebrow": "Oferty pracy",
@@ -4635,6 +4635,34 @@
     "copyAllFacebook": "Kopiuj wszystkie linki Facebook",
     "copied": "Skopiowano",
     "note": "Parametry UTM zawierają wyłącznie ogólne identyfikatory kampanii, nigdy dane osobowe."
+  },
+  "marketplaceV3": {
+    "title": "Aktywuj Marketplace Ready",
+    "subtitle": "Sprawdź wymagania i zaakceptuj warunki Marketplace, aby Twój profil był widoczny dla firm.",
+    "requirementsTitle": "Wymagania Marketplace Ready",
+    "requirements": {
+      "cv": "CV przesłane i dostępne",
+      "profession": "Wskazany zawód lub specjalizacja",
+      "location": "Miejsce lub region pracy",
+      "availability": "Zadeklarowana dostępność"
+    },
+    "certificatesOptional": "Certyfikaty są opcjonalne: poprawiają profil, ale nie są wymagane do udziału w Marketplace.",
+    "consentText": "Akceptując, zgadzasz się, aby PIPINGBOX przedstawiało Twój profil zawodowy zweryfikowanym firmom zgodnie z warunkami Marketplace (wersja v3-2026-10-17). Twoje oryginalne CV i dane kontaktowe nigdy nie są wyświetlane bez Twojej zgody.",
+    "consentCheckbox": "Przeczytałem/am i akceptuję warunki Marketplace (v3).",
+    "acceptCta": "Akceptuj i aktywuj",
+    "resultReady": "Twój profil jest Marketplace Ready. Firmy mogą Cię teraz znaleźć.",
+    "resultNotEligible": "Zgoda zapisana. Uzupełnij brakujące wymagania, aby aktywować Marketplace Ready.",
+    "resultLegacy": "Twój profil jest chroniony wcześniejszymi warunkami. Nie wprowadzono zmian.",
+    "resultError": "Nie udało się zakończyć akceptacji. Spróbuj ponownie.",
+    "completeProfileLink": "Uzupełnij swój profil",
+    "contractVersion": "Wersja umowy: {{version}} · Język: {{lang}}",
+    "resultAccountType": "Ta czynność jest dostępna tylko dla kont zawodowych.",
+    "goDashboard": "Przejdź do panelu",
+    "contractNotActive": "Warunki jeszcze nieaktywne",
+    "contractNotActiveBody": "Warunki Marketplace v3 są w trakcie przeglądu prawnego i nie są jeszcze aktywowane. Gdy będą dostępne, będziesz mógł je tutaj zaakceptować.",
+    "contractChanged": "Warunki uległy zmianie",
+    "contractChangedBody": "Warunki Marketplace zostały zaktualizowane podczas ich przeglądania. Ze względów bezpieczeństwa nie zarejestrowano akceptacji. Przed zaakceptowaniem zapoznaj się z aktualną wersją.",
+    "reviewAgainCta": "Przejrzyj aktualną wersję"
   },
   "companyCore": {
     "loading": "Ładowanie…",
