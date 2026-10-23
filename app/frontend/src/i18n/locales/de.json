@@ -1450,6 +1450,7 @@
       "pdfDownloaded": "PDF heruntergeladen — mit 100 % / Originalgröße drucken, nicht an Seite anpassen"
     },
     "categoryFabrication": "Fertigung",
+    "familyOffsets": "Versätze und Verlagerungen",
     "elbowCut": {
       "arcNeutral": "Neutraler Bogen (C-C):",
       "name": "Bogenschnitt-Rechner",
@@ -1718,6 +1719,7 @@
       },
       "offset": {
         "title": "Rohrversatz",
+        "cardSubtitle": "Versätze mit Bögen, ohne Bögen und Maßprüfung",
         "tabWithElbows": "Mit Bögen",
         "tabWithoutElbows": "Ohne Bögen",
         "tabVerify": "Prüfen",

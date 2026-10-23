@@ -1154,6 +1154,7 @@
     "reynolds": "Liczba Reynoldsa",
     "flangeRating": "Wyszukiwarka klas kołnierzy",
     "categoryFabrication": "Prefabrykacja",
+    "familyOffsets": "Odsunięcia i przesunięcia",
     "elbowCut": {
       "name": "Kalkulator cięcia kolan",
       "subtitle": "Oblicz, gdzie przeciąć standardowe kolano, aby uzyskać dowolny kąt",
@@ -1885,6 +1886,7 @@
       },
       "offset": {
         "title": "Przesunięcie rury",
+        "cardSubtitle": "Odsunięcia z kolankami, bez kolanek i weryfikacja wymiarów",
         "tabWithElbows": "Z kolanami",
         "tabWithoutElbows": "Bez kolan",
         "tabVerify": "Weryfikacja",

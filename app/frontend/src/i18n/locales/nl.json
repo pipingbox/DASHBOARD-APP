@@ -1450,6 +1450,7 @@
       "pdfDownloaded": "PDF gedownload — print op 100% / werkelijke grootte, niet aanpassen aan pagina"
     },
     "categoryFabrication": "Fabricage",
+    "familyOffsets": "Verspringingen en verplaatsingen",
     "elbowCut": {
       "arcNeutral": "Neutrale boog (C-C):",
       "name": "Bochtsnij-calculator",
@@ -1718,6 +1719,7 @@
       },
       "offset": {
         "title": "Buissprong",
+        "cardSubtitle": "Verspringingen met bochten, zonder bochten en maatcontrole",
         "tabWithElbows": "Met bochten",
         "tabWithoutElbows": "Zonder bochten",
         "tabVerify": "Controleren",

@@ -1151,6 +1151,7 @@
     "reynolds": "Numero di Reynolds",
     "flangeRating": "Ricerca Flange Rating",
     "categoryFabrication": "Fabbricazione",
+    "familyOffsets": "Svasi e spostamenti",
     "elbowCut": {
       "name": "Calcolatore di taglio curve",
       "subtitle": "Calcola dove tagliare una curva standard per ottenere qualsiasi angolo",
@@ -1875,6 +1876,7 @@
       },
       "offset": {
         "title": "Dislivello tubazione",
+        "cardSubtitle": "Svasi con gomiti, senza gomiti e verifica delle misure",
         "tabWithElbows": "Con curve",
         "tabWithoutElbows": "Senza curve",
         "tabVerify": "Verifica",

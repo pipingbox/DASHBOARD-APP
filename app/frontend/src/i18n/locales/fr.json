@@ -1453,6 +1453,7 @@
       "pdfDownloaded": "PDF téléchargé — imprimez à 100 % / taille réelle, sans ajustement à la page"
     },
     "categoryFabrication": "Fabrication",
+    "familyOffsets": "Décalages et déplacements",
     "elbowCut": {
       "arcNeutral": "Arc neutre (C-C) :",
       "name": "Calculateur de coupe de coude",
@@ -1721,6 +1722,7 @@
       },
       "offset": {
         "title": "Saut de tuyauterie",
+        "cardSubtitle": "Décalages avec coudes, sans coudes et vérification des mesures",
         "tabWithElbows": "Avec coudes",
         "tabWithoutElbows": "Sans coudes",
         "tabVerify": "Vérifier",

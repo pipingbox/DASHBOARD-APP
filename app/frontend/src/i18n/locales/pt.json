@@ -1453,6 +1453,7 @@
       "pdfDownloaded": "PDF baixado — imprima a 100% / tamanho real, sem ajustar à página"
     },
     "categoryFabrication": "Fabricação",
+    "familyOffsets": "Desvios e deslocamentos",
     "elbowCut": {
       "arcNeutral": "Arco neutro (C-C):",
       "name": "Calculadora de corte de curva",
@@ -1721,6 +1722,7 @@
       },
       "offset": {
         "title": "Desvio de tubagem",
+        "cardSubtitle": "Desvios com cotovelos, sem cotovelos e verificação de medidas",
         "tabWithElbows": "Com curvas",
         "tabWithoutElbows": "Sem curvas",
         "tabVerify": "Verificar",
