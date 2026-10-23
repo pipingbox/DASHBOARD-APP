@@ -6,6 +6,7 @@ on:
       - 'app/frontend/**'
       - 'scripts/academy-content.mjs'
       - 'scripts/academy-content*.test.mjs'
+      - 'scripts/academy-exam-passmark.test.mjs'
       - 'scripts/check-i18n-*.mjs'
       - '.github/workflows/academy-vca-pr.yml'
 
@@ -32,5 +33,5 @@ jobs:
         run: node scripts/check-i18n-schema.mjs && node scripts/check-i18n-usage.mjs && node scripts/check-i18n-coverage.mjs --strict
       - name: Strict Academy content
         run: node scripts/academy-content.mjs validate-vca && node scripts/academy-content.mjs validate
-      - name: Content and loading regressions
-        run: node --test scripts/academy-content.test.mjs scripts/academy-content-loading.test.mjs
+      - name: Content, loading and pass-mark regressions
+        run: node --experimental-strip-types --test scripts/academy-content.test.mjs scripts/academy-content-loading.test.mjs scripts/academy-exam-passmark.test.mjs
