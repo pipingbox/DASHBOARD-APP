@@ -106,7 +106,9 @@
     "companyDocumentation": "Gestion Documentaire Industrielle",
     "companySection": "Entreprise",
     "companySettings": "Paramètres",
-    "companyWorkspace": "Espace Entreprise"
+    "companyWorkspace": "Espace Entreprise",
+    "companyTenant": "Mon entreprise",
+    "companyTeam": "Équipe"
   },
   "notifications": {
     "title": "Notifications",
@@ -811,7 +813,7 @@
     "examBookOfficialCTA": "Prêt pour votre certificat ?",
     "examBookOfficialText": "Réservez votre examen VCA officiel auprès d'un centre agréé.",
     "examBookOfficialButton": "Réserver l'examen officiel",
-    "examLanguageNote": "Ce simulateur utilise des questions en anglais.",
+    "examLanguageNote": "Ce simulateur utilise des questions en {{language}}.",
     "examLanguageBVCA": "L'examen officiel B-VCA est disponible en jusqu'à 20 langues dans les centres d'examen.",
     "examLanguageVOLVCA": "L'examen officiel VOL-VCA est disponible en néerlandais, anglais, allemand et français.",
     "examPassScore": "Score de passage",
@@ -966,7 +968,8 @@
         "badgeCompliance": "Conforme à la Ley 31/1995",
         "badgeHours": "{{hours}}h de formation",
         "badgeDownloadable": "Attestation téléchargeable"
-      }
+      },
+      "studyLanguagesNote": "support de cours et questions disponibles dans les {{count}} langues"
     },
     "coursePage": {
       "tabPreparationCourse": "Cours de préparation",
@@ -1063,8 +1066,73 @@
       "fillNameAndPostalCode": "Veuillez renseigner votre nom et votre code postal",
       "certificationUnavailable": "Certification non disponible. Veuillez réessayer plus tard.",
       "submitFailed": "Échec de l'envoi de la demande de réservation",
-      "submitted": "Demande de réservation envoyée ! PipingBox vous contactera sous 24 h pour confirmer la réservation de votre examen."
-    }
+      "submitted": "Demande de réservation envoyée ! PipingBox vous contactera sous 24 h pour confirmer la réservation de votre examen.",
+      "eyebrow": "Examen officiel VCA",
+      "title": "Réservez votre examen VCA",
+      "description": "PipingBox vous prépare et gère la réservation de votre examen officiel VCA dans des centres reconnus en Belgique.",
+      "officialBadge": "Officiel BESACC/SSVV",
+      "disclaimerTitle": "Important — Certification officielle",
+      "disclaimerNotIssuer": "PipingBox ne délivre pas de certificats VCA.",
+      "disclaimerManages": "PipingBox vous prépare avec la formation et gère la réservation de l'examen officiel auprès de centres d'examen VCA reconnus.",
+      "disclaimerIssuedBy": "Le certificat VCA est délivré par SSVV/BESACC via le centre d'examen.",
+      "officialAuthority": "Autorité officielle : {{body}}",
+      "stepExamDetails": "Détails de l'examen",
+      "examType": "Type d'examen",
+      "audienceOperators": "Exécutants",
+      "audienceSupervisors": "Responsables hiérarchiques",
+      "examLanguage": "Langue de l'examen",
+      "postalCode": "Votre code postal",
+      "postalCodePlaceholder": "ex. 2000",
+      "preferredDate": "Date souhaitée",
+      "bookingMode": "Type de réservation",
+      "modeExamOnly": "Examen seul",
+      "modeExamOnlyHint": "Je me suis préparé avec PipingBox",
+      "modeCoursePlusExam": "Formation + examen",
+      "modeCoursePlusExamHint": "En présentiel au centre",
+      "stepCenters": "Centres d'examen reconnus",
+      "noCenters": "Aucun centre ne correspond à vos critères. Essayez de modifier le type d'examen ou le type de réservation.",
+      "tagOnline": "En ligne",
+      "tagCourse": "Formation",
+      "examFeeShort": "droits d'examen",
+      "coursePlusExamPrice": "{{price}} € formation+examen",
+      "stepContact": "Vos coordonnées",
+      "name": "Nom",
+      "namePlaceholder": "Vos nom et prénom",
+      "phone": "Téléphone (WhatsApp)",
+      "summaryTitle": "Récapitulatif de la réservation",
+      "summaryLanguage": "Langue",
+      "summaryMode": "Type",
+      "noPreference": "Sans préférence",
+      "summaryCenter": "Centre",
+      "anyCenter": "N'importe quel centre disponible",
+      "officialExamFee": "Droits d'examen officiels",
+      "paidToCenter": "(à payer au centre)",
+      "managementFee": "Frais de gestion PipingBox",
+      "total": "Total",
+      "feeStandard": "Standard {{price}} €",
+      "feeUrgent": "Urgent {{price}} €",
+      "feeHint": "Standard : confirmation sous 48 h. Urgent : confirmation sous 24 h + assistance linguistique.",
+      "submitting": "Envoi en cours...",
+      "signInToBook": "Connectez-vous pour réserver",
+      "submit": "Envoyer la demande de réservation",
+      "afterSubmitNote": "Après l'envoi, PipingBox vous contactera par WhatsApp/e-mail sous 24-48 h pour confirmer votre réservation et encaisser les frais de gestion.",
+      "nextStepsTitle": "Et ensuite ?",
+      "nextStep1": "Vous envoyez cette demande de réservation.",
+      "nextStep2": "PipingBox vous contacte sous 24-48 h pour confirmer les disponibilités.",
+      "nextStep3": "Vous payez les {{price}} € de frais de gestion (Stripe/virement).",
+      "nextStep4": "PipingBox réserve votre place d'examen auprès du centre.",
+      "nextStep5": "Vous passez l'examen. Le centre délivre votre certificat VCA."
+    },
+    "examLoadingContent": "Chargement des questions…",
+    "moduleFallbackTitle": "Module {{number}}",
+    "moduleEstimatedMinutes": "~{{minutes}} min",
+    "noLessonContent": "Aucun contenu de leçon disponible pour ce module.",
+    "quizAnsweredCount": "{{answered}}/{{total}} répondues",
+    "bookVcaExamCta": "Réservez votre examen officiel VCA",
+    "bookVcaExamCtaHint": "Consultez les centres d’examen et réservez votre place",
+    "examContentLoadError": "Impossible de charger le support de cours dans cette langue. Le simulateur reste indisponible.",
+    "examContentRetry": "Recharger et réessayer",
+    "examContentUnavailable": "Questions indisponibles"
   },
   "tools": {
     "eyebrow": "Outils",
@@ -1742,7 +1810,8 @@
         "straightCut": "Coupe droite",
         "centerToCenter": "Axe à axe",
         "diagonal": "H (diagonale)",
-        "cutAngleEnd": "Angle de coupe par extrémité"
+        "cutAngleEnd": "Angle de coupe par extrémité",
+        "cardSubtitle": "Décalages avec coudes, sans coudes et vérification des mesures"
       },
       "miteredElbow": {
         "title": "Coude à segments",
@@ -2028,6 +2097,53 @@
         "piece_lengths_invalid": "Les longueurs de pièces calculées sont invalides",
         "clr_gt_half_od": "Le CLR doit être supérieur à OD/2",
         "beta_range": "L'angle de coupe doit être compris entre 0° et {{max}}°"
+      },
+      "twoElbowOffset": {
+        "title": "Décalage à deux coudes",
+        "subtitle": "Décalage de lignes parallèles avec deux coudes : avancement, parcours et segment droit intermédiaire.",
+        "lineCount": "Nombre de lignes",
+        "elbowAngle": "Angle des coudes",
+        "initialSpacing": "Écart initial des axes",
+        "finalSpacing": "Écart final des axes",
+        "clr": "Rayon à l'axe (CLR)",
+        "nps": "NPS",
+        "elbowType": "Type de coude",
+        "catalogHint": "Le sélecteur NPS/type remplit le CLR depuis le catalogue ; modifiable manuellement.",
+        "invalidFields": "Vérifiez les champs : valeurs vides ou invalides.",
+        "drawPlaceholder": "Saisissez des paramètres pour afficher le décalage",
+        "alignmentNote": "La position du décalage le long de l'axe est purement visuelle ; ce n'est pas une cote d'atelier.",
+        "angleLabel": "Angle",
+        "direction": "Sens",
+        "direction_expanding": "Écart croissant",
+        "direction_contracting": "Écart décroissant",
+        "direction_straight": "Lignes droites",
+        "travelSpread": "Écart max. de parcours",
+        "line": "Ligne",
+        "offset": "Décalage",
+        "advance": "Avancement",
+        "travel": "Parcours",
+        "takeOut": "Retrait/coude",
+        "straightCut": "Segment droit",
+        "diff": "Diff.",
+        "status": "État",
+        "statusReference": "Référence (droite)",
+        "statusTangent": "Coudes tangents",
+        "statusDisplaced": "Décalée",
+        "noteGeometry": "Le parcours est la distance entre intersections théoriques des axes ; ce n'est pas la longueur d'arc du coude. L'avancement n'est pas une longueur de coupe.",
+        "nominalCutNote": "Le segment droit est nominal entre points de tangence : sans jeu de soudure, marge de montage ni épaisseur de scie.",
+        "nominalAngleNote": "Angle non normalisé commercialement : géométrie nominale. Vérifiez la disponibilité de l'accessoire avant fabrication.",
+        "tangentNote": "Un segment droit intermédiaire est nul : les coudes sont tangents (ce n'est pas un ordre de couper 0 mm).",
+        "dims": {
+          "spacingInitial": "Écart initial",
+          "spacingFinal": "Écart final",
+          "offset": "Décal.",
+          "advance": "Avancement",
+          "travel": "Parcours",
+          "straightCut": "Segment droit"
+        },
+        "clrSourceCatalog": "CLR résolu du catalogue : NPS {{combo}}.",
+        "clrSourceCustom": "CLR personnalisé ; ne provient pas du catalogue.",
+        "clrMissing": "Le catalogue de cet outil n'a pas de CLR tabulé pour NPS {{combo}}. Saisissez un CLR pour calculer."
       }
     },
     "tabPipeDimensions": "Dimensions de tuyau",
@@ -2351,7 +2467,8 @@
       "pdfSeam": "couture",
       "pdfWrapNote": "Enveloppement : X le long de la circonférence, Y depuis le bout carré côté coude.",
       "pdfClosure": "fermeture"
-    }
+    },
+    "familyOffsets": "Décalages et déplacements"
   },
   "jobs": {
     "eyebrow": "Offres",
@@ -2810,7 +2927,9 @@
     "conflictPrompt": "Certaines données diffèrent de votre profil. Choisissez la valeur à conserver.",
     "retryProfileNotReady": "Votre profil est en préparation. Réessayez dans quelques secondes.",
     "applyError": "Une erreur s'est produite. Veuillez réessayer.",
-    "dismissed": "Brouillon écarté. Vous pouvez compléter votre profil manuellement."
+    "dismissed": "Brouillon écarté. Vous pouvez compléter votre profil manuellement.",
+    "extractionFoundTitle": "Nous avons trouvé des informations professionnelles dans votre CV.",
+    "extractionFoundDesc": "Vérifiez-les pour compléter votre profil — cela prend 1-2 minutes."
   },
   "certExtract": {
     "analyzing": "Analyse du document…",
@@ -2943,7 +3062,22 @@
     "view": "Voir",
     "download": "Télécharger",
     "cvPreviewFailed": "Échec de la génération du lien d'aperçu du CV",
-    "previewFailed": "Échec de la génération du lien d'aperçu"
+    "previewFailed": "Échec de la génération du lien d'aperçu",
+    "cvExtraction": {
+      "title": "Extraction de CV",
+      "not_processed": "Non traité",
+      "processing": "Traitement",
+      "pending_review": "En attente de révision du candidat",
+      "review_confirmed": "Confirmé",
+      "extraction_failed": "Extraction échouée",
+      "dismissed": "Ignoré",
+      "fieldsExperiences": "{{fields}} champs · {{experiences}} expériences",
+      "experienceExplicit": "Expérience du CV : {{years}} ans",
+      "experienceDerived": "Expérience dérivée : {{years}} ans",
+      "discrepant": "écart explicite/dérivé — révision requise",
+      "processed": "Traité : {{date}}",
+      "confirmed": "Confirmé : {{date}}"
+    }
   },
   "inviteToJob": {
     "buttonLabel": "Inviter à un poste",
@@ -4522,5 +4656,103 @@
     "contractChanged": "Les conditions ont changé",
     "contractChangedBody": "Les conditions du Marketplace ont été mises à jour pendant que vous les consultiez. Par sécurité, aucune acceptation n'a été enregistrée. Veuillez relire la version actuelle avant d'accepter.",
     "reviewAgainCta": "Relire la version actuelle"
+  },
+  "companyCore": {
+    "loading": "Chargement…",
+    "switcher": {
+      "label": "Entreprise active"
+    },
+    "roles": {
+      "owner": "Propriétaire",
+      "admin": "Administrateur",
+      "recruiter": "Recruteur",
+      "viewer": "Lecture seule"
+    },
+    "verification": {
+      "unverified": "Non vérifiée",
+      "pending": "Vérification en cours",
+      "verified": "Vérifiée",
+      "rejected": "Vérification refusée"
+    },
+    "create": {
+      "title": "Configurez votre entreprise",
+      "description": "Créez l'espace de votre entreprise pour inviter votre équipe. Créer une entreprise ne la vérifie pas.",
+      "nameLabel": "Nom de l'entreprise",
+      "countryLabel": "Pays (facultatif)",
+      "submit": "Créer l'entreprise",
+      "submitting": "Création…"
+    },
+    "view": {
+      "title": "Mon entreprise",
+      "description": "Aperçu de l'espace de votre entreprise.",
+      "verificationTitle": "Statut de vérification",
+      "teamTitle": "Équipe",
+      "teamDescription": "Membres, rôles et invitations",
+      "yourRoleTitle": "Votre rôle"
+    },
+    "team": {
+      "title": "Équipe",
+      "description": "Membres de {{company}}",
+      "noCompany": "Vous ne faites partie d'aucune entreprise pour le moment.",
+      "createLink": "Configurez votre entreprise",
+      "membersTitle": "Membres",
+      "unnamedMember": "Membre sans nom",
+      "you": "vous",
+      "confirmRemove": "Retirer ce membre ? Son accès est révoqué immédiatement.",
+      "confirmTransfer": "Transférer la propriété ? Vous deviendrez administrateur.",
+      "transferTitle": "Transférer la propriété",
+      "removeTitle": "Retirer le membre",
+      "leaveTitle": "Quitter l'entreprise"
+    },
+    "invite": {
+      "title": "Inviter un membre",
+      "emailLabel": "Adresse e-mail",
+      "roleLabel": "Rôle",
+      "submit": "Créer l'invitation",
+      "submitting": "Création…",
+      "created": "Invitation créée. Partagez ce lien à usage unique :",
+      "alreadyPending": "Une invitation est déjà en attente pour cette adresse e-mail.",
+      "copy": "Copier",
+      "copied": "Lien copié",
+      "emailNotice": "L'envoi par e-mail n'est pas encore activé — partagez le lien manuellement avec la personne invitée."
+    },
+    "invitations": {
+      "title": "Invitations",
+      "revoke": "Révoquer",
+      "expires": "expire le {{date}}",
+      "status": {
+        "pending": "en attente",
+        "accepted": "acceptée",
+        "rejected": "refusée",
+        "revoked": "révoquée",
+        "expired": "expirée"
+      }
+    },
+    "accept": {
+      "title": "Invitation d'entreprise",
+      "sessionRequired": "Pour répondre à cette invitation, connectez-vous ou inscrivez-vous avec l'adresse e-mail invitée, puis rouvrez ce lien.",
+      "signIn": "Se connecter",
+      "register": "S'inscrire",
+      "question": "Voulez-vous rejoindre cette entreprise ?",
+      "accept": "Accepter",
+      "reject": "Refuser",
+      "processing": "Traitement…",
+      "success": "Vous avez rejoint l'entreprise. Redirection…",
+      "rejected": "Invitation refusée."
+    },
+    "errors": {
+      "not_authenticated": "Vous devez être connecté.",
+      "forbidden": "Vous n'avez pas la permission pour cette action.",
+      "not_found": "Introuvable.",
+      "invalid_name": "Nom d'entreprise invalide.",
+      "invalid_email": "Adresse e-mail invalide.",
+      "invalid_role": "Rôle invalide.",
+      "invalid_or_expired": "Cette invitation est invalide, expirée ou déjà utilisée.",
+      "email_mismatch": "Cette invitation a été envoyée à une autre adresse e-mail. Connectez-vous avec l'adresse invitée.",
+      "not_active": "L'adhésion n'est pas active.",
+      "last_owner": "L'entreprise doit conserver au moins un propriétaire.",
+      "cannot_transfer_to_self": "Vous ne pouvez pas transférer la propriété à vous-même.",
+      "unknown": "Une erreur est survenue. Veuillez réessayer."
+    }
   }
 }

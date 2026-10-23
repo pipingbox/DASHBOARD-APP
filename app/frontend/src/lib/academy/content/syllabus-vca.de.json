@@ -1,0 +1,297 @@
+[
+  {
+    "id": "m1-legal",
+    "iconKey": "Shield",
+    "officialRef": "VCA 2026 §1",
+    "title": "Modul 1: Gesetzgebung und Vorschriften",
+    "lessons": [
+      {
+        "title": "1.1 Belgisches und europäisches Arbeitsschutzrecht",
+        "duration": "15 min",
+        "topics": [
+          "Codex over Welzijn op het Werk (Kodex über das Wohlbefinden am Arbeitsplatz)",
+          "EU-Rahmenrichtlinie 89/391/EEC",
+          "Rechte und Pflichten der Arbeitnehmer",
+          "Verantwortung des Arbeitgebers"
+        ]
+      },
+      {
+        "title": "1.2 Das VCA-System und die Zertifizierung",
+        "duration": "10 min",
+        "topics": [
+          "Was ist VCA?",
+          "B-VCA im Vergleich zu VOL-VCA",
+          "Gültigkeit (10 Jahre)",
+          "Trägerschaft durch SSVV/BESACC"
+        ]
+      },
+      {
+        "title": "1.3 ARAB und CODELCO",
+        "duration": "12 min",
+        "topics": [
+          "Algemeen Reglement voor de Arbeidsbescherming (Allgemeine Arbeitsschutzordnung)",
+          "Commissie voor Welzijn op het Werk (Ausschuss für Wohlbefinden am Arbeitsplatz)",
+          "Meldung von Arbeitsunfällen"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m2-risk",
+    "iconKey": "AlertTriangle",
+    "officialRef": "VCA 2026 §2",
+    "title": "Modul 2: Risikoanalyse und Prävention",
+    "lessons": [
+      {
+        "title": "2.1 Risikoermittlung",
+        "duration": "20 min",
+        "topics": [
+          "Was ist ein Risiko?",
+          "Gefahr oder Risiko",
+          "Risikomatrix",
+          "Arbeitssicherheitsanalyse (JSA)"
+        ]
+      },
+      {
+        "title": "2.2 Hierarchie der Schutzmaßnahmen",
+        "duration": "15 min",
+        "topics": [
+          "Beseitigung der Gefahrenquelle",
+          "Substitution (Ersatz durch weniger gefährliche Stoffe oder Verfahren)",
+          "Technische Maßnahmen",
+          "Organisatorische Maßnahmen",
+          "PSA (letztes Mittel)"
+        ]
+      },
+      {
+        "title": "2.3 Arbeitsfreigabesystem",
+        "duration": "12 min",
+        "topics": [
+          "Erlaubnisschein für Heißarbeiten",
+          "Befahrerlaubnis für enge Räume",
+          "Verriegeln und Kennzeichnen (LOTO)",
+          "Erlaubnisschein für Arbeiten in der Höhe"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m3-ppe",
+    "iconKey": "HardHat",
+    "officialRef": "VCA 2026 §3",
+    "title": "Modul 3: Persönliche Schutzausrüstung",
+    "lessons": [
+      {
+        "title": "3.1 Pflicht-PSA in Industrieanlagen",
+        "duration": "10 min",
+        "topics": [
+          "Schutzhelm (EN 397)",
+          "Schutzbrille (EN 166)",
+          "Sicherheitsschuhe (EN ISO 20345)",
+          "Warnweste (EN 20471)",
+          "Schutzhandschuhe (EN 388)"
+        ]
+      },
+      {
+        "title": "3.2 Atemschutz",
+        "duration": "15 min",
+        "topics": [
+          "FFP1-/FFP2-/FFP3-Masken",
+          "Halbmasken und Vollmasken",
+          "Umluftunabhängiges Atemschutzgerät (SCBA) für enge Räume",
+          "Filterauswahl (A, B, E, K, P)"
+        ]
+      },
+      {
+        "title": "3.3 Gehörschutz und Absturzsicherung",
+        "duration": "10 min",
+        "topics": [
+          "Gehörschutzstöpsel oder Kapselgehörschutz (SNR-Wert)",
+          "Auffanggurt (EN 361)",
+          "Verbindungsmittel und Sicherungsseile",
+          "Anschlagpunkte (EN 795)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m4-fire",
+    "iconKey": "Flame",
+    "officialRef": "VCA 2026 §4",
+    "title": "Modul 4: Brand- und Explosionsschutz",
+    "lessons": [
+      {
+        "title": "4.1 Branddreieck und Brandklassen",
+        "duration": "12 min",
+        "topics": [
+          "Branddreieck (Wärme, Brennstoff, Sauerstoff)",
+          "Brandklassen A/B/C/D/F",
+          "Feuerlöschertypen (Wasser, Schaum, CO2, Pulver)",
+          "PASS-Methode"
+        ]
+      },
+      {
+        "title": "4.2 ATEX-Zonen",
+        "duration": "15 min",
+        "topics": [
+          "Zonen 0/1/2 (Gas)",
+          "Zonen 20/21/22 (Staub)",
+          "Gerätekategorien (1/2/3)",
+          "Heißarbeiten in ATEX-Zonen"
+        ]
+      },
+      {
+        "title": "4.3 Evakuierungsverfahren",
+        "duration": "10 min",
+        "topics": [
+          "Alarmsignale",
+          "Fluchtwege",
+          "Sammelplätze",
+          "Anwesenheitskontrolle am Sammelplatz"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m5-electrical",
+    "iconKey": "Zap",
+    "officialRef": "VCA 2026 §5",
+    "title": "Modul 5: Elektrische Sicherheit",
+    "lessons": [
+      {
+        "title": "5.1 Elektrische Gefährdungen",
+        "duration": "15 min",
+        "topics": [
+          "Stromschlag",
+          "Störlichtbogen",
+          "Schrittspannung",
+          "Berechtigungsstufen BA4/BA5"
+        ]
+      },
+      {
+        "title": "5.2 Verriegeln und Kennzeichnen (LOTO)",
+        "duration": "12 min",
+        "topics": [
+          "LOTO-Verfahren in 6 Schritten",
+          "Trennen von den Energiequellen",
+          "Prüfen der Energiefreiheit",
+          "Gruppenverriegelung"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m6-height",
+    "iconKey": "Wind",
+    "officialRef": "VCA 2026 §6",
+    "title": "Modul 6: Arbeiten in der Höhe",
+    "lessons": [
+      {
+        "title": "6.1 Absturzgefahren und ihre Vermeidung",
+        "duration": "15 min",
+        "topics": [
+          "Begriffsbestimmung (Absturzhöhe >2 m)",
+          "Seitenschutz und Bordbretter",
+          "Schutznetze",
+          "Auffangsysteme"
+        ]
+      },
+      {
+        "title": "6.2 Sicherheit auf Gerüsten",
+        "duration": "12 min",
+        "topics": [
+          "Gerüstkennzeichnung (grün/rot/gelb)",
+          "Prüfanforderungen",
+          "Lastklassen",
+          "Befähigte Person"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m7-chemical",
+    "iconKey": "Droplets",
+    "officialRef": "VCA 2026 §7",
+    "title": "Modul 7: Gefahrstoffe",
+    "lessons": [
+      {
+        "title": "7.1 CLP/GHS-Einstufung",
+        "duration": "15 min",
+        "topics": [
+          "Gefahrenpiktogramme",
+          "H-Sätze und P-Sätze",
+          "Signalwörter (Gefahr/Achtung)",
+          "Sicherheitsdatenblätter (SDB)"
+        ]
+      },
+      {
+        "title": "7.2 Asbest und Quarz",
+        "duration": "12 min",
+        "topics": [
+          "Asbestarten (weiß/braun/blau)",
+          "REACH-Verordnung",
+          "Quarzstaub (RESPIRE-SILICE)",
+          "Arbeitsplatzgrenzwerte"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m8-ergonomics",
+    "iconKey": "Eye",
+    "officialRef": "VCA 2026 §8",
+    "title": "Modul 8: Ergonomie und manuelle Handhabung von Lasten",
+    "lessons": [
+      {
+        "title": "8.1 Hebetechniken",
+        "duration": "10 min",
+        "topics": [
+          "Richtige Körperhaltung beim Heben",
+          "Heben im Team",
+          "Mechanische Hilfsmittel",
+          "Gewichtsgrenzen (25 kg Männer / 12,5 kg Frauen)"
+        ]
+      },
+      {
+        "title": "8.2 Bildschirmarbeit und Körperhaltung",
+        "duration": "8 min",
+        "topics": [
+          "Abstand zum Bildschirm",
+          "Einstellung des Stuhls",
+          "Pausen (5 min/Stunde)",
+          "Vorbeugung von Augenbelastung"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m9-accidents",
+    "iconKey": "ClipboardList",
+    "officialRef": "VCA 2026 §9",
+    "title": "Modul 9: Unfälle und Erste Hilfe",
+    "lessons": [
+      {
+        "title": "9.1 Unfallmeldung",
+        "duration": "12 min",
+        "topics": [
+          "Meldung von Beinaheunfällen",
+          "Unfalluntersuchung",
+          "Analyse der Grundursachen",
+          "Korrekturmaßnahmen"
+        ]
+      },
+      {
+        "title": "9.2 Grundlagen der Ersten Hilfe",
+        "duration": "15 min",
+        "topics": [
+          "DRABC-Schema",
+          "Herz-Lungen-Wiederbelebung (HLW, 30:2)",
+          "Stabile Seitenlage",
+          "Blutstillung",
+          "Versorgung von Verbrennungen",
+          "Augenspülung"
+        ]
+      }
+    ]
+  }
+]

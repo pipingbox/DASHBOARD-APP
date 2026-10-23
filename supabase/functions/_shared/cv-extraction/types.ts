@@ -59,6 +59,22 @@ export interface ExtractedField {
   extracted_at: string;
   /** Id del draft/documento fuente; lo asigna el llamador (fila del draft). */
   source_document_id: string;
+  /** PB-CV-EXPERIENCE-DERIVATION-001 — procedencia fina dentro de 'cv':
+   *  ausencia o 'cv_text' = valor textual del documento;
+   *  'derived_from_experience_dates' = calculado a partir de las fechas de
+   *  las experiencias (nunca se presenta como dato textual del CV). */
+  provenance?: 'cv_text' | 'derived_from_experience_dates';
+  /** PB-CV-EXPERIENCE-DERIVATION-001 — metadata del cálculo derivado de
+   *  years_experience (agregados, sin PII de las experiencias). */
+  derivation?: {
+    total_months: number;
+    derived_years: number;
+    intervals_used: number;
+    intervals_total: number;
+    /** Relación con el valor explícito del CV cuando ambos existen. */
+    explicit_years?: number;
+    consistency?: 'coherent' | 'uncertain' | 'discrepant';
+  };
 }
 
 export interface ProposedExperience {

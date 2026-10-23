@@ -78,6 +78,10 @@ jobs:
       - name: i18n coverage strict guard (7 locales at 100%)
         run: node scripts/check-i18n-coverage.mjs --strict
 
+      # PB-VCA-I18N-11-001: VCA study material must ship in all 11 canonical languages.
+      - name: Academy VCA content strict gate (11 languages)
+        run: node scripts/academy-content.mjs validate-vca && node --test scripts/academy-content.test.mjs
+
       - name: Catalog integrity guard
         run: node scripts/check-catalog.mjs
 

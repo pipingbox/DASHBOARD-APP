@@ -1,0 +1,36 @@
+name: Academy VCA PR Gate
+
+on:
+  pull_request:
+    paths:
+      - 'app/frontend/**'
+      - 'scripts/academy-content.mjs'
+      - 'scripts/academy-content*.test.mjs'
+      - 'scripts/check-i18n-*.mjs'
+      - '.github/workflows/academy-vca-pr.yml'
+
+jobs:
+  academy-vca:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install frontend dependencies
+        working-directory: app/frontend
+        run: npm ci
+      - name: TypeScript
+        working-directory: app/frontend
+        run: npm run typecheck
+      - name: Lint
+        working-directory: app/frontend
+        run: npm run lint
+      - name: i18n schema and usage
+        run: node scripts/check-i18n-schema.mjs && node scripts/check-i18n-usage.mjs && node scripts/check-i18n-coverage.mjs --strict
+      - name: Strict Academy content
+        run: node scripts/academy-content.mjs validate-vca && node scripts/academy-content.mjs validate
+      - name: Content and loading regressions
+        run: node --test scripts/academy-content.test.mjs scripts/academy-content-loading.test.mjs

@@ -15,7 +15,7 @@ import {
   Clock,
   Award,
 } from 'lucide-react';
-import { ACADEMY_CONTENT_LANGUAGES, useSyllabus } from '@/lib/academy/content';
+import { syllabusLanguages, useSyllabus } from '@/lib/academy/content';
 import { getNetPriceCents, formatNetPriceEur, EXCL_VAT_NOTE } from '@/lib/academy/pricing';
 
 /* ─── PRL Course Content (Official Syllabus) ───
@@ -36,9 +36,6 @@ import { getNetPriceCents, formatNetPriceEur, EXCL_VAT_NOTE } from '@/lib/academ
  * and `syllabus-prl-intermedio.<lang>.json` (see PB-I18N-LAYER3-001);
  * only the icons stay in the component.
  */
-
-/** Languages the study material is actually available in (English + Layer 3). */
-const COURSE_LANGUAGES = ['en', ...ACADEMY_CONTENT_LANGUAGES];
 
 const MODULE_ICONS: Record<string, React.ElementType> = {
   Scale,
@@ -61,6 +58,9 @@ export function PRLCourseContent({ variant = 'Básico' }: PRLCourseContentProps)
   const basicoModules = useSyllabus('prl-basico');
   const intermedioExtraModules = useSyllabus('prl-intermedio');
 
+  const courseLanguages = variant === 'Básico'
+    ? syllabusLanguages('prl-basico')
+    : syllabusLanguages('prl-basico', 'prl-intermedio');
   const visibleModules = variant === 'Básico'
     ? basicoModules
     : [...basicoModules, ...intermedioExtraModules];
@@ -124,7 +124,7 @@ export function PRLCourseContent({ variant = 'Básico' }: PRLCourseContentProps)
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {COURSE_LANGUAGES.map((lang) => (
+          {courseLanguages.map((lang) => (
             <span key={lang} className="px-2 py-0.5 text-[10px] bg-zinc-800/60 text-zinc-400 rounded-sm">
               {lang.toUpperCase()}
             </span>

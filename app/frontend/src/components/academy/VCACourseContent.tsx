@@ -31,8 +31,12 @@ import { getNetPriceCents, formatNetPriceEur, EXCL_VAT_NOTE } from '@/lib/academ
  * (see PB-I18N-LAYER3-001); only the icons stay in the component.
  */
 
-/** Languages the study material is actually available in (English + Layer 3). */
-const COURSE_LANGUAGES = ['en', ...ACADEMY_CONTENT_LANGUAGES];
+/**
+ * Languages the study material is actually available in. PB-VCA-I18N-11-001:
+ * `ACADEMY_CONTENT_LANGUAGES` already includes English and covers the full
+ * canonical list, so no language falls back to the English material.
+ */
+const COURSE_LANGUAGES = ACADEMY_CONTENT_LANGUAGES;
 
 const QUESTION_COUNT = getVcaQuestionsSync('en').length;
 
@@ -109,7 +113,9 @@ export function VCACourseContent() {
               {lang.toUpperCase()}
             </span>
           ))}
-          <span className="text-[10px] text-zinc-600">{t('academy.courseContent.otherLanguagesInEnglish')}</span>
+          <span className="text-[10px] text-zinc-600">
+            {t('academy.courseContent.studyLanguagesNote', { count: COURSE_LANGUAGES.length })}
+          </span>
         </div>
 
         <div className="border-t border-zinc-800 pt-3">

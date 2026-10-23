@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { LessonContent } from '@/lib/academy-types';
 import type { VCAQuestion } from '@/lib/academy-types';
 import { toSupportedCode } from '@/i18n';
+import { loadVcaContentForLanguage } from './loadVcaContent';
 import enLessons from './vca-lessons.en.json';
 import enSyllabusVca from './syllabus-vca.en.json';
 import enSyllabusScc from './syllabus-scc.en.json';
@@ -25,7 +26,16 @@ import questionMeta from './vca-questions.meta.json';
 type LessonMap = Record<string, LessonContent>;
 type QuestionTextMap = Record<string, Record<string, string | Record<string, string>>>;
 
+// PB-VCA-I18N-11-001: every canonical language in `i18n/languages.json`
+// (other than English, which is bundled) must have a loader in all three maps.
+// `scripts/academy-content.mjs validate-vca` fails the build otherwise.
 const LESSON_LOADERS: Record<string, () => Promise<{ default: unknown }>> = {
+  es: () => import('./vca-lessons.es.json'),
+  nl: () => import('./vca-lessons.nl.json'),
+  fr: () => import('./vca-lessons.fr.json'),
+  de: () => import('./vca-lessons.de.json'),
+  pt: () => import('./vca-lessons.pt.json'),
+  it: () => import('./vca-lessons.it.json'),
   ro: () => import('./vca-lessons.ro.json'),
   uk: () => import('./vca-lessons.uk.json'),
   pl: () => import('./vca-lessons.pl.json'),
@@ -33,6 +43,12 @@ const LESSON_LOADERS: Record<string, () => Promise<{ default: unknown }>> = {
 };
 
 const QUESTION_LOADERS: Record<string, () => Promise<{ default: unknown }>> = {
+  es: () => import('./vca-questions.es.json'),
+  nl: () => import('./vca-questions.nl.json'),
+  fr: () => import('./vca-questions.fr.json'),
+  de: () => import('./vca-questions.de.json'),
+  pt: () => import('./vca-questions.pt.json'),
+  it: () => import('./vca-questions.it.json'),
   ro: () => import('./vca-questions.ro.json'),
   uk: () => import('./vca-questions.uk.json'),
   pl: () => import('./vca-questions.pl.json'),
@@ -68,11 +84,25 @@ const EN_SYLLABI: Record<SyllabusKey, SyllabusModule[]> = {
  */
 const SYLLABUS_LOADERS: Record<string, Partial<Record<SyllabusKey, () => Promise<{ default: unknown }>>>> = {
   es: {
+    vca: () => import('./syllabus-vca.es.json'),
     'prl-basico': () => import('./syllabus-prl-basico.es.json'),
     'prl-intermedio': () => import('./syllabus-prl-intermedio.es.json'),
   },
+  nl: {
+    vca: () => import('./syllabus-vca.nl.json'),
+  },
+  fr: {
+    vca: () => import('./syllabus-vca.fr.json'),
+  },
   de: {
+    vca: () => import('./syllabus-vca.de.json'),
     scc: () => import('./syllabus-scc.de.json'),
+  },
+  pt: {
+    vca: () => import('./syllabus-vca.pt.json'),
+  },
+  it: {
+    vca: () => import('./syllabus-vca.it.json'),
   },
   ro: {
     vca: () => import('./syllabus-vca.ro.json'),
@@ -141,8 +171,24 @@ export function useSyllabus(key: SyllabusKey): SyllabusModule[] {
   return modules;
 }
 
-/** Languages with translated Academy content (others read English). */
-export const ACADEMY_CONTENT_LANGUAGES = Object.keys(LESSON_LOADERS);
+/**
+ * Languages with translated VCA study material, English included (it is bundled,
+ * every other code has a lazy loader). PB-VCA-I18N-11-001: this must equal the
+ * canonical list in `i18n/languages.json`; the content validator enforces it.
+ */
+export const ACADEMY_CONTENT_LANGUAGES: readonly string[] = [
+  'en',
+  ...Object.keys(LESSON_LOADERS).filter((lang) => lang in QUESTION_LOADERS && !!SYLLABUS_LOADERS[lang]?.vca),
+];
+
+export function syllabusLanguages(...keys: SyllabusKey[]): string[] {
+  return ['en', ...Object.keys(SYLLABUS_LOADERS).filter((lang) => keys.every((key) => !!SYLLABUS_LOADERS[lang]?.[key]))];
+}
+
+/** True when VCA lessons + questions ship in `lang` (not served through the English fallback). */
+export function hasVcaContent(lang: string): boolean {
+  return lang === 'en' || (lang in LESSON_LOADERS && lang in QUESTION_LOADERS);
+}
 
 const EN_LESSONS = enLessons as unknown as LessonMap;
 const EN_QUESTION_TEXT = enQuestionText as unknown as QuestionTextMap;
@@ -189,15 +235,10 @@ export async function loadVcaLessons(lang: string): Promise<LessonMap> {
   if (cached) return cached;
   const loader = LESSON_LOADERS[lang];
   if (!loader) return EN_LESSONS;
-  try {
-    const mod = await loader();
-    const value = (mod.default ?? mod) as unknown as LessonMap;
-    lessonCache.set(lang, value);
-    return value;
-  } catch (err) {
-    console.warn(`[academy] falling back to English lessons for "${lang}"`, err);
-    return EN_LESSONS;
-  }
+  const mod = await loader();
+  const value = (mod.default ?? mod) as unknown as LessonMap;
+  lessonCache.set(lang, value);
+  return value;
 }
 
 export async function loadVcaQuestions(lang: string): Promise<VCAQuestion[]> {
@@ -205,41 +246,58 @@ export async function loadVcaQuestions(lang: string): Promise<VCAQuestion[]> {
   if (cached) return cached;
   const loader = QUESTION_LOADERS[lang];
   if (!loader) return EN_QUESTIONS;
-  try {
-    const mod = await loader();
-    const value = buildQuestions((mod.default ?? mod) as unknown as QuestionTextMap);
-    questionCache.set(lang, value);
-    return value;
-  } catch (err) {
-    console.warn(`[academy] falling back to English questions for "${lang}"`, err);
-    return EN_QUESTIONS;
-  }
+  const mod = await loader();
+  const value = buildQuestions((mod.default ?? mod) as unknown as QuestionTextMap);
+  questionCache.set(lang, value);
+  return value;
+}
+
+function isVcaCached(lang: string): boolean {
+  return lang === 'en' || (lessonCache.has(lang) && questionCache.has(lang));
+}
+
+/** Localised title of one of the 22 official VCA modules, taken from its question bank wording. */
+export function getVcaModuleName(questions: VCAQuestion[], moduleId: number): string | undefined {
+  return questions.find((q) => q.moduleId === moduleId)?.moduleName;
 }
 
 /**
  * Study material in the active UI language. Starts from the cached/English
  * value so consumers never render an empty state, then swaps in the
- * translation once its chunk resolves.
+ * translation once its chunk resolves. `ready` is false while the active
+ * language still shows the English fallback — gate anything that freezes a
+ * snapshot of the questions (mock exam start) on it.
  */
 export function useVcaContent() {
   const { i18n } = useTranslation();
   const lang = toSupportedCode(i18n.language) ?? 'en';
   const [lessons, setLessons] = useState<LessonMap>(() => getVcaLessonsSync(lang));
   const [questions, setQuestions] = useState<VCAQuestion[]>(() => getVcaQuestionsSync(lang));
+  const [loadState, setLoadState] = useState<{ lang: string; state: 'loading' | 'ready' | 'error' }>(
+    () => ({ lang, state: isVcaCached(lang) ? 'ready' : 'loading' }),
+  );
 
   useEffect(() => {
-    let active = true;
     setLessons(getVcaLessonsSync(lang));
     setQuestions(getVcaQuestionsSync(lang));
-    void Promise.all([loadVcaLessons(lang), loadVcaQuestions(lang)]).then(([l, q]) => {
-      if (!active) return;
-      setLessons(l);
-      setQuestions(q);
-    });
-    return () => {
-      active = false;
-    };
+    setLoadState({ lang, state: isVcaCached(lang) ? 'ready' : 'loading' });
+    return loadVcaContentForLanguage(
+      lang, loadVcaLessons, loadVcaQuestions,
+      (loadedLessons, loadedQuestions) => {
+        setLessons(loadedLessons);
+        setQuestions(loadedQuestions);
+        setLoadState({ lang, state: isVcaCached(lang) ? 'ready' : 'error' });
+      },
+      () => setLoadState({ lang, state: 'error' }),
+    );
   }, [lang]);
 
-  return { lessons, questions, lang };
+  const state = loadState.lang === lang ? loadState.state : isVcaCached(lang) ? 'ready' : 'loading';
+  return {
+    lessons: loadState.lang === lang ? lessons : getVcaLessonsSync(lang),
+    questions: loadState.lang === lang ? questions : getVcaQuestionsSync(lang),
+    lang,
+    ready: state === 'ready' && isVcaCached(lang),
+    error: state === 'error',
+  };
 }

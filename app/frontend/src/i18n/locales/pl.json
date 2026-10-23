@@ -106,7 +106,9 @@
     "companyDocumentation": "Zarządzanie dokumentacją przemysłową",
     "companySection": "Firma",
     "companySettings": "Ustawienia",
-    "companyWorkspace": "Obszar roboczy firmy"
+    "companyWorkspace": "Obszar roboczy firmy",
+    "companyTenant": "Moja firma",
+    "companyTeam": "Zespół"
   },
   "notifications": {
     "title": "Powiadomienia",
@@ -868,7 +870,7 @@
     "examBookOfficialCTA": "Gotowy na certyfikat?",
     "examBookOfficialText": "Zarezerwuj oficjalny egzamin VCA w autoryzowanym centrum egzaminacyjnym.",
     "examBookOfficialButton": "Zarezerwuj oficjalny egzamin",
-    "examLanguageNote": "Ten symulator zawiera pytania w języku angielskim.",
+    "examLanguageNote": "Ten symulator zawiera pytania w języku: {{language}}.",
     "examLanguageBVCA": "Oficjalny egzamin B-VCA jest dostępny w centrach egzaminacyjnych w nawet 20 językach.",
     "examLanguageVOLVCA": "Oficjalny egzamin VOL-VCA jest dostępny w języku niderlandzkim, angielskim, niemieckim i francuskim.",
     "examPassScore": "Próg zaliczenia",
@@ -969,7 +971,8 @@
         "badgeCompliance": "Spełnia Ley 31/1995",
         "badgeHours": "{{hours}}h szkolenia",
         "badgeDownloadable": "Zaświadczenie do pobrania"
-      }
+      },
+      "studyLanguagesNote": "materiał do nauki i pytania dostępne we wszystkich {{count}} językach"
     },
     "coursePage": {
       "tabPreparationCourse": "Kurs przygotowawczy",
@@ -1066,8 +1069,73 @@
       "fillNameAndPostalCode": "Podaj swoje imię i nazwisko oraz kod pocztowy",
       "certificationUnavailable": "Certyfikacja niedostępna. Spróbuj ponownie później.",
       "submitFailed": "Nie udało się wysłać prośby o rezerwację",
-      "submitted": "Prośba o rezerwację wysłana! PipingBox skontaktuje się z Tobą w ciągu 24 godzin, aby potwierdzić rezerwację egzaminu."
-    }
+      "submitted": "Prośba o rezerwację wysłana! PipingBox skontaktuje się z Tobą w ciągu 24 godzin, aby potwierdzić rezerwację egzaminu.",
+      "eyebrow": "Oficjalny egzamin VCA",
+      "title": "Zarezerwuj egzamin VCA",
+      "description": "PipingBox przygotowuje Pana/Panią do egzaminu i obsługuje rezerwację oficjalnego egzaminu VCA w uznanych ośrodkach w Belgii.",
+      "officialBadge": "Oficjalnie: BESACC/SSVV",
+      "disclaimerTitle": "Ważne — certyfikacja oficjalna",
+      "disclaimerNotIssuer": "PipingBox nie wydaje certyfikatów VCA.",
+      "disclaimerManages": "PipingBox przygotowuje Pana/Panią w ramach kursu i obsługuje rezerwację oficjalnego egzaminu w uznanych ośrodkach egzaminacyjnych VCA.",
+      "disclaimerIssuedBy": "Certyfikat VCA jest wydawany przez SSVV/BESACC za pośrednictwem ośrodka egzaminacyjnego.",
+      "officialAuthority": "Organ oficjalny: {{body}}",
+      "stepExamDetails": "Szczegóły egzaminu",
+      "examType": "Rodzaj egzaminu",
+      "audienceOperators": "Pracownicy wykonawczy",
+      "audienceSupervisors": "Osoby kierujące pracownikami",
+      "examLanguage": "Język egzaminu",
+      "postalCode": "Pana/Pani kod pocztowy",
+      "postalCodePlaceholder": "np. 2000",
+      "preferredDate": "Preferowana data",
+      "bookingMode": "Tryb rezerwacji",
+      "modeExamOnly": "Tylko egzamin",
+      "modeExamOnlyHint": "Przygotowanie z PipingBox",
+      "modeCoursePlusExam": "Kurs + egzamin",
+      "modeCoursePlusExamHint": "Zajęcia stacjonarne w ośrodku",
+      "stepCenters": "Uznane ośrodki egzaminacyjne",
+      "noCenters": "Żaden ośrodek nie spełnia podanych kryteriów. Proszę zmienić rodzaj egzaminu lub tryb rezerwacji.",
+      "tagOnline": "Online",
+      "tagCourse": "Kurs",
+      "examFeeShort": "opłata egzaminacyjna",
+      "coursePlusExamPrice": "{{price}} € za kurs + egzamin",
+      "stepContact": "Pana/Pani dane kontaktowe",
+      "name": "Imię i nazwisko",
+      "namePlaceholder": "Imię i nazwisko",
+      "phone": "Telefon (WhatsApp)",
+      "summaryTitle": "Podsumowanie rezerwacji",
+      "summaryLanguage": "Język",
+      "summaryMode": "Tryb",
+      "noPreference": "Bez preferencji",
+      "summaryCenter": "Ośrodek",
+      "anyCenter": "Dowolny dostępny ośrodek",
+      "officialExamFee": "Opłata za oficjalny egzamin",
+      "paidToCenter": "(płatna na rzecz ośrodka)",
+      "managementFee": "Opłata obsługowa PipingBox",
+      "total": "Razem",
+      "feeStandard": "Standardowa: {{price}} €",
+      "feeUrgent": "Pilna: {{price}} €",
+      "feeHint": "Standardowa: potwierdzenie w ciągu 48 godz. Pilna: potwierdzenie w ciągu 24 godz. + wsparcie językowe.",
+      "submitting": "Wysyłanie...",
+      "signInToBook": "Zaloguj się, aby zarezerwować",
+      "submit": "Wyślij wniosek o rezerwację",
+      "afterSubmitNote": "Po wysłaniu wniosku PipingBox skontaktuje się z Panem/Panią przez WhatsApp lub e-mail w ciągu 24-48 godz., aby potwierdzić rezerwację i rozliczyć opłatę obsługową.",
+      "nextStepsTitle": "Co dalej?",
+      "nextStep1": "Wysyła Pan/Pani ten wniosek o rezerwację.",
+      "nextStep2": "PipingBox kontaktuje się z Panem/Panią w ciągu 24-48 godz., aby potwierdzić dostępność.",
+      "nextStep3": "Opłaca Pan/Pani opłatę obsługową w wysokości {{price}} € (Stripe lub przelew).",
+      "nextStep4": "PipingBox rezerwuje termin egzaminu w ośrodku.",
+      "nextStep5": "Przystępuje Pan/Pani do egzaminu. Certyfikat VCA wydaje ośrodek."
+    },
+    "examLoadingContent": "Ładowanie pytań…",
+    "moduleFallbackTitle": "Moduł {{number}}",
+    "moduleEstimatedMinutes": "~{{minutes}} min",
+    "noLessonContent": "Brak treści lekcji dla tego modułu.",
+    "quizAnsweredCount": "{{answered}}/{{total}} odpowiedzi udzielonych",
+    "bookVcaExamCta": "Zarezerwuj oficjalny egzamin VCA",
+    "bookVcaExamCtaHint": "Przejrzyj ośrodki egzaminacyjne i zarezerwuj miejsce",
+    "examContentLoadError": "Nie udało się wczytać materiału w tym języku. Egzamin próbny pozostaje niedostępny.",
+    "examContentRetry": "Odśwież i spróbuj ponownie",
+    "examContentUnavailable": "Pytania niedostępne"
   },
   "tools": {
     "eyebrow": "Narzędzia",
@@ -1906,7 +1974,8 @@
         "straightCut": "Cięcie proste",
         "centerToCenter": "Oś do osi",
         "diagonal": "H (przekątna)",
-        "cutAngleEnd": "Kąt cięcia na koniec"
+        "cutAngleEnd": "Kąt cięcia na koniec",
+        "cardSubtitle": "Odsunięcia z kolankami, bez kolanek i weryfikacja wymiarów"
       },
       "miteredElbow": {
         "title": "Kolano segmentowe",
@@ -2192,6 +2261,53 @@
         "piece_lengths_invalid": "Obliczone długości segmentów są nieprawidłowe",
         "clr_gt_half_od": "CLR musi być większy niż OD/2",
         "beta_range": "Kąt cięcia musi mieścić się w zakresie od 0° do {{max}}°"
+      },
+      "twoElbowOffset": {
+        "title": "Przesunięcie dwoma kolankami",
+        "subtitle": "Przesunięcie równoległych linii dwoma kolankami: wyprzedzenie, droga i odcinek prosty.",
+        "lineCount": "Liczba linii",
+        "elbowAngle": "Kąt kolanka",
+        "initialSpacing": "Rozstaw początkowy osi",
+        "finalSpacing": "Rozstaw końcowy osi",
+        "clr": "Promień do osi (CLR)",
+        "nps": "NPS",
+        "elbowType": "Typ kolanka",
+        "catalogHint": "Selektor NPS/typ wypełnia CLR z katalogu; można edytować ręcznie.",
+        "invalidFields": "Sprawdź pola: puste lub nieprawidłowe wartości.",
+        "drawPlaceholder": "Wprowadź parametry, aby zobaczyć przesunięcie",
+        "alignmentNote": "Pozycja przesunięcia wzdłuż osi jest wyłącznie poglądowa; to nie wymiar warsztatowy.",
+        "angleLabel": "Kąt",
+        "direction": "Kierunek",
+        "direction_expanding": "Rozszerzający",
+        "direction_contracting": "Zwężający",
+        "direction_straight": "Linie proste",
+        "travelSpread": "Maks. różnica drogi",
+        "line": "Linia",
+        "offset": "Przesunięcie",
+        "advance": "Wyprzedzenie",
+        "travel": "Droga",
+        "takeOut": "Odpad/kolano",
+        "straightCut": "Odcinek prosty",
+        "diff": "Różn.",
+        "status": "Stan",
+        "statusReference": "Odniesienie (prosta)",
+        "statusTangent": "Styczne kolanka",
+        "statusDisplaced": "Przesunięta",
+        "noteGeometry": "Droga to odległość między teoretycznymi przecięciami osi; to nie długość łuku kolanka. Wyprzedzenie to nie długość cięcia.",
+        "nominalCutNote": "Odcinek prosty jest nominalny między punktami styczności: bez szczeliny spawania, zapasu montażowego i grubości piły.",
+        "nominalAngleNote": "Kąt nieznormowany handlowo: geometria nominalna. Sprawdź dostępność kształtki przed produkcją.",
+        "tangentNote": "Pewien odcinek prosty wynosi zero: kolanka są styczne (to nie polecenie cięcia 0 mm).",
+        "dims": {
+          "spacingInitial": "Rozstaw pocz.",
+          "spacingFinal": "Rozstaw końc.",
+          "offset": "Przesun.",
+          "advance": "Wyprz.",
+          "travel": "Droga",
+          "straightCut": "Odcinek"
+        },
+        "clrSourceCatalog": "CLR z katalogu: NPS {{combo}}.",
+        "clrSourceCustom": "CLR własny; nie pochodzi z katalogu.",
+        "clrMissing": "Katalog tego narzędzia nie ma zestawionego CLR dla NPS {{combo}}. Wprowadź CLR, aby obliczyć."
       }
     },
     "landing": {
@@ -2354,7 +2470,8 @@
       "pdfSeam": "szew",
       "pdfWrapNote": "Owinienie: X wzdłuż obwodu, Y od kwadratowego końca po stronie kolana.",
       "pdfClosure": "zamknięcie"
-    }
+    },
+    "familyOffsets": "Odsunięcia i przesunięcia"
   },
   "jobs": {
     "eyebrow": "Oferty pracy",
@@ -2817,7 +2934,9 @@
     "conflictPrompt": "Niektóre dane różnią się od Twojego profilu. Wybierz, którą wartość zachować.",
     "retryProfileNotReady": "Twój profil jest przygotowywany. Spróbuj ponownie za kilka sekund.",
     "applyError": "Coś poszło nie tak. Spróbuj ponownie.",
-    "dismissed": "Wersja robocza odrzucona. Możesz uzupełnić profil ręcznie."
+    "dismissed": "Wersja robocza odrzucona. Możesz uzupełnić profil ręcznie.",
+    "extractionFoundTitle": "Znaleźliśmy informacje zawodowe w Twoim CV.",
+    "extractionFoundDesc": "Sprawdź je, aby uzupełnić profil — zajmie to 1-2 minuty."
   },
   "certExtract": {
     "analyzing": "Analizowanie dokumentu…",
@@ -2950,7 +3069,22 @@
     "view": "Zobacz",
     "download": "Pobierz",
     "cvPreviewFailed": "Nie udało się wygenerować linku do podglądu CV",
-    "previewFailed": "Nie udało się wygenerować linku do podglądu"
+    "previewFailed": "Nie udało się wygenerować linku do podglądu",
+    "cvExtraction": {
+      "title": "Ekstrakcja CV",
+      "not_processed": "Nieprzetworzone",
+      "processing": "Przetwarzanie",
+      "pending_review": "Oczekuje na weryfikację kandydata",
+      "review_confirmed": "Potwierdzone",
+      "extraction_failed": "Ekstrakcja nieudana",
+      "dismissed": "Odrzucone",
+      "fieldsExperiences": "{{fields}} pól · {{experiences}} doświadczeń",
+      "experienceExplicit": "Doświadczenie z CV: {{years}} lat",
+      "experienceDerived": "Doświadczenie wyliczone: {{years}} lat",
+      "discrepant": "rozbieżność jawnie/deklarowana — wymaga weryfikacji",
+      "processed": "Przetworzone: {{date}}",
+      "confirmed": "Potwierdzone: {{date}}"
+    }
   },
   "inviteToJob": {
     "buttonLabel": "Zaproś do oferty",
@@ -4529,5 +4663,103 @@
     "contractChanged": "Warunki uległy zmianie",
     "contractChangedBody": "Warunki Marketplace zostały zaktualizowane podczas ich przeglądania. Ze względów bezpieczeństwa nie zarejestrowano akceptacji. Przed zaakceptowaniem zapoznaj się z aktualną wersją.",
     "reviewAgainCta": "Przejrzyj aktualną wersję"
+  },
+  "companyCore": {
+    "loading": "Ładowanie…",
+    "switcher": {
+      "label": "Aktywna firma"
+    },
+    "roles": {
+      "owner": "Właściciel",
+      "admin": "Administrator",
+      "recruiter": "Rekruter",
+      "viewer": "Tylko odczyt"
+    },
+    "verification": {
+      "unverified": "Nieweryfikowana",
+      "pending": "Weryfikacja w toku",
+      "verified": "Zweryfikowana",
+      "rejected": "Weryfikacja odrzucona"
+    },
+    "create": {
+      "title": "Skonfiguruj swoją firmę",
+      "description": "Utwórz przestrzeń swojej firmy, aby zaprosić zespół. Utworzenie firmy nie weryfikuje jej.",
+      "nameLabel": "Nazwa firmy",
+      "countryLabel": "Kraj (opcjonalnie)",
+      "submit": "Utwórz firmę",
+      "submitting": "Tworzenie…"
+    },
+    "view": {
+      "title": "Moja firma",
+      "description": "Przegląd przestrzeni Twojej firmy.",
+      "verificationTitle": "Status weryfikacji",
+      "teamTitle": "Zespół",
+      "teamDescription": "Członkowie, role i zaproszenia",
+      "yourRoleTitle": "Twoja rola"
+    },
+    "team": {
+      "title": "Zespół",
+      "description": "Członkowie firmy {{company}}",
+      "noCompany": "Nie należysz jeszcze do żadnej firmy.",
+      "createLink": "Skonfiguruj swoją firmę",
+      "membersTitle": "Członkowie",
+      "unnamedMember": "Członek bez nazwy",
+      "you": "ty",
+      "confirmRemove": "Usunąć tego członka? Jego dostęp zostanie natychmiast cofnięty.",
+      "confirmTransfer": "Przenieść własność? Staniesz się administratorem.",
+      "transferTitle": "Przenieś własność",
+      "removeTitle": "Usuń członka",
+      "leaveTitle": "Opuść firmę"
+    },
+    "invite": {
+      "title": "Zaproś członka",
+      "emailLabel": "Adres e-mail",
+      "roleLabel": "Rola",
+      "submit": "Utwórz zaproszenie",
+      "submitting": "Tworzenie…",
+      "created": "Zaproszenie utworzone. Udostępnij ten jednorazowy link:",
+      "alreadyPending": "Dla tego adresu e-mail istnieje już oczekujące zaproszenie.",
+      "copy": "Kopiuj",
+      "copied": "Link skopiowany",
+      "emailNotice": "Wysyłka e-maili nie jest jeszcze włączona — udostępnij link ręcznie zaproszonej osobie."
+    },
+    "invitations": {
+      "title": "Zaproszenia",
+      "revoke": "Cofnij",
+      "expires": "wygasa {{date}}",
+      "status": {
+        "pending": "oczekujące",
+        "accepted": "zaakceptowane",
+        "rejected": "odrzucone",
+        "revoked": "cofnięte",
+        "expired": "wygasłe"
+      }
+    },
+    "accept": {
+      "title": "Zaproszenie do firmy",
+      "sessionRequired": "Aby odpowiedzieć na to zaproszenie, zaloguj się lub zarejestruj z zaproszonego adresu e-mail, a następnie otwórz ten link ponownie.",
+      "signIn": "Zaloguj się",
+      "register": "Zarejestruj się",
+      "question": "Chcesz dołączyć do tej firmy?",
+      "accept": "Zaakceptuj",
+      "reject": "Odrzuć",
+      "processing": "Przetwarzanie…",
+      "success": "Dołączyłeś do firmy. Przekierowywanie…",
+      "rejected": "Zaproszenie odrzucone."
+    },
+    "errors": {
+      "not_authenticated": "Musisz być zalogowany.",
+      "forbidden": "Nie masz uprawnień do tej akcji.",
+      "not_found": "Nie znaleziono.",
+      "invalid_name": "Nieprawidłowa nazwa firmy.",
+      "invalid_email": "Nieprawidłowy adres e-mail.",
+      "invalid_role": "Nieprawidłowa rola.",
+      "invalid_or_expired": "To zaproszenie jest nieprawidłowe, wygasło lub zostało już użyte.",
+      "email_mismatch": "To zaproszenie zostało wysłane na inny adres e-mail. Zaloguj się zaproszonym adresem.",
+      "not_active": "Członkostwo nie jest aktywne.",
+      "last_owner": "Firma musi zachować co najmniej jednego właściciela.",
+      "cannot_transfer_to_self": "Nie możesz przenieść własności na siebie.",
+      "unknown": "Coś poszło nie tak. Spróbuj ponownie."
+    }
   }
 }

@@ -9,6 +9,12 @@
  *   chunks <lang>     -> splits the English JSON into translation work units
  *   assemble <lang>   -> rebuilds the locale JSON from translated chunks
  *   validate <lang>   -> structural parity check against English
+ *   validate-vca      -> PB-VCA-I18N-11-001: strict VCA gate — every canonical
+ *                        language (i18n/languages.json) must ship its own
+ *                        syllabus, lessons and questions, fully translated and
+ *                        registered in the lazy loaders. Exit 1 otherwise.
+ *                        ACADEMY_CONTENT_DIR / ACADEMY_INDEX_FILE override the
+ *                        inputs so the regression test can run on a mutated copy.
  *
  * Structural fields (correctAnswer, moduleId, difficulty, flags, callout type,
  * table shape) are NEVER part of the translatable payload, so a translation can
@@ -22,10 +28,16 @@ import { tmpdir } from 'node:os';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = join(ROOT, 'app/frontend/src');
-const CONTENT = join(SRC, 'lib/academy/content');
+const CONTENT = process.env.ACADEMY_CONTENT_DIR ?? join(SRC, 'lib/academy/content');
+const INDEX_FILE = process.env.ACADEMY_INDEX_FILE ?? join(CONTENT, 'index.ts');
 const TX = '/workspace/i18n-tx/academy';
 const TMP = join(tmpdir(), 'pb-academy-extract');
 const SYLLABI = ['vca', 'scc', 'prl-basico', 'prl-intermedio'];
+const EXISTING_COURSE_COVERAGE = {
+  scc: ['en', 'de', 'ro', 'uk', 'pl', 'bg'],
+  'prl-basico': ['en', 'es', 'ro', 'uk', 'pl', 'bg'],
+  'prl-intermedio': ['en', 'es', 'ro', 'uk', 'pl', 'bg'],
+};
 
 const loadTsData = async () => {
   // The TS sources mix JSON-style and JS-style object literals, so they are
@@ -164,11 +176,28 @@ function validateLessons(en, tr, errors, label) {
         if (!s[key] && ts[key]) errors.push(`${at}: unexpected ${key}`);
       }
       if (s.table) {
-        if (!ts.table || ts.table.headers?.length !== s.table.headers.length || ts.table.rows?.length !== s.table.rows.length) {
+        if (!ts.table || !Array.isArray(ts.table.headers) || !Array.isArray(ts.table.rows)
+          || ts.table.headers.length !== s.table.headers.length || ts.table.rows.length !== s.table.rows.length) {
           errors.push(`${at}: table shape mismatch`);
         } else {
+          s.table.headers.forEach((header, column) => {
+            const value = ts.table.headers[column];
+            if (typeof value !== 'string' || (header.trim() && !value.trim())) {
+              errors.push(`${at}: table header ${column + 1} empty or not a string`);
+            }
+          });
           s.table.rows.forEach((row, r) => {
-            if (ts.table.rows[r].length !== row.length) errors.push(`${at}: table row ${r + 1} width mismatch`);
+            const translated = ts.table.rows[r];
+            if (!Array.isArray(translated) || translated.length !== row.length) {
+              errors.push(`${at}: table row ${r + 1} width mismatch`);
+            } else {
+              row.forEach((cell, column) => {
+                const value = translated[column];
+                if (typeof value !== 'string' || (cell.trim() && !value.trim())) {
+                  errors.push(`${at}: table row ${r + 1} cell ${column + 1} empty or not a string`);
+                }
+              });
+            }
           });
         }
       } else if (ts.table) errors.push(`${at}: unexpected table`);
@@ -249,6 +278,14 @@ const SCRIPT_RULES = {
   bg: { forbidden: /[\u044B\u044D\u0451\u042B\u042D\u0401]/, required: /[\u0430-\u044F]/ },
   ro: { forbidden: null, required: /[\u0103\u00E2\u00EE\u0219\u021B]/ },
   pl: { forbidden: null, required: /[\u0105\u0107\u0119\u0142\u0144\u00F3\u015B\u017A\u017C]/ },
+  // Latin-script locales: the "required" probe is a mix of native diacritics and
+  // very frequent function words, so an English leftover is caught statistically.
+  es: { forbidden: null, required: /[\u00E1\u00E9\u00ED\u00F3\u00FA\u00F1\u00BF\u00A1]|\b(el|la|los|las|de|del|que|con|para|una?)\b/i },
+  pt: { forbidden: null, required: /[\u00E3\u00F5\u00E7\u00E1\u00E9\u00ED\u00F3\u00FA\u00E2\u00EA\u00F4]|\b(os|as|de|do|da|dos|das|que|com|para|uma?|n\u00E3o|s\u00E3o)\b/i },
+  nl: { forbidden: null, required: /\b(de|het|een|van|en|niet|met|voor|wordt|worden|zijn|bij|op|aan|moet|u)\b/i },
+  fr: { forbidden: null, required: /[\u00E9\u00E8\u00EA\u00E0\u00E7\u00F9\u00FB\u00EE\u00F4]|\b(le|la|les|des|du|une?|et|est|pour|dans|sur|avec|ne|pas)\b/i },
+  de: { forbidden: null, required: /[\u00E4\u00F6\u00FC\u00DF\u00C4\u00D6\u00DC]|\b(der|die|das|und|nicht|mit|ist|sind|f\u00FCr|bei|auf|von|werden|muss|wird|eine?n?)\b/i },
+  it: { forbidden: null, required: /[\u00E0\u00E8\u00E9\u00EC\u00F2\u00F9]|\b(il|lo|la|gli|le|di|del|della|che|con|per|una?|non|sono|\u00E8)\b/i },
 };
 
 function checkScript(lang, data, errors, label) {
@@ -342,13 +379,19 @@ function validate(langs) {
     const qp = join(CONTENT, `vca-questions.${lang}.json`);
     for (const key of SYLLABI) {
       const sp = join(CONTENT, `syllabus-${key}.${lang}.json`);
-      if (!existsSync(sp)) continue;
+      if (!existsSync(sp)) {
+        if (key === 'vca' || EXISTING_COURSE_COVERAGE[key]?.includes(lang)) {
+          errors.push(`${lang}: missing syllabus-${key}.${lang}.json`);
+        }
+        continue;
+      }
       const tr = JSON.parse(readFileSync(sp, 'utf8'));
       validateSyllabus(JSON.parse(readFileSync(join(CONTENT, `syllabus-${key}.en.json`), 'utf8')), tr, errors, `${lang} syllabus ${key}`);
       checkScript(lang, tr, errors, `${lang} syllabus ${key}`);
     }
     if (!existsSync(lp) || !existsSync(qp)) {
-      console.log(`· ${lang}: no VCA study material (falls back to English)`);
+      // PB-VCA-I18N-11-001: no longer tolerated for canonical languages — see validate-vca.
+      errors.push(`${lang}: missing VCA study material (vca-lessons / vca-questions)`);
       continue;
     }
     const lessons = JSON.parse(readFileSync(lp, 'utf8'));
@@ -359,16 +402,6 @@ function validate(langs) {
     checkScript(lang, questions, errors, `${lang} questions`);
     checkModuleNames(lang, questions, errors);
     checkAnswerKeys(lang, questions, errors);
-    for (const key of SYLLABI) {
-      const sp = join(CONTENT, `syllabus-${key}.${lang}.json`);
-      if (!existsSync(sp)) {
-        errors.push(`${lang}: missing syllabus-${key}.${lang}.json (Academy content is translated for this language)`);
-        continue;
-      }
-      const tr = JSON.parse(readFileSync(sp, 'utf8'));
-      validateSyllabus(JSON.parse(readFileSync(join(CONTENT, `syllabus-${key}.en.json`), 'utf8')), tr, errors, `${lang} syllabus ${key}`);
-      checkScript(lang, tr, errors, `${lang} syllabus ${key}`);
-    }
   }
   if (errors.length) {
     console.error(`✗ ${errors.length} Academy content problem(s)`);
@@ -413,6 +446,126 @@ function validateSyllabus(en, tr, errors, label) {
   });
 }
 
+/** Strings equal to the English source that are long enough to be sentences. */
+function findUntranslated(en, tr, label) {
+  const hits = [];
+  const walk = (a, b, path) => {
+    if (typeof a === 'string') {
+      // Units, codes, acronyms and short headers may legitimately coincide; a
+      // string of more than three words identical to English is an omission.
+      if (a === b && a.trim().split(/\s+/).length > 3) hits.push(`${label}: ${path} is untranslated: "${a.slice(0, 60)}"`);
+      return;
+    }
+    if (a && typeof a === 'object' && b && typeof b === 'object') {
+      for (const k of Object.keys(a)) walk(a[k], b[k], `${path}.${k}`);
+    }
+  };
+  walk(en, tr, '');
+  return hits;
+}
+
+/** Languages registered in a `const X_LOADERS = { ... }` map of content/index.ts. */
+function loaderLanguages(indexSource, mapName, syllabusKey) {
+  const start = indexSource.indexOf(`const ${mapName}`);
+  if (start < 0) return null;
+  // Skip the type annotation (`Record<..., { default: unknown }>`): the map
+  // literal is the first `{` after the assignment.
+  const open = indexSource.indexOf('{', indexSource.indexOf('= {', start));
+  let depth = 0;
+  let end = open;
+  for (; end < indexSource.length; end++) {
+    if (indexSource[end] === '{') depth++;
+    else if (indexSource[end] === '}' && --depth === 0) break;
+  }
+  const body = indexSource.slice(open, end + 1);
+  if (!syllabusKey) {
+    return [...body.matchAll(/^\s*([a-z]{2}):\s*\(\)\s*=>\s*import\(['"]\.\/([^'"]+)['"]\)/gm)]
+      .map((m) => ({ lang: m[1], file: m[2] }));
+  }
+  const loaders = [];
+  const re = /^\s{2}([a-z]{2}):\s*\{([\s\S]*?)^\s{2}\},?/gm;
+  for (const m of body.matchAll(re)) {
+    const entry = new RegExp(`^\\s*'?${syllabusKey}'?:\\s*\\(\\)\\s*=>\\s*import\\(['"]\\./([^'"]+)['"]\\)`, 'm').exec(m[2]);
+    if (entry) loaders.push({ lang: m[1], file: entry[1] });
+  }
+  return loaders;
+}
+
+/**
+ * PB-VCA-I18N-11-001 — strict VCA coverage gate for the canonical language list.
+ * Fails when any language relies on the English fallback for VCA material.
+ */
+function validateVca(langs) {
+  const errors = [];
+  const required = ['syllabus-vca', 'vca-lessons', 'vca-questions'];
+  const read = (name) => JSON.parse(readFileSync(join(CONTENT, `${name}.json`), 'utf8'));
+  const en = { syllabus: read('syllabus-vca.en'), lessons: read('vca-lessons.en'), questions: read('vca-questions.en') };
+  const indexSource = existsSync(INDEX_FILE) ? readFileSync(INDEX_FILE, 'utf8') : '';
+  const registered = {
+    lessons: loaderLanguages(indexSource, 'LESSON_LOADERS'),
+    questions: loaderLanguages(indexSource, 'QUESTION_LOADERS'),
+    syllabus: loaderLanguages(indexSource, 'SYLLABUS_LOADERS', 'vca'),
+  };
+  for (const [k, v] of Object.entries(registered)) if (!v) errors.push(`index.ts: ${k} loader map not found`);
+
+  const summary = [];
+  for (const lang of langs) {
+    const missing = required.filter((name) => !existsSync(join(CONTENT, `${name}.${lang}.json`)));
+    if (lang !== 'en' && missing.length) {
+      errors.push(`${lang}: missing required VCA resource(s): ${missing.map((m) => `${m}.${lang}.json`).join(', ')}`);
+      continue;
+    }
+    if (lang !== 'en') {
+      for (const [kind, langsIn] of Object.entries(registered)) {
+        if (langsIn && !langsIn.some((loader) => loader.lang === lang)) errors.push(`${lang}: ${kind} file exists but is not registered in index.ts loaders`);
+      }
+    }
+    const syllabus = read(`syllabus-vca.${lang}`);
+    const lessons = read(`vca-lessons.${lang}`);
+    const questions = read(`vca-questions.${lang}`);
+    validateSyllabus(en.syllabus, syllabus, errors, `${lang} syllabus vca`);
+    validateLessons(en.lessons, lessons, errors, `${lang} lessons`);
+    validateQuestions(en.questions, questions, errors, `${lang} questions`);
+    checkModuleNames(lang, questions, errors);
+    checkAnswerKeys(lang, questions, errors);
+    if (lang !== 'en') {
+      checkScript(lang, syllabus, errors, `${lang} syllabus vca`);
+      checkScript(lang, lessons, errors, `${lang} lessons`);
+      checkScript(lang, questions, errors, `${lang} questions`);
+      errors.push(...findUntranslated(en.syllabus, syllabus, `${lang} syllabus vca`));
+      errors.push(...findUntranslated(en.lessons, lessons, `${lang} lessons`));
+      errors.push(...findUntranslated(en.questions, questions, `${lang} questions`));
+    }
+    const sections = Object.values(lessons).reduce((n, l) => n + (l.sections?.length ?? 0), 0);
+    summary.push(`${lang}: ${syllabus.length} modules / ${Object.keys(lessons).length} lessons / ${sections} sections / ${Object.keys(questions).length} questions`);
+  }
+  // Resources present on disk for a language outside the canonical list, or
+  // registered loaders without a file, are configuration drift.
+  for (const kind of ['syllabus-vca', 'vca-lessons', 'vca-questions']) {
+    for (const file of readdirSync(CONTENT)) {
+      const m = new RegExp(`^${kind}\\.([a-z]{2})\\.json$`).exec(file);
+      if (m && !langs.includes(m[1])) errors.push(`${file}: resource for a language outside i18n/languages.json`);
+    }
+  }
+  for (const [kind, langsIn] of Object.entries(registered)) {
+    const name = kind === 'syllabus' ? 'syllabus-vca' : `vca-${kind}`;
+    for (const { lang, file } of langsIn ?? []) {
+      const expected = `${name}.${lang}.json`;
+      if (file !== expected) errors.push(`index.ts: ${kind} loader for "${lang}" imports ${file} instead of ${expected}`);
+      if (!existsSync(join(CONTENT, expected))) errors.push(`index.ts: ${kind} loader for "${lang}" points to a missing file`);
+      if (!langs.includes(lang)) errors.push(`index.ts: ${kind} loader for "${lang}" is not a canonical language`);
+    }
+  }
+
+  summary.forEach((line) => console.log('  ', line));
+  if (errors.length) {
+    console.error(`✗ validate-vca: ${errors.length} problem(s) — VCA is not fully localised`);
+    errors.slice(0, 60).forEach((e) => console.error('  -', e));
+    process.exit(1);
+  }
+  console.log(`✓ validate-vca: VCA syllabus, lessons and questions are complete and registered for ${langs.length} languages (${langs.join(', ')}).`);
+}
+
 /** Per-chunk gate used by translators before assembling a language. */
 function verifyChunk(kind, refFile, trFile) {
   const ref = JSON.parse(readFileSync(refFile, 'utf8'));
@@ -449,8 +602,9 @@ if (cmd === 'extract') await extract();
 else if (cmd === 'chunks') chunks(arg);
 else if (cmd === 'assemble') assemble(arg);
 else if (cmd === 'validate') validate(arg ? [arg] : LANGS);
+else if (cmd === 'validate-vca') validateVca(LANGS);
 else if (cmd === 'verify-chunk') verifyChunk(arg, process.argv[4], process.argv[5]);
 else {
-  console.error('usage: academy-content.mjs extract | chunks <lang> | assemble <lang> | validate [lang]');
+  console.error('usage: academy-content.mjs extract | chunks <lang> | assemble <lang> | validate [lang] | validate-vca | verify-chunk <kind> <en> <tr>');
   process.exit(2);
 }

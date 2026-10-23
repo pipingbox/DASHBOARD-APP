@@ -106,7 +106,9 @@
     "companyDocumentation": "Industrial Document Management",
     "companySection": "Company",
     "companySettings": "Settings",
-    "companyWorkspace": "Company Workspace"
+    "companyWorkspace": "Company Workspace",
+    "companyTenant": "My Company",
+    "companyTeam": "Team"
   },
   "notifications": {
     "title": "Notifications",
@@ -866,7 +868,7 @@
     "examBookOfficialCTA": "Ready for your certificate?",
     "examBookOfficialText": "Book your official VCA exam with an authorized exam center.",
     "examBookOfficialButton": "Book Official Exam",
-    "examLanguageNote": "This simulator uses English questions.",
+    "examLanguageNote": "This simulator uses questions in {{language}}.",
     "examLanguageBVCA": "The official B-VCA exam is available in up to 20 languages at exam centers.",
     "examLanguageVOLVCA": "The official VOL-VCA exam is available in Dutch, English, German and French.",
     "examPassScore": "Pass Score",
@@ -963,7 +965,8 @@
         "badgeCompliance": "Meets Ley 31/1995",
         "badgeHours": "{{hours}}h of training",
         "badgeDownloadable": "Downloadable certificate"
-      }
+      },
+      "studyLanguagesNote": "study material and questions available in all {{count}} languages"
     },
     "coursePage": {
       "tabPreparationCourse": "Preparation Course",
@@ -1060,8 +1063,73 @@
       "fillNameAndPostalCode": "Please fill in your name and postal code",
       "certificationUnavailable": "Certification not available. Please try again later.",
       "submitFailed": "Failed to submit booking request",
-      "submitted": "Booking request submitted! PipingBox will contact you within 24h to confirm your exam reservation."
-    }
+      "submitted": "Booking request submitted! PipingBox will contact you within 24h to confirm your exam reservation.",
+      "eyebrow": "VCA Official Exam",
+      "title": "Book Your VCA Exam",
+      "description": "PipingBox prepares you and manages your official VCA exam reservation at recognized centers in Belgium.",
+      "officialBadge": "Official BESACC/SSVV",
+      "disclaimerTitle": "Important — Official Certification",
+      "disclaimerNotIssuer": "PipingBox does not issue VCA certificates.",
+      "disclaimerManages": "PipingBox prepares you with the course and manages the reservation of the official exam at recognized VCA exam centers.",
+      "disclaimerIssuedBy": "The VCA certificate is issued by SSVV/BESACC through the exam center.",
+      "officialAuthority": "Official authority: {{body}}",
+      "stepExamDetails": "Exam Details",
+      "examType": "Exam Type",
+      "audienceOperators": "Operators",
+      "audienceSupervisors": "Supervisors",
+      "examLanguage": "Exam Language",
+      "postalCode": "Your Postal Code",
+      "postalCodePlaceholder": "e.g. 2000",
+      "preferredDate": "Preferred Date",
+      "bookingMode": "Booking Mode",
+      "modeExamOnly": "Exam Only",
+      "modeExamOnlyHint": "I prepared with PipingBox",
+      "modeCoursePlusExam": "Course + Exam",
+      "modeCoursePlusExamHint": "Classroom at center",
+      "stepCenters": "Recognized Exam Centers",
+      "noCenters": "No centers match your criteria. Try changing the exam type or booking mode.",
+      "tagOnline": "Online",
+      "tagCourse": "Course",
+      "examFeeShort": "exam fee",
+      "coursePlusExamPrice": "€{{price}} course+exam",
+      "stepContact": "Your Contact Details",
+      "name": "Name",
+      "namePlaceholder": "Your full name",
+      "phone": "Phone (WhatsApp)",
+      "summaryTitle": "Booking Summary",
+      "summaryLanguage": "Language",
+      "summaryMode": "Mode",
+      "noPreference": "No preference",
+      "summaryCenter": "Center",
+      "anyCenter": "Any available center",
+      "officialExamFee": "Official exam fee",
+      "paidToCenter": "(paid to center)",
+      "managementFee": "PipingBox management fee",
+      "total": "Total",
+      "feeStandard": "Standard €{{price}}",
+      "feeUrgent": "Urgent €{{price}}",
+      "feeHint": "Standard: confirmation within 48h. Urgent: confirmation within 24h + language assistance.",
+      "submitting": "Submitting...",
+      "signInToBook": "Sign in to book",
+      "submit": "Submit Booking Request",
+      "afterSubmitNote": "After submitting, PipingBox will contact you via WhatsApp/email within 24-48h to confirm your reservation and process the management fee.",
+      "nextStepsTitle": "What happens next?",
+      "nextStep1": "You submit this booking request.",
+      "nextStep2": "PipingBox contacts you within 24-48h to confirm availability.",
+      "nextStep3": "You pay the €{{price}} management fee (Stripe/transfer).",
+      "nextStep4": "PipingBox reserves your exam slot at the center.",
+      "nextStep5": "You attend the exam. The center issues your VCA certificate."
+    },
+    "examLoadingContent": "Loading questions…",
+    "moduleFallbackTitle": "Module {{number}}",
+    "moduleEstimatedMinutes": "~{{minutes}} min",
+    "noLessonContent": "No lesson content available for this module.",
+    "quizAnsweredCount": "{{answered}}/{{total}} answered",
+    "bookVcaExamCta": "Book Your Official VCA Exam",
+    "bookVcaExamCtaHint": "Browse exam centers and book your reservation",
+    "examContentLoadError": "Could not load study material in this language. The practice exam remains unavailable.",
+    "examContentRetry": "Reload and try again",
+    "examContentUnavailable": "Questions unavailable"
   },
   "tools": {
     "landing": {
@@ -1965,7 +2033,8 @@
         "straightCut": "Straight cut",
         "centerToCenter": "Center-to-center",
         "diagonal": "H (diagonal)",
-        "cutAngleEnd": "Cut angle per end"
+        "cutAngleEnd": "Cut angle per end",
+        "cardSubtitle": "Offsets with elbows, without elbows and measure verification"
       },
       "miteredElbow": {
         "title": "Mitered Elbow",
@@ -2251,6 +2320,53 @@
         "piece_lengths_invalid": "Computed piece lengths are invalid",
         "clr_gt_half_od": "CLR must be greater than OD/2",
         "beta_range": "Cut angle must be between 0° and {{max}}°"
+      },
+      "twoElbowOffset": {
+        "title": "Two-elbow offset",
+        "subtitle": "Offset between parallel lines using two elbows, with advance, travel and intermediate straight.",
+        "lineCount": "Number of lines",
+        "elbowAngle": "Elbow angle",
+        "initialSpacing": "Initial center spacing",
+        "finalSpacing": "Final center spacing",
+        "clr": "Center-line radius (CLR)",
+        "nps": "NPS",
+        "elbowType": "Elbow type",
+        "catalogHint": "The NPS/type selector fills CLR from the catalog; you can edit it manually.",
+        "invalidFields": "Check the fields: some values are empty or invalid.",
+        "drawPlaceholder": "Enter parameters to view the offset",
+        "alignmentNote": "The jog position along the axis is display-only; it is not a works dimension.",
+        "angleLabel": "Angle",
+        "direction": "Direction",
+        "direction_expanding": "Widening",
+        "direction_contracting": "Narrowing",
+        "direction_straight": "Straight lines",
+        "travelSpread": "Max travel difference",
+        "line": "Line",
+        "offset": "Offset",
+        "advance": "Advance",
+        "travel": "Travel",
+        "takeOut": "Take-out/elbow",
+        "straightCut": "Straight",
+        "diff": "Diff.",
+        "status": "Status",
+        "statusReference": "Reference (straight)",
+        "statusTangent": "Tangent elbows",
+        "statusDisplaced": "Offset",
+        "noteGeometry": "Travel is the distance between theoretical axis intersections; it is not the elbow arc length. Advance is not a cut length.",
+        "nominalCutNote": "The straight is nominal between tangent points: it excludes weld gap, assembly margin and saw kerf.",
+        "nominalAngleNote": "Angle not commercially standardized: nominal geometry. Verify fitting availability before fabrication.",
+        "tangentNote": "Some intermediate straight is zero: the elbows end up tangent to each other (not an order to cut 0 mm).",
+        "dims": {
+          "spacingInitial": "Initial spacing",
+          "spacingFinal": "Final spacing",
+          "offset": "Offset",
+          "advance": "Advance",
+          "travel": "Travel",
+          "straightCut": "Straight"
+        },
+        "clrSourceCatalog": "CLR resolved from the catalog: NPS {{combo}}.",
+        "clrSourceCustom": "Custom CLR; not taken from the catalog.",
+        "clrMissing": "This tool's catalog has no tabulated CLR for NPS {{combo}}. Enter a CLR to calculate."
       }
     },
     "premiumBanner": {
@@ -2348,7 +2464,8 @@
       "pdfSeam": "seam",
       "pdfWrapNote": "Wrap: X along the circumference, Y from the elbow-side square end.",
       "pdfClosure": "closure"
-    }
+    },
+    "familyOffsets": "Offsets and displacements"
   },
   "jobs": {
     "eyebrow": "Jobs",
@@ -2803,7 +2920,9 @@
     "conflictPrompt": "Some data differs from your profile. Choose which value to keep.",
     "retryProfileNotReady": "Your profile is being prepared. Try again in a few seconds.",
     "applyError": "Something went wrong. Please try again.",
-    "dismissed": "Draft discarded. You can complete your profile manually."
+    "dismissed": "Draft discarded. You can complete your profile manually.",
+    "extractionFoundTitle": "We found professional information in your CV.",
+    "extractionFoundDesc": "Review it to complete your profile — it takes 1-2 minutes."
   },
   "certExtract": {
     "analyzing": "Analyzing the document…",
@@ -2936,7 +3055,22 @@
     "view": "View",
     "download": "Download",
     "cvPreviewFailed": "Failed to generate CV preview link",
-    "previewFailed": "Failed to generate preview link"
+    "previewFailed": "Failed to generate preview link",
+    "cvExtraction": {
+      "title": "CV Extraction",
+      "not_processed": "Not processed",
+      "processing": "Processing",
+      "pending_review": "Pending candidate review",
+      "review_confirmed": "Confirmed",
+      "extraction_failed": "Extraction failed",
+      "dismissed": "Dismissed",
+      "fieldsExperiences": "{{fields}} fields · {{experiences}} experiences",
+      "experienceExplicit": "CV experience: {{years}} years",
+      "experienceDerived": "Derived experience: {{years}} years",
+      "discrepant": "explicit/derived discrepancy — review needed",
+      "processed": "Processed: {{date}}",
+      "confirmed": "Confirmed: {{date}}"
+    }
   },
   "inviteToJob": {
     "buttonLabel": "Invite to Job",
@@ -4515,5 +4649,103 @@
     "contractChanged": "The terms have changed",
     "contractChangedBody": "The Marketplace terms were updated while you were reviewing them. For your security, no acceptance has been recorded. Please review the current version before accepting.",
     "reviewAgainCta": "Review the current version"
+  },
+  "companyCore": {
+    "loading": "Loading…",
+    "switcher": {
+      "label": "Active company"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "recruiter": "Recruiter",
+      "viewer": "Viewer"
+    },
+    "verification": {
+      "unverified": "Not verified",
+      "pending": "Verification pending",
+      "verified": "Verified",
+      "rejected": "Verification rejected"
+    },
+    "create": {
+      "title": "Set up your company",
+      "description": "Create your company workspace to invite your team. Creating a company does not verify it.",
+      "nameLabel": "Company name",
+      "countryLabel": "Country (optional)",
+      "submit": "Create company",
+      "submitting": "Creating…"
+    },
+    "view": {
+      "title": "My company",
+      "description": "Overview of your company workspace.",
+      "verificationTitle": "Verification status",
+      "teamTitle": "Team",
+      "teamDescription": "Members, roles and invitations",
+      "yourRoleTitle": "Your role"
+    },
+    "team": {
+      "title": "Team",
+      "description": "Members of {{company}}",
+      "noCompany": "You don't belong to any company yet.",
+      "createLink": "Set up your company",
+      "membersTitle": "Members",
+      "unnamedMember": "Unnamed member",
+      "you": "you",
+      "confirmRemove": "Remove this member? Their access is revoked immediately.",
+      "confirmTransfer": "Transfer ownership? You will become an admin.",
+      "transferTitle": "Transfer ownership",
+      "removeTitle": "Remove member",
+      "leaveTitle": "Leave company"
+    },
+    "invite": {
+      "title": "Invite a member",
+      "emailLabel": "Email",
+      "roleLabel": "Role",
+      "submit": "Create invitation",
+      "submitting": "Creating…",
+      "created": "Invitation created. Share this single-use link:",
+      "alreadyPending": "There is already a pending invitation for this email.",
+      "copy": "Copy",
+      "copied": "Link copied",
+      "emailNotice": "Email delivery is not enabled yet — share the link manually with the invitee."
+    },
+    "invitations": {
+      "title": "Invitations",
+      "revoke": "Revoke",
+      "expires": "expires {{date}}",
+      "status": {
+        "pending": "pending",
+        "accepted": "accepted",
+        "rejected": "rejected",
+        "revoked": "revoked",
+        "expired": "expired"
+      }
+    },
+    "accept": {
+      "title": "Company invitation",
+      "sessionRequired": "To respond to this invitation, sign in or register with the invited email address, then reopen this link.",
+      "signIn": "Sign in",
+      "register": "Register",
+      "question": "Do you want to join this company?",
+      "accept": "Accept",
+      "reject": "Reject",
+      "processing": "Processing…",
+      "success": "You have joined the company. Redirecting…",
+      "rejected": "Invitation rejected."
+    },
+    "errors": {
+      "not_authenticated": "You must be signed in.",
+      "forbidden": "You don't have permission for this action.",
+      "not_found": "Not found.",
+      "invalid_name": "Invalid company name.",
+      "invalid_email": "Invalid email address.",
+      "invalid_role": "Invalid role.",
+      "invalid_or_expired": "This invitation is invalid, expired or already used.",
+      "email_mismatch": "This invitation was sent to a different email address. Sign in with the invited email.",
+      "not_active": "The membership is not active.",
+      "last_owner": "The company must keep at least one owner.",
+      "cannot_transfer_to_self": "You cannot transfer ownership to yourself.",
+      "unknown": "Something went wrong. Please try again."
+    }
   }
 }
