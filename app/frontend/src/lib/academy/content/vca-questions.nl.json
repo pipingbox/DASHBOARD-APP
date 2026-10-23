@@ -1,0 +1,2024 @@
+{
+  "m1q1": {
+    "questionText": "Welke maatregel kan de Inspectiedienst nemen?",
+    "optionA": "Een vergadering houden om de arbeidsomstandigheden te bespreken.",
+    "optionB": "Een boete opleggen.",
+    "optionC": "Een gezondheidsonderzoek uitvoeren.",
+    "explanation": "De Inspectiedienst (Arbeidsinspectie) kan gezondheidsonderzoeken uitvoeren, het werk stilleggen en boetes opleggen. Het organiseren van vergaderingen behoort niet tot haar handhavingsbevoegdheden.",
+    "officialRef": "Module 1 — Wetgeving",
+    "moduleName": "Wetgeving"
+  },
+  "m1q2": {
+    "questionText": "Wat is het doel van de arbowetgeving (wetgeving inzake veiligheid en gezondheid)?",
+    "optionA": "Zorgen voor zo goed mogelijke arbeidsomstandigheden.",
+    "optionB": "Het aantal arbeidsongevallen verminderen.",
+    "optionC": "De werksfeer verbeteren.",
+    "explanation": "Het hoofddoel van de arbowetgeving is zorgen voor zo goed mogelijke arbeidsomstandigheden voor alle werknemers, met aandacht voor gezondheid, veiligheid en welzijn.",
+    "officialRef": "Module 1 — Wetgeving",
+    "moduleName": "Wetgeving"
+  },
+  "m1q3": {
+    "questionText": "Welke van de onderstaande maatregelen kan de Inspectiedienst nemen?",
+    "optionA": "Een of meer werknemers laten ontslaan.",
+    "optionB": "Het werk laten stilleggen.",
+    "optionC": "Medische onderzoeken uitvoeren.",
+    "explanation": "De Inspectiedienst kan het werk stilleggen wanneer er dreigend gevaar is. Zij kan geen werknemers ontslaan — dat is de bevoegdheid van de werkgever.",
+    "officialRef": "Module 1 — Wetgeving",
+    "moduleName": "Wetgeving"
+  },
+  "m1q4": {
+    "questionText": "Wat geeft de CE-markering op een artikel aan?",
+    "optionA": "Het artikel voldoet aan de Europese minimumeisen.",
+    "optionB": "Het artikel mag alleen binnen de EU worden verhandeld.",
+    "optionC": "De fabrikant voldoet aan de Europese arbowet (wet inzake veiligheid en gezondheid).",
+    "moduleName": "Wetgeving"
+  },
+  "m1q5": {
+    "questionText": "Wat is een van de doelstellingen van de Wet milieubeheer?",
+    "optionA": "Afvalstromen beheersen tijdens het hele productieproces.",
+    "optionB": "Het milieu beschermen tegen schadelijke bedrijfsactiviteiten.",
+    "optionC": "De mens beschermen tegen gevaarlijke stoffen.",
+    "moduleName": "Wetgeving"
+  },
+  "m1q6": {
+    "questionText": "Wat beschrijft ARBO?",
+    "optionA": "ARBO beschrijft de arbeidsomstandigheden (veiligheid en gezondheid op het werk).",
+    "optionB": "ARBO beschrijft de momenten waarop de Arbeidsinspectie moet worden geïnformeerd.",
+    "optionC": "ARBO beschrijft de risico's van het werken met gevaarlijke stoffen.",
+    "moduleName": "Wetgeving"
+  },
+  "m1q7": {
+    "questionText": "Wat is het toepassingsgebied van de arbowetgeving?",
+    "optionA": "Rechten en plichten van werkgever en werknemer inzake veiligheid en gezondheid thuis.",
+    "optionB": "Rechten en plichten van werkgever en werknemer inzake veiligheid en gezondheid op de werkplek.",
+    "optionC": "Rechten en plichten van de werknemer inzake veiligheid en gezondheid.",
+    "moduleName": "Wetgeving"
+  },
+  "m1q8": {
+    "questionText": "Op welke plaatsen is de arbowetgeving van toepassing?",
+    "optionA": "Op alle plaatsen waar wordt gewerkt.",
+    "optionB": "Op alle plaatsen waar niet wordt gewerkt.",
+    "optionC": "Op alle plaatsen met bijzondere arbeidsomstandigheden.",
+    "moduleName": "Wetgeving"
+  },
+  "m1q9": {
+    "questionText": "De arbowetgeving is van toepassing op:",
+    "optionA": "De werkgever.",
+    "optionB": "De werknemers.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Wetgeving"
+  },
+  "m1q10": {
+    "questionText": "De arbowetgeving heeft geen betrekking op:",
+    "optionA": "Gezondheid",
+    "optionB": "Welzijn",
+    "optionC": "Beveiliging (security)",
+    "moduleName": "Wetgeving"
+  },
+  "m1q11": {
+    "questionText": "De arbowetgeving is van toepassing op:",
+    "optionA": "De werkgever",
+    "optionB": "De werknemer",
+    "optionC": "Beide antwoorden zijn juist",
+    "moduleName": "Wetgeving"
+  },
+  "m1q12": {
+    "questionText": "Wat is geen uitgangspunt van de arbowetgeving?",
+    "optionA": "Ondersteuning door deskundigen of diensten.",
+    "optionB": "De verschillende werknemers hoeven niet samen te werken.",
+    "optionC": "Overleg en samenwerking met de werknemers.",
+    "moduleName": "Wetgeving"
+  },
+  "m1q13": {
+    "questionText": "Wat is een belangrijke taak van de preventiedeskundigen?",
+    "optionA": "Meewerken aan de risico-inventarisatie en -evaluatie.",
+    "optionB": "Toezicht houden op werkgevers.",
+    "optionC": "Medische onderzoeken uitvoeren.",
+    "moduleName": "Wetgeving"
+  },
+  "m1q14": {
+    "questionText": "Belangrijke doelstellingen van de arbeidstijdenwetgeving zijn:",
+    "optionA": "De maximale arbeidstijd en de minimale rusttijd vastleggen.",
+    "optionB": "De mogelijkheid bevorderen om werk en zorgtaken te combineren.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Wetgeving"
+  },
+  "m1q15": {
+    "questionText": "Uitgangspunten van de CE-markering zijn:",
+    "optionA": "Een CE-markering moet worden aangebracht door de fabrikant en de importeur.",
+    "optionB": "De CE-markering is niet voor elk arbeidsmiddel vereist.",
+    "optionC": "Een CE-markering moet worden aangebracht door de fabrikant of de importeur.",
+    "moduleName": "Wetgeving"
+  },
+  "m2q1": {
+    "questionText": "Hoe wordt het begrip risico omschreven?",
+    "optionA": "Risico = kans X effect.",
+    "optionB": "Risico = gevaar X kans.",
+    "optionC": "Risico = effect X gevaar.",
+    "explanation": "Risico wordt berekend als Kans × Effect (gevolg). Een grote kans op een klein voorval kan hetzelfde risico opleveren als een kleine kans op een catastrofaal voorval.",
+    "officialRef": "Module 2 — Gevaren, risico's en preventie",
+    "moduleName": "Gevaren, risico's en preventie"
+  },
+  "m2q2": {
+    "questionText": "Gevaren op de werkplek zijn:",
+    "optionA": "Lawaai.",
+    "optionB": "Straling.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "explanation": "Zowel lawaai als straling zijn volgens de arbowetgeving erkende gevaren op de werkplek. Ze kunnen op lange termijn gezondheidsschade veroorzaken, ook zonder direct zichtbaar letsel.",
+    "officialRef": "Module 2 — Gevaren, risico's en preventie",
+    "moduleName": "Gevaren, risico's en preventie"
+  },
+  "m2q3": {
+    "questionText": "Wat is geen bron van gevaren en risico's op de werkplek?",
+    "optionA": "Arbeidsmiddelen.",
+    "optionB": "Gedrag van de werknemer.",
+    "optionC": "Problemen thuis.",
+    "moduleName": "Gevaren, risico's en preventie"
+  },
+  "m2q4": {
+    "questionText": "Op welke manier kan preventie in de praktijk worden aangepakt?",
+    "optionA": "Onveilige situaties voorkomen.",
+    "optionB": "Onveilige handelingen voorkomen.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Gevaren, risico's en preventie"
+  },
+  "m2q5": {
+    "questionText": "Wat is een onveilige situatie?",
+    "optionA": "Een situatie die voldoet aan de voorwaarden voor veilig werken.",
+    "optionB": "Een situatie waarin mensen de met gebodsborden voorgeschreven PBM niet dragen.",
+    "optionC": "Een situatie die niet voldoet aan de voorwaarden voor veilig werken en die tot een ongeval kan leiden.",
+    "moduleName": "Gevaren, risico's en preventie"
+  },
+  "m2q6": {
+    "questionText": "Welke handeling is een onveilige handeling?",
+    "optionA": "Werken met werkvergunningen waar die zijn opgelegd.",
+    "optionB": "Gereedschap verkeerd gebruiken.",
+    "optionC": "De voorgeschreven PBM gebruiken.",
+    "moduleName": "Gevaren, risico's en preventie"
+  },
+  "m2q7": {
+    "questionText": "Wat is de beste manier om met onveilige situaties om te gaan?",
+    "optionA": "De oorzaak wegnemen.",
+    "optionB": "Anderen erbij roepen.",
+    "optionC": "Anderen waarschuwen.",
+    "moduleName": "Gevaren, risico's en preventie"
+  },
+  "m2q8": {
+    "questionText": "De verschillende stappen van een RI&E (risico-inventarisatie en -evaluatie) zijn:",
+    "optionA": "1. Risico's evalueren / 2. Gevaren identificeren / 3. Inventariseren",
+    "optionB": "1. Gevaren identificeren / 2. Risico's inventariseren / 3. Risico's evalueren",
+    "optionC": "1. Gevaren identificeren / 2. Risico's evalueren / 3. Inventariseren",
+    "moduleName": "Gevaren, risico's en preventie"
+  },
+  "m2q9": {
+    "questionText": "Waar staat LMRA voor?",
+    "optionA": "Labour Market Regulatory Authority (toezichthouder op de arbeidsmarkt).",
+    "optionB": "Last Minute Risk Analysis (laatste-minuut-risicoanalyse).",
+    "optionC": "Last Minor Random Analysis (laatste kleine willekeurige analyse).",
+    "moduleName": "Gevaren, risico's en preventie"
+  },
+  "m2q10": {
+    "questionText": "Wat is het doel van de werkvoorbereiding?",
+    "optionA": "De tijd bepalen die nodig is om het werk af te maken.",
+    "optionB": "Een werkmethode bepalen die veilig is en geen gezondheidsschade veroorzaakt.",
+    "optionC": "Een manier bepalen om het werk zo snel mogelijk af te maken.",
+    "moduleName": "Gevaren, risico's en preventie"
+  },
+  "m2q11": {
+    "questionText": "Wat is een aanpak van het uitzendbureau (intermediair) voor risicovolle taken?",
+    "optionA": "Afspraken met de inlener over het informeren van de uitzendkracht.",
+    "optionB": "Informatie aan de uitzendkracht over de risicovolle taken.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Gevaren, risico's en preventie"
+  },
+  "m3q1": {
+    "questionText": "Wat is de oorzaak van de meeste ongevallen?",
+    "optionA": "Menselijk falen.",
+    "optionB": "Slechte arbeidsomstandigheden.",
+    "optionC": "Gebrek aan goed onderhoud van gereedschap.",
+    "explanation": "Onveilig gedrag (menselijk falen, sluiproutes nemen) is de belangrijkste oorzaak van arbeidsongevallen. Technische storingen en omgevingsfactoren dragen ook bij, maar minder vaak.",
+    "officialRef": "Module 3 — Ongevallen: oorzaken en preventie",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m3q2": {
+    "questionText": "Welke factoren spelen volgens Lateiner een rol bij ongevallen?",
+    "optionA": "Achtergrond, menselijk falen en onveilige situaties en handelingen.",
+    "optionB": "De omgeving, menselijk falen en onveilige situaties.",
+    "optionC": "Het milieu, menselijk falen en onveilige situaties.",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m3q3": {
+    "questionText": "Het opstellen van procedures voor het handelen bij ongevallen is een maatregel gericht op:",
+    "optionA": "De omgeving.",
+    "optionB": "De organisatie.",
+    "optionC": "De mens.",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m3q4": {
+    "questionText": "Welke onderdelen moeten in het eindrapport van een ongevalsonderzoek staan?",
+    "optionA": "Tekeningen van het ongeval, getuigenverklaringen en genomen maatregelen.",
+    "optionB": "Analyse, conclusies en aanbevelingen.",
+    "optionC": "Gespreksverslagen, relevante documenten en foto's.",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m3q5": {
+    "questionText": "De twee directe oorzaken van een ongeval of incident zijn:",
+    "optionA": "Onveilige handelingen of defect materieel.",
+    "optionB": "Onveilige handelingen of onveilige situaties.",
+    "optionC": "Menselijk falen of defect materieel.",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m3q6": {
+    "questionText": "Wat is geen persoonsgebonden factor die tot een incident kan leiden?",
+    "optionA": "Onvoldoende planning.",
+    "optionB": "Onvoldoende aandacht.",
+    "optionC": "Onvoldoende ervaring.",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m3q7": {
+    "questionText": "Aan welke persoon moet een ongeval worden gemeld?",
+    "optionA": "De Arbeidsinspectie.",
+    "optionB": "Uw directe collega's.",
+    "optionC": "De direct leidinggevende.",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m3q8": {
+    "questionText": "Wat moet men doen met alle ongevallen of bijna-ongevallen?",
+    "optionA": "Meer PBM verstrekken.",
+    "optionB": "Het gebeurde registreren.",
+    "optionC": "De factoren vaststellen die de ongevallen hebben veroorzaakt.",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m3q9": {
+    "questionText": "Wie is verantwoordelijk voor het ongevalsonderzoek?",
+    "optionA": "De inlener.",
+    "optionB": "Het uitzendbureau.",
+    "optionC": "De Arbeidsinspectie.",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m3q10": {
+    "questionText": "Wie is verantwoordelijk bij afwezigheid wegens ziekte?",
+    "optionA": "De inlener.",
+    "optionB": "Het uitzendbureau.",
+    "optionC": "De Arbeidsinspectie.",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m3q11": {
+    "questionText": "Wat is het doel van de Wet op de arbeidsongeschiktheidsuitkering?",
+    "optionA": "De re-integratie van nieuwe werknemers verbeteren.",
+    "optionB": "De re-integratie van zieke werknemers binnen of buiten het bedrijf verbeteren.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m3q12": {
+    "questionText": "Wat is een verplichting van het uitzendbureau in het kader van de Wet op de arbeidsongeschiktheidsuitkering?",
+    "optionA": "Beide antwoorden zijn juist.",
+    "optionB": "Bij nalatigheid kan de loondoorbetalingsverplichting met een jaar worden verlengd.",
+    "optionC": "Een plan van aanpak voor re-integratie opstellen en uitvoeren.",
+    "moduleName": "Ongevallen: oorzaken en preventie"
+  },
+  "m4q1": {
+    "questionText": "Wat is een oorzaak van een ongeval door vallen en struikelen?",
+    "optionA": "Een vlakke antislipvloer.",
+    "optionB": "Losliggende kabels en touwen.",
+    "optionC": "Een opgeruimde werkplek.",
+    "moduleName": "Veilig gedrag"
+  },
+  "m4q2": {
+    "questionText": "Wat is geen oorzaak van onveilig gedrag?",
+    "optionA": "Gebrek aan voorbeeldfunctie.",
+    "optionB": "Onwil (niet willen).",
+    "optionC": "Goed geformuleerde doelstellingen.",
+    "moduleName": "Veilig gedrag"
+  },
+  "m4q3": {
+    "questionText": "Welk beleidselement beïnvloedt het menselijk gedrag met het oog op veilig werken?",
+    "optionA": "Een sanctiebeleid.",
+    "optionB": "Duidelijkheid over de prioriteit van veilig werken.",
+    "optionC": "Beleid gericht op goed werkende machines.",
+    "moduleName": "Veilig gedrag"
+  },
+  "m4q4": {
+    "questionText": "Waarom is de rol van de leidinggevende belangrijk voor het menselijk gedrag?",
+    "optionA": "De leidinggevende is een rolmodel.",
+    "optionB": "De leidinggevende laat de werknemers de werkmethode bepalen.",
+    "optionC": "De leidinggevende beschikt over de nodige informatie over werknemers, werk en omstandigheden.",
+    "moduleName": "Veilig gedrag"
+  },
+  "m4q5": {
+    "questionText": "Wat is een algemene gedragsregel voor veilig werken?",
+    "optionA": "Kritisch zijn ten opzichte van uzelf.",
+    "optionB": "Werknemers mogen niet ingrijpen, maar moeten melden bij de leidinggevende.",
+    "optionC": "Meningen vastleggen en opslaan.",
+    "moduleName": "Veilig gedrag"
+  },
+  "m4q6": {
+    "questionText": "Wat is geen gedrag dat veilig werken bevordert?",
+    "optionA": "Aandacht voor persoonlijke hygiëne, orde en netheid.",
+    "optionB": "Alleen aan uw eigen gezondheid en veiligheid denken.",
+    "optionC": "Onveilige situaties melden en passend ingrijpen.",
+    "moduleName": "Veilig gedrag"
+  },
+  "m4q7": {
+    "questionText": "De invloed van alcohol en drugs op veilig werken veroorzaakt:",
+    "optionA": "Verminderd of problematisch functioneren.",
+    "optionB": "Geen gedragsveranderingen.",
+    "optionC": "Een goede inschatting van situaties.",
+    "moduleName": "Veilig gedrag"
+  },
+  "m4q8": {
+    "questionText": "Wat wordt verwacht met betrekking tot alcohol- en drugsgebruik voor veilig werken?",
+    "optionA": "Gebruik is toegestaan wanneer leidinggevenden ervan op de hoogte zijn.",
+    "optionB": "Hulp zoeken bij chronisch problematisch gebruik.",
+    "optionC": "De leidinggevende hoeft niet te worden geïnformeerd over incidenteel gebruik.",
+    "moduleName": "Veilig gedrag"
+  },
+  "m4q9": {
+    "questionText": "Wat is een taak van de intermediair om veilig werken te bevorderen?",
+    "optionA": "Beide antwoorden zijn juist.",
+    "optionB": "De uitzendkracht informeren over de noodzaak van veilig werken.",
+    "optionC": "De basiskennis op het gebied van veiligheid en gezondheid controleren.",
+    "moduleName": "Veilig gedrag"
+  },
+  "m5q1": {
+    "questionText": "Wat zijn verplichtingen van werkgevers volgens de wetgeving inzake veiligheid en gezondheid?",
+    "optionA": "Voorlichting en instructie geven over de gevaren op het werk.",
+    "optionB": "Gevaarlijke situaties melden aan de leidinggevende.",
+    "optionC": "De overheidsinspectie voor veiligheid en gezondheid inschakelen.",
+    "explanation": "Werknemers hebben het recht om onveilig werk te weigeren zonder angst voor represailles. Dit is een fundamenteel recht volgens de wetgeving inzake veiligheid en gezondheid.",
+    "officialRef": "Module 5 — Taken, rechten en plichten",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q2": {
+    "questionText": "Wat zijn verplichtingen van werknemers volgens de arbeidsomstandighedenwet?",
+    "optionA": "De Arbeidsinspectie inschakelen.",
+    "optionB": "Gevaarlijke situaties melden aan de leidinggevende/supervisor.",
+    "optionC": "Voorlichting geven over de gevaren op het werk.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q3": {
+    "questionText": "Wanneer hebben werknemers het recht om hun werk te onderbreken?",
+    "optionA": "Als er geen PBM beschikbaar zijn.",
+    "optionB": "Als de Arbeidsinspectie een onderzoek komt uitvoeren.",
+    "optionC": "Als er onmiddellijk en ernstig gevaar voor personen ontstaat.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q4": {
+    "questionText": "Wie neemt deel aan het overleg van de ondernemingsraad?",
+    "optionA": "De afdelingsleiding en de werknemers.",
+    "optionB": "Alle werknemers, inclusief het tijdelijke personeel.",
+    "optionC": "De werkgever en de vertegenwoordigers van de werknemers.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q5": {
+    "questionText": "Wat is het verschil tussen de SCC*- en de SCC**-certificering?",
+    "optionA": "SCC* richt zich op veiligheidsstructuren; SCC** omvat ook milieuzorg.",
+    "optionB": "SCC* richt zich op de directe beheersing van de veiligheid; SCC** omvat ook veiligheidsstructuren.",
+    "optionC": "SCC* richt zich op kwaliteitszorg; SCC** omvat ook de zorg voor arbeidsomstandigheden.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q6": {
+    "questionText": "Wat moet men doen bij onmiddellijk gevaar?",
+    "optionA": "De risico's wegnemen die het gevaar hebben veroorzaakt.",
+    "optionB": "Doorwerken tot iemand u zegt te stoppen.",
+    "optionC": "Het werk stoppen en/of uw eigen veiligheid waarborgen.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q7": {
+    "questionText": "Wat is een voordeel van werkplekinspecties?",
+    "optionA": "Ze geven een goed inzicht in de veiligheidssituatie.",
+    "optionB": "Ze vergroten het veiligheidsbewustzijn.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q8": {
+    "questionText": "Een wettelijke aansprakelijkheid op het gebied van veiligheid en gezondheid is:",
+    "optionA": "Het uitzendbureau is verantwoordelijk voor de arbeidsongevallenverzekering.",
+    "optionB": "De inlenende onderneming heeft specifieke taken.",
+    "optionC": "De relaties tussen de inlenende onderneming, de uitzendkracht en de Arbeidsinspectie.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q9": {
+    "questionText": "Het verschil tussen de formele en de feitelijke werkgever is:",
+    "optionA": "De feitelijke werkgever is degene onder wiens gezag de uitzendkracht werkt.",
+    "optionB": "Beide antwoorden zijn juist.",
+    "optionC": "De formele werkgever heeft de werknemer daadwerkelijk in dienst.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q10": {
+    "questionText": "Wie is verantwoordelijk voor de arbeidsomstandigheden bij uitzendwerk?",
+    "optionA": "De uitzendwerkgever levert de persoonlijke arbeidsomstandigheden aan de inlenende onderneming.",
+    "optionB": "Het uitzendbureau is verantwoordelijk.",
+    "optionC": "De feitelijke werkgever (de inlenende onderneming) is verantwoordelijk.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q11": {
+    "questionText": "Een wettelijke aansprakelijkheid op het gebied van veiligheid en gezondheid is geregeld als:",
+    "optionA": "Een bijzondere relatie: uitzendbureau, inlenende onderneming, Arbeidsinspectie en werknemer.",
+    "optionB": "Een driehoeksrelatie: uitzendbureau, inlenende onderneming en werknemer.",
+    "optionC": "De inlenende onderneming is aansprakelijk voor de doorgeleidingsplicht van informatie.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q12": {
+    "questionText": "Een belangrijk aspect van veiligheid en gezondheid bij het plaatsen van een uitzendkracht is:",
+    "optionA": "Het opvragen van de vereiste documenten inzake veiligheid en gezondheid.",
+    "optionB": "De procedure voor aanvragen en het vastleggen van afspraken over veiligheid en gezondheid.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q13": {
+    "questionText": "Wat moet met de inlenende onderneming worden besproken met betrekking tot medisch onderzoek?",
+    "optionA": "Voor welke functies een medisch onderzoek vereist is.",
+    "optionB": "Medisch onderzoek door de leidinggevende.",
+    "optionC": "Het verstrekken van informatie over de vereiste medische geschiktheid.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q14": {
+    "questionText": "Elementen die het dossier van de uitzendkracht moet bevatten, zijn:",
+    "optionA": "Functiegerichte beperkingen.",
+    "optionB": "Een kopie van een identiteitsbewijs.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q15": {
+    "questionText": "Wat is geen noodzakelijk aandachtspunt wanneer de inlenende onderneming een aanvraag indient?",
+    "optionA": "De vereiste medische geschiktheid.",
+    "optionB": "Wie de instructies over PBM zal geven.",
+    "optionC": "Het bezit van een geldig VOL SCC-certificaat.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q16": {
+    "questionText": "Wat moet er gebeuren om de afspraken met de inlenende onderneming te controleren?",
+    "optionA": "Een formele kennismaking met de collega's.",
+    "optionB": "Ontvangst bij het bedrijf; kennismaking met de leidinggevende.",
+    "optionC": "De uitzendkracht moet zijn eigen PBM meebrengen.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q17": {
+    "questionText": "Een aandachtspunt bij het evalueren van uitzendwerk is:",
+    "optionA": "Het verstrekken van PBM en werkkleding.",
+    "optionB": "Voorzieningen zoals kleedruimte, kantine en sanitair.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q18": {
+    "questionText": "Wat is belangrijk bij het overleg over veiligheid en gezondheid binnen het uitzendbureau?",
+    "optionA": "De betrokkenheid van de Arbeidsinspectie.",
+    "optionB": "De betrokkenheid van de collega's.",
+    "optionC": "De betrokkenheid van de directie en de leidinggevenden.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m5q19": {
+    "questionText": "Wat is de betrokkenheid van de uitzendkracht bij het VGM-overleg?",
+    "optionA": "De uitzendkracht moet deelnemen aan het VGM-overleg bij de inlenende onderneming.",
+    "optionB": "De intermediair informeert de werknemer over het bestaan van het VGM-overleg.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Taken, rechten, plichten en overleg"
+  },
+  "m6q1": {
+    "questionText": "De procedure voor het melden van een brand valt onder de:",
+    "optionA": "SCC-procedures.",
+    "optionB": "Algemene veiligheidsregels.",
+    "optionC": "Specifieke veiligheidsregels.",
+    "moduleName": "Procedures, instructies en signalering"
+  },
+  "m6q2": {
+    "questionText": "Wat moet in een werkvergunning worden beschreven?",
+    "optionA": "De relevante controlepunten uit de SCC.",
+    "optionB": "Het aantal werknemers met een IER-diploma.",
+    "optionC": "De maatregelen die de verstrekker en de houder van de vergunning moeten nemen.",
+    "moduleName": "Procedures, instructies en signalering"
+  },
+  "m6q3": {
+    "questionText": "Algemene veiligheidsregels zijn bedoeld voor:",
+    "optionA": "Eén afdeling van het bedrijf.",
+    "optionB": "Uitzendkrachten.",
+    "optionC": "Aannemers en onderaannemers.",
+    "moduleName": "Procedures, instructies en signalering"
+  },
+  "m6q4": {
+    "questionText": "Algemene veiligheidsregels:",
+    "optionA": "Moeten schriftelijk worden vastgelegd.",
+    "optionB": "Zijn gereedschapsspecifieke regels voor het gebruik.",
+    "optionC": "Moeten in één taal worden opgesteld.",
+    "moduleName": "Procedures, instructies en signalering"
+  },
+  "m6q5": {
+    "questionText": "Specifieke veiligheidsregels hebben geen betrekking op:",
+    "optionA": "Lunchpauzes.",
+    "optionB": "Ventilatie.",
+    "optionC": "Het betreden van besloten ruimten.",
+    "moduleName": "Procedures, instructies en signalering"
+  },
+  "m6q6": {
+    "questionText": "Een richtlijn met betrekking tot specifieke veiligheidsregels is:",
+    "optionA": "Ze moeten ook door moedertaalsprekers worden begrepen.",
+    "optionB": "Ze moeten aan alle werknemers worden bekendgemaakt.",
+    "optionC": "Zodra ze zijn uitgelegd, kan men ervan uitgaan dat iedereen weet wat ze betekenen.",
+    "moduleName": "Procedures, instructies en signalering"
+  },
+  "m6q7": {
+    "questionText": "Een functie van een aansluitflens is:",
+    "optionA": "Toevoerleidingen naar vaten, tanks of installaties afsluiten.",
+    "optionB": "Leidingdelen van elkaar scheiden.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Procedures, instructies en signalering"
+  },
+  "m6q8": {
+    "questionText": "Wat is geen onderdeel van de werkvergunning met betrekking tot de aangevraagde werkzaamheden?",
+    "optionA": "Hoe de werkzaamheden zullen plaatsvinden.",
+    "optionB": "Waar de werkzaamheden zullen plaatsvinden.",
+    "optionC": "Waarom de werkzaamheden zullen plaatsvinden.",
+    "moduleName": "Procedures, instructies en signalering"
+  },
+  "m6q9": {
+    "questionText": "Wat is een onderdeel van de werkvergunning voor de maatregelen door de uitvoerende werknemer?",
+    "optionA": "Alle PBM moeten hier worden vermeld.",
+    "optionB": "De maatregelen die de uitvoerende werknemers moeten nemen om veilig te werken.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Procedures, instructies en signalering"
+  },
+  "m6q10": {
+    "questionText": "Wat houdt de doorgeleidingsplicht van informatie in?",
+    "optionA": "Beide antwoorden zijn juist.",
+    "optionB": "Het uitzendbureau moet de informatie over de werkplek doorgeven.",
+    "optionC": "De inlenende onderneming en het uitzendbureau hebben een gedeelde plicht om informatie te verstrekken.",
+    "moduleName": "Procedures, instructies en signalering"
+  },
+  "m7q1": {
+    "questionText": "Welke taak behoort tot de rol van bedrijfshulpverleners?",
+    "optionA": "Een beginnende brand blussen en schade en letsel beperken.",
+    "optionB": "Deelnemen aan het ongevallenonderzoeksteam.",
+    "optionC": "Gasdetectiemetingen uitvoeren.",
+    "moduleName": "Voorbereiding op noodsituaties"
+  },
+  "m7q2": {
+    "questionText": "Wat wordt verstaan onder een noodsituatie?",
+    "optionA": "Noodsituaties veroorzaakt door ongevallen, brand, explosie of het ongecontroleerd vrijkomen van stoffen.",
+    "optionB": "Dreiging door slecht weer, natuurrampen, maatschappelijke onrust of een terroristische aanslag.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Voorbereiding op noodsituaties"
+  },
+  "m7q3": {
+    "questionText": "Een bedrijfsnoodplan is:",
+    "optionA": "Een beschrijving van de maatregelen en voorzieningen die zijn voorbereid voor noodsituaties.",
+    "optionB": "Een lijst van maatregelen om ervoor te zorgen dat de arbeidsomstandigheden veilig zijn.",
+    "optionC": "Een lijst van maatregelen die werknemers moeten voorbereiden voordat ze met het werk beginnen.",
+    "moduleName": "Voorbereiding op noodsituaties"
+  },
+  "m7q4": {
+    "questionText": "Het beperken van de gevolgen van mogelijke noodsituaties is het doel van:",
+    "optionA": "Het geheel van arbeidsomstandigheden.",
+    "optionB": "Een (intern) bedrijfsnoodplan.",
+    "optionC": "Het bedrijfshulpverleningsteam.",
+    "moduleName": "Voorbereiding op noodsituaties"
+  },
+  "m7q5": {
+    "questionText": "Wat is geen fase in het beheersen van noodsituaties?",
+    "optionA": "Eerste alarm.",
+    "optionB": "Tweede alarm.",
+    "optionC": "Beëindiging.",
+    "moduleName": "Voorbereiding op noodsituaties"
+  },
+  "m7q6": {
+    "questionText": "Het eerste alarm bij noodsituaties is:",
+    "optionA": "Een lijst van manieren om mensen te alarmeren.",
+    "optionB": "Een beschrijving van de manieren waarop een noodsituatie kan worden gemeld en welke informatie moet worden doorgegeven.",
+    "optionC": "Een luide bel die aangeeft dat er een noodsituatie is.",
+    "moduleName": "Voorbereiding op noodsituaties"
+  },
+  "m7q7": {
+    "questionText": "Een onderdeel van de beëindiging van de noodsituatie is:",
+    "optionA": "De manier waarop de beëindiging wordt bekendgemaakt.",
+    "optionB": "Wie bevoegd is om de noodsituatie beëindigd te verklaren.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Voorbereiding op noodsituaties"
+  },
+  "m7q8": {
+    "questionText": "Een van de minimumeisen voor eerste hulp is:",
+    "optionA": "Opgeleide leden van het bedrijfshulpverleningsteam.",
+    "optionB": "Eerstehulpmiddelen die altijd beschikbaar zijn.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Voorbereiding op noodsituaties"
+  },
+  "m7q9": {
+    "questionText": "Welke volgorde is juist bij een evacuatiesignaal?",
+    "optionA": "1: Werk stoppen / 2: Geen liften gebruiken / 3: Naar de verzamelplaats gaan.",
+    "optionB": "1: Werk stoppen / 2: Geen liften gebruiken / 3: Aanwezigheid melden op de verzamelplaats.",
+    "optionC": "1: Werk stoppen / 2: Aanwezigheid melden / 3: Dwars op de windrichting evacueren.",
+    "moduleName": "Voorbereiding op noodsituaties"
+  },
+  "m8q1": {
+    "questionText": "Hoe kunt u aan het etiket zien welke risico's een gevaarlijk product met zich meebrengt?",
+    "optionA": "Aan de S-zinnen.",
+    "optionB": "Aan de M-zinnen.",
+    "optionC": "Aan de R-zinnen.",
+    "explanation": "Een VIB (veiligheidsinformatieblad) geeft essentiële informatie over gevaarlijke stoffen: samenstelling, gevaren, eerste hulp, hantering, opslag en verwijdering.",
+    "officialRef": "Module 8 — Gevaarlijke stoffen",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q2": {
+    "questionText": "Wat geeft het gele vlak van de ruitvormige gevaarsaanduiding aan?",
+    "optionA": "Reactiviteitsgevaar.",
+    "optionB": "Gezondheidsgevaar.",
+    "optionC": "Brandgevaar.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q3": {
+    "questionText": "Welke giftige werking heeft koolmonoxide?",
+    "optionA": "Verlamming van uw reukzin.",
+    "optionB": "Zuurstof wordt niet meer in het bloed opgenomen.",
+    "optionC": "Een irriterende werking op de luchtwegen.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q4": {
+    "questionText": "Welke informatie staat in een veiligheidsinformatieblad van een materiaal?",
+    "optionA": "Informatie over de stappen om in een besloten ruimte te werken.",
+    "optionB": "Informatie over de vergunningen die nodig zijn om met het product te werken.",
+    "optionC": "Informatie over de gevaren en de veiligheidsmaatregelen die u moet nemen.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q5": {
+    "questionText": "Onder normale omstandigheden is het zuurstofgehalte in de lucht:",
+    "optionA": "21%.",
+    "optionB": "19%.",
+    "optionC": "25%.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q6": {
+    "questionText": "Gebrek aan ventilatie:",
+    "optionA": "Heft het zuurstoftekort op.",
+    "optionB": "Kan een te lage zuurstofconcentratie veroorzaken.",
+    "optionC": "Veroorzaakt ademhalingsproblemen.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q7": {
+    "questionText": "Een witte schouder op een gascilinder betekent:",
+    "optionA": "Kooldioxide.",
+    "optionB": "Lucht.",
+    "optionC": "Zuurstof.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q8": {
+    "questionText": "Bij het opslaan van gasflessen:",
+    "optionA": "Moet men ze goed vastzetten.",
+    "optionB": "Moet men ze in speciale kelders plaatsen.",
+    "optionC": "Moeten ze dicht bij de werkplek worden geplaatst zodat ze makkelijk bereikbaar zijn.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q9": {
+    "questionText": "Wat wordt bedoeld met gevaarlijke stoffen?",
+    "optionA": "Materialen die gemakkelijk ontploffen als ze met veel zuurstof worden gemengd.",
+    "optionB": "Materialen die een gevaar vormen voor de gezondheid en/of het milieu.",
+    "optionC": "Materialen waarvoor een speciale opleiding nodig is voordat ze worden gebruikt.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q10": {
+    "questionText": "Gevaarlijke stoffen op de werkplek worden aangeduid met:",
+    "optionA": "Een vierkant gevaarsymbool, zwart op een rode achtergrond.",
+    "optionB": "Een vierkant gevaarsymbool, zwart op een oranje achtergrond.",
+    "optionC": "Een vierkant gevaarsymbool, zwart op een gele achtergrond.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q11": {
+    "questionText": "Vaccinatie is een voorzorgsmaatregel bij het werken met:",
+    "optionA": "Biologische stoffen.",
+    "optionB": "Ontvlambare stoffen.",
+    "optionC": "Irriterende stoffen.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q12": {
+    "questionText": "Biologische stoffen kunnen aanwezig zijn in:",
+    "optionA": "De landbouw.",
+    "optionB": "Verontreinigde grond.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q13": {
+    "questionText": "Het vakkundig opruimen van gemorst product is een preventieve maatregel tegen:",
+    "optionA": "Brand.",
+    "optionB": "Vallende voorwerpen.",
+    "optionC": "Lekkages.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q14": {
+    "questionText": "Wat is geen oorzaak van lekkages?",
+    "optionA": "Beschadiging (bijv. een aanrijding met een heftruck).",
+    "optionB": "Een verkeerde werkwijze bij het overtappen van vaten.",
+    "optionC": "Het correct monteren van flenzen.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q15": {
+    "questionText": "Uitglijden is een gevolg van:",
+    "optionA": "Milieuverontreiniging.",
+    "optionB": "Lekkages.",
+    "optionC": "Het gebruik van gevaarlijke stoffen.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q16": {
+    "questionText": "Het gevaar van organische oplosmiddelen is dat ze:",
+    "optionA": "Ontvlambaar of licht ontvlambaar zijn.",
+    "optionB": "Bijtend zijn.",
+    "optionC": "Irriterend zijn.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q17": {
+    "questionText": "Een voorbeeld van een cyclische verbinding is:",
+    "optionA": "Zink.",
+    "optionB": "Fenol.",
+    "optionC": "Terpentine (white spirit).",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q18": {
+    "questionText": "De kans op mesothelioom is een gezondheidseffect dat verband houdt met:",
+    "optionA": "Benzeen.",
+    "optionB": "Terpentine (white spirit).",
+    "optionC": "Asbest.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q19": {
+    "questionText": "Wat is geen mogelijke plaats waar asbest voorkomt?",
+    "optionA": "In nieuwbouwwoningen.",
+    "optionB": "Dakbedekking en wandbekleding.",
+    "optionC": "In en achter het metselwerk van ovens en ketels.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q20": {
+    "questionText": "Wat is geen wettelijke bepaling met betrekking tot asbest?",
+    "optionA": "Nieuw gebruik en bewerking van asbest is toegestaan.",
+    "optionB": "Asbesthoudend afval moet gescheiden worden ingezameld.",
+    "optionC": "Waar risico op contact met asbest bestaat, wordt een specifiek etiket aangebracht.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q21": {
+    "questionText": "Een uitgangspunt van het periodiek medisch onderzoek is:",
+    "optionA": "Vaststellen of de kandidaat geschikt blijft om met stoffen te werken.",
+    "optionB": "Vaststellen of de kandidaat geschikt blijft om met de gevaarlijke stof te werken.",
+    "optionC": "De frequentie hangt af van de werknemer.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q22": {
+    "questionText": "De veiligheidsaanbevelingen op de nieuwe etiketten beschrijven:",
+    "optionA": "De maatregelen om veranderingen in de arbeidsomstandigheden te voorkomen.",
+    "optionB": "De maatregelen om risico's bij het werken met het product te voorkomen.",
+    "optionC": "De maatregelen om brand te voorkomen.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q23": {
+    "questionText": "De cijfers op een gevarendiamant lopen van:",
+    "optionA": "1 tot 5.",
+    "optionB": "0 tot 4.",
+    "optionC": "0 tot 5.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m8q24": {
+    "questionText": "De maatregelen om risico's bij het werken met het product te voorkomen staan beschreven in:",
+    "optionA": "De H-zinnen.",
+    "optionB": "De R-zinnen.",
+    "optionC": "De S-zinnen.",
+    "moduleName": "Gevaarlijke stoffen"
+  },
+  "m9q1": {
+    "questionText": "Wat is een nadeel van het blussen van een brand met water?",
+    "optionA": "Het brandende materiaal kan heftig reageren met water.",
+    "optionB": "De blussers worden gehinderd door rook.",
+    "optionC": "Het gebruik van water is relatief duur.",
+    "explanation": "De branddriehoek vereist brandstof, zuurstof en warmte (ontstekingsbron). Het wegnemen van een van deze elementen blust de brand of voorkomt hem.",
+    "officialRef": "Module 9 — Brand en explosie",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q2": {
+    "questionText": "Wat moet u weten voordat u een brand gaat blussen?",
+    "optionA": "Hoe lang het al brandt.",
+    "optionB": "Hoe hoog de temperatuur is.",
+    "optionC": "Welke stof er brandt.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q3": {
+    "questionText": "Wat moet als eerste worden gedaan wanneer een brand wordt ontdekt?",
+    "optionA": "Indien mogelijk zelf blussen.",
+    "optionB": "Mensen in veiligheid brengen.",
+    "optionC": "De brand melden.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q4": {
+    "questionText": "Wat betekent een explosiegrens?",
+    "optionA": "De hoogste/laagste temperatuur van een vaste stof waarbij een explosie kan optreden.",
+    "optionB": "De hoogste/laagste concentratie van een gas in lucht waarbij een explosie kan optreden.",
+    "optionC": "De hoogste/laagste concentratie van metalen waarbij een explosie kan optreden.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q5": {
+    "questionText": "Wat wordt bedoeld met het vlampunt?",
+    "optionA": "De hoogste/laagste concentratie van gas en lucht voor een explosie.",
+    "optionB": "De hoogste/laagste temperatuur van een vaste stof voor een explosie.",
+    "optionC": "De laagste temperatuur van een vloeistof waarbij de damp kan worden ontstoken.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q6": {
+    "questionText": "Welk gevolg kan een overmaat aan zuurstof hebben tijdens een brand?",
+    "optionA": "Gemakkelijkere ontsteking van ontvlambare stoffen.",
+    "optionB": "Langer doorbranden.",
+    "optionC": "Verstikking van de brand.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q7": {
+    "questionText": "Een ontvlambare stof:",
+    "optionA": "Is nodig voor een brand of explosie.",
+    "optionB": "Is altijd een gas.",
+    "optionC": "Veroorzaakt altijd brand of een explosie.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q8": {
+    "questionText": "Wat is een explosie?",
+    "optionA": "Een brand veroorzaakt door een ontvlambare stof.",
+    "optionB": "Een zeer snel verlopende brand waarbij een drukgolf vrijkomt.",
+    "optionC": "Een brand van klasse C.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q9": {
+    "questionText": "Waarop heeft een brand van klasse A betrekking?",
+    "optionA": "Gassen.",
+    "optionB": "Vloeistoffen.",
+    "optionC": "Vaste stoffen.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q10": {
+    "questionText": "Het bord dat een explosiegevaarlijke zone aanduidt:",
+    "optionA": "Toont de letters Ex.",
+    "optionB": "Toont de letters Er.",
+    "optionC": "Toont een vuursymbool.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q11": {
+    "questionText": "Een explosiegevaarlijke omgeving is een omgeving:",
+    "optionA": "Waar speciale maatregelen moeten worden genomen om ontsteking van explosieve mengsels te voorkomen.",
+    "optionB": "Waar het niet mogelijk is dat een explosief mengsel ontstaat.",
+    "optionC": "Waar geen speciale maatregelen mogen worden genomen.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q12": {
+    "questionText": "Een eis voor de brandwacht bij heet werk is:",
+    "optionA": "Minimaal vijf jaar ervaring met vuur.",
+    "optionB": "Een specifieke opleiding.",
+    "optionC": "Minimaal een jaar ervaring met vuur.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q13": {
+    "questionText": "Bij de behandeling van brandwonden:",
+    "optionA": "Spoelt u minimaal 5 minuten met water.",
+    "optionB": "Spoelt u minimaal 15 minuten met water.",
+    "optionC": "Spoelt u minimaal 10 minuten met water.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q14": {
+    "questionText": "Bij het blussen van een brand mag men niet:",
+    "optionA": "Alert blijven, ook als de brand geblust lijkt.",
+    "optionB": "Te allen tijde de eigen veiligheid waarborgen.",
+    "optionC": "Zomaar weglopen wanneer de brand geblust is.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q15": {
+    "questionText": "Blusdekens:",
+    "optionA": "Koelen.",
+    "optionB": "Verdringen zuurstof.",
+    "optionC": "Sluiten zuurstof af.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q16": {
+    "questionText": "Een nadeel van blussen met een blusdeken is:",
+    "optionA": "Kans op vrieswonden.",
+    "optionB": "Men moet dicht bij de vuurhaard komen.",
+    "optionC": "Verontreiniging.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q17": {
+    "questionText": "Een nadeel van blussen met kooldioxide is:",
+    "optionA": "Kan een verstikkende atmosfeer veroorzaken.",
+    "optionB": "Kans op vrieswonden door de lage temperatuur.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Brand en explosie"
+  },
+  "m9q18": {
+    "questionText": "Een bluseigenschap van zand is:",
+    "optionA": "Zand verdringt zuurstof.",
+    "optionB": "Zand sluit zuurstof af.",
+    "optionC": "Zand heeft een koelende werking.",
+    "moduleName": "Brand en explosie"
+  },
+  "m10q1": {
+    "questionText": "Waarop moet u letten bij het gebruik van beitels?",
+    "optionA": "Gebruik alleen beitels zonder bramen op de snijkant.",
+    "optionB": "Gebruik alleen beitels die gekeurd zijn.",
+    "optionC": "Gebruik alleen beitels van de juiste sterkte.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q2": {
+    "questionText": "Waarom mag u nooit handschoenen dragen bij machines met draaiende delen?",
+    "optionA": "Omdat uw handen niet in contact komen met de draaiende delen.",
+    "optionB": "Omdat de machine beschadigd kan raken.",
+    "optionC": "Omdat de handschoen en uw hand in de machine kunnen worden meegetrokken.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q3": {
+    "questionText": "Wat betekent veilig werken met kolomboormachines?",
+    "optionA": "Gebruikmaken van het spouwmes.",
+    "optionB": "Het werkstuk stevig inklemmen.",
+    "optionC": "Tegendruk geven tijdens het boren.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q4": {
+    "questionText": "Waarmee moeten hamers zijn uitgerust om ongevallen te voorkomen?",
+    "optionA": "Een kunststof steel.",
+    "optionB": "Een metalen steel.",
+    "optionC": "Een steel die goed in de hamerkop is geborgd.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q5": {
+    "questionText": "Wat is het doel van een dodemansknop op pneumatisch gereedschap?",
+    "optionA": "Hiermee kan de gebruiker pauzes nemen.",
+    "optionB": "Om het gereedschap in de opwarmstand te zetten.",
+    "optionC": "Om de machine onmiddellijk te stoppen wanneer de handgreep wordt losgelaten.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q6": {
+    "questionText": "Wat moet aanwezig zijn op een tafelcirkelzaag?",
+    "optionA": "Een glazen scherm.",
+    "optionB": "Een beschermkap over het zaagblad, bevestigd aan een stevige steun.",
+    "optionC": "Een terugslagbeveiliging.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q7": {
+    "questionText": "Elektrisch handgereedschap voor 230 volt:",
+    "optionA": "Moet dubbel geïsoleerd zijn.",
+    "optionB": "Moet voorzien zijn van een veiligheidsaarding.",
+    "optionC": "Mag alleen worden gebruikt door een voldoende geïnstrueerde persoon.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q8": {
+    "questionText": "Een periodieke keuring moet worden uitgevoerd:",
+    "optionA": "Aan machines en elektrisch gereedschap.",
+    "optionB": "Elke week.",
+    "optionC": "Om er zeker van te zijn dat elke werknemer zijn werk leuk vindt.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q9": {
+    "questionText": "Een machine stopt zo snel mogelijk wanneer:",
+    "optionA": "De noodstop wordt gebruikt.",
+    "optionB": "De bedieningshendel wordt losgelaten.",
+    "optionC": "De draaiende delen worden geblokkeerd.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q10": {
+    "questionText": "Wat is een palletwagen?",
+    "optionA": "Een voertuig om personen te vervoeren.",
+    "optionB": "Een voertuig om lasten over verschillende hoogten te verplaatsen.",
+    "optionC": "Een voertuig met een hefhoogte van 20 cm.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q11": {
+    "questionText": "Een eis voor een heftruckchauffeur is:",
+    "optionA": "Het gebruik van de veiligheidsgordel.",
+    "optionB": "Het bezit van getoetste deskundigheid.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q12": {
+    "questionText": "Wat is geen veiligheidsmaatregel voor heftrucks?",
+    "optionA": "Neem geen passagier mee als er geen speciale zitplaats beschikbaar is.",
+    "optionB": "Men mag het contragewicht verhogen wanneer dat nodig is.",
+    "optionC": "Beide antwoorden zijn geen veiligheidsmaatregel.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q13": {
+    "questionText": "Bij het werken met zagen:",
+    "optionA": "Het zaagblad moet goed gespannen zijn.",
+    "optionB": "Het zaagblad mag niet te scherp zijn.",
+    "optionC": "De bediener moet een passende opleiding hebben gevolgd.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q14": {
+    "questionText": "Bij het werken met messen:",
+    "optionA": "De tanden moeten naar voren wijzen.",
+    "optionB": "Schuif een uitschuifbaar mes niet te ver uit.",
+    "optionC": "Het blad moet goed gespannen zijn.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q15": {
+    "questionText": "Bij het werken met kleine werkstukken:",
+    "optionA": "Men moet ze met één hand vasthouden.",
+    "optionB": "Men moet het werkstuk inklemmen.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q16": {
+    "questionText": "Broeken en handschoenen van speciale vezels worden gebruikt bij:",
+    "optionA": "Het werken met een kettingzaag.",
+    "optionB": "Het werken met schroevendraaiers.",
+    "optionC": "Het werken met hamers.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q17": {
+    "questionText": "Een spijker-/nietpistool moet voorzien zijn van:",
+    "optionA": "Een extra handgreep aan de zijkant.",
+    "optionB": "Een beveiliging tegen ongewenst afvuren.",
+    "optionC": "Een doorzichtig scherm.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q18": {
+    "questionText": "Een spouwmes wordt gebruikt bij:",
+    "optionA": "Een handcirkelzaag.",
+    "optionB": "Een kettingzaag.",
+    "optionC": "Een schroevendraaier.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q19": {
+    "questionText": "Welke informatie moet op een slijpschijf aanwezig zijn?",
+    "optionA": "Het minimaal toegestane toerental.",
+    "optionB": "De naam van de fabrikant.",
+    "optionC": "De gebruiker van de schijf.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q20": {
+    "questionText": "Bij het werken met pneumatisch aangedreven handgereedschap moet men:",
+    "optionA": "De luchttoevoer na gebruik afsluiten.",
+    "optionB": "Regelmatig pauzeren bij het gebruik van trillend gereedschap.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m10q21": {
+    "questionText": "Wat is bij het werken met werkbankslijpmachines geen mogelijk gevaar?",
+    "optionA": "Gezondheidsklachten door het inademen van gevaarlijk stof.",
+    "optionB": "Het spouwmes kan losraken.",
+    "optionC": "Geraakt of gegrepen worden door bewegende delen.",
+    "moduleName": "Arbeidsmiddelen"
+  },
+  "m11q1": {
+    "questionText": "Wat is een gevaar bij sloopwerkzaamheden?",
+    "optionA": "Instabiliteit van het sloopfront.",
+    "optionB": "Uitstekende delen van de constructie.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Sloopwerkzaamheden"
+  },
+  "m11q2": {
+    "questionText": "Tijdens sloopwerkzaamheden moet men beschikken over:",
+    "optionA": "Een valbeveiligingssysteem.",
+    "optionB": "Voldoende pauzes.",
+    "optionC": "Zo weinig mogelijk pauzeren.",
+    "moduleName": "Sloopwerkzaamheden"
+  },
+  "m11q3": {
+    "questionText": "Wat moet men doen bij het verwijderen van keramische vezels?",
+    "optionA": "Alles in kleine stukken breken.",
+    "optionB": "Geen stortkoker gebruiken.",
+    "optionC": "Uw werkoverall dragen.",
+    "moduleName": "Sloopwerkzaamheden"
+  },
+  "m12q1": {
+    "questionText": "Wat moet men doen bij autogeen lassen met zuurstof en acetyleen?",
+    "optionA": "Acetyleenflessen rechtop opslaan of onder een hoek van minimaal 25 graden.",
+    "optionB": "Acetyleenflessen rechtop opslaan of onder een hoek van minimaal 30 graden.",
+    "optionC": "Acetyleenflessen rechtop opslaan of onder een hoek van minimaal 40 graden.",
+    "moduleName": "Lassen, snijden en branden"
+  },
+  "m12q2": {
+    "questionText": "Wat is een risico van autogeen lassen?",
+    "optionA": "Lucht is zwaarder dan propaan.",
+    "optionB": "Vlamterugslag.",
+    "optionC": "De flessen staan niet onder druk.",
+    "moduleName": "Lassen, snijden en branden"
+  },
+  "m12q3": {
+    "questionText": "Wat is een veiligheidsmaatregel bij elektrisch lassen?",
+    "optionA": "Persoonlijke bescherming: lashelm, schort, kleding, veiligheidsschoenen.",
+    "optionB": "Lasgordijnen ter bescherming tegen uv- en infraroodstraling.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Lassen, snijden en branden"
+  },
+  "m12q4": {
+    "questionText": "Wat is geen risico van elektrisch lassen?",
+    "optionA": "Verblinding door infraroodstraling.",
+    "optionB": "Verbrand hoornvlies door warmtestraling.",
+    "optionC": "Longklachten door het inademen van lasrook.",
+    "moduleName": "Lassen, snijden en branden"
+  },
+  "m13q1": {
+    "questionText": "Waarom is het belangrijk om zorgvuldig te graven?",
+    "optionA": "Economisch voordeel.",
+    "optionB": "Leveringszekerheid van de nutsbedrijven.",
+    "optionC": "De ontgraving kan instorten.",
+    "moduleName": "Graven en werken in of bij sleuven"
+  },
+  "m13q2": {
+    "questionText": "Wat is geen risico van graafwerkzaamheden?",
+    "optionA": "Verstikking door beschadiging van gasleidingen.",
+    "optionB": "Elektrocutie door beschadiging van onder spanning staande kabels.",
+    "optionC": "Explosiegevaar.",
+    "moduleName": "Graven en werken in of bij sleuven"
+  },
+  "m13q3": {
+    "questionText": "Wat is een regel voor zorgvuldig graven?",
+    "optionA": "Meld elke afwijkende ligging of beschadiging aan de verantwoordelijke.",
+    "optionB": "Graaf pas nadat de ligging van kabels is vastgesteld met proefsleuven binnen 1,5 m.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Graven en werken in of bij sleuven"
+  },
+  "m13q4": {
+    "questionText": "Bij het werken in of bij een ontgraving moet u:",
+    "optionA": "Een ladder plaatsen.",
+    "optionB": "Afzettingen gebruiken op risicovolle plaatsen.",
+    "optionC": "Zorgen voor doeltreffende stempeling en taludvoorzieningen.",
+    "moduleName": "Graven en werken in of bij sleuven"
+  },
+  "m14q1": {
+    "questionText": "Vanaf welke hoogte moet de werkgever maatregelen nemen om vallen te voorkomen?",
+    "optionA": "Vanaf 3,5 meter.",
+    "optionB": "Vanaf 1,5 meter.",
+    "optionC": "Vanaf 2,5 meter.",
+    "explanation": "Werken op een hoogte van meer dan 2 meter vereist valbeveiligingsmaatregelen. De hiërarchie is: eerst collectieve bescherming (leuningen), daarna persoonlijke bescherming (harnas).",
+    "officialRef": "Module 14 — Werken op hoogte",
+    "moduleName": "Werken op hoogte"
+  },
+  "m14q2": {
+    "questionText": "Welke veiligheidsmaatregel vermindert het valgevaar op een plat dak?",
+    "optionA": "Een dakrandbeveiliging.",
+    "optionB": "Loopplanken.",
+    "optionC": "Een veiligheidsharnas.",
+    "moduleName": "Werken op hoogte"
+  },
+  "m14q3": {
+    "questionText": "Wat moet worden gecontroleerd voordat een ladder mag worden gebruikt?",
+    "optionA": "Of de ladder niet langer is dan 12 meter.",
+    "optionB": "Of hij onder een hoek van ongeveer 75 graden is opgesteld.",
+    "optionC": "Of de ladderbomen onderaan stalen doppen hebben.",
+    "moduleName": "Werken op hoogte"
+  },
+  "m14q4": {
+    "questionText": "Wat moeten personen in een hangsteiger gebruiken?",
+    "optionA": "Een oprolbaar harnas.",
+    "optionB": "Een nierband.",
+    "optionC": "Een veiligheidsharnas.",
+    "moduleName": "Werken op hoogte"
+  },
+  "m14q5": {
+    "questionText": "Aan welke zijde moet een rolsteiger worden beklommen?",
+    "optionA": "Voorzijde.",
+    "optionB": "Binnenzijde.",
+    "optionC": "Achterzijde.",
+    "moduleName": "Werken op hoogte"
+  },
+  "m14q6": {
+    "questionText": "Wat doet u bij voorkeur met een vloeropening?",
+    "optionA": "Afstand houden tijdens het werk.",
+    "optionB": "Afdekken met stevig materiaal.",
+    "optionC": "Een veiligheidsharnas dragen dat aan een veiligheidslijn is bevestigd.",
+    "moduleName": "Werken op hoogte"
+  },
+  "m14q7": {
+    "questionText": "Wat is geen gevaar bij het werken nabij wand- en vloeropeningen?",
+    "optionA": "Geraakt worden door een voorwerp dat door een opening valt.",
+    "optionB": "Door een vloeropening vallen.",
+    "optionC": "Het afsluiten van een grote vloeropening.",
+    "moduleName": "Werken op hoogte"
+  },
+  "m14q8": {
+    "questionText": "Een ladder wordt gebruikt voor:",
+    "optionA": "Voor het uitvoeren van kleine werkzaamheden.",
+    "optionB": "Het overbruggen van een bepaalde hoogte.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Werken op hoogte"
+  },
+  "m14q9": {
+    "questionText": "Het reiken tot maximaal één armlengte is een regel voor het werken met:",
+    "optionA": "Kolomboormachines.",
+    "optionB": "Ladders.",
+    "optionC": "Tafelzagen.",
+    "moduleName": "Werken op hoogte"
+  },
+  "m15q1": {
+    "questionText": "Mag een leek werken aan onder spanning staande elektrische installaties?",
+    "optionA": "Ja, mits de leek ouder is dan 21 jaar.",
+    "optionB": "Ja, maar alleen als de deskundige voortdurend beschikbaar is.",
+    "optionC": "Nee, nooit.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q2": {
+    "questionText": "Wat doet een aardlekschakelaar?",
+    "optionA": "Hij leidt hoogspanningsstroom af naar de aarddraad.",
+    "optionB": "Hij schakelt de stroom uit bij een bepaalde lekstroom.",
+    "optionC": "Hij werkt als een kunstmatige aarde.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q3": {
+    "questionText": "Welke veilige spanning moet u in een besloten ruimte gebruiken?",
+    "optionA": "Gelijkspanning (max. 50V) of wisselspanning (max. 130V).",
+    "optionB": "Gelijkspanning (max. 12V) of wisselspanning (max. 120V).",
+    "optionC": "Gelijkspanning (max. 120V) of wisselspanning (max. 50V).",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q4": {
+    "questionText": "Wat kan ongevallen door elektriciteit veroorzaken?",
+    "optionA": "Het ontbreken van aarding.",
+    "optionB": "Het indrukken van de noodstop.",
+    "optionC": "Het doorslaan van een zekering.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q5": {
+    "questionText": "Wat is het grootste gevaar van stroom door het lichaam?",
+    "optionA": "De schrikreactie.",
+    "optionB": "Het ontstaan van brandwonden.",
+    "optionC": "Stroomdoorgang door het hart.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q6": {
+    "questionText": "Elektrocutie is een gevaar dat verband houdt met:",
+    "optionA": "Het gebruik van gevaarlijke stoffen.",
+    "optionB": "Het gebruik van elektriciteit.",
+    "optionC": "Het gebruik van brandbare stoffen.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q7": {
+    "questionText": "Letsel door elektrische stroom is niet afhankelijk van:",
+    "optionA": "De stroomsterkte.",
+    "optionB": "De duur van de stroomdoorgang door het lichaam.",
+    "optionC": "De dikte van de huid.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q8": {
+    "questionText": "De sterkte van de stroom door het lichaam is afhankelijk van:",
+    "optionA": "De weerstand van de ondergrond, exclusief schoeisel.",
+    "optionB": "De spanning.",
+    "optionC": "Uw levensstijl.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q9": {
+    "questionText": "Hoe ontstaat een kortsluiting?",
+    "optionA": "Wanneer twee delen met verschillende spanning direct met elkaar in contact komen.",
+    "optionB": "Wanneer twee delen met dezelfde spanning direct met elkaar in contact komen.",
+    "optionC": "Wanneer een elektrische draad niet geaard is.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q10": {
+    "questionText": "Het ontstaan en de grootte van een elektrische vlamboog worden bepaald door:",
+    "optionA": "De stroomsterkte.",
+    "optionB": "Het potentiaalverschil tussen de delen.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q11": {
+    "questionText": "Antistatische schoenen worden gedragen bij:",
+    "optionA": "Het werken in besloten ruimten.",
+    "optionB": "Het werken met statische elektriciteit.",
+    "optionC": "Het werken met ladders.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q12": {
+    "questionText": "Een gevaar van statische elektriciteit is:",
+    "optionA": "Ontlading kan een vonk veroorzaken.",
+    "optionB": "Gevoelige elektronische apparatuur kan beschadigd raken.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q13": {
+    "questionText": "In welke situatie ontstaat geen statische elektriciteit?",
+    "optionA": "In ruimten met een laag zuurstofgehalte.",
+    "optionB": "Bij vloeistoffen die door een kunststof leiding stromen of worden geroerd.",
+    "optionC": "Bij het lopen over een kunststof vloerbedekking.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q14": {
+    "questionText": "Wat is geen beschermingsmethode voor behuizingen?",
+    "optionA": "Dubbele isolatie beschermt tegen het binnendringen van stof en vocht.",
+    "optionB": "Bescherming tegen stoten en vallende voorwerpen.",
+    "optionC": "Bescherming tegen het binnendringen van vocht.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q15": {
+    "questionText": "Een gevaar van het gebruik van voedingskabels en verlengsnoeren is:",
+    "optionA": "De voedingskabels zijn te kort.",
+    "optionB": "Struikelen over kabels.",
+    "optionC": "Overbelasting van de kabel.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q16": {
+    "questionText": "Bij het gebruik van een kabelhaspel moet men:",
+    "optionA": "De kabel volledig van de haspel afrollen.",
+    "optionB": "Deze niet in besloten ruimten gebruiken.",
+    "optionC": "Deze nooit volledig van de haspel afrollen.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q17": {
+    "questionText": "Wanneer een kabelhaspel niet volledig is afgerold:",
+    "optionA": "Kan dit statische elektriciteit veroorzaken.",
+    "optionB": "Kan deze zeer heet worden en brand veroorzaken.",
+    "optionC": "Kan dit elektrische vonken veroorzaken.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q18": {
+    "questionText": "De beschermingswaarde van de aardlekschakelaar voor een bouwplaats is:",
+    "optionA": "300 mA.",
+    "optionB": "25 mA.",
+    "optionC": "30 mA.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q19": {
+    "questionText": "Een veiligheidsmaatregel vóór het werken met elektrische arbeidsmiddelen is:",
+    "optionA": "Visueel controleren op beschadigingen en afwijkingen.",
+    "optionB": "Beschadigingen melden en beschadigde arbeidsmiddelen niet gebruiken.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Elektriciteit"
+  },
+  "m15q20": {
+    "questionText": "Bij het gebruik van elektriciteit:",
+    "optionA": "Moeten steigers op rubberen matten worden geplaatst.",
+    "optionB": "Moeten steigers worden geaard.",
+    "optionC": "Hoeft er niets bijzonders met steigers te gebeuren.",
+    "moduleName": "Elektriciteit"
+  },
+  "m16q1": {
+    "questionText": "Wat is een kenmerk van een besloten ruimte?",
+    "optionA": "Moeilijke toegang.",
+    "optionB": "Goede verlichting.",
+    "optionC": "Voldoende werkruimte.",
+    "moduleName": "Besloten ruimten"
+  },
+  "m16q2": {
+    "questionText": "Is een mangatwacht verplicht tijdens het werken in een besloten ruimte?",
+    "optionA": "Ja, maar hij mag weggaan wanneer de metingen zijn afgerond.",
+    "optionB": "Nee, tenzij dit in de vergunning van de aannemer is aangegeven.",
+    "optionC": "Ja, zolang er iemand in de besloten ruimte aanwezig is.",
+    "moduleName": "Besloten ruimten"
+  },
+  "m16q3": {
+    "questionText": "Hoe kan verstikkingsgevaar ontstaan in een besloten ruimte?",
+    "optionA": "Door defecten in de elektrische installatie.",
+    "optionB": "Door hoge concentraties zuurstof.",
+    "optionC": "Door een onvoldoende concentratie zuurstof.",
+    "moduleName": "Besloten ruimten"
+  },
+  "m16q4": {
+    "questionText": "Welke van de onderstaande spanningen is veilig?",
+    "optionA": "120 volt wisselspanning.",
+    "optionB": "240 volt gelijkspanning.",
+    "optionC": "120 volt gelijkspanning.",
+    "moduleName": "Besloten ruimten"
+  },
+  "m16q5": {
+    "questionText": "Wat is geen voorbeeld van een besloten ruimte?",
+    "optionA": "Opslagreservoirs of tanks.",
+    "optionB": "Lastenten in of bij diepe sleuven.",
+    "optionC": "Nauw, klein, nat, glad en weinig bewegingsruimte.",
+    "moduleName": "Besloten ruimten"
+  },
+  "m16q6": {
+    "questionText": "Een regel voor het uitvoeren van metingen in een besloten ruimte is:",
+    "optionA": "Metingen moeten door de leidinggevende worden uitgevoerd.",
+    "optionB": "Metingen moeten worden uitgevoerd door de werknemer in de ruimte.",
+    "optionC": "Metingen moeten door een deskundig persoon worden uitgevoerd.",
+    "moduleName": "Besloten ruimten"
+  },
+  "m16q7": {
+    "questionText": "Bij het toezicht houden op een besloten ruimte moet hiermee rekening worden gehouden:",
+    "optionA": "Er mag geen communicatie plaatsvinden bij instortingsgevaar.",
+    "optionB": "De hulpdiensten waarschuwen als de persoon in gevaar is.",
+    "optionC": "De toezichthouder moet ander werk doen tijdens het toezicht.",
+    "moduleName": "Besloten ruimten"
+  },
+  "m16q8": {
+    "questionText": "De permanente mangatwacht moet:",
+    "optionA": "Aanwezig zijn wanneer er brandbare materialen zijn.",
+    "optionB": "De hele tijd op het terrein aanwezig zijn.",
+    "optionC": "Over aantoonbaar getoetste deskundigheid beschikken.",
+    "moduleName": "Besloten ruimten"
+  },
+  "m16q9": {
+    "questionText": "De verblijfsduur in een besloten ruimte:",
+    "optionA": "Hangt af van waar de besloten ruimte zich bevindt.",
+    "optionB": "Moet zo kort mogelijk zijn.",
+    "optionC": "Maakt niet uit.",
+    "moduleName": "Besloten ruimten"
+  },
+  "m16q10": {
+    "questionText": "Een veiligheidsmaatregel om het risico op elektrocutie in een besloten ruimte te verminderen is:",
+    "optionA": "Beide antwoorden zijn juist.",
+    "optionB": "Arbeidsmiddelen op de juiste manier spanningsloos maken.",
+    "optionC": "Veilige spanningen gebruiken in besloten ruimten met geleidende wanden.",
+    "moduleName": "Besloten ruimten"
+  },
+  "m17q1": {
+    "questionText": "Wanneer moeten hijswerkzaamheden worden gestaakt?",
+    "optionA": "Volg de instructies van de kraanfabrikant met betrekking tot de windkracht.",
+    "optionB": "Boven windkracht 4.",
+    "optionC": "Boven windkracht 5.",
+    "moduleName": "Hijsen"
+  },
+  "m17q2": {
+    "questionText": "Wat is een hijsgereedschap?",
+    "optionA": "Een strop.",
+    "optionB": "Een borgband.",
+    "optionC": "Een harnasgordel.",
+    "moduleName": "Hijsen"
+  },
+  "m17q3": {
+    "questionText": "Hoe worden twee stroppen aan een stalen ring genoemd?",
+    "optionA": "Een tweesprong.",
+    "optionB": "Een paar stroppen.",
+    "optionC": "Een duo.",
+    "moduleName": "Hijsen"
+  },
+  "m17q4": {
+    "questionText": "Wat wordt in een kraanboek vastgelegd?",
+    "optionA": "Welke keuringscertificaten verplicht zijn.",
+    "optionB": "Welke gewichten over welke afstand mogen worden verplaatst.",
+    "optionC": "Welke keuringen een kraan heeft gehad.",
+    "moduleName": "Hijsen"
+  },
+  "m17q5": {
+    "questionText": "Welke stelling over kettingen is JUIST?",
+    "optionA": "Bij kettingen langs scherpe randen gebruikt u hoekbeschermers.",
+    "optionB": "Kettingen met uitgerekte schalmen mogen worden gebruikt als het gewicht de limiet niet overschrijdt.",
+    "optionC": "Kettingen mogen nooit worden verlengd.",
+    "moduleName": "Hijsen"
+  },
+  "m17q6": {
+    "questionText": "Wat is geen voorbeeld van hijsmaterieel?",
+    "optionA": "Een torenkraan.",
+    "optionB": "Een loopkraan.",
+    "optionC": "Een palletwagen.",
+    "moduleName": "Hijsen"
+  },
+  "m17q7": {
+    "questionText": "Wat kan men met hijsmaterieel doen?",
+    "optionA": "Lasten verticaal verplaatsen.",
+    "optionB": "Lasten horizontaal verplaatsen.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Hijsen"
+  },
+  "m17q8": {
+    "questionText": "Een algemeen gevaar bij het werken met hijsmaterieel is:",
+    "optionA": "Vallen van de last.",
+    "optionB": "Omvallen van het hijsmaterieel.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Hijsen"
+  },
+  "m17q9": {
+    "questionText": "Stempels worden gebruikt bij het werken met:",
+    "optionA": "Kolomboormachines.",
+    "optionB": "Gevaarlijke stoffen.",
+    "optionC": "Hijsmaterieel.",
+    "moduleName": "Hijsen"
+  },
+  "m17q10": {
+    "questionText": "Staalkabels:",
+    "optionA": "Mogen niet worden geknoopt.",
+    "optionB": "Moeten in een vochtige ruimte worden opgeslagen.",
+    "optionC": "Mogen nog worden gebruikt wanneer ze sterk verroest zijn.",
+    "moduleName": "Hijsen"
+  },
+  "m18q1": {
+    "questionText": "Wat is infraroodstraling?",
+    "optionA": "Niet-ioniserende straling.",
+    "optionB": "Ioniserende straling.",
+    "optionC": "Natuurlijke achtergrondstraling.",
+    "moduleName": "Straling"
+  },
+  "m18q2": {
+    "questionText": "Een veiligheidsmaatregel tegen ioniserende straling is:",
+    "optionA": "Zo ver mogelijk uit de buurt blijven.",
+    "optionB": "Het gebied rond de bron afzetten.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Straling"
+  },
+  "m18q3": {
+    "questionText": "Een medisch onderzoek is verplicht voor werknemers die:",
+    "optionA": "Gedurende korte tijd met gevaarlijke stoffen werken.",
+    "optionB": "Werken met apparatuur of stoffen die ioniserende straling uitzenden.",
+    "optionC": "Af en toe ziek zijn.",
+    "moduleName": "Straling"
+  },
+  "m18q4": {
+    "questionText": "Toezicht houden op stralingsveiligheid en -hygiëne is een taak van:",
+    "optionA": "De leidinggevende.",
+    "optionB": "De stralingsdeskundige.",
+    "optionC": "De bedrijfshulpverlening.",
+    "moduleName": "Straling"
+  },
+  "m18q5": {
+    "questionText": "Wat is het verschil tussen ioniserende en niet-ioniserende straling?",
+    "optionA": "Niet-ioniserende straling is de enige straling die ionen vormt.",
+    "optionB": "Niet-ioniserende straling is zwakker dan ioniserende straling.",
+    "optionC": "Niet-ioniserende straling is sterker dan ioniserende straling.",
+    "moduleName": "Straling"
+  },
+  "m18q6": {
+    "questionText": "Een veiligheidsmaatregel om te voorkomen dat niet-ioniserende straling de gezondheid schaadt is:",
+    "optionA": "Let op de instructies op de apparaten.",
+    "optionB": "Respecteer de instructies met betrekking tot de gebruiksduur.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Straling"
+  },
+  "m19q1": {
+    "questionText": "Wat bepaalt niet de omstandigheden van de werkomgeving?",
+    "optionA": "De leidinggevende.",
+    "optionB": "De trillingen.",
+    "optionC": "De verlichting.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q2": {
+    "questionText": "Een soort fysieke trillingen is:",
+    "optionA": "Hand-armtrillingen door mechanisch gereedschap.",
+    "optionB": "Lichaamstrillingen door een voertuig of een bewegende vloer.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q3": {
+    "questionText": "Wat is geen gezondheidsklacht door trillingen op het lichaam?",
+    "optionA": "Huidinfecties.",
+    "optionB": "Spierpijn.",
+    "optionC": "Vermoeidheid.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q4": {
+    "questionText": "Het op peil houden van de vochtbalans is een beheersmaatregel:",
+    "optionA": "Bij het werken met gevaarlijke stoffen.",
+    "optionB": "Om ervoor te zorgen dat er geen branden ontstaan.",
+    "optionC": "Om het werkcomfort te waarborgen.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q5": {
+    "questionText": "Een factor die de fysieke belasting beïnvloedt is:",
+    "optionA": "De werkhouding.",
+    "optionB": "Beide antwoorden zijn juist.",
+    "optionC": "De bewegingen die moeten worden gemaakt.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q6": {
+    "questionText": "Een functie van een pauze tijdens het werk is:",
+    "optionA": "Een gezellig informeel gesprek met collega's voeren.",
+    "optionB": "Overbelasting voorkomen.",
+    "optionC": "Voldoende tijd hebben om te lunchen.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q7": {
+    "questionText": "Chronische vermoeidheid is een gezondheidsrisico:",
+    "optionA": "Door één keer per maand overwerken.",
+    "optionB": "Van statische belasting.",
+    "optionC": "Van het werken met gevaarlijke stoffen.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q8": {
+    "questionText": "De relatie met uw collega's:",
+    "optionA": "Beïnvloedt de werktijdregeling.",
+    "optionB": "Moet altijd positief zijn.",
+    "optionC": "Beïnvloedt de mentale belasting.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q9": {
+    "questionText": "De juiste houding bij handmatig tillen en verplaatsen is:",
+    "optionA": "De last zo dicht mogelijk bij het lichaam houden.",
+    "optionB": "Tillen met een rechte rug en gebogen knieën.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q10": {
+    "questionText": "Wat is geen voorwaarde waarbij staand werk de voorkeur heeft?",
+    "optionA": "Wanneer vaak naar beneden, naar boven of ver weg moet worden gereikt.",
+    "optionB": "Als krachten van meer dan 30 N (3,0 kg) moeten worden uitgeoefend.",
+    "optionC": "Als er onvoldoende beenruimte is.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q11": {
+    "questionText": "De optimale zithouding tijdens het werk is:",
+    "optionA": "Goede ondersteuning van de bovenbenen op de zitting.",
+    "optionB": "Ontlasting van de schouders, bijvoorbeeld met armsteunen.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q12": {
+    "questionText": "Wat is een richtlijn voor correct zitten tijdens het werk?",
+    "optionA": "Zorg voor een optimale zithouding.",
+    "optionB": "Blijf, eenmaal in de optimale houding, zo lang mogelijk op deze manier doorwerken.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q13": {
+    "questionText": "Het aanbevolen maximumgewicht van 25 Kg is een veiligheidsmaatregel voor:",
+    "optionA": "Tillen in zittende houding.",
+    "optionB": "Handmatig tillen.",
+    "optionC": "Hijsen met een kraan.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m19q14": {
+    "questionText": "De juiste houding bij handmatig tillen is:",
+    "optionA": "Tillen met een rechte rug en gebogen knieën.",
+    "optionB": "De last zo dicht mogelijk bij het lichaam houden.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "De ergonomische werkplek"
+  },
+  "m20q1": {
+    "questionText": "Wat is het effect van te hard geluid op de werkplek?",
+    "optionA": "Het verhoogt het risico op de werkplek.",
+    "optionB": "Als gehoorbescherming wordt gedragen, heeft hard geluid geen effect.",
+    "optionC": "Er kan harder worden gewerkt, omdat u niet kunt praten.",
+    "moduleName": "Lawaai op de werkplek"
+  },
+  "m20q2": {
+    "questionText": "Welke factoren bepalen of lawaai schadelijk is?",
+    "optionA": "Blootstellingsduur en weerstand van de gehoorbeentjes.",
+    "optionB": "Toonhoogte en sterkte van het geluid.",
+    "optionC": "Afstand en warmteontwikkeling in het oor.",
+    "moduleName": "Lawaai op de werkplek"
+  },
+  "m20q3": {
+    "questionText": "Twee gelijke geluidsbronnen samen verhogen het geluidsniveau met:",
+    "optionA": "3 dB.",
+    "optionB": "6 dB.",
+    "optionC": "9 dB.",
+    "moduleName": "Lawaai op de werkplek"
+  },
+  "m20q4": {
+    "questionText": "Blootstelling aan overmatig lawaai veroorzaakt:",
+    "optionA": "Witte vingers.",
+    "optionB": "Blijvende hersenbeschadiging.",
+    "optionC": "Concentratieverlies.",
+    "moduleName": "Lawaai op de werkplek"
+  },
+  "m20q5": {
+    "questionText": "Een verdubbeling van de afstand tot de geluidsbron geeft een vermindering van ongeveer:",
+    "optionA": "3 dB(A).",
+    "optionB": "6 dB(A).",
+    "optionC": "9 dB(A).",
+    "moduleName": "Lawaai op de werkplek"
+  },
+  "m20q6": {
+    "questionText": "Moeite hebben met telefoneren is een symptoom van:",
+    "optionA": "Tijdelijk gehoorverlies.",
+    "optionB": "Een lawaaierige omgeving.",
+    "optionC": "Blijvend gehoorverlies.",
+    "moduleName": "Lawaai op de werkplek"
+  },
+  "m20q7": {
+    "questionText": "De meeteenheid voor het geluid(sdruk)niveau is:",
+    "optionA": "De lumen.",
+    "optionB": "De decibel.",
+    "optionC": "De amplitude.",
+    "moduleName": "Lawaai op de werkplek"
+  },
+  "m20q8": {
+    "questionText": "De juiste volgorde om overmatig lawaai te beheersen is:",
+    "optionA": "1. Bron verminderen / 2. Gehoorbescherming gebruiken / 3. Geluid dempen / 4. Afschermen",
+    "optionB": "1. Gehoorbescherming gebruiken / 2. Afschermen / 3. Geluid dempen / 4. Bron verminderen",
+    "optionC": "1. Bron verminderen / 2. Afschermen / 3. Geluid dempen / 4. Gehoorbescherming gebruiken",
+    "moduleName": "Lawaai op de werkplek"
+  },
+  "m20q9": {
+    "questionText": "Welke maatregelen moet de werkgever nemen bij deze geluidsniveaus?",
+    "optionA": "Vanaf 85 dB(A) een gehooronderzoek en gehoorbescherming aanbieden.",
+    "optionB": "Vanaf 80 dB(A) een gehooronderzoek en gehoorbescherming aanbieden.",
+    "optionC": "Vanaf 75 dB(A) een gehooronderzoek en gehoorbescherming aanbieden.",
+    "moduleName": "Lawaai op de werkplek"
+  },
+  "m21q1": {
+    "questionText": "Waarom mogen in de industrie geen metalen veiligheidshelmen worden gedragen?",
+    "optionA": "Een metalen helm kan het hoofd verwonden.",
+    "optionB": "Een metalen helm kan vallende voorwerpen onvoldoende opvangen.",
+    "optionC": "Een metalen helm kan elektriciteit geleiden.",
+    "explanation": "PBM zijn altijd het laatste redmiddel in de arbeidshygiënische strategie. Ze beschermen alleen de drager en zijn afhankelijk van juist gebruik. Collectieve maatregelen hebben altijd de voorkeur.",
+    "officialRef": "Module 21 — Persoonlijke beschermingsmiddelen",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q2": {
+    "questionText": "Voor welke werkzaamheden is een stoffiltermasker een geschikte adembescherming?",
+    "optionA": "Bij het spuiten van verf.",
+    "optionB": "Bij het lassen.",
+    "optionC": "Bij breek- en hakwerk.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q3": {
+    "questionText": "In welke situaties biedt een ruimzichtbril een goede bescherming?",
+    "optionA": "Bij werkzaamheden waarbij zuurspatten voorkomen.",
+    "optionB": "Bij werk boven het hoofd.",
+    "optionC": "Bij werk in besloten ruimten.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q4": {
+    "questionText": "Bij werken met een geluidsniveau hoger dan 85 dB(A):",
+    "optionA": "Wordt gehoorbescherming aanbevolen.",
+    "optionB": "Mag de werknemer zelf kiezen of hij gehoorbescherming gebruikt.",
+    "optionC": "Is gehoorbescherming verplicht.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q5": {
+    "questionText": "PBM moeten:",
+    "optionA": "In één maat beschikbaar zijn.",
+    "optionB": "Op elke werkplek aanwezig zijn.",
+    "optionC": "Getest zijn.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q6": {
+    "questionText": "Het verschil tussen een veiligheidsbril en een laskap:",
+    "optionA": "Laskappen beschermen tegen infraroodstraling; veiligheidsbrillen beschermen tegen rondvliegende deeltjes.",
+    "optionB": "Veiligheidsbrillen beschermen tegen uv-straling; laskappen beschermen tegen rondvliegende deeltjes.",
+    "optionC": "Veiligheidsbrillen bedekken het hele gezicht en laskappen niet.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q7": {
+    "questionText": "Een te lage zuurstofconcentratie is een gevaar voor:",
+    "optionA": "Het milieu.",
+    "optionB": "Branden.",
+    "optionC": "De ademhaling.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q8": {
+    "questionText": "Onafhankelijke adembescherming moet worden gebruikt:",
+    "optionA": "Als er hoge en onbekende concentraties gevaarlijke stoffen aanwezig zijn.",
+    "optionB": "Als er minder dan 19% zuurstof in de lucht is.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q9": {
+    "questionText": "Wat is geen regel voor het gebruik van valbeveiliging?",
+    "optionA": "Veiligheidsharnassen moeten goed passen en op de drager zijn afgesteld.",
+    "optionB": "Valbeveiligingsmiddelen die een val hebben opgevangen, mogen opnieuw worden gebruikt.",
+    "optionC": "Vanglijnen mogen niet vuil zijn.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q10": {
+    "questionText": "Signaalkleding wordt gebruikt:",
+    "optionA": "Bij lage temperaturen.",
+    "optionB": "Om de drager zichtbaar te maken.",
+    "optionC": "Tegen verontreiniging, bij lassen en slijpen.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q11": {
+    "questionText": "Uitglijden is een gevaar voor:",
+    "optionA": "Handen en armen.",
+    "optionB": "Voeten en benen.",
+    "optionC": "Hoofd en gezicht.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q12": {
+    "questionText": "Verschillende vormen van hand- en armbescherming zijn:",
+    "optionA": "Handschoenen met antislipzool.",
+    "optionB": "Handschoenen met verlengde pols- en/of armbescherming.",
+    "optionC": "Stalen neus om de vingers te beschermen tegen zware vallende voorwerpen.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q13": {
+    "questionText": "Een belangrijke eigenschap van een veiligheidshelm is:",
+    "optionA": "Binnenwerk: vangt een schok op en verdeelt die over het hoofd.",
+    "optionB": "Buitenschaal: vangt een schok op en verdeelt die over het hoofd.",
+    "optionC": "Binnenwerk: stevig genoeg om vallende voorwerpen te stoppen.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q14": {
+    "questionText": "Gevaren voor het hoofd tijdens het werk zijn:",
+    "optionA": "Stoten.",
+    "optionB": "Vallende voorwerpen.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m21q15": {
+    "questionText": "Een neus-mondmasker wordt gebruikt:",
+    "optionA": "Tegen deeltjes en gassen of dampen.",
+    "optionB": "Om het hele gezicht te bedekken.",
+    "optionC": "Alleen tegen deeltjes, niet tegen gassen of dampen.",
+    "moduleName": "Persoonlijke beschermingsmiddelen"
+  },
+  "m22q1": {
+    "questionText": "Welke kenmerken heeft een gebodsbord?",
+    "optionA": "Het is rond, blauw en heeft een wit pictogram.",
+    "optionB": "Het is driehoekig en geel met een zwart pictogram.",
+    "optionC": "Het is rechthoekig en groen met een wit pictogram.",
+    "moduleName": "Signalering en markering"
+  },
+  "m22q2": {
+    "questionText": "Welke eisen gelden voor waarschuwingsborden op de werkplek?",
+    "optionA": "De uitvoering moet voor iedereen duidelijk zijn.",
+    "optionB": "Ze moeten op een veilige hoogte worden bevestigd.",
+    "optionC": "Ze hebben bij voorkeur tekst in het Nederlands.",
+    "moduleName": "Signalering en markering"
+  },
+  "m22q3": {
+    "questionText": "Een groep veiligheidsborden is:",
+    "optionA": "Gebodsborden.",
+    "optionB": "EHBO-borden.",
+    "optionC": "Uitgangsborden.",
+    "moduleName": "Signalering en markering"
+  },
+  "m22q4": {
+    "questionText": "Een bord dat iets verbiedt, is:",
+    "optionA": "Een rond rood bord met een witte rand en een rode diagonaal.",
+    "optionB": "Een driehoekig geel bord met een zwarte rand.",
+    "optionC": "Een rond wit bord met een rode rand en een rode diagonaal.",
+    "moduleName": "Signalering en markering"
+  },
+  "m22q5": {
+    "questionText": "Een driehoekig geel bord met een zwarte rand is de uitvoering van:",
+    "optionA": "Een reddingsbord.",
+    "optionB": "Een waarschuwingsbord.",
+    "optionC": "Een gebodsbord.",
+    "moduleName": "Signalering en markering"
+  },
+  "m22q6": {
+    "questionText": "De algemene betekenis van waarschuwingsborden is:",
+    "optionA": "Iets verbieden.",
+    "optionB": "De weg naar reddingsmiddelen.",
+    "optionC": "Let op, gevaar.",
+    "moduleName": "Signalering en markering"
+  },
+  "m22q7": {
+    "questionText": "Een vierkant of rechthoekig groen bord met een wit pictogram is bestemd voor:",
+    "optionA": "Gebodsborden.",
+    "optionB": "Waarschuwingsborden.",
+    "optionC": "Reddingsborden (veiligheidsvoorzieningen).",
+    "moduleName": "Signalering en markering"
+  },
+  "m22q8": {
+    "questionText": "Brandbestrijdingsmiddelen bevinden zich bij borden die zijn:",
+    "optionA": "Vierkant/rechthoekig en groen met een wit pictogram.",
+    "optionB": "Vierkant/rechthoekig en rood met een wit pictogram.",
+    "optionC": "Vierkant/rechthoekig en zwart met een wit pictogram.",
+    "moduleName": "Signalering en markering"
+  },
+  "m22q9": {
+    "questionText": "De algemene betekenis van borden voor brandbestrijdingsmiddelen:",
+    "optionA": "Geeft aan waar het middel te vinden is: de weg ernaartoe.",
+    "optionB": "Geeft aan waar het middel te vinden is: de plaats zelf.",
+    "optionC": "Beide antwoorden zijn juist.",
+    "moduleName": "Signalering en markering"
+  },
+  "m22q10": {
+    "questionText": "Gele of witte strepen worden gebruikt voor:",
+    "optionA": "Het markeren van de bovenste en onderste trede van trappen.",
+    "optionB": "Markering van doorgangen en stapelplaatsen.",
+    "optionC": "Gebodsborden.",
+    "moduleName": "Signalering en markering"
+  },
+  "mc001": {
+    "questionText": "Welke van de volgende middelen zijn verplicht bij werken op hoogte boven 2 meter?",
+    "explanation": "Werken op hoogte vereist minimaal valbeveiliging (harnas + vanglijn), hoofdbescherming en voetbescherming. Signaalkleding en gehoorbescherming zijn afhankelijk van de specifieke omgeving.",
+    "officialRef": "Module 14 — Werken op hoogte",
+    "moduleName": "Werken op hoogte",
+    "options": {
+      "a": "Veiligheidsharnas met vanglijn",
+      "b": "Veiligheidshelm",
+      "c": "Veiligheidsschoenen met stalen neus",
+      "d": "Signaalhesje (hoge zichtbaarheid)",
+      "e": "Gehoorbescherming"
+    }
+  },
+  "mc002": {
+    "questionText": "Welke van de volgende stoffen zijn volgens de REACH-verordening ingedeeld als gevaarlijke stoffen?",
+    "explanation": "Asbest, benzeen en kwartsstof zijn alle ingedeeld als gevaarlijke stoffen met strikte grenswaarden voor blootstelling. Drinkwater en perslucht zijn volgens REACH niet als gevaarlijk ingedeeld.",
+    "officialRef": "Module 8 — Gevaarlijke stoffen",
+    "moduleName": "Gevaarlijke stoffen",
+    "options": {
+      "a": "Asbestvezels",
+      "b": "Benzeen",
+      "c": "Drinkwater",
+      "d": "Kwartsstof",
+      "e": "Perslucht"
+    }
+  },
+  "mc003": {
+    "questionText": "Welke van de volgende methoden zijn geldige manieren om brand op een werkplek te voorkomen?",
+    "explanation": "Brandpreventie bestaat uit het wegnemen van ontstekingsbronnen, de juiste opslag van brandbare stoffen en voldoende ventilatie. Water mag niet worden gebruikt bij chemische lekkages (kan de stof verspreiden of ermee reageren). Brandblussers moeten bereikbaar zijn, niet achter slot en grendel.",
+    "officialRef": "Module 9 — Brand en explosie",
+    "moduleName": "Brand en explosie",
+    "options": {
+      "a": "Ontstekingsbronnen in de buurt van brandbare materialen wegnemen",
+      "b": "Brandbare vloeistoffen opslaan in goedgekeurde veiligheidskasten",
+      "c": "De ventilatie verhogen om brandbare dampen te verdunnen",
+      "d": "Water gebruiken om alle chemische lekkages op te ruimen",
+      "e": "Brandblussers achter slot en grendel bewaren om misbruik te voorkomen"
+    }
+  },
+  "tf001": {
+    "questionText": "Geef aan of elk van de volgende stellingen over gevaarlijke stoffen juist of onjuist is:",
+    "explanation": "Het VIB moet volgens de REACH-verordening beschikbaar zijn. Originele verpakkingen voorkomen verwarring. Chemisch afval moet via specifieke afvoerroutes worden afgevoerd. Zowel vloeistoffen als gassen kunnen ventilatie vereisen.",
+    "officialRef": "Module 8 — Gevaarlijke stoffen",
+    "moduleName": "Gevaarlijke stoffen",
+    "statements": {
+      "s1": "Een VIB (veiligheidsinformatieblad) moet altijd op de locatie beschikbaar zijn",
+      "s2": "Gevaarlijke stoffen moeten in hun originele verpakking worden bewaard",
+      "s3": "U mag chemisch afval bij het gewone afval weggooien",
+      "s4": "Ventilatie is alleen vereist voor vloeistoffen, niet voor gassen"
+    }
+  },
+  "tf002": {
+    "questionText": "Geef aan of elk van de volgende stellingen over PBM juist of onjuist is:",
+    "explanation": "PBM zijn het laatste redmiddel in de arbeidshygiënische strategie, niet het eerste. Werkgevers moeten PBM gratis verstrekken. Beschadigde PBM moeten worden vervangen. De CE-markering bevestigt dat aan de Europese veiligheidsnormen is voldaan.",
+    "officialRef": "Module 21 — Persoonlijke beschermingsmiddelen",
+    "moduleName": "Persoonlijke beschermingsmiddelen",
+    "statements": {
+      "s1": "PBM zijn de eerste verdedigingslinie in de arbeidshygiënische strategie",
+      "s2": "De werkgever is verantwoordelijk voor het gratis verstrekken van PBM",
+      "s3": "Beschadigde PBM moeten onmiddellijk worden vervangen",
+      "s4": "PBM met een CE-markering voldoen aan de Europese minimumeisen voor veiligheid"
+    }
+  },
+  "tf003": {
+    "questionText": "Geef aan of elk van de volgende stellingen over werken in besloten ruimten juist of onjuist is:",
+    "explanation": "Voor het betreden van een besloten ruimte is altijd een werkvergunning vereist. Het meten van de atmosfeer is verplicht, ongeacht of er zichtbare gevaren zijn (zuurstoftekort is onzichtbaar). Een mangatwacht en reddingsmiddelen zijn altijd vereist.",
+    "officialRef": "Module 16 — Besloten ruimten",
+    "moduleName": "Besloten ruimten",
+    "statements": {
+      "s1": "Vóór het betreden van een besloten ruimte is altijd een werkvergunning vereist",
+      "s2": "Het meten van de atmosfeer is alleen nodig als er een zichtbaar gevaar is",
+      "s3": "Buiten de besloten ruimte moet een mangatwacht (buitenwacht) aanwezig zijn",
+      "s4": "Reddingsmiddelen moeten vóór het betreden beschikbaar zijn"
+    }
+  },
+  "ord001": {
+    "questionText": "Zet de stappen van de arbeidshygiënische strategie (van eliminatie tot laatste redmiddel) in de juiste volgorde, te beginnen met de meest gewenste:",
+    "explanation": "De arbeidshygiënische strategie loopt van eliminatie → vervanging → technische maatregelen → organisatorische maatregelen → PBM. PBM zijn altijd het laatste redmiddel, omdat ze afhankelijk zijn van juist gebruik door de individuele werknemer.",
+    "officialRef": "Module 3 — Risicopreventie",
+    "moduleName": "Ongevallen: oorzaken en preventie",
+    "items": {
+      "i1": "Organisatorische maatregelen (procedures, opleiding)",
+      "i2": "Eliminatie van het gevaar",
+      "i3": "Persoonlijke beschermingsmiddelen (PBM)",
+      "i4": "Vervanging (door iets minder gevaarlijks)",
+      "i5": "Technische maatregelen (fysieke afschermingen)"
+    }
+  },
+  "ord002": {
+    "questionText": "Zet de stappen voor het reageren op een chemische lekkage in de juiste volgorde:",
+    "explanation": "Bij een chemische lekkage: eerst evacueren en anderen waarschuwen, daarna de stof identificeren aan de hand van het VIB, vervolgens opruimen met de juiste PBM en materialen en ten slotte het incident melden.",
+    "officialRef": "Module 8 — Gevaarlijke stoffen",
+    "moduleName": "Gevaarlijke stoffen",
+    "items": {
+      "i1": "De leidinggevende informeren en het incidentrapport invullen",
+      "i2": "De directe omgeving evacueren en anderen waarschuwen",
+      "i3": "Opruimen met geschikte absorptiemiddelen en PBM",
+      "i4": "De stof identificeren aan de hand van het VIB"
+    }
+  },
+  "ord003": {
+    "questionText": "Zet de stappen voor het gebruik van een brandblusser (PASS-techniek) in de juiste volgorde:",
+    "explanation": "De PASS-techniek: borgpen verwijderen → op de basis richten → hendel indrukken → heen en weer bewegen. Richt altijd op de basis van het vuur, niet op de vlammen.",
+    "officialRef": "Module 9 — Brand en explosie",
+    "moduleName": "Brand en explosie",
+    "items": {
+      "i1": "De hendel indrukken om het blusmiddel vrij te laten",
+      "i2": "De borgpen verwijderen",
+      "i3": "Heen en weer bewegen over de basis van het vuur",
+      "i4": "De spuitmond op de basis van het vuur richten"
+    }
+  },
+  "mat001": {
+    "questionText": "Koppel elk type brandblusser aan de brandklasse waarvoor hij is bedoeld:",
+    "explanation": "Water: alleen vaste stoffen van klasse A. Schuim: vloeistoffen van klasse B (en A). CO₂: elektrische branden (klasse C) — verdringt zuurstof zonder residu achter te laten. Bluspoeder: veelzijdig (A, B, C) maar laat residu achter.",
+    "officialRef": "Module 9 — Brand en explosie",
+    "moduleName": "Brand en explosie",
+    "leftItems": {
+      "l1": "Waterblusser",
+      "l2": "CO₂-blusser",
+      "l3": "Schuimblusser",
+      "l4": "Poederblusser"
+    },
+    "rightItems": {
+      "r1": "Klasse A — Vaste stoffen (hout, papier)",
+      "r2": "Klasse B — Brandbare vloeistoffen (benzine, olie)",
+      "r3": "Klasse C — Elektrische branden",
+      "r4": "Branden van klasse A, B en C (allround)"
+    }
+  },
+  "mat002": {
+    "questionText": "Koppel elke kleur van veiligheidssignalering aan de betekenis ervan:",
+    "explanation": "Kleurcodering volgens ISO 7010: rood = verbod/brandbestrijding, geel = waarschuwing, blauw = gebod, groen = veilige situatie/nooduitgang. Deze zijn in de hele EU gestandaardiseerd.",
+    "officialRef": "Module 22 — Signalering en markering",
+    "moduleName": "Signalering en markering",
+    "leftItems": {
+      "l1": "Rood",
+      "l2": "Geel / amber",
+      "l3": "Blauw",
+      "l4": "Groen"
+    },
+    "rightItems": {
+      "r1": "Verbod of brandbestrijdingsmiddelen",
+      "r2": "Waarschuwing / voorzichtigheid",
+      "r3": "Gebod (verplichte handeling)",
+      "r4": "Veilige situatie / vluchtweg"
+    }
+  },
+  "mat003": {
+    "questionText": "Koppel elk type PBM aan het gevaar waartegen het in de eerste plaats beschermt:",
+    "explanation": "Elk type PBM is gekoppeld aan zijn primaire gevaar. Oorkappen beschermen tegen lawaai. FFP3-maskers beschermen tegen fijne deeltjes. Een ruimzichtbril beschermt de ogen. Trillingsdempende handschoenen verminderen het risico op HAVS door elektrisch handgereedschap.",
+    "officialRef": "Module 21 — Persoonlijke beschermingsmiddelen",
+    "moduleName": "Persoonlijke beschermingsmiddelen",
+    "leftItems": {
+      "l1": "Oorkappen / oordoppen",
+      "l2": "Adembescherming (FFP3-masker)",
+      "l3": "Ruimzichtbril",
+      "l4": "Trillingsdempende handschoenen"
+    },
+    "rightItems": {
+      "r1": "Lawaaidoofheid (gehoorverlies door lawaai)",
+      "r2": "Inademing van fijn stof en aerosolen",
+      "r3": "Chemische spatten of rondvliegende deeltjes in de ogen",
+      "r4": "Hand-armvibratiesyndroom (HAVS)"
+    }
+  }
+}

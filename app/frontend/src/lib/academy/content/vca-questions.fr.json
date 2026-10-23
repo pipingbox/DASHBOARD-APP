@@ -1,0 +1,2024 @@
+{
+  "m1q1": {
+    "questionText": "Quelle mesure le Service d'inspection peut-il prendre ?",
+    "optionA": "Organiser une réunion pour discuter des conditions de travail.",
+    "optionB": "Infliger une amende.",
+    "optionC": "Effectuer un examen de santé.",
+    "explanation": "Le Service d'inspection (Inspection du travail) peut effectuer des examens de santé, faire arrêter les travaux et infliger des amendes. L'organisation de réunions ne fait pas partie de ses pouvoirs de contrainte.",
+    "officialRef": "Module 1 — Législation",
+    "moduleName": "Législation"
+  },
+  "m1q2": {
+    "questionText": "Quel est l'objectif de la législation en matière de sécurité et de santé ?",
+    "optionA": "Offrir les meilleures conditions de travail possibles.",
+    "optionB": "Réduire le nombre d'accidents du travail.",
+    "optionC": "Améliorer l'ambiance au travail.",
+    "explanation": "L'objectif principal de la législation en matière de sécurité et de santé est d'offrir les meilleures conditions de travail possibles à tous les travailleurs, en couvrant la santé, la sécurité et le bien-être.",
+    "officialRef": "Module 1 — Législation",
+    "moduleName": "Législation"
+  },
+  "m1q3": {
+    "questionText": "Laquelle des mesures ci-dessous le Service d'inspection peut-il prendre ?",
+    "optionA": "Faire licencier un ou plusieurs travailleurs.",
+    "optionB": "Faire arrêter les travaux.",
+    "optionC": "Effectuer des examens médicaux.",
+    "explanation": "Le Service d'inspection peut faire arrêter les travaux en cas de danger imminent. Il ne peut pas licencier des travailleurs : cela relève de la compétence de l'employeur.",
+    "officialRef": "Module 1 — Législation",
+    "moduleName": "Législation"
+  },
+  "m1q4": {
+    "questionText": "Qu'indique le marquage CE sur un article ?",
+    "optionA": "L'article satisfait aux exigences européennes minimales.",
+    "optionB": "L'article ne peut être commercialisé qu'au sein de l'UE.",
+    "optionC": "Le fabricant respecte la loi européenne sur la sécurité et la santé.",
+    "moduleName": "Législation"
+  },
+  "m1q5": {
+    "questionText": "Quel est l'un des objectifs de la loi sur la gestion de l'environnement ?",
+    "optionA": "Maîtriser les flux de déchets pendant tout le processus de production.",
+    "optionB": "Protéger l'environnement contre les activités nuisibles des entreprises.",
+    "optionC": "Protéger les personnes contre les substances dangereuses.",
+    "moduleName": "Législation"
+  },
+  "m1q6": {
+    "questionText": "Que décrit la réglementation ARBO ?",
+    "optionA": "La réglementation ARBO décrit les conditions de travail (sécurité et santé au travail).",
+    "optionB": "La réglementation ARBO décrit les moments où l'Inspection du travail doit être informée.",
+    "optionC": "La réglementation ARBO décrit les risques liés au travail avec des substances dangereuses.",
+    "moduleName": "Législation"
+  },
+  "m1q7": {
+    "questionText": "Quel est le champ d'application de la législation en matière de sécurité et de santé ?",
+    "optionA": "Les droits et obligations de l'employeur et du travailleur en matière de sécurité et de santé à domicile.",
+    "optionB": "Les droits et obligations de l'employeur et du travailleur en matière de sécurité et de santé sur le lieu de travail.",
+    "optionC": "Les droits et obligations du travailleur en matière de sécurité et de santé.",
+    "moduleName": "Législation"
+  },
+  "m1q8": {
+    "questionText": "Dans quels lieux la législation en matière de sécurité et de santé s'applique-t-elle ?",
+    "optionA": "Dans tous les lieux où un travail est effectué.",
+    "optionB": "Dans tous les lieux où aucun travail n'est effectué.",
+    "optionC": "Dans tous les lieux présentant des conditions de travail particulières.",
+    "moduleName": "Législation"
+  },
+  "m1q9": {
+    "questionText": "La législation en matière de sécurité et de santé s'applique à :",
+    "optionA": "L'employeur.",
+    "optionB": "Les travailleurs.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Législation"
+  },
+  "m1q10": {
+    "questionText": "La législation en matière de sécurité et de santé ne concerne pas :",
+    "optionA": "La santé",
+    "optionB": "Le bien-être",
+    "optionC": "La sûreté (gardiennage, protection contre les intrusions)",
+    "moduleName": "Législation"
+  },
+  "m1q11": {
+    "questionText": "La législation en matière de sécurité et de santé s'applique à :",
+    "optionA": "L'employeur",
+    "optionB": "Le travailleur",
+    "optionC": "Les deux réponses sont correctes",
+    "moduleName": "Législation"
+  },
+  "m1q12": {
+    "questionText": "Qu'est-ce qui n'est pas un principe de base de la législation en matière de sécurité et de santé ?",
+    "optionA": "L'appui apporté par des experts ou des services de prévention.",
+    "optionB": "Les différents travailleurs ne sont pas tenus de collaborer.",
+    "optionC": "La concertation et la collaboration avec les travailleurs.",
+    "moduleName": "Législation"
+  },
+  "m1q13": {
+    "questionText": "Quelle est une tâche importante des experts en prévention ?",
+    "optionA": "Collaborer à l'inventaire et à l'évaluation des risques.",
+    "optionB": "Surveiller les employeurs.",
+    "optionC": "Effectuer des examens médicaux.",
+    "moduleName": "Législation"
+  },
+  "m1q14": {
+    "questionText": "Les objectifs importants de la législation sur le temps de travail sont :",
+    "optionA": "Fixer la durée maximale de travail et la durée minimale de repos.",
+    "optionB": "Favoriser la possibilité de concilier le travail et les tâches de soins.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Législation"
+  },
+  "m1q15": {
+    "questionText": "Les principes du marquage CE sont :",
+    "optionA": "Le marquage CE doit être apposé par le fabricant et l'importateur.",
+    "optionB": "Le marquage CE n'est pas obligatoire pour tous les équipements.",
+    "optionC": "Le marquage CE doit être apposé par le fabricant ou l'importateur.",
+    "moduleName": "Législation"
+  },
+  "m2q1": {
+    "questionText": "Comment la notion de risque est-elle décrite ?",
+    "optionA": "Risque = probabilité X effet.",
+    "optionB": "Risque = danger X probabilité.",
+    "optionC": "Risque = effet X danger.",
+    "explanation": "Le risque se calcule comme Probabilité × Effet (conséquence). Une probabilité élevée d'un événement mineur peut représenter le même risque qu'une faible probabilité d'un événement catastrophique.",
+    "officialRef": "Module 2 — Dangers, risques et prévention",
+    "moduleName": "Dangers, risques et prévention"
+  },
+  "m2q2": {
+    "questionText": "Sont des dangers sur le lieu de travail :",
+    "optionA": "Le bruit.",
+    "optionB": "Les rayonnements.",
+    "optionC": "Les deux réponses sont correctes.",
+    "explanation": "Le bruit et les rayonnements sont tous deux des dangers professionnels reconnus par la législation en matière de sécurité et de santé. Ils peuvent provoquer des atteintes à la santé à long terme, même sans blessure visible immédiate.",
+    "officialRef": "Module 2 — Dangers, risques et prévention",
+    "moduleName": "Dangers, risques et prévention"
+  },
+  "m2q3": {
+    "questionText": "Qu'est-ce qui n'est pas une source de dangers et de risques sur le lieu de travail ?",
+    "optionA": "Les équipements.",
+    "optionB": "Le comportement du travailleur.",
+    "optionC": "Les problèmes à la maison.",
+    "moduleName": "Dangers, risques et prévention"
+  },
+  "m2q4": {
+    "questionText": "De quelle manière la prévention peut-elle être abordée dans la pratique ?",
+    "optionA": "En évitant les situations dangereuses.",
+    "optionB": "En évitant les actes dangereux.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Dangers, risques et prévention"
+  },
+  "m2q5": {
+    "questionText": "Qu'est-ce qu'une situation dangereuse ?",
+    "optionA": "Une situation qui respecte les conditions d'un travail en sécurité.",
+    "optionB": "Une situation où des personnes ne portent pas les EPI indiqués par les panneaux d'obligation.",
+    "optionC": "Une situation qui ne respecte pas les conditions d'un travail en sécurité et qui peut conduire à un accident.",
+    "moduleName": "Dangers, risques et prévention"
+  },
+  "m2q6": {
+    "questionText": "Quelle action est un acte dangereux ?",
+    "optionA": "Travailler avec des permis de travail là où ils sont imposés.",
+    "optionB": "Utiliser les outils de manière incorrecte.",
+    "optionC": "Utiliser les EPI prescrits.",
+    "moduleName": "Dangers, risques et prévention"
+  },
+  "m2q7": {
+    "questionText": "Quelle est la meilleure façon de traiter les situations dangereuses ?",
+    "optionA": "Éliminer la cause.",
+    "optionB": "Appeler d'autres personnes.",
+    "optionC": "Avertir d'autres personnes.",
+    "moduleName": "Dangers, risques et prévention"
+  },
+  "m2q8": {
+    "questionText": "Les différentes étapes d'une RI&E (inventaire et évaluation des risques) sont :",
+    "optionA": "1. Évaluer les risques / 2. Identifier les dangers / 3. Faire l'inventaire",
+    "optionB": "1. Identifier les dangers / 2. Faire l'inventaire des risques / 3. Évaluer les risques",
+    "optionC": "1. Identifier les dangers / 2. Évaluer les risques / 3. Faire l'inventaire",
+    "moduleName": "Dangers, risques et prévention"
+  },
+  "m2q9": {
+    "questionText": "Que signifie le sigle LMRA ?",
+    "optionA": "Labour Market Regulatory Authority (autorité de régulation du marché du travail).",
+    "optionB": "Last Minute Risk Analysis (analyse des risques de dernière minute).",
+    "optionC": "Last Minor Random Analysis (dernière analyse aléatoire mineure).",
+    "moduleName": "Dangers, risques et prévention"
+  },
+  "m2q10": {
+    "questionText": "Quel est l'objectif de la préparation du travail ?",
+    "optionA": "Déterminer le temps nécessaire pour terminer le travail.",
+    "optionB": "Déterminer une méthode de travail qui soit sûre et qui ne cause pas d'atteinte à la santé.",
+    "optionC": "Déterminer une façon de terminer le travail le plus rapidement possible.",
+    "moduleName": "Dangers, risques et prévention"
+  },
+  "m2q11": {
+    "questionText": "Quelle est une mesure de l'agence d'intérim (intermédiaire) pour les tâches à haut risque ?",
+    "optionA": "Des accords avec l'entreprise utilisatrice sur l'information à donner au travailleur intérimaire.",
+    "optionB": "Une information au travailleur intérimaire concernant les tâches à haut risque.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Dangers, risques et prévention"
+  },
+  "m3q1": {
+    "questionText": "Quelle est la cause de la plupart des accidents ?",
+    "optionA": "L'erreur humaine.",
+    "optionB": "Les mauvaises conditions de travail.",
+    "optionC": "Le manque d'entretien adéquat des outils.",
+    "explanation": "Le comportement dangereux (erreur humaine, raccourcis) est la principale cause des accidents du travail. Les défaillances techniques et les facteurs liés à l'environnement y contribuent aussi, mais moins fréquemment.",
+    "officialRef": "Module 3 — Accidents : causes et prévention",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m3q2": {
+    "questionText": "Selon Lateiner, quels facteurs jouent un rôle dans les accidents ?",
+    "optionA": "Les antécédents, l'erreur humaine et les situations et opérations dangereuses.",
+    "optionB": "L'entourage, l'erreur humaine et les situations dangereuses.",
+    "optionC": "L'environnement, l'erreur humaine et les situations dangereuses.",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m3q3": {
+    "questionText": "Élaborer des procédures d'action en cas d'accident est une mesure qui vise :",
+    "optionA": "L'entourage.",
+    "optionB": "L'organisation.",
+    "optionC": "Les personnes.",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m3q4": {
+    "questionText": "Quelles parties doivent figurer dans le rapport final d'une enquête d'accident ?",
+    "optionA": "Les croquis de l'accident, les déclarations des témoins et les mesures prises.",
+    "optionB": "L'analyse, les conclusions et les recommandations.",
+    "optionC": "Les comptes rendus d'entretiens, les documents pertinents et les photos.",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m3q5": {
+    "questionText": "Les deux causes directes d'un accident ou d'un incident sont :",
+    "optionA": "Des actes dangereux ou des équipements défectueux.",
+    "optionB": "Des actes dangereux ou des situations dangereuses.",
+    "optionC": "Une erreur humaine ou des équipements défectueux.",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m3q6": {
+    "questionText": "Qu'est-ce qui n'est pas un facteur lié à la personne pouvant conduire à un incident ?",
+    "optionA": "Une planification insuffisante.",
+    "optionB": "Une attention insuffisante.",
+    "optionC": "Une expérience insuffisante.",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m3q7": {
+    "questionText": "À quelle personne un accident doit-il être signalé ?",
+    "optionA": "À l'Inspection du travail.",
+    "optionB": "À vos collègues directs.",
+    "optionC": "Au responsable hiérarchique direct.",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m3q8": {
+    "questionText": "Que doit-on faire de tous les accidents et presqu'accidents ?",
+    "optionA": "Fournir davantage d'EPI.",
+    "optionB": "Enregistrer l'événement.",
+    "optionC": "Identifier les facteurs qui ont causé les accidents.",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m3q9": {
+    "questionText": "Qui est responsable des enquêtes d'accident ?",
+    "optionA": "L'entreprise utilisatrice.",
+    "optionB": "L'agence d'intérim.",
+    "optionC": "L'Inspection du travail.",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m3q10": {
+    "questionText": "Qui est responsable de l'absence pour maladie ?",
+    "optionA": "L'entreprise utilisatrice.",
+    "optionB": "L'agence d'intérim.",
+    "optionC": "L'Inspection du travail.",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m3q11": {
+    "questionText": "Quel est l'objectif de la loi sur l'accès aux prestations d'invalidité permanente ?",
+    "optionA": "Améliorer la réintégration des nouveaux travailleurs.",
+    "optionB": "Améliorer la réintégration des travailleurs malades au sein ou en dehors de l'entreprise.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m3q12": {
+    "questionText": "Quelle est une obligation de l'agence d'intérim dans le cadre de la loi sur les prestations d'invalidité ?",
+    "optionA": "Les deux réponses sont correctes.",
+    "optionB": "En cas de négligence, l'obligation de payer le salaire peut être prolongée d'un an.",
+    "optionC": "Élaborer et exécuter un plan d'action pour la réintégration.",
+    "moduleName": "Accidents : causes et prévention"
+  },
+  "m4q1": {
+    "questionText": "Quelle est une cause d'accident par chute ou trébuchement ?",
+    "optionA": "Un sol plat et antidérapant.",
+    "optionB": "Des câbles et des cordes qui traînent.",
+    "optionC": "Un lieu de travail bien rangé.",
+    "moduleName": "Comportement en matière de sécurité"
+  },
+  "m4q2": {
+    "questionText": "Qu'est-ce qui n'est pas une cause de comportement dangereux ?",
+    "optionA": "Le manque d'exemplarité de la hiérarchie.",
+    "optionB": "Le manque de volonté (ne pas vouloir).",
+    "optionC": "Des objectifs bien formulés.",
+    "moduleName": "Comportement en matière de sécurité"
+  },
+  "m4q3": {
+    "questionText": "Quel élément de la politique de l'entreprise influence le comportement humain pour un travail en sécurité ?",
+    "optionA": "Une politique de sanctions.",
+    "optionB": "La clarté sur la priorité donnée au travail en sécurité.",
+    "optionC": "Une politique axée sur des machines qui fonctionnent bien.",
+    "moduleName": "Comportement en matière de sécurité"
+  },
+  "m4q4": {
+    "questionText": "Pourquoi le rôle du responsable hiérarchique est-il important pour le comportement humain ?",
+    "optionA": "Le responsable hiérarchique est un modèle à suivre.",
+    "optionB": "Le responsable hiérarchique laisse les travailleurs déterminer la méthode de travail.",
+    "optionC": "Le responsable hiérarchique dispose des informations nécessaires sur les travailleurs, le travail et les circonstances.",
+    "moduleName": "Comportement en matière de sécurité"
+  },
+  "m4q5": {
+    "questionText": "Quelle est une règle générale de comportement pour un travail en sécurité ?",
+    "optionA": "Faire preuve d'esprit critique envers soi-même.",
+    "optionB": "Les travailleurs ne doivent pas intervenir, mais informer le responsable hiérarchique.",
+    "optionC": "Noter les opinions et les archiver.",
+    "moduleName": "Comportement en matière de sécurité"
+  },
+  "m4q6": {
+    "questionText": "Lequel n'est pas un comportement qui favorise le travail en sécurité ?",
+    "optionA": "Veiller à l'hygiène personnelle, à l'ordre et à la propreté.",
+    "optionB": "Penser uniquement à votre propre santé et sécurité.",
+    "optionC": "Signaler les situations dangereuses et intervenir de manière appropriée.",
+    "moduleName": "Comportement en matière de sécurité"
+  },
+  "m4q7": {
+    "questionText": "L'influence de l'alcool et des drogues sur le travail en sécurité entraîne :",
+    "optionA": "Un travail dégradé ou problématique.",
+    "optionB": "Aucun changement de comportement.",
+    "optionC": "Une bonne appréciation des situations.",
+    "moduleName": "Comportement en matière de sécurité"
+  },
+  "m4q8": {
+    "questionText": "Qu'attend-on en matière de consommation d'alcool et de drogues pour un travail en sécurité ?",
+    "optionA": "La consommation est autorisée lorsque les responsables hiérarchiques en sont informés.",
+    "optionB": "Chercher de l'aide en cas de consommation problématique chronique.",
+    "optionC": "Le responsable hiérarchique ne doit pas être informé d'une consommation occasionnelle.",
+    "moduleName": "Comportement en matière de sécurité"
+  },
+  "m4q9": {
+    "questionText": "Quelle est une tâche de l'intermédiaire pour promouvoir le travail en sécurité ?",
+    "optionA": "Les deux réponses sont correctes.",
+    "optionB": "Informer le travailleur intérimaire de la nécessité de travailler en sécurité.",
+    "optionC": "Vérifier les connaissances de base en matière de sécurité et de santé.",
+    "moduleName": "Comportement en matière de sécurité"
+  },
+  "m5q1": {
+    "questionText": "Quelles sont les obligations des employeurs selon la législation en matière de sécurité et de santé ?",
+    "optionA": "Fournir des informations et des instructions sur les dangers au travail.",
+    "optionB": "Signaler les situations dangereuses au responsable.",
+    "optionC": "Faire appel au service officiel d'inspection en matière de sécurité et de santé.",
+    "explanation": "Les travailleurs ont le droit de refuser un travail dangereux sans crainte de représailles. Il s'agit d'un droit fondamental inscrit dans la législation en matière de sécurité et de santé.",
+    "officialRef": "Module 5 — Tâches, droits et devoirs",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q2": {
+    "questionText": "Quelles sont les obligations des travailleurs selon la loi sur les conditions de travail ?",
+    "optionA": "Faire appel à l'Inspection du travail.",
+    "optionB": "Signaler les situations dangereuses au responsable/responsable hiérarchique.",
+    "optionC": "Fournir des informations sur les dangers au travail.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q3": {
+    "questionText": "Quand les travailleurs ont-ils le droit d'interrompre leur travail ?",
+    "optionA": "Si les EPI ne sont pas disponibles.",
+    "optionB": "Si l'Inspection du travail vient enquêter.",
+    "optionC": "En cas de danger grave et immédiat pour les personnes.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q4": {
+    "questionText": "Qui participe à la concertation du conseil d'entreprise ?",
+    "optionA": "La direction du service et les travailleurs.",
+    "optionB": "Tous les travailleurs, y compris le personnel intérimaire.",
+    "optionC": "L'employeur et les représentants des travailleurs.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q5": {
+    "questionText": "Quelle est la différence entre la certification SCC* et la certification SCC** ?",
+    "optionA": "SCC* porte sur les structures de sécurité ; SCC** inclut la protection de l'environnement.",
+    "optionB": "SCC* porte sur la maîtrise directe de la sécurité ; SCC** inclut les structures de sécurité.",
+    "optionC": "SCC* porte sur la gestion de la qualité ; SCC** inclut la gestion des conditions de travail.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q6": {
+    "questionText": "Que doit-on faire en cas de danger immédiat ?",
+    "optionA": "Corriger les risques qui ont causé le danger.",
+    "optionB": "Continuer à travailler jusqu'à ce que quelqu'un vous dise d'arrêter.",
+    "optionC": "Arrêter le travail et/ou assurer votre propre sécurité.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q7": {
+    "questionText": "Quel est un avantage des inspections du lieu de travail ?",
+    "optionA": "Elles donnent une bonne vue de la situation en matière de sécurité.",
+    "optionB": "Elles renforcent la sensibilisation à la sécurité.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q8": {
+    "questionText": "Une responsabilité légale en matière de sécurité et de santé est :",
+    "optionA": "L'agence d'intérim est responsable de l'assurance contre les accidents du travail.",
+    "optionB": "L'entreprise utilisatrice a des tâches spécifiques.",
+    "optionC": "Les relations entre l'entreprise utilisatrice, le travailleur intérimaire et l'Inspection du travail.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q9": {
+    "questionText": "La différence entre l'employeur formel et l'employeur réel est :",
+    "optionA": "L'employeur réel est celui sous l'autorité duquel le travailleur intérimaire travaille.",
+    "optionB": "Les deux réponses sont correctes.",
+    "optionC": "L'employeur formel est celui qui emploie effectivement le travailleur.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q10": {
+    "questionText": "Qui est responsable des conditions de travail dans le cadre du travail intérimaire ?",
+    "optionA": "L'employeur intérimaire transmet les conditions de travail personnelles à l'entreprise utilisatrice.",
+    "optionB": "L'agence d'intérim est responsable.",
+    "optionC": "L'employeur réel (l'entreprise utilisatrice) est responsable.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q11": {
+    "questionText": "Une responsabilité légale en matière de sécurité et de santé s'organise comme :",
+    "optionA": "Une relation spéciale : agence, entreprise utilisatrice, Inspection du travail et travailleur.",
+    "optionB": "Une relation triangulaire : agence, entreprise utilisatrice et travailleur.",
+    "optionC": "L'entreprise utilisatrice est responsable du devoir de transmission des informations.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q12": {
+    "questionText": "Un aspect de sécurité et de santé important lors de la mise à disposition d'un travailleur intérimaire est :",
+    "optionA": "Demander les documents de sécurité et de santé requis.",
+    "optionB": "La procédure de demande et l'enregistrement des accords en matière de sécurité et de santé.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q13": {
+    "questionText": "Que faut-il convenir avec l'entreprise utilisatrice concernant l'examen médical ?",
+    "optionA": "Pour quels postes un examen médical est exigé.",
+    "optionB": "L'examen médical réalisé par le responsable hiérarchique.",
+    "optionC": "Fournir des informations sur l'aptitude médicale exigée.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q14": {
+    "questionText": "Les éléments que doit contenir le dossier du travailleur intérimaire sont :",
+    "optionA": "Les limitations liées au poste.",
+    "optionB": "Une copie d'un document d'identité.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q15": {
+    "questionText": "Qu'est-ce qui n'est pas un point d'attention nécessaire lorsque l'entreprise utilisatrice introduit une demande ?",
+    "optionA": "L'aptitude médicale exigée.",
+    "optionB": "Qui donnera les instructions relatives aux EPI.",
+    "optionC": "La possession d'un certificat VOL SCC valide.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q16": {
+    "questionText": "Que faut-il faire pour vérifier les accords avec l'entreprise utilisatrice ?",
+    "optionA": "Une présentation formelle aux collègues de travail.",
+    "optionB": "Accueil dans l'entreprise ; rencontre avec le responsable hiérarchique.",
+    "optionC": "Le travailleur intérimaire doit apporter ses propres EPI.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q17": {
+    "questionText": "Un aspect à examiner lors de l'évaluation du travail intérimaire est :",
+    "optionA": "La remise des EPI et des vêtements de travail.",
+    "optionB": "Les installations telles que vestiaire, réfectoire et sanitaires.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q18": {
+    "questionText": "Qu'est-ce qui est important dans les réunions de sécurité et de santé au sein de l'agence d'intérim ?",
+    "optionA": "La participation de l'Inspection du travail.",
+    "optionB": "La participation des collègues de travail.",
+    "optionC": "La participation de la direction et des responsables hiérarchiques.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m5q19": {
+    "questionText": "Quelle est la participation du travailleur intérimaire aux réunions SSE ?",
+    "optionA": "Le travailleur intérimaire doit participer aux réunions SSE de l'entreprise utilisatrice.",
+    "optionB": "L'intermédiaire informe le travailleur de l'existence des réunions SSE.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Tâches, droits, devoirs et concertation"
+  },
+  "m6q1": {
+    "questionText": "La procédure de signalement d'un incendie relève des :",
+    "optionA": "Procédures SCC.",
+    "optionB": "Règles générales de sécurité.",
+    "optionC": "Règles spécifiques de sécurité.",
+    "moduleName": "Procédures, instructions et signalisation"
+  },
+  "m6q2": {
+    "questionText": "Que doit décrire un permis de travail ?",
+    "optionA": "Les points de contrôle pertinents du SCC.",
+    "optionB": "Le nombre de travailleurs titulaires d'un diplôme IER.",
+    "optionC": "Les mesures à prendre par l'émetteur et par le titulaire du permis.",
+    "moduleName": "Procédures, instructions et signalisation"
+  },
+  "m6q3": {
+    "questionText": "Les règles générales de sécurité sont destinées :",
+    "optionA": "À un seul service de l'entreprise.",
+    "optionB": "Aux travailleurs intérimaires.",
+    "optionC": "Aux entrepreneurs et sous-traitants.",
+    "moduleName": "Procédures, instructions et signalisation"
+  },
+  "m6q4": {
+    "questionText": "Les règles générales de sécurité :",
+    "optionA": "Doivent être consignées par écrit.",
+    "optionB": "Sont des règles d'utilisation propres à chaque outil.",
+    "optionC": "Doivent être rédigées dans une seule langue.",
+    "moduleName": "Procédures, instructions et signalisation"
+  },
+  "m6q5": {
+    "questionText": "Les règles spécifiques de sécurité ne concernent pas :",
+    "optionA": "Les pauses de midi.",
+    "optionB": "La ventilation.",
+    "optionC": "L'entrée dans les espaces confinés.",
+    "moduleName": "Procédures, instructions et signalisation"
+  },
+  "m6q6": {
+    "questionText": "Une ligne directrice concernant les règles spécifiques de sécurité est :",
+    "optionA": "Elles doivent aussi être comprises par les locuteurs natifs.",
+    "optionB": "Elles doivent être communiquées à tous les travailleurs.",
+    "optionC": "Une fois expliquées, on peut conclure que tout le monde sait ce qu'elles signifient.",
+    "moduleName": "Procédures, instructions et signalisation"
+  },
+  "m6q7": {
+    "questionText": "Une fonction d'une bride de raccordement est :",
+    "optionA": "Fermer les conduites d'alimentation vers des réservoirs, des cuves ou des installations.",
+    "optionB": "Séparer des tronçons de tuyauterie.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Procédures, instructions et signalisation"
+  },
+  "m6q8": {
+    "questionText": "Qu'est-ce qui n'est pas une rubrique du permis de travail relative aux activités demandées ?",
+    "optionA": "Comment les activités seront réalisées.",
+    "optionB": "Où les activités seront réalisées.",
+    "optionC": "Pourquoi les activités seront réalisées.",
+    "moduleName": "Procédures, instructions et signalisation"
+  },
+  "m6q9": {
+    "questionText": "Qu'est-ce qu'une rubrique du permis de travail relative aux mesures à prendre par le travailleur opérationnel ?",
+    "optionA": "Tous les EPI doivent y être indiqués.",
+    "optionB": "Les mesures que les travailleurs opérationnels doivent prendre pour travailler en sécurité.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Procédures, instructions et signalisation"
+  },
+  "m6q10": {
+    "questionText": "Qu'implique le devoir de transmission des informations ?",
+    "optionA": "Les deux réponses sont correctes.",
+    "optionB": "L'agence doit transmettre les informations relatives au lieu de travail.",
+    "optionC": "L'entreprise utilisatrice et l'agence ont un devoir partagé de fournir des informations.",
+    "moduleName": "Procédures, instructions et signalisation"
+  },
+  "m7q1": {
+    "questionText": "Quelle tâche relève du rôle des équipiers d'intervention d'urgence ?",
+    "optionA": "Éteindre un début d'incendie et limiter les dégâts et les blessures.",
+    "optionB": "Participer à l'équipe d'enquête sur les accidents.",
+    "optionC": "Effectuer des mesures de détection de gaz.",
+    "moduleName": "Préparation aux situations d'urgence"
+  },
+  "m7q2": {
+    "questionText": "Qu'entend-on par situation d'urgence ?",
+    "optionA": "Des situations d'urgence causées par des accidents, un incendie, une explosion ou une fuite incontrôlée de substances.",
+    "optionB": "Des menaces dues au mauvais temps, à des catastrophes naturelles, à des troubles sociaux ou à un attentat terroriste.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Préparation aux situations d'urgence"
+  },
+  "m7q3": {
+    "questionText": "Un plan d'urgence d'entreprise est :",
+    "optionA": "Une description des mesures et des moyens prévus pour les situations d'urgence.",
+    "optionB": "Une liste de mesures visant à garantir que les conditions de travail sont sûres.",
+    "optionC": "Une liste de mesures que les travailleurs doivent préparer avant de commencer le travail.",
+    "moduleName": "Préparation aux situations d'urgence"
+  },
+  "m7q4": {
+    "questionText": "Limiter les effets de situations d'urgence possibles est l'objectif de :",
+    "optionA": "L'ensemble des conditions de travail.",
+    "optionB": "Un plan d'urgence (interne) d'entreprise.",
+    "optionC": "L'équipe d'intervention d'urgence.",
+    "moduleName": "Préparation aux situations d'urgence"
+  },
+  "m7q5": {
+    "questionText": "Qu'est-ce qui n'est pas une phase de la maîtrise des situations d'urgence ?",
+    "optionA": "Première alerte.",
+    "optionB": "Deuxième alerte.",
+    "optionC": "Fin de l'urgence.",
+    "moduleName": "Préparation aux situations d'urgence"
+  },
+  "m7q6": {
+    "questionText": "La première alerte dans les situations d'urgence est :",
+    "optionA": "Une liste de moyens d'alerter les personnes.",
+    "optionB": "Une description des moyens par lesquels une urgence peut être signalée et des informations à communiquer.",
+    "optionC": "Une sonnerie forte qui signale qu'il y a une urgence.",
+    "moduleName": "Préparation aux situations d'urgence"
+  },
+  "m7q7": {
+    "questionText": "Un élément de la fin de la situation d'urgence est :",
+    "optionA": "La manière dont la fin de l'urgence est notifiée.",
+    "optionB": "Qui est autorisé à déclarer la fin de l'urgence.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Préparation aux situations d'urgence"
+  },
+  "m7q8": {
+    "questionText": "L'une des exigences minimales pour les premiers secours est :",
+    "optionA": "Des membres formés de l'équipe d'intervention d'urgence.",
+    "optionB": "Du matériel de premiers secours toujours disponible.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Préparation aux situations d'urgence"
+  },
+  "m7q9": {
+    "questionText": "Quelle séquence est correcte lors d'un signal d'évacuation ?",
+    "optionA": "1 : Arrêter le travail / 2 : Ne pas utiliser les ascenseurs / 3 : Se rendre au point de rassemblement.",
+    "optionB": "1 : Arrêter le travail / 2 : Ne pas utiliser les ascenseurs / 3 : Signaler sa présence au point de rassemblement.",
+    "optionC": "1 : Arrêter le travail / 2 : Signaler sa présence / 3 : Évacuer perpendiculairement au vent.",
+    "moduleName": "Préparation aux situations d'urgence"
+  },
+  "m8q1": {
+    "questionText": "Comment pouvez-vous savoir, d'après son étiquette, quels risques présente un produit dangereux ?",
+    "optionA": "Grâce aux phrases S.",
+    "optionB": "Grâce aux phrases M.",
+    "optionC": "Grâce aux phrases R.",
+    "explanation": "Une FDS (fiche de données de sécurité) fournit des informations essentielles sur les substances dangereuses : composition, dangers, premiers secours, manipulation, stockage et élimination.",
+    "officialRef": "Module 8 — Substances dangereuses",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q2": {
+    "questionText": "Qu'indique la surface jaune du losange de signalisation de danger ?",
+    "optionA": "Danger de réactivité.",
+    "optionB": "Danger pour la santé.",
+    "optionC": "Danger d'incendie.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q3": {
+    "questionText": "Quel effet toxique a le monoxyde de carbone ?",
+    "optionA": "Paralysie de l'odorat.",
+    "optionB": "L'oxygène n'est plus absorbé dans le sang.",
+    "optionC": "Un effet irritant sur les voies respiratoires.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q4": {
+    "questionText": "Quelles informations contient une fiche de données de sécurité d'un produit ?",
+    "optionA": "Des informations sur les étapes pour travailler dans un espace confiné.",
+    "optionB": "Des informations sur les permis nécessaires pour travailler avec le produit.",
+    "optionC": "Des informations sur les dangers et les mesures de sécurité que vous devez prendre.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q5": {
+    "questionText": "Dans des conditions normales, la teneur en oxygène de l'air est de :",
+    "optionA": "21%.",
+    "optionB": "19%.",
+    "optionC": "25%.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q6": {
+    "questionText": "Le manque de ventilation :",
+    "optionA": "Élimine le manque d'oxygène.",
+    "optionB": "Peut provoquer une concentration d'oxygène trop faible.",
+    "optionC": "Provoque des problèmes respiratoires.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q7": {
+    "questionText": "Une ogive blanche sur une bouteille de gaz signifie :",
+    "optionA": "Dioxyde de carbone.",
+    "optionB": "Air.",
+    "optionC": "Oxygène.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q8": {
+    "questionText": "Lors du stockage des bouteilles de gaz :",
+    "optionA": "Il faut les arrimer correctement.",
+    "optionB": "Il faut les placer dans des caves spéciales.",
+    "optionC": "Il faut les placer près du poste de travail pour y accéder facilement.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q9": {
+    "questionText": "Qu'entend-on par substances dangereuses ?",
+    "optionA": "Des matières qui explosent facilement si elles sont mélangées à une forte concentration d'oxygène.",
+    "optionB": "Des matières qui présentent un danger pour la santé et/ou pour l'environnement.",
+    "optionC": "Des matières qui exigent une formation spéciale avant leur utilisation.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q10": {
+    "questionText": "Sur le lieu de travail, les substances dangereuses sont signalées par :",
+    "optionA": "Un symbole de danger carré, noir sur fond rouge.",
+    "optionB": "Un symbole de danger carré, noir sur fond orange.",
+    "optionC": "Un symbole de danger carré, noir sur fond jaune.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q11": {
+    "questionText": "La vaccination est une mesure de précaution pour travailler avec des :",
+    "optionA": "Substances biologiques.",
+    "optionB": "Substances inflammables.",
+    "optionC": "Substances irritantes.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q12": {
+    "questionText": "Des substances biologiques peuvent être présentes dans :",
+    "optionA": "L'agriculture.",
+    "optionB": "Les sols contaminés.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q13": {
+    "questionText": "L'enlèvement professionnel du produit répandu est une mesure préventive contre :",
+    "optionA": "L'incendie.",
+    "optionB": "La chute d'objets.",
+    "optionC": "Les fuites.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q14": {
+    "questionText": "Qu'est-ce qui n'est pas une cause de fuites ?",
+    "optionA": "Des dommages (p. ex. collision avec un chariot élévateur).",
+    "optionB": "Une procédure erronée lors du transvasement de récipients.",
+    "optionC": "L'installation correcte des brides.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q15": {
+    "questionText": "Les glissades sont une conséquence de :",
+    "optionA": "La contamination de l'environnement.",
+    "optionB": "Les fuites.",
+    "optionC": "L'utilisation de substances dangereuses.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q16": {
+    "questionText": "Le danger des solvants organiques est qu'ils sont :",
+    "optionA": "Inflammables ou très inflammables.",
+    "optionB": "Corrosifs.",
+    "optionC": "Irritants.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q17": {
+    "questionText": "Un exemple de composé cyclique est :",
+    "optionA": "Le zinc.",
+    "optionB": "Le phénol.",
+    "optionC": "Le white spirit.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q18": {
+    "questionText": "Le risque de mésothéliome est un effet sur la santé lié à :",
+    "optionA": "Le benzène.",
+    "optionB": "Le white spirit.",
+    "optionC": "L'amiante.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q19": {
+    "questionText": "Quel n'est pas un emplacement possible de l'amiante ?",
+    "optionA": "Dans les maisons nouvellement construites.",
+    "optionB": "Les matériaux de couverture et le revêtement des murs.",
+    "optionC": "Dans et derrière la maçonnerie des fours et des chaudières.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q20": {
+    "questionText": "Qu'est-ce qui n'est pas une disposition légale concernant l'amiante ?",
+    "optionA": "La nouvelle utilisation et la transformation de l'amiante sont autorisées.",
+    "optionB": "Les déchets contenant de l'amiante doivent être collectés séparément.",
+    "optionC": "Là où il existe un risque de contact avec l'amiante, une étiquette spécifique est apposée.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q21": {
+    "questionText": "Un principe de l'examen médical périodique est :",
+    "optionA": "Déterminer si le candidat reste apte à travailler avec des substances.",
+    "optionB": "Déterminer si le candidat reste apte à travailler avec la substance dangereuse.",
+    "optionC": "La périodicité dépend du travailleur.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q22": {
+    "questionText": "Les conseils de prudence figurant sur les nouvelles étiquettes décrivent :",
+    "optionA": "Les mesures pour éviter un changement des conditions de travail.",
+    "optionB": "Les mesures pour éviter les risques lors du travail avec le produit.",
+    "optionC": "Les mesures pour éviter l'incendie.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q23": {
+    "questionText": "Les chiffres d'un losange de danger vont de :",
+    "optionA": "1 à 5.",
+    "optionB": "0 à 4.",
+    "optionC": "0 à 5.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m8q24": {
+    "questionText": "Les mesures pour éviter les risques lors du travail avec le produit sont décrites dans :",
+    "optionA": "Les phrases H.",
+    "optionB": "Les phrases R.",
+    "optionC": "Les phrases S.",
+    "moduleName": "Substances dangereuses"
+  },
+  "m9q1": {
+    "questionText": "Quel est un inconvénient de l'extinction d'un incendie avec de l'eau ?",
+    "optionA": "La matière en combustion peut réagir violemment à l'eau.",
+    "optionB": "Les opérateurs sont gênés par la fumée.",
+    "optionC": "L'utilisation d'eau est relativement coûteuse.",
+    "explanation": "Le triangle du feu nécessite un combustible, de l'oxygène et de la chaleur (source d'inflammation). Supprimer l'un de ces éléments éteint ou prévient l'incendie.",
+    "officialRef": "Module 9 — Incendie et explosion",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q2": {
+    "questionText": "Que devez-vous savoir avant d'éteindre un incendie ?",
+    "optionA": "Depuis combien de temps il brûle.",
+    "optionB": "Quelle est la température.",
+    "optionC": "Quelle substance brûle.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q3": {
+    "questionText": "Que faut-il faire en premier lieu lorsqu'un incendie est détecté ?",
+    "optionA": "L'éteindre vous-même, si possible.",
+    "optionB": "Guider les personnes vers un lieu sûr.",
+    "optionC": "Signaler l'incendie.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q4": {
+    "questionText": "Que signifie une limite d'explosivité ?",
+    "optionA": "La température maximale/minimale d'un solide à laquelle une explosion peut se produire.",
+    "optionB": "La concentration maximale/minimale d'un gaz dans l'air à laquelle une explosion peut se produire.",
+    "optionC": "La concentration maximale/minimale de métaux à laquelle une explosion peut se produire.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q5": {
+    "questionText": "Qu'entend-on par point d'éclair ?",
+    "optionA": "La concentration maximale/minimale de gaz et d'air pour qu'il y ait explosion.",
+    "optionB": "La température maximale/minimale d'un solide pour qu'il y ait explosion.",
+    "optionC": "La température minimale d'un liquide à laquelle ses vapeurs peuvent s'enflammer.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q6": {
+    "questionText": "Quel effet un excès d'oxygène peut-il avoir lors d'un incendie ?",
+    "optionA": "Une inflammation plus facile des substances inflammables.",
+    "optionB": "Une combustion prolongée.",
+    "optionC": "L'étouffement du feu.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q7": {
+    "questionText": "Une substance inflammable :",
+    "optionA": "Est nécessaire pour qu'il y ait un incendie ou une explosion.",
+    "optionB": "Est toujours un gaz.",
+    "optionC": "Provoque toujours un incendie ou une explosion.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q8": {
+    "questionText": "Qu'est-ce qu'une explosion ?",
+    "optionA": "Un incendie provoqué par une substance inflammable.",
+    "optionB": "Un incendie qui se développe très rapidement et libère une onde de pression.",
+    "optionC": "Un feu de classe C.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q9": {
+    "questionText": "Qu'est-ce qui brûle dans un feu de classe A ?",
+    "optionA": "Des gaz.",
+    "optionB": "Des liquides.",
+    "optionC": "Des matières solides.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q10": {
+    "questionText": "Le panneau qui indique une zone à risque d'explosion :",
+    "optionA": "Affiche les lettres Ex.",
+    "optionB": "Affiche les lettres Er.",
+    "optionC": "Affiche un symbole de feu.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q11": {
+    "questionText": "Un environnement à risque d'explosion est un lieu :",
+    "optionA": "Où des mesures spéciales doivent être prises pour empêcher l'inflammation de mélanges explosifs.",
+    "optionB": "Où il n'est pas possible qu'un mélange explosif se forme.",
+    "optionC": "Où des mesures spéciales ne doivent pas être prises.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q12": {
+    "questionText": "Une exigence pour le surveillant de travaux par point chaud est :",
+    "optionA": "Au moins cinq ans d'expérience avec le feu.",
+    "optionB": "Une formation spécifique.",
+    "optionC": "Au moins un an d'expérience avec le feu.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q13": {
+    "questionText": "Lors du traitement des brûlures :",
+    "optionA": "Rincez à l'eau pendant au moins 5 minutes.",
+    "optionB": "Rincez à l'eau pendant au moins 15 minutes.",
+    "optionC": "Rincez à l'eau pendant au moins 10 minutes.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q14": {
+    "questionText": "Lors de l'extinction d'un incendie, il ne faut pas :",
+    "optionA": "Rester vigilant même lorsque le feu semble éteint.",
+    "optionB": "Veiller à votre propre sécurité à tout moment.",
+    "optionC": "Partir sans plus lorsque le feu est éteint.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q15": {
+    "questionText": "Les couvertures anti-feu :",
+    "optionA": "Refroidissent.",
+    "optionB": "Chassent l'oxygène.",
+    "optionC": "Isolent de l'oxygène.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q16": {
+    "questionText": "Un inconvénient de l'extinction avec une couverture anti-feu est :",
+    "optionA": "Le risque de brûlures par le froid.",
+    "optionB": "Il faut s'approcher très près du foyer de l'incendie.",
+    "optionC": "La contamination.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q17": {
+    "questionText": "Un inconvénient de l'extinction au dioxyde de carbone est :",
+    "optionA": "Il peut créer une atmosphère asphyxiante.",
+    "optionB": "Le risque de brûlures par le froid en raison de la basse température.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m9q18": {
+    "questionText": "Une caractéristique extinctrice du sable est que :",
+    "optionA": "Le sable chasse l'oxygène.",
+    "optionB": "Le sable isole de l'oxygène.",
+    "optionC": "Le sable a un pouvoir refroidissant.",
+    "moduleName": "Incendie et explosion"
+  },
+  "m10q1": {
+    "questionText": "À quoi devez-vous faire attention lors de l'utilisation de burins ?",
+    "optionA": "N'utilisez que des burins sans bavures sur le tranchant.",
+    "optionB": "N'utilisez que des burins qui ont été testés.",
+    "optionC": "N'utilisez que des burins de la résistance adéquate.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q2": {
+    "questionText": "Pourquoi ne devez-vous jamais porter de gants avec des machines comportant des pièces en rotation ?",
+    "optionA": "Parce que vos mains n'entrent pas en contact avec les pièces en rotation.",
+    "optionB": "Parce que la machine peut être endommagée.",
+    "optionC": "Parce que le gant et votre main peuvent être entraînés dans la machine.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q3": {
+    "questionText": "Que signifie travailler en sécurité avec une perceuse à colonne ?",
+    "optionA": "Utiliser le couteau diviseur.",
+    "optionB": "Serrer fermement la pièce à usiner.",
+    "optionC": "Exercer une contre-pression lors du perçage.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q4": {
+    "questionText": "De quoi les marteaux doivent-ils être munis pour prévenir les accidents ?",
+    "optionA": "D'un manche en plastique.",
+    "optionB": "D'un manche métallique.",
+    "optionC": "D'un manche solidement fixé dans la tête du marteau.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q5": {
+    "questionText": "Quel est le rôle de l'interrupteur homme mort sur un outil pneumatique ?",
+    "optionA": "Il permet à l'opérateur de faire des pauses.",
+    "optionB": "Mettre l'outil en position de préchauffage.",
+    "optionC": "Arrêter immédiatement la machine lorsque la poignée est relâchée.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q6": {
+    "questionText": "Que doit comporter une scie circulaire à table ?",
+    "optionA": "Un écran en verre.",
+    "optionB": "Un protecteur de lame fixé à un support robuste.",
+    "optionC": "Une protection contre le recul.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q7": {
+    "questionText": "Les outils électriques portatifs en 230 volts :",
+    "optionA": "Doivent être à double isolation.",
+    "optionB": "Doivent être munis d'une mise à la terre de protection.",
+    "optionC": "Ne peuvent être utilisés que par une personne suffisamment instruite.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q8": {
+    "questionText": "Un contrôle périodique doit être effectué :",
+    "optionA": "Sur les machines et les outils électriques.",
+    "optionB": "Chaque semaine.",
+    "optionC": "Pour s'assurer que chaque travailleur aime son travail.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q9": {
+    "questionText": "Une machine s'arrêtera le plus rapidement possible lorsque :",
+    "optionA": "L'arrêt d'urgence est actionné.",
+    "optionB": "La poignée de commande est relâchée.",
+    "optionC": "Les pièces en rotation sont bloquées.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q10": {
+    "questionText": "Qu'est-ce qu'un transpalette ?",
+    "optionA": "Un véhicule pour transporter des personnes.",
+    "optionB": "Un véhicule pour déplacer des charges à différentes hauteurs.",
+    "optionC": "Un véhicule avec une hauteur de levée de 20 cm.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q11": {
+    "questionText": "Une exigence pour le conducteur d'un chariot élévateur est :",
+    "optionA": "L'utilisation de la ceinture de sécurité.",
+    "optionB": "Posséder la compétence attestée par un examen.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q12": {
+    "questionText": "Qu'est-ce qui n'est pas une mesure de sécurité pour les chariots élévateurs ?",
+    "optionA": "Ne pas prendre de passager si aucun siège spécial n'est disponible.",
+    "optionB": "On peut augmenter le contrepoids en cas de besoin.",
+    "optionC": "Aucune des deux réponses n'est une mesure de sécurité.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q13": {
+    "questionText": "Lors du travail avec des scies :",
+    "optionA": "La lame doit être bien tendue.",
+    "optionB": "La lame ne doit pas être trop affûtée.",
+    "optionC": "L'opérateur doit avoir suivi une formation adéquate.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q14": {
+    "questionText": "Lors du travail avec des couteaux :",
+    "optionA": "Les dents doivent être orientées vers l'avant.",
+    "optionB": "Ne sortez pas trop loin une lame rétractable.",
+    "optionC": "La lame doit être bien tendue.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q15": {
+    "questionText": "Lors du travail sur de petites pièces :",
+    "optionA": "Il faut les tenir d'une main.",
+    "optionB": "Il faut fixer la pièce dans un serre-joint ou un étau.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q16": {
+    "questionText": "Les pantalons et gants en fibre spéciale sont utilisés lorsque :",
+    "optionA": "L'on travaille avec une tronçonneuse.",
+    "optionB": "L'on travaille avec des tournevis.",
+    "optionC": "L'on travaille avec des marteaux.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q17": {
+    "questionText": "Une cloueuse/agrafeuse doit être équipée :",
+    "optionA": "D'une poignée supplémentaire sur le côté.",
+    "optionB": "D'une protection contre le déclenchement involontaire.",
+    "optionC": "D'un écran transparent.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q18": {
+    "questionText": "Un couteau diviseur s'utilise avec :",
+    "optionA": "Une scie circulaire portative.",
+    "optionB": "Une tronçonneuse.",
+    "optionC": "Un tournevis.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q19": {
+    "questionText": "Quelle information doit figurer sur un disque à meuler ?",
+    "optionA": "La vitesse de rotation minimale admissible.",
+    "optionB": "Le nom du fabricant.",
+    "optionC": "L'utilisateur du disque.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q20": {
+    "questionText": "Lors du travail avec des outils à main pneumatiques, il faut :",
+    "optionA": "Couper l'alimentation en air après utilisation.",
+    "optionB": "Faire des pauses régulières lors de l'utilisation d'outils vibrants.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Équipements de travail"
+  },
+  "m10q21": {
+    "questionText": "Lors du travail avec des meuleuses d'établi, qu'est-ce qui n'est pas un danger possible ?",
+    "optionA": "Des problèmes de santé dus à l'inhalation de poussières dangereuses.",
+    "optionB": "Le couteau diviseur peut se détacher.",
+    "optionC": "Être heurté ou happé par des pièces en mouvement.",
+    "moduleName": "Équipements de travail"
+  },
+  "m11q1": {
+    "questionText": "Quel est un danger lors de la démolition ?",
+    "optionA": "L'instabilité du front de démolition.",
+    "optionB": "Les parties saillantes de la construction.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Travaux de démolition"
+  },
+  "m11q2": {
+    "questionText": "Pendant les travaux de démolition, il faut disposer de :",
+    "optionA": "Un dispositif antichute.",
+    "optionB": "Des temps de pause suffisants.",
+    "optionC": "Faire le moins de pauses possible.",
+    "moduleName": "Travaux de démolition"
+  },
+  "m11q3": {
+    "questionText": "Que faut-il faire lors du retrait de fibres céramiques ?",
+    "optionA": "Tout casser en petits morceaux.",
+    "optionB": "Ne pas utiliser de goulotte à gravats.",
+    "optionC": "Porter votre salopette de travail.",
+    "moduleName": "Travaux de démolition"
+  },
+  "m12q1": {
+    "questionText": "Que faut-il faire lors du soudage au gaz à l'oxygène et à l'acétylène ?",
+    "optionA": "Les bouteilles d'acétylène sont stockées debout ou avec une inclinaison d'au moins 25 degrés.",
+    "optionB": "Les bouteilles d'acétylène sont stockées debout ou avec une inclinaison d'au moins 30 degrés.",
+    "optionC": "Les bouteilles d'acétylène sont stockées debout ou avec une inclinaison d'au moins 40 degrés.",
+    "moduleName": "Soudage, coupage et brûlage"
+  },
+  "m12q2": {
+    "questionText": "Quel est un risque du soudage au gaz ?",
+    "optionA": "L'air est plus lourd que le propane.",
+    "optionB": "Le retour de flamme.",
+    "optionC": "Les bouteilles ne sont pas sous pression.",
+    "moduleName": "Soudage, coupage et brûlage"
+  },
+  "m12q3": {
+    "questionText": "Quelle est une mesure de sécurité lors du soudage électrique ?",
+    "optionA": "Protection individuelle : masque de soudage, tablier, vêtements, chaussures de sécurité.",
+    "optionB": "Des rideaux de soudage pour protéger des rayonnements UV et infrarouges.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Soudage, coupage et brûlage"
+  },
+  "m12q4": {
+    "questionText": "Qu'est-ce qui n'est pas un risque associé au soudage électrique ?",
+    "optionA": "L'aveuglement dû au rayonnement infrarouge.",
+    "optionB": "La brûlure de la cornée due au rayonnement thermique.",
+    "optionC": "Des problèmes pulmonaires dus à l'inhalation de fumées de soudage.",
+    "moduleName": "Soudage, coupage et brûlage"
+  },
+  "m13q1": {
+    "questionText": "Pourquoi est-il important d'excaver avec précaution ?",
+    "optionA": "Pour les gains économiques.",
+    "optionB": "Pour la sécurité d'approvisionnement des sociétés de distribution (impétrants).",
+    "optionC": "L'excavation peut s'effondrer.",
+    "moduleName": "Excavations et travaux en tranchée"
+  },
+  "m13q2": {
+    "questionText": "Qu'est-ce qui n'est pas un risque associé à l'excavation ?",
+    "optionA": "L'asphyxie due à l'endommagement de conduites de gaz.",
+    "optionB": "L'électrocution due à l'endommagement de câbles sous tension.",
+    "optionC": "Le danger d'explosion.",
+    "moduleName": "Excavations et travaux en tranchée"
+  },
+  "m13q3": {
+    "questionText": "Quelle est une règle pour excaver avec précaution ?",
+    "optionA": "Signaler au responsable toute position différente ou tout dommage.",
+    "optionB": "N'excaver qu'après avoir déterminé la position des câbles par des sondages à moins de 1,5 m.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Excavations et travaux en tranchée"
+  },
+  "m13q4": {
+    "questionText": "Lorsque vous travaillez dans une excavation ou à proximité, vous devez :",
+    "optionA": "Installer une échelle.",
+    "optionB": "Utiliser des clôtures aux endroits à risque.",
+    "optionC": "Prévoir un étançonnement et des talus efficaces.",
+    "moduleName": "Excavations et travaux en tranchée"
+  },
+  "m14q1": {
+    "questionText": "À partir de quelle hauteur l'employeur doit-il prendre des mesures pour prévenir les chutes ?",
+    "optionA": "À partir de 3,5 mètres.",
+    "optionB": "À partir de 1,5 mètre.",
+    "optionC": "À partir de 2,5 mètres.",
+    "explanation": "Le travail à une hauteur supérieure à 2 mètres exige des mesures de protection contre les chutes. La hiérarchie est la suivante : d'abord la protection collective (garde-corps), puis la protection individuelle (harnais).",
+    "officialRef": "Module 14 — Travail en hauteur",
+    "moduleName": "Travail en hauteur"
+  },
+  "m14q2": {
+    "questionText": "Quelle mesure de sécurité réduit le danger de chute sur un toit plat ?",
+    "optionA": "Un système de protection de rive de toiture.",
+    "optionB": "Des planches de circulation.",
+    "optionC": "Un harnais de sécurité.",
+    "moduleName": "Travail en hauteur"
+  },
+  "m14q3": {
+    "questionText": "Que faut-il vérifier avant de pouvoir utiliser une échelle ?",
+    "optionA": "Que l'échelle ne mesure pas plus de 12 mètres.",
+    "optionB": "Qu'elle est dressée avec un angle d'environ 75 degrés.",
+    "optionC": "Que les montants ont des embouts en acier à la base.",
+    "moduleName": "Travail en hauteur"
+  },
+  "m14q4": {
+    "questionText": "Que doivent utiliser les personnes sur un échafaudage suspendu ?",
+    "optionA": "Un harnais à rappel automatique.",
+    "optionB": "Une ceinture de maintien lombaire.",
+    "optionC": "Un harnais de sécurité.",
+    "moduleName": "Travail en hauteur"
+  },
+  "m14q5": {
+    "questionText": "Par quel côté faut-il monter sur un échafaudage roulant ?",
+    "optionA": "Par l'avant.",
+    "optionB": "Par l'intérieur.",
+    "optionC": "Par l'arrière.",
+    "moduleName": "Travail en hauteur"
+  },
+  "m14q6": {
+    "questionText": "Que devez-vous faire de préférence avec une ouverture dans le sol ?",
+    "optionA": "Garder vos distances pendant le travail.",
+    "optionB": "La recouvrir d'un matériau solide.",
+    "optionC": "Porter un harnais de sécurité attaché à une ligne de sécurité.",
+    "moduleName": "Travail en hauteur"
+  },
+  "m14q7": {
+    "questionText": "Qu'est-ce qui n'est pas un danger du travail à proximité d'ouvertures dans les murs et les sols ?",
+    "optionA": "Être heurté par un objet tombant à travers une ouverture.",
+    "optionB": "Tomber à travers une ouverture dans le sol.",
+    "optionC": "Fermer une grande ouverture dans le sol.",
+    "moduleName": "Travail en hauteur"
+  },
+  "m14q8": {
+    "questionText": "Une échelle s'utilise pour :",
+    "optionA": "Pour réaliser des travaux de faible importance.",
+    "optionB": "Franchir une certaine hauteur.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Travail en hauteur"
+  },
+  "m14q9": {
+    "questionText": "La portée maximale d'une longueur de bras est une règle pour le travail avec :",
+    "optionA": "Des perceuses à colonne.",
+    "optionB": "Des échelles.",
+    "optionC": "Des scies d'établi.",
+    "moduleName": "Travail en hauteur"
+  },
+  "m15q1": {
+    "questionText": "Une personne non qualifiée peut-elle travailler sur des installations électriques sous tension ?",
+    "optionA": "Oui, à condition que la personne non qualifiée ait plus de 21 ans.",
+    "optionB": "Oui, mais uniquement si l'expert est disponible en permanence.",
+    "optionC": "Non, jamais.",
+    "moduleName": "Électricité"
+  },
+  "m15q2": {
+    "questionText": "Que fait un disjoncteur différentiel ?",
+    "optionA": "Il dérive le courant haute tension vers le conducteur de terre.",
+    "optionB": "Il coupe l'alimentation à partir d'un certain courant de fuite.",
+    "optionC": "Il fonctionne comme une terre artificielle.",
+    "moduleName": "Électricité"
+  },
+  "m15q3": {
+    "questionText": "Quelle tension de sécurité devez-vous utiliser dans un espace confiné ?",
+    "optionA": "Courant continu (max. 50V) ou courant alternatif (max. 130V).",
+    "optionB": "Courant continu (max. 12V) ou courant alternatif (max. 120V).",
+    "optionC": "Courant continu (max. 120V) ou courant alternatif (max. 50V).",
+    "moduleName": "Électricité"
+  },
+  "m15q4": {
+    "questionText": "Qu'est-ce qui peut provoquer des accidents dus à l'électricité ?",
+    "optionA": "L'absence de mise à la terre.",
+    "optionB": "L'actionnement de l'arrêt d'urgence.",
+    "optionC": "La fusion d'un fusible.",
+    "moduleName": "Électricité"
+  },
+  "m15q5": {
+    "questionText": "Quel est le plus grand danger du passage du courant à travers le corps ?",
+    "optionA": "La réaction de sursaut.",
+    "optionB": "L'apparition de brûlures.",
+    "optionC": "Le passage du courant à travers le cœur.",
+    "moduleName": "Électricité"
+  },
+  "m15q6": {
+    "questionText": "L'électrocution est un danger lié à :",
+    "optionA": "L'utilisation de substances dangereuses.",
+    "optionB": "L'utilisation de l'électricité.",
+    "optionC": "L'utilisation de substances inflammables.",
+    "moduleName": "Électricité"
+  },
+  "m15q7": {
+    "questionText": "Les lésions dues au courant électrique ne dépendent pas de :",
+    "optionA": "L'intensité du courant.",
+    "optionB": "La durée du passage du courant à travers le corps.",
+    "optionC": "L'épaisseur de la peau.",
+    "moduleName": "Électricité"
+  },
+  "m15q8": {
+    "questionText": "L'intensité du courant traversant le corps dépend de :",
+    "optionA": "La résistance de la surface, sans tenir compte des chaussures.",
+    "optionB": "La tension.",
+    "optionC": "Votre mode de vie.",
+    "moduleName": "Électricité"
+  },
+  "m15q9": {
+    "questionText": "Comment se produit un court-circuit ?",
+    "optionA": "Lorsque deux parties à des tensions différentes entrent en contact direct.",
+    "optionB": "Lorsque deux parties à la même tension entrent en contact direct.",
+    "optionC": "Lorsqu'un fil électrique n'est pas mis à la terre.",
+    "moduleName": "Électricité"
+  },
+  "m15q10": {
+    "questionText": "L'apparition et la taille d'un arc électrique sont déterminées par :",
+    "optionA": "L'intensité du courant.",
+    "optionB": "La différence de potentiel entre les parties.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Électricité"
+  },
+  "m15q11": {
+    "questionText": "Les chaussures antistatiques se portent lorsque :",
+    "optionA": "L'on travaille dans des espaces confinés.",
+    "optionB": "L'on travaille avec de l'électricité statique.",
+    "optionC": "L'on travaille avec des échelles.",
+    "moduleName": "Électricité"
+  },
+  "m15q12": {
+    "questionText": "Un danger de l'électricité statique est :",
+    "optionA": "La décharge peut provoquer une étincelle.",
+    "optionB": "Les équipements électroniques sensibles peuvent être endommagés.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Électricité"
+  },
+  "m15q13": {
+    "questionText": "Dans quelle situation l'électricité statique ne se produira-t-elle pas ?",
+    "optionA": "Dans des locaux à faible teneur en oxygène.",
+    "optionB": "Pour des liquides circulant dans une conduite en plastique ou agités.",
+    "optionC": "En marchant sur un revêtement de sol en plastique.",
+    "moduleName": "Électricité"
+  },
+  "m15q14": {
+    "questionText": "Qu'est-ce qui n'est pas une méthode de protection des enveloppes ?",
+    "optionA": "La double isolation protège contre la pénétration de poussière et d'humidité.",
+    "optionB": "Protection contre les chocs et la chute d'objets.",
+    "optionC": "Protection contre la pénétration d'humidité.",
+    "moduleName": "Électricité"
+  },
+  "m15q15": {
+    "questionText": "Un danger de l'utilisation de câbles d'alimentation et de rallonges est :",
+    "optionA": "Les câbles d'alimentation sont trop courts.",
+    "optionB": "Trébucher sur les câbles.",
+    "optionC": "La surcharge du câble.",
+    "moduleName": "Électricité"
+  },
+  "m15q16": {
+    "questionText": "Lors de l'utilisation d'un enrouleur de câble, il faut :",
+    "optionA": "Dérouler complètement le câble de l'enrouleur.",
+    "optionB": "Ne pas l'utiliser dans des espaces confinés.",
+    "optionC": "Ne jamais le dérouler complètement de l'enrouleur.",
+    "moduleName": "Électricité"
+  },
+  "m15q17": {
+    "questionText": "Lorsqu'un enrouleur de câble n'est pas complètement déroulé :",
+    "optionA": "Il peut produire de l'électricité statique.",
+    "optionB": "Il peut devenir très chaud et provoquer un incendie.",
+    "optionC": "Il peut produire des étincelles électriques.",
+    "moduleName": "Électricité"
+  },
+  "m15q18": {
+    "questionText": "La valeur de protection du disjoncteur différentiel pour un chantier de construction est de :",
+    "optionA": "300 mA.",
+    "optionB": "25 mA.",
+    "optionC": "30 mA.",
+    "moduleName": "Électricité"
+  },
+  "m15q19": {
+    "questionText": "Une mesure de sécurité avant de travailler avec des équipements électriques est :",
+    "optionA": "Vérifier visuellement l'absence de dommages et de non-conformités.",
+    "optionB": "Signaler les dommages et ne pas utiliser les équipements endommagés.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Électricité"
+  },
+  "m15q20": {
+    "questionText": "Lorsqu'on utilise de l'électricité :",
+    "optionA": "Les échafaudages doivent être placés sur des tapis en caoutchouc.",
+    "optionB": "Les échafaudages doivent être mis à la terre.",
+    "optionC": "Il n'y a rien de particulier à faire avec les échafaudages.",
+    "moduleName": "Électricité"
+  },
+  "m16q1": {
+    "questionText": "Quelle est une caractéristique d'un espace confiné ?",
+    "optionA": "Un accès difficile.",
+    "optionB": "Un bon éclairage.",
+    "optionC": "Un espace de travail suffisant.",
+    "moduleName": "Espaces confinés"
+  },
+  "m16q2": {
+    "questionText": "Un surveillant au trou d'homme est-il obligatoire pendant les travaux dans un espace clos ?",
+    "optionA": "Oui, mais il peut partir une fois les mesures terminées.",
+    "optionB": "Non, sauf indication contraire dans la licence de l'entrepreneur.",
+    "optionC": "Oui, tant qu'il y a quelqu'un dans l'espace clos.",
+    "moduleName": "Espaces confinés"
+  },
+  "m16q3": {
+    "questionText": "Comment un risque d'asphyxie peut-il survenir dans un espace confiné ?",
+    "optionA": "Par des défauts de l'installation électrique.",
+    "optionB": "Par des concentrations élevées d'oxygène.",
+    "optionC": "Par une concentration insuffisante d'oxygène.",
+    "moduleName": "Espaces confinés"
+  },
+  "m16q4": {
+    "questionText": "Laquelle des tensions ci-dessous est sûre ?",
+    "optionA": "120 volts en courant alternatif.",
+    "optionB": "240 volts en courant continu.",
+    "optionC": "120 volts en courant continu.",
+    "moduleName": "Espaces confinés"
+  },
+  "m16q5": {
+    "questionText": "Qu'est-ce qui n'est pas un exemple d'espace confiné ?",
+    "optionA": "Les réservoirs ou cuves de stockage.",
+    "optionB": "Les tentes de soudage dans ou près des excavations profondes.",
+    "optionC": "Étroit, petit, humide, glissant et avec peu de place pour manœuvrer.",
+    "moduleName": "Espaces confinés"
+  },
+  "m16q6": {
+    "questionText": "Une règle pour effectuer des mesures dans un espace confiné est :",
+    "optionA": "Les mesures doivent être effectuées par le responsable hiérarchique.",
+    "optionB": "Les mesures doivent être effectuées par le travailleur qui se trouve dans l'espace.",
+    "optionC": "Les mesures doivent être effectuées par une personne compétente.",
+    "moduleName": "Espaces confinés"
+  },
+  "m16q7": {
+    "questionText": "Lors de la surveillance d'un espace confiné, il faut tenir compte de ceci :",
+    "optionA": "Il ne doit pas y avoir de communication en cas de risque d'effondrement.",
+    "optionB": "Prévenir les services de secours si la personne est en danger.",
+    "optionC": "Le surveillant doit effectuer d'autres travaux pendant qu'il surveille.",
+    "moduleName": "Espaces confinés"
+  },
+  "m16q8": {
+    "questionText": "Le surveillant permanent doit :",
+    "optionA": "Être présent lorsqu'il y a des matières inflammables.",
+    "optionB": "Être sur le chantier en permanence.",
+    "optionC": "Posséder une compétence attestée de manière démontrable.",
+    "moduleName": "Espaces confinés"
+  },
+  "m16q9": {
+    "questionText": "La durée de séjour dans un espace confiné :",
+    "optionA": "Dépend de l'endroit où se trouve l'espace confiné.",
+    "optionB": "Doit être aussi courte que possible.",
+    "optionC": "N'a pas d'importance.",
+    "moduleName": "Espaces confinés"
+  },
+  "m16q10": {
+    "questionText": "Une mesure de sécurité pour réduire le risque d'électrocution dans un espace confiné est :",
+    "optionA": "Les deux réponses sont correctes.",
+    "optionB": "Mettre les équipements hors tension de la manière correcte.",
+    "optionC": "Utiliser des tensions de sécurité dans les espaces confinés à parois conductrices.",
+    "moduleName": "Espaces confinés"
+  },
+  "m17q1": {
+    "questionText": "Quand les opérations de levage doivent-elles être suspendues ?",
+    "optionA": "Respectez les instructions du fabricant de la grue concernant la force du vent.",
+    "optionB": "Au-dessus d'un vent de force 4.",
+    "optionC": "Au-dessus d'un vent de force 5.",
+    "moduleName": "Levage"
+  },
+  "m17q2": {
+    "questionText": "Lequel de ces éléments est un accessoire de levage ?",
+    "optionA": "Une élingue.",
+    "optionB": "Une sangle de retenue.",
+    "optionC": "Une ceinture de harnais.",
+    "moduleName": "Levage"
+  },
+  "m17q3": {
+    "questionText": "Comment appelle-t-on deux élingues fixées à un anneau en acier ?",
+    "optionA": "Une élingue à deux brins.",
+    "optionB": "Une paire d'élingues.",
+    "optionC": "Un duo.",
+    "moduleName": "Levage"
+  },
+  "m17q4": {
+    "questionText": "Qu'est-ce qui est consigné dans le carnet de la grue ?",
+    "optionA": "Quels certificats de contrôle sont obligatoires.",
+    "optionB": "Quels poids peuvent être déplacés et sur quelle distance.",
+    "optionC": "Quels contrôles la grue a subis.",
+    "moduleName": "Levage"
+  },
+  "m17q5": {
+    "questionText": "Quelle affirmation concernant les chaînes est CORRECTE ?",
+    "optionA": "Avec des chaînes passant sur des arêtes vives, on utilise des protège-arêtes.",
+    "optionB": "Les chaînes à maillons étirés peuvent être utilisées si le poids ne dépasse pas la limite.",
+    "optionC": "Les chaînes ne peuvent jamais être rallongées.",
+    "moduleName": "Levage"
+  },
+  "m17q6": {
+    "questionText": "Qu'est-ce qui n'est pas un exemple d'appareil de levage ?",
+    "optionA": "Une grue à tour.",
+    "optionB": "Un pont roulant.",
+    "optionC": "Un transpalette.",
+    "moduleName": "Levage"
+  },
+  "m17q7": {
+    "questionText": "Que peut-on faire avec un appareil de levage ?",
+    "optionA": "Déplacer des charges verticalement.",
+    "optionB": "Déplacer des charges horizontalement.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Levage"
+  },
+  "m17q8": {
+    "questionText": "Un danger général lors du travail avec du matériel de levage est :",
+    "optionA": "La chute de la charge.",
+    "optionB": "Le basculement de l'appareil de levage.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Levage"
+  },
+  "m17q9": {
+    "questionText": "Les stabilisateurs sont utilisés lors du travail avec :",
+    "optionA": "Des perceuses à colonne.",
+    "optionB": "Des matières dangereuses.",
+    "optionC": "Des appareils de levage.",
+    "moduleName": "Levage"
+  },
+  "m17q10": {
+    "questionText": "Les câbles en acier :",
+    "optionA": "Ne doivent pas être noués.",
+    "optionB": "Doivent être stockés dans un local humide.",
+    "optionC": "Peuvent encore être utilisés lorsqu'ils sont très rouillés.",
+    "moduleName": "Levage"
+  },
+  "m18q1": {
+    "questionText": "Le rayonnement infrarouge est :",
+    "optionA": "Un rayonnement non ionisant.",
+    "optionB": "Un rayonnement ionisant.",
+    "optionC": "Un rayonnement naturel de fond.",
+    "moduleName": "Rayonnements"
+  },
+  "m18q2": {
+    "questionText": "Une mesure de sécurité contre les rayonnements ionisants est :",
+    "optionA": "Se tenir aussi loin que possible.",
+    "optionB": "Baliser la zone autour de la source.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Rayonnements"
+  },
+  "m18q3": {
+    "questionText": "Un examen médical est obligatoire pour les travailleurs qui :",
+    "optionA": "Travaillent avec des substances dangereuses pendant une courte période.",
+    "optionB": "Travaillent avec des équipements ou des substances qui émettent des rayonnements ionisants.",
+    "optionC": "Sont malades de temps en temps.",
+    "moduleName": "Rayonnements"
+  },
+  "m18q4": {
+    "questionText": "La surveillance de la sécurité et de l'hygiène en matière de rayonnements est une tâche :",
+    "optionA": "Du responsable hiérarchique.",
+    "optionB": "De l'expert en rayonnements.",
+    "optionC": "De l'équipe d'intervention d'urgence.",
+    "moduleName": "Rayonnements"
+  },
+  "m18q5": {
+    "questionText": "Quelle est la différence entre rayonnement ionisant et non ionisant ?",
+    "optionA": "Le rayonnement non ionisant est le seul rayonnement qui crée des ions.",
+    "optionB": "Le rayonnement non ionisant est plus faible que le rayonnement ionisant.",
+    "optionC": "Le rayonnement non ionisant est plus fort que le rayonnement ionisant.",
+    "moduleName": "Rayonnements"
+  },
+  "m18q6": {
+    "questionText": "Une mesure de sécurité pour éviter que le rayonnement non ionisant nuise à la santé est :",
+    "optionA": "Prêter attention aux instructions figurant sur les appareils.",
+    "optionB": "Respecter les instructions relatives à la durée d'utilisation.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Rayonnements"
+  },
+  "m19q1": {
+    "questionText": "Qu'est-ce qui ne détermine pas les conditions de l'environnement de travail ?",
+    "optionA": "Le responsable hiérarchique.",
+    "optionB": "Les vibrations.",
+    "optionC": "L'éclairage.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q2": {
+    "questionText": "Un type de vibrations physiques est :",
+    "optionA": "Les vibrations main-bras provenant d'outils mécaniques.",
+    "optionB": "Les vibrations du corps entier provenant d'un véhicule ou d'un sol en mouvement.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q3": {
+    "questionText": "Qu'est-ce qui n'est pas un trouble de santé dû aux vibrations transmises au corps ?",
+    "optionA": "Des infections de la peau.",
+    "optionB": "Des douleurs musculaires.",
+    "optionC": "De la fatigue.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q4": {
+    "questionText": "Maintenir l'équilibre hydrique est une mesure de maîtrise :",
+    "optionA": "Lors du travail avec des substances dangereuses.",
+    "optionB": "Pour garantir qu'il n'y aura pas d'incendie.",
+    "optionC": "Pour garantir le confort au travail.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q5": {
+    "questionText": "Un facteur qui influence la charge physique est :",
+    "optionA": "La position/posture de travail.",
+    "optionB": "Les deux réponses sont correctes.",
+    "optionC": "Les mouvements qui doivent être effectués.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q6": {
+    "questionText": "Une fonction de la pause pendant le travail est :",
+    "optionA": "Avoir une conversation informelle agréable avec les collègues.",
+    "optionB": "Prévenir la surcharge.",
+    "optionC": "Disposer de suffisamment de temps pour déjeuner.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q7": {
+    "questionText": "La fatigue chronique est un risque pour la santé :",
+    "optionA": "Lié aux heures supplémentaires effectuées une fois par mois.",
+    "optionB": "Lié à la charge statique.",
+    "optionC": "Lié au travail avec des substances dangereuses.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q8": {
+    "questionText": "La relation avec vos collègues :",
+    "optionA": "Influence le régime des horaires de travail.",
+    "optionB": "Doit toujours être positive.",
+    "optionC": "Influence la charge mentale.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q9": {
+    "questionText": "La posture correcte lors du levage et du déplacement manuels est :",
+    "optionA": "Garder la charge aussi près que possible du corps.",
+    "optionB": "Soulever avec le dos droit et les genoux fléchis.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q10": {
+    "questionText": "Laquelle n'est pas une condition dans laquelle le travail debout est préférable ?",
+    "optionA": "Lorsqu'il faut fréquemment atteindre vers le bas, vers le haut ou loin.",
+    "optionB": "Si des forces supérieures à 30 N (3,0 kg) doivent être exercées.",
+    "optionC": "S'il n'y a pas assez de place pour les jambes.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q11": {
+    "questionText": "La position assise optimale pendant le travail est :",
+    "optionA": "Un bon appui des cuisses sur le siège.",
+    "optionB": "Un soulagement des épaules, par exemple avec des accoudoirs.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q12": {
+    "questionText": "Quelle est une règle pour une position assise correcte pendant le travail ?",
+    "optionA": "Veiller à une position assise optimale.",
+    "optionB": "Une fois dans la position optimale, continuer à travailler ainsi aussi longtemps que possible.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q13": {
+    "questionText": "Le poids maximal recommandé de 25 Kg est une mesure de sécurité pour :",
+    "optionA": "Le levage en position assise.",
+    "optionB": "Le levage manuel.",
+    "optionC": "Le levage avec une grue.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m19q14": {
+    "questionText": "La posture correcte lors du levage manuel est :",
+    "optionA": "Soulever avec le dos droit et les genoux fléchis.",
+    "optionB": "Garder la charge aussi près que possible du corps.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Le poste de travail ergonomique"
+  },
+  "m20q1": {
+    "questionText": "Quel est l'effet d'un bruit excessivement fort sur le lieu de travail ?",
+    "optionA": "Il augmente le risque sur le lieu de travail.",
+    "optionB": "Si une protection auditive est portée, le bruit fort n'a aucun effet.",
+    "optionC": "Il est possible de travailler davantage puisqu'on ne peut pas parler.",
+    "moduleName": "Bruit au poste de travail"
+  },
+  "m20q2": {
+    "questionText": "Quels facteurs déterminent si le bruit est nocif ?",
+    "optionA": "Le temps d'exposition et la résistance des osselets de l'oreille.",
+    "optionB": "La hauteur et l'intensité du bruit.",
+    "optionC": "La distance et le dégagement de chaleur à l'intérieur de l'oreille.",
+    "moduleName": "Bruit au poste de travail"
+  },
+  "m20q3": {
+    "questionText": "Deux sources sonores identiques réunies augmentent le niveau sonore de :",
+    "optionA": "3 dB.",
+    "optionB": "6 dB.",
+    "optionC": "9 dB.",
+    "moduleName": "Bruit au poste de travail"
+  },
+  "m20q4": {
+    "questionText": "L'exposition à un bruit excessif provoque :",
+    "optionA": "Des doigts blancs.",
+    "optionB": "Des lésions cérébrales permanentes.",
+    "optionC": "Une perte de concentration.",
+    "moduleName": "Bruit au poste de travail"
+  },
+  "m20q5": {
+    "questionText": "Doubler la distance par rapport à la source de bruit donne une réduction d'environ :",
+    "optionA": "3 dB(A).",
+    "optionB": "6 dB(A).",
+    "optionC": "9 dB(A).",
+    "moduleName": "Bruit au poste de travail"
+  },
+  "m20q6": {
+    "questionText": "Avoir des difficultés à téléphoner est un symptôme de :",
+    "optionA": "Perte auditive temporaire.",
+    "optionB": "Un environnement bruyant.",
+    "optionC": "Perte auditive permanente.",
+    "moduleName": "Bruit au poste de travail"
+  },
+  "m20q7": {
+    "questionText": "L'unité de mesure du niveau de (pression) sonore est :",
+    "optionA": "Le lumen.",
+    "optionB": "Le décibel.",
+    "optionC": "L'amplitude.",
+    "moduleName": "Bruit au poste de travail"
+  },
+  "m20q8": {
+    "questionText": "L'ordre correct pour maîtriser un bruit excessif est :",
+    "optionA": "1. Réduire la source / 2. Utiliser une protection auditive / 3. Amortir le bruit / 4. Isoler par écran",
+    "optionB": "1. Utiliser une protection auditive / 2. Isoler par écran / 3. Amortir le bruit / 4. Réduire la source",
+    "optionC": "1. Réduire la source / 2. Isoler par écran / 3. Amortir le bruit / 4. Utiliser une protection auditive",
+    "moduleName": "Bruit au poste de travail"
+  },
+  "m20q9": {
+    "questionText": "Quelles mesures l'employeur doit-il prendre à ces niveaux sonores ?",
+    "optionA": "À partir de 85 dB(A), proposer un examen auditif et une protection auditive.",
+    "optionB": "À partir de 80 dB(A), proposer un examen auditif et une protection auditive.",
+    "optionC": "À partir de 75 dB(A), proposer un examen auditif et une protection auditive.",
+    "moduleName": "Bruit au poste de travail"
+  },
+  "m21q1": {
+    "questionText": "Pourquoi ne faut-il pas porter de casque de sécurité métallique dans l'industrie ?",
+    "optionA": "Un casque métallique peut blesser la tête.",
+    "optionB": "Un casque métallique ne peut pas amortir suffisamment la chute d'objets.",
+    "optionC": "Un casque métallique peut conduire l'électricité.",
+    "explanation": "L'EPI est toujours le dernier recours dans la hiérarchie des mesures de maîtrise. Il ne protège que la personne qui le porte et dépend de son utilisation correcte. Les mesures collectives sont toujours à privilégier.",
+    "officialRef": "Module 21 — Équipements de protection individuelle",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q2": {
+    "questionText": "Pour quelles activités un masque à filtre à poussières constitue-t-il une protection respiratoire adéquate ?",
+    "optionA": "Lors de la peinture au pistolet.",
+    "optionB": "Lors du soudage.",
+    "optionC": "Lors de travaux de démolition et de piquage.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q3": {
+    "questionText": "Dans quelles situations les lunettes-masques de sécurité offrent-elles une bonne protection ?",
+    "optionA": "Pour les activités où se produisent des projections d'acide.",
+    "optionB": "Pour les travaux au-dessus de la tête.",
+    "optionC": "Pour les travaux en espaces confinés.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q4": {
+    "questionText": "Lors de travaux avec un niveau de bruit supérieur à 85 dB(A) :",
+    "optionA": "La protection auditive est recommandée.",
+    "optionB": "Le travailleur peut choisir d'utiliser ou non une protection auditive.",
+    "optionC": "La protection auditive est obligatoire.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q5": {
+    "questionText": "Les EPI doivent être :",
+    "optionA": "Disponibles en une seule taille.",
+    "optionB": "Présents à chaque poste de travail.",
+    "optionC": "Testés.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q6": {
+    "questionText": "La différence entre des lunettes de sécurité et un masque de soudage :",
+    "optionA": "Les masques de soudage protègent du rayonnement infrarouge ; les lunettes protègent des particules projetées.",
+    "optionB": "Les lunettes de sécurité protègent des UV ; les masques de soudage protègent des particules projetées.",
+    "optionC": "Les lunettes de sécurité couvrent tout le visage et les masques de soudage non.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q7": {
+    "questionText": "Une concentration d'oxygène trop faible est un danger pour :",
+    "optionA": "L'environnement.",
+    "optionB": "Les incendies.",
+    "optionC": "La respiration.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q8": {
+    "questionText": "Une protection respiratoire autonome doit être utilisée :",
+    "optionA": "S'il y a des concentrations élevées et inconnues de substances dangereuses.",
+    "optionB": "S'il y a moins de 19% d'oxygène dans l'air.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q9": {
+    "questionText": "Qu'est-ce qui n'est pas une règle d'utilisation de la protection antichute ?",
+    "optionA": "Les harnais de sécurité doivent être bien ajustés et adaptés à la personne qui les porte.",
+    "optionB": "Les dispositifs antichute qui ont déjà arrêté une chute peuvent être réutilisés.",
+    "optionC": "Les lignes de vie ne doivent pas être sales.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q10": {
+    "questionText": "Les vêtements de haute visibilité sont utilisés :",
+    "optionA": "À basse température.",
+    "optionB": "Pour rendre visible la personne qui les porte.",
+    "optionC": "Contre la contamination, lors du soudage et du meulage.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q11": {
+    "questionText": "Les glissades sont un danger pour :",
+    "optionA": "Les mains et les bras.",
+    "optionB": "Les pieds et les jambes.",
+    "optionC": "La tête et le visage.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q12": {
+    "questionText": "Différentes formes de protection des mains et des bras sont :",
+    "optionA": "Des gants avec semelle antidérapante.",
+    "optionB": "Des gants avec protection prolongée du poignet et/ou du bras.",
+    "optionC": "Un embout en acier pour protéger les doigts de la chute d'objets lourds.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q13": {
+    "questionText": "Une propriété principale du casque de sécurité est :",
+    "optionA": "Intérieur : absorbe un choc et le répartit sur la tête.",
+    "optionB": "Extérieur : absorbe un choc et le répartit sur la tête.",
+    "optionC": "Intérieur : suffisamment robuste pour arrêter la chute d'objets.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q14": {
+    "questionText": "Les dangers pour la tête pendant le travail sont :",
+    "optionA": "Les chocs.",
+    "optionB": "La chute d'objets.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m21q15": {
+    "questionText": "Un demi-masque couvrant le nez et la bouche est utilisé :",
+    "optionA": "Contre les particules et les gaz ou vapeurs.",
+    "optionB": "Pour couvrir tout le visage.",
+    "optionC": "Uniquement contre les particules, pas contre les gaz ou vapeurs.",
+    "moduleName": "Équipements de protection individuelle"
+  },
+  "m22q1": {
+    "questionText": "Quelles caractéristiques s'appliquent à un panneau d'obligation ?",
+    "optionA": "Il est rond, bleu, avec un pictogramme blanc.",
+    "optionB": "Il est triangulaire et jaune avec un pictogramme noir.",
+    "optionC": "Il est rectangulaire et vert avec un pictogramme blanc.",
+    "moduleName": "Signalisation et marquage"
+  },
+  "m22q2": {
+    "questionText": "Quelles exigences s'appliquent aux panneaux d'avertissement sur le lieu de travail ?",
+    "optionA": "Le dessin doit être clair pour tous.",
+    "optionB": "Ils doivent être fixés à une hauteur sûre.",
+    "optionC": "Ils comportent de préférence un texte en néerlandais.",
+    "moduleName": "Signalisation et marquage"
+  },
+  "m22q3": {
+    "questionText": "Un groupe de panneaux est :",
+    "optionA": "Les panneaux d'obligation.",
+    "optionB": "Les panneaux de premiers secours.",
+    "optionC": "Les panneaux de sortie.",
+    "moduleName": "Signalisation et marquage"
+  },
+  "m22q4": {
+    "questionText": "Un panneau qui interdit quelque chose est :",
+    "optionA": "Un panneau circulaire rouge avec un bord blanc et une diagonale rouge.",
+    "optionB": "Un panneau triangulaire jaune avec un bord noir.",
+    "optionC": "Un panneau circulaire blanc avec un bord rouge et une diagonale rouge.",
+    "moduleName": "Signalisation et marquage"
+  },
+  "m22q5": {
+    "questionText": "Un panneau triangulaire jaune avec un bord noir correspond au dessin de :",
+    "optionA": "Un panneau de sauvetage.",
+    "optionB": "Un panneau d'avertissement.",
+    "optionC": "Un panneau d'obligation.",
+    "moduleName": "Signalisation et marquage"
+  },
+  "m22q6": {
+    "questionText": "La signification générale des panneaux d'avertissement est :",
+    "optionA": "Interdire quelque chose.",
+    "optionB": "Le chemin vers les moyens de secours.",
+    "optionC": "Attention, danger.",
+    "moduleName": "Signalisation et marquage"
+  },
+  "m22q7": {
+    "questionText": "Un panneau carré ou rectangulaire vert avec un pictogramme blanc correspond à :",
+    "optionA": "Les panneaux d'obligation.",
+    "optionB": "Les panneaux d'avertissement.",
+    "optionC": "Les panneaux de sauvetage ou de secours.",
+    "moduleName": "Signalisation et marquage"
+  },
+  "m22q8": {
+    "questionText": "Le matériel de lutte contre l'incendie se trouve près de panneaux qui sont :",
+    "optionA": "Carrés/rectangulaires et verts avec un pictogramme blanc.",
+    "optionB": "Carrés/rectangulaires et rouges avec un pictogramme blanc.",
+    "optionC": "Carrés/rectangulaires et noirs avec un pictogramme blanc.",
+    "moduleName": "Signalisation et marquage"
+  },
+  "m22q9": {
+    "questionText": "La signification générale des panneaux de matériel de lutte contre l'incendie :",
+    "optionA": "Ils indiquent où se trouve le matériel : le chemin pour y accéder.",
+    "optionB": "Ils indiquent où se trouve le matériel : l'emplacement lui-même.",
+    "optionC": "Les deux réponses sont correctes.",
+    "moduleName": "Signalisation et marquage"
+  },
+  "m22q10": {
+    "questionText": "Les bandes jaunes ou blanches sont utilisées pour :",
+    "optionA": "Marquer la première et la dernière marche des escaliers.",
+    "optionB": "Le marquage des voies de circulation et des zones de stockage.",
+    "optionC": "Les panneaux d'obligation.",
+    "moduleName": "Signalisation et marquage"
+  },
+  "mc001": {
+    "questionText": "Lesquels des éléments suivants sont obligatoires lors de travaux en hauteur à plus de 2 mètres ?",
+    "explanation": "Le travail en hauteur exige au minimum une protection antichute (harnais + longe), une protection de la tête et une protection des pieds. Le gilet de haute visibilité et la protection auditive dépendent de l'environnement concret.",
+    "officialRef": "Module 14 — Travail en hauteur",
+    "moduleName": "Travail en hauteur",
+    "options": {
+      "a": "Harnais de sécurité avec longe",
+      "b": "Casque de sécurité",
+      "c": "Chaussures de sécurité avec embout en acier",
+      "d": "Gilet de haute visibilité",
+      "e": "Protection auditive"
+    }
+  },
+  "mc002": {
+    "questionText": "Lesquelles des substances suivantes sont classées comme substances dangereuses selon le règlement REACH ?",
+    "explanation": "L'amiante, le benzène et la poussière de silice sont tous classés comme substances dangereuses avec des limites d'exposition strictes. L'eau potable et l'air comprimé ne sont pas classés comme dangereux selon REACH.",
+    "officialRef": "Module 8 — Substances dangereuses",
+    "moduleName": "Substances dangereuses",
+    "options": {
+      "a": "Fibres d'amiante",
+      "b": "Benzène",
+      "c": "Eau potable",
+      "d": "Poussière de silice",
+      "e": "Air comprimé"
+    }
+  },
+  "mc003": {
+    "questionText": "Lesquelles des méthodes suivantes sont valables pour prévenir un incendie sur un lieu de travail ?",
+    "explanation": "La prévention des incendies consiste à éliminer les sources d'ignition, à stocker correctement les produits inflammables et à assurer une ventilation adéquate. L'eau ne doit pas être utilisée sur les déversements chimiques (elle peut les étendre ou réagir). Les extincteurs doivent être accessibles, pas enfermés sous clé.",
+    "officialRef": "Module 9 — Incendie et explosion",
+    "moduleName": "Incendie et explosion",
+    "options": {
+      "a": "Éliminer les sources d'ignition à proximité des matières inflammables",
+      "b": "Stocker les liquides inflammables dans des armoires de sécurité homologuées",
+      "c": "Augmenter la ventilation pour diluer les vapeurs inflammables",
+      "d": "Utiliser de l'eau pour nettoyer tous les déversements chimiques",
+      "e": "Garder les extincteurs sous clé pour éviter tout usage abusif"
+    }
+  },
+  "tf001": {
+    "questionText": "Indiquez si chacune des affirmations suivantes sur les substances dangereuses est vraie ou fausse :",
+    "explanation": "La FDS doit être disponible conformément au règlement REACH. Les emballages d'origine évitent les confusions. Les déchets chimiques doivent suivre des filières d'élimination spécifiques. Les liquides comme les gaz peuvent nécessiter une ventilation.",
+    "officialRef": "Module 8 — Substances dangereuses",
+    "moduleName": "Substances dangereuses",
+    "statements": {
+      "s1": "Une FDS (fiche de données de sécurité) doit toujours être disponible sur le site",
+      "s2": "Les substances dangereuses doivent être stockées dans leur emballage d'origine",
+      "s3": "Vous pouvez jeter les déchets chimiques dans les ordures ordinaires",
+      "s4": "La ventilation n'est requise que pour les liquides, pas pour les gaz"
+    }
+  },
+  "tf002": {
+    "questionText": "Indiquez si chacune des affirmations suivantes sur les EPI est vraie ou fausse :",
+    "explanation": "L'EPI est le dernier recours dans la hiérarchie des mesures de maîtrise, pas le premier. L'employeur doit fournir les EPI gratuitement. Un EPI endommagé doit être remplacé. Le marquage CE confirme la conformité aux normes de sécurité de l'UE.",
+    "officialRef": "Module 21 — Équipements de protection individuelle",
+    "moduleName": "Équipements de protection individuelle",
+    "statements": {
+      "s1": "L'EPI est la première ligne de défense dans la hiérarchie des mesures de maîtrise",
+      "s2": "L'employeur est responsable de la fourniture gratuite des EPI",
+      "s3": "Un EPI endommagé doit être remplacé immédiatement",
+      "s4": "Un EPI portant le marquage CE répond aux exigences minimales européennes de sécurité"
+    }
+  },
+  "tf003": {
+    "questionText": "Indiquez si chacune des affirmations suivantes sur le travail en espaces confinés est vraie ou fausse :",
+    "explanation": "L'entrée dans un espace confiné exige toujours un permis de travail. La mesure de l'atmosphère est obligatoire indépendamment des dangers visibles (le manque d'oxygène est invisible). Un surveillant extérieur et du matériel de sauvetage sont toujours requis.",
+    "officialRef": "Module 16 — Espaces confinés",
+    "moduleName": "Espaces confinés",
+    "statements": {
+      "s1": "Un permis de travail est toujours requis avant d'entrer dans un espace confiné",
+      "s2": "La mesure de l'atmosphère n'est nécessaire que s'il existe un danger visible",
+      "s3": "Un surveillant doit être présent à l'extérieur de l'espace confiné",
+      "s4": "Le matériel de sauvetage doit être disponible avant l'entrée"
+    }
+  },
+  "ord001": {
+    "questionText": "Placez les étapes de la hiérarchie des mesures de maîtrise (de l'élimination au dernier recours) dans le bon ordre, en commençant par la plus souhaitable :",
+    "explanation": "La hiérarchie des mesures de maîtrise va de Élimination → Substitution → Mesures techniques → Mesures organisationnelles → EPI. L'EPI est toujours le dernier recours parce qu'il dépend de l'utilisation correcte par chaque personne.",
+    "officialRef": "Module 3 — Prévention des risques",
+    "moduleName": "Accidents : causes et prévention",
+    "items": {
+      "i1": "Mesures organisationnelles (procédures, formation)",
+      "i2": "Élimination du danger",
+      "i3": "Équipements de protection individuelle (EPI)",
+      "i4": "Substitution (remplacer par quelque chose de moins dangereux)",
+      "i5": "Mesures techniques (barrières physiques)"
+    }
+  },
+  "ord002": {
+    "questionText": "Placez les étapes de la réaction à un déversement chimique dans le bon ordre :",
+    "explanation": "En cas de déversement chimique : d'abord évacuer et avertir les autres, puis identifier la substance au moyen de la FDS, ensuite nettoyer avec les EPI et le matériel adéquats et, enfin, signaler l'incident.",
+    "officialRef": "Module 8 — Substances dangereuses",
+    "moduleName": "Substances dangereuses",
+    "items": {
+      "i1": "Avertir le responsable hiérarchique et remplir le rapport d'incident",
+      "i2": "Évacuer la zone immédiate et avertir les autres",
+      "i3": "Nettoyer avec des matériaux absorbants appropriés et des EPI",
+      "i4": "Identifier la substance au moyen de la FDS"
+    }
+  },
+  "ord003": {
+    "questionText": "Placez les étapes d'utilisation d'un extincteur (technique PASS) dans le bon ordre :",
+    "explanation": "La technique PASS : retirer la goupille → viser la base → presser la poignée → balayer de gauche à droite. Visez toujours la base du feu, pas les flammes.",
+    "officialRef": "Module 9 — Incendie et explosion",
+    "moduleName": "Incendie et explosion",
+    "items": {
+      "i1": "Presser la poignée pour libérer l'agent extincteur",
+      "i2": "Retirer la goupille de sécurité",
+      "i3": "Balayer de gauche à droite à la base du feu",
+      "i4": "Diriger la lance vers la base du feu"
+    }
+  },
+  "mat001": {
+    "questionText": "Associez chaque type d'extincteur à la classe de feu pour laquelle il est conçu :",
+    "explanation": "Eau : uniquement les solides de classe A. Mousse : liquides de classe B (et A). CO₂ : feux électriques (classe C) — déplace l'oxygène sans laisser de résidus. Poudre sèche : polyvalente (A, B, C) mais laisse des résidus.",
+    "officialRef": "Module 9 — Incendie et explosion",
+    "moduleName": "Incendie et explosion",
+    "leftItems": {
+      "l1": "Extincteur à eau",
+      "l2": "Extincteur au CO₂",
+      "l3": "Extincteur à mousse",
+      "l4": "Extincteur à poudre sèche"
+    },
+    "rightItems": {
+      "r1": "Classe A — Matières solides (bois, papier)",
+      "r2": "Classe B — Liquides inflammables (essence, huile)",
+      "r3": "Classe C — Feux électriques",
+      "r4": "Feux de classes A, B et C (polyvalent)"
+    }
+  },
+  "mat002": {
+    "questionText": "Associez chaque couleur de signalisation de sécurité à sa signification :",
+    "explanation": "Code de couleurs ISO 7010 : rouge = interdiction/matériel incendie, jaune = avertissement, bleu = obligation, vert = situation sûre/urgence. Ces couleurs sont normalisées dans toute l'UE.",
+    "officialRef": "Module 22 — Signalisation et marquage",
+    "moduleName": "Signalisation et marquage",
+    "leftItems": {
+      "l1": "Rouge",
+      "l2": "Jaune / ambre",
+      "l3": "Bleu",
+      "l4": "Vert"
+    },
+    "rightItems": {
+      "r1": "Interdiction ou matériel de lutte contre l'incendie",
+      "r2": "Avertissement / prudence",
+      "r3": "Action obligatoire (à faire impérativement)",
+      "r4": "Situation sûre / issue de secours"
+    }
+  },
+  "mat003": {
+    "questionText": "Associez chaque type d'EPI au danger contre lequel il protège principalement :",
+    "explanation": "Chaque type d'EPI est associé à son danger principal. Les coquilles antibruit protègent contre le bruit. Les masques FFP3 protègent contre les particules fines. Les lunettes-masques protègent les yeux. Les gants antivibrations réduisent le risque de syndrome des vibrations main-bras (HAVS) dû aux outils électroportatifs.",
+    "officialRef": "Module 21 — Équipements de protection individuelle",
+    "moduleName": "Équipements de protection individuelle",
+    "leftItems": {
+      "l1": "Coquilles antibruit / bouchons d'oreilles",
+      "l2": "Masque respiratoire (masque FFP3)",
+      "l3": "Lunettes-masques de sécurité",
+      "l4": "Gants antivibrations"
+    },
+    "rightItems": {
+      "r1": "Perte auditive due au bruit",
+      "r2": "Inhalation de poussières fines et d'aérosols",
+      "r3": "Projections chimiques ou particules projetées dans les yeux",
+      "r4": "Syndrome des vibrations main-bras (HAVS)"
+    }
+  }
+}
