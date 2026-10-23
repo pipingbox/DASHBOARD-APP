@@ -1127,7 +1127,10 @@
     "noLessonContent": "Nu există conținut de lecție disponibil pentru acest modul.",
     "quizAnsweredCount": "{{answered}}/{{total}} răspunsuri date",
     "bookVcaExamCta": "Rezervați-vă examenul oficial VCA",
-    "bookVcaExamCtaHint": "Consultați centrele de examinare și rezervați-vă locul"
+    "bookVcaExamCtaHint": "Consultați centrele de examinare și rezervați-vă locul",
+    "examContentLoadError": "Materialul de studiu în această limbă nu a putut fi încărcat. Simularea rămâne blocată.",
+    "examContentRetry": "Reîncărcați și încercați din nou",
+    "examContentUnavailable": "Întrebări indisponibile"
   },
   "tools": {
     "eyebrow": "Instrumente",

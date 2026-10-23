@@ -1127,7 +1127,10 @@
     "noLessonContent": "Aucun contenu de leçon disponible pour ce module.",
     "quizAnsweredCount": "{{answered}}/{{total}} répondues",
     "bookVcaExamCta": "Réservez votre examen officiel VCA",
-    "bookVcaExamCtaHint": "Consultez les centres d’examen et réservez votre place"
+    "bookVcaExamCtaHint": "Consultez les centres d’examen et réservez votre place",
+    "examContentLoadError": "Impossible de charger le support de cours dans cette langue. Le simulateur reste indisponible.",
+    "examContentRetry": "Recharger et réessayer",
+    "examContentUnavailable": "Questions indisponibles"
   },
   "tools": {
     "eyebrow": "Outils",

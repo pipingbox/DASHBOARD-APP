@@ -1127,7 +1127,10 @@
     "noLessonContent": "Não há conteúdo de lição disponível para este módulo.",
     "quizAnsweredCount": "{{answered}}/{{total}} respondidas",
     "bookVcaExamCta": "Marque o seu exame oficial VCA",
-    "bookVcaExamCtaHint": "Consulte os centros de exame e faça a sua marcação"
+    "bookVcaExamCtaHint": "Consulte os centros de exame e faça a sua marcação",
+    "examContentLoadError": "Não foi possível carregar o material de estudo neste idioma. O simulacro permanece indisponível.",
+    "examContentRetry": "Recarregar e tentar novamente",
+    "examContentUnavailable": "Perguntas indisponíveis"
   },
   "tools": {
     "eyebrow": "Tools",

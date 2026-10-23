@@ -609,7 +609,7 @@ export default function AcademyExam() {
   const { user } = useAuth();
   // PB-VCA-I18N-11-001: `ready` is false while the active language still shows the
   // English fallback; the exam must never freeze a snapshot of untranslated questions.
-  const { questions: localizedQuestions, lang: contentLang, ready: contentReady } = useVcaContent();
+  const { questions: localizedQuestions, lang: contentLang, ready: contentReady, error: contentError } = useVcaContent();
 
   const type: ExamType = examType === 'volvca' ? 'volvca' : 'bvca';
   const config = EXAM_CONFIG[type];
@@ -879,14 +879,24 @@ export default function AcademyExam() {
               <span className="text-sm text-zinc-300">{t('academy.examUnderstand', 'I understand the exam rules')}</span>
             </label>
 
+            {contentError && (
+              <div role="alert" className="rounded-lg border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-200">
+                <p>{t('academy.examContentLoadError')}</p>
+                <Button type="button" variant="outline" onClick={() => window.location.reload()} className="mt-3 border-rose-500/50">
+                  {t('academy.examContentRetry')}
+                </Button>
+              </div>
+            )}
             <Button
               onClick={startExam}
               disabled={!rulesAccepted || !contentReady}
               className="w-full bg-[#f59e0b] hover:bg-[#d97706] text-black font-medium disabled:opacity-50"
             >
-              {contentReady
-                ? t('academy.examStart', 'Start Exam')
-                : t('academy.examLoadingContent', 'Loading questions…')}
+              {contentError
+                ? t('academy.examContentUnavailable')
+                : contentReady
+                  ? t('academy.examStart', 'Start Exam')
+                  : t('academy.examLoadingContent', 'Loading questions…')}
             </Button>
           </div>
         </div>

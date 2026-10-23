@@ -189,7 +189,7 @@ export default function AcademyModule() {
             {t('academy.eyebrow', 'Academy')}
           </button>
           <ChevronRight className="h-3 w-3" />
-          <span className="text-zinc-200">Module {mid}</span>
+          <span className="text-zinc-200">{t('academy.moduleFallbackTitle', { number: mid })}</span>
         </div>
 
         {/* Back button */}
@@ -211,7 +211,7 @@ export default function AcademyModule() {
             </div>
             <div className="flex-1">
               <p className="text-xs text-[#f59e0b] font-medium uppercase tracking-wider mb-1">
-                Module {mid}
+                {t('academy.moduleFallbackTitle', { number: mid })}
               </p>
               <h1 className="text-xl font-bold text-zinc-100 mb-2">{moduleName}</h1>
               <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">

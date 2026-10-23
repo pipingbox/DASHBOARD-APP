@@ -1130,7 +1130,10 @@
     "noLessonContent": "Brak treści lekcji dla tego modułu.",
     "quizAnsweredCount": "{{answered}}/{{total}} odpowiedzi udzielonych",
     "bookVcaExamCta": "Zarezerwuj oficjalny egzamin VCA",
-    "bookVcaExamCtaHint": "Przejrzyj ośrodki egzaminacyjne i zarezerwuj miejsce"
+    "bookVcaExamCtaHint": "Przejrzyj ośrodki egzaminacyjne i zarezerwuj miejsce",
+    "examContentLoadError": "Nie udało się wczytać materiału w tym języku. Egzamin próbny pozostaje niedostępny.",
+    "examContentRetry": "Odśwież i spróbuj ponownie",
+    "examContentUnavailable": "Pytania niedostępne"
   },
   "tools": {
     "eyebrow": "Narzędzia",

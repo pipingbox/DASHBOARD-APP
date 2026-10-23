@@ -1127,7 +1127,10 @@
     "noLessonContent": "Nessun contenuto didattico disponibile per questo modulo.",
     "quizAnsweredCount": "{{answered}}/{{total}} risposte",
     "bookVcaExamCta": "Prenoti il Suo esame ufficiale VCA",
-    "bookVcaExamCtaHint": "Consulti i centri d’esame e prenoti il Suo posto"
+    "bookVcaExamCtaHint": "Consulti i centri d’esame e prenoti il Suo posto",
+    "examContentLoadError": "Impossibile caricare il materiale didattico in questa lingua. La simulazione resta bloccata.",
+    "examContentRetry": "Ricaricare e riprovare",
+    "examContentUnavailable": "Domande non disponibili"
   },
   "tools": {
     "eyebrow": "Centro Tecnico",

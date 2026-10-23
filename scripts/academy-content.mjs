@@ -33,6 +33,11 @@ const INDEX_FILE = process.env.ACADEMY_INDEX_FILE ?? join(CONTENT, 'index.ts');
 const TX = '/workspace/i18n-tx/academy';
 const TMP = join(tmpdir(), 'pb-academy-extract');
 const SYLLABI = ['vca', 'scc', 'prl-basico', 'prl-intermedio'];
+const EXISTING_COURSE_COVERAGE = {
+  scc: ['en', 'de', 'ro', 'uk', 'pl', 'bg'],
+  'prl-basico': ['en', 'es', 'ro', 'uk', 'pl', 'bg'],
+  'prl-intermedio': ['en', 'es', 'ro', 'uk', 'pl', 'bg'],
+};
 
 const loadTsData = async () => {
   // The TS sources mix JSON-style and JS-style object literals, so they are
@@ -171,11 +176,28 @@ function validateLessons(en, tr, errors, label) {
         if (!s[key] && ts[key]) errors.push(`${at}: unexpected ${key}`);
       }
       if (s.table) {
-        if (!ts.table || ts.table.headers?.length !== s.table.headers.length || ts.table.rows?.length !== s.table.rows.length) {
+        if (!ts.table || !Array.isArray(ts.table.headers) || !Array.isArray(ts.table.rows)
+          || ts.table.headers.length !== s.table.headers.length || ts.table.rows.length !== s.table.rows.length) {
           errors.push(`${at}: table shape mismatch`);
         } else {
+          s.table.headers.forEach((header, column) => {
+            const value = ts.table.headers[column];
+            if (typeof value !== 'string' || (header.trim() && !value.trim())) {
+              errors.push(`${at}: table header ${column + 1} empty or not a string`);
+            }
+          });
           s.table.rows.forEach((row, r) => {
-            if (ts.table.rows[r].length !== row.length) errors.push(`${at}: table row ${r + 1} width mismatch`);
+            const translated = ts.table.rows[r];
+            if (!Array.isArray(translated) || translated.length !== row.length) {
+              errors.push(`${at}: table row ${r + 1} width mismatch`);
+            } else {
+              row.forEach((cell, column) => {
+                const value = translated[column];
+                if (typeof value !== 'string' || (cell.trim() && !value.trim())) {
+                  errors.push(`${at}: table row ${r + 1} cell ${column + 1} empty or not a string`);
+                }
+              });
+            }
           });
         }
       } else if (ts.table) errors.push(`${at}: unexpected table`);
@@ -357,7 +379,12 @@ function validate(langs) {
     const qp = join(CONTENT, `vca-questions.${lang}.json`);
     for (const key of SYLLABI) {
       const sp = join(CONTENT, `syllabus-${key}.${lang}.json`);
-      if (!existsSync(sp)) continue;
+      if (!existsSync(sp)) {
+        if (key === 'vca' || EXISTING_COURSE_COVERAGE[key]?.includes(lang)) {
+          errors.push(`${lang}: missing syllabus-${key}.${lang}.json`);
+        }
+        continue;
+      }
       const tr = JSON.parse(readFileSync(sp, 'utf8'));
       validateSyllabus(JSON.parse(readFileSync(join(CONTENT, `syllabus-${key}.en.json`), 'utf8')), tr, errors, `${lang} syllabus ${key}`);
       checkScript(lang, tr, errors, `${lang} syllabus ${key}`);
@@ -375,16 +402,6 @@ function validate(langs) {
     checkScript(lang, questions, errors, `${lang} questions`);
     checkModuleNames(lang, questions, errors);
     checkAnswerKeys(lang, questions, errors);
-    if (!existsSync(join(CONTENT, `syllabus-vca.${lang}.json`))) {
-      errors.push(`${lang}: missing syllabus-vca.${lang}.json`);
-    }
-    // SCC / PRL syllabi are separate courses: their absence is reported as a
-    // finding for prioritisation, not as a VCA failure (PB-VCA-I18N-11-001 §6).
-    for (const key of SYLLABI.filter((k) => k !== 'vca')) {
-      if (!existsSync(join(CONTENT, `syllabus-${key}.${lang}.json`))) {
-        console.log(`· ${lang}: syllabus-${key} not translated (separate course, English shown)`);
-      }
-    }
   }
   if (errors.length) {
     console.error(`✗ ${errors.length} Academy content problem(s)`);
@@ -462,15 +479,16 @@ function loaderLanguages(indexSource, mapName, syllabusKey) {
   }
   const body = indexSource.slice(open, end + 1);
   if (!syllabusKey) {
-    return [...body.matchAll(/^\s*([a-z]{2}):\s*\(\)\s*=>\s*import\(/gm)].map((m) => m[1]);
+    return [...body.matchAll(/^\s*([a-z]{2}):\s*\(\)\s*=>\s*import\(['"]\.\/([^'"]+)['"]\)/gm)]
+      .map((m) => ({ lang: m[1], file: m[2] }));
   }
-  // Nested map: { es: { vca: () => import(...), ... }, ... }
-  const langs = [];
+  const loaders = [];
   const re = /^\s{2}([a-z]{2}):\s*\{([\s\S]*?)^\s{2}\},?/gm;
   for (const m of body.matchAll(re)) {
-    if (new RegExp(`^\\s*'?${syllabusKey}'?:\\s*\\(\\)\\s*=>\\s*import\\(`, 'm').test(m[2])) langs.push(m[1]);
+    const entry = new RegExp(`^\\s*'?${syllabusKey}'?:\\s*\\(\\)\\s*=>\\s*import\\(['"]\\./([^'"]+)['"]\\)`, 'm').exec(m[2]);
+    if (entry) loaders.push({ lang: m[1], file: entry[1] });
   }
-  return langs;
+  return loaders;
 }
 
 /**
@@ -499,7 +517,7 @@ function validateVca(langs) {
     }
     if (lang !== 'en') {
       for (const [kind, langsIn] of Object.entries(registered)) {
-        if (langsIn && !langsIn.includes(lang)) errors.push(`${lang}: ${kind} file exists but is not registered in index.ts loaders`);
+        if (langsIn && !langsIn.some((loader) => loader.lang === lang)) errors.push(`${lang}: ${kind} file exists but is not registered in index.ts loaders`);
       }
     }
     const syllabus = read(`syllabus-vca.${lang}`);
@@ -531,8 +549,10 @@ function validateVca(langs) {
   }
   for (const [kind, langsIn] of Object.entries(registered)) {
     const name = kind === 'syllabus' ? 'syllabus-vca' : `vca-${kind}`;
-    for (const lang of langsIn ?? []) {
-      if (!existsSync(join(CONTENT, `${name}.${lang}.json`))) errors.push(`index.ts: ${kind} loader for "${lang}" points to a missing file`);
+    for (const { lang, file } of langsIn ?? []) {
+      const expected = `${name}.${lang}.json`;
+      if (file !== expected) errors.push(`index.ts: ${kind} loader for "${lang}" imports ${file} instead of ${expected}`);
+      if (!existsSync(join(CONTENT, expected))) errors.push(`index.ts: ${kind} loader for "${lang}" points to a missing file`);
       if (!langs.includes(lang)) errors.push(`index.ts: ${kind} loader for "${lang}" is not a canonical language`);
     }
   }

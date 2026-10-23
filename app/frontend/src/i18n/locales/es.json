@@ -1127,7 +1127,10 @@
     "noLessonContent": "No hay contenido de lección disponible para este módulo.",
     "quizAnsweredCount": "{{answered}}/{{total}} respondidas",
     "bookVcaExamCta": "Reserve su examen oficial VCA",
-    "bookVcaExamCtaHint": "Consulte los centros de examen y reserve su plaza"
+    "bookVcaExamCtaHint": "Consulte los centros de examen y reserve su plaza",
+    "examContentLoadError": "No se pudo cargar el material de estudio en este idioma. El simulacro sigue bloqueado.",
+    "examContentRetry": "Recargar e intentarlo de nuevo",
+    "examContentUnavailable": "Preguntas no disponibles"
   },
   "tools": {
     "eyebrow": "Tools",

@@ -1124,7 +1124,10 @@
     "noLessonContent": "Für dieses Modul ist kein Lerninhalt verfügbar.",
     "quizAnsweredCount": "{{answered}}/{{total}} beantwortet",
     "bookVcaExamCta": "Buchen Sie Ihre offizielle VCA-Prüfung",
-    "bookVcaExamCtaHint": "Prüfungszentren ansehen und Platz reservieren"
+    "bookVcaExamCtaHint": "Prüfungszentren ansehen und Platz reservieren",
+    "examContentLoadError": "Das Lernmaterial in dieser Sprache konnte nicht geladen werden. Die Übungsprüfung bleibt gesperrt.",
+    "examContentRetry": "Neu laden und erneut versuchen",
+    "examContentUnavailable": "Fragen nicht verfügbar"
   },
   "tools": {
     "eyebrow": "Tools",

@@ -1124,7 +1124,10 @@
     "noLessonContent": "Er is geen lesinhoud beschikbaar voor deze module.",
     "quizAnsweredCount": "{{answered}}/{{total}} beantwoord",
     "bookVcaExamCta": "Boek uw officiële VCA-examen",
-    "bookVcaExamCtaHint": "Bekijk de examencentra en maak uw reservering"
+    "bookVcaExamCtaHint": "Bekijk de examencentra en maak uw reservering",
+    "examContentLoadError": "Het lesmateriaal in deze taal kon niet worden geladen. Het oefenexamen blijft geblokkeerd.",
+    "examContentRetry": "Pagina opnieuw laden en opnieuw proberen",
+    "examContentUnavailable": "Vragen niet beschikbaar"
   },
   "tools": {
     "eyebrow": "Tools",

@@ -1124,7 +1124,10 @@
     "noLessonContent": "No lesson content available for this module.",
     "quizAnsweredCount": "{{answered}}/{{total}} answered",
     "bookVcaExamCta": "Book Your Official VCA Exam",
-    "bookVcaExamCtaHint": "Browse exam centers and book your reservation"
+    "bookVcaExamCtaHint": "Browse exam centers and book your reservation",
+    "examContentLoadError": "Could not load study material in this language. The practice exam remains unavailable.",
+    "examContentRetry": "Reload and try again",
+    "examContentUnavailable": "Questions unavailable"
   },
   "tools": {
     "landing": {

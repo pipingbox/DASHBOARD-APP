@@ -115,3 +115,43 @@ test('fails when the correct-answer option disappears from a translation', () =>
   assert.equal(r.status, 1);
   assert.match(r.out, /nl (questions|answer key)/);
 });
+
+for (const [kind, file] of [['lessons', 'vca-lessons'], ['questions', 'vca-questions'], ['syllabus', 'syllabus-vca']]) {
+  test(`fails when ${kind} loader imports English instead of Spanish`, () => {
+    const r = withCopy((dir) => {
+      const idx = join(dir, 'index.ts');
+      const source = readFileSync(idx, 'utf8');
+      const target = `./${file}.es.json`;
+      assert.ok(source.includes(target));
+      writeFileSync(idx, source.replace(target, `./${file}.en.json`));
+    });
+    assert.equal(r.status, 1);
+    assert.match(r.out, new RegExp(`${kind} loader for "es" imports ${file}.en.json instead of ${file}.es.json`));
+  });
+}
+
+for (const [part, mutate] of [
+  ['header', (table) => { table.headers[0] = ' '; }],
+  ['cell', (table) => { table.rows[0][0] = ' '; }],
+]) {
+  test(`fails when a translated table ${part} is blank`, () => {
+    const r = withCopy((dir) => editJson(dir, 'vca-lessons.es.json', (d) => mutate(d['9'].sections[1].table)));
+    assert.equal(r.status, 1);
+    assert.match(r.out, new RegExp(`table (header|row).* empty or not a string`));
+  });
+}
+
+test('existing SCC coverage remains required by validate ro', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'pb-academy-coverage-'));
+  try {
+    cpSync(CONTENT, dir, { recursive: true });
+    unlinkSync(join(dir, 'syllabus-scc.ro.json'));
+    const result = spawnSync(process.execPath, [SCRIPT, 'validate', 'ro'], {
+      env: { ...process.env, ACADEMY_CONTENT_DIR: dir }, encoding: 'utf8',
+    });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /ro: missing syllabus-scc.ro.json/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
