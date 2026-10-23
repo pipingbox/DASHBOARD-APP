@@ -66,7 +66,10 @@ import {
   CompanyAnalytics,
   CompanySettings,
   CompanyBilling,
+  CompanyTenant,
+  CompanyTeam,
 } from './pages/company';
+import InviteAccept from './pages/InviteAccept';
 import PricingPage from './pages/PricingPage';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
@@ -104,6 +107,16 @@ const withGateOnly = (node: React.ReactNode) => (
 
 const withShellRoles = (node: React.ReactNode, allowedRoles: string[]) => (
   <ProtectedRoute allowedRoles={allowedRoles}>
+    <AppShell>{node}</AppShell>
+  </ProtectedRoute>
+);
+
+// PB-CE-COMPANY-CORE-001: company tenant routes are open to ANY authenticated
+// user — an invited teammate may still have a worker profile. Authorization is
+// enforced server-side by the pb_company_* RPCs against memberships, never by
+// a client-side role gate.
+const withShellAuth = (node: React.ReactNode) => (
+  <ProtectedRoute>
     <AppShell>{node}</AppShell>
   </ProtectedRoute>
 );
@@ -268,6 +281,19 @@ const AppRoutes = () => {
     <Route
       path="/company/billing"
       element={withShellRoles(<CompanyBilling />, ['admin', 'company'])}
+    />
+    {/* PB-CE-COMPANY-CORE-001 — company tenant + team accounts */}
+    <Route
+      path="/company/tenant"
+      element={withShellAuth(<CompanyTenant />)}
+    />
+    <Route
+      path="/company/team"
+      element={withShellAuth(<CompanyTeam />)}
+    />
+    <Route
+      path="/company-invite/:token"
+      element={<InviteAccept />}
     />
     <Route
       path="/academy"

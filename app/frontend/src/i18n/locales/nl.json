@@ -106,7 +106,9 @@
     "companyDocumentation": "Industrieel Documentbeheer",
     "companySection": "Bedrijf",
     "companySettings": "Instellingen",
-    "companyWorkspace": "Bedrijfsomgeving"
+    "companyWorkspace": "Bedrijfsomgeving",
+    "companyTenant": "Mijn bedrijf",
+    "companyTeam": "Team"
   },
   "notifications": {
     "title": "Meldingen",
@@ -4619,5 +4621,103 @@
     "copyAllFacebook": "Alle Facebook-links kopiëren",
     "copied": "Gekopieerd",
     "note": "UTM-parameters bevatten alleen algemene campagne-identificaties, nooit persoonsgegevens."
+  },
+  "companyCore": {
+    "loading": "Laden…",
+    "switcher": {
+      "label": "Actief bedrijf"
+    },
+    "roles": {
+      "owner": "Eigenaar",
+      "admin": "Beheerder",
+      "recruiter": "Recruiter",
+      "viewer": "Alleen lezen"
+    },
+    "verification": {
+      "unverified": "Niet geverifieerd",
+      "pending": "Verificatie in behandeling",
+      "verified": "Geverifieerd",
+      "rejected": "Verificatie geweigerd"
+    },
+    "create": {
+      "title": "Stel uw bedrijf in",
+      "description": "Maak de werkruimte van uw bedrijf aan om uw team uit te nodigen. Een bedrijf aanmaken verifieert het niet.",
+      "nameLabel": "Bedrijfsnaam",
+      "countryLabel": "Land (optioneel)",
+      "submit": "Bedrijf aanmaken",
+      "submitting": "Aanmaken…"
+    },
+    "view": {
+      "title": "Mijn bedrijf",
+      "description": "Overzicht van de werkruimte van uw bedrijf.",
+      "verificationTitle": "Verificatiestatus",
+      "teamTitle": "Team",
+      "teamDescription": "Leden, rollen en uitnodigingen",
+      "yourRoleTitle": "Uw rol"
+    },
+    "team": {
+      "title": "Team",
+      "description": "Leden van {{company}}",
+      "noCompany": "U maakt nog geen deel uit van een bedrijf.",
+      "createLink": "Stel uw bedrijf in",
+      "membersTitle": "Leden",
+      "unnamedMember": "Naamloos lid",
+      "you": "u",
+      "confirmRemove": "Dit lid verwijderen? De toegang wordt onmiddellijk ingetrokken.",
+      "confirmTransfer": "Eigendom overdragen? U wordt beheerder.",
+      "transferTitle": "Eigendom overdragen",
+      "removeTitle": "Lid verwijderen",
+      "leaveTitle": "Bedrijf verlaten"
+    },
+    "invite": {
+      "title": "Lid uitnodigen",
+      "emailLabel": "E-mailadres",
+      "roleLabel": "Rol",
+      "submit": "Uitnodiging aanmaken",
+      "submitting": "Aanmaken…",
+      "created": "Uitnodiging aangemaakt. Deel deze eenmalige link:",
+      "alreadyPending": "Er staat al een uitnodiging in behandeling voor dit e-mailadres.",
+      "copy": "Kopiëren",
+      "copied": "Link gekopieerd",
+      "emailNotice": "E-mailbezorging is nog niet actief — deel de link handmatig met de uitgenodigde persoon."
+    },
+    "invitations": {
+      "title": "Uitnodigingen",
+      "revoke": "Intrekken",
+      "expires": "verloopt op {{date}}",
+      "status": {
+        "pending": "in behandeling",
+        "accepted": "geaccepteerd",
+        "rejected": "geweigerd",
+        "revoked": "ingetrokken",
+        "expired": "verlopen"
+      }
+    },
+    "accept": {
+      "title": "Bedrijfsuitnodiging",
+      "sessionRequired": "Om op deze uitnodiging te reageren, log in of registreer u met het uitgenodigde e-mailadres en open deze link opnieuw.",
+      "signIn": "Inloggen",
+      "register": "Registreren",
+      "question": "Wilt u lid worden van dit bedrijf?",
+      "accept": "Accepteren",
+      "reject": "Weigeren",
+      "processing": "Verwerken…",
+      "success": "U bent lid geworden van het bedrijf. Doorsturen…",
+      "rejected": "Uitnodiging geweigerd."
+    },
+    "errors": {
+      "not_authenticated": "U moet ingelogd zijn.",
+      "forbidden": "U heeft geen toestemming voor deze actie.",
+      "not_found": "Niet gevonden.",
+      "invalid_name": "Ongeldige bedrijfsnaam.",
+      "invalid_email": "Ongeldig e-mailadres.",
+      "invalid_role": "Ongeldige rol.",
+      "invalid_or_expired": "Deze uitnodiging is ongeldig, verlopen of al gebruikt.",
+      "email_mismatch": "Deze uitnodiging is naar een ander e-mailadres gestuurd. Log in met het uitgenodigde e-mailadres.",
+      "not_active": "Het lidmaatschap is niet actief.",
+      "last_owner": "Het bedrijf moet ten minste één eigenaar behouden.",
+      "cannot_transfer_to_self": "U kunt de eigendom niet aan zichzelf overdragen.",
+      "unknown": "Er is iets misgegaan. Probeer het opnieuw."
+    }
   }
 }
