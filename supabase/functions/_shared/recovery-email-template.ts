@@ -10,6 +10,8 @@
 // Diseño: responsive (tabla anidada 600px máx.), negro/blanco/naranja
 // PipingBox, logotipo canónico y botón VOLVER A MI PERFIL.
 
+import { renderEmailHeader } from "./email-header.ts";
+
 export const RECOVERY_EMAIL_SUBJECT = "Hemos corregido un problema en tu cuenta de PipingBox";
 export const RECOVERY_EMAIL_TEST_SUBJECT_PREFIX = "[TEST] ";
 export const RECOVERY_EMAIL_TEMPLATE_ID = "recovery_v1";
@@ -48,14 +50,7 @@ export function renderRecoveryEmailHtml(name: string): string {
       <td align="center" style="padding:24px 12px;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px; max-width:100%;">
 
-          <!-- Header: logo sobre negro -->
-          <tr>
-            <td align="center" style="padding:24px 24px 20px 24px; background-color:#000000; border-bottom:2px solid #f59e0b;">
-              <img src="https://pipingbox.com/assets/logos/logo-horizontal.png"
-                   alt="PipingBox" width="180"
-                   style="display:block; width:180px; max-width:60%; height:auto; border:0;" />
-            </td>
-          </tr>
+          ${renderEmailHeader()}
 
           <!-- Cuerpo -->
           <tr>

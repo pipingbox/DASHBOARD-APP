@@ -12,6 +12,11 @@ export {
   renderApplicationPendingProfileEmail,
   renderMarketplaceReadyEmail,
   PENDING_PROFILE_ITEM_KEYS,
+  // PB-WELCOME-EMAIL-001
+  renderWelcomeEmail,
+  WELCOME_ROUTES,
+  type WelcomeRenderInput,
+  type WelcomeVariant,
   type ActionRenderInput,
   type NoticeRenderInput,
   type ApplicationPendingProfileRenderInput,

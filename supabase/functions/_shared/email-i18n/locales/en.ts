@@ -202,6 +202,105 @@ const en: EmailLocale = {
       note: "Nothing has been published yet: the extracted data only becomes part of your profile after you review and confirm it. Certifications mentioned in your CV are recorded as declared, not verified.",
       footer_reason: "You are receiving this message because PIPINGBOX received a CV associated with your account.",
     },
+    // ── PB-WELCOME-EMAIL-001 ────────────────────────────────────────────────
+    welcome_worker: {
+      subject: "PIPINGBOX · Welcome! Your next opportunity starts here",
+      preheader: "Your account is confirmed. Complete your professional profile and start discovering industrial opportunities.",
+      heading: "Welcome to PIPINGBOX 🧡",
+      intro: "Your account is confirmed. Now the important part begins.",
+      ecosystem: "PIPINGBOX is an international digital ecosystem for professionals and companies in industrial assembly, piping, welding and maintenance.",
+      button: "Complete my profile",
+      profile: {
+        heading: "Complete your professional profile",
+        body: "Your experience has value — make it visible to companies. Add your specialities, experience, availability and CV. An up-to-date profile helps us identify opportunities related to your capabilities.",
+      },
+      opportunities: {
+        heading: "Job opportunities and intelligent matching",
+        body: "Discover job offers from the industrial sector. Our matching system progressively connects experience, skills, location and availability with what companies need, so you can find relevant opportunities simply and efficiently.",
+      },
+      comms: {
+        heading: "Communication and notifications",
+        body: "Stay informed about your account activity and the opportunities available. We are preparing new WhatsApp alerts for users who voluntarily activate that channel: operational messages about your account are separate from optional communications, and no optional channel is enabled without your explicit consent.",
+      },
+      tools: {
+        heading: "Professional tools hub",
+        body: "Explore our technical tools specialised in piping, welding and prefabrication. We keep developing new utilities to make the work of industrial professionals easier.",
+      },
+      academy: {
+        heading: "PIPINGBOX Academy",
+        body: "Explore the VCA preparation resources currently available. We continue working to add new courses and training content as they are published.",
+      },
+      community: {
+        heading: "Our community is growing",
+        body: "We are building a space to connect professionals, share knowledge and create new collaboration opportunities.",
+      },
+      beta: {
+        heading: "You are part of our BETA version",
+        body: "PIPINGBOX keeps evolving. Have you found an error? Do you have a suggestion? Would you like a new tool? We want to hear your opinion.",
+      },
+      beta_cta: "Tell us at {support}.",
+      closing: "We are working to build a unique ecosystem that connects workers, companies, tools and opportunities in industrial assembly. Thank you for being part of PIPINGBOX.",
+      signature: "The PIPINGBOX Team",
+      account_type_notice: "Did you choose the wrong account type when you signed up? Write to {support} and our team will review your case manually.",
+      links_intro: "Quick access:",
+      link_profile: "My profile",
+      link_opportunities: "Job offers",
+      link_tools: "Tools",
+      link_academy: "Academy",
+      link_community: "Community",
+      footer_reason: "You are receiving this message because you have just confirmed your email address on PIPINGBOX.",
+    },
+    welcome_company: {
+      subject: "PIPINGBOX · Welcome! Start building your industrial team",
+      preheader: "Your company account is confirmed. Complete your company profile and prepare your first industrial job offer.",
+      heading: "Welcome to PIPINGBOX 🧡",
+      intro: "Your company account is confirmed. Now the important part begins.",
+      ecosystem: "PIPINGBOX is an international digital ecosystem for professionals and companies in industrial assembly, piping, welding and maintenance.",
+      button: "Complete company profile",
+      profile: {
+        heading: "Complete your company profile",
+        body: "Your company profile is what professionals see first. Add your business details, activity, locations and the industrial specialities you usually need, so your offers reach the right profiles.",
+      },
+      opportunities: {
+        heading: "Publish offers and manage industrial needs",
+        body: "Publish job offers and register your workforce needs to reach qualified professionals in piping, welding, assembly and maintenance. Publishing offers and reviewing candidates is available today; advanced automatic matching and conversational screening are still in development.",
+      },
+      verification: {
+        heading: "Company verification and restricted functions",
+        body: "Some functions are reserved for verified companies. Until your company is verified you can complete your profile and prepare your offers, while publication and access to candidate contact details remain subject to review by our team. We will tell you exactly what is required and nothing is charged during the beta.",
+      },
+      comms: {
+        heading: "Communication and notifications",
+        body: "Stay informed about your account activity and the status of your offers. We are preparing new WhatsApp alerts for accounts that voluntarily activate that channel: operational messages are separate from optional communications, and no optional channel is enabled without your explicit consent.",
+      },
+      tools: {
+        heading: "Professional tools hub",
+        body: "Explore our technical tools specialised in piping, welding and prefabrication. Your technical team can use them while we keep developing new utilities.",
+      },
+      academy: {
+        heading: "PIPINGBOX Academy",
+        body: "Explore the VCA preparation resources currently available for your teams. We continue working to add new courses and training content as they are published.",
+      },
+      community: {
+        heading: "Our community is growing",
+        body: "We are building a space to connect companies and professionals, share knowledge and create new collaboration opportunities in the industrial sector.",
+      },
+      beta: {
+        heading: "You are part of our BETA version",
+        body: "PIPINGBOX keeps evolving. Have you found an error? Do you have a suggestion? Do you need a function that does not exist yet? We want to hear your opinion.",
+      },
+      beta_cta: "Tell us at {support}.",
+      closing: "We are working to build a unique ecosystem that connects workers, companies, tools and opportunities in industrial assembly. Thank you for being part of PIPINGBOX.",
+      signature: "The PIPINGBOX Team",
+      account_type_notice: "Did you register as a company by mistake, or should this be a professional account? Write to {support} and our team will review it manually.",
+      links_intro: "Quick access:",
+      link_profile: "Company profile",
+      link_opportunities: "Publish an offer",
+      link_tools: "Tools",
+      link_academy: "Academy",
+      link_community: "Community",
+      footer_reason: "You are receiving this message because you have just confirmed the email address of your PIPINGBOX company account.",
+    },
   },
 };
 

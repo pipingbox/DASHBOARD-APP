@@ -207,7 +207,8 @@ Deno.test("escape HTML de variables (inyección)", () => {
   const evil = `<script>alert('x')</script><img src=x onerror="alert(1)">`;
   const r = renderActionEmail({ template: "confirmation", lang: "en", actionUrl: URL_OK, vars: { email: evil } });
   assert(!r.html.includes("<script>"), "script sin escapar");
-  assert(!r.html.includes("<img"), "etiqueta img sin escapar");
+  assertEquals((r.html.match(/<img\b/gi) ?? []).length, 1, "sólo se permite el logo oficial; no la imagen inyectada");
+  assert(!r.html.includes("<img src=x"), "etiqueta img inyectada sin escapar");
   assert(!r.html.includes('onerror="'), "atributo con comillas sin escapar");
   assertStringIncludes(r.html, "&lt;script&gt;");
   assertStringIncludes(r.html, "onerror=&quot;alert(1)&quot;");

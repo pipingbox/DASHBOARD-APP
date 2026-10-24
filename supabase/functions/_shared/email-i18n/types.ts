@@ -76,6 +76,65 @@ export interface MarketplaceReadyStrings {
   footer_reason: string;
 }
 
+/** PB-WELCOME-EMAIL-001 — bloque de sección del correo de bienvenida. */
+export interface WelcomeSectionStrings {
+  heading: string;
+  body: string;
+}
+
+/** PB-WELCOME-EMAIL-001 — EMAIL DE BIENVENIDA, variante PROFESIONAL.
+ *
+ *  Se envía UNA sola vez por usuario, tras la confirmación REAL de su
+ *  dirección de correo. NO es un correo de autenticación: no transporta
+ *  token, no caduca y no contiene enlaces de un solo uso.
+ *
+ *  Prohibiciones de producto que los textos deben respetar (ticket §2/§4):
+ *   - `comms` NO activa ni insinúa consentimiento de WhatsApp (empleo ni
+ *     marketing) y separa comunicaciones operativas de opcionales.
+ *   - `academy` NO promete certificados oficiales ni cursos no publicados.
+ *   - `account_type_notice` NO ofrece cambio automático de tipo de cuenta:
+ *     únicamente una vía de revisión manual por soporte. */
+export interface WelcomeStrings {
+  subject: string;
+  preheader: string;
+  heading: string;
+  /** "Tu cuenta está confirmada. Ahora empieza lo importante." */
+  intro: string;
+  /** Qué es el ecosistema PIPINGBOX. */
+  ecosystem: string;
+  /** CTA principal (botón naranja). */
+  button: string;
+  profile: WelcomeSectionStrings;
+  opportunities: WelcomeSectionStrings;
+  comms: WelcomeSectionStrings;
+  tools: WelcomeSectionStrings;
+  academy: WelcomeSectionStrings;
+  community: WelcomeSectionStrings;
+  beta: WelcomeSectionStrings;
+  /** Invitación a reportar errores y sugerencias. Usa {support}. */
+  beta_cta: string;
+  /** Cierre: "Trabajamos para construir un ecosistema único…". */
+  closing: string;
+  /** "Equipo PIPINGBOX". */
+  signature: string;
+  /** Revisión del tipo de cuenta si se eligió el equivocado. Usa {support}. */
+  account_type_notice: string;
+  /** Intro de la lista de accesos directos. */
+  links_intro: string;
+  link_profile: string;
+  link_opportunities: string;
+  link_tools: string;
+  link_academy: string;
+  link_community: string;
+  footer_reason: string;
+}
+
+/** PB-WELCOME-EMAIL-001 — EMAIL DE BIENVENIDA, variante EMPRESA.
+ *  Añade las condiciones de acceso para empresas NO verificadas (ticket §4). */
+export interface WelcomeCompanyStrings extends WelcomeStrings {
+  verification: WelcomeSectionStrings;
+}
+
 export interface EmailCommonStrings {
   brand_tagline: string;
   /** "Si el botón no funciona, copia esta dirección en tu navegador:" */
@@ -121,6 +180,10 @@ export interface EmailTemplates {
   // profesional. Revisa los datos." JAMÁS afirma validación, disponibilidad
   // para empresas ni certificados verificados.
   cv_review_pending: ActionTemplateStrings;     // {name}
+  // PB-WELCOME-EMAIL-001 — bienvenida tras confirmación REAL del correo.
+  // Exactamente una por usuario; variante según tipo de cuenta.
+  welcome_worker: WelcomeStrings;               // {support}
+  welcome_company: WelcomeCompanyStrings;       // {support}
 }
 
 export type TemplateId = keyof EmailTemplates;
@@ -145,6 +208,15 @@ export const ACTION_TEMPLATES = [
 export const DEDICATED_ACTION_TEMPLATES = [
   "application_pending_profile", "marketplace_ready",
 ] as const satisfies readonly TemplateId[];
+
+// PB-WELCOME-EMAIL-001 — plantillas con renderizador dedicado
+// (renderWelcomeEmail): maquetación por secciones, dos variantes y lista de
+// accesos directos. Se validan en welcome-email_test.ts.
+export const WELCOME_TEMPLATES = [
+  "welcome_worker", "welcome_company",
+] as const satisfies readonly TemplateId[];
+
+export type WelcomeTemplateId = (typeof WELCOME_TEMPLATES)[number];
 
 export const NOTICE_TEMPLATES = [
   "reauthentication",

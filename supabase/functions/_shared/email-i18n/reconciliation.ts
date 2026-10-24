@@ -1,3 +1,4 @@
+import { renderEmailHeader } from "../email-header.ts";
 import { type EmailLanguage } from "./languages.ts";
 import { BRAND, escapeHtml, safeUrl } from "./render.ts";
 
@@ -55,7 +56,7 @@ export function renderMarketplaceReconciliationEmail(input: { lang: EmailLanguag
   const list = pending.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
   const phone = input.phoneMissing ? marketplacePhoneRecommendation(input.lang) : null;
   const phoneHtml = phone ? `<h2>${escapeHtml(phone.heading)}</h2><p>${escapeHtml(phone.body)}</p>` : "";
-  const html = `<!doctype html><html lang="${input.lang}"><head><meta charset="utf-8"></head><body style="background:#F3F4F6;color:#1F2937;font-family:Arial,sans-serif"><main style="max-width:600px;margin:auto;background:white;padding:28px"><header style="background:${BRAND.black};color:white;padding:16px;font-size:22px">PIPING<span style="color:${BRAND.orange}">BOX</span></header><h1>${escapeHtml(copy.heading)}</h1><p>${escapeHtml(copy.body)}</p><p>${escapeHtml(copy.pending)}</p><ul>${list}</ul>${phoneHtml}<a href="${escapeHtml(url)}" style="display:inline-block;background:${BRAND.orange};color:${BRAND.buttonText};padding:14px 24px">${escapeHtml(copy.button)}</a><p>${escapeHtml(copy.footer)}</p></main></body></html>`;
+  const html = `<!doctype html><html lang="${input.lang}"><head><meta charset="utf-8"></head><body style="background:#F3F4F6;color:#1F2937;font-family:Arial,sans-serif"><main style="max-width:600px;margin:auto;background:white;padding:28px">${renderEmailHeader("block")}<h1>${escapeHtml(copy.heading)}</h1><p>${escapeHtml(copy.body)}</p><p>${escapeHtml(copy.pending)}</p><ul>${list}</ul>${phoneHtml}<a href="${escapeHtml(url)}" style="display:inline-block;background:${BRAND.orange};color:${BRAND.buttonText};padding:14px 24px">${escapeHtml(copy.button)}</a><p>${escapeHtml(copy.footer)}</p></main></body></html>`;
   const text = [copy.heading, "", copy.body, "", copy.pending, ...lines, ...(phone ? ["", phone.heading, phone.body] : []), "", `${copy.button}: ${url}`, "", copy.footer].join("\n");
   return { lang: input.lang, subject: copy.subject, html, text };
 }

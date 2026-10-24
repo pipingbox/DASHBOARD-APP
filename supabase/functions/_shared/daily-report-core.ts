@@ -5,6 +5,8 @@
 // dependencias se inyectan. Esto permite las 17 pruebas obligatorias sin
 // levantar servicios.
 
+import { renderEmailHeader } from "./email-header.ts";
+
 export const BRUSSELS_TZ = "Europe/Brussels";
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -735,6 +737,7 @@ export function renderReportHtml(d: ReportData): string {
     .join("");
 
   return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:680px;margin:0 auto;padding:24px;background:#0a0a0a;color:#e4e4e7;border:1px solid #27272a;">
+  ${renderEmailHeader("block")}
   <div style="border-bottom:1px solid #27272a;padding-bottom:16px;margin-bottom:24px;">
     <h1 style="margin:0;font-size:20px;color:#f59e0b;">${d.isTest ? "[TEST] " : ""}PipingBox Daily Intelligence</h1>
     <p style="margin:4px 0 0;font-size:12px;color:#71717a;">Periodo: ${esc(d.window.reportDate)} (Europe/Brussels) · Generado: ${esc(d.generatedAt)} · Estado: ${d.executionStatus}</p>
