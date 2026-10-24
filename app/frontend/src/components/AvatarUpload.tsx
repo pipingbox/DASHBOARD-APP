@@ -207,7 +207,13 @@ export function AvatarUpload({
             ) : (
               <Camera className="h-3.5 w-3.5" />
             )}
-            {uploading ? t('profile.avatarUploading') : avatarUrl ? t('profile.avatarChange') : t('profile.avatarUpload')}
+            {/* PB-UI-DOM-PROFILE-INSERTBEFORE-UNRESOLVED-001: RCA CONFIRMED.
+                Camera and Loader2 are DISTINCT lucide components, so the swap
+                unmounts one and mounts the other anchored at the next sibling.
+                As bare text, Chrome auto-translate font-wraps (detaches) it and
+                the mount throws NotFoundError insertBefore (reproduced in
+                tests/profile-dom-insertbefore-profile.spec.ts). */}
+            <span>{uploading ? t('profile.avatarUploading') : avatarUrl ? t('profile.avatarChange') : t('profile.avatarUpload')}</span>
             <input
               ref={inputRef}
               type="file"
@@ -238,7 +244,10 @@ export function AvatarUpload({
                 ) : (
                   <Eye className="h-3.5 w-3.5" />
                 )}
-                {showAvatar ? t('profile.avatarHide') : t('profile.avatarShow')}
+                {/* PB-UI-DOM-PROFILE-INSERTBEFORE-UNRESOLVED-001: RCA CONFIRMED
+                    (same class as the upload CTA above — distinct lucide swap
+                    anchored at formerly-bare text). */}
+                <span>{showAvatar ? t('profile.avatarHide') : t('profile.avatarShow')}</span>
               </button>
 
               <button
@@ -252,7 +261,9 @@ export function AvatarUpload({
                 ) : (
                   <Trash2 className="h-3.5 w-3.5" />
                 )}
-                Remove
+                {/* PB-UI-DOM-PROFILE-INSERTBEFORE-UNRESOLVED-001: RCA CONFIRMED
+                    (same class as the upload CTA above). */}
+                <span>Remove</span>
               </button>
             </>
           )}
