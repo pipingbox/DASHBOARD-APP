@@ -97,28 +97,11 @@ export async function createNotification(args: CreateNotificationArgs): Promise<
 }
 
 // ─── Convenience Helpers ───
-
-/** Notify worker that their profile is incomplete after signup */
-export async function notifyProfileIncomplete(userId: string): Promise<void> {
-  await createNotification({
-    recipientId: userId,
-    type: 'PROFILE_INCOMPLETE',
-    title: 'Perfil incompleto',
-    message: 'Completa tu perfil para aparecer ante empresas.',
-    actionUrl: '/profile',
-  });
-}
-
-/** Notify worker that their profile is marketplace-ready */
-export async function notifyProfileReady(userId: string): Promise<void> {
-  await createNotification({
-    recipientId: userId,
-    type: 'PROFILE_READY',
-    title: 'Perfil listo',
-    message: 'Tu perfil ya puede ser descubierto por empresas.',
-    actionUrl: '/profile',
-  });
-}
+// (notifyProfileIncomplete / notifyProfileReady were removed in
+// PB-NOTIFICATION-PROFILE-INCOMPLETE-FIX-001: they had no callers and used
+// the cross-user RPC for self-notifications — the same broken path that
+// caused the PROFILE_INCOMPLETE: P0001 incident. Profile suggestions now
+// go through the dedicated pb_create_profile_suggestions() RPC above.)
 
 /** Notify referrer that their referral has joined */
 export async function notifyReferralJoined(referrerId: string, referralId: string): Promise<void> {
@@ -430,103 +413,37 @@ export async function deleteNotification(notificationId: string): Promise<void> 
 
 // ─── Profile improvement suggestions (PB-NOTIF-001 Fase 3) ────────────────
 //
-// Each suggestion uses PROFILE_INCOMPLETE type + related_entity_id = "field:<key>"
-// for dedup. The same suggestion is not re-sent within SUGGESTION_COOLDOWN_DAYS.
+// PB-NOTIFICATION-PROFILE-INCOMPLETE-FIX-001: suggestions used to go through
+// createNotification() → pb_create_client_notification, which is the hardened
+// cross-user boundary (client-creatable types only, self-recipient banned).
+// PROFILE_INCOMPLETE is a self-notification and was never client-creatable,
+// so every attempt failed with P0001 (21 × notification_rpc_error on 23/10).
+//
+// The dedicated RPC pb_create_profile_suggestions() takes ZERO arguments:
+// the user comes from auth.uid(), the gaps from the canonical profile row,
+// and the type/content/action_url are fixed server-side. Per-field dedup
+// with a 30-day cooldown and the 3-per-call limit also live in the RPC.
+// Fail-open: errors are swallowed so the profile save is never affected.
 
-const SUGGESTION_COOLDOWN_DAYS = 30;
-
-export interface ProfileSuggestionInput {
-  title: string | null | undefined;
-  skills: string[] | null | undefined;
-  location: string | null | undefined;
-  languages: string[] | null | undefined;
-  years_experience: number | null | undefined;
-  availability_status: string | null | undefined;
-}
-
-/** Returns up to `maxSuggestions` actionable suggestions for the given profile gaps. */
-export function buildProfileSuggestions(
-  profile: ProfileSuggestionInput,
-  maxSuggestions = 3,
-): { fieldKey: string; message: string }[] {
-  const suggestions: { fieldKey: string; message: string }[] = [];
-
-  if (!profile.title?.trim())
-    suggestions.push({
-      fieldKey: 'title',
-      message: 'Añade tu especialización (ej. Piping Designer, Welder) para aparecer en búsquedas relevantes.',
-    });
-
-  if (!profile.skills || profile.skills.length === 0)
-    suggestions.push({
-      fieldKey: 'skills',
-      message: 'Añade tus habilidades técnicas para mejorar tu compatibilidad con ofertas.',
-    });
-
-  if (!profile.location?.trim())
-    suggestions.push({
-      fieldKey: 'location',
-      message: 'Añade tu ubicación para recibir ofertas locales y proyectos cercanos.',
-    });
-
-  if (!profile.languages || profile.languages.length === 0)
-    suggestions.push({
-      fieldKey: 'languages',
-      message: 'Indica los idiomas en que puedes trabajar para acceder a más oportunidades.',
-    });
-
-  if (!profile.years_experience || profile.years_experience === 0)
-    suggestions.push({
-      fieldKey: 'years_experience',
-      message: 'Añade tus años de experiencia para que las empresas puedan evaluar tu perfil correctamente.',
-    });
-
-  if (!profile.availability_status)
-    suggestions.push({
-      fieldKey: 'availability_status',
-      message: 'Indica tu disponibilidad actual para recibir invitaciones de empresas.',
-    });
-
-  return suggestions.slice(0, maxSuggestions);
-}
-
-/**
- * Send actionable profile improvement notifications.
- * Each field deduped independently with a 30-day cooldown so the user
- * only receives each suggestion once a month at most.
- */
-export async function notifyProfileSuggestions(
-  userId: string,
-  profile: ProfileSuggestionInput,
-): Promise<void> {
-  const suggestions = buildProfileSuggestions(profile);
-  if (suggestions.length === 0) return;
-
-  const cooloff = new Date(Date.now() - SUGGESTION_COOLDOWN_DAYS * 24 * 60 * 60 * 1000).toISOString();
-
-  for (const { fieldKey, message } of suggestions) {
-    const entityId = `field:${fieldKey}`;
-
-    // Dedup: skip if already sent within cooldown window
-    const { data: existing } = await supabase
-      .from(TABLES.notifications)
-      .select('id')
-      .eq('user_id', userId)
-      .eq('type', 'PROFILE_INCOMPLETE')
-      .eq('related_entity_id', entityId)
-      .gte('created_at', cooloff)
-      .limit(1);
-
-    if (existing && existing.length > 0) continue;
-
-    await createNotification({
-      recipientId: userId,
-      type: 'PROFILE_INCOMPLETE',
-      title: 'Completa tu perfil',
-      message,
-      relatedEntityType: 'profile',
-      relatedEntityId: entityId,
-      actionUrl: '/profile',
+export async function notifyProfileSuggestions(): Promise<void> {
+  try {
+    const { error } = await supabase.rpc('pb_create_profile_suggestions');
+    if (error) {
+      // Distinct error name so this path is never confused with the
+      // cross-user RPC boundary telemetry.
+      trackEvent('app_error', {
+        error_name: 'profile_suggestion_rpc_error',
+        error_message: `PROFILE_INCOMPLETE: ${error.code ?? 'unknown'}`,
+        component_top: 'notifications',
+        origin: 'notifyProfileSuggestions',
+      });
+    }
+  } catch (err) {
+    trackEvent('app_error', {
+      error_name: 'profile_suggestion_rpc_exception',
+      error_message: `PROFILE_INCOMPLETE: ${err instanceof Error ? err.name : 'unknown'}`,
+      component_top: 'notifications',
+      origin: 'notifyProfileSuggestions',
     });
   }
 }
