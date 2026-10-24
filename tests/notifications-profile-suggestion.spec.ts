@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel: string) => readFileSync(join(REPO_ROOT, rel), 'utf-8');
 
-const SQL_058 = read('sql/058-pb-notification-profile-suggestion-001.sql');
+const SQL_062 = read('sql/062-pb-notification-profile-suggestion-001.sql');
 const SQL_032 = read('sql/032-pb-notifications-referral-hardening.sql');
 const NOTIFICATIONS_LIB = read('app/frontend/src/lib/notifications.ts');
 const PROFILE_PAGE = read('app/frontend/src/pages/Profile.tsx');
@@ -32,82 +32,91 @@ const INVITE_MODAL = read('app/frontend/src/components/InviteToJobModal.tsx');
 const COMMUNITY_POST = read('app/frontend/src/pages/CommunityPost.tsx');
 const REFERRALS_LIB = read('app/frontend/src/lib/referrals.ts');
 
-test.describe('PB-NOTIFICATION-PROFILE-INCOMPLETE-FIX-001 — sql/058 dedicated RPC', () => {
+test.describe('PB-NOTIFICATION-PROFILE-INCOMPLETE-FIX-001 — sql/062 dedicated RPC', () => {
   test('zero-argument signature: nothing client-controllable', () => {
-    expect(SQL_058).toContain('CREATE OR REPLACE FUNCTION public.pb_create_profile_suggestions()');
+    expect(SQL_062).toContain('CREATE OR REPLACE FUNCTION public.pb_create_profile_suggestions()');
     // No parameters at all — type, actor, recipient and content cannot be
     // passed (let alone forged) from the browser.
-    expect(SQL_058).toMatch(/pb_create_profile_suggestions\(\)\s*\nRETURNS integer/);
-    expect(SQL_058).not.toContain('p_recipient_id');
-    expect(SQL_058).not.toContain('p_type');
+    expect(SQL_062).toMatch(/pb_create_profile_suggestions\(\)\s*\nRETURNS integer/);
+    expect(SQL_062).not.toContain('p_recipient_id');
+    expect(SQL_062).not.toContain('p_type');
   });
 
-  test('same security pattern as the hardened cross-user RPC', () => {
-    expect(SQL_058).toContain('SECURITY DEFINER');
-    expect(SQL_058).toContain("SET search_path TO 'public', 'pg_temp'");
-    expect(SQL_058).toContain('REVOKE EXECUTE ON FUNCTION public.pb_create_profile_suggestions() FROM PUBLIC, anon');
-    expect(SQL_058).toContain('GRANT EXECUTE ON FUNCTION public.pb_create_profile_suggestions() TO authenticated');
+  test('least-privilege pattern: SECURITY INVOKER (PO G2) + hardened grants', () => {
+    // G2 (PO review): no RLS bypass is needed for this RPC — authenticated
+    // already owns SELECT on own profile, SELECT on own notifications and
+    // INSERT on own notifications (authenticated_insert_own_notifications).
+    // SECURITY DEFINER would only trigger the Supabase Advisor warning
+    // "authenticated_security_definer_function_executable".
+    // Checked on the executable body: the explanatory header legitimately
+    // mentions SECURITY DEFINER when documenting why it was rejected.
+    const body = SQL_062.slice(SQL_062.indexOf('CREATE OR REPLACE FUNCTION'));
+    expect(body).toContain('SECURITY INVOKER');
+    expect(body).not.toContain('SECURITY DEFINER');
+    expect(SQL_062).toContain("SET search_path TO 'public', 'pg_temp'");
+    expect(SQL_062).toContain('REVOKE EXECUTE ON FUNCTION public.pb_create_profile_suggestions() FROM PUBLIC, anon');
+    expect(SQL_062).toContain('GRANT EXECUTE ON FUNCTION public.pb_create_profile_suggestions() TO authenticated');
   });
 
   test('user derived exclusively from auth.uid()', () => {
-    expect(SQL_058).toContain('v_user uuid := auth.uid()');
-    expect(SQL_058).toContain('IF v_user IS NULL THEN');
+    expect(SQL_062).toContain('v_user uuid := auth.uid()');
+    expect(SQL_062).toContain('IF v_user IS NULL THEN');
     // The only INSERT targets v_user — no other recipient is possible.
-    expect(SQL_058).toContain('v_user, \'PROFILE_INCOMPLETE\', \'Completa tu perfil\', v_message, \'profile\',');
+    expect(SQL_062).toContain('v_user, \'PROFILE_INCOMPLETE\', \'Completa tu perfil\', v_message, \'profile\',');
   });
 
   test('type is a fixed server-side literal (only PROFILE_INCOMPLETE)', () => {
-    expect(SQL_058).toContain("'PROFILE_INCOMPLETE'");
-    expect(SQL_058).not.toContain('p_type');
-    expect(SQL_058).not.toContain('v_type');
+    expect(SQL_062).toContain("'PROFILE_INCOMPLETE'");
+    expect(SQL_062).not.toContain('p_type');
+    expect(SQL_062).not.toContain('v_type');
   });
 
   test('gaps derive from canonical profile state', () => {
-    expect(SQL_058).toContain(
+    expect(SQL_062).toContain(
       'SELECT p.title, p.skills, p.location, p.years_experience, p.availability_status',
     );
-    expect(SQL_058).toContain('FROM public.app_14da0f1941_profiles AS p');
-    expect(SQL_058).toContain('WHERE p.user_id = v_user');
+    expect(SQL_062).toContain('FROM public.app_14da0f1941_profiles AS p');
+    expect(SQL_062).toContain('WHERE p.user_id = v_user');
     // All evaluated fields have a real canonical column.
     for (const field of ['title', 'skills', 'location', 'years_experience', 'availability_status']) {
-      expect(SQL_058).toContain(`'${field}'`);
+      expect(SQL_062).toContain(`'${field}'`);
     }
     // 'languages' has no canonical column and no form input: it was a phantom
     // suggestion that could never be cleared — it must not be suggested.
     // (Checked on the executable body, not on the explanatory header.)
-    const body = SQL_058.slice(SQL_058.indexOf('CREATE OR REPLACE FUNCTION'));
+    const body = SQL_062.slice(SQL_062.indexOf('CREATE OR REPLACE FUNCTION'));
     expect(body).not.toContain("'languages'");
   });
 
   test('fail-open: missing profile row returns 0 without raising', () => {
-    expect(SQL_058).toContain('IF NOT FOUND THEN');
-    const notFoundIdx = SQL_058.indexOf('IF NOT FOUND THEN');
-    const returnZeroIdx = SQL_058.indexOf('RETURN 0;');
+    expect(SQL_062).toContain('IF NOT FOUND THEN');
+    const notFoundIdx = SQL_062.indexOf('IF NOT FOUND THEN');
+    const returnZeroIdx = SQL_062.indexOf('RETURN 0;');
     expect(notFoundIdx).toBeGreaterThan(-1);
     expect(returnZeroIdx).toBeGreaterThan(notFoundIdx);
   });
 
   test('30-day per-field cooldown and 3-per-call limit live in the RPC', () => {
-    expect(SQL_058).toContain("interval '30 days'");
-    expect(SQL_058).toContain("n.related_entity_id = 'field:' || v_field");
-    expect(SQL_058).toContain('IF v_created >= 3 THEN');
+    expect(SQL_062).toContain("interval '30 days'");
+    expect(SQL_062).toContain("n.related_entity_id = 'field:' || v_field");
+    expect(SQL_062).toContain('IF v_created >= 3 THEN');
   });
 
   test('rollback block drops only the new RPC', () => {
-    expect(SQL_058).toContain('DROP FUNCTION IF EXISTS public.pb_create_profile_suggestions();');
-    expect(SQL_058).not.toContain('DROP FUNCTION IF EXISTS public.pb_create_client_notification');
+    expect(SQL_062).toContain('DROP FUNCTION IF EXISTS public.pb_create_profile_suggestions();');
+    expect(SQL_062).not.toContain('DROP FUNCTION IF EXISTS public.pb_create_client_notification');
   });
 });
 
 test.describe('PB-NOTIFICATION-PROFILE-INCOMPLETE-FIX-001 — boundary NOT weakened', () => {
-  test('sql/058 does not touch pb_create_client_notification', () => {
-    expect(SQL_058).not.toContain('CREATE OR REPLACE FUNCTION public.pb_create_client_notification');
-    expect(SQL_058).not.toContain('ALTER FUNCTION');
-    expect(SQL_058).not.toContain('CREATE POLICY');
-    expect(SQL_058).not.toContain('GRANT EXECUTE ON FUNCTION public.pb_create_client_notification');
-    expect(SQL_058).not.toContain('REVOKE EXECUTE ON FUNCTION public.pb_create_client_notification');
+  test('sql/062 does not touch pb_create_client_notification', () => {
+    expect(SQL_062).not.toContain('CREATE OR REPLACE FUNCTION public.pb_create_client_notification');
+    expect(SQL_062).not.toContain('ALTER FUNCTION');
+    expect(SQL_062).not.toContain('CREATE POLICY');
+    expect(SQL_062).not.toContain('GRANT EXECUTE ON FUNCTION public.pb_create_client_notification');
+    expect(SQL_062).not.toContain('REVOKE EXECUTE ON FUNCTION public.pb_create_client_notification');
     // The only REVOKE/GRANT pair in the executable body belongs to the new RPC.
-    const body = SQL_058.slice(SQL_058.indexOf('CREATE OR REPLACE FUNCTION'));
+    const body = SQL_062.slice(SQL_062.indexOf('CREATE OR REPLACE FUNCTION'));
     expect((body.match(/REVOKE EXECUTE/g) ?? []).length, 'exactly one REVOKE (new RPC)').toBe(1);
     expect((body.match(/GRANT EXECUTE/g) ?? []).length, 'exactly one GRANT (new RPC)').toBe(1);
   });

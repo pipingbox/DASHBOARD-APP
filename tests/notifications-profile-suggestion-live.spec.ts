@@ -2,7 +2,7 @@ import { test, expect, request as pwRequest, type APIRequestContext } from '@pla
 
 /**
  * PB-NOTIFICATION-PROFILE-INCOMPLETE-FIX-001 — live QA matrix for the
- * dedicated pb_create_profile_suggestions() RPC (sql/058).
+ * dedicated pb_create_profile_suggestions() RPC (sql/062).
  *
  * Covers the incident QA requirements:
  *   * valid suggestion is delivered through the new path (self, own profile)
@@ -61,7 +61,7 @@ async function login(email: string, password: string): Promise<{ token: string; 
   return { token: body.access_token, uid: body.user.id };
 }
 
-test.describe('PB-NOTIFICATION-PROFILE-INCOMPLETE — sql/058 live QA', () => {
+test.describe('PB-NOTIFICATION-PROFILE-INCOMPLETE — sql/062 live QA', () => {
   test.skip(!SUPABASE_URL || !ANON_KEY || !EMAIL_A || !EMAIL_B, 'env missing');
 
   let tokenA = '';
@@ -96,7 +96,7 @@ test.describe('PB-NOTIFICATION-PROFILE-INCOMPLETE — sql/058 live QA', () => {
     }
     // Owner-DELETE every PROFILE_INCOMPLETE row on the QA accounts
     // (all of them are artifacts of this suite — the type was never
-    // deliverable before sql/058).
+    // deliverable before sql/062).
     for (const [tok, uid] of [
       [tokenA, uidA],
       [tokenB, uidB],

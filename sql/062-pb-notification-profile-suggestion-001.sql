@@ -20,9 +20,20 @@
 --     notificación) y no requiere secrets, colas ni I/O externo.
 --   * Reutiliza el patrón de seguridad ya establecido en esta base
 --     (pb_create_client_notification, app_update_application_status):
---     SECURITY DEFINER + search_path fijado + REVOKE a PUBLIC/anon.
+--     search_path fijado + REVOKE a PUBLIC/anon.
 --   * Una Edge Function añadiría infraestructura (deploy, secrets,
 --     service_role) sin ganancia de seguridad. Se descarta.
+--
+-- DECISIÓN DE PRIVILEGIO MÍNIMO (revisión PO G2, PR #100):
+--   * SECURITY INVOKER (NO DEFINER). Ninguna operación requiere bypass de
+--     RLS: el rol authenticated ya dispone de SELECT del perfil propio,
+--     SELECT de notificaciones propias e INSERT de notificaciones propias
+--     (política authenticated_insert_own_notifications: auth.uid() =
+--     user_id). Todas las queries filtran por v_user y el INSERT usa
+--     user_id = v_user, de modo que RLS se cumple por construcción.
+--   * SECURITY DEFINER no aportaba nada y generaba el warning de Supabase
+--     Advisor "authenticated_security_definer_function_executable".
+--   * search_path fijado como buena práctica (defensa en profundidad).
 --
 -- CONTRATO DE SEGURIDAD DE pb_create_profile_suggestions():
 --   * CERO parámetros: el navegador no controla tipo, actor, destinatario,
@@ -60,7 +71,7 @@
 CREATE OR REPLACE FUNCTION public.pb_create_profile_suggestions()
 RETURNS integer
 LANGUAGE plpgsql
-SECURITY DEFINER
+SECURITY INVOKER
 SET search_path TO 'public', 'pg_temp'
 AS $$
 DECLARE
