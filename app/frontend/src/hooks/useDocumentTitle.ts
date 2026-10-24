@@ -32,9 +32,14 @@ const PAGE_META_KEYS: Record<string, string> = {
 };
 
 // pages that carry a translated meta description
-const PAGE_DESCRIPTION_KEYS = new Set(['home', 'tools', 'jobs', 'pricing', 'academy', 'companies', 'register']);
+// PB-SEO-CRAWLER-CANONICAL-001: exported so prerender/public.js resolves the
+// crawler-facing <title>/<meta description> through this SAME map. Duplicating
+// the mapping in the prerenderer is what let the sitemap, the router and the
+// prerenderer drift apart before (see prerender/sitemap.js header).
+export const PAGE_DESCRIPTION_KEYS = new Set(['home', 'tools', 'jobs', 'pricing', 'academy', 'companies', 'register']);
 
-function resolvePageKey(path: string): string | null {
+// PB-SEO-CRAWLER-CANONICAL-001: exported (pure function, unchanged behaviour).
+export function resolvePageKey(path: string): string | null {
   if (PAGE_META_KEYS[path]) return PAGE_META_KEYS[path];
   const matchedKey = Object.keys(PAGE_META_KEYS)
     .filter((key) => key !== '/' && path.startsWith(key))

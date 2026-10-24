@@ -9,6 +9,7 @@ import { pbExplicitSitemapPlugin } from './prerender/sitemap.js';
 import { pbPrerenderHeadDedupePlugin } from './prerender/head-dedupe.js';
 import { getBlogRoutes } from './prerender/blog-routes.js';
 import { getToolLandingPrerenderRoutes } from './prerender/tool-landings.js';
+import { getAppRoutePrerenderRoutes } from './prerender/app-routes.js';
 
 /**
  * PB-PWA-IDENTITY-001: give every non-production deployment its own installable
@@ -102,12 +103,22 @@ process.env.VITE_APP_LOGO_URL ??= '/assets/logos/logo-icon.png';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
-  // PB-SEO-103: blog routes + SEO tool landing routes share one prerender
-  // pipeline. The dispatcher (prerender/public.js) routes each URL to the
-  // blog prerender or the ToolLandingPage renderer.
+  // PB-SEO-103 / PB-SEO-CRAWLER-CANONICAL-001: blog routes, SEO tool landing
+  // routes and the public app routes share one prerender pipeline. The
+  // dispatcher (prerender/public.js) routes each URL to the blog prerender,
+  // the ToolLandingPage renderer or the app-route renderer.
+  //
+  // App routes are queued here because the sitemap already advertised them
+  // while the prerenderer ignored them: they were served the index.html shell,
+  // whose fallback canonical points at '/'. Both lists now come from
+  // prerender/app-routes.js so they cannot diverge again.
   const prerenderRoutes =
     command === 'build'
-      ? [...getBlogRoutes(), ...getToolLandingPrerenderRoutes()]
+      ? [
+          ...getBlogRoutes(),
+          ...getToolLandingPrerenderRoutes(),
+          ...getAppRoutePrerenderRoutes(),
+        ]
       : [];
 
   return {
