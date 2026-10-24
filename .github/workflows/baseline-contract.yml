@@ -1,0 +1,32 @@
+name: Baseline Contract
+
+# PB-ENT-E0B-BASELINE-DDL-001 — STATIC CONTRACT CI del baseline DDL legacy.
+# Sin credenciales de producción (decisión PO §7-A): valida integridad y
+# formato de los artefactos versionados en docs/baseline/artifacts/.
+# SKIP limpio mientras no exista la primera captura live.
+# El LIVE DRIFT CHECK es manual / programado / gate de release
+# (docs/baseline/README.md §7).
+
+on:
+  pull_request:
+    paths:
+      - 'docs/baseline/**'
+      - 'scripts/check-baseline-artifacts.mjs'
+      - '.github/workflows/baseline-contract.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/baseline/**'
+      - 'scripts/check-baseline-artifacts.mjs'
+      - '.github/workflows/baseline-contract.yml'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  baseline-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate baseline artifacts
+        run: node scripts/check-baseline-artifacts.mjs
