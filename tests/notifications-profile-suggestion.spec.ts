@@ -73,7 +73,7 @@ test.describe('PB-NOTIFICATION-PROFILE-INCOMPLETE-FIX-001 — sql/062 dedicated 
 
   test('gaps derive from canonical profile state', () => {
     expect(SQL_062).toContain(
-      'SELECT p.title, p.skills, p.location, p.years_experience, p.availability_status',
+      'SELECT p.title, p.skills, p.location, p.years_experience, p.availability_status, p.account_type',
     );
     expect(SQL_062).toContain('FROM public.app_14da0f1941_profiles AS p');
     expect(SQL_062).toContain('WHERE p.user_id = v_user');
@@ -86,6 +86,28 @@ test.describe('PB-NOTIFICATION-PROFILE-INCOMPLETE-FIX-001 — sql/062 dedicated 
     // (Checked on the executable body, not on the explanatory header.)
     const body = SQL_062.slice(SQL_062.indexOf('CREATE OR REPLACE FUNCTION'));
     expect(body).not.toContain("'languages'");
+  });
+
+  test('G3: worker-only domain guard, fail-closed, in the backend', () => {
+    // The suggestions are worker-domain (title/skills/location/years/
+    // availability + offer-oriented messages). Production has company and
+    // admin profiles with those fields empty, so without this guard the PR
+    // would activate worker suggestions for non-worker accounts.
+    const body = SQL_062.slice(SQL_062.indexOf('CREATE OR REPLACE FUNCTION'));
+    // account_type is read from the canonical profile row...
+    expect(SQL_062).toContain('p.account_type');
+    // ...and any non-worker (company, admin, NULL, unknown) returns 0 rows.
+    const guardIdx = body.indexOf("IF v_account_type IS DISTINCT FROM 'worker' THEN");
+    expect(guardIdx).toBeGreaterThan(-1);
+    const returnIdx = body.indexOf('RETURN 0;', guardIdx);
+    expect(returnIdx).toBeGreaterThan(guardIdx);
+    // The guard must run BEFORE any suggestion INSERT (fail-closed ordering).
+    const insertIdx = body.indexOf('INSERT INTO public.app_14da0f1941_notifications');
+    expect(guardIdx).toBeLessThan(insertIdx);
+    // account_type itself is never modified, and no RLS/policy is touched.
+    expect(SQL_062).not.toMatch(/UPDATE\s+public\.app_14da0f1941_profiles/i);
+    expect(SQL_062).not.toContain('ALTER POLICY');
+    expect(SQL_062).not.toContain('DROP POLICY');
   });
 
   test('fail-open: missing profile row returns 0 without raising', () => {

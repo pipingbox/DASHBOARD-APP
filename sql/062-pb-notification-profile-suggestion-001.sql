@@ -56,6 +56,18 @@
 --   * Fail-open: sin fila de perfil → RETURN 0, sin excepción. El guardado
 --     del perfil jamás se ve afectado por este camino.
 --
+-- RESTRICCIÓN DE DOMINIO (revisión PO G3, PR #100):
+--   * Las sugerencias de esta familia son de dominio worker (title, skills,
+--     location, years_experience, availability_status y mensajes orientados
+--     a ofertas/evaluación por empresas). Producción contiene perfiles
+--     company/admin con esos campos vacíos: sin guard, el PR activaría
+--     sugerencias worker para cuentas no-worker por primera vez.
+--   * Guard fail-closed en el BACKEND: solo account_type = 'worker' puede
+--     producir PROFILE_INCOMPLETE de esta familia. Cualquier
+--     account_type IS DISTINCT FROM 'worker' (company, admin, NULL,
+--     desconocido) → RETURN 0, cero filas. El frontend no participa en
+--     la decisión y no se modifica account_type, RLS ni ninguna policy.
+--
 -- NO TOCA (boundary intacto):
 --   * pb_create_client_notification: definición, allowlist, grants y
 --     self-notification ban SIN CAMBIOS.
@@ -81,6 +93,7 @@ DECLARE
   v_location text;
   v_years integer;
   v_availability text;
+  v_account_type text;
   v_fields text[] := ARRAY['title', 'skills', 'location', 'years_experience', 'availability_status'];
   v_field text;
   v_missing boolean;
@@ -92,13 +105,19 @@ BEGIN
   END IF;
 
   -- Estado canónico del perfil: única fuente de verdad para los gaps.
-  SELECT p.title, p.skills, p.location, p.years_experience, p.availability_status
-    INTO v_title, v_skills, v_location, v_years, v_availability
+  SELECT p.title, p.skills, p.location, p.years_experience, p.availability_status, p.account_type
+    INTO v_title, v_skills, v_location, v_years, v_availability, v_account_type
     FROM public.app_14da0f1941_profiles AS p
    WHERE p.user_id = v_user;
 
   -- Sin fila de perfil no hay nada que sugerir: fail-open, sin error.
   IF NOT FOUND THEN
+    RETURN 0;
+  END IF;
+
+  -- Restricción de dominio (PO G3): fail-closed. Las sugerencias de esta
+  -- familia son de dominio worker; company/admin/NULL/desconocido → 0 filas.
+  IF v_account_type IS DISTINCT FROM 'worker' THEN
     RETURN 0;
   END IF;
 
@@ -166,10 +185,12 @@ REVOKE EXECUTE ON FUNCTION public.pb_create_profile_suggestions() FROM PUBLIC, a
 GRANT EXECUTE ON FUNCTION public.pb_create_profile_suggestions() TO authenticated;
 
 -- ── Verificación post-aplicación (QA) ────────────────────────────────────────
--- 1) RPC como authenticated con perfil incompleto            -> integer >= 1
+-- 1) RPC como authenticated worker con perfil incompleto    -> integer >= 1
 --    y filas PROFILE_INCOMPLETE con related_entity_id='field:<key>'
 -- 2) RPC inmediata de nuevo                                   -> 0 nuevas
 --    (cooldown 30 días deduplica por campo)
 -- 3) RPC anon                                                 -> error/401
 -- 4) Sin parámetro de recipient: imposible falsificar destino
 -- 5) pb_create_client_notification sin cambios (allowlist, grants, self-ban)
+-- 6) company / admin / account_type NULL o desconocido       -> RETURN 0
+--    (guard fail-closed G3, cero filas PROFILE_INCOMPLETE)

@@ -192,6 +192,36 @@ test.describe('PB-NOTIFICATION-PROFILE-INCOMPLETE — sql/062 live QA', () => {
     await bctx.dispose();
   });
 
+  test('G3: non-worker account (company) gets zero suggestions, fail-closed', async () => {
+    // PO G3: the suggestion family is worker-domain. The QA B account is a
+    // company with incomplete profile fields — exactly the case that must
+    // NOT produce worker suggestions. The guard is backend-only (fail-closed).
+    const bctx = await rest(tokenB);
+
+    // Fixture contract: B must be a non-worker account for this regression
+    // to be meaningful (QA fixture qa-company@example.invalid).
+    const profile = await (
+      await bctx.get(`/rest/v1/${PROFILES}?select=account_type&user_id=eq.${uidB}`)
+    ).json();
+    expect(profile.length).toBeGreaterThan(0);
+    if (profile[0].account_type === 'worker') {
+      test.skip(true, 'E2E_TEST_EMAIL_B is a worker; non-worker guard accredited by source spec + QA probes');
+    }
+    expect(profile[0].account_type, 'B fixture must be non-worker (company)').not.toBe('worker');
+
+    // Company with incomplete profile: RPC returns 0...
+    const res = await bctx.post(`/rest/v1/rpc/${RPC}`, { data: {} });
+    expect(res.status()).toBe(200);
+    expect(await res.json(), 'non-worker must get zero suggestions (fail-closed)').toBe(0);
+
+    // ...and zero PROFILE_INCOMPLETE rows exist for the company account.
+    const rowsB = await (
+      await bctx.get(`/rest/v1/${T}?select=id&user_id=eq.${uidB}&type=eq.${TYPE}`)
+    ).json();
+    expect(rowsB.length, 'non-worker must have zero PROFILE_INCOMPLETE rows').toBe(0);
+    await bctx.dispose();
+  });
+
   test('unexpected parameters (type/recipient forgery) are rejected', async () => {
     const ctx = await rest(tokenA);
     const res = await ctx.post(`/rest/v1/rpc/${RPC}`, {
