@@ -4745,6 +4745,7 @@
       "not_active": "Die Mitgliedschaft ist nicht aktiv.",
       "last_owner": "Das Unternehmen muss mindestens einen Eigentümer behalten.",
       "cannot_transfer_to_self": "Sie können das Eigentum nicht an sich selbst übertragen.",
+      "target_already_owner": "Das ausgewählte Mitglied ist bereits Eigentümer.",
       "unknown": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
     }
   }

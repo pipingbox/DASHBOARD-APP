@@ -4759,6 +4759,7 @@
       "not_active": "Członkostwo nie jest aktywne.",
       "last_owner": "Firma musi zachować co najmniej jednego właściciela.",
       "cannot_transfer_to_self": "Nie możesz przenieść własności na siebie.",
+      "target_already_owner": "Wybrany członek jest już właścicielem.",
       "unknown": "Coś poszło nie tak. Spróbuj ponownie."
     }
   }
