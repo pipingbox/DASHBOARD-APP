@@ -361,7 +361,13 @@ export function CVUploadSection() {
                   ) : (
                     <Download className="h-3 w-3" />
                   )}
-                  {t('workerProfile.cv.view')}
+                  {/* PB-UI-DOM-PROFILE-INSERTBEFORE-UNRESOLVED-001: RCA CONFIRMED.
+                      Download/Loader2 are distinct lucide components — the swap
+                      mounts anchored at the next sibling; as bare text, Chrome
+                      auto-translate detaches it and the mount throws
+                      NotFoundError insertBefore (reproduced in
+                      tests/profile-dom-insertbefore-profile.spec.ts). */}
+                  <span>{t('workerProfile.cv.view')}</span>
                 </button>
                 {/* Mobile fix: Use <label> instead of button + programmatic click */}
                 <label
