@@ -106,7 +106,9 @@
     "companyDocumentation": "Industrielles Dokumentenmanagement",
     "companySection": "Unternehmen",
     "companySettings": "Einstellungen",
-    "companyWorkspace": "Unternehmensbereich"
+    "companyWorkspace": "Unternehmensbereich",
+    "companyTenant": "Mein Unternehmen",
+    "companyTeam": "Team"
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -810,7 +812,7 @@
     "examBookOfficialCTA": "Bereit für Ihr Zertifikat?",
     "examBookOfficialText": "Buchen Sie Ihre offizielle VCA-Prüfung bei einem zugelassenen Prüfungszentrum.",
     "examBookOfficialButton": "Offizielle Prüfung buchen",
-    "examLanguageNote": "Dieser Simulator verwendet englische Fragen.",
+    "examLanguageNote": "Dieser Simulator verwendet Fragen in der Sprache {{language}}.",
     "examLanguageBVCA": "Die offizielle B-VCA-Prüfung ist in bis zu 20 Sprachen an Prüfungszentren verfügbar.",
     "examLanguageVOLVCA": "Die offizielle VOL-VCA-Prüfung ist auf Niederländisch, Englisch, Deutsch und Französisch verfügbar.",
     "examPassScore": "Bestehensgrenze",
@@ -963,7 +965,8 @@
         "badgeCompliance": "Erfüllt Ley 31/1995",
         "badgeHours": "{{hours}}h Schulung",
         "badgeDownloadable": "Bescheinigung zum Herunterladen"
-      }
+      },
+      "studyLanguagesNote": "Lernmaterial und Fragen in allen {{count}} Sprachen verfügbar"
     },
     "coursePage": {
       "tabPreparationCourse": "Vorbereitungskurs",
@@ -1060,8 +1063,73 @@
       "fillNameAndPostalCode": "Bitte geben Sie Ihren Namen und Ihre Postleitzahl ein",
       "certificationUnavailable": "Zertifizierung nicht verfügbar. Bitte versuchen Sie es später erneut.",
       "submitFailed": "Buchungsanfrage konnte nicht gesendet werden",
-      "submitted": "Buchungsanfrage gesendet! PipingBox kontaktiert Sie innerhalb von 24 Stunden, um Ihre Prüfungsreservierung zu bestätigen."
-    }
+      "submitted": "Buchungsanfrage gesendet! PipingBox kontaktiert Sie innerhalb von 24 Stunden, um Ihre Prüfungsreservierung zu bestätigen.",
+      "eyebrow": "Offizielle VCA-Prüfung",
+      "title": "Buchen Sie Ihre VCA-Prüfung",
+      "description": "PipingBox bereitet Sie vor und übernimmt die Anmeldung zu Ihrer offiziellen VCA-Prüfung in anerkannten Prüfungszentren in Belgien.",
+      "officialBadge": "Offiziell BESACC/SSVV",
+      "disclaimerTitle": "Wichtig — Offizielle Zertifizierung",
+      "disclaimerNotIssuer": "PipingBox stellt keine VCA-Zertifikate aus.",
+      "disclaimerManages": "PipingBox bereitet Sie mit dem Kurs vor und übernimmt die Anmeldung zur offiziellen Prüfung in anerkannten VCA-Prüfungszentren.",
+      "disclaimerIssuedBy": "Das VCA-Zertifikat wird von SSVV/BESACC über das Prüfungszentrum ausgestellt.",
+      "officialAuthority": "Offizielle Stelle: {{body}}",
+      "stepExamDetails": "Prüfungsdaten",
+      "examType": "Prüfungsart",
+      "audienceOperators": "Ausführende Mitarbeiter",
+      "audienceSupervisors": "Vorgesetzte",
+      "examLanguage": "Prüfungssprache",
+      "postalCode": "Ihre Postleitzahl",
+      "postalCodePlaceholder": "z. B. 2000",
+      "preferredDate": "Wunschtermin",
+      "bookingMode": "Buchungsart",
+      "modeExamOnly": "Nur Prüfung",
+      "modeExamOnlyHint": "Ich habe mich mit PipingBox vorbereitet",
+      "modeCoursePlusExam": "Kurs + Prüfung",
+      "modeCoursePlusExamHint": "Präsenzkurs im Zentrum",
+      "stepCenters": "Anerkannte Prüfungszentren",
+      "noCenters": "Keine Zentren entsprechen Ihren Kriterien. Ändern Sie die Prüfungsart oder die Buchungsart.",
+      "tagOnline": "Online",
+      "tagCourse": "Kurs",
+      "examFeeShort": "Prüfungsgebühr",
+      "coursePlusExamPrice": "{{price}} € Kurs+Prüfung",
+      "stepContact": "Ihre Kontaktdaten",
+      "name": "Name",
+      "namePlaceholder": "Ihr vollständiger Name",
+      "phone": "Telefon (WhatsApp)",
+      "summaryTitle": "Buchungsübersicht",
+      "summaryLanguage": "Sprache",
+      "summaryMode": "Buchungsart",
+      "noPreference": "Keine Präferenz",
+      "summaryCenter": "Zentrum",
+      "anyCenter": "Beliebiges verfügbares Zentrum",
+      "officialExamFee": "Offizielle Prüfungsgebühr",
+      "paidToCenter": "(zahlbar an das Prüfungszentrum)",
+      "managementFee": "PipingBox-Bearbeitungsgebühr",
+      "total": "Gesamt",
+      "feeStandard": "Standard {{price}} €",
+      "feeUrgent": "Eilservice {{price}} €",
+      "feeHint": "Standard: Bestätigung innerhalb von 48 Std. Eilservice: Bestätigung innerhalb von 24 Std. + Sprachunterstützung.",
+      "submitting": "Wird gesendet...",
+      "signInToBook": "Zum Buchen anmelden",
+      "submit": "Buchungsanfrage senden",
+      "afterSubmitNote": "Nach dem Senden kontaktiert PipingBox Sie innerhalb von 24-48 Std. per WhatsApp/E-Mail, um Ihre Anmeldung zu bestätigen und die Bearbeitungsgebühr abzuwickeln.",
+      "nextStepsTitle": "Wie geht es weiter?",
+      "nextStep1": "Sie senden diese Buchungsanfrage.",
+      "nextStep2": "PipingBox kontaktiert Sie innerhalb von 24-48 Std., um die Verfügbarkeit zu bestätigen.",
+      "nextStep3": "Sie zahlen die Bearbeitungsgebühr von {{price}} € (Stripe/Überweisung).",
+      "nextStep4": "PipingBox reserviert Ihren Prüfungstermin im Zentrum.",
+      "nextStep5": "Sie nehmen an der Prüfung teil. Das Zentrum stellt Ihr VCA-Zertifikat aus."
+    },
+    "examLoadingContent": "Fragen werden geladen…",
+    "moduleFallbackTitle": "Modul {{number}}",
+    "moduleEstimatedMinutes": "~{{minutes}} Min.",
+    "noLessonContent": "Für dieses Modul ist kein Lerninhalt verfügbar.",
+    "quizAnsweredCount": "{{answered}}/{{total}} beantwortet",
+    "bookVcaExamCta": "Buchen Sie Ihre offizielle VCA-Prüfung",
+    "bookVcaExamCtaHint": "Prüfungszentren ansehen und Platz reservieren",
+    "examContentLoadError": "Das Lernmaterial in dieser Sprache konnte nicht geladen werden. Die Übungsprüfung bleibt gesperrt.",
+    "examContentRetry": "Neu laden und erneut versuchen",
+    "examContentUnavailable": "Fragen nicht verfügbar"
   },
   "tools": {
     "eyebrow": "Tools",
@@ -1739,7 +1807,8 @@
         "straightCut": "Gerader Schnitt",
         "centerToCenter": "Mitte zu Mitte",
         "diagonal": "H (Diagonale)",
-        "cutAngleEnd": "Schnittwinkel pro Ende"
+        "cutAngleEnd": "Schnittwinkel pro Ende",
+        "cardSubtitle": "Versätze mit Bögen, ohne Bögen und Maßprüfung"
       },
       "miteredElbow": {
         "title": "Segmentbogen",
@@ -2025,6 +2094,53 @@
         "piece_lengths_invalid": "Berechnete Stücklängen sind ungültig",
         "clr_gt_half_od": "CLR muss größer als OD/2 sein",
         "beta_range": "Der Schnittwinkel muss zwischen 0° und {{max}}° liegen"
+      },
+      "twoElbowOffset": {
+        "title": "Versatz mit zwei Bögen",
+        "subtitle": "Parallelversatz mit zwei Bögen: Vorschub, Weg und gerades Zwischenstück.",
+        "lineCount": "Leitungsanzahl",
+        "elbowAngle": "Bogenwinkel",
+        "initialSpacing": "Anfangs-Achsabstand",
+        "finalSpacing": "End-Achsabstand",
+        "clr": "Achsenradius (CLR)",
+        "nps": "NPS",
+        "elbowType": "Bogentyp",
+        "catalogHint": "Die NPS/Typ-Auswahl füllt CLR aus dem Katalog; manuell editierbar.",
+        "invalidFields": "Felder prüfen: leere oder ungültige Werte.",
+        "drawPlaceholder": "Parameter eingeben, um den Versatz zu sehen",
+        "alignmentNote": "Die Position des Versatzes entlang der Achse ist nur Darstellung; keine Werkangabe.",
+        "angleLabel": "Winkel",
+        "direction": "Richtung",
+        "direction_expanding": "Verbreiternd",
+        "direction_contracting": "Verengend",
+        "direction_straight": "Gerade Leitungen",
+        "travelSpread": "Max. Wegdifferenz",
+        "line": "Leitung",
+        "offset": "Versatz",
+        "advance": "Vorschub",
+        "travel": "Weg",
+        "takeOut": "Abzug/Bogen",
+        "straightCut": "Gerades Stück",
+        "diff": "Diff.",
+        "status": "Status",
+        "statusReference": "Referenz (gerade)",
+        "statusTangent": "Tangentenbögen",
+        "statusDisplaced": "Versetzt",
+        "noteGeometry": "Der Weg ist der Abstand zwischen den theoretischen Achsenschnittpunkten; nicht die Bogenlänge. Der Vorschub ist keine Schnittlänge.",
+        "nominalCutNote": "Das gerade Stück ist nominal zwischen Tangentenpunkten: ohne Spalt, Montagezugabe oder Sägeblattstärke.",
+        "nominalAngleNote": "Winkel nicht handelsüblich normiert: nominale Geometrie. Verfügbarkeit des Formstücks vor Fertigung prüfen.",
+        "tangentNote": "Ein gerades Zwischenstück ist null: die Bögen liegen aneinander tangential (kein Auftrag, 0 mm zu schneiden).",
+        "dims": {
+          "spacingInitial": "Anfangsabstand",
+          "spacingFinal": "Endabstand",
+          "offset": "Versatz",
+          "advance": "Vorschub",
+          "travel": "Weg",
+          "straightCut": "Gerades"
+        },
+        "clrSourceCatalog": "CLR aus dem Katalog: NPS {{combo}}.",
+        "clrSourceCustom": "Eigener CLR; nicht aus dem Katalog.",
+        "clrMissing": "Der Katalog dieses Tools enthält keinen tabellierten CLR für NPS {{combo}}. Gib einen CLR ein, um zu rechnen."
       }
     },
     "tabPipeDimensions": "Rohrabmessungen",
@@ -2348,7 +2464,8 @@
       "pdfSeam": "Naht",
       "pdfWrapNote": "Umlagegen: X entlang des Umfangs, Y vom quadratischen Ende auf der Bogenseite.",
       "pdfClosure": "Schluss"
-    }
+    },
+    "familyOffsets": "Versätze und Verlagerungen"
   },
   "jobs": {
     "eyebrow": "Stellen",
@@ -4504,5 +4621,131 @@
     "copyAllFacebook": "Alle Facebook-Links kopieren",
     "copied": "Kopiert",
     "note": "UTM-Parameter enthalten nur generische Kampagnen-IDs, niemals personenbezogene Daten."
+  },
+  "marketplaceV3": {
+    "title": "Marketplace Ready aktivieren",
+    "subtitle": "Prüfen Sie die Anforderungen und akzeptieren Sie die Marketplace-Bedingungen, damit Ihr Profil für Unternehmen sichtbar wird.",
+    "requirementsTitle": "Anforderungen für Marketplace Ready",
+    "requirements": {
+      "cv": "Lebenslauf hochgeladen und zugänglich",
+      "profession": "Beruf oder Fachrichtung angegeben",
+      "location": "Arbeitsort oder Region",
+      "availability": "Verfügbarkeit angegeben"
+    },
+    "certificatesOptional": "Zertifikate sind optional: Sie verbessern Ihr Profil, sind aber für den Marketplace nicht erforderlich.",
+    "consentText": "Mit Ihrer Zustimmung darf PIPINGBOX Ihr Berufsprofil verifizierten Unternehmen gemäß den Marketplace-Bedingungen (Version v3-2026-10-17) präsentieren. Ihr ursprünglicher Lebenslauf und Ihre Kontaktdaten werden niemals ohne Ihre Zustimmung angezeigt.",
+    "consentCheckbox": "Ich habe die Marketplace-Bedingungen (v3) gelesen und akzeptiere sie.",
+    "acceptCta": "Akzeptieren und aktivieren",
+    "resultReady": "Ihr Profil ist Marketplace Ready. Unternehmen können Sie jetzt finden.",
+    "resultNotEligible": "Zustimmung gespeichert. Vervollständigen Sie die fehlenden Anforderungen, um Marketplace Ready zu aktivieren.",
+    "resultLegacy": "Ihr Profil ist durch die vorherigen Bedingungen geschützt. Es wurden keine Änderungen vorgenommen.",
+    "resultError": "Die Zustimmung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.",
+    "completeProfileLink": "Vervollständigen Sie Ihr Profil",
+    "contractVersion": "Vertragsversion: {{version}} · Sprache: {{lang}}",
+    "resultAccountType": "Diese Aktion ist nur für professionelle Konten verfügbar.",
+    "goDashboard": "Zum Dashboard",
+    "contractNotActive": "Bedingungen noch nicht aktiv",
+    "contractNotActiveBody": "Die Marketplace-v3-Bedingungen befinden sich in rechtlicher Prüfung und sind noch nicht aktiviert. Sobald sie verfügbar sind, können Sie sie hier annehmen.",
+    "contractChanged": "Die Bedingungen haben sich geändert",
+    "contractChangedBody": "Die Marketplace-Bedingungen wurden aktualisiert, während Sie sie geprüft haben. Zu Ihrer Sicherheit wurde keine Zustimmung registriert. Bitte prüfen Sie die aktuelle Version, bevor Sie zustimmen.",
+    "reviewAgainCta": "Aktuelle Version prüfen"
+  },
+  "companyCore": {
+    "loading": "Wird geladen…",
+    "switcher": {
+      "label": "Aktives Unternehmen"
+    },
+    "roles": {
+      "owner": "Eigentümer",
+      "admin": "Administrator",
+      "recruiter": "Recruiter",
+      "viewer": "Nur Lesen"
+    },
+    "verification": {
+      "unverified": "Nicht verifiziert",
+      "pending": "Verifizierung ausstehend",
+      "verified": "Verifiziert",
+      "rejected": "Verifizierung abgelehnt"
+    },
+    "create": {
+      "title": "Richten Sie Ihr Unternehmen ein",
+      "description": "Erstellen Sie den Arbeitsbereich Ihres Unternehmens, um Ihr Team einzuladen. Das Erstellen eines Unternehmens verifiziert es nicht.",
+      "nameLabel": "Unternehmensname",
+      "countryLabel": "Land (optional)",
+      "submit": "Unternehmen erstellen",
+      "submitting": "Wird erstellt…"
+    },
+    "view": {
+      "title": "Mein Unternehmen",
+      "description": "Überblick über den Arbeitsbereich Ihres Unternehmens.",
+      "verificationTitle": "Verifizierungsstatus",
+      "teamTitle": "Team",
+      "teamDescription": "Mitglieder, Rollen und Einladungen",
+      "yourRoleTitle": "Ihre Rolle"
+    },
+    "team": {
+      "title": "Team",
+      "description": "Mitglieder von {{company}}",
+      "noCompany": "Sie gehören noch zu keinem Unternehmen.",
+      "createLink": "Richten Sie Ihr Unternehmen ein",
+      "membersTitle": "Mitglieder",
+      "unnamedMember": "Unbenanntes Mitglied",
+      "you": "Sie",
+      "confirmRemove": "Dieses Mitglied entfernen? Der Zugriff wird sofort entzogen.",
+      "confirmTransfer": "Eigentum übertragen? Sie werden Administrator.",
+      "transferTitle": "Eigentum übertragen",
+      "removeTitle": "Mitglied entfernen",
+      "leaveTitle": "Unternehmen verlassen"
+    },
+    "invite": {
+      "title": "Mitglied einladen",
+      "emailLabel": "E-Mail-Adresse",
+      "roleLabel": "Rolle",
+      "submit": "Einladung erstellen",
+      "submitting": "Wird erstellt…",
+      "created": "Einladung erstellt. Teilen Sie diesen Einmal-Link:",
+      "alreadyPending": "Für diese E-Mail-Adresse liegt bereits eine ausstehende Einladung vor.",
+      "copy": "Kopieren",
+      "copied": "Link kopiert",
+      "emailNotice": "Der E-Mail-Versand ist noch nicht aktiviert — teilen Sie den Link manuell mit der eingeladenen Person."
+    },
+    "invitations": {
+      "title": "Einladungen",
+      "revoke": "Widerrufen",
+      "expires": "läuft ab am {{date}}",
+      "status": {
+        "pending": "ausstehend",
+        "accepted": "angenommen",
+        "rejected": "abgelehnt",
+        "revoked": "widerrufen",
+        "expired": "abgelaufen"
+      }
+    },
+    "accept": {
+      "title": "Unternehmens-Einladung",
+      "sessionRequired": "Um auf diese Einladung zu antworten, melden Sie sich mit der eingeladenen E-Mail-Adresse an oder registrieren Sie sich und öffnen Sie diesen Link erneut.",
+      "signIn": "Anmelden",
+      "register": "Registrieren",
+      "question": "Möchten Sie diesem Unternehmen beitreten?",
+      "accept": "Annehmen",
+      "reject": "Ablehnen",
+      "processing": "Wird verarbeitet…",
+      "success": "Sie sind dem Unternehmen beigetreten. Weiterleitung…",
+      "rejected": "Einladung abgelehnt."
+    },
+    "errors": {
+      "not_authenticated": "Sie müssen angemeldet sein.",
+      "forbidden": "Sie haben keine Berechtigung für diese Aktion.",
+      "not_found": "Nicht gefunden.",
+      "invalid_name": "Ungültiger Unternehmensname.",
+      "invalid_email": "Ungültige E-Mail-Adresse.",
+      "invalid_role": "Ungültige Rolle.",
+      "invalid_or_expired": "Diese Einladung ist ungültig, abgelaufen oder bereits verwendet.",
+      "email_mismatch": "Diese Einladung wurde an eine andere E-Mail-Adresse gesendet. Melden Sie sich mit der eingeladenen Adresse an.",
+      "not_active": "Die Mitgliedschaft ist nicht aktiv.",
+      "last_owner": "Das Unternehmen muss mindestens einen Eigentümer behalten.",
+      "cannot_transfer_to_self": "Sie können das Eigentum nicht an sich selbst übertragen.",
+      "unknown": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+    }
   }
 }

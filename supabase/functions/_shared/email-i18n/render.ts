@@ -391,7 +391,11 @@ export function renderApplicationPendingProfileEmail(
 
   const bodyTpl = !vars.company && t.body_no_company ? t.body_no_company : t.body;
 
-  const required = ["cv", "certificate", "availability", "consent", "completion"] as const satisfies readonly Requirement[];
+  const required = [
+    "cv", "certificate", "availability", "consent", "completion",
+    // PR-V3-01: claves del contrato v3 (pb_marketplace_missing_requirements_v3).
+    "profession", "location",
+  ] as const satisfies readonly Requirement[];
   const itemKeys = input.pendingItems.filter((key): key is Requirement =>
     (required as readonly string[]).includes(key)
   );

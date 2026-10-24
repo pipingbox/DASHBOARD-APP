@@ -75,6 +75,36 @@
 -- ══════════════════════════════════════════════════════════════════════════════
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- 0. Gate interno de sincronización (PB-RELEASE-002 / PO RELEASE DECISION 002)
+--
+--    Instalación INERTE por defecto ('off'): bloquea promociones para TODOS
+--    los actores — trigger de candidaturas, wrapper authenticated, sweep y
+--    Edge Functions con service_role. REVOKE a authenticated por sí solo NO
+--    bastaba: las Edge Functions activas (application-activation.ts) ya
+--    invocan pb_sync_marketplace_ready_state con service_role.
+--
+--    RLS cerrado sin policies: inaccesible vía API para anon/authenticated;
+--    service_role y el owner la leen para evaluar el gate.
+--    ON CONFLICT DO NOTHING: la re-ejecución NUNCA resetea un gate activado.
+--
+--    Activación (fase 2, GO independiente y auditado):
+--      UPDATE public.pb_marketplace_sync_gate
+--         SET gate_value = 'on', updated_by = '<operador>'
+--       WHERE gate_key = 'sync_mode';
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.pb_marketplace_sync_gate (
+  gate_key    text PRIMARY KEY,
+  gate_value  text NOT NULL,
+  updated_at  timestamptz NOT NULL DEFAULT now(),
+  updated_by  text
+);
+ALTER TABLE public.pb_marketplace_sync_gate ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.pb_marketplace_sync_gate FROM anon, authenticated;
+INSERT INTO public.pb_marketplace_sync_gate (gate_key, gate_value, updated_by)
+VALUES ('sync_mode', 'off', 'pb-release-002-seed')
+ON CONFLICT (gate_key) DO NOTHING;
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- 1. Núcleo: sincronización canónica de un perfil (promoción consent-gated)
 -- ─────────────────────────────────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.pb_sync_marketplace_ready_state(
@@ -96,6 +126,17 @@ DECLARE
 BEGIN
   IF p_user_id IS NULL THEN
     RETURN QUERY SELECT 'missing_user_id'::text, NULL::boolean, 0;
+    RETURN;
+  END IF;
+
+  -- PB-RELEASE-002: gate interno. Con sync_mode <> 'on' NINGÚN actor
+  -- promociona (ni trigger, ni wrapper, ni sweep, ni Edge Functions
+  -- service_role). Se evalúa antes del SELECT FOR UPDATE: cero locks, cero
+  -- efectos secundarios, outcome explícito y manejable por las Edge
+  -- Functions activas (equivalente a "no promovido", jamás excepción).
+  IF (SELECT gate_value FROM public.pb_marketplace_sync_gate
+       WHERE gate_key = 'sync_mode') IS DISTINCT FROM 'on' THEN
+    RETURN QUERY SELECT 'sync_gate_closed'::text, FALSE, 0;
     RETURN;
   END IF;
 

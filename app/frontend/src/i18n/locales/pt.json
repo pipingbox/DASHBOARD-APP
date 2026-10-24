@@ -106,7 +106,9 @@
     "companyDocumentation": "Gestão Documental Industrial",
     "companySection": "Empresa",
     "companySettings": "Configurações",
-    "companyWorkspace": "Ambiente da Empresa"
+    "companyWorkspace": "Ambiente da Empresa",
+    "companyTenant": "A minha empresa",
+    "companyTeam": "Equipa"
   },
   "notifications": {
     "title": "Notificações",
@@ -811,7 +813,7 @@
     "examBookOfficialCTA": "Pronto para o seu certificado?",
     "examBookOfficialText": "Reserve o seu exame VCA oficial num centro autorizado.",
     "examBookOfficialButton": "Reservar Exame Oficial",
-    "examLanguageNote": "Este simulador usa perguntas em inglês.",
+    "examLanguageNote": "Este simulador utiliza perguntas em {{language}}.",
     "examLanguageBVCA": "O exame oficial B-VCA está disponível em até 20 idiomas nos centros de exame.",
     "examLanguageVOLVCA": "O exame oficial VOL-VCA está disponível em neerlandês, inglês, alemão e francês.",
     "examPassScore": "Pontuação Mínima",
@@ -966,7 +968,8 @@
         "badgeCompliance": "Cumpre a Ley 31/1995",
         "badgeHours": "{{hours}}h de formação",
         "badgeDownloadable": "Certificado descarregável"
-      }
+      },
+      "studyLanguagesNote": "material de estudo e perguntas disponíveis nos {{count}} idiomas"
     },
     "coursePage": {
       "tabPreparationCourse": "Curso de preparação",
@@ -1063,8 +1066,73 @@
       "fillNameAndPostalCode": "Preencha o seu nome e código postal",
       "certificationUnavailable": "Certificação não disponível. Tente novamente mais tarde.",
       "submitFailed": "Não foi possível enviar o pedido de reserva",
-      "submitted": "Pedido de reserva enviado! A PipingBox irá contactá-lo no prazo de 24 h para confirmar a reserva do seu exame."
-    }
+      "submitted": "Pedido de reserva enviado! A PipingBox irá contactá-lo no prazo de 24 h para confirmar a reserva do seu exame.",
+      "eyebrow": "Exame oficial VCA",
+      "title": "Marque o seu exame VCA",
+      "description": "A PipingBox prepara-o e gere a marcação do seu exame oficial VCA em centros reconhecidos na Bélgica.",
+      "officialBadge": "Oficial BESACC/SSVV",
+      "disclaimerTitle": "Importante — Certificação oficial",
+      "disclaimerNotIssuer": "A PipingBox não emite certificados VCA.",
+      "disclaimerManages": "A PipingBox prepara-o através do curso e gere a marcação do exame oficial em centros de exame VCA reconhecidos.",
+      "disclaimerIssuedBy": "O certificado VCA é emitido pela SSVV/BESACC através do centro de exame.",
+      "officialAuthority": "Entidade oficial: {{body}}",
+      "stepExamDetails": "Dados do exame",
+      "examType": "Tipo de exame",
+      "audienceOperators": "Operadores",
+      "audienceSupervisors": "Supervisores",
+      "examLanguage": "Idioma do exame",
+      "postalCode": "O seu código postal",
+      "postalCodePlaceholder": "p. ex. 2000",
+      "preferredDate": "Data preferida",
+      "bookingMode": "Modalidade de marcação",
+      "modeExamOnly": "Apenas exame",
+      "modeExamOnlyHint": "Preparei-me com a PipingBox",
+      "modeCoursePlusExam": "Curso + exame",
+      "modeCoursePlusExamHint": "Formação presencial no centro",
+      "stepCenters": "Centros de exame reconhecidos",
+      "noCenters": "Nenhum centro corresponde aos seus critérios. Tente alterar o tipo de exame ou a modalidade de marcação.",
+      "tagOnline": "Em linha",
+      "tagCourse": "Curso",
+      "examFeeShort": "taxa de exame",
+      "coursePlusExamPrice": "€{{price}} curso+exame",
+      "stepContact": "Os seus dados de contacto",
+      "name": "Nome",
+      "namePlaceholder": "O seu nome completo",
+      "phone": "Telefone (WhatsApp)",
+      "summaryTitle": "Resumo da marcação",
+      "summaryLanguage": "Idioma",
+      "summaryMode": "Modalidade",
+      "noPreference": "Sem preferência",
+      "summaryCenter": "Centro",
+      "anyCenter": "Qualquer centro disponível",
+      "officialExamFee": "Taxa do exame oficial",
+      "paidToCenter": "(paga ao centro)",
+      "managementFee": "Taxa de gestão da PipingBox",
+      "total": "Total a pagar",
+      "feeStandard": "Normal €{{price}}",
+      "feeUrgent": "Urgente €{{price}}",
+      "feeHint": "Normal: confirmação em 48 h. Urgente: confirmação em 24 h + assistência linguística.",
+      "submitting": "A enviar...",
+      "signInToBook": "Inicie sessão para marcar",
+      "submit": "Enviar pedido de marcação",
+      "afterSubmitNote": "Após o envio, a PipingBox entrará em contacto por WhatsApp/e-mail no prazo de 24-48 h para confirmar a sua marcação e processar a taxa de gestão.",
+      "nextStepsTitle": "O que acontece a seguir?",
+      "nextStep1": "Envia este pedido de marcação.",
+      "nextStep2": "A PipingBox entra em contacto no prazo de 24-48 h para confirmar a disponibilidade.",
+      "nextStep3": "Paga a taxa de gestão de €{{price}} (Stripe/transferência).",
+      "nextStep4": "A PipingBox reserva a sua vaga de exame no centro.",
+      "nextStep5": "Comparece no exame. O centro emite o seu certificado VCA."
+    },
+    "examLoadingContent": "A carregar perguntas…",
+    "moduleFallbackTitle": "Módulo {{number}}",
+    "moduleEstimatedMinutes": "~{{minutes}} min",
+    "noLessonContent": "Não há conteúdo de lição disponível para este módulo.",
+    "quizAnsweredCount": "{{answered}}/{{total}} respondidas",
+    "bookVcaExamCta": "Marque o seu exame oficial VCA",
+    "bookVcaExamCtaHint": "Consulte os centros de exame e faça a sua marcação",
+    "examContentLoadError": "Não foi possível carregar o material de estudo neste idioma. O simulacro permanece indisponível.",
+    "examContentRetry": "Recarregar e tentar novamente",
+    "examContentUnavailable": "Perguntas indisponíveis"
   },
   "tools": {
     "eyebrow": "Tools",
@@ -1742,7 +1810,8 @@
         "straightCut": "Corte reto",
         "centerToCenter": "Centro a centro",
         "diagonal": "H (diagonal)",
-        "cutAngleEnd": "Ângulo de corte por extremidade"
+        "cutAngleEnd": "Ângulo de corte por extremidade",
+        "cardSubtitle": "Desvios com cotovelos, sem cotovelos e verificação de medidas"
       },
       "miteredElbow": {
         "title": "Curva segmentada",
@@ -2028,6 +2097,53 @@
         "piece_lengths_invalid": "Os comprimentos de peça calculados são inválidos",
         "clr_gt_half_od": "O CLR deve ser maior que OD/2",
         "beta_range": "O ângulo de corte deve estar entre 0° e {{max}}°"
+      },
+      "twoElbowOffset": {
+        "title": "Deslocamento com dois cotovelos",
+        "subtitle": "Deslocamento de linhas paralelas com dois cotovelos: avanço, percurso e trecho reto intermédio.",
+        "lineCount": "Número de linhas",
+        "elbowAngle": "Ângulo dos cotovelos",
+        "initialSpacing": "Distância inicial entre eixos",
+        "finalSpacing": "Distância final entre eixos",
+        "clr": "Raio ao eixo (CLR)",
+        "nps": "NPS",
+        "elbowType": "Tipo de cotovelo",
+        "catalogHint": "O seletor NPS/tipo preenche o CLR do catálogo; editável manualmente.",
+        "invalidFields": "Verifique os campos: valores vazios ou inválidos.",
+        "drawPlaceholder": "Introduza parâmetros para ver o deslocamento",
+        "alignmentNote": "A posição do deslocamento ao longo do eixo é apenas visual; não é uma cota de oficina.",
+        "angleLabel": "Ângulo",
+        "direction": "Sentido",
+        "direction_expanding": "Afastando",
+        "direction_contracting": "Aproximando",
+        "direction_straight": "Linhas retas",
+        "travelSpread": "Dif. máx. de percurso",
+        "line": "Linha",
+        "offset": "Deslocamento",
+        "advance": "Avanço",
+        "travel": "Percurso",
+        "takeOut": "Desconto/cotovelo",
+        "straightCut": "Trecho reto",
+        "diff": "Dif.",
+        "status": "Estado",
+        "statusReference": "Referência (reta)",
+        "statusTangent": "Cotovelos tangentes",
+        "statusDisplaced": "Deslocada",
+        "noteGeometry": "O percurso é a distância entre interseções teóricas dos eixos; não é o comprimento de arco do cotovelo. O avanço não é um comprimento de corte.",
+        "nominalCutNote": "O trecho reto é nominal entre pontos de tangência: sem folga de solda, margem de montagem ou espessura de serra.",
+        "nominalAngleNote": "Ângulo não normalizado comercialmente: geometria nominal. Verifique a disponibilidade do acessório antes de fabricar.",
+        "tangentNote": "Algum trecho reto intermédio é zero: os cotovelos ficam tangentes (não é ordem de cortar 0 mm).",
+        "dims": {
+          "spacingInitial": "Dist. inicial",
+          "spacingFinal": "Dist. final",
+          "offset": "Desloc.",
+          "advance": "Avanço",
+          "travel": "Percurso",
+          "straightCut": "Trecho reto"
+        },
+        "clrSourceCatalog": "CLR resolvido do catálogo: NPS {{combo}}.",
+        "clrSourceCustom": "CLR personalizado; não provém do catálogo.",
+        "clrMissing": "O catálogo desta ferramenta não tem CLR tabulado para NPS {{combo}}. Introduz um CLR para calcular."
       }
     },
     "tabPipeDimensions": "Dimensões do tubo",
@@ -2351,7 +2467,8 @@
       "pdfSeam": "costura",
       "pdfWrapNote": "Enrolar: X ao longo da circunferência, Y desde a extremidade quadrada do lado do cotovelo.",
       "pdfClosure": "fecho"
-    }
+    },
+    "familyOffsets": "Desvios e deslocamentos"
   },
   "jobs": {
     "eyebrow": "Jobs",
@@ -4511,5 +4628,131 @@
     "copyAllFacebook": "Copiar todos os links do Facebook",
     "copied": "Copiado",
     "note": "Os parâmetros UTM contêm apenas identificadores genéricos de campanha, nunca dados pessoais."
+  },
+  "marketplaceV3": {
+    "title": "Ativar Marketplace Ready",
+    "subtitle": "Reveja os requisitos e aceite as condições do Marketplace para tornar o seu perfil visível às empresas.",
+    "requirementsTitle": "Requisitos do Marketplace Ready",
+    "requirements": {
+      "cv": "CV carregado e acessível",
+      "profession": "Profissão ou ofício indicado",
+      "location": "Local ou região de trabalho",
+      "availability": "Disponibilidade declarada"
+    },
+    "certificatesOptional": "Os certificados são opcionais: melhoram o seu perfil, mas não são obrigatórios para entrar no Marketplace.",
+    "consentText": "Ao aceitar, autoriza a PIPINGBOX a apresentar o seu perfil profissional a empresas verificadas de acordo com as condições do Marketplace (versão v3-2026-10-17). O seu CV original e os seus dados de contacto nunca são mostrados sem a sua autorização.",
+    "consentCheckbox": "Li e aceito as condições do Marketplace (v3).",
+    "acceptCta": "Aceitar e ativar",
+    "resultReady": "O seu perfil está Marketplace Ready. As empresas já podem encontrá-lo.",
+    "resultNotEligible": "Consentimento registado. Complete os requisitos pendentes para ativar o Marketplace Ready.",
+    "resultLegacy": "O seu perfil está protegido pelas condições anteriores. Não foram aplicadas alterações.",
+    "resultError": "Não foi possível concluir a aceitação. Tente novamente.",
+    "completeProfileLink": "Complete o seu perfil",
+    "contractVersion": "Versão do contrato: {{version}} · Idioma: {{lang}}",
+    "resultAccountType": "Esta ação está disponível apenas para contas profissionais.",
+    "goDashboard": "Ir para o seu painel",
+    "contractNotActive": "Condições ainda não ativas",
+    "contractNotActiveBody": "As condições do Marketplace v3 estão em revisão jurídica e ainda não estão ativadas. Poderá aceitá-las aqui quando estiverem disponíveis.",
+    "contractChanged": "As condições mudaram",
+    "contractChangedBody": "As condições do Marketplace foram atualizadas enquanto as revia. Por segurança, não foi registada nenhuma aceitação. Reveja a versão atual antes de aceitar.",
+    "reviewAgainCta": "Rever a versão atual"
+  },
+  "companyCore": {
+    "loading": "A carregar…",
+    "switcher": {
+      "label": "Empresa ativa"
+    },
+    "roles": {
+      "owner": "Proprietário",
+      "admin": "Administrador",
+      "recruiter": "Recrutador",
+      "viewer": "Somente leitura"
+    },
+    "verification": {
+      "unverified": "Não verificada",
+      "pending": "Verificação pendente",
+      "verified": "Verificada",
+      "rejected": "Verificação rejeitada"
+    },
+    "create": {
+      "title": "Configure a sua empresa",
+      "description": "Crie o espaço da sua empresa para convidar a sua equipa. Criar uma empresa não a verifica.",
+      "nameLabel": "Nome da empresa",
+      "countryLabel": "País (opcional)",
+      "submit": "Criar empresa",
+      "submitting": "A criar…"
+    },
+    "view": {
+      "title": "A minha empresa",
+      "description": "Visão geral do espaço da sua empresa.",
+      "verificationTitle": "Estado de verificação",
+      "teamTitle": "Equipa",
+      "teamDescription": "Membros, funções e convites",
+      "yourRoleTitle": "A sua função"
+    },
+    "team": {
+      "title": "Equipa",
+      "description": "Membros de {{company}}",
+      "noCompany": "Ainda não pertence a nenhuma empresa.",
+      "createLink": "Configure a sua empresa",
+      "membersTitle": "Membros",
+      "unnamedMember": "Membro sem nome",
+      "you": "você",
+      "confirmRemove": "Remover este membro? O acesso é revogado imediatamente.",
+      "confirmTransfer": "Transferir a propriedade? Passará a administrador.",
+      "transferTitle": "Transferir propriedade",
+      "removeTitle": "Remover membro",
+      "leaveTitle": "Sair da empresa"
+    },
+    "invite": {
+      "title": "Convidar um membro",
+      "emailLabel": "E-mail",
+      "roleLabel": "Função",
+      "submit": "Criar convite",
+      "submitting": "A criar…",
+      "created": "Convite criado. Partilhe esta ligação de utilização única:",
+      "alreadyPending": "Já existe um convite pendente para este e-mail.",
+      "copy": "Copiar",
+      "copied": "Ligação copiada",
+      "emailNotice": "O envio por e-mail ainda não está ativo — partilhe a ligação manualmente com a pessoa convidada."
+    },
+    "invitations": {
+      "title": "Convites",
+      "revoke": "Revogar",
+      "expires": "expira em {{date}}",
+      "status": {
+        "pending": "pendente",
+        "accepted": "aceite",
+        "rejected": "rejeitado",
+        "revoked": "revogado",
+        "expired": "expirado"
+      }
+    },
+    "accept": {
+      "title": "Convite de empresa",
+      "sessionRequired": "Para responder a este convite, inicie sessão ou registe-se com o e-mail convidado e reabra esta ligação.",
+      "signIn": "Iniciar sessão",
+      "register": "Registar",
+      "question": "Pretende juntar-se a esta empresa?",
+      "accept": "Aceitar",
+      "reject": "Rejeitar",
+      "processing": "A processar…",
+      "success": "Juntou-se à empresa. A redirecionar…",
+      "rejected": "Convite rejeitado."
+    },
+    "errors": {
+      "not_authenticated": "Tem de iniciar sessão.",
+      "forbidden": "Não tem permissão para esta ação.",
+      "not_found": "Não encontrado.",
+      "invalid_name": "Nome de empresa inválido.",
+      "invalid_email": "E-mail inválido.",
+      "invalid_role": "Função inválida.",
+      "invalid_or_expired": "Este convite é inválido, expirou ou já foi utilizado.",
+      "email_mismatch": "Este convite foi enviado para outro e-mail. Inicie sessão com o e-mail convidado.",
+      "not_active": "A adesão não está ativa.",
+      "last_owner": "A empresa tem de manter pelo menos um proprietário.",
+      "cannot_transfer_to_self": "Não pode transferir a propriedade para si próprio.",
+      "unknown": "Algo falhou. Tente novamente."
+    }
   }
 }

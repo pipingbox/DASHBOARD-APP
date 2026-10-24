@@ -106,7 +106,9 @@
     "companyDocumentation": "Gestionarea documentelor industriale",
     "companySection": "Companie",
     "companySettings": "Setări",
-    "companyWorkspace": "Spațiu de lucru companie"
+    "companyWorkspace": "Spațiu de lucru companie",
+    "companyTenant": "Compania mea",
+    "companyTeam": "Echipă"
   },
   "notifications": {
     "title": "Notificări",
@@ -867,7 +869,7 @@
     "examBookOfficialCTA": "Sunteți pregătit pentru certificat?",
     "examBookOfficialText": "Programați examenul oficial VCA la un centru de examinare autorizat.",
     "examBookOfficialButton": "Programați examenul oficial",
-    "examLanguageNote": "Acest simulator folosește întrebări în limba engleză.",
+    "examLanguageNote": "Acest simulator folosește întrebări în limba {{language}}.",
     "examLanguageBVCA": "Examenul oficial B-VCA este disponibil în până la 20 de limbi la centrele de examinare.",
     "examLanguageVOLVCA": "Examenul oficial VOL-VCA este disponibil în neerlandeză, engleză, germană și franceză.",
     "examPassScore": "Scor de promovare",
@@ -966,7 +968,8 @@
         "badgeCompliance": "Îndeplinește Ley 31/1995",
         "badgeHours": "{{hours}}h de formare",
         "badgeDownloadable": "Certificat descărcabil"
-      }
+      },
+      "studyLanguagesNote": "material de studiu și întrebări disponibile în toate cele {{count}} limbi"
     },
     "coursePage": {
       "tabPreparationCourse": "Curs de pregătire",
@@ -1063,8 +1066,73 @@
       "fillNameAndPostalCode": "Vă rugăm să completați numele și codul poștal",
       "certificationUnavailable": "Certificarea nu este disponibilă. Vă rugăm să încercați din nou mai târziu.",
       "submitFailed": "Cererea de rezervare nu a putut fi trimisă",
-      "submitted": "Cererea de rezervare a fost trimisă! PipingBox vă va contacta în termen de 24h pentru a confirma rezervarea examenului."
-    }
+      "submitted": "Cererea de rezervare a fost trimisă! PipingBox vă va contacta în termen de 24h pentru a confirma rezervarea examenului.",
+      "eyebrow": "Examen oficial VCA",
+      "title": "Rezervați-vă examenul VCA",
+      "description": "PipingBox vă pregătește și vă gestionează rezervarea la examenul oficial VCA în centre recunoscute din Belgia.",
+      "officialBadge": "Oficial BESACC/SSVV",
+      "disclaimerTitle": "Important — Certificare oficială",
+      "disclaimerNotIssuer": "PipingBox nu eliberează certificate VCA.",
+      "disclaimerManages": "PipingBox vă pregătește prin curs și gestionează rezervarea examenului oficial în centre de examinare VCA recunoscute.",
+      "disclaimerIssuedBy": "Certificatul VCA este eliberat de SSVV/BESACC prin intermediul centrului de examinare.",
+      "officialAuthority": "Autoritate oficială: {{body}}",
+      "stepExamDetails": "Detaliile examenului",
+      "examType": "Tipul examenului",
+      "audienceOperators": "Operatori",
+      "audienceSupervisors": "Personal cu funcții de conducere",
+      "examLanguage": "Limba examenului",
+      "postalCode": "Codul dumneavoastră poștal",
+      "postalCodePlaceholder": "de ex. 2000",
+      "preferredDate": "Data preferată",
+      "bookingMode": "Tipul rezervării",
+      "modeExamOnly": "Doar examen",
+      "modeExamOnlyHint": "M-am pregătit cu PipingBox",
+      "modeCoursePlusExam": "Curs + examen",
+      "modeCoursePlusExamHint": "Curs la sediul centrului",
+      "stepCenters": "Centre de examinare recunoscute",
+      "noCenters": "Niciun centru nu corespunde criteriilor dumneavoastră. Încercați să modificați tipul examenului sau tipul rezervării.",
+      "tagOnline": "Online",
+      "tagCourse": "Curs",
+      "examFeeShort": "taxă de examen",
+      "coursePlusExamPrice": "{{price}} € curs+examen",
+      "stepContact": "Datele dumneavoastră de contact",
+      "name": "Nume",
+      "namePlaceholder": "Numele dumneavoastră complet",
+      "phone": "Telefon (WhatsApp)",
+      "summaryTitle": "Sumarul rezervării",
+      "summaryLanguage": "Limbă",
+      "summaryMode": "Tip",
+      "noPreference": "Fără preferință",
+      "summaryCenter": "Centru",
+      "anyCenter": "Orice centru disponibil",
+      "officialExamFee": "Taxa oficială de examen",
+      "paidToCenter": "(se achită centrului)",
+      "managementFee": "Taxa de gestionare PipingBox",
+      "total": "Total",
+      "feeStandard": "Standard {{price}} €",
+      "feeUrgent": "Urgent {{price}} €",
+      "feeHint": "Standard: confirmare în 48 h. Urgent: confirmare în 24 h + asistență lingvistică.",
+      "submitting": "Se trimite...",
+      "signInToBook": "Autentificați-vă pentru a rezerva",
+      "submit": "Trimiteți cererea de rezervare",
+      "afterSubmitNote": "După trimitere, PipingBox vă va contacta prin WhatsApp/e-mail în 24-48 h pentru a confirma rezervarea și a procesa taxa de gestionare.",
+      "nextStepsTitle": "Ce urmează?",
+      "nextStep1": "Trimiteți această cerere de rezervare.",
+      "nextStep2": "PipingBox vă contactează în 24-48 h pentru a confirma disponibilitatea.",
+      "nextStep3": "Achitați taxa de gestionare de {{price}} € (Stripe/transfer bancar).",
+      "nextStep4": "PipingBox vă rezervă locul la examen în cadrul centrului.",
+      "nextStep5": "Vă prezentați la examen. Centrul vă eliberează certificatul VCA."
+    },
+    "examLoadingContent": "Se încarcă întrebările…",
+    "moduleFallbackTitle": "Modulul {{number}}",
+    "moduleEstimatedMinutes": "~{{minutes}} min",
+    "noLessonContent": "Nu există conținut de lecție disponibil pentru acest modul.",
+    "quizAnsweredCount": "{{answered}}/{{total}} răspunsuri date",
+    "bookVcaExamCta": "Rezervați-vă examenul oficial VCA",
+    "bookVcaExamCtaHint": "Consultați centrele de examinare și rezervați-vă locul",
+    "examContentLoadError": "Materialul de studiu în această limbă nu a putut fi încărcat. Simularea rămâne blocată.",
+    "examContentRetry": "Reîncărcați și încercați din nou",
+    "examContentUnavailable": "Întrebări indisponibile"
   },
   "tools": {
     "eyebrow": "Instrumente",
@@ -1903,7 +1971,8 @@
         "straightCut": "Tăiere dreaptă",
         "centerToCenter": "De la ax la ax",
         "diagonal": "H (diagonală)",
-        "cutAngleEnd": "Unghi de tăiere pe capăt"
+        "cutAngleEnd": "Unghi de tăiere pe capăt",
+        "cardSubtitle": "Deviere cu coturi, fără coturi și verificarea măsurilor"
       },
       "miteredElbow": {
         "title": "Cot segmentat",
@@ -2189,6 +2258,53 @@
         "piece_lengths_invalid": "Lungimile calculate ale segmentelor sunt invalide",
         "clr_gt_half_od": "CLR trebuie să fie mai mare decât OD/2",
         "beta_range": "Unghiul de tăiere trebuie să fie între 0° și {{max}}°"
+      },
+      "twoElbowOffset": {
+        "title": "Deplasare cu două coturi",
+        "subtitle": "Deplasarea liniilor paralele cu două coturi: înaintare, parcurs și segment drept intermediar.",
+        "lineCount": "Număr de linii",
+        "elbowAngle": "Unghiul coturilor",
+        "initialSpacing": "Distanța inițială între axe",
+        "finalSpacing": "Distanța finală între axe",
+        "clr": "Raza la axă (CLR)",
+        "nps": "NPS",
+        "elbowType": "Tipul cotului",
+        "catalogHint": "Selectorul NPS/tip completează CLR din catalog; editabil manual.",
+        "invalidFields": "Verifică câmpurile: valori goale sau invalide.",
+        "alignmentNote": "Poziția deplasării de-a lungul axei este doar vizuală; nu este o cotă de atelier.",
+        "angleLabel": "Unghi",
+        "direction": "Sens",
+        "direction_expanding": "Divergent",
+        "direction_contracting": "Convergent",
+        "direction_straight": "Linii drepte",
+        "travelSpread": "Dif. max. de parcurs",
+        "line": "Linie",
+        "offset": "Deplasare",
+        "advance": "Înaintare",
+        "travel": "Parcurs",
+        "takeOut": "Retras/cot",
+        "straightCut": "Segment drept",
+        "diff": "Dif.",
+        "status": "Stare",
+        "statusReference": "Referință (dreaptă)",
+        "statusTangent": "Coturi tangente",
+        "statusDisplaced": "Deplasată",
+        "noteGeometry": "Parcursul este distanța dintre intersecțiile teoretice ale axelor; nu este lungimea arcului cotului. Înaintarea nu este o lungime de tăiere.",
+        "nominalCutNote": "Segmentul drept este nominal între punctele de tangență: fără joc de sudură, marjă de montaj sau grosimea fierăstrăului.",
+        "nominalAngleNote": "Unghi nenormalizat comercial: geometrie nominală. Verifică disponibilitatea fitingului înainte de fabricație.",
+        "tangentNote": "Un segment drept intermediar este zero: coturile rămân tangente (nu este o comandă de tăiere de 0 mm).",
+        "dims": {
+          "spacingInitial": "Distanță init.",
+          "spacingFinal": "Distanță finală",
+          "offset": "Deplas.",
+          "advance": "Înaintare",
+          "travel": "Parcurs",
+          "straightCut": "Segment"
+        },
+        "drawPlaceholder": "Introdu parametrii pentru a vedea deplasarea",
+        "clrSourceCatalog": "CLR din catalog: NPS {{combo}}.",
+        "clrSourceCustom": "CLR personalizat; nu provine din catalog.",
+        "clrMissing": "Catalogul acestei unelte nu are CLR tabulat pentru NPS {{combo}}. Introdu un CLR pentru a calcula."
       }
     },
     "landing": {
@@ -2351,7 +2467,8 @@
       "pdfSeam": "cusătură",
       "pdfWrapNote": "Înfășurare: X de-a lungul circumferinței, Y de la capătul pătrat din partea cotului.",
       "pdfClosure": "închidere"
-    }
+    },
+    "familyOffsets": "Deviere și deplasări"
   },
   "jobs": {
     "eyebrow": "Locuri de muncă",
@@ -4511,5 +4628,131 @@
     "copyAllFacebook": "Copiază toate linkurile de Facebook",
     "copied": "Copiat",
     "note": "Parametrii UTM conțin doar identificatori generici de campanie, niciodată date personale."
+  },
+  "marketplaceV3": {
+    "title": "Activează Marketplace Ready",
+    "subtitle": "Verifică cerințele și acceptă condițiile Marketplace pentru ca profilul tău să fie vizibil companiilor.",
+    "requirementsTitle": "Cerințe Marketplace Ready",
+    "requirements": {
+      "cv": "CV încărcat și accesibil",
+      "profession": "Profesie sau meserie indicată",
+      "location": "Locația sau regiunea de lucru",
+      "availability": "Disponibilitate declarată"
+    },
+    "certificatesOptional": "Certificatele sunt opționale: îți îmbunătățesc profilul, dar nu sunt obligatorii pentru Marketplace.",
+    "consentText": "Prin acceptare, autorizezi PIPINGBOX să prezinte profilul tău profesional companiilor verificate conform condițiilor Marketplace (versiunea v3-2026-10-17). CV-ul tău original și datele de contact nu sunt afișate niciodată fără autorizarea ta.",
+    "consentCheckbox": "Am citit și accept condițiile Marketplace (v3).",
+    "acceptCta": "Acceptă și activează",
+    "resultReady": "Profilul tău este Marketplace Ready. Companiile te pot găsi acum.",
+    "resultNotEligible": "Consimțământ înregistrat. Completează cerințele rămase pentru a activa Marketplace Ready.",
+    "resultLegacy": "Profilul tău este protejat de condițiile anterioare. Nu s-au aplicat modificări.",
+    "resultError": "Acceptarea nu a putut fi finalizată. Încearcă din nou.",
+    "completeProfileLink": "Completează-ți profilul",
+    "contractVersion": "Versiunea contractului: {{version}} · Limba: {{lang}}",
+    "resultAccountType": "Această acțiune este disponibilă doar pentru conturile profesionale.",
+    "goDashboard": "Mergi la panoul tău",
+    "contractNotActive": "Condițiile nu sunt încă active",
+    "contractNotActiveBody": "Condițiile Marketplace v3 sunt în curs de revizuire juridică și nu sunt încă activate. Le vei putea accepta aici când vor fi disponibile.",
+    "contractChanged": "Condițiile s-au schimbat",
+    "contractChangedBody": "Condițiile Marketplace au fost actualizate în timp ce le analizai. Din motive de securitate, nu a fost înregistrată nicio acceptare. Te rugăm să revezi versiunea actuală înainte de a accepta.",
+    "reviewAgainCta": "Revezi versiunea actuală"
+  },
+  "companyCore": {
+    "loading": "Se încarcă…",
+    "switcher": {
+      "label": "Companie activă"
+    },
+    "roles": {
+      "owner": "Proprietar",
+      "admin": "Administrator",
+      "recruiter": "Recrutor",
+      "viewer": "Doar citire"
+    },
+    "verification": {
+      "unverified": "Neverificată",
+      "pending": "Verificare în curs",
+      "verified": "Verificată",
+      "rejected": "Verificare respinsă"
+    },
+    "create": {
+      "title": "Configurează-ți compania",
+      "description": "Creează spațiul companiei tale pentru a-ți invita echipa. Crearea unei companii nu o verifică.",
+      "nameLabel": "Numele companiei",
+      "countryLabel": "Țară (opțional)",
+      "submit": "Creează compania",
+      "submitting": "Se creează…"
+    },
+    "view": {
+      "title": "Compania mea",
+      "description": "Prezentarea spațiului companiei tale.",
+      "verificationTitle": "Starea verificării",
+      "teamTitle": "Echipă",
+      "teamDescription": "Membri, roluri și invitații",
+      "yourRoleTitle": "Rolul tău"
+    },
+    "team": {
+      "title": "Echipă",
+      "description": "Membri ai {{company}}",
+      "noCompany": "Nu faci parte încă din nicio companie.",
+      "createLink": "Configurează-ți compania",
+      "membersTitle": "Membri",
+      "unnamedMember": "Membru fără nume",
+      "you": "tu",
+      "confirmRemove": "Scoți acest membru? Accesul îi este revocat imediat.",
+      "confirmTransfer": "Transferi proprietatea? Vei deveni administrator.",
+      "transferTitle": "Transferă proprietatea",
+      "removeTitle": "Scoate membrul",
+      "leaveTitle": "Părăsește compania"
+    },
+    "invite": {
+      "title": "Invită un membru",
+      "emailLabel": "E-mail",
+      "roleLabel": "Rol",
+      "submit": "Creează invitația",
+      "submitting": "Se creează…",
+      "created": "Invitație creată. Distribuie acest link de unică folosință:",
+      "alreadyPending": "Există deja o invitație în așteptare pentru acest e-mail.",
+      "copy": "Copiază",
+      "copied": "Link copiat",
+      "emailNotice": "Trimiterea prin e-mail nu este încă activată — distribuie linkul manual persoanei invitate."
+    },
+    "invitations": {
+      "title": "Invitații",
+      "revoke": "Revocă",
+      "expires": "expiră la {{date}}",
+      "status": {
+        "pending": "în așteptare",
+        "accepted": "acceptată",
+        "rejected": "respinsă",
+        "revoked": "revocată",
+        "expired": "expirată"
+      }
+    },
+    "accept": {
+      "title": "Invitație la companie",
+      "sessionRequired": "Pentru a răspunde la această invitație, autentifică-te sau înregistrează-te cu e-mailul invitat, apoi redeschide acest link.",
+      "signIn": "Autentificare",
+      "register": "Înregistrare",
+      "question": "Vrei să te alături acestei companii?",
+      "accept": "Acceptă",
+      "reject": "Respinge",
+      "processing": "Se procesează…",
+      "success": "Te-ai alăturat companiei. Se redirecționează…",
+      "rejected": "Invitație respinsă."
+    },
+    "errors": {
+      "not_authenticated": "Trebuie să fii autentificat.",
+      "forbidden": "Nu ai permisiunea pentru această acțiune.",
+      "not_found": "Nu a fost găsit.",
+      "invalid_name": "Nume de companie invalid.",
+      "invalid_email": "E-mail invalid.",
+      "invalid_role": "Rol invalid.",
+      "invalid_or_expired": "Această invitație este invalidă, a expirat sau a fost deja folosită.",
+      "email_mismatch": "Această invitație a fost trimisă către alt e-mail. Autentifică-te cu e-mailul invitat.",
+      "not_active": "Calitatea de membru nu este activă.",
+      "last_owner": "Compania trebuie să păstreze cel puțin un proprietar.",
+      "cannot_transfer_to_self": "Nu îți poți transfera proprietatea ție însuți.",
+      "unknown": "Ceva a eșuat. Încearcă din nou."
+    }
   }
 }

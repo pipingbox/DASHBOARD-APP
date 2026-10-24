@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { LessonRenderer } from '@/components/LessonRenderer';
 import { getModuleQuestions, toQuizQuestions, VCAQuizQuestion } from '@/lib/vca-questions';
-import { useVcaContent } from '@/lib/academy/content';
+import { getVcaModuleName, useVcaContent } from '@/lib/academy/content';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -68,31 +68,6 @@ const MODULE_ICONS: Record<number, React.ReactNode> = {
   22: <SignpostBig className="h-6 w-6" />,
 };
 
-const MODULE_NAMES: Record<number, string> = {
-  1: 'Legislation',
-  2: 'Dangers, Risks and Prevention',
-  3: 'Accidents: Causes and Prevention',
-  4: 'Safety Conduct',
-  5: 'Tasks, Rights, Duties and Discussions',
-  6: 'Procedures, Instructions and Signs',
-  7: 'Preparations for Emergencies',
-  8: 'Hazardous Substances',
-  9: 'Fire and Explosions',
-  10: 'Equipment',
-  11: 'Demolish Activities',
-  12: 'Welding, Cutting and Burning',
-  13: 'Digging and Excavations',
-  14: 'Working at Height',
-  15: 'Electricity',
-  16: 'Confined Spaces',
-  17: 'Hoisting',
-  18: 'Radiation',
-  19: 'The Ergonomic Workplace',
-  20: 'Noise at the Workplace',
-  21: 'Personal Protective Equipment',
-  22: 'Signs and Markings',
-};
-
 export default function AcademyModule() {
   const { moduleId } = useParams<{ moduleId: string }>();
   const navigate = useNavigate();
@@ -111,7 +86,8 @@ export default function AcademyModule() {
   const { lessons: localizedLessons, questions: localizedQuestions } = useVcaContent();
   const questions = getModuleQuestions(mid, toQuizQuestions(localizedQuestions));
   const lesson = localizedLessons[mid];
-  const moduleName = MODULE_NAMES[mid] || `Module ${mid}`;
+  // PB-VCA-I18N-11-001: module titles come from the localised question bank, not a fixed English map.
+  const moduleName = getVcaModuleName(localizedQuestions, mid) ?? t('academy.moduleFallbackTitle', 'Module {{number}}', { number: mid });
   const estimatedMinutes = Math.max(5, Math.ceil(questions.length * 1.5));
 
   // Load existing progress
@@ -213,7 +189,7 @@ export default function AcademyModule() {
             {t('academy.eyebrow', 'Academy')}
           </button>
           <ChevronRight className="h-3 w-3" />
-          <span className="text-zinc-200">Module {mid}</span>
+          <span className="text-zinc-200">{t('academy.moduleFallbackTitle', { number: mid })}</span>
         </div>
 
         {/* Back button */}
@@ -235,13 +211,13 @@ export default function AcademyModule() {
             </div>
             <div className="flex-1">
               <p className="text-xs text-[#f59e0b] font-medium uppercase tracking-wider mb-1">
-                Module {mid}
+                {t('academy.moduleFallbackTitle', { number: mid })}
               </p>
               <h1 className="text-xl font-bold text-zinc-100 mb-2">{moduleName}</h1>
               <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
                 <span>{questions.length} {t('academy.questions', 'questions')}</span>
                 <span className="text-zinc-600">|</span>
-                <span>~{estimatedMinutes} min</span>
+                <span>{t('academy.moduleEstimatedMinutes', '~{{minutes}} min', { minutes: estimatedMinutes })}</span>
                 <span className="text-zinc-600">|</span>
                 <Badge variant="outline" className="text-[10px] border-[#f59e0b]/30 text-[#f59e0b]">
                   {questions.some(q => !q.isBVCA) ? 'VOL-VCA' : 'B-VCA / VOL-VCA'}
@@ -293,7 +269,7 @@ export default function AcademyModule() {
               {lesson ? (
                 <LessonRenderer content={lesson} />
               ) : (
-                <p className="text-zinc-400 text-sm">No lesson content available for this module.</p>
+                <p className="text-zinc-400 text-sm">{t('academy.noLessonContent', 'No lesson content available for this module.')}</p>
               )}
 
               {/* Go to quiz button */}
@@ -434,7 +410,7 @@ export default function AcademyModule() {
                   {t('academy.submitAnswers', 'Submit Answers')}
                 </Button>
                 <p className="text-xs text-zinc-500 mt-2">
-                  {Object.keys(answers).length}/{questions.length} answered
+                  {t('academy.quizAnsweredCount', '{{answered}}/{{total}} answered', { answered: Object.keys(answers).length, total: questions.length })}
                 </p>
               </div>
             )}

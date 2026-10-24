@@ -206,13 +206,13 @@ export function VCAExamBooking() {
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="VCA Official Exam"
-        title="Book Your VCA Exam"
-        description="PipingBox prepares you and manages your official VCA exam reservation at recognized centers in Belgium."
+        eyebrow={t('academy.vcaBooking.eyebrow')}
+        title={t('academy.vcaBooking.title')}
+        description={t('academy.vcaBooking.description')}
         actions={
           <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-zinc-500">
             <ShieldCheck className="h-3.5 w-3.5" />
-            Official BESACC/SSVV
+            {t('academy.vcaBooking.officialBadge')}
           </span>
         }
       />
@@ -221,11 +221,10 @@ export function VCAExamBooking() {
       <div className="border border-[#f59e0b]/30 bg-[#f59e0b]/5 rounded-sm p-4 flex items-start gap-3">
         <AlertCircle className="h-5 w-5 text-[#f59e0b] shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <p className="text-xs font-semibold text-[#f59e0b]">Important — Official Certification</p>
+          <p className="text-xs font-semibold text-[#f59e0b]">{t('academy.vcaBooking.disclaimerTitle')}</p>
           <p className="text-xs text-zinc-400 leading-relaxed">
-            PipingBox does <strong className="text-zinc-300">not</strong> issue VCA certificates. PipingBox prepares you
-            with the course and <strong className="text-zinc-300">manages the reservation</strong> of the official exam
-            at recognized VCA exam centers. The VCA certificate is issued by SSVV/BESACC through the exam center.
+            <strong className="text-zinc-300">{t('academy.vcaBooking.disclaimerNotIssuer')}</strong>{' '}
+            {t('academy.vcaBooking.disclaimerManages')} {t('academy.vcaBooking.disclaimerIssuedBy')}
           </p>
           {activeCert?.official_url && (
             <a
@@ -234,7 +233,7 @@ export function VCAExamBooking() {
               rel="noreferrer"
               className="inline-block text-[10px] text-[#f59e0b] underline underline-offset-2 mt-1"
             >
-              Official authority: {activeCert.issuing_body}
+              {t('academy.vcaBooking.officialAuthority', { body: activeCert.issuing_body })}
             </a>
           )}
         </div>
@@ -247,12 +246,12 @@ export function VCAExamBooking() {
           <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm p-5 space-y-4">
             <div className="flex items-center gap-2">
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f59e0b] text-[10px] font-bold text-black">1</span>
-              <h3 className="text-sm font-semibold text-zinc-200">Exam Details</h3>
+              <h3 className="text-sm font-semibold text-zinc-200">{t('academy.vcaBooking.stepExamDetails')}</h3>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">Exam Type</label>
+                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">{t('academy.vcaBooking.examType')}</label>
                 <div className="grid grid-cols-2 gap-2">
                   {(['B-VCA', 'VOL-VCA'] as const).map((type) => (
                     <button
@@ -266,7 +265,7 @@ export function VCAExamBooking() {
                     >
                       {type}
                       <span className="block text-[9px] text-zinc-600 mt-0.5">
-                        {type === 'B-VCA' ? 'Operators' : 'Supervisors'}
+                        {type === 'B-VCA' ? t('academy.vcaBooking.audienceOperators') : t('academy.vcaBooking.audienceSupervisors')}
                       </span>
                     </button>
                   ))}
@@ -274,7 +273,7 @@ export function VCAExamBooking() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">Exam Language</label>
+                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">{t('academy.vcaBooking.examLanguage')}</label>
                 <select
                   value={examLanguage}
                   onChange={(e) => setExamLanguage(e.target.value)}
@@ -287,17 +286,17 @@ export function VCAExamBooking() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">Your Postal Code</label>
+                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">{t('academy.vcaBooking.postalCode')}</label>
                 <Input
                   value={postalCode}
                   onChange={(e) => setPostalCode(e.target.value)}
-                  placeholder="e.g. 2000"
+                  placeholder={t('academy.vcaBooking.postalCodePlaceholder')}
                   className="bg-zinc-900 border-zinc-800 text-zinc-200"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">Preferred Date</label>
+                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">{t('academy.vcaBooking.preferredDate')}</label>
                 <Input
                   type="date"
                   value={preferredDate}
@@ -307,7 +306,7 @@ export function VCAExamBooking() {
               </div>
 
               <div className="space-y-2 sm:col-span-2">
-                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">Booking Mode</label>
+                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">{t('academy.vcaBooking.bookingMode')}</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setBookingMode('exam_only')}
@@ -317,8 +316,8 @@ export function VCAExamBooking() {
                         : 'bg-zinc-900/60 border-zinc-800 text-zinc-400'
                     }`}
                   >
-                    Exam Only
-                    <span className="block text-[9px] text-zinc-600 mt-0.5">I prepared with PipingBox</span>
+                    {t('academy.vcaBooking.modeExamOnly')}
+                    <span className="block text-[9px] text-zinc-600 mt-0.5">{t('academy.vcaBooking.modeExamOnlyHint')}</span>
                   </button>
                   <button
                     onClick={() => setBookingMode('course_plus_exam')}
@@ -328,8 +327,8 @@ export function VCAExamBooking() {
                         : 'bg-zinc-900/60 border-zinc-800 text-zinc-400'
                     }`}
                   >
-                    Course + Exam
-                    <span className="block text-[9px] text-zinc-600 mt-0.5">Classroom at center</span>
+                    {t('academy.vcaBooking.modeCoursePlusExam')}
+                    <span className="block text-[9px] text-zinc-600 mt-0.5">{t('academy.vcaBooking.modeCoursePlusExamHint')}</span>
                   </button>
                 </div>
               </div>
@@ -340,7 +339,7 @@ export function VCAExamBooking() {
           <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm p-5 space-y-4">
             <div className="flex items-center gap-2">
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f59e0b] text-[10px] font-bold text-black">2</span>
-              <h3 className="text-sm font-semibold text-zinc-200">Recognized Exam Centers</h3>
+              <h3 className="text-sm font-semibold text-zinc-200">{t('academy.vcaBooking.stepCenters')}</h3>
             </div>
 
             {loading ? (
@@ -349,7 +348,7 @@ export function VCAExamBooking() {
               </div>
             ) : filteredCenters.length === 0 ? (
               <div className="text-center py-8 text-xs text-zinc-500">
-                No centers match your criteria. Try changing the exam type or booking mode.
+                {t('academy.vcaBooking.noCenters')}
               </div>
             ) : (
               <div className="space-y-2">
@@ -375,18 +374,18 @@ export function VCAExamBooking() {
                             <span key={lang} className="px-1.5 py-0.5 text-[9px] bg-zinc-800/60 text-zinc-400 rounded-sm">{lang}</span>
                           ))}
                           {center.online_available && (
-                            <span className="px-1.5 py-0.5 text-[9px] bg-blue-500/10 text-blue-400 rounded-sm">Online</span>
+                            <span className="px-1.5 py-0.5 text-[9px] bg-blue-500/10 text-blue-400 rounded-sm">{t('academy.vcaBooking.tagOnline')}</span>
                           )}
                           {center.course_plus_exam_price_cents > 0 && (
-                            <span className="px-1.5 py-0.5 text-[9px] bg-green-500/10 text-green-400 rounded-sm">Course</span>
+                            <span className="px-1.5 py-0.5 text-[9px] bg-green-500/10 text-green-400 rounded-sm">{t('academy.vcaBooking.tagCourse')}</span>
                           )}
                         </div>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="text-xs font-medium text-[#f59e0b]">€{(center.exam_price_cents / 100).toFixed(2)}</p>
-                        <p className="text-[9px] text-zinc-600">exam fee</p>
+                        <p className="text-[9px] text-zinc-600">{t('academy.vcaBooking.examFeeShort')}</p>
                         {center.course_plus_exam_price_cents > 0 && (
-                          <p className="text-[10px] text-zinc-500 mt-1">€{(center.course_plus_exam_price_cents / 100).toFixed(2)} course+exam</p>
+                          <p className="text-[10px] text-zinc-500 mt-1">{t('academy.vcaBooking.coursePlusExamPrice', { price: (center.course_plus_exam_price_cents / 100).toFixed(2) })}</p>
                         )}
                       </div>
                     </div>
@@ -400,21 +399,21 @@ export function VCAExamBooking() {
           <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm p-5 space-y-4">
             <div className="flex items-center gap-2">
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f59e0b] text-[10px] font-bold text-black">3</span>
-              <h3 className="text-sm font-semibold text-zinc-200">Your Contact Details</h3>
+              <h3 className="text-sm font-semibold text-zinc-200">{t('academy.vcaBooking.stepContact')}</h3>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">Name</label>
+                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">{t('academy.vcaBooking.name')}</label>
                 <Input
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
-                  placeholder="Your full name"
+                  placeholder={t('academy.vcaBooking.namePlaceholder')}
                   className="bg-zinc-900 border-zinc-800 text-zinc-200"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">Phone (WhatsApp)</label>
+                <label className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-medium">{t('academy.vcaBooking.phone')}</label>
                 <Input
                   value={userPhone}
                   onChange={(e) => setUserPhone(e.target.value)}
@@ -429,31 +428,37 @@ export function VCAExamBooking() {
         {/* Summary sidebar */}
         <div className="space-y-4">
           <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-sm p-5 space-y-4 sticky top-4">
-            <h3 className="text-sm font-semibold text-zinc-200">Booking Summary</h3>
+            <h3 className="text-sm font-semibold text-zinc-200">{t('academy.vcaBooking.summaryTitle')}</h3>
 
             <div className="space-y-2 text-xs">
-              <SummaryRow label="Exam Type" value={examType} />
-              <SummaryRow label="Language" value={examLanguage} />
-              <SummaryRow label="Mode" value={bookingMode === 'exam_only' ? 'Exam Only' : 'Course + Exam'} />
-              <SummaryRow label="Preferred Date" value={preferredDate || 'No preference'} />
+              <SummaryRow label={t('academy.vcaBooking.examType')} value={examType} />
+              <SummaryRow label={t('academy.vcaBooking.summaryLanguage')} value={examLanguage} />
               <SummaryRow
-                label="Center"
-                value={selectedCenter ? `${selectedCenter.city}` : 'Any available center'}
+                label={t('academy.vcaBooking.summaryMode')}
+                value={bookingMode === 'exam_only' ? t('academy.vcaBooking.modeExamOnly') : t('academy.vcaBooking.modeCoursePlusExam')}
+              />
+              <SummaryRow label={t('academy.vcaBooking.preferredDate')} value={preferredDate || t('academy.vcaBooking.noPreference')} />
+              <SummaryRow
+                label={t('academy.vcaBooking.summaryCenter')}
+                value={selectedCenter ? `${selectedCenter.city}` : t('academy.vcaBooking.anyCenter')}
               />
             </div>
 
             {/* Transparent pricing — official fee + PipingBox fee separated (legal requirement) */}
             <div className="border-t border-zinc-800 pt-3 space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500">Official exam fee <span className="text-zinc-600">(paid to center)</span></span>
+                <span className="text-zinc-500">
+                  {t('academy.vcaBooking.officialExamFee')}{' '}
+                  <span className="text-zinc-600">{t('academy.vcaBooking.paidToCenter')}</span>
+                </span>
                 <span className="text-zinc-300">{examPriceEur !== null ? `€${examPriceEur.toFixed(2)}` : '€—'}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500">PipingBox management fee</span>
+                <span className="text-zinc-500">{t('academy.vcaBooking.managementFee')}</span>
                 <span className="text-[#f59e0b] font-medium">€{feeAmount.toFixed(2)}</span>
               </div>
               <div className="flex items-center justify-between text-xs pt-1 border-t border-zinc-800/60">
-                <span className="text-zinc-400 font-medium">Total</span>
+                <span className="text-zinc-400 font-medium">{t('academy.vcaBooking.total')}</span>
                 <span className="text-zinc-200 font-semibold">€{totalEur.toFixed(2)}</span>
               </div>
               <div className="flex items-center gap-2 pt-1">
@@ -465,7 +470,7 @@ export function VCAExamBooking() {
                       : 'bg-zinc-900 border-zinc-800 text-zinc-400'
                   }`}
                 >
-                  Standard €10
+                  {t('academy.vcaBooking.feeStandard', { price: 10 })}
                 </button>
                 <button
                   onClick={() => setFeeType('urgent')}
@@ -475,11 +480,11 @@ export function VCAExamBooking() {
                       : 'bg-zinc-900 border-zinc-800 text-zinc-400'
                   }`}
                 >
-                  Urgent €15
+                  {t('academy.vcaBooking.feeUrgent', { price: 15 })}
                 </button>
               </div>
               <p className="text-[9px] text-zinc-600 leading-relaxed pt-1">
-                Standard: confirmation within 48h. Urgent: confirmation within 24h + language assistance.
+                {t('academy.vcaBooking.feeHint')}
               </p>
             </div>
 
@@ -489,43 +494,42 @@ export function VCAExamBooking() {
               className="w-full bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
             >
               {submitting ? (
-                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Submitting...</>
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {t('academy.vcaBooking.submitting')}</>
               ) : !user ? (
-                'Sign in to book'
+                t('academy.vcaBooking.signInToBook')
               ) : (
-                <>Submit Booking Request <ArrowRight className="ml-2 h-4 w-4" /></>
+                <>{t('academy.vcaBooking.submit')} <ArrowRight className="ml-2 h-4 w-4" /></>
               )}
             </Button>
 
             <p className="text-[9px] text-zinc-600 leading-relaxed text-center">
-              After submitting, PipingBox will contact you via WhatsApp/email within 24-48h to confirm your reservation
-              and process the management fee.
+              {t('academy.vcaBooking.afterSubmitNote')}
             </p>
           </div>
 
           {/* What happens next */}
           <div className="border border-zinc-800/60 bg-[#0d0d0d] rounded-sm p-4 space-y-3">
-            <h4 className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-semibold">What happens next?</h4>
+            <h4 className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 font-semibold">{t('academy.vcaBooking.nextStepsTitle')}</h4>
             <ol className="space-y-2 text-[11px] text-zinc-400">
               <li className="flex gap-2">
                 <span className="text-[#f59e0b] font-bold">1.</span>
-                You submit this booking request.
+                {t('academy.vcaBooking.nextStep1')}
               </li>
               <li className="flex gap-2">
                 <span className="text-[#f59e0b] font-bold">2.</span>
-                PipingBox contacts you within 24-48h to confirm availability.
+                {t('academy.vcaBooking.nextStep2')}
               </li>
               <li className="flex gap-2">
                 <span className="text-[#f59e0b] font-bold">3.</span>
-                You pay the €{feeAmount} management fee (Stripe/transfer).
+                {t('academy.vcaBooking.nextStep3', { price: feeAmount })}
               </li>
               <li className="flex gap-2">
                 <span className="text-[#f59e0b] font-bold">4.</span>
-                PipingBox reserves your exam slot at the center.
+                {t('academy.vcaBooking.nextStep4')}
               </li>
               <li className="flex gap-2">
                 <span className="text-[#f59e0b] font-bold">5.</span>
-                You attend the exam. The center issues your VCA certificate.
+                {t('academy.vcaBooking.nextStep5')}
               </li>
             </ol>
           </div>

@@ -9,3 +9,6 @@ export { default as CompanyProfile } from './CompanyProfile';
 export { default as CompanyAnalytics } from './CompanyAnalytics';
 export { default as CompanySettings } from './CompanySettings';
 export { default as CompanyBilling } from './CompanyBilling';
+// PB-CE-COMPANY-CORE-001 — company tenant + team accounts.
+export { default as CompanyTenant } from './CompanyTenant';
+export { default as CompanyTeam } from './CompanyTeam';

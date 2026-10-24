@@ -106,7 +106,9 @@
     "companyDocumentation": "Industrieel Documentbeheer",
     "companySection": "Bedrijf",
     "companySettings": "Instellingen",
-    "companyWorkspace": "Bedrijfsomgeving"
+    "companyWorkspace": "Bedrijfsomgeving",
+    "companyTenant": "Mijn bedrijf",
+    "companyTeam": "Team"
   },
   "notifications": {
     "title": "Meldingen",
@@ -831,7 +833,7 @@
     "examBookOfficialCTA": "Klaar voor uw certificaat?",
     "examBookOfficialText": "Boek uw officieel VCA-examen bij een erkend examencentrum.",
     "examBookOfficialButton": "Officieel Examen Boeken",
-    "examLanguageNote": "Deze simulator gebruikt Engelstalige vragen.",
+    "examLanguageNote": "Deze simulator gebruikt vragen in het {{language}}.",
     "examLanguageBVCA": "Het officiële B-VCA examen is beschikbaar in maximaal 20 talen bij examencentra.",
     "examLanguageVOLVCA": "Het officiële VOL-VCA examen is beschikbaar in Nederlands, Engels, Duits en Frans.",
     "examPassScore": "Slagingsgrens",
@@ -963,7 +965,8 @@
         "badgeCompliance": "Voldoet aan Ley 31/1995",
         "badgeHours": "{{hours}}h opleiding",
         "badgeDownloadable": "Certificaat te downloaden"
-      }
+      },
+      "studyLanguagesNote": "lesmateriaal en vragen beschikbaar in alle {{count}} talen"
     },
     "coursePage": {
       "tabPreparationCourse": "Voorbereidingscursus",
@@ -1060,8 +1063,73 @@
       "fillNameAndPostalCode": "Vul uw naam en postcode in",
       "certificationUnavailable": "Certificering niet beschikbaar. Probeer het later opnieuw.",
       "submitFailed": "Boekingsaanvraag indienen mislukt",
-      "submitted": "Boekingsaanvraag ingediend! PipingBox neemt binnen 24 uur contact met u op om uw examenreservering te bevestigen."
-    }
+      "submitted": "Boekingsaanvraag ingediend! PipingBox neemt binnen 24 uur contact met u op om uw examenreservering te bevestigen.",
+      "eyebrow": "Officieel VCA-examen",
+      "title": "Boek uw VCA-examen",
+      "description": "PipingBox leidt u op en regelt de reservering van uw officiële VCA-examen bij erkende examencentra in België.",
+      "officialBadge": "Officieel BESACC/SSVV",
+      "disclaimerTitle": "Belangrijk — Officiële certificering",
+      "disclaimerNotIssuer": "PipingBox geeft géén VCA-certificaten ('diploma's') uit.",
+      "disclaimerManages": "PipingBox leidt u op met de cursus en regelt de reservering van het officiële examen bij erkende VCA-examencentra.",
+      "disclaimerIssuedBy": "Het VCA-certificaat wordt uitgereikt door SSVV/BESACC via het examencentrum.",
+      "officialAuthority": "Officiële instantie: {{body}}",
+      "stepExamDetails": "Examengegevens",
+      "examType": "Soort examen",
+      "audienceOperators": "Uitvoerenden",
+      "audienceSupervisors": "Leidinggevenden",
+      "examLanguage": "Examentaal",
+      "postalCode": "Uw postcode",
+      "postalCodePlaceholder": "bijv. 2000",
+      "preferredDate": "Voorkeursdatum",
+      "bookingMode": "Soort boeking",
+      "modeExamOnly": "Alleen examen",
+      "modeExamOnlyHint": "Ik heb me voorbereid met PipingBox",
+      "modeCoursePlusExam": "Cursus + examen",
+      "modeCoursePlusExamHint": "Klassikaal bij het centrum",
+      "stepCenters": "Erkende examencentra",
+      "noCenters": "Geen centra gevonden die aan uw criteria voldoen. Wijzig het soort examen of de soort boeking.",
+      "tagOnline": "Online",
+      "tagCourse": "Cursus",
+      "examFeeShort": "examengeld",
+      "coursePlusExamPrice": "€{{price}} cursus + examen",
+      "stepContact": "Uw contactgegevens",
+      "name": "Naam",
+      "namePlaceholder": "Uw volledige naam",
+      "phone": "Telefoon (WhatsApp)",
+      "summaryTitle": "Overzicht van uw boeking",
+      "summaryLanguage": "Taal",
+      "summaryMode": "Soort",
+      "noPreference": "Geen voorkeur",
+      "summaryCenter": "Centrum",
+      "anyCenter": "Elk beschikbaar centrum",
+      "officialExamFee": "Officieel examengeld",
+      "paidToCenter": "(te betalen aan het examencentrum)",
+      "managementFee": "Bemiddelingskosten PipingBox",
+      "total": "Totaal",
+      "feeStandard": "Standaard €{{price}}",
+      "feeUrgent": "Met spoed €{{price}}",
+      "feeHint": "Standaard: bevestiging binnen 48 uur. Met spoed: bevestiging binnen 24 uur + taalkundige ondersteuning.",
+      "submitting": "Verzenden...",
+      "signInToBook": "Meld u aan om te boeken",
+      "submit": "Boekingsaanvraag verzenden",
+      "afterSubmitNote": "Na verzending neemt PipingBox binnen 24-48 uur via WhatsApp/e-mail contact met u op om uw reservering te bevestigen en de bemiddelingskosten te verwerken.",
+      "nextStepsTitle": "Hoe gaat het verder?",
+      "nextStep1": "U verzendt deze boekingsaanvraag.",
+      "nextStep2": "PipingBox neemt binnen 24-48 uur contact met u op om de beschikbaarheid te bevestigen.",
+      "nextStep3": "U betaalt de bemiddelingskosten van €{{price}} (Stripe/overschrijving).",
+      "nextStep4": "PipingBox reserveert uw examenplaats bij het examencentrum.",
+      "nextStep5": "U legt het examen af. Het examencentrum reikt uw VCA-certificaat uit."
+    },
+    "examLoadingContent": "Vragen laden…",
+    "moduleFallbackTitle": "Module {{number}}",
+    "moduleEstimatedMinutes": "~{{minutes}} min",
+    "noLessonContent": "Er is geen lesinhoud beschikbaar voor deze module.",
+    "quizAnsweredCount": "{{answered}}/{{total}} beantwoord",
+    "bookVcaExamCta": "Boek uw officiële VCA-examen",
+    "bookVcaExamCtaHint": "Bekijk de examencentra en maak uw reservering",
+    "examContentLoadError": "Het lesmateriaal in deze taal kon niet worden geladen. Het oefenexamen blijft geblokkeerd.",
+    "examContentRetry": "Pagina opnieuw laden en opnieuw proberen",
+    "examContentUnavailable": "Vragen niet beschikbaar"
   },
   "tools": {
     "eyebrow": "Tools",
@@ -1739,7 +1807,8 @@
         "straightCut": "Rechte snede",
         "centerToCenter": "Hart-op-hart",
         "diagonal": "H (diagonaal)",
-        "cutAngleEnd": "Snijhoek per uiteinde"
+        "cutAngleEnd": "Snijhoek per uiteinde",
+        "cardSubtitle": "Verspringingen met bochten, zonder bochten en maatcontrole"
       },
       "miteredElbow": {
         "title": "Gesegmenteerde bocht",
@@ -2025,6 +2094,53 @@
         "piece_lengths_invalid": "Berekende stuklengtes zijn ongeldig",
         "clr_gt_half_od": "CLR moet groter zijn dan OD/2",
         "beta_range": "De snijhoek moet tussen 0° en {{max}}° liggen"
+      },
+      "twoElbowOffset": {
+        "title": "Verschuiving met twee knieën",
+        "subtitle": "Verschuiving van parallelle leidingen met twee knieën: voorschot, weg en recht tussenstuk.",
+        "lineCount": "Aantal leidingen",
+        "elbowAngle": "Kniehoek",
+        "initialSpacing": "Begin-asafstand",
+        "finalSpacing": "Eind-asafstand",
+        "clr": "Asradius (CLR)",
+        "nps": "NPS",
+        "elbowType": "Knietype",
+        "catalogHint": "De NPS/type-keuze vult CLR uit de catalogus; handmatig aanpasbaar.",
+        "invalidFields": "Controleer de velden: lege of ongeldige waarden.",
+        "drawPlaceholder": "Voer parameters in om de verschuiving te zien",
+        "alignmentNote": "De positie van de verschuiving langs de as is enkel visueel; geen werkatte.",
+        "angleLabel": "Hoek",
+        "direction": "Richting",
+        "direction_expanding": "Uitlopend",
+        "direction_contracting": "Inlopend",
+        "direction_straight": "Rechte leidingen",
+        "travelSpread": "Max. wegverschil",
+        "line": "Leiding",
+        "offset": "Verschuiving",
+        "advance": "Voorschot",
+        "travel": "Weg",
+        "takeOut": "Aftrek/knie",
+        "straightCut": "Recht stuk",
+        "diff": "Versch.",
+        "status": "Status",
+        "statusReference": "Referentie (recht)",
+        "statusTangent": "Tangente knieën",
+        "statusDisplaced": "Verplaatst",
+        "noteGeometry": "De weg is de afstand tussen theoretische askruispunten; niet de booglengte van de knie. Het voorschot is geen snijlengte.",
+        "nominalCutNote": "Het rechte stuk is nominaal tussen raakpunten: zonder lasnaad, montagelucht of zaagbladbreedte.",
+        "nominalAngleNote": "Hoek niet commercieel genormaliseerd: nominaal. Controleer de beschikbaarheid van de fitting voor fabricage.",
+        "tangentNote": "Een recht tussenstuk is nul: de knieën liggen rakend tegen elkaar (geen opdracht om 0 mm te zagen).",
+        "dims": {
+          "spacingInitial": "Beginafstand",
+          "spacingFinal": "Eindafstand",
+          "offset": "Verschr.",
+          "advance": "Voorschot",
+          "travel": "Weg",
+          "straightCut": "Recht"
+        },
+        "clrSourceCatalog": "CLR uit de catalogus: NPS {{combo}}.",
+        "clrSourceCustom": "Eigen CLR; niet uit de catalogus.",
+        "clrMissing": "De catalogus van deze tool heeft geen getabuleerde CLR voor NPS {{combo}}. Voer een CLR in om te berekenen."
       }
     },
     "tabPipeDimensions": "Pijpafmetingen",
@@ -2348,7 +2464,8 @@
       "pdfSeam": "naad",
       "pdfWrapNote": "Wikkelen: X langs de omtrek, Y vanaf het kwadratische uiteinde aan de bochtzijde.",
       "pdfClosure": "sluiting"
-    }
+    },
+    "familyOffsets": "Verspringingen en verplaatsingen"
   },
   "jobs": {
     "eyebrow": "Vacatures",
@@ -4504,5 +4621,131 @@
     "copyAllFacebook": "Alle Facebook-links kopiëren",
     "copied": "Gekopieerd",
     "note": "UTM-parameters bevatten alleen algemene campagne-identificaties, nooit persoonsgegevens."
+  },
+  "marketplaceV3": {
+    "title": "Marketplace Ready activeren",
+    "subtitle": "Controleer de vereisten en accepteer de Marketplace-voorwaarden om uw profiel zichtbaar te maken voor bedrijven.",
+    "requirementsTitle": "Vereisten voor Marketplace Ready",
+    "requirements": {
+      "cv": "CV geüpload en toegankelijk",
+      "profession": "Beroep of vakgebied opgegeven",
+      "location": "Werklocatie of regio",
+      "availability": "Beschikbaarheid opgegeven"
+    },
+    "certificatesOptional": "Certificaten zijn optioneel: ze verbeteren uw profiel maar zijn niet vereist voor de Marketplace.",
+    "consentText": "Door te accepteren stemt u ermee in dat PIPINGBOX uw professionele profiel presenteert aan geverifieerde bedrijven volgens de Marketplace-voorwaarden (versie v3-2026-10-17). Uw originele CV en contactgegevens worden nooit zonder uw toestemming getoond.",
+    "consentCheckbox": "Ik heb de Marketplace-voorwaarden (v3) gelezen en accepteer ze.",
+    "acceptCta": "Accepteren en activeren",
+    "resultReady": "Uw profiel is Marketplace Ready. Bedrijven kunnen u nu vinden.",
+    "resultNotEligible": "Toestemming geregistreerd. Vul de ontbrekende vereisten aan om Marketplace Ready te activeren.",
+    "resultLegacy": "Uw profiel is beschermd onder de vorige voorwaarden. Er zijn geen wijzigingen toegepast.",
+    "resultError": "De acceptatie kon niet worden voltooid. Probeer het opnieuw.",
+    "completeProfileLink": "Vul uw profiel aan",
+    "contractVersion": "Contractversie: {{version}} · Taal: {{lang}}",
+    "resultAccountType": "Deze actie is alleen beschikbaar voor professionele accounts.",
+    "goDashboard": "Ga naar uw dashboard",
+    "contractNotActive": "Voorwaarden nog niet actief",
+    "contractNotActiveBody": "De Marketplace v3-voorwaarden worden juridisch beoordeeld en zijn nog niet geactiveerd. Zodra ze beschikbaar zijn, kunt u ze hier accepteren.",
+    "contractChanged": "De voorwaarden zijn gewijzigd",
+    "contractChangedBody": "De Marketplace-voorwaarden zijn bijgewerkt terwijl u ze bekeek. Voor uw veiligheid is er geen akkoord geregistreerd. Lees de huidige versie voordat u akkoord gaat.",
+    "reviewAgainCta": "Huidige versie bekijken"
+  },
+  "companyCore": {
+    "loading": "Laden…",
+    "switcher": {
+      "label": "Actief bedrijf"
+    },
+    "roles": {
+      "owner": "Eigenaar",
+      "admin": "Beheerder",
+      "recruiter": "Recruiter",
+      "viewer": "Alleen lezen"
+    },
+    "verification": {
+      "unverified": "Niet geverifieerd",
+      "pending": "Verificatie in behandeling",
+      "verified": "Geverifieerd",
+      "rejected": "Verificatie geweigerd"
+    },
+    "create": {
+      "title": "Stel uw bedrijf in",
+      "description": "Maak de werkruimte van uw bedrijf aan om uw team uit te nodigen. Een bedrijf aanmaken verifieert het niet.",
+      "nameLabel": "Bedrijfsnaam",
+      "countryLabel": "Land (optioneel)",
+      "submit": "Bedrijf aanmaken",
+      "submitting": "Aanmaken…"
+    },
+    "view": {
+      "title": "Mijn bedrijf",
+      "description": "Overzicht van de werkruimte van uw bedrijf.",
+      "verificationTitle": "Verificatiestatus",
+      "teamTitle": "Team",
+      "teamDescription": "Leden, rollen en uitnodigingen",
+      "yourRoleTitle": "Uw rol"
+    },
+    "team": {
+      "title": "Team",
+      "description": "Leden van {{company}}",
+      "noCompany": "U maakt nog geen deel uit van een bedrijf.",
+      "createLink": "Stel uw bedrijf in",
+      "membersTitle": "Leden",
+      "unnamedMember": "Naamloos lid",
+      "you": "u",
+      "confirmRemove": "Dit lid verwijderen? De toegang wordt onmiddellijk ingetrokken.",
+      "confirmTransfer": "Eigendom overdragen? U wordt beheerder.",
+      "transferTitle": "Eigendom overdragen",
+      "removeTitle": "Lid verwijderen",
+      "leaveTitle": "Bedrijf verlaten"
+    },
+    "invite": {
+      "title": "Lid uitnodigen",
+      "emailLabel": "E-mailadres",
+      "roleLabel": "Rol",
+      "submit": "Uitnodiging aanmaken",
+      "submitting": "Aanmaken…",
+      "created": "Uitnodiging aangemaakt. Deel deze eenmalige link:",
+      "alreadyPending": "Er staat al een uitnodiging in behandeling voor dit e-mailadres.",
+      "copy": "Kopiëren",
+      "copied": "Link gekopieerd",
+      "emailNotice": "E-mailbezorging is nog niet actief — deel de link handmatig met de uitgenodigde persoon."
+    },
+    "invitations": {
+      "title": "Uitnodigingen",
+      "revoke": "Intrekken",
+      "expires": "verloopt op {{date}}",
+      "status": {
+        "pending": "in behandeling",
+        "accepted": "geaccepteerd",
+        "rejected": "geweigerd",
+        "revoked": "ingetrokken",
+        "expired": "verlopen"
+      }
+    },
+    "accept": {
+      "title": "Bedrijfsuitnodiging",
+      "sessionRequired": "Om op deze uitnodiging te reageren, log in of registreer u met het uitgenodigde e-mailadres en open deze link opnieuw.",
+      "signIn": "Inloggen",
+      "register": "Registreren",
+      "question": "Wilt u lid worden van dit bedrijf?",
+      "accept": "Accepteren",
+      "reject": "Weigeren",
+      "processing": "Verwerken…",
+      "success": "U bent lid geworden van het bedrijf. Doorsturen…",
+      "rejected": "Uitnodiging geweigerd."
+    },
+    "errors": {
+      "not_authenticated": "U moet ingelogd zijn.",
+      "forbidden": "U heeft geen toestemming voor deze actie.",
+      "not_found": "Niet gevonden.",
+      "invalid_name": "Ongeldige bedrijfsnaam.",
+      "invalid_email": "Ongeldig e-mailadres.",
+      "invalid_role": "Ongeldige rol.",
+      "invalid_or_expired": "Deze uitnodiging is ongeldig, verlopen of al gebruikt.",
+      "email_mismatch": "Deze uitnodiging is naar een ander e-mailadres gestuurd. Log in met het uitgenodigde e-mailadres.",
+      "not_active": "Het lidmaatschap is niet actief.",
+      "last_owner": "Het bedrijf moet ten minste één eigenaar behouden.",
+      "cannot_transfer_to_self": "U kunt de eigendom niet aan zichzelf overdragen.",
+      "unknown": "Er is iets misgegaan. Probeer het opnieuw."
+    }
   }
 }

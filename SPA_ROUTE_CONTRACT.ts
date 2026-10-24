@@ -126,6 +126,7 @@ export const SPA_ROUTE_CONTRACT: RouteRule[] = [
   // ─── PROTECTED exact routes ────────────────────────────────────────────────
   { pattern: '/dashboard', visibility: 'PROTECTED', kind: 'EXACT' },
   { pattern: '/onboarding', visibility: 'PROTECTED', kind: 'EXACT', note: 'PB-GROWTH-GATE-ONBOARDING-001: resume entry for postponed onboarding' },
+  { pattern: '/marketplace/v3', visibility: 'PROTECTED', kind: 'EXACT', note: 'PR-V3-02 PB-MARKETPLACE-V3-RECRUITMENT-001: Marketplace Ready v3 contract acceptance wizard' },
   { pattern: '/profile', visibility: 'PROTECTED', kind: 'EXACT' },
   // PB-CV-AUTO-PROFILE-001 — CV draft review (draft-first confirmation flow).
   { pattern: '/profile/cv-review', visibility: 'PROTECTED', kind: 'EXACT', note: 'PB-CV-AUTO-PROFILE-001: review CV-extracted profile draft' },
@@ -148,6 +149,19 @@ export const SPA_ROUTE_CONTRACT: RouteRule[] = [
   { pattern: '/company/analytics', visibility: 'COMPANY', kind: 'EXACT' },
   { pattern: '/company/settings', visibility: 'COMPANY', kind: 'EXACT' },
   { pattern: '/company/billing', visibility: 'COMPANY', kind: 'EXACT' },
+
+  // ─── PB-CE-COMPANY-CORE-001 — company tenant + team accounts ──────────────
+  // Open to any authenticated user (an invited teammate may hold a worker
+  // profile); authorization is enforced server-side by pb_company_* RPCs.
+  { pattern: '/company/tenant', visibility: 'PROTECTED', kind: 'EXACT' },
+  { pattern: '/company/team', visibility: 'PROTECTED', kind: 'EXACT' },
+  {
+    pattern: '/company-invite/:token',
+    visibility: 'PROTECTED',
+    kind: 'DYNAMIC',
+    validate: (_path, params) => /^[0-9a-f]{64}$/i.test(params.token ?? ''),
+    note: 'single-use invite link (SHA-256 hex token); session optional, page prompts sign-in',
+  },
 
   // ─── ADMIN exact routes ────────────────────────────────────────────────────
   { pattern: '/admin', visibility: 'ADMIN', kind: 'EXACT' },
