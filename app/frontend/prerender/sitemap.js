@@ -3,6 +3,7 @@ import path from 'node:path';
 import { getBlogRoutes } from './blog-routes.js';
 import { getSitemapLastmod } from './blog-sitemap.js';
 import { TOOL_LANDINGS } from '../src/lib/tool-landings';
+import { APP_ROUTES } from './app-routes.js';
 
 // PB-OBSERVABILITY-PROD-ROLLOUT-001: replaces vite-plugin-sitemap.
 //
@@ -21,24 +22,10 @@ import { TOOL_LANDINGS } from '../src/lib/tool-landings';
 
 const HOSTNAME = 'https://pipingbox.com';
 
-// PB-WEB-006: all public routes approved in PB-WEB-005 (F1 + F2).
-// PB-SEO-101: legal/contact/certification routes added.
-const APP_ROUTES = [
-  '/tools',
-  '/academy',
-  '/jobs',
-  '/pricing',
-  '/companies',
-  '/companies/request-workers',
-  '/contact',
-  '/privacy',
-  '/terms',
-  '/dsa',
-  '/certifications',
-  '/certifications/vca',
-  '/certifications/scc',
-  '/certifications/prl',
-];
+// PB-SEO-CRAWLER-CANONICAL-001: APP_ROUTES moved to ./app-routes.js so the
+// sitemap and the prerender queue read the SAME list. Previously this list
+// lived here only, which is how 14 advertised URLs ended up never being
+// prerendered (and therefore served the shell's canonical = '/').
 
 export function buildSitemapEntries() {
   const lastmod = getSitemapLastmod();
