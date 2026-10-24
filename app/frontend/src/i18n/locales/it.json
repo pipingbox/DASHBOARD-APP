@@ -682,7 +682,7 @@
     "examIntroRule1": "Solo una risposta corretta per domanda",
     "examIntroRule2": "Non puoi tornare indietro nell'esame ufficiale (la modalità pratica lo consente)",
     "examIntroRule3": "L'esame viene inviato automaticamente allo scadere del tempo",
-    "examIntroRule4": "Hai bisogno del 65% per superare l'esame",
+    "examIntroRule4": "Hai bisogno del {{percent}}% per superare l'esame",
     "examUnderstand": "Comprendo le regole dell'esame",
     "examStart": "Inizia Esame",
     "examQuestionOf": "Domanda {{current}} di {{total}}",
@@ -873,7 +873,7 @@
     "examLanguageBVCA": "L'esame ufficiale B-VCA è disponibile in fino a 20 lingue presso i centri d'esame.",
     "examLanguageVOLVCA": "L'esame ufficiale VOL-VCA è disponibile in olandese, inglese, tedesco e francese.",
     "examPassScore": "Punteggio Minimo",
-    "examPassScoreValue": "65% ({{threshold}}/{{max}} pts)",
+    "examPassScoreValue": "{{percent}}% ({{threshold}}/{{max}} pts)",
     "examModuleBreakdown": "Punteggio per Modulo",
     "examCorrectCount": "{{correct}} su {{total}} domande corrette",
     "examPointsEarned": "Punti ottenuti: {{points}}",
@@ -4752,6 +4752,7 @@
       "not_active": "L'iscrizione non è attiva.",
       "last_owner": "L’azienda deve mantenere almeno un proprietario.",
       "cannot_transfer_to_self": "Non puoi trasferire la proprietà a te stesso.",
+      "target_already_owner": "Il membro selezionato è già proprietario.",
       "unknown": "Qualcosa è andato storto. Riprova."
     }
   }

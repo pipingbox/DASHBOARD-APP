@@ -817,7 +817,7 @@
     "examLanguageBVCA": "O exame oficial B-VCA está disponível em até 20 idiomas nos centros de exame.",
     "examLanguageVOLVCA": "O exame oficial VOL-VCA está disponível em neerlandês, inglês, alemão e francês.",
     "examPassScore": "Pontuação Mínima",
-    "examPassScoreValue": "65% ({{threshold}}/{{max}} pts)",
+    "examPassScoreValue": "{{percent}}% ({{threshold}}/{{max}} pts)",
     "examModuleBreakdown": "Pontuação por Módulo",
     "examCorrectCount": "{{correct}} de {{total}} perguntas corretas",
     "examPointsEarned": "Pontos obtidos: {{points}}",
@@ -840,7 +840,7 @@
     "examIntroRule1": "Apenas uma resposta correta por pergunta",
     "examIntroRule2": "Não pode voltar atrás no exame oficial (o modo prática permite)",
     "examIntroRule3": "O exame é submetido automaticamente quando o tempo acaba",
-    "examIntroRule4": "Precisa de 65% para passar",
+    "examIntroRule4": "Precisa de {{percent}}% para passar",
     "examUnderstand": "Compreendo as regras do exame",
     "examStart": "Iniciar Exame",
     "examQuestionOf": "Pergunta {{current}} de {{total}}",
@@ -4752,6 +4752,7 @@
       "not_active": "A adesão não está ativa.",
       "last_owner": "A empresa tem de manter pelo menos um proprietário.",
       "cannot_transfer_to_self": "Não pode transferir a propriedade para si próprio.",
+      "target_already_owner": "O membro selecionado já é proprietário.",
       "unknown": "Algo falhou. Tente novamente."
     }
   }

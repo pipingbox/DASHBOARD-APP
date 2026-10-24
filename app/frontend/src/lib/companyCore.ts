@@ -52,6 +52,7 @@ export type CompanyCoreError =
   | 'not_active'
   | 'last_owner'
   | 'cannot_transfer_to_self'
+  | 'target_already_owner'
   | 'unknown';
 
 function extractErrorCode(err: unknown): CompanyCoreError {
@@ -59,7 +60,7 @@ function extractErrorCode(err: unknown): CompanyCoreError {
   const codes: CompanyCoreError[] = [
     'not_authenticated', 'forbidden', 'not_found', 'invalid_name', 'invalid_email',
     'invalid_role', 'invalid_or_expired', 'email_mismatch', 'not_active',
-    'last_owner', 'cannot_transfer_to_self',
+    'last_owner', 'cannot_transfer_to_self', 'target_already_owner',
   ];
   for (const code of codes) {
     if (msg.includes(code)) return code;

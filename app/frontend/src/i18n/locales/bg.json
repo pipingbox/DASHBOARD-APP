@@ -682,7 +682,7 @@
     "examIntroRule1": "Само един верен отговор на всеки въпрос",
     "examIntroRule2": "На официалния изпит не можете да се връщате назад (в режим на упражнение това е позволено)",
     "examIntroRule3": "Изпитът се предава автоматично при изтичане на времето",
-    "examIntroRule4": "Нужни са ви 70%, за да преминете",
+    "examIntroRule4": "Нужни са ви {{percent}}%, за да преминете",
     "examUnderstand": "Разбирам правилата на изпита",
     "examStart": "Започни изпита",
     "examQuestionOf": "Въпрос {{current}} от {{total}}",
@@ -872,7 +872,7 @@
     "examLanguageBVCA": "Официалният B-VCA изпит е достъпен на до 20 езика в изпитните центрове.",
     "examLanguageVOLVCA": "Официалният VOL-VCA изпит е достъпен на нидерландски, английски, немски и френски език.",
     "examPassScore": "Праг за успех",
-    "examPassScoreValue": "65% ({{threshold}}/{{max}} т.)",
+    "examPassScoreValue": "{{percent}}% ({{threshold}}/{{max}} т.)",
     "examModuleBreakdown": "Резултат по модули",
     "examCorrectCount": "{{correct}} от {{total}} въпроса верни",
     "examPointsEarned": "Спечелени точки: {{points}}",
@@ -4745,6 +4745,7 @@
       "not_active": "Членството не е активно.",
       "last_owner": "Компанията трябва да запази поне един собственик.",
       "cannot_transfer_to_self": "Не можете да прехвърлите собствеността на себе си.",
+      "target_already_owner": "Избраният член вече е собственик.",
       "unknown": "Нещо се обърка. Опитайте отново."
     }
   }

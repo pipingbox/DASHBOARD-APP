@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useVcaContent } from '@/lib/academy/content';
+import { EXAM_CONFIG, examPassPercent, examPassPoints, examPassed, type VcaExamType } from '@/lib/academy/examPassMark';
 import { SUPPORTED_LANGUAGES } from '@/i18n';
 import {
   VCAQuestion,
@@ -58,14 +59,6 @@ function formatTime(sec: number): string {
   const s = sec % 60;
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
-
-type ExamType = 'bvca' | 'volvca';
-
-// Corrected VCA exam config: B-VCA 40q/60min/65%, VOL-VCA 60q/60min/65%
-const EXAM_CONFIG: Record<ExamType, { questions: number; duration: number; passScore: number; maxPoints: number }> = {
-  bvca:   { questions: 40, duration: 60 * 60, passScore: 26, maxPoints: 4000 },
-  volvca: { questions: 60, duration: 60 * 60, passScore: 39, maxPoints: 6000 },
-};
 
 // ─── SCORING ─────────────────────────────────────────────────────────────────
 
@@ -611,8 +604,9 @@ export default function AcademyExam() {
   // English fallback; the exam must never freeze a snapshot of untranslated questions.
   const { questions: localizedQuestions, lang: contentLang, ready: contentReady, error: contentError } = useVcaContent();
 
-  const type: ExamType = examType === 'volvca' ? 'volvca' : 'bvca';
+  const type: VcaExamType = examType === 'volvca' ? 'volvca' : 'bvca';
   const config = EXAM_CONFIG[type];
+  const passPercent = examPassPercent(type);
 
   const [phase, setPhase] = useState<'intro' | 'exam' | 'results'>('intro');
   const [questions, setQuestions] = useState<VCAQuestion[]>([]);
@@ -667,8 +661,7 @@ export default function AcademyExam() {
 
     const maxPoints = currentQuestions.length * 100;
     const percentage = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
-    // Pass at 65% of total points
-    const passed = percentage >= 65;
+    const passed = examPassed(type, totalPoints, maxPoints);
     const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
 
     setResult({ correct: correctCount, total: currentQuestions.length, totalPoints, maxPoints, percentage, passed, duration });
@@ -818,9 +811,7 @@ export default function AcademyExam() {
               <div>
                 <p className="text-xs text-zinc-500 mb-1">{t('academy.examPassScore', 'Pass Score')}</p>
                 <p className="text-lg font-semibold text-zinc-100">
-                  {t('academy.examPassScoreValue', '65% ({{threshold}}/{{max}} pts)')
-                    .replace('{{threshold}}', String(Math.round(config.maxPoints * 0.65)))
-                    .replace('{{max}}', String(config.maxPoints))}
+                  {t('academy.examPassScoreValue', { percent: passPercent, threshold: examPassPoints(type), max: config.maxPoints, defaultValue: '{{percent}}% ({{threshold}}/{{max}} pts)' })}
                 </p>
               </div>
               <div>
@@ -847,7 +838,7 @@ export default function AcademyExam() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#f59e0b] mt-0.5">•</span>
-                  {t('academy.examIntroRule4', 'You need 65% to pass')}
+                  {t('academy.examIntroRule4', { percent: passPercent, defaultValue: 'You need {{percent}}% to pass' })}
                 </li>
               </ul>
             </div>
@@ -959,7 +950,7 @@ export default function AcademyExam() {
             <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-lg p-4 text-center">
               <p className="text-xs text-zinc-500 mb-1">{t('academy.examPassScore', 'Pass Score')}</p>
               <p className="text-lg font-semibold text-zinc-100">{result.percentage}%</p>
-              <p className="text-xs text-zinc-500">/ 65%</p>
+              <p className="text-xs text-zinc-500">/ {passPercent}%</p>
             </div>
             <div className="border border-zinc-800/80 bg-[#0d0d0d] rounded-lg p-4 text-center">
               <p className="text-xs text-zinc-500 mb-1">{t('academy.examIntroQuestions', 'Questions')}</p>
