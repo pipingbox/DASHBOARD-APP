@@ -187,18 +187,13 @@ export default function Profile() {
     // Recalculate profile completion (non-blocking)
     if (user) recalculateAndSaveProfileCompletion(user.id).catch(() => {});
 
-    // Send targeted improvement suggestions for any remaining gaps (PB-NOTIF-001 Fase 3).
-    // Fire-and-forget with 30-day dedup per field so the user is never spammed.
+    // Send targeted improvement suggestions for any remaining gaps
+    // (PB-NOTIF-001 Fase 3 / PB-NOTIFICATION-PROFILE-INCOMPLETE-FIX-001).
+    // Dedicated zero-arg RPC: user from auth.uid(), gaps from the canonical
+    // profile row, 30-day dedup per field server-side. Fire-and-forget,
+    // fail-open — never blocks or breaks the save flow.
     if (user) {
-      const savedPayload = payload as Record<string, unknown>;
-      notifyProfileSuggestions(user.id, {
-        title: savedPayload.title as string | null,
-        skills: savedPayload.skills as string[] | null,
-        location: savedPayload.location as string | null,
-        languages: savedPayload.languages as string[] | null,
-        years_experience: savedPayload.years_experience as number | null,
-        availability_status: savedPayload.availability_status as string | null,
-      }).catch(() => {});
+      notifyProfileSuggestions().catch(() => {});
     }
 
     if (isMountedRef.current) {
