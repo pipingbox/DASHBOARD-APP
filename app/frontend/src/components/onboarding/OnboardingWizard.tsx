@@ -11,6 +11,7 @@ import { trackEvent } from '@/lib/observability';
 import { withTimeout } from '@/lib/withTimeout';
 import { ProfileWriteCoordinator } from '@/lib/profileWriteCoordinator';
 import { ProfileWriteGuard, createSupabaseProfileUpdateAdapter } from '@/lib/profileWriteGuard';
+import { ProfilePhoneSection } from '@/components/profile/ProfilePhoneSection';
 import { isValidImageFile, isHeicFile, validateFileSize, getSafeImageExtension, ACCEPT_IMAGES } from '@/lib/fileUploadUtils';
 
 /* ─── Constants ─── */
@@ -1179,6 +1180,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                     {t('onboarding.skipPhotoHint')}
                   </p>
                 </div>
+                {accountType === 'worker' && <ProfilePhoneSection />}
               </div>
             )}
           </div>

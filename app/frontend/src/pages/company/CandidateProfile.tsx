@@ -89,6 +89,7 @@ interface CandidateProfileData {
   preferred_regions: string | null;
   rotation_preference: string | null;
   notice_period: string | null;
+  phone_e164?: string | null;
 }
 
 interface CandidateApplication {
@@ -124,6 +125,7 @@ export default function CandidateProfile() {
   const { user, profile: viewerProfile } = useAuth();
   const { t, i18n } = useTranslation();
   const [profile, setProfile] = useState<CandidateProfileData | null>(null);
+  const [profileLoadedFromDb, setProfileLoadedFromDb] = useState(false);
   const [applications, setApplications] = useState<CandidateApplication[]>([]);
   const [experiences, setExperiences] = useState<WorkExperience[]>([]);
   const [documents, setDocuments] = useState<WorkerCertification[]>([]);
@@ -262,7 +264,7 @@ export default function CandidateProfile() {
       }
 
       if (profileData) {
-        console.log('[CandidateProfile] candidate profile object:', profileData);
+        setProfileLoadedFromDb(true);
         setProfile(profileData as unknown as CandidateProfileData);
         // Use the profile's user_id for related queries (candidateUserId might be the profile's `id` field)
         const actualUserId = (profileData as Record<string, unknown>).user_id as string || candidateUserId;
@@ -444,6 +446,7 @@ export default function CandidateProfile() {
         notice_period: null,
       };
 
+      setProfileLoadedFromDb(false);
       setProfile(fallbackProfile);
 
       const mappedApps: CandidateApplication[] = appsData.map((app: Record<string, unknown>) => ({
@@ -759,6 +762,12 @@ export default function CandidateProfile() {
             </div>
           </div>
         </div>
+
+        {isAdminViewer && profileLoadedFromDb && (
+          <div className="mt-4 border-t border-zinc-800 pt-4 text-xs text-amber-300" data-testid="candidate-phone-indicator">
+            {profile.phone_e164 ? t('profile.phoneAvailableInternal') : t('profile.phoneMissingInternal')}
+          </div>
+        )}
 
         {/* Action Buttons */}
         {(effectiveRole === 'company' || effectiveRole === 'admin') && (
