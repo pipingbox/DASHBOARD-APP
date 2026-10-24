@@ -406,7 +406,14 @@ export default function Profile() {
               disabled={saving}
               className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
             >
-              {saving ? t('common.saving') : t('profile.saveProfile')}
+              {/* PB-UI-DOM-INSERTBEFORE-RESIDUAL-001: PREVENTIVE HARDENING (not
+                  a demonstrated RCA). A lone conditional text child is updated
+                  in place by React 18 (nodeValue) — the BEFORE probe under
+                  font-wrap mutation did NOT reproduce insertBefore (see
+                  tests/profile-dom-insertbefore-residual.spec.ts). The stable
+                  <span> keeps the structure translation-proof by construction,
+                  consistent with the CVReview RCA fix and prior hardening. */}
+              <span>{saving ? t('common.saving') : t('profile.saveProfile')}</span>
             </Button>
             <Button
               type="button"

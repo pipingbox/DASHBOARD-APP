@@ -449,7 +449,11 @@ export default function CVReview() {
             size="lg"
           >
             {applying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {t('cvReview.confirmCta')}
+            {/* PB-UI-DOM-INSERTBEFORE-RESIDUAL-001: stable <span> label — a bare
+                text sibling of the conditional spinner is font-wrapped (detached)
+                by Chrome auto-translate, and mounting the spinner then throws
+                NotFoundError insertBefore. */}
+            <span>{t('cvReview.confirmCta')}</span>
           </Button>
           <Button onClick={handleDismiss} variant="outline" disabled={applying} className="border-zinc-700 text-zinc-300" size="lg">
             {t('cvReview.dismissCta')}
