@@ -93,3 +93,22 @@ sql/060 reemplaza por segunda vez las definiciones de `pb_company_member_change_
 | `after` + 060b (rollback) | C1 reproducida de nuevo (0 owners) + F1 no levanta → 060b restaura exactamente 059 | ✅ rollback verificado |
 
 RCA completo de la segunda carrera: cabecera de `sql/060-pb-ent-e0a-company-core-concurrency-002.sql`.
+## 6. Addendum 2026-10-24 (iteración 2) — sql/061: G1 + G2 en pb_company_transfer_ownership
+
+**Corrección a esta auditoría:** la tabla §3 afirmaba (F2/F3/F5) que todo `authenticated` sin membership recibe `forbidden` en las RPCs de mutación. Era cierto para `change_role`/`remove` pero **NO para `pb_company_transfer_ownership` en 058/059/060**: el guard `pb_company_role(...) <> 'owner'` es NULL-unsafe (`NULL <> 'owner'` = NULL → el `IF` no ejecuta la rama). La afirmación queda corregida por los findings F6/F7, ya **FIXED** en sql/061.
+
+### Findings nuevos (PO review iteración 2)
+
+| # | Función | Finding | Exposición real | Evidencia BEFORE | Estado |
+|---|---|---|---|---|---|
+| F6 | `pb_company_transfer_ownership` | **G1 — AUTH NULL BYPASS**: guard NULL-unsafe + `v_actor_membership_id` sin comprobación `FOUND` → outsider `authenticated` (sin membership) superaba el guard, el UPDATE del actor era no-op silencioso y el target era promovido a owner | Cualquier usuario autenticado conociendo/adivinando `company_id` + `membership_id` válidos podía promover owners en empresas ajenas (SECURITY DEFINER + EXECUTE a `authenticated`) | Harness F6 modo before061: outsider → `bypassed`, owners 1→2, B `owner/active` | **FIXED (061)**: guard temprano `IS DISTINCT FROM 'owner'` (fail-closed) + `NOT FOUND → forbidden` en membership del actor. AFTER: `forbidden`, owners 1→1, cero cambios |
+| F7 | `pb_company_transfer_ownership` | **G2 — TOCTOU de autorización del actor**: ownership comprobado antes del mutex; un owner concurrente podía degradar/retirar al actor mientras transfer esperaba el lock y la transferencia se completaba con autorización stale | Owner degradado/retirado conservaba capacidad de transferir en la ventana de carrera | Harness C3a/C3b modo before061: T1 `completed`, B `owner/active` (con A ya `admin/active` o `owner/removed`) | **FIXED (061)**: revalidación post-lock del rol del actor (paso 4) + relectura del target post-lock. AFTER: C3a/C3b `forbidden`, B `admin/active`, owners=1 |
+
+### Verificación post-061 (misma metodología §1-§3, DB local PG17 con 058+059+060+061)
+
+- **Firma y grants:** idénticos (`CREATE OR REPLACE`, misma firma; grantees verificados en vivo: `postgres` + `authenticated` únicamente; cero `PUBLIC`/`anon`).
+- **search_path:** `'public','pg_temp'` verificado en vivo para las tres mutaciones.
+- **change_role/remove:** no requieren cambio — desde 060 evalúan el rol del actor post-lock y NULL-safe (`IS NULL → forbidden`).
+- **Harness completo:** `after` (058+059+060+061) **3/3 PASS** A/B/C1/C2/C3a/C3b/D/E/F1–F6 · `before` (058) A-race reproducida · `before060` (058+059) C1 reproducida · `before061` (058+059+060) G1+G2 reproducidos · rollback **061b** restaura exactamente 060 (G1+G2 vuelven a reproducirse).
+
+RCA completo: cabecera de `sql/061-pb-ent-e0a-company-core-concurrency-003.sql`.

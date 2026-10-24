@@ -158,3 +158,41 @@ SET search_path TO 'public', 'pg_temp'
 AS $$
   SELECT m.role || '/' || m.status FROM public.app_company_memberships m WHERE m.id = p_membership_id;
 $$;
+
+-- Adds one extra ACTIVE member with the given role to an existing company and
+-- returns the membership id (needed by C3: owner A + owner C + admin B).
+CREATE OR REPLACE FUNCTION testfixture_e0a_add_member(p_company_id uuid, p_role text)
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public', 'pg_temp'
+AS $$
+DECLARE
+  v_user uuid;
+  v_id uuid;
+BEGIN
+  INSERT INTO auth.users (id) VALUES (gen_random_uuid()) RETURNING id INTO v_user;
+  INSERT INTO public.app_14da0f1941_profiles (user_id, full_name)
+  VALUES (v_user, 'E0A extra ' || p_role);
+  INSERT INTO public.app_company_memberships (company_id, user_id, role, status, invited_by)
+  VALUES (p_company_id, v_user, p_role, 'active', NULL)
+  RETURNING id INTO v_id;
+  RETURN v_id;
+END $$;
+
+-- Creates a standalone authenticated user WITHOUT any membership (outsider
+-- for the F6 auth-bypass test) and returns its auth.users id.
+CREATE OR REPLACE FUNCTION testfixture_e0a_seed_outsider()
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public', 'pg_temp'
+AS $$
+DECLARE
+  v_user uuid;
+BEGIN
+  INSERT INTO auth.users (id) VALUES (gen_random_uuid()) RETURNING id INTO v_user;
+  INSERT INTO public.app_14da0f1941_profiles (user_id, full_name)
+  VALUES (v_user, 'E0A outsider');
+  RETURN v_user;
+END $$;

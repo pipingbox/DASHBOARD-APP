@@ -29,13 +29,22 @@
 #      rejected with target_already_owner; transfer to removed membership ->
 #      not_found; transfer to self -> cannot_transfer_to_self; transfer by a
 #      non-owner -> forbidden; happy path A(owner)->C(recruiter) succeeds.
+#   F6. G1 (PO review iteración 2): authenticated OUTSIDER (sin membership)
+#       con IDs válidos -> forbidden; cero cambios de roles/status; owner
+#       count inalterado. (058/059/060: bypass — NULL <> 'owner' = NULL.)
+#   C3. G2 (PO review iteración 2): autorización stale. A/C owners, B admin.
+#       T2 (C) toma el mutex primero; T1 (A) inicia transfer A→B y bloquea;
+#       T2 degrada (C3a) o retira (C3b) a A y commitea; T1 reanuda.
+#       061: forbidden, B sigue admin/active, T1 no muta nada.
 #
-# Usage: ./TESTFIXTURE-run-e0a-owner-race.sh <dbname> [before|before060|after]
+# Usage: ./TESTFIXTURE-run-e0a-owner-race.sh <dbname> [before|before060|before061|after]
 #   before    = 058 only: the ORIGINAL A-race is VISIBLE (0 owners possible).
-#   before060 = 058+059 (PR #98 as reviewed): A/B/C2/D/E hold, but the C1
-#               transfer<->remove-non-owner race is still reachable (0 owners
-#               possible) and F1 does not raise (contract discrepancy).
-#   after     = 058+059+060: everything holds (A/B/C1/C2/D/E/F).
+#   before060 = 058+059 (PR #98 as first reviewed): A/B/C2/D/E hold, but the
+#               C1 race is still reachable, F1 does not raise, and the F6/C3
+#               authorization bypasses exist.
+#   before061 = 058+059+060 (PR #98 iteración 1): C1/F contract hold, pero G1
+#               (F6 outsider bypass) y G2 (C3 stale auth) se REPRODUCEN.
+#   after     = 058+059+060+061: everything holds (A/B/C1/C2/C3/D/E/F/F6).
 #
 # Exit code: 0 if the observed behaviour matches the mode, 1 otherwise.
 # =============================================================================
@@ -349,6 +358,80 @@ F5_STATE_C=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_state('$F5C')")
 echo "$F5_OUT" | rg -q "^t$|^true$" && [ "$F5_STATE_A" = "admin/active" ] && [ "$F5_STATE_C" = "owner/active" ] && F5_CONTRACT=ok || F5_CONTRACT=bad
 echo "TEST F: F1(already-owner)=$F1_CONTRACT F2(removed)=$F2_CONTRACT F3(self)=$F3_CONTRACT F4(non-owner)=$F4_CONTRACT F5(happy)=$F5_CONTRACT"
 
+# ── TEST F6: AUTH NULL BYPASS (G1, PO review iteración 2) ─────────────────────
+# Authenticated OUTSIDER (sin membership) con company_id y target válidos.
+# 058/059/060: `pb_company_role() <> 'owner'` con NULL → el guard no se levanta
+# y la función promueve al target (bypass). 061: forbidden, cero cambios.
+CF6=$("${PSQL[@]}" -c "SELECT testfixture_e0a_seed_company_mixed('RACE-F6', '{admin}')")
+F6A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$CF6', 'owner', 1)")
+F6B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$CF6', 'admin', 1)")
+F6X=$("${PSQL[@]}" -c "SELECT testfixture_e0a_seed_outsider()")
+F6_OWNERS_BEFORE=$("${PSQL[@]}" -c "SELECT testfixture_e0a_owner_count('$CF6')")
+F6_OUT=$("${PSQL[@]}" 2>&1 <<SQL
+BEGIN;
+SET LOCAL request.jwt.claim.sub = '$F6X';
+SELECT public.pb_company_transfer_ownership('$CF6', '$F6B');
+COMMIT;
+SQL
+)
+F6_STATE_A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_state('$F6A')")
+F6_STATE_B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_state('$F6B')")
+F6_OWNERS_AFTER=$("${PSQL[@]}" -c "SELECT testfixture_e0a_owner_count('$CF6')")
+echo "$F6_OUT" | rg -q "forbidden" && F6_RESULT=forbidden || F6_RESULT=bypassed
+echo "TEST F6 (outsider): result=$F6_RESULT owners:$F6_OWNERS_BEFORE->$F6_OWNERS_AFTER A=$F6_STATE_A B=$F6_STATE_B"
+
+# ── TEST C3: TOCTOU de autorización del actor (G2, PO review iteración 2) ─────
+# A owner, C segundo owner, B admin. T2 (C) adquiere el mutex de empresa
+# PRIMERO; T1 (A) inicia transfer A→B (guard temprano pasa: A aún es owner) y
+# bloquea en el mutex; T2 degrada (C3a) o retira (C3b) a A y COMMIT; T1
+# reanuda. 061: la revalidación post-lock rechaza con forbidden y B sigue
+# no-owner. 058/059/060: la transferencia se completa con autorización stale.
+run_c3() {
+  local NAME="$1" OP="$2"   # OP: demote | remove
+  local C3 M_A M_C M_B U_A U_C
+  C3=$("${PSQL[@]}" -c "SELECT testfixture_e0a_seed_company('$NAME', 2)")
+  M_A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$C3', 'owner', 1)")
+  M_C=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$C3', 'owner', 2)")
+  M_B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_add_member('$C3', 'admin')")
+  U_A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_user('$M_A')")
+  U_C=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_user('$M_C')")
+
+  rm -f "$A_READY" "$B_READY"; : > "$A_OUT"; : > "$B_OUT"
+  # T2 (C): adquiere el mutex PRIMERO, espera a que T1 esté bloqueado, muta A y commitea.
+  "${PSQL[@]}" >"$A_OUT" 2>&1 <<SQL &
+BEGIN;
+SET LOCAL request.jwt.claim.sub = '$U_C';
+SELECT 1 FROM public.app_companies WHERE id = '$C3' FOR UPDATE;
+\! touch $A_READY
+\! bash -c 'while [ ! -e $B_READY ]; do sleep 0.05; done'
+SELECT pg_sleep(1);
+$( [ "$OP" = "demote" ] && echo "SELECT public.pb_company_member_change_role('$M_A', 'admin');" || echo "SELECT public.pb_company_member_remove('$M_A');" )
+COMMIT;
+SQL
+  local PIDT2=$!
+  # T1 (A): espera el mutex tomado por T2, inicia transfer y bloquea.
+  "${PSQL[@]}" >"$B_OUT" 2>&1 <<SQL &
+\! bash -c 'while [ ! -e $A_READY ]; do sleep 0.05; done'
+BEGIN;
+SET LOCAL request.jwt.claim.sub = '$U_A';
+\! touch $B_READY
+SELECT public.pb_company_transfer_ownership('$C3', '$M_B');
+COMMIT;
+SQL
+  local PIDT1=$!
+  wait "$PIDT2" "$PIDT1"
+
+  C3_B_STATE=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_state('$M_B')")
+  C3_OWNERS=$("${PSQL[@]}" -c "SELECT testfixture_e0a_owner_count('$C3')")
+  if echo " $(cat "$B_OUT") " | rg -q "forbidden"; then C3_T1=forbidden; else C3_T1=completed; fi
+  echo "TEST $NAME ($OP): T1=$C3_T1 B=$C3_B_STATE owners=$C3_OWNERS A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_state('$M_A')")"
+  # export para el veredicto
+  if [ "$OP" = "demote" ]; then C3A_T1=$C3_T1; C3A_B=$C3_B_STATE; C3A_OWNERS=$C3_OWNERS;
+  else C3B_T1=$C3_T1; C3B_B=$C3_B_STATE; C3B_OWNERS=$C3_OWNERS; fi
+}
+run_c3 "RACE-C3A" demote
+run_c3 "RACE-C3B" remove
+
 # ── Verdict ───────────────────────────────────────────────────────────────────
 echo "---"
 if [ "$MODE" = "after" ]; then
@@ -380,7 +463,35 @@ if [ "$MODE" = "after" ]; then
   [ "$F3_CONTRACT" = "raised" ] || { echo "F3 FAIL: transfer to self must raise cannot_transfer_to_self"; PASS=0; }
   [ "$F4_CONTRACT" = "raised" ] || { echo "F4 FAIL: transfer by non-owner must raise forbidden"; PASS=0; }
   [ "$F5_CONTRACT" = "ok" ] || { echo "F5 FAIL: happy path transfer broken (A=$F5_STATE_A C=$F5_STATE_C)"; PASS=0; }
-  [ "$PASS" = "1" ] && { echo "E0A-HARNESS: AFTER-FIX PASS (A/B/C1/C2/D/E/F)"; exit 0; } || { echo "E0A-HARNESS: AFTER-FIX FAIL"; exit 1; }
+  # G1: outsider -> forbidden, cero cambios (roles/status y owner count inalterados)
+  [ "$F6_RESULT" = "forbidden" ] || { echo "F6 FAIL: outsider transfer must raise forbidden (G1 bypass!)"; PASS=0; }
+  [ "$F6_STATE_A" = "owner/active" ] && [ "$F6_STATE_B" = "admin/active" ] || { echo "F6 FAIL: state changed by outsider (A=$F6_STATE_A B=$F6_STATE_B)"; PASS=0; }
+  [ "$F6_OWNERS_AFTER" = "$F6_OWNERS_BEFORE" ] || { echo "F6 FAIL: owner count changed ($F6_OWNERS_BEFORE->$F6_OWNERS_AFTER)"; PASS=0; }
+  # G2: autorización stale -> forbidden; B sigue no-owner; T1 no realiza cambios
+  [ "$C3A_T1" = "forbidden" ] || { echo "C3a FAIL: stale-auth transfer (demote) must raise forbidden, got $C3A_T1"; PASS=0; }
+  [ "$C3A_B" = "admin/active" ] || { echo "C3a FAIL: B must stay admin/active, got $C3A_B"; PASS=0; }
+  [ "$C3B_T1" = "forbidden" ] || { echo "C3b FAIL: stale-auth transfer (remove) must raise forbidden, got $C3B_T1"; PASS=0; }
+  [ "$C3B_B" = "admin/active" ] || { echo "C3b FAIL: B must stay admin/active, got $C3B_B"; PASS=0; }
+  [ "$PASS" = "1" ] && { echo "E0A-HARNESS: AFTER-FIX PASS (A/B/C1/C2/C3/D/E/F+F6)"; exit 0; } || { echo "E0A-HARNESS: AFTER-FIX FAIL"; exit 1; }
+elif [ "$MODE" = "before061" ]; then
+  # 058+059+060 (PR #98 iteración 1, tal como se revisó en la iteración 2):
+  # A-F se mantienen (060), PERO G1 (F6 outsider bypass) y G2 (C3 stale auth)
+  # siguen presentes — este modo los REPRODUCE como evidencia.
+  PASS=1
+  [ "$OWNERS_AFTER_C1" = "1" ] || { echo "C1(060) FAIL: 060 debe mantener C1, got $OWNERS_AFTER_C1"; PASS=0; }
+  [ "$F1_CONTRACT" = "raised" ] || { echo "F1(060) FAIL: 060 debe imponer el contrato non-owner"; PASS=0; }
+  [ "$F5_CONTRACT" = "ok" ] || { echo "F5(060) FAIL: happy path roto"; PASS=0; }
+  [ "$PASS" = "1" ] || { echo "E0A-HARNESS: BEFORE-061 baseline broken"; exit 1; }
+  [ "$F6_RESULT" = "bypassed" ] \
+    && echo "E0A-HARNESS: BEFORE-061 G1 outsider bypass REPRODUCED (B=$F6_STATE_B owners:$F6_OWNERS_BEFORE->$F6_OWNERS_AFTER)" \
+    || echo "E0A-HARNESS: BEFORE-061 G1 bypass not reproduced this run (result=$F6_RESULT)"
+  [ "$C3A_T1" = "completed" ] \
+    && echo "E0A-HARNESS: BEFORE-061 G2 stale-auth transfer (demote) COMPLETED (B=$C3A_B)" \
+    || echo "E0A-HARNESS: BEFORE-061 C3a not reproduced this run (T1=$C3A_T1)"
+  [ "$C3B_T1" = "completed" ] \
+    && echo "E0A-HARNESS: BEFORE-061 G2 stale-auth transfer (remove) COMPLETED (B=$C3B_B)" \
+    || echo "E0A-HARNESS: BEFORE-061 C3b not reproduced this run (T1=$C3B_T1)"
+  exit 0
 elif [ "$MODE" = "before060" ]; then
   # 058+059 (PR #98 as reviewed): the FIRST fix holds (A/B/C2/D/E consistent)
   # but the C1 transfer<->remove-non-owner race is still reachable and the
