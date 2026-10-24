@@ -229,7 +229,9 @@ export async function sendApplicationPendingProfileEmail(
     // READY-RECOVERY-001): un fallo técnico del RPC y una lista vacía son
     // situaciones distintas y no se mezclan.
     const { data: missingData, error: missingError } = await supabase.rpc(
-      "pb_marketplace_missing_requirements",
+      // PR-V3-01: despacho por version de contrato del perfil (v3 -> v3,
+      // resto -> v2 historico). Unica autoridad: backend.
+      "pb_marketplace_missing_requirements_for",
       { p_user_id: p.userId, p_declared_consent: profile.marketplace_consent_declared === true },
     );
     if (missingError || !Array.isArray(missingData) ||

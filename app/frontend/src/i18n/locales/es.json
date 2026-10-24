@@ -106,7 +106,9 @@
     "companyDocumentation": "Gestión Documental Industrial",
     "companySection": "Empresa",
     "companySettings": "Configuración",
-    "companyWorkspace": "Entorno Empresa"
+    "companyWorkspace": "Entorno Empresa",
+    "companyTenant": "Mi Empresa",
+    "companyTeam": "Equipo"
   },
   "notifications": {
     "title": "Notificaciones",
@@ -1217,7 +1219,6 @@
     "reynolds": "Número de Reynolds",
     "flangeRating": "Consulta de rating de bridas",
     "categoryFabrication": "Fabricación",
-    "familyOffsets": "Quiebros y desplazamientos",
     "elbowCut": {
       "name": "Calculadora de Corte de Codos",
       "subtitle": "Calcula dónde cortar un codo estándar para obtener cualquier ángulo",
@@ -1942,7 +1943,6 @@
       },
       "offset": {
         "title": "Quiebro de tubería",
-        "cardSubtitle": "Quiebros con codos, sin codos y comprobación de medidas",
         "tabWithElbows": "Con codos",
         "tabWithoutElbows": "Sin codos",
         "tabVerify": "Comprobar",
@@ -1964,7 +1964,8 @@
         "straightCut": "Corte recto",
         "centerToCenter": "Centro a centro",
         "diagonal": "H (diagonal)",
-        "cutAngleEnd": "Ángulo de corte por extremo"
+        "cutAngleEnd": "Ángulo de corte por extremo",
+        "cardSubtitle": "Quiebros con codos, sin codos y comprobación de medidas"
       },
       "miteredElbow": {
         "title": "Codo a gajos",
@@ -2228,6 +2229,29 @@
           }
         }
       },
+      "errors": {
+        "line_count_range": "El número de líneas debe ser un entero entre {{min}} y {{max}}",
+        "spacing_positive": "La separación entre ejes debe ser una longitud positiva y finita ({{field}})",
+        "elbow_angle_range": "El ángulo del codo debe estar entre 0° y {{max}}°",
+        "clr_positive": "El CLR debe ser un radio positivo y finito",
+        "per_line_specs_count": "Las especificaciones por línea deben coincidir con el número de líneas",
+        "per_line_clr_invalid": "Línea {{line}}: el CLR por línea debe ser un radio positivo y finito",
+        "advance_invalid": "Línea {{line}}: el avance calculado no es válido",
+        "negative_cut": "La longitud de corte recto es negativa ({{value}} mm): el radio del codo es demasiado grande para esta geometría",
+        "ab_positive": "{{field}} debe ser una longitud positiva y finita",
+        "angle_mismatch": "La geometría requiere un codo de {{required}}°; el codo seleccionado de {{selected}}° es incompatible para un quiebro 2D de líneas paralelas",
+        "verify_two_values": "Introduce exactamente dos valores de A, B, H o θ",
+        "verify_h_smaller": "H no puede ser menor que {{side}}",
+        "verify_invalid": "No se pudo resolver el triángulo de comprobación",
+        "segments_min": "N debe ser un entero ≥ {{min}} piezas rectas",
+        "total_angle_range": "El ángulo total debe estar entre 0° y {{max}}°",
+        "radius_positive": "El radio debe ser una longitud positiva y finita",
+        "od_positive": "El OD debe ser una longitud positiva y finita",
+        "radius_gt_half_od": "El radio ({{radius}} mm) debe ser mayor que OD/2 ({{halfOd}} mm)",
+        "piece_lengths_invalid": "Las longitudes de pieza calculadas no son válidas",
+        "clr_gt_half_od": "El CLR debe ser mayor que OD/2",
+        "beta_range": "El ángulo de corte debe estar entre 0° y {{max}}°"
+      },
       "twoElbowOffset": {
         "title": "Desplazamiento con dos codos",
         "subtitle": "Desplazamiento de líneas paralelas mediante dos codos, con avance, recorrido y tramo recto intermedio.",
@@ -2274,29 +2298,6 @@
         "clrSourceCatalog": "CLR resuelto del catálogo: NPS {{combo}}.",
         "clrSourceCustom": "CLR personalizado; no procede del catálogo.",
         "clrMissing": "El catálogo de esta herramienta no tiene CLR tabulado para NPS {{combo}}. Introduce un CLR para calcular."
-      },
-      "errors": {
-        "line_count_range": "El número de líneas debe ser un entero entre {{min}} y {{max}}",
-        "spacing_positive": "La separación entre ejes debe ser una longitud positiva y finita ({{field}})",
-        "elbow_angle_range": "El ángulo del codo debe estar entre 0° y {{max}}°",
-        "clr_positive": "El CLR debe ser un radio positivo y finito",
-        "per_line_specs_count": "Las especificaciones por línea deben coincidir con el número de líneas",
-        "per_line_clr_invalid": "Línea {{line}}: el CLR por línea debe ser un radio positivo y finito",
-        "advance_invalid": "Línea {{line}}: el avance calculado no es válido",
-        "negative_cut": "La longitud de corte recto es negativa ({{value}} mm): el radio del codo es demasiado grande para esta geometría",
-        "ab_positive": "{{field}} debe ser una longitud positiva y finita",
-        "angle_mismatch": "La geometría requiere un codo de {{required}}°; el codo seleccionado de {{selected}}° es incompatible para un quiebro 2D de líneas paralelas",
-        "verify_two_values": "Introduce exactamente dos valores de A, B, H o θ",
-        "verify_h_smaller": "H no puede ser menor que {{side}}",
-        "verify_invalid": "No se pudo resolver el triángulo de comprobación",
-        "segments_min": "N debe ser un entero ≥ {{min}} piezas rectas",
-        "total_angle_range": "El ángulo total debe estar entre 0° y {{max}}°",
-        "radius_positive": "El radio debe ser una longitud positiva y finita",
-        "od_positive": "El OD debe ser una longitud positiva y finita",
-        "radius_gt_half_od": "El radio ({{radius}} mm) debe ser mayor que OD/2 ({{halfOd}} mm)",
-        "piece_lengths_invalid": "Las longitudes de pieza calculadas no son válidas",
-        "clr_gt_half_od": "El CLR debe ser mayor que OD/2",
-        "beta_range": "El ángulo de corte debe estar entre 0° y {{max}}°"
       }
     },
     "premiumBanner": {
@@ -2466,7 +2467,8 @@
       "pdfSeam": "costura",
       "pdfWrapNote": "Envuelva: X a lo largo de la circunferencia, Y desde el extremo cuadrado del lado del codo.",
       "pdfClosure": "cierre"
-    }
+    },
+    "familyOffsets": "Quiebros y desplazamientos"
   },
   "jobs": {
     "eyebrow": "Jobs",
@@ -4626,5 +4628,131 @@
     "copyAllFacebook": "Copiar todos los enlaces de Facebook",
     "copied": "Copiado",
     "note": "Los parámetros UTM contienen solo identificadores genéricos de campaña, nunca datos personales."
+  },
+  "marketplaceV3": {
+    "title": "Activar Marketplace Ready",
+    "subtitle": "Revisa los requisitos y acepta las condiciones del Marketplace para que tu perfil sea visible para las empresas.",
+    "requirementsTitle": "Requisitos de Marketplace Ready",
+    "requirements": {
+      "cv": "CV subido y accesible",
+      "profession": "Profesión u oficio indicado",
+      "location": "Ubicación o región de trabajo",
+      "availability": "Disponibilidad declarada"
+    },
+    "certificatesOptional": "Los certificados son opcionales: mejoran tu perfil, pero no son obligatorios para entrar en el Marketplace.",
+    "consentText": "Al aceptar, autorizas a PIPINGBOX a presentar tu perfil profesional a empresas verificadas según las condiciones del Marketplace (versión v3-2026-10-17). Tu CV original y tus datos de contacto nunca se muestran sin tu autorización.",
+    "consentCheckbox": "He leído y acepto las condiciones del Marketplace (v3).",
+    "acceptCta": "Aceptar y activar",
+    "resultReady": "Tu perfil es Marketplace Ready. Las empresas ya pueden encontrarte.",
+    "resultNotEligible": "Consentimiento registrado. Completa los requisitos pendientes para activar Marketplace Ready.",
+    "resultLegacy": "Tu perfil está protegido por las condiciones anteriores. No se aplicaron cambios.",
+    "resultError": "No se pudo completar la aceptación. Inténtalo de nuevo.",
+    "completeProfileLink": "Completa tu perfil",
+    "contractVersion": "Versión del contrato: {{version}} · Idioma: {{lang}}",
+    "resultAccountType": "Esta acción solo está disponible para cuentas profesionales.",
+    "goDashboard": "Ir a tu panel",
+    "contractNotActive": "Condiciones todavía no activas",
+    "contractNotActiveBody": "Las condiciones del Marketplace v3 están en revisión jurídica y todavía no están activadas. Cuando estén disponibles podrás aceptarlas desde aquí.",
+    "contractChanged": "Las condiciones han cambiado",
+    "contractChangedBody": "Las condiciones del Marketplace se actualizaron mientras las revisabas. Por seguridad no se ha registrado ninguna aceptación. Revisa la versión actual antes de aceptar.",
+    "reviewAgainCta": "Revisar la versión actual"
+  },
+  "companyCore": {
+    "loading": "Cargando…",
+    "switcher": {
+      "label": "Empresa activa"
+    },
+    "roles": {
+      "owner": "Propietario",
+      "admin": "Administrador",
+      "recruiter": "Reclutador",
+      "viewer": "Solo lectura"
+    },
+    "verification": {
+      "unverified": "No verificada",
+      "pending": "Verificación pendiente",
+      "verified": "Verificada",
+      "rejected": "Verificación rechazada"
+    },
+    "create": {
+      "title": "Configura tu empresa",
+      "description": "Crea el espacio de tu empresa para invitar a tu equipo. Crear una empresa no la verifica.",
+      "nameLabel": "Nombre de la empresa",
+      "countryLabel": "País (opcional)",
+      "submit": "Crear empresa",
+      "submitting": "Creando…"
+    },
+    "view": {
+      "title": "Mi empresa",
+      "description": "Resumen del espacio de tu empresa.",
+      "verificationTitle": "Estado de verificación",
+      "teamTitle": "Equipo",
+      "teamDescription": "Miembros, roles e invitaciones",
+      "yourRoleTitle": "Tu rol"
+    },
+    "team": {
+      "title": "Equipo",
+      "description": "Miembros de {{company}}",
+      "noCompany": "Todavía no perteneces a ninguna empresa.",
+      "createLink": "Configura tu empresa",
+      "membersTitle": "Miembros",
+      "unnamedMember": "Miembro sin nombre",
+      "you": "tú",
+      "confirmRemove": "¿Retirar a este miembro? Su acceso se revoca inmediatamente.",
+      "confirmTransfer": "¿Transferir la propiedad? Pasarás a ser administrador.",
+      "transferTitle": "Transferir propiedad",
+      "removeTitle": "Retirar miembro",
+      "leaveTitle": "Salir de la empresa"
+    },
+    "invite": {
+      "title": "Invitar a un miembro",
+      "emailLabel": "Correo electrónico",
+      "roleLabel": "Rol",
+      "submit": "Crear invitación",
+      "submitting": "Creando…",
+      "created": "Invitación creada. Comparte este enlace de un solo uso:",
+      "alreadyPending": "Ya existe una invitación pendiente para este correo.",
+      "copy": "Copiar",
+      "copied": "Enlace copiado",
+      "emailNotice": "El envío por correo aún no está habilitado: comparte el enlace manualmente con la persona invitada."
+    },
+    "invitations": {
+      "title": "Invitaciones",
+      "revoke": "Revocar",
+      "expires": "caduca {{date}}",
+      "status": {
+        "pending": "pendiente",
+        "accepted": "aceptada",
+        "rejected": "rechazada",
+        "revoked": "revocada",
+        "expired": "caducada"
+      }
+    },
+    "accept": {
+      "title": "Invitación de empresa",
+      "sessionRequired": "Para responder a esta invitación, inicia sesión o regístrate con el correo invitado y vuelve a abrir este enlace.",
+      "signIn": "Iniciar sesión",
+      "register": "Registrarse",
+      "question": "¿Quieres unirte a esta empresa?",
+      "accept": "Aceptar",
+      "reject": "Rechazar",
+      "processing": "Procesando…",
+      "success": "Te has unido a la empresa. Redirigiendo…",
+      "rejected": "Invitación rechazada."
+    },
+    "errors": {
+      "not_authenticated": "Debes iniciar sesión.",
+      "forbidden": "No tienes permiso para esta acción.",
+      "not_found": "No encontrado.",
+      "invalid_name": "Nombre de empresa no válido.",
+      "invalid_email": "Correo electrónico no válido.",
+      "invalid_role": "Rol no válido.",
+      "invalid_or_expired": "Esta invitación no es válida, ha caducado o ya se ha usado.",
+      "email_mismatch": "Esta invitación se envió a otro correo. Inicia sesión con el correo invitado.",
+      "not_active": "La membresía no está activa.",
+      "last_owner": "La empresa debe conservar al menos un propietario.",
+      "cannot_transfer_to_self": "No puedes transferirte la propiedad a ti mismo.",
+      "unknown": "Algo ha fallado. Inténtalo de nuevo."
+    }
   }
 }

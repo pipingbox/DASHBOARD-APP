@@ -106,7 +106,9 @@
     "companyDocumentation": "Gestionarea documentelor industriale",
     "companySection": "Companie",
     "companySettings": "Setări",
-    "companyWorkspace": "Spațiu de lucru companie"
+    "companyWorkspace": "Spațiu de lucru companie",
+    "companyTenant": "Compania mea",
+    "companyTeam": "Echipă"
   },
   "notifications": {
     "title": "Notificări",
@@ -1217,7 +1219,6 @@
     "reynolds": "Numărul Reynolds",
     "flangeRating": "Căutare rating flanșe",
     "categoryFabrication": "Fabricație",
-    "familyOffsets": "Deviere și deplasări",
     "elbowCut": {
       "name": "Calculator de tăiere a coturilor",
       "subtitle": "Calculați unde să tăiați un cot standard pentru a obține orice unghi",
@@ -1949,7 +1950,6 @@
       },
       "offset": {
         "title": "Decalaj țeavă",
-        "cardSubtitle": "Deviere cu coturi, fără coturi și verificarea măsurilor",
         "tabWithElbows": "Cu coturi",
         "tabWithoutElbows": "Fără coturi",
         "tabVerify": "Verificare",
@@ -1971,7 +1971,8 @@
         "straightCut": "Tăiere dreaptă",
         "centerToCenter": "De la ax la ax",
         "diagonal": "H (diagonală)",
-        "cutAngleEnd": "Unghi de tăiere pe capăt"
+        "cutAngleEnd": "Unghi de tăiere pe capăt",
+        "cardSubtitle": "Deviere cu coturi, fără coturi și verificarea măsurilor"
       },
       "miteredElbow": {
         "title": "Cot segmentat",
@@ -2235,6 +2236,29 @@
           }
         }
       },
+      "errors": {
+        "line_count_range": "Numărul de linii trebuie să fie un număr întreg între {{min}} și {{max}}",
+        "spacing_positive": "Distanța între axe trebuie să fie o lungime pozitivă finită ({{field}})",
+        "elbow_angle_range": "Unghiul cotului trebuie să fie între 0° și {{max}}°",
+        "clr_positive": "CLR trebuie să fie o rază pozitivă finită",
+        "per_line_specs_count": "Specificațiile pe linie trebuie să corespundă numărului de linii",
+        "per_line_clr_invalid": "Linia {{line}}: CLR pe linie trebuie să fie o rază pozitivă finită",
+        "advance_invalid": "Linia {{line}}: avansul calculat este invalid",
+        "negative_cut": "Lungimea tăierii drepte este negativă ({{value}} mm): raza cotului este prea mare pentru această geometrie",
+        "ab_positive": "{{field}} trebuie să fie o lungime pozitivă finită",
+        "angle_mismatch": "Geometria necesită un cot de {{required}}°; cotul selectat de {{selected}}° este incompatibil pentru un decalaj 2D de linii paralele",
+        "verify_two_values": "Furnizați exact două dintre A, B, H sau θ",
+        "verify_h_smaller": "H nu poate fi mai mic decât {{side}}",
+        "verify_invalid": "Triunghiul de verificare nu poate fi rezolvat",
+        "segments_min": "N trebuie să fie un număr întreg ≥ {{min}} segmente drepte",
+        "total_angle_range": "Unghiul total trebuie să fie între 0° și {{max}}°",
+        "radius_positive": "Raza trebuie să fie o lungime pozitivă finită",
+        "od_positive": "OD trebuie să fie o lungime pozitivă finită",
+        "radius_gt_half_od": "Raza ({{radius}} mm) trebuie să fie mai mare decât OD/2 ({{halfOd}} mm)",
+        "piece_lengths_invalid": "Lungimile calculate ale segmentelor sunt invalide",
+        "clr_gt_half_od": "CLR trebuie să fie mai mare decât OD/2",
+        "beta_range": "Unghiul de tăiere trebuie să fie între 0° și {{max}}°"
+      },
       "twoElbowOffset": {
         "title": "Deplasare cu două coturi",
         "subtitle": "Deplasarea liniilor paralele cu două coturi: înaintare, parcurs și segment drept intermediar.",
@@ -2281,29 +2305,6 @@
         "clrSourceCatalog": "CLR din catalog: NPS {{combo}}.",
         "clrSourceCustom": "CLR personalizat; nu provine din catalog.",
         "clrMissing": "Catalogul acestei unelte nu are CLR tabulat pentru NPS {{combo}}. Introdu un CLR pentru a calcula."
-      },
-      "errors": {
-        "line_count_range": "Numărul de linii trebuie să fie un număr întreg între {{min}} și {{max}}",
-        "spacing_positive": "Distanța între axe trebuie să fie o lungime pozitivă finită ({{field}})",
-        "elbow_angle_range": "Unghiul cotului trebuie să fie între 0° și {{max}}°",
-        "clr_positive": "CLR trebuie să fie o rază pozitivă finită",
-        "per_line_specs_count": "Specificațiile pe linie trebuie să corespundă numărului de linii",
-        "per_line_clr_invalid": "Linia {{line}}: CLR pe linie trebuie să fie o rază pozitivă finită",
-        "advance_invalid": "Linia {{line}}: avansul calculat este invalid",
-        "negative_cut": "Lungimea tăierii drepte este negativă ({{value}} mm): raza cotului este prea mare pentru această geometrie",
-        "ab_positive": "{{field}} trebuie să fie o lungime pozitivă finită",
-        "angle_mismatch": "Geometria necesită un cot de {{required}}°; cotul selectat de {{selected}}° este incompatibil pentru un decalaj 2D de linii paralele",
-        "verify_two_values": "Furnizați exact două dintre A, B, H sau θ",
-        "verify_h_smaller": "H nu poate fi mai mic decât {{side}}",
-        "verify_invalid": "Triunghiul de verificare nu poate fi rezolvat",
-        "segments_min": "N trebuie să fie un număr întreg ≥ {{min}} segmente drepte",
-        "total_angle_range": "Unghiul total trebuie să fie între 0° și {{max}}°",
-        "radius_positive": "Raza trebuie să fie o lungime pozitivă finită",
-        "od_positive": "OD trebuie să fie o lungime pozitivă finită",
-        "radius_gt_half_od": "Raza ({{radius}} mm) trebuie să fie mai mare decât OD/2 ({{halfOd}} mm)",
-        "piece_lengths_invalid": "Lungimile calculate ale segmentelor sunt invalide",
-        "clr_gt_half_od": "CLR trebuie să fie mai mare decât OD/2",
-        "beta_range": "Unghiul de tăiere trebuie să fie între 0° și {{max}}°"
       }
     },
     "landing": {
@@ -2466,7 +2467,8 @@
       "pdfSeam": "cusătură",
       "pdfWrapNote": "Înfășurare: X de-a lungul circumferinței, Y de la capătul pătrat din partea cotului.",
       "pdfClosure": "închidere"
-    }
+    },
+    "familyOffsets": "Deviere și deplasări"
   },
   "jobs": {
     "eyebrow": "Locuri de muncă",
@@ -4626,5 +4628,131 @@
     "copyAllFacebook": "Copiază toate linkurile de Facebook",
     "copied": "Copiat",
     "note": "Parametrii UTM conțin doar identificatori generici de campanie, niciodată date personale."
+  },
+  "marketplaceV3": {
+    "title": "Activează Marketplace Ready",
+    "subtitle": "Verifică cerințele și acceptă condițiile Marketplace pentru ca profilul tău să fie vizibil companiilor.",
+    "requirementsTitle": "Cerințe Marketplace Ready",
+    "requirements": {
+      "cv": "CV încărcat și accesibil",
+      "profession": "Profesie sau meserie indicată",
+      "location": "Locația sau regiunea de lucru",
+      "availability": "Disponibilitate declarată"
+    },
+    "certificatesOptional": "Certificatele sunt opționale: îți îmbunătățesc profilul, dar nu sunt obligatorii pentru Marketplace.",
+    "consentText": "Prin acceptare, autorizezi PIPINGBOX să prezinte profilul tău profesional companiilor verificate conform condițiilor Marketplace (versiunea v3-2026-10-17). CV-ul tău original și datele de contact nu sunt afișate niciodată fără autorizarea ta.",
+    "consentCheckbox": "Am citit și accept condițiile Marketplace (v3).",
+    "acceptCta": "Acceptă și activează",
+    "resultReady": "Profilul tău este Marketplace Ready. Companiile te pot găsi acum.",
+    "resultNotEligible": "Consimțământ înregistrat. Completează cerințele rămase pentru a activa Marketplace Ready.",
+    "resultLegacy": "Profilul tău este protejat de condițiile anterioare. Nu s-au aplicat modificări.",
+    "resultError": "Acceptarea nu a putut fi finalizată. Încearcă din nou.",
+    "completeProfileLink": "Completează-ți profilul",
+    "contractVersion": "Versiunea contractului: {{version}} · Limba: {{lang}}",
+    "resultAccountType": "Această acțiune este disponibilă doar pentru conturile profesionale.",
+    "goDashboard": "Mergi la panoul tău",
+    "contractNotActive": "Condițiile nu sunt încă active",
+    "contractNotActiveBody": "Condițiile Marketplace v3 sunt în curs de revizuire juridică și nu sunt încă activate. Le vei putea accepta aici când vor fi disponibile.",
+    "contractChanged": "Condițiile s-au schimbat",
+    "contractChangedBody": "Condițiile Marketplace au fost actualizate în timp ce le analizai. Din motive de securitate, nu a fost înregistrată nicio acceptare. Te rugăm să revezi versiunea actuală înainte de a accepta.",
+    "reviewAgainCta": "Revezi versiunea actuală"
+  },
+  "companyCore": {
+    "loading": "Se încarcă…",
+    "switcher": {
+      "label": "Companie activă"
+    },
+    "roles": {
+      "owner": "Proprietar",
+      "admin": "Administrator",
+      "recruiter": "Recrutor",
+      "viewer": "Doar citire"
+    },
+    "verification": {
+      "unverified": "Neverificată",
+      "pending": "Verificare în curs",
+      "verified": "Verificată",
+      "rejected": "Verificare respinsă"
+    },
+    "create": {
+      "title": "Configurează-ți compania",
+      "description": "Creează spațiul companiei tale pentru a-ți invita echipa. Crearea unei companii nu o verifică.",
+      "nameLabel": "Numele companiei",
+      "countryLabel": "Țară (opțional)",
+      "submit": "Creează compania",
+      "submitting": "Se creează…"
+    },
+    "view": {
+      "title": "Compania mea",
+      "description": "Prezentarea spațiului companiei tale.",
+      "verificationTitle": "Starea verificării",
+      "teamTitle": "Echipă",
+      "teamDescription": "Membri, roluri și invitații",
+      "yourRoleTitle": "Rolul tău"
+    },
+    "team": {
+      "title": "Echipă",
+      "description": "Membri ai {{company}}",
+      "noCompany": "Nu faci parte încă din nicio companie.",
+      "createLink": "Configurează-ți compania",
+      "membersTitle": "Membri",
+      "unnamedMember": "Membru fără nume",
+      "you": "tu",
+      "confirmRemove": "Scoți acest membru? Accesul îi este revocat imediat.",
+      "confirmTransfer": "Transferi proprietatea? Vei deveni administrator.",
+      "transferTitle": "Transferă proprietatea",
+      "removeTitle": "Scoate membrul",
+      "leaveTitle": "Părăsește compania"
+    },
+    "invite": {
+      "title": "Invită un membru",
+      "emailLabel": "E-mail",
+      "roleLabel": "Rol",
+      "submit": "Creează invitația",
+      "submitting": "Se creează…",
+      "created": "Invitație creată. Distribuie acest link de unică folosință:",
+      "alreadyPending": "Există deja o invitație în așteptare pentru acest e-mail.",
+      "copy": "Copiază",
+      "copied": "Link copiat",
+      "emailNotice": "Trimiterea prin e-mail nu este încă activată — distribuie linkul manual persoanei invitate."
+    },
+    "invitations": {
+      "title": "Invitații",
+      "revoke": "Revocă",
+      "expires": "expiră la {{date}}",
+      "status": {
+        "pending": "în așteptare",
+        "accepted": "acceptată",
+        "rejected": "respinsă",
+        "revoked": "revocată",
+        "expired": "expirată"
+      }
+    },
+    "accept": {
+      "title": "Invitație la companie",
+      "sessionRequired": "Pentru a răspunde la această invitație, autentifică-te sau înregistrează-te cu e-mailul invitat, apoi redeschide acest link.",
+      "signIn": "Autentificare",
+      "register": "Înregistrare",
+      "question": "Vrei să te alături acestei companii?",
+      "accept": "Acceptă",
+      "reject": "Respinge",
+      "processing": "Se procesează…",
+      "success": "Te-ai alăturat companiei. Se redirecționează…",
+      "rejected": "Invitație respinsă."
+    },
+    "errors": {
+      "not_authenticated": "Trebuie să fii autentificat.",
+      "forbidden": "Nu ai permisiunea pentru această acțiune.",
+      "not_found": "Nu a fost găsit.",
+      "invalid_name": "Nume de companie invalid.",
+      "invalid_email": "E-mail invalid.",
+      "invalid_role": "Rol invalid.",
+      "invalid_or_expired": "Această invitație este invalidă, a expirat sau a fost deja folosită.",
+      "email_mismatch": "Această invitație a fost trimisă către alt e-mail. Autentifică-te cu e-mailul invitat.",
+      "not_active": "Calitatea de membru nu este activă.",
+      "last_owner": "Compania trebuie să păstreze cel puțin un proprietar.",
+      "cannot_transfer_to_self": "Nu îți poți transfera proprietatea ție însuți.",
+      "unknown": "Ceva a eșuat. Încearcă din nou."
+    }
   }
 }

@@ -106,7 +106,9 @@
     "companyDocumentation": "Gestione Documentale Industriale",
     "companySection": "Azienda",
     "companySettings": "Impostazioni",
-    "companyWorkspace": "Area Azienda"
+    "companyWorkspace": "Area Azienda",
+    "companyTenant": "La mia azienda",
+    "companyTeam": "Team"
   },
   "notifications": {
     "title": "Notifiche",
@@ -1217,7 +1219,6 @@
     "reynolds": "Numero di Reynolds",
     "flangeRating": "Ricerca Flange Rating",
     "categoryFabrication": "Fabbricazione",
-    "familyOffsets": "Svasi e spostamenti",
     "elbowCut": {
       "name": "Calcolatore di taglio curve",
       "subtitle": "Calcola dove tagliare una curva standard per ottenere qualsiasi angolo",
@@ -1942,7 +1943,6 @@
       },
       "offset": {
         "title": "Dislivello tubazione",
-        "cardSubtitle": "Svasi con gomiti, senza gomiti e verifica delle misure",
         "tabWithElbows": "Con curve",
         "tabWithoutElbows": "Senza curve",
         "tabVerify": "Verifica",
@@ -1964,7 +1964,8 @@
         "straightCut": "Taglio diritto",
         "centerToCenter": "Asse ad asse",
         "diagonal": "H (diagonale)",
-        "cutAngleEnd": "Angolo di taglio per estremità"
+        "cutAngleEnd": "Angolo di taglio per estremità",
+        "cardSubtitle": "Svasi con gomiti, senza gomiti e verifica delle misure"
       },
       "miteredElbow": {
         "title": "Curva a settori",
@@ -2228,6 +2229,29 @@
           }
         }
       },
+      "errors": {
+        "line_count_range": "Il numero di linee deve essere un intero tra {{min}} e {{max}}",
+        "spacing_positive": "L'interasse deve essere una lunghezza positiva e finita ({{field}})",
+        "elbow_angle_range": "L'angolo della curva deve essere tra 0° e {{max}}°",
+        "clr_positive": "Il CLR deve essere un raggio positivo e finito",
+        "per_line_specs_count": "Le specifiche per linea devono corrispondere al numero di linee",
+        "per_line_clr_invalid": "Linea {{line}}: il CLR per linea deve essere un raggio positivo e finito",
+        "advance_invalid": "Linea {{line}}: l'avanzamento calcolato non è valido",
+        "negative_cut": "La lunghezza di taglio diritto è negativa ({{value}} mm): il raggio della curva è troppo grande per questa geometria",
+        "ab_positive": "{{field}} deve essere una lunghezza positiva e finita",
+        "angle_mismatch": "La geometria richiede una curva di {{required}}°; la curva selezionata di {{selected}}° è incompatibile per un dislivello 2D di linee parallele",
+        "verify_two_values": "Fornisci esattamente due valori tra A, B, H o θ",
+        "verify_h_smaller": "H non può essere minore di {{side}}",
+        "verify_invalid": "Impossibile risolvere il triangolo di verifica",
+        "segments_min": "N deve essere un intero ≥ {{min}} pezzi diritti",
+        "total_angle_range": "L'angolo totale deve essere tra 0° e {{max}}°",
+        "radius_positive": "Il raggio deve essere una lunghezza positiva e finita",
+        "od_positive": "L'OD deve essere una lunghezza positiva e finita",
+        "radius_gt_half_od": "Il raggio ({{radius}} mm) deve essere maggiore di OD/2 ({{halfOd}} mm)",
+        "piece_lengths_invalid": "Le lunghezze dei pezzi calcolate non sono valide",
+        "clr_gt_half_od": "Il CLR deve essere maggiore di OD/2",
+        "beta_range": "L'angolo di taglio deve essere tra 0° e {{max}}°"
+      },
       "twoElbowOffset": {
         "title": "Spostamento con due ginocchi",
         "subtitle": "Spostamento di linee parallele con due ginocchi: avanzamento, percorso e tratto retto intermedio.",
@@ -2274,29 +2298,6 @@
         "clrSourceCatalog": "CLR dal catalogo: NPS {{combo}}.",
         "clrSourceCustom": "CLR personalizzato; non deriva dal catalogo.",
         "clrMissing": "Il catalogo di questo strumento non ha un CLR tabellato per NPS {{combo}}. Inserisci un CLR per calcolare."
-      },
-      "errors": {
-        "line_count_range": "Il numero di linee deve essere un intero tra {{min}} e {{max}}",
-        "spacing_positive": "L'interasse deve essere una lunghezza positiva e finita ({{field}})",
-        "elbow_angle_range": "L'angolo della curva deve essere tra 0° e {{max}}°",
-        "clr_positive": "Il CLR deve essere un raggio positivo e finito",
-        "per_line_specs_count": "Le specifiche per linea devono corrispondere al numero di linee",
-        "per_line_clr_invalid": "Linea {{line}}: il CLR per linea deve essere un raggio positivo e finito",
-        "advance_invalid": "Linea {{line}}: l'avanzamento calcolato non è valido",
-        "negative_cut": "La lunghezza di taglio diritto è negativa ({{value}} mm): il raggio della curva è troppo grande per questa geometria",
-        "ab_positive": "{{field}} deve essere una lunghezza positiva e finita",
-        "angle_mismatch": "La geometria richiede una curva di {{required}}°; la curva selezionata di {{selected}}° è incompatibile per un dislivello 2D di linee parallele",
-        "verify_two_values": "Fornisci esattamente due valori tra A, B, H o θ",
-        "verify_h_smaller": "H non può essere minore di {{side}}",
-        "verify_invalid": "Impossibile risolvere il triangolo di verifica",
-        "segments_min": "N deve essere un intero ≥ {{min}} pezzi diritti",
-        "total_angle_range": "L'angolo totale deve essere tra 0° e {{max}}°",
-        "radius_positive": "Il raggio deve essere una lunghezza positiva e finita",
-        "od_positive": "L'OD deve essere una lunghezza positiva e finita",
-        "radius_gt_half_od": "Il raggio ({{radius}} mm) deve essere maggiore di OD/2 ({{halfOd}} mm)",
-        "piece_lengths_invalid": "Le lunghezze dei pezzi calcolate non sono valide",
-        "clr_gt_half_od": "Il CLR deve essere maggiore di OD/2",
-        "beta_range": "L'angolo di taglio deve essere tra 0° e {{max}}°"
       }
     },
     "premiumBanner": {
@@ -2466,7 +2467,8 @@
       "pdfSeam": "cucitura",
       "pdfWrapNote": "Avvolgimento: X lungo la circonferenza, Y dal fondo squadrato lato gomito.",
       "pdfClosure": "chiusura"
-    }
+    },
+    "familyOffsets": "Svasi e spostamenti"
   },
   "jobs": {
     "eyebrow": "Lavori",
@@ -4626,5 +4628,131 @@
     "copyAllFacebook": "Copia tutti i link Facebook",
     "copied": "Copiato",
     "note": "I parametri UTM contengono solo identificativi generici di campagna, mai dati personali."
+  },
+  "marketplaceV3": {
+    "title": "Attiva Marketplace Ready",
+    "subtitle": "Verifica i requisiti e accetta le condizioni del Marketplace per rendere il tuo profilo visibile alle aziende.",
+    "requirementsTitle": "Requisiti Marketplace Ready",
+    "requirements": {
+      "cv": "CV caricato e accessibile",
+      "profession": "Professione o mestiere indicato",
+      "location": "Luogo o regione di lavoro",
+      "availability": "Disponibilità dichiarata"
+    },
+    "certificatesOptional": "I certificati sono facoltativi: migliorano il tuo profilo ma non sono obbligatori per entrare nel Marketplace.",
+    "consentText": "Accettando, autorizzi PIPINGBOX a presentare il tuo profilo professionale ad aziende verificate secondo le condizioni del Marketplace (versione v3-2026-10-17). Il tuo CV originale e i tuoi dati di contatto non vengono mai mostrati senza la tua autorizzazione.",
+    "consentCheckbox": "Ho letto e accetto le condizioni del Marketplace (v3).",
+    "acceptCta": "Accetta e attiva",
+    "resultReady": "Il tuo profilo è Marketplace Ready. Le aziende possono ora trovarti.",
+    "resultNotEligible": "Consenso registrato. Completa i requisiti mancanti per attivare Marketplace Ready.",
+    "resultLegacy": "Il tuo profilo è protetto dalle condizioni precedenti. Nessuna modifica applicata.",
+    "resultError": "Impossibile completare l'accettazione. Riprova.",
+    "completeProfileLink": "Completa il tuo profilo",
+    "contractVersion": "Versione del contratto: {{version}} · Lingua: {{lang}}",
+    "resultAccountType": "Questa azione è disponibile solo per gli account professionali.",
+    "goDashboard": "Vai alla tua dashboard",
+    "contractNotActive": "Condizioni non ancora attive",
+    "contractNotActiveBody": "Le condizioni del Marketplace v3 sono in revisione legale e non sono ancora attivate. Potrai accettarle qui quando saranno disponibili.",
+    "contractChanged": "Le condizioni sono cambiate",
+    "contractChangedBody": "Le condizioni del Marketplace sono state aggiornate mentre le stavi esaminando. Per sicurezza non è stata registrata alcuna accettazione. Rileggi la versione attuale prima di accettare.",
+    "reviewAgainCta": "Rileggi la versione attuale"
+  },
+  "companyCore": {
+    "loading": "Caricamento…",
+    "switcher": {
+      "label": "Azienda attiva"
+    },
+    "roles": {
+      "owner": "Proprietario",
+      "admin": "Amministratore",
+      "recruiter": "Reclutatore",
+      "viewer": "Sola lettura"
+    },
+    "verification": {
+      "unverified": "Non verificata",
+      "pending": "Verifica in corso",
+      "verified": "Verificata",
+      "rejected": "Verifica rifiutata"
+    },
+    "create": {
+      "title": "Configura la tua azienda",
+      "description": "Crea lo spazio della tua azienda per invitare il tuo team. Creare un'azienda non la verifica.",
+      "nameLabel": "Nome dell'azienda",
+      "countryLabel": "Paese (opzionale)",
+      "submit": "Crea l'azienda",
+      "submitting": "Creazione…"
+    },
+    "view": {
+      "title": "La mia azienda",
+      "description": "Panoramica dello spazio della tua azienda.",
+      "verificationTitle": "Stato di verifica",
+      "teamTitle": "Team",
+      "teamDescription": "Membri, ruoli e inviti",
+      "yourRoleTitle": "Il tuo ruolo"
+    },
+    "team": {
+      "title": "Team",
+      "description": "Membri di {{company}}",
+      "noCompany": "Non fai ancora parte di nessuna azienda.",
+      "createLink": "Configura la tua azienda",
+      "membersTitle": "Membri",
+      "unnamedMember": "Membro senza nome",
+      "you": "tu",
+      "confirmRemove": "Rimuovere questo membro? L’accesso viene revocato immediatamente.",
+      "confirmTransfer": "Trasferire la proprietà? Diventerai amministratore.",
+      "transferTitle": "Trasferisci proprietà",
+      "removeTitle": "Rimuovi membro",
+      "leaveTitle": "Lascia l’azienda"
+    },
+    "invite": {
+      "title": "Invita un membro",
+      "emailLabel": "Email",
+      "roleLabel": "Ruolo",
+      "submit": "Crea invito",
+      "submitting": "Creazione…",
+      "created": "Invito creato. Condividi questo link monouso:",
+      "alreadyPending": "Esiste già un invito in sospeso per questa email.",
+      "copy": "Copia",
+      "copied": "Link copiato",
+      "emailNotice": "L'invio via email non è ancora attivo — condividi il link manualmente con la persona invitata."
+    },
+    "invitations": {
+      "title": "Inviti",
+      "revoke": "Revoca",
+      "expires": "scade il {{date}}",
+      "status": {
+        "pending": "in sospeso",
+        "accepted": "accettato",
+        "rejected": "rifiutato",
+        "revoked": "revocato",
+        "expired": "scaduto"
+      }
+    },
+    "accept": {
+      "title": "Invito aziendale",
+      "sessionRequired": "Per rispondere a questo invito, accedi o registrati con l'email invitata, quindi riapri questo link.",
+      "signIn": "Accedi",
+      "register": "Registrati",
+      "question": "Vuoi entrare in questa azienda?",
+      "accept": "Accetta",
+      "reject": "Rifiuta",
+      "processing": "Elaborazione…",
+      "success": "Sei entrato nell’azienda. Reindirizzamento…",
+      "rejected": "Invito rifiutato."
+    },
+    "errors": {
+      "not_authenticated": "Devi effettuare l’accesso.",
+      "forbidden": "Non hai i permessi per questa azione.",
+      "not_found": "Non trovato.",
+      "invalid_name": "Nome azienda non valido.",
+      "invalid_email": "Email non valida.",
+      "invalid_role": "Ruolo non valido.",
+      "invalid_or_expired": "Questo invito non è valido, è scaduto o è già stato utilizzato.",
+      "email_mismatch": "Questo invito è stato inviato a un'altra email. Accedi con l'email invitata.",
+      "not_active": "L'iscrizione non è attiva.",
+      "last_owner": "L’azienda deve mantenere almeno un proprietario.",
+      "cannot_transfer_to_self": "Non puoi trasferire la proprietà a te stesso.",
+      "unknown": "Qualcosa è andato storto. Riprova."
+    }
   }
 }

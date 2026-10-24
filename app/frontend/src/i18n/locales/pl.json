@@ -106,7 +106,9 @@
     "companyDocumentation": "Zarządzanie dokumentacją przemysłową",
     "companySection": "Firma",
     "companySettings": "Ustawienia",
-    "companyWorkspace": "Obszar roboczy firmy"
+    "companyWorkspace": "Obszar roboczy firmy",
+    "companyTenant": "Moja firma",
+    "companyTeam": "Zespół"
   },
   "notifications": {
     "title": "Powiadomienia",
@@ -1220,7 +1222,6 @@
     "reynolds": "Liczba Reynoldsa",
     "flangeRating": "Wyszukiwarka klas kołnierzy",
     "categoryFabrication": "Prefabrykacja",
-    "familyOffsets": "Odsunięcia i przesunięcia",
     "elbowCut": {
       "name": "Kalkulator cięcia kolan",
       "subtitle": "Oblicz, gdzie przeciąć standardowe kolano, aby uzyskać dowolny kąt",
@@ -1952,7 +1953,6 @@
       },
       "offset": {
         "title": "Przesunięcie rury",
-        "cardSubtitle": "Odsunięcia z kolankami, bez kolanek i weryfikacja wymiarów",
         "tabWithElbows": "Z kolanami",
         "tabWithoutElbows": "Bez kolan",
         "tabVerify": "Weryfikacja",
@@ -1974,7 +1974,8 @@
         "straightCut": "Cięcie proste",
         "centerToCenter": "Oś do osi",
         "diagonal": "H (przekątna)",
-        "cutAngleEnd": "Kąt cięcia na koniec"
+        "cutAngleEnd": "Kąt cięcia na koniec",
+        "cardSubtitle": "Odsunięcia z kolankami, bez kolanek i weryfikacja wymiarów"
       },
       "miteredElbow": {
         "title": "Kolano segmentowe",
@@ -2238,6 +2239,29 @@
           }
         }
       },
+      "errors": {
+        "line_count_range": "Liczba linii musi być liczbą całkowitą od {{min}} do {{max}}",
+        "spacing_positive": "Rozstaw osi musi być dodatnią skończoną długością ({{field}})",
+        "elbow_angle_range": "Kąt kolana musi mieścić się w zakresie od 0° do {{max}}°",
+        "clr_positive": "CLR musi być dodatnim skończonym promieniem",
+        "per_line_specs_count": "Specyfikacje dla linii muszą odpowiadać liczbie linii",
+        "per_line_clr_invalid": "Linia {{line}}: CLR dla linii musi być dodatnim skończonym promieniem",
+        "advance_invalid": "Linia {{line}}: obliczony posuw jest nieprawidłowy",
+        "negative_cut": "Długość cięcia prostego jest ujemna ({{value}} mm): promień kolana jest zbyt duży dla tej geometrii",
+        "ab_positive": "{{field}} musi być dodatnią skończoną długością",
+        "angle_mismatch": "Geometria wymaga kolana {{required}}°; wybrane kolano {{selected}}° jest niezgodne dla przesunięcia 2D linii równoległych",
+        "verify_two_values": "Podaj dokładnie dwie z wartości A, B, H lub θ",
+        "verify_h_smaller": "H nie może być mniejsze niż {{side}}",
+        "verify_invalid": "Nie można rozwiązać trójkąta weryfikacyjnego",
+        "segments_min": "N musi być liczbą całkowitą ≥ {{min}} prostych segmentów",
+        "total_angle_range": "Kąt całkowity musi mieścić się w zakresie od 0° do {{max}}°",
+        "radius_positive": "Promień musi być dodatnią skończoną długością",
+        "od_positive": "OD musi być dodatnią skończoną długością",
+        "radius_gt_half_od": "Promień ({{radius}} mm) musi być większy niż OD/2 ({{halfOd}} mm)",
+        "piece_lengths_invalid": "Obliczone długości segmentów są nieprawidłowe",
+        "clr_gt_half_od": "CLR musi być większy niż OD/2",
+        "beta_range": "Kąt cięcia musi mieścić się w zakresie od 0° do {{max}}°"
+      },
       "twoElbowOffset": {
         "title": "Przesunięcie dwoma kolankami",
         "subtitle": "Przesunięcie równoległych linii dwoma kolankami: wyprzedzenie, droga i odcinek prosty.",
@@ -2284,29 +2308,6 @@
         "clrSourceCatalog": "CLR z katalogu: NPS {{combo}}.",
         "clrSourceCustom": "CLR własny; nie pochodzi z katalogu.",
         "clrMissing": "Katalog tego narzędzia nie ma zestawionego CLR dla NPS {{combo}}. Wprowadź CLR, aby obliczyć."
-      },
-      "errors": {
-        "line_count_range": "Liczba linii musi być liczbą całkowitą od {{min}} do {{max}}",
-        "spacing_positive": "Rozstaw osi musi być dodatnią skończoną długością ({{field}})",
-        "elbow_angle_range": "Kąt kolana musi mieścić się w zakresie od 0° do {{max}}°",
-        "clr_positive": "CLR musi być dodatnim skończonym promieniem",
-        "per_line_specs_count": "Specyfikacje dla linii muszą odpowiadać liczbie linii",
-        "per_line_clr_invalid": "Linia {{line}}: CLR dla linii musi być dodatnim skończonym promieniem",
-        "advance_invalid": "Linia {{line}}: obliczony posuw jest nieprawidłowy",
-        "negative_cut": "Długość cięcia prostego jest ujemna ({{value}} mm): promień kolana jest zbyt duży dla tej geometrii",
-        "ab_positive": "{{field}} musi być dodatnią skończoną długością",
-        "angle_mismatch": "Geometria wymaga kolana {{required}}°; wybrane kolano {{selected}}° jest niezgodne dla przesunięcia 2D linii równoległych",
-        "verify_two_values": "Podaj dokładnie dwie z wartości A, B, H lub θ",
-        "verify_h_smaller": "H nie może być mniejsze niż {{side}}",
-        "verify_invalid": "Nie można rozwiązać trójkąta weryfikacyjnego",
-        "segments_min": "N musi być liczbą całkowitą ≥ {{min}} prostych segmentów",
-        "total_angle_range": "Kąt całkowity musi mieścić się w zakresie od 0° do {{max}}°",
-        "radius_positive": "Promień musi być dodatnią skończoną długością",
-        "od_positive": "OD musi być dodatnią skończoną długością",
-        "radius_gt_half_od": "Promień ({{radius}} mm) musi być większy niż OD/2 ({{halfOd}} mm)",
-        "piece_lengths_invalid": "Obliczone długości segmentów są nieprawidłowe",
-        "clr_gt_half_od": "CLR musi być większy niż OD/2",
-        "beta_range": "Kąt cięcia musi mieścić się w zakresie od 0° do {{max}}°"
       }
     },
     "landing": {
@@ -2469,7 +2470,8 @@
       "pdfSeam": "szew",
       "pdfWrapNote": "Owinienie: X wzdłuż obwodu, Y od kwadratowego końca po stronie kolana.",
       "pdfClosure": "zamknięcie"
-    }
+    },
+    "familyOffsets": "Odsunięcia i przesunięcia"
   },
   "jobs": {
     "eyebrow": "Oferty pracy",
@@ -4633,5 +4635,131 @@
     "copyAllFacebook": "Kopiuj wszystkie linki Facebook",
     "copied": "Skopiowano",
     "note": "Parametry UTM zawierają wyłącznie ogólne identyfikatory kampanii, nigdy dane osobowe."
+  },
+  "marketplaceV3": {
+    "title": "Aktywuj Marketplace Ready",
+    "subtitle": "Sprawdź wymagania i zaakceptuj warunki Marketplace, aby Twój profil był widoczny dla firm.",
+    "requirementsTitle": "Wymagania Marketplace Ready",
+    "requirements": {
+      "cv": "CV przesłane i dostępne",
+      "profession": "Wskazany zawód lub specjalizacja",
+      "location": "Miejsce lub region pracy",
+      "availability": "Zadeklarowana dostępność"
+    },
+    "certificatesOptional": "Certyfikaty są opcjonalne: poprawiają profil, ale nie są wymagane do udziału w Marketplace.",
+    "consentText": "Akceptując, zgadzasz się, aby PIPINGBOX przedstawiało Twój profil zawodowy zweryfikowanym firmom zgodnie z warunkami Marketplace (wersja v3-2026-10-17). Twoje oryginalne CV i dane kontaktowe nigdy nie są wyświetlane bez Twojej zgody.",
+    "consentCheckbox": "Przeczytałem/am i akceptuję warunki Marketplace (v3).",
+    "acceptCta": "Akceptuj i aktywuj",
+    "resultReady": "Twój profil jest Marketplace Ready. Firmy mogą Cię teraz znaleźć.",
+    "resultNotEligible": "Zgoda zapisana. Uzupełnij brakujące wymagania, aby aktywować Marketplace Ready.",
+    "resultLegacy": "Twój profil jest chroniony wcześniejszymi warunkami. Nie wprowadzono zmian.",
+    "resultError": "Nie udało się zakończyć akceptacji. Spróbuj ponownie.",
+    "completeProfileLink": "Uzupełnij swój profil",
+    "contractVersion": "Wersja umowy: {{version}} · Język: {{lang}}",
+    "resultAccountType": "Ta czynność jest dostępna tylko dla kont zawodowych.",
+    "goDashboard": "Przejdź do panelu",
+    "contractNotActive": "Warunki jeszcze nieaktywne",
+    "contractNotActiveBody": "Warunki Marketplace v3 są w trakcie przeglądu prawnego i nie są jeszcze aktywowane. Gdy będą dostępne, będziesz mógł je tutaj zaakceptować.",
+    "contractChanged": "Warunki uległy zmianie",
+    "contractChangedBody": "Warunki Marketplace zostały zaktualizowane podczas ich przeglądania. Ze względów bezpieczeństwa nie zarejestrowano akceptacji. Przed zaakceptowaniem zapoznaj się z aktualną wersją.",
+    "reviewAgainCta": "Przejrzyj aktualną wersję"
+  },
+  "companyCore": {
+    "loading": "Ładowanie…",
+    "switcher": {
+      "label": "Aktywna firma"
+    },
+    "roles": {
+      "owner": "Właściciel",
+      "admin": "Administrator",
+      "recruiter": "Rekruter",
+      "viewer": "Tylko odczyt"
+    },
+    "verification": {
+      "unverified": "Nieweryfikowana",
+      "pending": "Weryfikacja w toku",
+      "verified": "Zweryfikowana",
+      "rejected": "Weryfikacja odrzucona"
+    },
+    "create": {
+      "title": "Skonfiguruj swoją firmę",
+      "description": "Utwórz przestrzeń swojej firmy, aby zaprosić zespół. Utworzenie firmy nie weryfikuje jej.",
+      "nameLabel": "Nazwa firmy",
+      "countryLabel": "Kraj (opcjonalnie)",
+      "submit": "Utwórz firmę",
+      "submitting": "Tworzenie…"
+    },
+    "view": {
+      "title": "Moja firma",
+      "description": "Przegląd przestrzeni Twojej firmy.",
+      "verificationTitle": "Status weryfikacji",
+      "teamTitle": "Zespół",
+      "teamDescription": "Członkowie, role i zaproszenia",
+      "yourRoleTitle": "Twoja rola"
+    },
+    "team": {
+      "title": "Zespół",
+      "description": "Członkowie firmy {{company}}",
+      "noCompany": "Nie należysz jeszcze do żadnej firmy.",
+      "createLink": "Skonfiguruj swoją firmę",
+      "membersTitle": "Członkowie",
+      "unnamedMember": "Członek bez nazwy",
+      "you": "ty",
+      "confirmRemove": "Usunąć tego członka? Jego dostęp zostanie natychmiast cofnięty.",
+      "confirmTransfer": "Przenieść własność? Staniesz się administratorem.",
+      "transferTitle": "Przenieś własność",
+      "removeTitle": "Usuń członka",
+      "leaveTitle": "Opuść firmę"
+    },
+    "invite": {
+      "title": "Zaproś członka",
+      "emailLabel": "Adres e-mail",
+      "roleLabel": "Rola",
+      "submit": "Utwórz zaproszenie",
+      "submitting": "Tworzenie…",
+      "created": "Zaproszenie utworzone. Udostępnij ten jednorazowy link:",
+      "alreadyPending": "Dla tego adresu e-mail istnieje już oczekujące zaproszenie.",
+      "copy": "Kopiuj",
+      "copied": "Link skopiowany",
+      "emailNotice": "Wysyłka e-maili nie jest jeszcze włączona — udostępnij link ręcznie zaproszonej osobie."
+    },
+    "invitations": {
+      "title": "Zaproszenia",
+      "revoke": "Cofnij",
+      "expires": "wygasa {{date}}",
+      "status": {
+        "pending": "oczekujące",
+        "accepted": "zaakceptowane",
+        "rejected": "odrzucone",
+        "revoked": "cofnięte",
+        "expired": "wygasłe"
+      }
+    },
+    "accept": {
+      "title": "Zaproszenie do firmy",
+      "sessionRequired": "Aby odpowiedzieć na to zaproszenie, zaloguj się lub zarejestruj z zaproszonego adresu e-mail, a następnie otwórz ten link ponownie.",
+      "signIn": "Zaloguj się",
+      "register": "Zarejestruj się",
+      "question": "Chcesz dołączyć do tej firmy?",
+      "accept": "Zaakceptuj",
+      "reject": "Odrzuć",
+      "processing": "Przetwarzanie…",
+      "success": "Dołączyłeś do firmy. Przekierowywanie…",
+      "rejected": "Zaproszenie odrzucone."
+    },
+    "errors": {
+      "not_authenticated": "Musisz być zalogowany.",
+      "forbidden": "Nie masz uprawnień do tej akcji.",
+      "not_found": "Nie znaleziono.",
+      "invalid_name": "Nieprawidłowa nazwa firmy.",
+      "invalid_email": "Nieprawidłowy adres e-mail.",
+      "invalid_role": "Nieprawidłowa rola.",
+      "invalid_or_expired": "To zaproszenie jest nieprawidłowe, wygasło lub zostało już użyte.",
+      "email_mismatch": "To zaproszenie zostało wysłane na inny adres e-mail. Zaloguj się zaproszonym adresem.",
+      "not_active": "Członkostwo nie jest aktywne.",
+      "last_owner": "Firma musi zachować co najmniej jednego właściciela.",
+      "cannot_transfer_to_self": "Nie możesz przenieść własności na siebie.",
+      "unknown": "Coś poszło nie tak. Spróbuj ponownie."
+    }
   }
 }

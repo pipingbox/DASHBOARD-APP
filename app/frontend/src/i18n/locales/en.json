@@ -106,7 +106,9 @@
     "companyDocumentation": "Industrial Document Management",
     "companySection": "Company",
     "companySettings": "Settings",
-    "companyWorkspace": "Company Workspace"
+    "companyWorkspace": "Company Workspace",
+    "companyTenant": "My Company",
+    "companyTeam": "Team"
   },
   "notifications": {
     "title": "Notifications",
@@ -1286,7 +1288,6 @@
     "reynolds": "Reynolds Number",
     "flangeRating": "Flange Rating Lookup",
     "categoryFabrication": "Fabrication",
-    "familyOffsets": "Offsets and displacements",
     "elbowCut": {
       "name": "Elbow Cut Calculator",
       "subtitle": "Calculate where to cut a standard elbow to get any angle",
@@ -2011,7 +2012,6 @@
       },
       "offset": {
         "title": "Pipe Offset",
-        "cardSubtitle": "Offsets with elbows, without elbows and measure verification",
         "tabWithElbows": "With elbows",
         "tabWithoutElbows": "Without elbows",
         "tabVerify": "Verify",
@@ -2033,7 +2033,8 @@
         "straightCut": "Straight cut",
         "centerToCenter": "Center-to-center",
         "diagonal": "H (diagonal)",
-        "cutAngleEnd": "Cut angle per end"
+        "cutAngleEnd": "Cut angle per end",
+        "cardSubtitle": "Offsets with elbows, without elbows and measure verification"
       },
       "miteredElbow": {
         "title": "Mitered Elbow",
@@ -2297,6 +2298,29 @@
           }
         }
       },
+      "errors": {
+        "line_count_range": "Line count must be an integer between {{min}} and {{max}}",
+        "spacing_positive": "Center spacing must be a positive finite length ({{field}})",
+        "elbow_angle_range": "Elbow angle must be between 0° and {{max}}°",
+        "clr_positive": "CLR must be a positive finite radius",
+        "per_line_specs_count": "Per-line specs must match the number of lines",
+        "per_line_clr_invalid": "Line {{line}}: per-line CLR must be a positive finite radius",
+        "advance_invalid": "Line {{line}}: computed advance is invalid",
+        "negative_cut": "Straight cut length is negative ({{value}} mm): the elbow radius is too large for this geometry",
+        "ab_positive": "{{field}} must be a positive finite length",
+        "angle_mismatch": "Geometry requires a {{required}}° elbow; the selected {{selected}}° elbow is incompatible for a 2D parallel-line offset",
+        "verify_two_values": "Provide exactly two of A, B, H or θ",
+        "verify_h_smaller": "H cannot be smaller than {{side}}",
+        "verify_invalid": "Unable to solve the verification triangle",
+        "segments_min": "N must be an integer ≥ {{min}} straight pieces",
+        "total_angle_range": "Total angle must be between 0° and {{max}}°",
+        "radius_positive": "Radius must be a positive finite length",
+        "od_positive": "OD must be a positive finite length",
+        "radius_gt_half_od": "Radius ({{radius}} mm) must be greater than OD/2 ({{halfOd}} mm)",
+        "piece_lengths_invalid": "Computed piece lengths are invalid",
+        "clr_gt_half_od": "CLR must be greater than OD/2",
+        "beta_range": "Cut angle must be between 0° and {{max}}°"
+      },
       "twoElbowOffset": {
         "title": "Two-elbow offset",
         "subtitle": "Offset between parallel lines using two elbows, with advance, travel and intermediate straight.",
@@ -2343,29 +2367,6 @@
         "clrSourceCatalog": "CLR resolved from the catalog: NPS {{combo}}.",
         "clrSourceCustom": "Custom CLR; not taken from the catalog.",
         "clrMissing": "This tool's catalog has no tabulated CLR for NPS {{combo}}. Enter a CLR to calculate."
-      },
-      "errors": {
-        "line_count_range": "Line count must be an integer between {{min}} and {{max}}",
-        "spacing_positive": "Center spacing must be a positive finite length ({{field}})",
-        "elbow_angle_range": "Elbow angle must be between 0° and {{max}}°",
-        "clr_positive": "CLR must be a positive finite radius",
-        "per_line_specs_count": "Per-line specs must match the number of lines",
-        "per_line_clr_invalid": "Line {{line}}: per-line CLR must be a positive finite radius",
-        "advance_invalid": "Line {{line}}: computed advance is invalid",
-        "negative_cut": "Straight cut length is negative ({{value}} mm): the elbow radius is too large for this geometry",
-        "ab_positive": "{{field}} must be a positive finite length",
-        "angle_mismatch": "Geometry requires a {{required}}° elbow; the selected {{selected}}° elbow is incompatible for a 2D parallel-line offset",
-        "verify_two_values": "Provide exactly two of A, B, H or θ",
-        "verify_h_smaller": "H cannot be smaller than {{side}}",
-        "verify_invalid": "Unable to solve the verification triangle",
-        "segments_min": "N must be an integer ≥ {{min}} straight pieces",
-        "total_angle_range": "Total angle must be between 0° and {{max}}°",
-        "radius_positive": "Radius must be a positive finite length",
-        "od_positive": "OD must be a positive finite length",
-        "radius_gt_half_od": "Radius ({{radius}} mm) must be greater than OD/2 ({{halfOd}} mm)",
-        "piece_lengths_invalid": "Computed piece lengths are invalid",
-        "clr_gt_half_od": "CLR must be greater than OD/2",
-        "beta_range": "Cut angle must be between 0° and {{max}}°"
       }
     },
     "premiumBanner": {
@@ -2463,7 +2464,8 @@
       "pdfSeam": "seam",
       "pdfWrapNote": "Wrap: X along the circumference, Y from the elbow-side square end.",
       "pdfClosure": "closure"
-    }
+    },
+    "familyOffsets": "Offsets and displacements"
   },
   "jobs": {
     "eyebrow": "Jobs",
@@ -4619,5 +4621,131 @@
     "copyAllFacebook": "Copy all Facebook links",
     "copied": "Copied",
     "note": "UTM parameters contain only generic campaign identifiers — never personal data."
+  },
+  "marketplaceV3": {
+    "title": "Activate Marketplace Ready",
+    "subtitle": "Review the requirements and accept the Marketplace terms to make your profile visible to companies.",
+    "requirementsTitle": "Marketplace Ready requirements",
+    "requirements": {
+      "cv": "CV uploaded and accessible",
+      "profession": "Profession or trade indicated",
+      "location": "Work location or region",
+      "availability": "Availability declared"
+    },
+    "certificatesOptional": "Certificates are optional: they improve your profile but are not required to join the Marketplace.",
+    "consentText": "By accepting, you agree that PIPINGBOX may present your professional profile to verified companies according to the Marketplace terms (version v3-2026-10-17). Your original CV and contact details are never shown without your authorization.",
+    "consentCheckbox": "I have read and accept the Marketplace terms (v3).",
+    "acceptCta": "Accept and activate",
+    "resultReady": "Your profile is Marketplace Ready. Companies can now find you.",
+    "resultNotEligible": "Consent recorded. Complete the pending requirements to activate Marketplace Ready.",
+    "resultLegacy": "Your profile is protected under the previous terms. No changes were applied.",
+    "resultError": "Could not complete the acceptance. Please try again.",
+    "completeProfileLink": "Complete your profile",
+    "contractVersion": "Contract version: {{version}} · Language: {{lang}}",
+    "resultAccountType": "This action is only available for professional accounts.",
+    "goDashboard": "Go to your dashboard",
+    "contractNotActive": "Terms not yet active",
+    "contractNotActiveBody": "The Marketplace v3 terms are under legal review and are not activated yet. You will be able to accept them here once available.",
+    "contractChanged": "The terms have changed",
+    "contractChangedBody": "The Marketplace terms were updated while you were reviewing them. For your security, no acceptance has been recorded. Please review the current version before accepting.",
+    "reviewAgainCta": "Review the current version"
+  },
+  "companyCore": {
+    "loading": "Loading…",
+    "switcher": {
+      "label": "Active company"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "recruiter": "Recruiter",
+      "viewer": "Viewer"
+    },
+    "verification": {
+      "unverified": "Not verified",
+      "pending": "Verification pending",
+      "verified": "Verified",
+      "rejected": "Verification rejected"
+    },
+    "create": {
+      "title": "Set up your company",
+      "description": "Create your company workspace to invite your team. Creating a company does not verify it.",
+      "nameLabel": "Company name",
+      "countryLabel": "Country (optional)",
+      "submit": "Create company",
+      "submitting": "Creating…"
+    },
+    "view": {
+      "title": "My company",
+      "description": "Overview of your company workspace.",
+      "verificationTitle": "Verification status",
+      "teamTitle": "Team",
+      "teamDescription": "Members, roles and invitations",
+      "yourRoleTitle": "Your role"
+    },
+    "team": {
+      "title": "Team",
+      "description": "Members of {{company}}",
+      "noCompany": "You don't belong to any company yet.",
+      "createLink": "Set up your company",
+      "membersTitle": "Members",
+      "unnamedMember": "Unnamed member",
+      "you": "you",
+      "confirmRemove": "Remove this member? Their access is revoked immediately.",
+      "confirmTransfer": "Transfer ownership? You will become an admin.",
+      "transferTitle": "Transfer ownership",
+      "removeTitle": "Remove member",
+      "leaveTitle": "Leave company"
+    },
+    "invite": {
+      "title": "Invite a member",
+      "emailLabel": "Email",
+      "roleLabel": "Role",
+      "submit": "Create invitation",
+      "submitting": "Creating…",
+      "created": "Invitation created. Share this single-use link:",
+      "alreadyPending": "There is already a pending invitation for this email.",
+      "copy": "Copy",
+      "copied": "Link copied",
+      "emailNotice": "Email delivery is not enabled yet — share the link manually with the invitee."
+    },
+    "invitations": {
+      "title": "Invitations",
+      "revoke": "Revoke",
+      "expires": "expires {{date}}",
+      "status": {
+        "pending": "pending",
+        "accepted": "accepted",
+        "rejected": "rejected",
+        "revoked": "revoked",
+        "expired": "expired"
+      }
+    },
+    "accept": {
+      "title": "Company invitation",
+      "sessionRequired": "To respond to this invitation, sign in or register with the invited email address, then reopen this link.",
+      "signIn": "Sign in",
+      "register": "Register",
+      "question": "Do you want to join this company?",
+      "accept": "Accept",
+      "reject": "Reject",
+      "processing": "Processing…",
+      "success": "You have joined the company. Redirecting…",
+      "rejected": "Invitation rejected."
+    },
+    "errors": {
+      "not_authenticated": "You must be signed in.",
+      "forbidden": "You don't have permission for this action.",
+      "not_found": "Not found.",
+      "invalid_name": "Invalid company name.",
+      "invalid_email": "Invalid email address.",
+      "invalid_role": "Invalid role.",
+      "invalid_or_expired": "This invitation is invalid, expired or already used.",
+      "email_mismatch": "This invitation was sent to a different email address. Sign in with the invited email.",
+      "not_active": "The membership is not active.",
+      "last_owner": "The company must keep at least one owner.",
+      "cannot_transfer_to_self": "You cannot transfer ownership to yourself.",
+      "unknown": "Something went wrong. Please try again."
+    }
   }
 }
