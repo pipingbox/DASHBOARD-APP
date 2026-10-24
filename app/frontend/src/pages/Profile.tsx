@@ -406,7 +406,11 @@ export default function Profile() {
               disabled={saving}
               className="bg-[#f59e0b] text-black hover:bg-[#d97706] font-semibold"
             >
-              {saving ? t('common.saving') : t('profile.saveProfile')}
+              {/* PB-UI-DOM-INSERTBEFORE-RESIDUAL-001: keep the label inside a
+                  single stable <span>; a bare conditional text swap lets Chrome
+                  auto-translate font-wrap (detach) the text node, and the
+                  saving→idle commit then throws NotFoundError insertBefore. */}
+              <span>{saving ? t('common.saving') : t('profile.saveProfile')}</span>
             </Button>
             <Button
               type="button"
