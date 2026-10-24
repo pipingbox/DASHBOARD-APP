@@ -287,7 +287,7 @@ Deno.test("reconciliación: idioma del destinatario, candidaturas conservadas y 
     const rendered = renderMarketplaceReconciliationEmail({
       lang: resolved.lang,
       actionUrl: "https://pipingbox.com/profile",
-      missing: ["cv", "certificate", "availability", "consent"],
+      missing: ["cv", "certificate", "availability", "consent"], applicationCount: 2,
     });
     assertEquals(rendered.lang, lang);
     assertStringIncludes(rendered.html, `<html lang="${lang}"`);
@@ -295,16 +295,53 @@ Deno.test("reconciliación: idioma del destinatario, candidaturas conservadas y 
     assert(!rendered.text.toLowerCase().includes("phone"));
     assertEquals((rendered.html.match(/<li>/g) ?? []).length, 4);
   }
-  const es = renderMarketplaceReconciliationEmail({ lang: "es", actionUrl: "https://pipingbox.com/profile", missing: ["cv", "cv"] });
+  const es = renderMarketplaceReconciliationEmail({ lang: "es", actionUrl: "https://pipingbox.com/profile", missing: ["cv", "cv"], applicationCount: 2 });
   assertStringIncludes(es.text, "siguen registradas");
   assertEquals((es.html.match(/<li>/g) ?? []).length, 1);
-  assertThrows(() => renderMarketplaceReconciliationEmail({ lang: "en", actionUrl: "javascript:1", missing: ["cv"] }));
+  assertThrows(() => renderMarketplaceReconciliationEmail({ lang: "en", actionUrl: "javascript:1", missing: ["cv"], applicationCount: 1 }));
+});
+
+Deno.test("reconciliación: 1, 2 y 5 candidaturas concuerdan en 11 idiomas y en texto/HTML", () => {
+  const headings: Record<string, [string, string]> = {
+    en: ["Your application is still registered", "Your applications are still registered"],
+    es: ["Tu candidatura sigue registrada", "Tus candidaturas siguen registradas"],
+    pt: ["A sua candidatura continua registada", "As suas candidaturas continuam registadas"],
+    fr: ["Votre candidature est toujours enregistrée", "Vos candidatures sont toujours enregistrées"],
+    de: ["Ihre Bewerbung bleibt gespeichert", "Ihre Bewerbungen bleiben gespeichert"],
+    it: ["La tua candidatura resta registrata", "Le tue candidature restano registrate"],
+    nl: ["Je sollicitatie blijft geregistreerd", "Je sollicitaties blijven geregistreerd"],
+    pl: ["Twoje zgłoszenie nadal jest zapisane", "Twoje zgłoszenia nadal są zapisane"],
+    ro: ["Candidatura ta rămâne înregistrată", "Candidaturile tale rămân înregistrate"],
+    uk: ["Вашу заявку зареєстровано", "Ваші заявки залишаються зареєстрованими"],
+    bg: ["Кандидатурата ви остава регистрирана", "Кандидатурите ви остават регистрирани"],
+  };
+  for (const lang of SUPPORTED_EMAIL_LANGUAGES) {
+    for (const count of [1, 2, 5]) {
+      const rendered = renderMarketplaceReconciliationEmail({
+        lang, actionUrl: "https://pipingbox.com/profile", missing: ["cv"], applicationCount: count,
+      });
+      const [singular, plural] = headings[lang];
+      const expected = count === 1 ? singular : plural;
+      const other = count === 1 ? plural : singular;
+      assertStringIncludes(rendered.html, `<h1>${expected}</h1>`);
+      assertStringIncludes(rendered.html, `display:none;max-height:0;overflow:hidden">${expected}</span>`);
+      assertStringIncludes(rendered.text, expected);
+      assert(!rendered.text.includes(other));
+      assert(!rendered.html.includes(`<h1>${other}</h1>`));
+      assertStringIncludes(rendered.text, "/profile");
+      assert(rendered.subject.length > 0);
+    }
+  }
+  const singular = renderMarketplaceReconciliationEmail({ lang: "es", actionUrl: "https://pipingbox.com/profile", missing: ["cv"], applicationCount: 1 });
+  assertStringIncludes(singular.text, "Tu candidatura no ha sido rechazada");
+  assert(!singular.text.includes("Tus candidaturas"));
+  assertThrows(() => renderMarketplaceReconciliationEmail({ lang: "es", actionUrl: "https://pipingbox.com/profile", missing: ["cv"], applicationCount: 0 }));
 });
 
 Deno.test("teléfono ausente aparece solo como recomendación en los dos correos", () => {
   for (const lang of SUPPORTED_EMAIL_LANGUAGES) {
     const reconciliation = renderMarketplaceReconciliationEmail({
-      lang, actionUrl: "https://pipingbox.com/profile", missing: ["cv"], phoneMissing: true,
+      lang, actionUrl: "https://pipingbox.com/profile", missing: ["cv"], applicationCount: 1, phoneMissing: true,
     });
     const pending = renderApplicationPendingProfileEmail({
       lang, actionUrl: "https://pipingbox.com/profile", pendingItems: ["cv"], phoneMissing: true,
@@ -316,12 +353,12 @@ Deno.test("teléfono ausente aparece solo como recomendación en los dos correos
       assertEquals((email.html.match(/<li/g) ?? []).length, 1);
     }
     const withPhone = renderMarketplaceReconciliationEmail({
-      lang, actionUrl: "https://pipingbox.com/profile", missing: ["cv"], phoneMissing: false,
+      lang, actionUrl: "https://pipingbox.com/profile", missing: ["cv"], applicationCount: 1, phoneMissing: false,
     });
     assert(!withPhone.text.includes("WhatsApp"));
   }
   const es = renderMarketplaceReconciliationEmail({
-    lang: "es", actionUrl: "https://pipingbox.com/profile", missing: ["cv"], phoneMissing: true,
+    lang: "es", actionUrl: "https://pipingbox.com/profile", missing: ["cv"], applicationCount: 1, phoneMissing: true,
   });
   assertStringIncludes(es.text, "Sube un CV válido");
   assertStringIncludes(es.text, "Recomendado: añade tu número de teléfono");
