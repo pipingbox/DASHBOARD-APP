@@ -4752,6 +4752,7 @@
       "not_active": "A adesão não está ativa.",
       "last_owner": "A empresa tem de manter pelo menos um proprietário.",
       "cannot_transfer_to_self": "Não pode transferir a propriedade para si próprio.",
+      "target_already_owner": "O membro selecionado já é proprietário.",
       "unknown": "Algo falhou. Tente novamente."
     }
   }

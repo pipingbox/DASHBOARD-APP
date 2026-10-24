@@ -88,3 +88,73 @@ AS $$
   SELECT count(*)::int FROM public.app_company_memberships m
   WHERE m.company_id = p_company_id AND m.role = 'owner' AND m.status = 'active';
 $$;
+
+-- Seed: one company (status 'active') with exactly 1 owner plus members with
+-- the given non-owner roles. This is the CANONICAL transfer scenario per the
+-- sql/058 contract (target = active non-owner): PO review of PR #98 requires
+-- the transfer<->remove race to be tested with a non-owner target (C1).
+-- Returns the company_id.
+CREATE OR REPLACE FUNCTION testfixture_e0a_seed_company_mixed(p_name text, p_extra_roles text[])
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public', 'pg_temp'
+AS $$
+DECLARE
+  v_company_id uuid;
+  v_user uuid;
+  r text;
+BEGIN
+  INSERT INTO auth.users (id) VALUES (gen_random_uuid()) RETURNING id INTO v_user;
+  INSERT INTO public.app_14da0f1941_profiles (user_id, full_name)
+  VALUES (v_user, 'E0A creator ' || p_name);
+
+  INSERT INTO public.app_companies (name, created_by, status, verification_status)
+  VALUES (p_name, v_user, 'active', 'unverified')
+  RETURNING id INTO v_company_id;
+
+  -- exactly one owner
+  INSERT INTO auth.users (id) VALUES (gen_random_uuid()) RETURNING id INTO v_user;
+  INSERT INTO public.app_14da0f1941_profiles (user_id, full_name)
+  VALUES (v_user, 'E0A owner ' || p_name);
+  INSERT INTO public.app_company_memberships (company_id, user_id, role, status, invited_by)
+  VALUES (v_company_id, v_user, 'owner', 'active', NULL);
+
+  FOREACH r IN ARRAY p_extra_roles LOOP
+    INSERT INTO auth.users (id) VALUES (gen_random_uuid()) RETURNING id INTO v_user;
+    INSERT INTO public.app_14da0f1941_profiles (user_id, full_name)
+    VALUES (v_user, 'E0A ' || r || ' ' || p_name);
+    INSERT INTO public.app_company_memberships (company_id, user_id, role, status, invited_by)
+    VALUES (v_company_id, v_user, r, 'active', NULL);
+  END LOOP;
+
+  RETURN v_company_id;
+END $$;
+
+-- Membership id of the n-th ACTIVE member with a given role of a company.
+CREATE OR REPLACE FUNCTION testfixture_e0a_role_membership(p_company_id uuid, p_role text, p_ordinal int)
+RETURNS uuid
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path TO 'public', 'pg_temp'
+AS $$
+  SELECT m.id
+  FROM public.app_company_memberships m
+  WHERE m.company_id = p_company_id AND m.role = p_role AND m.status = 'active'
+  ORDER BY m.created_at ASC, m.id ASC
+  OFFSET (p_ordinal - 1) LIMIT 1;
+$$;
+
+-- Snapshot of the final state of the two memberships involved in a race test,
+-- as 'role/status|role/status', for explicit post-state assertions (PO: "no
+-- basta con comprobar solo ausencia de deadlock").
+CREATE OR REPLACE FUNCTION testfixture_e0a_membership_state(p_membership_id uuid)
+RETURNS text
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path TO 'public', 'pg_temp'
+AS $$
+  SELECT m.role || '/' || m.status FROM public.app_company_memberships m WHERE m.id = p_membership_id;
+$$;

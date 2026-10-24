@@ -4745,6 +4745,7 @@
       "not_active": "The membership is not active.",
       "last_owner": "The company must keep at least one owner.",
       "cannot_transfer_to_self": "You cannot transfer ownership to yourself.",
+      "target_already_owner": "The selected member is already an owner.",
       "unknown": "Something went wrong. Please try again."
     }
   }

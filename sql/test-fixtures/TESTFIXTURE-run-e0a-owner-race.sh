@@ -10,20 +10,32 @@
 # -file barrier guarantees both transactions are open and past their snapshot
 # point before either commits — a genuine race, not two sequential calls.
 #
-# Tests (PO acceptance criteria):
+# Tests (PO acceptance criteria + PO review of PR #98, 2026-10-24):
 #   A. Two owners degrade themselves simultaneously  -> exactly one succeeds,
 #      the other fails with last_owner; company keeps >= 1 owner.
 #   B. Two owners remove themselves simultaneously   -> idem (never 0 owners).
-#   C. transfer_ownership concurrent with a remove of the target -> tenant
-#      keeps >= 1 active owner and a consistent state.
+#   C1. CANONICAL (PO review): 1 owner A + admin B; transfer A->B concurrent
+#       with remove(B) -> active_owner_count = 1 ALWAYS, explicit final state
+#       of A and B asserted, no deadlock. This is the documented contract of
+#       pb_company_transfer_ownership (target = active NON-owner).
+#   C2. Legacy 2-owner variant kept as additional evidence: transfer A->B (B
+#       already owner) concurrent with remove(B) -> with 060 the transfer is
+#       rejected (target_already_owner) or finds the target gone (not_found);
+#       owners = 1, no deadlock.
 #   D. Operations on DIFFERENT companies do not block each other globally.
 #   E. Re-running the operations keeps idempotency (no error storms, state
 #      stays consistent).
+#   F. Canonical contract (sequential): transfer to an already-owner target is
+#      rejected with target_already_owner; transfer to removed membership ->
+#      not_found; transfer to self -> cannot_transfer_to_self; transfer by a
+#      non-owner -> forbidden; happy path A(owner)->C(recruiter) succeeds.
 #
-# Usage: ./TESTFIXTURE-run-e0a-owner-race.sh <dbname> [before|after]
-#   before = expect the race to be VISIBLE (058 without the fix) — both
-#            operations may succeed and the invariant can break.
-#   after  = expect the fix (059) to hold — exactly one operation wins.
+# Usage: ./TESTFIXTURE-run-e0a-owner-race.sh <dbname> [before|before060|after]
+#   before    = 058 only: the ORIGINAL A-race is VISIBLE (0 owners possible).
+#   before060 = 058+059 (PR #98 as reviewed): A/B/C2/D/E hold, but the C1
+#               transfer<->remove-non-owner race is still reachable (0 owners
+#               possible) and F1 does not raise (contract discrepancy).
+#   after     = 058+059+060: everything holds (A/B/C1/C2/D/E/F).
 #
 # Exit code: 0 if the observed behaviour matches the mode, 1 otherwise.
 # =============================================================================
@@ -148,10 +160,58 @@ OWNERS_AFTER_B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_owner_count('$COMPANY3'
 B_ERR=$(rg -c "last_owner" "$A_OUT" "$B_OUT" 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
 echo "TEST B: owners_after=$OWNERS_AFTER_B last_owner_errors=$B_ERR"
 
-# ── TEST C: transfer_ownership concurrent with remove of the target ───────────
-# Company RACE4: owner O + second owner P. Session 1: O transfers to P.
-# Session 2: P removes himself concurrently. Outcome must leave >= 1 owner and
-# a consistent state (no error storm, no 0 owners).
+# ── TEST C1 (CANONICAL, PO review PR #98): transfer to NON-OWNER + remove ────
+# Company RACE-C1: exactly 1 owner A + 1 active admin B (the documented
+# transfer scenario of sql/058: target = active non-owner).
+# T1: A transfers ownership to B.  T2: A removes B concurrently.
+# With 059, remove(B) sees B as admin -> takes NO company lock -> can commit
+# after the transfer leaves B as owner -> A admin + B owner/removed = 0 owners.
+COMPANY5=$("${PSQL[@]}" -c "SELECT testfixture_e0a_seed_company_mixed('RACE-C1', '{admin}')")
+M5A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$COMPANY5', 'owner', 1)")
+M5B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$COMPANY5', 'admin', 1)")
+U5A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_user('$M5A')")
+[ -n "$COMPANY5" ] && [ -n "$M5A" ] && [ -n "$M5B" ] || fail "seed RACE-C1 incomplete"
+
+rm -f "$A_READY" "$B_READY"
+: > "$A_OUT"; : > "$B_OUT"
+# T1: owner A transfers ownership to admin B.
+"${PSQL[@]}" >"$A_OUT" 2>&1 <<SQL &
+BEGIN;
+SET LOCAL request.jwt.claim.sub = '$U5A';
+SELECT 1;
+\! touch $A_READY
+\! bash -c 'while [ ! -e $B_READY ]; do sleep 0.05; done'
+SELECT public.pb_company_transfer_ownership('$COMPANY5', '$M5B');
+COMMIT;
+SQL
+PIDA=$!
+# T2: owner A removes B concurrently.
+"${PSQL[@]}" >"$B_OUT" 2>&1 <<SQL &
+BEGIN;
+SET LOCAL request.jwt.claim.sub = '$U5A';
+SELECT 1;
+\! touch $B_READY
+\! bash -c 'while [ ! -e $A_READY ]; do sleep 0.05; done'
+SELECT public.pb_company_member_remove('$M5B');
+COMMIT;
+SQL
+PIDB=$!
+wait "$PIDA" "$PIDB"
+
+OWNERS_AFTER_C1=$("${PSQL[@]}" -c "SELECT testfixture_e0a_owner_count('$COMPANY5')")
+C1_STATE_A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_state('$M5A')")
+C1_STATE_B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_state('$M5B')")
+C1_DEADLOCK=$(cat "$A_OUT" "$B_OUT" | rg -ci "deadlock" || echo 0)
+# El perdedor es rechazado de forma controlada: si ganó el remove, el transfer
+# encuentra el target no activo (not_found); si ganó el transfer, A ya es admin
+# y no puede retirar al nuevo owner (forbidden) — o choca con last_owner.
+C1_ERR=$(cat "$A_OUT" "$B_OUT" | rg -o "last_owner|not_found|forbidden" | wc -l)
+echo "TEST C1: owners_after=$OWNERS_AFTER_C1 state_A=$C1_STATE_A state_B=$C1_STATE_B errors(last_owner|not_found|forbidden)=$C1_ERR deadlocks=$C1_DEADLOCK"
+
+# ── TEST C2 (legacy, kept as additional evidence): 2 owners, transfer to ─────
+# an ALREADY-OWNER target concurrent with remove of that target.
+# After 060 the transfer must be rejected (target_already_owner) or find the
+# target already gone (not_found); the tenant keeps exactly 1 owner.
 COMPANY4=$("${PSQL[@]}" -c "SELECT testfixture_e0a_seed_company('RACE4', 2)")
 M4A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_owner_membership('$COMPANY4', 1)")
 M4B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_owner_membership('$COMPANY4', 2)")
@@ -160,7 +220,7 @@ U4B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_user('$M4B')")
 
 rm -f "$A_READY" "$B_READY"
 : > "$A_OUT"; : > "$B_OUT"
-# Session 1: owner A transfers ownership to B.
+# Session 1: owner A transfers ownership to B (already owner -> contract breach).
 "${PSQL[@]}" >"$A_OUT" 2>&1 <<SQL &
 BEGIN;
 SET LOCAL request.jwt.claim.sub = '$U4A';
@@ -185,8 +245,11 @@ PIDB=$!
 wait "$PIDA" "$PIDB"
 
 OWNERS_AFTER_C=$("${PSQL[@]}" -c "SELECT testfixture_e0a_owner_count('$COMPANY4')")
-C_DEADLOCK=$(rg -ci "deadlock" "$A_OUT" "$B_OUT" 2>/dev/null | awk -F: '{s+=$2} END {print s+0}')
-echo "TEST C: owners_after=$OWNERS_AFTER_C deadlock_errors=$C_DEADLOCK"
+C2_STATE_A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_state('$M4A')")
+C2_STATE_B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_state('$M4B')")
+C_DEADLOCK=$(cat "$A_OUT" "$B_OUT" | rg -ci "deadlock" || echo 0)
+C2_CONTRACT_ERR=$(rg -o "target_already_owner|not_found" "$A_OUT" | wc -l)
+echo "TEST C2: owners_after=$OWNERS_AFTER_C state_A=$C2_STATE_A state_B=$C2_STATE_B transfer_errors=$C2_CONTRACT_ERR deadlocks=$C_DEADLOCK"
 
 # ── TEST E: idempotency — re-run a remove on an already-removed membership ────
 # pb_company_member_remove on a non-active membership must return true (no-op),
@@ -207,24 +270,139 @@ E_ERR=${E_ERR:-0}
 fi
 echo "TEST E: idempotent re-remove errors=$E_ERR"
 
+# ── TEST F: canonical transfer contract (sequential, deterministic) ──────────
+# PO review PR #98: sql/058 documents the transfer target as "active non-owner"
+# but the code did not enforce it. 060 canonicalizes: target already owner ->
+# target_already_owner. Evidence of the discrepancy: in before/before060 mode
+# F1 does NOT raise.
+# F1: transfer to an ALREADY-OWNER target.
+CF1=$("${PSQL[@]}" -c "SELECT testfixture_e0a_seed_company('RACE-F1', 2)")
+F1A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_owner_membership('$CF1', 1)")
+F1B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_owner_membership('$CF1', 2)")
+F1U=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_user('$F1A')")
+F1_OUT=$("${PSQL[@]}" 2>&1 <<SQL
+BEGIN;
+SET LOCAL request.jwt.claim.sub = '$F1U';
+SELECT public.pb_company_transfer_ownership('$CF1', '$F1B');
+ROLLBACK;
+SQL
+)
+echo "$F1_OUT" | rg -q "target_already_owner" && F1_CONTRACT=raised || F1_CONTRACT=not_raised
+
+# F2: transfer to a REMOVED membership -> not_found.
+CF2=$("${PSQL[@]}" -c "SELECT testfixture_e0a_seed_company_mixed('RACE-F2', '{admin}')")
+F2A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$CF2', 'owner', 1)")
+F2B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$CF2', 'admin', 1)")
+F2U=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_user('$F2A')")
+"${PSQL[@]}" -c "UPDATE public.app_company_memberships SET status='removed' WHERE id='$F2B'" >/dev/null
+F2_OUT=$("${PSQL[@]}" 2>&1 <<SQL
+BEGIN;
+SET LOCAL request.jwt.claim.sub = '$F2U';
+SELECT public.pb_company_transfer_ownership('$CF2', '$F2B');
+ROLLBACK;
+SQL
+)
+echo "$F2_OUT" | rg -q "not_found" && F2_CONTRACT=raised || F2_CONTRACT=not_raised
+
+# F3: transfer to self -> cannot_transfer_to_self (regression).
+CF3=$("${PSQL[@]}" -c "SELECT testfixture_e0a_seed_company_mixed('RACE-F3', '{recruiter}')")
+F3A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$CF3', 'owner', 1)")
+F3U=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_user('$F3A')")
+F3_OUT=$("${PSQL[@]}" 2>&1 <<SQL
+BEGIN;
+SET LOCAL request.jwt.claim.sub = '$F3U';
+SELECT public.pb_company_transfer_ownership('$CF3', '$F3A');
+ROLLBACK;
+SQL
+)
+echo "$F3_OUT" | rg -q "cannot_transfer_to_self" && F3_CONTRACT=raised || F3_CONTRACT=not_raised
+
+# F4: transfer attempted by a NON-OWNER actor -> forbidden (regression).
+CF4=$("${PSQL[@]}" -c "SELECT testfixture_e0a_seed_company_mixed('RACE-F4', '{admin,recruiter}')")
+F4B=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$CF4', 'admin', 1)")
+F4C=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$CF4', 'recruiter', 1)")
+F4U=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_user('$F4B')")
+F4_OUT=$("${PSQL[@]}" 2>&1 <<SQL
+BEGIN;
+SET LOCAL request.jwt.claim.sub = '$F4U';
+SELECT public.pb_company_transfer_ownership('$CF4', '$F4C');
+ROLLBACK;
+SQL
+)
+echo "$F4_OUT" | rg -q "forbidden" && F4_CONTRACT=raised || F4_CONTRACT=not_raised
+
+# F5: happy path regression — A(owner) transfers to C(recruiter, active
+# non-owner): succeeds; A becomes admin, C becomes owner.
+CF5=$("${PSQL[@]}" -c "SELECT testfixture_e0a_seed_company_mixed('RACE-F5', '{recruiter}')")
+F5A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$CF5', 'owner', 1)")
+F5C=$("${PSQL[@]}" -c "SELECT testfixture_e0a_role_membership('$CF5', 'recruiter', 1)")
+F5U=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_user('$F5A')")
+F5_OUT=$("${PSQL[@]}" 2>&1 <<SQL
+BEGIN;
+SET LOCAL request.jwt.claim.sub = '$F5U';
+SELECT public.pb_company_transfer_ownership('$CF5', '$F5C');
+COMMIT;
+SQL
+)
+F5_STATE_A=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_state('$F5A')")
+F5_STATE_C=$("${PSQL[@]}" -c "SELECT testfixture_e0a_membership_state('$F5C')")
+echo "$F5_OUT" | rg -q "^t$|^true$" && [ "$F5_STATE_A" = "admin/active" ] && [ "$F5_STATE_C" = "owner/active" ] && F5_CONTRACT=ok || F5_CONTRACT=bad
+echo "TEST F: F1(already-owner)=$F1_CONTRACT F2(removed)=$F2_CONTRACT F3(self)=$F3_CONTRACT F4(non-owner)=$F4_CONTRACT F5(happy)=$F5_CONTRACT"
+
 # ── Verdict ───────────────────────────────────────────────────────────────────
 echo "---"
 if [ "$MODE" = "after" ]; then
-  # With the fix: exactly one winner in A and B (owners_after = 1), no global
-  # blocking in D, C consistent (>= 1 owner, no deadlock), E idempotent.
+  # With 060: exactly one winner in A and B; C1 leaves exactly 1 owner with a
+  # consistent final state (transfer won: A admin/active + B owner/active, or
+  # remove won: A owner/active + B admin/removed) and exactly one controlled
+  # error; C2 keeps 1 owner with the transfer rejected; D no global blocking;
+  # E idempotent; F contract enforced.
   PASS=1
   [ "$OWNERS_AFTER_A" = "1" ] || { echo "A FAIL: expected exactly 1 owner left, got $OWNERS_AFTER_A"; PASS=0; }
   [ "$A_ERR" -ge 1 ] || { echo "A FAIL: expected a last_owner error on the loser"; PASS=0; }
   [ "$OWNERS_AFTER_B" = "1" ] || { echo "B FAIL: expected exactly 1 owner left, got $OWNERS_AFTER_B"; PASS=0; }
   [ "$B_ERR" -ge 1 ] || { echo "B FAIL: expected a last_owner error on the loser"; PASS=0; }
-  [ "$OWNERS_AFTER_C" -ge 1 ] || { echo "C FAIL: expected >= 1 owner, got $OWNERS_AFTER_C"; PASS=0; }
-  [ "$C_DEADLOCK" = "0" ] || { echo "C FAIL: deadlock detected"; PASS=0; }
+  [ "$OWNERS_AFTER_C1" = "1" ] || { echo "C1 FAIL: expected exactly 1 active owner, got $OWNERS_AFTER_C1"; PASS=0; }
+  { [ "$C1_STATE_A" = "admin/active" ] && [ "$C1_STATE_B" = "owner/active" ]; } \
+    || { [ "$C1_STATE_A" = "owner/active" ] && [ "$C1_STATE_B" = "admin/removed" ]; } \
+    || { echo "C1 FAIL: inconsistent final state A=$C1_STATE_A B=$C1_STATE_B"; PASS=0; }
+  [ "$C1_ERR" -ge 1 ] || { echo "C1 FAIL: expected a last_owner/not_found error on the loser"; PASS=0; }
+  [ "$C1_DEADLOCK" = "0" ] || { echo "C1 FAIL: deadlock detected"; PASS=0; }
+  [ "$OWNERS_AFTER_C" = "1" ] || { echo "C2 FAIL: expected exactly 1 owner, got $OWNERS_AFTER_C"; PASS=0; }
+  [ "$C2_STATE_A" = "owner/active" ] || { echo "C2 FAIL: A must remain owner/active, got $C2_STATE_A"; PASS=0; }
+  case "$C2_STATE_B" in */removed) : ;; *) echo "C2 FAIL: B must end removed, got $C2_STATE_B"; PASS=0;; esac
+  [ "$C2_CONTRACT_ERR" -ge 1 ] || { echo "C2 FAIL: transfer must be rejected (target_already_owner|not_found)"; PASS=0; }
+  [ "$C_DEADLOCK" = "0" ] || { echo "C2 FAIL: deadlock detected"; PASS=0; }
   [ "$D_MS" -lt 3000 ] || { echo "D FAIL: independent company blocked ${D_MS}ms (global lock?)"; PASS=0; }
   [ "$E_ERR" = "0" ] || { echo "E FAIL: idempotent re-remove raised"; PASS=0; }
-  [ "$PASS" = "1" ] && { echo "E0A-HARNESS: AFTER-FIX PASS (A/B/C/D/E)"; exit 0; } || { echo "E0A-HARNESS: AFTER-FIX FAIL"; exit 1; }
+  [ "$F1_CONTRACT" = "raised" ] || { echo "F1 FAIL: transfer to already-owner must raise target_already_owner"; PASS=0; }
+  [ "$F2_CONTRACT" = "raised" ] || { echo "F2 FAIL: transfer to removed membership must raise not_found"; PASS=0; }
+  [ "$F3_CONTRACT" = "raised" ] || { echo "F3 FAIL: transfer to self must raise cannot_transfer_to_self"; PASS=0; }
+  [ "$F4_CONTRACT" = "raised" ] || { echo "F4 FAIL: transfer by non-owner must raise forbidden"; PASS=0; }
+  [ "$F5_CONTRACT" = "ok" ] || { echo "F5 FAIL: happy path transfer broken (A=$F5_STATE_A C=$F5_STATE_C)"; PASS=0; }
+  [ "$PASS" = "1" ] && { echo "E0A-HARNESS: AFTER-FIX PASS (A/B/C1/C2/D/E/F)"; exit 0; } || { echo "E0A-HARNESS: AFTER-FIX FAIL"; exit 1; }
+elif [ "$MODE" = "before060" ]; then
+  # 058+059 (PR #98 as reviewed): the FIRST fix holds (A/B/C2/D/E consistent)
+  # but the C1 transfer<->remove-non-owner race is still reachable and the
+  # transfer contract is not enforced (F1 must NOT raise target_already_owner).
+  PASS=1
+  [ "$OWNERS_AFTER_A" = "1" ] || { echo "A(059) FAIL: 059 must hold the A invariant, got $OWNERS_AFTER_A"; PASS=0; }
+  [ "$OWNERS_AFTER_B" = "1" ] || { echo "B(059) FAIL: 059 must hold the B invariant, got $OWNERS_AFTER_B"; PASS=0; }
+  [ "$OWNERS_AFTER_C" -ge 1 ] || { echo "C2(059) FAIL: owner-target path was already serialized, got $OWNERS_AFTER_C"; PASS=0; }
+  [ "$C_DEADLOCK" = "0" ] || { echo "C2(059) FAIL: deadlock detected"; PASS=0; }
+  [ "$D_MS" -lt 3000 ] || { echo "D(059) FAIL: independent company blocked ${D_MS}ms"; PASS=0; }
+  [ "$E_ERR" = "0" ] || { echo "E(059) FAIL: idempotent re-remove raised"; PASS=0; }
+  [ "$F1_CONTRACT" = "not_raised" ] || { echo "F1(059) FAIL: 059 must NOT enforce the non-owner contract (discrepancy evidence)"; PASS=0; }
+  [ "$PASS" = "1" ] || { echo "E0A-HARNESS: BEFORE-060 baseline broken"; exit 1; }
+  if [ "$OWNERS_AFTER_C1" = "0" ]; then
+    echo "E0A-HARNESS: BEFORE-060 C1 race REPRODUCED (0 active owners: A=$C1_STATE_A B=$C1_STATE_B)"
+  else
+    echo "E0A-HARNESS: BEFORE-060 C1 race not reproduced this run (owners=$OWNERS_AFTER_C1 A=$C1_STATE_A B=$C1_STATE_B)"
+  fi
+  exit 0
 else
-  # Before the fix: the race is observable — both A operations can succeed and
-  # the company can end with 0 owners (invariant broken).
+  # Before any fix (058 only): the race is observable — both A operations can
+  # succeed and the company can end with 0 owners (invariant broken).
   if [ "$OWNERS_AFTER_A" = "0" ]; then
     echo "E0A-HARNESS: BEFORE-FIX race REPRODUCED (0 owners after concurrent degrade)"
     exit 0

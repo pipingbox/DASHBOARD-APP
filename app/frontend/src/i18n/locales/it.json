@@ -4752,6 +4752,7 @@
       "not_active": "L'iscrizione non è attiva.",
       "last_owner": "L’azienda deve mantenere almeno un proprietario.",
       "cannot_transfer_to_self": "Non puoi trasferire la proprietà a te stesso.",
+      "target_already_owner": "Il membro selezionato è già proprietario.",
       "unknown": "Qualcosa è andato storto. Riprova."
     }
   }

@@ -4752,6 +4752,7 @@
       "not_active": "Calitatea de membru nu este activă.",
       "last_owner": "Compania trebuie să păstreze cel puțin un proprietar.",
       "cannot_transfer_to_self": "Nu îți poți transfera proprietatea ție însuți.",
+      "target_already_owner": "Membrul selectat este deja proprietar.",
       "unknown": "Ceva a eșuat. Încearcă din nou."
     }
   }

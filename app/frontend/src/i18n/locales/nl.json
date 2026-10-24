@@ -4745,6 +4745,7 @@
       "not_active": "Het lidmaatschap is niet actief.",
       "last_owner": "Het bedrijf moet ten minste één eigenaar behouden.",
       "cannot_transfer_to_self": "U kunt de eigendom niet aan zichzelf overdragen.",
+      "target_already_owner": "Het geselecteerde lid is al eigenaar.",
       "unknown": "Er is iets misgegaan. Probeer het opnieuw."
     }
   }
